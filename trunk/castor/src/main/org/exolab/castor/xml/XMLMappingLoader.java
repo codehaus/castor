@@ -50,6 +50,7 @@ package org.exolab.castor.xml;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.MapItem;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
@@ -63,6 +64,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
+import org.exolab.castor.mapping.xml.Property;
 import org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType;
 import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.util.Configuration;
@@ -313,7 +315,9 @@ public class XMLMappingLoader
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
     {
+        
         FieldDescriptor        fieldDesc;
+        CollectionType         colType  = fieldMap.getCollection();
         String                 xmlName  = null;
         NodeType               nodeType = null;
         String                 match    = null;
@@ -321,8 +325,16 @@ public class XMLMappingLoader
         boolean                isReference = false;
         boolean                isXMLTransient = false;
 
-        // Create an XML field descriptor
+        //-- handle special case for HashMap/Hashtable
+        if ((fieldMap.getType() == null) && (colType != null)) {
+            if ((colType == CollectionType.HASHTABLE) ||
+                (colType == CollectionType.MAP)) 
+            {
+                fieldMap.setType(MapItem.class.getName());
+            }
+        }
 
+        // Create an XML field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
 
         BindXml xml = fieldMap.getBindXml();
@@ -402,6 +414,9 @@ public class XMLMappingLoader
 
         //--set a default fieldValidator
         xmlDesc.setValidator(new FieldValidator());
+        
+        //-- enable use parent namespace if explicit one doesn't exist
+        xmlDesc.setUseParentsNamespace(true);
 
         //-- If deriveNameByClass we need to reset the name to
         //-- null because XMLFieldDescriptorImpl tries to be smart
@@ -450,12 +465,20 @@ public class XMLMappingLoader
                 validator = new NameValidator(NameValidator.NCNAME);
                 xmlDesc.setValidator(new FieldValidator(validator));
             }
+            
+            //-- special properties?
+            Property[] props = xml.getProperty();
+            if ((props != null) && (props.length > 0)) {
+                for (int pIdx = 0; pIdx < props.length; pIdx++) {
+                    Property prop = props[pIdx];
+                    xmlDesc.setProperty(prop.getName(), prop.getValue());
+                }
+            }
         }
 
         //-- Get collection type
-        CollectionType colType = fieldMap.getCollection();
         if (colType == null) {
-            //-- just in case use forgot to use collection="..."
+            //-- just in case user forgot to use collection="..."
             //-- in the mapping file
             Class type = fieldDesc.getFieldType();
             if (CollectionHandlers.hasHandler(type)) {
@@ -465,10 +488,9 @@ public class XMLMappingLoader
         }
         
         //-- isMapped item
-        if (colType != null) {
-            
+        if (colType != null) {    
             if ((colType == CollectionType.HASHTABLE) ||
-                                (colType == CollectionType.MAP))
+                (colType == CollectionType.MAP))
             {
                 //-- Make sure user is not using an addMethod
                 //-- before setting the mapped field to true.
