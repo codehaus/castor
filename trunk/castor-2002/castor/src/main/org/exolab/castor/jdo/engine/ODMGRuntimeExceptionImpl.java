@@ -65,9 +65,9 @@ public class ODMGRuntimeExceptionImpl
     private Exception _except;
 
 
-    public ODMGRuntimeExceptionImpl( Exception except )
+    public ODMGRuntimeExceptionImpl( String message, Exception except )
     {
-	super( "Nested exception: " + except.toString() );
+	super( message );
 	_except = except;
     }
 

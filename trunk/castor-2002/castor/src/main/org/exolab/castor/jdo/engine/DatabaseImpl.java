@@ -63,6 +63,7 @@ import org.odmg.ObjectNotPersistentException;
 import org.odmg.ClassNotPersistenceCapableException;
 import org.odmg.TransactionNotInProgressException;
 import org.odmg.TransactionInProgressException;
+import org.odmg.LockNotGrantedException;
 import org.odmg.ODMGException;
 import org.odmg.ODMGRuntimeException;
 import javax.transaction.Status;
@@ -70,8 +71,8 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
-import org.exolab.castor.jdo.desc.JDOObjectDesc;
+import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.util.Messages;
 
 
@@ -182,7 +183,7 @@ public final class DatabaseImpl
 	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoMapping", dbName ) );
 	if ( ! dbs.canConnect() )
 	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoDataSource", dbName ) );
-	_dbEngine = DatabaseEngine.getDatabaseEngine( dbs, _logWriter );
+	_dbEngine = DatabaseEngine.getDatabaseEngine( dbs );
     }
 
 
@@ -207,11 +208,25 @@ public final class DatabaseImpl
     public synchronized void makePersistent( Object obj )
     {
 	TransactionContext tx;
+	ObjectDesc         objDesc;
 
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
-	tx.create( _dbEngine, obj, null );
+	objDesc = _dbEngine.getObjectDesc( obj.getClass() );
+	if ( objDesc == null || objDesc.getIdentityField() == null )
+	    throw new ClassNotPersistenceCapableException( obj.getClass().getName() );
+	try {
+	    tx.create( _dbEngine, obj, objDesc.getIdentityField().getValue( obj ) );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
+	    throw new ClassNotPersistenceCapableException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.DuplicateIdentityException except ) {
+	    throw new ODMGRuntimeException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+	}
     }
 
 
@@ -222,18 +237,54 @@ public final class DatabaseImpl
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
-	tx.delete( obj );
-
+	try {
+	    tx.delete( obj );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
+	    throw new ObjectNotPersistentException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+	    throw new LockNotGrantedException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+	}
     }
 
 
-    public synchronized Object query( Class type, Object primKey )
+    public synchronized Object lookup( Class type, Object primKey )
 	throws ODMGException
     {
 	TransactionContext tx;
+	ObjectDesc         objDesc;
+	Object             obj;
 
 	tx = getTransaction();
-	return tx.load( _dbEngine, type, primKey, _mode, _lockWaitTimeout );
+	objDesc = _dbEngine.getObjectDesc( type );
+	if ( objDesc == null )
+	    throw new ClassNotPersistenceCapableException();
+	obj = objDesc.createNew();
+	try {
+	    switch ( _mode ) {
+	    case OPEN_READ_ONLY:
+		tx.load( _dbEngine, obj, primKey, AccessMode.ReadOnly );
+		break;
+	    case OPEN_EXCLUSIVE:
+		tx.load( _dbEngine, obj, primKey, AccessMode.Exclusive );
+		break;
+	    case OPEN_READ_WRITE:
+		tx.load( _dbEngine, obj, primKey, AccessMode.ReadWrite );
+		break;
+	    }
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+	    throw new LockNotGrantedException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+	} catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
+	    return null;
+	}
+	return obj;
     }
 
 
@@ -242,20 +293,24 @@ public final class DatabaseImpl
     {
 	TransactionContext tx;
 	NameBinding        binding;
-	JDOObjectDesc      objDesc;
+	ObjectDesc         objDesc;
 
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
-	tx.create( _dbEngine, obj, name );
+	makePersistent( obj );
 	objDesc = _dbEngine.getObjectDesc( obj.getClass() );
-	if ( objDesc == null )
-	    throw new ClassNotPersistenceCapableExceptionImpl( obj.getClass() );
-	binding = new NameBinding( name, obj, objDesc );
+	binding = new NameBinding( name, obj, (org.exolab.castor.jdo.desc.JDOObjectDesc) objDesc );
 	try {
 	    tx.create( _dbEngine, binding, name );
-	} catch ( DuplicatePrimaryKeyException except ) {
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.DuplicateIdentityException except ) {
 	    throw new ObjectNameNotUniqueException( name );
+	} catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
+	    throw new NotImplementedException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
 	}
     }
 
@@ -270,14 +325,20 @@ public final class DatabaseImpl
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
 	try {
-	    binding = (NameBinding) tx.load( _dbEngine, NameBinding.class, name,
-					     OPEN_READ_WRITE, _lockWaitTimeout );
-	} catch ( ODMGException except ) {
-	    throw new ObjectNameNotFoundException( "Nested exception: " + except.toString() );
-	}
-	if ( binding == null )
+	    binding = new NameBinding();
+	    tx.load( _dbEngine, binding, name, AccessMode.Exclusive );
+	    tx.delete( binding );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
+	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
+	} catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
 	    throw new ObjectNameNotFoundException( name );
-	tx.delete( binding );
+	}
     }
 
 
@@ -285,19 +346,28 @@ public final class DatabaseImpl
 	throws ObjectNameNotFoundException
     {
 	TransactionContext tx;
-	NameBinding binding;
+	NameBinding        binding;
+	Object             obj;
+	ObjectDesc         objDesc;
 
 	tx = getTransaction();
 	try {
-	    binding = (NameBinding) tx.load( _dbEngine, NameBinding.class, name,
-					     OPEN_READ_WRITE, _lockWaitTimeout );
-	    if ( binding == null )
-		throw new ObjectNameNotFoundException( name );
-	    tx.unlock( binding );
-	    return tx.load( _dbEngine, binding.getType(), binding.objectId,
-			    _mode, _lockWaitTimeout );
-	} catch ( ODMGException except ) {
-	    throw new ObjectNameNotFoundException( "Nested exception: " + except.toString() );
+	    binding = new NameBinding();
+	    tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
+	    objDesc = _dbEngine.getObjectDesc( binding.getType() );
+	    if ( objDesc == null )
+		throw new ClassNotPersistenceCapableException( objDesc.getObjectType().getName() );
+	    obj = objDesc.createNew();
+	    tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
+	    return obj;
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+	} catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
+	    throw new ObjectNameNotFoundException( name );
 	}
     }
 
@@ -391,8 +461,7 @@ public final class DatabaseImpl
 	    case TMFAIL:
 		try {
 		    _ctx.rollback();
-		} catch ( ODMGRuntimeException except ) {
-		}
+		} catch ( Exception except ) { }
 		break;
 	    case TMSUSPEND:
 		break;
@@ -421,7 +490,9 @@ public final class DatabaseImpl
 	    // Forget is never called on an open transaction, but one
 	    // can never tell.
 	    if ( ctx.isOpen() ) {
-		ctx.rollback();
+		try {
+		    ctx.rollback();
+		} catch ( Exception except ) { }
 		throw new XAException( XAException.XAER_PROTO );
 	    }
 	}
@@ -453,7 +524,9 @@ public final class DatabaseImpl
 		    } else {
 			return XA_RDONLY;
 		    }
-		} catch ( ODMGRuntimeException except ) {
+		} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+		    throw new XAException( XAException.XAER_PROTO );
+		} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
 		    throw new XAException( XAException.XA_RBROLLBACK );
 		}
 	    case Status.STATUS_MARKED_ROLLBACK:
@@ -501,10 +574,10 @@ public final class DatabaseImpl
 		// as a heuristic decision to rollback.
 		try {
 		    ctx.commit();
-		} catch ( ODMGRuntimeException except ) {
+		} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+		    throw new XAException( XAException.XAER_PROTO );
+		} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
 		    throw new XAException( XAException.XA_HEURRB );
-		} catch ( Exception except ) {
-		    throw new XAException( XAException.XAER_RMFAIL );
 		}
 	    default:
 		throw new XAException( XAException.XAER_PROTO );

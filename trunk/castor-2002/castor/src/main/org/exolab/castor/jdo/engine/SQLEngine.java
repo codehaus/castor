@@ -53,17 +53,21 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.odmg.ODMGException;
-import org.odmg.ODMGRuntimeException;
-import org.odmg.ObjectNotPersistentException;
-import org.exolab.castor.jdo.ODMGSQLException;
-import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
 import org.exolab.castor.jdo.desc.PrimaryKeyDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.RelationDesc;
 import org.exolab.castor.jdo.desc.Relation;
-import org.exolab.castor.util.Logger;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.persist.Persistence;
+import org.exolab.castor.persist.Query;
+import org.exolab.castor.persist.DuplicateIdentityException;
+import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.ObjectNotFoundException;
+import org.exolab.castor.persist.ObjectModifiedException;
+import org.exolab.castor.persist.ObjectDeletedException;
+import org.exolab.castor.persist.QueryException;
 
 
 /**
@@ -79,13 +83,14 @@ import org.exolab.castor.util.Logger;
  * @version $Revision$ $Date$
  */
 class SQLEngine
+    implements Persistence
 {
 
 
     private JDOObjectDesc    _objDesc;
 
 
-    private PrimaryKeyDesc  _primKey;
+    PrimaryKeyDesc           _primKey;
 
 
     private boolean         _createRequiresPK = true;
@@ -106,11 +111,14 @@ class SQLEngine
     private String          _sqlLoad;
 
 
+    private String          _sqlLoadLock;
+
+
     String          _sqlFinder;
     String          _sqlFinderJoin;
 
 
-    private JDOFieldDesc[]   _loadFields;
+    JDOFieldDesc[]           _loadFields;
 
 
     private SQLRelated[]     _related;
@@ -120,15 +128,16 @@ class SQLEngine
 
 
     SQLEngine( JDOObjectDesc objDesc, PrintWriter logWriter )
+	throws MappingException
     {
 	if ( objDesc == null )
 	    throw new IllegalArgumentException( "Argument 'objDesc' is null" );
 	_objDesc = objDesc;
 	_primKey = _objDesc.getPrimaryKey();
 	if ( _primKey == null )
-	    throw new ODMGRuntimeException( "Cannot persist a table that lacks a primary key descriptor" );
+	    throw new MappingException( "Cannot persist a table that lacks a primary key descriptor" );
 	if ( _objDesc.getPrimaryKeyField() == null )
-	    throw new ODMGRuntimeException( "Cannot persist an object with an external primary key" );
+	    throw new MappingException( "Cannot persist an object with an external primary key" );
 	buildCreateSql();
 	buildRemoveSql();
 	buildStoreSql();
@@ -150,6 +159,7 @@ class SQLEngine
 
 
     SQLEngine( JDOObjectDesc objDesc, PrimaryKeyDesc primKey, PrintWriter logWriter )
+	throws MappingException
     {
 	this( objDesc, logWriter );
 	_primKey = primKey;
@@ -162,13 +172,14 @@ class SQLEngine
     }
 
 
-    /**
-     * Must be called with object and primary key. Creates the row(s)
-     * associated with the object and it's direct relationships. Complains
-     * if a row with the same primary key is found in the database.
-     */
-    public void create( Connection conn, Object obj, Object primKey )
-	throws DuplicatePrimaryKeyException, ODMGRuntimeException, ODMGSQLException
+    Query createQuery( String sql, Class[] types )
+    {
+	return new SQLQuery( this, types, sql );
+    }
+
+
+    public Object create( Object conn, Object obj, Object identity )
+	throws DuplicateIdentityException, PersistenceException
     {
 	JDOFieldDesc[]    descs;
 	PreparedStatement stmt;
@@ -180,12 +191,12 @@ class SQLEngine
 	    if ( _related != null ) {
 		for ( i = 0 ; i < _related.length ; ++i ) {
 		    if ( _related[ i ].getRelationType() == Relation.OneToOne ) {
-			_related[ i ].create( conn, obj, primKey );
+			_related[ i ].create( conn, obj, identity );
 		    }
 		}
 	    }
 	    if ( _extends != null ) {
-		_extends.create( conn, obj, primKey );
+		_extends.create( conn, obj, identity );
 	    }
 
 	    // If creation requires a primary key to be supplied, must check
@@ -193,36 +204,36 @@ class SQLEngine
 	    // also lock the table against creation of an object with such
 	    // a primary key.
 	    if ( _createRequiresPK ) {
-		if ( primKey == null )
-		    throw new ODMGRuntimeException( "This implementation requires a primary key to be set prior to object creation" );
+		if ( identity == null )
+		    throw new PersistenceException( "This implementation requires a primary key to be set prior to object creation" );
 
 		// Check that there is no duplicity in the table
-		stmt = conn.prepareStatement( _pkLookup );
+		stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 		if ( _primKey.isPrimitive() ) {
-		    stmt.setObject( 1, primKey );
+		    stmt.setObject( 1, identity );
 		} else {
 		    descs = _primKey.getJDOFields();
 		    for ( i = 0 ; i < descs.length ; ++i ) {
-			descs[ i ].getValue( primKey, stmt, i + 1 );
+			descs[ i ].getValue( identity, stmt, i + 1 );
 		    }
 		}
 		if ( stmt.executeQuery().next() )
-		    throw new DuplicatePrimaryKeyException( obj.getClass(), primKey );
+		    throw new DuplicateIdentityException( obj.getClass(), identity );
 		stmt.close();
 	    }
 	    
 	    // Must remember that SQL column index is base one
 	    count = 1;
-	    stmt = conn.prepareStatement( _sqlCreate );
+	    stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
 	    if ( _createRequiresPK ) {
 		if ( _primKey.isPrimitive() ) {
-		    stmt.setObject( count, primKey );
+		    stmt.setObject( count, identity );
 		    count += 1;
 		} else {
-		    primKey = _objDesc.getPrimaryKeyField().getValue( obj );
+		    identity = _objDesc.getPrimaryKeyField().getValue( obj );
 		    descs = _primKey.getJDOFields();
 		    for ( i = 0 ; i < descs.length ; ++i ) {
-			descs[ i ].getValue( primKey, stmt, count + i );
+			descs[ i ].getValue( identity, stmt, count + i );
 		    }
 		    count += i;
 		}
@@ -247,10 +258,10 @@ class SQLEngine
 				stmt.setObject( count, value );
 			    count += 1;
 			} else {
-			    primKey = related.getPrimaryKeyField().getValue( obj );
+			    identity = related.getPrimaryKeyField().getValue( obj );
 			    descs = related.getPrimaryKey().getJDOFields();
 			    for ( j = 0 ; j < descs.length ; ++j ) {
-				value = descs[ j ].getValue( primKey );
+				value = descs[ j ].getValue( identity );
 				if ( value != null )
 				    stmt.setObject( count + j, value );
 			    }
@@ -262,20 +273,14 @@ class SQLEngine
 
 	    stmt.executeUpdate();
 	    stmt.close();
+	    return null;
 	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
+	    throw new PersistenceException( except );
 	}
     }
 
-
-    /**
-     * Must be called with object and primary key. Loads the row(s)
-     * associated with the object and it's direct relationships. Complains
-     * if the object is not found in the database. Will not create the
-     * object in order to load it.
-     */
-    public boolean load( Connection conn, Object obj, Object primKey )
-	throws  ODMGSQLException
+    public Object load( Object conn, Object obj, Object identity, boolean lock )
+	throws ObjectNotFoundException, PersistenceException
     {
 	PreparedStatement stmt;
 	ResultSet         rs;
@@ -284,21 +289,19 @@ class SQLEngine
 	Object            thisPk;
 
 	try {
-	    stmt = conn.prepareStatement( _sqlLoad );
+	    stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
 	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, primKey );
+		stmt.setObject( 1, identity );
 	    } else {
 		pkDescs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-		    pkDescs[ i ].getValue( primKey, stmt, i + 1 );
+		    pkDescs[ i ].getValue( identity, stmt, i + 1 );
 		}
 	    }
 	    
 	    rs = stmt.executeQuery();
-	    if ( ! rs.next() ) {
-		return false;
-	    }
-	    _objDesc.getPrimaryKeyField().setValue( obj, primKey );
+	    if ( ! rs.next() )
+		throw new ObjectNotFoundException( obj.getClass(), identity );
 	    
 	    do {
 		// First iteration for a PK: traverse all the fields
@@ -312,124 +315,15 @@ class SQLEngine
 	    rs.close();
 	    stmt.close();
 	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
+	    throw new PersistenceException( except );
 	}
-	return true;
+	return null;
     }
 
 
-    public boolean dirtyCheck( Connection conn, Object obj, Object primKey )
-	throws  ODMGSQLException
-    {
-	PreparedStatement stmt;
-	ResultSet         rs;
-	JDOFieldDesc[]    pkDescs = null;
-	Object            pk;
-	Object            thisPk;
-
-	try {
-	    stmt = conn.prepareStatement( _sqlLoad );
-	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, primKey );
-	    } else {
-		pkDescs = _primKey.getJDOFields();
-		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-		    pkDescs[ i ].getValue( primKey, stmt, i + 1 );
-		}
-	    }
-	    
-	    rs = stmt.executeQuery();
-	    if ( ! rs.next() ) {
-		return false;
-	    }
-	    
-	    do {
-		// First iteration for a PK: traverse all the fields
-		for ( int i = 0; i < _loadFields.length ; ++i  ) {
-		    Object objValue;
-		    Object sqlValue;
-
-		    // Usinging typed setValue so float/double, int/long
-		    // can be intermixed with automatic conversion, something
-		    // that throws an exception in the untyped version
-		    objValue = _loadFields[ i ].getValue( obj );
-		    sqlValue = rs.getObject( i + 1 );
-		    if ( ( objValue == null && sqlValue != null ) ||
-			 ( objValue != null && ! objValue.equals( sqlValue ) ) )
-			return false;
-		}
-	    } while ( rs.next() );
-	    rs.close();
-	    stmt.close();
-	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
-	}
-	return true;
-    }
-
-
-    public Object query( Connection conn, String sql, Object[] values )
-	throws  ODMGSQLException
-    {
-	PreparedStatement stmt;
-	Object            obj;
-	ResultSet         rs;
-	int               count;
-	Object            pk;
-	JDOFieldDesc[]    pkDescs;
-
-	try {
-	    obj = _objDesc.createNew();
-	    stmt = conn.prepareStatement( sql );
-	    for ( int i = 0 ; i < values.length ; ++i ) {
-		stmt.setObject( i + 1, values[ i ] );
-	    }
-
-	    rs = stmt.executeQuery();
-	    if ( ! rs.next() ) {
-		return null;
-	    }
-
-	    if ( _primKey.isPrimitive() ) {
-		pk = rs.getObject( 1 );
-		count = 2;
-	    } else {
-		pk = _primKey.createNew();
-		pkDescs = _primKey.getJDOFields();
-		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-		    pkDescs[ i ].setValue( pk, rs, 1 + i );
-		}
-		count = pkDescs.length + 1;
-	    }
-	    _objDesc.getPrimaryKeyField().setValue( obj, pk );
-	    
-	    do {
-		// First iteration for a PK: traverse all the fields
-		for ( int i = 0; i < _loadFields.length ; ++i  ) {
-		    // Usinging typed setValue so float/double, int/long
-		    // can be intermixed with automatic conversion, something
-		    // that throws an exception in the untyped version
-		    _loadFields[ i ].setValue( obj, rs, i + count );
-		}
-	    } while ( rs.next() );
-	    rs.close();
-	    stmt.close();
-	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
-	}
-	return obj;
-    }
-
-
-    /**
-     * Must be called with object and primary key. Removes the row(s)
-     * associated with the object and it's direct relationships. Complains
-     * if the object is no longer in the database. If the primary key of
-     * the object has been changed, it must be removed/created and not
-     * stored.
-     */
-    public void store( Connection conn, Object obj, Object primKey )
-	throws ObjectNotPersistentException, ODMGSQLException
+    public Object store( Object conn, Object obj, Object identity,
+			 Object original, Object stamp )
+	throws ObjectModifiedException, ObjectDeletedException, PersistenceException
     {
 	PreparedStatement stmt;
 	JDOFieldDesc[]    descs;
@@ -443,15 +337,15 @@ class SQLEngine
 	    if ( _related != null ) {
 		for ( i = 0 ; i < _related.length ; ++i ) {
 		    if ( _related[ i ].getRelationType() == Relation.OneToOne ) {
-			_related[ i ].store( conn, obj, primKey );
+			_related[ i ].store( conn, obj, identity, original, stamp );
 		    }
 		}
 	    }
 	    if ( _extends != null ) {
-		_extends.store( conn, obj, primKey );
+		_extends.store( conn, obj, identity, original, stamp );
 	    }
 
-	    stmt = conn.prepareStatement( _sqlStore );
+	    stmt = ( (Connection) conn ).prepareStatement( _sqlStore );
 
 	    descs = _objDesc.getJDOFields();
 	    count = 1;
@@ -472,10 +366,10 @@ class SQLEngine
 				stmt.setObject( count, value );
 			    count += 1;
 			} else {
-			    primKey = related.getPrimaryKeyField().getValue( obj );
+			    identity = related.getPrimaryKeyField().getValue( obj );
 			    descs = related.getPrimaryKey().getJDOFields();
 			    for ( j = 0 ; j < descs.length ; ++j ) {
-				value = descs[ j ].getValue( primKey );
+				value = descs[ j ].getValue( identity );
 				if ( value != null )
 				    stmt.setObject( count + j, value );
 			    }
@@ -486,33 +380,29 @@ class SQLEngine
 	    }
 	    
 	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( count, primKey );
+		stmt.setObject( count, identity );
 	    } else {
 		descs = _primKey.getJDOFields();
 		for ( i = 0 ; i < descs.length ; ++i ) {
-		    descs[ i ].getValue( primKey, stmt, count + 1 );
+		    descs[ i ].getValue( identity, stmt, count + 1 );
 		}
 	    }
 	    if ( stmt.executeUpdate() == 0 ) {
 		// If no update was performed, the object has been previously
 		// removed from persistent storage. Complain about this.
 		stmt.close();
-		throw new ObjectNotPersistentExceptionImpl( obj );
+		throw new ObjectDeletedException( obj.getClass(), identity );
 	    }
 	    stmt.close();
+	    return null;
 	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
+	    throw new PersistenceException( except );
 	}
     }
 
 
-    /**
-     * Must be called with object and primary key. Removes the row(s)
-     * associated with the object and it's direct relationships. Complains
-     * if the object is no longer in the database.
-     */
-    public void delete( Connection conn, Object obj, Object primKey )
-	throws ObjectNotPersistentException, ODMGSQLException
+    public void delete( Object conn, Object obj, Object identity )
+	throws PersistenceException
     {
 	PreparedStatement stmt;
 	JDOFieldDesc[]    descs;
@@ -520,72 +410,68 @@ class SQLEngine
 	try {
 	    for ( int i = 0 ; i < _related.length ; ++i ) {
 		if ( _related[ i ].getRelationType() == Relation.OneToOne ) {
-		    _related[ i ].delete( conn, obj, primKey );
+		    _related[ i ].delete( conn, obj, identity );
 		}
 	    }
 	    if ( _extends != null ) {
-		_extends.delete( conn, obj, primKey );
+		_extends.delete( conn, obj, identity );
 	    }
 
-	    stmt = conn.prepareStatement( _sqlRemove );
+	    stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
 	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, primKey );
+		stmt.setObject( 1, identity );
 	    } else {
 		descs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
-		    descs[ i ].getValue( primKey, stmt, i + 1 );
+		    descs[ i ].getValue( identity, stmt, i + 1 );
 		}
-	    }
-	    if ( stmt.executeUpdate() == 0 ) {
-		// If no remove was performed, the object has been previously
-		// removed from persistent storage. Complain about this.
-		stmt.close();
-		throw new ObjectNotPersistentExceptionImpl( primKey );
 	    }
 	    stmt.close();
 	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
+	    throw new PersistenceException( except );
 	}
     }
 
 
-    /**
-     * Must be called with object, primary key and either write or read.
-     * Only write locks are implemented by locking the database row.
-     * No need to call for read locks. Should not be called for an
-     * object that was created, only if loaded/deleted.
-     */
-    public void writeLock( Connection conn, Object obj, Object primKey )
-	throws ObjectNotPersistentException, ODMGSQLException
+    public void writeLock( Object conn, Object obj, Object identity )
+	throws ObjectDeletedException, PersistenceException
     {
 	PreparedStatement stmt;
 	JDOFieldDesc[]    descs;
 
 	try {
 	    if ( _extends != null ) {
-		_extends.writeLock( conn, obj, primKey );
+		_extends.writeLock( conn, obj, identity );
 	    }
 	    // Only write locks are implemented by locking the row.
-	    stmt = conn.prepareStatement( _pkLookup );
+	    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, primKey );
+		stmt.setObject( 1, identity );
 	    } else {
 		descs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
-		    descs[ i ].getValue( primKey, stmt, i + 1 );
+		    descs[ i ].getValue( identity, stmt, i + 1 );
 		}
 	    }
 	    if ( ! stmt.executeQuery().next() )
-		throw new ObjectNotPersistentExceptionImpl( obj );
+		throw new ObjectDeletedException( obj.getClass(), identity );
 	    stmt.close();
 	} catch ( SQLException except ) {
-	    throw new ODMGSQLException( except );
+	    throw new PersistenceException( except );
 	}
     }
 
 
+    public void changeIdentity( Object conn, Object obj, Object oldIdentity, Object newIdentity )
+	throws DuplicateIdentityException, PersistenceException
+    {
+    }
+
+
+
 
     protected void buildRelated( PrintWriter logWriter )
+	throws MappingException
     {
 	RelationDesc[] related;
 	Vector         engines;
@@ -769,6 +655,7 @@ class SQLEngine
 		    sqlJoin, loadFields, 0, false );
 
 	_sqlLoad = sqlFields.append( sqlFrom ).append( sqlJoin ).toString();
+	_sqlLoadLock = _sqlLoad + " FOR UPDATE";
 	_loadFields = new JDOFieldDesc[ loadFields.size() ];
 	loadFields.copyInto( _loadFields );
 
@@ -889,6 +776,127 @@ class SQLEngine
 				    sqlJoin, loadFields, count, true );
 	}
 	return count;
+    }
+
+
+
+    static class SQLQuery
+	implements Query
+    {
+
+
+	private ResultSet _rs;
+
+
+	private SQLEngine _engine;
+
+
+	private Class[]   _types;
+
+
+	private Object[]  _values;
+
+
+	private String    _sql;
+
+
+	SQLQuery( SQLEngine engine, Class[] types, String sql )
+	{
+	    _engine = engine;
+	    _types = types;
+	    _values = new Object[ _types.length ];
+	    _sql = sql;
+	}
+
+
+	public int getParameterCount()
+	{
+	    return _types.length;
+	}
+
+
+	public Class getParameterType( int index )
+	    throws ArrayIndexOutOfBoundsException
+	{
+	    return _types[ index ];
+	}
+
+
+	public void setParameter( int index, Object value )
+	    throws ArrayIndexOutOfBoundsException, IllegalArgumentException
+	{
+	    // XXX Need to perform type conversion at this point
+	    _values[ index ] = value;
+	}
+
+
+	public ObjectDesc getObjectDesc()
+	{
+	    return _engine.getObjectDesc();
+	}
+
+
+	public void execute( Object conn, boolean lock )
+	    throws QueryException, PersistenceException
+	{
+	    PreparedStatement stmt;
+
+	    try {
+		stmt = ( (Connection) conn ).prepareStatement( _sql );
+		for ( int i = 0 ; i < _values.length ; ++i ) {
+		    stmt.setObject( i + 1, _values[ i ] );
+		}
+		_rs = stmt.executeQuery();
+	    } catch ( SQLException except ) {
+		throw new PersistenceException( except );
+	    }
+	}
+
+
+	public Object nextIdentity()
+	    throws PersistenceException
+	{
+	    Object         identity;
+	    JDOFieldDesc[] pkDescs;
+	    
+	    try {
+		if ( ! _rs.next() )
+		    return null;
+		if ( _engine._primKey.isPrimitive() ) {
+		    identity = _rs.getObject( 1 );
+		} else {
+		    identity = _engine._primKey.createNew();
+		    pkDescs = _engine._primKey.getJDOFields();
+		    for ( int i = 0 ; i < pkDescs.length ; ++i ) {
+			pkDescs[ i ].setValue( identity, _rs, 1 + i );
+		    }
+		}
+	    } catch ( SQLException except ) {
+		throw new PersistenceException( except );
+	    }
+	    return identity;
+	}
+	
+	
+	public Object fetch( Object obj )
+	    throws ObjectNotFoundException, PersistenceException
+	{
+	    int count;
+	    
+	    try {
+		if ( _engine._primKey.isPrimitive() )
+		    count = 2;
+		else
+		    count = _engine._primKey.getJDOFields().length + 1;
+		for ( int i = 0; i < _engine._loadFields.length ; ++i  ) {
+		    _engine._loadFields[ i ].setValue( obj, _rs, i + count );
+		}
+	    } catch ( SQLException except ) {
+		throw new PersistenceException( except );
+	    }
+	    return null;
+	}
+
     }
 
 

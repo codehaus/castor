@@ -49,6 +49,7 @@ package org.exolab.castor.jdo.engine;
 
 import java.io.PrintWriter;
 import org.exolab.castor.mapping.FieldDesc;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.jdo.desc.RelationDesc;
@@ -73,6 +74,7 @@ class SQLRelated
 
     SQLRelated( RelationDesc objDesc, JDOObjectDesc parent, FieldDesc parentField,
 		PrintWriter logWriter )
+	throws MappingException
     {
 	super( objDesc, parent.getPrimaryKey(), logWriter );
 	_relType = objDesc.getRelationType();

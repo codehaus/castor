@@ -70,7 +70,6 @@ import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.DatabaseEngine;
 import org.exolab.castor.jdo.engine.DatabaseSource;
-import org.exolab.castor.jdo.engine.OID;
 
 
 /**
@@ -107,6 +106,7 @@ public class ODMG
 
     public Database getDatabase( Object obj )
     {
+	/*
 	DatabaseEngine dbEngine;
 	DatabaseImpl   db;
 
@@ -117,12 +117,17 @@ public class ODMG
 	if ( _logWriter != null )
 	    db.setLogWriter( _logWriter );
 	return db;
+	*/
+	return null;
     }
 
 
     public String getObjectId( Object obj )
     {
+	/*
 	return DatabaseEngine.createObjectOID( obj ).toString();
+	*/
+	return null;
     }
 
 
