@@ -48,7 +48,7 @@ package org.exolab.castor.persist;
 
 
 import javax.transaction.Status;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
@@ -252,7 +252,7 @@ public final class QueryResults
     {
 	OID                            oid;
 	TransactionContext.ObjectEntry entry;
-	ObjectDesc                     objDesc;
+	ClassDesc                     clsDesc;
 	
 	// Make sure transaction is still open.
 	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
@@ -297,8 +297,8 @@ public final class QueryResults
 	    // already loaded into the persistence engine at this point and
 	    // has a lock based on the original query (i.e. read write
 	    // or exclusive). If no next record return null.
-	    objDesc = _engine.getObjectDesc( _query.getResultType() );
-	    oid = new OID( objDesc, _lastIdentity );
+	    clsDesc = _engine.getClassDesc( _query.getResultType() );
+	    oid = new OID( clsDesc, _lastIdentity );
 	    
 	    // Did we already load (or created) this object in this
 	    // transaction.

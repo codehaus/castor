@@ -51,7 +51,7 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import javax.transaction.xa.Xid;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.spi.Persistence;
@@ -87,7 +87,7 @@ public interface PersistenceEngine
      * @param type The Java type
      * @return The object descriptor
      */
-    public ObjectDesc getObjectDesc( Class type );
+    public ClassDesc getClassDesc( Class type );
 
 
     /**

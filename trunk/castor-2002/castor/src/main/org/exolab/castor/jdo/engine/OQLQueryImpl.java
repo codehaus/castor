@@ -60,8 +60,6 @@ import org.odmg.QueryParameterTypeInvalidException;
 import org.odmg.QueryInvalidException;
 import org.odmg.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.jdo.desc.JDOObjectDesc;
-import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
@@ -125,7 +123,7 @@ public class OQLQueryImpl
 	String          objType;
 	String          objName;
 	StringBuffer    sql;
-	JDOObjectDesc   objDesc;
+	JDOClassDesc   clsDesc;
 	SQLEngine       engine;
 	Vector          types;
 	Class[]         array;
@@ -158,16 +156,16 @@ public class OQLQueryImpl
 	if ( _dbEngine == null )
 	    throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
 	engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-	objDesc = engine.getObjectDesc();
+	clsDesc = engine.getClassDesc();
 
 	if ( token.hasMoreTokens() ) {
 	    if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
 		throw new QueryInvalidException( "Missing WHERE clause" );
-	    parseField( objDesc, token, sql, types );
+	    parseField( clsDesc, token, sql, types );
 	    while ( token.hasMoreTokens() ) {
 		if ( ! token.nextToken().equals( "AND" ) )
 		    throw new QueryInvalidException( "Only AND supported in WHERE clause" );
-		parseField( objDesc, token, sql, types );
+		parseField( clsDesc, token, sql, types );
 	    }
 	} else {
 	    sql.append( "1 = 1" );
@@ -184,7 +182,7 @@ public class OQLQueryImpl
     }
 
 
-    private void parseField( JDOObjectDesc objDesc, StringTokenizer token,
+    private void parseField( JDOClassDesc clsDesc, StringTokenizer token,
 			     StringBuffer sqlWhere, Vector types )
 	throws QueryInvalidException
     {
@@ -206,30 +204,30 @@ public class OQLQueryImpl
 	value = token.nextToken();
 	if ( name.indexOf( "." ) > 0 )
 	    name = name.substring( name.indexOf( "." ) + 1 );
-	fields = objDesc.getJDOFields();
+	fields = clsDesc.getJDOFields();
 	field = null;
 	for ( int i = 0 ; i < fields.length ; ++i ) {
 	    if ( fields[ i ].getFieldName().equals( name ) ) {
-		sqlWhere.append( objDesc.getSQLName( fields[ i ].getSQLName() ) );
+		sqlWhere.append( clsDesc.getSQLName( fields[ i ].getSQLName() ) );
 		field = fields[ i ];
 		break;
 	    }
 	}
 	if ( field == null ) {
-	    fields = objDesc.getPrimaryKey().getJDOFields();
+	    fields = clsDesc.getPrimaryKey().getJDOFields();
 	    for ( int i = 0 ; i < fields.length ; ++i ) {
 		if ( fields[ i ].getFieldName().equals( name ) ) {
-		    sqlWhere.append( objDesc.getSQLName( fields[ i ].getSQLName() ) );
+		    sqlWhere.append( clsDesc.getSQLName( fields[ i ].getSQLName() ) );
 		    field = fields[ i ];
 		    break;
 		}
 	    }
 	}
 	if ( fields == null ) {
-	    if ( objDesc.getPrimaryKey().isPrimitive() &&
-		 objDesc.getPrimaryKeyField().getFieldName().equals( name ) ) {
-		sqlWhere.append( objDesc.getSQLName( objDesc.getPrimaryKey().getSQLName() ) );
-		field = objDesc.getPrimaryKeyField();
+	    if ( clsDesc.getPrimaryKey().isPrimitive() &&
+		 clsDesc.getPrimaryKeyField().getFieldName().equals( name ) ) {
+		sqlWhere.append( clsDesc.getSQLName( clsDesc.getPrimaryKey().getSQLName() ) );
+		field = clsDesc.getPrimaryKeyField();
 	    }
 	}
 	if ( field == null )
@@ -264,7 +262,7 @@ public class OQLQueryImpl
 	    identity = results.nextIdentity();
 	    while ( identity != null ) {
 		try {
-		    obj = _dbEngine.getObjectDesc( results.getResultType() ).createNew();
+		    obj = _dbEngine.getClassDesc( results.getResultType() ).createNew();
 		    results.fetch( obj );
 		    set.addElement( obj );
 		} catch ( ObjectNotFoundException except ) {

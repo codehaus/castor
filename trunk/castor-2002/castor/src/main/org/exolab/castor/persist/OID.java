@@ -47,7 +47,7 @@
 package org.exolab.castor.persist;
 
 
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 
 
 /**
@@ -97,7 +97,7 @@ final class OID
     private int          _hashCode;
 
 
-    OID( ObjectDesc objDesc, Object identity )
+    OID( ClassDesc clsDesc, Object identity )
     {
 	if ( identity == null )
 	    throw new IllegalArgumentException( "Argument 'identity' is null" );
@@ -105,10 +105,10 @@ final class OID
 	// OID must be unique across the engine: always use the parent
 	// most class of an object, getting it from the descriptor
 	/*
-	while ( objDesc.getExtends() != null )
-	    objDesc = (ObjectDesc) objDesc.getExtends();
+	while ( clsDesc.getExtends() != null )
+	    clsDesc = (ClassDesc) clsDesc.getExtends();
 	*/
-	_type = objDesc.getObjectType();
+	_type = clsDesc.getObjectType();
 	_hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }
 

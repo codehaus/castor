@@ -52,7 +52,7 @@ import java.util.Enumeration;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
@@ -445,21 +445,21 @@ public abstract class TransactionContext
     {
 	OID         oid;
 	ObjectEntry entry;
-	ObjectDesc  objDesc;
+	ClassDesc  clsDesc;
 
 	if ( _status != Status.STATUS_ACTIVE )
 	    throw new TransactionNotInProgressException();
 	// Make sure the object has not beed persisted in this transaction.
 	if ( getObjectEntry( obj ) != null )
 	    throw new PersistenceException( "persist.objectAlreadyPersistent", obj, identity );
-	objDesc = engine.getObjectDesc( obj.getClass() );
-	if ( objDesc == null )
+	clsDesc = engine.getClassDesc( obj.getClass() );
+	if ( clsDesc == null )
 	    throw new ClassNotPersistenceCapableException( obj.getClass() );
 
 	// Create the object. This can only happen once for each object in
 	// all transactions running on the same engine, so after creation
 	// add a new entry for this object and use this object as the view
-	if ( identity != null && getObjectEntry( engine, new OID( objDesc, identity ) ) != null )
+	if ( identity != null && getObjectEntry( engine, new OID( clsDesc, identity ) ) != null )
 	    throw new DuplicateIdentityException( obj.getClass(), identity );
 	oid = engine.create( this, obj, identity );
 	entry = addObjectEntry( obj, oid, engine );
@@ -663,15 +663,15 @@ public abstract class TransactionContext
 		    entry.engine.delete( this, entry.oid );
 		} else {
 		    Object     identity;
-		    ObjectDesc objDesc;
+		    ClassDesc clsDesc;
 
 		    // When storing the object it's OID might change
 		    // if the primary identity has been changed
-		    objDesc = entry.engine.getObjectDesc( entry.obj.getClass() );
-		    identity = objDesc.getIdentityField().getValue( entry.obj );
+		    clsDesc = entry.engine.getClassDesc( entry.obj.getClass() );
+		    identity = clsDesc.getIdentityField().getValue( entry.obj );
 		    if ( identity == null )
 			throw new TransactionAbortedException( "persist.noIdentity", 
-							       objDesc.getObjectType(), null );
+							       clsDesc.getObjectType(), null );
 		    entry.oid = entry.engine.store( this, entry.oid, entry.obj, identity, _lockTimeout );
 		}
 	    }
@@ -906,7 +906,7 @@ public abstract class TransactionContext
      * Indicates which lock this transaction is waiting for. When a
      * transaction attempts to acquire a lock it must indicate which
      * lock it attempts to acquire in order to perform dead-lock
-     * detection. This method is called by {@link DatabaseEngine}
+     * detection. This method is called by {@link ObjectLock}
      * before entering the temporary lock-acquire state.
      *
      * @param lock The lock which this transaction attempts to acquire

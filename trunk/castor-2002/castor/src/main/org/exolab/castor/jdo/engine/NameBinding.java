@@ -49,7 +49,6 @@ package org.exolab.castor.jdo.engine;
 
 import org.odmg.ODMGRuntimeException;
 import org.odmg.ClassNotPersistenceCapableException;
-import org.exolab.castor.jdo.desc.JDOObjectDesc;
 
 
 /**
@@ -76,15 +75,15 @@ public class NameBinding
     }
 
 
-    public NameBinding( String name, Object obj, JDOObjectDesc objDesc )
+    public NameBinding( String name, Object obj, JDOClassDesc clsDesc )
     {
 	Object     primKey;
 
 	this.name = name;
 	type = obj.getClass().getName();
-	if ( objDesc.getPrimaryKeyField() == null )
+	if ( clsDesc.getPrimaryKeyField() == null )
 	    throw new ClassNotPersistenceCapableException();
-	primKey = objDesc.getPrimaryKeyField().getValue( obj );
+	primKey = clsDesc.getPrimaryKeyField().getValue( obj );
 	// XXX Need to serialize the primary key to support non-string keys
 	objectId = primKey.toString();
     }

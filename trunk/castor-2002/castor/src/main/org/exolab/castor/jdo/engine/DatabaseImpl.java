@@ -71,7 +71,7 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.PersistenceEngine;
@@ -210,16 +210,16 @@ public final class DatabaseImpl
     public synchronized void makePersistent( Object obj )
     {
 	TransactionContext tx;
-	ObjectDesc         objDesc;
+	ClassDesc         clsDesc;
 
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
-	objDesc = _dbEngine.getObjectDesc( obj.getClass() );
-	if ( objDesc == null || objDesc.getIdentityField() == null )
+	clsDesc = _dbEngine.getClassDesc( obj.getClass() );
+	if ( clsDesc == null || clsDesc.getIdentityField() == null )
 	    throw new ClassNotPersistenceCapableException( obj.getClass().getName() );
 	try {
-	    tx.create( _dbEngine, obj, objDesc.getIdentityField().getValue( obj ) );
+	    tx.create( _dbEngine, obj, clsDesc.getIdentityField().getValue( obj ) );
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
 	    throw new TransactionNotInProgressException( except.getMessage() );
 	} catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
@@ -257,14 +257,14 @@ public final class DatabaseImpl
 	throws ODMGException
     {
 	TransactionContext tx;
-	ObjectDesc         objDesc;
+	ClassDesc         clsDesc;
 	Object             obj;
 
 	tx = getTransaction();
-	objDesc = _dbEngine.getObjectDesc( type );
-	if ( objDesc == null )
+	clsDesc = _dbEngine.getClassDesc( type );
+	if ( clsDesc == null )
 	    throw new ClassNotPersistenceCapableException();
-	obj = objDesc.createNew();
+	obj = clsDesc.createNew();
 	try {
 	    switch ( _mode ) {
 	    case OPEN_READ_ONLY:
@@ -295,14 +295,14 @@ public final class DatabaseImpl
     {
 	TransactionContext tx;
 	NameBinding        binding;
-	ObjectDesc         objDesc;
+	ClassDesc         clsDesc;
 
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
 	makePersistent( obj );
-	objDesc = _dbEngine.getObjectDesc( obj.getClass() );
-	binding = new NameBinding( name, obj, (org.exolab.castor.jdo.desc.JDOObjectDesc) objDesc );
+	clsDesc = _dbEngine.getClassDesc( obj.getClass() );
+	binding = new NameBinding( name, obj, (JDOClassDesc) clsDesc );
 	try {
 	    tx.create( _dbEngine, binding, name );
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
@@ -350,16 +350,16 @@ public final class DatabaseImpl
 	TransactionContext tx;
 	NameBinding        binding;
 	Object             obj;
-	ObjectDesc         objDesc;
+	ClassDesc         clsDesc;
 
 	tx = getTransaction();
 	try {
 	    binding = new NameBinding();
 	    tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
-	    objDesc = _dbEngine.getObjectDesc( binding.getType() );
-	    if ( objDesc == null )
-		throw new ClassNotPersistenceCapableException( objDesc.getObjectType().getName() );
-	    obj = objDesc.createNew();
+	    clsDesc = _dbEngine.getClassDesc( binding.getType() );
+	    if ( clsDesc == null )
+		throw new ClassNotPersistenceCapableException( clsDesc.getObjectType().getName() );
+	    obj = clsDesc.createNew();
 	    tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
 	    return obj;
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {

@@ -60,7 +60,7 @@ public interface MappingResolver
 {
 
 
-    public ObjectDesc getDescriptor( Class type );
+    public ClassDesc getDescriptor( Class type );
 
 
     public Enumeration listDescriptors();
