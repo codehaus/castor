@@ -47,6 +47,14 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.io.Reader;
+import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.sql.Date;
@@ -57,6 +65,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.io.IOException;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.mapping.MappingException;
 
@@ -97,9 +106,9 @@ public final class SQLTypes
         int sep;
 
         sep = sqlTypeName.indexOf( LeftParamSeparator );
-        if ( sep >= 0 ) 
+        if ( sep >= 0 )
             sqlTypeName = sqlTypeName.substring( 0, sep );
-        
+
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
                 return _typeInfos[ i ].javaType;
@@ -107,7 +116,7 @@ public final class SQLTypes
         throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
     }
 
-    
+
     /**
      * Returns the Java type from the SQL type name.
      *
@@ -121,9 +130,9 @@ public final class SQLTypes
         int sep;
 
         sep = sqlTypeName.indexOf( LeftParamSeparator );
-        if ( sep >= 0 ) 
+        if ( sep >= 0 )
             sqlTypeName = sqlTypeName.substring( 0, sep );
-        
+
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
                 return _typeInfos[ i ].sqlType;
@@ -146,7 +155,7 @@ public final class SQLTypes
 
         left = sqlTypeName.indexOf( LeftParamSeparator );
         right = sqlTypeName.indexOf( RightParamSeparator );
-        if ( right < 0 ) 
+        if ( right < 0 )
             right = sqlTypeName.length();
 
         if ( left >= 0 )
@@ -191,8 +200,8 @@ public final class SQLTypes
         }
         return java.sql.Types.OTHER;
     }
-    
-    
+
+
     /**
      * Convert from Java name to SQL name. Performs trivial conversion
      * by lowering case of all letters and adding underscore between
@@ -215,13 +224,13 @@ public final class SQLTypes
         int          i;
         char         ch;
         boolean      wasLower;
-        
+
         // Get only the last part of the Java name (whether it's
         // class name with package, or field name with parent)
         if ( javaName.indexOf( '.' ) > 0 ) {
             javaName = javaName.substring( javaName.lastIndexOf( '.' ) + 1 );
         }
-        
+
         sql = new StringBuffer( javaName.length() );
         wasLower = false;
         for ( i = 0 ; i < javaName.length() ; ++i ) {
@@ -267,7 +276,7 @@ public final class SQLTypes
     {
         StringBuffer java;
         int          i;
-        
+
         java = new StringBuffer( sqlName.length() );
         if ( scope != null )
             java.append( scope ).append( '.' );
@@ -294,6 +303,44 @@ public final class SQLTypes
         case Types.DATE:       return rs.getDate( index );
         case Types.TIMESTAMP:  return rs.getTimestamp( index );
         case Types.INTEGER:    return new Integer( rs.getInt( index ) );
+        case Types.LONGVARBINARY:
+        case Types.VARBINARY:
+        case Types.BINARY:
+            return rs.getBytes(index);
+        case Types.CHAR:
+        case Types.VARCHAR:
+        case Types.LONGVARCHAR:
+            return rs.getString(index);
+        case Types.BLOB:
+            try {
+                Blob blob = rs.getBlob( index );
+                InputStream blobIs = blob.getBinaryStream();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[256];
+                int len = 0;
+                int b;
+                while ( (len = blobIs.read(buffer)) > 0 )
+                    bos.write( buffer, 0, len );
+
+                return bos.toByteArray();
+            } catch ( IOException e ) {
+                throw new SQLException("IOException thrown while reading BLOB into a byte array!");
+            }
+        case Types.CLOB:
+            try {
+                Clob blob = rs.getClob( index );
+                Reader blobIs = blob.getCharacterStream();
+                CharArrayWriter bos = new CharArrayWriter();
+                char[] buffer = new char[256];
+                int len = 0;
+                int b;
+                while ( (len = blobIs.read(buffer)) > 0 )
+                    bos.write( buffer, 0, len );
+
+                return bos.toString();
+            } catch ( IOException e ) {
+                throw new SQLException("IOException thrown while reading CLOB into a string!");
+            }
         default:               return rs.getObject( index );
         }
     }
@@ -302,11 +349,11 @@ public final class SQLTypes
     static class TypeInfo
     {
         final int    sqlType;
-        
+
         final String sqlTypeName;
-        
+
         final Class  javaType;
-        
+
         TypeInfo( int sqlType, String sqlTypeName, Class javaType )
         {
             this.sqlType     = sqlType;
@@ -316,7 +363,7 @@ public final class SQLTypes
 
     }
 
-    
+
     /**
      * List of all the SQL types supported by Castor JDO.
      */
@@ -343,7 +390,7 @@ public final class SQLTypes
         new TypeInfo( java.sql.Types.OTHER,         "other",         java.lang.Object.class ),
         new TypeInfo( java.sql.Types.JAVA_OBJECT,   "javaobject",    java.lang.Object.class )
     };
-    
+
 
 }
 
