@@ -970,6 +970,40 @@ public final class CacheEngine
 
 
     /**
+     * Acquire a write lock on the object in memory. A soft lock prevents
+     * other threads from changing the object, but does not acquire a lock
+     * on the database.
+     *
+     * @param tx The transaction context
+     * @param oid The object's OID
+     * @param timeout The timeout waiting to acquire a lock on the
+     *  object (specified in seconds)
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws ObjectDeletedException The object has been deleted from
+     *  persistent storage
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public void softLock( TransactionContext tx, OID oid, int timeout )
+        throws LockNotGrantedException, ObjectDeletedException, PersistenceException
+    {
+        ObjectLock lock;
+        TypeInfo   typeInfo;
+
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
+        lock = typeInfo.cache.getLock( oid );
+        if ( lock == null || ! lock.hasLock( tx, false ) )
+            throw new IllegalStateException( Messages.format( "persist.internal",
+                                                              "Attempt to lock object for which no lock was acquired" ) );
+
+        // Attempt to obtain a lock on the database. If this attempt
+        // fails, release the lock and report the exception.
+        lock.acquire( tx, true, timeout );
+    }
+
+
+    /**
      * Obtain a copy of the cached object give the object's OID. The
      * cached object is copied into the supplied object without
      * affecting the locks. This method is generally called after a

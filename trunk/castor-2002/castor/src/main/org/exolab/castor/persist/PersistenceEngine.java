@@ -291,6 +291,29 @@ public interface PersistenceEngine
     
 
     /**
+     * Acquire a soft lock on the object. A soft lock is acquired in
+     * memory but not in the database. It prevents any concurrent updates
+     * to the object from this point on. However, it does not guarantee that
+     * the object has not been modified in the course of the transaction or
+     * exists in the persistent storage. For that the object must be loaded
+     * with exclusive access.
+     *
+     * @param tx The transaction context
+     * @param oid The object's oid
+     * @param timeout The timeout waiting to acquire a lock on the
+     *  object (specified in seconds)
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws ObjectDeletedException The object has been deleted from
+     *  persistent storage
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public void softLock( TransactionContext tx, OID oid, int timeout )
+        throws LockNotGrantedException, ObjectDeletedException, PersistenceException;
+
+
+    /**
      * Obtain a copy of the cached object give the object's OID. The
      * cached object is copied into the supplied object without
      * affecting the locks. This method is generally called after a
