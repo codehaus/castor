@@ -161,7 +161,7 @@ public class JDOFieldDescriptor
 
     public String toString()
     {
-        return super.toString() + " AS " + _sqlName[0];
+        return super.toString() + (_sqlName == null ? "" : " AS " + _sqlName[0]);
     }
 
 
