@@ -2,6 +2,12 @@
 CVS
 ---
 
+XML:   Fixed bug 1372: Mapping.loadMapping(String) duplicates directory 
+       path. Fixed problem by making the given url a relative URL 
+       so that the document base isn't duplicated.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1372
+       (kvisco - 20041217)
+
 XML:   Fixed typo with null check during validation code in
        XMLClassDescriptorImpl 
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1560
