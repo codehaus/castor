@@ -41,7 +41,9 @@
     <item name="Configuration, Libs, Building" href="conf-lib.xml"/>
     <item name="Transactions &amp; Locks" href="locking.xml"/>
     <item name="Design: Persistence" href="design-persist.xml"/>
+<!--
     <item name="Design: OQL Parser" href="design-oql-parser.xml"/>
+-->
     <item name="Key Generators" href="key-generator.xml"/>
   </menu>
   <menu name="Misc">
