@@ -49,7 +49,7 @@ public interface Operator {
     /**
      * The divide operator type
      */
-    public static final int DIVIDE_DEFINED     = 2;
+    public static final int DIVIDE_OPERATOR     = 2;
             
     /**
      * The "equality" operator type
@@ -72,10 +72,14 @@ public interface Operator {
     public static final int OR_OPERATOR        = 6;
     
     /**
+     * The quotient operator type
+     */
+    public static final int QUOTIENT_OPERATOR  = 7;
+    
+    /**
      * The subtract operator type
      */
-    public static final int SUBTRACT_OPERATOR  = 7;
-    
+    public static final int SUBTRACT_OPERATOR  = 8;
     
     //----------------------/
     //- Method definitions -/
