@@ -232,6 +232,14 @@ public class MemberFactory {
         if (xmlType != null) {
             if (xmlType.isSimpleType()) {
                 SimpleType simpleType = (SimpleType)xmlType;
+                
+                String derivationMethod = simpleType.getDerivationMethod();
+                if (derivationMethod != null) {
+                    if (SchemaNames.RESTRICTION.equals(derivationMethod)) {
+                        SimpleType base = (SimpleType)simpleType.getBaseType();
+                        if (base != null) simpleType = base;
+                    }
+                }
 
                 //-- handle special case for enumerated types
                 if (simpleType.hasFacet(Facet.ENUMERATION)) {
