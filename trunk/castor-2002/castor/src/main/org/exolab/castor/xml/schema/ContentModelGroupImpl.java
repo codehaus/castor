@@ -56,7 +56,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class ContentModelGroupImpl implements ContentModelGroup {
+class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable {
 
 
     private Vector _contentModel = null;
@@ -188,7 +188,7 @@ class ContentModelGroupImpl implements ContentModelGroup {
     public int getMinOccurs() {
         return 1;
     }
-    
+
     /**
      * Returns the Particle at the specified index
      * @param index the index of the particle to return

@@ -49,29 +49,29 @@ package org.exolab.castor.xml.schema;
  * An XML Schema model group Order
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
 **/
-public final class Order {
-    
+public final class Order implements java.io.Serializable {
+
     public static final short ALL      = 0;
     public static final short SEQUENCE = 1;
     public static final short CHOICE   = 2;
-    
+
     public static final Order all    = new Order(Order.ALL);
     public static final Order choice = new Order(Order.CHOICE);
     public static final Order seq    = new Order(Order.SEQUENCE);
-    
+
     private short type = ALL;
-    
+
     /**
      * Creates a new Order with the given Type;
     **/
     private Order(short type) {
         this.type = type;
     } //-- Order
-    
+
     public short getType() {
         return this.type;
     } //-- getType
-    
+
     public String toString() {
         switch(type) {
             case CHOICE:
@@ -82,8 +82,8 @@ public final class Order {
                 return "all";
         }
     }
-    
-    public static Order valueOf(String value) 
+
+    public static Order valueOf(String value)
         throws IllegalArgumentException
     {
         if ("all".equals(value)) {
@@ -102,5 +102,5 @@ public final class Order {
             throw new IllegalArgumentException(sb.toString());
         }
     } //-- valueOf
-    
+
 } //-- Order

@@ -53,15 +53,15 @@ import java.util.Enumeration;
 /**
  * A list for maintaining facets
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
-public class FacetList {
+public class FacetList implements java.io.Serializable {
 
     /**
      * The list of facets
     **/
     private List facets    = null;
-    
+
     /**
      * Creates a new FacetList
     **/
@@ -76,7 +76,7 @@ public class FacetList {
     public void add(Facet facet) {
         if (facet != null) facets.add(facet);
     } //-- add
-    
+
     /**
      * Returns the facet at the given index
      * @param index the index of the Facet to return
@@ -84,7 +84,7 @@ public class FacetList {
     public Facet get(int index) {
         return (Facet)facets.get(index);
     } //-- get
-    
+
     /**
      * Removes the given Facet from this list
      * @param facet the Facet to remove
@@ -92,7 +92,7 @@ public class FacetList {
     public void remove(Facet facet) {
         facets.remove(facet);
     } //-- remove
-    
+
     /**
      * Returns the number of Facets in this list
      * @return the number of Facets in this list
@@ -100,7 +100,7 @@ public class FacetList {
     public int size() {
         return facets.size();
     } //-- size
-    
+
     /**
      * Returns an Enumeration of the Facets in this list
      * @return an Enumeration of the Facets in this list
@@ -108,6 +108,6 @@ public class FacetList {
     public Enumeration enumerate() {
         return new FacetListEnumerator(this);
     } //-- enumerate
-    
+
 } //-- FacetList
 

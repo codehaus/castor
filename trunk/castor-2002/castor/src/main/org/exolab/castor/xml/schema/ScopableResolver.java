@@ -49,27 +49,27 @@ import java.util.Hashtable;
 
 /**
  * An implementation of Resolver that can be "scoped". Which means you
- * can construct a ScopableResovler and give it another Resolver (which 
+ * can construct a ScopableResovler and give it another Resolver (which
  * can also be Scopable). If this Resolver cannot "resolve" the id, then
  * it will try to use the given Resolver to resolver it.
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ScopableResolver implements Resolver {
-    
+public class ScopableResolver implements Resolver , java.io.Serializable{
+
     private Hashtable ids;
-    
+
     private Resolver _resolver = null;
-    
+
     public ScopableResolver() {
         ids = new Hashtable();
     } //-- ScopableResolver
-    
+
     public ScopableResolver(Resolver resolver) {
         this();
         _resolver = resolver;
     } //-- ScopableResolver
-    
+
     /**
      * Adds a resolvable object to this resolver identified by <tt>id</tt>.
      * Subsequent calls to {@link #resolve} with the same <tt>id</tt>
@@ -84,7 +84,7 @@ public class ScopableResolver implements Resolver {
         }
         ids.put(id, referent);
     } //-- register
-    
+
     /**
      * Removes a resolvable object from this resolver. Subsequent calls
      * to {@link #resolve} with the same <tt>id</tt> will return null.
@@ -97,7 +97,7 @@ public class ScopableResolver implements Resolver {
             ids.remove(obj);
         }
     } //-- removeResolvable
-    
+
     public Referable resolve(String id) {
         Referable referable = (Referable) ids.get(id);
         if ((referable == null) && (_resolver != null)) {
@@ -105,6 +105,6 @@ public class ScopableResolver implements Resolver {
         }
         return referable;
     } //-- resolve
-    
-    
+
+
 } //-- ScopableResolver
