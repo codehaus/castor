@@ -43,7 +43,7 @@ drop table test_pks_person;
 create table test_pks_person (
   fname varchar(15)    not null,
   lname varchar(15)    not null,
-  bday  date 
+  bday  date null
 );
 create unique index test_pks_person_pk on test_pks_person( fname, lname );
 grant all on test_pks_person to test;
@@ -52,7 +52,7 @@ drop table test_pks_employee;
 create table test_pks_employee (
   fname varchar(15)    not null,
   lname varchar(15)    not null,
-  startDate date 
+  start_date date null
 );
 create unique index test_pks_person_employee_pk on test_pks_employee( fname, lname );
 grant all on test_pks_employee to test;
@@ -73,12 +73,11 @@ create table test_pks_address (
   fname varchar(15)    not null,
   lname varchar(15)    not null,
   id int               not null,
-  stree varchar(30),
-  city  varchar(30),
-  state varchar(2),
-  zip varchar(6)
+  street varchar(30)    null,
+  city  varchar(30)    null,
+  state varchar(2)     null,
+  zip varchar(6)       null
 );
-create unique index test_pks_address_fk on test_pks_address( fname, lname );
 create unique index test_pks_address_pk on test_pks_address( id );
 grant all on test_pks_address to test;
 
@@ -87,12 +86,26 @@ create table test_pks_contract (
   fname varchar(15)    not null,
   lname varchar(15)    not null,
   policy_no int        not null,
-  contract_no int      not null
+  contract_no int      not null,
+  c_comment varchar(90)  null
 );
 create unique index test_pks_contract_fk on test_pks_contract( fname, lname );
 create unique index test_pks_contract_pk on test_pks_contract( policy_no, contract_no );
 grant all on test_pks_contract to test;
 
+drop table test_pks_category_contract;
+create table test_pks_category_contract (
+  policy_no int        not null,
+  contract_no int      not null,
+  cate_id int          not null
+);
+
+drop table test_pks_category;
+create table test_pks_category (
+  id  int              not null,
+  name varchar(20)     not null
+);
+create unique index test_pks_category_pk on test_pks_category( id );
 
 -- test_table_ex
 drop table test_table_ex;
@@ -205,6 +218,24 @@ create unique index test_keygen_pk
   on test_keygen ( id );
 grant all on test_keygen to test;
 
+
+-- list_types
+drop table list_types;
+create table list_types (
+  o_char  CHAR         null,
+  o_nchar NCHAR        null,
+  o_varchar VARCHAR(20) null,
+  o_varchar2 VARCHAR2(20) null,
+  o_clob CLOB null,
+  o_long LONG null,
+  o_number NUMBER null,
+  o_int   INT null,
+  o_date DATE null,
+  o_raw   RAW(20)      null,
+--  o_longraw LONG RAW    null,
+  o_blob  BLOB         null,
+  o_bfile BFILE        null
+);
 
 -- test_keygen_ext
 drop table test_keygen_ext;
