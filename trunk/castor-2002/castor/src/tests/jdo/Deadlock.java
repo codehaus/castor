@@ -108,7 +108,6 @@ public class Deadlock
             if ( ! runOnce( stream, Database.Shared ) )
                 result = false;
             stream.writeVerbose( "" );
-            /*
             stream.writeVerbose( "Running in access mode exclusive" );
             if ( ! runOnce( stream, Database.Exclusive ) )
                 result = false;
@@ -117,7 +116,6 @@ public class Deadlock
             if ( ! runOnce( stream, Database.DbLocked ) )
                 result = false;
             stream.writeVerbose( "" );
-            */
             _db.close();
         } catch ( Exception except ) {
             try {

@@ -50,10 +50,10 @@
   </menu>
 
   <notice>
-    Java, EJB, JDBC, JNDI, Sun, Sun Microsystems are trademarks or registered trademarks of Sun Microsystems, Inc.
-    in the United States and in other countries. XML, XML schema and related standards are trademarks or registered
-    trademarks of MIT, INRIA, Keio or others, and a product of the World Wide Web Consortium. All other product
-    names mentioned herein are trademarks of their respective owners.
+    Java, Enterprise JavaBeans, JDBC, JNDI, Sun, Sun Microsystems and other Java related APIs are trademarks or
+    registered trademarks of Sun Microsystems, Inc. in the United States and in other countries. XML, XML schema,
+    XSLT and related standards are trademarks or registered trademarks of MIT, INRIA, Keio or others, and a product
+    of the World Wide Web Consortium. All other product names mentioned herein are trademarks of their respective owners.
   </notice>
   <notice>
     Copyright 2000 (C) <a href="http://www.exoffice.com">Exoffice Technologies Inc</a>. All Rights Reserved.
