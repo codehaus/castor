@@ -1487,7 +1487,7 @@ public class Schema extends Annotated {
     } //-- getStructureType
 
     /**
-     * Checks the validity of this Schema defintion.
+     * Checks the validity of this Schema definition.
      *
      * @throws ValidationException when this Schema definition
      * is invalid.
