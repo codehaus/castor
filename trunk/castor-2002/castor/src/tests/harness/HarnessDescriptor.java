@@ -231,4 +231,9 @@ public class HarnessDescriptor implements org.exolab.castor.xml.XMLClassDescript
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }
