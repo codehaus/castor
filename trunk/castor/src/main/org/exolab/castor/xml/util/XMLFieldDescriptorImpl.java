@@ -51,7 +51,9 @@ import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.util.List;
+
 import java.util.StringTokenizer;
+import java.util.Properties;
 
 /**
  * XML field descriptor. Wraps {@link FieldDescriptor} and adds
@@ -63,6 +65,8 @@ import java.util.StringTokenizer;
 public class XMLFieldDescriptorImpl
     implements XMLFieldDescriptor
 {
+    
+    
 
 
     private static final String WILD_CARD = "*";
@@ -164,6 +168,11 @@ public class XMLFieldDescriptorImpl
 
 
     /**
+     * The "user-set" properties of this XMLFieldDescriptor
+     */
+    private Properties _properties = null;
+    
+    /**
      * indicates a required field when true
     **/
     public boolean _required = false;
@@ -184,6 +193,12 @@ public class XMLFieldDescriptorImpl
      */
     private String _qNamePrefix = null;
 
+    /**
+     * A flag which indicates the parent class' namespace
+     * should be used by default
+     */
+    private boolean _useParentClassNamespace = false;
+    
     private FieldValidator _validator = null;
     
     /**
@@ -508,13 +523,10 @@ public class XMLFieldDescriptorImpl
     **/
     public String getNameSpaceURI() {
 
-        //-- use containing class's namespace if
-        //-- necessary
-        /*
-           KV removed 20030109 (causing wrong namespace to be used,
-           if the field really doesn't have one)
-           
-        if ((nsURI == null) && (this._contClsDescriptor != null)) {
+        if ((_nsURI == null) && 
+            (_contClsDescriptor != null) &&
+            _useParentClassNamespace)
+        {
             if (isPrimitive(_fieldType) && (_nodeType == NodeType.Element))
             {
                 if (_contClsDescriptor instanceof XMLClassDescriptor) {
@@ -522,7 +534,6 @@ public class XMLFieldDescriptorImpl
                 }
             }
         }
-        */
         return _nsURI;
     } //-- getNameSpaceURI
 
@@ -577,6 +588,25 @@ public class XMLFieldDescriptorImpl
     public String getLocationPath() {
         return _xmlPath;
     } //-- getLocationPath
+    
+    
+    /**     
+     * Returns the value property with the given name or null
+     * if no such property exists. This method is useful for
+     * future evolutions of this interface as well as for
+     * user-defined extensions. See class declared properties
+     * for built-in properties.
+     *
+     * @param propertyName the name of the property whose value
+     * should be returned.
+     *
+     * @return the value of the property, or null.
+     */
+    public String getProperty(String propertyName) {
+        if ((_properties == null) || (propertyName == null))
+            return null;
+        return _properties.getProperty(propertyName);
+    } //-- getProperty
     
     /**
      * Returns the prefix used in case the value of the
@@ -933,6 +963,34 @@ public class XMLFieldDescriptorImpl
     public void setMultivalued(boolean multivalued) {
         this._multivalued = multivalued;
     } //-- setMultivalued
+    
+    /**     
+     * Sets the value property with the given name
+     *
+     * @param propertyName the name of the property to set
+     * the value of
+     * @param value the value of the property
+     * @see getProperty
+     */
+    public void setProperty(String propertyName, String value) {
+        
+        if (propertyName == null) {
+            String err = "The argument 'propertyName' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        if (_properties == null)
+            _properties = new Properties();
+         
+         
+        if (value == null) {
+            _properties.remove(propertyName);
+        }
+        else {
+            _properties.put(propertyName, value);
+        }
+    } //-- setProperty
+    
 
     /**
      * Sets the type of the XML Schema type of the value
@@ -1010,6 +1068,15 @@ public class XMLFieldDescriptorImpl
         _transient = isTransient;
     } //-- isTransient
 
+    /**
+     * Sets whether or not the namespace for the parent "containing" 
+     * class should be used during marshalling/unmarshalling when
+     * no specific namespace URI has been set for this field.
+     */
+    public void setUseParentsNamespace(boolean useParentsNamespace) {
+        _useParentClassNamespace = useParentsNamespace;
+    }
+    
     public void setValidator(FieldValidator validator) {
 
         //-- remove reference from current FieldValidator
