@@ -76,6 +76,38 @@ public class ElementDecl extends Particle
     //--------------------/
     
     /**
+     * The block attribute for this element definition.
+    **/
+    private BlockList _block = null;
+    
+    /**
+     * collection of Identity Constraints
+    **/
+    private Vector _constraints = null;
+    
+    /**
+     * The default value for this element definition. Only
+     * useful for simpleContent.
+    **/
+    private String _default = null;
+    
+    /**
+     * A reference to a top-level element declaration
+    **/
+    private String _elementRef = null;
+    
+    /**
+     * The final value for this element definition.
+    **/
+    private FinalList _final = null;
+    
+    /**
+     * The fixed value for this element definition. Only
+     * used for simpleContent.
+    **/
+	private String _fixed = null;
+	
+    /**
      * The form type for this element definition. 
      * Specifies whether names should be qualified or unqualified.
      * Uses the default Form from the parent Schema if unspecified.
@@ -83,42 +115,41 @@ public class ElementDecl extends Particle
     private Form _form = null;
     
     /**
+     * The unique ID for this element definition (optional).
+    **/
+    private String _id = null;
+    
+    /**
      * Flag indicating whether or not this Element declaration is
      * abstract
     **/
-    private boolean isAbstract = false;
+    private boolean _isAbstract = false;
 
     /**
      * The element name
     **/
-    private String name = null;
-
-
-    /**
-     * A reference to a top-level element declaration
-    **/
-    String elementRef = null;
+    private String _name = null;
 
     /**
-     * The XMLType for this element declaration
+     * Flag indicating whether or not the element value may be null.
     **/
-    private XMLType xmlType = null;
+    private boolean _nillable = false;
+    
 
     /**
      * The parent schema that this element declaration belongs to
     **/
-    private Schema schema = null;
-
-    private boolean nillable = false;
-
-    private String _default = null;
-	private String _fixed = null;
-    private String _block;
+    private Schema _schema = null;
 
     /**
-     * collection of Identity Constraints
+     * The substitutionGroup for this element definition.
     **/
-    private Vector _constraints = null;
+    private String _substitutionGroup = null;
+    
+    /**
+     * The XMLType for this element declaration
+    **/
+    private XMLType _xmlType = null;
     
     /**
      * Creates a new default element definition
@@ -143,8 +174,8 @@ public class ElementDecl extends Particle
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        this.schema = schema;
-        this.name = name;
+        _schema = schema;
+        _name   = name;
         _constraints = new Vector(3);
     } //-- ElementDecl
 
@@ -158,6 +189,15 @@ public class ElementDecl extends Particle
         _constraints.addElement(constraint);
     } //-- addIdentityConstraint
     
+	/**
+	 * Returns the value of the 'block' attribute for this element
+	 *
+	 * @return the value of the block attribute.
+	**/
+	public BlockList getBlock() {
+		return _block;
+	} //-- getBlock
+	
     /**
      * Returns the default value of this element definition.
      *
@@ -168,6 +208,16 @@ public class ElementDecl extends Particle
         return _default;
     } //-- getDefaultValue
 
+	/**
+	 * Returns the value of the 'final' attribute for this element
+	 * definition.
+	 *
+	 * @return the FinalList for this element definition.
+	**/
+	public FinalList getFinal() {
+		return _final;
+	} //-- getFinal
+	
     /**
      * Returns the fixed value of this element definition.
      *
@@ -189,6 +239,15 @@ public class ElementDecl extends Particle
     public Form getForm() {
         return _form;
     } //-- getForm
+    
+    /**
+     * Returns the 'id' for this element definition.
+     *
+     * @return the 'id' for this element definition.
+    **/
+    public String getId() {
+        return _id;
+    } //-- getId
     
     /**
      * Returns an Enumeration of IdentityConstraint objects contained within
@@ -218,9 +277,9 @@ public class ElementDecl extends Particle
     **/
     public String getName(boolean ignoreRef) {
         if (isReference() && ignoreRef == false) {
-            return elementRef;
+            return _elementRef;
         }
-		else return name;
+		else return _name;
     } //-- getName
 
     /**
@@ -236,9 +295,9 @@ public class ElementDecl extends Particle
             return null;
         }
 
-        if (xmlType == null) return null;
+        if (_xmlType == null) return null;
         else
-            return xmlType.getType();
+            return _xmlType.getType();
     } //-- getXMLType
 
     /**
@@ -248,8 +307,8 @@ public class ElementDecl extends Particle
      * @return the ElementDecl that this element definition references
     **/
     public ElementDecl getReference() {
-        if (elementRef != null)
-            return schema.getElementDecl(elementRef);
+        if (_elementRef != null)
+            return _schema.getElementDecl(_elementRef);
         return null;
     } //-- getReference
 
@@ -260,7 +319,7 @@ public class ElementDecl extends Particle
      * @see Referable
     **/
     public String getReferenceId() {
-        if (name != null) return "element:"+name;
+        if (_name != null) return "element:"+_name;
         return null;
     } //-- getReferenceId
 
@@ -269,16 +328,26 @@ public class ElementDecl extends Particle
      * @return the XML Schema to which this element declaration belongs.
     **/
     public Schema getSchema() {
-        return this.schema;
+        return _schema;
     } //-- getSchema
 
+    /**
+     * Returns the substitutionGroup for this element declaration, or
+     * null if it's absent.
+     *
+     * @return the substitutionGroup membership for this element
+     * declaration, or null if absent.
+    **/
+    public String getSubstitutionGroup() {
+        return _substitutionGroup;
+    } //-- getSubstitutionGroup
 
     /**
      * Returns true if this element definition is abstract
      * @return true if this element definition is abstract
     **/
     public boolean isAbstract() {
-        return isAbstract;
+        return _isAbstract;
     } //-- isAbstract
 
     /**
@@ -289,7 +358,7 @@ public class ElementDecl extends Particle
      * may appear with no content, otherwise false.
     **/
     public boolean isNillable() {
-        return nillable;
+        return _nillable;
     } //-- isNullable
 
     /**
@@ -298,7 +367,7 @@ public class ElementDecl extends Particle
      * @return true if this element definition is a reference
     **/
     public boolean isReference() {
-        return (elementRef != null);
+        return (_elementRef != null);
     } //-- isReference
 
     /**
@@ -307,7 +376,7 @@ public class ElementDecl extends Particle
      * element definition should be abstract
     **/
     public void setAbstract(boolean isAbstract) {
-        this.isAbstract = isAbstract;
+        _isAbstract = isAbstract;
     } //-- isAbstract
 
     /**
@@ -350,6 +419,29 @@ public class ElementDecl extends Particle
     } //-- removeIdentityConstraint
     
 
+	/**
+	 * Sets the value of the 'block' attribute for this element
+	 *
+	 * @param block the value of the block attribute for this
+	 * element definition.
+	**/
+	public void setBlock(BlockList block) {
+	    _block = block;
+	} //-- setBlock
+
+	/**
+	 * Sets the value of the 'block' attribute for this element
+	 *
+	 * @param block the value of the block attribute for this
+	 * element definition.
+	**/
+	public void setBlock(String block) {
+	    if (block == null) 
+	        _block = null;
+	    else 
+	        _block = new BlockList(block);
+	} //-- setBlock
+
     /**
      * Sets the default value for this element definition.
      *
@@ -359,6 +451,31 @@ public class ElementDecl extends Particle
         this._default = value;
     } //-- setDefaultValue
 
+	/**
+	 * Sets the value of the 'final' attribute for this element
+	 * definition.
+	 *
+	 * @param finalValue the value of the final attribute for this
+	 * element definition.
+	**/
+	public void setFinal(FinalList finalList) {
+	        _final = finalList;
+	} //-- setFinal
+
+	/**
+	 * Sets the value of the 'final' attribute for this element
+	 * definition.
+	 *
+	 * @param finalValue the value of the final attribute for this
+	 * element definition.
+	**/
+	public void setFinal(String finalValue) {
+	    if (finalValue == null) 
+	        _final = null;
+	    else 
+	        _final = new FinalList(finalValue);
+	} //-- setFinal
+	
     /**
      * Sets the fixed value for this element definition.
      *
@@ -381,11 +498,20 @@ public class ElementDecl extends Particle
     } //-- setForm
     
     /**
+     * Sets the Id for this element definition.
+     *
+     * @param id the Id for this element definition.
+    **/
+    public void setId(String id) {
+        _id = id;
+    } //-- setId
+    
+    /**
      * Sets the name of the element that this Element definition defines
      * @param name the name of the defined element
     **/
     public void setName(String name) {
-        this.name = name;
+        _name = name;
     } //-- setName
 
     /**
@@ -396,8 +522,8 @@ public class ElementDecl extends Particle
      * of this element definition may appear with empty content
     **/
     public void setNillable(boolean nillable) {
-        this.nillable = nillable;
-    } //-- setNullable
+        _nillable = nillable;
+    } //-- setNillable
 
     /**
      * Sets the reference for this element definition
@@ -405,9 +531,9 @@ public class ElementDecl extends Particle
     **/
     public void setReference(ElementDecl reference) {
         if (reference == null)
-            this.elementRef = null;
+            _elementRef = null;
         else
-            this.elementRef = reference.getName();
+            _elementRef = reference.getName();
     } //-- setReference
 
     /**
@@ -416,9 +542,19 @@ public class ElementDecl extends Particle
      * definition references
     **/
     public void setReference(String reference) {
-        this.elementRef = reference;
+        _elementRef = reference;
     } //-- setReference
 
+    /**
+     * Sets the substitutionGroup for this element definition.
+     *
+     * @param substitutionGroup the substitutionGroup for this
+     * element definition.
+    **/
+    public void setSubstitutionGroup(String substitutionGroup) {
+        _substitutionGroup = substitutionGroup;
+    } //-- setSubstitutionGroup
+    
     /**
      * Sets the XMLType for this Element declaration.
      * @param type the XMLType for this element declaration.
@@ -430,14 +566,14 @@ public class ElementDecl extends Particle
     public void setType(XMLType type)
     {
         //-- reset parent of current type
-        if (this.xmlType != null) {
-            this.xmlType.setParent(null);
+        if (_xmlType != null) {
+            _xmlType.setParent(null);
         }
         if (type != null) {
             type.setParent(this);
         }
 
-        this.xmlType = type;
+        _xmlType = type;
     } //-- setType
 
 
@@ -448,25 +584,11 @@ public class ElementDecl extends Particle
     {
         TypeReference reference= new TypeReference();
         reference.setName(name);
-        reference.setSchema(schema);
+        reference.setSchema(_schema);
         setType(reference);
     }
 
-	/**
-	 * Returns the value of the 'block' attribute for this element
-	 */
-	public String getBlock()
-	{
-		return _block;
-	}
 
-	/**
-	 * Sets the value of the 'block' attribute for this element
-	 */
-	public void setBlock(String block)
-	{
-		_block = block;
-	}
 
     //-------------------------------/
     //- Implementation of Structure -/
@@ -489,14 +611,14 @@ public class ElementDecl extends Particle
 
         //-- if this merely references another element definition
         //-- just check that we can resolve the reference
-        if (elementRef != null) {
-            if (schema.getElementDecl(elementRef) == null) {
-                String err = "<element ref=\"" + elementRef + "\"> "+
+        if (_elementRef != null) {
+            if (_schema.getElementDecl(_elementRef) == null) {
+                String err = "<element ref=\"" + _elementRef + "\"> "+
                     "is not resolvable.";
                 throw new ValidationException(err);
             }
         }
-        else if (name == null)  {
+        else if (_name == null)  {
             String err = "<element> is missing required 'name' or " +
                 "'ref' attribute.";
             throw new ValidationException(err);
