@@ -47,23 +47,11 @@
 package org.exolab.castor.persist;
 
 import org.exolab.castor.persist.spi.Complex;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.spi.CallbackInterceptor;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.jdo.PersistenceException;
 import java.util.Vector;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

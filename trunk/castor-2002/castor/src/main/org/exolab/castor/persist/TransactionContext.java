@@ -46,11 +46,10 @@
 
 package org.exolab.castor.persist;
 
-
-import java.util.Hashtable;
-import java.util.Enumeration;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.Hashtable;
+import java.util.Enumeration;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
