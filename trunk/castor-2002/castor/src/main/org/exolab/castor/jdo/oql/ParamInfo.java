@@ -49,6 +49,9 @@ package org.exolab.castor.jdo.oql;
 import java.util.Vector;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.jdo.engine.SQLTypes;
+import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 
 /**
  * A class to store and check information about numbered query parameters.
@@ -60,11 +63,28 @@ public class ParamInfo {
 
   private String _userDefinedType;
   private String _systemType;
-  
+
   private Class _class;
 
   private Vector _sqlQueryParamMap;
-    
+
+  private Class _fieldType;
+
+  private Class _sqlType;
+
+  /**
+   * Convertor that converts from the parameter type to SQL type of the parameter,
+   * if the latter is defined and not equal to the parameter class, otherwise
+   * equals null.
+   */
+  private TypeConvertor _convertor;
+
+  /**
+   * The type convertor parameter.
+   */
+  private String        _convertorParam;
+
+
   /**
    * Creates a new ParamInfo.  Which checks for incompatibilities between types.
    *
@@ -73,14 +93,14 @@ public class ParamInfo {
    * @throws QueryException if the user defined type cannot be converted to the
    *      systemType or if the type is not found.
    */
-  public ParamInfo( String userDefinedType, String systemType ) 
-      throws QueryException 
+  public ParamInfo( String userDefinedType, String systemType, JDOFieldDescriptor desc )
+      throws QueryException
   {
     _userDefinedType = userDefinedType;
     _systemType = systemType;
 
     _sqlQueryParamMap = new Vector();
-    
+
     Class userClass = null;
     Class systemClass = null;
     try {
@@ -94,10 +114,10 @@ public class ParamInfo {
       try {
         userClass = Types.typeFromName(getClass().getClassLoader(), userDefinedType);
 
-        if ( userClass.isPrimitive() ) 
+        if ( userClass.isPrimitive() )
           userClass = Types.typeFromPrimitive( userClass );
 
-      } 
+      }
       catch (Exception e) {
         throw new QueryException( "The class " + userClass + " could not be found." );
       }
@@ -109,26 +129,35 @@ public class ParamInfo {
       }
 
       _class = userClass;
-    }
-    else
+    } else {
       _class = systemClass;
-
+    }
+    if (desc != null) {
+        _fieldType = desc.getFieldType();
+        try {
+            _sqlType = SQLTypes.typeFromSQLType(desc.getSQLType()[0]);
+        } catch (Exception ex) {
+            throw new QueryException( "Can't determine SQL class: " + ex );
+        }
+        _convertor = desc.getConvertor();
+        _convertorParam = desc.getConvertorParam();
+    }
   }
-  
+
   /**
    * Checks whether the userDefinedType and systemType match those previousle
    * specified in the constructor.
    *
    * @param userDefinedType The user defined type, empty string if undefined.
    * @param systemType The system generated type
-   * @throws QueryException if the user defined type is not the same as the 
-   *    one prevuiously specified in the constructor, or if the systemType is 
+   * @throws QueryException if the user defined type is not the same as the
+   *    one prevuiously specified in the constructor, or if the systemType is
    *    not convertable to the original systemType.
    */
-  public void check( String userDefinedType, String systemType ) 
-      throws QueryException 
+  public void check( String userDefinedType, String systemType )
+      throws QueryException
   {
-    if ( ! _userDefinedType.equals(userDefinedType) ) 
+    if ( ! _userDefinedType.equals(userDefinedType) )
       throw new QueryException( "Different types were specified for the same numbered parameter." );
 
     if ( ! systemType.equals(_systemType) ) {
@@ -144,11 +173,11 @@ public class ParamInfo {
         Class userClass = null;
         try {
           userClass = Class.forName(_userDefinedType);
-        } 
+        }
         catch (Exception e) {
           throw new QueryException( "The class " + userClass + " could not be found." );
         }
-  
+
         if ( ! systemClass.isAssignableFrom(userClass) )
           throw new QueryException( "The class " + userDefinedType + " is incompatible with the system defined class " + systemType );
 
@@ -157,7 +186,7 @@ public class ParamInfo {
   }
 
   /**
-   * Specifies whether this parameter was specified in the OQL with a User 
+   * Specifies whether this parameter was specified in the OQL with a User
    * defined type, like $(int)1.
    *
    * @return True if this parameter whas a user defined type otherwise false
@@ -192,5 +221,47 @@ public class ParamInfo {
   public Class getTheClass() {
     return _class;
   }
-  
+
+    /**
+     * Returns the Java field type
+     *
+     * @return Java field type
+     */
+    public Class getFieldType()
+    {
+        return _fieldType;
+    }
+
+
+    /**
+     * Returns the SQL type
+     *
+     * @return SQL type
+     */
+    public Class getSQLType()
+    {
+        return _sqlType;
+    }
+
+
+    /**
+     * @return Convertor that converts from the parameter type to SQL type of the parameter,
+     * if the latter is defined and not equal to the parameter class, otherwise
+     * returns null.
+     */
+    public TypeConvertor getConvertor() {
+        return _convertor;
+    }
+
+    /**
+     * Returns the convertor parameter.
+     *
+     * @return Convertor parameter
+     */
+    public String getConvertorParam()
+    {
+        return _convertorParam;
+    }
+
+
 }

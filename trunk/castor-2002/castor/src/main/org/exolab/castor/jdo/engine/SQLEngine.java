@@ -602,7 +602,7 @@ public final class SQLEngine implements Persistence {
                     stmt.close();
 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-                
+
                 // bind the identity to the preparedStatement
                 count = 1;
                 if ( identity instanceof Complex ) {
@@ -835,9 +835,9 @@ public final class SQLEngine implements Persistence {
     }
 
 
-    public void delete( Object conn, Object identity ) 
+    public void delete( Object conn, Object identity )
             throws PersistenceException {
-        
+
         PreparedStatement stmt = null;
 
         try {
@@ -881,7 +881,7 @@ public final class SQLEngine implements Persistence {
 
     public void writeLock( Object conn, Object identity )
             throws ObjectDeletedException, PersistenceException {
-                
+
         PreparedStatement stmt = null;
         try {
             // Must obtain lock on record in parent table first.
@@ -978,7 +978,7 @@ public final class SQLEngine implements Persistence {
                             } else {
                                 temp[j] = null;
                             }
-                        } 
+                        }
                         if ( notNull )
                             fields[i] = new Complex( _fields[i].columns.length, temp );
                         else
@@ -1110,9 +1110,9 @@ public final class SQLEngine implements Persistence {
         // it is possible to have no fields in INSERT statement:
         // only the primary key field in the table,
         // with KeyGenerator DURING_INSERT or BEFORE_INSERT
-        if ( count == 0 ) 
+        if ( count == 0 )
             sql.setLength( sql.length() - 2 ); // cut " ("
-        else 
+        else
             sql.append( ")" );
         sql.append( " VALUES (" );
         for ( int i = 0 ; i < count; ++i ) {
@@ -1639,9 +1639,9 @@ public final class SQLEngine implements Persistence {
                 }
                     if ( empty )
                     return null;
-                else if ( _engine._ids.length > 1 ) 
+                else if ( _engine._ids.length > 1 )
                     return new Complex( returnId );
-                else 
+                else
                     return returnId[0];
 
             } catch ( SQLException except ) {
@@ -1668,7 +1668,7 @@ public final class SQLEngine implements Persistence {
         }
 
 
-        public Object fetch(Object[] fields,Object identity) 
+        public Object fetch(Object[] fields,Object identity)
                 throws ObjectNotFoundException, PersistenceException {
 
             int    count;
