@@ -445,8 +445,49 @@ public class XMLDiff {
                 }
                 return false;
             }
-            if (!compareText(attr1.getStringValue(), attValue2)) {
-                if (print) {
+            
+            String attValue1 = attr1.getStringValue();
+            if (!compareText(attValue1, attValue2)) {
+                
+                boolean attsEqual = false;
+                
+                //-- check for possible QName match...
+                //-- eventually we'll want to load the 
+                //-- schema and use that for type-checking
+                //-- but we'll assume QName if ':' exists
+                int idx1 = attValue1.indexOf(':');
+                int idx2 = attValue2.indexOf(':');
+                if ((idx1 >=0 ) || (idx2 >= 0)) {
+                    
+                    String prefix1 = "";
+                    String prefix2 = "";
+                    String ns1 = "";
+                    String ns2 = "";
+                    
+                    if (idx1 >= 0) {
+                        prefix1 = attValue1.substring(0, idx1);
+                        attValue1 = attValue1.substring(idx1+1);
+                    }
+                    ns1 = node1.getNamespaceURI(prefix1);
+                    
+                    if (idx2 >= 0) {
+                        prefix2 = attValue2.substring(0, idx2);
+                        attValue2 = attValue2.substring(idx2+1);
+                    }
+                    ns2 = node2.getNamespaceURI(prefix2);
+                    
+                    if (compareText(attValue1, attValue2)) {
+                        //-- check namespaces
+                        if (ns1 == null) ns1 = "";
+                        if (ns2 == null) ns2 = "";
+                        attsEqual = ns1.equals(ns2);
+                    }
+                   
+                }
+                
+                
+                
+                if ((!attsEqual) && (print)) {
                     sInfo.pw.print("- ");
                     printStartTag(node1, sInfo.pw);
                     sInfo.pw.print("+ ");
@@ -454,7 +495,7 @@ public class XMLDiff {
                     sInfo.pw.println("The attribute '" + attr1.getLocalName() +
                         "' contains a difference value in the second node.");
                 }
-                return false;
+                return attsEqual;
             }
             
             ++count1;
@@ -716,21 +757,23 @@ public class XMLDiff {
     **/
     private boolean compareText(String s1, String s2) {
         
-        if (_ignoreWhitespace) {
-            StringTokenizer st1 = new StringTokenizer(s1);
-            StringTokenizer st2 = new StringTokenizer(s2);
+        if (!s1.equals(s2)) {
+            if (_ignoreWhitespace) {
+                StringTokenizer st1 = new StringTokenizer(s1);
+                StringTokenizer st2 = new StringTokenizer(s2);
 
-            while (st1.hasMoreTokens() && st2.hasMoreTokens()) {
-                if (!st1.nextToken().equals(st2.nextToken())) {
-                    return false;
+                while (st1.hasMoreTokens() && st2.hasMoreTokens()) {
+                    if (!st1.nextToken().equals(st2.nextToken())) {
+                        return false;
+                    }
                 }
-            }
 
-            if (st1.hasMoreTokens() || st2.hasMoreTokens())
-                return false; // one of the string is smaller than the other, we fail...
-        }
-        else {
-            return s1.equals(s2);
+                if (st1.hasMoreTokens() || st2.hasMoreTokens())
+                    return false; // one of the string is smaller than the other, we fail...
+            }
+            else {
+                return false;
+            }
         }
 
         return true;
