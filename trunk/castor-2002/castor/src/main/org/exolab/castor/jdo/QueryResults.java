@@ -48,9 +48,13 @@ package org.exolab.castor.jdo;
 
 
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 
 /**
+ * An iteration of the results of a query. This interface provides the
+ * ability to move forward only in the result set and pick the next
+ * result and close it.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -60,14 +64,39 @@ public interface QueryResults
 {
 
 
+    /**
+     * Returns true if there are any more results in the result set.
+     * If an error occured reading the last result, an exception will
+     * be thrown and the result set cannot be used further.
+     *
+     * @return True if there are any more results in the result set
+     * @throws PersistenceException An error with the persistence
+     *  engine
+     */
     public boolean hasMore()
         throws PersistenceException;
 
 
+    /**
+     * Returns the next result in the result set. If there are no
+     * more results (a previous cal to {@link #hasMore} returns
+     * false) this method will throw an exceptin. If an error
+     * occured reading the last result, an exception will be
+     * thrown and the result set cannot be used further.
+     *
+     * @return The next result in the result set
+     * @throws PersistenceException An error with the persistence
+     *  engine
+     * @throws NoSuchElementException There are no more results in
+     *  the result set
+     */
     public Object next()
-        throws PersistenceException;
+        throws PersistenceException, NoSuchElementException;
 
 
+    /**
+     * Closes the result set and releases all resources held by it.
+     */
     public void close();
 
 

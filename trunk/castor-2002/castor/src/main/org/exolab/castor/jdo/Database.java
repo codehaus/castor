@@ -71,10 +71,10 @@ package org.exolab.castor.jdo;
  * <p>
  * For example:
  * <pre>
- * Database    db;
- * Query       oql;
- * Product     prod;
- * Enumeration enum;
+ * Database     db;
+ * Query        oql;
+ * QueryResults results;
+ * Product      prod;
  *
  * <font color="red">// Open a database and start a transaction</font>
  * db = jdo.getDatabase();
@@ -82,10 +82,10 @@ package org.exolab.castor.jdo;
  * <font color="red">// Select all the products in a given group</font>
  * oql = db.getOQLQuery( "SELECT p FROM Product p WHERE group=$");
  * oql.bind( groupId );
- * enum = oql.execute();
- * while ( enum.hasMore() ) {
+ * results = oql.execute();
+ * while ( results.hasMore() ) {
  *   <font color="red">// A 25% mark down for each product and mark as sale</font>
- *   prod = (Product) enum.next();
+ *   prod = (Product) results.next();
  *   prod.markDown( 0.25 );
  *   prod.setOnSale( true );
  * }
