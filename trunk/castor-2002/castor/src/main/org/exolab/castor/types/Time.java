@@ -56,6 +56,7 @@ import java.util.Date;
  * <p>Describes an XML schema Time.
  * <p>The format is defined by W3C XML Schema Recommendation and ISO8601
  * i.e <tt>(-)hh:mm:ss.sss(Z|(+|-)hh:mm)</tt>
+ * <p> Currently deep support of milli seconds is not implemented.
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  * @see DateTimeBase
@@ -350,7 +351,7 @@ public class Time extends DateTimeBase {
          if (flags!=3 && flags != 0)
             throw new ParseException("Bad Time Format: "+str+"\nA Time must follow the pattern hh:mm:ss.s(Z|((+|-)hh:mm)).",idx);
         else if (flags == 3) {
-                result.setSecond(number, number2);
+                result.setSecond(number2, number);
         }
 
         else if (flags == 0) {
