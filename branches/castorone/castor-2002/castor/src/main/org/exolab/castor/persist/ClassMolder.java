@@ -824,9 +824,12 @@ public class ClassMolder {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                newfields[i] = new Object[] { _fhs[i].getValue( object ) };
                 if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
+                    updateCache = true;
                     if ( _fhs[i].isStored() ) {
-                        updateCache = true;
                         if ( _fhs[i].isCheckDirty() ) {
                             modified = true;
                             lockrequired = true;
@@ -1217,13 +1220,11 @@ public class ClassMolder {
         if ( lockrequired ) {
             //tx.writeLock( object, tx.getTransactionTimeout() );
         }
-
         tx.markModified( object, modified, updateCache );
 
-
-        if ( updateCache || modified ) 
+        if ( updateCache || modified )
             tx.writeLock( object, timeout );
-         
+
         return updateCache;
         // checkValidity
         // call store of each fieldMolder
