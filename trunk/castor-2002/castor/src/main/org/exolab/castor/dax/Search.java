@@ -65,13 +65,33 @@ public interface Search
 {
 
 
+    /**
+     * Sets the next query parameter. This method is called for
+     * each query parameter and sets its value. All query parameters
+     * must be set prior to calling {@link #execute}.
+     *
+     * @param value The query parameter's value
+     */
     public void setParameter( String value )
 	throws IndexOutOfBoundsException;
 
 
+    /**
+     * Returns the number of query parameters for this search.
+     *
+     * @return Number of query parameters
+     */
     public void getParameterCount();
 
 
+    /**
+     * Execute the search and return an enumeration of search
+     * results.
+     *
+     * @throws InvalidSearchException An invalid search expression
+     *  or query parameter
+     * @throws DirectoryException Directory access failed
+     */
     public Enumeration execute()
 	throws InvalidSearchException, DirectoryException;
 
