@@ -756,7 +756,7 @@ public class ClassMolder
                 // lazy loading for object (hollow object) is not support in
                 // this version. Warns user if lazy loading is specified.
                 if ( _fhs[i].isLazy() )
-                    System.err.println( "Warning: Lazy loading of object is not yet support!" );
+                    _log.info("Lazy loading of object is not yet support!" );
 
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
@@ -1249,7 +1249,7 @@ public class ClassMolder
                         break; // do the next field if both are null
 
                     if ( value != null && tx.isDeleted(value) ) {
-                        System.err.println("Warning: deleted object found!");
+                        _log.warn ("Deleted object found!");
                         if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
                             updatePersist = true;
                         updateCache = true;
