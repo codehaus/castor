@@ -1,6 +1,16 @@
 
 Version (CVS) 
 -------------
+
+XML:    Added initial support for wrapper elements, which are now supported 
+        via the bind-xml "location" attribute. More information will be
+        available in the docs, hopefully soon. 
+        (kvisco - 20030313)
+
+XML:    Applied Edwin Dankert's patch to DatatypeHandler (used by the 
+        XMLInstance2Schema tool) to support empty string values.
+        (kvisco - 20030312)
+        
 XML:    Fixed Bug 1232: The facet 'MinInclusive' was not handle properly for decimal
         datatype.
         (Arnaud - 20030225)
