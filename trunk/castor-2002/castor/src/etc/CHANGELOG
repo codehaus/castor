@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML:    Added fix to CollectionInfoJ2 for unbounded collections. (kvisco)
+           - reported by Julien Viet
+
 XML:    Added nested Exception support for SimpleTypesFactory (kvisco)
 
 XML:    Added nested Exception support for FieldHandlerImpl (kvisco)
