@@ -530,8 +530,7 @@ public class DescriptorSourceFactory {
         if (member.getName().equals("_anyObject")) return;
 
         XSType xsType = member.getSchemaType();
-
-        if (xsType.getType() == XSType.COLLECTION) {
+        if ((xsType.getType() == XSType.COLLECTION)){
                 XSList xsList = (XSList)xsType;
                 CollectionInfo cInfo = (CollectionInfo)member;
                 FieldInfo content = cInfo.getContent();
@@ -547,6 +546,9 @@ public class DescriptorSourceFactory {
 
 
             xsType = ((CollectionInfo)member).getContent().getSchemaType();
+            //special handling for NMTOKEN
+            if (xsType.getType() == XSType.NMTOKEN_TYPE)
+                return;
         }
         else if (member.isRequired()) {
             jsc.add("fieldValidator.setMinOccurs(1);");
