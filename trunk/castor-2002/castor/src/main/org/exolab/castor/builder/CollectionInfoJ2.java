@@ -372,8 +372,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         int maxSize = getXSList().getMaximumSize();
         if (maxSize != 0) {
             jsc.add("if (!(");
-            jsc.append(getName());
-            jsc.append(".size() < ");
+            jsc.append("index < ");
             jsc.append(Integer.toString(maxSize));
             jsc.append(")) {");
             jsc.indent();
