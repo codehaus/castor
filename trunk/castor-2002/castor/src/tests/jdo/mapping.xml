@@ -15,7 +15,7 @@
       <sql name="value1" type="varchar" />
     </field>
     <field name="people" type="jdo.TestManyPerson" collection="collection"
-    required="false" >
+    required="false" set-method="setPeople" get-method="getPeople">
     <sql many-table="test_group_person"/>
     </field>
   </class>
@@ -92,7 +92,8 @@
     <field name="birthday" type="date"  >
       <sql name="bday" type="date" />
     </field>
-    <field name="address" type="jdo.TestLazyAddress" collection="collection" lazy="true"/>
+    <field name="address" type="jdo.TestLazyAddress" collection="collection" lazy="true" 
+           set-method="setAddress" get-method="getAddress"/>
   </class>
 
   <class name="jdo.TestLazyAddress" depends="jdo.TestLazyPerson" identity="id">
