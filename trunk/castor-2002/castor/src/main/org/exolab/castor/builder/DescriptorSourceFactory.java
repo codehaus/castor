@@ -296,6 +296,8 @@ public class DescriptorSourceFactory {
                case XSType.ID_TYPE:
                        jsc.add("this.identity = desc;" );
                        break;
+                case XSType.QNAME_TYPE:
+                       jsc.add("desc.setSchemaType(\"QName\");");
                /***********************/
                default:
                    break;
