@@ -220,7 +220,7 @@ public class CastorTestCase extends TestCase {
         }
 
         try {
-            _testDescriptor = TestDescriptor.unmarshal(new InputStreamReader(descriptor));
+            _testDescriptor = (TestDescriptor) TestDescriptor.unmarshal(new InputStreamReader(descriptor));
         } catch (ValidationException ve) {
             verbose("Error reading: "+_testFile.getAbsolutePath());
             verbose("-> " + ve.toString());
@@ -237,7 +237,6 @@ public class CastorTestCase extends TestCase {
         String suiteName = _testDescriptor.getName();
         TestSuite suite = new TestSuite(suiteName);
         
-        
         verbose("Creating '" + suiteName + "' test suite");
 
         MarshallingTest mar = _testDescriptor.getTestDescriptorChoice().getMarshallingTest();
@@ -249,6 +248,7 @@ public class CastorTestCase extends TestCase {
             for (int i=0; i<mar.getUnitTestCaseCount(); ++i) {
                 UnitTestCase tc = mar.getUnitTestCase(i);
                 MarshallingFrameworkTestCase mftc = new MarshallingFrameworkTestCase(this, tc, mar, _outputRootFile);
+                mftc._configuration = mar.getConfiguration();
                 mftc.setTestSuiteName(suiteName);
                 suite.addTest(mftc.suite());
             }
