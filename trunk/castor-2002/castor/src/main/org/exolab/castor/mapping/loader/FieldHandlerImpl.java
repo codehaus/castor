@@ -400,7 +400,7 @@ public final class FieldHandlerImpl
 
     public void setValue( Object object, Object value )
     {
-        if ( _colHandler == null ) {
+        if ( _colHandler == null || _addMethod != null) {
 
             // If there is a convertor, apply conversion here.
             if ( value != null && _convertTo != null ) {

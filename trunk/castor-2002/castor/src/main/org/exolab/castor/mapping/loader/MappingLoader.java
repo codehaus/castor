@@ -673,11 +673,14 @@ public abstract class MappingLoader
             }
 
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
-
+              
             fieldName = fieldMap.getName(); // Not the same for nested fields
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
             handler = new FieldHandlerImpl( fieldName, getSequence, setSequence, getMethod, setMethod, typeInfo );
+
+            if ((setMethod != null) && (setMethod.getName().startsWith(ADD_METHOD_PREFIX)))
+                handler.setAddMethod(setMethod);
         }
 
         // If there is a create method, add it to the field handler
