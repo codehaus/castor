@@ -583,7 +583,7 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- If _topClass is null, then we need to search
             //-- the resolver for one
             if (_topClass == null) {
-                classDesc = _cdResolver.resolveByXMLName(name, null);
+                classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
 
                 if (classDesc != null)
                     _topClass = classDesc.getJavaClass();
@@ -723,20 +723,27 @@ public final class UnmarshalHandler extends MarshalFramework
         */
         XMLClassDescriptor cdInherited = null;
         if (descriptor == null) {
-            cdInherited = _cdResolver.resolveByXMLName(name, null);
-            if (cdInherited != null) {
-                Class subclass = cdInherited.getJavaClass();
-                XMLFieldDescriptor[] descriptors =
-                    classDesc.getElementDescriptors();
-                for (int i = 0; i < descriptors.length; i++) {
-                    if (descriptors[i] == null) continue;
-                    //-- check for inheritence
-                    Class superclass = descriptors[i].getFieldType();
-                    if (superclass.isAssignableFrom(subclass)) {
-                        descriptor = descriptors[i];
-                        break;
+            ClassDescriptorEnumeration cde = 
+                _cdResolver.resolveAllByXMLName(name, namespace, null);
+                
+            if (cde.hasNext()) {
+                XMLFieldDescriptor[] descriptors 
+                    = classDesc.getElementDescriptors();
+                while (cde.hasNext() && (descriptor == null)) {
+                    cdInherited = cde.getNext();
+                    Class subclass = cdInherited.getJavaClass();
+                    for (int i = 0; i < descriptors.length; i++) {
+                        if (descriptors[i] == null) continue;
+                        //-- check for inheritence
+                        Class superclass = descriptors[i].getFieldType();
+                        if (superclass.isAssignableFrom(subclass)) {
+                            descriptor = descriptors[i];
+                            break;
+                        }
                     }
                 }
+                //-- reset inherited class descriptor, if necessary
+                if (descriptor == null) cdInherited = null;
             }
         } /* end of additional inheritance logic */
 
@@ -841,7 +848,7 @@ public final class UnmarshalHandler extends MarshalFramework
         classDesc = null;
         if (cdInherited != null) classDesc = cdInherited;
         else if (!name.equals(descriptor.getXMLName()))
-            classDesc = _cdResolver.resolveByXMLName(name, null);
+            classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
 
         if (classDesc == null)
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
@@ -910,7 +917,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
                 //-- first look for a descriptor based
                 //-- on the XML name
-                classDesc = _cdResolver.resolveByXMLName(name, loader);
+                classDesc = _cdResolver.resolveByXMLName(name, namespace, loader);
                 //-- if null, create classname, and try resolving
                 String cname = null;
                 if (classDesc == null) {
@@ -1058,7 +1065,7 @@ public final class UnmarshalHandler extends MarshalFramework
             // Retrieve the type corresponding to the schema name and
             // return it.
             XMLClassDescriptor classDesc =
-                _cdResolver.resolveByXMLName(xsiTypeAttribute, null);
+                _cdResolver.resolveByXMLName(xsiTypeAttribute, null, null);
 
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
