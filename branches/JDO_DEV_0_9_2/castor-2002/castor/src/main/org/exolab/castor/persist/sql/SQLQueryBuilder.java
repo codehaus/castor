@@ -89,7 +89,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see SQLQueryExecutor
  */
-public class SQLQueryBuilder implements SQLQueryKinds {
+public final class SQLQueryBuilder implements SQLQueryKinds {
 
     /**
      * The factory method for creating instances of this class.
@@ -108,7 +108,7 @@ public class SQLQueryBuilder implements SQLQueryKinds {
         if (kind == LOOKUP || kind == SELECT) {
             try {
                 query = factory.getQueryExpression();
-                buildLookup(query, info, oneToManyPath);
+                buildLookup(factory, query, info, oneToManyPath);
                 if (kind == SELECT) {
                     buildSelect(query, info);
                 }
@@ -202,11 +202,12 @@ public class SQLQueryBuilder implements SQLQueryKinds {
         return getExecutor(factory, connector, log, info, DELETE, dirtyCheckNulls, false, null);
     }
 
-    private static void buildLookup(QueryExpression query, SQLEntityInfo info,
+    private static void buildLookup(BaseFactory factory, QueryExpression query, SQLEntityInfo info,
                                     SQLRelationInfo[] oneToManyPath)
             throws QueryException {
         String entityClass;
         String[] names;
+        StringBuffer order;
 
         if (oneToManyPath == null) {
             entityClass = info.info.entityClass;
@@ -218,11 +219,21 @@ public class SQLQueryBuilder implements SQLQueryKinds {
         for (int i = 0; i < names.length; i++) {
             query.addParameter(entityClass, names[i], QueryExpression.OpEquals);
         }
-        if (oneToManyPath != null) {
+        if (oneToManyPath != null && oneToManyPath.length > 1) {
             for (int i = 1; i < oneToManyPath.length; i++) {
                 query.addInnerJoin(oneToManyPath[i].oneInfo.info.entityClass, oneToManyPath[i].oneInfo.idNames,
                                    oneToManyPath[i].manyTable, oneToManyPath[i].manyForeignKey.fieldNames);
             }
+            entityClass = oneToManyPath[oneToManyPath.length - 1].manyTable;
+            names = oneToManyPath[oneToManyPath.length - 1].manyForeignKey.fieldNames;
+            order = new StringBuffer(256);
+            for (int i = 0; i < names.length; i++) {
+                if (i > 0) {
+                    order.append(',');
+                }
+                order.append(factory.quoteName(entityClass + "." + names[i]));
+            }
+            query.addOrderClause(order.toString());
         }
     }
 

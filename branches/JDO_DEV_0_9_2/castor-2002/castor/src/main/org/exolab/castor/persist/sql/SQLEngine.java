@@ -48,8 +48,10 @@ package org.exolab.castor.persist.sql;
 
 
 import java.util.Vector;
+import java.util.Iterator;
 import java.util.Stack;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -111,7 +113,7 @@ import org.exolab.castor.util.Messages;
  *
  * @version $Revision$ $Date$
  */
-public final class SQLEngine implements Persistence, SQLQueryKinds {
+public final class SQLEngine implements Persistence, SQLConnector.ConnectorListener, SQLQueryKinds {
 
     private final static boolean ID_TYPE = true;
 
@@ -183,6 +185,11 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
 
 
     private SQLConnector         _connector;
+
+    /**
+     * The HashMap maps Key to the set of LoadedRelations.
+     */
+    private HashMap _loadedRelations = new HashMap();
 
 
     SQLEngine( EntityInfo info, LockEngine lockEngine, LogInterceptor log,
@@ -309,7 +316,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
         if (_sqlCreate == null) {
             _sqlCreate = SQLQueryBuilder.getCreateExecutor(_factory, _connector, _log, _info);
         }
-        _sqlCreate.execute(key, _lockEngine, (Connection) conn, entity, null, null);
+        _sqlCreate.execute(key, _lockEngine, (Connection) conn, entity.identity, entity, null, null, null);
     }
 
     private BitSet getDirtyCheckNulls(Entity original) {
@@ -387,7 +394,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
                 _sqlStoreDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
         }
-        executor.execute(key, _lockEngine, (Connection) conn, entity, original, null);
+        executor.execute(key, _lockEngine, (Connection) conn, entity.identity, entity, original, null, null);
     }
 
 
@@ -428,7 +435,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
                 _sqlRemoveDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
         }
-        executor.execute(key, _lockEngine, (Connection) conn, original, original, null);
+        executor.execute(key, _lockEngine, (Connection) conn, original.identity, null, original, null, null);
     }
 
 
@@ -454,7 +461,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
         if (_sqlLock == null) {
             _sqlLock = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, true);
         }
-        _sqlLock.execute(key, _lockEngine, (Connection) conn, entity, null, null);
+        _sqlLock.execute(key, _lockEngine, (Connection) conn, entity.identity, null, null, null, null);
     }
 
 
@@ -477,19 +484,21 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
      * @throws PersistenceException A persistence error occured
      */
     public void load( Key key, Object conn, Entity entity, AccessMode accessMode )
-        throws PersistenceException {
+            throws PersistenceException {
+        SQLQueryExecutor executor;
 
         if (accessMode == AccessMode.DbLocked) {
             if (_sqlLoadLock == null) {
                 _sqlLoadLock = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true, null);
             }
-            _sqlLoadLock.execute(key, _lockEngine, (Connection) conn, entity, null, null);
+            executor = _sqlLoadLock;
         } else {
             if (_sqlLoad == null) {
                 _sqlLoad = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, false, null);
             }
-            _sqlLoad.execute(key, _lockEngine, (Connection) conn, entity, null, null);
+            executor = _sqlLoad;
         }
+        executor.execute(key, _lockEngine, (Connection) conn, entity.identity, entity, null, null, null);
     }
 
     /**
@@ -510,8 +519,43 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
         SQLQueryExecutor executor;
         SQLRelationInfo[] oneToManyPath;
         HashMap map;
+        LoadedRelation lr = null;
+        Set lrSet;
+        String oneTable;
+        Object identity;
+        boolean found;
+        List list;
 
-        oneToManyPath = new SQLRelationInfo[] {SQLRelationInfo.getInstance(relation.fieldInfo)};
+        found = false;
+        lrSet = (Set) _loadedRelations.get(key);
+        if (lrSet == null) {
+            lrSet = new HashSet();
+            _loadedRelations.put(key, lrSet);
+            _connector.addListener(key, this);
+        } else {
+            // if the given identity on "one" side of the current Relation appeared in the list of identities
+            // on "many" side of one of the loaded relations, then we pre-fetch relations.
+            oneTable = relation.fieldInfo.entityClass.entityClass;
+            for (Iterator it = lrSet.iterator(); it.hasNext(); ) {
+                lr = (LoadedRelation) it.next();
+                if (lr.manyTable.equals(oneTable) && lr.list.contains(relation.identity)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (found) {
+            oneToManyPath = new SQLRelationInfo[lr.oneToManyPath.length + 1];
+            System.arraycopy(lr.oneToManyPath, 0, oneToManyPath, 0, lr.oneToManyPath.length);
+            identity = lr.identity;
+            list = new ArrayList();
+        } else {
+            oneToManyPath = new SQLRelationInfo[1];
+            identity = relation.identity;
+            list = relation.list;
+        }
+        oneToManyPath[oneToManyPath.length - 1] = SQLRelationInfo.getInstance(relation.fieldInfo);
+
         if (accessMode == AccessMode.DbLocked) {
             if (_sqlRelatedLockMap == null) {
                 _sqlRelatedLockMap = new HashMap();
@@ -528,7 +572,23 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
             executor = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true, oneToManyPath);
             map.put(relation.fieldInfo, executor);
         }
-        executor.execute(key, _lockEngine, (Connection) conn, null, null, relation);
+        executor.execute(key, _lockEngine, (Connection) conn, identity, null, null, relation, list);
+        lrSet.remove(lr);
+        lrSet.add(new LoadedRelation(oneToManyPath, identity, list));
+    }
+
+    /**
+     * Implementation of SQLConnector.ConnectorListener
+     */
+    public void connectionPrepare( Key key ) {
+        _loadedRelations.remove(key);
+        _connector.removeListener(key, this);
+    }
+
+    /**
+     * Implementation of SQLConnector.ConnectorListener
+     */
+    public void connectionRelease( Key key ) {
     }
 
 /* TODO: redesign

@@ -47,6 +47,7 @@
 package org.exolab.castor.persist.sql;
 
 import java.util.Set;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see SQLQueryBuilder
  */
-public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQueryKinds {
+public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQueryKinds {
 
     /**
      * The maximum depth of the inheritance tree
@@ -195,19 +196,21 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     /**
      * This method is used by SQLEngine in create(), update(), delete() and load().
      * @param lockEngine The lock engine, used to addCache and addRelated.
+     * @param identity The identity that is used as the query parameter.
      * @param entity The main Entity (input or output).
      * @param original The original value of Entity, it is used for UPDATE and DELETE with dirty checking.
      * @param relation The relation to load.
+     * @param list The list of all loaded entities (used with relation).
      */
-    public void execute(Key key, LockEngine lockEngine, Connection conn, Entity entity, Entity original,
-                        Relation relation)
+    public void execute(Key key, LockEngine lockEngine, Connection conn, Object identity,
+                        Entity entity, Entity original, Relation relation, List list)
             throws PersistenceException {
         boolean useBatch;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int count;
-        Object identity;
         Entity tmpEntity;
+        Relation relation2;
 
         try {
             useBatch = (_canUseBatch && conn.getMetaData().supportsBatchUpdates());
@@ -259,9 +262,9 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
 
             if (_kind == INSERT && _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT) {
                 entity.identity = generateKey(conn); // Generate key before INSERT
+                identity = entity.identity;
             }
 
-            identity = (entity != null ? entity.identity : relation.identity);
             if (identity != null) {
                 count = bindIdentity(identity, stmt, count, _idInfo);
             }
@@ -285,7 +288,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             // execute the query
             if (_kind == SELECT || _kind == LOOKUP) {
                 rs = stmt.executeQuery();
-                if (entity != null) { // loding one entity => must exist
+                if (_kind == LOOKUP || entity != null) { // lookup or load one entity => must exist
                     if (!rs.next()) {
                         throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _info, identity) );
                     }
@@ -319,12 +322,31 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
                 if (relation.list == null) {
                     relation.list = new ArrayList();
                 }
+                // The following algorithm pre-fetches relations assuming that
+                // the ResultSet is ordered by the foreign key.
+                relation2 = null;
                 while (rs.next()) {
                     entity = new Entity();
                     entity.info = _info.superEntities[0].info;
                     loadEntity(entity, rs);
-                    relation.list.add(entity.identity);
+                    list.add(entity.identity);
                     lockEngine.addEntity(key, entity);
+                    // did we load the needed relation?
+                    identity = entity.getFieldValue(relation.fieldInfo.relatedForeignKey);
+                    if (identity.equals(relation.identity)) {
+                        relation.list.add(entity.identity);
+                    } else {
+                        if (relation2 == null || !identity.equals(relation2.identity)) {
+                            if (relation2 != null) {
+                                lockEngine.addRelated(key, relation2);
+                            }
+                            relation2 = new Relation(relation.fieldInfo, identity, new ArrayList());
+                        }
+                        relation2.list.add(entity.identity);
+                    }
+                }
+                if (relation2 != null) {
+                    lockEngine.addRelated(key, relation2);
                 }
             }
         } catch (SQLException except) {
@@ -489,7 +511,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             _pkLookup = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, false);
         }
         try {
-            _pkLookup.execute(key, lockEngine, conn, entity, null, null);
+            _pkLookup.execute(key, lockEngine, conn, entity.identity, null, null, null, null);
 
             // The entity exists in the database
             if (_kind == INSERT) {
