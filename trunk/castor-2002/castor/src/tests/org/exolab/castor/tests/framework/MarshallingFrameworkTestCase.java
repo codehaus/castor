@@ -54,7 +54,7 @@ import org.exolab.castor.tests.framework.ObjectModelInstanceBuilder;
 import org.exolab.castor.tests.framework.CastorTestable;
 import org.exolab.castor.tests.framework.testDescriptor.MarshallingTest;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
-import org.exolab.castor.tests.framework.testDescriptor.RootObject;
+import org.exolab.castor.tests.framework.testDescriptor.Root_Object;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.Marshaller;
@@ -87,10 +87,10 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
     /**
      * Create a new test case for the given setup.
      */
-    public MarshallingFrameworkTestCase(CastorJarTestCase jarTest, UnitTestCase unit, MarshallingTest marshalling, File outputRoot) {
-        super(jarTest, unit, outputRoot);
+    public MarshallingFrameworkTestCase(CastorTestCase test, UnitTestCase unit, MarshallingTest marshalling, File outputRoot) {
+        super(test, unit, outputRoot);
         _marshallingConf = marshalling;
-        _hasRandom       = _marshallingConf.getRootObject().getRandom();
+        _hasRandom       = _marshallingConf.getRoot_Object().getRandom();
     }
 
     /**
@@ -101,7 +101,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         super(name, mftc);
         _marshallingConf = mftc._marshallingConf;
     }
-    
+
     /**
      * Create a new MarshallingFrameworkTestCase with the given name.
      */
@@ -114,9 +114,9 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
      * Return the test suite for this given test setup.
      */
     public Test suite() {
-        
+
         TestSuite suite  = new TestSuite(_name);
-        
+
         // Use the default test implemented in XMLTestCase
         suite.addTest(new MarshallingFrameworkTestCase("testWithReferenceDocument", this));
 
@@ -134,34 +134,34 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         throws java.lang.Exception {
 
         verbose("\n========================================");
-        verbose("Setting up test for '" + _name + "' from '" + _jarTest.getName() + "'");
+        verbose("Setting up test for '" + _name + "' from '" + _test.getName() + "'");
 
         _inputName  = _unitTest.getInput();
         _outputName = _unitTest.getOutput();
 
         if (_inputName != null)
-            _input  = _jarTest.getClassLoader().getResourceAsStream(_inputName);
+            _input  = _test.getClassLoader().getResourceAsStream(_inputName);
 
         assert("An input file is specified by can't be found", (_inputName == null) || (_input != null));
 
         if (_outputName != null)
-            _output = _jarTest.getClassLoader().getResourceAsStream(_outputName);
+            _output = _test.getClassLoader().getResourceAsStream(_outputName);
 
         assert("An output file is specified by can't be found", (_outputName == null) || (_output != null));
 
 
-        RootObject rootType = _marshallingConf.getRootObject();
+        Root_Object rootType = _marshallingConf.getRoot_Object();
         _rootClassName = rootType.getContent();
         _hasDump =   rootType.getDump();
         _hasRandom = rootType.getRandom();
 
         if (_rootClassName == null)
-            throw new Exception("No object root found in test descriptor"); 
+            throw new Exception("No object root found in test descriptor");
 
-        _rootClass =  _jarTest.getClassLoader().loadClass(_rootClassName);
+        _rootClass =  _test.getClassLoader().loadClass(_rootClassName);
 
         // Try to load the mapping file if any, else we will use the introspector
-        String mappingFilePath = _marshallingConf.getMappingFile();
+        String mappingFilePath = _marshallingConf.getMapping_File();
 
         if (mappingFilePath == null) {
             verbose("### TESTING INTROSPECTION ###");
@@ -169,23 +169,23 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         } else {
             verbose("### TESTING MAPPING ###");
             verbose("Mapping file: " + mappingFilePath);
-            InputStream mappingFile = _jarTest.getClassLoader().getResourceAsStream(mappingFilePath);
-            
+            InputStream mappingFile = _test.getClassLoader().getResourceAsStream(mappingFilePath);
+
             if (mappingFile == null)
-                throw new Exception("Unable to locate the mapping file '" + _marshallingConf.getMappingFile() + "' in the jar '" + _jarTest.getName() + "'");
-            
-            _mapping = new Mapping(_jarTest.getClassLoader());
+                throw new Exception("Unable to locate the mapping file '" + _marshallingConf.getMapping_File() + "' in the jar '" + _test.getName() + "'");
+
+            _mapping = new Mapping(_test.getClassLoader());
             _mapping.loadMapping(new InputSource(mappingFile));
         }
     }
-    
-    
+
+
     /**
      * Clean up the tests.
      */
     protected void tearDown()
         throws java.lang.Exception {
-        
+
         verbose("Test for '" + _name + "' complete");
         verbose("========================================");
 

@@ -45,37 +45,17 @@
 
 package org.exolab.castor.tests.framework;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.exolab.castor.tests.framework.testDescriptor.RootObject;
-import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
-import org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest;
-
-import org.exolab.castor.builder.FieldInfoFactory;
-
-import sun.misc.URLClassPath;
-
-import java.net.URLClassLoader;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.File;
-
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
-
-import org.exolab.castor.builder.SourceGenerator;
-
-import java.util.Properties;
-import java.util.Vector;
-import java.util.Enumeration;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.jar.*;
+import java.util.zip.*;
+import junit.framework.*;
+import org.apache.tools.ant.*;
+import org.apache.tools.ant.taskdefs.*;
+import org.apache.tools.ant.types.*;
+import org.exolab.castor.builder.*;
+import org.exolab.castor.tests.framework.testDescriptor.*;
 
 /**
  * This class encapsulate all the logic to run the tests patterns for the source
@@ -105,12 +85,18 @@ public class SourceGeneratorTestCase extends XMLTestCase {
     private String _fieldInfoFactoryName;
 
     /**
+     * the compilation ANT task
+     */
+    private Javac _compileTask;
+
+    /**
      * Create a new test case for the given setup.
      */
-    public SourceGeneratorTestCase(CastorJarTestCase jarTest, UnitTestCase unit, SourceGeneratorTest sourceGen, File outputRoot) {
-        super(jarTest, unit, outputRoot);
+    public SourceGeneratorTestCase(CastorTestCase test, UnitTestCase unit, SourceGeneratorTest sourceGen, File outputRoot) {
+        super(test, unit, outputRoot);
         _sourceGenConf  = sourceGen;
-        _hasRandom      = _sourceGenConf.getRootObject().getRandom();
+        _hasRandom      = _sourceGenConf.getRoot_Object().getRandom();
+        initCompileTask();
     }
 
     /**
@@ -120,6 +106,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
     public SourceGeneratorTestCase(String name, SourceGeneratorTestCase sgtc) {
         super(name, sgtc);
         _sourceGenConf  = sgtc._sourceGenConf;
+        initCompileTask();
     }
 
     /**
@@ -128,6 +115,18 @@ public class SourceGeneratorTestCase extends XMLTestCase {
     public SourceGeneratorTestCase(String name) {
         super(name);
         _name = name;
+        initCompileTask();
+    }
+
+    private void initCompileTask() {
+        if (_compileTask == null) {
+            Project project = new Project();
+            project.init();
+            _compileTask = new Javac();
+            project.setBasedir(".");
+            _compileTask.setProject(project);
+            _compileTask.setFork(true);
+        }
     }
 
 
@@ -154,10 +153,10 @@ public class SourceGeneratorTestCase extends XMLTestCase {
         throws java.lang.Exception {
 
         verbose("\n========================================");
-        verbose("Setting up test for '" + _name + "' from '" + _jarTest.getName() + "'");
+        verbose("Setting up test for '" + _name + "' from '" + _test.getName() + "'");
 
         // 0. Get information to run the test
-        _propertyFileName     = _sourceGenConf.getPropertyFile();
+        _propertyFileName     = _sourceGenConf.getProperty_File();
 
         _fieldInfoFactoryName = _sourceGenConf.getFieldInfoFactory();
 
@@ -165,12 +164,12 @@ public class SourceGeneratorTestCase extends XMLTestCase {
         _outputName = _unitTest.getOutput();
 
         if (_inputName != null)
-            _input  = _jarTest.getClassLoader().getResourceAsStream(_inputName);
+            _input  = _test.getClassLoader().getResourceAsStream(_inputName);
 
         if (_outputName != null)
-            _output = _jarTest.getClassLoader().getResourceAsStream(_outputName);
+            _output = _test.getClassLoader().getResourceAsStream(_outputName);
 
-        RootObject rootType = _sourceGenConf.getRootObject();
+        Root_Object rootType = _sourceGenConf.getRoot_Object();
         _rootClassName      = rootType.getContent();
         _hasDump            = rootType.getDump();
         _hasRandom          = rootType.getRandom();
@@ -192,7 +191,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
             SourceGenerator sourceGen = null;
 
             if (_fieldInfoFactoryName != null) {
-                Class factoryClass = _jarTest.getClassLoader().loadClass(_fieldInfoFactoryName);
+                Class factoryClass = _test.getClassLoader().loadClass(_fieldInfoFactoryName);
                 FieldInfoFactory factory = (FieldInfoFactory)factoryClass.newInstance();
                 sourceGen = new SourceGenerator(factory);
             } else
@@ -200,7 +199,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
 
             if (_propertyFileName != null) {
                 Properties prop = new Properties();
-                prop.load(_jarTest.getClassLoader().getResourceAsStream(_propertyFileName));
+                prop.load(_test.getClassLoader().getResourceAsStream(_propertyFileName));
                 sourceGen.setDefaultProperties(prop);
             }
             //don't forget to reset the properties
@@ -208,26 +207,37 @@ public class SourceGeneratorTestCase extends XMLTestCase {
            // equals() is needed to compare two objects
             sourceGen.setEqualsMethod(true);
             sourceGen.setTestable(true);
+            sourceGen.setSuppressNonFatalWarnings(true);
 
             sourceGen.setDestDir(_outputRootFile.getAbsolutePath());
             sourceGen.generateSource(new FileReader(_schemaFile), null);
 
             // 3. Compile the file generated by the source generator
             verbose("Compiling the files");
-            Vector fileList = CompilerHelper.findAllJavaFiles(_outputRootFile, new Vector());
+            //Vector fileList = CompilerHelper.findAllJavaFiles(_outputRootFile, new Vector());
 
-            assert("Unable to find the file generated by the source compiler", fileList.size() != 0);
+            //assert("Unable to find the file generated by the source compiler", fileList.size() != 0);
 
-            CompilerHelper.compile(_outputRootFile.getAbsolutePath(), fileList, null);
+            //INVOKE ANT API FOR COMPILATION
+            _compileTask.setDestdir(_outputRootFile.getAbsoluteFile());
+            Path classpath = _compileTask.createClasspath();
+            classpath.setPath(System.getProperty("java.class.path"));
+            _compileTask.setClasspath(classpath);
+
+            Path sourcepath = _compileTask.createSrc();
+            sourcepath.setLocation(_outputRootFile);
+            _compileTask.setSrcdir(sourcepath);
+            _compileTask.execute();
         }
 
         // 4. Nest the class loader to look into the tmp dir
-        ClassLoader loader =  new URLClassLoader(URLClassPath.pathToURLs(_outputRootFile.getAbsoluteFile().toString()),
-                                                 _jarTest.getClassLoader());
-        _jarTest.setClassLoader(loader);
+        //don't forget to add the previous path
+        URL[] urlList = {_test.getTestFile().toURL(), _outputRootFile.toURL()};
+        ClassLoader loader =  new URLClassLoader(urlList, _test.getClass().getClassLoader());
+        _test.setClassLoader(loader);
 
         // 5. Set up the root class
-        _rootClass =  _jarTest.getClassLoader().loadClass(_rootClassName);
+        _rootClass =  _test.getClassLoader().loadClass(_rootClassName);
     }
 
     /**
@@ -249,17 +259,32 @@ public class SourceGeneratorTestCase extends XMLTestCase {
     private void copySupportFiles(File root)
         throws IOException, FileNotFoundException {
 
-        JarFile jar = new JarFile(_jarTest.getJarFile());
-        for (Enumeration e = jar.entries(); e.hasMoreElements(); ) {
-            ZipEntry entry = (ZipEntry)e.nextElement();
-            if (isSupportFile(entry.getName())) {
-                verbose("Moving file '" + entry.getName() + "' into the output directory");
-                InputStream src = jar.getInputStream(entry);
-                File out = new File(root, entry.getName());
-                out.getParentFile().mkdirs();
-                copy(src, new FileOutputStream(out));
-            }
+        if (_test.getType() == CastorTestCase.JAR) {
+            JarFile jar = new JarFile(_test.getTestFile());
+            for (Enumeration e = jar.entries(); e.hasMoreElements(); ) {
+                ZipEntry entry = (ZipEntry)e.nextElement();
+                if (isSupportFile(entry.getName())) {
+                    verbose("Moving file '" + entry.getName() + "' into the output directory");
+                    InputStream src = jar.getInputStream(entry);
+                    File out = new File(root, entry.getName());
+                    out.getParentFile().mkdirs();
+                    copy(src, new FileOutputStream(out));
+                }
+            }//for
         }
+        else if (_test.getType() == CastorTestCase.DIRECTORY) {
+            File[] entries = _test.getTestFile().listFiles();
+            for (int i=0 ; i<entries.length; i++) {
+                File tempEntry = entries[i];
+                if (isSupportFile(tempEntry.getName())) {
+                    verbose("Moving file '" + tempEntry.getName() + "' into the output directory");
+                    InputStream src = new FileInputStream(tempEntry);
+                    File out = new File(root, tempEntry.getName());
+                    out.getParentFile().mkdirs();
+                    copy(src, new FileOutputStream(out));
+                }
+            }//for
+        }//else
     }
 
 
