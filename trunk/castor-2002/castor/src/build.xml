@@ -119,7 +119,7 @@
     <jar      jarfile="${dist}/${archive}-xml.jar" basedir="${classes}"
               manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,CHANGELOG,
               org/exolab/castor/xml/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,
-	          org/exolab/castor/*" />
+              org/exolab/castor/*" />
   </target>
 
 
@@ -151,9 +151,7 @@
     <mkdir   dir="${build}/doc/javadoc" />
     <javadoc sourcepath="${main}" destdir="${build}/doc/javadoc" dir="."
              doctitle="Castor" public="true" noindex="true" author="true"
-	         packagenames="org.exolab.castor.xml, org.exolab.castor.jdo, org.exolab.castor.dax,
-            org.exolab.castor.persist.*, org.exolab.castor.mapping,
-            org.exolab.castor.dsml, org.exolab.castor.util" />
+             packagenames="org.*" />
   </target>
 
   <target name="docs" depends="doc,javadoc">
