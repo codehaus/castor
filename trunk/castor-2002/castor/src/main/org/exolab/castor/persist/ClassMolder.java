@@ -1722,6 +1722,7 @@ public class ClassMolder {
                     break;
 
                 case FieldMolder.ONE_TO_MANY:
+                case FieldMolder.MANY_TO_MANY:
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
                     if ( _fhs[i].isDependent() ) {
@@ -1772,8 +1773,6 @@ public class ClassMolder {
                             }
                         }
                     }
-                    break;
-                case FieldMolder.MANY_TO_MANY:
                     break;
                 }
             }
