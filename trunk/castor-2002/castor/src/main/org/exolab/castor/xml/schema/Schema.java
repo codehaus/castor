@@ -815,18 +815,20 @@ public class Schema extends Annotated {
         //-- Get SimpleType object
         SimpleType result = null;
         if (ns == null) {
-            //-- first try built-in types
-            result= simpleTypesFactory.getBuiltInType(name);
-            //if we have a built-in type not declared in the good namespace -> Exception
-             if ( (result != null) && (_namespaces.contains(DEFAULT_SCHEMA_NS))) {
-                String err = "getSimpleType: the simple type '"+name+
-                             "' has not been declared in XML Schema namespace.";
-                throw new IllegalArgumentException(err);
+            
+            //-- first check user-defined types
+            result = (SimpleType)_simpleTypes.get(name);
+            
+            //-- otherwise try built-in types
+            if (result == null) {
+                result= simpleTypesFactory.getBuiltInType(name);
+                //if we have a built-in type not declared in the good namespace -> Exception
+                if ( (result != null) && (_namespaces.contains(DEFAULT_SCHEMA_NS))) {
+                    String err = "getSimpleType: the simple type '"+name+
+                                "' has not been declared in XML Schema namespace.";
+                    throw new IllegalArgumentException(err);
+                }
             }
-
-            //-- otherwise check user-defined types
-            if (result == null)
-                result = (SimpleType)_simpleTypes.get(name);
         }
         else if (ns.equals(_schemaNamespace))
             result= simpleTypesFactory.getBuiltInType(canonicalName);
