@@ -213,7 +213,6 @@ class DatingService {
             javaClasses = new Hashtable();
         else if ( javaClasses.contains( className ) )
             return (Class) javaClasses.get( className );
-
         resolved = Types.typeFromName( loader, className );
         javaClasses.put( className, resolved );
         return resolved;
