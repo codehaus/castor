@@ -362,11 +362,7 @@ public abstract class MappingLoader
             relDesc = getDescriptor( fields[ i ].getFieldType() );
             if ( relDesc == NoDescriptor ) {
             } else if ( relDesc != null ) {
-                handler = fields[ i ].getHandler();
-                handler = new IndirectFieldHandler( relDesc.getIdentity().getHandler(), handler,
-                                                    fields[ i ].isRequired() );
-                ( (FieldDescriptorImpl) fields[ i ] ).setHandler( handler );
-                ( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
+		( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
             }
         }
     }
