@@ -105,6 +105,20 @@ create unique index test_pks_payroll_pk on test_pks_payroll( id );
 grant all on test_pks_payroll to test;
 
 
+drop table test_pks_project;
+
+create table test_pks_project (
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  id    int             not null,
+  name  varchar(100)
+);
+
+create unique index test_pks_project_pk on test_pks_project( id );
+
+grant all on test_pks_payroll to test;
+
+
 drop table test_pks_address;
 
 create table test_pks_address (
