@@ -324,11 +324,26 @@ public class XMLClassDescriptorImpl extends Validator
             for (int i = 0; i < elementDescriptors.size(); i++) {
                 desc = (XMLFieldDescriptor)elementDescriptors.get(i);
                 if (desc == null) continue;
+
                 if (desc.matches(name)) {
-                    if (!desc.matches(WILDCARD)) return desc;
-                    result = desc;
+                      if (!desc.matches(WILDCARD)) return desc;
+                      result = desc;
+                      break;
                 }
+
+                //handle container
+                if ( (result == null) && desc.isContainer() ) {
+                    XMLClassDescriptor xcd = (XMLClassDescriptor)desc.getClassDescriptor();
+
+                    //is it in this class descriptor?
+                    if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
+                        result = desc;
+                        break;
+                    }
+
+                }//container
             }
+
             if (result != null)
                 return result;
         }
@@ -336,11 +351,13 @@ public class XMLClassDescriptorImpl extends Validator
         if (wild || (nodeType == NodeType.Attribute)) {
             XMLFieldDescriptor desc = null;
             for (int i = 0; i < attributeDescriptors.size(); i++) {
+
                 desc = (XMLFieldDescriptor)attributeDescriptors.get(i);
                 if (desc == null)
                     continue;
-                if (desc.matches(name))
+                if (desc.matches(name)) {
                     return desc;
+                }
             }
         }
 
@@ -350,9 +367,14 @@ public class XMLClassDescriptorImpl extends Validator
             XMLFieldDescriptor desc = null;
             for (int i = 0; i < elementDescriptors.size(); i++) {
                 desc = (XMLFieldDescriptor)elementDescriptors.get(i);
+
                 if (desc.isContainer()) {
-                    if (desc.matches(name))
-                        return desc;
+                     XMLClassDescriptor xcd = (XMLClassDescriptor)desc.getClassDescriptor();
+                    //is it in this class descriptor?
+                    XMLFieldDescriptor temp = xcd.getFieldDescriptor(name, NodeType.Attribute);
+                    if (temp != null) {
+                        return temp;
+                    }
                 }
             }
         }
@@ -824,8 +846,97 @@ public class XMLClassDescriptorImpl extends Validator
         return _accessMode;
     } //-- getAccessMode
 
+    /**
+     * <p>Returns true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
+     * the given name anf if the given object can hold this field (i.e a value is not already set for
+     * this field).
+     * The different criterias for accepting a field with a given name are:
+     * <ul>
+     *    <li>an <tt>XMLFieldDescriptor</tt> of this XMLClassDescriptorImpl that matches
+     *    the given field name exists.</li>
+     *    <li>A value has not already been set for the field.</li>
+     *    <li>If the XMLClassDescriptorImpl represents a CHOICE then no other value must have
+     *    been set.</li>
+     * </ul>
+     *
+     * @param fieldName the name of the field to check
+     * @param object the object represented by this XMLCLassDescriptor
+     * @return true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     */
+    public boolean canAccept(String fieldName, Object object) {
 
+        boolean result = false;
+        boolean hasValue = false;
+        XMLFieldDescriptor[] fields = null;
+        int i = 0;
+        //1--direct look up for a field
+        XMLFieldDescriptor fieldDesc = this.getFieldDescriptor(fieldName, NodeType.Element);
+        if (fieldDesc == null)
+           fieldDesc = this.getFieldDescriptor(fieldName, NodeType.Attribute);
 
+        //if the descriptor is still null, the field can't be in stored in this classDescriptor
+        if (fieldDesc == null)
+            return false;
+
+        //2-- the fieldDescriptor is a container
+        if (fieldDesc.isContainer()) {
+            Object tempObject = fieldDesc.getHandler().getValue(object);
+            //if the object is not yet instantiated, we return true
+            if (tempObject == null)
+                result = true;
+            else
+                result = ((XMLClassDescriptor)fieldDesc.getClassDescriptor()).canAccept(fieldName, tempObject);
+        }
+
+        //3--The descriptor is multivalued
+       /* if (desc.isMultivalued()) {
+            //-- check size
+            FieldValidator validator = desc.getValidator();
+            if (validator != null) {
+                if (validator.getMaxOccurs() == UNBOUNDED) {
+                   return true;
+                }
+                 else {
+                    // count current objects and add 1
+                    current = countCollection(handler.getValue());
+                    newTotal = current + 1;
+                    return (minOccurs <= newTotal <= maxOccurs);
+                 }
+            }
+            else {
+                //-- not created by source generator...assume unbounded
+                return true;
+            }
+        }*/
+
+        //4-- Check if the value is set or not
+        else {
+            FieldHandler handler = fieldDesc.getHandler();
+            hasValue = (handler.getValue(object) != null);
+            result = !hasValue;
+        }
+
+        //5--if there is no value and the _compositor is CHOICE
+        //--we have to check to see if another value has not been set
+        if (result && (_compositor == CHOICE)
+            && (fieldDesc.getNodeType() == NodeType.Element) ) {
+            fields = this.getElementDescriptors();
+            i = 0;
+            while (result && i<fields.length) {
+                XMLFieldDescriptor desc = fields[i];
+                if (desc != fieldDesc && (object!=null) ) {
+                    hasValue = desc.getHandler().getValue(object) != null;
+                    if (hasValue)
+                        result = false;
+                }
+                i++;
+            }//while
+        }//CHOICE
+        return result;
+    }//--canAccept
 
     //---------------------/
     //- Protected Methods -/
@@ -862,7 +973,6 @@ public class XMLClassDescriptorImpl extends Validator
         if (idx >= 0) name = name.substring(idx+1);
         return _naming.toXMLName(name);
     }
-
 } //-- XMLClassDescriptor
 
 
