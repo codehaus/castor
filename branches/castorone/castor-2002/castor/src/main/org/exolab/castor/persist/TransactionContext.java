@@ -400,10 +400,13 @@ public abstract class TransactionContext
             entry = addObjectEntry( oid, object );
 
         } catch ( ObjectNotFoundException except ) {
+            removeObjectEntry( object );
             throw except;
         } catch ( LockNotGrantedException except ) {
+            removeObjectEntry( object );
             throw except;
         } catch ( ClassNotPersistenceCapableException except ) {
+            removeObjectEntry( object );
             throw new PersistenceException( Messages.format("persist.nested",except) );
         }
 
@@ -430,7 +433,6 @@ public abstract class TransactionContext
         if ( accessMode == AccessMode.ReadOnly ) {
             makeReadOnly( object );
         }
-        System.out.println("new instance (return): "+object);
         return object;
     }
 
@@ -941,7 +943,7 @@ public abstract class TransactionContext
             if ( except instanceof TransactionAbortedException )
                 throw (TransactionAbortedException) except;
             // Any error is reported as transaction aborted
-            throw new TransactionAbortedException( Messages.format("persist.nested", except) );
+            throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
         }
     }
 
@@ -977,9 +979,10 @@ public abstract class TransactionContext
             commitConnections();
             System.out.println("[connection commited!]");
         } catch ( Exception except ) {
+            except.printStackTrace();
             // Any error that happens, we're going to rollback the transaction.
             _status = Status.STATUS_MARKED_ROLLBACK;
-            throw new TransactionAbortedException( Messages.format("persist.nested", except) );
+            throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
         }
 
         // Assuming all went well in the connection department,
@@ -1058,7 +1061,9 @@ public abstract class TransactionContext
                 }
                 if ( entry.molder.getCallback() != null )
                     entry.molder.getCallback().releasing( entry.object, false );
-            } catch ( Exception except ) { }
+            } catch ( Exception except ) { 
+                // maybe we should remove it, when castor become stable
+            }
         }
 
         // Forget about all the objects in this transaction,
