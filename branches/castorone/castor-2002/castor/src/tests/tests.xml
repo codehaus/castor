@@ -43,7 +43,7 @@
     <!-- <case class="jdo.StoredProcedure" /> -->
 
     <!-- D -->
-    <case class="jdo.ListTypes" />
+    <!-- <case class="jdo.ListTypes" /> -->
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -80,7 +80,7 @@
     <case class="jdo.Persistent" />
 
     <!-- D -->
-    <case class="jdo.ListTypes" />
+    <!-- <case class="jdo.ListTypes" /> -->
   </category>
 
   <category name="xml" class="xml.XMLCategory">
