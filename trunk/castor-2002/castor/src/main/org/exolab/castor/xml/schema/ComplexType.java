@@ -93,15 +93,21 @@ public class ComplexType extends XMLType
 
 	/**
 	 * The value of the 'block' attribute for this ComplexType
-	 */
-	private String block;
+	**/
+	private String block = null; 
 
     /**
      * A wildcard that represents an <anyAttribute> element if any.
      * Only one <anyAttribute> can appear inside the global scope of
      * a complexType
-     */
-     private Wildcard _anyAttribute;
+    **/
+    private Wildcard _anyAttribute = null;
+     
+    /**
+     * The parent structure for this ComplexType
+     * (either an ElementDecl or a Schema)
+    **/
+    private Structure _parent = null;
 
     /**
      * Creates a new Complextype, with no name
@@ -190,25 +196,6 @@ public class ComplexType extends XMLType
      */
     public AttributeGroupDecl getAttributeGroup() { return attributes; }
 
-    /**
-     * Returns the content type of this ComplexType
-     * @return the content type of this ComplexType
-    **/
-    public ContentType getContentType() {
-        return content;
-    } //-- getContentType
-
-
-    /**
-     * Returns the Id used to Refer to this Object
-     * @return the Id used to Refer to this Object
-     * @see Referable
-    **/
-    public String getReferenceId() {
-        return "archetype:"+getName();
-    } //-- getReferenceId
-
-
    /**
      * Returns the base type that this type inherits from.
      * @return the parent type.
@@ -219,6 +206,36 @@ public class ComplexType extends XMLType
         }
         return super.getBaseType();
     } //-- getBaseType
+    
+    /**
+     * Returns the content type of this ComplexType
+     * @return the content type of this ComplexType
+    **/
+    public ContentType getContentType() {
+        return content;
+    } //-- getContentType
+
+
+    /**
+     * Returns the parent of this ComplexType, this value may be null if
+     * no parent has been set.
+     *
+     * @return the parent Structure of this ComplexType.
+    **/
+    public Structure getParent() {
+        return _parent;
+    } //-- getParent
+    
+    /**
+     * Returns the Id used to Refer to this Object
+     * @return the Id used to Refer to this Object
+     * @see Referable
+    **/
+    public String getReferenceId() {
+        return "archetype:"+getName();
+    } //-- getReferenceId
+
+
 
     /**
      * Returns true if this is a top level Complextype
@@ -326,6 +343,9 @@ public class ComplexType extends XMLType
         throws SchemaException
     {
         _contentModel.addGroup(group);
+        
+        //-- set reference to parent
+        group.setParent(this);        
     } //-- addGroup
 
     /**
@@ -338,6 +358,9 @@ public class ComplexType extends XMLType
         throws SchemaException
     {
         _contentModel.addGroup(group);
+        
+        //-- set reference to parent
+        group.setParent(this);        
     } //-- addGroup
 
     /**
@@ -467,5 +490,28 @@ public class ComplexType extends XMLType
         return Structure.COMPLEX_TYPE;
     } //-- getStructureType
 
+    //---------------------/
+    //- Protected Methods -/
+    //---------------------/
+    
+    /**
+     * Sets the parent for this ComplexType
+     *
+     * @param parent the parent Structure for this ComplexType
+    **/
+    protected void setParent(Structure parent) {
+        if (parent != null) {
+            switch (parent.getStructureType()) {
+                case Structure.SCHEMA:
+                case Structure.ELEMENT:
+                    break;
+                default:
+                    String error = "Invalid parent for ComplexType";
+                    throw new IllegalArgumentException(error);
+            }
+        }
+        _parent = parent;
+    } //-- setParent
+    
 
 } //-- Complextype

@@ -83,6 +83,15 @@ class TypeReference extends XMLType
     }
 
     /**
+     * Sets the parent for this Schema type
+     *
+     * @param parent the parent Structure for SchemaType
+    **/
+    protected void setParent(Structure parent) {
+        //-- never used by references
+    } //-- setParent
+    
+    /**
      * Returns Structure.UNKNOWN
      * (This class should not be seen outside ElementDecl anyway)
     **/
