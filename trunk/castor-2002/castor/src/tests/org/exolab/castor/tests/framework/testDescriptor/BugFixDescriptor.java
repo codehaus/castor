@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -64,13 +64,13 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_reporter", "Reporter", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BugFix target = (BugFix) object;
                 return target.getReporter();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -81,7 +81,7 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
@@ -101,53 +101,56 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         }
         desc.setValidator(fieldValidator);
         
-        //-- _dateReport
-        desc = new XMLFieldDescriptorImpl(java.util.Date.class, "_dateReport", "Date_Report", NodeType.Element);
+        //-- _date_Report
+        desc = new XMLFieldDescriptorImpl(org.exolab.castor.types.Date.class, "_date_Report", "Date_Report", NodeType.Element);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BugFix target = (BugFix) object;
-                return target.getDateReport();
+                return target.getDate_Report();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     BugFix target = (BugFix) object;
-                    target.setDateReport( (java.util.Date) value);
+                    target.setDate_Report( (org.exolab.castor.types.Date) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
-                return new java.util.Date();
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new org.exolab.castor.types.Date();
             }
         } );
-        desc.setHandler( new DateFieldHandler(handler));
-        desc.setImmutable(true);
+        desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
         desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _dateReport
+        //-- validation code for: _date_Report
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            DateTimeValidator dv = new DateTimeValidator();
+            fieldValidator.setValidator(dv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _fixer
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_fixer", "Fixer", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BugFix target = (BugFix) object;
                 return target.getFixer();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -158,7 +161,7 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
@@ -178,53 +181,56 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         }
         desc.setValidator(fieldValidator);
         
-        //-- _dateFix
-        desc = new XMLFieldDescriptorImpl(java.util.Date.class, "_dateFix", "Date_Fix", NodeType.Element);
+        //-- _date_Fix
+        desc = new XMLFieldDescriptorImpl(org.exolab.castor.types.Date.class, "_date_Fix", "Date_Fix", NodeType.Element);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BugFix target = (BugFix) object;
-                return target.getDateFix();
+                return target.getDate_Fix();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     BugFix target = (BugFix) object;
-                    target.setDateFix( (java.util.Date) value);
+                    target.setDate_Fix( (org.exolab.castor.types.Date) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
-                return new java.util.Date();
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new org.exolab.castor.types.Date();
             }
         } );
-        desc.setHandler( new DateFieldHandler(handler));
-        desc.setImmutable(true);
+        desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
         desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _dateFix
+        //-- validation code for: _date_Fix
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            DateTimeValidator dv = new DateTimeValidator();
+            fieldValidator.setValidator(dv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _commentList
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_commentList", "Comment", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BugFix target = (BugFix) object;
                 return target.getComment();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -235,7 +241,7 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
@@ -248,6 +254,11 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         //-- validation code for: _commentList
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserve");
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
     } //-- org.exolab.castor.tests.framework.testDescriptor.BugFixDescriptor()

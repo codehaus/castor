@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -110,7 +110,7 @@ public class CategoryType implements java.io.Serializable {
     **/
     public static org.exolab.castor.tests.framework.testDescriptor.types.CategoryType valueOf(java.lang.String string)
     {
-        Object obj = null;
+        java.lang.Object obj = null;
         if (string != null) obj = _memberTable.get(string);
         if (obj == null) {
             String err = "'" + string + "' is not a valid CategoryType";

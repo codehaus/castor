@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -34,11 +34,11 @@ public class SourceGeneratorTest implements java.io.Serializable {
 
     private java.lang.String _schema;
 
-    private java.lang.String _propertyFile;
+    private java.lang.String _property_File;
 
     private java.lang.String _fieldInfoFactory;
 
-    private RootObject _rootObject;
+    private Root_Object _root_Object;
 
     private java.util.Vector _unitTestCaseList;
 
@@ -68,6 +68,17 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- void addUnitTestCase(UnitTestCase) 
 
     /**
+     * 
+     * @param index
+     * @param vUnitTestCase
+    **/
+    public void addUnitTestCase(int index, UnitTestCase vUnitTestCase)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _unitTestCaseList.insertElementAt(vUnitTestCase, index);
+    } //-- void addUnitTestCase(int, UnitTestCase) 
+
+    /**
     **/
     public java.util.Enumeration enumerateUnitTestCase()
     {
@@ -75,6 +86,8 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- java.util.Enumeration enumerateUnitTestCase() 
 
     /**
+     * Returns the value of field 'fieldInfoFactory'.
+     * @return the value of field 'fieldInfoFactory'.
     **/
     public java.lang.String getFieldInfoFactory()
     {
@@ -82,20 +95,26 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- java.lang.String getFieldInfoFactory() 
 
     /**
+     * Returns the value of field 'property_File'.
+     * @return the value of field 'property_File'.
     **/
-    public java.lang.String getPropertyFile()
+    public java.lang.String getProperty_File()
     {
-        return this._propertyFile;
-    } //-- java.lang.String getPropertyFile() 
+        return this._property_File;
+    } //-- java.lang.String getProperty_File() 
 
     /**
+     * Returns the value of field 'root_Object'.
+     * @return the value of field 'root_Object'.
     **/
-    public RootObject getRootObject()
+    public Root_Object getRoot_Object()
     {
-        return this._rootObject;
-    } //-- RootObject getRootObject() 
+        return this._root_Object;
+    } //-- Root_Object getRoot_Object() 
 
     /**
+     * Returns the value of field 'schema'.
+     * @return the value of field 'schema'.
     **/
     public java.lang.String getSchema()
     {
@@ -184,53 +203,53 @@ public class SourceGeneratorTest implements java.io.Serializable {
     **/
     public UnitTestCase removeUnitTestCase(int index)
     {
-        Object obj = _unitTestCaseList.elementAt(index);
+        java.lang.Object obj = _unitTestCaseList.elementAt(index);
         _unitTestCaseList.removeElementAt(index);
         return (UnitTestCase) obj;
     } //-- UnitTestCase removeUnitTestCase(int) 
 
     /**
-     * 
-     * @param _fieldInfoFactory
+     * Sets the value of field 'fieldInfoFactory'.
+     * @param fieldInfoFactory the value of field 'fieldInfoFactory'
     **/
-    public void setFieldInfoFactory(java.lang.String _fieldInfoFactory)
+    public void setFieldInfoFactory(java.lang.String fieldInfoFactory)
     {
-        this._fieldInfoFactory = _fieldInfoFactory;
+        this._fieldInfoFactory = fieldInfoFactory;
     } //-- void setFieldInfoFactory(java.lang.String) 
 
     /**
-     * 
-     * @param _propertyFile
+     * Sets the value of field 'property_File'.
+     * @param property_File the value of field 'property_File'.
     **/
-    public void setPropertyFile(java.lang.String _propertyFile)
+    public void setProperty_File(java.lang.String property_File)
     {
-        this._propertyFile = _propertyFile;
-    } //-- void setPropertyFile(java.lang.String) 
+        this._property_File = property_File;
+    } //-- void setProperty_File(java.lang.String) 
 
     /**
-     * 
-     * @param _rootObject
+     * Sets the value of field 'root_Object'.
+     * @param root_Object the value of field 'root_Object'.
     **/
-    public void setRootObject(RootObject _rootObject)
+    public void setRoot_Object(Root_Object root_Object)
     {
-        this._rootObject = _rootObject;
-    } //-- void setRootObject(RootObject) 
+        this._root_Object = root_Object;
+    } //-- void setRoot_Object(Root_Object) 
 
     /**
-     * 
-     * @param _schema
+     * Sets the value of field 'schema'.
+     * @param schema the value of field 'schema'.
     **/
-    public void setSchema(java.lang.String _schema)
+    public void setSchema(java.lang.String schema)
     {
-        this._schema = _schema;
+        this._schema = schema;
     } //-- void setSchema(java.lang.String) 
 
     /**
      * 
-     * @param vUnitTestCase
      * @param index
+     * @param vUnitTestCase
     **/
-    public void setUnitTestCase(UnitTestCase vUnitTestCase, int index)
+    public void setUnitTestCase(int index, UnitTestCase vUnitTestCase)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -238,7 +257,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _unitTestCaseList.setElementAt(vUnitTestCase, index);
-    } //-- void setUnitTestCase(UnitTestCase, int) 
+    } //-- void setUnitTestCase(int, UnitTestCase) 
 
     /**
      * 

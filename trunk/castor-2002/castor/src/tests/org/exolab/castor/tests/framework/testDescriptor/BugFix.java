@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -14,7 +14,6 @@ package org.exolab.castor.tests.framework.testDescriptor;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 import org.exolab.castor.xml.*;
@@ -35,11 +34,11 @@ public class BugFix implements java.io.Serializable {
 
     private java.lang.String _reporter;
 
-    private java.util.Date _dateReport;
+    private org.exolab.castor.types.Date _date_Report;
 
     private java.lang.String _fixer;
 
-    private java.util.Date _dateFix;
+    private org.exolab.castor.types.Date _date_Fix;
 
     private java.util.Vector _commentList;
 
@@ -69,6 +68,17 @@ public class BugFix implements java.io.Serializable {
     } //-- void addComment(java.lang.String) 
 
     /**
+     * 
+     * @param index
+     * @param vComment
+    **/
+    public void addComment(int index, java.lang.String vComment)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _commentList.insertElementAt(vComment, index);
+    } //-- void addComment(int, java.lang.String) 
+
+    /**
     **/
     public java.util.Enumeration enumerateComment()
     {
@@ -95,7 +105,7 @@ public class BugFix implements java.io.Serializable {
     public java.lang.String[] getComment()
     {
         int size = _commentList.size();
-        java.lang.String[] mArray = new String[size];
+        java.lang.String[] mArray = new java.lang.String[size];
         for (int index = 0; index < size; index++) {
             mArray[index] = (String)_commentList.elementAt(index);
         }
@@ -110,20 +120,26 @@ public class BugFix implements java.io.Serializable {
     } //-- int getCommentCount() 
 
     /**
+     * Returns the value of field 'date_Fix'.
+     * @return the value of field 'date_Fix'.
     **/
-    public java.util.Date getDateFix()
+    public org.exolab.castor.types.Date getDate_Fix()
     {
-        return this._dateFix;
-    } //-- java.util.Date getDateFix() 
+        return this._date_Fix;
+    } //-- org.exolab.castor.types.Date getDate_Fix() 
 
     /**
+     * Returns the value of field 'date_Report'.
+     * @return the value of field 'date_Report'.
     **/
-    public java.util.Date getDateReport()
+    public org.exolab.castor.types.Date getDate_Report()
     {
-        return this._dateReport;
-    } //-- java.util.Date getDateReport() 
+        return this._date_Report;
+    } //-- org.exolab.castor.types.Date getDate_Report() 
 
     /**
+     * Returns the value of field 'fixer'.
+     * @return the value of field 'fixer'.
     **/
     public java.lang.String getFixer()
     {
@@ -131,6 +147,8 @@ public class BugFix implements java.io.Serializable {
     } //-- java.lang.String getFixer() 
 
     /**
+     * Returns the value of field 'reporter'.
+     * @return the value of field 'reporter'.
     **/
     public java.lang.String getReporter()
     {
@@ -185,17 +203,17 @@ public class BugFix implements java.io.Serializable {
     **/
     public java.lang.String removeComment(int index)
     {
-        Object obj = _commentList.elementAt(index);
+        java.lang.Object obj = _commentList.elementAt(index);
         _commentList.removeElementAt(index);
         return (String)obj;
     } //-- java.lang.String removeComment(int) 
 
     /**
      * 
-     * @param vComment
      * @param index
+     * @param vComment
     **/
-    public void setComment(java.lang.String vComment, int index)
+    public void setComment(int index, java.lang.String vComment)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -203,7 +221,7 @@ public class BugFix implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _commentList.setElementAt(vComment, index);
-    } //-- void setComment(java.lang.String, int) 
+    } //-- void setComment(int, java.lang.String) 
 
     /**
      * 
@@ -219,39 +237,39 @@ public class BugFix implements java.io.Serializable {
     } //-- void setComment(java.lang.String) 
 
     /**
-     * 
-     * @param _dateFix
+     * Sets the value of field 'date_Fix'.
+     * @param date_Fix the value of field 'date_Fix'.
     **/
-    public void setDateFix(java.util.Date _dateFix)
+    public void setDate_Fix(org.exolab.castor.types.Date date_Fix)
     {
-        this._dateFix = _dateFix;
-    } //-- void setDateFix(java.util.Date) 
+        this._date_Fix = date_Fix;
+    } //-- void setDate_Fix(org.exolab.castor.types.Date) 
 
     /**
-     * 
-     * @param _dateReport
+     * Sets the value of field 'date_Report'.
+     * @param date_Report the value of field 'date_Report'.
     **/
-    public void setDateReport(java.util.Date _dateReport)
+    public void setDate_Report(org.exolab.castor.types.Date date_Report)
     {
-        this._dateReport = _dateReport;
-    } //-- void setDateReport(java.util.Date) 
+        this._date_Report = date_Report;
+    } //-- void setDate_Report(org.exolab.castor.types.Date) 
 
     /**
-     * 
-     * @param _fixer
+     * Sets the value of field 'fixer'.
+     * @param fixer the value of field 'fixer'.
     **/
-    public void setFixer(java.lang.String _fixer)
+    public void setFixer(java.lang.String fixer)
     {
-        this._fixer = _fixer;
+        this._fixer = fixer;
     } //-- void setFixer(java.lang.String) 
 
     /**
-     * 
-     * @param _reporter
+     * Sets the value of field 'reporter'.
+     * @param reporter the value of field 'reporter'.
     **/
-    public void setReporter(java.lang.String _reporter)
+    public void setReporter(java.lang.String reporter)
     {
-        this._reporter = _reporter;
+        this._reporter = reporter;
     } //-- void setReporter(java.lang.String) 
 
     /**

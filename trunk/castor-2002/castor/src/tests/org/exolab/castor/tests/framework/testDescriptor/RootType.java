@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -75,6 +75,8 @@ implements java.io.Serializable
     } //-- void deleteRandom() 
 
     /**
+     * Returns the value of field 'dump'.
+     * @return the value of field 'dump'.
     **/
     public boolean getDump()
     {
@@ -82,6 +84,8 @@ implements java.io.Serializable
     } //-- boolean getDump() 
 
     /**
+     * Returns the value of field 'random'.
+     * @return the value of field 'random'.
     **/
     public boolean getRandom()
     {
@@ -130,22 +134,22 @@ implements java.io.Serializable
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
 
     /**
-     * 
-     * @param _dump
+     * Sets the value of field 'dump'.
+     * @param dump the value of field 'dump'.
     **/
-    public void setDump(boolean _dump)
+    public void setDump(boolean dump)
     {
-        this._dump = _dump;
+        this._dump = dump;
         this._has_dump = true;
     } //-- void setDump(boolean) 
 
     /**
-     * 
-     * @param _random
+     * Sets the value of field 'random'.
+     * @param random the value of field 'random'.
     **/
-    public void setRandom(boolean _random)
+    public void setRandom(boolean random)
     {
-        this._random = _random;
+        this._random = random;
         this._has_random = true;
     } //-- void setRandom(boolean) 
 

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -64,13 +64,13 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_schema", "Schema", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 SourceGeneratorTest target = (SourceGeneratorTest) object;
                 return target.getSchema();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -81,7 +81,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
@@ -101,28 +101,28 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         }
         desc.setValidator(fieldValidator);
         
-        //-- _propertyFile
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_propertyFile", "Property_File", NodeType.Element);
+        //-- _property_File
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_property_File", "Property_File", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 SourceGeneratorTest target = (SourceGeneratorTest) object;
-                return target.getPropertyFile();
+                return target.getProperty_File();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     SourceGeneratorTest target = (SourceGeneratorTest) object;
-                    target.setPropertyFile( (java.lang.String) value);
+                    target.setProperty_File( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
@@ -131,7 +131,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _propertyFile
+        //-- validation code for: _property_File
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
@@ -144,13 +144,13 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_fieldInfoFactory", "FieldInfoFactory", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 SourceGeneratorTest target = (SourceGeneratorTest) object;
                 return target.getFieldInfoFactory();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -161,7 +161,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
@@ -179,28 +179,28 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         }
         desc.setValidator(fieldValidator);
         
-        //-- _rootObject
-        desc = new XMLFieldDescriptorImpl(RootObject.class, "_rootObject", "Root_Object", NodeType.Element);
+        //-- _root_Object
+        desc = new XMLFieldDescriptorImpl(Root_Object.class, "_root_Object", "Root_Object", NodeType.Element);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 SourceGeneratorTest target = (SourceGeneratorTest) object;
-                return target.getRootObject();
+                return target.getRoot_Object();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     SourceGeneratorTest target = (SourceGeneratorTest) object;
-                    target.setRootObject( (RootObject) value);
+                    target.setRoot_Object( (Root_Object) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
-                return new RootObject();
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new Root_Object();
             }
         } );
         desc.setHandler(handler);
@@ -209,7 +209,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _rootObject
+        //-- validation code for: _root_Object
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
         desc.setValidator(fieldValidator);
@@ -217,13 +217,13 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         //-- _unitTestCaseList
         desc = new XMLFieldDescriptorImpl(UnitTestCase.class, "_unitTestCaseList", "UnitTestCase", NodeType.Element);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 SourceGeneratorTest target = (SourceGeneratorTest) object;
                 return target.getUnitTestCase();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -234,7 +234,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new UnitTestCase();
             }
         } );

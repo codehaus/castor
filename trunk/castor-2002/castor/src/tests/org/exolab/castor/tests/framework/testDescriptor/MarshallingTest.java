@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -32,9 +32,9 @@ public class MarshallingTest implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
-    private RootObject _rootObject;
+    private Root_Object _root_Object;
 
-    private java.lang.String _mappingFile;
+    private java.lang.String _mapping_File;
 
     private java.util.Vector _unitTestCaseList;
 
@@ -64,6 +64,17 @@ public class MarshallingTest implements java.io.Serializable {
     } //-- void addUnitTestCase(UnitTestCase) 
 
     /**
+     * 
+     * @param index
+     * @param vUnitTestCase
+    **/
+    public void addUnitTestCase(int index, UnitTestCase vUnitTestCase)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _unitTestCaseList.insertElementAt(vUnitTestCase, index);
+    } //-- void addUnitTestCase(int, UnitTestCase) 
+
+    /**
     **/
     public java.util.Enumeration enumerateUnitTestCase()
     {
@@ -71,18 +82,22 @@ public class MarshallingTest implements java.io.Serializable {
     } //-- java.util.Enumeration enumerateUnitTestCase() 
 
     /**
+     * Returns the value of field 'mapping_File'.
+     * @return the value of field 'mapping_File'.
     **/
-    public java.lang.String getMappingFile()
+    public java.lang.String getMapping_File()
     {
-        return this._mappingFile;
-    } //-- java.lang.String getMappingFile() 
+        return this._mapping_File;
+    } //-- java.lang.String getMapping_File() 
 
     /**
+     * Returns the value of field 'root_Object'.
+     * @return the value of field 'root_Object'.
     **/
-    public RootObject getRootObject()
+    public Root_Object getRoot_Object()
     {
-        return this._rootObject;
-    } //-- RootObject getRootObject() 
+        return this._root_Object;
+    } //-- Root_Object getRoot_Object() 
 
     /**
      * 
@@ -166,35 +181,35 @@ public class MarshallingTest implements java.io.Serializable {
     **/
     public UnitTestCase removeUnitTestCase(int index)
     {
-        Object obj = _unitTestCaseList.elementAt(index);
+        java.lang.Object obj = _unitTestCaseList.elementAt(index);
         _unitTestCaseList.removeElementAt(index);
         return (UnitTestCase) obj;
     } //-- UnitTestCase removeUnitTestCase(int) 
 
     /**
-     * 
-     * @param _mappingFile
+     * Sets the value of field 'mapping_File'.
+     * @param mapping_File the value of field 'mapping_File'.
     **/
-    public void setMappingFile(java.lang.String _mappingFile)
+    public void setMapping_File(java.lang.String mapping_File)
     {
-        this._mappingFile = _mappingFile;
-    } //-- void setMappingFile(java.lang.String) 
+        this._mapping_File = mapping_File;
+    } //-- void setMapping_File(java.lang.String) 
+
+    /**
+     * Sets the value of field 'root_Object'.
+     * @param root_Object the value of field 'root_Object'.
+    **/
+    public void setRoot_Object(Root_Object root_Object)
+    {
+        this._root_Object = root_Object;
+    } //-- void setRoot_Object(Root_Object) 
 
     /**
      * 
-     * @param _rootObject
-    **/
-    public void setRootObject(RootObject _rootObject)
-    {
-        this._rootObject = _rootObject;
-    } //-- void setRootObject(RootObject) 
-
-    /**
-     * 
-     * @param vUnitTestCase
      * @param index
+     * @param vUnitTestCase
     **/
-    public void setUnitTestCase(UnitTestCase vUnitTestCase, int index)
+    public void setUnitTestCase(int index, UnitTestCase vUnitTestCase)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -202,7 +217,7 @@ public class MarshallingTest implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _unitTestCaseList.setElementAt(vUnitTestCase, index);
-    } //-- void setUnitTestCase(UnitTestCase, int) 
+    } //-- void setUnitTestCase(int, UnitTestCase) 
 
     /**
      * 

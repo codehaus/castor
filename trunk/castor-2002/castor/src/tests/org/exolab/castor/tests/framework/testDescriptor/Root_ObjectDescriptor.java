@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package org.exolab.castor.tests.framework.testDescriptor.types;
+package org.exolab.castor.tests.framework.testDescriptor;
 
   //---------------------------------/
  //- Imported classes and packages -/
@@ -26,7 +26,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class CategoryTypeDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class Root_ObjectDescriptor extends RootTypeDescriptor {
 
 
       //--------------------------/
@@ -46,10 +46,10 @@ public class CategoryTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
      //- Constructors -/
     //----------------/
 
-    public CategoryTypeDescriptor() {
+    public Root_ObjectDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/Test";
-        xmlName = "CategoryType";
+        xmlName = "Root_Object";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
@@ -57,7 +57,7 @@ public class CategoryTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
         
         //-- initialize element descriptors
         
-    } //-- org.exolab.castor.tests.framework.testDescriptor.types.CategoryTypeDescriptor()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Root_ObjectDescriptor()
 
 
       //-----------/
@@ -82,6 +82,8 @@ public class CategoryTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
+        if (identity == null)
+            return super.getIdentity();
         return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
@@ -89,7 +91,7 @@ public class CategoryTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
     **/
     public java.lang.Class getJavaClass()
     {
-        return org.exolab.castor.tests.framework.testDescriptor.types.CategoryType.class;
+        return org.exolab.castor.tests.framework.testDescriptor.Root_Object.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**
