@@ -189,6 +189,17 @@ public class OqlTests extends CastorTestCase {
 		tryQuery(query, 0);
 
 
+		 // query using comparison between bind variable parameter and constant, find all objects
+		query = _db.getOQLQuery("select x from jdo.TestObject x where $(int)1 = 1000");
+		query.bind(1000);
+		tryQuery(query, MAX_ID+1-MIN_ID);
+
+		 // query using comparison between bind variable parameter and constant, find no objects
+		query = _db.getOQLQuery("select x from jdo.TestObject x where $(int)1 = 1000");
+		query.bind(2000);
+		tryQuery(query, 0);
+
+
 		 // query using 1 bind variable parameter, find all but the first and last object
 		query = _db.getOQLQuery("select x from jdo.TestObject x where id>$1 and id<$2");
 		query.bind(MIN_ID);
