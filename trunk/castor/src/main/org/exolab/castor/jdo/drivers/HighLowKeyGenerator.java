@@ -56,6 +56,8 @@ import java.sql.Types;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.mapping.MappingException;
@@ -72,6 +74,12 @@ import org.exolab.castor.util.Messages;
  */
 public class HighLowKeyGenerator implements KeyGenerator
 {
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance(HighLowKeyGenerator.class);
+    
     private final static BigDecimal ONE = new BigDecimal( 1 );
 
     private final static String SEQ_TABLE = "table";
@@ -332,6 +340,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                     try {
                         conn.rollback();
                     } catch ( SQLException ex2 ) {
+                        _log.warn ("Problem rolling back JDBC transaction.", ex2);
                     }
                 }
                 throw new PersistenceException( Messages.format(
@@ -341,12 +350,14 @@ public class HighLowKeyGenerator implements KeyGenerator
                     try {
                         stmt.close();
                     } catch ( SQLException ex ) {
+                        _log.warn ("Problem closing JDBC Statement", ex);
                     }
                 }
                 if ( stmt2 != null ) {
                     try {
                         stmt2.close();
                     } catch ( SQLException ex ) {
+                        _log.warn ("Problem closing JDBC Statement", ex);
                     }
                 }
             }
