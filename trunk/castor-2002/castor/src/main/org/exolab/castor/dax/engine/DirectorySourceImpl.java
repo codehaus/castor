@@ -62,9 +62,9 @@ import org.exolab.castor.dax.DirectorySource;
 import org.exolab.castor.dax.DirectoryException;
 import org.exolab.castor.dax.XADirectory;
 import org.exolab.castor.dax.XADirectorySource;
+import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.xml.Unmarshaller;
 
@@ -230,17 +230,17 @@ public class DirectorySourceImpl
                                                  PrintWriter logWriter )
         throws MappingException
     {
-        DAXMappingLoader mapping;
+        Mapping mapping;
 
         try {
-            mapping = new DAXMappingLoader( null );
+            mapping = new Mapping( null );
             mapping.setEntityResolver( resolver );
             mapping.setLogWriter( logWriter );
             mapping.loadMapping( source );
+            _mapResolver = mapping.getDAXMapping();
         } catch ( IOException except ) {
             throw new MappingException( except );
         }
-        _mapResolver = mapping;
     }
     
 
