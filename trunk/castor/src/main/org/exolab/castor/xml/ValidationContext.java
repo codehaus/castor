@@ -49,6 +49,8 @@ package org.exolab.castor.xml;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 
+import java.util.HashSet;
+
 /**
  * A class which can be used to hold validation information, used
  * by the TypeValidator interface.
@@ -78,6 +80,11 @@ public class ValidationContext {
      * and resolving ClassDescriptors during validation
      */
     private ClassDescriptorResolver _resolver = null;
+    
+    /**
+     * List of objects marked as validated
+     */
+    private HashSet _validated = null;
     
     
     /**
@@ -166,5 +173,26 @@ public class ValidationContext {
     public void setResolver(ClassDescriptorResolver resolver) {
         _resolver = resolver;
     } //-- setResolver
-   
+
+    protected boolean isValidated(Object obj) {
+    	if (_validated != null) {
+    		return _validated.contains(obj);
+        }
+        return false;
+    }
+    
+    protected void addValidated(Object obj) {
+    	if (_validated == null) {
+            _validated = new HashSet();
+        }
+        _validated.add(obj);
+    }
+    
+    protected void removeValidated(Object obj) {
+        if (_validated != null) {
+            _validated.remove(obj);
+        }
+    }
+    
+    
 } //-- ValidationContext
