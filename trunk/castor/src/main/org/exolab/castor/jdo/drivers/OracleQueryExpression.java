@@ -48,21 +48,40 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.util.Enumeration;
+import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
+import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
  * QueryExpression for Oracle 7/8.
  *
+ * As of release 8.1.6, Oracle supports limiting the number of rows returned by a query
+ * through the use of the following mechanism.
+ * 
+ * SELECT *
+ * FROM (
+ *	    SELECT  empno, ename, job, sal,
+ *	            rank() over (order by sal) rnk
+ *	    FROM    emp
+ *	)
+ *	WHERE   rnk BETWEEN 3 AND 8
+ * 
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public final class OracleQueryExpression
     extends JDBCQueryExpression
 {
-
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( OracleQueryExpression.class );
 
     public OracleQueryExpression( PersistenceFactory factory )
     {
@@ -70,7 +89,7 @@ public final class OracleQueryExpression
     }
 
 
-    public String getStatement( boolean lock )
+    public String getStatement( boolean lock ) throws SyntaxNotSupportedException 
     {
         StringBuffer sql;
         boolean      first;
@@ -83,6 +102,18 @@ public final class OracleQueryExpression
 
         sql.append( getColumnList() );
 
+        // add support for OQL LIMIT/OFFSET - part1
+        if (_limit != null) {
+        	sql.append (" , rank() over ( ");
+            // add ORDER BY clause
+            if ( _order != null ) {
+            	sql.append(JDBCSyntax.OrderBy).append(_order);
+            } else {
+            	throw new SyntaxNotSupportedException ("To use a LIMIT clause with Oracle, an ORDER BY clause is required.");
+            }
+			sql.append ( " ) rnk ");
+        }
+        
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
         enum = _tables.keys();
@@ -131,16 +162,59 @@ public final class OracleQueryExpression
         }
         first = addWhereClause( sql, first );
         
-        if ( _order != null )
+        // add ORDER BY clause, but only if no LIMIT clause has been specified
+        if ( _order != null && _limit == null)
           sql.append(JDBCSyntax.OrderBy).append(_order);
  
         // Use FOR UPDATE to lock selected tables.
         if ( lock )
             sql.append( " FOR UPDATE" );
+        
+        // add LIMIT/OFFSET clause - part 2
+        if ( _limit != null ) {
+        	sql.insert (0, " select * from ( ");
+        	
+        	if ( _offset != null ) {
+        		sql.append (" ) where rnk - " + _offset + " between 1 and " + _limit + " ");
+        	} else {
+        		sql.append (" ) where rnk <= " + _limit + " ");
+        	}
+        }
+        
+        _log.debug ("SQL statement = " + sql.toString());
         return sql.toString();
     }
-    
 
+
+    /**
+     * Indicates that Oracle supports an OQL LIMIT clause.
+     * 
+     * @return true to indicate that Oracle supports an OQL LIMIT clause.
+     */
+    public boolean isLimitClauseSupported()
+    {
+    	return true;
+    }
+
+    /**
+     * Indicates that Oracle supports an OQL OFFSET clause.
+     * 
+     * @return true to indicate that Oracle supports an OQL OFFSET clause.
+     */
+    public boolean isOffsetClauseSupported()
+    {
+    	return true;
+    }
+
+    /**
+     * @param paramInfo
+     * @return re-ordered bind parameter info
+     */
+    public Map postProcessParamInfo(Map paramInfo)
+    {
+        if (_limit!=null && _offset!=null)
+            return reorderParamInfo(paramInfo, _limitFirstBindIdx, _limitLastBindIdx, _offsetFirstBindIdx, _offsetLastBindIdx);
+        else
+            return paramInfo;
+    }
 }
-
-
