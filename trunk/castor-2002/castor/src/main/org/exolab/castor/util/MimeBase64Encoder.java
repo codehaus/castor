@@ -139,7 +139,8 @@ public final class MimeBase64Encoder
         for (int i=0; i<line.length; i++)
             line[i] = 0;
 	ch = new char[ out.length() ];
-	out.getChars( 0, out.length(), ch, 0 );
+	if (out.length() > 0) 
+	    out.getChars( 0, out.length(), ch, 0 );
 	return ch;
     }
 }
