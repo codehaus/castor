@@ -136,6 +136,12 @@ public class XMLClassDescriptorImpl
      */
     private AccessMode         _accessMode;
 
+    /**
+     * A flag to indicate that this XMLClassDescriptor was
+     * created via introspection
+    **/
+    private boolean            _introspected = false;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -244,6 +250,49 @@ public class XMLClassDescriptorImpl
         elementDescriptors.toArray(fields);
         return fields;
     } // getElementDescriptors
+
+    /**
+     * Returns the XML field descriptor matching the given
+     * xml name and nodeType. If NodeType is null, then
+     * either an AttributeDescriptor, or ElementDescriptor
+     * may be returned. Null is returned if no matching
+     * descriptor is available.
+     *
+     * @param name the xml name to match against
+     * @param nodeType, the NodeType to match against, or null if
+     * the node type is not known.
+     * @return the matching descriptor, or null if no matching
+     * descriptor is available.
+     *
+    **/
+    public XMLFieldDescriptor getFieldDescriptor
+        (String name, NodeType nodeType) 
+    {
+        
+        boolean wild = ((nodeType == null) || _introspected);
+        
+        if (wild || (nodeType == NodeType.Element)) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < elementDescriptors.size(); i++) {
+                desc = (XMLFieldDescriptor)elementDescriptors.get(i);
+                if (desc == null) continue;
+                if (desc.matches(name)) return desc;
+            }
+        }
+        
+        if (wild || (nodeType == NodeType.Attribute)) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < attributeDescriptors.size(); i++) {
+                desc = (XMLFieldDescriptor)attributeDescriptors.get(i);
+                if (desc == null) continue;
+                if (desc.matches(name)) return desc;
+            }
+        }
+        
+        return null;
+        
+    } //-- getFieldDescriptor
+    
 
     /**
      * @return the namespace prefix to use when marshalling as XML.
@@ -550,6 +599,17 @@ public class XMLClassDescriptorImpl
         this._extends = classDesc;
     } //-- setExtendsWithoutFlatten
     
+    /**
+     * Sets a flag to indicate whether or not this XMLClassDescriptorImpl
+     * was created via introspection
+     *
+     * @param introspected a boolean, when true indicated that this
+     * XMLClassDescriptor was created via introspection
+    **/
+    protected void setIntrospected(boolean introspected) {
+        this._introspected = introspected;
+    } //-- setIntrospected
+    
     protected String toXMLName(String className) {
         //-- create default XML name
         String name = className;
@@ -557,6 +617,8 @@ public class XMLClassDescriptorImpl
         if (idx >= 0) name = name.substring(idx+1);
         return MarshalHelper.toXMLName(name);
     }
+    
+    
 } //-- XMLClassDescriptor
 
 
