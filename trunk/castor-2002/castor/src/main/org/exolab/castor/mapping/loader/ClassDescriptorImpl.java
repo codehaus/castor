@@ -138,10 +138,11 @@ public class ClassDescriptorImpl
         }
         _accessMode = accessMode;
 
-	// fritz: propagate containing class to fields
-	_identity.setContainingClassDescriptor( this );
-	for ( int i=0; i<_fields.length; i++ )
-	    _fields[i].setContainingClassDescriptor( this );
+    // fritz: propagate containing class to fields
+    if ( _identity != null )
+        _identity.setContainingClassDescriptor( this );
+    for ( int i=0; i<_fields.length; i++ )
+        _fields[i].setContainingClassDescriptor( this );
     }
     
     
