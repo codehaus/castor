@@ -862,7 +862,7 @@ public class Marshaller extends MarshalFramework {
             if ((namespace != null) && (namespace.length() > 0)) {
                 String prefix = attDescriptor.getNameSpacePrefix();
                 if ((prefix == null) || (prefix.length() == 0))
-                    prefix = _namespaces.getNamespacePrefix(namespace);
+                    prefix = _namespaces.getNonDefaultNamespacePrefix(namespace);
 
                 if ((prefix == null) || (prefix.length() == 0)) {
                     //-- automatically create namespace prefix?
@@ -1166,7 +1166,14 @@ public class Marshaller extends MarshalFramework {
     private boolean declareNamespace(String nsPrefix, String nsURI)
     {
         boolean declared = false;
+        
+        //-- make sure it's not already declared...
         if ( (nsURI != null) && (nsURI.length() != 0)) {
+            
+            String tmpURI = _namespaces.getNamespaceURI(nsPrefix);
+            if ((tmpURI != null) && (tmpURI.equals(nsURI))) {
+                return declared;
+            }
             String tmpPrefix = _namespaces.getNamespacePrefix(nsURI);
             if ((tmpPrefix == null) || (!tmpPrefix.equals(nsPrefix))) {
                 _namespaces.addNamespace(nsPrefix, nsURI);
