@@ -101,6 +101,17 @@ public interface FieldDescriptor
 
 
     /**
+     * Returns the class descriptor related to the field type. If the
+     * field type is a class for which a descriptor exists, this
+     * descriptor is returned. If the field type is a class for which
+     * no mapping is provided, null is returned.
+     *
+     * @return The class descriptor of the field type, or null
+     */
+    public ClassDescriptor getClassDescriptor();
+
+
+    /**
      * Returns the handler of the field. In order to persist or marshal
      * a field descriptor will be associated with a handler.
      *
@@ -110,14 +121,12 @@ public interface FieldDescriptor
 
 
     /**
-     * Returns the class descriptor related to the field type. If the
-     * field type is a class for which a descriptor exists, this
-     * descriptor is returned. If the field type is a class for which
-     * no mapping is provided, null is returned.
+     * Return the collection handler of this field type. Returns null
+     * if the field is not a collection.
      *
-     * @return The class descriptor of the field type, or null
+     * @return The collection handler
      */
-    public ClassDescriptor getClassDescriptor();
+    public CollectionHandler getCollectionHandler();
 
 
 }
