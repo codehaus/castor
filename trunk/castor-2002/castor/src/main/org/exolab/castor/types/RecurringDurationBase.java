@@ -150,8 +150,8 @@ public abstract class RecurringDurationBase
         throws IllegalArgumentException
     {
         try {
-            this.setDuration(TimeDuration.parse(duration));
-            this.setPeriodInternal(TimeDuration.parse(period));
+            this.setDuration(TimeDuration.parseTimeDuration(duration));
+            this.setPeriodInternal(TimeDuration.parseTimeDuration(period));
         } catch (Exception e) {
             String err = "In RecurringDurationBase : "+e;
             throw new IllegalArgumentException(err);
@@ -213,7 +213,7 @@ public abstract class RecurringDurationBase
         throws OperationNotSupportedException
     {
         try {
-            setPeriodInternal(TimeDuration.parse(period));
+            setPeriodInternal(TimeDuration.parseTimeDuration(period));
         } catch (ParseException e) {
             String err = "RecurringDuration, setPeriod:"+e;
             throw new IllegalArgumentException(err);
@@ -242,7 +242,7 @@ public abstract class RecurringDurationBase
         throws OperationNotSupportedException
     {
         try {
-            _duration = (TimeDuration.parse(duration));
+            _duration = (TimeDuration.parseTimeDuration(duration));
         } catch (ParseException e) {
             String err = "RecurringDuration, setDuration:"+e;
             throw new IllegalArgumentException(err);
@@ -481,7 +481,7 @@ public abstract class RecurringDurationBase
                             +"for the duration and period can not be compared";
                 throw new ValidationException(err);
         }
-        result = result && (this.getHour() == reccD.getHour());
+        result = (this.getHour() == reccD.getHour());
         result = result && (this.getMinute() == reccD.getMinute());
         result = result && (this.getSeconds() == reccD.getSeconds());
         result = result && (this.getMilli() == reccD.getMilli());
