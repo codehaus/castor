@@ -40,15 +40,9 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
-<<<<<<< XSDecimal.java
  * $Id$
  * Date         Author          Changes
  * 10/31/00     Arnaud Blandin  support for min/max, scale&precision facets
-=======
- * $Id$
- * Date         Author          Changes
- * 10/31/00     Arnaud Blandin  support for min/max, scale&precision facets
->>>>>>> 1.2
  */
 
 package org.exolab.castor.builder.types;
