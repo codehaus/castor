@@ -261,7 +261,7 @@ public class ClassDescriptorResolverImpl
                 MappingLoader mapLoader = (MappingLoader)mapping.getResolver(Mapping.XML);
                 classDesc = (XMLClassDescriptor) mapLoader.getDescriptor(type);
             }
-            catch(MappingException mx) {};
+            catch(MappingException mx) {}
             if (classDesc != null) {
                 associate(type, classDesc);
                 return classDesc;
@@ -351,7 +351,7 @@ public class ClassDescriptorResolverImpl
                 MappingLoader mapLoader = (MappingLoader)mapping.getResolver(Mapping.XML);
                 classDesc = (XMLClassDescriptor) mapLoader.getDescriptor(className);
             }
-            catch(MappingException mx) {};
+            catch(MappingException mx) {}
             if (classDesc != null) {
                 if (classDesc.getJavaClass() != null) {
                     associate(classDesc.getJavaClass(), classDesc);
@@ -519,7 +519,7 @@ public class ClassDescriptorResolverImpl
                     }
                 }
             }
-            catch(MappingException mx) {};
+            catch(MappingException mx) {}
             classDesc = null;
         }
         
@@ -585,7 +585,7 @@ public class ClassDescriptorResolverImpl
                     }
                 }
             }
-            catch(MappingException mx) {};
+            catch(MappingException mx) {}
         }
         
         return xcdEnumerator;
