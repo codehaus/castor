@@ -63,60 +63,60 @@ import java.lang.reflect.*;
  * @version $Revision$ $Date$
 **/
 public class Validator implements ClassValidator {
-    
+
     /**
      * Creates a new Validator
     **/
     public Validator() {
         super();
     } //-- Validator
-    
+
     /**
      * Validates the given Object
      * @param object the Object to validate
     **/
-    public void validate(Object object) 
-        throws ValidationException 
+    public void validate(Object object)
+        throws ValidationException
     {
         validate(object, (ClassDescriptorResolver) null);
-        
+
     } //-- validate
-    
+
     /**
      * Validates the given Object
      * @param object the Object to validate
-     * @param resolver the ClassDescriptorResolver to load 
+     * @param resolver the ClassDescriptorResolver to load
      * ClassDescriptors for use during validation.
     **/
     public void validate(Object object, ClassDescriptorResolver resolver)
         throws ValidationException
     {
-        
+
         if (object == null) {
             throw new ValidationException("Cannot validate a null Object.");
-        } 
-        
+        }
+
         if (resolver == null) {
             resolver = new ClassDescriptorResolverImpl();
         }
-      
+
         XMLClassDescriptor classDesc = null;
 
         if (! MarshalFramework.isPrimitive(object.getClass()))
-            resolver.resolve(object.getClass());
-        
+            classDesc = resolver.resolve(object.getClass());
+
         //-- we cannot validate an object if ClassDescriptor is null
         if (classDesc == null) return;
-        
+
         TypeValidator validator = classDesc.getValidator();
-        
+
         XMLFieldDescriptor fieldDesc = null;
-        
+
         try {
             if (validator != null) {
                 if (validator instanceof ClassValidator)
                     ((ClassValidator)validator).validate(object, resolver);
-                else 
+                else
                     validator.validate(object);
             }
             //-- default validation
@@ -127,7 +127,7 @@ public class Validator implements ClassValidator {
                     for (int i = 0; i < fields.length; i++) {
                         fieldDesc = (XMLFieldDescriptor)fields[i];
                         if (fieldDesc == null) continue;
-                        FieldValidator fieldValidator 
+                        FieldValidator fieldValidator
                             = fieldDesc.getValidator();
                         if (fieldValidator != null)
                             fieldValidator.validate(object, resolver);
@@ -151,9 +151,9 @@ public class Validator implements ClassValidator {
             loc.addParent(classDesc.getXMLName());
             throw vx;
         }
-        
+
     } //-- validate
-    
+
     /**
      * Validates an Object model, ClassDescriptor classes will be used
      * to perform Validation. If no ClassDescriptor class exists, one
@@ -163,14 +163,14 @@ public class Validator implements ClassValidator {
      * XMLClassDescriptors, this may be null
     **
     public static void validate
-        (Object object, ClassDescriptorResolver cdResolver) 
+        (Object object, ClassDescriptorResolver cdResolver)
         throws ValidationException
     {
         Validator validator = new Validator();
         validator.setResolver(cdResolver);
         validator.validate(object);
     } //-- validate
-    
+
     */
-    
+
 } //-- Validator
