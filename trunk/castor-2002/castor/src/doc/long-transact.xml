@@ -4,42 +4,39 @@
     <title>Castor JDO Long Transactions Support</title>
 
     <section title="Introduction">
-      <p>The usual Castor transactions are called here short 
-         transactions: an object is read, modified and written within the 
+      <p>The usual Castor transactions are called here short
+         transactions: an object is read, modified and written within the
          bounds of one transaction.
-         Long transactions consist of two Castor transactions: 
-         an object is read in the first and written in the second. 
+         Long transactions consist of two Castor transactions:
+         an object is read in the first and written in the second.
          Between them the object is sent "outwards" and modified there.
-         For example, the object may be send to a client application and 
-         dispayed to a user, or it may be sent to a servlet engine and is 
-         displayed on a web page. After that the modified object returns 
-         back and is written to the database in the second transaction. 
-         At this point the object is usually not the same physical instance 
-         as one that was read in the first transaction. 
-         The example code for writing the object in the second Castor 
-         transaction follows: 
+         For example, the object may be send to a client application and
+         dispayed to a user, or it may be sent to a servlet engine and is
+         displayed on a web page. After that the modified object returns
+         back and is written to the database in the second transaction.
+         At this point the object is usually not the same physical instance
+         as one that was read in the first transaction.
+         The example code for writing the object in the second Castor
+         transaction follows:
          <pre>
              db.begin();
              db.update(object);
              db.commit();
          </pre>
-         Note, that if the object doesn't exist in the database, 
-         db.update(object) is equivalent to 
-         db.create(object).
-         Also note, that it is natural to read the object in the first
+         Note, that it is natural to read the object in the first
          transaction in the read-only mode.
       </p>
-      <p>Since the time interval between the first and the second 
-         transaction is relatively big, it is desirable to perform dirty 
+      <p>Since the time interval between the first and the second
+         transaction is relatively big, it is desirable to perform dirty
          checking, i.e. to check that the object has not been modified
-         in the database during the long transaction. 
-         For that the object must hold a timestamp: it is set by 
-         Castor during the first Castor transaction and is checked during 
-         the second one. 
-         In order to enable the dirty checking for long transactions, 
-         the object should implement the interface 
+         in the database during the long transaction.
+         For that the object must hold a timestamp: it is set by
+         Castor during the first Castor transaction and is checked during
+         the second one.
+         In order to enable the dirty checking for long transactions,
+         the object should implement the interface
          org.exolab.castor.jdo.TimeStampable
-         having two methods: <code>long jdoGetTimeStamp()</code> and 
+         having two methods: <code>long jdoGetTimeStamp()</code> and
          <code>void jdoSetTimeStamp(long timeStamp)</code>
          Note, that for a new objects jdoGetTimeStamp() must 
          return 0, in this case db.update(object) acts as db.create(object).
