@@ -55,6 +55,7 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.types.AnyNode;
+import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.Messages;
