@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML:    Added support for the extremely powerful 'handler' attribute on
+        the field element for the mapping (kvisco - 20011205)
+
 XML:    Patch to XMLMappingLoader to fix dropped multiple id fields. This is a
         actually a patch to fix bugs which occur in MappingLoader and an errant
         implementation of ClassDescriptor (ClassDescriptorImpl). This fix should
