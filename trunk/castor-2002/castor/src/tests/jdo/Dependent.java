@@ -142,8 +142,10 @@ public class Dependent extends CastorTestCase {
         detail = new TestDetail( 6 );
         detail.addDetail2( new TestDetail2() );
         detail.addDetail2( new TestDetail2() );
+
         master.addDetail( detail );
         detail = new TestDetail( 7 );
+        detail.setDetail3( new TestDetail3( 101 ) );
         detail.addDetail2( new TestDetail2() );
         detail.addDetail2( new TestDetail2() );
         master.addDetail( detail );
@@ -176,7 +178,7 @@ public class Dependent extends CastorTestCase {
                 fail("loaded detail 5 with details2: " + detail);
             }
             detail = master.findDetail( 6 );
-            if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
+            if ( detail.getDetails2() == null || detail.getDetails2().size() != 2 ) {
                 stream.println( "Error: loaded detail 6 without two details: " + detail );
                 fail("loaded detail 6 without two details: " + detail);
             }
@@ -184,6 +186,10 @@ public class Dependent extends CastorTestCase {
             if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                 stream.println( "Error: loaded detail 7 without two details: " + detail );
                 fail("loaded detail 7 without two details: " + detail);
+            }
+            if ( detail.getDetail3() == null || detail.getDetail3().getId() != 101 ) {
+                stream.println( "Error: loaded detail 6 wrong detail3: " + detail );
+                fail("loaded detail 7 wrong detail3: " + detail);
             }
         } else {
             stream.println( "Error: failed to create master with details and group" );
@@ -205,6 +211,8 @@ public class Dependent extends CastorTestCase {
         // remove detail with id == 6 explicitly
         detail = (TestDetail) master.findDetail( 6 );
         master.getDetails().remove( master.getDetails().indexOf( detail ) );
+        detail = (TestDetail) master.findDetail( 7 );
+        detail.setDetail3( new TestDetail3( 102 ) );
         // add new detail
         master.addDetail( new TestDetail( 8 ) );
         // add new detail and create it explicitely
@@ -228,6 +236,11 @@ public class Dependent extends CastorTestCase {
                 fail("loaded master has wrong set of details: " + master);
             } else {
                 stream.println( "Details changed correctly: " + master );
+            }
+            detail = (TestDetail) master.findDetail( 7 );
+            if ( detail.getDetail3() == null || detail.getDetail3().getId() != 102 ) {
+                stream.println( "Error: loaded detail y wrong detail3: " + detail );
+                fail("loaded detail 7 wrong detail3: " + detail);
             }
         } else {
             stream.println( "Error: master not found" );
