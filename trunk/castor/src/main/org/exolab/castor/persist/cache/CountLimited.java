@@ -74,12 +74,11 @@ implements Cache
 	private final static int LRU_OLD = 0;
 	private final static int LRU_NEW = 1;
 	
-	private Hashtable mapKeyPos;
-	private Object[] keys;
-	private Object[] values;
-	private int[] status;
+	private Hashtable mapKeyPos = null;
+	private Object[] keys = null;
+	private Object[] values = null;
+	private int[] status = null;
 	private int cur;
-	private int size;
     
     public static int DEFAULT_SIZE = 30;
 	
@@ -92,28 +91,14 @@ implements Cache
     
     public CountLimited () {
     	super();
-        init (DEFAULT_SIZE);
+        setCapacity(DEFAULT_SIZE);
     }
     
-	public CountLimited (int size) {
-		init (size);
+	public CountLimited (int capacity) {
+    	super();
+    	setCapacity(capacity);
 	}
 	
-    /**
-     * Initializes object instance.
-     * @param size the number of elemenst to be cached.
-     */
-    protected void init (int size) {
-        keys = new Object[size];
-        values = new Object[size];
-        status = new int[size];
-        mapKeyPos = new Hashtable(size);
-
-        this.size = size;
-    }
-    
-    
-    
 	/**
 	 * Maps the specified <code>key</code> to the specified 
 	 * <code>value</code> in this Map. Neither the key nor the 
@@ -169,7 +154,7 @@ implements Cache
 			status[cur] = LRU_NEW;
 			mapKeyPos.put(key, intvalue);
 			cur++;
-			if ( cur >= size ) cur = 0;
+			if ( cur >= getCapacity() ) cur = 0;
 			if ( oldObject != null )
 				dispose( oldObject );
 			return oldObject;
@@ -272,7 +257,7 @@ implements Cache
 		if ( s == LRU_NEW ) {
 			status[cur] = LRU_OLD;
 			cur++;
-			if ( cur >= size ) cur = 0;
+			if ( cur >= getCapacity() ) cur = 0;
 			return LRU_NEW;
 		}
 		return LRU_OLD;
@@ -318,7 +303,34 @@ implements Cache
 	 * @see org.exolab.castor.persist.cache.Cache#setCapacity(int)
 	 */
 	public void setCapacity (int capacity) {
-		super.setCapacity (capacity);
-        this.size = capacity;
+		if(getCapacity() == 0) {
+		    // cache has not yet been initialized
+	        keys = new Object[capacity];
+	        values = new Object[capacity];
+	        status = new int[capacity];
+	        mapKeyPos = new Hashtable(capacity);
+
+	        super.setCapacity (capacity);
+		} else if(getCapacity() > capacity){
+		    // cache has been initialized but capacity will decrease
+		    // we do nothing and leave capazity as is
+		} else if(getCapacity() < capacity){
+		    // cache has been initialized but capacity will increased
+		    Object[] nkeys = new Object[capacity];
+		    System.arraycopy(keys, 0, nkeys, 0, getCapacity());
+	        keys = nkeys;
+	        
+		    Object[] nvalues = new Object[capacity];
+		    System.arraycopy(values, 0, nvalues, 0, getCapacity());
+	        values = nvalues;
+	        
+		    int[] nstatus = new int[capacity];
+		    System.arraycopy(status, 0, nstatus, 0, getCapacity());
+	        status = nstatus;
+
+	        // mapKeyPos will resize automatically
+
+	        super.setCapacity (capacity);
+		}
 	}
 }
