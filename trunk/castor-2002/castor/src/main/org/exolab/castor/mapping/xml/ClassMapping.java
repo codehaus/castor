@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Vector;
+import org.exolab.castor.mapping.xml.types.AccessType;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -28,13 +29,9 @@ import org.xml.sax.DocumentHandler;
 public class ClassMapping implements java.io.Serializable {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
-
-    private java.lang.String _access = "shared";
-
-    private java.lang.String _identity;
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
 
     private java.lang.String _name;
 
@@ -42,7 +39,18 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.Object _depends;
 
-    private java.lang.String _keyGenerator;
+    private java.lang.String _identity;
+
+    private org.exolab.castor.mapping.xml.types.AccessType _access;
+
+    private java.lang.Object _keyGenerator;
+
+    private boolean _autoComplete;
+
+    /**
+     * keeps track of state for field: _autoComplete
+    **/
+    private boolean _has_autoComplete;
 
     private java.lang.String _description;
 
@@ -74,7 +82,7 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param vContainer
     **/
-    public void addContainer(Container vContainer) 
+    public void addContainer(Container vContainer)
         throws java.lang.IndexOutOfBoundsException
     {
         _containerList.addElement(vContainer);
@@ -84,7 +92,7 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param vFieldMapping
     **/
-    public void addFieldMapping(FieldMapping vFieldMapping) 
+    public void addFieldMapping(FieldMapping vFieldMapping)
         throws java.lang.IndexOutOfBoundsException
     {
         _fieldMappingList.addElement(vFieldMapping);
@@ -92,25 +100,43 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public java.util.Enumeration enumerateContainer() {
+    public void deleteAutoComplete()
+    {
+        this._has_autoComplete= false;
+    } //-- void deleteAutoComplete() 
+
+    /**
+    **/
+    public java.util.Enumeration enumerateContainer()
+    {
         return _containerList.elements();
     } //-- java.util.Enumeration enumerateContainer() 
 
     /**
     **/
-    public java.util.Enumeration enumerateFieldMapping() {
+    public java.util.Enumeration enumerateFieldMapping()
+    {
         return _fieldMappingList.elements();
     } //-- java.util.Enumeration enumerateFieldMapping() 
 
     /**
     **/
-    public java.lang.String getAccess() {
+    public org.exolab.castor.mapping.xml.types.AccessType getAccess()
+    {
         return this._access;
-    } //-- java.lang.String getAccess() 
+    } //-- org.exolab.castor.mapping.xml.types.AccessType getAccess() 
 
     /**
     **/
-    public CacheTypeMapping getCacheTypeMapping() {
+    public boolean getAutoComplete()
+    {
+        return this._autoComplete;
+    } //-- boolean getAutoComplete() 
+
+    /**
+    **/
+    public CacheTypeMapping getCacheTypeMapping()
+    {
         return this._cacheTypeMapping;
     } //-- CacheTypeMapping getCacheTypeMapping() 
 
@@ -118,7 +144,7 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param index
     **/
-    public Container getContainer(int index) 
+    public Container getContainer(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -131,7 +157,8 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public Container[] getContainer() {
+    public Container[] getContainer()
+    {
         int size = _containerList.size();
         Container[] mArray = new Container[size];
         for (int index = 0; index < size; index++) {
@@ -142,25 +169,29 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public int getContainerCount() {
+    public int getContainerCount()
+    {
         return _containerList.size();
     } //-- int getContainerCount() 
 
     /**
     **/
-    public java.lang.Object getDepends() {
+    public java.lang.Object getDepends()
+    {
         return this._depends;
     } //-- java.lang.Object getDepends() 
 
     /**
     **/
-    public java.lang.String getDescription() {
+    public java.lang.String getDescription()
+    {
         return this._description;
     } //-- java.lang.String getDescription() 
 
     /**
     **/
-    public java.lang.Object getExtends() {
+    public java.lang.Object getExtends()
+    {
         return this._extends;
     } //-- java.lang.Object getExtends() 
 
@@ -168,7 +199,7 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param index
     **/
-    public FieldMapping getFieldMapping(int index) 
+    public FieldMapping getFieldMapping(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -181,7 +212,8 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public FieldMapping[] getFieldMapping() {
+    public FieldMapping[] getFieldMapping()
+    {
         int size = _fieldMappingList.size();
         FieldMapping[] mArray = new FieldMapping[size];
         for (int index = 0; index < size; index++) {
@@ -192,43 +224,50 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public int getFieldMappingCount() {
+    public int getFieldMappingCount()
+    {
         return _fieldMappingList.size();
     } //-- int getFieldMappingCount() 
 
     /**
     **/
-    public java.lang.String getIdentity() {
+    public java.lang.String getIdentity()
+    {
         return this._identity;
     } //-- java.lang.String getIdentity() 
 
     /**
     **/
-    public java.lang.String getKeyGenerator() {
+    public java.lang.Object getKeyGenerator()
+    {
         return this._keyGenerator;
-    } //-- java.lang.String getKeyGenerator() 
+    } //-- java.lang.Object getKeyGenerator() 
 
     /**
     **/
-    public MapTo getMapTo() {
+    public MapTo getMapTo()
+    {
         return this._mapTo;
     } //-- MapTo getMapTo() 
 
     /**
     **/
-    public java.lang.String getName() {
+    public java.lang.String getName()
+    {
         return this._name;
     } //-- java.lang.String getName() 
 
     /**
     **/
-    public java.lang.String getReferenceId() {
-        return this._name;
-    } //-- java.lang.String getReferenceId() 
+    public boolean hasAutoComplete()
+    {
+        return this._has_autoComplete;
+    } //-- boolean hasAutoComplete() 
 
     /**
     **/
-    public boolean isValid() {
+    public boolean isValid()
+    {
         try {
             validate();
         }
@@ -242,11 +281,9 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param out
     **/
-    public void marshal(java.io.Writer out) 
+    public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, out);
     } //-- void marshal(java.io.Writer) 
@@ -255,24 +292,24 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param handler
     **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
+    public void marshal(org.xml.sax.DocumentHandler handler)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
     **/
-    public void removeAllContainer() {
+    public void removeAllContainer()
+    {
         _containerList.removeAllElements();
     } //-- void removeAllContainer() 
 
     /**
     **/
-    public void removeAllFieldMapping() {
+    public void removeAllFieldMapping()
+    {
         _fieldMappingList.removeAllElements();
     } //-- void removeAllFieldMapping() 
 
@@ -280,7 +317,8 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param index
     **/
-    public Container removeContainer(int index) {
+    public Container removeContainer(int index)
+    {
         Object obj = _containerList.elementAt(index);
         _containerList.removeElementAt(index);
         return (Container) obj;
@@ -290,7 +328,8 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param index
     **/
-    public FieldMapping removeFieldMapping(int index) {
+    public FieldMapping removeFieldMapping(int index)
+    {
         Object obj = _fieldMappingList.elementAt(index);
         _fieldMappingList.removeElementAt(index);
         return (FieldMapping) obj;
@@ -300,15 +339,27 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _access
     **/
-    public void setAccess(java.lang.String _access) {
+    public void setAccess(org.exolab.castor.mapping.xml.types.AccessType _access)
+    {
         this._access = _access;
-    } //-- void setAccess(java.lang.String) 
+    } //-- void setAccess(org.exolab.castor.mapping.xml.types.AccessType) 
+
+    /**
+     * 
+     * @param _autoComplete
+    **/
+    public void setAutoComplete(boolean _autoComplete)
+    {
+        this._autoComplete = _autoComplete;
+        this._has_autoComplete = true;
+    } //-- void setAutoComplete(boolean) 
 
     /**
      * 
      * @param _cacheTypeMapping
     **/
-    public void setCacheTypeMapping(CacheTypeMapping _cacheTypeMapping) {
+    public void setCacheTypeMapping(CacheTypeMapping _cacheTypeMapping)
+    {
         this._cacheTypeMapping = _cacheTypeMapping;
     } //-- void setCacheTypeMapping(CacheTypeMapping) 
 
@@ -317,7 +368,7 @@ public class ClassMapping implements java.io.Serializable {
      * @param vContainer
      * @param index
     **/
-    public void setContainer(Container vContainer, int index) 
+    public void setContainer(Container vContainer, int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -329,9 +380,23 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
+     * @param containerArray
+    **/
+    public void setContainer(Container[] containerArray)
+    {
+        //-- copy array
+        _containerList.removeAllElements();
+        for (int i = 0; i < containerArray.length; i++) {
+            _containerList.addElement(containerArray[i]);
+        }
+    } //-- void setContainer(Container) 
+
+    /**
+     * 
      * @param _depends
     **/
-    public void setDepends(java.lang.Object _depends) {
+    public void setDepends(java.lang.Object _depends)
+    {
         this._depends = _depends;
     } //-- void setDepends(java.lang.Object) 
 
@@ -339,7 +404,8 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _description
     **/
-    public void setDescription(java.lang.String _description) {
+    public void setDescription(java.lang.String _description)
+    {
         this._description = _description;
     } //-- void setDescription(java.lang.String) 
 
@@ -347,7 +413,8 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _extends
     **/
-    public void setExtends(java.lang.Object _extends) {
+    public void setExtends(java.lang.Object _extends)
+    {
         this._extends = _extends;
     } //-- void setExtends(java.lang.Object) 
 
@@ -356,7 +423,7 @@ public class ClassMapping implements java.io.Serializable {
      * @param vFieldMapping
      * @param index
     **/
-    public void setFieldMapping(FieldMapping vFieldMapping, int index) 
+    public void setFieldMapping(FieldMapping vFieldMapping, int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -368,9 +435,23 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
+     * @param fieldMappingArray
+    **/
+    public void setFieldMapping(FieldMapping[] fieldMappingArray)
+    {
+        //-- copy array
+        _fieldMappingList.removeAllElements();
+        for (int i = 0; i < fieldMappingArray.length; i++) {
+            _fieldMappingList.addElement(fieldMappingArray[i]);
+        }
+    } //-- void setFieldMapping(FieldMapping) 
+
+    /**
+     * 
      * @param _identity
     **/
-    public void setIdentity(java.lang.String _identity) {
+    public void setIdentity(java.lang.String _identity)
+    {
         this._identity = _identity;
     } //-- void setIdentity(java.lang.String) 
 
@@ -378,15 +459,17 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _keyGenerator
     **/
-    public void setKeyGenerator(java.lang.String _keyGenerator) {
+    public void setKeyGenerator(java.lang.Object _keyGenerator)
+    {
         this._keyGenerator = _keyGenerator;
-    } //-- void setKeyGenerator(java.lang.String) 
+    } //-- void setKeyGenerator(java.lang.Object) 
 
     /**
      * 
      * @param _mapTo
     **/
-    public void setMapTo(MapTo _mapTo) {
+    public void setMapTo(MapTo _mapTo)
+    {
         this._mapTo = _mapTo;
     } //-- void setMapTo(MapTo) 
 
@@ -394,7 +477,8 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _name
     **/
-    public void setName(java.lang.String _name) {
+    public void setName(java.lang.String _name)
+    {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
@@ -402,7 +486,7 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.ClassMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.ClassMapping.class, reader);
@@ -410,7 +494,7 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public void validate() 
+    public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
         org.exolab.castor.xml.Validator.validate(this, null);

@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -14,6 +14,7 @@ package org.exolab.castor.mapping.xml;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import org.exolab.castor.mapping.xml.types.TypeType;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -26,13 +27,18 @@ import org.xml.sax.DocumentHandler;
 public class CacheTypeMapping implements java.io.Serializable {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
+
+    private org.exolab.castor.mapping.xml.types.TypeType _type;
 
     private int _capacity;
 
-    private java.lang.String _type = "count-limited";
+    /**
+     * keeps track of state for field: _capacity
+    **/
+    private boolean _has_capacity;
 
 
       //----------------/
@@ -50,19 +56,36 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
     **/
-    public int getCapacity() {
+    public void deleteCapacity()
+    {
+        this._has_capacity= false;
+    } //-- void deleteCapacity() 
+
+    /**
+    **/
+    public int getCapacity()
+    {
         return this._capacity;
     } //-- int getCapacity() 
 
     /**
     **/
-    public java.lang.String getType() {
+    public org.exolab.castor.mapping.xml.types.TypeType getType()
+    {
         return this._type;
-    } //-- java.lang.String getType() 
+    } //-- org.exolab.castor.mapping.xml.types.TypeType getType() 
 
     /**
     **/
-    public boolean isValid() {
+    public boolean hasCapacity()
+    {
+        return this._has_capacity;
+    } //-- boolean hasCapacity() 
+
+    /**
+    **/
+    public boolean isValid()
+    {
         try {
             validate();
         }
@@ -76,11 +99,9 @@ public class CacheTypeMapping implements java.io.Serializable {
      * 
      * @param out
     **/
-    public void marshal(java.io.Writer out) 
+    public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, out);
     } //-- void marshal(java.io.Writer) 
@@ -89,11 +110,9 @@ public class CacheTypeMapping implements java.io.Serializable {
      * 
      * @param handler
     **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
+    public void marshal(org.xml.sax.DocumentHandler handler)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
@@ -102,23 +121,26 @@ public class CacheTypeMapping implements java.io.Serializable {
      * 
      * @param _capacity
     **/
-    public void setCapacity(int _capacity) {
+    public void setCapacity(int _capacity)
+    {
         this._capacity = _capacity;
+        this._has_capacity = true;
     } //-- void setCapacity(int) 
 
     /**
      * 
      * @param _type
     **/
-    public void setType(java.lang.String _type) {
+    public void setType(org.exolab.castor.mapping.xml.types.TypeType _type)
+    {
         this._type = _type;
-    } //-- void setType(java.lang.String) 
+    } //-- void setType(org.exolab.castor.mapping.xml.types.TypeType) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.CacheTypeMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.CacheTypeMapping.class, reader);
@@ -126,7 +148,7 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
     **/
-    public void validate() 
+    public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
         org.exolab.castor.xml.Validator.validate(this, null);

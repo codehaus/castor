@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -26,9 +26,9 @@ import org.xml.sax.DocumentHandler;
 public class Include implements java.io.Serializable {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
 
     private java.lang.String _href;
 
@@ -48,13 +48,15 @@ public class Include implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getHref() {
+    public java.lang.String getHref()
+    {
         return this._href;
     } //-- java.lang.String getHref() 
 
     /**
     **/
-    public boolean isValid() {
+    public boolean isValid()
+    {
         try {
             validate();
         }
@@ -68,11 +70,9 @@ public class Include implements java.io.Serializable {
      * 
      * @param out
     **/
-    public void marshal(java.io.Writer out) 
+    public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, out);
     } //-- void marshal(java.io.Writer) 
@@ -81,11 +81,9 @@ public class Include implements java.io.Serializable {
      * 
      * @param handler
     **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
+    public void marshal(org.xml.sax.DocumentHandler handler)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
@@ -94,7 +92,8 @@ public class Include implements java.io.Serializable {
      * 
      * @param _href
     **/
-    public void setHref(java.lang.String _href) {
+    public void setHref(java.lang.String _href)
+    {
         this._href = _href;
     } //-- void setHref(java.lang.String) 
 
@@ -102,7 +101,7 @@ public class Include implements java.io.Serializable {
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.Include unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Include unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.Include) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Include.class, reader);
@@ -110,7 +109,7 @@ public class Include implements java.io.Serializable {
 
     /**
     **/
-    public void validate() 
+    public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
         org.exolab.castor.xml.Validator.validate(this, null);

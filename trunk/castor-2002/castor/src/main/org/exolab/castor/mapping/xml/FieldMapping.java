@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -14,6 +14,7 @@ package org.exolab.castor.mapping.xml;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -26,31 +27,49 @@ import org.xml.sax.DocumentHandler;
 public class FieldMapping implements java.io.Serializable {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
 
     private java.lang.String _name;
 
-    private boolean _lazy = false;
+    private java.lang.String _type;
 
-    private boolean _direct = false;
+    private boolean _required;
 
-    private boolean _transient = false;
+    /**
+     * keeps track of state for field: _required
+    **/
+    private boolean _has_required;
 
-    private java.lang.String _collection;
+    private boolean _transient;
 
-    private java.lang.String _setMethod;
+    /**
+     * keeps track of state for field: _transient
+    **/
+    private boolean _has_transient;
+
+    private boolean _direct;
+
+    /**
+     * keeps track of state for field: _direct
+    **/
+    private boolean _has_direct;
+
+    private boolean _lazy;
+
+    /**
+     * keeps track of state for field: _lazy
+    **/
+    private boolean _has_lazy;
 
     private java.lang.String _getMethod;
 
-    private boolean _required = false;
+    private java.lang.String _setMethod;
 
     private java.lang.String _createMethod;
 
-    private java.lang.String _type;
-
-    private java.lang.Object _manyToMany;
+    private org.exolab.castor.mapping.xml.types.CollectionType _collection;
 
     private java.lang.String _description;
 
@@ -76,97 +95,162 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getCollection() {
-        return this._collection;
-    } //-- java.lang.String getCollection() 
+    public void deleteDirect()
+    {
+        this._has_direct= false;
+    } //-- void deleteDirect() 
 
     /**
     **/
-    public java.lang.String getCreateMethod() {
+    public void deleteLazy()
+    {
+        this._has_lazy= false;
+    } //-- void deleteLazy() 
+
+    /**
+    **/
+    public void deleteRequired()
+    {
+        this._has_required= false;
+    } //-- void deleteRequired() 
+
+    /**
+    **/
+    public void deleteTransient()
+    {
+        this._has_transient= false;
+    } //-- void deleteTransient() 
+
+    /**
+    **/
+    public org.exolab.castor.mapping.xml.types.CollectionType getCollection()
+    {
+        return this._collection;
+    } //-- org.exolab.castor.mapping.xml.types.CollectionType getCollection() 
+
+    /**
+    **/
+    public java.lang.String getCreateMethod()
+    {
         return this._createMethod;
     } //-- java.lang.String getCreateMethod() 
 
     /**
     **/
-    public java.lang.String getDescription() {
+    public java.lang.String getDescription()
+    {
         return this._description;
     } //-- java.lang.String getDescription() 
 
     /**
     **/
-    public boolean getDirect() {
+    public boolean getDirect()
+    {
         return this._direct;
     } //-- boolean getDirect() 
 
     /**
     **/
-    public java.lang.String getGetMethod() {
+    public java.lang.String getGetMethod()
+    {
         return this._getMethod;
     } //-- java.lang.String getGetMethod() 
 
     /**
     **/
-    public boolean getLazy() {
+    public boolean getLazy()
+    {
         return this._lazy;
     } //-- boolean getLazy() 
 
     /**
     **/
-    public Ldap getLdap() {
+    public Ldap getLdap()
+    {
         return this._ldap;
     } //-- Ldap getLdap() 
 
     /**
     **/
-    public java.lang.Object getManyToMany() {
-        return this._manyToMany;
-    } //-- java.lang.Object getManyToMany() 
-
-    /**
-    **/
-    public java.lang.String getName() {
+    public java.lang.String getName()
+    {
         return this._name;
     } //-- java.lang.String getName() 
 
     /**
     **/
-    public boolean getRequired() {
+    public boolean getRequired()
+    {
         return this._required;
     } //-- boolean getRequired() 
 
     /**
     **/
-    public java.lang.String getSetMethod() {
+    public java.lang.String getSetMethod()
+    {
         return this._setMethod;
     } //-- java.lang.String getSetMethod() 
 
     /**
     **/
-    public Sql getSql() {
+    public Sql getSql()
+    {
         return this._sql;
     } //-- Sql getSql() 
 
     /**
     **/
-    public boolean getTransient() {
+    public boolean getTransient()
+    {
         return this._transient;
     } //-- boolean getTransient() 
 
     /**
     **/
-    public java.lang.String getType() {
+    public java.lang.String getType()
+    {
         return this._type;
     } //-- java.lang.String getType() 
 
     /**
     **/
-    public Xml getXml() {
+    public Xml getXml()
+    {
         return this._xml;
     } //-- Xml getXml() 
 
     /**
     **/
-    public boolean isValid() {
+    public boolean hasDirect()
+    {
+        return this._has_direct;
+    } //-- boolean hasDirect() 
+
+    /**
+    **/
+    public boolean hasLazy()
+    {
+        return this._has_lazy;
+    } //-- boolean hasLazy() 
+
+    /**
+    **/
+    public boolean hasRequired()
+    {
+        return this._has_required;
+    } //-- boolean hasRequired() 
+
+    /**
+    **/
+    public boolean hasTransient()
+    {
+        return this._has_transient;
+    } //-- boolean hasTransient() 
+
+    /**
+    **/
+    public boolean isValid()
+    {
         try {
             validate();
         }
@@ -180,11 +264,9 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param out
     **/
-    public void marshal(java.io.Writer out) 
+    public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, out);
     } //-- void marshal(java.io.Writer) 
@@ -193,11 +275,9 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param handler
     **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
+    public void marshal(org.xml.sax.DocumentHandler handler)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
@@ -206,15 +286,17 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _collection
     **/
-    public void setCollection(java.lang.String _collection) {
+    public void setCollection(org.exolab.castor.mapping.xml.types.CollectionType _collection)
+    {
         this._collection = _collection;
-    } //-- void setCollection(java.lang.String) 
+    } //-- void setCollection(org.exolab.castor.mapping.xml.types.CollectionType) 
 
     /**
      * 
      * @param _createMethod
     **/
-    public void setCreateMethod(java.lang.String _createMethod) {
+    public void setCreateMethod(java.lang.String _createMethod)
+    {
         this._createMethod = _createMethod;
     } //-- void setCreateMethod(java.lang.String) 
 
@@ -222,7 +304,8 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _description
     **/
-    public void setDescription(java.lang.String _description) {
+    public void setDescription(java.lang.String _description)
+    {
         this._description = _description;
     } //-- void setDescription(java.lang.String) 
 
@@ -230,15 +313,18 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _direct
     **/
-    public void setDirect(boolean _direct) {
+    public void setDirect(boolean _direct)
+    {
         this._direct = _direct;
+        this._has_direct = true;
     } //-- void setDirect(boolean) 
 
     /**
      * 
      * @param _getMethod
     **/
-    public void setGetMethod(java.lang.String _getMethod) {
+    public void setGetMethod(java.lang.String _getMethod)
+    {
         this._getMethod = _getMethod;
     } //-- void setGetMethod(java.lang.String) 
 
@@ -246,31 +332,27 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _lazy
     **/
-    public void setLazy(boolean _lazy) {
+    public void setLazy(boolean _lazy)
+    {
         this._lazy = _lazy;
+        this._has_lazy = true;
     } //-- void setLazy(boolean) 
 
     /**
      * 
      * @param _ldap
     **/
-    public void setLdap(Ldap _ldap) {
+    public void setLdap(Ldap _ldap)
+    {
         this._ldap = _ldap;
     } //-- void setLdap(Ldap) 
 
     /**
      * 
-     * @param _manyToMany
-    **/
-    public void setManyToMany(java.lang.Object _manyToMany) {
-        this._manyToMany = _manyToMany;
-    } //-- void setManyToMany(java.lang.Object) 
-
-    /**
-     * 
      * @param _name
     **/
-    public void setName(java.lang.String _name) {
+    public void setName(java.lang.String _name)
+    {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
@@ -278,15 +360,18 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _required
     **/
-    public void setRequired(boolean _required) {
+    public void setRequired(boolean _required)
+    {
         this._required = _required;
+        this._has_required = true;
     } //-- void setRequired(boolean) 
 
     /**
      * 
      * @param _setMethod
     **/
-    public void setSetMethod(java.lang.String _setMethod) {
+    public void setSetMethod(java.lang.String _setMethod)
+    {
         this._setMethod = _setMethod;
     } //-- void setSetMethod(java.lang.String) 
 
@@ -294,7 +379,8 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _sql
     **/
-    public void setSql(Sql _sql) {
+    public void setSql(Sql _sql)
+    {
         this._sql = _sql;
     } //-- void setSql(Sql) 
 
@@ -302,15 +388,18 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _transient
     **/
-    public void setTransient(boolean _transient) {
+    public void setTransient(boolean _transient)
+    {
         this._transient = _transient;
+        this._has_transient = true;
     } //-- void setTransient(boolean) 
 
     /**
      * 
      * @param _type
     **/
-    public void setType(java.lang.String _type) {
+    public void setType(java.lang.String _type)
+    {
         this._type = _type;
     } //-- void setType(java.lang.String) 
 
@@ -318,7 +407,8 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _xml
     **/
-    public void setXml(Xml _xml) {
+    public void setXml(Xml _xml)
+    {
         this._xml = _xml;
     } //-- void setXml(Xml) 
 
@@ -326,7 +416,7 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.FieldMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.FieldMapping.class, reader);
@@ -334,7 +424,7 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public void validate() 
+    public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
         org.exolab.castor.xml.Validator.validate(this, null);

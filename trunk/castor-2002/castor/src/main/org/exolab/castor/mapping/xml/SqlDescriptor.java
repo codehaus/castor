@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -26,18 +26,12 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
+public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
-
-    private org.exolab.castor.xml.XMLFieldDescriptor[] elements;
-
-    private org.exolab.castor.xml.XMLFieldDescriptor[] attributes;
-
-    private org.exolab.castor.xml.util.XMLFieldDescriptorImpl contentDesc;
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
 
     private java.lang.String nsPrefix;
 
@@ -53,15 +47,17 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
     //----------------/
 
     public SqlDescriptor() {
+        super();
+        nsURI = "http://castor.exolab.org/";
         xmlName = "sql";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[5];
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -81,52 +77,18 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                 }
             }
             public Object newInstance( Object parent ) {
-                return new java.lang.String();
+                return null;
             }
         } );
         desc.setHandler(handler);
-        attributes[0] = desc;
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            fieldValidator.setValidator(sv);
-        }
-		desc.setValidator(fieldValidator);
-        
-        //-- _dirty
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_dirty", "dirty", NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Sql target = (Sql) object;
-                return target.getDirty();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Sql target = (Sql) object;
-                    target.setDirty( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        attributes[1] = desc;
-        
-        //-- validation code for: _dirty
-        fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
@@ -157,53 +119,21 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
             }
         } );
         desc.setHandler(handler);
-        attributes[2] = desc;
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
         
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
             fieldValidator.setValidator(sv);
         }
-		desc.setValidator(fieldValidator);
-        
-        //-- _manyKey
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyKey", "many-key", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Sql target = (Sql) object;
-                return target.getManyKey();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Sql target = (Sql) object;
-                    target.setManyKey( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new java.lang.String();
-            }
-        } );
-        desc.setHandler(handler);
-        attributes[3] = desc;
-        
-        //-- validation code for: _manyKey
-        fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            fieldValidator.setValidator(sv);
-        }
-		desc.setValidator(fieldValidator);
+        desc.setValidator(fieldValidator);
         
         //-- _manyTable
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyTable", "many-table", NodeType.Attribute);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -223,20 +153,95 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                 }
             }
             public Object newInstance( Object parent ) {
-                return new java.lang.String();
+                return null;
             }
         } );
         desc.setHandler(handler);
-        attributes[4] = desc;
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
         
         //-- validation code for: _manyTable
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _manyKey
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyKey", "many-key", NodeType.Attribute);
+        desc.setImmutable(true);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                Sql target = (Sql) object;
+                return target.getManyKey();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Sql target = (Sql) object;
+                    target.setManyKey( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _manyKey
+        fieldValidator = new FieldValidator();
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _dirty
+        desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.DirtyType.class, "_dirty", "dirty", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                Sql target = (Sql) object;
+                return target.getDirty();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Sql target = (Sql) object;
+                    target.setDirty( (org.exolab.castor.mapping.xml.types.DirtyType) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler( new EnumFieldHandler(org.exolab.castor.mapping.xml.types.DirtyType.class, handler));
+        desc.setImmutable(true);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _dirty
+        fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
         
-        elements = new XMLFieldDescriptorImpl[0];
     } //-- org.exolab.castor.mapping.xml.SqlDescriptor()
 
 
@@ -246,128 +251,57 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
 
     /**
     **/
-    public org.exolab.castor.mapping.AccessMode getAccessMode() {
+    public org.exolab.castor.mapping.AccessMode getAccessMode()
+    {
         return null;
     } //-- org.exolab.castor.mapping.AccessMode getAccessMode() 
 
     /**
     **/
-    public org.exolab.castor.xml.XMLFieldDescriptor[] getAttributeDescriptors() {
-        return attributes;
-    } //-- org.exolab.castor.xml.XMLFieldDescriptor[] getAttributeDescriptors() 
-
-    /**
-    **/
-    public org.exolab.castor.xml.XMLFieldDescriptor getContentDescriptor() {
-        return contentDesc;
-    } //-- org.exolab.castor.xml.XMLFieldDescriptor getContentDescriptor() 
-
-    /**
-    **/
-    public org.exolab.castor.xml.XMLFieldDescriptor[] getElementDescriptors() {
-        return elements;
-    } //-- org.exolab.castor.xml.XMLFieldDescriptor[] getElementDescriptors() 
-
-    /**
-    **/
-    public org.exolab.castor.mapping.ClassDescriptor getExtends() {
+    public org.exolab.castor.mapping.ClassDescriptor getExtends()
+    {
         return null;
     } //-- org.exolab.castor.mapping.ClassDescriptor getExtends() 
 
     /**
-     * Returns the XML field descriptor matching the given
-     * xml name and nodeType. If NodeType is null, then
-     * either an AttributeDescriptor, or ElementDescriptor
-     * may be returned. Null is returned if no matching
-     * descriptor is available.
-     *
-     * @param name the xml name to match against
-     * @param nodeType, the NodeType to match against, or null if
-     * the node type is not known.
-     * @return the matching descriptor, or null if no matching
-     * descriptor is available.
-     *
     **/
-    public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType) 
+    public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
-        
-        boolean wild = (nodeType == null);
-        
-        if (wild || (nodeType == NodeType.Element)) {
-            XMLFieldDescriptor desc = null;
-            for (int i = 0; i < elements.length; i++) {
-                desc = elements[i];
-                if (desc == null) continue;
-                if (desc.matches(name)) return desc;
-            }
-        }
-        
-        if (wild || (nodeType == NodeType.Attribute)) {
-            XMLFieldDescriptor desc = null;
-            for (int i = 0; i < attributes.length; i++) {
-                desc = attributes[i];
-                if (desc == null) continue;
-                if (desc.matches(name)) return desc;
-            }
-        }
-        
-        return null;
-        
-    } //-- getFieldDescriptor
-
-    /**
-    **/
-    public org.exolab.castor.mapping.FieldDescriptor[] getFields() {
-        int size = attributes.length + elements.length;
-        if (contentDesc != null) ++size;
-        
-        FieldDescriptor[] fields = new FieldDescriptor[size];
-        int c = 0;
-        for (int i = 0; i < attributes.length; i++)
-            fields[c++] = attributes[i];
-        
-        for (int i = 0; i < elements.length; i++)
-            fields[c++] = elements[i];
-        
-        if (contentDesc != null) fields[c] = contentDesc;
-        
-        return fields;
-    } //-- org.exolab.castor.mapping.FieldDescriptor[] getFields() 
-
-    /**
-    **/
-    public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
         return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**
     **/
-    public java.lang.Class getJavaClass() {
+    public java.lang.Class getJavaClass()
+    {
         return org.exolab.castor.mapping.xml.Sql.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**
     **/
-    public java.lang.String getNameSpacePrefix() {
+    public java.lang.String getNameSpacePrefix()
+    {
         return nsPrefix;
     } //-- java.lang.String getNameSpacePrefix() 
 
     /**
     **/
-    public java.lang.String getNameSpaceURI() {
+    public java.lang.String getNameSpaceURI()
+    {
         return nsURI;
     } //-- java.lang.String getNameSpaceURI() 
 
     /**
     **/
-    public org.exolab.castor.xml.TypeValidator getValidator() {
+    public org.exolab.castor.xml.TypeValidator getValidator()
+    {
         return null;
     } //-- org.exolab.castor.xml.TypeValidator getValidator() 
 
     /**
     **/
-    public java.lang.String getXMLName() {
+    public java.lang.String getXMLName()
+    {
         return xmlName;
     } //-- java.lang.String getXMLName() 
 

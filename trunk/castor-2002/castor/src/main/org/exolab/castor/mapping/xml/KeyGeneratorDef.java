@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -28,9 +28,9 @@ import org.xml.sax.DocumentHandler;
 public class KeyGeneratorDef implements java.io.Serializable {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
 
     private java.lang.String _name;
 
@@ -57,7 +57,7 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param vParam
     **/
-    public void addParam(Param vParam) 
+    public void addParam(Param vParam)
         throws java.lang.IndexOutOfBoundsException
     {
         _paramList.addElement(vParam);
@@ -65,19 +65,22 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
     **/
-    public java.util.Enumeration enumerateParam() {
+    public java.util.Enumeration enumerateParam()
+    {
         return _paramList.elements();
     } //-- java.util.Enumeration enumerateParam() 
 
     /**
     **/
-    public java.lang.String getAlias() {
+    public java.lang.String getAlias()
+    {
         return this._alias;
     } //-- java.lang.String getAlias() 
 
     /**
     **/
-    public java.lang.String getName() {
+    public java.lang.String getName()
+    {
         return this._name;
     } //-- java.lang.String getName() 
 
@@ -85,7 +88,7 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param index
     **/
-    public Param getParam(int index) 
+    public Param getParam(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -98,7 +101,8 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
     **/
-    public Param[] getParam() {
+    public Param[] getParam()
+    {
         int size = _paramList.size();
         Param[] mArray = new Param[size];
         for (int index = 0; index < size; index++) {
@@ -109,19 +113,15 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
     **/
-    public int getParamCount() {
+    public int getParamCount()
+    {
         return _paramList.size();
     } //-- int getParamCount() 
 
     /**
     **/
-    public java.lang.String getReferenceId() {
-        return this._name;
-    } //-- java.lang.String getReferenceId() 
-
-    /**
-    **/
-    public boolean isValid() {
+    public boolean isValid()
+    {
         try {
             validate();
         }
@@ -135,11 +135,9 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param out
     **/
-    public void marshal(java.io.Writer out) 
+    public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, out);
     } //-- void marshal(java.io.Writer) 
@@ -148,18 +146,17 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param handler
     **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
+    public void marshal(org.xml.sax.DocumentHandler handler)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
     **/
-    public void removeAllParam() {
+    public void removeAllParam()
+    {
         _paramList.removeAllElements();
     } //-- void removeAllParam() 
 
@@ -167,7 +164,8 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param index
     **/
-    public Param removeParam(int index) {
+    public Param removeParam(int index)
+    {
         Object obj = _paramList.elementAt(index);
         _paramList.removeElementAt(index);
         return (Param) obj;
@@ -177,7 +175,8 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param _alias
     **/
-    public void setAlias(java.lang.String _alias) {
+    public void setAlias(java.lang.String _alias)
+    {
         this._alias = _alias;
     } //-- void setAlias(java.lang.String) 
 
@@ -185,7 +184,8 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * 
      * @param _name
     **/
-    public void setName(java.lang.String _name) {
+    public void setName(java.lang.String _name)
+    {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
@@ -194,7 +194,7 @@ public class KeyGeneratorDef implements java.io.Serializable {
      * @param vParam
      * @param index
     **/
-    public void setParam(Param vParam, int index) 
+    public void setParam(Param vParam, int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -206,9 +206,22 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
      * 
+     * @param paramArray
+    **/
+    public void setParam(Param[] paramArray)
+    {
+        //-- copy array
+        _paramList.removeAllElements();
+        for (int i = 0; i < paramArray.length; i++) {
+            _paramList.addElement(paramArray[i]);
+        }
+    } //-- void setParam(Param) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.KeyGeneratorDef unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.KeyGeneratorDef unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.KeyGeneratorDef) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.KeyGeneratorDef.class, reader);
@@ -216,7 +229,7 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
     **/
-    public void validate() 
+    public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
         org.exolab.castor.xml.Validator.validate(this, null);
