@@ -90,7 +90,8 @@
   <target name="examples" depends="prepare">
     <mkdir dir="${build}/examples" />
     <javac srcdir="${source}/examples" destdir="${build}/examples"
-           classpath="${classpath}" debug="on" deprecation="${deprecation}" />
+           classpath="${classpath}" debug="on" deprecation="${deprecation}"
+           excludes="servlet/**" />
   </target>
 
   <!-- Build the test packages -->
@@ -135,15 +136,13 @@
     <copydir  src="${doc}/images" dest="${build}/doc/print/images" />
 
     <copydir  src="${schema}" includes="*.dtd,*.xsd" dest="${build}/doc" />
+    <replace  file="${build}/doc/index.html" token="$$VERSION$$" value="${version}" />
+    <replace  file="${build}/doc/print/index.html" token="$$VERSION$$" value="${version}" />
     <replace  file="${build}/doc/download.html" token="$$VERSION$$" value="${version}" />
     <replace  file="${build}/doc/print/download.html" token="$$VERSION$$" value="${version}" />
 
-    <mkdir    dir="${build}/doc/pres" />
-    <style    basedir="${doc}/pres" destdir="${build}/doc/pres" style="style/exolab.xsl"
-              includes="**.xml" excludes="style/**,project.xml" />
-    <copydir  src="${doc}/pres" dest="${build}/doc/pres" includes="license.txt,document.dtd" />
-    <copydir  src="${doc}/pres/images" dest="${build}/doc/pres/images" />
-    <copydir  src="${doc}/pres/style" dest="${build}/doc/pres/style" includes="images/**,*.css" />
+    <mkdir    dir="${build}/doc/ora-mar-2k" />
+    <copydir  src="${doc}/ora-mar-2k" dest="${build}/doc/ora-mar-2k" />
   </target>
 
   <!-- Build the full JavaDocs -->
