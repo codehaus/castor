@@ -73,10 +73,10 @@
 	                           <xsd:enumeration value="arraylist"/>
                		           <xsd:enumeration value="odmg"/>
                              </xsd:restriction>
-	                      </xsd:simpleType> 
+	                      </xsd:simpleType>
 	                 </xsd:element>
 					<!-- the binding file name -->
-					<xsd:element name="BindingFile" type="xsd:string" minOccurs="0" maxOccurs="1"/>  
+					<xsd:element name="BindingFile" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 					<!-- the qualified name of the root Object -->
 					<!-- later: define a pattern to describe a Java quailified name-->
 					<xsd:element name="Root_Object" type="test:RootType" minOccurs="1" maxOccurs="1"/>
@@ -92,7 +92,7 @@
 			<xsd:sequence>
 					<!-- the qualified name of the root Object -->
 					<!-- later: define a pattern to describe a Java quailified name-->
-					<xsd:element name="Root_Object" type="test:RootType" minOccurs="1" maxOccurs="1"/>
+               <xsd:element name="Root_Object" type="test:RootType" minOccurs="0" maxOccurs="1"/>
 					<!-- the configuration for the marshalling framework -->
 					<xsd:element ref="test:Configuration" minOccurs="0" maxOccurs="1"/>
 					<!-- the test cases for the Marshalling Framework-->
@@ -143,7 +143,7 @@
             </xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:element name="Configuration">
 	    <xsd:complexType>
 	       <xsd:choice>
@@ -152,7 +152,7 @@
 	       </xsd:choice>
 	    </xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:complexType name="ConfigurationType">
 	    <xsd:sequence>
 	       <xsd:element name="Call-method" maxOccurs="unbounded">
@@ -166,7 +166,7 @@
 										<xsd:attribute name="type" type="xsd:string" required="true"/>
 									</xsd:extension>
 								</xsd:simpleContent>
-                           </xsd:complexType>  
+                           </xsd:complexType>
 				       </xsd:element>
 	               </xsd:sequence>
 	               <!-- the name of the method to call -->
