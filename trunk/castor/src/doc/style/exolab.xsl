@@ -374,6 +374,10 @@
     </span>
   </xsl:template>
 
+  <xsl:template match="include">
+      <xsl:apply-templates select="document(./@href)/document/body/section"/>
+  </xsl:template>
+
   <xsl:template match="mailing-lists">
     <xsl:apply-templates/>
   </xsl:template>
