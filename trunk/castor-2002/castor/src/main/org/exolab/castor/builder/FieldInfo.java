@@ -78,6 +78,11 @@ public class FieldInfo extends XMLInfo {
     private String _default    = null;
     
     /**
+     * The fixed production for this FieldInfo
+    **/
+    private String _fixed      = null;
+    
+    /**
      * A flag to indicate a final member
     **/
     private boolean _final     = false;
@@ -189,6 +194,17 @@ public class FieldInfo extends XMLInfo {
     } //-- getDefaultValue
     
     /**
+     * Returns the fixed production for this FieldInfo, or null
+     * if no fixed value has been specified.
+     * @return the fixed value for this FieldInfo
+     * <BR />
+     * NOTE: Fixed values are NOT the same as default values
+    **/
+    public String getFixedValue() {
+        return _fixed;
+    } //-- getFixedValue
+    
+    /**
      * Returns the name of the read method for this FieldInfo
      * @return the name of the read method for this FieldInfo
     **/
@@ -289,6 +305,17 @@ public class FieldInfo extends XMLInfo {
     public void setFinal(boolean isFinal) {
         this._final = isFinal;
     } //-- isFinal
+    
+    /**
+     * Sets the fixed value in which instances of this field type must
+     * lexically match
+     * @param fixedValue the fixed production for this FieldInfo
+     * <BR />
+     * NOTE: This is not the same as default value!
+    **/
+    public void setFixedValue(String fixedValue) {
+        this._fixed = fixedValue;
+    } //-- setFixedValue
     
     /** 
      * Sets the "static" status of this FieldInfo. Static
