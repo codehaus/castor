@@ -299,7 +299,7 @@ public class SchemaUnmarshaller extends ComponentReader {
                 //-- Since the Schema Object Model does not yet support
                 //-- namespace scoping, we need to checking for namespace
                 //-- prefix collisions...and remap the prefixes
-                String tmpURI = _schema.getNamespaceURI(prefix);
+                String tmpURI = _schema.getNamespace(prefix);
                 if ((tmpURI != null) && (foundSchemaDef)) {
                     if (!tmpURI.equals(ns)) {
                         if (!hasCollisions) {
@@ -316,7 +316,7 @@ public class SchemaUnmarshaller extends ComponentReader {
                             
                         int count = 1;
                         String newPrefix = prefix + count;
-                        tmpURI = _schema.getNamespaceURI(newPrefix);
+                        tmpURI = _schema.getNamespace(newPrefix);
                         while (tmpURI != null) {
                             if (tmpURI.equals(ns)) {
                                 //-- no remapping necessary
@@ -324,7 +324,7 @@ public class SchemaUnmarshaller extends ComponentReader {
                             }
                             ++count;
                             newPrefix = prefix + count;
-                            tmpURI = _schema.getNamespaceURI(newPrefix);
+                            tmpURI = _schema.getNamespace(newPrefix);
                         }
                         _prefixMappings.addMapping(prefix, newPrefix);
                         prefix = newPrefix;
