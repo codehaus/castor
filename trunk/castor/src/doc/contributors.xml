@@ -349,6 +349,12 @@
     </description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Hugubakken" given="Stein"/>
+    <email>duli@start.no</email>
+    <description>Provied various patches for Castor JDO, incl. performance caches.</description>
+  </contributor>
+
   <!-- Last names begin with I-L -->
 
   <contributor type="Contributor">
