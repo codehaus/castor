@@ -62,6 +62,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
 import org.xml.sax.XMLReader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
@@ -96,6 +98,11 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public final class LocalConfiguration extends Configuration {
 
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static final Log _log = LogFactory.getFactory().getInstance(Class.class);
 
 	/**
      * The properties loaded from the local configuration file.
@@ -328,7 +335,6 @@ public final class LocalConfiguration extends Configuration {
 
         if ( parser instanceof XMLReader ) {
             StringTokenizer token;
-            boolean         flag;            
             XMLReader xmlReader = (XMLReader)parser;
             try {
                 xmlReader.setFeature( Features.Validation, validation );
@@ -436,7 +442,6 @@ public final class LocalConfiguration extends Configuration {
         }
 
         StringTokenizer token;
-        boolean         flag;            
         try {
             reader.setFeature( Features.Validation, validation );
             reader.setFeature( Features.Namespaces, namespaces );
@@ -517,7 +522,6 @@ public final class LocalConfiguration extends Configuration {
      * DOM and SAX events. If such control is not required, it is
      * recommended to call one of the other two methods.
      *
-     * @param output The output stream
      * @return A suitable serializer
      */
     public Serializer getSerializer()
@@ -674,6 +678,7 @@ public final class LocalConfiguration extends Configuration {
             URL url = getClass().getResource("/" + fileOrResourceName);
             if (url != null) {
                 _resourceUrl = url.toString();
+                _log.debug ("Trying to load configuration file from " + _resourceUrl);
                 _props.load( url.openStream() );
                 //-- debug information
                 //System.out.println("merging local configuration: " + url.toExternalForm());

@@ -52,20 +52,16 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
 import java.util.StringTokenizer;
-import java.util.Hashtable;
-import java.net.URL;
-import org.xml.sax.SAXException;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLNaming;
 import org.exolab.castor.xml.util.DefaultNaming;
@@ -280,7 +276,7 @@ public abstract class Configuration
      * sub-classes.
      *
      * @returns true if the configuration specifies debugging.
-     * @see getDefaultDebug
+     * @see #getDefaultDebug()
      */
     public boolean debug() {
         return getDefaultDebug();
@@ -308,7 +304,7 @@ public abstract class Configuration
      * sub-classes.
      *
      * @return true if element processing should be "strict".
-     * @see getDefaultStrictElements
+     * @see #getDefaultStrictElements()
      */
     public boolean strictElements() {
         return getDefaultStrictElements();
@@ -321,7 +317,7 @@ public abstract class Configuration
      * If set to false, these 'unknown' elements are ignored
      *
      * @return true if element processing should be "strict".
-     * @see strictElements
+     * @see #strictElements()
      */
     public static boolean getDefaultStrictElements() {
         getDefault();
@@ -337,7 +333,7 @@ public abstract class Configuration
      *
      * @return true if by default validation should be performed during the
      * marshalling and unmarshalling process, otherwise false.
-     * @see getDefaultMarshallingValidation
+     * @see #getDefaultMarshallingValidation()
      */
     public boolean marshallingValidation() {
         return getDefaultMarshallingValidation();
@@ -351,7 +347,7 @@ public abstract class Configuration
      * @return true if by default validation should be performed during the
      * marshalling and unmarshalling process, otherwise false.
      *
-     * @see marshallingValidation
+     * @see #marshallingValidation()
      */
     public static boolean getDefaultMarshallingValidation()
     {
@@ -368,7 +364,7 @@ public abstract class Configuration
      * sub-classes.
      *
      * @return the current set of configuration properties. 
-     * @see getDefault
+     * @see #getDefault()
      */
     public Properties getProperties() {
         return getDefault();
@@ -380,7 +376,7 @@ public abstract class Configuration
      * default configuration.
      *
      * @return the default configuration properties
-     * @see getProperties
+     * @see #getProperties()
      */
     public static synchronized Properties getDefault()
     {
@@ -396,10 +392,10 @@ public abstract class Configuration
      * of {@link #getDefault}.
      *
      * @param name The property name
-     * @param default The property's default value
+     * @param defValue The property's default value
      * @return The property's value
-     * @see getDefaultProperty
-     * @see getProperties
+     * @see #getDefaultProperty(String,String)
+     * @see #getProperties()
      */
     public String getProperty( String name, String defValue )
     {
@@ -414,9 +410,9 @@ public abstract class Configuration
      * of {@link #getDefault}.
      *
      * @param name The property name
-     * @param default The property's default value
+     * @param defValue The property's default value
      * @return The property's value
-     * @see getProperty
+     * @see #getProperty (String, String)
      */
     public static String getDefaultProperty( String name, String defValue )
     {
@@ -432,7 +428,7 @@ public abstract class Configuration
      *
      * @return the currently configured naming conventions to use 
      * for the XML framework     
-     * @see getDefaultXMLNaming
+     * @see #getDefaultXMLNaming()
      */
     public XMLNaming getXMLNaming() {
         return getDefaultXMLNaming();
@@ -478,7 +474,7 @@ public abstract class Configuration
      * sub-classes.
      *
      * @return a suitable XML parser
-     * @see getDefaultParser
+     * @see #getDefaultParser()
      */
     public Parser getParser() {
         return getDefaultParser();
@@ -489,7 +485,7 @@ public abstract class Configuration
      * specified in the default configuration file.
      *
      * @return a suitable XML parser
-     * @see getParser
+     * @see #getParser()
      */
     public static Parser getDefaultParser()
     {
@@ -569,7 +565,6 @@ public abstract class Configuration
 
         if ( parser instanceof XMLReader ) {
             StringTokenizer token;
-            boolean         flag;            
             XMLReader xmlReader = (XMLReader)parser;
             try {
                 xmlReader.setFeature( Features.Validation, validation );
@@ -599,7 +594,7 @@ public abstract class Configuration
      *
      * @return the NodeType assigned to Java primitives, or null
      * if no NodeType was specified.
-     * @see getDefaultPrimitiveNodeType
+     * @see #getDefaultPrimitiveNodeType()
      */
     public NodeType getPrimitiveNodeType() {
         return getDefaultPrimitiveNodeType();
@@ -614,7 +609,7 @@ public abstract class Configuration
      * @return the NodeType assigned to Java primitives, or null
      * if no NodeType was specified.
      *
-     * @see getPrimitiveNodeType
+     * @see #getPrimitiveNodeType()
      */
     public static NodeType getDefaultPrimitiveNodeType() {
         
@@ -732,7 +727,6 @@ public abstract class Configuration
         }
 
         StringTokenizer token;
-        boolean         flag;            
         try {
             reader.setFeature( Features.Validation, validation );
             reader.setFeature( Features.Namespaces, namespaces );
@@ -755,7 +749,7 @@ public abstract class Configuration
      * Evaluator, or null if no validator was specified
      *
      * @return the regular expression evaluator,
-     * @see getDefaultRegExpEvaluator
+     * @see #getDefaultRegExpEvaluator()
      */
     public RegExpEvaluator getRegExpEvaluator() {
         return getDefaultRegExpEvaluator();
@@ -767,7 +761,7 @@ public abstract class Configuration
      *
      * @return the regular expression evaluator,
      *
-     * @see getRegExpEvaluator
+     * @see #getRegExpEvaluator()
      */
     public static RegExpEvaluator getDefaultRegExpEvaluator() {
 
@@ -802,9 +796,8 @@ public abstract class Configuration
      * Design note: This method should be overloaded by any 
      * sub-classes.
      *
-     * @param output The output stream
      * @return A suitable serializer
-     * @see getDefaultSerializer
+     * @see #getDefaultSerializer()
      */
     public abstract Serializer getSerializer();
 
@@ -815,9 +808,8 @@ public abstract class Configuration
      * DOM and SAX events. If such control is not required, it is
      * recommended to call one of the other two methods.
      *
-     * @param output The output stream
      * @return A suitable serializer
-     * @see getSerializer
+     * @see #getSerializer()
      */
     public static Serializer getDefaultSerializer()
     {
@@ -847,7 +839,7 @@ public abstract class Configuration
      * sub-classes.
      *
      * @return the currently configured OutputFormat.
-     * @see getDefaultOutputFormat
+     * @see #getDefaultOutputFormat()
      */
     public abstract OutputFormat getOutputFormat();
 
@@ -990,8 +982,6 @@ public abstract class Configuration
 	public static Properties loadProperties(String resourceName, String fileName)
 	{
         File        file;
-        InputStream is;
-
         Properties properties = new Properties();
 
         boolean found = false;
