@@ -42,48 +42,51 @@ public final class MimeBase64Decoder
     private ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     private byte token[] = new byte[4];      // input buffer
+
     private byte bytes[] = new byte[3];      // output buffer
+
     private int token_length = 0;            // input buffer length
 
     static private final byte NUL = 127;     // must be out of range 0-64
+
     static private final byte EOF = 126;     // must be out of range 0-64
 
     static private final byte map[] = {
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   000-007
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   010-017
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   020-027
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   030-037
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   040-047   !"#$%&'
-      NUL, NUL, NUL,  62, NUL, NUL, NUL,  63,      //   050-057  ()*+,-./
-       52,  53,  54,  55,  56,  57,  58,  59,      //   060-067  01234567
-       60,  61, NUL, NUL, NUL, EOF, NUL, NUL,      //   070-077  89:;<=>?
-
-      NUL,   0,   1,   2,   3,   4,   5,   6,      //   100-107  @ABCDEFG
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   000-007
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   010-017
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   020-027
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   030-037
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   040-047   !"#$%&'
+        NUL, NUL, NUL, 62,  NUL, NUL, NUL, 63,      //   050-057  ()*+,-./
+        52,  53,  54,  55,  56,  57,  58,  59,      //   060-067  01234567
+        60,  61,  NUL, NUL, NUL, EOF, NUL, NUL,      //   070-077  89:;<=>?
+        
+        NUL,   0,   1,   2,   3,   4,   5,   6,      //   100-107  @ABCDEFG
         7,   8,   9,  10,  11,  12,  13,  14,      //   110-117  HIJKLMNO
-       15,  16,  17,  18,  19,  20,  21,  22,      //   120-127  PQRSTUVW
-       23,  24,  25, NUL, NUL, NUL, NUL, NUL,      //   130-137  XYZ[\]^_
-      NUL,  26,  27,  28,  29,  30,  31,  32,      //   140-147  `abcdefg
-       33,  34,  35,  36,  37,  38,  39,  40,      //   150-157  hijklmno
-       41,  42,  43,  44,  45,  46,  47,  48,      //   160-167  pqrstuvw
-       49,  50,  51, NUL, NUL, NUL, NUL, NUL,      //   170-177  xyz{|}~
-
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   200-207
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   210-217
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   220-227
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   230-237
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   240-247
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   250-257
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   260-267
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   270-277
-
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   300-307
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   310-317
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   320-327
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   330-337
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   340-347
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   350-357
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   360-367
-      NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   370-377
+        15,  16,  17,  18,  19,  20,  21,  22,      //   120-127  PQRSTUVW
+        23,  24,  25, NUL, NUL, NUL, NUL, NUL,      //   130-137  XYZ[\]^_
+        NUL,  26,  27,  28,  29,  30,  31,  32,      //   140-147  `abcdefg
+        33,  34,  35,  36,  37,  38,  39,  40,      //   150-157  hijklmno
+        41,  42,  43,  44,  45,  46,  47,  48,      //   160-167  pqrstuvw
+        49,  50,  51, NUL, NUL, NUL, NUL, NUL,      //   170-177  xyz{|}~
+        
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   200-207
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   210-217
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   220-227
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   230-237
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   240-247
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   250-257
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   260-267
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   270-277
+        
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   300-307
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   310-317
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   320-327
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   330-337
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   340-347
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   350-357
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   360-367
+        NUL, NUL, NUL, NUL, NUL, NUL, NUL, NUL,      //   370-377
     };
 
 
@@ -95,26 +98,26 @@ public final class MimeBase64Decoder
                    (token[1] << 12) |
                    (token[2] << 6) |
                    (token[3]));
-
+        
         bytes[0] = (byte) (0xFF & (num >> 16));
         bytes[1] = (byte) (0xFF & (num >> 8));
         bytes[2] = (byte) (0xFF & num);
-
+        
         out.write(bytes,0,3);
     }
-
-
+    
+    
     // Hairier routine that deals with the final token, which can have fewer
     // than four characters, and that might be padded with '='.
     //
     private final void decode_final_token()
     {
-
+        
         byte b0 = token[0];
         byte b1 = token[1];
         byte b2 = token[2];
         byte b3 = token[3];
-
+        
         int eq_count = 0;
 
         if (b0 == EOF) { b0 = 0; eq_count++; }
@@ -131,7 +134,7 @@ public final class MimeBase64Decoder
         // "xx==" means 2 bytes mapped to 1.
         // "x===" can't happen, because "x" would then be encoding
         //        only 6 bits, not 8, the minimum possible.
-
+        
         out.write((byte) (num >> 16));             // byte 1, count = 0 or 1 or 2
         if (eq_count <= 1) {
             out.write((byte) ((num >> 8) & 0xFF)); // byte 2, count = 0 or 1
@@ -142,15 +145,35 @@ public final class MimeBase64Decoder
     }
 
 
-    public final void translate(char[] ch, int offset, int length)
+    public final void translate( char[] ch, int offset, int length )
     {
-
         if (token == null) // already saw eof marker?
             return;
-
+        
         for (int i = offset; i < offset + length; i++) {
             byte t = map[(ch[i]&0xff)];
+            
+            if ( t == EOF ) {
+                eof();
+            } else if (t != NUL) {
+                token[token_length++] = t;
+            }
+            if (token_length == 4) {
+                decode_token();
+                token_length = 0;
+            }
+        }
+    }
+    
 
+    public final void translate( String str )
+    {
+        if (token == null) // already saw eof marker?
+            return;
+        int length = str.length();
+        for (int i = 0; i < length; i++) {
+            byte t = map[(str.charAt(i)&0xff)];
+            
             if ( t == EOF ) {
                 eof();
             } else if (t != NUL) {
@@ -175,11 +198,13 @@ public final class MimeBase64Decoder
         token = new byte[4];
         bytes = new byte[3];
     }
-
-
+    
+    
     public byte[] getByteArray()
     {
         eof();
         return out.toByteArray();
     }
+
+
 }
