@@ -98,6 +98,7 @@ public class SchemaNames {
     public static final String BLOCK_ATTR       = "block";
     public static final String DEFAULT_ATTR     = "default";
     public static final String ID_ATTR          = "id";
+    public static final String FIXED_ATTR       = "fixed";
     public static final String MAX_OCCURS_ATTR  = "maxOccurs";
     public static final String MIN_OCCURS_ATTR  = "minOccurs";
     public static final String MIXED            = "mixed";
