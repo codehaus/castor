@@ -401,8 +401,12 @@ public class RelationCollection implements Collection, Lazy, TxSynchronizable {
         Object[] result = new Object[size()];
         Iterator itor = iterator();
 
+        int count = 0;
+
         while ( itor.hasNext() ) {
-            result = (Object[])itor.next();
+            // result = (Object[])itor.next();
+            // bug 1391
+            result[ count++ ] = itor.next();
         }
         return result;
     }
