@@ -50,7 +50,7 @@ package org.exolab.castor.mapping;
 import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.sql.SQLException;
-import org.exolab.castor.util.CastorException;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -61,25 +61,74 @@ import org.exolab.castor.util.CastorException;
  * @version $Revision$ $Date$
  */
 public class ValidityException
-    extends CastorException
+    extends Exception
 {
+
+
+    private Exception  _except;
+
+
+    public ValidityException( String message )
+    {
+        super( Messages.message( message ) );
+    }
 
 
     public ValidityException( String message, Object arg1 )
     {
-        super( message, arg1 );
+        super( Messages.format( message, arg1 ) );
     }
 
 
     public ValidityException( String message, Object arg1, Object arg2 )
     {
-        super( message, arg1, arg2 );
+        super( Messages.format( message, arg1, arg2 ) );
+    }
+
+
+    public ValidityException( String message, Object arg1, Object arg2, Object arg3 )
+    {
+        super( Messages.format( message, arg1, arg2, arg3 ) );
     }
 
 
     public ValidityException( Exception except )
     {
-        super( "mapping.nested", except.getMessage() );
+        super( Messages.format( "mapping.nested", except.toString() ) );
+        _except = except;
+    }
+
+
+    public Exception getException()
+    {
+        return _except;
+    }
+
+
+    public void printStackTrace()
+    {
+        if ( _except == null )
+            super.printStackTrace();
+        else
+            _except.printStackTrace();
+    }
+
+
+    public void printStackTrace( PrintStream print )
+    {
+        if ( _except == null )
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
+    }
+
+
+    public void printStackTrace( PrintWriter print )
+    {
+        if ( _except == null ) 
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
 
 
