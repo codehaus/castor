@@ -52,7 +52,7 @@
 
   <contributor type="Committer">
     <name surname="Guttman" given="Werner" />
-    <email>werner.guttman@gmx.de</email>
+    <email>werner.guttman@gmx.net</email>
     <description>
     JDO enhancements including TransactionManagerFactory API, the API for JDBC
     parameters and much more.
