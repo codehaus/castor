@@ -84,17 +84,17 @@ public abstract class AbstractCacheFactory
         catch (ClassNotFoundException cnfe) {
             _log.error ("Cannot find class " + getCacheClassName(), cnfe);
             throw new CacheAcquireException ( Messages.format( 
-                    "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage()));
+                    "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage()), cnfe);
         }
         catch (IllegalAccessException iae) {
             _log.error ("Illegal access with class " + getCacheClassName(), iae);
             throw new CacheAcquireException( Messages.format( 
-                    "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage()));
+                    "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage()), iae);
         } 
         catch (InstantiationException e) {
             _log.error ("Problem instantiating class " + getCacheClassName(), e);
             throw new CacheAcquireException( Messages.format( 
-                    "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()) );
+                    "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e );
         }
         
         return cache;
