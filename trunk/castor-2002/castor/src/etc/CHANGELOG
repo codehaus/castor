@@ -1,6 +1,12 @@
 Version (CVS)
 -------------
 
+JDO:    Castor JDO should now behave shamelessly in a multi classloader context.
+        This is especially relevant when used in a BMP/CMP environment where the 
+        EJB container might assign a ClassLoader instance per set of Beans, or 
+        might attach a different classloader for each new transaction.
+        (Sebastien Sahuc <ssahuc@intalio.com>)
+
 XML & JDO:  
         Check that an XML mapping file do not declare more identity attributes
         for a given class than there are field elementsdefined for that
