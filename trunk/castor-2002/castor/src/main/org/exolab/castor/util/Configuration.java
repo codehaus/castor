@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -510,7 +510,9 @@ public abstract class Configuration
         indent = ( prop.equalsIgnoreCase( TRUE_VALUE ) ||
                    prop.equalsIgnoreCase( ON_VALUE ) );
 
-        OutputFormat format = new OutputFormat( Method.XML, null, indent );
+        OutputFormat format = new OutputFormat();
+        format.setMethod(Method.XML);
+        format.setIndenting(indent);
         
         // There is a bad interaction between the indentation and the
         // setPreserveSpace option. The indentated output is strangely indented.
