@@ -265,6 +265,7 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         
         UnmarshalState state = (UnmarshalState) _stateInfo.pop();
+        
         //-- make sure we have the correct closing tag
         XMLFieldDescriptor descriptor = state.fieldDesc;
         if (!state.elementName.equals(name)) {            
@@ -277,6 +278,9 @@ public class UnmarshalHandler implements DocumentHandler {
         Class type = state.type;
 
         if ( type == null ) {
+            //-- this message will only show up if debug
+            //-- is turned on...how should we handle this case?
+            //-- should it be a fatal error?
             message("Ignoring " + state.elementName + " no descriptor was found");
             return;
         }
@@ -291,7 +295,6 @@ public class UnmarshalHandler implements DocumentHandler {
         //-- is not a primitive or a byte[] we must simply return
         if ((state.object == null) && (!state.primitiveOrImmutable))
             return;
-            
             
         if (state.primitiveOrImmutable) {
             
@@ -327,7 +330,7 @@ public class UnmarshalHandler implements DocumentHandler {
         if ((state.buffer != null) && 
             (state.buffer.length() > 0) &&
             (state.classDesc != null)) {
-            
+                
             XMLFieldDescriptor cdesc = state.classDesc.getContentDescriptor();
             if (cdesc != null) {
                 try {
@@ -338,6 +341,15 @@ public class UnmarshalHandler implements DocumentHandler {
                     String err = "unable to add text content to ";
                     err += descriptor.getXMLName();
                     err += " due to the following error: " + ise;
+                    throw new SAXException(err);
+                }
+            }
+            else {
+                //-- check for non-whitespace...and report error
+                if (!isWhitespace(state.buffer)) {
+                    String err = "Illegal Text data found as child of: "
+                        + name;
+                    err += "\n  value: \"" + state.buffer + "\"";
                     throw new SAXException(err);
                 }
             }
@@ -591,30 +603,23 @@ public class UnmarshalHandler implements DocumentHandler {
            classDesc = getClassDescriptor(parentState.object.getClass());
         
         //-- find Descriptor
-        XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
         XMLFieldDescriptor descriptor = null;
-        for (int i = 0; i < descriptors.length; i++) {
-            //-- check for null here, since I actually ran into this
-            //-- problem once
-            if (descriptors[i] == null) continue;
-            
-            if (descriptors[i].matches(name)) {
-                descriptor = descriptors[i];
-                break;
-            }
-        }
-
-
+        descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
+        
         /*
-          If descriptor is null, we need to handle possible inheritence.
+          If descriptor is null, we need to handle possible inheritence,
+          which might not be described in the current ClassDescriptor.
           This can be a slow process...for speed use the match attribute
-          of the xml element in the mapping file
+          of the xml element in the mapping file. This logic might
+          not be completely necessary, and perhaps we should remove it.
         */
         XMLClassDescriptor cdInherited = null;
         if (descriptor == null) {
             cdInherited = _cdResolver.resolveByXMLName(name, null);
             if (cdInherited != null) {
                 Class subclass = cdInherited.getJavaClass();
+                XMLFieldDescriptor[] descriptors =
+                    classDesc.getElementDescriptors();
                 for (int i = 0; i < descriptors.length; i++) {
                     if (descriptors[i] == null) continue;
                     Class superclass = descriptors[i].getFieldType();
@@ -624,260 +629,213 @@ public class UnmarshalHandler implements DocumentHandler {
                     }
                 }
             }
-        }
+        } /* end of additional inheritance logic */
 
+        if (descriptor == null) {
+            String msg = "unable to find FieldDescriptor for '" + name;
+            msg += "' in ClassDescriptor of " + classDesc.getXMLName();
+            message(msg);
+            return;
+        }
+        
         //-- Find object type and create new Object of that type
-        if (descriptor != null) {
             
-            state.fieldDesc = descriptor;
+        state.fieldDesc = descriptor;
             
-            /* <update>
-            if (!descriptor.getAccessRights().isWritable()) {
-                if (debug) {
-                    buf.setLength(0);
-                    buf.append("The field for element '");
-                    buf.append(name);
-                    buf.append("' is read-only.");
-                    message(buf.toString());
-                }
-                return;
+        /* <update> 
+            *  we need to add this code back in, to make sure
+            *  we have proper access rights.
+            *
+        if (!descriptor.getAccessRights().isWritable()) {
+            if (debug) {
+                buf.setLength(0);
+                buf.append("The field for element '");
+                buf.append(name);
+                buf.append("' is read-only.");
+                message(buf.toString());
             }
-            */
+            return;
+        }
+        */
             
-            //-- Find class to instantiate
-            //-- check xml names to see if we should look for a more specific
-            //-- ClassDescriptor, otherwise just use the one found in the
-            //-- descriptor
-            classDesc = null;
-            if (cdInherited != null) classDesc = cdInherited;
-            else if (!name.equals(descriptor.getXMLName()))
-                classDesc = _cdResolver.resolveByXMLName(name, null);
+        //-- Find class to instantiate
+        //-- check xml names to see if we should look for a more specific
+        //-- ClassDescriptor, otherwise just use the one found in the
+        //-- descriptor
+        classDesc = null;
+        if (cdInherited != null) classDesc = cdInherited;
+        else if (!name.equals(descriptor.getXMLName()))
+            classDesc = _cdResolver.resolveByXMLName(name, null);
             
-            if (classDesc == null)
-                classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
+        if (classDesc == null)
+            classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
             
-            FieldHandler handler = descriptor.getHandler();
+        FieldHandler handler = descriptor.getHandler();
             
-            boolean useHandler = true;
+        boolean useHandler = true;
             
-            /*
-            Method creator = descriptor.getCreateMethod();
-            if (creator == null) {
-            
+        try {
+                    
+            //-- Get Class type...first use ClassDescriptor,
+            //-- since it could be more specific than 
+            //-- the FieldDescriptor
+            if (classDesc != null) {
+                _class = classDesc.getJavaClass();
+                //-- XXXX this is a hack I know...but we
+                //-- XXXX can't use the handler in this case
+                state.derived = true;
+            }
+            else
                 _class = descriptor.getFieldType();
                 
-                if (_class == Object.class) {
+            // Retrieving the xsi:type attribute, if present
+            String instanceType = getInstanceType(atts);
+            if (instanceType != null) {
+                Class instanceClass = null;
+                try {
+                        
+                    XMLClassDescriptor instanceDesc 
+                        = getClassDescriptor(instanceType, _loader);
+                        
+                    if (instanceDesc != null) {
+                        instanceClass = instanceDesc.getJavaClass();
+                        classDesc = instanceDesc;
+                    }
+                    else
+                        instanceClass = loadClass(instanceType, null);
+                            
+                    if (!_class.isAssignableFrom(instanceClass)) {
+                        String err = instanceClass 
+                            + " is not a subclass of " + _class;
+                        throw new SAXException(err);
+                    }
+                    _class = instanceClass;
+                    useHandler = false;
+                } 
+                catch(Exception ex) {
+                    String msg = "unable to instantiate " + instanceType;
+                    throw new SAXException(msg + "; " + ex);
+                }
                     
+            }
+                
+            //-- Handle support for "Any" type
+            if (_class == Object.class) {
+                    
+                Class pClass = parentState.type;
+                ClassLoader loader = pClass.getClassLoader();
+                    
+                //-- first look for a descriptor based
+                //-- on the XML name
+                classDesc = _cdResolver.resolveByXMLName(name, loader);
+                    
+                //-- if null, create classname, and try resolving
+                String cname = null;
+                if (classDesc == null) {
                     //-- create class name
-                    String cname = MarshalHelper.toJavaName(name,true);
+                    cname = MarshalHelper.toJavaName(name,true);
+                    classDesc = getClassDescriptor(cname, loader);
+                }
                     
-                    //-- use parent to package information
-                    String pkg = parentState.object.getClass().getName();
+                //-- if still null, try using parents package
+                if (classDesc == null) {
+                    //-- use parent to get package information
+                    String pkg = pClass.getName();
                     int idx = pkg.lastIndexOf('.');
                     if (idx > 0) {
-                        pkg = pkg.substring(0,idx);
+                        pkg = pkg.substring(0,idx+1);
                         cname = pkg + cname;
-                    }
-                    mInfo = MarshalHelper.getMarshalInfo(cname);
-                    if (mInfo != null) {
-                        _class = mInfo.getClassType();
+                        classDesc = getClassDescriptor(cname, loader);
                     }
                 }
-                
-                state.type = _class;
-                
-                //-- instantiate class
-                try {
                     
-                    if (_class.isArray())
-                        byteArray = (_class.getComponentType() == Byte.TYPE);
-                    
-                    if ((!_class.isPrimitive()) && (!byteArray)) {
-                        state.object = _class.newInstance();
-                    }
+                if (classDesc != null) {
+                    _class = classDesc.getJavaClass();
+                    useHandler = false;
                 }
-                catch(java.lang.NoSuchMethodError nsme) {
-                    String err = "no default constructor for class: "; 
-                    err += className(_class);
-                    throw new SAXException(err);
-                }
-                catch(java.lang.Exception ex) {
-                    String err = "unable to instantiate a new type of: ";
-                    err += className(_class);
+                else {
+                    String err = "unable to determine class for " + 
+                        "element: " + name;
                     throw new SAXException(err);
                 }
             }
-            
-            //-- use creator method to create a new object
+                
+            boolean byteArray = false;
+            if (_class.isArray())
+                byteArray = (_class.getComponentType() == Byte.TYPE);
+                    
+            //-- check for immutable
+            if (isPrimitive(_class) || 
+                descriptor.isImmutable() || 
+                byteArray) 
+            {
+                state.object = null; 
+                state.primitiveOrImmutable = true;
+            }
             else {
-                
-            */
-            try {
-                    
-                //-- Get Class type...first use ClassDescriptor,
-                //-- since it could be more specific than 
-                //-- the FieldDescriptor
-                if (classDesc != null) {
-                    _class = classDesc.getJavaClass();
-                    //-- XXXX this is a hack I know...but we
-                    //-- XXXX can't use the handler in this case
-                    state.derived = true;
-                }
-                else
-                    _class = descriptor.getFieldType();
-                
-                // Retrieving the xsi:type attribute, if present
-                String instanceType = getInstanceType(atts);
-                if (instanceType != null) {
-                    Class instanceClass = null;
+                //-- XXXX should remove this test once we can
+                //-- XXXX come up with a better solution
+                if ((!state.derived) && useHandler) 
+                    state.object = handler.newInstance(parentState.object);
+                //-- reassign class in case there is a conflict
+                //-- between descriptor#getFieldType and
+                //-- handler#newInstance...I should hope not, but
+                //-- who knows
+                if (state.object != null) 
+                    _class = state.object.getClass();
+                else {
                     try {
-                        
-                        XMLClassDescriptor instanceDesc 
-                            = _cdResolver.resolve(instanceType);
-                        
-                        if (instanceDesc != null)
-                            instanceClass = instanceDesc.getJavaClass();
-                        else
-                            instanceClass = loadClass(instanceType, null);
-                            
-                        if (!_class.isAssignableFrom(instanceClass)) {
-                            String err = instanceClass 
-                                + " is not a subclass of " + _class;
-                            throw new SAXException(err);
-                        }
-                        _class = instanceClass;
-                        useHandler = false;
-                    } 
-                    catch(Exception ex) {
-                        String msg = "unable to instantiate " + instanceType;
-                        throw new SAXException(msg + "; " + ex);
+                        state.object = _class.newInstance();
                     }
-                    
-                }
-                
-                //-- Handle support for "Any" type
-                if (_class == Object.class) {
-                    
-                    Class pClass = parentState.type;
-                    ClassLoader loader = pClass.getClassLoader();
-                    
-                    //-- first look for a descriptor based
-                    //-- on the XML name
-                    classDesc = _cdResolver.resolveByXMLName(name, loader);
-                    
-                    //-- if null, create classname, and try resolving
-                    String cname = null;
-                    if (classDesc == null) {
-                        //-- create class name
-                        cname = MarshalHelper.toJavaName(name,true);
-                        classDesc = getClassDescriptor(cname, loader);
-                    }
-                    
-                    //-- if still null, try using parents package
-                    if (classDesc == null) {
-                        //-- use parent to get package information
-                        String pkg = pClass.getName();
-                        int idx = pkg.lastIndexOf('.');
-                        if (idx > 0) {
-                            pkg = pkg.substring(0,idx+1);
-                            cname = pkg + cname;
-                            classDesc = getClassDescriptor(cname, loader);
-                        }
-                    }
-                    
-                    if (classDesc != null) {
-                        _class = classDesc.getJavaClass();
-                        useHandler = false;
-                    }
-                    else {
-                        String err = "unable to determine class for " + 
-                            "element: " + name;
+                    catch(java.lang.Exception ex) {
+                        String err = "unable to instantiate a new type of: ";
+                        err += className(_class);
                         throw new SAXException(err);
                     }
                 }
+            }
+            state.type = _class;
+        }
+        catch (java.lang.IllegalStateException ise) {
+            message(ise.toString());
+        }
+            
+            
+        //-- At this point we should have a new object, unless
+        //-- we are dealing with a primitive type, or a special
+        //-- case such as byte[]
+        if (classDesc == null) {
+            classDesc = getClassDescriptor(_class);
+        }
+        state.classDesc = classDesc;
+            
+        if ((state.object == null) && (!state.primitiveOrImmutable))
+        {
+            String err = "unable to unmarshal: " + name + "\n";
+            err += " - unable to instantiate: " + className(_class);
+            throw new SAXException(err);
+        }
+            
+        //-- assign object, if incremental
+
+        if (descriptor.isIncremental()) {
                 
-                boolean byteArray = false;
-                if (_class.isArray())
-                    byteArray = (_class.getComponentType() == Byte.TYPE);
-                    
-                //-- check for immutable
-                if (isPrimitive(_class) || 
-                    descriptor.isImmutable() || 
-                    byteArray) 
-                {
-                    state.object = null; 
-                    state.primitiveOrImmutable = true;
-                }
-                else {
-                    //-- XXXX should remove this test once we can
-                    //-- XXXX come up with a better solution
-                    if ((!state.derived) && useHandler) 
-                        state.object = handler.newInstance(parentState.object);
-                    //-- reassign class in case there is a conflict
-                    //-- between descriptor#getFieldType and
-                    //-- handler#newInstance...I should hope not, but
-                    //-- who knows
-                    if (state.object != null) 
-                        _class = state.object.getClass();
-                    else {
-                        try {
-                            state.object = _class.newInstance();
-                        }
-                        catch(java.lang.Exception ex) {
-                            String err = "unable to instantiate a new type of: ";
-                            err += className(_class);
-                            throw new SAXException(err);
-                        }
-                    }
-                }
-                state.type = _class;
+            if (debug) {
+                buf.setLength(0);
+                buf.append("debug: Processing incrementally for element: ");
+                buf.append(name);
+                message(buf.toString());
             }
-            catch (java.lang.IllegalStateException ise) {
-                message(ise.toString());
+                
+            try {
+                handler.setValue(parentState.object, state.object);
             }
-            ///////} //-- end if (creator)           
-            
-            
-            //-- At this point we should have a new object, unless
-            //-- we are dealing with a primitive type, or a special
-            //-- case such as byte[]
-            if (classDesc == null) {
-                classDesc = getClassDescriptor(_class);
-            }
-            state.classDesc = classDesc;
-            
-            if ((state.object == null) && (!state.primitiveOrImmutable))
-            {
-                String err = "unable to unmarshal: " + name + "\n";
-                err += " - unable to instantiate: " + className(_class);
+            catch(java.lang.IllegalStateException ise) {
+                String err = "unable to add \"" + name + "\" to ";
+                err += parentState.fieldDesc.getXMLName();
+                err += " due to the following error: " + ise;
                 throw new SAXException(err);
             }
-            
-            //-- assign object, if incremental
-
-            if (descriptor.isIncremental()) {
-                
-                if (debug) {
-                    buf.setLength(0);
-                    buf.append("debug: Processing incrementally for element: ");
-                    buf.append(name);
-                    message(buf.toString());
-                }
-                
-                try {
-                    handler.setValue(parentState.object, state.object);
-                }
-                catch(java.lang.IllegalStateException ise) {
-                    String err = "unable to add \"" + name + "\" to ";
-                    err += parentState.fieldDesc.getXMLName();
-                    err += " due to the following error: " + ise;
-                    throw new SAXException(err);
-                }
-            }
-        }
-        else {
-            //System.out.println("descriptor is null");
-            message("unable to find FieldDescriptor for: " + name);
         }
         
         if (state.object != null)
@@ -1153,7 +1111,6 @@ public class UnmarshalHandler implements DocumentHandler {
         return classDesc;
     } //-- getClassDescriptor
     
-    
     /**
      * Returns the name of a class, handles array types
      * @return the name of a class, handles array types
@@ -1183,6 +1140,30 @@ public class UnmarshalHandler implements DocumentHandler {
             
         return (type.getSuperclass() == Number.class);
     } //-- isPrimitive
+    
+    /**
+     * Checks the given StringBuffer to determine if it only
+     * contains whitespace. 
+     *
+     * @param sb the StringBuffer to check
+     * @return true if the only whitespace characters were
+     * found in the given StringBuffer
+    **/
+    private boolean isWhitespace(StringBuffer sb) {
+        for (int i = 0; i < sb.length(); i++) {
+            char ch = sb.charAt(i);
+            switch (ch) {
+                case ' ':
+                case '\n':
+                case '\t':
+                case '\r':
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return true;
+    } //-- isWhitespace
     
     /**
      * Loads and returns the class with the given class name using the 
