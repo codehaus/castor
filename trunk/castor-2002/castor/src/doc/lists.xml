@@ -4,6 +4,7 @@
     <title>Castor Mailing Lists</title>
     <header>
     </header>
+    <section title="">
       <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated to the developers of Castor.</p>
 
       <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
@@ -18,7 +19,7 @@
       <p><mailing-list name="castor-announce" description="The Castor Announcement Mailing List"
                        server="exolab.org" manager="minimalist"
                        archive="http://castor.exolab.org/list-archive/"/></p>
-
+    </section>
 
   </body>
 </document>
