@@ -14,6 +14,21 @@
     <a href="{.}"><xsl:copy-of select="."/></a>
   </xsl:template>
 
+  <xsl:template name="link-convertor">
+    <xsl:param name="href" select="empty"/>
+    <xsl:choose>
+      <xsl:when test="starts-with($href,'http:')">
+        <xsl:value-of select="$href"/>
+      </xsl:when>
+      <xsl:when test="not(contains($href,'.xml'))">
+        <xsl:value-of select="$href"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="substring-before($href, '.xml')"/>.html
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 
   <xsl:template match="javadoc">
     <xsl:choose>

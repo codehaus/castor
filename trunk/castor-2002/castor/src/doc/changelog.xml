@@ -15,7 +15,7 @@ XML:     Fixed bug with using datatype
 
 JDO:     Where clause now supports:
          - unary operators: +, -, abs, not
-         - binary operators: +, -, *, /, mod, ||, LIKE, >, >=, <, <=, =, !=, and,
+         - binary operators: +, -, *, /, mod, ||, LIKE, &gt;, &gt;=, &lt;, &lt;=, =, !=, and,
          - parenthesis: passed through to SQL as in OQL
          - numbered parameters including user specified type support
          (Nissim &lt;nissim@panix.com&gt;)
