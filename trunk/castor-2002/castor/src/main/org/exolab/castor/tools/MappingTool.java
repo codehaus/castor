@@ -67,7 +67,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.xml.types.CollectionType;
-import org.exolab.castor.mapping.xml.Xml;
+import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.util.Messages;
 
@@ -149,9 +149,9 @@ public class MappingTool
             fieldMap.setTransient( fields[ i ].isTransient() );
             if ( fields[ i ].isMultivalued() )
                 fieldMap.setCollection( CollectionType.ENUMERATE );
-            fieldMap.setXml( new Xml() );
-            fieldMap.getXml().setName( ( (XMLFieldDescriptor) fields[ i ] ).getXMLName() );
-            fieldMap.getXml().setNode( NodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
+            fieldMap.setBindXml( new BindXml() );
+            fieldMap.getBindXml().setName( ( (XMLFieldDescriptor) fields[ i ] ).getXMLName() );
+            fieldMap.getBindXml().setNode( NodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
             classMap.addFieldMapping( fieldMap );
 
             if ( ! Types.isSimpleType( fields[ i ].getFieldType() ) )
