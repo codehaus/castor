@@ -70,7 +70,7 @@ import java.util.Vector;
 
 
 /**
- * A Marshaller to allowing Marshalling Java Object's to XML
+ * A Marshaller to allowing serializing Java Object's to XML
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -98,6 +98,12 @@ public class Marshaller {
      * The NameSpace URI to Prefix table
     **/
     private Hashtable _nsURIKeyHash = null;
+    
+    /**
+     * The default namespace
+    **/
+    private String _defaultNamespace = null;
+    
     
     /**
      * The current namespace scoping
@@ -137,11 +143,15 @@ public class Marshaller {
     } //-- Marshaller
 
 
+    /**
+     * Creates a new Marshaller with the given writer
+     * @param out the Writer to serialize to
+    **/
     public Marshaller( Writer out )
         throws IOException
     {
         this( Configuration.getSerializer( out ) );
-    }
+    } //-- Marshaller
 
 
     public void setMapping( Mapping mapping )
@@ -149,35 +159,71 @@ public class Marshaller {
     {
         _cdResolver = new ClassDescriptorResolverImpl();
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getXMLMapping() );
-    }
+    } //-- setMapping
 
+    /**
+     * Sets the mapping for the given Namespace prefix
+     * @param nsPrefix the namespace prefix
+     * @param nsURI the namespace that the prefix resolves to
+    **/
+    public void setNamespaceMapping(String nsPrefix, String nsURI) {
+        
+        if ((nsURI == null) || (nsURI.length() == 0)) {
+            String err = "namespace URI must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        if ((nsPrefix == null) || (nsPrefix.length() == 0)) {
+            _defaultNamespace = nsURI;
+            return;
+        }
+        
+        _nsPrefixKeyHash.put(nsPrefix, nsURI);
+        _nsURIKeyHash.put(nsURI, nsPrefix);
+        
+    } //-- setNamespacePrefix
 
+    /**
+     * Marshals the given Object as XML using the given writer
+     * @param obj the Object to marshal
+     * @param out the writer to marshal to
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
+    **/
     public static void marshal(Object object, Writer out) 
         throws MarshalException, ValidationException
     {
-        Marshaller mar;
+        Marshaller marshaller;
 
         try {
-            mar = new Marshaller(out);
-            mar.marshal(object);
+            marshaller = new Marshaller(out);
+            marshaller.marshal(object);
         } catch ( IOException except ) {
             throw new MarshalException( except );
         }
     } //-- marshal
 
-    public static void marshal(Object object, DocumentHandler docHandler) 
+    /**
+     * Marshals the given Object as XML using the given DocumentHandler
+     * to send events to.
+     * @param obj the Object to marshal
+     * @param handler the DocumentHandler to marshal to
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
+    **/
+    public static void marshal(Object object, DocumentHandler handler) 
         throws MarshalException, ValidationException
     {
-        Marshaller mar;
+        Marshaller marshaller;
 
-        mar = new Marshaller(docHandler);
-        mar.marshal(object);
+        marshaller = new Marshaller(handler);
+        marshaller.marshal(object);
     } //-- marshal
 
     /**
-     * Marshals the given Object as XML using the given DocumentHandler.
+     * Marshals the given Object as XML using the DocumentHandler
+     * for this Marshaller.
      * @param obj the Object to marshal
-     * @param handler the DocumentHandler to marshal to
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
     **/
