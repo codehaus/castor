@@ -68,9 +68,9 @@ import org.apache.xml.serialize.XMLSerializer;
 import org.apache.xml.serialize.SerializerFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
-import com.kvisco.xsl.*;
-import com.kvisco.xsl.util.*;
-import com.kvisco.net.impl.URILocationImpl;
+import org.exolab.adaptx.xslt.*;
+import org.exolab.adaptx.xslt.util.*;
+import org.exolab.adaptx.net.impl.URILocationImpl;
 
 /**
  * Extends {@link HttpServlet} to provide XML output capabilities.
@@ -94,7 +94,7 @@ public abstract class XMLServlet
      */
     private ServletContext  _ctx;
 
-    private static XSLProcessor    _xslp;
+    private static XSLTProcessor    _xslp;
     
     /**
      * Servlets that implement this method should call it.
@@ -102,7 +102,7 @@ public abstract class XMLServlet
     public void init( ServletConfig config )
     {
         _ctx = config.getServletContext();
-        _xslp = new XSLProcessor();
+        _xslp = new XSLTProcessor();
     }
 
 
@@ -145,7 +145,7 @@ public abstract class XMLServlet
         private DocumentHandler   _docHandler;
 
 
-        private XSLStylesheet   _stylesheet;
+        private XSLTStylesheet   _stylesheet;
 
 
         private OutputFormat      _format;
@@ -156,7 +156,7 @@ public abstract class XMLServlet
         
         private final ServletContext      _ctx;
 
-        private final XSLReader           _xslReader;
+        private final XSLTReader           _xslReader;
         
 
         XMLServletResponseImpl( ServletContext ctx, HttpServletResponse response )
@@ -172,7 +172,7 @@ public abstract class XMLServlet
             if ( param != null )
                 setOutputFormat( new OutputFormat( param, null, "true".equals( _ctx.getInitParameter( "xsl:output-indent" ) ) ) );
                 
-            _xslReader = new XSLReader();
+            _xslReader = new XSLTReader();
         }
 
 
