@@ -378,7 +378,8 @@ public final class SQLTypes
             boolVal = rs.getBoolean( index );
             return ( rs.wasNull() ? null : new Boolean( boolVal ) );
         default:               
-            return rs.getObject( index ); 
+            value = rs.getObject( index );
+            return ( rs.wasNull()? null : value );
         }
     }
 
