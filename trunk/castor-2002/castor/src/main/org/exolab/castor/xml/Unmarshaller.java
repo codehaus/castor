@@ -286,7 +286,9 @@ public class Unmarshaller {
             eventProducer.start();
         }
         catch(org.xml.sax.SAXException sx) {
-            MarshalException marshalEx = new MarshalException(sx);
+            Exception except = sx.getException();
+            if (except == null) except = sx;
+            MarshalException marshalEx = new MarshalException(except);
             if(handler.getDocumentLocator()!=null)
             {
                 FileLocation location = new FileLocation();
