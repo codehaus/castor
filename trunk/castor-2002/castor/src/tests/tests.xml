@@ -20,6 +20,7 @@
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
+    <case class="jdo.TypeConversion" />
     <case class="jdo.MultiPKs" />
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
@@ -60,6 +61,7 @@
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
+    <case class="jdo.TypeConversion" />
     <case class="jdo.TypeLOB" />
     <case class="jdo.MultiPKs" />
     <case class="jdo.ManyToMany" />
