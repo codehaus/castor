@@ -98,7 +98,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     /**
      * The element name of the Group to be unmarshalled.
     **/
-    private String _element = SchemaNames.GROUP;
+    private String _element = SchemaNames.SEQUENCE;
 
     private boolean foundAll        = false;
     private boolean foundElement    = false;
