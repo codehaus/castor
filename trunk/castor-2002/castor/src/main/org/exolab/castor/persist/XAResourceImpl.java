@@ -75,7 +75,7 @@ public final class XAResourceImpl
      * The cache engine to which this XA resource belongs.
      * Will be used to associate Xid with a transaction context.
      */
-    private CacheEngine       _engine;
+    private final PersistenceEngine       _engine;
     
     
     /**
@@ -83,10 +83,10 @@ public final class XAResourceImpl
      * used to associate/dissociate the source with the
      * transaction context.
      */
-    private XAResourceSource  _xaSource;
+    private final XAResourceSource  _xaSource;
 
 
-    public XAResourceImpl( CacheEngine engine, XAResourceSource xaSource )
+    public XAResourceImpl( PersistenceEngine engine, XAResourceSource xaSource )
     {
         if ( engine == null || xaSource == null )
             throw new IllegalArgumentException( "Argument 'engine' or xaSource' is null" );
