@@ -624,6 +624,12 @@ public class Unmarshaller {
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
+        
+        if (unmarshaller._debug) {
+            String warning = "debug: *static* unmarshal method called, this will " +
+                "ignore any mapping files or changes made to an Unmarshaller instance.";
+            System.out.println(warning);
+        }
         return unmarshaller.unmarshal(reader);
     } //-- void unmarshal(Writer)
 
@@ -641,6 +647,11 @@ public class Unmarshaller {
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
+        if (unmarshaller._debug) {
+            String warning = "debug: *static* unmarshal method called, this will " +
+                "ignore any mapping files or changes made to an Unmarshaller instance.";
+            System.out.println(warning);
+        }
         return unmarshaller.unmarshal(source);
     } //-- void unmarshal(Writer)
 
@@ -658,6 +669,11 @@ public class Unmarshaller {
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
+        if (unmarshaller._debug) {
+            String warning = "debug: *static* unmarshal method called, this will " +
+                "ignore any mapping files or changes made to an Unmarshaller instance.";
+            System.out.println(warning);
+        }
         return unmarshaller.unmarshal(node);
     } //-- void unmarshal(Writer)
 
