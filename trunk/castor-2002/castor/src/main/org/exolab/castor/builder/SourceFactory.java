@@ -577,8 +577,6 @@ public class SourceFactory  {
         jMethod.addParameter(new JParameter(SGTypes.Writer, "out"));
         parent.addMethod(jMethod);
         JSourceCode jsc = jMethod.getSourceCode();
-        jsc.add("//-- we must have a valid element before marshalling");
-        jsc.add("//validate(false);");
         jsc.add("");
         jsc.add("Marshaller.marshal(this, out);");
 
@@ -593,8 +591,6 @@ public class SourceFactory  {
         jMethod.addParameter(new JParameter(jc, "handler"));
         parent.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
-        jsc.add("//-- we must have a valid element before marshalling");
-        jsc.add("//validate(false);");
         jsc.add("");
         jsc.add("Marshaller.marshal(this, handler);");
 
