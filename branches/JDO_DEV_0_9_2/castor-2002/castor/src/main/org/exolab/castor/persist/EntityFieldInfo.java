@@ -48,10 +48,10 @@ package org.exolab.castor.persist;
 import java.util.Arrays;
 
 /**
- * This class specify a logic field of an entity. 
+ * This class specify a logic field of an entity.
  * <p>
- * In general, one logical field maps to an actual field of the entity. 
- * Exception happens when a logical field is a foreign identity, and 
+ * In general, one logical field maps to an actual field of the entity.
+ * Exception happens when a logical field is a foreign identity, and
  * the foreign identity spans more than one actually field. In such
  * case, the logical field is said to be complex.
  */
@@ -66,116 +66,111 @@ public final class EntityFieldInfo {
     public final int CARDINALITY_MANY_TO_ONE = 3;
 
 
-	/**
-	 * Indicate this field is an identity field.
-	 */
+    /**
+     * Indicate this field is an identity field.
+     */
     public boolean id;
 
-	/**
-	 * Indicate this field is a foreign identitiy. 
-	 */
+    /**
+     * Indicate this field is a foreign identitiy.
+     */
     public boolean foreign;
 
-	/**
-	 * Indicate this field 
-	 */
+    /**
+     * Indicate this field
+     */
     public boolean complex;
 
-	/**
-	 * Indicate this field is virtual field and is obtained by a join of this
-	 * entity and another entitiy.
-	 */
+    /**
+     * Indicate this field is virtual field and is obtained by a join of this
+     * entity and another entitiy.
+     */
     public boolean join;
 
-	/**
-	 * Indicate this field is a large binary field.
-	 */
+    /**
+     * Indicate this field is a large binary field.
+     */
     public boolean blob;
 
-	/**
-	 * Indicate this field is a foreign identity which corresponds to a foregin 
-	 * entity, which is stored in a different data store than this entity.
-	 */
+    /**
+     * Indicate this field is a foreign identity which corresponds to a foregin
+     * entity, which is stored in a different data store than this entity.
+     */
     public boolean sameDataStore;
 
-	/**
-	 * Specify the cardinality number of this logical field
-	 */
+    /**
+     * Specify the cardinality number of this logical field
+     */
     public int cardinality;
 
-	/**
-	 * Indicate the bridge should perform dirty check on this field when
-	 * it the entity is stored.
-	 */
+    /**
+     * Indicate the bridge should perform dirty check on this field when
+     * it the entity is stored.
+     */
     public boolean dirtyCheck;
 
-	/**
-	 * The expected types of this data store.
-	 */
+    /**
+     * The expected types of this data store.
+     */
     public Class[] expectedType;
 
-	/**
-	 * The native type of this field in the data store.
-	 */
+    /**
+     * The native type of this field in the data store.
+     */
     public Class[] declaredType;
 
-	/**
-	 * The type conversion parameter of the expected type and declared type.
-	 */
-	public Object[] typeParam;
+    /**
+     * The type conversion parameter of the expected type and declared type.
+     */
+    public Object typeParam;
 
-	/**
-	 * The Entity in which this field belongs to.
-	 */ 
+    /**
+     * The Entity in which this field belongs to.
+     */
     public Entity entityClass;
 
-	/**
-	 * The native field name(s) of this entity.
-	 */
+    /**
+     * The native field name(s) of this entity.
+     */
     public String[] fieldNames;
 
-	/**
-	 * The foreign entity that this field corresponds to.
-	 */
+    /**
+     * The foreign entity that this field corresponds to.
+     */
     public Entity relatedEntityClass;
 
-	/**
-	 * The foreign entity which this field correspond to  
-	 */
-    // we don't need it if we have relatedEntityClass right?
-	//public String[] relatedEntityIdFieldNames;
+    /**
+     * The foreign key which this field correspond to (for one-to-many and one-to-one relations).
+     */
+    public EntityFieldInfo relatedForeignKey;
 
     public EntityFieldInfo() {
         // implements it....
     }
 
     public boolean equals( Object object ) {
-        if ( !( object instanceof EntityFieldInfo ) )
+        EntityFieldInfo info;
+
+        if ( !( object instanceof EntityFieldInfo ) ) {
             return false;
-
-        EntityFieldInfo info = (EntityFieldInfo) object;
-
-        return 
-          ( this.id            == info.id &&
-            this.foreign       == info.foreign &&
-            this.complex       == info.complex &&
-            this.join          == info.join &&
-            this.blob          == info.blob &&
-            this.sameDataStore == info.sameDataStore &&
-            this.cardinality   == info.cardinality &&
-            this.dirtyCheck    == info.dirtyCheck &&
-            this.expectedType  == info.expectedType &&
-            this.declaredType  == info.declaredType &&
-            this.entityClass   == info.entityClass &&
-            this.fieldName     == info.fieldName &&
-            this.relatedEntityClass == info.relatedEntityClass &&
-            this.relatedEntityIdFieldName == info.relatedEntityIdFieldName &&
-            Arrays.equals( this.fieldNames, info.fieldNames ) && 
-            Arrays.equals( this.relatedEntityIdFieldNames, info.relatedEntityIdFieldNames ) );
+        }
+        if (object == this) {
+            return true;
+        }
+        info = (EntityFieldInfo) object;
+        return  (entityClass.equals(info.entityClass) &&
+                ((fieldNames == null && info.fieldNames == null) ||
+                    Arrays.equals(fieldNames, info.fieldNames)) &&
+                ((relatedEntityClass == null && info.relatedEntityClass == null) ||
+                    relatedEntityClass.equals(info.relatedEntityClass)) &&
+                ((relatedForeignKey == null && info.relatedForeignKey == null) ||
+                    relatedForeignKey.equals(info.relatedForeignKey)));
     }
 
     public int hashCode() {
-        return entityClass == null? 0: entityClass.hashCode();
+        return (entityClass == null ? 0: entityClass.hashCode()) +
+                (fieldNames == null ? 0 : fieldNames[0].hashCode()) +
+                (relatedEntityClass == null ? 0 : relatedEntityClass.hashCode());
     }
 
 

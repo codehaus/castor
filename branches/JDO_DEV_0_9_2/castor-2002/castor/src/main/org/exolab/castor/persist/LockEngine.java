@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
