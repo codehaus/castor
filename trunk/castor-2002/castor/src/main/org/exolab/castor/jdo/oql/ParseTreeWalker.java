@@ -1227,7 +1227,7 @@ public class ParseTreeWalker implements TokenTypes
             if ( tokenType == DOT && path != null && path.size() > 2 ) {
                 clsTableAlias = buildTableAlias( clsDesc.getTableName(), path, path.size() - 2 );
                 JDOClassDescriptor srcDesc = _clsDesc;
-                for ( int i = 1; i < path.size() - 1; i++ ) {
+                for ( int i = 1; i < path.size(); i++ ) {
                     Object[] fieldAndClass = getFieldAndClassDesc((String) path.elementAt(i), srcDesc,
                                                                   _queryExpr, path, i - 1);
                     if (fieldAndClass == null) {
