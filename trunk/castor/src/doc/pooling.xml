@@ -58,8 +58,10 @@
 <code-panel>        
 <code><![CDATA[
   <data-source class-name="org.postgresql.PostgresqlDataSource">
-   <params server-name="localhost" database-name="app"
-           user="smith" password="secret"/>
+   <param name="serverName" value="localhost" />
+   <param name="databaseName" value="app" />
+   <param name="user" value="smith" />
+   <param name="password" value="secret" />
   </data-source>
 ]]></code>
 </code-panel>
@@ -112,7 +114,7 @@
 <code-panel>
 <code><![CDATA[
   <data-source class-name="com.codestudio.sql.PoolManDataSource">
-   <params database-name="appPool"/>
+    <param name="databaseName" value="appPool" />
   </data-source>
 ]]></code>
 </code-panel>
@@ -142,10 +144,12 @@
 <code-panel>        
 <code><![CDATA[
   <data-source class-name="org.postgresql.jdbc2.optional.PoolingDataSource">
-     <params server-name="localhost" database-name="app"
-             initial-connections="2" max-connections="10"
-             user="smith" password="secret"
-     />
+   <param name="serverName" value="localhost" />
+   <param name="databaseName" value="app" />
+   <param name="initialConnections" value="2" />
+   <param name="maxConnections" value="10" />
+   <param name="user" value="smith" />
+   <param name="password" value="secret" />
   </data-source>
 ]]></code>
 </code-panel>
@@ -265,11 +269,11 @@
 <code-panel>        
 <code><![CDATA[
   <data-source class-name="org.apache.commons.dbcp.BasicDataSource">
-    <params driver-class-name="com.mysql.jdbc.Driver" 
-            username="test" 
-            password="test" 
-            url="jdbc:mysql://localhost/test" 
-            max-active="10" />
+    <param name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <param name="username" value="test" />
+    <param name="password" value="test" />
+    <param name="url" value="jdbc:mysql://localhost/test" />
+    <param name="maxActive" value="10" />
   </data-source>
 ]]></code>
 </code-panel>        
