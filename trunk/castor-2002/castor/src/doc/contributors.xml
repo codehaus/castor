@@ -328,6 +328,11 @@
     <description>Patches to JDO</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name give="Ralf" surname="Purnhagen" />
+    <email>purnhar@gmx.net</email>
+    <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>
+  </contributor>
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
