@@ -29,6 +29,26 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="1860">
+					<description>
+						<b>Rename JDO2 to JDOManager.</b>
+					</description>
+					<contributor>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</reporter>
+					<type>Ref.</type>
+					<module>JDO</module>
+					<date>20050406</date>
+				</bug>
 				<bug id="1820">
 					<description>
 						Add template for submitting a bug report.
@@ -239,7 +259,7 @@
 						<email>martin-fuchs@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<module>Misc</module>
 					<date>20050305</date>
 				</bug>
@@ -384,7 +404,7 @@
                   <name>Keith Visco</name>
                   <email>keith AT kvisco DOT com</email>
 					</submitter>
-               <type>Enhancement</type>
+               <type>Enh.</type>
                <project>XML</project>
                <module>Mapping</module>
                <date>20050118</date>
@@ -460,7 +480,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Caching</module>
 				</bug>
@@ -617,7 +637,7 @@
 						<email>keith@kvisco.com</email>
                </submitter>
                <reporter></reporter>
-               <type>Enhancement</type>
+               <type>Enh.</type>
                <project>XML</project>
                <module>XML</module>
                <date>20041210</date>
@@ -638,7 +658,7 @@
 						<email>keith@kvisco.com</email>
                </submitter>
                <reporter></reporter>
-               <type>Enhancement</type>
+               <type>Enh.</type>
                <project>XML</project>
                <module>XML</module>
                <date>20041210</date>
@@ -689,7 +709,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Werner Guttmann</reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>JDO</module>
 				</bug>
@@ -719,7 +739,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Martin Fuchs</reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>JDO</module>
 				</bug>
@@ -776,7 +796,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Martin Fuchs</reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>JDO</module>
 				</bug>
@@ -791,7 +811,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Martin Fuchs</reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Configuration</module>
 				</bug>
@@ -821,7 +841,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Martin Fuchs</reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>OQL</module>
 				</bug>
@@ -851,7 +871,7 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Martin Fuchs</reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>OQL</module>
 				</bug>
@@ -1424,7 +1444,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>ferret@frii.com</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20041007</date>
@@ -1505,7 +1525,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20041005</date>
@@ -1565,7 +1585,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Config</module>
 					<date>20041002</date>
@@ -1601,7 +1621,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Emhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Config</module>
 					<date>20040927</date>
@@ -1624,7 +1644,7 @@ JDO2 jdo = JDO2.createInstance ("test");
                <reporter>
                    <name>Marco Soeima</name>
                </reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
                <project>XML</project>
                <module>XML</module>
                <date>20040916</date>
@@ -1647,7 +1667,7 @@ JDO2 jdo = JDO2.createInstance ("test");
                    <name>David Thal</name>
                    <email>dthal AT combimatrix DOT com</email>
                </reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
                <project>XML</project>
                <module>XML</module>
                <date>20040910</date>
@@ -1716,7 +1736,7 @@ JDO2 jdo = JDO2.createInstance ("test");
                   <name>Keith Visco</name>
                   <email>keith AT kvisco DOT com</email>
 					</submitter>
-               <type>Enhancement</type>
+               <type>Enh.</type>
                <project>XML</project>
                <module>XML</module>
                <date>20040910</date>
@@ -1737,7 +1757,7 @@ JDO2 jdo = JDO2.createInstance ("test");
                   <name>Keith Visco</name>
                   <email>keith AT kvisco DOT com</email>
 					</submitter>
-               <type>Enhancement</type>
+               <type>Enh.</type>
                <project>XML</project>
                <module>XML</module>
                <date>20040910</date>
@@ -1756,7 +1776,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>OQL</module>
 					<date>20040909</date>
@@ -1794,7 +1814,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>OQL</module>
 					<date>20040812</date>
@@ -1813,7 +1833,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>XML</project>
 					<module>Mapping tool</module>
 					<date>20040811</date>
@@ -1886,7 +1906,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20040607</date>
@@ -1906,7 +1926,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Caching</module>
 					<date>20040513</date>
@@ -1925,7 +1945,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enhancement</type>
+					<type>Enh.</type>
 					<project>ALL</project>
 					<module>Core</module>
 					<date>20040502</date>
@@ -2000,7 +2020,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>OQL</module>
 					<date>20041001</date>
@@ -2018,7 +2038,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20041001</date>
@@ -2210,7 +2230,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20040917</date>
@@ -2304,7 +2324,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20040906</date>
@@ -2542,7 +2562,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Tests</module>
 					<date>20040428</date>
@@ -2632,7 +2652,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20040806</date>
@@ -2763,7 +2783,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20040421</date>
@@ -2801,7 +2821,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 						<email>ferret@frii.com</email>
 					</submitter>
 					<reporter></reporter>
-					<type>Enh</type>
+					<type>Enh.</type>
 					<project>JDO</project>
 					<module>Core</module>
 					<date>20040323</date>

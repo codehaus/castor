@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDO2;
+import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
@@ -34,7 +34,7 @@ public class Test1214 extends TestCase {
 
     public void testDoubleEntities() throws Exception {
     	try {
-            JDO2.loadConfiguration(getClass().getResource("jdo-conf-double.xml").toString());
+            JDOManager.loadConfiguration(getClass().getResource("jdo-conf-double.xml").toString());
     		fail();
     	}
     	catch (MappingException ex) {
@@ -43,8 +43,8 @@ public class Test1214 extends TestCase {
 	}
 
     public void testIntEntities() throws Exception {
-        JDO2.loadConfiguration(getClass().getResource("jdo-conf-int.xml").toString());
-        JDO2 jdo = JDO2.createInstance("test1214-int");
+        JDOManager.loadConfiguration(getClass().getResource("jdo-conf-int.xml").toString());
+        JDOManager jdo = JDOManager.createInstance("test1214-int");
 
         Database db = jdo.getDatabase();
         db.begin();
@@ -63,8 +63,8 @@ public class Test1214 extends TestCase {
     }
 
     public void testIntAndDoubleEntities() throws Exception {
-        JDO2.loadConfiguration(getClass().getResource("jdo-conf-int-and-double.xml").toString());
-        JDO2 jdo = JDO2.createInstance("test1214-int-and-double");
+        JDOManager.loadConfiguration(getClass().getResource("jdo-conf-int-and-double.xml").toString());
+        JDOManager jdo = JDOManager.createInstance("test1214-int-and-double");
         
         Database db = jdo.getDatabase();
         db.begin();
@@ -83,8 +83,8 @@ public class Test1214 extends TestCase {
     }
 
     public void testIntAndIntegerEntities() throws Exception {
-        JDO2.loadConfiguration(getClass().getResource("jdo-conf-int-and-integer.xml").toString());
-        JDO2 jdo = JDO2.createInstance("test1214-int-and-integer");
+        JDOManager.loadConfiguration(getClass().getResource("jdo-conf-int-and-integer.xml").toString());
+        JDOManager jdo = JDOManager.createInstance("test1214-int-and-integer");
         
         Database db = jdo.getDatabase();
         db.begin();
@@ -103,8 +103,8 @@ public class Test1214 extends TestCase {
     }
 
     public void testIntegerEntities() throws Exception {
-        JDO2.loadConfiguration(getClass().getResource("jdo-conf-integer.xml").toString());
-        JDO2 jdo = JDO2.createInstance("test1214-integer");
+        JDOManager.loadConfiguration(getClass().getResource("jdo-conf-integer.xml").toString());
+        JDOManager jdo = JDOManager.createInstance("test1214-integer");
         
         Database db = jdo.getDatabase();
         db.begin();
@@ -123,8 +123,8 @@ public class Test1214 extends TestCase {
     }
 
     public void testIntegerAndDoubleEntities() throws Exception {
-        JDO2.loadConfiguration(getClass().getResource("jdo-conf-integer-and-double.xml").toString());
-        JDO2 jdo = JDO2.createInstance("test1214-integer-and-double");
+        JDOManager.loadConfiguration(getClass().getResource("jdo-conf-integer-and-double.xml").toString());
+        JDOManager jdo = JDOManager.createInstance("test1214-integer-and-double");
         
         Database db = jdo.getDatabase();
         db.begin();

@@ -51,7 +51,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.exolab.castor.jdo.JDO2;
+import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
@@ -127,7 +127,7 @@ public class QueryAnalyser {
         BorderLayout borderLayout1 = new BorderLayout();
         DefaultTableModel model;
 
-        JDO2 jdo;
+        JDOManager jdo;
         String databasename;
         String dbconfig;
         JTabbedPane TabbedPane = new JTabbedPane();
@@ -383,8 +383,8 @@ public class QueryAnalyser {
 
         private void openDB() {
             try{
-                JDO2.loadConfiguration (dbconfig, ClassLoader.getSystemClassLoader());
-                jdo = JDO2.createInstance(databasename);
+                JDOManager.loadConfiguration (dbconfig, ClassLoader.getSystemClassLoader());
+                jdo = JDOManager.createInstance(databasename);
                 //only to try a connection
                 Database db = jdo.getDatabase();
             } 

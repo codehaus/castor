@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDO2;
+import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 
@@ -16,7 +16,7 @@ public final class TestTemplate extends TestCase {
     
     private static Log _log = null;
     
-    private JDO2 _jdo = null;
+    private JDOManager _jdo = null;
 
     public static void main(final String[] args) throws Exception {
         TestTemplate test = new TestTemplate();
@@ -39,8 +39,8 @@ public final class TestTemplate extends TestCase {
         _log = LogFactory.getFactory().getInstance(TestTemplate.class);
 
         String config = getClass().getResource(JDO_CONF_FILE).toString();
-        JDO2.loadConfiguration(config, getClass().getClassLoader());
-        _jdo = JDO2.createInstance(DATABASE_NAME);
+        JDOManager.loadConfiguration(config, getClass().getClassLoader());
+        _jdo = JDOManager.createInstance(DATABASE_NAME);
     }
     
     protected void tearDown() throws Exception {

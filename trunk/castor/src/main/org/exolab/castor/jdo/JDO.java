@@ -83,32 +83,30 @@ import org.exolab.castor.util.Messages;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
-
 /**
- * Implementation of the JDO engine used for obtaining database
- * connection. A JDO object is constructed with the name of a database
- * and other properties, and {@link #getDatabase} is used to obtain a
- * new database connection. Any number of database connections can be
- * obtained from the same JDO object.
- * <p>
+ * Implementation of the JDO engine used for obtaining database connection. A
+ * JDO object is constructed with the name of a database and other properties,
+ * and {@link #getDatabase} is used to obtain a new database connection. Any
+ * number of database connections can be obtained from the same JDO object.
+ * <p/>
  * The database configuration can be loaded using one of the {@link
- * #loadConfiguration(String)} method. Alternatively, {@link #setConfiguration(String)}
- * can be used to specify the URL of a database configuration file.
- * The configuration will loaded only once.
+ * #loadConfiguration(String)} methods. Alternatively, {@link
+ * #setConfiguration(String)} can be used to specify the URL of a database
+ * configuration file. The configuration will be loaded only once.
  * <p>
  * For example:
  * <pre>
- * <font color="red">// Load the database configuration</font>
+ * <font color="red">// load the database configuration</font>
  * JDO.loadConfiguration( "database.xml" );
  *
- * . . .
+ * ...
  *
  * JDO      jdo;
  * Database db;
  *
- * <font color="red">// Construct a new JDO for the database 'mydb'</font>
+ * <font color="red">// construct a new JDO for the database 'mydb'</font>
  * jdo = new JDO( "mydb" );
- * <font color="red">// Open a connection to the database</font>
+ * <font color="red">// open a connection to the database</font>
  * db = jdo.getDatabase();
  * </pre>
  * Or,
@@ -116,32 +114,32 @@ import org.xml.sax.InputSource;
  * JDO      jdo;
  * Database db;
  *
- * <font color="red">// Construct a new JDO and specify the configuration file</font>
+ * <font color="red">// construct a new JDO for the database 'mydb'</font>
  * jdo = new JDO( "mydb" );
+ * <font color="red">// specify the database configuration</font>
  * jdo.setConfiguration( "database.xml" );
- * <font color="red">// Open a connection to the database</font>
+ * <font color="red">// open a connection to the database</font>
  * db = jdo.getDatabase();
  * </pre>
  *
+ * @deprecated JDO has been replaced by JDOManager. 
+ * 
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
-public class JDO
-    implements DataObjects, Referenceable,
-           ObjectFactory, Serializable
-{
-
+public final class JDO
+implements DataObjects, Referenceable, ObjectFactory, Serializable {
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
      */
-    private static Log _log = LogFactory.getFactory().getInstance( JDO.class );
+    private static final Log LOG = LogFactory.getLog(JDO.class);
 
     /**
      * The default lock timeout for this database is 10 seconds.
      */
-    public static final int DefaultLockTimeout = 10;
+    public static final int DEFAULT_LOCK_TIMEOUT = 10;
 
     /**
      * The URL of the database configuration file. If the URL is
@@ -158,9 +156,11 @@ public class JDO
     /**
      * The log intercpetor to which all logging and tracing messages
      * will be sent.
+     * 
      * @deprecated There is no need for this member due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
-     * @see #_log
+     * 
+     * @see #LOG
      */
     private LogInterceptor  _logInterceptor;
 
@@ -180,14 +180,12 @@ public class JDO
      * timeout, an infinite value for no timeout. The timeout is
      * specified in seconds.
      */
-    private int _lockTimeout = DefaultLockTimeout;
-
+    private int _lockTimeout = DEFAULT_LOCK_TIMEOUT;
 
     /**
      * The name of this database.
      */
     private String _dbName;
-
 
     /**
      * Description of this database.
@@ -231,9 +229,8 @@ public class JDO
      * Constructs a new JDO database factory. Must call {@link
      * #setDatabaseName} before calling {@link #getDatabase}.
      */
-    public JDO()
-    {
-    	// default constructor, no code
+    public JDO() {
+        // default constructor, no code
     }
 
     /**
@@ -242,8 +239,7 @@ public class JDO
      *
      * @param name The database name
      */
-    public JDO( String name )
-    {
+    public JDO(final String name) {
         _dbName = name;
     }
 
@@ -254,15 +250,16 @@ public class JDO
      * logging and tracing messages will be printed.
      *
      * @param logWriter A PrintWriter instance.
+     * 
      * @deprecated There is no need for this method due to the implementation
-     * of Log4J which is controlled via the log4j.properties file.
+     *             of Log4J which is controlled via the log4j.properties file.
      */
-    public void setLogWriter( PrintWriter logWriter )
-    {
-        if ( logWriter == null )
+    public void setLogWriter(final PrintWriter logWriter) {
+        if (logWriter == null) {
             _logInterceptor = null;
-        else
-            _logInterceptor = new OutputLogInterceptor( logWriter );
+        } else {
+            _logInterceptor = new OutputLogInterceptor(logWriter);
+        }
     }
 
     /**
@@ -272,11 +269,11 @@ public class JDO
      * logging and tracing messages are sent.
      *
      * @param logInterceptor The log interceptor, null if disabled
+     * 
      * @deprecated There is no need for this method due to the implementation
-     * of Log4J which is controlled via the log4j.properties file.
+     *             of Log4J which is controlled via the log4j.properties file.
      */
-    public void setLogInterceptor( LogInterceptor logInterceptor )
-    {
+    public void setLogInterceptor(final LogInterceptor logInterceptor) {
         _logInterceptor = logInterceptor;
     }
 
@@ -293,8 +290,7 @@ public class JDO
      *
      * @param callback The callback interceptor, null if disabled
      */
-    public void setCallbackInterceptor( CallbackInterceptor callback )
-    {
+    public void setCallbackInterceptor(final CallbackInterceptor callback) {
         _callback = callback;
     }
 
@@ -311,8 +307,7 @@ public class JDO
      *
      * @param factory The instance factory, null to use the default
      */
-    public void setInstanceFactory( InstanceFactory factory )
-    {
+    public void setInstanceFactory(final InstanceFactory factory) {
         _instanceFactory = factory;
     }
 
@@ -323,50 +318,56 @@ public class JDO
      * @deprecated There is no need for this method due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      */
-    public LogInterceptor getLogInterceptor()
-    {
+    public LogInterceptor getLogInterceptor() {
         return _logInterceptor;
     }
 
     /**
-     * Sets the application class loader.
-     * This method should be used with application servers that use multiple
-     * class loaders. The default value is "null". It means that
-     * application classes are loaded through <code>Class.forName(className)</code>.
+     * Sets the application class loader. This method should be used with
+     * application servers that use multiple class loaders. The default value
+     * is "null". It means that application classes are loaded through
+     * <code>Class.forName(className)</code>.
+     * <p>
      * Examples:
-     * <p><code>jdo.setClassLoader(getClass().getClassLoader());</code>
-     * <p><code>jdo.setClassLoader(Thread.currentThread().getContextClassLoader());</code>
+     * <p>
+     * <code>
+     *   jdo.setClassLoader(getClass().getClassLoader());
+     * </code><p><code>
+     *   jdo.setClassLoader(Thread.currentThread().getContextClassLoader());
+     * </code>
+     * 
+     * @param classLoader New ClassLoader to be used or null to use the default.
      */
-    public void setClassLoader( ClassLoader classLoader)
-    {
+    public void setClassLoader(final ClassLoader classLoader) {
         _classLoader = classLoader;
     }
 
     /**
      * Returns the application classloader.
+     * 
+     * @return The currently used ClassLoader or null if default is used.
      */
-    public ClassLoader getClassLoader()
-    {
+    public ClassLoader getClassLoader() {
         return _classLoader;
     }
 
     /**
-     * Sets the entity resolver.
-     * The resolver can be used to resolve cached entities, e.g.
-     * for external mapping documents.
-     * Note, that you cannot create two Database instances that differ
-     * only in a resolver.
+     * Sets the entity resolver. The resolver can be used to resolve cached
+     * entities, e.g. for external mapping documents. Note, that you cannot
+     * create two Database instances that differ only in a resolver.
+     * 
+     * @param entityResolver New EntityResolver to be used.
      */
-    public void setEntityResolver( EntityResolver entityResolver)
-    {
+    public void setEntityResolver(final EntityResolver entityResolver) {
         _entityResolver = entityResolver;
     }
 
     /**
      * Returns the entity resolver.
+     * 
+     * @return The EntityResolver currently in use.
      */
-    public EntityResolver getEntityResolver()
-    {
+    public EntityResolver getEntityResolver() {
         return _entityResolver;
     }
 
@@ -377,11 +378,12 @@ public class JDO
      *
      * @param description The description of this database
      */
-    public void setDescription( String description )
-    {
-    	if ( description == null )
-    		throw new NullPointerException( "DataSource: Argument 'description' is null" );
-    	_description = description;
+    public void setDescription(final String description) {
+        if (description == null) {
+            throw new NullPointerException(
+                    "DataSource: Argument 'description' is null");
+        }
+        _description = description;
     }
 
     /**
@@ -391,9 +393,8 @@ public class JDO
      *
      * @return The description of this database
      */
-    public String getDescription()
-    {
-    	return _description;
+    public String getDescription() {
+        return _description;
     }
 
     /**
@@ -404,8 +405,7 @@ public class JDO
      *
      * @param name The name of this database
      */
-    public void setDatabaseName( String name )
-    {
+    public void setDatabaseName(final String name) {
         _dbName = name;
     }
 
@@ -416,8 +416,7 @@ public class JDO
      *
      * @return The name of this database
      */
-    public String getDatabaseName()
-    {
+    public String getDatabaseName() {
         return _dbName;
     }
 
@@ -430,8 +429,7 @@ public class JDO
      *
      * @param seconds The lock timeout, specified in seconds
      */
-    public void setLockTimeout( int seconds )
-    {
+    public void setLockTimeout(final int seconds) {
         _lockTimeout = seconds;
     }
 
@@ -442,8 +440,7 @@ public class JDO
      *
      * @return The lock timeout, specified in seconds
      */
-    public int getLockTimeout()
-    {
+    public int getLockTimeout() {
         return _lockTimeout;
     }
 
@@ -458,8 +455,7 @@ public class JDO
      *
      * @param url The URL of the database configuration file
      */
-    public void setConfiguration( String url )
-    {
+    public void setConfiguration(final String url) {
         _jdoConfURI = url;
     }
 
@@ -467,8 +463,7 @@ public class JDO
      * Provides JDO with a JDO configuration file. 
      * @param jdoConfiguration A JDO configuration instance.
      */
-    public void setConfiguration( JdoConf jdoConfiguration)
-    {
+    public void setConfiguration(final JdoConf jdoConfiguration) {
         _jdoConf = jdoConfiguration;
     }
 
@@ -479,8 +474,7 @@ public class JDO
      *
      * @return The URL of the database configuration file
      */
-    public String getConfiguration()
-    {
+    public String getConfiguration() {
         return _jdoConfURI;
     }
 
@@ -499,19 +493,20 @@ public class JDO
      *
      * @param pool true to enable database pooling
      */
-    public void setDatabasePooling( boolean pool ) {
-        if ( !pool ) {
-            if ( _txDbPool == null )
+    public void setDatabasePooling(final boolean pool) {
+        if (!pool) {
+            if (_txDbPool == null) {
                 return;
-            else if ( _txDbPool.isEmpty() ) {
+            } else if (_txDbPool.isEmpty()) {
                 _txDbPool = null;
                 return;
-            } else
-                throw new IllegalStateException("JDO Pooling started. It can not be set to false");
+            } else {
+                throw new IllegalStateException(
+                        "JDO Pooling started. It can not be set to false");
+            }
+        } else if (_txDbPool == null) {
+            _txDbPool = new TxDatabaseMap();
         }
-        
-        if ( _txDbPool == null ) 
-        	_txDbPool = new TxDatabaseMap();
         return;
     }
 
@@ -519,6 +514,7 @@ public class JDO
      * Indicates if jdo Database pooling is enable or not.
      * <p>
      * <b>Experimental</b> maybe removed in the further release
+     * 
      * @see #setDatabasePooling(boolean)
      */ 
     public boolean getDatabasePooling() {
@@ -526,16 +522,20 @@ public class JDO
     }
 
     /**
-     * True if user prefer all reachable object to be stored automatically.
-     * False if user want only dependent object to be stored.
-     * See also, {@link JDO#setAutoStore(boolean)}
+     * Sets <tt>autoStore</tt> mode.
+     * 
+     * @param  autoStore True if user prefer all reachable object to be stored
+     *         automatically; False if user want only dependent object to be
+     *         stored.  
      */
-    public void setAutoStore( boolean autoStore ) {
+    public void setAutoStore(final boolean autoStore) {
         _autoStore = autoStore;
     }
 
     /**
-     * Return if the next Database instance will be set to autoStore.
+     * Return if the next database instance will be set to <tt>autoStore</tt>.
+     * 
+     * @return True if <tt>autoStore</tt> is enabled.
      */
     public boolean isAutoStore() {
         return _autoStore;
@@ -548,101 +548,110 @@ public class JDO
      * or if no database configuration exists for the named database.
      *
      * @return An open connection to the database
-     * @throws DatabaseNotFoundException Attempted to open a database
-     *  that does not exist
      * @throws PersistenceException Database access failed
      */
-    public Database getDatabase()
-        throws DatabaseNotFoundException, PersistenceException
-    {
-        if ( _dbName == null )
-            throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
+    public Database getDatabase() throws PersistenceException {
+        if (_dbName == null) {
+            throw new IllegalStateException(
+                    "Called 'getDatabase' without first setting database name");
+        }
 
-        if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
+        if (DatabaseRegistry.getDatabaseRegistry(_dbName) == null) {
             // use _jdoConfURI to load the JDO configuration
-            if (_jdoConfURI != null)
-	            try {
-	                DatabaseRegistry.loadDatabase( new InputSource( _jdoConfURI ), _entityResolver, _classLoader );
-	            } catch ( MappingException except ) {
-	                throw new DatabaseNotFoundException( except );
-	            }
+            if (_jdoConfURI != null) {
+                try {
+                    DatabaseRegistry.loadDatabase(new InputSource(_jdoConfURI),
+                                                  _entityResolver,
+                                                  _classLoader);
+                } catch (MappingException ex) {
+                    throw new DatabaseNotFoundException(ex);
+                }
             // alternatively, use a JdoConf instance to load the JDO configuration
-            else if (_jdoConf != null){
-            	try {
-            		DatabaseRegistry.loadDatabase( _jdoConf, _entityResolver, _classLoader );
-            	} catch ( MappingException except ) {
-            		throw new DatabaseNotFoundException( except );
-            	}
+            } else if (_jdoConf != null) {
+                try {
+                    DatabaseRegistry.loadDatabase(_jdoConf,
+                                                  _entityResolver,
+                                                  _classLoader);
+                } catch (MappingException ex) {
+                    throw new DatabaseNotFoundException(ex);
+                }
+            } else {
+                throw new DatabaseNotFoundException(Messages.format(
+                        "jdo.dbNoMapping", _dbName));
             }
-            else 
-            	throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
         }
 
         // load transaction manager factory registry configuration
         try {
-            TransactionManagerFactoryRegistry.load (new InputSource (_jdoConfURI), _entityResolver);
-        }
-        catch (TransactionManagerAcquireException e) {
-            throw new PersistenceException (Messages.message ("jdo.transaction.problemToInitializeTransactionManagerFactory"), e); 
+            TransactionManagerFactoryRegistry.load(
+                    new InputSource(_jdoConfURI), _entityResolver);
+        } catch (TransactionManagerAcquireException ex) {
+            throw new PersistenceException(Messages.message(
+                    "jdo.problem.initializingTransactionManagerFactory"), ex); 
         }
 
         if (_transactionManagerFactory == null) {
-            
             String transactionMode = null;
             try {
-                TransactionDemarcation demarcation =
-                    JDOConfLoader.getTransactionDemarcation(new InputSource (_jdoConfURI), _entityResolver);
+                TransactionDemarcation demarcation;
+                String mode;
+                org.exolab.castor.jdo.conf.TransactionManager manager;
+                
+                demarcation = JDOConfLoader.getTransactionDemarcation(
+                        new InputSource(_jdoConfURI), _entityResolver);
                      
-                String demarcationMode =demarcation.getMode();
-
-                org.exolab.castor.jdo.conf.TransactionManager transactionManager = demarcation.getTransactionManager();
+                mode = demarcation.getMode();
+                manager = demarcation.getTransactionManager();
                                 
-                if (transactionManager != null) 
-                    transactionMode = transactionManager.getName();
-                else {
-                    
-                    if (demarcationMode.equals(LocalTransactionManagerFactory.NAME))
-                        transactionMode= LocalTransactionManagerFactory.NAME;
-                    else
-                        throw new PersistenceException (Messages.message ("jdo.transaction.missingTransactionManagerConfiguration"));
+                if (manager != null) {
+                    transactionMode = manager.getName();
+                } else if (LocalTransactionManagerFactory.NAME.equals(mode)) {
+                    transactionMode = LocalTransactionManagerFactory.NAME;
+                } else {
+                    throw new PersistenceException(Messages.message(
+                            "jdo.problem.missingTransactionConfiguration"));
                 }
                     
-            }
-            catch (MappingException e) {
-                throw new PersistenceException ("jdo.transaction.noValidTransactionMode", e);
+            } catch (MappingException ex) {
+                throw new PersistenceException(Messages.message(
+                        "jdo.problem.noValidTransactionMode"), ex);
             }
                  
             /*
-             * Try to obtain the specified<code>TransactionManagerFactory</code> instance from the
-             * registry.
+             * Try to obtain the specified<code>TransactionManagerFactory</code>
+             * instance from the registry.
              * 
              * If the returned TransactionManagerFactory instance is null,
              * return an exception to indicate that we cannot live without a
              * valid TransactionManagerFactory instance and that the user should
              * change her configuration.
              */
-             _transactionManagerFactory = 
-                TransactionManagerFactoryRegistry.getTransactionManagerFactory (transactionMode);
+             _transactionManagerFactory = TransactionManagerFactoryRegistry
+                     .getTransactionManagerFactory(transactionMode);
         
             if (_transactionManagerFactory == null) {
-                throw new DatabaseNotFoundException( Messages.format( "jdo.transaction.missingTransactionManagerFactory", transactionMode));
+                throw new DatabaseNotFoundException(Messages.format(
+                        "jdo.transaction.missingTransactionManagerFactory",
+                        transactionMode));
             }
 
             /*
-             *  Try to obtain a <code>javax.jta.TransactionManager>/code> from the factory.
+             * Try to obtain a <code>javax.jta.TransactionManager>/code> from
+             * the factory.
              */
             try {
-                _transactionManager = _transactionManagerFactory.getTransactionManager();
-            } catch (TransactionManagerAcquireException e) {
-                throw new DatabaseNotFoundException( Messages.format( "jdo.transaction.unableToAcquireTransactionManager", 
-                    _transactionManagerFactory.getName(),
-                    e ) );
+                _transactionManager = _transactionManagerFactory
+                        .getTransactionManager();
+            } catch (TransactionManagerAcquireException ex) {
+                throw new DatabaseNotFoundException(Messages.format(
+                        "jdo.transaction.unableToAcquireTransactionManager",
+                        _transactionManagerFactory.getName(), ex));
             }
         }
         
-        /* At this point, we MUST have a valid instance of TransactionManagerFactory, and 
-         * dependent on its type (LOCAL or not), we MIGHT have a
-         * valid<code>javax.jta.TransactionManager</code> instance.
+        /* At this point, we MUST have a instance of TransactionManagerFactory,
+         * and dependent on its type (LOCAL or not), we MIGHT have a valid
+         * <code>javax.jta.TransactionManager</code> instance.
          * 
          * Scenario 1: If the user uses Castor in standalone mode (outside of an
          * J2EE container), we have a TransactionManagerFactory instance only,
@@ -653,37 +662,43 @@ public class JDO
          * demarcation, we have both a TransactionManagerFactory (different from 
          * LOCAL) and a TransactionManager instance.
          */
-         
-        if ((!_transactionManagerFactory.getName().equals (LocalTransactionManagerFactory.NAME )) && 
-            (_transactionManager != null)) {
+        if ((_transactionManager != null) 
+                && !LocalTransactionManagerFactory.NAME.equals(
+                        _transactionManagerFactory.getName())) {
+            
             Transaction        transaction;
             DatabaseImpl       dbImpl;
 
             try {
                 transaction = _transactionManager.getTransaction();
-                if ( _txDbPool != null && _txDbPool.containsTx (transaction))
+                if ((_txDbPool != null) && _txDbPool.containsTx(transaction)) {
                     return _txDbPool.get (transaction);
+                }
                 
-                if (transaction != null && transaction.getStatus() == Status.STATUS_ACTIVE) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, 
-                            _callback, _instanceFactory, transaction, _classLoader, _autoStore);
+                if ((transaction != null)
+                        && (transaction.getStatus() == Status.STATUS_ACTIVE)) {
                     
-                    if (_txDbPool != null)
-                        _txDbPool.put( transaction, dbImpl );
+                    dbImpl = new DatabaseImpl(_dbName, _lockTimeout, _callback,
+                            _instanceFactory, transaction, _classLoader,
+                            _autoStore);
                     
-                    transaction.registerSynchronization( dbImpl );
+                    if (_txDbPool != null) {
+                        _txDbPool.put(transaction, dbImpl);
+                    }
+                    
+                    transaction.registerSynchronization(dbImpl);
                     return dbImpl;
                 }
-            } 
-            catch (Exception except) {
+            } catch (Exception ex) {
                 // NamingException, SystemException, RollbackException
-                if (_logInterceptor != null)
-                    _logInterceptor.exception( except );
+                if (_logInterceptor != null) {
+                    _logInterceptor.exception(ex);
+                }
             }
         }
         
-        return new DatabaseImpl( _dbName, _lockTimeout, 
-                _callback, _instanceFactory, null, _classLoader, _autoStore );
+        return new DatabaseImpl(_dbName, _lockTimeout, _callback,
+                _instanceFactory, null, _classLoader, _autoStore);
     }
 
     /**
@@ -692,15 +707,13 @@ public class JDO
      * name, connection factory and mappings.
      * 
      * @param url The JDO configuration file
-     * @throw MappingException The mapping file is invalid, or any
+     * @throws MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadConfiguration( String url )
-        throws MappingException
-    {
-        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null );
+    public static void loadConfiguration(final String url)
+    throws MappingException {
+        DatabaseRegistry.loadDatabase(new InputSource(url), null, null);
     }
-
 
     /**
      * Load database configuration from the specified URL. <tt>url</tt>
@@ -710,13 +723,13 @@ public class JDO
      * 
      * @param url The JDO configuration file
      * @param loader The class loader to use, null for the default
-     * @throw MappingException The mapping file is invalid, or any
+     * @throws MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadConfiguration( String url, ClassLoader loader )
-        throws MappingException
-    {
-        DatabaseRegistry.loadDatabase( new InputSource( url ), null, loader );
+    public static void loadConfiguration(final String url,
+                                         final ClassLoader loader)
+    throws MappingException {
+        DatabaseRegistry.loadDatabase(new InputSource(url), null, loader);
     }
     
     /**
@@ -730,92 +743,100 @@ public class JDO
      * @param source The JDO configuration file
      * @param resolver An optional entity resolver
      * @param loader The class loader to use, null for the default
-     * @throw MappingException The mapping file is invalid, or any
+     * @throws MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadConfiguration( InputSource source, EntityResolver resolver,
-                                          ClassLoader loader )
-        throws MappingException
-    {
-        DatabaseRegistry.loadDatabase( source, resolver, loader );
+    public static void loadConfiguration(final InputSource source,
+                                         final EntityResolver resolver, 
+                                         final ClassLoader loader)
+    throws MappingException {
+        DatabaseRegistry.loadDatabase(source, resolver, loader);
     }
 
     /**
-     * Creates a JNDI reference from the current JDO instance, to be bound to a JNDI tree.
+     * Creates a JNDI reference from the current JDO instance, to be bound to
+     * a JNDI tree.
+     * 
      * @return valid A JNDI Reference.
-     * @exception NamingException If the Reference cannot be created. 
+     * @throws NamingException If the Reference cannot be created.
+     *  
      * @see javax.naming.Referenceable#getReference()
      */
-    public synchronized Reference getReference()
-    	throws NamingException
-    {
-    	Reference ref;
-    	
-    	if (_jdoConfURI == null) {
-    		throw new NamingException ("JDO instance does not have a valid configuration URI set.");
-    	}
-    	
-    	// We use same object as factory.
-    	ref = new Reference( getClass().getName(), getClass().getName(), null );
-    	
-    	if ( _description != null )
-    		ref.add( new StringRefAddr( "description", _description ) );
-    	if ( _dbName != null )
-    		ref.add( new StringRefAddr( "databaseName", _dbName ) );
-    	if ( _jdoConfURI != null )
-    		ref.add( new StringRefAddr( "configuration", _jdoConfURI ) );
-    	ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
-    	
-    	return ref;
+    public synchronized Reference getReference() throws NamingException {
+        Reference ref;
+        
+        if (_jdoConfURI == null) {
+            throw new NamingException(
+                "JDO instance does not have a valid configuration URI set.");
+        }
+        
+        // We use same object as factory.
+        ref = new Reference(getClass().getName(), getClass().getName(), null);
+        
+        if (_description != null) {
+            ref.add(new StringRefAddr("description", _description));
+        }
+        if (_dbName != null) {
+            ref.add(new StringRefAddr("databaseName", _dbName));
+        }
+        if (_jdoConfURI != null) {
+            ref.add(new StringRefAddr("configuration", _jdoConfURI));
+        }
+        ref.add(new StringRefAddr("lockTimeout",
+                Integer.toString(_lockTimeout)));
+        
+        return ref;
     }
-
 
     /**
-     * Creates an instance of JDO from a JNDI reference. 
-     * @see javax.naming.spi.ObjectFactory#getObjectInstance(java.lang.Object, javax.naming.Name, javax.naming.Context, java.util.Hashtable)
+     * Creates an instance of JDO from a JNDI reference.
+     *  
+     * @see javax.naming.spi.ObjectFactory
      */
-    public Object getObjectInstance( Object refObj, Name name, Context nameCtx, Hashtable env )
-        throws NamingException
-    {
-    	Reference ref;
-    	
-    	// Can only reconstruct from a reference.
-    	if ( refObj instanceof Reference ) {
-    		ref = (Reference) refObj;
-    		// Make sure reference is of datasource class.
-    		if (!ref.getClassName().equals( getClass().getName() ) ) {
-    			throw new NamingException( "Reference not constructed from class " + getClass().getName() );
-    		}    			
-    		
-    		JDO     jdo;
-    		RefAddr addr;
-    		
-    		try {
-    			jdo = (JDO) Class.forName( ref.getClassName() ).newInstance();
-    		} catch ( Exception except ) {
-    			throw new NamingException( except.toString() );
-    		}
-    		addr = ref.get( "description" );
-    		if ( addr != null )
-    			jdo._description = (String) addr.getContent();
-    		addr = ref.get( "databaseName" );
-    		if ( addr != null )
-    			jdo._dbName = (String) addr.getContent();
-    		addr = ref.get( "configuration" );
-    		if ( addr != null )
-    			jdo._jdoConfURI = (String) addr.getContent();
-    		addr = ref.get( "lockTimeout" );
-    		if ( addr != null )
-    			jdo._lockTimeout = Integer.parseInt( (String) addr.getContent() );
-    		return jdo;
-    			
-    		
-    	} else if ( refObj instanceof Remote )
-    		return refObj;
-    	else
-    		return null;
+    public Object getObjectInstance(final Object refObj, final Name name,
+                                    final Context nameCtx, final Hashtable env)
+    throws NamingException {
+        Reference ref;
+        
+        // Can only reconstruct from a reference.
+        if (refObj instanceof Reference) {
+            ref = (Reference) refObj;
+            // Make sure reference is of datasource class.
+            if (!ref.getClassName().equals(getClass().getName())) {
+                throw new NamingException(
+                        "Reference not constructed from class "
+                        + getClass().getName());
+            }
+            
+            JDO     jdo;
+            RefAddr addr;
+            
+            try {
+                jdo = (JDO) Class.forName(ref.getClassName()).newInstance();
+            } catch (Exception ex) {
+                throw new NamingException(ex.toString());
+            }
+            addr = ref.get("description");
+            if (addr != null) {
+                jdo._description = (String) addr.getContent();
+            }
+            addr = ref.get("databaseName");
+            if (addr != null) {
+                jdo._dbName = (String) addr.getContent();
+            }
+            addr = ref.get("configuration");
+            if (addr != null) {
+                jdo._jdoConfURI = (String) addr.getContent();
+            }
+            addr = ref.get("lockTimeout");
+            if (addr != null) {
+                jdo._lockTimeout = Integer.parseInt((String) addr.getContent());
+            }
+            return jdo;
+        } else if (refObj instanceof Remote) {
+            return refObj;
+        } else {
+            return null;
+        }
     }
-    
 }
-
-

@@ -9,7 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDO2;
+import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.mapping.Mapping;
@@ -45,7 +45,7 @@ public class Test
     private Mapping  _mapping;
 
 
-    private JDO2      _jdo;
+    private JDOManager      _jdo;
 
 
     public static void main( String[] args )
@@ -75,8 +75,8 @@ public class Test
          _mapping.loadMapping( getClass().getResource( MappingFile ) );
 
          String jdoConf =  getClass().getResource( JdoConfFile ).toString();
-         JDO2.loadConfiguration (jdoConf);
-         _jdo = JDO2.createInstance("test");
+         JDOManager.loadConfiguration (jdoConf);
+         _jdo = JDOManager.createInstance("test");
     }
 
 
