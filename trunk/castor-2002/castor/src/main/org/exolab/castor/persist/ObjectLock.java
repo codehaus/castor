@@ -94,6 +94,9 @@ final class ObjectLock
 {
 
 
+    final static boolean TRACE = false;
+
+
     /**
      * The object being locked, null if the object has been deleted.
      */
@@ -239,6 +242,8 @@ final class ObjectLock
                         _writeLock = tx;
                     else
                         _readLock = new LinkedTx( tx, null );
+                    if ( TRACE )
+                        System.out.println( "Acquired on " + toString() + " by " + tx );
                     return _object;
                 } else if ( write && _writeLock == null &&
                             _readLock.tx == tx && _readLock.next == null ) {
@@ -246,6 +251,8 @@ final class ObjectLock
                     // Order is important in case thread is stopped in the middle
                     _readLock = null;
                     _writeLock = tx;
+                    if ( TRACE )
+                        System.out.println( "Acquired on " + toString() + " by " + tx );
                     return _object;
                 } else if ( ! write && _writeLock == null && _writeWaiting == null ) {
                     // Looking for read lock and no write locks, can acquire
@@ -259,13 +266,20 @@ final class ObjectLock
                             return _object;
                         read = read.next;
                     }
+                    if ( TRACE )
+                        System.out.println( "Acquired on " + toString() + " by " + tx );
                     _readLock = new LinkedTx( tx, _readLock );
                     return _object;
                 } else {
                     // Don't wait if timeout is zero
-                    if ( timeout == 0 )
+                    if ( timeout == 0 ) {
+                        if ( TRACE )
+                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
                         throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
                                                                "persist.readLockTimeout" );
+                    }
+                    if ( TRACE )
+                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
 		    // Detect possibility of dead-lock. Must remain in wait-on-lock
 		    // position until lock is granted or exception thrown.
 		    tx.setWaitOnLock( this );
@@ -289,10 +303,10 @@ final class ObjectLock
 			throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
                                                                "persist.readLockTimeout" );
 		    }
-		    if ( _object == null ) {
+		    if ( _object == null )
 			// If object has been deleted while waiting for lock, report deletion.
 			throw new ObjectDeletedWaitingForLockException();
-		    }
+
 		    // Try to re-acquire lock, this time less timeout,
 		    // eventually timeout of zero will either succeed or fail
 		    // without blocking.
@@ -322,6 +336,8 @@ final class ObjectLock
      */
     synchronized void release( TransactionContext tx )
     {
+        if ( TRACE )
+            System.out.println( "Release " + this.toString() + " by " + tx );
         try {
             tx.setWaitOnLock( null );
             if ( _writeLock == tx ) {
@@ -348,10 +364,11 @@ final class ObjectLock
             // acquire lock. First one to succeed wins (or multiple if
             // waiting for read lock).
             notifyAll();
-        } catch ( Throwable death ) {
+        } catch ( ThreadDeath death ) {
             // This operation must never fail, not even in the
             // event of a thread death
             release( tx );
+            throw death;
         }
     }
 
@@ -370,15 +387,18 @@ final class ObjectLock
     {
         if ( tx != _writeLock )
             throw new RuntimeException( Messages.message( "persist.notOwnerLock" ) );
+        if ( TRACE )
+            System.out.println( "Delete " + this.toString() + " by " + tx );
         try {
             // Mark lock as unlocked and deleted, notify all waiting transactions
             _object = null;
             _writeLock = null;
             notifyAll();
-        } catch ( Throwable death ) {
+        } catch ( ThreadDeath death ) {
             // Delete operation must never fail, not even in the
             // event of a thread death
             release( tx );
+            throw death;
         }
     }
 
@@ -500,11 +520,19 @@ final class ObjectLock
                     }
                 }
             }
-        } catch ( Throwable death ) {
+        } catch ( ThreadDeath death ) {
             // This operation must never fail, not even in the
             // event of a thread death
             removeWaiting( tx );
+            throw death;
         }
+    }
+
+
+    public String toString()
+    {
+        return _oid.toString() + " " + ( ( _readLock == null ? "-" : "R" ) + "/" +
+                                         ( _writeLock == null ? "-" : "W" ) );
     }
 
 
