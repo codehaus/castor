@@ -8,7 +8,7 @@
 
 	    <release version="0.9.6 RC3">
     		<description>Bug fixes in Castor JDO.</description>
-    		<date>January xx, 2005</date>
+    		<date>January 11, 2005</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
 				<p>Preparations for the final release have started. Since the second release candidate, 
@@ -1382,7 +1382,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1689">
 					<description>
-				       Added code to support is<FieldName>() methods for boolean properties in 
+				       Added code to support is&lt;FieldName&gt;() methods for boolean properties in 
 				       addition to standard getter.
 					</description>
 					<contributor>
@@ -1439,8 +1439,8 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1689">
 					<description>
-						FieldMolder now looks for is<FieldName>() methods for boolean properties, 
-						in addition to standard get<FieldName>() methods.
+						FieldMolder now looks for is&lt;FieldName&gt;() methods for boolean properties, 
+						in addition to standard get&lt;FieldName&gt;() methods.
 					</description>
 					<contributor>
 						<name>Martin Fuchs</name>
@@ -1551,7 +1551,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 					<module>Core</module>
 					<date>20040902</date>
 				</bug>
-				<bug id=1445"">
+				<bug id="1445">
 					<description>
 						Added clearCache() method to CastorTestCase, and fixed a problem in test 
 						data setup in src/tests/jdo/OqlExtends.java
@@ -2032,7 +2032,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 					<description>
 						Added code to support org.exolab.castor.types.Duration as a native 
 						type in Castor JDO. Added convertors for type conversion 
-						org.exolab.castor.types.Duration <--> java.lang.Long.
+						org.exolab.castor.types.Duration &lt;-&gt; java.lang.Long.
 					</description>
 					<contributor>
 						<name>Tomasz Piontek</name>
