@@ -300,10 +300,10 @@ public final class SQLTypes
             return rs.getDate( index );
         case Types.TIMESTAMP:
             return rs.getTimestamp( index ); 
+        case Types.FLOAT:
         case Types.DOUBLE:
             doubleVal = rs.getDouble( index );
             return ( rs.wasNull() ? null : new Double( doubleVal ) );
-        case Types.FLOAT:
         case Types.REAL:
             floatVal = rs.getFloat( index );
             return ( rs.wasNull() ? null : new Float( floatVal ) );
