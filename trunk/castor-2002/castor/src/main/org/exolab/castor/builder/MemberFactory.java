@@ -622,9 +622,47 @@ public class MemberFactory {
         if (enum.hasMoreElements()) {
             //-- just use first <info>
             Documentation documentation = (Documentation) enum.nextElement();
-            return documentation.getContent();
+            return normalize(documentation.getContent());
         }
         return null;
     } //-- createComment
+
+    /**
+     * Normalizes the given string for use in comments
+     *
+     * @param value the String to normalize
+    **/
+    private String normalize (String value) {
+
+        if (value == null) return null;
+
+        char[] chars = value.toCharArray();
+        char[] newChars = new char[chars.length];
+        int count = 0;
+        int i = 0;
+        boolean skip = false;
+        
+        while (i < chars.length) {
+            char ch = chars[i++];
+            
+            if ((ch == ' ') || (ch == '\t')) {
+                if ((!skip) && (count != 0)) {
+                    newChars[count++] = ' ';
+                }
+                skip = true;
+            }
+            else {
+                if (count == 0) {
+                    //-- ignore new lines only if count == 0
+                    if ((ch == '\r') || (ch == '\n')) {
+                        continue;
+                    }
+                }
+                newChars[count++] = ch;
+                skip = false;
+            }
+        }
+        return new String(newChars,0,count);
+    }
 
 } //-- MemberFactory
