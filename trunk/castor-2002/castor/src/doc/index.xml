@@ -34,6 +34,7 @@
     <section title="News">
       <p>
       <ul>
+        <li>Mar 3, 2000: Version 0.7.10, addresses performance of the cache engine</li>
         <li>Feb 25, 2000: Version 0.7.9, new mapping file, one-one relation handling</li>
         <li>Feb 4, 2000: Version 0.7.7</li>
         <li>Feb 2, 2000: Version 0.7.6, first DAX release</li>
