@@ -261,7 +261,7 @@ public final class XSInt extends XSPatternBase {
             else if (Facet.MIN_INCLUSIVE.equals(name))
                 setMinInclusive(facet.toInt());
             else if (Facet.PATTERN.equals(name)) {
-                addPattern(facet.getValue());
+                setPattern(facet.getValue());
             }
 
         }
@@ -356,18 +356,12 @@ public final class XSInt extends XSPatternBase {
             jsc.append(");");
         }
         //-- pattern facet
-        String[] patterns = getPatterns();
-        if (patterns != null) {
-            int i = 0;
-            while (i<patterns.length) {
-                 String pattern = patterns[i];
-                 if (pattern != null) {
-                       jsc.add("typeValidator.addPattern(\"");
-                       jsc.append(escapePattern(pattern));
-                       jsc.append("\");");
-                 }     
-             }
-         }
+        String pattern = getPattern();
+        if (pattern != null) {
+            jsc.add("typeValidator.setPattern(\"");
+            jsc.append(escapePattern(pattern));
+            jsc.append("\");");
+        }
         jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 		
      }
