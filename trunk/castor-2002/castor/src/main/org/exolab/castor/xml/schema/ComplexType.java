@@ -65,66 +65,66 @@ public class ComplexType extends XMLType
      * The abstract flag for this ComplexType
     **/
     private boolean _abstract = false;
-    
+
     /**
      * A wildcard that represents an <anyAttribute> element if any.
      * Only one <anyAttribute> can appear inside the global scope of
      * a complexType
     **/
     private Wildcard _anyAttribute = null;
-    
+
     /**
      * The attribute declarations for this ComplexType.
     **/
     private AttributeGroupDecl _attributes = null;
-    
+
 	/**
      * The base type used in <restriction> or <extension>
     **/
     private String _baseType = null;
-    
+
     /**
      * The value of the 'block' property for this ComplexType. This
      * value may be null.
     **/
     private BlockList _block = null;
-    
+
 	/**
 	 * a flag set to true if this complexType is a complexContent
 	 */
 	private boolean _complexContent = false;
 
-    /** 
+    /**
      * The content type ("mixed", "elemOnly") for this ComplexType.
     **/
     private ContentType _content  = ContentType.elemOnly;
-    
+
     /**
      * The ContentModel for this ComplexType
     **/
     private ContentModelGroup _contentModel = null;
-    
+
     /**
      * The final property for this ComplexType. This value may be null.
     **/
     private FinalList _final = null;
-    
+
     /**
      * The unique id for this ComplexType (optional)
     **/
     private String _id = null;
-    
+
     /**
      * The parent structure for this ComplexType
      * (either an ElementDecl or a Schema)
     **/
     private Structure _parent = null;
-    
+
     /**
 	 * a flag set to true if this complexType is a restriction
 	 */
 	private boolean _restricted = false;
-	
+
     /**
 	 * a flag set to true if this complexType is a simpleContent
 	 */
@@ -137,7 +137,7 @@ public class ComplexType extends XMLType
     //------------------/
     //- Constructor(s) -/
     //------------------/
-    
+
     /**
      * Creates a new Complextype, with no name
      * @param schema the owning Schema document
@@ -225,7 +225,7 @@ public class ComplexType extends XMLType
     public Wildcard getAnyAttribute() {
         return _anyAttribute;
     }
-     
+
     /**
      * Returns the AttributeDecl associated with the given name
      * @return the AttributeDecl associated with the given name, or
@@ -264,7 +264,7 @@ public class ComplexType extends XMLType
 	public BlockList getBlock() {
 		return _block;
 	} //-- getBlock
-	
+
     /**
      * Returns the content type of this ComplexType
      * @return the content type of this ComplexType
@@ -274,7 +274,7 @@ public class ComplexType extends XMLType
     } //-- getContentType
 
     /**
-     * Returns the list of values for the final property for this 
+     * Returns the list of values for the final property for this
      * ComplexType, or null if no final values have been set.
      *
      * @return the FinalList for this ComplexType
@@ -282,7 +282,7 @@ public class ComplexType extends XMLType
     public FinalList getFinal() {
         return _final;
     } //-- getFinal
-    
+
     /**
      * Returns the Id for this ComplexType, or null if no Id has been set.
      *
@@ -291,7 +291,7 @@ public class ComplexType extends XMLType
     public String getId() {
         return _id;
     } //-- getId
-    
+
     /**
      * Returns the parent of this ComplexType, this value may be null if
      * no parent has been set.
@@ -320,7 +320,7 @@ public class ComplexType extends XMLType
     public boolean isAbstract() {
         return _abstract;
     } //-- isAbstract
-    
+
     /**
      * Returns true if this is a top level Complextype
      * @return true if this is a top level Complextype
@@ -364,7 +364,7 @@ public class ComplexType extends XMLType
     public void setAbstract(boolean isAbstract) {
         _abstract = isAbstract;
     } //-- setAbstract
-    
+
     /**
      * Sets the wildcard (anyAttribute) of the complexType
      * @exception SchemaException thrown when a wildcard as already be set
@@ -389,7 +389,31 @@ public class ComplexType extends XMLType
         _anyAttribute = wildcard;
 
      }
-     	
+
+
+    /**
+     * Removes the given Wildcard from this Group.
+     * @param wilcard the Wildcard to remove.
+     * @return true if the wildcard has been successfully removed, false otherwise.
+     */
+     public boolean removeWildcard(Wildcard wildcard) {
+         if (wildcard == null)
+            return false;
+         if (wildcard.equals(_anyAttribute)) {
+             _anyAttribute = null;
+             return true;
+         }
+         return false;
+
+     }
+
+     public void addWildcard(Wildcard wildcard)
+         throws SchemaException
+     {
+        setAnyAttribute(wildcard);
+     }
+
+
     /**
      * Sets the base type that this type is derived from
      * @param base the type that this type is derived from
@@ -405,11 +429,11 @@ public class ComplexType extends XMLType
 	 * ComplexType definition.
 	**/
 	public void setBlock(BlockList block) {
-	    
+
 	    if (block != null) {
 	        if (block.hasSubstitution()) {
 	            String err = "'substitution' is an illegal value of the "+
-	                "'block' attribute for a complexType definition."; 
+	                "'block' attribute for a complexType definition.";
 	            throw new IllegalArgumentException(err);
 	        }
 	    }
@@ -423,13 +447,13 @@ public class ComplexType extends XMLType
 	 * ComplexType definition.
 	**/
 	public void setBlock(String block) {
-	    if (block == null) 
+	    if (block == null)
 	        _block = null;
 	    else {
 	        setBlock(new BlockList(block));
 	    }
 	} //-- setBlock
-	
+
 	/**
 	 * Sets whether or not this complexType is a 'complexContent'
 	 * @param complexContent true if this complexType is a 'complexContent'
@@ -446,7 +470,7 @@ public class ComplexType extends XMLType
     {
         _content = contentType;
     } //-- setContentType
-    
+
 	/**
 	 * Sets the value of the 'final' attribute for this ComplexType
 	 * definition.
@@ -466,12 +490,12 @@ public class ComplexType extends XMLType
 	 * ComplexType definition.
 	**/
 	public void setFinal(String finalValue) {
-	    if (finalValue == null) 
+	    if (finalValue == null)
 	        _final = null;
-	    else 
+	    else
 	        _final = new FinalList(finalValue);
 	} //-- setFinal
-	
+
     /**
      * Sets the Id for this ComplexType. The Id must be globally unique
      * within the Schema. Use a null value to remove the Id.
@@ -481,7 +505,7 @@ public class ComplexType extends XMLType
     public void setId(String id) {
         _id = id;
     } //-- setId
-    
+
 	/**
 	 * Sets whether or not this complexType is a 'simpleContent'
 	 * @param complexContent true if this complexType is a 'simpleContent'
@@ -664,8 +688,8 @@ public class ComplexType extends XMLType
     } //-- getParticleCount
 
 
-     
-	
+
+
 
     //-------------------------------/
     //- Implementation of Structure -/

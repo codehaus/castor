@@ -174,15 +174,19 @@ public class WildcardUnmarshaller extends SaxUnmarshaller {
          */
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
         if (attValue != null) {
+            if (_wildcard.isAttributeWildcard())
+                throw new IllegalStateException("'maxOccurs' is prohibited on a <anyAttribute> element.");
             if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
             int maxOccurs = toInt(attValue);
             _wildcard.setMaxOccurs(maxOccurs);
         }
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
-        if (attValue != null)
+        if (attValue != null) {
+             if (_wildcard.isAttributeWildcard())
+                throw new IllegalStateException("'minOccurs' is prohibited on a <anyAttribute> element.");
             _wildcard.setMinOccurs(toInt(attValue));
-
+        }
         //-- processContents
         attValue = atts.getValue("processContents");
 

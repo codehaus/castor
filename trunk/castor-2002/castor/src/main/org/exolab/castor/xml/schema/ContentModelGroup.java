@@ -99,13 +99,28 @@ public interface ContentModelGroup {
     public void addGroup(ModelGroup group)
         throws SchemaException;
 
-
     /**
      * Removes the given ModelGroup Definition from this ContentModelGroup.
      * @param group the ModelGroup Definition to remove.
      * @return true if the group has been successfully removed, false otherwise.
      */
      public boolean removeGroup(ModelGroup group);
+
+    /**
+     * Adds the given wildcard to this ContentModelGroup
+     * @param wilcard the wilcard to add
+     * @exception SchemaException when the wilcard is <anyAttribute> and
+     * not <any>
+     */
+     public void addWildcard(Wildcard wilcard)
+         throws SchemaException;
+
+    /**
+     * Removes the given Wildcard from this ContentModelGroup.
+     * @param group the Wilcard to remove.
+     * @return true if the wildcard has been successfully removed, false otherwise.
+     */
+     public boolean removeWildcard(Wildcard wildcard);
 
     /**
      * Returns an enumeration of all the Particles contained
