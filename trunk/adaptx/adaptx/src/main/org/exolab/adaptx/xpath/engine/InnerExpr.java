@@ -26,6 +26,7 @@ import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathResult;
 
+import org.exolab.adaptx.xpath.expressions.GroupedExpression;
 import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
 
 /**
@@ -33,7 +34,9 @@ import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class InnerExpr extends PrimaryExpr {
+class InnerExpr 
+    extends PrimaryExpr implements GroupedExpression
+{
     
     private XPathExpression _expr = null;
 
@@ -72,6 +75,15 @@ class InnerExpr extends PrimaryExpr {
             
         throw new XPathException("missing expression after '('");
     } //-- evaluate
+    
+    /**
+     * Returns the underlying expression of this grouping
+     * 
+     * @param returns the underlying XPath expresion 
+     */
+    public XPathExpression getExpression() {
+        return _expr;
+    } //-- getExpression
     
     /**
      * Returns the String representation of this PrimaryExpr
