@@ -47,13 +47,13 @@
 package org.exolab.castor.jdo.transactionmanager.spi;
 
 
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
-import org.exolab.castor.util.Messages;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.transaction.TransactionManager;
+
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
+import org.exolab.castor.util.Messages;
 
 /**
   * An IBM Websphere 4 and prior specific factory for acquiring transactions

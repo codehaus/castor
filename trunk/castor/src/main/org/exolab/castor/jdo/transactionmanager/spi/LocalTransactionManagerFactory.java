@@ -47,8 +47,9 @@
 package org.exolab.castor.jdo.transactionmanager.spi;
 
 
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import javax.transaction.TransactionManager;
+
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 
 /**
  * Default transaction manager when Castor is used in standalone mode,

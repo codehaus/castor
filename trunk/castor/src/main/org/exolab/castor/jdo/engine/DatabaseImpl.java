@@ -48,36 +48,35 @@ package org.exolab.castor.jdo.engine;
 
 
 import javax.transaction.Status;
-import javax.transaction.Transaction;
-import javax.transaction.SystemException;
 import javax.transaction.Synchronization;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.Query;
-import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
-import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
-import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.ObjectNotPersistentException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
-import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
-import org.exolab.castor.persist.spi.InstanceFactory;
+import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.util.Messages;
 
 

@@ -47,15 +47,14 @@
 package org.exolab.castor.jdo.transactionmanager.spi;
 
 
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
-import org.exolab.castor.util.Messages;
-
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NoInitialContextException;
 import javax.transaction.TransactionManager;
+
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
+import org.exolab.castor.util.Messages;
 
 /**
  * Transaction manager factory instance to be used with J2EE containers
