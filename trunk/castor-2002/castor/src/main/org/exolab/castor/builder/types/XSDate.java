@@ -58,7 +58,7 @@ public final class XSDate extends XSType {
      * The JType represented by this XSType
     **/
     private static final JType jType
-        = new JClass("org.exolab.castor.types.DateType");
+        = new JClass("org.exolab.castor.types.Date");
         //("java.sql.Date");
 
     private String value = null;
