@@ -165,15 +165,15 @@ public class Century extends TimePeriod {
      */
      public String toString() {
 
-        String result = null;
+        StringBuffer result = new StringBuffer();
 
-        result = String.valueOf(this.getCentury());
+        result.append(String.valueOf(this.getCentury()));
         if (result.length() == 1)
-            result = "0"+result;
+            result.insert(0,0);
 
-        result = isNegative() ? "-"+result : result;
-
-        return result;
+        if (isNegative())
+           result.insert(0,"-");
+        return result.toString();
 
     }//toString
 
