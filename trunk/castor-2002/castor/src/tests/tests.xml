@@ -1,50 +1,50 @@
-<jtf:harness name="castor">
+<harness name="castor">
 
-  <jtf:category name="sybase" class="jdo.JDOCategory">
-    <jtf:description>JDO tests for Sybase 11</jtf:description>
-    <jdo:jdo database-name="sybase" configuration="sybase.xml" />
-    <jtf:case class="jdo.Concurrent" />
-    <jtf:case class="jdo.Deadlock" />
-    <jtf:case class="jdo.DuplicateKey" />
-    <jtf:case class="jdo.ReadOnly" />
-    <jtf:case class="jdo.TypeHandling"/>
-    <jtf:case class="jdo.Join" />
-    <jtf:case class="jdo.KeyGenGeneric" />
-    <jtf:case class="jdo.KeyGenIdentity" />
-    <jtf:case class="jdo.StoredProcedure" />
-  </jtf:category>
+  <category name="sybase" class="jdo.JDOCategory">
+    <description>JDO tests for Sybase 11</description>
+    <jdo database-name="sybase" configuration="sybase.xml" />
+    <case class="jdo.Concurrent" />
+    <case class="jdo.Deadlock" />
+    <case class="jdo.DuplicateKey" />
+    <case class="jdo.ReadOnly" />
+    <case class="jdo.TypeHandling"/>
+    <case class="jdo.Join" />
+    <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenIdentity" />
+    <case class="jdo.StoredProcedure" />
+  </category>
 
 <!--
-  <jtf:category name="postgres" class="jdo.JDOCategory">
-    <jtf:description>JDO tests for PostgreSQL 6.5/7</jtf:description>
-    <jdo:jdo database-name="postgres" configuration="postgres.xml" />
-    <jtf:case class="jdo.Concurrent" />
-    <jtf:case class="jdo.Deadlock" />
-    <jtf:case class="jdo.DuplicateKey" />
-    <jtf:case class="jdo.ReadOnly" />
-    <jtf:case class="jdo.TypeHandling" />
-    <jtf:case class="jdo.KeyGenGeneric" />
-    <jtf:case class="jdo.KeyGenSequence" />
-  </jtf:category>
+  <category name="postgres" class="jdo.JDOCategory">
+    <description>JDO tests for PostgreSQL 6.5/7</description>
+    <jdo database-name="postgres" configuration="postgres.xml" />
+    <case class="jdo.Concurrent" />
+    <case class="jdo.Deadlock" />
+    <case class="jdo.DuplicateKey" />
+    <case class="jdo.ReadOnly" />
+    <case class="jdo.TypeHandling" />
+    <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenSequence" />
+  </category>
 
-  <jtf:category name="oracle" class="jdo.JDOCategory">
-    <jtf:description>JDO tests for Oracle8i</jtf:description>
-    <jdo:jdo database-name="oracle" configuration="oracle.xml" />
-    <jtf:case class="jdo.Concurrent" />
-    <jtf:case class="jdo.Deadlock" />
-    <jtf:case class="jdo.DuplicateKey" />
-    <jtf:case class="jdo.ReadOnly" />
-    <jtf:case class="jdo.Join" />
-    <jtf:case class="jdo.KeyGenGeneric" />
-    <jtf:case class="jdo.KeyGenSequence" />
-    <jtf:case class="jdo.KeyGenReturning" />
-  </jtf:category>
+  <category name="oracle" class="jdo.JDOCategory">
+    <description>JDO tests for Oracle8i</description>
+    <jdo database-name="oracle" configuration="oracle.xml" />
+    <case class="jdo.Concurrent" />
+    <case class="jdo.Deadlock" />
+    <case class="jdo.DuplicateKey" />
+    <case class="jdo.ReadOnly" />
+    <case class="jdo.Join" />
+    <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenSequence" />
+    <case class="jdo.KeyGenReturning" />
+  </category>
 -->
 
-  <jtf:category name="xml" class="xml.XMLCategory">
-    <jtf:description>Tests for XML marshalling framework</jtf:description>
-    <jtf:case class="xml.Inheritance" />
-  </jtf:category>
+  <category name="xml" class="xml.XMLCategory">
+    <description>Tests for XML marshalling framework</description>
+    <case class="xml.Inheritance" />
+  </category>
 
-</jtf:harness>
+</harness>
 
