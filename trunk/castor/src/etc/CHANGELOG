@@ -1,6 +1,13 @@
 
 Version (CVS) 
 -------------
+
+JDO:   Fixed bug 1628.
+       Brought configuration of <data-source> in line with <driver>, switching
+       from <params> to a sequence of <param> elements.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1628
+       (Werner - 20040901)
+
 JDO:   Added the Castor Ant Task and an Ant target to the build jar.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=885
        (Bruce - 20041007)
@@ -360,6 +367,7 @@ XML:   Fix for bug 1632. StringValidator.normalize wasn't handling empty
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1632
        (kvisco - 20040511)
 
+>>>>>>> 1.99
 XML:   Performance change to org.exolab.castor.util.List to demand create internal Object[]
        From various performance improvements contributed by Ian Richards (also CODA)
        (afawcett - 20040510)
