@@ -261,7 +261,7 @@ public final class XSInt extends XSPatternBase {
             else if (Facet.MIN_INCLUSIVE.equals(name))
                 setMinInclusive(facet.toInt());
             else if (Facet.PATTERN.equals(name)) {
-                setPattern(facet.getValue());
+                addPattern(facet.getValue());
             }
 
         }
@@ -280,7 +280,7 @@ public final class XSInt extends XSPatternBase {
        if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
-            StringBuffer sb = new StringBuffer("new Integer(");
+            StringBuffer sb = new StringBuffer("new java.lang.Integer(");
             sb.append(variableName);
             sb.append(")");
             return sb.toString();
@@ -296,7 +296,7 @@ public final class XSInt extends XSPatternBase {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-       StringBuffer sb = new StringBuffer("((Integer)");
+       StringBuffer sb = new StringBuffer("((java.lang.Integer)");
        sb.append(variableName);
        sb.append(")");
        if (!_asWrapper)
@@ -356,12 +356,18 @@ public final class XSInt extends XSPatternBase {
             jsc.append(");");
         }
         //-- pattern facet
-        String pattern = getPattern();
-        if (pattern != null) {
-            jsc.add("typeValidator.setPattern(\"");
-            jsc.append(escapePattern(pattern));
-            jsc.append("\");");
-        }
+        String[] patterns = getPatterns();
+        if (patterns != null) {
+            int i = 0;
+            while (i<patterns.length) {
+                 String pattern = patterns[i];
+                 if (pattern != null) {
+                       jsc.add("typeValidator.addPattern(\"");
+                       jsc.append(escapePattern(pattern));
+                       jsc.append("\");");
+                 }     
+             }
+         }
         jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 		
      }

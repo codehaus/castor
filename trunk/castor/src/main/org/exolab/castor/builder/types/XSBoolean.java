@@ -98,7 +98,7 @@ public final class XSBoolean extends XSType {
         if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
-            StringBuffer sb = new StringBuffer("new Boolean(");
+            StringBuffer sb = new StringBuffer("new java.lang.Boolean(");
             sb.append(variableName);
             sb.append(")");
             return sb.toString();
@@ -114,7 +114,7 @@ public final class XSBoolean extends XSType {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Boolean)");
+        StringBuffer sb = new StringBuffer("((java.lang.Boolean)");
         sb.append(variableName);
         sb.append(")");
         if (!_asWrapper) {

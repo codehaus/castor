@@ -251,11 +251,12 @@ public final class XSShort extends XSPatternBase {
 				setMinInclusive(facet.toShort());
 			//-- pattern
 			else if (Facet.PATTERN.equals(name))
-				setPattern(facet.getValue());
+				addPattern(facet.getValue());
 
 		}
 
 	} //-- toXSShort
+    
 	/**
 	 * Returns the String necessary to convert an instance of this XSType
 	 * to an Object. This method is really only useful for primitive types
@@ -267,7 +268,7 @@ public final class XSShort extends XSPatternBase {
 		if (_asWrapper)
 			return super.createToJavaObjectCode(variableName);
 		else {
-			StringBuffer sb = new StringBuffer("new Short(");
+			StringBuffer sb = new StringBuffer("new java.lang.Short(");
 			sb.append(variableName);
 			sb.append(")");
 			return sb.toString();
@@ -283,7 +284,7 @@ public final class XSShort extends XSPatternBase {
 	 * instance of this XSType
 	**/
 	public String createFromJavaObjectCode(String variableName) {
-		StringBuffer sb = new StringBuffer("((Short)");
+		StringBuffer sb = new StringBuffer("((java.lang.Short)");
 		sb.append(variableName);
 		sb.append(")");
 		if (!_asWrapper) {
@@ -342,13 +343,20 @@ public final class XSShort extends XSPatternBase {
 			jsc.append(fixedValue);
 			jsc.append(");");
 		}
-		//-- pattern facet
-		String pattern = getPattern();
-		if (pattern != null) {
-			jsc.add("typeValidator.setPattern(\"");
-			jsc.append(escapePattern(pattern));
-			jsc.append("\");");
-		}
+        //-- pattern facet
+        String[] patterns = getPatterns();
+        if (patterns != null) {
+            int i = 0;
+            while (i<patterns.length) {
+                 String pattern = patterns[i];
+                 if (pattern != null) {
+                       jsc.add("typeValidator.addPattern(\"");
+                       jsc.append(escapePattern(pattern));
+                       jsc.append("\");");
+                 }     
+             }
+             i++;
+         }
 		jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 		
 	}

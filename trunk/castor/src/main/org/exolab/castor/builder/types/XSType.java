@@ -344,7 +344,9 @@ public abstract class XSType {
 
 	/**
 	 * Returns a list of Facets from the simpleType
-	 *	(duplicate facets due to extension are filtered out)
+	 *(duplicate facets due to extension are filtered out).
+     * This rule does not apply for the pattern facet.
+     * 
      * @param simpletype the Simpletype we want the facets for
      * @return Unique list of facets from the simple type
 	 */
@@ -352,11 +354,16 @@ public abstract class XSType {
 	{
 		Hashtable hashTable = new Hashtable();
         Enumeration enum = simpleType.getFacets();
-		while (enum.hasMoreElements()) {
+		int counter = 0;
+        while (enum.hasMoreElements()) {
 
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();
-			hashTable.put(name, facet);
+			if (name.equals("pattern")) {
+                name = name + counter;
+                counter++;        
+            }
+            hashTable.put(name, facet);
 		}
 		return hashTable.elements();
 	}

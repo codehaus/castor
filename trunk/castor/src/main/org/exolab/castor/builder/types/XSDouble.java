@@ -250,7 +250,7 @@ public final class XSDouble extends XSPatternBase {
                 setMinInclusive(facet.toDouble());
             //-- pattern
             else if (Facet.PATTERN.equals(name))
-                setPattern(facet.getValue());
+                addPattern(facet.getValue());
         }
     }
 
@@ -265,7 +265,7 @@ public final class XSDouble extends XSPatternBase {
         if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
-            StringBuffer sb = new StringBuffer("new Double(");
+            StringBuffer sb = new StringBuffer("new java.lang.Double(");
             sb.append(variableName);
             sb.append(")");
             return sb.toString();
@@ -281,7 +281,7 @@ public final class XSDouble extends XSPatternBase {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Double)");
+        StringBuffer sb = new StringBuffer("((java.lang.Double)");
         sb.append(variableName);
         sb.append(")");
         if (!_asWrapper) {
@@ -338,13 +338,22 @@ public final class XSDouble extends XSPatternBase {
              jsc.append(fixedValue);
              jsc.append(");");
         }               //-- pattern facet
-        String pattern = getPattern();
-        if (pattern != null) {
-             jsc.add("typeValidator.setPattern(\"");
-             jsc.append(escapePattern(pattern));
-             jsc.append("\");");
-        }
-        jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
+        //-- pattern facet
+        String[] patterns = getPatterns();
+        if (patterns != null) {
+            int i = 0;
+            while (i<patterns.length) {
+                 String pattern = patterns[i];
+                 if (pattern != null) {
+                       jsc.add("typeValidator.addPattern(\"");
+                       jsc.append(escapePattern(pattern));
+                       jsc.append("\");");
+                 }     
+             }
+             i++;
+         }
+        
+         jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 
 		
     }

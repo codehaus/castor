@@ -198,7 +198,7 @@ public final class XSQName extends XSPatternBase {
             else if (Facet.LENGTH.equals(name))
                 setLength(facet.toInt());
             else if (Facet.PATTERN.equals(name))
-                setPattern(facet.getValue());
+                addPattern(facet.getValue());
 
         }
     }
