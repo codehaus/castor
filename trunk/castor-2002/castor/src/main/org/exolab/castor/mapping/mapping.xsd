@@ -11,8 +11,9 @@
     *Note*: This schema is under evolution and subject to change.
 
  -->
-<schema>
-
+<xsd:schema xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+  targetNamespace="http://castor.exolab.org/"
+  version="0.8">
 
   <element name="mapping">
     <type content="elemOnly" order="seq">

@@ -68,6 +68,7 @@
   <target name="clean">
     <deltree dir="${build}"/>
     <deltree dir="${dist}"/>
+    <deltree dir="${schema}"/>
   </target>
 
 

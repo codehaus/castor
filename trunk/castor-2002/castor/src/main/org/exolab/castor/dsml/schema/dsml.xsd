@@ -3,7 +3,7 @@
 <!-- XML Schema Description for DSML -->
 <!-- Last updated: 1999-11-30        -->
 
-<schema
+<xsd:schema xmlns:xsd="http://www.w3.org/1999/XMLSchema"
   targetNS="http://www.dsml.org/DSML"
   version="1.0"
   xmlns="http://www.w3.org/1999/09/24-xmlschema">
