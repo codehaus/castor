@@ -92,7 +92,7 @@ public class Marshaller extends MarshalFramework {
      * The XSI Namespace URI
     **/
     public static final String XSI_NAMESPACE
-        = "http://www.w3.org/2000/10/XMLSchema-instance";
+        = "http://www.w3.org/2001/XMLSchema-instance";
 
     /**
      * The namespace declaration String
@@ -113,14 +113,14 @@ public class Marshaller extends MarshalFramework {
      * The CDATA type..uses for SAX attributes
     **/
     private static final String CDATA = "CDATA";
-    
-    
+
+
     /**
      * A static flag used to enable debugging when using
      * the static marshal methods.
     **/
     public static boolean enableDebug = false;
-    
+
     /**
      * A flag indicating whether or not to generate
      * debug information
@@ -445,9 +445,9 @@ public class Marshaller extends MarshalFramework {
     public static void marshal(Object object, Writer out)
         throws MarshalException, ValidationException
     {
-        if (object == null) 
+        if (object == null)
             throw new MarshalException("object must not be null");
-            
+
         if (enableDebug) {
             System.out.print("- Marshaller called using ");
             System.out.println("*static* marshal(Object, Writer)");
@@ -472,9 +472,9 @@ public class Marshaller extends MarshalFramework {
     public static void marshal(Object object, DocumentHandler handler)
         throws MarshalException, ValidationException
     {
-        if (object == null) 
+        if (object == null)
             throw new MarshalException("object must not be null");
-            
+
         if (enableDebug) {
             System.out.print("- Marshaller called using ");
             System.out.println("*static* marshal(Object, DocumentHandler)");
@@ -495,13 +495,13 @@ public class Marshaller extends MarshalFramework {
     public static void marshal(Object object, Node node)
         throws MarshalException, ValidationException
     {
-        if (object == null) 
+        if (object == null)
             throw new MarshalException("object must not be null");
-            
+
         if (enableDebug) {
             System.out.print("- Marshaller called using ");
             System.out.println("*static* marshal(Object, Node)");
-        }        
+        }
         Marshaller marshaller;
         marshaller = new Marshaller(node);
         marshaller.marshal(object);
@@ -517,9 +517,9 @@ public class Marshaller extends MarshalFramework {
     public void marshal(Object object)
         throws MarshalException, ValidationException
     {
-        if (object == null) 
+        if (object == null)
             throw new MarshalException("object must not be null");
-            
+
         if (_debug) {
             System.out.println("Marshalling " + object.getClass().getName());
         }
@@ -642,7 +642,7 @@ public class Marshaller extends MarshalFramework {
                 if (_class != descriptor.getFieldType()) {
                     saveType = (!descriptor.getFieldType().isPrimitive());
                 }
-            } 
+            }
             else {
                 //-- save package information for use when searching
                 //-- for MarshalInfo classes
@@ -693,7 +693,7 @@ public class Marshaller extends MarshalFramework {
             saveType = false;
         //-- XXXX end Date fix
         if (saveType) {
-            
+
             // XML Name associated with the class we are marshalling
             String xmlElementName = classDesc.getXMLName();
             // We try to find if there is a XMLClassDescriptor associated
@@ -816,7 +816,7 @@ public class Marshaller extends MarshalFramework {
         }
 
 
-        //-- Look for attributes in container fields, 
+        //-- Look for attributes in container fields,
         //-- (also handle container in container)
         /* REMOVED For now (KV)
         processContainerAttributes(object, classDesc, atts);
@@ -1095,11 +1095,11 @@ public class Marshaller extends MarshalFramework {
 
 
     private void processContainerAttributes
-        (Object target, XMLClassDescriptor classDesc, AttributeListImpl atts) 
+        (Object target, XMLClassDescriptor classDesc, AttributeListImpl atts)
         throws MarshalException
     {
-        
-        
+
+
         XMLFieldDescriptor[] elemDescriptors = classDesc.getElementDescriptors();
 
         for (int i = 0; i < elemDescriptors.length; i++) {
@@ -1111,7 +1111,7 @@ public class Marshaller extends MarshalFramework {
             Object containerObject = elemDescriptor.getHandler().getValue(target);
 
             if (containerObject == null) continue;
-            
+
             XMLClassDescriptor containerClassDesc = (XMLClassDescriptor)elemDescriptor.getClassDescriptor();
             if (containerClassDesc == null) {
                 containerClassDesc = getClassDescriptor(elemDescriptor.getFieldType());
@@ -1134,15 +1134,15 @@ public class Marshaller extends MarshalFramework {
                 if (value == null) continue;
                 atts.addAttribute(xmlName, CDATA, value.toString());
             }
-                
-                
+
+
             // recursively process containers
             processContainerAttributes(containerObject, containerClassDesc, atts);
         }
 
     } //-- processContainerAttributes
-    
-    
+
+
     private void validate(Object object)
         throws ValidationException
     {
