@@ -2,19 +2,26 @@
 Version (CVS)
 -------------
 
+XML:    Added push behavior for the unmarshaller with SAX producer. Made some functions public 
+        and UnmarshalHandler final.
+        (Sebastien Gignoux <gignoux@intalio.com>)
+
 XML:	Remove the xsi:type when using the generated descriptors.(Arnaud)
 
 XML:	Support for the <any> element in the Marshalling Framework.(Arnaud)
 
-XML:	Added setRootElement method to Marshaller.java to override default root element name for 	document. 
-	Usefull when using classes generated via 'type' mapping, as the root element name is not known.
-	(Andrew Fawcett, andrew.fawcett@coda.com)
+XML:    Added setRootElement method to Marshaller.java to override default root element name for 	document. 
+        Usefull when using classes generated via 'type' mapping, as the root element name is not known.
+        (Andrew Fawcett, andrew.fawcett@coda.com)
 
-XML:	Fix the Marshaller to handle correctly Vector by keeping the xsi:type information 
-	(Bug reported by Eric Kaplan (eric.kaplan@armanta.com) (Arnaud)
+XML:    Fix the Marshaller to handle correctly Vector by keeping the xsi:type information 
+        (Bug reported by Eric Kaplan (eric.kaplan@armanta.com) (Arnaud)
 
-XML: 	Fix the SourceGenerator to handle correctly the 'types' package when a Date/Time
-	type is used as an attribute.(thanks to Maria Gray <maria.gray@datalex.ie>, Christopher P. van 		        Buskirk <Chris.vanBuskirk@vanderbilt.edu> and Dean Thompson <dthompson@medebiz.net> for their 			proposed solutions) (Arnaud)
+XML: 	Fix the SourceGenerator to handle correctly the 'types' package when a
+        Date/Time type is used as an attribute.(thanks to 
+        Maria Gray <maria.gray@datalex.ie>, 
+        Christopher P. van Buskirk <Chris.vanBuskirk@vanderbilt.edu> and 
+        Dean Thompson <dthompson@medebiz.net> for their proposed solutions) (Arnaud)
 
 XML:    Removed a dependency to xerces jar in Configuration.java (Patch submitted by
         Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM> and committed by
