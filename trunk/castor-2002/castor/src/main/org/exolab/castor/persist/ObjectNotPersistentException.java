@@ -57,7 +57,7 @@ import org.exolab.castor.util.CastorException;
  * @version $Revision$ $Date$
  */
 public class ObjectNotPersistentException
-    extends CastorException
+    extends PersistenceException
 {
 
 

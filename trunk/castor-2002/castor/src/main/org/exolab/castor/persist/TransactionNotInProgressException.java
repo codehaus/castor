@@ -55,7 +55,7 @@ import org.exolab.castor.util.CastorException;
  * @version $Revision$ $Date$
  */
 public class TransactionNotInProgressException
-    extends CastorException
+    extends PersistenceException
 {
 
 

@@ -60,7 +60,7 @@ import org.exolab.castor.util.CastorException;
  * @version $Revision$ $Date$
  */
 public class TransactionAbortedException
-    extends CastorException
+    extends PersistenceException
 {
 
 

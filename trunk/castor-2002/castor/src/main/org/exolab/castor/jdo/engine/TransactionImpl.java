@@ -245,10 +245,10 @@ public final class TransactionImpl
 	    throw new LockNotGrantedException( except.getMessage() );
 	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
 	    throw new ObjectNotPersistentException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
 	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
 	}
     }
 
