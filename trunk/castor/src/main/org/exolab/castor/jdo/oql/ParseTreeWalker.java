@@ -58,6 +58,7 @@ import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.util.SqlBindParser;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
@@ -1085,30 +1086,9 @@ public class ParseTreeWalker implements TokenTypes
     String sqlExpr = getSQLExpr(whereClause.getChild(0));
 
     //Map numbered parameters
-    StringBuffer sb = new StringBuffer();
-    int startPos = 0;
-    int pos = sqlExpr.indexOf("?", startPos);
-    int SQLParamIndex = 1;
-    while ( pos != -1 ) {
-      String paramString;
-      int endPos = sqlExpr.indexOf(" ", pos);
-      if ( endPos != -1 )
-        paramString = sqlExpr.substring(pos + 1, endPos);
-      else
-        paramString = sqlExpr.substring(pos + 1);
-      Integer paramNumber = new Integer(paramString);
-      ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
-      paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append( sqlExpr.substring( startPos, pos+1 ) );	// including trailing "?"
-      startPos = endPos < 0 ? sqlExpr.length() : endPos;
-      pos = sqlExpr.indexOf("?", startPos);
-    }
-    if ( startPos < sqlExpr.length() )
-      sb.append( sqlExpr.substring( startPos ) );
+    mapBindParameters(sqlExpr);
 
-    _queryExpr.addWhereClause( sb.toString() );
-
-    _SQLParamIndex = SQLParamIndex; //Alex
+	_queryExpr.addWhereClause(sqlExpr);
   }
 
   /**
@@ -1123,30 +1103,9 @@ public class ParseTreeWalker implements TokenTypes
     String sqlExpr = getSQLExpr(limitClause/*.getChild(0)*/);
 
     //Map numbered parameters
-    StringBuffer sb = new StringBuffer();
-    int startPos = 0;
-    int pos = sqlExpr.indexOf("?", startPos);
-    int SQLParamIndex = _SQLParamIndex;
-    while ( pos != -1 ) {
-      String paramString;
-      int endPos = sqlExpr.indexOf(" ", pos);
-      if ( endPos != -1 )
-        paramString = sqlExpr.substring(pos + 1, endPos);
-      else
-        paramString = sqlExpr.substring(pos + 1);
-      Integer paramNumber = new Integer(paramString);
-      ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
-      paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append( sqlExpr.substring( startPos, pos+1 ) );	// including trailing "?"
-      startPos = endPos < 0 ? sqlExpr.length() : endPos;
-      pos = sqlExpr.indexOf("?", startPos);
-    }
-    if ( startPos < sqlExpr.length() )
-      sb.append( sqlExpr.substring( startPos ) );
+    mapBindParameters(sqlExpr);
 
-    _queryExpr.addLimitClause(sb.toString(), _SQLParamIndex, SQLParamIndex-1);
-    // System.out.println(sb.toString());
-    _SQLParamIndex = SQLParamIndex;
+	_queryExpr.addLimitClause(sqlExpr);
   }
 
   /**
@@ -1154,35 +1113,34 @@ public class ParseTreeWalker implements TokenTypes
    * @param offsetClause The parse tree node with the offset clause
    * @throws SyntaxNotSupportedException If the LIMIT clause is not supported by a RDBMS.
    */
-private void addOffsetClause(ParseTreeNode offsetClause)
+  private void addOffsetClause(ParseTreeNode offsetClause)
   	throws SyntaxNotSupportedException
   {
     String sqlExpr = getSQLExpr(offsetClause/*.getChild(0)*/);
 
     //Map numbered parameters
-    StringBuffer sb = new StringBuffer();
-    int startPos = 0;
-    int pos = sqlExpr.indexOf("?", startPos);
-    int SQLParamIndex = _SQLParamIndex;
-    while ( pos != -1 ) {
-      String paramString;
-      int endPos = sqlExpr.indexOf(" ", pos);
-      if ( endPos != -1 )
-        paramString = sqlExpr.substring(pos + 1, endPos);
-      else
-        paramString = sqlExpr.substring(pos + 1);
-      Integer paramNumber = paramNumber = new Integer(paramString);
-      ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
-      paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append( sqlExpr.substring( startPos, pos+1 ) );	// including trailing "?"
-      startPos = endPos < 0 ? sqlExpr.length() : endPos;
-      pos = sqlExpr.indexOf("?", startPos);
-    }
-    if ( startPos < sqlExpr.length() )
-      sb.append( sqlExpr.substring( startPos ) );
+    mapBindParameters(sqlExpr);
 
-    _queryExpr.addOffsetClause(sb.toString(), _SQLParamIndex, SQLParamIndex-1);
-    _SQLParamIndex = SQLParamIndex;
+	_queryExpr.addOffsetClause(sqlExpr);
+  }
+
+  /**
+   * Map numbered parameters of the given SQL expression 
+   * 
+   * @param sqlExpr
+   */
+  private void mapBindParameters(String sqlExpr)
+  {
+      SqlBindParser parser = new SqlBindParser(sqlExpr);
+
+      int SQLParamIndex = _SQLParamIndex;
+      while(parser.next()) {
+          int paramNum = parser.getParamNumber();
+          ParamInfo paramInfo = (ParamInfo) _paramInfo.get(new Integer(paramNum));
+          paramInfo.mapToSQLParam(SQLParamIndex++);
+      }
+
+      _SQLParamIndex = SQLParamIndex;
   }
 
   /**
@@ -1398,8 +1356,6 @@ private void addOffsetClause(ParseTreeNode offsetClause)
     }
 
     return "";
-
-
   }
 
 
