@@ -201,6 +201,8 @@ public final class UnmarshalHandler extends MarshalFramework
 
 
     private Hashtable _resolveTable = null;
+    
+	private Hashtable _javaPackages = null;    
 
     private ClassLoader _loader = null;
 
@@ -302,6 +304,7 @@ public final class UnmarshalHandler extends MarshalFramework
         _stateInfo          = new Stack();
         _idResolver         = new IDResolverImpl();
         _resolveTable       = new Hashtable();
+		_javaPackages 		= new Hashtable();        
         buf                 = new StringBuffer();
         _topClass           = _class;
         _namespaces         = new Namespaces();
@@ -3000,16 +3003,23 @@ public final class UnmarshalHandler extends MarshalFramework
      * @param type the Class to return the package of
      * @return the package for the given Class
     **/
-    private String getJavaPackage(Class type) {
-        if (type == null) return null;
-        String pkg = type.getName();
-        int idx = pkg.lastIndexOf('.');
-        if (idx > 0) {
-            pkg = pkg.substring(0,idx);
-        }
-        else pkg = "";
-        return pkg;
-    } //-- getJavaPackage
+	private String getJavaPackage(Class type)
+	{
+		if (type == null)
+			return null;
+		String pkg = (String)_javaPackages.get(type);
+		if(pkg == null)
+		{
+			pkg = type.getName();
+			int idx = pkg.lastIndexOf('.');
+			if (idx > 0)
+			pkg = pkg.substring(0,idx);
+			else
+			pkg = "";
+			_javaPackages.put(type, pkg);
+		}
+		return pkg;
+	} //-- getJavaPackage
 
     /**
      * Returns the name of a class, handles array types
