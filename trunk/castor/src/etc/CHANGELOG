@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:    Fixed code generation for nested groups that can occur more than once and that 
+        are the only particle of the group.
+        (Arnaud -20030523)
+
 JDO:    Fixed bug 1313: Default capacity on count-limited cache type is 30 not 100
         Fix noted by Stein M. Eliassen <stein.m.eliassen@start.no>
         (Bruce - 20030516)
