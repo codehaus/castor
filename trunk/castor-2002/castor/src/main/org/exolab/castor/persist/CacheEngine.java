@@ -908,9 +908,18 @@ public final class CacheEngine
             if ( oid.isExclusive() )
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                       fields, identity, null, null ) );
-            else
-                oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-                                                      fields, identity, original, oid.getStamp() ) );
+            else {
+                try {
+                    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
+                                                          fields, identity, original, oid.getStamp() ) );
+                } catch ( ObjectModifiedException except ) {
+                    // If object modified in database, remove it from cache
+                    typeInfo.cache.removeLock( oid );
+                    typeInfo.cache.removeOID( original );
+                    lock.delete( tx );
+                    throw except;
+                }
+            }
             oid.setExclusive( false );
         }
         return oid;
