@@ -58,7 +58,6 @@ import org.exolab.javasource.*;
 import java.util.Enumeration;
 import java.util.Vector;
 
-
 /**
  * This class creates the Java Source classes for Schema
  * components
@@ -198,6 +197,15 @@ public class SourceFactory  {
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
         state.setCreateGroupItem(createGroupItem);
+
+        //--Keeps track of the new factory state
+        if (sgState.getCurrentFactoryState() == null)
+           sgState.setCurrentFactoryState(state);
+        else {
+            state.setParent(sgState.getCurrentFactoryState());
+            sgState.setCurrentFactoryState(state);
+        }
+
         initialize(jClass);
 
         //-- set super class if necessary
@@ -377,6 +385,13 @@ public class SourceFactory  {
         JClass    jClass    = state.jClass;
         state.setCreateGroupItem(createGroupItem);
 
+        //--Keeps track of the new factory state
+        if (sgState.getCurrentFactoryState() == null)
+           sgState.setCurrentFactoryState(state);
+        else {
+            state.setParent(sgState.getCurrentFactoryState());
+            sgState.setCurrentFactoryState(state);
+        }
 		state.markAsProcessed(type);
 
 		initialize(jClass);
@@ -641,6 +656,13 @@ public class SourceFactory  {
         JClass    jClass    = state.jClass;
         state.setCreateGroupItem(createGroupItem);
 		state.markAsProcessed(group);
+        //--Keeps track of the new factory state
+        if (sgState.getCurrentFactoryState() == null)
+           sgState.setCurrentFactoryState(state);
+        else {
+            state.setParent(sgState.getCurrentFactoryState());
+            sgState.setCurrentFactoryState(state);
+        }
 
 		initialize(jClass);
         //-- set super class if necessary
@@ -1076,6 +1098,10 @@ public class SourceFactory  {
                     String methodName = JavaNaming.toJavaClassName(tempName);
                     methodName = "get"+methodName;
                     JMethod method = jclass.getMethod(methodName,0);
+                    //@todo handle the Item introduced in with the group handling
+                    if (method == null)
+                        continue;
+
                     componentName = method.getReturnType().getName();
                     method = null;
                     methodName = null;
@@ -1387,7 +1413,7 @@ public class SourceFactory  {
 					//-- Output Java class for element declaration?
 					if (elementSource)
 					{
-						//-- make sure we haven't processed this element yet
+                       //-- make sure we haven't processed this element yet
 						//-- to prevent endless recursion.
 						ElementDecl tmpDecl = eDecl;
 						while (tmpDecl.isReference()) {
@@ -1929,6 +1955,11 @@ class FactoryState implements ClassInfoResolver {
     **/
     private boolean           _bound = false;
 
+    /**
+     * Keeps track of the different FactoryState
+     */
+     private FactoryState _parent = null;
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -1936,11 +1967,11 @@ class FactoryState implements ClassInfoResolver {
     /**
      * Creates a new FactoryState
     **/
+
     protected FactoryState
         (String className, SGStateInfo sgState)
     {
-
-        if (sgState == null)
+       if (sgState == null)
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
 
         _sgState     = sgState;
@@ -1959,7 +1990,6 @@ class FactoryState implements ClassInfoResolver {
 
         //-- boundProperties
         _bound = SourceGenerator.boundPropertiesEnabled();
-
     } //-- FactoryState
 
     //-----------/
@@ -1998,7 +2028,13 @@ class FactoryState implements ClassInfoResolver {
      * @param complexType the Element to check for being marked as processed
     **/
     boolean processed(ElementDecl element) {
-        return _processed.contains(element);
+        boolean result = _processed.contains(element);
+        if (!result) {
+            if (getParent() != null) {
+                return getParent().processed(element);
+            }
+        }
+        return result;
     } //-- processed
 
     /**
@@ -2015,7 +2051,13 @@ class FactoryState implements ClassInfoResolver {
      * @param complexType the ComplexType to check for being marked as processed
     **/
     boolean processed(ComplexType complex) {
-       return _processed.contains(complex);
+       boolean result = _processed.contains(complex);
+        if (!result) {
+           if (getParent() != null) {
+                return getParent().processed(complex);
+            }
+        }
+        return result;
     } //-- processed
 
     /**
@@ -2032,7 +2074,13 @@ class FactoryState implements ClassInfoResolver {
      * @param group the Group to check for being marked as processed
     **/
     boolean processed(Group group) {
-       return _processed.contains(group);
+       boolean result = _processed.contains(group);
+        if (!result) {
+            if (getParent() != null) {
+                return getParent().processed(group);
+            }
+        }
+        return result;
     } //-- processed
 
 	/**
@@ -2081,5 +2129,24 @@ class FactoryState implements ClassInfoResolver {
      */
      void setCreateGroupItem(boolean createGroupItem) {
          _createGroupItem = createGroupItem;
+     }
+
+     /**
+      * Returns the parent of this FactoryState.
+      * The parent of a factory state is the previous item
+      * of the list that contained all the created factory states.
+      * @return the parent of this FactoryState.
+      */
+     FactoryState getParent() {
+        return _parent;
+     }
+
+     /**
+      * Sets the parent of this FactoryState
+      * @param parent the parent FactoryState
+      * @see #getParent
+      */
+     void setParent(FactoryState parent) {
+         _parent = parent;
      }
 } //-- FactoryState
