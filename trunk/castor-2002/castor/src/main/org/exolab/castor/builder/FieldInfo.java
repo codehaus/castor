@@ -114,11 +114,12 @@ public class FieldInfo extends XMLInfo {
     //------------------/
     
     /**
-     * Creates a JMember for this FieldInfo
+     * Creates the JMembers for this FieldInfo, sometimes a "field"
+     * requires more than one java field
      * @return a JMember which has the appropriate type and name
      * for this FieldInfo
     **/
-    public JMember createMember() {
+    public void createJavaField(JClass jClass) {
         
         XSType type = getSchemaType();
         
@@ -137,19 +138,28 @@ public class FieldInfo extends XMLInfo {
         //-- set Javadoc comment
         if (_comment != null) jMember.setComment(_comment);
         
+        jClass.addMember(jMember);
         
-        return jMember;
-    } //-- createMember
+        
+        //-- special supporting fields
+        
+        //-- has_field
+        if ((!type.isEnumerated()) && type.isPrimitive() && (!isRequired())) {
+            jMember = new JMember(JType.Boolean, "_has" + name);
+            jMember.setComment("keeps track of state for field: " + name);
+            jClass.addMember(jMember);
+        }
+        
+    } //-- createJavaField
     
     
     /**
      * Creates the access methods for this FieldInfo
-     * @return the set of access methods needed for
-     * this member
+     * @param jClass the JClass to add the methods to
     **/
-    public JMethod[] createAccessMethods() {
+    public void createAccessMethods(JClass jClass) {
         
-        JMethod[] methods = new JMethod[2];
+        JMethod method    = null;
         JSourceCode jsc   = null;
         
         String mname = methodSuffix();
@@ -157,24 +167,44 @@ public class FieldInfo extends XMLInfo {
         XSType xsType = getSchemaType();
         JType jType  = xsType.getJType();
         
+        
+        boolean needs_has 
+            = ((!xsType.isEnumerated()) && xsType.isPrimitive() &&
+                (!isRequired()));
+            
         //-- create get method
-        methods[0] = new JMethod(jType, "get"+mname);
-        jsc = methods[0].getSourceCode();
+        method = new JMethod(jType, "get"+mname);
+        jClass.addMethod(method);
+        jsc = method.getSourceCode();
         jsc.add("return this.");
         jsc.append(this.name);
         jsc.append(";");
         
         //-- create set method
-        methods[1] = new JMethod(null, "set"+mname);
-        methods[1].addParameter(new JParameter(jType, this.name));
-        jsc = methods[1].getSourceCode();
+        method = new JMethod(null, "set"+mname);
+        jClass.addMethod(method);
+        method.addParameter(new JParameter(jType, this.name));
+        jsc = method.getSourceCode();
         jsc.add("this.");
         jsc.append(getName());
         jsc.append(" = ");
         jsc.append(getName());
         jsc.append(";");
         
-        return methods;
+        if (needs_has) {
+            jsc.add("this._has");
+            jsc.append(getName());
+            jsc.append(" = true;");
+           
+            //-- create hasMethod
+            method = new JMethod(JType.Boolean, "has"+mname);
+            jClass.addMethod(method);
+            jsc = method.getSourceCode();
+            jsc.add("return this._has");
+            jsc.append(getName());
+            jsc.append(";");
+        }
+        
         
     } //-- createAccessMethods
     

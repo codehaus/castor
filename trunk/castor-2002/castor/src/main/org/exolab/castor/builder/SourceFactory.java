@@ -601,11 +601,12 @@ public class SourceFactory  {
         
         state.classInfo.addFieldInfo(fieldInfo);
         
-        state.jClass.addMember(fieldInfo.createMember());
+        //-- Have FieldInfo create the proper field
+        fieldInfo.createJavaField(state.jClass);
         
         //-- do not create access methods for transient fields
         if (!fieldInfo.isTransient()) {
-            state.jClass.addMethods(fieldInfo.createAccessMethods());
+            fieldInfo.createAccessMethods(state.jClass);
         }
         
         //-- Add initialization code

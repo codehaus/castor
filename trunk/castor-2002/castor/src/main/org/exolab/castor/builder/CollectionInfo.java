@@ -115,9 +115,8 @@ public class CollectionInfo extends FieldInfo {
     //- Public Methods -/
     //------------------/
     
-    public JMethod[] createAccessMethods() {
+    public void createAccessMethods(JClass jClass) {
         
-        Vector methods = new Vector(10);
         
         JMethod method = null;
         
@@ -133,7 +132,7 @@ public class CollectionInfo extends FieldInfo {
         String cName = JavaXMLNaming.toJavaClassName(getElementName());
         
         method = new JMethod(null, "add"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(contentParam);
@@ -148,7 +147,7 @@ public class CollectionInfo extends FieldInfo {
         
         JType jType = getContentType().getJType();
         method = new JMethod(jType, "get"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(new JParameter(JType.Int, "index"));
                     
@@ -161,7 +160,7 @@ public class CollectionInfo extends FieldInfo {
 
         jType = jType.createArray();
         method = new JMethod(jType, "get"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         
         createGetMethod(method);
 
@@ -171,7 +170,7 @@ public class CollectionInfo extends FieldInfo {
         //---------------------/
         
         method = new JMethod(null, "set"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(contentParam);
         method.addParameter(new JParameter(JType.Int, "index"));
@@ -184,7 +183,7 @@ public class CollectionInfo extends FieldInfo {
         //--------------------------/
         
         method = new JMethod(JType.Int, "get"+cName+"Count");
-        methods.addElement(method);
+        jClass.addMethod(method);
         
         createGetCountMethod(method);
         
@@ -194,7 +193,7 @@ public class CollectionInfo extends FieldInfo {
         //---------------------------/
         
         method = new JMethod(SGTypes.Enumeration, "enumerate"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         
         createEnumerateMethod(method);
         
@@ -217,7 +216,7 @@ public class CollectionInfo extends FieldInfo {
         
         jType = getContentType().getJType();
         method = new JMethod(jType, "remove"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         method.addParameter(new JParameter(JType.Int, "index"));
         
         createRemoveByIndexMethod(method);
@@ -228,17 +227,9 @@ public class CollectionInfo extends FieldInfo {
         //-----------------------------/
         
         method = new JMethod(null, "removeAll"+cName);
-        methods.addElement(method);
+        jClass.addMethod(method);
         
         createRemoveAllMethod(method);
-        
-        
-        /* Return JMethod[] */
-        
-        JMethod[] jmArray = new JMethod[methods.size()];
-        methods.copyInto(jmArray);
-        
-        return jmArray;
         
     } //-- createAccessMethods
     
