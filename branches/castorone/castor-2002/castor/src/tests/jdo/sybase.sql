@@ -150,6 +150,71 @@ go
 create unique index test_pks_category_pk on test_pks_category( id )
 go
 
+-- base class
+drop table test_rel_person
+go
+create table test_rel_person (
+  pid    int             not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  bday  datetime 
+)
+go
+
+create unique index test_rel_person_pk on test_rel_person( pid );
+go
+grant all on test_rel_person to test;
+go
+
+-- extend base class (person)
+drop table test_rel_employee;
+go
+create table test_rel_employee (
+  pid    int             not null,
+  start_date datetime null
+)
+go
+create unique index test_rel_person_employee_pk on test_rel_employee( pid )
+go
+grant all on test_rel_employee to test
+go
+
+-- depends class of person
+drop table test_rel_address
+go
+create table test_rel_address (
+  pid    int             not null,
+  id  int               not null,
+  street varchar(30) null,
+  city  varchar(30) null,
+  state varchar(2) null,
+  zip varchar(6) null
+)
+go
+create index test_rel_address_fk on test_rel_address( pid )
+go
+create unique index test_rel_address_pk on test_rel_address( id )
+go
+grant all on test_rel_address to test
+go
+
+
+-- depend class of employee
+drop table test_rel_payroll
+go
+create table test_rel_payroll (
+  pid    int             not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+)
+go
+create unique index test_rel_payroll_fk on test_rel_payroll( pid )
+go
+create unique index test_rel_payroll_pk on test_rel_payroll( id )
+go
+-- end for test_relations
+
 
 -- test_table_ex
 drop table test_table_ex
