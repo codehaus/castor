@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -172,9 +172,21 @@ public class XMLFieldDescriptorImpl
      private String _qNamePrefix = null;
 
     /**
-     * The XML name of the field.
+     * The XML name of the field, this is only the local
+     * name.
+     *
+     * @see _xmlPath
      */
     private String _xmlName    = null;
+    
+    /**
+     * The relative XML path used when wrapping in nested elements,
+     * does not include the name of the field itself.
+     *
+     * @see _xmlName
+     */
+    private String _xmlPath    = null;
+
 
     private String[] _matches = null;
 
@@ -214,9 +226,11 @@ public class XMLFieldDescriptorImpl
         //////////////////////////////////////////////////
         else this._fieldType  = fieldType;
         this._fieldName  = fieldName;
-        this._xmlName    = xmlName;
         this._nodeType   = nodeType;
         this._nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
+        
+        //-- call the setXMLName method to handle checking for full path
+        setXMLName(xmlName);
 
     } //-- XMLFieldDescriptorImpl
 
@@ -302,7 +316,8 @@ public class XMLFieldDescriptorImpl
 
         //-- handle xml name
         if ( xmlName == null ) xmlName = getFieldName();
-        _xmlName = xmlName;
+        //-- call the setXMLName method to handle checking for full path
+        setXMLName(xmlName);
 
         if (nodeType == null) {
             if (this.multivalued)
@@ -473,15 +488,62 @@ public class XMLFieldDescriptorImpl
         return _nodeType;
     }
 
-     /**
-      * Returns the prefix used in case the value of the
-      * field described by this descriptor is of type QName.
-      * This is helpful for the Marshaller but not mandatory.
-      * @return the prefix used in the QName value.
-      */
-      public String getQNamePrefix() {
-          return _qNamePrefix;
-      }
+    /**
+     * Returns the "relative" XML path for the field being described.
+     *
+     * In most cases, this will be null. However sometimes a
+     * field may be mapped to a nested element. In which case 
+     * the value returned by this method should be the nested
+     * element name. If more than one level of nesting is
+     * needed each nested element name should be separated by
+     * by a path separator (forward slash '/').
+     *
+     * The location path name is "relative" to the parent Class. The
+     * name of the parent should not be included in the path.
+     *
+     * 
+     * For example, give the following two classes:
+     * <code>
+     *
+     *    class Root {    
+     *        Bar bar;    
+     *    }
+     *
+     *    class Bar {
+     *       String value;
+     *    }
+     * </code>
+     *
+     * And the following XML:
+     *
+     * <code>
+     *    &lt;root&gt;
+     *       &lt;foo&gt;
+     *          &lt;bar&gt; value of bar &lt;/bar&gt;
+     *       &lt;/foo&gt;
+     *    &lt;/root&gt;
+     * </code>
+     *
+     * Since foo has no associated class, the path for 'bar'
+     * would be: "foo"
+     * 
+     * 
+     * @returns the "relative" XML path for the field being described.
+     */
+    public String getLocationPath() {
+        return _xmlPath;
+    } //-- getLocationPath
+    
+    /**
+     * Returns the prefix used in case the value of the
+     * field described by this descriptor is of type QName.
+     * This is helpful for the Marshaller but not mandatory.
+     *
+     * @return the prefix used in the QName value.
+     */
+    public String getQNamePrefix() {
+        return _qNamePrefix;
+    }
 
     /**
      * Returns a specific validator for the field described by
@@ -665,6 +727,53 @@ public class XMLFieldDescriptorImpl
         this._immutable = immutable;
     } //-- setImmutable
 
+    /**
+     * Sets the location path for the field being described.
+     *
+     * In most cases, this isn't needed. However sometimes a
+     * field may be mapped to a nested element. In which case 
+     * the value of the location path should be the nested
+     * element name. If more than one level of nesting is
+     * needed each nested element name should be separated by
+     * by a path separator (forward slash '/').
+     *
+     * The location path name is "relative" to the parent Class. The
+     * name of the parent should not be included in the path.
+     *
+     * 
+     * For example, give the following two classes:
+     * <code>
+     *
+     *    class Root {    
+     *        Bar bar;    
+     *    }
+     *
+     *    class Bar {
+     *       String value;
+     *    }
+     * </code>
+     *
+     * And the following XML:
+     *
+     * <code>
+     *    &lt;root&gt;
+     *       &lt;foo&gt;
+     *          &lt;bar&gt; value of bar &lt;/bar&gt;
+     *       &lt;/foo&gt;
+     *    &lt;/root&gt;
+     * </code>
+     *
+     * Since foo has no associated class, the path for 'bar'
+     * would be: "foo"
+     *
+     * @param path the "relative" location path for the field.
+     * @see getLocationPath.
+     */
+    public void setLocationPath(String path) {
+        //-- need to add some validation to the path at some point.
+        _xmlPath = path;
+    } //-- setLocationPath
+    
     /**
      * Sets whether or not this field has been mapped in a Map or
      * Hashtable.
