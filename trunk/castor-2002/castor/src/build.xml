@@ -130,12 +130,14 @@
               org/exolab/castor/xml/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,
               org/exolab/castor/*" />
 
+<!--
     <delete   file="${classes}/MANIFEST.MF" />
     <delete   file="${dist}/sourceGen.jar" />
     <copyfile src="${source}/etc/sourceGenMANIFEST.MF" dest="${classes}/MANIFEST.MF" />
     <replace  file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}" />
     <jar      jarfile="${dist}/sourceGen.jar" basedir="${classes}"
               manifest="${classes}/MANIFEST.MF" includes="LICENSE,README" />
+-->
   </target>
 
 
