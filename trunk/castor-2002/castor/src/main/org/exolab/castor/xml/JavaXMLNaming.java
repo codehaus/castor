@@ -94,11 +94,18 @@ public class JavaXMLNaming {
     } //-- toJavaClassName
 
     public static String toJavaMemberName(String name) {
+        return toJavaMemberName(name, true);
+    } //-- toJavaMemberName
+
+    public static String toJavaMemberName
+        (String name, boolean useKeywordSubstitutions) 
+    {
         
         if (name == null) return null;
         
         String memberName = toJavaName(name, false);
-        if (isKeyword(memberName)) {
+        
+        if (isKeyword(memberName) && useKeywordSubstitutions) {
             String mappedName = (String) subst.get(memberName);
             if (mappedName != null) memberName = mappedName;
             else memberName = "_"+memberName;
@@ -139,6 +146,9 @@ public class JavaXMLNaming {
             char ch = ncChars[i];
             
             switch(ch) {
+                case ' ':
+                    ncChars[next++] = '_';
+                    break;
                 case ':':
                 case '-':
                 case '_':
