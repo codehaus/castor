@@ -105,6 +105,8 @@ public class SourceGenerator {
     private String lineSeparator = null;
     private JComment header = null;
     
+    private boolean warnOnOverwrite = true;
+    
     public SourceGenerator() {
         super();    
         
@@ -205,6 +207,10 @@ public class SourceGenerator {
         return version;
     } //-- getVersion
     
+    public void setSuppressNonFatalWarnings(boolean suppress) {
+        warnOnOverwrite = (!suppress);   
+    } //-- setSuppressNonFatalWarnings
+    
     /**
      * main class used for command line invocation
     **/
@@ -227,12 +233,16 @@ public class SourceGenerator {
         allOptions.addFlag("line-separator", "( unix | mac | win)", desc);
         allOptions.setOptional("line-separator", true);
         
+        desc = "Suppress non fatal warnings, such as overwritting files.";
+        allOptions.addFlag("f", "", desc);
+        
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
         
         String schemaFilename = options.getProperty("i");
         String packageName    = options.getProperty("package");
         String lineSepStyle   = options.getProperty("line-separator");
+        boolean force         = (options.getProperty("f") != null);
         
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
@@ -255,6 +265,8 @@ public class SourceGenerator {
             }
         }
         sgen.setLineSeparator(lineSep);
+        sgen.setSuppressNonFatalWarnings(force);
+        if (force) System.out.println("Suppressing non fatal warnings.");
         
         if (schemaFilename == null) {
             System.out.println(appName);
