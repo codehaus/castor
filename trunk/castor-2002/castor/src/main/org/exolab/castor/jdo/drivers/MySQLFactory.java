@@ -71,6 +71,11 @@ public final class MySQLFactory
         return "mysql";
     }
 
+    public QueryExpression getQueryExpression()
+    {
+        return new MySQLQueryExpression( this );
+    }
+
 }
 
 
