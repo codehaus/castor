@@ -99,8 +99,6 @@ final class OID
 
     OID( ClassDesc clsDesc, Object identity )
     {
-	if ( identity == null )
-	    throw new IllegalArgumentException( "Argument 'identity' is null" );
 	_identity = identity;
 	// OID must be unique across the engine: always use the parent
 	// most class of an object, getting it from the descriptor

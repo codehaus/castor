@@ -31,7 +31,8 @@
 \n  doc      Builds the documentation
 \n  javadoc  Builds the API JavaDocs
 \n  source   Builds the source tarball in the dist directory
-\n  tarball  Builds the binary distribution in the dist directory\n" />
+\n  tarball  Builds the binary distribution in the dist directory
+\n  cvs      Update the sources from the CVS\n" />
   </target>
 
 
@@ -61,7 +62,7 @@
   <!-- Same as main, but no debug and no deprecation -->
   <target name="no-debug" depends="prepare">
     <javac srcdir="${source}/main" destdir="${classes}"
-           classpath="${classpath}" debug="off" deprecation="off"/>
+           classpath="${classpath}" debug="off" deprecation="off" optimize="on"/>
   </target>
 
 
@@ -78,17 +79,17 @@
     <javac srcdir="${source}/tests" destdir="${build}/tests"
            classpath="${classpath}" debug="on" deprecation="${deprecation}"/>
   </target>
+  
 
-
-  <!-- Build a full release including JAR, tarball, source and documentation -->
+  <!-- Build a full release including JAR, zip/tarball, source and documentation -->
   <target name="release" depends="clean,jar,tarball,source,doc,javadoc">
-    <jar jarfile="${dist}/${archive}-doc.jar" basedir="${build}" items="doc" />
+    <jar jarfile="${dist}/${archive}-doc.jar" basedir="${build}" includes="doc/**" />
   </target>
 
 
   <!-- Build the JAR file using no-debug -->
   <target name="jar" depends="no-debug">
-    <deltree dir="${dist}/${archive}.jar" />
+    <delete file="${dist}/${archive}.jar" />
 
     <copyfile src="${source}/etc/MANIFEST.MF" dest="${classes}/MANIFEST.MF" />
     <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
@@ -97,7 +98,7 @@
     <copyfile src="${source}/etc/CHANGELOG" dest="${classes}/CHANGELOG" />
 
     <jar jarfile="${dist}/${archive}.jar" basedir="${classes}"
-         manifest="${classes}/MANIFEST.MF" items="LICENSE,README,CHANGELOG,org" />
+         manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,CHANGELOG,org/**" />
   </target>
 
 
@@ -114,32 +115,36 @@
   <!-- Build the API JavaDoc -->
   <!-- Note: you need the proper permission to get it running -->
   <target name="javadoc" depends="prepare">
-    <mkdir dir="${build}/doc" />
-    <mkdir dir="${build}/doc/javadoc" />
-    <javadoc2 sourcepath="${source}/main" destdir="${build}/doc/javadoc"
-              doctitle="Castor" public="true" noindex="true" author="true"
-	      packagenames="org.exolab.castor.xml, org.exolab.castor.jdo, org.exolab.castor.dax,
-                            org.exolab.castor.persist, org.exolab.castor.persist.spi, org.exolab.castor.mapping,
-                            org.exolab.castor.dsml, org.exolab.castor.dsml.jndi, org.exolab.castor.dsml.mozilla,
-                            org.exolab.castor.dsml.tools, org.exolab.castor.util" />
+    <mkdir   dir="${build}/doc" />
+    <deltree dir="${build}/doc/javadoc" />
+    <mkdir   dir="${build}/doc/javadoc" />
+    <javadoc sourcepath="${source}/main" destdir="${build}/doc/javadoc" dir="."
+             doctitle="Castor" public="true" noindex="true" author="true"
+	     packagenames="org.exolab.castor.xml, org.exolab.castor.jdo, org.exolab.castor.dax,
+                           org.exolab.castor.persist.*, org.exolab.castor.mapping,
+                           org.exolab.castor.dsml.*, org.exolab.castor.util" />
   </target>
 
 
   <!-- Build the source distribution -->
   <target name="source" depends="prepare">
-    <deltree dir="${dist}/${archive}-src.tar.gz" />
+    <delete file="${dist}/${archive}-src.tgz" />
+    <delete file="${dist}/${archive}-src.zip" />
     <exec command="tar --create --compress --exclude-from ${source}/etc/exclude
                    *.sh *.bat ${source} ${lib}"
           dir="." output="${dist}/${archive}-src.tgz" />
+    <zip zipfile="${dist}/${archive}-src.zip" basedir="." includes="*.sh *.bat ${source}/** ${lib}/**"
+         defaultexcludes="true" />         
   </target>
 
 
   <!-- Build the tarball including JAR and all dependent packages -->
   <target name="tarball" depends="prepare,jar,examples">
     <property name="bin" value="${build}/${archive}" />
-    <deltree  dir="${dist}/${archive}.tar.gz" />
+    <delete   file="${dist}/${archive}.tgz" />
+    <delete   file="${dist}/${archive}.zip" />
     <deltree  dir="${bin}" />
-    <mkdir dir="${bin}" />
+    <mkdir    dir="${bin}" />
     <copyfile src="${etc}/README"
               dest="${bin}/README" />
     <copyfile src="${etc}/LICENSE"
@@ -168,8 +173,24 @@
           dir="." output="${bin}/examples.tgz" />
     <exec command="tar --create --compress --directory ${build} ${archive}"
           dir="." output="${dist}/${archive}.tgz" />
+    <delete file="${bin}/examples.tgz" />
+    <zip zipfile="${bin}/examples.zip" basedir="${source}" includes="examples/**"
+         defaultexcludes="true" />
+    <zip zipfile="${dist}/${archive}.zip" basedir="${build}" includes="${archive}/**" />
+  </target>
+
+
+  <!-- Update the sources from the CVS -->
+  <target name="cvs" depends="clean">
+    <cvs cvsroot=":pserver:arkin@virtuals.exoffice.com:/cvs/${project}"
+         dest="." package="${project}" />
   </target>
 
 
 </project>
+
+
+
+
+
 
