@@ -105,8 +105,6 @@
 <pre>
   build.sh examples
   example.sh jdo
-  example.sh xml
-  example.sh dax
 </pre>
       </p>
 
