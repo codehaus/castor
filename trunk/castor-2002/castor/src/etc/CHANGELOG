@@ -1,6 +1,16 @@
 Version 0.8.9
 -------------
 
+JDO:    Annoying type conversion problems solved:
+        - integer SQL type for Oracle now can be used for dependent objects
+          identities - before this caused type conversion error;
+        - timestamp SQL type can be used with Sybase - before dirty checking
+          failed;
+        - Database.load() now accepts identity value of the field type,
+          type conversion is performed correctly - before it was needed
+          to use the SQL type for Database.load(), but the field type
+          for OQLQuery.bind(). (Oleg Nitz)
+
 JDO:    Interbase driver (contributed by Terry Child <tmchild@gmx.net>).
 
 JDO:    Added UUID key generator.
