@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -118,6 +118,7 @@ public class DependentKeyGen extends CastorTestCase {
         
         _db = _category.getDatabase( verbose );
 
+        /*
         stream.println( "Delete everything" );
         _db.begin();
         oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMasterKeyGen master" );
@@ -138,6 +139,7 @@ public class DependentKeyGen extends CastorTestCase {
         oql.close();
         stream.println( "Deleting " + cnt + " group objects" );
         _db.commit();
+        */
 
         stream.println( "Attempt to create master with details" );
         _db.begin();
@@ -184,8 +186,8 @@ public class DependentKeyGen extends CastorTestCase {
             }
             detail = master.findDetail( detailId5 );
             if ( detail.getDetails2() != null && detail.getDetails2().size() != 0 ) {
-                stream.println( "Error: loaded detail 5 with details2: " + qres.next() );
-                fail("loaded detail 5 with details2: " + qres.next());
+                stream.println( "Error: loaded detail 5 with details2: " + detail );
+                fail("loaded detail 5 with details2: " + detail );
             }
             detail = master.findDetail( detailId6 );
             if ( detail.getDetails2() == null || detail.getDetails2().size() != 2 ) {
