@@ -120,6 +120,7 @@ public class SourceGenerator {
     private SourceFactory sourceFactory = null;
 
     private ConsoleDialog dialog = null;
+    
     /**
      * Creates a SourceGenerator using the default FieldInfo factory
      */
@@ -455,8 +456,7 @@ public class SourceGenerator {
     private void processComplexType(ComplexType complexType, SGStateInfo sInfo) {
 
         if (complexType == null) return;
-
-
+        
         ClassInfo classInfo = sInfo.resolve(complexType);
 
         if (classInfo == null) {
