@@ -215,6 +215,30 @@ public class JMethod {
         return this.name;
     } //-- getName
 
+    /**
+     * Returns the JParameter at the given index
+     * @param index the index of the JParameter to return
+     * @return the JParameter at the given index
+    **/
+    public JParameter getParameter(int index) {
+        return (JParameter)params.get(index);
+    } //-- getParameter
+    
+    /**
+     * Returns the set of JParameters for this JMethod.
+     * <BR />
+     * <B>Note:</B> the array is a copy, the params in the array
+     * are the actual references.
+     * @return the set of JParameters for this JMethod
+    **/
+    public synchronized JParameter[] getParameters() {
+        JParameter[] pArray = new JParameter[params.size()];
+        for (int i = 0; i < pArray.length; i++) {
+            pArray[i] = (JParameter)params.get(i);
+        }
+        return pArray;
+    } //-- getParameters
+    
     public JType getReturnType() {
         return returnType;
     } //-- getReturnType
