@@ -88,10 +88,10 @@ public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
      * @params Parameters for key generator.
      */
     public KeyGenerator getKeyGenerator( PersistenceFactory factory,
-            Properties params )
+            Properties params, int sqlType )
             throws MappingException
     {
-        return new HighLowKeyGenerator( params );
+        return new HighLowKeyGenerator( params, sqlType );
     }
 
     /**

@@ -52,11 +52,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Hashtable;
 import java.util.Properties;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -82,6 +81,8 @@ public class HighLowKeyGenerator implements KeyGenerator
 
     private final static String GRAB_SIZE = "grab-size";
 
+    private final int _sqlType;
+
     // Sequence table name 
     private final String _seqTable;
 
@@ -91,8 +92,11 @@ public class HighLowKeyGenerator implements KeyGenerator
     // Sequence table value column name
     private final String _seqValue;
 
-    // grab size
-    private final BigDecimal _grabSize;
+    // grab size as int
+    private int _grabSizeI;
+
+    // grab size as BigDecimal
+    private BigDecimal _grabSizeD;
 
     // last generated values
     private Hashtable _lastValues = new Hashtable();
@@ -103,34 +107,41 @@ public class HighLowKeyGenerator implements KeyGenerator
     /**
      * Initialize the HIGH/LOW key generator.
      */
-    public HighLowKeyGenerator( Properties params ) throws MappingException
+    public HighLowKeyGenerator( Properties params, int sqlType )
+            throws MappingException
     {
         String factorStr;
 
+        _sqlType = sqlType;
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL) 
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
+
         _seqTable = params.getProperty( SEQ_TABLE );
-        if ( _seqTable == null ) {
+        if ( _seqTable == null ) 
             throw new MappingException( Messages.format( "mapping.KeyGenParamNotSet",
-                    SEQ_TABLE, getClass().getName() ) );
-        }
+                                        SEQ_TABLE, getClass().getName() ) );
 
         _seqKey = params.getProperty( SEQ_KEY );
-        if ( _seqKey == null ) {
+        if ( _seqKey == null ) 
             throw new MappingException( Messages.format( "mapping.KeyGenParamNotSet",
-                    SEQ_KEY, getClass().getName() ) );
-        }
+                                        SEQ_KEY, getClass().getName() ) );
 
         _seqValue = params.getProperty( SEQ_VALUE );
-        if ( _seqValue == null ) {
+        if ( _seqValue == null ) 
             throw new MappingException( Messages.format( "mapping.KeyGenParamNotSet",
-                    SEQ_VALUE, getClass().getName() ) );
-        }
+                                        SEQ_VALUE, getClass().getName() ) );
 
         factorStr = params.getProperty( GRAB_SIZE, "1" );
-        _grabSize = new BigDecimal( factorStr );
-        if ( _grabSize.compareTo( new BigDecimal( 0 ) ) <= 0 ) {
-            throw new MappingException( Messages.format( "mapping.wrongKeyGenParam",
-                    factorStr, GRAB_SIZE, getClass().getName() ) );
+        try {
+            _grabSizeI = Integer.parseInt( factorStr );
+        } catch ( NumberFormatException except ) {
+            _grabSizeI = 0;
         }
+        if ( _grabSizeI <= 0 ) 
+            throw new MappingException( Messages.format( "mapping.wrongKeyGenParam",
+                                        factorStr, GRAB_SIZE, getClass().getName() ) );
+        _grabSizeD = new BigDecimal( _grabSizeI );
     }
 
     /**
@@ -146,13 +157,17 @@ public class HighLowKeyGenerator implements KeyGenerator
             String primKeyName, Properties props )
             throws PersistenceException
     {
-        BigDecimal last;
-        BigDecimal max;
+        Object last;
+        Object max;
+        boolean inRange;
 
-        last = (BigDecimal) _lastValues.get( tableName );
-        max = (BigDecimal) _maxValues.get( tableName );
+        last = _lastValues.get( tableName );
+        max = _maxValues.get( tableName );
         if ( last != null ) {    
-            last = last.add( ONE );
+            if ( _sqlType == Types.INTEGER )
+                last = new Integer( ( (Integer) last ).intValue() + 1 );
+            else
+                last = ((BigDecimal) last).add( ONE );
         } else {
             String sql;
             String pk;
@@ -181,40 +196,40 @@ public class HighLowKeyGenerator implements KeyGenerator
                 rs = stmt.executeQuery();
 
                 if ( rs.next() ) {
-                    Object value;
-                    Class valClass;
-                    TypeConvertor back = null;
+                    if ( _sqlType == Types.INTEGER ) {
+                        int value;
+                        int maxVal;
 
-                    value = rs.getObject( 1 );
-                    valClass = value.getClass();
-                    if ( !valClass.equals(BigDecimal.class) ) {
-                        try {
-                            value = Types.getConvertor(valClass, BigDecimal.class ).convert( value, null );
-                            back = Types.getConvertor( BigDecimal.class, valClass );
-                        } catch ( Exception except ) {
-                            throw new PersistenceException(
-                                    Messages.format( "mapping.keyGenWrongType",
-                                    getClass().getName(), value.getClass() ), except );
-                        }
-                    }
-                    last = (BigDecimal) value;
-                    max = last.add( _grabSize );
-                    if ( back != null ) {
-                        rs.updateObject( 1, back.convert( max, null ) );
+                        value = rs.getInt( 1 );
+                        last = new Integer( value + 1 );
+                        maxVal = value + _grabSizeI;
+                        max = new Integer( maxVal );
+                        rs.updateInt( 1, maxVal );
                     } else {
-                        rs.updateBigDecimal( 1, max );
+                        BigDecimal value;
+                        BigDecimal maxVal;
+
+                        value = rs.getBigDecimal( 1 );
+                        last = value.add( ONE );
+                        maxVal = value.add( _grabSizeD );
+                        max = maxVal;
+                        rs.updateBigDecimal( 1, maxVal );
                     }
                     rs.updateRow();
-                    last = last.add( ONE );
                 } else {
                     stmt = conn.prepareStatement("INSERT INTO " + _seqTable +
                                                 " (" + _seqKey + "," + _seqValue +
                                                 ") VALUES (?, ?)");
                     stmt.setString( 1, tableName );
-                    stmt.setInt( 2, _grabSize.intValue() );
+                    stmt.setInt( 2, _grabSizeI );
                     stmt.executeUpdate();
-                    last = ONE;
-                    max = _grabSize;
+                    if ( _sqlType == Types.INTEGER ) {
+                        last = new Integer( 1 );
+                        max = new Integer( _grabSizeI );
+                    } else {
+                        last = ONE;
+                        max = _grabSizeD;
+                    }
                 }
             } catch ( SQLException ex ) {
                 throw new PersistenceException( Messages.format(
@@ -229,7 +244,12 @@ public class HighLowKeyGenerator implements KeyGenerator
             }
         }
 
-        if ( last.compareTo( max ) < 0 ) {
+        if ( _sqlType == Types.INTEGER ) 
+            inRange = ( ( (Integer) last ).compareTo( (Integer) max ) < 0 );
+        else
+            inRange = ( ( (BigDecimal) last ).compareTo( (BigDecimal) max ) < 0 );
+
+        if ( inRange ) {
             _lastValues.put( tableName, last );
             _maxValues.put( tableName, max );
         } else {

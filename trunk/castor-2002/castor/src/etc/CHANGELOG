@@ -32,6 +32,11 @@ JDO:     Changed the inner SELECT syntax in MaxKeyGenerator to make it work
 JDO:     Hypersonic SQL driver.
          (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>)
 
+JDO:     Changed KeyGeneratorFactory interface for better perfomance:
+         now the target primary key SQL type is passed to the key generator,
+         and no type conversions are performed after the key is generated.
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
 Version 0.8.7  June 2, 2000
 ---------------------------
 

@@ -85,6 +85,7 @@ final class KeyGeneratorRegistry
      */
     public KeyGenerator getKeyGenerator( PersistenceFactory factory,
                                          KeyGeneratorDescriptor desc,
+                                         int sqlType,
                                          LogInterceptor logInterceptor )
             throws MappingException
     {
@@ -92,14 +93,14 @@ final class KeyGeneratorRegistry
         KeyGeneratorFactory keyGenFactory;
         KeyGenerator keyGen;
 
-        keyGenName = desc.getName();
+        keyGenName = desc.getName() + " " + sqlType;
         keyGen = (KeyGenerator) _keyGens.get( keyGenName );
         if ( keyGen == null ) {
             keyGenFactory = KeyGeneratorFactoryRegistry.getKeyGeneratorFactory(
                     desc.getKeyGeneratorFactoryName() );
 
             if (keyGenFactory != null) {
-                keyGen = keyGenFactory.getKeyGenerator( factory, desc.getParams() );
+                keyGen = keyGenFactory.getKeyGenerator( factory, desc.getParams(), sqlType );
                 if ( keyGen != null && logInterceptor != null ) {
                     logInterceptor.message( "Key generator " +
                             desc.getKeyGeneratorFactoryName() +

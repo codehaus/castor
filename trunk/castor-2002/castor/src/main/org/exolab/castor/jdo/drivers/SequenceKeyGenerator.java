@@ -52,6 +52,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -81,11 +82,14 @@ public final class SequenceKeyGenerator implements KeyGenerator
     private final byte _style;
 
 
+    private final int _sqlType;
+
+
     /**
      * Initialize the SEQUENCE key generator.
      */
     public SequenceKeyGenerator( PersistenceFactory factory,
-            Properties params )
+            Properties params, int sqlType )
             throws MappingException
     {
         String fName = factory.getFactoryName();
@@ -103,6 +107,10 @@ public final class SequenceKeyGenerator implements KeyGenerator
         _seqName = params.getProperty("sequence", "{0}_seq");
         _style = ( fName.equals( "postgresql" ) ? BEFORE_INSERT :
                                    ( returning  ? DURING_INSERT : AFTER_INSERT) );
+        _sqlType = sqlType;
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL) 
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
     }
 
 
@@ -121,7 +129,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
     {
         Statement stmt = null;
         ResultSet rs;
-        Object identity = null;
+        int value;
 
         try {
             stmt = conn.createStatement();
@@ -136,7 +144,11 @@ public final class SequenceKeyGenerator implements KeyGenerator
             }
 
             if ( rs.next() ) {
-                return rs.getObject( 1 );
+                value = rs.getInt( 1 );
+                if ( _sqlType == Types.INTEGER )
+                    return new Integer( value );
+                else
+                    return new BigDecimal( value );
             } else {
                 throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
             }
