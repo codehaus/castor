@@ -45,15 +45,25 @@
 
 package org.exolab.castor.xml;
 
-//-- xml related imports
-import org.xml.sax.*;
-import org.w3c.dom.*;
-import org.xml.sax.helpers.AttributeListImpl;
+
+//-- castor imports
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.xml.util.*;
 
+//-- misc xml related imports
+import org.w3c.dom.Node;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.DocumentHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.Parser;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributeListImpl;
+import org.xml.sax.helpers.XMLReaderAdapter;
+
+//-- Java imports
 import java.io.IOException;
 import java.io.Reader;
 import java.io.PrintWriter;
@@ -203,6 +213,31 @@ public class Unmarshaller {
         _debug = Configuration.debug();
         _validate = Configuration.marshallingValidation();
     } //-- initConfig
+    
+    /**
+     * Creates and initalizes an UnmarshalHandler
+     * @return the new UnmarshalHandler
+    **/
+    public UnmarshalHandler createHandler() {
+        
+        UnmarshalHandler handler = new UnmarshalHandler(_class);
+        handler.setResolver(_cdResolver);
+        handler.setLogWriter(_pw);
+        handler.setDebug(_debug);
+        handler.setReuseObjects(_reuseObjects);
+        handler.setValidation(_validate);
+
+        if (_instanceObj != null) {
+            handler.setRootObject(_instanceObj);
+        }
+        if (_idResolver != null)
+            handler.setIDResolver(_idResolver);
+
+        if (_loader != null)
+            handler.setClassLoader(_loader);
+
+        return handler;
+    } //-- createHandler
     
     /**
      * Sets the ClassLoader to use when loading new classes.
@@ -442,7 +477,26 @@ public class Unmarshaller {
     {
 		return unmarshal(new DOMEventProducer(node));
     } //-- unmarshal(EventProducer)
+    
+    //-------------------------/
+    //- Public Static Methods -/
+    //-------------------------/
 
+    
+    /**
+     * Wraps the given UnmarshalHandler with a SAX 2 ContentHandler.
+     * Allows for improved integration with SAX 2 applications
+     *
+     * @return the ContentHandler
+    **/
+    public static ContentHandler getContentHandler(UnmarshalHandler handler) 
+        throws SAXException
+    {
+        XMLReaderAdapter adapter = new XMLReaderAdapter();
+        adapter.setDocumentHandler(handler);
+        return adapter;
+    } //-- getContentHandler
+    
     /**
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
@@ -494,30 +548,7 @@ public class Unmarshaller {
         return unmarshaller.unmarshal(node);
     } //-- void unmarshal(Writer)
 
-    /**
-     * Creates and initalizes an UnmarshalHandler
-     * @return the new UnmarshalHandler
-    **/
-    public UnmarshalHandler createHandler() {
-        
-        UnmarshalHandler handler = new UnmarshalHandler(_class);
-        handler.setResolver(_cdResolver);
-        handler.setLogWriter(_pw);
-        handler.setDebug(_debug);
-        handler.setReuseObjects(_reuseObjects);
-        handler.setValidation(_validate);
 
-        if (_instanceObj != null) {
-            handler.setRootObject(_instanceObj);
-        }
-        if (_idResolver != null)
-            handler.setIDResolver(_idResolver);
-
-        if (_loader != null)
-            handler.setClassLoader(_loader);
-
-        return handler;
-    } //-- createHandler
-
+    
 } //-- Unmarshaller
 
