@@ -240,7 +240,8 @@ public class JDBCQueryExpression
                 for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                     if ( j > 0 )
                         sql.append( JDBCSyntax.And );
-                    sql.append( join.leftColumns[ j ] ).append( OpEquals ).append( join.rightColumns[ j ] );
+                    sql.append( join.leftTable ).append( "." ).append( join.leftColumns[ j ] ).append( OpEquals );
+                    sql.append( join.rightTable ).append( "." ).append( join.rightColumns[ j ] );
                 }
             }
         }
