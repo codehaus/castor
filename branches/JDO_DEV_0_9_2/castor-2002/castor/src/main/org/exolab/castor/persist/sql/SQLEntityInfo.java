@@ -64,7 +64,7 @@ import org.exolab.castor.persist.types.SQLTypes;
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public class SQLEntityInfo
+public final class SQLEntityInfo
 {
 
     private static HashMap _instances = new HashMap();
@@ -114,6 +114,8 @@ public class SQLEntityInfo
         this.info = info;
 
         // Must be done as early as possible to avoid infinite loop of sub/super-entities
+        // But there is a threat that some other thread may use this instance before the constructor
+        // finishes and all fields are set. This problem is solved by synchronization block in getInstance().
         _instances.put(info, this);
 
         // "Linearize" the identity columns
@@ -182,14 +184,27 @@ public class SQLEntityInfo
     public static SQLEntityInfo getInstance(EntityInfo info) throws MappingException {
         SQLEntityInfo res;
 
-        res = (SQLEntityInfo) _instances.get(info);
-        if (res == null) {
-            res = new SQLEntityInfo(info);
+        // Due to this synchronization other threads will not access the instance until it's
+        // constructor finishes, but inside the constructor new instances (sub-classes and super-classes)
+        // can be obtained via getInstance, since we are in the same thread.
+        synchronized (_instances) {
+            res = (SQLEntityInfo) _instances.get(info);
+            if (res == null) {
+                res = new SQLEntityInfo(info);
+            }
+            return res;
         }
-        return res;
     }
 
     public String toString() {
         return info.toString();
+    }
+
+    public boolean equals(Object obj) {
+        return info.equals(obj);
+    }
+
+    public int hashCode() {
+        return info.hashCode();
     }
 }

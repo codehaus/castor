@@ -59,7 +59,7 @@ import org.exolab.castor.persist.types.SQLTypes;
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public class SQLFieldInfo
+public final class SQLFieldInfo
 {
     /**
      * The info for the value field;
@@ -89,6 +89,14 @@ public class SQLFieldInfo
     }
 
     public String toString() {
-        return info.entityClass.entityClass + "." + (info.fieldNames == null ? "null" : info.fieldNames[0]);
+        return info.toString();
+    }
+
+    public boolean equals(Object obj) {
+        return info.equals(obj);
+    }
+
+    public int hashCode() {
+        return info.hashCode();
     }
 }
