@@ -1,6 +1,9 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1466 as noted by [arthurb@cs.uu.nl].
+       (Bruce - 20031203)
+
 JDO:   Fixed the SQLTypes TypeConverters so that each anonymous method 
        that calls a getter that wraps DateFormat et al. only does so 
        once. 
