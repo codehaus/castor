@@ -4,8 +4,7 @@
 	<classpathentry kind="src" path="src/examples"/>
 	<classpathentry kind="src" path="src/tests"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/adaptx_0.9.7.jar"/>
-	<classpathentry kind="lib" path="lib/ant_1.4.jar"/>
+	<classpathentry kind="lib" path="lib/adaptx_0.9.10.jar"/>
 	<classpathentry kind="lib" path="lib/ant_1.5.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-oro-2.0.5.jar"/>
