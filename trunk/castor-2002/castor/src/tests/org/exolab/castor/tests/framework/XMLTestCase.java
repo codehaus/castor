@@ -270,6 +270,8 @@ public abstract class XMLTestCase extends TestCase {
 
         verbose("Test with reference document");
 
+        String outputName = _name.replace(' ', '_') + "-testWithReferenceDocument.xml";
+
         // 1. Unmarshall Input file if any
         Object out = null;
         if (_input != null) {
@@ -290,7 +292,15 @@ public abstract class XMLTestCase extends TestCase {
             if (generated != null) {
                 boolean result = generated.equals(out);
                 verbose("Compare to reference object: " + ((result)?"OK":"Failed"));
-                assert(result);
+
+                if (result == false) {
+                    // try to dump the unmarshalled object
+                    FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
+                    writer.write(((CastorTestable)out).dumpFields());
+                    writer.close();
+                }
+
+                assert("Generated object and unmarshalled reference document differ", result);
             }
         } else if (generated != null) {
             // We don't have an input file, but we can use the hardcoded object for the next steps
@@ -301,7 +311,6 @@ public abstract class XMLTestCase extends TestCase {
         }
 
         // 3. Marshall the object
-        String outputName = _name.replace(' ', '_') + "-testWithReferenceDocument.xml";
         verbose("Marshal the object into '" + outputName +"'");
         File marshal_output = testMarshal(out, outputName);
 
