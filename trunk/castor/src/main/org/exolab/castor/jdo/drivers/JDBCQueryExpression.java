@@ -86,6 +86,8 @@ public class JDBCQueryExpression
 
 
     protected String    _limit;
+    
+    protected String    _offset;
 
 
     protected boolean   _distinct = false;
@@ -258,6 +260,11 @@ public class JDBCQueryExpression
 
     public void addLimitClause( String limit ) {
         _limit = limit;
+    }
+
+
+    public void addOffsetClause( String offset ) {
+        _offset = offset;
     }
 
 
