@@ -66,6 +66,7 @@ import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
+import org.exolab.castor.mapping.xml.CacheTypeMapping;
 import org.exolab.castor.mapping.xml.Param;
 import org.exolab.castor.util.Messages;
 
@@ -119,7 +120,6 @@ public class JDOMappingLoader
     {
         ClassDescriptor   clsDesc;
         String            keyGenName;
-        CacheType         cacheType;
         KeyGeneratorDescriptor keyGenDesc;
         
         // If no SQL information for class, ignore it. JDO only
@@ -175,9 +175,15 @@ public class JDOMappingLoader
             }
         }
 
-        cacheType = new CacheType( clsMap.getCacheTypeMapping() );
-        JDOClassDescriptor jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
-            keyGenDesc, cacheType );
+        JDOClassDescriptor jd;
+        CacheTypeMapping cacheMapping = clsMap.getCacheTypeMapping();
+        if ( cacheMapping != null ) 
+            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+                    keyGenDesc, cacheMapping.getType(), cacheMapping.getCapacity() );
+        else 
+            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+                    keyGenDesc, null, 0 );
+
         jd.setMapping( clsMap );
         return jd;
     }

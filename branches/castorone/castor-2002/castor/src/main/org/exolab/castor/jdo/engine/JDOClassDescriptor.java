@@ -75,6 +75,9 @@ public class JDOClassDescriptor
      */
     private String  _tableName;
 
+    /**
+     * The ClassDescriptor of the class which this class depends on.
+     */
     private ClassDescriptor _depends;
 
     /**
@@ -83,15 +86,20 @@ public class JDOClassDescriptor
     private final KeyGeneratorDescriptor _keyGenDesc;
 
     /**
-     * The mechanism used for caching this class
+     * The preferred mechanism for caching instance of this class
      */
-    private final CacheType _cacheType;
+    private final String _cacheType;
+
+    /**
+     * The preferred mechanism for caching instance of this class
+     */
+    private final int _cacheParam;
 
 
     public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName, 
-            KeyGeneratorDescriptor keyGenDesc, CacheType cacheType )
-        throws MappingException
-    {
+            KeyGeneratorDescriptor keyGenDesc, String cacheType, int cacheParam ) 
+            throws MappingException {
+
         super( clsDesc.getJavaClass(), clsDesc.getFields(), 
                (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getIdentities():null),
                clsDesc.getExtends(), 
@@ -99,15 +107,17 @@ public class JDOClassDescriptor
                clsDesc.getAccessMode() );
         if ( tableName == null )
             throw new IllegalArgumentException( "Argument 'tableName' is null" );
-        _tableName = tableName;
         if ( getIdentity() == null )
             throw new MappingException( "mapping.noIdentity", getJavaClass().getName() );
         if ( ! ( getIdentity() instanceof JDOFieldDescriptor ) )
             throw new IllegalArgumentException( "Identity field must be of type JDOFieldDescriptor" );
         if ( getExtends() != null && ! ( getExtends() instanceof JDOClassDescriptor ) )
             throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
+
+        _tableName = tableName;
         _keyGenDesc = keyGenDesc;
         _cacheType = cacheType;
+        _cacheParam = cacheParam;
         if ( clsDesc instanceof ClassDescriptorImpl )
             _depends = ((ClassDescriptorImpl)clsDesc).getDepends();
     }
@@ -128,13 +138,21 @@ public class JDOClassDescriptor
     }
 
     /**
-     * Returns the preferred mechanism of cache of this class
+     * Returns the preferred mechanism for caching instance of this class
      *
-     * @return Cache Type
+     * @return a String represent the cache type
      */
-    public CacheType getCacheType()
-    {
+    public String getCacheType() {
         return _cacheType;
+    }
+
+    /**
+     * Returns the preferred mechanism for caching instance of this class
+     *
+     * @return an int represent the param
+     */
+    public int getCacheParam() {
+        return _cacheParam;
     }
 
     /**

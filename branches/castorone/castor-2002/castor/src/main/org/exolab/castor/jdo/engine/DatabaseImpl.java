@@ -430,7 +430,6 @@ public class DatabaseImpl
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
 
-        System.out.println("[transaction begin]");
         _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
         _threadTracer.add( Thread.currentThread(), this );
@@ -449,7 +448,6 @@ public class DatabaseImpl
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         try {
-            System.out.println("[transaction committing]");
             _threadTracer.remove( Thread.currentThread() );
             _ctx.prepare();
             _ctx.commit();
@@ -458,7 +456,6 @@ public class DatabaseImpl
             throw except;
         } finally {
             _ctx = null;
-            System.out.println("[transaction committed]");
         }
     }
 
@@ -475,7 +472,6 @@ public class DatabaseImpl
         _threadTracer.remove( Thread.currentThread() );
         _ctx.rollback();
         _ctx = null;
-        System.out.println("[transaction rollbacked]");
     }
 
 
@@ -586,10 +582,8 @@ public class DatabaseImpl
                             Thread t = (Thread) threads.next();
                             if ( !t.isAlive() ) {
                                 /*
-                                System.out.println("Thread dead: "+t);
                                 Database db = (Database) _threads.get( t );
                                 if ( db.isActive() ) {
-                                    System.out.println("roll back cus thread dead");
                                     try {
                                         db.rollback();
                                     } catch ( TransactionNotInProgressException e ) {
