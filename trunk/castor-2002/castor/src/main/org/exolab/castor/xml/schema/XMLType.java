@@ -45,6 +45,9 @@
 
 package org.exolab.castor.xml.schema;
 
+
+import org.exolab.castor.xml.ValidationException;
+
 /**
  * The base type for XML Schema types, such as complex types
  * and simple types.
@@ -52,14 +55,49 @@ package org.exolab.castor.xml.schema;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class XMLType extends Annotated {
+public abstract class XMLType extends Annotated
+{
+    /**
+     * Error message for a null argument
+     */
+    protected static String NULL_ARGUMENT
+        = "A null argument was passed to " + XMLType.class.getName();
 
     /**
-     * Returns the name of this XML Type
-     * @return the name of this XML Type
+     * The name of this type
+     */
+    private String name = null;
+
+   /**
+     * The base datatype reference
     **/
-    public abstract String getName();
-    
+    private XMLType baseType = null;
+
+    /**
+     * The owning Schema to which this type belongs
+    **/
+    private Schema schema = null;
+
+    /**
+     * The name of the derivation method (if any)
+     */
+    private String derivationMethod= null;
+
+
+    ///////////////////////////////  Methods  //////////////////////////////////
+
+    /**
+     * Returns the name of this type (null if none was defined)
+    **/
+    public String getName() { return name; }
+
+    /**
+     * Sets the name of this type
+     * @param name of the type
+    **/
+    public void setName(String name) { this.name= name; }
+
+
     /**
      * Returns true if this XMLType is a ComplexType
      * @return true if this XMLType is a ComplexType
@@ -67,7 +105,7 @@ public abstract class XMLType extends Annotated {
     public final boolean isComplexType() {
         return (getStructureType() == Structure.COMPLEX_TYPE);
     } //-- isComplexType
-    
+
     /**
      * Returns true if this XMLType is a SimpleType
      * @return true if this XMLType is a SimpleType
@@ -75,5 +113,77 @@ public abstract class XMLType extends Annotated {
     public final boolean isSimpleType() {
         return (getStructureType() == Structure.SIMPLE_TYPE);
     } //-- isSimpleType
-    
+
+
+    /**
+     * Returns the schema to which this type belongs
+     * @return the Schema to which this type belongs
+    **/
+    public Schema getSchema() {
+        return schema;
+    } //-- getSchema
+
+    /**
+     * Sets the name of this SimpleType
+     * @param schema the Schema to which this Simpletype belongs
+    **/
+    public void setSchema(Schema schema)
+    {
+      if (schema == null) {
+            String err = NULL_ARGUMENT + "; 'schema' must not be null.";
+            throw new IllegalArgumentException(err);
+      }
+      this.schema    = schema;
+    }
+
+    /**
+     * Returns the base type that this type inherits from.
+     * If this type is a Simpletype that is a built in primitive type then null is returned.
+     * @return the parent type.
+    **/
+    public XMLType getBaseType() {
+        return baseType;
+    } //-- getBaseType
+
+    /**
+     * Sets the base type for this datatype
+     * @param base the base type which this datatype inherits from
+    **/
+    public void setBaseType(XMLType baseType) {
+        this.baseType = baseType;
+    } //-- setBaseType
+
+    /**
+     * Gets the name of the derivation method used to derive this type from its
+     * parent. null for primitive types.
+     */
+    public String getDerivationMethod() { return derivationMethod; }
+
+    /**
+     * Sets the derivation method name
+     */
+    public void setDerivationMethod(String derivationMethod)
+    {
+        this.derivationMethod= derivationMethod;
+    }
+
+    /**
+     * Returns the type this type "really" represents
+     * ("this" in most cases), provides the indirection needed by references
+     * and forward declarations.
+     */
+    XMLType getType() { return this; }
+
+
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- do nothing
+    } //-- validate
+
 } //-- XMLType

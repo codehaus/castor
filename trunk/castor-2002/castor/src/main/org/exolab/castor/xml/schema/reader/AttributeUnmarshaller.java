@@ -53,7 +53,7 @@ import org.xml.sax.*;
 /**
  * The base class for unmarshallers
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class AttributeUnmarshaller extends SaxUnmarshaller {
 
@@ -66,53 +66,53 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The Attribute reference for the Attribute we are constructing
     **/
     private AttributeDecl _attribute = null;
-    
+
     private Schema _schema = null;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
 
     public AttributeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
+        (Schema schema, AttributeList atts, Resolver resolver)
     {
         super();
         this._schema = schema;
-        
+
         setResolver(resolver);
-        
+
         _attribute = new AttributeDecl(schema, atts.getValue("name"));
-        
+
         //-- handle remaining attributes
         String attValue = null;
-        
+
         //-- value
         String defaultValue = atts.getValue(SchemaNames.VALUE_ATTR);
         _attribute.setDefaultValue(defaultValue);
-        
+
         //-- use
         String useValue = atts.getValue(SchemaNames.USE_ATTR);
         if (useValue == null) {
             useValue = "default";
         }
         _attribute.setUseValue(useValue);
-        
+
         //-- type
         attValue = atts.getValue("type");
         if (attValue != null) {
-            _attribute.setSimpleTypeRef(attValue);
+            _attribute.setSimpleTypeReference(attValue);
         }
-        
+
     } //-- AttributeUnmarshaller
 
       //-----------/
@@ -129,9 +129,9 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     public String elementName() {
         return SchemaNames.ATTRIBUTE;
     } //-- elementName
-    
+
     /**
-     * 
+     *
     **/
     public AttributeDecl getAttribute() {
         return _attribute;
@@ -144,13 +144,13 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     public Object getObject() {
         return getAttribute();
     } //-- getObject
-    
+
     /**
-     * 
-     * @param name 
-     * @param atts 
+     *
+     * @param name
+     * @param atts
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
         //-- Do delagation if necessary
@@ -159,54 +159,54 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            unmarshaller = new SimpleTypeUnmarshaller(_schema, 
+            unmarshaller = new SimpleTypeUnmarshaller(_schema,
                                                       atts,
                                                       getResolver());
         }
         else {
             illegalElement(name);
         }
-    
+
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
-        
+
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
             unmarshaller.endElement(name);
             --depth;
             return;
         }
-        
+
         //-- call unmarshaller finish to perform any necessary cleanup
         unmarshaller.finish();
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation ann = (Annotation) unmarshaller.getObject();
             _attribute.addAnnotation(ann);
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            SimpleType simpleType = 
+            SimpleType simpleType =
                 ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
             _attribute.setSimpleType(simpleType);
         }
-        
+
         unmarshaller = null;
-    
+
     } //-- endElement
-    
-    public void characters(char[] ch, int start, int length) 
+
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary

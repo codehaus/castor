@@ -55,15 +55,15 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class ElementDecl extends ContentModelType {
-    
-    
+
+
     /**
      * Error message for a null argument
     **/
     private static String NULL_ARGUMENT
         = "A null argument was passed to the constructor of " +
            ElementDecl.class.getName();
-    
+
     /**
      * Flag indicating whether or not this Element declaration is
      * abstract
@@ -75,50 +75,50 @@ public class ElementDecl extends ContentModelType {
      * may appear as children of it's context
     **/
     private int maxOccurs = -1;
-    
+
     /**
      * The minimum number of occurances of this element that must
      * exist in it's parent context
     **/
     private int minOccurs = 1;
-    
+
     /**
      * The element name
     **/
     private String name = null;
 
-         
-    /**
-     * The type of this element
-    **/
-    private String typeRef = null;
-    
+
     /**
      * A reference to a top-level element declaration
     **/
     String elementRef = null;
-    
-    
+
+
     /**
      * The Schema URI for this Element Declaration
     **/
     private String schemaName = null;
-    
+
     /**
      * The Schema Abbreviation for the Schema name
     **/
     private String schemaAbbrev = null;
-    
+
     /**
      * The XMLType for this element declaration
     **/
     private XMLType xmlType = null;
-    
+
+    /**
+     * True if the xmlType is a type reference
+     */
+    private boolean hasTypeReference= false;
+
     /**
      * The parent schema that this element declaration belongs to
-    **/    
+    **/
     private Schema schema = null;
-    
+
     /**
      * Creates a new default element definition
      * @param schema, the XML Schema to which this element declartion
@@ -129,7 +129,7 @@ public class ElementDecl extends ContentModelType {
     public ElementDecl(Schema schema) {
         this(schema, null);
     } //-- ElementDecl
-    
+
     /**
      * Creates a new default element definition
      * @param schema, the XML Schema to which this Element Declartion
@@ -145,8 +145,8 @@ public class ElementDecl extends ContentModelType {
         this.schema = schema;
         this.name = name;
     } //-- ElementDecl
-    
-        
+
+
     /**
      * Returns the maximum number of occurances that this element
      * must appear within it's parent context
@@ -166,7 +166,7 @@ public class ElementDecl extends ContentModelType {
     public int getMinimumOccurance() {
         return minOccurs;
     } //-- getMinimumOccurance
-    
+
     /**
      * Returns the name of this Element declaration
      * @return the name of this element declaration
@@ -177,31 +177,23 @@ public class ElementDecl extends ContentModelType {
         }
         else return name;
     } //-- getName
-    
+
     /**
-     * Returns the XMLType (ComplexType or SimpleType) of this ElementDecl. 
+     * Returns the XMLType (ComplexType or SimpleType) of this ElementDecl.
      * @return the XMLType of this ElementDecl
     **/
     public XMLType getType() {
-        
+
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null)
                 return element.getType();
             return null;
         }
-        
-        if (xmlType == null) {
-            //-- check simpletype first since it has higher
-            //-- precedence
-            if (typeRef != null) {
-                
-                XMLType tmp = schema.getSimpleType(typeRef);
-                if (tmp != null) return tmp;
-                else return schema.getComplexType(typeRef);
-            }
-        }
-        return xmlType;
+
+        if (xmlType == null) return null;
+        else
+            return xmlType.getType();
     } //-- getXMLType
 
     /**
@@ -215,7 +207,7 @@ public class ElementDecl extends ContentModelType {
             return schema.getElementDecl(elementRef);
         return null;
     } //-- getReference
-    
+
     /**
      * Returns the XML Schema to which this element declaration belongs.
      * @return the XML Schema to which this element declaration belongs.
@@ -231,7 +223,7 @@ public class ElementDecl extends ContentModelType {
     public String getSchemaAbbrev() {
         return this.schemaAbbrev;
     } //-- getSchemaAbbrev
-    
+
     /**
      * Returns the Schema Name for this Element declaration.
      * @return the Schema Name for this Element declaration.
@@ -239,7 +231,7 @@ public class ElementDecl extends ContentModelType {
     public String getSchemaName() {
         return this.schemaName;
     } //-- getSchemaName
-    
+
     /**
      * Returns true if this element definition is abstract
      * @return true if this element definition is abstract
@@ -256,7 +248,7 @@ public class ElementDecl extends ContentModelType {
     public boolean isReference() {
         return (elementRef != null);
     } //-- isReference
-    
+
     /**
      * Sets whether or not this element definition is abstract
      * @param isAbstract, a boolean when true indicates that this
@@ -265,18 +257,18 @@ public class ElementDecl extends ContentModelType {
     public void setAbstract(boolean isAbstract) {
         this.isAbstract = isAbstract;
     } //-- isAbstract
-    
-    /** 
+
+    /**
      * Sets the maximum number of occurances that this element must
      * appear within it's parent context
-     * @param maxOccurs the maximum number of occurances that this 
+     * @param maxOccurs the maximum number of occurances that this
      * element may appear within it's parent context
     **/
     public void setMaximumOccurance(int maxOccurs) {
         this.maxOccurs = maxOccurs;
     } //-- setMaximumOccurance
-    
-    /** 
+
+    /**
      * Sets the minimum number of occurances that this element must
      * appear within it's parent context
      * @param minOccurs the number of occurances that this element must
@@ -285,7 +277,7 @@ public class ElementDecl extends ContentModelType {
     public void setMinimumOccurance(int minOccurs) {
         this.minOccurs = minOccurs;
     } //-- setMinimumOccurance
-    
+
     /**
      * Sets the name of the element that this Element definition defines
      * @param name the name of the defined element
@@ -293,27 +285,27 @@ public class ElementDecl extends ContentModelType {
     public void setName(String name) {
         this.name = name;
     } //-- setName
-    
+
     /**
      * Sets the reference for this element definition
      * @param reference the Element definition that this definition references
     **/
     public void setReference(ElementDecl reference) {
-        if (reference == null) 
+        if (reference == null)
             this.elementRef = null;
         else
             this.elementRef = reference.getName();
     } //-- setReference
-    
+
     /**
      * Sets the reference for this element definition
-     * @param reference the name of the element definition that this 
+     * @param reference the name of the element definition that this
      * definition references
     **/
     public void setReference(String reference) {
         this.elementRef = reference;
     } //-- setReference
-    
+
     /**
      * Sets the Schema Abbreviation for the Schema name
      * @param abbrev the Schema Abbreviation for the Schema name
@@ -322,50 +314,61 @@ public class ElementDecl extends ContentModelType {
     public void setSchemaAbbrev(String abbrev) {
         this.schemaAbbrev = abbrev;
     } //-- setSchemaAbbrev
-    
+
     /**
      * Sets the Schema Name for this Element declaration.
-     * @param uri, the Schema Name, which is a URI for this element 
+     * @param uri, the Schema Name, which is a URI for this element
      * declaration
      * @see #setSchemaAbbrev
     **/
     public void setSchemaName(String uri) {
         this.schemaName = uri;
     } //-- setSchemaName
-    
-    
+
+
     /**
-     * Sets the XMLType for this Element declaration. 
+     * Sets the XMLType for this Element declaration.
      * @param type the XMLType for this element declaration.
      * <BR />
      * <B>Note:</B> This method is mutually exclusive with
      * #setTypeReference, if a reference has previously been
      * set it will be ignored.
     **/
-    public void setType(XMLType type) {
-        
+    public void setType(XMLType type)
+    {
+        hasTypeReference= false;
+
         if ((type != null) && (type.isSimpleType())) {
             ((SimpleType)type).setParent(this);
         }
         this.xmlType = type;
     } //-- setType
 
+
     /**
-     * Sets the type reference for this element (either complextype or
-     * simpletype)
-    **/
-    public void setTypeReference(String typeRef) {
-        this.typeRef = typeRef;
-    } //-- setTypeRef
-    
-    public String getTypeReference() {
-        return typeRef;
-    } //-- getTypeRef
+     * Sets the type of this element to be a reference.
+     */
+    public void setTypeReference(String name)
+    {
+        hasTypeReference= true;
+        TypeReference reference= new TypeReference();
+        reference.setName(name);
+        reference.setSchema(schema);
+        setType(reference);
+    }
+
+    /**
+     * Returns true if this element's type is a reference.
+     */
+    public boolean hasTypeReference()
+    {
+        return hasTypeReference;
+    }
 
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -373,14 +376,14 @@ public class ElementDecl extends ContentModelType {
     public short getStructureType() {
         return Structure.ELEMENT;
     } //-- getStructureType
-    
+
     /**
      * Checks the validity of this element definition
      * @exception ValidationException when this element definition
      * is invalid
     **/
     public void validate() throws ValidationException {
-        
+
         //-- if this merely references another element definition
         //-- just check that we can resolve the reference
         if (elementRef != null) {
@@ -396,6 +399,6 @@ public class ElementDecl extends ContentModelType {
             throw new ValidationException(err);
         }
     } //-- validate
-    
-    
+
+
 } //-- Element

@@ -42,7 +42,7 @@
  *
  * $Id$
  */
- 
+
 
 package org.exolab.castor.xml.schema;
 
@@ -59,19 +59,19 @@ public class AttributeDecl extends Annotated {
 
     private static final short FIXED   = 1; // #b01
     private static final short DEFAULT = 2; // #b10
-    
+
     /**
      * Error message for a null argument
     **/
     private static String NULL_ARGUMENT
         = "A null argument was passed to the constructor of " +
            AttributeDecl.class.getName();
-    
+
     /**
      * The name of attributes defined by this AttributeDecl
     **/
     private String name = null;
-    
+
     /**
      * The minimum occurance that this attribute must appear
     **/
@@ -80,31 +80,22 @@ public class AttributeDecl extends Annotated {
      * The maximum occurance that this attribute must appear
     **/
     private int maxOccurs = 1;
-    
+
+
     /**
-     * The type reference for this attribute declaration.
-     * <BR />
-     * <B>Note:</B> This is mutually exclusive with simpleType
-    **/
-    private String typeRef = null;
-    
-    /**
-     * The in-lined (anonymous) simple type for
-     * this AttributeDecl.
-     * <BR />
-     * <B>Note:</B> This is mutually exclusive with typeRef
+     * The simple type for this AttributeDecl.
     **/
     private SimpleType simpleType = null;
-    
+
     /**
      * The Schema to which this AttributeDecl belongs
     **/
     private Schema schema = null;
-    
+
     private String value = null;
-    
+
     private short useFlag = FIXED;
-    
+
     /**
      * Creates a default Attribute declaration.
      * Since name is required for a valid Attribute declaration
@@ -113,10 +104,10 @@ public class AttributeDecl extends Annotated {
     public AttributeDecl(Schema schema, String name) {
         this(schema, name, 0);
     } //-- Attribute
-    
+
     /**
      * Creates a new AttrDecl with the given name
-     * @param name of the Attribute defined by this attribute declaration 
+     * @param name of the Attribute defined by this attribute declaration
      * @param minOccurs the minimum number of occurances that attributes
      * defined by this definition must appear
      * <BR />
@@ -128,16 +119,15 @@ public class AttributeDecl extends Annotated {
             throw new IllegalArgumentException(err);
         }
         if ((name == null) || (name.length() == 0)) {
-            String err = NULL_ARGUMENT + 
+            String err = NULL_ARGUMENT +
                 "; 'name' must not be null or zero-length.";
             throw new IllegalArgumentException(err);
         }
         this.name    = name;
         this.schema  = schema;
-        this.typeRef = SchemaNames.STRING_TYPE;
         setMinOccurs(minOccurs);
     } //-- AttrDecl
-    
+
     /**
      * Returns the name of attributes defined by this AttributeDecl
      * @return the name of attributes defined by this AttributeDecl
@@ -145,20 +135,16 @@ public class AttributeDecl extends Annotated {
     public String getName() {
         return name;
     } //-- getName
-    
+
     /**
      * Returns the data type associated with this AttributeDecl
      * @return the data type associated with this AttributeDecl
     **/
     public SimpleType getSimpleType() {
-        if (simpleType != null) return simpleType;
-        else return schema.getSimpleType(typeRef);
+        return (SimpleType)simpleType.getType();
     } //-- getSimpleType
 
-    public String getSimpleTypeRef() {
-        return typeRef;
-    } //-- getSimpleTypeRef
-    
+
     /**
      * Returns the default value, or null if none was defined
      * @return the default value, or null if none was defined
@@ -169,7 +155,7 @@ public class AttributeDecl extends Annotated {
         }
         return null;
     } //-- getDefaultValue
-    
+
     /**
      * Returns the maximum occurance that attributes defined by this
      * definition must appear
@@ -182,7 +168,7 @@ public class AttributeDecl extends Annotated {
     public int getMaxOccurs() {
         return 1;
     } //-- getMaxOccurs
-    
+
     /**
      * Returns the minimum occurance that attributes defined by this
      * definition must appear
@@ -193,31 +179,31 @@ public class AttributeDecl extends Annotated {
         return this.minOccurs;
     } //-- getMinOccurs
 
-    
+
     /**
      * Checks to see if attributes defined by this definition are required.
-     * This is the same as checking for minOccurs equal to 1.     
+     * This is the same as checking for minOccurs equal to 1.
      * @return true if minOccurs is equal to 1.
     **/
     public boolean getRequired() {
         return (minOccurs == 1);
     } //-- getRequired
-    
-    
+
+
     /**
-     * Returns the fixed value of which attributes of this type must 
+     * Returns the fixed value of which attributes of this type must
      * lexically match, or null if no fixed value has been specified.
      * @return the fixed value for this attribute declaration.
     **/
     public String getFixedValue() {
-        
+
         if (useFlag == FIXED) {
             return value;
         }
         return null;
-        
+
     } //-- getFixedValue
-    
+
     /**
      * Returns true if this attribute declaration has a fixed value
      * of which attributes of this type must lexically match.
@@ -226,39 +212,34 @@ public class AttributeDecl extends Annotated {
     public boolean hasFixedValue() {
         return ((value != null) && (useFlag == FIXED));
     } //-- hasFixedValue
-    
+
     /**
      * Sets the SimpleType for this attribute declaration
      * @param simpleType the SimpleType for this attribute
      * declaration
-     * <BR />
-     * <B>Note:</B>This method is mutually exclusive with
-     * #setSimpleTypeRef
     **/
     public void setSimpleType(SimpleType simpleType) {
         this.simpleType = simpleType;
         if (simpleType != null) {
             simpleType.setParent(this);
         }
-        this.typeRef = null;
     } //-- setSimpleType
-    
+
     /**
-     * Sets the simple type "reference" for this attribute
-     * declaration
-     * @param name the name of the type
-     * <BR />
-     * <B>Note:</B>This method is mutually exclusive with
-     * #setSimpleType
-    **/
-    public void setSimpleTypeRef(String name) {
-        this.typeRef = name;
-        this.simpleType = null;
-    } //-- setSimpletypeRef
-    
-    
+     * Sets the simple type of this attribute to be a reference.
+     */
+    public void setSimpleTypeReference(String name)
+    {
+        SimpleTypeReference reference= new SimpleTypeReference();
+        reference.setName(name);
+        reference.setSchema(schema);
+        setSimpleType(reference);
+    }
+
+
+
     /**
-     * Sets the default value for instances of this Attribute 
+     * Sets the default value for instances of this Attribute
      *
      * @param value the default value
     **/
@@ -266,7 +247,7 @@ public class AttributeDecl extends Annotated {
         this.value = value;
         if (value != null) this.useFlag = DEFAULT;
     } //-- setDefault
-    
+
     public void setUseValue(String value) {
         if (value != null) {
             if (value.equals("fixed")) {
@@ -280,7 +261,7 @@ public class AttributeDecl extends Annotated {
             }
         }
     } //-- setUse
-    
+
     /**
      * Sets the minimum occurance that attributes defined by this
      * definition must appear
@@ -290,25 +271,25 @@ public class AttributeDecl extends Annotated {
      * The only valid values for minOccurs are 0 and 1.
     **/
     public void setMinOccurs(int minOccurs) {
-        if (minOccurs > 0) 
+        if (minOccurs > 0)
             this.minOccurs = 1;
-        else 
+        else
             this.minOccurs = 0;
     } //-- setMinOccurs
-    
+
     /**
      * Sets the name of attributes defined by this attribute definition
-     * @param name 
+     * @param name
     **/
     public void setName(String name) {
         this.name = name;
     } //-- setName
 
-    
+
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -316,20 +297,20 @@ public class AttributeDecl extends Annotated {
     public short getStructureType() {
         return Structure.ATTRIBUTE;
     } //-- getStructureType
-    
+
     /**
      * Checks the validity of this Attribute declaration
      * @exception ValidationException when this Attribute declaration
      * is invalid
     **/
-    public void validate() 
-        throws ValidationException 
+    public void validate()
+        throws ValidationException
     {
         if (name == null)  {
             String err = "<attribute> is missing required 'name' attribute.";
             throw new ValidationException(err);
         }
-        
+
     } //-- validate
-    
+
 } //-- AttrDecl

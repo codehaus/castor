@@ -46,7 +46,6 @@
 package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.schema.types.*;
 
 import java.util.Vector;
 import java.util.Hashtable;
@@ -89,6 +88,8 @@ public class Schema extends Annotated {
     **/
     private Hashtable elements = null;
 
+    private static SimpleTypesFactory simpleTypesFactory= new SimpleTypesFactory();
+
     /**
      * Creates a new SchemaDef
     **/
@@ -111,47 +112,6 @@ public class Schema extends Annotated {
 
     private void init() {
 
-        //-- create default built-in types for this Schema
-
-        try {
-            //-- ID
-            addSimpleType(new IDType(this));
-            //-- IDREF
-            addSimpleType(new IDREFType(this));
-            //-- NCName
-            addSimpleType(new NCNameType(this));
-            //-- NMTOKEN
-            addSimpleType(new NMTokenType(this));
-
-            //-- binary
-            addSimpleType(new BinaryType(this));
-            //-- boooean
-            addSimpleType(new BooleanType(this));
-            //-- double
-            addSimpleType(new DoubleType(this));
-            //-- integer
-            addSimpleType(new IntegerType(this));
-            //-- long
-            addSimpleType(new LongType(this));
-            //-- negative-integer
-            addSimpleType(new NegativeIntegerType(this));
-            //-- positive-integer
-            addSimpleType(new PositiveIntegerType(this));
-            //-- string
-            addSimpleType(new StringType(this));
-            //-- timeInstant
-            addSimpleType(new TimeInstantType(this));
-            //-- decimal
-            addSimpleType(new DecimalType(this));
-			//-- short
-			addSimpleType(new ShortType(this));
-			//-- int
-			addSimpleType(new IntType(this));
-        }
-        catch (SchemaException sx) {
-            //-- will never be thrown here since we
-            //-- are not adding invalid SimpleTypes
-        }
     } //-- init
 
     /**
@@ -194,7 +154,7 @@ public class Schema extends Annotated {
     {
 
         String name = simpleType.getName();
-        
+
         if ((name == null) || (name.length() == 0)) {
             String err = "No name found for top-level SimpleType. " +
                 " A top-level SimpleType must have a name.";
@@ -210,7 +170,7 @@ public class Schema extends Annotated {
             String err = "a SimpleType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        
+
         simpleType.setParent(this);
         simpleTypes.put(name, simpleType);
 
@@ -269,11 +229,15 @@ public class Schema extends Annotated {
      * document. A call to #addSimpleType must till be made in order
      * to add the SimpleType to this Schema.
      * @param name the name of the SimpleType
+     * @param baseName the name of the SimpleType's base type
+     * @param derivation the name of the derivation method (""/"list"/"restriction")
      * @return the new SimpleType.
     **/
-    public SimpleType createSimpleType(String name) {
-        return new SimpleType(this, name);
-    } //-- createSimpleType(String)
+    public SimpleType createUserSimpleType(String name, String baseName, String derivation)
+    {
+        return simpleTypesFactory.createUserSimpleType(this, name, baseName, derivation, true);
+    }
+
 
     /**
      * Returns the ComplexType of associated with the given name
@@ -319,7 +283,18 @@ public class Schema extends Annotated {
         int colon = name.indexOf(':');
         if (colon != -1)
             canonicalName = name.substring(colon + 1);
-        return (SimpleType)simpleTypes.get(canonicalName);
+        SimpleType result= (SimpleType)simpleTypes.get(canonicalName);
+
+        if (result == null) {
+            //the type may be built in, ask the factory for it.
+            result= simpleTypesFactory.getBuiltInType(canonicalName);
+        }
+        else {
+            //result could be a deferredSimpleType => getType will resolve it
+            result= (SimpleType)result.getType();
+        }
+
+        return result;
     } //-- getSimpleType
 
     /**
@@ -352,7 +327,7 @@ public class Schema extends Annotated {
      * <BR />
      * Note: This is not the same as targetNamespace. This is
      * the namespace of "XML Schema" itself and not the namespace of the
-     * schema that is represented by this object model 
+     * schema that is represented by this object model
      * (see #getTargetNamespace).
      * @return the namespace of the XML Schema
      *
@@ -360,7 +335,7 @@ public class Schema extends Annotated {
     public String getSchemaNamespace() {
         return this.schemaNS;
     } //-- getSchemaNamespace
-    
+
     /**
      * Returns the target namespace for this Schema, or null if no
      * namespace has been defined.
@@ -395,6 +370,19 @@ public class Schema extends Annotated {
         this.name = name;
     } //-- setName
 
+
+    /**
+     * Returns the first simple or complex type which name equals TypeName
+     */
+    public XMLType getType(String typeName)
+    {
+        XMLType result= getSimpleType(typeName);
+        if (result == null)
+            result = getComplexType(typeName);
+        return result;
+    }
+
+
     /**
      * Sets the target namespace for this Schema
      * @param targetNamespace the target namespace for this Schema
@@ -403,6 +391,10 @@ public class Schema extends Annotated {
     public void setTargetNamespace(String targetNamespace) {
         this.targetNS = targetNamespace;
     } //-- setTargetNamespace
+
+
+    /** Gets the type factory, package private */
+    static SimpleTypesFactory getTypeFactory() { return simpleTypesFactory; }
 
     //-------------------------------/
     //- Implementation of Structure -/

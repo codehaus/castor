@@ -52,115 +52,85 @@ import java.util.Enumeration;
 /**
  * An XML Schema SimpleType
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
-public class SimpleType extends XMLType 
+
+public abstract class SimpleType extends XMLType
     implements Referable
 {
 
-    /**
-     * Error message for a null argument
-    **/
-    private static String NULL_ARGUMENT
-        = "A null argument was passed to the constructor of " +
-           SimpleType.class.getName();
-          
-          
-       
-    /**
-     * The base datatype reference
-    **/
-    private String base = null;    
-    
-    /**
-     * The name for this simpleType
-    **/
-    private String name = null;
-    
     /**
      * The constraining facets of this type
     **/
     private FacetList facets     = null;
 
-    /**
-     * The owning Schema to which this Simpletype belongs
-    **/
-    private Schema schema = null;
-    
-    /**
+
+   /**
      * The parent structure of this SimpleType
      * (Schema, AttributeDecl or ElementDecl)
     **/
     private Structure parent = null;
-    
+
+
     /**
-     * Creates a new SimpleType with the given name and basetype reference.
-     * @param name of the SimpleType
-     * @param schema the Schema to which this SimpleType belongs
+     * The code for this simple type
+     * (As defined by SimpleTypesFactory)
     **/
-    public SimpleType(Schema schema, String name) {
-        this(schema, name, null);
-    } //-- SimpleType
-    
+    private int typeCode= SimpleTypesFactory.INVALID_TYPE;
+
+
     /**
-     * Creates a new SimpleType with the given name and basetype reference.
-     * @param name of the SimpleType
-     * @param schema the Schema to which this SimpleType belongs
-     * @param base the base simpleType which this simpleType inherits from.
-     * If the simpleType does not "extend" any other, base may be null.
-    **/
-    public SimpleType(Schema schema, String name, String base) {
+     * Default constructor
+     */
+    public SimpleType() {
         super();
-        if (schema == null) {
-            String err = NULL_ARGUMENT + "; 'schema' must not be null.";
-            throw new IllegalArgumentException(err);
-        }
-        
-        /* in-line simpleTypes don't need a name
-        if ((name == null) || (name.length() == 0)) {
-            String err = NULL_ARGUMENT + 
-                "; 'name' must not be null or zero-length.";
-            throw new IllegalArgumentException(err);
-        }
-        */
-        
-        this.schema  = schema;
-        this.name    = name;
-        this.base  = base;
         this.facets  = new FacetList();
-    } //-- SimpleType
-    
+    }
+
+
     /**
      * Adds the given Facet to this Simpletype.
      * @param facet the Facet to add to this Simpletype
     **/
     public void addFacet(Facet facet) {
-        
+
         if (facet == null) return;
-        
+
         String name = facet.getName();
-        
+
         if (name == null) return;
-        
+
         facets.add(facet);
-        
+
     } //-- addFacet
-    
+
+    /**
+     * Returns the first facet associated with the given name
+     * @return the first facet associated with the given name
+    **/
+    public Facet getFacet(String name) {
+        Enumeration facets= getFacets(name);
+
+        if (facets == null) return null;
+
+        return (Facet)facets.nextElement();
+    } //-- getFacet
+
     /**
      * Returns the facets associated with the given name
      * @return the facets associated with the given name
     **/
     public Enumeration getFacets(String name) {
         FacetListEnumerator fle = null;
-        SimpleType datatype = getBase();
+        SimpleType datatype = (SimpleType)getBaseType();
         if (datatype != null) {
             fle = (FacetListEnumerator)datatype.getFacets(name);
         }
         fle = new FacetListEnumerator(facets, fle);
         fle.setMask(name);
         return fle;
-    } //-- getFacets 
-    
+    } //-- getFacets
+
     /**
      * Returns an Enumeration of all the Facets (including inherited)
      * facets for this type.
@@ -168,44 +138,28 @@ public class SimpleType extends XMLType
     **/
     public Enumeration getFacets() {
         FacetListEnumerator fle = null;
-        SimpleType datatype = getBase();
+        SimpleType datatype = (SimpleType)getBaseType();
         if (datatype != null) {
             fle = (FacetListEnumerator)datatype.getFacets();
         }
         fle = new FacetListEnumerator(facets, fle);
         return fle;
     } //-- getFacets
-    
+
+
+
     /**
-     * Returns the name of this SimpleType
-     * @return the name of this SimpleType
-    **/
-    public String getName() {
-        return name;
-    } //-- getName
-    
-    
-    /**
-     * Returns the base SimpleType that this SimpleType inherits from.
-     * If this Simpletype does not inherit from any other, or if
-     * reference cannot be resolved this will be null.
-     * @return the base SimpleType that this SimpleType inherits from.
-    **/
-    public SimpleType getBase() {
-        if (base == null) return null;
-        return this.schema.getSimpleType(base);
-    } //-- getBase
-    
-    /**
-     * Returns the name of the base type for this datatype.
-     * If this datatype does not inherit from any other, this
-     * will be null.
-     * @return the name of the base type for this datatype.
-    **/
-    public String getBaseRef() {
+     * Returns the built in type this type is derived from.
+     */
+    public SimpleType getBuiltInBaseType()
+    {
+        SimpleType base = this;
+        while ((base != null) && ( ! SimpleTypesFactory.isBuiltInType( base.getTypeCode() ) )) {
+            base = (SimpleType)base.getBaseType();
+        }
         return base;
-    } //-- getBaseRef
-    
+    }
+
     /**
      * Returns the parent Structure that contains this SimpleType.
      * This can be either a Schema, AttributeDecl or ElementDecl.
@@ -214,24 +168,17 @@ public class SimpleType extends XMLType
     public Structure getParent() {
         return parent;
     } //-- getParent
-    
+
     /**
-     * Returns the Id used to Refer to this Object. 
+     * Returns the Id used to Refer to this Object.
      * @return the Id used to Refer to this Object
      * @see org.exolab.castor.xml.Referable
     **/
     public String getReferenceId() {
-        return "datatype:"+name;
+        return "datatype:"+getName();
     } //-- getReferenceId
-    
-    /**
-     * Returns the schema to which this Simpletype belongs
-     * @return the Schema to which this Simpletype belongs
-    **/
-    public Schema getSchema() {
-        return schema;
-    } //-- getSchema
-    
+
+
     /**
      * Returns true if this Simpletype has a specified Facet
      * with the given name.
@@ -247,19 +194,88 @@ public class SimpleType extends XMLType
         }
         return false;
     } //-- hasFacet
-    
+
+
     /**
-     * Sets the base type for this datatype
-     * @param base the base type which this datatype inherits from
+     *  Gets the code for this simple type (define in SimpleTypesFactory)
+     */
+    public int getTypeCode() { return typeCode; }
+
+
+    /** Package private setter of the code for this simple type **/
+    void setTypeCode(int code) { typeCode= code; }
+
+
+
+    /////////////////////////////////////////////////////////
+    // Helpers to get the min/max/length facets
+    // (so that they are shared between listType
+    // and binary, uriref, string
+    //
+
+    /**
+     *  Returns the value of the length facet
+     *  result can be null
     **/
-    public void setBaseRef(String base) {
-        this.base = base;
-    } //-- setBaseTypeRef
-    
+    public Long getLength()
+    {
+        Facet lengthFacet= getFacet(Facet.LENGTH);
+        if (lengthFacet == null) return null;
+
+        try
+        {
+            return new Long(lengthFacet.toLong());
+        }
+        catch (java.lang.Exception e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     *  Returns the value of the minlength facet
+     *  result can be null
+    **/
+    public Long getMinLength()
+    {
+        Facet minLengthFacet= getFacet(Facet.MIN_LENGTH);
+        if (minLengthFacet == null) return null;
+
+        try
+        {
+            return new Long(minLengthFacet.toLong());
+        }
+        catch (java.lang.Exception e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     *  Returns the value of the maxlength facet
+     *  result can be null
+    **/
+    public Long getMaxLength()
+    {
+        Facet maxLengthFacet= getFacet(Facet.MAX_LENGTH);
+        if (maxLengthFacet == null) return null;
+
+        try
+        {
+            return new Long(maxLengthFacet.toLong());
+        }
+        catch (java.lang.Exception e)
+        {
+            return null;
+        }
+    }
+
+
+
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -267,21 +283,10 @@ public class SimpleType extends XMLType
     public short getStructureType() {
         return Structure.SIMPLE_TYPE;
     } //-- getStructureType
-    
-    /**
-     * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
-     * is invalid.
-    **/
-    public void validate()
-        throws ValidationException
-    {
-        //-- do nothing
-    } //-- validate
-    
-    
+
+
     //-- protected Methods -/
-    
+
     /**
      * Sets the parent for this SimpleType
      * @param parent the Structure that contains this SimpleType.
@@ -290,5 +295,11 @@ public class SimpleType extends XMLType
     protected void setParent(Structure parent) {
         this.parent = parent;
     } //-- setParent
-    
+
+    /**
+     * Copy this type's facet in the other type
+     * (other.facets= facets; )
+     */
+    protected void copyFacets(SimpleType other) { other.facets= facets; }
+
 } //-- DataType

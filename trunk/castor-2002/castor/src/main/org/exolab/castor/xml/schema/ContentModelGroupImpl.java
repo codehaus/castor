@@ -61,7 +61,7 @@ class ContentModelGroupImpl implements ContentModelGroup {
 
     private Vector _contentModel = null;
     private ScopableResolver _resolver = null;
-    
+
     /**
      * Creates a new ContentModelGroup.
     **/
@@ -69,19 +69,19 @@ class ContentModelGroupImpl implements ContentModelGroup {
         _contentModel = new Vector();
         _resolver = new ScopableResolver();
     } //-- ContentModelGroup
-    
+
     /**
      * Adds the given ElementDecl to this ContentModelGroup
      * @param elementDecl the ElementDecl to add
      * @exception SchemaException when an ElementDecl already
      * exists with the same name as the given ElementDecl
     **/
-    public void addElementDecl(ElementDecl elementDecl) 
+    public void addElementDecl(ElementDecl elementDecl)
         throws SchemaException
     {
-        
+
         if (elementDecl == null) return;
-        
+
         String name = elementDecl.getName();
         String key = "element:"+name;
         //-- check for naming collisions
@@ -90,25 +90,25 @@ class ContentModelGroupImpl implements ContentModelGroup {
             err += name + ", already exists in this scope.";
             throw new SchemaException(err);
         }
-        
+
         //_resolver.addResolvable(key, elementDecl);
-        
+
         //-- add to content model
         _contentModel.addElement(elementDecl);
-        
+
     } //-- addElementDecl
-    
+
     /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
      * specified group already exists in the current scope
     **/
-    public void addGroup(Group group) 
+    public void addGroup(Group group)
         throws SchemaException
     {
         if (group == null) return;
-        
+
         String name = group.getName();
         if (name != null) {
             String key = "group:"+name;
@@ -118,15 +118,18 @@ class ContentModelGroupImpl implements ContentModelGroup {
                 err += name + ", already exists in this scope.";
                 throw new SchemaException(err);
             }
-            
+
             _resolver.addResolvable(key, group);
         }
-        
+
         //-- add to content model
         _contentModel.addElement(group);
     } //-- addGroup
-    
+
     public Enumeration enumerate() {
         return _contentModel.elements();
     } //-- enumerate
+
+    public int getChildrenCount() { return _contentModel.size(); }
+
 } //-- ContentModelGroup

@@ -52,7 +52,7 @@ import org.exolab.castor.util.OrderedMap;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.xml.schema.types.*;
+import org.exolab.castor.xml.schema.SimpleTypesFactory;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -63,13 +63,13 @@ import java.util.Hashtable;
  * @version $Revision$ $Date$
 **/
 public class TypeConversion {
-    
-    
-    public static final String TIME_FORMAT 
+
+
+    public static final String TIME_FORMAT
         = "CCYY-MM-DDThh:mm:ss.sss";
-        
+
     private static OrderedMap sjNameMap = iCreateNameMap();
-    
+
     /**
      * Returns the Java type name based on the given Schema
      * type name
@@ -80,12 +80,12 @@ public class TypeConversion {
         if (mappedName != null) return mappedName;
         else return schemaTypeName;
     } //-- getJavaTypeName
-    
+
     /*
     public static XSType createXSType(String schemaType) {
-        
+
         XSType xsType = null;
-        
+
         //-- string
         if ("string".equals(schemaType)) {
             xsType = new XSString();
@@ -128,150 +128,150 @@ public class TypeConversion {
         return xsType;
     } //-- createXSType
     */
-    
-    
+
+
     /**
      * Converts the given Simpletype to the appropriate XSType.
      * @return the XSType which represets the given Simpletype
     **/
     public static XSType convertType(SimpleType simpleType) {
-        
+
         if (simpleType == null) return null;
-        
+
         XSType xsType = null;
-        
-        
+
+
         //-- enumerated types
         if (simpleType.hasFacet("enumeration")) {
-            String className 
+            String className
                 = JavaXMLNaming.toJavaClassName(simpleType.getName());
-                
+
             XSClass xsClass = new XSClass(new JClass(className));
             xsClass.setAsEnumertated(true);
             return xsClass;
         }
-        
+
         //-- determine base type
         SimpleType base = simpleType;
-        while ((base != null) && (!(base instanceof BuiltInType))) {
-            base = base.getBase();
+        while ((base != null) && ( ! SimpleTypesFactory.isBuiltInType( base.getTypeCode() ) )) {
+            base = (SimpleType)base.getBaseType();
         }
         if (base == null) {
-            String className 
+            String className
                 = JavaXMLNaming.toJavaClassName(simpleType.getName());
             xsType = new XSClass(new JClass(className));
         }
         else {
-            switch ( ((BuiltInType)base).getType() ) {
-                
+            switch ( base.getTypeCode() ) {
+
                 //-- ID
-                case BuiltInType.ID_TYPE:
+                case SimpleTypesFactory.ID_TYPE:
                     return new XSId();
                 //-- IDREF
-                case BuiltInType.IDREF_TYPE:
+                case SimpleTypesFactory.IDREF_TYPE:
                     return new XSIdRef();
                 //-- NCName
-                case BuiltInType.NCNAME_TYPE:
+                case SimpleTypesFactory.NCNAME_TYPE:
                     return new XSNCName();
                 //-- NMTOKEN
-                case BuiltInType.NMTOKEN_TYPE:
+                case SimpleTypesFactory.NMTOKEN_TYPE:
                     return new XSNMToken();
                 //-- binary
-                case BuiltInType.BINARY_TYPE:
+                case SimpleTypesFactory.BINARY_TYPE:
                     return new XSBinary();
                 //-- boolean
-                case BuiltInType.BOOLEAN_TYPE:
+                case SimpleTypesFactory.BOOLEAN_TYPE:
                     return new XSBoolean();
                 //-- double
-                case BuiltInType.DOUBLE_TYPE:
+                case SimpleTypesFactory.DOUBLE_TYPE:
                     return new XSReal();
                 //-- integer
-                case BuiltInType.INTEGER_TYPE:
+                case SimpleTypesFactory.INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSInteger();
                     readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
-                //-- negative-integer 
-                case BuiltInType.NEGATIVE_INTEGER_TYPE:
+                //-- negative-integer
+                case SimpleTypesFactory.NEGATIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSNegativeInteger();
                     readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
                 //-- positive-integer
-                case BuiltInType.POSITIVE_INTEGER_TYPE:
+                case SimpleTypesFactory.POSITIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSPositiveInteger();
                     readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
-                case BuiltInType.LONG_TYPE:
+                case SimpleTypesFactory.LONG_TYPE:
                     return new XSLong();
                 //-- string
-                case BuiltInType.STRING_TYPE:
+                case SimpleTypesFactory.STRING_TYPE:
                     return toXSString(simpleType);
                 //-- timeInstant
-                case BuiltInType.TIME_INSTANT_TYPE:
+                case SimpleTypesFactory.TIME_INSTANT_TYPE:
                     return new XSTimeInstant();
                 //-- decimal
-                case BuiltInType.DECIMAL_TYPE:
+                case SimpleTypesFactory.DECIMAL_TYPE:
                     return new XSDecimal();
                 //-- short
-                case BuiltInType.SHORT_TYPE:
+                case SimpleTypesFactory.SHORT_TYPE:
 					XSShort xsShort = new XSShort();
 					readShortFacets(simpleType, xsShort);
                     return xsShort;
                 //-- short
-				case BuiltInType.INT_TYPE:
+				case SimpleTypesFactory.INT_TYPE:
 					XSInt xsInt = new XSInt();
 					readIntFacets(simpleType, xsInt);
                     return xsInt;
                 default:
                     //-- error
-                    String className 
+                    String className
                         = JavaXMLNaming.toJavaClassName(simpleType.getName());
                     xsType = new XSClass(new JClass(className));
                     break;
-                
+
             }
         }
         return xsType;
-        
+
     } //-- convertType
-    
-        
+
+
     /**
      * Determines if the given type is a built in Schema simpletype
     **/
     public static boolean isBuiltInType(String type) {
         return (sjNameMap.get(type) != null);
     } //-- isBuiltInType
-    
+
     public static String getSchemaTypeName(String javaTypeName) {
         return sjNameMap.getNameByObject(javaTypeName);
-    } //-- getSchemaTypeNam        
-        
+    } //-- getSchemaTypeNam
+
       //-------------------/
      //- Private Methods -/
     //-------------------/
-    
+
     /**
      * Converts the given simpletype to an XSInteger
      * @param simpletype the Simpletype to convert
      * @return the XSInteger representation of the given Simpletype
     **/
     private static void readIntegerFacets
-        (SimpleType simpleType, XSInteger xsInteger) 
+        (SimpleType simpleType, XSInteger xsInteger)
     {
-        
+
         //-- copy valid facets
         Enumeration enum = simpleType.getFacets();
         while (enum.hasMoreElements()) {
-            
+
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();
-            
+
             //-- maxExclusive
             if (Facet.MAX_EXCLUSIVE.equals(name))
                 xsInteger.setMaxExclusive(facet.toInt());
@@ -284,27 +284,28 @@ public class TypeConversion {
             //-- minInclusive
             else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
                 xsInteger.setMinInclusive(facet.toInt());
-            
+
         }
-        
+
     } //-- toXSInteger
-	
+
+
     /**
      * Converts the given simpletype to an XSInteger
      * @param simpletype the Simpletype to convert
      * @return the XSInteger representation of the given Simpletype
     **/
     private static void readIntFacets
-        (SimpleType simpleType, XSInt xsInt) 
+        (SimpleType simpleType, XSInt xsInt)
     {
-        
+
         //-- copy valid facets
         Enumeration enum = simpleType.getFacets();
         while (enum.hasMoreElements()) {
-            
+
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();
-            
+
             //-- maxExclusive
             if (Facet.MAX_EXCLUSIVE.equals(name))
                 xsInt.setMaxExclusive(facet.toInt());
@@ -317,26 +318,26 @@ public class TypeConversion {
             //-- minInclusive
             else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
                 xsInt.setMinInclusive(facet.toInt());
-            
+
         }
-        
+
     } //-- toXSInt
-    
+
     /**
      * Converts the given simpletype to an XSShort
      * @param simpletype the Simpletype to convert
      * @param xsShort the XSShort to set the facets in
     **/
     private static void readShortFacets
-        (SimpleType simpleType, XSShort xsShort) 
-    {        
+        (SimpleType simpleType, XSShort xsShort)
+    {
         //-- copy valid facets
         Enumeration enum = simpleType.getFacets();
         while (enum.hasMoreElements()) {
-            
+
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();
-            
+
             //-- maxExclusive
             if (Facet.MAX_EXCLUSIVE.equals(name))
                 xsShort.setMaxExclusive(facet.toShort());
@@ -349,11 +350,12 @@ public class TypeConversion {
             //-- minInclusive
             else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
                 xsShort.setMinInclusive(facet.toShort());
-            
+
         }
-        
+
     } //-- toXSShort
-    
+
+
     /**
      * Converts the given simpletype to an XSString
      * @param simpletype the Simpletype to convert
@@ -374,18 +376,18 @@ public class TypeConversion {
         }
         return xsString;
     } //-- toXSString
-    
+
     /**
      * Creates the naming table for type conversion
     **/
     private static OrderedMap iCreateNameMap() {
-        
+
         OrderedMap nameMap = new OrderedMap(10);
-        
+
         //-- #IDREF...temporary this will be changed, once
         //-- I add in the Resolver code
         nameMap.put("IDREF",        "java.lang.String");
-        
+
         //-- type mappings
         nameMap.put("ID",                  "java.lang.String");
         nameMap.put("NCName",              "java.lang.String");
@@ -399,10 +401,10 @@ public class TypeConversion {
         nameMap.put("string",              "java.lang.String");
         nameMap.put("timeInstant",         "java.util.Date");
         nameMap.put("decimal",             "java.util.BigDecimal");
-		nameMap.put("short",               "short");
-        nameMap.put("int",		           "int");				
-        
+        nameMap.put("short",               "short");
+        nameMap.put("int",		           "int");
+
         return nameMap;
     } //-- iCreateNameMap
-    
+
 } //-- TypeConversion

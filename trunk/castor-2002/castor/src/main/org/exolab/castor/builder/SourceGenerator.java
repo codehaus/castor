@@ -47,7 +47,6 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.xml.schema.reader.*;
 import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.types.BuiltInType;
 
 import org.exolab.javasource.*;
 import org.exolab.castor.builder.util.ConsoleDialog;
@@ -282,7 +281,7 @@ public class SourceGenerator {
         //-- source generator types name flag
         desc = "Sets the source generator types name (SGTypeFactory)";
         allOptions.addFlag("types", "types", desc, true);
-        
+
         //-- XXX maintained temporarily
         allOptions.addFlag("type-factory", "classname", "", true);
 
@@ -420,23 +419,21 @@ public class SourceGenerator {
 
         //-- create classes for sub-elements if necessary
         XMLType xmlType = elementDecl.getType();
-        
+
 
         //-- No type definition
         if (xmlType == null) {
-            String typeRef = elementDecl.getTypeReference();
-            System.out.print("'type' or 'simpleType' with name '" + typeRef);
-            System.out.print("' not found for element: ");
+            System.out.print("Type not found for element: ");
             System.out.println(elementDecl.getName());
             return;
         }
         //-- ComplexType
         else if (xmlType.isComplexType()) {
-            
+
             JClass jClass = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
-                                                        
+
             processComplexType((ComplexType)xmlType, sInfo);
 
             processJClass(jClass, sInfo);
@@ -469,19 +466,18 @@ public class SourceGenerator {
                                                      sInfo,
                                                      sInfo.packageName);
                 processJClass(jClass, sInfo);
-                
+
             }
 
             //-- process base complextype if necessary
-            String base = complexType.getBase();
-            if (base != null) {
-                Schema schema = complexType.getSchema();
-                processComplexType(schema.getComplexType(base), sInfo);
+            XMLType baseType= complexType.getBaseType();
+            if (baseType != null) {
+                processComplexType((ComplexType)baseType, sInfo); //This is wrong: a complex type can extend a simple type.
             }
 
             //-- process AttributeDecl
             processAttributes(complexType, sInfo);
-            
+
             //-- process ContentModel
             processContentModel(complexType, sInfo);
 
@@ -509,8 +505,8 @@ public class SourceGenerator {
         //-- generate source for a simpletype is
         //-- when it's an enumeration
         //if (! (simpleType instanceof BuiltInType) ) {
-        if (simpleType.hasFacet(Facet.ENUMERATION)) {    
-            
+        if (simpleType.hasFacet(Facet.ENUMERATION)) {
+
             ClassInfo classInfo = sInfo.resolve(simpleType);
 
             if (classInfo == null) {
@@ -533,22 +529,22 @@ public class SourceGenerator {
 
     /**
      * Processes the attribute declarations for the given complex type
-     * @param complexType the ComplexType containing the attribute 
+     * @param complexType the ComplexType containing the attribute
      * declarations to process.
      * @param sInfo the current source generator state information
     **/
     private void processAttributes(ComplexType complexType, SGStateInfo sInfo) {
-        
+
         if (complexType == null) return;
-        
+
         Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attribute = (AttributeDecl)enum.nextElement();
             processSimpleType(attribute.getSimpleType(), sInfo);
         }
-        
+
     } //-- processAttributes
-    
+
     /**
      * Processes the given ContentModelGroup
      * @param cmGroup the ContentModelGroup to process

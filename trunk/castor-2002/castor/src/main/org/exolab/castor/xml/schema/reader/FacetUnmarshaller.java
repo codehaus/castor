@@ -53,7 +53,7 @@ import org.xml.sax.*;
 /**
  * A class for Unmarshalling facets
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class FacetUnmarshaller extends SaxUnmarshaller {
 
@@ -66,22 +66,22 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller = null;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The Facet we are constructing
     **/
     private Facet _facet = null;
-    
+
     /**
      * The element name of the Facet currently being unmarshalled
     **/
     private String _elementName = null;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -91,30 +91,29 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
      * @param name the name of the Facet
      * @param atts the AttributeList
     **/
-    public FacetUnmarshaller (String name, AttributeList atts) 
+    public FacetUnmarshaller (String name, AttributeList atts)
         throws SAXException
     {
         super();
-        
+
         _elementName = name;
-        
+
         if (!isFacet(name)) {
             String err = "'" + name + "' is not a valid or supported facet.";
             throw new IllegalArgumentException(err);
         }
-        
+
         //-- handle attributes
         String attValue = null;
-            
-        _facet = new BasicFacet(name);
-        _facet.setValue(atts.getValue(SchemaNames.VALUE_ATTR));
-        
+
+        _facet = new Facet(name, atts.getValue(SchemaNames.VALUE_ATTR));
+
     } //-- ArchetypeUnmarshaller
 
       //-----------/
      //- Methods -/
     //-----------/
-    
+
     /**
      * Returns the name of the element that this SaxUnmarshaller
      * handles
@@ -126,7 +125,7 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     } //-- elementName
 
     /**
-     * 
+     *
     **/
     public Facet getFacet() {
         return _facet;
@@ -139,13 +138,13 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     public Object getObject() {
         return getFacet();
     } //-- getObject
-    
+
     /**
-     * @param name 
-     * @param atts 
+     * @param name
+     * @param atts
      * @see org.xml.sax.DocumentHandler
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
         //-- Do delagation if necessary
@@ -154,19 +153,19 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else illegalElement(name);
-        
+
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
         //-- Do delagation if necessary
@@ -175,17 +174,17 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
             --depth;
             return;
         }
-        
+
         if (unmarshaller == null)
             throw new SAXException("missing start element: " + name);
         else if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation annotation = (Annotation)unmarshaller.getObject();
             _facet.addAnnotation(annotation);
         }
-        
+
     } //-- endElement
 
-    public void characters(char[] ch, int start, int length) 
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary
@@ -195,7 +194,7 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     } //-- characters
 
     private boolean isFacet(String name) {
-        
+
         if (Facet.ENUMERATION.equals(name))   return true;
         if (Facet.LENGTH.equals(name))        return true;
         if (Facet.MAX_EXCLUSIVE.equals(name)) return true;
@@ -204,8 +203,8 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
         if (Facet.MIN_INCLUSIVE.equals(name)) return true;
         if (Facet.MAX_LENGTH.equals(name))    return true;
         if (Facet.MIN_LENGTH.equals(name))    return true;
-        
+
         return false;
     } //-- isFacet
-    
+
 } //-- FacetUnmarshaller
