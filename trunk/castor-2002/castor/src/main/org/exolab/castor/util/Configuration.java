@@ -212,8 +212,9 @@ public abstract class Configuration
 
     /**
      * True if the default configuration specified validation in the marshalling Framework
+     * True, by default!
      */
-     private static boolean  _MarshallingValidation;
+     private static boolean  _MarshallingValidation = true;
 
     /**
      * Returns true if the default configuration specified debugging.
@@ -489,8 +490,8 @@ public abstract class Configuration
         if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
             _debug = true;
         prop = _default.getProperty( Property.MarshallingValidation, "" );
-        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
-            _MarshallingValidation = true;
+        if ( prop.equalsIgnoreCase( "false" ) || prop.equalsIgnoreCase( "off" ) )
+            _MarshallingValidation = false;
         prop = null;
     }
 
