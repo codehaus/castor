@@ -133,6 +133,7 @@
     <case class="jdo.Collections" />
     <case class="jdo.OqlExtends" />
     <case class="jdo.DependentOrder" />
+    <case class="jdo.TestRollbackPrimitive" />
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
