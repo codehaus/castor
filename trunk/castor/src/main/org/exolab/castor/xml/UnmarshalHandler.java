@@ -897,6 +897,7 @@ public final class UnmarshalHandler extends MarshalFramework
         AttributeSet atts = processAttributeList(attList);
 
         String prefix = "";
+        String qName = name;
         int idx = name.indexOf(':');
         if (idx >= 0) {
              prefix = name.substring(0,idx);
@@ -1266,7 +1267,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
             //we need to recall startElement()
             //so that we can find a more appropriate descriptor in for the given name
-            startElement(name, attList);
+            startElement(qName, attList);
             return;
         }
         //--End of the container support
@@ -1418,9 +1419,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     //1- creates a new SAX2ANY handler
                     _anyUnmarshaller = new SAX2ANY(_namespaces);
                     //2- delegates the element handling
-                    String xmlName = ((prefix !=null) && (prefix.length() != 0))? prefix+':'+name:name;
-                    _anyUnmarshaller.startElement(xmlName, attList);
-                    xmlName = null;
+                    _anyUnmarshaller.startElement(qName, attList);
                     //first element so depth can only be one at this point
                     _depth = 1;
                     state.object = _anyUnmarshaller.getStartingNode();
