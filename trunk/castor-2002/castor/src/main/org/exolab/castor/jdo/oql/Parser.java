@@ -696,23 +696,31 @@ public class Parser implements TokenTypes {
 
     if ( tokenType != IDENTIFIER || nextTokenType != LPAREN )
       throw new OQLSyntaxException( "Expected a function call and did not find one, near " + _curToken.getTokenValue() );
-    
+
     ParseTreeNode retNode = match( IDENTIFIER );
-    retNode.addChild( match( LPAREN ) );
+    ParseTreeNode parNode = match( LPAREN );
+    parNode.addChild( unaryExpr() );
+    while ( _curToken.getTokenType() == COMMA ) {
+        match( COMMA );
+        parNode.addChild( unaryExpr() );
+    }
+    retNode.addChild( parNode );
+    retNode.addChild( match( RPAREN ) );
+/*    retNode.addChild( match( LPAREN ) );
 
     tokenType = _curToken.getTokenType();
     while ( tokenType != RPAREN )
       retNode.addChild( expr() );
-    
-    match( RPAREN );
-    
+
+    match( RPAREN );*/
+
     return retNode;
   }
 
   /**
    * Consumes tokens of collectionExpr.
    *
-   * @return Parse Tree with the root containing the function call and 
+   * @return Parse Tree with the root containing the function call and
    *    the children containing the parameters
    * @throws InvalidCharException passed through from match()
    * @throws OQLSyntaxException passed through from match() or if an

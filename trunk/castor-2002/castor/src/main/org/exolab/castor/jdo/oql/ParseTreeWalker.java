@@ -504,13 +504,25 @@ public class ParseTreeWalker implements TokenTypes
   private void checkWhereClause(ParseTreeNode whereClause)
         throws QueryException {
 
+    Enumeration e;
     int tokenType = whereClause.getToken().getTokenType();
+
     switch (tokenType) {
       case DOT:
         checkProjection( whereClause, false, false );
         break;
       case IDENTIFIER:
-        checkField(whereClause);
+        e = whereClause.children();
+        if ( e.hasMoreElements() ) {
+            if ( whereClause.getChild(0).getToken().getTokenType() == LPAREN ) {
+                // A function.
+                while ( e.hasMoreElements() ) {
+                    checkWhereClause( (ParseTreeNode) e.nextElement() );
+                }
+            }
+        } else {
+            checkField(whereClause);
+        }
         break;
       case DOLLAR:
         checkParameter(whereClause);
@@ -520,7 +532,7 @@ public class ParseTreeWalker implements TokenTypes
         checkInClauseRightSide(whereClause.getChild(1));
 
       default:
-        for (Enumeration e = whereClause.children(); e.hasMoreElements(); ) {
+        for (e = whereClause.children(); e.hasMoreElements(); ) {
           checkWhereClause( (ParseTreeNode) e.nextElement() );
         }
     }
@@ -1030,23 +1042,28 @@ public class ParseTreeWalker implements TokenTypes
 
       //fields or SQL functions
       case IDENTIFIER: case DOT:
-        if ( exprTree.getChildCount() > 0 && exprTree.getChild(1).getToken().getTokenType() == LPAREN ) {
+        if ( exprTree.getChildCount() > 0 &&
+             exprTree.getChild(0/* was '1' thth */).getToken().getTokenType() == LPAREN ) {
             //An SQL function
             sb = new StringBuffer(exprTree.getToken().getTokenValue()).append("(");
             int paramCount = 0;
-            for (Enumeration e = exprTree.children(); e.hasMoreElements(); ) {
-                sb.append( getSQLExpr( (ParseTreeNode) e.nextElement() ) ).append(" , ");
+            Enumeration e = exprTree.children();
+            e = ((ParseTreeNode) e.nextElement()).children(); // LPAREN's children
+            for (; e.hasMoreElements(); ) {
+                sb.append( getSQLExpr( (ParseTreeNode) e.nextElement() ) )
+                    .append(" , ");
                 paramCount++;
             }
 
             if ( paramCount > 0 ) {
                 //replace final comma space with close paren.
-                sb.replace(sb.length() - 2, sb.length() - 1, " )").append(" ");
+                sb.replace(sb.length() - 2, sb.length() - 1, " )");//.append(" ");
             } else {
                 //there were no parameters, so no commas.
                 sb.append(") ");
             }
 
+            //System.out.println( "Function found. '" + sb + "'" );
             return sb.toString();
         } else {
 
