@@ -50,12 +50,11 @@ package org.exolab.castor.persist;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import org.exolab.castor.mapping.ClassDesc;
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.IntegrityException;
-import org.exolab.castor.mapping.RelationDesc;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -138,19 +137,19 @@ final class CacheEngine
                  PersistenceFactory factory, PrintWriter logWriter )
         throws MappingException
     {
-        Enumeration enum;
-        ClassDesc  clsDesc;
-        Persistence persist;
+        Enumeration   enum;
+        ClassHandler  handler;
+        Persistence   persist;
         
         _logWriter = logWriter;
         enum = mapResolver.listDescriptors();
         while ( enum.hasMoreElements() ) {
-            clsDesc = (ClassDesc) enum.nextElement();
-            persist = factory.getPersistence( clsDesc, logWriter );
+            handler = new ClassHandler( (ClassDescriptor) enum.nextElement(), mapResolver );
+            persist = factory.getPersistence( handler, logWriter );
             if ( persist != null )
-                _typeInfo.put( clsDesc.getJavaClass(), new TypeInfo( persist, clsDesc ) );
+                _typeInfo.put( handler.getJavaClass(), new TypeInfo( persist, handler ) );
             else if ( _logWriter != null ) {
-                _logWriter.println( Messages.format( "persist.noEngine", clsDesc.getJavaClass() ) );
+                _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
             }
         }
     }
@@ -168,7 +167,7 @@ final class CacheEngine
     }
 
 
-    public ClassDesc getClassDesc( Class type )
+    public ClassHandler getClassHandler( Class type )
     {
         TypeInfo typeInfo;
         
@@ -176,7 +175,7 @@ final class CacheEngine
         if ( typeInfo == null )
             return null;
         else
-            return typeInfo.clsDesc;
+            return typeInfo.handler;
     }
 
 
@@ -228,7 +227,7 @@ final class CacheEngine
         
         // Create an OID to represent the object and see if we
         // have a lock (i.e. object is cached).
-        oid = new OID( typeInfo.clsDesc, identity );
+        oid = new OID( typeInfo.handler, identity );
         lock = getLock( oid );
         
         if ( lock != null ) {
@@ -257,7 +256,7 @@ final class CacheEngine
                         _logWriter.println( "PE: Loading " + obj.getClass().getName() +
                                             " (" + identity + ")" );
                     oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
-                                                         new RelationContext( tx, this ),
+                                                         new FetchContext( tx, this ),
                                                          obj, identity, accessMode ) );
                     oid.setExclusive( true );
                 } catch ( ObjectNotFoundException except ) {
@@ -287,14 +286,14 @@ final class CacheEngine
             
             // Object has not been loaded yet, or cleared from the cache.
             // The object is now loaded and a lock is acquired.
-            obj = typeInfo.clsDesc.newInstance();
-            typeInfo.clsDesc.getIdentity().setValue( obj, identity );
+            obj = typeInfo.handler.newInstance();
+            typeInfo.handler.setIdentity( obj, identity );
             try {
                 if ( _logWriter != null )
                     _logWriter.println( "PE: Loading " + obj.getClass().getName() + " ("
                                         + identity + ")" );
                 oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
-                                                     new RelationContext( tx, this ),
+                                                     new FetchContext( tx, this ),
                                                      obj, identity, accessMode ) );
             } catch ( ObjectNotFoundException except ) {
                 // Object was not found in persistent storge
@@ -358,7 +357,7 @@ final class CacheEngine
         typeInfo = (TypeInfo) _typeInfo.get( query.getResultType() );
         // Create an OID to represent the object and see if we
         // have a lock (i.e. object is cached).
-        oid = new OID( typeInfo.clsDesc, identity );
+        oid = new OID( typeInfo.handler, identity );
         lock = getLock( oid );
         
         if ( lock != null ) {
@@ -383,7 +382,7 @@ final class CacheEngine
                 // the database and obtain a lock on the object.
                 try {
                     if ( _logWriter != null )
-                        _logWriter.println( "PE: Loading " + typeInfo.clsDesc.getJavaClass().getName() +
+                        _logWriter.println( "PE: Loading " + typeInfo.handler.getJavaClass().getName() +
                                             " (" + identity + ")" );
                     oid.setStamp( query.fetch( obj ) );
                     oid.setExclusive( true );
@@ -414,11 +413,11 @@ final class CacheEngine
             
             // Object has not been loaded yet, or cleared from the cache.
             // The object is now loaded from the query and a lock is acquired.
-            obj = typeInfo.clsDesc.newInstance();
-            typeInfo.clsDesc.getIdentity().setValue( obj, identity );
+            obj = typeInfo.handler.newInstance();
+            typeInfo.handler.setIdentity( obj, identity );
             try {
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Loading " + typeInfo.clsDesc.getJavaClass().getName() +
+                    _logWriter.println( "PE: Loading " + typeInfo.handler.getJavaClass().getName() +
                                         " (" + identity + ")" );
                 oid.setStamp( query.fetch( obj ) );
             } catch ( PersistenceException except ) {
@@ -479,32 +478,37 @@ final class CacheEngine
 
         // Create all the dependent objects first. Must perform that
         // operation on all descendent classes.
-        RelationDesc[] relations;
-        ClassDesc      clsDesc;
+        RelationHandler[] relations;
+        ClassHandler      handler;
 
-        clsDesc = typeInfo.clsDesc;
-        while ( clsDesc != null ) {
-            relations = clsDesc.getRelations();
+        handler = typeInfo.handler;
+        while ( handler != null ) {
+            relations = handler.getRelations();
             for ( int i = 0 ; i < relations.length ; ++i ) {
-                Object related;
-                Object relatedId;
+                if ( relations[ i ].isMulti() ) {
+                    Object[] related;
+
+                    related = relations[ i ].getRelateds( obj );
+                    if ( related != null ) {
+                        for ( int j = 0 ; j < related.length ; ++j )
+                            if ( ! tx.isPersistent( related[ j ] ) )
+                                tx.create( this, related[ j ], relations[ i ].getIdentity( related[ j ] ) );
+                    }
+                } else {
+                    Object related;
                 
-                related = relations[ i ].getRelationField().getValue( obj );
-                if ( related != null && ! tx.isPersistent( related ) ) {
-                    if ( relations[ i ].isAttached() )
-                        relatedId = identity;
-                    else
-                        relatedId = relations[ i ].getRelatedClassDesc().getIdentity().getValue( related );
-                    tx.create( this, related, relatedId );
+                    related = relations[ i ].getRelated( obj );
+                    if ( related != null && ! tx.isPersistent( related ) )
+                        tx.create( this, related, relations[ i ].getIdentity( related ) );
                 }
             }
-            clsDesc = clsDesc.getExtends();
+            handler = handler.getExtends();
         }
 
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
-            oid = new OID( typeInfo.clsDesc, identity );
+            oid = new OID( typeInfo.handler, identity );
             if ( identity != null ) {
                 // If the object has a known identity at creation time, perform
                 // duplicate identity check. Otherwise, create the object in
@@ -531,7 +535,7 @@ final class CacheEngine
             }
 
             try {
-                typeInfo.clsDesc.canStore( obj );
+                typeInfo.handler.checkIntegrity( obj );
             } catch ( IntegrityException except ) {
                 throw new PersistenceException( except );
             }
@@ -539,9 +543,8 @@ final class CacheEngine
             // Copy the contents of the object we just created into the
             // cache engine. This copy will be deleted if the transaction
             // ends up rolling back.
-            locked = typeInfo.clsDesc.newInstance();
-            typeInfo.clsDesc.copyInto( obj, locked, null );
-            typeInfo.clsDesc.getIdentity().copyInto( obj, locked );
+            locked = typeInfo.handler.newInstance();
+            typeInfo.handler.copyInto( obj, locked, null );
             lock = new ObjectLock( locked );
             try {
                 lock.acquire( tx, true, 0 );
@@ -583,7 +586,7 @@ final class CacheEngine
         OID        oid;
         
         typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
-        oid = new OID( typeInfo.clsDesc, identity );
+        oid = new OID( typeInfo.handler, identity );
         // Get the lock from the OID. Assure the object has a write
         // lock -- since this was done during the transaction, we
         // don't wait to acquire the lock.
@@ -601,34 +604,54 @@ final class CacheEngine
         // Delete all the related objects as well. Detached objects are not
         // deleted when the primary object is deleted, but attached objects
         // are. These objects exist in persistent storage, but not in the cache.
-        ClassDesc      clsDesc;
-        RelationDesc[] relations;
+        ClassHandler      handler;
+        RelationHandler[] relations;
 
-        clsDesc = typeInfo.clsDesc;
-        while ( clsDesc != null ) {
-            relations = clsDesc.getRelations();
+        handler = typeInfo.handler;
+        while ( handler != null ) {
+            /*
+            relations = handler.getRelations();
             for ( int i = 0 ; i < relations.length ; ++i ) {
-                if ( relations[ i ].isAttached() ) {
+                if ( relations[ i ].isMulti() ) {
+                    Object[] related;
+                    TypeInfo relTypeInfo;
+                    Object   relIdentity;
+                    
+                    related = relations[ i ].getRelateds( obj );
+                    if ( related != null ) {
+                        relTypeInfo = (TypeInfo) _typeInfo.get( relations[ i ].getRelatedClass() );
+                        for ( int j = 0 ; j < related.length ; ++j ) {
+                            relIdentity = relations[ i ].getIdentity( related[ j ] );
+                            if ( _logWriter != null )
+                                _logWriter.println( "PE: Deleting " + relations[ j ].getRelatedClass().getName() +
+                                                    " (" + relIdentity + ")" );
+                            relTypeInfo.persist.delete( tx.getConnection( this ), relIdentity );
+                        }
+                    }
+                } else {
                     Object   related;
                     TypeInfo relTypeInfo;
+                    Object   relIdentity;
                     
-                    related = relations[ i ].getRelationField().getValue( obj );
+                    related = relations[ i ].getRelated( obj );
                     if ( related != null ) {
-                        relTypeInfo = (TypeInfo) _typeInfo.get( related.getClass() );
+                        relTypeInfo = (TypeInfo) _typeInfo.get( relations[ i ].getRelatedClass() );
+                        relIdentity = relations[ i ].getIdentity( related );
                         if ( _logWriter != null )
-                            _logWriter.println( "PE: Deleting " + related.getClass().getName() + " ("
-                                                + oid.getIdentity() + ")" );
-                        relTypeInfo.persist.delete( tx.getConnection( this ), related, oid.getIdentity() );
+                            _logWriter.println( "PE: Deleting " + relations[ i ].getRelatedClass().getName() +
+                                                " (" + relIdentity + ")" );
+                        relTypeInfo.persist.delete( tx.getConnection( this ), relIdentity );
                     }
                 }
             }
-            clsDesc = clsDesc.getExtends();
+            */
+            handler = handler.getExtends();
         }
 
         if ( _logWriter != null )
             _logWriter.println( "PE: Deleting " + obj.getClass().getName() + " ("
                                 + oid.getIdentity() + ")" );
-        typeInfo.persist.delete( tx.getConnection( this ), obj, oid.getIdentity() );
+        typeInfo.persist.delete( tx.getConnection( this ), oid.getIdentity() );
     }
     
 
@@ -673,7 +696,7 @@ final class CacheEngine
         boolean    sameIdentity;
         
         typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
-        oid = new OID( typeInfo.clsDesc, identity );
+        oid = new OID( typeInfo.handler, identity );
         lock = getLock( oid );
         if ( lock == null || ! lock.hasLock( tx, false ) )
             throw new IllegalStateException( Messages.format( "persist.internal",
@@ -704,10 +727,10 @@ final class CacheEngine
             sameIdentity = identity.equals( oldIdentity );
 
             // Check if object has been modified, and whether it can be stored.
-            if ( sameIdentity || ! typeInfo.clsDesc.isModified( obj, locked ) )
+            if ( sameIdentity || ! typeInfo.handler.isModified( obj, locked ) )
                 return oid;
             try {
-                typeInfo.clsDesc.canStore( obj );
+                typeInfo.handler.checkIntegrity( obj );
             } catch ( IntegrityException except ) {
                 throw new PersistenceException( except );
             }
@@ -733,7 +756,7 @@ final class CacheEngine
                 typeInfo.persist.changeIdentity( tx.getConnection( this ),
                                                  obj, oldIdentity, identity );
                 removeLock( removeOID( locked ) );
-                oid = new OID( typeInfo.clsDesc, identity );
+                oid = new OID( typeInfo.handler, identity );
                 if ( getLock( oid ) != null )
                     throw new DuplicateIdentityException( obj.getClass(), identity );
                 removeLock( removeOID( locked ) );
@@ -838,8 +861,7 @@ final class CacheEngine
                 _logWriter.println( Messages.format( "persist.internal", "copyObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         }
-        typeInfo.clsDesc.copyInto( locked, obj, new RelationContext( tx, this ) );
-        typeInfo.clsDesc.getIdentity().copyInto( locked, obj );
+        typeInfo.handler.copyInto( locked, obj, new FetchContext( tx, this ) );
     }
 
 
@@ -870,8 +892,7 @@ final class CacheEngine
         // need to wait for the lock
         try {
             locked = lock.acquire( tx, true, 0 );
-            typeInfo.clsDesc.copyInto( obj, locked, null );
-            typeInfo.clsDesc.getIdentity().copyInto( obj, locked );
+            typeInfo.handler.copyInto( obj, locked, null );
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
@@ -993,14 +1014,14 @@ final class CacheEngine
     static class TypeInfo
     {
         
-        ClassDesc   clsDesc;
+        final ClassHandler handler;
         
-        Persistence  persist;
+        final Persistence  persist;
         
-        TypeInfo( Persistence persist, ClassDesc clsDesc )
+        TypeInfo( Persistence persist, ClassHandler handler )
         {
             this.persist = persist;
-            this.clsDesc = clsDesc;
+            this.handler = handler;
         }
         
     }
