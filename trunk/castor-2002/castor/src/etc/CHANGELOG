@@ -2,11 +2,12 @@
 Version (CVS)
 -------------
 
-XML: Added code from Matt Small [msmall@clickability.com] that improves the
-     SchemaWriter support (Arnaud)
+XML: Fixed bug that prevented elements that reference each other to generate classes. It removes
+     the StackOverFlow Exception. (Arnaud)
 
-XML: Fixed bug in the generated descriptors to correctly generate validation code when
-     collections are used.
+XML: Added code from Matt Small [msmall@clickability.com] that improves the SchemaWriter support (Arnaud)
+
+XML: Fixed bug in the generated descriptors to correctly generate validation code when collections are used.
      (Reported by Dr. Louis Coetzee [lcoetzee@subversion.icomtek.csir.co.za]) (Arnaud)
    
 XML: Added QName support in the marshalling framework (when used via the mapping or via
