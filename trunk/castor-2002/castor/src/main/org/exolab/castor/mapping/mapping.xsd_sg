@@ -64,7 +64,7 @@
       <element name="related-mapping" minOccurs="2" maxOccurs="2">
 	<type content="elemOnly" order="seq">
 	  <element ref="sql" minOccurs="0" maxOccurs="1"/>
-          <attribute name="name" type="ID" minOccurs="1"/>
+          <attribute name="name" type="IDREF" minOccurs="1"/>
           <attribute name="type" type="NMTOKEN" minOccurs="0"/>
 	</type>
       </element>
