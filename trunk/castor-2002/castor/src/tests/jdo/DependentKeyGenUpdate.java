@@ -235,7 +235,6 @@ public class DependentKeyGenUpdate extends CastorTestCase {
         detailId9 = detail9.getId();
         detail3Id = detail3.getId();
 
-        System.out.println( "detail6 after commit(): "+detail6 );
         _db.begin();
         master = (TestMasterKeyGen) _db.load( TestMasterKeyGen.class, new Integer( masterId ) );
         if ( master != null ) {
