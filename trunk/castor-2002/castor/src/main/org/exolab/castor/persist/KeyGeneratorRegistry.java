@@ -71,8 +71,6 @@ public final class KeyGeneratorRegistry
 
     /**
      * Association between key generator names (aliases) and instances.
-     * To avoid cyclic references keyGenDesc->registry, registry->keyGenDesc
-     * WeakHashMap should be used here with JDK >= 1.2
      */
     private Hashtable  _keyGens = new Hashtable();
 
