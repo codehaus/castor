@@ -86,6 +86,8 @@ public class Unmarshaller {
     **/
     EntityResolver entityResolver = null;
 
+    private ClassLoader loader = null;
+    
     /**
      * The print writer used for log information
     **/
@@ -111,18 +113,29 @@ public class Unmarshaller {
      * @param c the Class to create the Unmarshaller for
     **/
     public Unmarshaller(Class c) {
+        this(c, null);
+    } //-- Unmarshaller(Class)
+
+    /**
+     * Creates a new Unmarshaller with the given Class
+     * @param c the Class to create the Unmarshaller for
+    **/
+    public Unmarshaller(Class c, ClassLoader loader) {
         super();
         this._class = c;
         this.debug = Configuration.debug();
-        _cdResolver = new ClassDescriptorResolverImpl();
+        this.loader = loader;
+        _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)
     
-    public void setMapping( Mapping mapping )
-        throws MappingException
-    {
-        _cdResolver = new ClassDescriptorResolverImpl();
-        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
-    }
+    /**
+     * Sets the ClassLoader to use when loading new classes
+     * @param loader the ClassLoader to use
+    **/
+    public void setClassLoader(ClassLoader loader) {
+        this.loader = loader;
+    } //-- setClassLoader
+    
     
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
@@ -153,6 +166,17 @@ public class Unmarshaller {
         this.pw = printWriter;
     } //-- setLogWriter
 
+    /**
+     * Sets the Mapping to use during unmarshalling
+     * @param mapping the Mapping to use during unmarshalling
+    **/
+    public void setMapping( Mapping mapping )
+        throws MappingException
+    {
+        _cdResolver = new ClassDescriptorResolverImpl(loader);
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
+    } //-- setMapping
+    
     /**
      * Sets the flag for validation
      * @param validate, a boolean to indicate whether or not 
