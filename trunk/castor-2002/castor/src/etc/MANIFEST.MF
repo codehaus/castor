@@ -5,7 +5,7 @@ Specification-Version: 0.8
 Implementation-Title: Castor
 Implementation-Vendor: Exoffice Technologies Inc.
 Implementation-Version: $VERSION$
-Class-path: xerces.jar, jdbc-se2.0.jar, odmg-3.0.jar, jndi.jar, jta1.0.1.jar
+Class-Path: xerces.jar, jdbc-se2.0.jar, jndi.jar, jta1.0.1.jar
 
 Name: org/exolab/castor
 Sealed: true
