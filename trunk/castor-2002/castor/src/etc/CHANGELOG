@@ -1,6 +1,9 @@
 Version 0.8.1   April 5, 2000
 -----------------------------
 
+XML:     Fixed long->object conversion which suffered from a cut and paste bug
+         from the integer type.
+
 XML:     Added back inheritence support inside XMLClassDescriptor,
          which was in MarshalInfo, but removed during the upgrade.
 
