@@ -112,6 +112,11 @@ public final class JMethodSignature {
         this.modifiers    = new JModifiers();
         this.params       = new JNamedMap(3);
         this.exceptions   = new Vector(1); 
+        
+        //-- add Return type descriptor
+        if (returnType != null) {
+            jdc.addDescriptor(JDocDescriptor.createReturnDesc(returnType.getLocalName()));
+        }
     } //-- JMethodSignature
 
     /**
