@@ -651,6 +651,7 @@ public final class UnmarshalHandler extends MarshalFramework
         XMLFieldDescriptor descriptor = state.fieldDesc;
         
         if (!state.elementName.equals(name)) {
+            
             //maybe there is still a container to end
             if (descriptor.isContainer()) {
                 _stateInfo.push(state);
@@ -899,6 +900,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- (Q: if we have a container, do we possibly need to 
         //--     also check the container's multivalued status?)
         if ( ! descriptor.isMultivalued() ) {
+
             if (state.isUsed(descriptor)) {
                 
                 String err = "element \"" + name;
@@ -915,7 +917,8 @@ public final class UnmarshalHandler extends MarshalFramework
                 
                 ValidationException vx =
                     new ValidationException(err);
-                throw new SAXException(vx);
+                
+            	throw new SAXException(vx);
             }
             state.markAsUsed(descriptor);
             //-- if this is the identity then save id
@@ -1597,6 +1600,9 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //Test if we can accept the field in the parentState
         //in case the parentState fieldDesc is a container
+        //-- This following logic tests to see if we are in a
+        //-- container and we need to close out the container
+        //-- before proceeding:
         boolean canAccept = false;
         while ((parentState.fieldDesc != null) &&
                (parentState.fieldDesc.isContainer() && !canAccept) )
@@ -1609,16 +1615,28 @@ public final class UnmarshalHandler extends MarshalFramework
                if (tempClassDesc == null)
                   tempClassDesc = getClassDescriptor(parentState.object.getClass());
             }
-
+            
             canAccept = tempClassDesc.canAccept(name, parentState.object);
 
             if (!canAccept) {
+                //-- Does container class even handle this field?
+                if (tempClassDesc.getFieldDescriptor(name, NodeType.Element) != null) {
+                    if (!parentState.fieldDesc.isMultivalued()) { 
+                        String error = "The container object (" + tempClassDesc.getJavaClass().getName();
+                        error += ") cannot accept the child object associated with the element '" + name + "'";
+                        error += " because the container is already full!";
+                        ValidationException vx = new ValidationException(error);
+                        throw new SAXException(vx);    
+                    }
+                }
                 endElement(parentState.elementName);
                 parentState = (UnmarshalState)_stateInfo.peek();
             }
-
             tempClassDesc = null;
         }
+        
+        
+        
 
 
         //-- create new state object
@@ -1634,7 +1652,9 @@ public final class UnmarshalHandler extends MarshalFramework
         _stateInfo.push(state);
 
         //-- make sure we should proceed
-        //if (parentState.object == null) return;
+        if (parentState.object == null) {
+            if (!parentState.wrapper) return;
+        }
 
         Class _class = null;
 
@@ -1825,6 +1845,7 @@ public final class UnmarshalHandler extends MarshalFramework
             state.clear();
             //-- inherit whitespace preserving from the parentState
             state.wsPreserve = parentState.wsPreserve;
+            state.parent = parentState;
             
             //here we can hard-code a name or take the field name
             state.elementName = descriptor.getFieldName();
@@ -1837,9 +1858,18 @@ public final class UnmarshalHandler extends MarshalFramework
                 // Check if the container object has already been instantiated
                 FieldHandler handler = descriptor.getHandler();
                 containerObject = handler.getValue(object);
-                if (containerObject != null)
-                    //remove the descriptor from the used list
-                    parentState.markAsNotUsed(descriptor);
+                if (containerObject != null){
+                    if (state.classDesc != null) {
+                    	if (state.classDesc.canAccept(name, containerObject)) {
+                            //remove the descriptor from the used list
+                            parentState.markAsNotUsed(descriptor);
+                        }
+                    }
+                    else {
+                        //remove the descriptor from the used list
+                        parentState.markAsNotUsed(descriptor);
+                    }
+                }
                 else {
                     containerObject = handler.newInstance(object);
                 }
