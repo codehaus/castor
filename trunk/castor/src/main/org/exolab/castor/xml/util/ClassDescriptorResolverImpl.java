@@ -144,8 +144,14 @@ public class ClassDescriptorResolverImpl
         }
         else {
             _cacheViaClass.put(type, classDesc);
-            if (classDesc.getXMLName() != null) {
-                _cacheViaName.put(classDesc.getXMLName(), classDesc);
+            String xmlName = classDesc.getXMLName();
+            if ((xmlName != null) && (xmlName.length() > 0)) {
+                String nameKey = xmlName;
+                String ns = classDesc.getNameSpaceURI();             
+                if ((ns != null) && (ns.length() > 0)) {
+                    nameKey = ns + ':' + xmlName;
+                }
+                _cacheViaName.put(nameKey, classDesc);
             }
         }
     } //-- associate
@@ -325,18 +331,26 @@ public class ClassDescriptorResolverImpl
         Enumeration enum             = null;
         
         //-- check name cache first...
-        classDesc = (XMLClassDescriptor)_cacheViaName.get(xmlName);
+        String nameKey = xmlName;
+        if ((namespaceURI != null) && (namespaceURI.length() > 0))
+            nameKey = namespaceURI + ':' + xmlName;
+            
+        classDesc = (XMLClassDescriptor)_cacheViaName.get(nameKey);
         if(classDesc != null)
             return classDesc;
 
         //-- next check mapping loader...
+        XMLClassDescriptor possibleMatch = null;
         if (mappingLoader != null) {
             enum = mappingLoader.listDescriptors();
             while (enum.hasMoreElements()) {
                 classDesc = (XMLClassDescriptor)enum.nextElement();
                 if (xmlName.equals(classDesc.getXMLName())) {
-                    _cacheViaName.put(xmlName, classDesc);
-                    return classDesc;
+                    if (namespaceEquals(namespaceURI, classDesc.getNameSpaceURI())) {
+                        _cacheViaName.put(nameKey, classDesc);
+                        return classDesc;
+                    }
+                    possibleMatch = classDesc;
                 }
                 classDesc = null;
             }
@@ -347,12 +361,23 @@ public class ClassDescriptorResolverImpl
         while (enum.hasMoreElements()) {
             classDesc = (XMLClassDescriptor)enum.nextElement();
             if (xmlName.equals(classDesc.getXMLName())) {
-                _cacheViaName.put(xmlName, classDesc);
-                return classDesc;
+                if (namespaceEquals(namespaceURI, classDesc.getNameSpaceURI())) {
+                    _cacheViaName.put(nameKey, classDesc);
+                    return classDesc;
+                }
+                if (possibleMatch == null) 
+                    possibleMatch = classDesc;
+                else if (possibleMatch != classDesc) {
+                    //-- too many possible matches, return null.
+                    possibleMatch = null;
+                }
             }
             classDesc = null;
         }
         
+        if (classDesc == null) 
+            classDesc = possibleMatch;
+            
         return classDesc;
    
     } //-- resolveByXMLName
@@ -463,6 +488,25 @@ public class ClassDescriptorResolverImpl
         _error = true;
         _errMessage = message;
     } //-- setError
+    
+    
+    /** 
+     * Compares the two strings for equality. A Null and empty
+     * strings are considered equal.
+     *
+     * @return true if the two strings are considered equal.
+     */
+    private boolean namespaceEquals(String ns1, String ns2) {
+        if (ns1 == null) {
+            return ((ns2 == null) || (ns2.length() == 0));
+        }
+        
+        if (ns2 == null) {
+            return (ns1.length() == 0);
+        }
+        
+        return ns1.equals(ns2);
+    } //-- namespaceEquals
     
 } //-- ClassDescriptorResolverImpl
 
