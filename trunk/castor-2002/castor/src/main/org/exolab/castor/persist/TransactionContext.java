@@ -240,7 +240,6 @@ public abstract class TransactionContext
      */
     private CallbackInterceptor        _callback;
 
-
     /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
@@ -438,10 +437,10 @@ public abstract class TransactionContext
 
 
     /**
-     * Obtains an object for use within the transaction. Before an
-     * object can be used in a transaction it must be fetched.
-     * Multiple access to the same object within the transaction will
-     * return the same object instance (except for read-only access).
+     * Load an object for use within the transaction. Multiple access 
+     * to the same object within the transaction will return the same 
+     * object instance (except for read-only access).
+     * <p>
      * This method is similar to {@link #fetch} except that it will
      * load the object only once within a transaction and always
      * return the same instance.
@@ -471,6 +470,7 @@ public abstract class TransactionContext
      *  persistent storage
      * @throws PersistenceException An error reported by the
      *  persistence engine
+     * @return object being loaded
      */
     public synchronized Object load( LockEngine engine, ClassMolder molder,
                                      Object identity, Object objectToBeLoaded,
@@ -479,6 +479,29 @@ public abstract class TransactionContext
         return load( engine, molder, identity, objectToBeLoaded, suggestedAccessMode, null );
     }
 
+    /**
+     * Load an object for use within the transaction. Multiple access 
+     * to the same object within the transaction will return the same 
+     * object instance (except for read-only access).
+     * <p>
+     * This method work the same as {@link load(LockEngine,ClassMolder,Object,Object,AccessMode),
+     * except a QueryResults can be specified.
+     * <p>
+     * @param engine The persistence engine
+     * @param molder The class persistence molder
+     * @param object The object to fetch (single instance per transaction)
+     * @param identity The object's identity
+     * @param accessMode The access mode (see {@link AccessMode})
+     *  the values in persistent storage
+     * @param results The QueryResult that the data to be loaded from.
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @return object being loaded
+     */
     public synchronized Object load( LockEngine engine, ClassMolder molder,
               Object identity, Object objectToBeLoaded, AccessMode suggestedAccessMode,
               QueryResults results )
@@ -545,8 +568,7 @@ public abstract class TransactionContext
             oid = engine.load( this, oid, object, suggestedAccessMode, _lockTimeout, results );
 
             // rehash the object entry, because oid might have changed!
-            entry = removeObjectEntry( object );
-            entry = addObjectEntry( oid, object );
+            entry = rehash( object, oid );
 
         } catch ( ObjectNotFoundException except ) {
             removeObjectEntry( object );
@@ -602,7 +624,6 @@ public abstract class TransactionContext
      * @param engine The persistence engine
      * @param query A query against the persistence engine
      * @param accessMode The access mode
-     * @param db The database loading this object
      * @return A query result iterator
      * @throws QueryException An invalid query
      * @throws PersistenceException An error reported by the
@@ -617,19 +638,12 @@ public abstract class TransactionContext
         return new QueryResults( this, engine, query, accessMode, _db );
     }
 
-
     /**
-     * Creates a new object in persistent storage and returns the
-     * object's OID. The object will be persisted only if the
-     * transaction commits. If an identity is provided then duplicate
-     * identity check happens in this method, if no identity is
-     * provided then duplicate identity check occurs when the
-     * transaction completes and the object is not visible in this
-     * transaction.
-     *
+     * Walk a data object tree starting from the specified object, and
+     * mark all object to be created.
+     * <p>
      * @param engine The persistence engine
      * @param object The object to persist
-     * @param identity The object's identity (may be null)
      * @return The object's OID
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
@@ -638,12 +652,13 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized OID create( LockEngine engine, ClassMolder molder, Object object, OID depended )
+    public synchronized void markCreate( LockEngine engine, ClassMolder molder, 
+            Object object, OID depended )
             throws DuplicateIdentityException, PersistenceException {
 
-        OID          oid;
-        Object      identity;
-        ObjectEntry  entry;
+        OID             oid;
+        Object          identity;
+        ObjectEntry     entry;
 
         if ( object == null )
             throw new NullPointerException();
@@ -656,7 +671,7 @@ public abstract class TransactionContext
         // so that if an object create automatically and user create it
         // again, it won't receive exception
         if ( _autoStore && entry != null && entry.object == object )
-            return entry.oid;
+            return;
 
         if ( entry != null && !entry.deleted )
             throw new PersistenceException( Messages.format("persist.objectAlreadyPersistent", object.getClass().getName(), entry.oid.getIdentity() ) );
@@ -669,7 +684,6 @@ public abstract class TransactionContext
         if ( identity != null && entry != null ) {
             if ( ! entry.deleted || entry.object != object )
                 throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
-
             else {
                 // If the object was already deleted in this transaction,
                 // just undelete it.
@@ -693,63 +707,150 @@ public abstract class TransactionContext
         }
 
         try {
-            if ( _callback != null ) {
-                _callback.creating( object, _db );
-            } else if ( molder.getCallback() != null ) {
-                molder.getCallback().creating( object, _db );
-            } 
-            // Must perform creation after object is recorded in transaction
-            // to prevent circular references.
-            if ( entry == null)
-                entry = addObjectEntry( oid, object );
-            oid = engine.create( this, oid, object );
-
-            if ( oid.getIdentity() == null ) {
-                    throw new IllegalStateException("oid.getIdentity() is null after create!");
-                }
-
-            removeObjectEntry( object );
             entry = addObjectEntry( oid, object );
+            entry.creating = true;
 
-            entry.created = true;
             if ( _callback != null ) {
-                _callback.using( object, _db );
-                _callback.created( object );
-            } else if ( molder.getCallback() != null ) {
-                molder.getCallback().using( object, _db );
-                molder.getCallback().created( object );
+                _callback.creating( entry.object, _db );
+            } else if ( entry.molder.getCallback() != null ) {
+                entry.molder.getCallback().creating( entry.object, _db );
             }
-            return oid;
-        } catch ( Exception except ) {
-            if ( _callback != null ) {
-                _callback.releasing( object, false );
-            } else if ( molder.getCallback() != null ) {
-                molder.getCallback().releasing( object, false );
-            } 
-            removeObjectEntry( object );
-            if ( except instanceof DuplicateIdentityException )
-                throw (DuplicateIdentityException) except;
-            if ( except instanceof PersistenceException )
-                throw (PersistenceException) except;
 
-            throw new PersistenceException( Messages.format("persist.nested",except) );
+            engine.markCreate( this, oid, object );
+        } catch ( LockNotGrantedException lneg ) {
+            // yip: do we need LockNotGrantedException, or should we 
+            // removed them?
+            removeObjectEntry( object );
+            throw new DuplicateIdentityException("");
+        } catch ( PersistenceException pe ) {
+            removeObjectEntry( object );
+            throw pe;
+        } catch ( Exception e ) {
+            removeObjectEntry( object );
+            throw new PersistenceException(Messages.format("persist.nested",e));
         }
     }
 
 
     /**
-     * Creates a new object in persistent storage and returns the
+     * Creates a new object in persistent storage. The object will
+     * be persisted only if the transaction commits. If an identity
+     * is provided then duplicate identity check happens in this 
+     * method, if no identity is provided then duplicate identity 
+     * check occurs when the transaction completes and the object 
+     * is not visible in this transaction.
+     *
+     * @param engine The persistence engine
+     * @param molder The molder of the creating class
+     * @param object The object to persist
+     * @param depended The master object's OID if exist
+     * @return The object's OID
+     * @throws DuplicateIdentityException An object with this identity
+     *  already exists in persistent storage
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws ClassNotPersistenceCapableException The class is not
+     *  persistent capable
+     */
+    public synchronized void create( LockEngine engine, ClassMolder molder, 
+            Object object, OID depended ) 
+            throws DuplicateIdentityException, PersistenceException {
+
+        // markCreate will walk the object tree starting from the specified
+        // object and mark all the object to be created.
+        markCreate( engine, molder, object, depended );
+        // if exception throws in markCreate state, we simply let the exception
+        // to pass to upper level.
+
+
+        // After the marking is done, we will actually create the object.
+        // However, because some objects contains foreign key are key 
+        // generated, such object should be created after some other.
+        // We iterate all object and creating object according the priority.
+        int         priority  = 0;
+        int         nextPrior = 0;
+        for ( boolean nextCreate=true; nextCreate; priority=nextPrior ) {
+            Enumeration enum = _objects.elements();
+            nextCreate = false;
+            while ( enum.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+                try {
+                    if ( enumEntry.creating && !enumEntry.deleted ) {
+                        if ( enumEntry.molder.getPriority() <= priority ) {
+                            // Must perform creation after object is recorded in transaction
+                            // to prevent circular references.
+                            OID oid = enumEntry.engine.create
+                                ( this, enumEntry.oid, enumEntry.object );
+
+                            if ( oid.getIdentity() == null )
+                                throw new IllegalStateException("oid.getIdentity() is null after create!");
+
+                            // rehash the object entry, in case of oid changed
+                            ObjectEntry entry = rehash( enumEntry.object, oid );
+                            entry.created = true;
+                            entry.creating = false;
+
+                            if ( _callback != null ) {
+                                _callback.using( entry.object, _db );
+                                _callback.created( entry.object );
+                            } else if ( enumEntry.molder.getCallback() != null ) {
+                                enumEntry.molder.getCallback().using( entry.object, _db );
+                                enumEntry.molder.getCallback().created( entry.object );
+                            }
+                        } else {
+                            nextPrior = Math.min( priority+1, enumEntry.molder.getPriority() );
+                            nextCreate = true;
+                        }
+                    }
+                } catch ( Exception except ) {
+                    if ( _callback != null ) {
+                        _callback.releasing( enumEntry.object, false );
+                    } else if ( molder.getCallback() != null ) {
+                        molder.getCallback().releasing( enumEntry.object, false );
+                    } 
+                    removeObjectEntry( enumEntry.object );
+                    if ( except instanceof DuplicateIdentityException )
+                        throw (DuplicateIdentityException) except;
+                    if ( except instanceof PersistenceException )
+                        throw (PersistenceException) except;
+                    throw new PersistenceException( Messages.format("persist.nested",except) );
+                }
+
+            }
+        }
+
+        // after we create the objects, some cache may invalid because the
+        // relation are cached on both side. So, we updateCache if it is
+        // marked to be update from the markCreate state
+        Enumeration enum = _objects.elements();
+        while ( enum.hasMoreElements() ) {
+            ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+            if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
+                enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
+                enumEntry.updateCacheNeeded = false;
+            }
+        }
+
+    }
+
+    /**
+     * Update a new object in persistent storage and returns the
      * object's OID. The object will be persisted only if the
      * transaction commits. If an identity is provided then duplicate
      * identity check happens in this method, if no identity is
      * provided then duplicate identity check occurs when the
      * transaction completes and the object is not visible in this
      * transaction.
-     *
+     * <p>
+     * Update will also mark object to be created if the TIMESTAMP
+     * equals to NO_TIMESTAMP.
+     * 
      * @param engine The persistence engine
      * @param molder The object's molder
      * @param object The object to persist
-     * @return The object's OID
+     * @param depended The master objects of the specified object to be 
+     *        created if exisit
+     * @return true if the object is marked to be created
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
      * @throws PersistenceException An error reported by the
@@ -760,7 +861,7 @@ public abstract class TransactionContext
      *  report that the object was modified in the database during the long 
      *  transaction.
      */
-    public synchronized OID update( LockEngine engine, ClassMolder molder, Object object, OID depended )
+    public boolean markUpdate( LockEngine engine, ClassMolder molder, Object object, OID depended )
         throws DuplicateIdentityException, ObjectModifiedException,
             ClassNotPersistenceCapableException, PersistenceException {
 
@@ -776,67 +877,154 @@ public abstract class TransactionContext
         oid = new OID( engine, molder, depended, identity );
         entry = getObjectEntry( engine, oid );
         if ( _autoStore && entry != null && entry.object == object )
-            return entry.oid;
+            return false;
 
         if ( entry != null ) {
             if ( entry.deleted )
                 throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass(), identity ) );
             else 
                 throw new DuplicateIdentityException( "update object which is already in the transaction" );
-
-            // to prevent circular references
-            //if ( entry.object == object )
-            //    return oid;
-            //[Oleg] in some cases (deletion of dependent objects) objects
-            //that were previously loaded in this transaction by the same
-            //update() call must be replaced. Thus, we must allow this.
-            //I don't see other way.
-            //release( entry.object );
-            //[Yip] Hum, i don't understand why
-            //[Oleg] Assume that one object B is referenced by object A
-            // in two ways (indirectly). Then during update(A) update(B) would
-            // be called twice.
-            //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
 
-        // If the object isn't found in the cache, then attempt to create it.
         try {
-            addObjectEntry( oid, object );
-
-            oid = engine.update( this, oid, object, null, _lockTimeout );
-
-            removeObjectEntry( object );
             entry = addObjectEntry( oid, object );
+            entry.creating = entry.engine.update( this, oid, object, null, 0 );
 
-            //if ( oid == null ) {
-            //    oid = create( engine, molder, object, depended );
-            //}
-
-            // rehash the object with new oid
-            //addObjectEntry( oid, object );
-        } catch ( ObjectModifiedException e ) {
+        } catch ( DuplicateIdentityException lneg ) {
             removeObjectEntry( object );
-            throw e;
-        } catch ( DuplicateIdentityException e ) {
+            throw lneg;
+        } catch ( PersistenceException pe ) {
             removeObjectEntry( object );
-            throw new ObjectModifiedException("Object modified and can not be updated!");
+            throw pe;
         }
 
-        try {
-            if ( _callback != null ) {
-                _callback.using( object, _db );
-                _callback.updated( object );
-            } else if ( molder.getCallback() != null ) {
-                molder.getCallback().using( object, _db );
-                molder.getCallback().updated( object );
-            } 
-        } catch ( Exception except ) {
-            release( object );
-            if ( except instanceof PersistenceException )
-                throw (PersistenceException) except;
-            throw new PersistenceException( except.getMessage(), except );
+        if ( !entry.creating ) {
+            try {
+                if ( _callback != null ) {
+                    _callback.using( object, _db );
+                    _callback.updated( object );
+                } else if ( molder.getCallback() != null ) {
+                    molder.getCallback().using( object, _db );
+                    molder.getCallback().updated( object );
+                } 
+            } catch ( Exception except ) {
+                release( object );
+                if ( except instanceof PersistenceException )
+                    throw (PersistenceException) except;
+                throw new PersistenceException( except.getMessage(), except );
+            }
+            return false;
+        } else {
+            return true;
         }
-        return oid;
+    }
+
+    /**
+     * Update a new object in persistent storage and returns the
+     * object's OID. The object will be persisted only if the
+     * transaction commits. If an identity is provided then duplicate
+     * identity check happens in this method, if no identity is
+     * provided then duplicate identity check occurs when the
+     * transaction completes and the object is not visible in this
+     * transaction.
+     * <p>
+     * Update will also mark object to be created if the TIMESTAMP
+     * equals to NO_TIMESTAMP.
+     * 
+     * @param engine The persistence engine
+     * @param molder The object's molder
+     * @param object The object to persist
+     * @param depended The master objects of the specified object to be 
+     *        created if exisit
+     * @throws DuplicateIdentityException An object with this identity
+     *  already exists in persistent storage
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws ClassNotPersistenceCapableException The class is not
+     *  persistent capable
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long 
+     *  transaction.
+     */
+    public synchronized void update( LockEngine engine, ClassMolder molder, Object object, OID depended )
+        throws DuplicateIdentityException, ObjectModifiedException,
+               ClassNotPersistenceCapableException, PersistenceException {
+
+        markUpdate( engine, molder, object, depended );
+
+        // markUpdate will actually update object loaded/create from preious
+        // transaction, or it might marked some object to be created.
+        // However, because some objects contains foreign key are key 
+        // generated, such object should be created after some other.
+        // We iterate all object and creating object according the priority.
+        int         priority  = 0;
+        int         nextPrior = 0;
+        for ( boolean nextCreate=true; nextCreate; priority=nextPrior ) {
+            Enumeration enum = _objects.elements();
+            nextCreate = false;
+            while ( enum.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+                try {
+                    if ( enumEntry.creating && !enumEntry.deleted ) {
+                        if ( enumEntry.molder.getPriority() <= priority ) {
+                            if ( _callback != null ) {
+                                _callback.creating( enumEntry.object, _db );
+                            } else if ( enumEntry.molder.getCallback() != null ) {
+                                enumEntry.molder.getCallback().creating( enumEntry.object, _db );
+                            } 
+                            // Must perform creation after object is recorded in transaction
+                            // to prevent circular references.
+                            OID oid = enumEntry.engine.create
+                                ( this, enumEntry.oid, enumEntry.object );
+
+                            if ( oid.getIdentity() == null )
+                                throw new IllegalStateException("oid.getIdentity() is null after create!");
+
+                            // rehash the object entry, in case of oid changed
+                            ObjectEntry entry = rehash( enumEntry.object, oid );
+
+                            entry.created = true;
+                            entry.creating = false;
+                            if ( _callback != null ) {
+                                _callback.using( entry.object, _db );
+                                _callback.created( entry.object );
+                            } else if ( enumEntry.molder.getCallback() != null ) {
+                                enumEntry.molder.getCallback().using( entry.object, _db );
+                                enumEntry.molder.getCallback().created( entry.object );
+                            }
+                        } else {
+                            nextPrior = Math.min( priority+1, enumEntry.molder.getPriority() );
+                            nextCreate = true;
+                        }
+                    }
+                } catch ( Exception except ) {
+                    if ( _callback != null ) {
+                        _callback.releasing( enumEntry.object, false );
+                    } else if ( molder.getCallback() != null ) {
+                        molder.getCallback().releasing( enumEntry.object, false );
+                    } 
+                    removeObjectEntry( enumEntry.object );
+                    if ( except instanceof DuplicateIdentityException )
+                        throw (DuplicateIdentityException) except;
+                    if ( except instanceof PersistenceException )
+                        throw (PersistenceException) except;
+                    except.printStackTrace();
+                    throw new PersistenceException( Messages.format("persist.nested",except) );
+                }
+            }
+        }
+
+        // after we create the objects, some cache may invalid because the
+        // relation are cached on both side. So, we updateCache if it is
+        // marked to be update from the markCreate state
+        Enumeration enum = _objects.elements();
+        while ( enum.hasMoreElements() ) {
+            ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+            if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
+                enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
+                enumEntry.updateCacheNeeded = false;
+            }
+        }
     }
 
 
@@ -997,7 +1185,6 @@ public abstract class TransactionContext
         }
     }
 
-
     /**
      * Acquire a write lock on the object. Read locks are implicitly
      * available when the object is queried. A write lock is only
@@ -1135,22 +1322,81 @@ public abstract class TransactionContext
                 enum = todo.elements();
                 while ( enum.hasMoreElements() ) {
                     entry = (ObjectEntry) enum.nextElement();
-                    if ( ! entry.deleted ) {
+                    if ( !entry.deleted && !entry.creating ) {
+                        ClassMolder  molder;
                         Object       identities;
-                        ClassMolder molder;
                         OID          oid;
 
-                        // When storing the object it's OID might change
-                        // if the primary identity has been changed
-                        // yip: is it true?
                         oid = entry.engine.preStore( this, entry.oid, entry.object, _lockTimeout );
                         if ( oid != null ) {
                             entry.oid = oid;
                             entry.updateCacheNeeded = true;
-                            //entry. = true;
                         }
                     }
                     done.addElement( entry );
+                }
+            }
+
+            // preStore will actually walk all existing object and it might marked 
+            // some object to be created (and to be removed).
+            // Because some objects contains foreign key are key generated, such 
+            // object should be created after some other. We iterate all objects and 
+            // creating object according the priority.
+            int         priority  = 0;
+            int         nextPrior = 0;
+            for ( boolean nextCreate=true; nextCreate; priority=nextPrior ) {
+                enum = _objects.elements();
+                nextCreate = false;
+                while ( enum.hasMoreElements() ) {
+                    ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+                    try {
+                        if ( enumEntry.creating && !enumEntry.deleted && !enumEntry.created ) {
+                            if ( enumEntry.molder.getPriority() <= priority ) {
+                                if ( _callback != null ) {
+                                    _callback.creating( enumEntry.object, _db );
+                                } else if ( enumEntry.molder.getCallback() != null ) {
+                                    enumEntry.molder.getCallback().creating( enumEntry.object, _db );
+                                } 
+                                // Must perform creation after object is recorded in transaction
+                                // to prevent circular references.
+                                OID oid = enumEntry.engine.create
+                                    ( this, enumEntry.oid, enumEntry.object );
+
+                                if ( oid.getIdentity() == null )
+                                    throw new IllegalStateException("oid.getIdentity() is null after create!");
+
+                                // rehash the object entry, in case of oid changed
+                                entry = rehash( enumEntry.object, oid );
+
+                                entry.created = true;
+                                // | entry.updateCacheNeeded = true;
+                                if ( _callback != null ) {
+                                    _callback.using( entry.object, _db );
+                                    _callback.created( entry.object );
+                                } else if ( enumEntry.molder.getCallback() != null ) {
+                                    enumEntry.molder.getCallback().using( entry.object, _db );
+                                    enumEntry.molder.getCallback().created( entry.object );
+                                }
+                            } else {
+                                nextPrior  = Math.min( priority+1, enumEntry.molder.getPriority() );
+                                nextCreate = true;
+                            }
+                        }
+                    } catch ( Exception except ) {
+                        if ( _callback != null ) {
+                            _callback.releasing( enumEntry.object, false );
+                        } else if ( enumEntry.molder.getCallback() != null ) {
+                            enumEntry.molder.getCallback().releasing( enumEntry.object, false );
+                        } 
+                        removeObjectEntry( enumEntry.object );
+                        if ( except instanceof DuplicateIdentityException )
+                            throw (DuplicateIdentityException) except;
+                        if ( except instanceof PersistenceException )
+                            throw (PersistenceException) except;
+
+                        throw new PersistenceException( Messages.format("persist.nested",except) );
+                    }
+
                 }
             }
 
@@ -1158,9 +1404,9 @@ public abstract class TransactionContext
             enum = _objects.elements();
             while ( enum.hasMoreElements() ) {
                 entry = (ObjectEntry) enum.nextElement();
-                if ( !entry.deleted && entry.updatePersistNeeded )
+                if ( !entry.deleted && !entry.creating && entry.updatePersistNeeded )
                     entry.engine.store( this, entry.oid, entry.object );
-                if ( !entry.deleted && entry.updateCacheNeeded )
+                if ( !entry.deleted && !entry.creating && entry.updateCacheNeeded )
                     entry.engine.softLock( this, entry.oid, _lockTimeout );
 
                 // do the callback
@@ -1192,6 +1438,7 @@ public abstract class TransactionContext
             }
 
             _status = Status.STATUS_PREPARED;
+
             return true;
         } catch ( Exception except ) {
             _status = Status.STATUS_MARKED_ROLLBACK;
@@ -1259,7 +1506,7 @@ public abstract class TransactionContext
                 
                 if ( entry.updateCacheNeeded ) {
                     entry.engine.updateCache( this, entry.oid, entry.object );
-                } 
+                }
                 entry.engine.releaseLock( this, entry.oid );
             }
             if ( _callback != null ) {
@@ -1314,7 +1561,8 @@ public abstract class TransactionContext
 
             entry = (ObjectEntry) enum.nextElement();
             try {
-                if ( entry.created ) {
+                if ( entry.creating ) {
+                } else if ( entry.created ) {
                     // Object has been created in this transaction,
                     // it no longer exists, forget about it in the engine.
                     entry.engine.revertObject( this, entry.oid, entry.object );
@@ -1333,6 +1581,7 @@ public abstract class TransactionContext
                 }
             } catch ( Exception except ) {
                 // maybe we should remove it, when castor become stable
+                except.printStackTrace();
             }
         }
 
@@ -1629,6 +1878,8 @@ public abstract class TransactionContext
             throw new IllegalArgumentException("oid cannot be null");
         if ( object == null )
             throw new IllegalArgumentException("object cannot be null");
+
+        //(new Exception("AddObjectEntry: "+oid)).printStackTrace();
         ObjectEntry entry;
         Hashtable   engineOids;
         LockEngine engine = oid.getLockEngine();
@@ -1666,6 +1917,19 @@ public abstract class TransactionContext
        return (ObjectEntry) engineOids.get( oid );
     }
 
+    ObjectEntry rehash( Object object, OID oid ) {
+        ObjectEntry entry = getObjectEntry( object );
+
+        if ( entry == null )
+            throw new IllegalArgumentException("ObjectEntry to be rehash is not found");
+        
+        Hashtable engineOids = (Hashtable) _engineOids.get( entry.engine );
+        engineOids.remove( entry.oid );
+        engineOids.put( oid, entry );
+        entry.oid = oid;
+
+        return entry;
+    }
 
     /**
      * Returns the entry for the object from the object. If the entry
@@ -1786,7 +2050,7 @@ public abstract class TransactionContext
          * class, but representing relations of different
          * pair of object. 
          */
-        final ClassMolder       molder;
+        final ClassMolder        molder;
         /**
          * The object.
          */
@@ -1806,6 +2070,11 @@ public abstract class TransactionContext
          * True if the object has been created in this transaction.
          */
         boolean                  created;
+
+        /**
+         * True if the object is indicated to be created.
+         */
+        boolean                  creating;
 
         /**
          * True if the object has been modified in the transaction,
@@ -1836,6 +2105,16 @@ public abstract class TransactionContext
             this.molder = molder;
             this.oid    = oid;
             this.object = object;
+        }
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append( oid );
+            sb.append('\t'); sb.append("deleted: ");  sb.append(deleted);
+            sb.append('\t'); sb.append("creating: "); sb.append(creating);
+            sb.append('\t'); sb.append("created: ");  sb.append(created);
+            sb.append('\t'); sb.append("deleted: ");  sb.append(deleted);
+            return sb.toString();
         }
 
     }
