@@ -124,11 +124,15 @@ public class ClassDescriptorResolverImpl
         String className = type.getName() + "Descriptor";
         try {
             ClassLoader loader = type.getClassLoader();
-            if ( loader != null ) {
-	        Class dClass = loader.loadClass(className);
-                classDesc = (XMLClassDescriptor) dClass.newInstance();
-                _cache.put(type, classDesc);
-            }
+            
+            Class dClass = null;            
+            if ( loader != null )
+	            dClass = loader.loadClass(className);
+	        else
+	            dClass = Class.forName(className);
+	            
+            classDesc = (XMLClassDescriptor) dClass.newInstance();
+            _cache.put(type, classDesc);
         }
         catch(ClassNotFoundException cnfe) { 
             /* 
