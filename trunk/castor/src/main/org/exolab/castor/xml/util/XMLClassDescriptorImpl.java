@@ -328,7 +328,7 @@ public class XMLClassDescriptorImpl extends Validator
      *
      */
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
+        (String name, String namespace, NodeType nodeType)
     {
         boolean wild = ((nodeType == null) || _introspected);
         XMLFieldDescriptor result = null;
@@ -361,7 +361,7 @@ public class XMLClassDescriptorImpl extends Validator
                     //prevent endless loop
                     if (xcd != this) {
                         //is it in this class descriptor?
-                        if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
+                        if (xcd.getFieldDescriptor(name, namespace, NodeType.Element) != null) {
                             result = desc;
                             break;
                         }
@@ -408,7 +408,7 @@ public class XMLClassDescriptorImpl extends Validator
                     //prevent endless loop
                     if (xcd != this) {
                         //is it in this class descriptor?
-                        XMLFieldDescriptor temp = xcd.getFieldDescriptor(name, NodeType.Attribute);
+                        XMLFieldDescriptor temp = xcd.getFieldDescriptor(name, namespace, NodeType.Attribute);
                         if (temp != null) {
                             return desc;
                         }
@@ -959,36 +959,20 @@ public class XMLClassDescriptorImpl extends Validator
         return _accessMode;
     } //-- getAccessMode
 
-    /**
-     * <p>Returns true if the given object represented by this XMLClassDescriptor
-     * can accept a member whose name is given.
-     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
-     * the given name anf if the given object can hold this field (i.e a value is not already set for
-     * this field).
-     * The different criterias for accepting a field with a given name are:
-     * <ul>
-     *    <li>an <tt>XMLFieldDescriptor</tt> of this XMLClassDescriptorImpl that matches
-     *    the given field name exists.</li>
-     *    <li>A value has not already been set for the field.</li>
-     *    <li>If the XMLClassDescriptorImpl represents a CHOICE then no other value must have
-     *    been set.</li>
-     * </ul>
-     *
-     * @param fieldName the name of the field to check
-     * @param object the object represented by this XMLCLassDescriptor
-     * @return true if the given object represented by this XMLClassDescriptor
-     * can accept a member whose name is given.
+    /*
+     *  (non-Javadoc)
+     * @see org.exolab.castor.xml.XMLClassDescriptor#canAccept(java.lang.String, java.lang.String, java.lang.Object)
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
 
         boolean result = false;
         boolean hasValue = false;
         XMLFieldDescriptor[] fields = null;
         int i = 0;
         //1--direct look up for a field
-        XMLFieldDescriptor fieldDesc = this.getFieldDescriptor(fieldName, NodeType.Element);
+        XMLFieldDescriptor fieldDesc = this.getFieldDescriptor(name, namespace, NodeType.Element);
         if (fieldDesc == null)
-           fieldDesc = this.getFieldDescriptor(fieldName, NodeType.Attribute);
+           fieldDesc = this.getFieldDescriptor(name, namespace, NodeType.Attribute);
 
         //if the descriptor is still null, the field can't be in stored in this classDescriptor
         if (fieldDesc == null)
@@ -1023,7 +1007,7 @@ public class XMLClassDescriptorImpl extends Validator
             if (tempObject == null)
                 result = true;
             else
-                result = ((XMLClassDescriptor)fieldDesc.getClassDescriptor()).canAccept(fieldName, tempObject);
+                result = ((XMLClassDescriptor)fieldDesc.getClassDescriptor()).canAccept(name, namespace, tempObject);
         }
         //4-- Check if the value is set or not
         else {

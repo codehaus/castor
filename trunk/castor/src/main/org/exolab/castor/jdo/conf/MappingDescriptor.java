@@ -13,12 +13,9 @@ package org.exolab.castor.jdo.conf;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.validators.*;
-import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
 
@@ -141,6 +138,7 @@ public class MappingDescriptor implements org.exolab.castor.xml.XMLClassDescript
      * descriptor is available.
      *
      * @param name the xml name to match against
+     * @param namespace the namespace uri
      * @param nodeType, the NodeType to match against, or null if
      * the node type is not known.
      * @return the matching descriptor, or null if no matching
@@ -148,7 +146,7 @@ public class MappingDescriptor implements org.exolab.castor.xml.XMLClassDescript
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
+        (String name, String namespace, NodeType nodeType)
     {
                boolean wild = (nodeType == null);
 
@@ -238,7 +236,7 @@ public class MappingDescriptor implements org.exolab.castor.xml.XMLClassDescript
     /**
      * false
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
          return false;
     }
 

@@ -46,9 +46,6 @@
 package org.exolab.castor.xml.descriptors;
 
 
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
@@ -60,7 +57,7 @@ import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
  * in as the root-level class, this is really only useful for
  * marshalling, as Enumerations are read-only.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class EnumerationDescriptor extends XMLClassDescriptorImpl

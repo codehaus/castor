@@ -12,8 +12,6 @@ package harness;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.XMLFieldDescriptor;
@@ -277,7 +275,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType) 
+        (String name, String namespace, NodeType nodeType) 
     {
         
         boolean wild = (nodeType == null);
@@ -287,7 +285,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             for (int i = 0; i < elements.length; i++) {
                 desc = elements[i];
                 if (desc == null) continue;
-                if (desc.matches(name)) return desc;
+                if (desc.matches(name, namespace)) return desc;
             }
         }
         
@@ -296,7 +294,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             for (int i = 0; i < attributes.length; i++) {
                 desc = attributes[i];
                 if (desc == null) continue;
-                if (desc.matches(name)) return desc;
+                if (desc.matches(name, namespace)) return desc;
             }
         }
         
@@ -346,12 +344,13 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
      * this field).
      * <p>This is mainly used for container object (that can contains other object), in this particular case
      * the implementation will return null.
-     * @param fieldName the name of the field to check
+     * @param name the xml name of the field to check
+     * @param namespace the namespace URI
      * @param object the object represented by this XMLCLassDescriptor
      * @return true if the given object represented by this XMLClassDescriptor
      * can accept a member whose name is given.
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
          return false;
     }
 }
