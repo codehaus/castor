@@ -166,6 +166,7 @@ public abstract class Configuration
         public static final String FileName = "castor.properties";
 
         static final String ResourceName = "/org/exolab/castor/castor.properties";
+        
     }
 
 
@@ -475,20 +476,4 @@ public abstract class Configuration
 		
 		return properties;
 	}
-	
-    /**
-     * Gets the url of the mapping file used to load the xml schema built-in type definitions.
-     */
-    public static URL getSimpleTypesMappingFileLocation()
-    {
-        return Configuration.class.getResource("/org/exolab/castor/util/resources/SimpleTypesMapping.properties");
-    }
-
-    /**
-     * Gets the url of the file that holds the xml schema built-in type definitions.
-     */
-    public static URL getSimpleTypesDefinitionLocation()
-    {
-        return Configuration.class.getResource("/org/exolab/castor/util/resources/SimpleTypes.properties");
-    }
-}
+} //-- Configuration
