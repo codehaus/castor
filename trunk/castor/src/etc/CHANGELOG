@@ -2,6 +2,39 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug with auto-complete and text-nodes. Basically the field
+       descriptor for text-nodes was not getting copied to the new
+       ClassDescriptor causing an error with "illegal text content"
+       to occur.
+       (kvisco - 20050228)
+
+XML:   Added support for package specific mapping files with
+       the name ".castor.xml". The package specific mapping
+       file is loaded the first time a class from the package
+       is resolved. This allows people to write mapping files
+       without having to specify them directly to the 
+       Marshaller and Unmarshaller. Note that this is only 
+       supported by Castor XML as the ClassDescriptorResolverImpl
+       is the class that invokes the automatic loading of the
+       package specific mapping files.
+       (kvisco - 20050228)
+
+XML:   Added support for CDR (ClassDescriptorResolver) 
+       class-to-descriptor package listings. Each package can
+       contain a ".castor.cdr" file which is a properties file
+       that lists the classname=descriptor. This allows the
+       default ClassDescriptorResolverImpl to find and load all 
+       descriptors from a given package. 
+       (kvisco - 20050228)
+
+
+XML:   Updated the ClassDescriptorResolver interface to remove
+       the getErrorMessage() and error() methods, and added
+       ResolverException. Please make sure you update any code that
+       directly uses ClassDescriptorResolver or our default 
+       implementation ClassDescriptorResovlerImpl.
+       (kvisco - 20050228)
+
 XML:   Fixed bug 1875. The primary issue was that the generated
        source code for simpleContent restrictions was not extending
        the type it was restricting, so it wasn't able to be used
