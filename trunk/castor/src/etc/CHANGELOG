@@ -1,7 +1,10 @@
 
 Version (CVS) 
 -------------
-JDO:   Fixed bug 1452. 
+JDO:   Fixed bug 1391 using contribution from xgard@gmx.de.
+       (Bruce - 20031110)
+
+JDO:   Fixed bug 1452 as noted by Marc Guillemot[mguillemot@yahoo.fr]. 
        (Bruce - 20031110)
 
 XML:   Add a new option in the CTF to allow dynamic configuration
