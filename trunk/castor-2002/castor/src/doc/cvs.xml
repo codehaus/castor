@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
+<document project="../project.xml">
+  <body title="CVS Access">
+    <p>The source code, documentation and libraries are available for anonymous access
+       from the ExoLab CVS server.</p>
+
+    <p>The CVS root is <tt>:pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/></tt>
+       and the password <tt>anoncvs</tt>.</p>
+
+    <p>To login to CVS from the command line and checkout a version of <project-name/>
+       use the following commands:</p>
+
+    <pre>
+  <b>$</b>cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> login
+  <b>password:</b> anoncvs
+  <b>$</b>cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> checkout <project-repository/>
+    </pre>
+
+  </body>
+</document>
