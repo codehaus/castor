@@ -790,6 +790,10 @@ public abstract class TransactionContext
                             entry.created = true;
                             entry.creating = false;
 
+                            // yip: we got problem here. We would run into 
+                            // problem if user try to create inside the 
+                            // callback. We must think a workaround to 
+                            // fixes this problem for backward compatiblity
                             if ( _callback != null ) {
                                 _callback.using( entry.object, _db );
                                 _callback.created( entry.object );
@@ -889,7 +893,9 @@ public abstract class TransactionContext
         try {
             entry = addObjectEntry( oid, object );
             entry.creating = entry.engine.update( this, oid, object, null, 0 );
-
+            // yip: there is one issue here. Because object might be marked 
+            // to be created in the update process. However, we have no easy
+            // way to fire jdoCreating() events from here.
         } catch ( DuplicateIdentityException lneg ) {
             removeObjectEntry( object );
             throw lneg;
