@@ -140,6 +140,18 @@ public abstract class TransactionContext
 
 
     /**
+     * Collection of objects loaded in read-only mode during this transaction.
+     * They are not persistent anymore, but we have to keep them in order
+     * to provide uniqueness of objects. E.g., if one depenent object
+     * contains reference to another one, the latter shouldn't be loaded twice.
+     * In the hashtable {@link OID} is the key and {@link ObjectEntry}
+     * is the value.
+     * @see #addObjectEntry
+     */
+    private final Hashtable  _readOnlyObjects = new Hashtable();
+
+
+    /**
      * The transaction status. See {@link Status} for list of valid values.
      */
     private int         _status;
@@ -280,11 +292,14 @@ public abstract class TransactionContext
                                       Object identity, AccessMode accessMode )
         throws ObjectNotFoundException, LockNotGrantedException, PersistenceException
     {
-        ObjectEntry entry;
+        ObjectEntry entry = null;
         OID         oid;
 
         oid = new OID( handler, identity );
-        entry = getObjectEntry( engine, oid );
+        if ( accessMode == AccessMode.ReadOnly ) 
+            entry = getReadOnlyObjectEntry( oid );
+        if ( entry == null ) 
+            entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
             // If the object has been loaded in this transaction from a
             // different engine this is an error. If the object has been
@@ -424,8 +439,7 @@ public abstract class TransactionContext
         }
 
         if ( accessMode == AccessMode.ReadOnly ) {
-            removeObjectEntryWithDependent( object );
-            engine.releaseLockWithDependent( this, oid );
+            makeReadOnly( object );
         }
         return object;
     }
@@ -999,6 +1013,7 @@ public abstract class TransactionContext
         // and mark it as completed.
         _objects.removeAllElements();
         _engineOids.clear();
+        _readOnlyObjects.clear();
         _status = Status.STATUS_COMMITTED;
     }
 
@@ -1055,6 +1070,7 @@ public abstract class TransactionContext
         // and mark it as completed.
         _objects.removeAllElements();
         _engineOids.clear();
+        _readOnlyObjects.clear();
         while ( _deletedList != null ) {
             entry = _deletedList;
             _deletedList = entry.nextDeleted;
@@ -1333,6 +1349,31 @@ public abstract class TransactionContext
         return null;
     }
 
+
+    /**
+     * Makes the object read-only: move it to the hashtable of readonly objects
+     * The object must be already in the transaction.
+     * Readonly objects should be unique in bounds of the transaction, 
+     * otherwise they may be loaded twice (e.g.: one dependent object
+     * contains reference to another).
+     */
+    void makeReadOnly( Object object )
+    {
+        ObjectEntry entry;
+
+        entry = removeObjectEntry( object );
+        if ( entry == null )
+            throw new IllegalStateException( Messages.format( "persist.internal",
+                                                              "Attempt to make read-only object that is not in transaction" ) );
+        _readOnlyObjects.put( entry.oid, entry );
+        entry.engine.releaseLock( this, entry.oid );
+    }
+
+
+    ObjectEntry getReadOnlyObjectEntry( OID oid )
+    {
+        return (ObjectEntry) _readOnlyObjects.get( oid );
+    }
 
     /**
      * A transaction records all objects accessed during the lifetime
