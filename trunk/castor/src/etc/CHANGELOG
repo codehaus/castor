@@ -33,6 +33,13 @@ JDO:   Fixed bug 1511 using contribution from Martin Fuchs [martin-fuchs@gmx.net
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1511
        (Werner - 20040917)
 
+XML:   Checked in some patches, contributed by Marco Soeima, for xsi:nil 
+       support. xsi:nil support is not complete with these patches, but
+       it was worth checking them in as it gets us closer to completion.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1723
+       (kvisco - 20040916)
+   
+
 JDO:   Fixed bug 1507 using contribution from Stein M. Hugubakken [dulci@start.no]
        Fixed problem using the HighLowKeyGenerator with the same-connection
        attribute set to 'true'.
@@ -58,17 +65,20 @@ JDO:   Fixed bug 1445 using contribution from Stein M. Hugubakken [dulci@start.n
 XML:   Fixed bug 1666: UnmarshalState._markedList Vector is a performance 
        bottleneck. Applied patch from David Thal which replaces the
        Vector with a HashSet.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1666
        (kvisco - 20040910)
 
 XML:   Fixed bug 1658: Handling of whitespace is never preserved for 
        container objects. Applied patch from Chris Giordano which
        basically inherits the whitespace preserving state from
        the parent UnmarshalState.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1658
        (kvisco - 20040910)
 
 XML:   Fixed bug 1634: Whitespace handling while unmarshalling is flawed.
        Updated the whitespace handling logic in UnmarshalHandler#characters
        method and checked in a test case.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1634
        (kvisco - 20040910)
 
 XML:   Updated the Marshaller to use ContentHandler directly instead
@@ -153,14 +163,17 @@ JDO:   Fixed bug 1709 using contribution from Donnie Armstrong. [donnie@attempt4
        (Werner - 20040806)
 
 XML:   Fixed bug 1706 - No support for XDoclet tags in Source Generator
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1706
        (Bruce - 20040804)
 
 JDO:   Fixed bug 1705 - DuplicateIdentityExceptions not reported correctly
        when using PostgreSQL.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1705
        (Bruce - 20040804)
 
 XML:   Fixed bug 1560 by adding some additional checks for null
        in the XMLClassDescriptorImpl.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1560
        (kvisco - 20040729)
 
 XML:   Updated the Unmarshaller to make sure it gets the ClassLoader
@@ -179,6 +192,7 @@ XML:   Fixed java.util.Set support in the introspector.
 
 XML:   Fixed bug 1683 so that the Source Generator better supports XDoclet
        tags in an XSD. 
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1683
        (Bruce - 20040711)
 
 JDO:   Fixed bug 1508 using contribution from Stein M. Hugubakken [dulci@start.no]
@@ -209,6 +223,7 @@ XML:   Fixed bug 1524: Stack Overflow when container elements occur in
        instance document. The problem was primarily due to the 
        MarshalFramework#searchInheritence method which was allowing
        the ClassDescriptors for schema groups to be searched.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1524
        (kvisco - 20040608)
 
 JDO:   Fixed bug 1402 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
@@ -224,6 +239,7 @@ JDO:   Fixed bug 1641 using contribution from Werner Guttmann [werner.guttmann@g
        
 XML:   Fixed bug 1633 XML Date Timezone Not unmarshalled correctly.
        Patch from axia@sonusnet.com.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1633
        (kvisco - 20040527)
 
 JDO:   Fixed bug 1067 using contribution from unkown.
@@ -240,10 +256,12 @@ JDO:   Fixed bug 1617 using contribution from Patrick vanKann [patrick.vankann@c
 JDO:   Fixed bug 1534.
        Added code to allow users to use their own cache implementation with Castor. 
        In general, available cache implementations are now specified in castor.properties.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1534
        (Werner - 20040513)
        
 XML:   Fix for bug 1632. StringValidator.normalize wasn't handling empty
        strings properly. Patch from Ulli Hafner.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1632
        (kvisco - 20040511)
 
 XML:   Performance change to org.exolab.castor.util.List to demand create internal Object[]
@@ -259,6 +277,7 @@ XML:   Performance enhancement to AnyNode2SAX.java (use when processing xsd:any 
 
 XML:   Fixed bug 1506 - Enhancement for EnumeratedTypeAccess interface
        using patch contributed by Robert La Ferla.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1506
        (kvisco - 20040505)
 
 ALL:   Reworked the mailing list guidelines. Added various sections re: cross-posting, etc.
@@ -270,35 +289,43 @@ JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
 
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Brought test config file for SAP DB in-line with XML Schema.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1605
        (Werner - 20040429)
        
 JDO:   Fixed bug 1368 using contribution from Tim O'Brien [tobrien@discursive.com].
-	   Small (mostly syntactical) changes to src/doc/jdo-faq.xml. Added a reference
-	   to XPath as well.
+       Small (mostly syntactical) changes to src/doc/jdo-faq.xml. Added a reference
+       to XPath as well.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1368
        (Werner - 20040428)
 
 JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
        Added test for IdentityKeyGenerator to SAP DB test suite.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1607
        (Werner - 20040428)
 
 JDO:   Fixed bug 1092 using contribution from Rhett Sutphin [rhett-sutphin@uiowa.edu].
-	   Fixed default namespace declaration, changed some small syntax issues.
+       Fixed default namespace declaration, changed some small syntax issues.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1092
        (Werner - 20040427)
 
 JDO:   Fixed bug 1606 using contribution from Emir Causevic [emirc@gawab.com]
        Fixed problem with incorrectly quoting non-function names for SAP DB.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1606
        (Werner - 20040427)
        
 JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
        Added support for SAB DB to IdentityKeyGenerator.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1607
        (Werner - 20040427)
 
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Fixed various problems related to the setup of JDO test data with SAP DB.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1605
        (Werner - 20040427)
        
 JDO:   Fixed bug 1615 using contribution from frric@wmdata.com [frric@wmdata.com]
        Fixed a typo in a debug statement (wrong message resource key used).
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1615
        (Werner - 20040426)
        
 JDO:   Fixed bug 1601 using contribution from Tomasz Piontek [piontek@man.poznan.pl]
@@ -312,26 +339,32 @@ JDO:   Fixed bug 1554 using contribution from Stein M. Hugubakken [dulci@start.n
        completely; uses the Hashtable directly, resulting in much better performance.
        ValuesEnumeration no longer use a Vector, but intercepts the initial 
        enumeration to provide the values.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1554
        (Werner - 20040420)
        
 JDO:   Fixed bug 1597 using patch from Emir Causevic [emirc@gawab.com]
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1597
        (Bruce - 20040408)
 
 JDO:   Fixed bug 1588.
        Introduces various checks and additional exception handling wrt to using TimeStampables.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1588
        (Werner - 20040406)
        
 ALL:   Fixed bug 1585 adding separate build folders for src/tests and src/examples
        to the Eclipse project files
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1585
        (Werner - 20040330)
 
 JDO:   Fixed bug 1573 using contribution from Stein M. Hugubakken [dulci@start.no]
        This improves code quality for the complete jdo package (except conf.*)
        by removing unused import statements and local variables.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1573
        (Werner - 20040330)
        
 ALL:   Fixed bug 1568 using contribution from jpinto@inescporto.pt [João Luis Pinto].
        Streamlines Eclipse related project files.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1568
        (Werner - 20040319)
 
 JDO:   Added many enhancements to the tx mgr API including code improvements,
@@ -340,10 +373,12 @@ JDO:   Added many enhancements to the tx mgr API including code improvements,
        (Bruce - 20040323)
 
 ALL:   Fixed bug 1563 using a patch from Keith
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1563
        (Bruce - 20040323)
 
 ALL:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
        Updates Eclipse related project files.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1566
        (Werner - 20040319)
 
 Version 0.9.5.3, March 09, 2004
