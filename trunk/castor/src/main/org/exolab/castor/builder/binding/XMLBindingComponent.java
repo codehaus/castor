@@ -40,6 +40,10 @@
  *
  * Copyright 2002-2004 (C) Intalio Inc. All Rights Reserved.
  *
+ * Any portions of this file developed by Keith Visco after Jan 19 2005 
+ * are Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ * 
+ *
  * $Id$
  */
 
@@ -1037,8 +1041,21 @@ public class XMLBindingComponent implements BindingComponent {
                result = _class.getAbstract();
         }
         if (!result) {
-            result = (_annotated.getStructureType() == Structure.COMPLEX_TYPE);
-            result = (result && _config.mappingSchemaElement2Java());
+            switch(_annotated.getStructureType()) {
+                case Structure.COMPLEX_TYPE:
+                    ComplexType cType = (ComplexType)_annotated;
+                    result = cType.isAbstract();
+                    //-- if we're in element-centric mode, then all 
+                    //--  complexTypes are treated as abstract
+                    result = result || _config.mappingSchemaElement2Java();
+                    break;
+                case Structure.ELEMENT:
+                    ElementDecl eDecl = (ElementDecl)_annotated;
+                    result = eDecl.isAbstract();
+                    break;
+                default:
+                    break;
+            }
         }
         return result;
     }
