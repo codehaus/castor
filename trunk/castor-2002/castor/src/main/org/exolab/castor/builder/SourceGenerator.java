@@ -723,8 +723,7 @@ public class SourceGenerator {
         else if (xmlType.isComplexType()) {
 
 			JClass[] classes = sourceFactory.createSourceCode(elementDecl,
-                                                        sInfo,
-                                                        sInfo.packageName);
+                                                        sInfo);
 
             processComplexType((ComplexType)xmlType, sInfo);
 
@@ -756,9 +755,7 @@ public class SourceGenerator {
             if (complexType.isTopLevel()) {
 
                 JClass[] classes
-                    = sourceFactory.createSourceCode(complexType,
-                                                     sInfo,
-                                                     sInfo.packageName);
+                    = sourceFactory.createSourceCode(complexType, sInfo);
 
                 for (int i = 0; i < classes.length; i++)
                     processJClass(classes[i], sInfo);
@@ -810,9 +807,7 @@ public class SourceGenerator {
             if (classInfo == null) {
 
                 JClass jClass
-                    = sourceFactory.createSourceCode(simpleType,
-                                                     sInfo,
-                                                     packageName);
+                    = sourceFactory.createSourceCode(simpleType, sInfo);
 
                 processJClass(jClass, sInfo);
             }
@@ -888,11 +883,7 @@ public class SourceGenerator {
             }
 		}
 
-		JClass[] classes = sourceFactory.createSourceCode(group,
-                                                    sInfo,
-                                                    sInfo.packageName);
-
-
+		JClass[] classes = sourceFactory.createSourceCode(group, sInfo);
         processContentModel(group, sInfo);
         for (int i = 0; i < classes.length; i++)
             processJClass(classes[i], sInfo);
