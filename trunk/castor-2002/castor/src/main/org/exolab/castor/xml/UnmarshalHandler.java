@@ -710,35 +710,7 @@ public final class UnmarshalHandler extends MarshalFramework
           XXXX Search for container, hopefully this is a temporary fix
         */
         if (descriptor == null) {
-            XMLFieldDescriptor[] descriptors 
-                = classDesc.getElementDescriptors();
-            
-            for (int i = 0; i < descriptors.length; i++) {
-                if (descriptors[i] == null) continue;
-                
-                XMLFieldDescriptor xfd = descriptors[i];
-                if (xfd.isContainer()) {
-                    //-- set class descriptor if necessary
-                    if (xfd.getClassDescriptor() == null) {
-                        XMLClassDescriptor xcd 
-                            = getClassDescriptor(xfd.getFieldType());
-                        if (xcd != null) {
-                            //-- set class descriptor if necessary
-                            if (xfd instanceof XMLFieldDescriptorImpl) {
-                                ((XMLFieldDescriptorImpl)xfd).setClassDescriptor(xcd);
-                            }
-                            if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
-                                descriptor = xfd;
-                                break;
-                            }
-                        }
-                    }
-                    else if (xfd.matches(name)) {
-                        descriptor = xfd;
-                        break;
-                    }
-                }
-            }
+            descriptor = searchContainers(name, classDesc);
         }
         /* end of container fix */
         
@@ -787,7 +759,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
 
 
-        //-- Handler container field (handle container in container too)
+        //-- Handle Container field (handle container in container too)
         Object object = parentState.object;
         while (descriptor.isContainer()) {
 
@@ -839,7 +811,7 @@ public final class UnmarshalHandler extends MarshalFramework
             parentState.container = containerObject;
             parentState.ContainerFieldDesc = descriptor;
             object = containerObject;
-        }
+        } //-- End Container Support
 
 
         //-- Find object type and create new Object of that type
@@ -1395,6 +1367,54 @@ public final class UnmarshalHandler extends MarshalFramework
         return classDesc;
     } //-- getClassDescriptor
 
+    /**
+     * Searches for Container descriptors that match the given element name.
+     * This is a patch, which will hopefully be changed at a later date.
+     *
+     * @param name the element to search for
+    **/
+    private XMLFieldDescriptor searchContainers
+        (String name, XMLClassDescriptor classDesc) 
+        throws SAXException
+    {
+        
+        XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
+        
+        XMLFieldDescriptor descriptor = null;
+        
+        for (int i = 0; i < descriptors.length; i++) {
+            if (descriptors[i] == null) continue;
+                
+            XMLFieldDescriptor xfd = descriptors[i];
+            if (xfd.isContainer()) {
+                //-- set class descriptor if necessary
+                if (xfd.getClassDescriptor() == null) {
+                    XMLClassDescriptor xcd 
+                        = getClassDescriptor(xfd.getFieldType());
+                    if (xcd != null) {
+                        //-- set class descriptor if necessary
+                        if (xfd instanceof XMLFieldDescriptorImpl) {
+                            ((XMLFieldDescriptorImpl)xfd).setClassDescriptor(xcd);
+                        }
+                        if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
+                            descriptor = xfd;
+                            break;
+                        }
+                        else if (searchContainers(name, xcd) != null) {
+                            descriptor = xfd;
+                            break;
+                        }
+                    }
+                }
+                else if (xfd.matches(name)) {
+                    descriptor = xfd;
+                    break;
+                }
+            }
+        }
+        return descriptor;
+    } //-- searchContainers.
+    
     /**
      * Returns the name of a class, handles array types
      * @return the name of a class, handles array types
