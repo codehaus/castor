@@ -25,78 +25,157 @@
     <name surname="Visco" given="Keith"/>
     <email>kvisco@intalio.com</email>
     <company id="intalio"/>
+    <project>XML</project>
     <description>
       Castor XML Project Lead. Intial Castor XML author.
       Responsible for all things wrong in Castor XML.
       Enhancements, bug fixes, documention, etc.
    </description>
-  </contributor>
-
-  <contributor type="Committer">
-    <name surname="Snyder" given="Bruce"/>
-    <email> ferret@frii.com</email>
-    <description>
-        Current JDO Project Lead taking over for Thomas Yip.
-        Currently reponsible for all things wrong in Castor JDO.
-        Enhancements, bug fixes, documention, etc.
-    </description>
+   <status>active</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Blandin" given="Arnaud"/>
     <email>blandin@intalio.com</email>
     <company id="intalio"/>
+    <project>XML</project>
     <description>Responsible for all the boring stuff that Keith doesn't want to do anymore.
     Causes immense stress for the other contributors. Introduces bad franglish into the documentation.</description>
+    <status>active</status>
   </contributor>
 
   <contributor type="Committer">
-    <name surname="Guttman" given="Werner" />
-    <email>werner.guttman@gmx.net</email>
+    <name surname="Snyder" given="Bruce"/>
+    <email> ferret@frii.com</email>
+    <project>JDO</project>
     <description>
-    JDO enhancements including TransactionManagerFactory API, the API for JDBC
-    parameters and much more.
+        Current JDO Project Lead taking over for Thomas Yip.
+        Currently reponsible for all things wrong in Castor JDO.
+        Enhancements, bug fixes, documention, etc.
     </description>
+    <status>active</status>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Guttmann" given="Werner" />
+    <email>werner.guttmann@gmx.net</email>
+    <project>JDO</project>
+    <description>
+       JDO enhancements including TransactionManagerFactory API, the API for JDBC
+       parameters and much more.
+    </description>
+    <status>active</status>
+    <since>
+      <date>Oct. 2003</date>
+    </since>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Fuchs" given="Martin" />
+    <email>martin-fuchs@gmx.net</email>
+    <company id="mentopolis"/>
+    <project>JDO</project>
+    <status>active</status>
+    <description>
+       JDO bug fixes and enhancements including JdoConfFactory;
+       test cases; Oracle questions
+    </description>
+    <since>
+      <date>Dec. 2004</date>
+    </since>
+  </contributor>
+
+  <contributor type="Committer">
+     <name surname="Joachim" given="Ralf" />
+     <email>ralf.joachim@syscon-world.de</email>
+     <project>JDO</project>
+     <company id="syscon"/>
+     <description>
+        JDO bug fixes and enhancements for type convertion; addition of test 
+        cases and documentation.
+     </description>
+    <status>active</status>
+    <since>
+      <date>Dec. 2004</date>
+    </since>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Block" given="Gregory" />
+    <email>gblock@ctoforaday.com</email>
+    <project>JDO</project>
+    <status>active</status>
+	<company id="ctoforaday"/>
+    <description>
+       Bugfixes/enhancements, stress testing, performance testing, tester of 
+       unusual 'runtime' environments, (Hashbelt) cache implementations et alias.
+    </description>
+    <since>
+      <date>Dec. 2004</date>
+    </since>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Hugubakken" given="Stein" />
+    <email>dulci@start.no</email>
+    <project>JDO</project>
+    <description>
+       Performance enhancements, core refactoring  and much more.
+    </description>
+    <status>active</status>
+    <since>
+      <date>Dec. 2004</date>
+    </since>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Yip" given="Thomas"/>
     <email>yip@intalio.com</email>
     <company id="intalio"/>
+    <project>JDO</project>
     <description>
       Lead developer of Castor JDO from late v.0.8 to early v.0.9.
       Enhancements to the lock model, LRU cache, lazy loading, multi-pk, m-n support, etc; bugs fixes, test cases, and documentation. (non-active)
     </description>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Arkin" given="Assaf"/>
     <email>arkin@intalio.com</email>
     <company id="intalio"/>
+    <project>JDO</project>
     <description>
        The initial author of Castor JDO.
        Formally responsible for all things wrong in JDO, and all bugs in Mapping API.
        (non-active)
     </description>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Fawcett" given="Andrew"/>
     <email>Andrew.Fawcett@coda.com</email>
     <company id="coda"/>
+    <project>XML</project>
     <description>XML enhancements.</description>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Gignoux" given="Sebastien"/>
     <email>gignoux@intalio.com</email>
     <description>XML Mapping enhancements, bug fixes, documentation and some testing.</description>
+    <project>XML</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Thielen" given="Thorsten"/>
     <email>thorsten@ipcon.de</email>
     <description>Enhancements to OQL.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
@@ -104,19 +183,25 @@
     <email>ssahuc@intalio.com</email>
     <company id="intalio"/>
     <description>Testing for Oracle and Castor XML.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Wolpert" given="Ned"/>
     <email>wolpert@codeheadsystems.com</email>
     <company id="codehead"/>
-    <description>JDO enhancements, refactoring and PostgreSQL integration.  (non-active)</description>
+    <description>JDO enhancements, refactoring and PostgreSQL integration.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Guessant" given="Mickael"/>
     <email>mickael.guessant@fisystem.com</email>
-    <description>JDO enhancements, help on the mailing list. (non-active)</description>
+    <description>JDO enhancements, help on the mailing list.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
@@ -124,28 +209,36 @@
     <email>on@ibis.odessa.ua</email>
     <company id="ibis"/>
     <description>Key generators, stored procedures, Sybase 11/12 support and
-     a variety of other design contributions. (non-active)</description>
+     a variety of other design contributions.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Maucherat" given="Remy"/>
     <email>remm@apache.org</email>
     <company id="sun"/>
-    <description>XML enhancements, lots of testing. (non-active)</description>
+    <description>XML enhancements, lots of testing.</description>
+    <project>XML</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Karpenstein" given="Nissim"/>
     <email>nissim@nksystems.com</email>
     <company id="nksystems"/>
-    <description>Develops the OQL query parser. (non-active)</description>
+    <description>Develops the OQL query parser.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Fritz" given="Markus"/>
     <email>mfritz@justis.de</email>
     <company id="justis"/>
-    <description>JDO bugfixes, enhancements. (non-active)</description>
+    <description>JDO bugfixes, enhancements.</description>
+    <project>JDO</project>
+    <status>inactive</status>
   </contributor>
 
 
@@ -375,19 +468,7 @@
     </description>
   </contributor>
 
-  <contributor type="Contributor">
-    <name surname="Hugubakken" given="Stein"/>
-    <email>duli@start.no</email>
-    <description>Provied various patches for Castor JDO, incl. performance caches.</description>
-  </contributor>
-
   <!-- Last names begin with I-L -->
-
-  <contributor type="Contributor">
-    <name surname="Joachim" given="Ralf" />
-    <email>ralf.joachim@syscon-world.de</email>
-    <description>Patch to fix parameterized types with whitespace support</description>
-  </contributor>
 
   <contributor type="Contributor">
     <name surname="Kelly" given="Shaun" />
@@ -532,7 +613,7 @@
   </contributor>
 
   <contributor type="Contributor">
-    <name surname="Pelchat" given="Stéphane"/>
+    <name surname="Pelchat" given="St?phane"/>
     <email>stephane@ofoto.com</email>
     <description>Patches to enum and date field handlers to support "nillable" fields.</description>
   </contributor>
@@ -958,7 +1039,7 @@
   </contributor>
 
   <contributor type="Feedback">
-    <name surname="Wichoski" given="Clóvis"/>
+    <name surname="Wichoski" given="Cl?vis"/>
     <email></email>
     <description>Patch for SapDbQueryExpression</description>
   </contributor>
@@ -1045,6 +1126,11 @@
     <url>www.codeheadsystems.com</url>
   </company>
 
+  <company id="ctoforaday">
+    <name>CTO for a day</name>
+    <url>www.ctoforaday.com</url>
+  </company>
+
 
   <!-- Company Names (E-H) -->
 
@@ -1072,6 +1158,11 @@
 
   <!-- Company Names (M-P) -->
 
+  <company id="mentopolis">
+    <name>Mentopolis</name>
+    <url>www.mentopolis.de/index.htm</url>
+  </company>
+  
   <company id="nksystems">
     <name>NK Systems</name>
     <url>www.nksystems.com</url>
@@ -1092,6 +1183,11 @@
   <company id="sun">
     <name>Sun Microsystems</name>
     <url>www.sun.com</url>
+  </company>
+
+  <company id="syscon">
+     <name>Syscon</name>
+     <url>www.syscon-world.de/index.html</url>
   </company>
 
   <!-- Company Names (T-Z) -->
