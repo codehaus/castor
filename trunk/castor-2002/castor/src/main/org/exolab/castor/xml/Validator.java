@@ -99,6 +99,10 @@ public class Validator {
       
         MarshalInfo mInfo = mResolver.resolve(object.getClass());
         
+        //-- we cannot validate object if MarshalInfo
+        //-- is null
+        if (mInfo == null) return;
+        
         ValidationRule[] rules = mInfo.getValidationRules();
         
         if (rules != null) {
