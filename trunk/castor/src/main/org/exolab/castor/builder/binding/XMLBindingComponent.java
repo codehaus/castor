@@ -56,6 +56,7 @@ import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.schema.Annotated;
 import org.exolab.castor.xml.schema.AttributeDecl;
 import org.exolab.castor.xml.schema.ComplexType;
+import org.exolab.castor.xml.schema.ContentModelGroup;
 import org.exolab.castor.xml.schema.ElementDecl;
 import org.exolab.castor.xml.schema.Form;
 import org.exolab.castor.xml.schema.Group;
@@ -139,14 +140,15 @@ public class XMLBindingComponent implements BindingComponent {
     /**
      * caches of several computations
      */
-    private int _hashCode =-1;
-    private String _javaClassName = null;
-    private String _javaMemberName = null;
-    private String _javaPackage = null;
+    private int       _hashCode =-1;
+    private String    _javaClassName = null;
+    private String    _javaMemberName = null;
+    private String    _javaPackage = null;
     private FieldType _member = null;
     private ClassType _class = null;
     private Interface _interface = null;
-    private Schema _schema = null;
+    private Schema    _schema = null;
+    private boolean   _userSpecifiedMemberName = false;
 
     /**
      * A GroupNaming helper class used to named anonymous groups
@@ -215,7 +217,7 @@ public class XMLBindingComponent implements BindingComponent {
         int _hashCode =-1;
         _javaClassName = null;
         _javaMemberName = null;
-        _javaPackage = null;
+        _javaPackage = null;        
         _schema = null;
         _member = null;
         _class = null;
@@ -223,6 +225,7 @@ public class XMLBindingComponent implements BindingComponent {
         _type = -1;
         _prefix = null;
         _suffix = null;
+        _userSpecifiedMemberName = false;
         
         
         //--look up for the particular componentBinding relative to the
@@ -755,7 +758,39 @@ public class XMLBindingComponent implements BindingComponent {
                          temp = _annotated;
                          setView(element.getReference());
                          result = getJavaMemberName();
+                         boolean userSpecified = _userSpecifiedMemberName;
                          setView(temp);
+                         
+                         //-- there might be more than once reference, so we
+                         //-- need to do a little counting here.                         
+                         if (!userSpecified) {
+                            String refName = element.getReferenceName();
+                            int count = 0;
+                            int index = 0;
+                            Structure structure = element.getParent();
+                            if (structure instanceof ContentModelGroup) {
+                                ContentModelGroup cmg = (ContentModelGroup)structure;
+                                Enumeration enum = cmg.enumerate();
+                                while (enum.hasMoreElements()) {
+                                    Structure tmpStruct = (Structure)enum.nextElement();
+                                    if (tmpStruct.getStructureType() == Structure.ELEMENT) {
+                                        ElementDecl tmpDecl = (ElementDecl)tmpStruct;
+                                        if (tmpDecl.isReference()) {
+                                            if (tmpDecl.getReferenceName().equals(refName)) {
+                                                ++count;
+                                                if (tmpDecl == element) {
+                                                    index = count;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (count > 1) {
+                                result = result + index;
+                            }
+                         }
+                         
                      }
                      element = null;
                 }
@@ -784,6 +819,9 @@ public class XMLBindingComponent implements BindingComponent {
 		                result = result + _suffix;
             
                 }
+            }
+            else {
+                _userSpecifiedMemberName = true;
             }
             _javaMemberName = JavaNaming.toJavaMemberName(result);
         }
