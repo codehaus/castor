@@ -1,6 +1,9 @@
 
 Version (CVS)
 -------------
+XML: Fixed bug in the generated classes: the attributes of complexTypes which contained
+     nested groups were wrongly located.
+     (Reported by Joseph Campolongo [jvc@cascadeworks.com]) (Arnaud)
 
 XML: Fixed bug that prevented string-to-primitive conversion code from being
      executed for identity fields (kvisco) 20010808
