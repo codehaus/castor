@@ -2344,7 +2344,7 @@ public class ClassMolder {
         for ( int i=0; i<osIds.length; i++ ) {
             osIds[i] = _ids[i].getValue( o, loader );
         }
-            if ( osIds[0] != null )
+            if ( osIds[0] == null )
                 return null;
             else
                 return new Complex( osIds );
