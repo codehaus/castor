@@ -102,6 +102,8 @@ public class ValueOfFieldHandler extends GeneralizedFieldHandler
             throw new IllegalArgumentException("The argument 'type' must not be null.");
         }
         
+        _type = type;
+        
         Method method = null;
         try {
             method = type.getMethod(METHOD_NAME, ARGS);
