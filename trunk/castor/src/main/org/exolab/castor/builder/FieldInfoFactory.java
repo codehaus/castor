@@ -82,6 +82,11 @@ public class FieldInfoFactory {
     private String _referenceSuffix = null;
 
     /**
+     * Bound properties
+     */
+    private boolean _bound = false;
+    
+    /**
      * Creates a new FieldInfoFactory. The default collection used will be
      * Java 1 type.
     **/
@@ -97,7 +102,9 @@ public class FieldInfoFactory {
     }
 
     public IdentityInfo createIdentity (String name) {
-        return new IdentityInfo(name);
+        IdentityInfo idInfo = new IdentityInfo(name);
+        if (_bound) idInfo.setBound(_bound);
+        return idInfo;
     } //-- createIdentity
 
 
@@ -130,14 +137,31 @@ public class FieldInfoFactory {
         if (_referenceSuffix != null) {
             cInfo.setReferenceMethodSuffix(_referenceSuffix);
         }        
+        if (_bound) {
+            cInfo.setBound(true);
+        }
         return cInfo;
     }
 
     public FieldInfo createFieldInfo (XSType type, String name) {
-        return new FieldInfo(type,name);
+        FieldInfo fieldInfo = new FieldInfo(type, name);
+        if (_bound) fieldInfo.setBound(true);
+        return fieldInfo;
     } //-- createFieldInfo
 
 
+    /**
+     * Sets whether or not the fields should be bound
+     * properties
+     *
+     * @param bound a boolean that when true indicates
+     * the FieldInfo should have the bound property
+     * enabled.
+     */
+    public void setBoundProperties(boolean bound) {
+        _bound = bound;
+    } //-- setBoundProperties
+    
     /**
      * Sets whether or not to create extra collection methods
      * for accessing the actual collection
