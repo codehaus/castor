@@ -48,7 +48,7 @@ package org.exolab.castor.mapping;
 
 
 
-//import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Database;
 
 
 
@@ -155,7 +155,6 @@ public class AccessMode
      */ 
     public short toShort()
     {
-        /*
         if ( this == Shared )
             return Database.Shared;
         if ( this == ReadOnly )
@@ -164,7 +163,6 @@ public class AccessMode
             return Database.DbLocked;
         if ( this == Exclusive )
             return Database.Exclusive;
-        */
         // never happens
         return -1;
     }
