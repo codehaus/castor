@@ -275,13 +275,100 @@ public class MultiPKs extends CWTestCase {
 					}							
 				}
 				System.out.println("OK: Categories are valid");
+
+				// now modify it!
+				address.remove( addresses[0] );
+				addresses[1].setStreet("New Second Street");
 			} else {
 				_db.rollback();
 				System.out.println("Error: FirstName, LastName or Birthday is wrong!");
 				return false;
-			}
-				
+			}				
 			_db.commit();
+
+
+			_db.begin();
+			loadPerson = (TestPKsEmployee) _db.load( TestPKsEmployee.class, fullname );
+			if ( loadPerson.getBirthday().equals(new Date(1922, 2, 2)) &&
+					loadPerson.getFirstName().equals("First") && loadPerson.getLastName().equals("Person") ) {
+				System.out.println("OK: Employee is valid");
+
+				ArrayList address = loadPerson.getAddress();
+				Iterator itor = address.iterator();
+				TestPKsAddress[] addresses = { null, null, null };
+				TestPKsAddress addr;
+				while ( itor.hasNext() ) {
+				    addr = (TestPKsAddress)itor.next();
+					if ( addr.getId() < 1 || addr.getId() > 3 ) {
+						_db.rollback();
+						System.out.println("Error: Address id is wrong");
+						return false;
+					}
+					addresses[addr.getId()-1] = addr;
+				}
+
+				if ( addresses[0] != null ) {
+					System.out.println("Error: Address 1 is not deleted");
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: Address 1 is deleted");
+
+				if ( addresses[1] == null || !addresses[1].getStreet().equals("New Second Street") 
+						|| !addresses[1].getCity().equals("Second City") || !addresses[1].getState().equals("BC") 
+						|| !addresses[1].getZip().equals("22222") || addresses[1].getPerson() != loadPerson ) {
+					System.out.println("Error: Address 2 is wrong");
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: Address 2 are valid");
+
+				TestPKsPayRoll payroll = loadPerson.getPayRoll();
+				if ( payroll == null || payroll.getId() != 1 || payroll.getHoliday() != 15 
+						|| payroll.getEmployee() != loadPerson || payroll.getHourlyRate() != 25 ) {
+					System.out.println("Error: PayRoll loaded wrong");
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: PayRoll is valid");
+
+				TestPKsContract cont = loadPerson.getContract();
+				if ( cont == null || cont.getPolicyNo() != 1001 || cont.getEmployee() != loadPerson 
+						|| cont.getContractNo() != 78 ) {
+					System.out.println("Error: Contract are not what expected!");
+					System.out.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
+					System.out.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());					
+					System.out.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());					
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: Contract is valid");
+
+				ArrayList catelist = cont.getCategory();
+				itor = catelist.iterator();
+				TestPKsContractCategory cate;
+				while ( itor.hasNext() ) {
+				    cate = (TestPKsContractCategory) itor.next();
+					if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
+					} else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
+					} else {
+						System.out.println("Error: Category is wrong");
+						_db.rollback();
+						return false;
+					}							
+				}
+				System.out.println("OK: Categories are valid");
+
+				// now modify it!
+				address.remove( addresses[0] );
+				addresses[1].setStreet("New Second Street");
+			} else {
+				_db.rollback();
+				System.out.println("Error: FirstName, LastName or Birthday is wrong!");
+				return false;
+			}				
+			_db.commit();
+
 
         } catch ( Exception e ) {
             result = false;

@@ -13,7 +13,7 @@ public class TestLazyContract {
     private int _contractNo;
     private String _comment;
 	private TestLazyEmployee _employee;
-	private ArrayList _category;
+	private Collection _category;
 
     public void setPolicyNo( int policy ) {
         _policyNo = policy;
@@ -39,10 +39,10 @@ public class TestLazyContract {
 	public TestLazyEmployee getEmployee() {
 		return _employee;
 	}
-	public void setCategory( ArrayList category ) {
+	public void setCategory( Collection category ) {
 		_category = category;
 	}
-	public ArrayList getCategory() {
+	public Collection getCategory() {
 		return _category;
 	}
 }

@@ -3,7 +3,6 @@
 package jdo;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -12,7 +11,7 @@ public class TestLazyPerson {
     private String _fname;
     private String _lname;
     private Date   _bday;
-    private ArrayList _address;
+    private Collection _address;
 
     public String getFirstName() {
         return _fname;
@@ -32,10 +31,10 @@ public class TestLazyPerson {
     public void setBirthday( Date date ) {
         _bday = date;
     }
-    public ArrayList getAddress() {
+    public Collection getAddress() {
         return _address;
     }
-    public void setAddress( ArrayList address ) {
+    public void setAddress( Collection address ) {
         _address = address;
     }
 }
