@@ -13,8 +13,8 @@ if "%1"=="" goto noargs
 
 goto end
 :noargs
-echo using default arguments [-text -verbose src/tests/MasterTestSuite]
-%JAVA% -classpath %CP% org.exolab.castor.tests.framework.CastorTestSuiteRunner -text -verbose src/tests/MasterTestSuite
+echo using default arguments [-text -verbose src/tests/MasterTestSuite -printStack]
+%JAVA% -classpath %CP% org.exolab.castor.tests.framework.CastorTestSuiteRunner -text -verbose src/tests/MasterTestSuite -printStack
 
 :end
 set CLASSPATH=%OLDCP%
