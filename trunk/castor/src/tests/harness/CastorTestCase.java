@@ -84,7 +84,7 @@ public class CastorTestCase extends TestCase {
     private void clearCache() {
         try {
             if (suite instanceof JDOCategory) {
-                DatabaseImpl db = (DatabaseImpl) ((JDOCategory) suite).getDatabase(verbose);
+                DatabaseImpl db = (DatabaseImpl) ((JDOCategory) suite).getDatabase();
                 db.getCacheManager().expireCache();
             }
         } catch (Exception e) {
