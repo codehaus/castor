@@ -101,6 +101,8 @@ public class ModelGroup extends Particle
      */
      private Schema _schema = null;
 
+     private String _id  = null;
+
     /**
      * Creates a new ModelGroup, with no name
     **/
@@ -199,6 +201,15 @@ public class ModelGroup extends Particle
     } //-- getExport
 
     /**
+     * Returns the ID for this Group
+     * @return the ID for this Group, or null if no ID is present
+     */
+    public String getId() {
+        return _id;
+    } //-- getId
+
+
+    /**
      * Returns the name of this ModelGroup, or null if no name was defined
      * @return the name of this ModelGroup, or null if no name was defined
     **/
@@ -209,6 +220,14 @@ public class ModelGroup extends Particle
     public Order getOrder() {
         return order;
     } //-- getOrder
+
+    /**
+     * Sets the ID for this Group
+     * @param id the ID for this Group
+    **/
+    public void setId(String id) {
+        _id = id;
+    } //-- setId
 
     /**
      * Sets the name of this ModelGroup

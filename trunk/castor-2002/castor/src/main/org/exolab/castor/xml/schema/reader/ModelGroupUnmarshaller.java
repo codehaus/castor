@@ -136,6 +136,8 @@ public class ModelGroupUnmarshaller extends SaxUnmarshaller {
             _group.setMinOccurs(toInt(attValue));
 
         //-- id
+        attValue = atts.getValue("id");
+        _group.setId(attValue);
         //-- not yet supported
 
         //-- @ref
