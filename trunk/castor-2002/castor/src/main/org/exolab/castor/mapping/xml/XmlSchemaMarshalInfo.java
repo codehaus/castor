@@ -65,7 +65,7 @@ public class XmlSchemaMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         rules = new ValidationRule[5];
         //-- initialize attributes
         
-        attributes = new MarshalDescriptor[4];
+        attributes = new MarshalDescriptor[5];
         //-- vPrefix
         desc = new SimpleMarshalDescriptor(java.lang.String.class, "vPrefix", "prefix");
         desc.setDescriptorType(DescriptorType.attribute);
@@ -135,6 +135,23 @@ public class XmlSchemaMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         bvr.setTypeValidator(new StringValidator());
         rules[3] = bvr;
         rules[4] = gvr;
+        //-- vXmlName
+        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vXmlName", "xml-name");
+        desc.setDescriptorType(DescriptorType.attribute);
+        try {
+            desc.setReadMethod(XmlSchema.class.getMethod("getXmlName", emptyClassArgs));
+            classArgs[0] = java.lang.String.class;
+            desc.setWriteMethod(XmlSchema.class.getMethod("setXmlName", classArgs));
+        }
+        catch(java.lang.NoSuchMethodException nsme) {};
+        
+        attributes[4] = desc;
+        
+        bvr = new BasicValidationRule("xml-name");
+        bvr.setAsAttributeRule();
+        bvr.setMaxOccurs(1);
+        bvr.setTypeValidator(new NameValidator(NameValidator.NMTOKEN));
+        rules[0] = bvr;
         //-- initialize elements
         
         elements = new MarshalDescriptor[0];

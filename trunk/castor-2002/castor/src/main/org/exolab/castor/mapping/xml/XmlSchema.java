@@ -47,6 +47,10 @@ public class XmlSchema implements java.io.Serializable {
     **/
     private java.lang.String vNamespace;
 
+    /**
+     * 
+    **/
+    private java.lang.String vXmlName;
 
       //----------------/
      //- Constructors -/
@@ -73,6 +77,20 @@ public class XmlSchema implements java.io.Serializable {
     public void setPrefix(java.lang.String vPrefix) {
         this.vPrefix = vPrefix;
     } //-- void setPrefix(java.lang.String) 
+
+    /**
+    **/
+    public java.lang.String getXmlName() {
+        return this.vXmlName;
+    } //-- java.lang.String getXmlName() 
+
+    /**
+     * @param vXmlName
+    **/
+    public void setXmlName(java.lang.String vXmlName) {
+        this.vXmlName = vXmlName;
+    } //-- void setXmlName(java.lang.String) 
+
 
     /**
     **/
