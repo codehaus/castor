@@ -1,6 +1,9 @@
 
 Version (CVS) 
 -------------
+XML:   Fixed bug 1683 so that the Source Generator better supports XDoclet
+       tags in an XSD. 
+       (Bruce - 20040711)
 
 JDO:   Fixed bug 1508 using contribution from Stein M. Hugubakken [dulci@start.no]
        Refactored code, applying strategy pattern.
