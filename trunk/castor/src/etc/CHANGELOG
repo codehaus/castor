@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1774.
+       Fixed problem with "sqltime" field type where it was incorrectly mapped to java.sql.Date 
+       rather than java.sql.Time.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1774
+       (Werner - 20041126)
+
 JDO:   Fixed bug 1788 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added support for SQL parameters as part of IN statements in WHERE clauses.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1788
