@@ -848,11 +848,11 @@ Database db = jdo.getDatabase();
     
     <section title="RDBMS-specific issues">
     
-    	<section title = "mySQL">
+    	<section title = "MySQL">
 
     		<section title="Use of DATETIME fields in general">
     	
-    			<p>mySQL in it's current releases (4.0.x and 4.1.x) does not store fractions of a 
+    			<p>MySQL in it's current releases (4.0.x and 4.1.x) does not store fractions of a 
     			   second in fields of type DATETIME that are mapped to java.sql.TimeStamp fields.
     			   As a result, Castor will throw ObjectModifiedExceptions during commits as Castor 
     			   internally maintains fractions of a seconds. </p> 
@@ -874,13 +874,13 @@ Database db = jdo.getDatabase();
                 
     		</section>
 
-    		<section title="mySQL 4.1.x and upgrade issues">
+    		<section title="MySQL 4.1.x and upgrade issues">
     		
  				<p>As with many other open source products, MySQL seems to be changing slightly from 
  				   version to version. There seems to be a problem with concurrency in MySQL 4.1.5
 				   that can be resolved by upgrading to 4.1.7 or higher.</p>
 				   
-				<p>With the 3.1.x releaseo of mySQL's Connector/J , the 'LIMIT $1' syntax of OQL does not 
+				<p>With the 3.1.x releaseo of MySQL's Connector/J , the 'LIMIT $1' syntax of OQL does not 
 				   work. We hence advise you to stay with the Connector/J 3.0.16 release instead until 
 				   further notice.</p>
 			
