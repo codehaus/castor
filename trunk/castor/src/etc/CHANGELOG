@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1793 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Changed SimpleQueryExecutor to reuse the current JDBC Connection, fixing
+       visibility issues.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1793
+       (Werner - 20041213)
+
 JDO:   Fixed bug 1816 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Fixed problem with double quotes in table names (sequence key generator).
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1816
