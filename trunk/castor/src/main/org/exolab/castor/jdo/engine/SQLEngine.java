@@ -784,7 +784,7 @@ public final class SQLEngine implements Persistence {
 
             storeStatement = getStoreStatement( original );
             stmt = ( (Connection) conn ).prepareStatement( storeStatement );
-            _log.debug( Messages.format( "jdo.store", storeStatement ) );
+            _log.debug( Messages.format( "jdo.storing", storeStatement ) );
 
             count = 1;
 
@@ -864,7 +864,7 @@ public final class SQLEngine implements Persistence {
                 stmt.close();
                 if ( original != null ) {
                     stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
-                    _log.debug( Messages.format( "jdo.store", _sqlLoad ) );
+                    _log.debug( Messages.format( "jdo.storing", _sqlLoad ) );
 
                     // bind the identity to the prepareStatement
                     count = 1;
