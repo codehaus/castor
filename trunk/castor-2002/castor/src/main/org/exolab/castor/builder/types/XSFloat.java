@@ -82,7 +82,8 @@ public final class XSFloat extends XSPatternBase {
         super(XSType.FLOAT_TYPE);
         if (asWrapper)
             this.jType = new JClass("java.lang.Float");
-    } //-- XSReal
+        else this.jType = JType.Float;
+    } //-- XSFloat
 
 
     /**

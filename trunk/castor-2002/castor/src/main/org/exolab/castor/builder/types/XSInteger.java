@@ -80,6 +80,7 @@ public class XSInteger extends XSPatternBase {
         super(XSType.INTEGER_TYPE);
         if (asWrapper)
             this.jType = new JClass("java.lang.Integer");
+        else this.jType = JType.Int;
     } //-- XSInteger
 
 
@@ -291,7 +292,7 @@ public class XSInteger extends XSPatternBase {
     **/
     public String createToJavaObjectCode(String variableName) {
         if (SourceGenerator.usePrimitiveWrapper())
-            return super.createToJavaObjectCode(variableName);
+           return super.createToJavaObjectCode(variableName);
         else {
             StringBuffer sb = new StringBuffer("new Integer(");
             sb.append(variableName);

@@ -77,6 +77,7 @@ public final class XSLong extends XSPatternBase {
         super(XSType.LONG_TYPE);
         if (asWrapper)
             this.jType = new JClass("java.lang.Long");
+        else this.jType = JType.Long;
     } //-- XSLong
 
 
