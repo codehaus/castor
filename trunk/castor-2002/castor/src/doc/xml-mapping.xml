@@ -191,7 +191,7 @@
       <section title="3.2 The &lt;class> element  "> 
 
         <code>
-        &lt;!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
+        &lt;!ELEMENT class ( description?, cache-type-mapping?, map-to?, (field|container)+ )>
         &lt;!ATTLIST class
                   name            ID       #REQUIRED
                   extends         IDREF    #IMPLIED
@@ -203,8 +203,8 @@
         </code>
 
 
-        <p>The  &lt;class> element contains all the information used to map a Java class into an
-          XML document. The content of &lt;class> is mainly used to describe the fields that
+        <p>The  &lt;class&gt; element contains all the information used to map a Java class into an
+          XML document. The content of &lt;class&gt; is mainly used to describe the fields that
             will be mapped.</p>
 
         <p>Description of the attributes:</p>
@@ -323,7 +323,7 @@ public class myclass {
 
       </section>
 
-      <section title="3.3 The &lt;map-to> element">
+      <section title="3.3 The &lt;map-to&gt; element">
 
         <code>
         &lt;!ELEMENT map-to EMPTY>
@@ -336,8 +336,8 @@ public class myclass {
                   ldap-oc    NMTOKEN  #IMPLIED>
         </code>
 
-        <p>&lt;map-to> is used to specify the name of the element that should be associated
-          with the given class.&lt;map-to> is only used for the root class. If this
+        <p>&lt;map-to&gt; is used to specify the name of the element that should be associated
+          with the given class.&lt;map-to&gt; is only used for the root class. If this
           information is not present, Castor will:</p>
 
         <ul>
@@ -366,24 +366,24 @@ public class myclass {
       </section>
 
 
-      <section title="3.4 The &lt;field> element">
+      <section title="3.4 The &lt;field&gt; element">
 
         <code>
         &lt;!ELEMENT field ( description?, sql?, xml?, ldap? )>
         &lt;!ATTLIST field
-                  name           NMTOKEN  #REQUIRED
-                  type           NMTOKEN  #IMPLIED
-                  required       ( true | false )  "false"
-                  direct         ( true | false )  "false"
-                  lazy           ( true | false )  "false"
-                  transient      ( true | false )  "false"
-                  get-method     NMTOKEN  #IMPLIED
-                  set-method     NMTOKEN  #IMPLIED
-                  create-method  NMTOKEN  #IMPLIED
-                  collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
+   		     name           NMTOKEN  #REQUIRED
+                     type           NMTOKEN  #IMPLIED
+                     required       ( true | false )  "false"
+                     direct         ( true | false )  "false"
+                     lazy           ( true | false )  "false"
+                     get-method     NMTOKEN  #IMPLIED
+                     set-method     NMTOKEN  #IMPLIED
+                     create-method  NMTOKEN  #IMPLIED
+                     transient      (true|false) "false"
+                     collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate )  #IMPLIED>
         </code> 
 
-        <p>&lt;field> is used to describe a property of a Java object we want to
+        <p>&lt;field&gt; is used to describe a property of a Java object we want to
           marshal/unmarshal. It gives:</p>
         <ul>
           <li>its identity ('name')</li>
@@ -397,7 +397,7 @@ public class myclass {
         <p>In order to determine the signature that Castor expects, there are two easy
           rules to apply.</p>
 
-        <p><b>1. Determine &lt;type>.</b></p> 
+        <p><b>1. Determine &lt;type&gt;.</b></p> 
 
         <ul>
           <li><p><b>If there is no 'collection' attribute</b>, the &lt;type> is just the Java type
@@ -458,7 +458,7 @@ public class myclass {
             given signature:</p>
 
           <code>
-            public &lt;type> &lt;name>;
+            public &lt;type%gt; &lt;name&gt;;
           </code>
 
           <li><p><b>If 'direct' is set to false or omitted</b>, Castor will access the property
@@ -467,28 +467,28 @@ public class myclass {
               try to find a function with the following signature:</p>
 
             <code>
-              public &lt;type> &lt;get-method>();
+              public &lt;type&gt; &lt;get-method&gt;();
             </code>
             or
             <code>
-              public void &lt;set-method>(&lt;type> value);
+              public void &lt;set-method&gt;(&lt;type&gt; value);
             </code>
 
             <p>If 'get-method' or 'set-method' attributes are not provided, Castor will try to
               find the following function:</p>
 
             <code>
-              public &lt;type> get&lt;capitalized-name>();
+              public &lt;type&gt; get&lt;capitalized-name&gt;();
             </code>
             or
             <code>
-              public void set&lt;capitalized-name>(&lt;type> value);
+              public void set&lt;capitalized-name&gt;(&lt;type&gt; value);
             </code>
             
-            <p>&lt;capitalized-name> means that Castor takes the &lt;name> attribute and put its first
+            <p>&lt;capitalized-name&gt; means that Castor takes the &lt;name&gt; attribute and put its first
               letter in uppercase without modifying the other letters.</p>
 
-            <p>The content of &lt;field> will contain the information on how to map this given
+            <p>The content of &lt;field&gt; will contain the information on how to map this given
               field to SQL, XML, ...</p>
           </li>
         </li>
@@ -540,12 +540,12 @@ public class myclass {
         <p>Description of the content:</p>
 
         <p>In the case of XML mapping, the content of a field element should be one and
-          only one &lt;xml> element describing how this given field will be mapped into the
+          only one &lt;xml&gt; element describing how this given field will be mapped into the
           XML document.</p>
       </section>
           
 
-      <section title="3.5 The &lt;bind-xml> element">
+      <section title="3.5 The &lt;bind-xml&gt; element">
 
         <code>
         &lt;!ELEMENT bind-xml EMPTY>
@@ -553,19 +553,31 @@ public class myclass {
                   name     NMTOKEN  #IMPLIED
                   type     NMTOKEN  #IMPLIED
                   matches  NMTOKEN  #IMPLIED
+                  QName-prefix NMTOKEN #IMPLIED
+                  reference (true|false) "false"
                   node     ( attribute | element | text )  #IMPLIED>
         </code> 
 
-        <p>&lt;bind-xml> is used to describe how a given Java field should appear in an XML
+        <p>&lt;bind-xml&gt; is used to describe how a given Java field should appear in an XML
           document. It is used both for marshalling and unmarshalling.</p>
 
         <p>Description of the attributes:</p>
         <ul>
           <li><b>name:</b> the name of the element or attribute</li>
 
-          <li><b>type:</b> xsi::type</li>
+          <li><b>type:</b>XML Schema type (of the value of this field) that requires specific handling in the
+                          Castor Marshalling Framework (such as 'QName' for instance).</li>
           
-          <li><b>matches:</b> not used</li>
+          <li><b>matches:</b> Allows overriding the matches rules</li>
+          
+          <li><b>QName-prefix:</b> When using a QName value, you can provide a default prefix that 
+             is used when marshalling value of type QName. More information on the use of 'QName-prefix'
+             can be found in the <a href="./SourceGeneratorUser.pdf">SourceGenerator Documentation</a></li>
+           
+          <li><b>reference:</b> Indicates if this field has to be treated as a reference by the unmarshaller.
+          In order to work properly, you must specify the node type to 'attribute' 
+          for both the 'id' and the 'reference'.</li>
+          
           
           <li><b>node:</b> indicates if the name corresponds to an attribute, an element,
             or text content. By default, primitive types are assumed to be an attribute
