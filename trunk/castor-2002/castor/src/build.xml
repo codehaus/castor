@@ -24,7 +24,7 @@
         <property name="deprecation" value="false"/>
         <property name="archive" value="${project}-${version}"/>
         <property name="excludes" value="**/package.html"/>
-        <property name="testexcludes" value="**/package.html,**/xml/xml2java/**"/>
+        <property name="testexcludes" value="**/package.html"/>
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
@@ -205,9 +205,9 @@
         	<arg value="-packagexml.xml2java" /> 
         </java>
         
-        <javac srcdir="${build}/tests" destdir="${build}/tests" excludes="${excludes}" classpath="${classpath}" debug="on" deprecation="${deprecation}" />
+        <javac srcdir="${build}/tests" destdir="${build}/tests" classpath="${classpath}" debug="on" deprecation="${deprecation}" />
         
-        <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${excludes}" classpath="${classpath}" debug="on" deprecation="${deprecation}"/>
+        <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" classpath="${classpath}" debug="on" deprecation="${deprecation}"/>
         
         <copy todir="${build}/tests">
             <fileset dir="${source}/tests">
