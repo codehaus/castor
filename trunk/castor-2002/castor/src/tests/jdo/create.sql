@@ -43,9 +43,10 @@ grant all on test_group to test;
 
 drop table   test_types;
 create table test_types (
-  id   numeric(10,0)  not null,
-  tdt  datetime       not null,
-  ttm  time           not null
+  id       numeric(10,0)  not null,
+  tdt      datetime       not null,
+  ttm      time           not null
+  int_val  integer        null
 );
 create unique index test_types_pk
   on test_types ( id );

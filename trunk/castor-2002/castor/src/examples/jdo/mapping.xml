@@ -7,8 +7,8 @@
          identity="id">
     <description>Product group</description>
     <map-to table="prod_group" xml="group" />
-    <field name="id">
-      <sql type="numeric" />
+    <field name="id" type="integer" >
+      <sql />
       <xml node="attribute"/>
     </field>
     <field name="name">

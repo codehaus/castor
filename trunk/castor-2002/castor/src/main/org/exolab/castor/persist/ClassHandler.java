@@ -707,6 +707,11 @@ public final class ClassHandler
                 this.dirty = true;
         }
 
+        public String toString()
+        {
+            return handler.toString();
+        }
+
     }
 
 
