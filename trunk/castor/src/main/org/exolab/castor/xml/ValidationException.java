@@ -51,12 +51,6 @@ package org.exolab.castor.xml;
  * @version $Revision$ $Date$
 **/
 public class ValidationException extends XMLException {
-    
-    /**
-     * A nested exception
-     */
-    private Exception _exception  = null;
-    
     /**
      * The location for this Exception
      */
@@ -98,12 +92,8 @@ public class ValidationException extends XMLException {
      * exception.
      * @param exception the nested exception
     **/
-    public ValidationException(Exception exception) {
+    public ValidationException(Throwable exception) {
         super(exception);
-        if (exception != null) {
-            super.setMessage(exception.getMessage());
-            this._exception = exception;
-        }
     } //-- ValidationException(Exception)
 
     /**
@@ -112,9 +102,8 @@ public class ValidationException extends XMLException {
      * @param message the detail message for this exception
      * @param exception the nested exception
     **/
-    public ValidationException(String message, Exception exception) {
+    public ValidationException(String message, Throwable exception) {
         super(message, exception);
-        this._exception = exception;
     } //-- ValidationException(String, Exception)
 
     /**
@@ -128,19 +117,8 @@ public class ValidationException extends XMLException {
         (String message, Exception exception, int errorCode) 
     {
         super(message, exception, errorCode);
-        this._exception = exception;
     } //-- ValidationException(String, Exception, int)
-    
-    /**
-     * Returns the exception, which in turn caused this Exception to
-     * be thrown, or null if nested exception exists.
-     * @return the exception, which in turn caused this Exception to
-     * be thrown, or null if nested exception exists.
-    **/
-    public Exception getException() {
-        return _exception;
-    } //-- getException
-    
+        
     /**
      * Returns the location of the exception
      *
@@ -262,9 +240,10 @@ public class ValidationException extends XMLException {
                 sb.append(";\n   - location of error: ");
                 sb.append(_location.toString());
             }
-            if (_exception != null) {
+            Throwable t = getCause();
+            if (t!=null) {
                 sb.append("\n");
-                sb.append(_exception.getMessage());
+                sb.append(t.getMessage());
             }
         }
         return sb.toString();
