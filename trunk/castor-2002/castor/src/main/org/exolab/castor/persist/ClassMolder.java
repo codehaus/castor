@@ -1720,7 +1720,7 @@ public class ClassMolder {
                         }
                     } else if ( tx.isAutoStore() ) {
                         if ( fields[i] != null ) {
-                            if ( o != null && fields[i] == fieldClassMolder.getIdentity( tx, o ) )
+                            if ( o != null && fields[i] == fieldClassMolder.getActualIdentity( tx, o ) )
                                 tx.update( fieldEngine, fieldClassMolder, o, null );
 
                         } else if ( o != null ) {
