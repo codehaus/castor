@@ -320,7 +320,7 @@ final class ObjectLock implements DepositBox {
     synchronized void acquireLoadLock( TransactionContext tx, boolean write, int timeout ) 
             throws LockNotGrantedException, ObjectDeletedWaitingForLockException {
         
-        long endtime = timeout<0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
+        long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
         while ( true ) {
             try {
                 // cases to consider:
