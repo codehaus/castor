@@ -8,11 +8,15 @@
 
   <topNav>
     <navLink>
+      <url>http://www.codehaus.org</url>
+      <display>Codehaus</display>
+    </navLink>
+    <navLink>
       <url>http://www.exolab.org</url>
       <display>ExoLab</display>
     </navLink>
     <navLink>
-      <url>http://openejb.sf.net</url>
+      <url>http://openejb.codehaus.org</url>
       <display>OpenEJB</display>
     </navLink>
 
