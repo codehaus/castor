@@ -235,10 +235,20 @@ public class Marshaller {
 
     } //-- setMarshalAsDocument
     
+    /**
+     * Sets the given mapping to be used by the marshalling
+     * Framework. If a ClassDescriptorResolver exists
+     * This mapping will be added to the existing Resolver. Otherwise
+     * a new ClassDescriptorResolver will be created.
+     *
+     * @param mapping the mapping to using during marshalling
+    **/
     public void setMapping( Mapping mapping )
         throws MappingException
     {
-        _cdResolver = new ClassDescriptorResolverImpl();
+        if (_cdResolver == null) 
+            _cdResolver = new ClassDescriptorResolverImpl();
+            
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML, null ) );
     } //-- setMapping
 
