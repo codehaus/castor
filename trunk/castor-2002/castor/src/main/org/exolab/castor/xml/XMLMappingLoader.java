@@ -71,7 +71,7 @@ import org.exolab.castor.util.Configuration;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-
+import org.exolab.castor.xml.validators.NameValidator;
 
 /**
  * An XML implementation of mapping helper. Creates XML class
@@ -83,6 +83,12 @@ import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 public class XMLMappingLoader
     extends MappingLoader
 {
+
+    /**
+     * The NCName Schema type
+    **/
+    private static final String NCNAME = "NCName";
+    
 
     /**
      * naming conventions
@@ -351,10 +357,16 @@ public class XMLMappingLoader
         xmlDesc.setContainer(fieldMap.getContainer());
 
         //is the value type needs specific handling
-        //such as QName support?
+        //such as QName or NCName support?
         if (xml != null) {
-            xmlDesc.setSchemaType(xml.getType());
+            String xmlType = xml.getType();
+            xmlDesc.setSchemaType(xmlType);
             xmlDesc.setQNamePrefix(xml.getQNamePrefix());
+            TypeValidator validator = null;
+            if (NCNAME.equals(xmlType)) {
+                validator = new NameValidator(NameValidator.NCNAME);
+                xmlDesc.setValidator(new FieldValidator(validator));
+            }
         }
         
         //-- isMapped item
