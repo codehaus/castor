@@ -104,16 +104,16 @@ public final class Entity implements Cloneable {
 
     /** 
      * Indicate which entity classes is this entity actually belongs to
-     * The super-most entity of "actual" must equal to "root".
+     * The super-most entity of "actual" must equal to "base".
      */ 
     public EntityInfo   actual;
 
     /**
      * Represent the actual values in the data store. The values is
      * ordered in "super-most first" order. In the other words, the value 
-     * representing the root.fieldInfo[0] is stored in position zero of 
-     * values. Assuming actual is an immediate sub entity of root, the
-     * first values of actual is stored in value[root.fieldInfo.lenght].
+     * representing the base.fieldInfo[0] is stored in position zero of 
+     * values. Assuming actual is an immediate sub entity of base, the
+     * first values of actual is stored in value[base.fieldInfo.length].
      */
     public Object[]     values;
 
@@ -157,6 +157,43 @@ public final class Entity implements Cloneable {
         }
         ent = (Entity) obj;
         return (base.equals(ent.base) && identity.equals(ent.identity));
+    }
+
+    /**
+     * Determines this entity and the specified entitiy is strickly equals.
+     * In other words, they has the same base entity, same actual entity,
+     * same identity, same set of values.
+     */
+    public boolean strictEquals( Entity entity ) {
+        if ( entity == null )
+            return false;
+
+        // yip: three comparsions only. let me know if you can beat this
+        if ( !( base==entity.base || (base!=null && base.equals(entity.base) ) ) )
+            return false;
+
+        if ( !(actual==entity.actual || (actual!=null && actual.equals(entity.actual)) ) )
+            return false;
+
+        if ( !(identity==entity.identity || (identity!=null && identity.equals(entity.identity)) ) )
+            return false;
+
+        // make sure both is not null && both has enough length
+        if ( values == null && entity.values == null )
+            return true;
+        if ( values == null || entity.values == null )
+            return false;
+
+        int minLen = actual.getFieldOffset() + actual.fieldInfo.length;
+        if ( values.length < minLen || entity.values.length < minLen )
+            return false;
+
+        for ( int i = 0; i < minLen; i++ ) {
+            if ( !(values[i]==entity.values[i] 
+                    || (values[i]!=null && values[i].equals(entity.values[i])) ) )
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -219,7 +256,7 @@ public final class Entity implements Cloneable {
     /**
      * Obtain the value of a field represented by fieldInfo, if this entity
      * is initalized. FieldInfo must belongs to one of the entity that is lay 
-     * in the path between root and actual.
+     * in the path between base and actual.
      * <p>
      * If this entity is not initalized, it method always return false
      * <p>
@@ -230,7 +267,7 @@ public final class Entity implements Cloneable {
         if ( base == null || actual == null || values == null )
             return null;
 
-        // make sure fieldInfo is in the path between actual and root
+        // make sure fieldInfo is in the path between actual and base
         if ( !fieldInfo.entityClass.isSuper( actual ) )
             throw new IllegalArgumentException("Entity " + fieldInfo.entityClass 
                       + " for the field " + fieldInfo + " not found in " + this);
@@ -254,12 +291,12 @@ public final class Entity implements Cloneable {
     public void setFieldValue( EntityFieldInfo fieldInfo, Object value ) 
             throws IllegalArgumentException {
 
-        // check the state of root
+        // check the state of base
         if ( base == null )
-            // set root if it is not already been set
+            // set base if it is not already been set
             base = fieldInfo.entityClass.getBase();
         else if ( !fieldInfo.entityClass.getBase().equals( base ) ) 
-            throw new IllegalArgumentException("EntityFieldInfo does not contains the same root");
+            throw new IllegalArgumentException("EntityFieldInfo does not contains the same base");
 
         // check the state of actual
         if ( actual == null ) {
@@ -267,7 +304,7 @@ public final class Entity implements Cloneable {
             actual = fieldInfo.entityClass;
         } else if ( !fieldInfo.entityClass.isSuper( actual ) ) {
             // make sure the new field is compatible with the path between
-            // rooto and actual
+            // base and actual
             if ( actual.isSuper( fieldInfo.entityClass ) )
                 // upgrade the entity to a sub entity
                 actual = fieldInfo.entityClass;
