@@ -98,6 +98,17 @@ public class GenericFactory
     }
 
 
+    protected final String doubleQuoteName( String name )
+    {
+        int index;
+
+        index = name.indexOf( '.' );
+        if ( index > 0 )
+            return "\"" + name.substring( 0, index ) + "\".\"" + name.substring( index + 1 ) + "\"";
+        return '"' + name + '"';
+    }
+
+
 }
 
 
