@@ -75,6 +75,34 @@ class DeferredSimpleType extends SimpleType
     private int createInstanceCallsCount= 0;
 
     /**
+     * Creates a new default DeferredSimpleType.
+    **/
+    DeferredSimpleType() {
+        super();
+    } //-- DeferredSimpleType
+    
+    /**
+     * Creates a new DeferredSimpleType
+     *
+     * @param name the name of the SimpleType.
+    **/
+    DeferredSimpleType(String name) {
+        super();
+        setName(name);
+    } //-- DeferredSimpleType
+    
+    /**
+     * Creates a new DeferredSimpleType
+     *
+     * @param name the name of the SimpleType.
+     * @param schema the parent Schema of the SimpleType.
+    **/
+    DeferredSimpleType(String name, Schema schema) {
+        setName(name);
+        setSchema(schema); 
+    } //-- DeferredSimpleType
+    
+    /**
      * Sets the name of the base type that couldn't be resolved
      * when this type was created.
      */
@@ -99,8 +127,8 @@ class DeferredSimpleType extends SimpleType
     {
         createInstanceCallsCount++;
         if (createInstanceCallsCount >= 666) {
-            System.out.println("There is probably an inheritance cycle involving the type: " + getName());
-            return; //we are probably in an evil cycle
+            String err = "cyclic type definition involving the type: " + getName();
+            throw new IllegalStateException(err);
         }
 
         //create the type, false means we don't want a DeferredSimpleType to be returned.
