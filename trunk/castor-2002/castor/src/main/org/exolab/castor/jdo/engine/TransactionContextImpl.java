@@ -105,53 +105,6 @@ final class TransactionContextImpl
     }
 
 
-    /*
-      // XXX NOT FULLY IMPLEMENTED
-      public synchronized Object query( DatabaseEngine dbEngine, Class type, String sql,
-      Object[] values, int accessMode, int timeout )
-      throws TransactionNotInProgressException, LockNotGrantedException,
-      LockNotGrantedException, ODMGException
-      {
-      Object      obj;
-      ObjectEntry entry;
-      OID         oid;
-      
-      if ( _status != Status.STATUS_ACTIVE )
-      throw new TransactionNotInProgressException( "Transaction has been closed" );
-      // Load the object through the engine acquiring the proper lock
-      // Return null if object not found, otherwise we have a read/write lock
-      oid = dbEngine.query( this, type, sql, values,
-      ( accessMode == AccessMode.Exclusive ), timeout );
-      if ( oid == null )
-      return null;
-      
-      // It is possible that we already retrieved this object in this
-      // transaction, in which case we look up the retrieve record and
-      // decide whether to return it or not.
-      entry = getObjectEntry( oid );
-      if ( entry != null ) {
-      if ( entry.deleted )
-      return null;
-      if ( accessMode != AccessMode.ReadOnly )
-      entry.readOnly = false;
-      return entry.obj;
-      }
-      
-      // Need to grab the object from the engine and create a new entry
-      // for it. Then need to create a copy of the object and return
-      // that copy. With read/only, the read lock is released immediately
-      // after query. The object will not be stored unless a subsequent
-      // call in a different access mode attempt to re-acquire the lock.
-      obj = dbEngine.copyInto( this, oid, null );
-      entry = addObjectEntry( obj, oid, dbEngine );
-      if ( accessMode == AccessMode.ReadOnly ) {
-      entry.readOnly = true;
-      entry.dbEngine.releaseLock( this, entry.oid );
-      }    
-      return obj;
-      }
-    */
-
     protected void commitConnections( boolean keepOpen )
         throws TransactionAbortedException
     {

@@ -592,7 +592,6 @@ class SQLEngine
         public void setParameter( int index, Object value )
             throws ArrayIndexOutOfBoundsException, IllegalArgumentException
         {
-            // XXX Need to perform type conversion at this point
             _values[ index ] = value;
         }
         
