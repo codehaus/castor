@@ -100,7 +100,10 @@ public class Validator implements ClassValidator {
             resolver = new ClassDescriptorResolverImpl();
         }
       
-        XMLClassDescriptor classDesc = resolver.resolve(object.getClass());
+        XMLClassDescriptor classDesc = null;
+
+        if (! UnmarshalHandler.isPrimitive(object.getClass()))
+            resolver.resolve(object.getClass());
         
         //-- we cannot validate an object if ClassDescriptor is null
         if (classDesc == null) return;

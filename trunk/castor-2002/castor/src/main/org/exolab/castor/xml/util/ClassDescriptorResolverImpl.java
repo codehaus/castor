@@ -151,15 +151,12 @@ public class ClassDescriptorResolverImpl
     public XMLClassDescriptor resolve(Class type) {
         
         clearError();
-        
+
         if (type == null) return null;
         
         XMLClassDescriptor classDesc = (XMLClassDescriptor) _cache.get(type);
         
         if (classDesc != null) return classDesc;
-
-        if (Types.isPrimitiveType(type) && !(type instanceof Object))
-            return null;
 
         //-- check mapping loader first 
         //-- [proposed by George Stewart]
@@ -245,7 +242,7 @@ public class ClassDescriptorResolverImpl
             //-- do nothing for now
         }
         
-        if (_class != null) {
+        if ((_class != null) && (!UnmarshalHandler.isPrimitive(_class))) {
             classDesc = resolve(_class);
         }
         else clearError(); //-- clear error flag
