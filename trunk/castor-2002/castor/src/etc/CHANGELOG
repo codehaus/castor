@@ -20,7 +20,7 @@ XML: 	Add a property in castorbuilder.properties to generate a clean 'equals' me
 
 XML:	Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
 
-JDO:    Fixed some problems when two key generated related (or dependent) object creating in 
+JDO:    Fixed some problems when two key generated related (or dependent) object creating in
         the same transaction. (Thomas)
 
 JDO:    Relaxed the restriction so that a data object class can now extends one class and
@@ -38,19 +38,42 @@ JDO:	Encapsulated and nested runtime exceptions generated while accessing the da
 JDO:	Fixed a few bugs which some variables are mixed up in ClassMolder.
 	(submitted by Eldad Zamler<eldad314@netvision.net.il>)
 
-JDO:    Fixed NPEs introduced by autoStore. (reported by Steve Vaughan <snmvaughan92@yahoo.com> 
+JDO:    Fixed NPEs introduced by autoStore. (reported by Steve Vaughan <snmvaughan92@yahoo.com>
 	and Patric Bechtel <bechtel@ipcon.de>)
 
-	
+JDO:    Fixed bug: 1:1-dependent objects with key generator were not created on creation of master object.
+        (oleg)
+
+JDO:    Fixed bug: dependent collections with key generator where updated incorrectly
+        (reported by Ivica Rimac <ivica.rimac@KOM.tu-darmstadt.de>)
+
+JDO:    Added possibility to use in a query condition object references that correspond to sql field.
+        In this case the object of a persistence capable class should be bound as a parameter. (oleg)
+
+JDO:    Fixed bug: SQL types and order of fields in multi-column identities were handled incorrectly
+        (reported by Geoff Jacobsen <geoffj@casquet.inet.net.nz>)
+
+JDO:    Fixed bugs: readonly locking mode didn't work properly in some cases
+        (Damon Maria <damon@mahu-ika.com>, David J Snowsill <david.snowsill@calibreft.com.au>)
+
+JDO:    Fixed bug: conversions defined in a mapping configuration were not applied to OQL query parameters.
+        (oleg)
+
+JDO:    Added support for table names such as "user.tablename".
+        (Andrew Ballanger <AWBALLAN@smumn.edu>)
+
+JDO:    Fixed bug: object modifications were determined incorrectly in some cases.
+        (David J Snowsill <david.snowsill@calibreft.com.au>, oleg)
+
 Version 0.9 February, 15 2001
 -----------------------------
 
-XML:   Adding a new feature for handling all types of content and not only TEXT content (Arnaud)  
+XML:   Adding a new feature for handling all types of content and not only TEXT content (Arnaud)
 
 XML:   Change the read method name for arrays (Arnaud)
-       (bug reported by thebuledirt@yahoo.com)	 
+       (bug reported by thebuledirt@yahoo.com)
 
-XML:   Several bug fixes in the SourceGenerator concerning the attribute string value (Arnaud) 
+XML:   Several bug fixes in the SourceGenerator concerning the attribute string value (Arnaud)
 
 XML:   Added improved grouping support. Grouping support is not finished,
        but is definately improved over Castor 0.8.11. 1st-level choice is
