@@ -69,6 +69,9 @@ import org.exolab.castor.jdo.MappingException;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
 import org.exolab.castor.jdo.desc.ObjectDesc;
 import org.exolab.castor.util.Messages;
+import javax.transaction.xa.XAResource;
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.Xid;
 
 
 /**
@@ -84,7 +87,7 @@ import org.exolab.castor.util.Messages;
  * @see DatabaseSource
  */
 public final class DatabaseImpl
-    implements Database
+    implements Database, XAResource
 {
 
 
@@ -106,6 +109,13 @@ public final class DatabaseImpl
      * Elements are of type {@link TransactionContext}.
      */
     private Vector           _txOpen = new Vector();
+
+
+    /**
+     * The transaction context is this database was accessed with an
+     * {@link XAResource}.
+     */
+    private TransactionContext _ctx;
 
 
     private PrintWriter      _logWriter;
@@ -299,6 +309,9 @@ public final class DatabaseImpl
 
 	if ( _dbEngine == null )
 	    throw new DatabaseClosedException( Messages.message( "castor.jdo.odmg.dbClosed" ) );
+	if ( _ctx != null )
+	    return _ctx;
+
 	// Get the current transaction, complain if none found:
 	// Cannot persist outside of a transaction.
 	tx = TransactionImpl.getCurrentContext();
@@ -308,6 +321,218 @@ public final class DatabaseImpl
 	if ( ! _txOpen.contains( tx ) )
 	    _txOpen.addElement( tx );
 	return tx;
+    }
+
+
+    private Hashtable _resManager = new Hashtable();
+
+
+    public synchronized void start( Xid xid, int flags )
+        throws XAException
+    {
+	// General checks.
+	if ( xid == null )
+	    throw new XAException( XAException.XAER_INVAL );
+
+	synchronized ( _resManager ) {
+	    switch ( flags ) {
+	    case TMNOFLAGS:
+		_ctx = (TransactionContext) _resManager.get( xid );
+		if ( _ctx == null ) {
+		    _ctx = new TransactionContext();
+		    _resManager.put( xid, _ctx );
+		}
+		break;
+	    case TMJOIN:
+	    case TMRESUME:
+		_ctx = (TransactionContext) _resManager.get( xid );
+		if ( _ctx == null )
+		    throw new XAException( XAException.XAER_NOTA );
+		if ( _ctx.getStatus() != TransactionContext.Status.Open )
+		    throw new XAException( XAException.XAER_NOTA );
+		break;
+	    default:
+		// No other flags supported in start().
+		throw new XAException( XAException.XAER_INVAL );
+	    }
+	}
+    }
+
+
+    public synchronized void end( Xid xid, int flags )
+        throws XAException
+    {
+	// General checks.
+	if ( xid == null )
+	    throw new XAException( XAException.XAER_INVAL );
+
+	synchronized ( _resManager ) {
+	    if ( _ctx == null )
+		throw new XAException( XAException.XAER_INVAL );
+	    switch ( flags ) {
+	    case TMSUCCESS:
+		break;
+	    case TMFAIL:
+		try {
+		    _ctx.rollback();
+		} catch ( ODMGRuntimeException except ) {
+		}
+		break;
+	    case TMSUSPEND:
+		break;
+	    default:
+		throw new XAException( XAException.XAER_INVAL );
+	    }
+	    _ctx = null;
+	}
+    }
+
+
+    public synchronized void forget( Xid xid )
+	throws XAException
+    {
+	// General checks.
+	if ( xid == null )
+	    throw new XAException( XAException.XAER_INVAL );
+
+	synchronized ( _resManager ) {
+	    TransactionContext ctx;
+
+	    ctx = (TransactionContext) _resManager.remove( xid );
+	    if ( ctx == null )
+		throw new XAException( XAException.XAER_NOTA );
+	    if ( ctx.getStatus() == TransactionContext.Status.Open ) {
+		ctx.rollback();
+		throw new XAException( XAException.XAER_PROTO );
+	    }
+	}
+    }
+
+
+    public synchronized int prepare( Xid xid )
+	throws XAException
+    {
+	// General checks.
+	if ( xid == null )
+	    throw new XAException( XAException.XAER_INVAL );
+
+	synchronized ( _resManager ) {
+	    TransactionContext ctx;
+
+	    ctx = (TransactionContext) _resManager.get( xid );
+	    if ( ctx == null )
+		throw new XAException( XAException.XAER_NOTA );
+	    switch ( ctx.getStatus() ) {
+	    case TransactionContext.Status.Open:
+		try {
+		    if ( ctx.prepare() ) {
+			return XA_OK;
+		    } else {
+			return XA_RDONLY;
+		    }
+		} catch ( ODMGRuntimeException except ) {
+		    throw new XAException( XAException.XA_RBROLLBACK );
+		}
+	    case TransactionContext.Status.Committed:
+		return XA_RDONLY;
+	    case TransactionContext.Status.Rolledback:
+		throw new XAException( XAException.XA_RBROLLBACK );
+	    default:
+		// This should never happen
+		throw new XAException( XAException.XAER_RMFAIL );
+	    }
+	}
+    }
+
+
+    public Xid[] recover( int flags )
+        throws XAException
+    {
+	return null;
+    }
+
+
+    public synchronized void commit( Xid xid, boolean onePhase )
+        throws XAException
+    {
+	// General checks.
+	if ( xid == null )
+	    throw new XAException( XAException.XAER_INVAL );
+
+	synchronized ( _resManager ) {
+	    TransactionContext ctx;
+
+	    ctx = (TransactionContext) _resManager.get( xid );
+	    if ( ctx == null )
+		throw new XAException( XAException.XAER_NOTA );
+	    switch ( ctx.getStatus() ) {
+	    case TransactionContext.Status.Committed:
+		return;
+	    case TransactionContext.Status.Rolledback:
+		throw new XAException( XAException.XA_HEURRB );
+	    case TransactionContext.Status.Open:
+		try {
+		    ctx.commit();
+		} catch ( ODMGRuntimeException except ) {
+		    throw new XAException( XAException.XA_HEURRB );
+		}
+	    }
+	}
+    }
+
+
+    public synchronized void rollback( Xid xid )
+        throws XAException
+    {
+	// General checks.
+	if ( xid == null )
+	    throw new XAException( XAException.XAER_INVAL );
+
+	synchronized ( _resManager ) {
+	    TransactionContext ctx;
+
+	    ctx = (TransactionContext) _resManager.get( xid );
+	    if ( ctx == null )
+		throw new XAException( XAException.XAER_NOTA );
+	    switch ( ctx.getStatus() ) {
+	    case TransactionContext.Status.Committed:
+		throw new XAException( XAException.XA_HEURCOM );
+	    case TransactionContext.Status.Rolledback:
+		return;
+	    case TransactionContext.Status.Open:
+		try {
+		    ctx.rollback();
+		} catch ( ODMGRuntimeException except ) {
+		    throw new XAException( XAException.XA_HEURHAZ );
+		}
+	    }
+	}
+    }
+
+
+    public synchronized boolean isSameRM( XAResource xaRes )
+	throws XAException
+    {
+	// Two resource managers are equal if they produce equivalent
+	// connection (i.e. same database, same user). If the two are
+	// equivalent they would share a transaction by joining.
+	if ( xaRes == null || ! ( xaRes instanceof DatabaseImpl ) )
+	    return false;
+	if ( _resManager.equals( ( (DatabaseImpl) xaRes )._resManager ) )
+	    return true;
+	return false;
+    }
+
+
+    public boolean setTransactionTimeout( int timeout )
+    {
+	return false;
+    }
+
+
+    public int getTransactionTimeout()
+    {
+	return 0;
     }
 
 
