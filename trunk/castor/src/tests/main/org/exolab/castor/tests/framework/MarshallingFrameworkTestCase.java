@@ -45,28 +45,19 @@
 package org.exolab.castor.tests.framework;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.exolab.castor.tests.framework.ObjectModelBuilder;
-import org.exolab.castor.tests.framework.CastorTestable;
 import org.exolab.castor.tests.framework.testDescriptor.MarshallingTest;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
 import org.exolab.castor.tests.framework.testDescriptor.Root_Object;
 import org.exolab.castor.tests.framework.testDescriptor.Listener;
 import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.xml.Marshaller;
 
 import org.xml.sax.InputSource;
 
-import java.lang.reflect.Method;
 
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 
 /**
  * This class encapsulate all the logic to run the test patterns for the
