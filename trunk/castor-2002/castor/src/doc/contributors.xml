@@ -157,6 +157,18 @@
     <description>Added InstantDB to the list of supported databases.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Child" given="Terry"/>
+    <email>tmchild@gmx.net</email>
+    <description>Contributed Interbase driver.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Bueno" given="Leonardo"/>
+    <email>leonardo@itera.com.br</email>
+    <description>Contributed MySQL driver.</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company

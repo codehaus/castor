@@ -30,6 +30,7 @@
            <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
            <tr><td>instantdb</td><td>InstantDB</td></tr>
            <tr><td>interbase</td><td>Interbase</td></tr>
+           <tr><td>mysql</td><td>MySQL</td></tr>
          </table></p>
       <p><small>Note: Castor do not work with JDBC-ODBC bridge from Sun,
                 therefore MS Access is not supported.
