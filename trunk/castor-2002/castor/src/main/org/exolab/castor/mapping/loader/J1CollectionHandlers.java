@@ -110,7 +110,7 @@ public final class J1CollectionHandlers
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
                     return new CollectionHandlers.EmptyEnumerator();
-                return new ArrayEnumerator( (Object[]) collection );
+                return new ArrayEnumerator( collection );
             }
             public int size( Object collection ) {
                 if ( collection == null )
@@ -196,25 +196,25 @@ public final class J1CollectionHandlers
         implements Enumeration
     {
 
-        private final Object[] _array;
+        private final Object _array;
 
-        private int            _index;
+        private int          _index;
 
-        ArrayEnumerator( Object[] array )
+        ArrayEnumerator( Object array )
         {
             _array = array;
         }
 
         public boolean hasMoreElements()
         {
-            return ( _index < _array.length );
+            return ( _index < Array.getLength(_array) );
         }
 
         public Object nextElement()
         {
-            if ( _index > _array.length )
+            if ( _index >  Array.getLength(_array) )
                 throw new NoSuchElementException();
-            return _array[ _index++ ];
+            return Array.get(_array, _index++ );
         }
 
     }
