@@ -64,6 +64,8 @@ import java.util.Vector;
  */
 abstract class MarshalFramework {
 
+    
+    
     //--------------------------/
     //- Public class variables -/
     //--------------------------/
@@ -133,13 +135,19 @@ abstract class MarshalFramework {
      * The default prefix used for specifying the
      * xsi:type as a classname instead of a schema name.
      * This is a Castor specific hack.
-    **/
+     */
     static final String JAVA_PREFIX = "java:";
 
     /**
      * The name of the QName type
-    **/
+     */
     static final String QNAME_NAME = "QName";
+    
+    /**
+     * An empty array of field descriptors
+     */
+    static final XMLFieldDescriptor[] NO_FIELD_DESCRIPTORS 
+        = new XMLFieldDescriptor[0];
 
     /**
      * Returns true if the given Class is a considered a
