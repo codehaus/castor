@@ -61,18 +61,22 @@ public class IndirectFieldHandler
 {
 
 
-    protected FieldHandler   _indirect;
+    private FieldHandler   _indirect;
 
 
-    protected FieldHandler   _handler;
+    private FieldHandler   _handler;
 
 
-    public IndirectFieldHandler( FieldHandler handler, FieldHandler indirect )
+    private boolean        _required;
+
+
+    public IndirectFieldHandler( FieldHandler handler, FieldHandler indirect, boolean required )
     {
         if ( indirect == null || handler == null )
             throw new IllegalArgumentException( "Argument 'handler' or 'indirect' is null" );
         _handler = handler;
         _indirect = indirect;
+        _required = required;
     }
 
 
@@ -111,7 +115,11 @@ public class IndirectFieldHandler
         Object ref;
 
         ref = _indirect.getValue( object );
-        if ( ref != null )
+        if ( ref == null ) {
+            if ( _required )
+                throw new IntegrityException( "mapping.requiredField",
+                                              object.getClass().getName(), _indirect.toString() );
+        } else
             _handler.checkIntegrity( ref );
     }
 

@@ -149,7 +149,7 @@ public abstract class MappingLoader
     }
 
 
-    public Enumeration listObjectTypes()
+    public Enumeration listJavaClasses()
     {
         return _clsDescs.keys();
     }
@@ -352,8 +352,10 @@ public abstract class MappingLoader
             if ( relDesc == NoDescriptor ) {
             } else if ( relDesc != null ) {
                 handler = fields[ i ].getHandler();
-                handler = new IndirectFieldHandler( relDesc.getIdentity().getHandler(), handler );
+                handler = new IndirectFieldHandler( relDesc.getIdentity().getHandler(), handler,
+                                                    fields[ i ].isRequired() );
                 ( (FieldDescriptorImpl) fields[ i ] ).setHandler( handler );
+                ( (FieldDescriptorImpl) fields[ i ] ).setTypeDescriptor( relDesc );
             }
         }
 
