@@ -66,7 +66,7 @@ import javax.transaction.Transaction;
 
 /**
  * An implementation of the JDO database supporting explicit transaction
- * demaracation.
+ * demarcation.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
@@ -433,7 +433,7 @@ public class DatabaseImpl
 
 
     public OQLQuery getOQLQuery( String oql )
-        throws QueryException
+        throws PersistenceException
     {
         OQLQuery oqlImpl;
 
