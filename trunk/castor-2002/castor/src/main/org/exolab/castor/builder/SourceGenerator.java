@@ -274,9 +274,9 @@ public class SourceGenerator {
         allOptions.addFlag("h", "", desc);
         allOptions.setOptional("h", true);
         
-        //-- source generator type-factory name flag
-        allOptions.addFlag("type-factory", "type-factory-name", "Sets the source generator type-factory name (SGTypeFactory)");
-        allOptions.setOptional("type-factory", true);
+        //-- source generator types name flag
+        allOptions.addFlag("types", "types", "Sets the source generator types name (SGTypeFactory)");
+        allOptions.setOptional("types", true);
         
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
@@ -293,7 +293,7 @@ public class SourceGenerator {
         String  packageName    = options.getProperty("package");
         String  lineSepStyle   = options.getProperty("line-separator");
         boolean force         = (options.getProperty("f") != null);
-        String  typeFactory    = options.getProperty("type-factory");
+        String  typeFactory    = options.getProperty("types");
         
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
@@ -318,14 +318,15 @@ public class SourceGenerator {
 
         SourceGenerator sgen = null;
         if (typeFactory != null) {
+            typeFactory = Configuration.getProperty("org.exolab.castor.builder.type." + typeFactory.toLowerCase(),typeFactory);
             try {
                 sgen = new SourceGenerator((FieldInfoFactory)Class.forName(typeFactory).newInstance());
             }
             catch(Exception x) {
-                System.out.print("- invalid option for type-factory: ");
+                System.out.print("- invalid option for types: ");
                 System.out.println(typeFactory);
                 System.out.println(x);
-                System.out.println("-- using default source generator type-factory");
+                System.out.println("-- using default source generator types");
                 sgen = new SourceGenerator(); // default
             }
         }
