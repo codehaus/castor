@@ -418,7 +418,7 @@ public final class SQLEngine implements Persistence {
 	private Object idToSQL( int index, Object object )
 			throws PersistenceException {
 
-		if ( object == null || _ids[index].convertFrom == null )
+        if ( object == null || _ids[index].convertFrom == null )
 			return object;
 		return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
 	}
@@ -1477,7 +1477,7 @@ public final class SQLEngine implements Persistence {
         private Object[]        _lastIdentity;
 
 
-        private int             _identSqlType;
+        private int[]           _identSqlType;
 
 
         private boolean         _resultSetDone;
@@ -1489,7 +1489,10 @@ public final class SQLEngine implements Persistence {
             _types = types;
             _values = new Object[ _types.length ];
             _sql = sql;
-            _identSqlType = ( (JDOFieldDescriptor) _engine._clsDesc.getIdentity() ).getSQLType()[0];
+            _identSqlType = new int[_engine._clsDesc.getIdentities().length];
+            for (int i = 0; i < _identSqlType.length; i++) {
+                _identSqlType[i] = ((JDOFieldDescriptor) _engine._clsDesc.getIdentities()[i]).getSQLType()[0];
+            }
         }
 
 
@@ -1567,30 +1570,31 @@ public final class SQLEngine implements Persistence {
                     _lastIdentity = new Object[_engine._ids.length];
                     returnId = new Object[_engine._ids.length];
                     empty = true;
-                    if ( _engine._ids.length == 1 ) {
-                        _lastIdentity[0] = SQLTypes.getObject( _rs, 1, _identSqlType );
-                        returnId[0] = _engine.idToJava( 0, _lastIdentity[0] );
-                        return returnId[0];
-                    } else {
                     for ( int i=0; i<_engine._ids.length; i++ ) {
-                            _lastIdentity[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
-                            returnId[i] = _engine.idToJava( i, _lastIdentity[i] );
-                            if ( _lastIdentity[i] != null )
+                        _lastIdentity[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType[i] );
+                        returnId[i] = _engine.idToJava( i, _lastIdentity[i] );
+                        if ( _lastIdentity[i] != null )
                             empty = false;
                     }
                     if ( empty ) {
                         return null;
                     } else {
+                        switch (_engine._ids.length) {
+                        case 1:
+                            return returnId[0];
+                        case 2:
+                            return new Complex( returnId[0], returnId[1] );
+                        default:
                             return new Complex( returnId );
                         }
                     }
                 }
 
-                // convert the identity from java type into sql 
+                // convert the identity from java type into sql
                 // type for comparsion
                 oldIdentity =  new Object[_engine._ids.length];
                 returnId = new Object[_engine._ids.length];
-                
+
                 // determine if the id in the resultSet is a new one
                 if ( _engine._ids.length > 1 ) {
                     Complex id = (Complex) identity;
@@ -1623,7 +1627,7 @@ public final class SQLEngine implements Persistence {
 
                     empty = true;
                     for ( int i=0; i<_engine._ids.length; i++ ) {
-                        Object o = SQLTypes.getObject( _rs, 1+i, _identSqlType );
+                        Object o = SQLTypes.getObject( _rs, 1+i, _identSqlType[i] );
                         if ( !oldIdentity[i].equals( o ) ) {
                             newId = true;
                             _lastIdentity[i] = o;
@@ -1737,7 +1741,7 @@ public final class SQLEngine implements Persistence {
 
                     // check if the table row consists data of the interested identity
                     for ( int i=0; i<_lastIdentity.length; i++ ) {
-                        Object o = SQLTypes.getObject( _rs, count, _identSqlType );
+                        Object o = SQLTypes.getObject( _rs, count, _identSqlType[i] );
                         if ( !o.equals( sqlIdentity[i] ) ) {
                             newId = true;
                             _lastIdentity[i] = o;
@@ -1785,7 +1789,7 @@ public final class SQLEngine implements Persistence {
                         if ( _rs.next() ) {
                             // check if the table row consists data of the interested identity
                             for ( int i=0; i<_lastIdentity.length; i++ ) {
-                                Object o = SQLTypes.getObject( _rs, count, _identSqlType );
+                                Object o = SQLTypes.getObject( _rs, count, _identSqlType[i] );
                                 if ( !o.equals( sqlIdentity[i] ) ) {
                                     newId = true;
                                     _lastIdentity[i] = o;
