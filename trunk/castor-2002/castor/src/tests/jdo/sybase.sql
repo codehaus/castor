@@ -15,20 +15,11 @@ go
 -- test many to many
 drop table test_group_person
 go
-create table test_group_person (
-  gid int         not null,
-  pid int        not null
-)
-go
-create index test_group_person_p_pk on test_group_person ( pid )
-go
-create index test_group_person_g_pk on test_group_person ( gid )
-go
-grant all on test_group_person to test
-go
-
 drop table test_many_group
 go
+drop table test_many_person
+go
+
 create table test_many_group (
   gid       int           not null,
   value1    varchar(100)  not null
@@ -39,8 +30,6 @@ go
 grant all on test_many_group to test
 go
 
-drop table test_many_person
-go
 create table test_many_person (
    pid      int          not null,
    value1   varchar(100) not null,
@@ -51,6 +40,24 @@ go
 create unique index test_many_person_pk on test_many_person ( pid )
 go
 grant all on test_many_person to test
+go
+
+create table test_group_person (
+  gid int         not null,
+  pid int        not null,
+  CONSTRAINT person_delete
+    FOREIGN KEY(pid) 
+    REFERENCES test_many_person(pid),
+  CONSTRAINT group_delete
+    FOREIGN KEY(gid) 
+    REFERENCES test_many_group(gid)
+)
+go
+create index test_group_person_p_pk on test_group_person ( pid )
+go
+create index test_group_person_g_pk on test_group_person ( gid )
+go
+grant all on test_group_person to test
 go
 
 -- test multiple pk
