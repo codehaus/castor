@@ -129,7 +129,8 @@ public class Param implements java.io.Serializable {
     public void validate() 
         throws org.exolab.castor.xml.ValidationException
     {
-        org.exolab.castor.xml.Validator.validate(this, null);
+        Validator validator = new Validator();
+        validator.validate(this);
     } //-- void validate() 
 
 }
