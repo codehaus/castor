@@ -14,26 +14,37 @@
       </p>
 
 
-      <p><b>castor-dev</b></p>
-      <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated to the developers of Castor.</p>
+      <section title="castor-dev">
+         <p><b>castor-dev</b></p>
+         <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated
+            to the developers of Castor.</p>
 
-      <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
-                       server="exolab.org" manager="minimalist"
-                       archive="http://castor.exolab.org/list-archive/"/>
-      </p>
-       <p>
-         <b>Note:</b> please familiarize yourself with the <a href="#Guidelines">guidelines</a>
-         before posting to the list.
-      </p>
+         <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
+                       server="exolab.org" manager="minimalist"/>
 
-      <p><b>castor-announce</b></p>
-      <p>Low volume (possibly more than 1 message per week)
-         mailing list for special announcements about Castor, such as
-         new releases.
-      </p>
+            <p>
+                <b>Note:</b> please familiarize yourself with the <a href="#Guidelines">guidelines</a>
+                before posting to the list.
+            </p>
 
-      <p><mailing-list name="castor-announce" description="The Castor Announcement Mailing List"
+            <b>Archives:</b>
+            <ul>
+               <li><url>http://marc.theaimsgroup.com/?l=castor-dev</url></li>
+               <li><url>http://www.mail-archive.com/castor-dev%40exolab.org</url></li>
+            </ul>
+         </p>
+      </section>
+
+      <section title="castor-announce">
+         <p><b>castor-announce</b></p>
+         <p>Low volume (possibly more than 1 message per week)
+            mailing list for special announcements about Castor, such as
+            new releases.
+         </p>
+
+         <p><mailing-list name="castor-announce" description="The Castor Announcement Mailing List"
                        server="exolab.org" manager="minimalist"/></p>
+       </section>
     </section>
     <section title="Guidelines">
     <p>
