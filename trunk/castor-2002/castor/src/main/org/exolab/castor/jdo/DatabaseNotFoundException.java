@@ -9,7 +9,7 @@ import java.io.PrintWriter;
  * This exception is thrown when attempting to open a database that
  * does not exist.
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public class DatabaseNotFoundException

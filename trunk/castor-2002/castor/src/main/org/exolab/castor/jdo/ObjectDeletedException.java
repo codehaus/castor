@@ -4,7 +4,7 @@ package org.exolab.castor.jdo;
 /**
  * This exception is thrown when accessing an object that was deleted.
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public class ObjectDeletedException

@@ -59,7 +59,7 @@ import java.util.Vector;
 
 /**
  * A helper used for generating source that deals with Collections
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class CollectionInfo extends FieldInfo {

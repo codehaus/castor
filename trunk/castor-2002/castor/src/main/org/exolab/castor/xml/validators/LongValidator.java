@@ -52,7 +52,7 @@ import org.exolab.castor.xml.*;
  * The Integer Validation class. This class handles validation
  * for the integer type as well as all integer derived types 
  * such as positive-integer and negative-integer
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class LongValidator extends PatternValidator
