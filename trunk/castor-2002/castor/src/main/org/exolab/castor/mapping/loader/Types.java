@@ -419,6 +419,28 @@ public class Types
                       String[].class,             false,    null ),
         new TypeInfo( "locale",      null,
                       java.util.Locale.class,     true,     null ),
+
+
+        /* Mapping for the java array of primitive type so they use the same
+         * naming encoding as array of object. 
+         */
+        new TypeInfo( "[Lbyte;",      null,
+                      byte[].class,    false,     null ),
+        new TypeInfo( "[Lchar;",      null,
+                      char[].class,    false,     null ),
+        new TypeInfo( "[Ldouble;",    null,
+                      double[].class,  false,     null ),
+        new TypeInfo( "[Lfloat;",     null,
+                      float[].class,   false,     null ),
+        new TypeInfo( "[Lint;",       null,
+                      int[].class,     false,     null ),
+        new TypeInfo( "[Llong;",      null,
+                      long[].class,    false,     null ),
+        new TypeInfo( "[Lshort;",     null,
+                      int[].class,     false,     null ),
+        new TypeInfo( "[Lboolean;",   null,
+                      int[].class,     false,     null ),
+
         /*
           new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
           new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),

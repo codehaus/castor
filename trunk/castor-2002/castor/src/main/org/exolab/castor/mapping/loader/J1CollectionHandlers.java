@@ -97,15 +97,13 @@ public final class J1CollectionHandlers
                     
                 type = type.getComponentType();
                 
-                Object[] newArray;
-                array = (Object[]) collection;
-                
-                //newArray = new Object[ array.length + 1 ];
-                newArray = (Object[])Array.newInstance(type, array.length+1);
-                
-                for ( int i = 0 ; i < array.length ; ++i )
-                    newArray[ i ] = array[ i ];
-                newArray[ array.length ] = object;
+                Object newArray = Array.newInstance(type, Array.getLength(collection)+1);
+
+                for ( int i = 0 ; i < Array.getLength(collection) ; ++i )
+                    Array.set(newArray, i,  Array.get(collection, i ));
+
+                Array.set(newArray, Array.getLength(collection),  object);
+
                 return newArray;
                 
             }
