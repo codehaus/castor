@@ -58,6 +58,7 @@ import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.*;
+import org.exolab.castor.xml.ClassDescriptorEnumeration;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
@@ -718,6 +719,14 @@ public class Marshaller extends MarshalFramework {
             // We try to find if there is a XMLClassDescriptor associated
             // with the XML name of this class
             XMLClassDescriptor xmlElementNameClassDesc = _cdResolver.resolveByXMLName(xmlElementName, null, null);
+
+            // More than one class can map to a given element name
+            ClassDescriptorEnumeration cdEnum= _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
+            for (; cdEnum.hasNext();) {
+                xmlElementNameClassDesc = cdEnum.getNext();
+                if (_class == xmlElementNameClassDesc.getJavaClass())
+                    break;
+            }
 
             // Try to find a field descriptor directly in the parent object
             XMLFieldDescriptor fieldDescMatch = ((XMLClassDescriptor)descriptor.getContainingClassDescriptor()).getFieldDescriptor(xmlElementName, NodeType.Element);
