@@ -216,11 +216,15 @@ public class FieldInfo extends XMLInfo {
         jClass.addMethod(method);
 
         String paramName = this.name;
-		//-- Keith, not sure why this was needed? I've commented it out
-		//-- since it causes compile failures when a field name is used
-		//-- that is a Java reserved word
-        // if (paramName.indexOf('_') == 0)
-        //   paramName = paramName.substring(1);
+        
+        //-- make parameter name pretty, 
+        //-- simply for aesthetic beauty
+        if (paramName.indexOf('_') == 0) {
+            String tempName = paramName.substring(1);
+            if (JavaNaming.isValidJavaIdentifier(tempName)) {
+                paramName = tempName;
+            }
+        }
 
         method.addParameter(new JParameter(jType, paramName));
         jsc = method.getSourceCode();
