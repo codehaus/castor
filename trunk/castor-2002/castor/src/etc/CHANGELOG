@@ -1,6 +1,10 @@
 Version (CVS)
 -------------
 
+XML:    Bug fix in the handling of 'Map' collection. Now we use the abstract
+        'Map' interface rather than 'HashMap'.
+        (Fix submitted by Ron Smith <rsmith7209@yahoo.com>)
+
 XML:    Added some logic to avoid unnecessary use of 'xsi:type' when
         marshalling. The logic check if Castor is able to find the proper java
         class to instantiate from the mapping file information.

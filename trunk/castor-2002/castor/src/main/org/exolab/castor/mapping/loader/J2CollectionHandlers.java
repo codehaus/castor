@@ -151,23 +151,23 @@ public final class J2CollectionHandlers
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new HashMap();
-                    ( (HashMap) collection ).put( object, object );
+                    ( (Map) collection ).put( object, object );
                     return collection;
                 } else {
-                    ( (HashMap) collection ).put( object, object );
+                    ( (Map) collection ).put( object, object );
                     return null;
                 }
             }
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
                     return new CollectionHandlers.EmptyEnumerator();
-                return new IteratorEnumerator( ( (HashMap) collection ).values().iterator() );
+                return new IteratorEnumerator( ( (Map) collection ).values().iterator() );
             }
             public int size( Object collection )
             {
                 if ( collection == null )
                     return 0;
-                return ( (HashMap) collection ).size();
+                return ( (Map) collection ).size();
             }
             public Object clear( Object collection ) {
                 if ( collection != null )
