@@ -176,6 +176,17 @@ public interface QueryExpression
      */
     public void addWhereClause( String whereClause );
     
+
+    /**
+     * Adds an order by clause.  Caller is responsible for making sure all 
+     * tables mentioned in the order by clause are included in the fromClause.
+     *
+     * @param orderClause The ORDER BY clause to add (without the words 
+     *    ORDER BY).
+     */
+    public void addOrderClause( String orderClause );
+    
+
     /**
      * Add an inner join.
      *

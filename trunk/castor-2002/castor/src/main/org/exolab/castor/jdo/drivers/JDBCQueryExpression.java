@@ -78,6 +78,8 @@ public class JDBCQueryExpression
 
     protected String    _where;
 
+    protected String    _order;
+
     protected boolean   _distinct = false;
 
 
@@ -131,6 +133,10 @@ public class JDBCQueryExpression
         _where = where;
     }
 
+
+    public void addOrderClause( String order ) {
+        _order = order;
+    }
 
     protected String getColumnList()
     {
@@ -244,8 +250,12 @@ public class JDBCQueryExpression
                     sql.append( join.rightTable ).append( "." ).append( join.rightColumns[ j ] );
                 }
             }
-        }
+        } 
         first = addWhereClause( sql, first );
+
+        if ( _order != null )
+          sql.append(JDBCSyntax.OrderBy).append(_order);
+          
         // There is no standard way to lock selected tables.
         return sql.toString();
     }

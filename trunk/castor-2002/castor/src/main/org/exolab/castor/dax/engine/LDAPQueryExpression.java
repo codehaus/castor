@@ -108,6 +108,11 @@ public class LDAPQueryExpression
     }
 
 
+    public void addOrderClause( String where )
+    {
+    }
+
+
     public String getStatement( boolean lock )
     {
         return _filter;

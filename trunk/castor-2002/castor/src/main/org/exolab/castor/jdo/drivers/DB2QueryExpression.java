@@ -116,6 +116,9 @@ public final class DB2QueryExpression
         }
         addWhereClause( sql, true );
 
+        if ( _order != null )
+          sql.append(JDBCSyntax.OrderBy).append(_order);
+          
         // Do not use FOR UPDATE to lock query.
         return sql.toString();
     }

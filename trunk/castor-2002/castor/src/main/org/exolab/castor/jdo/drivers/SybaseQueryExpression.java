@@ -110,6 +110,10 @@ public final class SybaseQueryExpression
             }
         }
         first = addWhereClause( sql, first );
+ 
+        if ( _order != null )
+          sql.append(JDBCSyntax.OrderBy).append(_order);
+          
         return sql.toString();
     }
     

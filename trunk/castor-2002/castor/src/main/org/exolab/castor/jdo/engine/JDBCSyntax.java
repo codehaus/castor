@@ -85,5 +85,7 @@ public interface JDBCSyntax
 
     public String Distinct = " DISTINCT ";
 
+    public String OrderBy = " ORDER BY ";
+
 }
 
