@@ -57,6 +57,8 @@ XML:    Update of the XML Schema syntax to the April 7th draft
         (Andrew Fawcett)
       - <include> element support (Andrew Fawcett)
 
+XML:	Java 2 types compatibility (Patrick Higgins)
+
 
 Version 0.8.8  June 20, 2000
 ----------------------------

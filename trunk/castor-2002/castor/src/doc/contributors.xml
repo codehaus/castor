@@ -85,6 +85,12 @@
     <description>XML enhancements.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Higgins" given="Patrick"/>
+    <email>phiggins@transzap.com</email>
+    <description>XML enhancements.</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Sahuc" given="Sebastien"/>
     <email>ssahuc@imediation.com</email>
