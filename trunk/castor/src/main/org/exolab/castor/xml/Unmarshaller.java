@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
