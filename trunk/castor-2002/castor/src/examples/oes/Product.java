@@ -189,6 +189,12 @@ public class Product
     }
 
 
+    public void jdoAfterRemove()
+        throws Exception
+    {
+    }
+
+
 }
 
 

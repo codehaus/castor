@@ -170,6 +170,12 @@ public class Product implements Persistent
     }
 
 
+    public void jdoAfterRemove()
+        throws Exception
+    {
+    }
+
+
     public String toString()
     {
         return _id + " " + _name;

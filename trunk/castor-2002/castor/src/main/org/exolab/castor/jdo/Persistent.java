@@ -140,6 +140,14 @@ public interface Persistent
         throws Exception;
     
 
+    /**
+     * Called to indicate that an object has been removed from persistent
+     * storage. This method is called during db.remove().
+     */
+    public void jdoAfterRemove()
+        throws Exception;
+    
+
 
     /**
      * Called to indicate that an object has been included to the current

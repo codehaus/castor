@@ -1231,10 +1231,10 @@ public abstract class TransactionContext
 
         entry = getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) );
         if ( entry != null && ! entry.deleted ) {
-            try {
-                ClassHandler handler;
+            ClassHandler handler;
                 
-                handler = entry.engine.getClassHandler( entry.object.getClass() );
+            handler = entry.engine.getClassHandler( entry.object.getClass() );
+            try {
                 if ( handler != null && handler.getCallback() != null )
                     handler.getCallback().removing( entry.object );
             } catch ( Exception except ) {
@@ -1260,6 +1260,12 @@ public abstract class TransactionContext
                 // Object has been deleted outside this transaction,
                 // forget about it
                 removeObjectEntryWithDependent( entry.object );
+            }
+            try {
+                if ( handler != null && handler.getCallback() != null )
+                    handler.getCallback().removed( entry.object );
+            } catch ( Exception except ) {
+                throw new PersistenceExceptionImpl( except );
             }
         }
     }

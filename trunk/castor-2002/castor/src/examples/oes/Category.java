@@ -133,5 +133,13 @@ public class Category
     public void jdoBeforeCreate( Database db )
     {
     }
+
+
+    public void jdoAfterRemove()
+        throws Exception
+    {
+    }
+
+
 }
             
