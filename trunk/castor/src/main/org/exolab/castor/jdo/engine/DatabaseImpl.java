@@ -310,8 +310,6 @@ public class DatabaseImpl
 
         tx = getTransaction();
         info = _scope.getPersistenceInfo( type );
-        if ( info == null )
-            throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", type.getName() ) );
 
         return tx.load( info.engine, info.molder, identity, object, null );
     }
@@ -360,8 +358,6 @@ public class DatabaseImpl
 
         tx = getTransaction();
         info = _scope.getPersistenceInfo( type );
-        if ( info == null )
-            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
         
         return tx.load( info.engine, info.molder, identity, null, mode );
     }
@@ -374,8 +370,6 @@ public class DatabaseImpl
 
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
-        if ( info == null )
-            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
 
         tx.create( info.engine, info.molder, object, null );
     }
@@ -398,8 +392,6 @@ public class DatabaseImpl
 
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
-        if ( info == null )
-            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
 
         tx.update( info.engine, info.molder, object, null );
     }
@@ -414,8 +406,6 @@ public class DatabaseImpl
         
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
-        if ( info == null )
-            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
 
         tx.delete( object );
     }

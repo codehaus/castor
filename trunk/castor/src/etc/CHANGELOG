@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1889 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed bug with cryptic message at 1:m relation with depends relationship.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1889
+       (Ralf - 20050318)
+       
 JDO:   Fixed bug 1882 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Fixed failure in hash code calculation of org.exolab.castor.persist.spi.Complex.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1882

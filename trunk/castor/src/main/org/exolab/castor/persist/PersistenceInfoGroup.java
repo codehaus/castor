@@ -44,23 +44,34 @@
 
 
 package org.exolab.castor.persist;
+
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
+import org.exolab.castor.util.Messages;
    
     
 public class PersistenceInfoGroup {
     LockEngine[] engines;
+    
     public PersistenceInfoGroup( LockEngine[] engines ) {
         this.engines = engines;
     }
-    public PersistenceInfo getPersistenceInfo( Class type ) {
-        ClassMolder molder;
-        for ( int i=0; i<engines.length; i++ ) {
-            molder = engines[i].getClassMolder( type );
-            if ( molder != null ) {
-                return new PersistenceInfo( engines[i], molder );
-            }
+    
+    public PersistenceInfo getPersistenceInfo( Class type ) throws ClassNotPersistenceCapableException {
+        ClassMolder molder = null;
+        int i = 0;
+        while ( (i<engines.length) && (molder == null) ) {
+            molder = engines[i++].getClassMolderWithDependent( type );
         }
-        return null;
+        
+        if (molder == null) {
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
+        } else if (molder.isDependent()) {
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classIsDependent", type.getName(), molder.getDepends().getName()) );
+        }
+        
+        return new PersistenceInfo( engines[--i], molder );
     }
+    
     public LockEngine getLockEngine() {
         if ( engines != null && engines.length >= 1 )
             return engines[0];

@@ -287,6 +287,11 @@ public final class LockEngine {
         }
         return null;
     }
+    
+    public ClassMolder getClassMolderWithDependent( Class cls ) {
+        TypeInfo info = (TypeInfo)_typeInfo.get( cls.getName() );
+        return (info != null) ? info.molder : null;
+    }
 
     public Persistence getPersistence( Class cls ) {
         ClassMolder molder = getClassMolder( cls );
@@ -884,9 +889,6 @@ public final class LockEngine {
         catch ( LockNotGrantedException e ) {
             throw new IllegalStateException("Write Lock expected!");
         } 
-        catch ( PersistenceException except ) {
-            typeInfo.delete( oid, tx );
-        }
     }
 
     /**
