@@ -110,7 +110,8 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
         //-- handle attributes
         String attValue = null;
             
-        _archetype.setName(atts.getValue("name"));
+        _archetype.setName(atts.getValue(SchemaNames.NAME_ATTR));
+        
         //-- read contentType
         String content = atts.getValue(SchemaNames.CONTENT_ATTR);
         if (content != null) {
@@ -118,7 +119,7 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
         }
         
         //-- source and derivedBy
-        String source = atts.getValue("source");
+        String source = atts.getValue(SchemaNames.SOURCE_ATTR);
         if ((source != null) && (source.length() > 0)) {
             
             String derivedBy = atts.getValue("derivedBy");
@@ -126,7 +127,7 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
                 (derivedBy.length() == 0) ||
                 (derivedBy.equals("extension"))) 
             {
-                _archetype.setSource(atts.getValue("source"));
+                _archetype.setSource(source);
             }
             else if (derivedBy.equals("restrictions")) {
                 String err = "restrictions not yet supported for <type>.";
@@ -185,7 +186,8 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
         if (name == SchemaNames.ATTRIBUTE) {
             allowRefines = false;
             allowContentModel = false;
-            unmarshaller = new AttributeUnmarshaller(atts, getResolver());
+            unmarshaller 
+                = new AttributeUnmarshaller(_schema, atts, getResolver());
         }
         else if (name == SchemaNames.ELEMENT) {
             allowRefines = false;

@@ -60,6 +60,12 @@ public class Archetype extends ContentModelGroup
     implements Referable
 {
 
+    /**
+     * Error message for a null argument
+    **/
+    private static String NULL_ARGUMENT
+        = "A null argument was passed to the constructor of " +
+           Archetype.class.getName();
     
     private String name = null;
     
@@ -94,6 +100,11 @@ public class Archetype extends ContentModelGroup
     **/
     public Archetype(Schema schema, String name) {
         super();
+        if (schema == null) {
+            String err = NULL_ARGUMENT + "; 'schema' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
         this.schema = schema;
         this.name = name;
         attributes   = new Hashtable();
@@ -119,6 +130,18 @@ public class Archetype extends ContentModelGroup
         
     } //-- addAttributeDecl
 
+    /**
+     * Creates an AttributeDecl with the given name. The attribute
+     * declaration will still need to be added to this Archetype,
+     * or another archetype in the same schema, by making a call
+     * to #addAttributeDecl
+     * @param name the name of the attribute
+     * @return the new AttributeDecl
+    **/
+    public AttributeDecl createAttributeDecl(String name) {
+        return new AttributeDecl(this.schema, name);
+    } //-- createAttributeDecl
+    
     /**
      * Returns the AttributeDecl of associated with the given name
      * @return the AttributeDecl of associated with the given name, or

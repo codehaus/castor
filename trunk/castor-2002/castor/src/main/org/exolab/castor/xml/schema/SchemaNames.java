@@ -54,14 +54,15 @@ public class SchemaNames {
     
     //-- packages
     public static final String SCHEMA_PACKAGE =
-        "org.exolab.xml.schema";
+        "org.exolab.castor.xml.schema";
         
     //-- element definitions
-    public static final String ARCHETYPE        = "archetype";
+    public static final String ARCHETYPE        = "type";
     public static final String ATTRIBUTE        = "attribute";
     public static final String DATATYPE_REF     = "datatypeRef";
     public static final String DATATYPE         = "datatype";
     public static final String ELEMENT          = "element";
+    public static final String ENUMERATION      = "enumeration";
     public static final String GROUP            = "group";
     public static final String SCHEMA           = "schema";
     public static final String MAX_EXCLUSIVE    = "maxExclusive";
@@ -76,9 +77,12 @@ public class SchemaNames {
     public static final String MIN_OCCURS_ATTR  = "minOccurs";
     public static final String NAME_ATTR        = "name";
     public static final String ORDER_ATTR       = "order";
+    public static final String SOURCE_ATTR      = "source";
     public static final String TYPE_ATTR        = "type";
+    public static final String VALUE_ATTR       = "value";
     
     //-- data types
-    public static final String STRING_DATATYPE  = "string";
+    public static final String INTEGER_TYPE     = "integer";
+    public static final String STRING_TYPE      = "string";
     
 } //-- SchemaNames
