@@ -200,6 +200,11 @@ public class ClassMolder {
      */
     private boolean _isKeyGenUsed;
 
+    /**
+     * True if org.exolab.castor.debug="true"
+     */
+    private boolean _debug;
+
 
     /**
      * Constructor
@@ -213,6 +218,8 @@ public class ClassMolder {
     ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, 
             ClassDescriptor clsDesc, Persistence persist )
             throws ClassNotFoundException, MappingException {
+
+        _debug = Boolean.getBoolean("org.exolab.castor.debug");
 
         ClassMapping clsMap = ((ClassDescriptorImpl) clsDesc).getMapping();
 
@@ -860,9 +867,9 @@ public class ClassMolder {
                             // throw exception
                             if ( !tx.isDepended( oid, o ) )
                                 throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
-                    } else {
-                        //if ( !tx.isPersistent( o ) )
-                        //    tx.create( fieldEngine, fieldClassMolder, o, null );
+                    } else if ( tx.isAutoStore() ) {
+                        if ( !tx.isPersistent( o ) && !tx.isDeleted( o ) )
+                            tx.create( fieldEngine, fieldClassMolder, o, null );
                     }
                 }
                 break;
@@ -883,14 +890,9 @@ public class ClassMolder {
                                 // throw exception
                                 if ( !tx.isDepended( oid, oo ) )
                                     throw new PersistenceException("Dependent object may not change its master");
-                        } else {
-                            // only dependent object will be created when
-                            // master object is created.
-                            // user should create all independent object
-                            // manually.
-
-                            // if ( !tx.isPersistent( oo ) )
-                            //    tx.create( fieldEngine, fieldClassMolder, oo, null );
+                        } else if ( tx.isAutoStore() ) {
+                            if ( !tx.isPersistent( oo ) && !tx.isDeleted( oo ) )
+                                tx.create( fieldEngine, fieldClassMolder, oo, null );
                         }
                     }
                 }
@@ -905,10 +907,15 @@ public class ClassMolder {
                     // many-to-many relation is never dependent relation
                     while (itor.hasNext()) {
                         Object oo = itor.next();
-                        if ( !tx.isPersistent( oo ) )
+                        if ( !tx.isPersistent( oo ) ) {
                             _fhs[i].getRelationLoader().createRelation(
                             (Connection)tx.getConnection(oid.getLockEngine()),
                             oid.getIdentity(), fieldClassMolder.getIdentity( tx, oo ) );
+
+                            if ( tx.isAutoStore() )
+                                if ( !tx.isPersistent( oo ) && !tx.isDeleted( oo ) )
+                                    tx.create( fieldEngine, fieldClassMolder, oo, null );
+                        }
                     }
                 }
                 break;
@@ -935,7 +942,10 @@ public class ClassMolder {
         return false;
     }
 
-    private boolean isEquals( Object o1, Object o2 ) {
+    /**
+     * A utility method which compare object.
+     */
+    private static boolean isEquals( Object o1, Object o2 ) {
         if ( o1 == o2 )
             return true;
         if ( o1 == null || o2 == null )
@@ -1046,45 +1056,79 @@ public class ClassMolder {
                 if ( value != null )
                     newfields[i] = fieldClassMolder.getIdentity( tx, value );
 
-                if ( !isEquals( fields[i], newfields[i] ) ) {
+                // | yip: don't delete the following comment, 
+                //      until it proved working by time. :-P
+                // if ids are the same 
+                //    if object is deleted
+                //        warn
+                //    if object are the same
+                //        done
+                //    not the same
+                //        exception
+                // ids not the same
+                //    if depend
+                //       if old is not null
+                //          delete old
+                //          removeRelation
+                //       if new is not null
+                //          create new
+                //    not depend and autoStore
+                //       if old is not null
+                //          removeRelation
+                //       if new is not null
+                //          createObject
+                //    not depend nor autoStore
+                //       if old is not null
+                //          removeRelation
+                //       if new is not null
+                if ( isEquals( fields[i], newfields[i] ) ) {
+                    if ( !_debug )
+                        break;
+
+                    if ( fields[i] == null ) 
+                        break; // do the next field if both are null
+
+                    if ( value != null && !tx.isDeleted(value) ) {
+                        System.err.println("Warning: deleted object found!");
+                        if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() ) 
+                            updatePersist = true;    
+                        updateCache = true;
+                        _fhs[i].setValue( object, null, tx.getClassLoader() );                        
+                        break;
+                    }
+
+                    if ( tx.isAutoStore() || _fhs[i].isDependent() )
+                        if ( value != tx.fetch( fieldEngine, fieldClassMolder, fields[i], null ) )
+                            throw new DuplicateIdentityException("");
+                } else {
                     if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() ) 
                         updatePersist = true;    
                     updateCache = true;
 
-                    if ( value != null ) {
-                        if ( _fhs[i].isDependent() ) {
-                            if ( fields[i].equals( newfields[i] ) ) {
-                                if ( fields[i] != null ) {
-                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, fields[i], null );
-                                    if ( reldel != null ) {
-                                        tx.delete( reldel );
-                                    } else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't delete dependent object himself. So, must
-                                        // error.
-                                    }
+                    if ( _fhs[i].isDependent() ) {
+                        if ( fields[i] != null ) {
+                            Object reldel = tx.fetch( fieldEngine, fieldClassMolder, fields[i], null );
+                            if ( reldel != null )
+                                tx.delete( reldel );
+                        } 
+                        
+                        if ( newfields[i] != null )
+                            if ( !tx.isPersistent( value ) )
+                                // should be created if transaction have no record of the object
+                                tx.create( fieldEngine, fieldClassMolder, value, oid );
 
-                                }
-                                if ( newfields[i] != null ) {
-                                    if ( !tx.isPersistent( value ) ) {
-                                        // should be created if transaction have no record of the object
-                                        tx.create( fieldEngine, fieldClassMolder, value, oid );
-                                    } else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't create dependent object himself. So, must
-                                        // error.
-                                    }
-                                }
-                            }
-                        } else {
-                            // need to do anything for non-dependent object?
-                            // it seem not. should list all the case and make sure
-                            if ( tx.isPersistent( value ) )
-                                fieldClassMolder.removeRelation( tx, value, this, object );
-                        }
+                    } else {
+                        if ( fields[i] != null )
+                            fieldClassMolder.removeRelation( tx, value, this, object );
+                        
+                        if ( newfields[i] != null )
+                            if ( tx.isAutoStore() )
+                                if ( !tx.isPersistent( value ) && !tx.isDeleted( value ) )
+                                    tx.create( fieldEngine, fieldClassMolder, value, null );
                     }
                 }
                 break;
+
             case FieldMolder.ONE_TO_MANY:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
@@ -1130,8 +1174,14 @@ public class ClassMolder {
                                 // user can't create dependent object himself. So, must
                                 // error.                                   
                             }
-                        }                                
+                        } else if ( tx.isAutoStore() ) {
+                            if ( !tx.isPersistent( addedValue ) && !tx.isDeleted( value ) )
+                                tx.create( fieldEngine, fieldClassMolder, addedValue, null );
+                        }
                     }
+
+                    // it would be good if we also compare the new field element with
+                    // the element in transaction, when debug is true
                 } else {
                     RelationCollection lazy = (RelationCollection) value;
                     ArrayList deleted = lazy.getDeleted();
@@ -1165,7 +1215,6 @@ public class ClassMolder {
                         if ( _fhs[i].isDependent() ) {
                             itor = added.iterator();
                             while ( itor.hasNext() ) {
-                                updateCache = true;
                                 Object toBeAdded = lazy.find( itor.next() );
                                 if ( toBeAdded != null ) {
                                     tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
@@ -1173,7 +1222,14 @@ public class ClassMolder {
                                     // what to do if it happens?
                                 }
                             }
-                        } else {
+                        } else if ( tx.isAutoStore() ) {
+                            itor = added.iterator();
+                            while ( itor.hasNext() ) {
+                                Object toBeAdded = lazy.find( itor.next() );
+                                if ( toBeAdded != null )
+                                    if ( !tx.isPersistent( toBeAdded ) && !tx.isDeleted( toBeAdded ) ) 
+                                        tx.create( fieldEngine, fieldClassMolder, toBeAdded, null );
+                            }
                         }
                     }
 
@@ -1230,6 +1286,10 @@ public class ClassMolder {
                         _fhs[i].getRelationLoader().createRelation( 
                         (Connection)tx.getConnection(oid.getLockEngine()), 
                         oid.getIdentity(), fieldClassMolder.getIdentity( tx, addedField ) );
+
+                        if ( tx.isAutoStore() )
+                            if ( !tx.isPersistent( addedField ) && !tx.isDeleted( addedField ) )
+                                tx.create( fieldEngine, fieldClassMolder, addedField, null );
                     }
 
                 } else {
@@ -1273,6 +1333,10 @@ public class ClassMolder {
                                 _fhs[i].getRelationLoader().createRelation(
                                 (Connection)tx.getConnection(oid.getLockEngine()),
                                 oid.getIdentity(), addedId );
+
+                                if ( tx.isAutoStore() )
+                                    if ( !tx.isPersistent( toBeAdded ) && !tx.isDeleted( toBeAdded ) ) 
+                                        tx.create( fieldEngine, fieldClassMolder, toBeAdded, null );
                             } else {
                                 // what to do if it happens?
                             }
@@ -1551,6 +1615,7 @@ public class ClassMolder {
                 case FieldMolder.PERSISTANCECAPABLE:
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
                     if ( _fhs[i].isDependent() ) {
                         // depedent class won't have persistenceInfo in LockEngine
                         // must look at fieldMolder for it
@@ -1558,15 +1623,16 @@ public class ClassMolder {
                         // load the cached dependent object from the data store.
                         // The loaded will be compared with the new one
                         value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
-                        o = _fhs[i].getValue( object, tx.getClassLoader() );
                         if ( o != null )
                             tx.update( fieldEngine, fieldClassMolder, o, oid );
-                    } else {
-                        o = _fhs[i].getValue( object, tx.getClassLoader() );
-                        if ( !tx.isPersistent( o ) ) {
-                            //tx.update( fieldEngine, fieldClassMolder, o, null );
-                        } else {
-                            //tx.create( fieldEngine, fieldClassMolder, o, null );
+
+                    } else if ( tx.isAutoStore() ) {
+                        if ( fields[i] != null ) {
+                            if ( o != null && fields[i] == fieldClassMolder.getIdentity( tx, o ) )
+                                tx.update( fieldEngine, fieldClassMolder, o, null );
+                        
+                        } else if ( o != null ) {
+                            tx.create( fieldEngine, fieldClassMolder, o, null );
                         }
                     }
                     break;
@@ -1601,15 +1667,26 @@ public class ClassMolder {
                             fieldEngine = _fhs[i].getFieldLockEngine();
                             RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, avlist );
                         }
-                    } else {
-                        // related object should be update maually
-                        /*
-                        o = _fhs[i].getValue( object );
-                        if ( !tx.isPersistent( o ) )
-                            //tx.update( fieldEngine, fieldClassMolder, o, null );
-                        else
-                            //tx.create( fieldEngine, fieldClassMolder, o, null );
-                        */
+                    } else if ( tx.isAutoStore() ) {
+                        Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
+                        ArrayList v = (ArrayList)fields[i];
+                        if ( v != null ) {
+                            while ( itor.hasNext() ) {
+                                Object element = itor.next();
+                                if ( v.contains( fieldClassMolder.getIdentity( tx, element ) ) ) {
+                                    tx.update( fieldEngine, fieldClassMolder, element, null );
+                                } else {
+                                    tx.create( fieldEngine, fieldClassMolder, element, null );
+                                }
+                            }
+                            if ( v != null ) {
+                                for ( int j=0,l=v.size(); j<l; j++ ) {
+                                    // load all the dependent object in cache for modification 
+                                    // check at commit time.
+                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
+                                }
+                            }
+                        }
                     }
                     break;
                 case FieldMolder.MANY_TO_MANY:
