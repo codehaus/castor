@@ -234,7 +234,7 @@ public final class SQLEngine implements Persistence {
         // then, we put depended class ids in the back
         JDOClassDescriptor base = clsDesc;
 
-        // make sure there is forbidded cases
+        // make sure there is no forbidded cases
         while ( base.getDepends() != null ) {
             if ( base.getExtends() != null )
                 throw new MappingException("Class should not both depends on and extended other classes");
@@ -265,12 +265,13 @@ public final class SQLEngine implements Persistence {
         // we always put the original id info in front
         JDOClassDescriptor jdoBase = (JDOClassDescriptor) base;
         FieldDescriptor[] idDescriptors = base.getIdentities();
+        System.out.println("base.id.length: "+idDescriptors.length);
         for ( int i=0; i<idDescriptors.length; i++ ) {
             if ( idDescriptors[i] instanceof JDOFieldDescriptor ) {
                 String name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
                 int type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
                 FieldHandlerImpl fh = (FieldHandlerImpl)idDescriptors[i].getHandler();
-                idsInfo.add( new ColumnInfo( name, null, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
+                idsInfo.add( new ColumnInfo( name, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
             } else
                 throw new MappingException("Except JDOFieldDescriptor");
         }
@@ -281,18 +282,20 @@ public final class SQLEngine implements Persistence {
         // care depended class which is depends on other class.
         // ClassMolder will take care of it.
         idDescriptors = null;
-        if ( jdoBase.getDepends()!= null ) {
+        if ( clsDesc.getDepends()!= null ) {
+            System.out.println("%%%%%%%%%is depends id"+clsDesc.getJavaClass().getName());
             idDescriptors = ((ClassDescriptorImpl)jdoBase.getDepends()).getIdentities();
             for ( int i=0; i<idDescriptors.length; i++ ) {
                 if ( idDescriptors[i] instanceof JDOFieldDescriptor ) {
                     String name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
                     int type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
                     FieldHandlerImpl fh = (FieldHandlerImpl)idDescriptors[i].getHandler();
-
-                    idsInfo.add( new ColumnInfo( name, null, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
+                    idsInfo.add( new ColumnInfo( name, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
                 } else
                     throw new MappingException("Except JDOFieldDescriptor");
             }
+        } else {
+            System.out.println("%%%%%%%isn't depends base: "+jdoBase.getJavaClass().getName()+" cls: " + clsDesc.getJavaClass().getName());
         }
 
         // then do the fields
@@ -1283,11 +1286,17 @@ public final class SQLEngine implements Persistence {
         for ( int i=0; i<_fields.length; i++ ) {
             if ( _fields[i].load ) {
                 if ( _fields[i].joined && !joinTables.contains( _fields[i].tableName ) ) {
-                    String[] rightCol = new String[_fields[i].columns.length];
-                    for ( int j=0; j<_fields[i].columns.length; j++ )
-                        rightCol[j] = _fields[i].columns[j].join;
-                    expr.addOuterJoin( _mapTo, idnames, _fields[i].tableName, rightCol );
-                    find.addOuterJoin( _mapTo, idnames, _fields[i].tableName, rightCol );
+                    int offset = clsDesc.getDepends()!=null? clsDesc.getIdentities().length : 0;
+                    String[] rightCol = _fields[i].joinFields;
+                    String[] leftCol = new String[_ids.length-offset];
+                    for ( int j=0; j<leftCol.length; j++ ) {
+                        leftCol[j] = _ids[j+offset].name;
+                        System.out.println("for i:"+i+" field: "+_fields[i].jdoName+" j: "+j+"/"+_fields[i].columns.length
+                        +" "+clsDesc.getJavaClass().getName()+" left: "+leftCol[j]+" right: "+rightCol[j]);
+                    }
+                    expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
+                    find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
+                    joinTables.add( _fields[i].tableName );
                 }
     
                 for ( int j=0; j<_fields[i].columns.length; j++ ) {
@@ -1443,6 +1452,9 @@ public final class SQLEngine implements Persistence {
 
         final boolean dirtyCheck;
 
+        final String[] joinFields;
+        //!TY fix this. joinFields should be in FieldInfo, not ColumnInfo
+
         //final boolean foreign;
 
         ColumnInfo[] columns;
@@ -1479,7 +1491,6 @@ public final class SQLEngine implements Persistence {
                 else 
                     type = REF_TYPE;
                         
-
                 // initalize the column names
                 FieldDescriptor[] relids = ((JDOClassDescriptor)related).getIdentities();
                 String[] names = null;
@@ -1490,6 +1501,7 @@ public final class SQLEngine implements Persistence {
                     relnames[i] = ((JDOFieldDescriptor)relids[i]).getSQLName();
                     if ( relnames[i] == null )
                         throw new MappingException("Related class identities field does not contains sql information!");
+                    System.out.println("~~~~~~~~~~~related id length: "+relids.length+" name: "+relnames[i]);
                 }
                 String[] joins = null;
                 if ( fieldDesc instanceof JDOFieldDescriptor ) 
@@ -1499,6 +1511,7 @@ public final class SQLEngine implements Persistence {
                     classnames[i] = ((JDOFieldDescriptor)classids[i]).getSQLName();
                     if ( classnames[i] == null )
                         throw new MappingException("Related class identities field does not contains sql information!");
+                    System.out.println("~~~~~~~~~~~class id length: "+classnames.length+" name: "+classnames[i]);
                 }
 
                 // basic check of column names
@@ -1507,7 +1520,7 @@ public final class SQLEngine implements Persistence {
                 if ( joins != null && joins.length != classids.length )
                     throw new MappingException("The number of column of foreign keys doesn't not match with what specified in manyKey");
 
-
+                // initalize the class
                 switch (type) {
                 case FIELD_TYPE:
                     this.tableName = ((JDOClassDescriptor)clsDesc).getTableName();;
@@ -1518,7 +1531,7 @@ public final class SQLEngine implements Persistence {
                     this.joined = false;
                     this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
                     names = (names!=null?names:relnames);
-                    joins = classnames;
+                    this.joinFields = classnames;
                     break;
                 case REF_TYPE:
                     this.tableName = ((JDOClassDescriptor)related).getTableName();
@@ -1529,7 +1542,7 @@ public final class SQLEngine implements Persistence {
                     this.joined = true;
                     this.dirtyCheck = (fieldDesc instanceof JDOFieldDescriptor)?((JDOFieldDescriptor)fieldDesc).isDirtyCheck():true;
                     names = (names!=null?names:relnames);
-                    joins = (joins!=null?joins:classnames);
+                    this.joinFields = (joins!=null?joins:classnames);
                     break;
                 case REL_TABLE_TYPE:
                     this.tableName = ((JDOFieldDescriptor)fieldDesc).getManyTable();
@@ -1540,7 +1553,7 @@ public final class SQLEngine implements Persistence {
                     this.joined = true;
                     this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
                     names = (names!=null?names:relnames);
-                    joins = (joins!=null?joins:classnames);
+                    this.joinFields = (joins!=null?joins:classnames);
                     break;
                 default:
                     throw new MappingException("Never happen! But, it won't compile without the exception");
@@ -1553,7 +1566,7 @@ public final class SQLEngine implements Persistence {
 
                     JDOFieldDescriptor relId = (JDOFieldDescriptor)relids[i];
                     FieldHandlerImpl fh = (FieldHandlerImpl) relId.getHandler();
-                    columns[i] = new ColumnInfo( names[i], joins[i], relId.getSQLType(), 
+                    columns[i] = new ColumnInfo( names[i], relId.getSQLType(), 
                             fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ); 
                 }
             } else {
@@ -1564,11 +1577,12 @@ public final class SQLEngine implements Persistence {
                 this.store = !ext;
                 this.multi = false;
                 this.joined = false;
+                this.joinFields = null;
                 this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
 
                 FieldHandlerImpl fh = (FieldHandlerImpl) fieldDesc.getHandler();
                 this.columns = new ColumnInfo[1];
-                this.columns[0] = new ColumnInfo( ((JDOFieldDescriptor)fieldDesc).getSQLName(), null,
+                this.columns[0] = new ColumnInfo( ((JDOFieldDescriptor)fieldDesc).getSQLName(), 
                         ((JDOFieldDescriptor)fieldDesc).getSQLType(), fh.getConvertTo(),
                         fh.getConvertFrom(), fh.getConvertParam() );
             }
@@ -1582,8 +1596,6 @@ public final class SQLEngine implements Persistence {
 
         final String  name;
 
-        final String  join;
-
         final int sqlType;
 
         final TypeConvertor convertTo;
@@ -1592,10 +1604,9 @@ public final class SQLEngine implements Persistence {
 
         final String convertParam;
 
-        ColumnInfo( String name, String join, int type, TypeConvertor convertTo,
+        ColumnInfo( String name, int type, TypeConvertor convertTo,
                 TypeConvertor convertFrom, String convertParam ) {
             this.name = name;
-            this.join = join;
             this.sqlType = type;
             this.convertTo = convertTo;
             this.convertFrom = convertFrom;

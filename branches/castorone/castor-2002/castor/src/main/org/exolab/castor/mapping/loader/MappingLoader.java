@@ -368,8 +368,9 @@ public abstract class MappingLoader
 
         
         // If this class depends another class, need to obtain the depended class
-        if ( clsMap.getDepends() != null ) {
+        if ( clsMap.getDepends() != null ) {            
             try {
+                System.out.println("############## is depends "+clsMap.getName());
                 depend = getDescriptor( resolveType( ( (ClassMapping)  clsMap.getDepends() ).getName() ) );
                 if ( depend == null )
                     throw new MappingException( "Depends not found" +
