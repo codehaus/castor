@@ -112,10 +112,14 @@ public final class AttributeDecl extends Annotated {
     private short useFlag = OPTIONAL;
 
     /**
+     * A reference to a top-level attribute
+     */
+    private String _attributeRef = null;
+
+    /**
      * Creates a new AttrDecl with the given name
      * @param name of the Attribute defined by this attribute declaration
-     * @param minOccurs the minimum number of occurances that attributes
-     * defined by this definition must appear
+     * @param schema the schema that contains the new attrDecl
     **/
     public AttributeDecl(Schema schema, String name) {
 
@@ -126,6 +130,19 @@ public final class AttributeDecl extends Annotated {
         this.schema  = schema;
         setName(name);
     } //-- AttributeDecl
+
+    /**
+     * Creates a new AttrDecl in the given schema.
+     * @param schema the schema that contains the new attrDecl
+     */
+      public AttributeDecl(Schema schema) {
+
+        if (schema == null) {
+            String err = NULL_ARGUMENT + "; 'schema' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        this.schema  = schema;
+      }
 
     /**
      * Returns the Id for this attribute declaration
@@ -145,10 +162,24 @@ public final class AttributeDecl extends Annotated {
     } //-- getName
 
     /**
+     * Returns the name of this Attribute declaration
+     * @param ingoreRef If True the name of the referenced
+     * attribute (if specified) is returned
+     * @return the name of this attribute declaration
+    **/
+    public String getName(boolean ignoreRef) {
+        if (isReference() && ignoreRef == false) {
+            return _attributeRef;
+        }
+		else return name;
+    } //-- getName
+    /**
      * Returns the data type associated with this AttributeDecl
      * @return the data type associated with this AttributeDecl
     **/
     public SimpleType getSimpleType() {
+        if (simpleType == null)
+            return null;
         return (SimpleType)simpleType.getType();
     } //-- getSimpleType
 
@@ -240,6 +271,15 @@ public final class AttributeDecl extends Annotated {
     } //-- getRequired
 
     /**
+     * Returns true if this attribute definition simply references another
+     * attribute Definition
+     * @return true if this attribute definition is a reference
+     */
+    public boolean isReference() {
+        return (_attributeRef != null);
+    } //-- isReference
+
+    /**
      * Sets the Id for this attribute declaration
      *
      * @param id the Id for this attribute declaration
@@ -278,6 +318,25 @@ public final class AttributeDecl extends Annotated {
         this.name = name;
     } //-- setName
 
+    /**
+     * Sets the reference for this attribute definition
+     * @param reference the Attribute definition that this definition references
+    **/
+    public void setReference(AttributeDecl reference) {
+        if (reference == null)
+            this._attributeRef = null;
+        else
+            this._attributeRef = reference.getName();
+    } //-- setReference
+
+    /**
+     * Sets the reference for this attribute definition
+     * @param reference the name of the attribute definition that this
+     * definition references
+    **/
+    public void setReference(String reference) {
+        this._attributeRef = reference;
+    } //-- setReference
     /**
      * Sets the SimpleType for this attribute declaration
      * @param simpleType the SimpleType for this attribute
