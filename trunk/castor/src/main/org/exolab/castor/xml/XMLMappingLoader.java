@@ -162,8 +162,9 @@ public class XMLMappingLoader
 
         fields = clsDesc.getFields();
         for ( int i = 0 ; i < fields.length ; ++i ) {
+            if (fields[i].getClassDescriptor() != null) continue;
             ClassDescriptor   relDesc;
-
+            
             relDesc = getDescriptor( fields[ i ].getFieldType() );
             if ( relDesc == NoDescriptor ) {
                 // XXX Error message should come here
@@ -421,6 +422,12 @@ public class XMLMappingLoader
         xmlDesc.setContainer(fieldMap.getContainer());
 
         if (xml != null) {
+            
+            //-- has class descriptor for type specified
+            if (xml.getClassMapping() != null) {
+                ClassDescriptor cd = createDescriptor(xml.getClassMapping());
+                xmlDesc.setClassDescriptor((XMLClassDescriptor)cd);
+            }
             
             //-- has location path?
             if (xml.getLocation() != null) {
