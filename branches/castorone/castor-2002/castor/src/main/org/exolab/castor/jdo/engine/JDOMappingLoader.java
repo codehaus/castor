@@ -236,7 +236,7 @@ public class JDOMappingLoader
             sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() ); */
         int sqlType;
         if ( fieldMap.getSql().getType() != null  ) {
-            sqlType = SQLTypes.sqlTypeFromName( fieldMap.getSql().getType() );
+            sqlType = SQLTypes.getSQLType( SQLTypes.typeFromName( fieldMap.getSql().getType() ) );
         } else {
             try {
                 sqlType = SQLTypes.getSQLType( 
