@@ -947,7 +947,7 @@ public class DescriptorSourceFactory {
                         min = xsTime.getMinInclusive();
                         jsc.add("tv.setMinInclusive(");
                     }
-                    jsc.append("org.exolab.castor.types.Time.parse(\""
+                    jsc.append("org.exolab.castor.types.Time.parseTime(\""
                                 +min.toString()+"\"");
                     jsc.append(");");
                     jsc.unindent();
@@ -971,7 +971,7 @@ public class DescriptorSourceFactory {
                         max = xsTime.getMaxInclusive();
                         jsc.add("tv.setMaxInclusive(");
                     }
-                    jsc.append("org.exolab.castor.types.Time.parse(\""
+                    jsc.append("org.exolab.castor.types.Time.parseTime(\""
                                 +max.toString()+"\"");
                     jsc.append(");");
                     jsc.unindent();
@@ -1008,7 +1008,7 @@ public class DescriptorSourceFactory {
                     RecurringDuration min = xsReccD.getMinExclusive();
                     if (min != null) {
                         jsc.add("org.exolab.castor.types.RecurringDuration min ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
                                 +"\""+min.toString()+"\");");
                         jsc.add("min.setDuration(\""+min.getDuration().toString()+"\");");
                         jsc.add("min.setPeriod(\""+min.getPeriod().toString()+"\");");
@@ -1016,7 +1016,7 @@ public class DescriptorSourceFactory {
                     } else {
                         min = xsReccD.getMinInclusive();
                         jsc.add("org.exolab.castor.types.RecurringDuration min ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
                                 +"\""+min.toString()+"\");");
                          jsc.add("min.setDuration(\""+min.getDuration().toString()+"\");");
                          jsc.add("min.setPeriod(\""+min.getPeriod().toString()+"\");");
@@ -1041,7 +1041,7 @@ public class DescriptorSourceFactory {
                     RecurringDuration max = xsReccD.getMaxExclusive();
                     if (max != null) {
                         jsc.add("org.exolab.castor.types.RecurringDuration max ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
                                 +"\""+max.toString()+"\");");
                         jsc.add("max.setDuration(\""+max.getDuration().toString()+"\");");
                         jsc.add("max.setPeriod(\""+max.getPeriod().toString()+"\");");
@@ -1050,7 +1050,7 @@ public class DescriptorSourceFactory {
                     else {
                         max = xsReccD.getMaxInclusive();
                         jsc.add("org.exolab.castor.types.RecurringDuration max ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
                                 +"\""+max.toString()+"\");");
                         jsc.add("max.setDuration(\""+max.getDuration().toString()+"\");");
                         jsc.add("max.setPeriod(\""+max.getPeriod().toString()+"\");");
