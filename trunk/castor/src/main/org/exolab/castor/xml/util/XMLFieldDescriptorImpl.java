@@ -719,6 +719,48 @@ public class XMLFieldDescriptorImpl
 
         return false;
     } //-- matches
+    
+    /**
+     * Returns true if this descriptor can be used to handle elements
+     * or attributes with the given XML name. By default this method
+     * simply compares the given XML name with the internal XML name.
+     * This method can be overridden to provide more complex matching.
+     * @param xmlName the XML name to compare
+     * @return true if this descriptor can be used to handle elements
+     * or attributes with the given XML name.
+     */
+    public boolean matches(String xmlName, String namespace) {
+
+        //-- compare namespaces
+        if (namespace == null) {
+            if ((_nsURI != null) && (_nsURI.length() > 0))
+                return false;
+        }
+        else if (_nsURI == null) {
+            if (namespace.length() > 0) {
+                return false;
+            }
+        }
+        else if (!_nsURI.equals(namespace)) {
+            return false;
+        }
+        
+        //-- if we make this far the namespaces
+        //-- match, now compare names
+        if (xmlName != null) {
+            if (_isWild) return true;
+            else if (_matches.length > 0) {
+                for (int i = 0; i < _matches.length; i++) {
+                    if (xmlName.equals( _matches[i] ) )
+                        return true;
+                }
+            }
+            else
+                return xmlName.equals(this._xmlName);
+        }
+
+        return false;
+    } //-- matches
 
     /**
      * Sets the XMLClassDescriptor for the described field
