@@ -326,12 +326,15 @@ public abstract class XMLTestCase extends TestCase {
             assert("Marshalled object differ from the reference file", result);
         }
 
-        // 5. umarshall outpur file and compare to ObjectModelInstanceBuilder
+        // 5. umarshall outpur file and compare to ObjectModelInstanceBuilder if any
         Object outAgain = testUnmarshal(marshal_output);
         assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", outAgain);
-        boolean result  = outAgain.equals(out);
-        verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
-        assert("The unmarshalled object differ from the referene object", result);
+
+        if (builderClassName != null) {
+            boolean result  = outAgain.equals(out);
+            verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
+            assert("The unmarshalled object differ from the referene object", result);
+        }
     }
 
 
