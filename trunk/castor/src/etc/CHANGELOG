@@ -2,6 +2,13 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1554 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Fixes a memory leak with the linked-list implementation by removing LinkedList
+       completely; uses the Hashtable directly, resulting in much better performance.
+       ValuesEnumeration no longer use a Vector, but intercepts the initial 
+       enumeration to provide the values.
+       (Werner - 20040420)
+       
 JDO:   Fixed bug 1597 using patch from Emir Causevic [emirc@gawab.com]
        (Bruce - 20040408)
 
