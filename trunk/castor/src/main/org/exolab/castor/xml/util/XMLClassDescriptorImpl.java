@@ -373,6 +373,12 @@ public class XMLClassDescriptorImpl extends Validator
 
                 if (desc.matches(name)) {
                       if (!desc.matches(WILDCARD)) return desc;
+                      //--  possible wildcard match check for
+                      //--  exact match (we need to extend the
+                      //--  the descriptor interface to handle this
+                      if (name.equals(desc.getXMLName())) 
+                        return desc;
+                      //-- assume wild-card match
                       result = desc;
                 }
 
