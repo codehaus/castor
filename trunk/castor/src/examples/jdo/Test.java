@@ -153,16 +153,10 @@ public class Test
         // working the second time around
         for ( int i = 7; i < 10; ++i )
         {
-            writer.println( "inside for loop of category deletion" );
             categoryOql.bind( i );
             results = categoryOql.execute();
-            if ( results != null )
-                writer.println( "################results are not null" );
-            else
-                writer.println( "%%%%%%%%%%%%%%%%results are null" );
             while ( results.hasMore() ) 
             {
-                writer.println( "INSIDE THE WHILE LOOP OF CATEGORY DELETION" );
                 category = ( Category ) results.next();
                 writer.println( "Deleting existing category: " + category );
                 db.remove( category );
