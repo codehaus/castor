@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1651 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added XML prefixes to various files in src/examples and src/tests/jdo.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1651
+       (Werner - 20040607)
+       
 XML:   Fixed a cyclic include bug with the IncludeUnmarshaller, added
        some code to make sure the main schema couldn't include itself.
        (kvisco - 20040624)
