@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug 1917 using contribution from Tim Telcik [ttelcik@hbf.com.au]
+       Fixed misleading error messages referencing to "javax.jta.TransactionManager"
+       instead of "javax.transaction.TransactionManager".
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1917
+       (Ralf - 20050330)
+
 JDO:   Fixed bug 1691 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Extend FieldHandlerImpl to be able to handle multiple overloaded set methods.
        This now makes possible to specify the pooling parameter "cache-scheme"

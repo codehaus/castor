@@ -31,6 +31,28 @@
               Short description says all ...
             </summary>
 			<bugs>
+				<bug id="1917">
+					<description>
+						Fixed misleading error messages referencing to
+						"javax.jta.TransactionManager" instead of
+						"javax.transaction.TransactionManager".
+					</description>
+					<contributor>
+						<name>Tim Telcik</name>
+						<email>ttelcik@hbf.com.au</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Tim Telcik</name>
+						<email>ttelcik@hbf.com.au</email>
+					</reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050330</date>
+				</bug>
 				<bug id="1691">
 					<description>
 						Extend FieldHandlerImpl to be able to handle multiple overloaded set methods.
