@@ -128,7 +128,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         if (temp != null) {
             if (_element.getFixedValue() != null)
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _element.setFixedValue(temp);
+            _element.setDefaultValue(temp);
         }
 
         //@fixed
@@ -136,7 +136,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         if (temp != null) {
             if (_element.getDefaultValue() != null)
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _element.setDefaultValue(temp);
+            _element.setFixedValue(temp);
         }
 
         temp = null;
