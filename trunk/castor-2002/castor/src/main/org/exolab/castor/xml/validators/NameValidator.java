@@ -103,6 +103,7 @@ public class NameValidator extends StringValidator {
                     err += value + "\" is not a valid CDATA.";
                     throw new ValidationException(err);
                 }
+                break;
 
             case NMTOKEN:
                 if (!ValidationUtils.isNMToken(value)) {
@@ -110,6 +111,8 @@ public class NameValidator extends StringValidator {
                     err += value + "\" is not a valid NMToken.";
                     throw new ValidationException(err);
                 }
+                break;
+
             case NCNAME:
             default:
                 if (!ValidationUtils.isNCName(value)) {
