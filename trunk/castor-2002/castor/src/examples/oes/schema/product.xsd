@@ -10,7 +10,6 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/1999/XMLSchema"
             targetNamespace="http://castor.exolab.org/OES"
             version="0.1">
-
 &app-types;
 &global-codes;
 

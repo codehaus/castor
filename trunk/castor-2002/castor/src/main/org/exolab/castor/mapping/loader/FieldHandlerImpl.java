@@ -307,7 +307,7 @@ public final class FieldHandlerImpl
         } catch ( InvocationTargetException except ) {
             // This should never happen
             throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                              toString(), except.getMessage() ) );
+                                                              toString(), except ) );
         }
 
         // If a collection, return an enumeration of it's values.
