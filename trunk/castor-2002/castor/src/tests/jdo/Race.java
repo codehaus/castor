@@ -58,6 +58,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
@@ -75,11 +76,11 @@ import org.exolab.exceptions.CWClassConstructorException;
  */
 public class Race extends CWTestCase {
 
-	private final static int NUM_OF_RACING_THREADS = 5;
+	private final static int NUM_OF_RACING_THREADS = 2;
 
 	private final static int NUM_OF_VALUE_PAIRS = 1;
 
-	private final static int NUM_OF_TRIALS = 50;
+	private final static int NUM_OF_TRIALS = 500;
 
     private JDOCategory    _category;
 
@@ -166,7 +167,7 @@ public class Race extends CWTestCase {
 	                TestRace tr = (TestRace) enum.nextElement();
 					if ( tr.getValue1() == controls[i].getValue1() && controls[i].getValue1() == (ts.length * NUM_OF_TRIALS) ) 
 						num++;
-					System.out.println( "Number Pair "+i+" -- JDO: "+tr.getValue1()+" control: "+controls[i].getValue1());	
+					stream.writeVerbose( "Number Pair "+i+" -- JDO: "+tr.getValue1()+" control: "+controls[i].getValue1());	
 				}
 			}
 			_db.commit();
@@ -178,6 +179,7 @@ public class Race extends CWTestCase {
 			} else {
 				stream.writeVerbose("Racing condition passed! :)");
 			}
+
             _db.close();
             _conn.close();
 
@@ -204,7 +206,7 @@ public class Race extends CWTestCase {
 		}
 		public void run() {
 			int num = 0;
-			System.out.println("start");
+			stream.writeVerbose("start testing");
 			out:
 			for ( int j=0; j<trial; j++ ) {
 				for ( int i=0; i<tr.length; i++ ) {
@@ -233,6 +235,7 @@ public class Race extends CWTestCase {
 						} catch ( TransactionAbortedException e ) {
 							// this exception should happen one in a while.
 							stream.writeVerbose( "Excepted exception: "+e );
+							stream.writeVerbose( "Excepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
 						} catch ( QueryException e ) {
 							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
@@ -246,6 +249,10 @@ public class Race extends CWTestCase {
 							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
 							break out;
+//						} catch ( LockNotGrantedException e ) {
+//							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
+//							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+//							break out;
 						} catch ( Exception e ) {
 							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}

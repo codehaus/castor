@@ -440,7 +440,7 @@ public class OQLQueryImpl
                     results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
                     _fieldNum = 0;
 
-                    //System.out.println( _projectionType );
+                    // System.out.println( _projectionType );
                     
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
                       retVal = new OQLEnumeration( results );
