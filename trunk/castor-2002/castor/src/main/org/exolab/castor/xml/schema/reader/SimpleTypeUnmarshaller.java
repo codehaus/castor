@@ -106,8 +106,10 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
 
         String name = atts.getValue(SchemaNames.NAME_ATTR);
         String id   = atts.getValue(SchemaNames.ID_ATTR);
-
         _simpleTypeDef = new SimpleTypeDefinition(schema, name, id);
+        
+        //-- @final
+        _simpleTypeDef.setFinal(atts.getValue(SchemaNames.FINAL_ATTR));
 
 
     } //-- SimpleTypeUnmarshaller
