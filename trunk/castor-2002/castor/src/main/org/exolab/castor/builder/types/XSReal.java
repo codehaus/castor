@@ -57,7 +57,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public final class XSReal extends XSType {
+public final class XSReal extends XSPatternBase {
 
     //- Constraints for integer type
     Double maxInclusive = null;
@@ -238,6 +238,9 @@ public final class XSReal extends XSType {
             //-- minInclusive
             else if (Facet.MIN_INCLUSIVE.equals(name))
                 setMinInclusive(facet.toDouble());
+            //-- pattern
+            else if (Facet.PATTERN.equals(name))
+                setPattern(facet.getValue());
         }
     }
 

@@ -319,7 +319,7 @@ public class DescriptorSourceFactory {
             jsc.append(") object;");
             //-- check for null primitives
             if (xsType.isPrimitive()) {
-                
+
                 if ((!member.isRequired()) && (!xsType.isEnumerated())) {
                     jsc.add("// if null, use delete method for optional primitives ");
                     jsc.add("if (value == null) {");
@@ -330,7 +330,7 @@ public class DescriptorSourceFactory {
                     jsc.add("return;");
                     jsc.unindent();
                     jsc.add("}");
-                    
+
                 }
                 else {
                     jsc.add("// ignore null values for non optional primitives");
@@ -554,7 +554,7 @@ public class DescriptorSourceFactory {
             jsc.append(") object;");
             //-- check for null primitives
             if (xsType.isPrimitive()) {
-                
+
                 if ((!member.isRequired()) && (!xsType.isEnumerated())) {
                     jsc.add("// if null, use delete method for optional primitives ");
                     jsc.add("if (value == null) {");
@@ -564,7 +564,7 @@ public class DescriptorSourceFactory {
                     jsc.append("();");
                     jsc.add("return;");
                     jsc.unindent();
-                    jsc.add("}");                    
+                    jsc.add("}");
                 }
                 else {
                     jsc.add("// ignore null values for non optional primitives");
@@ -572,7 +572,7 @@ public class DescriptorSourceFactory {
                     jsc.add("");
                 }
             }
-            
+
             jsc.add("target.");
             jsc.append(member.getWriteMethodName());
             jsc.append("( ");
@@ -759,6 +759,58 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
 
+            //-- double
+            case XSType.DOUBLE:
+            {
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DoubleValidator dv = new DoubleValidator();");
+                XSReal xsDouble = (XSReal)xsType;
+                if (xsDouble.hasMinimum()) {
+                    Double min = xsDouble.getMinExclusive();
+                    if (min != null)
+                        jsc.add("dv.setMinExclusive(");
+                    else {
+                        min = xsDouble.getMinInclusive();
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append(min.toString());
+                    jsc.append(");");
+                }
+                if (xsDouble.hasMaximum()) {
+                    Double max = xsDouble.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("dv.setMaxExclusive(");
+                    else {
+                        max = xsDouble.getMaxInclusive();
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append(max.toString());
+                    jsc.append(");");
+                }
+
+                //-- fixed values
+                if (fixed != null) {
+                    //-- make sure we have a valid value...
+                    Double.parseDouble(fixed);
+
+                    jsc.add("dv.setFixedValue(");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
+                //-- pattern facet
+                pattern = xsDouble.getPattern();
+                if (pattern != null) {
+                    jsc.add("dv.setPattern(\"");
+                    jsc.append(escapePattern(pattern));
+                    jsc.append("\");");
+                }
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+            }
             case XSType.NEGATIVE_INTEGER:
             case XSType.POSITIVE_INTEGER:
             case XSType.INTEGER:
@@ -859,7 +911,7 @@ public class DescriptorSourceFactory {
                 jsc.unindent();
                 jsc.add("}");
                 break;
-            //-- int
+            //-- long
             case XSType.LONG:
             {
                 jsc.add("{ //-- local scope");
