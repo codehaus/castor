@@ -54,16 +54,16 @@ public abstract class TestKeyGenObject
 {
 
 
-    private int    _id;
+    private Integer    _id;
 
 
-    public void setId( int id )
+    public void setId( Integer id )
     {
         _id = id;
     }
 
 
-    public int getId()
+    public Integer getId()
     {
         return _id;
     }
@@ -71,7 +71,7 @@ public abstract class TestKeyGenObject
 
     public String toString()
     {
-        return "" + _id;
+        return ( _id == null ? "null" : _id.toString() );
     }
 
 

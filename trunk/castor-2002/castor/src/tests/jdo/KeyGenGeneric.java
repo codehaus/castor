@@ -151,12 +151,12 @@ public class KeyGenGeneric
         db.begin();
 
         // Find the first object and remove it 
-        object = (TestKeyGenObject) db.load( objClass, new Integer( object.getId() ) );
+        object = (TestKeyGenObject) db.load( objClass, object.getId() );
         stream.writeVerbose( "Removing first object: " + object );
         db.remove( object );
 
         // Find the second object and remove it
-        ext = (TestKeyGenObject) db.load( extClass, new Integer( ext.getId() ) );
+        ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
         stream.writeVerbose( "Removing second object: " + ext );
         db.remove( ext );
 
