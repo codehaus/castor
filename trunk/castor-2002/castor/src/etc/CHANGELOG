@@ -16,25 +16,25 @@ XML:    Fix a bug that creates infinite loop when cross-importing (or including)
 XML:    Added the support for the facets min/max Ex/Inclusive for the date/time types
         and added complete implementation of date/time W3C XML Schema datatypes (Arnaud).
 
-XML:	Added new supports for XML Schema Recommendation datatypes and remove old references to
+XML:    Added new supports for XML Schema Recommendation datatypes and remove old references to
         the Candidate Recommendation document (Arnaud).
 
 XML:    Added push behavior for the unmarshaller with SAX producer. Made some functions public
         and UnmarshalHandler final.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
-XML:	Remove the xsi:type when using the generated descriptors.(Arnaud)
+XML:    Remove the xsi:type when using the generated descriptors.(Arnaud)
 
-XML:	Support for the <any> element in the Marshalling Framework.(Arnaud)
+XML:    Support for the <any> element in the Marshalling Framework.(Arnaud)
 
-XML:    Added setRootElement method to Marshaller.java to override default root element name for 	document.
+XML:    Added setRootElement method to Marshaller.java to override default root element name for    document.
         Usefull when using classes generated via 'type' mapping, as the root element name is not known.
         (Andrew Fawcett, andrew.fawcett@coda.com)
 
 XML:    Fix the Marshaller to handle correctly Vector by keeping the xsi:type information
         (Bug reported by Eric Kaplan (eric.kaplan@armanta.com) (Arnaud)
 
-XML: 	Fix the SourceGenerator to handle correctly the 'types' package when a
+XML:    Fix the SourceGenerator to handle correctly the 'types' package when a
         Date/Time type is used as an attribute.(thanks to
         Maria Gray <maria.gray@datalex.ie>,
         Christopher P. van Buskirk <Chris.vanBuskirk@vanderbilt.edu> and
@@ -44,11 +44,11 @@ XML:    Removed a dependency to xerces jar in Configuration.java (Patch submitte
         Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM> and committed by
         Sebastien Gignoux <gignoux@intalio.com>)
 
-XML: 	Fix a bug in the validation framework. (Arnaud)
+XML:    Fix a bug in the validation framework. (Arnaud)
 
-XML:	Supports the <any> element in the Source Generator.(Arnaud)
+XML:    Supports the <any> element in the Source Generator.(Arnaud)
 
-XML:	Support the wildcards <any> and <anyAttribute> in the Schema Object Model.
+XML:    Support the wildcards <any> and <anyAttribute> in the Schema Object Model.
         (Arnaud)
 
 XML:    Improved grouping support....now handles maxOccurs > 1. Nested groups
@@ -116,7 +116,7 @@ JDO:    Fixed a "too many open cursor" errors caused by JDBC statement not
         released. (Submitted by Steve Bate [mail@technoetic.com])
 
 JDO:    Fixed an IllegalArgumentException being thrown the second time a value
-        or function query was bound. 
+        or function query was bound.
         (Submitted by Steve Bate [mail@technoetic.com])
 
 JDO:    Added IdentityKeyGenerator support for Informix.
@@ -151,13 +151,13 @@ JDO:    As part of the rewritten mentioned above, update is now behavior like
 
 JDO:    Added a final static variable TimeStampable NO_TIMESTAMP. (yip)
 
-JDO:    Added database to transaction association pooling. 
-        This option only affects JDO if transactionManager is set and 
-        a transaction is associated with the thread that call 
-        getDatabase(). If jdo Database pooling is enabled, JDO will 
-        first search in the pool to see if there is already a Database 
-        for the current transaction. If found, it returns the database; 
-        if not, it create a new one, associates it will the transaction 
+JDO:    Added database to transaction association pooling.
+        This option only affects JDO if transactionManager is set and
+        a transaction is associated with the thread that call
+        getDatabase(). If jdo Database pooling is enabled, JDO will
+        first search in the pool to see if there is already a Database
+        for the current transaction. If found, it returns the database;
+        if not, it create a new one, associates it will the transaction
         and return the newly created Database. (yip)
 
 JDO:    (misc) Added a BatchUpdateSQL utility to helps executing a batch
@@ -166,6 +166,7 @@ JDO:    (misc) Added a BatchUpdateSQL utility to helps executing a batch
 JDO:    (misc) Ported test cases and test harness framework from JTF to JUnit (yip)
 
 JDO:    (misc) Javadoc to test cases (yip)
+
 
 Version 0.9.2 March 28, 2001 - also includes version 0.9.1
 ----------------------------------------------------------
@@ -181,12 +182,12 @@ XML:    Added fix for enumerated simpleTypes. When a simpleType restricted anoth
 XML:    Added fix for generating source code using the element-method. Classes
         were no longer extending their abstract type definitions. (kvisco)
 
-XML: 	Add a command line property for the Source Generator to use the generated files in
+XML:    Add a command line property for the Source Generator to use the generated files in
         the Castor Testing Framework(Arnaud)
 
-XML: 	Add a property in castorbuilder.properties to generate a clean 'equals' method (Arnaud)
+XML:    Add a property in castorbuilder.properties to generate a clean 'equals' method (Arnaud)
 
-XML:	Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
+XML:    Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
 
 JDO:    Fixed some problems when two key generated related (or dependent) object creating in
         the same transaction. (Thomas)
@@ -194,16 +195,16 @@ JDO:    Fixed some problems when two key generated related (or dependent) object
 JDO:    Relaxed the restriction so that a data object class can now extends one class and
         depends another. (Suggested by Rimac, Ivica <ivica.rimac@KOM.tu-darmstadt.de>)
 
-JDO:	Fixed NPEs in TransactionContext, and ClassMolder in update(...). (Thomas)
+JDO:    Fixed NPEs in TransactionContext, and ClassMolder in update(...). (Thomas)
 
-JDO:	Edited the New features document for Castor JDO. (Submited by Rick Horowitz <rickhoro@yahoo.com>)
+JDO:    Edited the New features document for Castor JDO. (Submited by Rick Horowitz <rickhoro@yahoo.com>)
 
-JDO:	Updated the oqlQuery tools. (Submited by Thorsten Mauch <mauch@imkenberg.de>)
+JDO:    Updated the oqlQuery tools. (Submited by Thorsten Mauch <mauch@imkenberg.de>)
 
-JDO:	Encapsulated and nested runtime exceptions generated while accessing the data object
+JDO:    Encapsulated and nested runtime exceptions generated while accessing the data object
         into DataObjectAccessException. (suggested by Christian Sell <christian.sell@netcologne.de>)
 
-JDO:	Fixed a few bugs which some variables are mixed up in ClassMolder.
+JDO:    Fixed a few bugs which some variables are mixed up in ClassMolder.
         (submitted by Eldad Zamler<eldad314@netvision.net.il>)
 
 JDO:    Fixed NPEs introduced by autoStore. (reported by Steve Vaughan <snmvaughan92@yahoo.com>
@@ -266,18 +267,18 @@ XML:    Changed the default behavior of the Xerces Serializer to preserve space
         by default.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
-XML:	Added support for restriction in simpleContent and enhanced complexType support
-	(Arnaud <blandin@intalio.com>)	
+XML:    Added support for restriction in simpleContent and enhanced complexType support
+    (Arnaud <blandin@intalio.com>)
 
-XML: 	Added the command-line option '-nomarshall' which aims at preventing the
-	generation of the marshalling framework specific methods (marshall, unmarshall, validate)
-	(Arnaud <blandin@intalio.com>)
+XML:    Added the command-line option '-nomarshall' which aims at preventing the
+    generation of the marshalling framework specific methods (marshall, unmarshall, validate)
+    (Arnaud <blandin@intalio.com>)
 
 XML:   Added setNSPrefixAtRoot method. When used in conjunction with setNamespaceMapping this
-	will insert the namepsace declarations at the root node.
-	(Andrew Fawcett, andrew.fawcett@coda.com)
+    will insert the namepsace declarations at the root node.
+    (Andrew Fawcett, andrew.fawcett@coda.com)
 
-XML:    Fixed collection handling for introspected class. 
+XML:    Fixed collection handling for introspected class.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
 XML:    Bug fix for using addXxx methods.
@@ -290,30 +291,30 @@ XML:    Bug fix in the handling of 'Map' collection. Now we use the abstract
 XML:    Added some logic to avoid unnecessary use of 'xsi:type' when
         marshalling. The logic check if Castor is able to find the proper java
         class to instantiate from the mapping file information.
-        (Sebastien Gignoux <gignoux@intalio.com>) 
+        (Sebastien Gignoux <gignoux@intalio.com>)
 
 XML:    Solved a performance bug for unmarshalling of primitive type. We don't
         try anymore to generate a Class Descriptor for primitive type as we know
         that not only it fails but it is deadly slow (due to getMethods()
         call). Now, unmarhsalling speed is nearly only bounded by the speed of
         the parser.
-        (Sebastien Gignoux <gignoux@intalio.com>) 
+        (Sebastien Gignoux <gignoux@intalio.com>)
 
-XML & JDO:  
+XML & JDO:
         Check that an XML mapping file do not declare more identity attributes
         for a given class than there are field elementsdefined for that
         class.
         (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)
 
 XML & JDO:
-	Regenerated data objects in the org.exolab.castor.mapping.xml package,
-	using an updated version of schema (Nov 2000).
+    Regenerated data objects in the org.exolab.castor.mapping.xml package,
+    using an updated version of schema (Nov 2000).
 
 XML & JDO:
         Now the return type of get-method must be a super-class of or equal to
-	the class declared in mapping.xml (was: sub-class).
-	Note, that now "arraylist" can be used as a value of "collection"
-	attribute in mapping.xml 
+    the class declared in mapping.xml (was: sub-class).
+    Note, that now "arraylist" can be used as a value of "collection"
+    attribute in mapping.xml
 
 JDO:    Bug fix when castor closed Connection during db.close() (before the end of
         transaction) and the got new Connection during beforeCompletion(),
@@ -321,56 +322,56 @@ JDO:    Bug fix when castor closed Connection during db.close() (before the end 
         (Solution submitted by Terry Child <tmchild@gmx.net>)
 
 JDO:    Castor JDO should now behave shamelessly in a multi classloader context.
-        This is especially relevant when used in a BMP/CMP environment where the 
-        EJB container might assign a ClassLoader instance per set of Beans, or 
+        This is especially relevant when used in a BMP/CMP environment where the
+        EJB container might assign a ClassLoader instance per set of Beans, or
         might attach a different classloader for each new transaction.
         (Sebastien Sahuc <ssahuc@intalio.com>)
 
 JDO:    Added an AutoStore option to JDO. Method of setAutoStore and isAutoStore
-        are added into the jdo.Database interface. If autoStore is set, Castor 
+        are added into the jdo.Database interface. If autoStore is set, Castor
         will try to create or update** all reachable object if it is not
-        exist in the transaction, and store all reachable modified object at the 
+        exist in the transaction, and store all reachable modified object at the
         commit time. If autoStore is not set, Castor will only create/update/store
         dependent object, and related objects must be created/update explicitly.
-        (* update is used for long transaction only, all modified object 
+        (* update is used for long transaction only, all modified object
         created/loaded from the short transaction will be store properly
         at commit time) (Thomas Yip <yip@intalio.com>)
 
-JDO:    Added "trigger" mode for SEQUENCE key generator. 
+JDO:    Added "trigger" mode for SEQUENCE key generator.
         (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
 
 JDO:    Added support for MySQL auto_increment columns in IDENTITY key generator
         (Oleg Nitz, thanks to Alain RAVET <aravet@cirb.irisnet.be> for idea
         and to George Stewart <georgestewartiv@yahoo.com> for help).
 
-JDO:    Improved support for BLOB and CLOB values. Now you can get them as 
+JDO:    Improved support for BLOB and CLOB values. Now you can get them as
         java.io.InputStream and java.sql.Clob, respectively, see "types.html"
-        for details (oleg). 
+        for details (oleg).
 
-JDO:    Solved problem of NULL dirty checking with Oracle (oleg).         
+JDO:    Solved problem of NULL dirty checking with Oracle (oleg).
 
 JDO:    Added support for BIGINT sql type in key generators (oleg).
- 
-JDO:    Bug fix in the handling of classloader in the mapping loader (reported 
+
+JDO:    Bug fix in the handling of classloader in the mapping loader (reported
         by brian rogers <brian@freya.bianca.com>).
 
-JDO:    Added "serializable" as a supported field type. Require BLOB support in the 
-	database. (Thomas Yip <yip@intalio.com>)
+JDO:    Added "serializable" as a supported field type. Require BLOB support in the
+    database. (Thomas Yip <yip@intalio.com>)
 
 JDO:    Merged JDO branch, "castorone", into the main branch.
 
 JDO:    Merged: Store cycle during transaction "prepare" state is split into
-	preStore and store cycles. With the new addition cycle, dependent object 
-	using key-generator is stored properly. It also avoid unnecessary update
-	SQL statements execution. (Thomas Yip <yip@intalio.com>)
+    preStore and store cycles. With the new addition cycle, dependent object
+    using key-generator is stored properly. It also avoid unnecessary update
+    SQL statements execution. (Thomas Yip <yip@intalio.com>)
 
-JDO:    Merged: Added markModification in TransactionContext. It enable a 
-	more flexible way to mark an object dirty. (Thomas Yip <yip@intalio.com>)
+JDO:    Merged: Added markModification in TransactionContext. It enable a
+    more flexible way to mark an object dirty. (Thomas Yip <yip@intalio.com>)
 
-JDO:    Merged: RemoveRelated is added in LockEngine. It automatically removes the 
-	reference of the deleted object in other related object. It protect 
-	cache consistency and avoid some ObjectNotFoundException due to
-	users' errors. (Thomas Yip <yip@intalio.com>)
+JDO:    Merged: RemoveRelated is added in LockEngine. It automatically removes the
+    reference of the deleted object in other related object. It protect
+    cache consistency and avoid some ObjectNotFoundException due to
+    users' errors. (Thomas Yip <yip@intalio.com>)
 
 JDO:    Merged: Added Multiple Primary Keys support. (Thomas Yip <yip@intalio.com>)
 
@@ -380,37 +381,37 @@ JDO:    Merged: Added Lazy loading for "collection" support. (Thomas Yip <yip@in
 
 JDO:    Merged: Improved dependent object support. (Thomas Yip <yip@intalio.com>)
 
-JDO:    Merged: Improved the in-memory locking architecture and stablity. (Thomas Yip <yip@intalio.com>) 
+JDO:    Merged: Improved the in-memory locking architecture and stablity. (Thomas Yip <yip@intalio.com>)
 
 JDO:    Merged: Cleaned up excessive ExceptionImpl classes. (Thomas Yip <yip@intalio.com>)
 
-JDO:    Merged: Support of Object[] as a collection type is temporarily removed. 
-	(Thomas Yip <yip@intalio.com>)
+JDO:    Merged: Support of Object[] as a collection type is temporarily removed.
+    (Thomas Yip <yip@intalio.com>)
 
-JDO:    Merged: Support of custom ClassDescriptor for JDO side is no longer supported. 
-	(Thomas Yip <yip@intalio.com>)
+JDO:    Merged: Support of custom ClassDescriptor for JDO side is no longer supported.
+    (Thomas Yip <yip@intalio.com>)
 
-DAX:    Merged: Tempoarily removed DAX. To be reworked and merged into JDO 
-	(as new type of data-store).  (Thomas Yip <yip@intalio.com>)
+DAX:    Merged: Tempoarily removed DAX. To be reworked and merged into JDO
+    (as new type of data-store).  (Thomas Yip <yip@intalio.com>)
 
 DSML:   Add a more detailed policies :
-        * NewAttrOnly, which implies that new attributes are created according 
-        to the DSML, but attributes that already have a value in the ldap are 
+        * NewAttrOnly, which implies that new attributes are created according
+        to the DSML, but attributes that already have a value in the ldap are
         not updated;
-        * UpdateOnly, which mean that DSML attributes that do not already exist 
+        * UpdateOnly, which mean that DSML attributes that do not already exist
         in the Ldap are not created.
         Submitted by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
 
 DSML:   An ASCII string encoding bug is fixed.
-	Submiited by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
+    Submiited by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
 
 Version 0.8.11 December, 15 2000
 --------------------------------
 
-XML:    Updated Schema syntax and some of the Schema Object Model to support 
+XML:    Updated Schema syntax and some of the Schema Object Model to support
         the W3C XML Schema Candidate Release. (kvisco)
 
-XML:    Allow the use of uninitialized collection. Castor will instiate a new 
+XML:    Allow the use of uninitialized collection. Castor will instiate a new
         collection of the proper type when necessary.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
@@ -481,7 +482,7 @@ JDO:    InstantDB driver (contributed by I. Burak Ozyurt <bozyurt@san.rr.com>).
 JDO:    Replacing of extended object in the cache on load of extending object
         implemented. jdoLoad signature changed. Now in jdoLoad you can request
         reloading the object instance as an instance of an extending class.
-        You need some "type" field in the extended class, which determines 
+        You need some "type" field in the extended class, which determines
         the correct extending class, see example in
         src\examples\myapp\Product.java. (Oleg Nitz)
 
@@ -528,8 +529,8 @@ Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
 XML:    Support for Bound Properties
 
-XML:    Added support for Pattern Facet 
-         - currently works for string, integer, and long 
+XML:    Added support for Pattern Facet
+         - currently works for string, integer, and long
         (kvisco)
 
 XML:    Updated the Schema Object model to support the new Grouping syntax
@@ -538,14 +539,14 @@ XML:    Updated the Schema Object model to support the new Grouping syntax
 
 XML:    Updated Unmarshaller to support "empty" strings (kvisco)
 
-XML:    Added support for direct public field access for the Marshalling 
+XML:    Added support for direct public field access for the Marshalling
         Framework when no accessor methods exist. (kvisco)
 
 XML:    Fixed Marshaller#setMarshalAsDocument so that XML fragment marshalling
-        works again. This used to work, but changes to the serializers had 
+        works again. This used to work, but changes to the serializers had
         prevented this from working properly. Reported by Phil Grida. (kvisco)
 
-XML:    Fixed endless recursion bug when processing recursive element 
+XML:    Fixed endless recursion bug when processing recursive element
         declarations, reported by Chris Schaefer (kvisco).
 
 XML:    Added George Stewarts changes to give mappings higher priority than
@@ -554,10 +555,10 @@ XML:    Added George Stewarts changes to give mappings higher priority than
 XML:    Added Patrick Higgins changes to the javasource package to fix
         support for abstract methods (kvisco)
 
-XML:    Added support for in-lines SimpleTypes (anonymous) for 
+XML:    Added support for in-lines SimpleTypes (anonymous) for
         attribute declarations (kvisco)
 
-XML:    Added support for in-lined SimpleTypes (anonymous) for 
+XML:    Added support for in-lined SimpleTypes (anonymous) for
         element declarations. (kvisco)
 
 XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
@@ -565,10 +566,10 @@ XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
 
 XML:    Added support for top-level annotations (kvisco)
 
-XML:    Made some changes in Unmarshalling code to handle "null" primitives. 
+XML:    Made some changes in Unmarshalling code to handle "null" primitives.
     Based on suggestions from Fabrice Gomez. (kvisco)
 
-XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers 
+XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers
     using dynamic-introspection. (kvisco)
 
 XML:    Changed some case-sensitive issues with the below mentioned Schema
@@ -599,15 +600,15 @@ XML:    <include> element support (Andrew Fawcett)
 
 XML:    decimal type support (Andrew Fawcett)
 
-XML:    Support xsi:type from XML Schema for Instances 
+XML:    Support xsi:type from XML Schema for Instances
     (Remy Maucherat <remm@apache.org>)
 
 
 Version 0.8.8  June 20, 2000
 ----------------------------
 
-XML:     Added support for the Unmarshaller to automatically determine the 
-     Class of the root element, based on a given Mapping, or 
+XML:     Added support for the Unmarshaller to automatically determine the
+     Class of the root element, based on a given Mapping, or
      ClassDescriptorResolver
 
 XML:     Added support for the "has" method for primitives in the generated source
