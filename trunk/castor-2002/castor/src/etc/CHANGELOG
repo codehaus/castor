@@ -13,6 +13,10 @@ JDO:     Test for duplicate primary key only if select operation failed
          using either the SQL state (X/Open error code) or by running a
          separate select statement. (Contributed by Oleg Nitz)
 
+Persist: Added scrolling capability to QueryResult and PersistenceQuery
+         allowing more efficient collection implementation on top of JDBC
+         drivers that support cursors. (Idea by Oleg Nitz)
+
 Persist: Application level APIs now deal with PersistenceEngine and not
          with CacheEngine directly. All classes that extended CacheEngine
          have been eliminated.
