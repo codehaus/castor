@@ -168,10 +168,24 @@ public class SimpleTypesFactory
      */
     private static Hashtable _typesByName;
 
+    /** Cross index for _typesByName to quickly get type information from its code*/
+    private static Hashtable _typesByCode;
+
     /**
      * Log writer to report progress/errors. May be null.
      */
     private static PrintWriter _logWriter= new PrintWriter(System.out);
+
+
+    /**
+     * Gets a built in type's name given its code.
+     */
+    public String getBuiltInTypeName(int builtInTypeCode) {
+        Type type= getType(builtInTypeCode);
+        if (type == null) return null;
+        else
+            return type.getName();
+    }
 
 
     /**
@@ -292,12 +306,25 @@ public class SimpleTypesFactory
     }
 
     /**
+     * Gets the informations about the built in type which code is provided
+     * as input parameter.
+     * Loads the types definitions if they were not yet loaded
+     */
+    private Type getType(int typeCode)
+    {
+        if (_typesByCode == null) {
+            loadTypesDefinitions();
+        }
+        return (Type)_typesByCode.get(new Integer(typeCode));
+    }
+
+    /**
      * Loads the built in type definitions from their xml file and its mapping file
-     * into the static field typesByName. Loading is done only once.
+     * into the static fields typesByName and typeByCode. Loading is done only once.
      */
     private synchronized void loadTypesDefinitions()
     {
-        if ( _typesByName == null ) {
+        if ( (_typesByName == null) && (_typesByCode == null) ) {
 	        try
              {  //Load the mapping file
 		        Mapping mapping= new Mapping(getClass().getClassLoader());
@@ -314,7 +341,7 @@ public class SimpleTypesFactory
 		        if (Configuration.debug() && getLogWriter()!= null)
                    typeList.Print(getLogWriter());
 
-                //Store the types by name in the typesByName hashtable
+                //Store the types by name in the typesByName and typesByCode hashtables
                 //and create for each its associated SimpleType instance.
                 Vector types= typeList.getTypes();
                 _typesByName= new Hashtable();
@@ -322,6 +349,7 @@ public class SimpleTypesFactory
 		        {
 		            Type type= (Type)(types.get(index));
                     _typesByName.put(type.getName(), type);
+                    _typesByCode.put(new Integer(type.getCode()), type);
                     type.setSimpleType(createSimpleType(type));
 		        }
 	        }
