@@ -322,9 +322,10 @@ public class SourceGenerator
             //-- adjust targetNamespace
             if (targetNamespace == null)
                 targetNamespace = "";
-            if ((lookupPackageByNamespace(targetNamespace)) == null)
-                setNamespacePackageMapping(targetNamespace, packageName);
+                
+            setNamespacePackageMapping(targetNamespace, packageName);
         }
+        
         sInfo.packageName = packageName;
         sInfo.setDialog(_dialog);
         sInfo.setPromptForOverwrite(_warnOnOverwrite);
