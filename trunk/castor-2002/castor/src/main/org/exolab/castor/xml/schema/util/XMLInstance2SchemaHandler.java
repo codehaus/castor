@@ -63,14 +63,13 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class XMLInstance2SchemaHandler
+public final class XMLInstance2SchemaHandler
     implements DocumentHandler, org.xml.sax.ErrorHandler
 {
 
 
     private static final String XMLNS          = "xmlns";
     private static final String DEFAULT_PREFIX = "xsd";
-    
       //--------------------/
      //- Member Variables -/
     //--------------------/
@@ -91,6 +90,8 @@ public class XMLInstance2SchemaHandler
     private Stack _siStack = null;
     
     private String _nsPrefix = null;
+    
+    private Order  _defaultGroupOrder = Order.seq;
     
       //----------------/
      //- Constructors -/
@@ -151,6 +152,16 @@ public class XMLInstance2SchemaHandler
     public Schema getSchema() {
         return _schema;
     }
+    
+    /**
+     * This method is used to set the default group type. Either
+     * "sequence" or "all". The default is "sequence".
+     *
+     * @param order the default group order to use.
+    **/
+    protected void setDefaultGroupOrder(Order order) {
+        _defaultGroupOrder = order;
+    } //-- setDefaultGroupOrder
       
     //---------------------------------------/
     //- org.xml.sax.DocumentHandler methods -/
@@ -211,6 +222,7 @@ public class XMLInstance2SchemaHandler
                 type = new ComplexType(_schema);
                 parentInfo.element.setType(type);
                 group = new Group();
+                group.setOrder(_defaultGroupOrder);
                 type.addGroup(group);
                 group.addElementDecl(sInfo.element);
             }
@@ -219,15 +231,35 @@ public class XMLInstance2SchemaHandler
                 //-- check for another element declaration with
                 //-- same name ...
                 ElementDecl element = group.getElementDecl(name);
+                boolean checkGroupType = false;
                 if (element != null) {
                     //-- if complex...merge definition
                     if (sInfo.complex) {
                         merge(element, sInfo.element);
                     }
                     element.setMaxOccurs(Particle.UNBOUNDED);
+                    checkGroupType = true;
                 }
                 else {
                     group.addElementDecl(sInfo.element);
+                }
+                
+                //-- change group type if necessary
+                if (checkGroupType && (group.getOrder() == Order.seq)) {
+                    //-- make sure element is last item in group,
+                    //-- otherwise we need to switch to all
+                    boolean found = false;
+                    boolean changeType = false;
+                    for (int i = 0; i < group.getParticleCount(); i++) {
+                        if (found) {
+                            changeType = true;
+                            break;
+                        }
+                        if (element == group.getParticle(i)) found = true;
+                    }
+                    if (changeType) {
+                        group.setOrder(Order.all);
+                    }
                 }
             }
         }
