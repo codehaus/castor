@@ -269,6 +269,35 @@ public class TypeHandling
                 stream.writeVerbose( "OK: The boolean->char[01] conversion passed" );
 
             
+            stream.writeVerbose( "Testing the double->numeric conversion" );
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                types.setDoubleValue( 0.2 );
+            }
+            db.commit();
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                if ( types.getDoubleValue() != 0.2 ) {
+                    stream.writeVerbose( "Error: double value was not set" );
+                    result = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            else
+                stream.writeVerbose( "OK: The double->numeric conversion passed" );
+
+            
             stream.writeVerbose( "Testing date->int/numeric/char parameterized conversion" );
             df = new SimpleDateFormat();
             df.applyPattern("yyyy/MM/dd");

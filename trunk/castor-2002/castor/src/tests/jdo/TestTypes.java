@@ -84,6 +84,9 @@ public class TestTypes
     private boolean        _boolValue;
 
 
+    private double         _doubleValue;
+
+
     private java.util.Date _date2;
 
 
@@ -105,6 +108,7 @@ public class TestTypes
         _date2 = new java.util.Date();
         _time2 = new java.util.Date();
         _timestamp2 = new java.util.Date();
+        _doubleValue = 0.1;
     }
 
 
@@ -202,6 +206,18 @@ public class TestTypes
     public void setCharValue( char value )
     {
         _charValue = value;
+    }
+
+
+    public double getDoubleValue()
+    {
+        return _doubleValue;
+    }
+
+
+    public void setDoubleValue( double value )
+    {
+        _doubleValue = value;
     }
 
 
