@@ -1,5 +1,6 @@
 <project name="Castor" default="main" basedir=".">
     <target name="init">
+        <property name="name" value="Castor"/>
         <property name="source" value="src"/>
         <property name="main" value="${source}/main"/>
         <property name="etc" value="${source}/etc"/>
@@ -18,11 +19,11 @@
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
-            org.exolab.castor.dax,
             org.exolab.castor.xml,
             org.exolab.castor.dsml,
             org.exolab.castor.mapping"
         />
+        <!--    org.exolab.castor.dax,-->
         <property name="allpackagenames" value="org.*"/>
     </target>
     <!-- Display all the targets -->
@@ -132,7 +133,7 @@
     <target name="api" depends="prepare">
         <mkdir dir="${build}/doc"/>
         <mkdir dir="${build}/doc/api"/>
-        <javadoc sourcepath="${main}" destdir="${build}/doc/api" dir="." doctitle="${Name} API" windowtitle="${Name} API" bottom="${copyright}" public="true" author="true" packagenames="${apipackagenames}"/>
+        <javadoc sourcepath="${main}" destdir="${build}/doc/api" dir="." doctitle="${name} API" windowtitle="${name} API" bottom="${copyright}" public="true" author="true" packagenames="${apipackagenames}"/>
     </target>
     <!-- Build the docs, API and full JavaDocs, doc archives -->
     <target name="docs" depends="doc,api,javadoc">
