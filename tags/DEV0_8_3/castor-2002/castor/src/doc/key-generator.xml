@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/key-generator.xml">
+  <body>
+    <title>Castor JDO Key Generator Support</title>
+
+    <section title="Introduction">
+      <p>The key generator gives a possibility to generate identity field
+         values automatically. During <tt>create</tt> the value of the
+         identity field is set to the value obtained from the key generator.
+         Different algorithms may be used here, both generic and specific
+         for some database server.</p>
+
+      <p>The key generator for the given class is set in the mapping
+         specification file (<tt>mapping.xml</tt>), in the 
+         <tt>key-generator</tt> attribute of the <tt>class</tt> element, 
+         for example:
+         <pre><![CDATA[
+  <class name="myapp.ProductGroup"
+         identity="id" key-generator="MAX">
+    <field name="id">
+    </field>
+  </class>]]>
+         </pre></p>
+      <p>The following key generator names are supported in Castor 1.0:
+         <table border="1" cellpadding="4">
+           <tr><td>MAX</td><td>"MAX( pk ) + 1" generic algorithm</td></tr>
+           <tr><td>HIGH/LOW</td><td>HIGH/LOW generic algorithm</td></tr>
+           <tr><td>SYBASE</td><td>Supports autoincrement identity fields in
+                                  Sybase ASE/ASA and Microsoft SQL Server</td></tr>
+           <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle and PostgreSQL</td></tr>
+         </table></p>
+
+      <p>Some of these algorithms have parameters, which can be specified 
+         in the <tt>key-generator</tt> element of the mapping
+         specification file, for example:
+         <pre><![CDATA[
+  <key-generator name="HIGH/LOW">
+    <param name="table" value="SEQ"/>
+    <param name="key-column" value="SEQ_TableName"/>
+    <param name="value-column" value="SEQ_MaxPKValue"/>
+    <param name="grab-size" value="1000"/>
+  </key-generator>
+
+  <class name="myapp.ProductGroup"
+         identity="id" key-generator="HIGH/LOW">
+    <field name="id">
+    </field>
+  </class>]]>
+         </pre></p>
+
+      <p>It is possible to create several key generators with the same
+         algorithms but diffent parameters.
+         In this case you have to specify the <tt>alias</tt> attribute
+         in the <tt>key-generator</tt> element, for example:
+         <pre><![CDATA[
+  <key-generator name="SEQUENCE" alias="A">
+    <param name="sequence" value="a_seq"/>
+  </key-generator>
+
+  <key-generator name="SEQUENCE" alias="B">
+    <param name="sequence" value="b_seq"/>
+  </key-generator>
+
+  <class name="myapp.ProductGroup"
+         identity="id" key-generator="A">
+    <field name="id">
+    </field>
+  </class>]]>
+         </pre></p>
+    </section>
+
+  </body>
+</document>
+
+
+
+
+
+
+
+
+
