@@ -89,7 +89,7 @@
          <display>CastorWiki</display>
       </navLink>
       <navLink>
-        <url>rss/castor-announce.xml</url>
+        <url>http://castor.codehaus.org/rss/castor-announce.xml</url>
         <display>RSS news feed</display>
       </navLink>
     </section>
