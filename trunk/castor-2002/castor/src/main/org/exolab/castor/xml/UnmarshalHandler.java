@@ -291,8 +291,22 @@ public final class UnmarshalHandler extends MarshalFramework
     **/
     public void setIDResolver(IDResolver idResolver) {
         _idResolver.setResolver(idResolver);
-    } //-- idResolver
+    } //-- setIdResolver
 
+    
+    /**
+     * Sets whether or not attributes that do not match
+     * a specific field should simply be ignored or
+     * reported as an error. By default, extra attributes
+     * are ignored.
+     *
+     * @param ignoreExtraAtts a boolean that when true will
+     * allow non-matched attributes to simply be ignored.
+    **/
+    public void setIgnoreExtraAttributes(boolean ignoreExtraAtts) {
+        _strictAttributes = (!ignoreExtraAtts);    
+    } //-- setIgnoreExtraAttributes
+    
     /**
      * Sets the PrintWriter used for printing log messages
      * @param printWriter the PrintWriter to use when printing
