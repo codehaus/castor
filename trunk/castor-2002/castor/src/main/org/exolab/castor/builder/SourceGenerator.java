@@ -688,6 +688,11 @@ public class SourceGenerator {
         while (structures.hasMoreElements())
             processSimpleType((SimpleType)structures.nextElement(), sInfo);
 
+        //-- handle all top-level groups
+        structures = schema.getModelGroups();
+        while (structures.hasMoreElements())
+            createClasses((Group)structures.nextElement(), sInfo);
+
 
     } //-- createClasses
 
@@ -752,7 +757,7 @@ public class SourceGenerator {
                     = sourceFactory.createSourceCode(complexType,
                                                      sInfo,
                                                      sInfo.packageName);
-                                                     
+
                 for (int i = 0; i < classes.length; i++)
                     processJClass(classes[i], sInfo);
             }
@@ -869,7 +874,7 @@ public class SourceGenerator {
     } //-- process
 
     private void createClasses(Group group, SGStateInfo sInfo) {
-        
+
 		if (sInfo.verbose()) {
 		    System.out.print("Creating classes for group: ");
 		    System.out.println(group.getName());
@@ -878,16 +883,16 @@ public class SourceGenerator {
                 return;
             }
 		}
-		
+
 		JClass[] classes = sourceFactory.createSourceCode(group,
                                                     sInfo,
                                                     sInfo.packageName);
-                                                    
-        for (int i = 0; i < classes.length; i++) 
+
+        for (int i = 0; i < classes.length; i++)
             processJClass(classes[i], sInfo);
-        
+
     } //-- createClasses
-    
+
     /**
      * Processes the given JClass by creating the
      * corresponding MarshalInfo and print the Java classes

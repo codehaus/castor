@@ -1293,7 +1293,9 @@ public class SourceFactory  {
                         gInfo.setMinOccurs(group.getMinOccurs());
                     }
                     //-- if not nested, set compositor
-                    if (contentModel instanceof ComplexType) {
+                    if ((contentModel instanceof ComplexType)||
+                        (contentModel instanceof ModelGroup) )
+                    {
                         Order order = group.getOrder();
                         if (order == Order.choice)
                             state.classInfo.getGroupInfo().setAsChoice();
@@ -1339,13 +1341,18 @@ public class SourceFactory  {
                             throw new IllegalStateException(err);
                         }
                         //get the contentModel and proccess it
-                        if (tmp.getContentModelGroup() != null)
-                           processContentModel(tmp.getContentModelGroup(), state);
-                        else {
-                             String err = "<group> should contains :\" ";
-                             err += " 'all' or 'sequence' or 'choice'";
-                             err +="\"";
-                             throw new IllegalStateException(err);
+                        if (tmp.getContentModelGroup() != null) {
+                            if (tmp.getName() != null) {
+                                fieldInfo = memberFactory.createFieldInfo(tmp, state);
+                                handleField(fieldInfo, state);
+                                break;
+                            } else processContentModel(tmp.getContentModelGroup(), state);
+                         }
+                         else {
+                              String err = "<group> should contains :\" ";
+                              err += " 'all' or 'sequence' or 'choice'";
+                              err +="\"";
+                              throw new IllegalStateException(err);
                         }
                      }
 
