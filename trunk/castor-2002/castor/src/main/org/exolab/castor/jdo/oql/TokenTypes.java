@@ -103,4 +103,9 @@ public interface TokenTypes {
   int KEYWORD_BY = 47;
   int KEYWORD_ASC = 48;
   int KEYWORD_DESC = 49;
+  int KEYWORD_COUNT = 50;
+  int KEYWORD_SUM = 51;
+  int KEYWORD_MIN = 52;
+  int KEYWORD_MAX = 53;
+  int KEYWORD_AVG = 54;
 }
