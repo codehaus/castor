@@ -73,7 +73,6 @@ public final class IdentityKeyGenerator implements KeyGenerator
 
     private final int _sqlType;
 
-
     private final String _fName;
 
 
@@ -85,7 +84,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
         String fName = factory.getFactoryName();
         if ( !fName.equals("sybase") && !fName.equals("sql-server") &&
                 !fName.equals("hsql") && !fName.equals("mysql") &&
-                !fName.equals("informix") && !fName.equals("db2")) {
+                !fName.equals("informix") && !fName.equals("db2")&& !fName.equals("sapdb")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
@@ -134,6 +133,10 @@ public final class IdentityKeyGenerator implements KeyGenerator
                 stmt = conn.prepareStatement(
                     "SELECT IDENTITY_VAL_LOCAL() FROM " + tableName + " FETCH FIRST ROW ONLY");
                 rs = stmt.executeQuery();
+            } else if ( _fName.equals("sapdb") ) {
+               stmt = conn.prepareStatement(
+                   "SELECT " +  tableName + ".currval" +  " FROM " + tableName); //no need to quote any of these here
+               rs = stmt.executeQuery();
         } else {
                 stmt = conn.prepareStatement("SELECT @@identity");
                 rs = stmt.executeQuery();
