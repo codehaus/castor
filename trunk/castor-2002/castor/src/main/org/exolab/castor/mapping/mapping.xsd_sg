@@ -14,12 +14,12 @@
 <schema>
 
 
-  <element name="mapping">
+  <element name="mapping-root">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="include" minOccurs="0" />
-      <element ref="class" minOccurs="1" />
-      <element ref="key-generator" minOccurs="0" />
+      <element ref="class-mapping" minOccurs="1" />
+      <element ref="key-generator-def" minOccurs="0" />
     </type>
   </element>
 
@@ -31,12 +31,12 @@
   </element>
 
 
-  <element name="class">
+  <element name="class-mapping">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="map-to" minOccurs="0" maxOccurs="1" />
       <group order="choice" minOccurs="1">
-        <element ref="field"/>
+        <element ref="field-mapping"/>
         <element ref="container"/>
       </group>
       <attribute name="name" type="ID" minOccurs="1"/>
@@ -48,7 +48,7 @@
         <enumeration value="exclusive"/>
         <enumeration value="db-locked"/>
       </attribute>
-      <attribute name="key-generator" type="IDREF" minOccurs="0"/>
+      <attribute name="key-generator" type="string" minOccurs="0"/>
     </type>
   </element>
 
@@ -65,7 +65,7 @@
   </element>
 
 
-  <element name="field">
+  <element name="field-mapping">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="sql" minOccurs="0" maxOccurs="1"/>
@@ -90,7 +90,7 @@
   <element name="container">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
-      <element ref="field" minOccurs="1"/>
+      <element ref="field-mapping" minOccurs="1"/>
       <attribute name="name" type="NMTOKEN" minOccurs="1"/>
       <attribute name="type" type="NMTOKEN" minOccurs="0"/>
       <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
@@ -135,7 +135,7 @@
   </element>
 
 
-  <element name="key-generator">
+  <element name="key-generator-def">
     <type content="elemOnly" order="seq">
       <element ref="param" minOccurs="0" />
       <attribute name="name" type="ID" minOccurs="1" />

@@ -214,7 +214,7 @@ public class OQLQueryImpl
         }
         _dbEngine = _dbImpl.getPersistenceEngine(); 
         if ( _dbEngine == null )
-            throw new QueryException( "Cold not find an engine supporting class " + objType );
+            throw new QueryException( "Could not find an engine supporting class " + objType );
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
         clsDesc = engine.getDescriptor();
 

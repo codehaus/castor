@@ -482,15 +482,12 @@ public abstract class TransactionContext
         // add a new entry for this object and use this object as the view
         if ( identity != null && getObjectEntry( engine, new OID( handler, identity ) ) != null )
             throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
-        oid = new OID( handler, identity );
-        entry = addObjectEntry( object, oid, engine );
-        entry.created = true;
 
         if ( identity != null ) {
             try {
                 // Must perform creation after object is recorded in transaction
                 // to prevent circular references.
-                engine.create( this, object, identity );
+                oid = engine.create( this, object, identity );
             } catch ( DuplicateIdentityException except ) {
                 removeObjectEntry( object );
                 throw except;
@@ -501,7 +498,12 @@ public abstract class TransactionContext
                 removeObjectEntry( object );
                 throw new PersistenceExceptionImpl( except );
             }
+        } else {
+            oid = new OID( handler, identity );
         }
+
+        entry = addObjectEntry( object, oid, engine );
+        entry.created = true;
         return oid;
     }
 

@@ -48,8 +48,10 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.io.PrintWriter;
+import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.Properties;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -59,9 +61,13 @@ import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
+import org.exolab.castor.mapping.loader.KeyGeneratorDescriptorImpl;
+import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-
+import org.exolab.castor.mapping.xml.KeyGeneratorDef;
+import org.exolab.castor.mapping.xml.Param;
+import org.exolab.castor.util.Messages;
 
 /**
  * A JDO implementation of mapping helper. Creates JDO class descriptors
@@ -78,6 +84,20 @@ public class JDOMappingLoader
     private static final String IgnoreDirty = "ignore";
 
 
+    /**
+     * Used by the constructor for creating key generators.
+     * See {@link #loadMapping}.
+     */
+    private Hashtable _keyGenDefs = new Hashtable();
+
+
+    /**
+     * Used by the constructor for creating key generators.
+     * See {@link #loadMapping}.
+     */
+    private Hashtable _keyGenDescs = new Hashtable();
+
+
     public JDOMappingLoader( ClassLoader loader, PrintWriter logWriter )
     {
         super( loader, logWriter );
@@ -90,6 +110,8 @@ public class JDOMappingLoader
         ClassDescriptor   clsDesc;
         FieldDescriptor[] fields;
         Vector            jdoFields;
+        String            keyGenName;
+        KeyGeneratorDescriptorImpl keyGenDesc;
         
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
@@ -113,8 +135,41 @@ public class JDOMappingLoader
         // on (we need the descriptor for relations mapping).
         if ( clsDesc.getIdentity() == null )
             throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
-        
-        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable() );
+
+        // create a key generator descriptor
+        keyGenName = clsMap.getKeyGenerator();
+        keyGenDesc = null;
+        if ( keyGenName != null ) {
+            KeyGeneratorDef keyGenDef;
+            Enumeration enum;
+            Properties params;
+            KeyGeneratorDescriptorImpl oldKeyGenDesc;
+
+            // first search among declared key generators
+            // and resolve alias
+            keyGenDef = (KeyGeneratorDef) _keyGenDefs.get( keyGenName );
+            params = new Properties();
+            if ( keyGenDef != null ) {
+                keyGenName = keyGenDef.getName();
+                enum = keyGenDef.enumerateParam();
+                while ( enum.hasMoreElements() ) {
+                    Param par = (Param) enum.nextElement();
+                    params.put( par.getName(), par.getValue() );
+                }
+            }
+            keyGenDesc = new KeyGeneratorDescriptorImpl( keyGenName, params );
+            
+            // If the equal object was already instantiated, we use the old 
+            // object and leave this unreferenced so that it will be garbage collected
+            oldKeyGenDesc = (KeyGeneratorDescriptorImpl) _keyGenDescs.get(keyGenDesc);
+            if (oldKeyGenDesc == null) {
+                _keyGenDescs.put(keyGenDesc, keyGenDesc);
+            } else {
+                keyGenDesc = oldKeyGenDesc;
+            }
+        }
+
+        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), keyGenDesc );
     }
 
 
@@ -165,6 +220,32 @@ public class JDOMappingLoader
             fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
     }
 
+    public void loadMapping( MappingRoot mapping )
+        throws MappingException
+    {
+        Enumeration enum;
+        // Load the key generator definitions and check for duplicate names
+        enum = mapping.enumerateKeyGeneratorDef();
+        while ( enum.hasMoreElements() ) {
+            KeyGeneratorDef keyGenDef;
+            String name;
+
+            keyGenDef = (KeyGeneratorDef) enum.nextElement();
+            name = keyGenDef.getAlias();
+            if (name == null) {
+                name = keyGenDef.getName();
+            }
+            if ( _keyGenDefs.get( name ) != null ) {
+                throw new MappingException( Messages.format( "mapping.dupKeyGen", name ) );
+            }
+            _keyGenDefs.put( name, keyGenDef );
+        }
+
+        super.loadMapping( mapping );
+
+        _keyGenDefs = null;
+        _keyGenDescs = null;
+    }
 
 }
 

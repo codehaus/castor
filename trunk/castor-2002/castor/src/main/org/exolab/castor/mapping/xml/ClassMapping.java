@@ -38,6 +38,8 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.Object _extends;
 
+    private java.lang.String _keyGenerator;
+
     private java.lang.String _name;
 
     private java.lang.String _description;
@@ -186,6 +188,12 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
+    public java.lang.String getKeyGenerator() {
+        return this._keyGenerator;
+    } //-- java.lang.String getKeyGenerator() 
+
+    /**
+    **/
     public MapTo getMapTo() {
         return this._mapTo;
     } //-- MapTo getMapTo() 
@@ -201,6 +209,44 @@ public class ClassMapping implements java.io.Serializable {
     public java.lang.String getReferenceId() {
         return this._name;
     } //-- java.lang.String getReferenceId() 
+
+    /**
+    **/
+    public boolean isValid() {
+        try {
+            validate();
+        }
+        catch (org.exolab.castor.xml.ValidationException vex) {
+            return false;
+        }
+        return true;
+    } //-- boolean isValid() 
+
+    /**
+     * 
+     * @param out
+    **/
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * 
+     * @param handler
+    **/
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
     **/
@@ -298,6 +344,14 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
+     * @param _keyGenerator
+    **/
+    public void setKeyGenerator(java.lang.String _keyGenerator) {
+        this._keyGenerator = _keyGenerator;
+    } //-- void setKeyGenerator(java.lang.String) 
+
+    /**
+     * 
      * @param _mapTo
     **/
     public void setMapTo(MapTo _mapTo) {
@@ -311,5 +365,23 @@ public class ClassMapping implements java.io.Serializable {
     public void setName(java.lang.String _name) {
         this._name = _name;
     } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param reader
+    **/
+    public static org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.mapping.xml.ClassMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.ClassMapping.class, reader);
+    } //-- org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

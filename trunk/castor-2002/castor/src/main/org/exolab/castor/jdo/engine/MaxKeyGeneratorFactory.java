@@ -44,57 +44,50 @@
  */
 
 
-package org.exolab.castor.persist.spi;
+package org.exolab.castor.jdo.engine;
 
 
-import java.sql.Connection;
 import java.util.Properties;
-import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.spi.KeyGenerator;
+import org.exolab.castor.persist.spi.KeyGeneratorFactory;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * Interface for a key generator. The key generator is used for
- * producing identities for objects before they are created in the
- * database.
- * <p>
- * All the key generators belonging to the same database share the
- * same non-transactional connection to the database.
- * <p>
- * The key generator is configured from the mapping file using
- * Bean-like accessor methods.
+ * MAX key generator factory.
+ * The short name of this key generator is "MAX".
+ * It uses the following alrorithm: the maximum value of the primary
+ * key is fetched and the correspondent record is locked until the end
+ * of transaction, generator returns (max + 1).
+ * The lock guarantees that key generators of concurrent transactions
+ * will not use this key value, so DuplicateKeyException is impossible.
+ * If the table is empty, generator returns 1, no lock is put,
+ * DuplicateKeyException is possible.
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
+ * @see MaxKeyGenerator
  */
-public interface KeyGenerator
+public final class MaxKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
-     * Generate a new key for the specified table. This method is
-     * called when a new object is about to be created. In some
-     * environments the name of the owner of the object is known,
-     * e.g. the principal in a J2EE server.
-     *
-     * @param conn An open connection within the given transaction
-     * @param tableName The table name
-     * @param primKeyName The primary key name
-     * @param props A temporary replacement for Principal object
-     * @return A new key
-     * @throws PersistenceException An error occured talking to persistent
-     *  storage
+     * Produce the key generator.
+     * @factory Helper object for obtaining database-specific QuerySyntax.
+     * @params Parameters for key generator.
      */
-    public Object generateKey( Connection conn, String tableName,
-            String primKeyName, Properties props )
-        throws PersistenceException;
+    public KeyGenerator getKeyGenerator( PersistenceFactory factory,
+            Properties params )
+            throws MappingException
+    {
+        return new MaxKeyGenerator( factory );
+    }
 
     /**
-     * Is key generated before INSERT? 
+     * The short name of this key generator is "MAX"
      */
-    public boolean isBeforeInsert();
-
-    /**
-     * Is key generated in the same connection as INSERT?
-     */
-    public boolean isInSameConnection();
+    public String getName() {
+        return "MAX";
+    }
 }
+

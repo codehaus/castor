@@ -44,57 +44,61 @@
  */
 
 
-package org.exolab.castor.persist.spi;
+package org.exolab.castor.jdo.engine;
 
 
-import java.sql.Connection;
 import java.util.Properties;
-import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.spi.KeyGenerator;
+import org.exolab.castor.persist.spi.KeyGeneratorFactory;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * Interface for a key generator. The key generator is used for
- * producing identities for objects before they are created in the
- * database.
- * <p>
- * All the key generators belonging to the same database share the
- * same non-transactional connection to the database.
- * <p>
- * The key generator is configured from the mapping file using
- * Bean-like accessor methods.
+ * HIGH/LOW key generator factory.
+ * The short name of this key generator is "HIGH/LOW".
+ * It uses the following alrorithm: a special sequence table must be in 
+ * the database with keeps the maximum key values. The name of the 
+ * sequence table is a mandatory parameter of the key generator, 
+ * the parameter name is "table".
+ * The name of the primary key column of the sequence table and 
+ * the name of the column in which maximum values are stored are 
+ * mandatory parameters with the names "key-column" and "value-column",
+ * respectively. The key column contains table names, so it must be of
+ * a character type (char or varchar). The value column contains primary key
+ * values, it must be of a numeric type (numeric or int).
+ * Key generator reads the maximum value X for the given table, 
+ * writes the new value (X + N) to the sequence table and during next N 
+ * calls returns values X + 1, ..., X + N without database access.
+ * Number N (which sometimes is called "grab size") is an optional
+ * parameter of the key generator, the parameter name is "grab-size",
+ * default value is "1".
+ * For example, if you want to obtain HIGH/LOW key generator with  
+ * 3 digits in the LOW part of the key, you should set "grab-size" to "1000".
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
+ * @see HighLowGenerator
  */
-public interface KeyGenerator
+public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
-     * Generate a new key for the specified table. This method is
-     * called when a new object is about to be created. In some
-     * environments the name of the owner of the object is known,
-     * e.g. the principal in a J2EE server.
-     *
-     * @param conn An open connection within the given transaction
-     * @param tableName The table name
-     * @param primKeyName The primary key name
-     * @param props A temporary replacement for Principal object
-     * @return A new key
-     * @throws PersistenceException An error occured talking to persistent
-     *  storage
+     * Produce the key generator.
+     * @factory Helper object for obtaining database-specific QuerySyntax.
+     * @params Parameters for key generator.
      */
-    public Object generateKey( Connection conn, String tableName,
-            String primKeyName, Properties props )
-        throws PersistenceException;
+    public KeyGenerator getKeyGenerator( PersistenceFactory factory,
+            Properties params )
+            throws MappingException
+    {
+        return new HighLowKeyGenerator( params );
+    }
 
     /**
-     * Is key generated before INSERT? 
+     * The short name of this key generator is "HIGH/LOW"
      */
-    public boolean isBeforeInsert();
-
-    /**
-     * Is key generated in the same connection as INSERT?
-     */
-    public boolean isInSameConnection();
+    public String getName() {
+        return "HIGH/LOW";
+    }
 }
+

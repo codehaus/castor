@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.sql.SQLException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
@@ -81,10 +82,10 @@ public class GenericFactory
     public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException
     {
-	if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
-	    return null;
+        if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
+            return null;
         try {
-            return new SQLEngine( (JDOClassDescriptor) clsDesc, logInterceptor, this, null );
+            return new SQLEngine( (JDOClassDescriptor) clsDesc, logInterceptor, this, null);
         } catch ( MappingException except ) {
             if ( logInterceptor != null )
                 logInterceptor.exception( except );
@@ -92,7 +93,20 @@ public class GenericFactory
         }
     }
 
-
+    /**
+     * Only for jdo PersistenceFactories:
+     * determine if the given SQLException is DuplicateKeyException
+     * @return Boolean.TRUE means "yes",
+     *         Boolean.FALSE means "no",
+     *         null means "cannot determine"
+     */
+    public Boolean isDuplicateKeyException( SQLException ex )
+    {
+        if ( ex.getMessage().toUpperCase().indexOf("DUPLICATE KEY") >= 0 ) {
+            return Boolean.TRUE;
+        }
+        return null;
+    }
 }
 
 
