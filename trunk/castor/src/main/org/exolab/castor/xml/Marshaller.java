@@ -848,6 +848,8 @@ public class Marshaller extends MarshalFramework {
          ContentHandler handler)
         throws MarshalException, ValidationException
     {
+        
+        
         if (object == null) {
             String err = "Marshaller#marshal: null parameter: 'object'";
             throw new MarshalException(err);
@@ -883,8 +885,17 @@ public class Marshaller extends MarshalFramework {
         if (_parents.search(object) >= 0) return;
         _parents.push(object);
 
-        Class _class = object.getClass();
-
+        boolean nil = (object instanceof NilObject);
+        
+        Class _class = null;
+        
+        if (!nil) {
+            _class = object.getClass();
+        }
+        else {
+        	_class = ((NilObject)object).getClassDescriptor().getJavaClass();
+        }
+        
         boolean byteArray = false;
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
@@ -894,6 +905,7 @@ public class Marshaller extends MarshalFramework {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
 			atRoot = true;
         }
+        
 
         //-- calculate Object's name
         String name = descriptor.getXMLName();
@@ -916,8 +928,13 @@ public class Marshaller extends MarshalFramework {
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
         boolean saveType = false; /* flag for xsi:type */
-        if (_class == descriptor.getFieldType())
+        
+        if (object instanceof NilObject) {
+            classDesc = ((NilObject)object).getClassDescriptor();
+        }
+        else if (_class == descriptor.getFieldType()) {
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
+        }
 
         if (classDesc == null) {
             //-- check for primitive or String, we need to use
@@ -1067,6 +1084,8 @@ public class Marshaller extends MarshalFramework {
                 saveType = false;
             else if (descriptor.getHandler() instanceof EnumFieldHandler)
                 saveType = false;
+            else if (nil) 
+                saveType = false;
         }
         
 
@@ -1092,6 +1111,7 @@ public class Marshaller extends MarshalFramework {
 
              // XML Name associated with the class we are marshalling
              String xmlElementName = name;
+             String xmlNamespace = descriptor.getNameSpaceURI();
 
              // We try to find if there is a XMLClassDescriptor associated
              // with the XML name of this class
@@ -1120,7 +1140,8 @@ public class Marshaller extends MarshalFramework {
                     //--it means the container class could have been introspected
                     //--so no need to enter the logic
                     if (tempContaining != null) {
-                        XMLFieldDescriptor fieldDescMatch = tempContaining.getFieldDescriptor(xmlElementName, NodeType.Element);
+                        XMLFieldDescriptor fieldDescMatch =
+                            tempContaining.getFieldDescriptor(xmlElementName, xmlNamespace, NodeType.Element);
 
                         // Try to find a field descriptor by inheritance in the parent object
                         InheritanceMatch[] matches =
@@ -1329,7 +1350,14 @@ public class Marshaller extends MarshalFramework {
                 }
             }
             //-- save type information
-            atts.addAttribute(XSI_NAMESPACE, "type", XSI_TYPE, CDATA, typeName);
+            atts.addAttribute(XSI_NAMESPACE, TYPE_ATTR, XSI_TYPE, CDATA, typeName);
+        }
+        
+        if (nil) {
+            //-- declare XSI namespace, if necessary
+            declareNamespace(XSI_PREFIX, XSI_NAMESPACE);
+            //-- add xsi:nil="true"
+        	atts.addAttribute(XSI_NAMESPACE, NIL_ATTR, XSI_NIL_ATTR, CDATA, TRUE_VALUE);
         }
 
        //check if the value is a QName that needs to
@@ -1367,22 +1395,47 @@ public class Marshaller extends MarshalFramework {
                 
                 
                 //-- isNillable?
-                if (descriptor.isNillable()) {
+                if ((!nil) && descriptor.isNillable()) {
+                    XMLFieldDescriptor desc = classDesc.getContentDescriptor();
                 	descriptors = classDesc.getElementDescriptors();
-                    boolean isNilContent = (descriptors.length > 0);
-                    for (int i = 0; i < descriptors.length; ++i) {
-                        if (descriptors[i] == null) continue;
-                        Object value = descriptors[i].getHandler().getValue(object);
+                    int descCount = descriptors.length;
+                    boolean isNilContent = (descCount > 0) || (desc != null);
+                    
+                    //-- check content descriptor for a valid value
+                    if (desc != null) {
+                        Object value = desc.getHandler().getValue(object);
+                        if (value != null) {
+                            isNilContent = false;
+                            descCount = 0; 
+                        }
+                        else if (desc.isNillable() && desc.isRequired()) {
+                            isNilContent = false;
+                            descCount = 0; 
+                        }
+                    }
+                    
+                    
+                    for (int i = 0; i < descCount; i++) {
+                        desc = descriptors[i];
+                        if (desc == null) continue;
+                        Object value = desc.getHandler().getValue(object);
                         if (value != null) {
                             isNilContent = false;
                             firstNonNullIdx = i;
                             firstNonNullValue = value;
                             break;
                         }
+                        else if (desc.isNillable() && desc.isRequired()) {
+                        	isNilContent = false;
+                            firstNonNullIdx = i;
+                            firstNonNullValue = new NilObject(classDesc, desc);
+                            break;
+                        }
                     }
+                    
                     if (isNilContent) {
                         declareNamespace(XSI_PREFIX, XSI_NAMESPACE);
-                        atts.addAttribute(XSI_NAMESPACE, "nil", XSI_PREFIX + ":nil", CDATA, "true");
+                        atts.addAttribute(XSI_NAMESPACE, NIL_ATTR, XSI_NIL_ATTR, CDATA, TRUE_VALUE);
                     }
                 }
                 
@@ -1400,11 +1453,13 @@ public class Marshaller extends MarshalFramework {
                 
                 
                 handler.startElement(nsURI, name, qName, atts);
+                if (nil) return;
             } 
         }
         catch (org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
         }
+        
 
         //----------------------
         //-- handle text content
@@ -1420,6 +1475,7 @@ public class Marshaller extends MarshalFramework {
                 obj = cdesc.getHandler().getValue(object);
             }
             catch(IllegalStateException ise) {};
+            
             if (obj != null) {
                 char[] chars = null;
                 //-- handle base64 content
@@ -1490,6 +1546,7 @@ public class Marshaller extends MarshalFramework {
         //-- handle daughter elements
         //---------------------------
         
+        nil = false;
         descriptors = classDesc.getElementDescriptors();
         if (descriptor.isReference()) {
             descriptors = new XMLFieldDescriptor[0];
@@ -1518,7 +1575,12 @@ public class Marshaller extends MarshalFramework {
                 }
             }
             
-            if (obj == null) continue;
+            if (obj == null) {
+                if (elemDescriptor.isNillable() && (elemDescriptor.isRequired())) {
+                    nil = true;
+                }
+                else continue;
+            }
             
             
             //-- handle XML path
@@ -1604,8 +1666,11 @@ public class Marshaller extends MarshalFramework {
                 }
             }
             
+            if (nil) {
+                obj = new NilObject(classDesc, elemDescriptor);
+            }
 
-            Class type = obj.getClass();
+            final Class type = obj.getClass();
             
             //-- handle byte arrays
             if (type.isArray() && (type.getComponentType() == Byte.TYPE)) {
@@ -2236,6 +2301,39 @@ public class Marshaller extends MarshalFramework {
             this.localName = localName;
             this.qName = qName;
             this.location = location;
+        }
+    }
+    
+    /**
+     * A wrapper for a "Nil" object
+     * 
+     */
+    public static class NilObject {
+        
+        private XMLClassDescriptor _classDesc = null;
+        private XMLFieldDescriptor _fieldDesc = null;
+        
+        NilObject(XMLClassDescriptor classDesc, XMLFieldDescriptor fieldDesc) {
+            _classDesc = classDesc;
+            _fieldDesc = fieldDesc;
+        }
+        
+        /**
+         * Returns the associated XMLClassDescriptor
+         * 
+         * @return the XMLClassDescriptor
+         */
+        public XMLClassDescriptor getClassDescriptor() {
+            return _classDesc;
+        }
+        
+        /**
+         * Returns the associated XMLFieldDescriptor
+         * 
+         * @return the associated XMLFieldDescriptor
+         */
+        public XMLFieldDescriptor getFieldDescriptor() {
+            return _fieldDesc;
         }
     }
 
