@@ -146,6 +146,8 @@ public class MemberFactory {
         fieldInfo.setNodeName(attribute.getName());
         fieldInfo.setNodeType(XMLInfo.ATTRIBUTE_TYPE);
         fieldInfo.setRequired(attribute.getRequired());
+        fieldInfo.setDefaultValue(attribute.getDefault());
+        
         //fieldInfo.setSchemaType(attribute.getDatatypeRef());
         
         //-- add annotated comments
