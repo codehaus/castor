@@ -249,6 +249,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         if (attName.equals(XMLNS)) {
             defaultNS = attValue;
+            //register the default namespace with the empty string
+            _schema.addNamespace("", defaultNS);
             return;
         }
 
@@ -430,7 +432,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         if (name == SchemaNames.SCHEMA) return;
 
-
         //-- check for name mismatches
         if ((unmarshaller != null)) {
             if (!name.equals(unmarshaller.elementName())) {
@@ -446,7 +447,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //-- call unmarshaller.finish() to perform any necessary cleanup
         unmarshaller.finish();
-
 
         //-- <annotation>
         if (name.equals(SchemaNames.ANNOTATION)) {

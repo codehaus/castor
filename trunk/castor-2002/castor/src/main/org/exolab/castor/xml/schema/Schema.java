@@ -76,7 +76,6 @@ public class Schema extends Annotated {
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/2001/XMLSchema";
 
-
     private static final String NULL_ARGUMENT
         = "A null argument was passed to " +
            Schema.class.getName() + "#";
@@ -799,7 +798,9 @@ public class Schema extends Annotated {
                 throw new IllegalArgumentException(err);
             }
         }
-
+        //--Is the declaration in the default namespace (if any)
+        if (ns == null)
+            ns = (String)_namespaces.get(nsPrefix);
         //-- Get SimpleType object
         SimpleType result = null;
         if (ns == null) {
@@ -1258,40 +1259,40 @@ public class Schema extends Annotated {
     public void validate()
         throws ValidationException
     {
-        
+
         //-- Note: This method needs to be completed.
-        
+
         //-- top-level complexTypes
         Enumeration enum = _complexTypes.elements();
         while (enum.hasMoreElements()) {
             ComplexType type = (ComplexType)enum.nextElement();
             type.validate();
-        }        
+        }
         //-- top-level simpleTypes
         enum = _simpleTypes.elements();
         while (enum.hasMoreElements()) {
             SimpleType type = (SimpleType)enum.nextElement();
             type.validate();
-        }        
-        
-        //-- top-level elements    
+        }
+
+        //-- top-level elements
         enum = _elements.elements();
         while (enum.hasMoreElements()) {
             ((ElementDecl)enum.nextElement()).validate();
-        }        
-        
-        //-- top-level attributes 
+        }
+
+        //-- top-level attributes
         enum = _attributes.elements();
         while (enum.hasMoreElements()) {
             ((AttributeDecl)enum.nextElement()).validate();
-        }        
-        
+        }
+
         //-- top-level groups
         enum = _groups.elements();
         while (enum.hasMoreElements()) {
             ((Group)enum.nextElement()).validate();
-        }        
-        
+        }
+
         //-- top-level attribute groups
 
     } //-- validate
