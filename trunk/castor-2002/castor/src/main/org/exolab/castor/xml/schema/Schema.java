@@ -100,7 +100,7 @@ public class Schema extends SchemaBase {
      * @exception SchemaException if the Archetype does not have
      * a name or if another Archetype already exists with the same name
     **/
-    public void addArchetype(Archetype archetype) 
+    public synchronized void addArchetype(Archetype archetype) 
         throws SchemaException 
     {
         
@@ -110,11 +110,14 @@ public class Schema extends SchemaBase {
             String err = "a global archetype must contain a name.";
             throw new SchemaException(err);
         }
+        if (archetype.getSchema() != this) {
+            String err = "invalid attempt to add an archetype which ";
+            err += "belongs to a different Schema; type name: " + name;
+        }
         if (archetypes.get(name) != null) {
             String err = "an archetype already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        
         archetypes.put(name, archetype);
         
     } //-- addArchetype
@@ -145,6 +148,16 @@ public class Schema extends SchemaBase {
         
     } //-- addElementDecl
     
+    
+    /**
+     * Creates a new Archetype using this Schema as the owning Schema
+     * document. A call to #addArchetype must still be made in order
+     * add the archetype to this Schema.
+     * @return the new Archetype
+    **/
+    public Archetype createArchetype() {
+        return new Archetype(this);
+    } //-- createArchetype
     
     /**
      * Returns the Archetype of associated with the given name
@@ -184,12 +197,48 @@ public class Schema extends SchemaBase {
     } //-- getElementDecls
     
     /**
+     * Returns the target namespace for this Schema, or null if no
+     * namespace has been defined.
+     * @return the target namespace for this Schema, or null if no
+     * namespace has been defined
+    **/
+    public String getTargetNamespace() {
+        return this.targetNS;
+    } //-- getTargetNamespace
+    
+    /**
+     * Removes the given top level Archetype from this Schema
+     * @param archetype the Archetype to remove
+     * @return true if the archetype has been removed, or
+     * false if the archetype wasn't top level or
+     * didn't exist in this Schema
+    **/
+    public boolean removeArchetype(Archetype archetype) {
+        if (archetype.isTopLevel()) {
+            if (archetypes.contains(archetype)) {
+                archetypes.remove(archetype);
+                return true;
+            }
+        }
+        return false;
+    } //-- removeArchetype
+    
+    /**
      * Sets the name of this Schema definition
     **/
     public void setName(String name) {
         this.name = name;
     } //-- setName
     
+    /**
+     * Sets the target namespace for this Schema
+     * @param targetNamespace the target namespace for this Schema
+     * @see <B>&sect; 2.7 XML Schema Part 1: Structures</B>
+    **/
+    public void setTargetNamespace(String targetNamespace) {
+        this.targetNS = targetNamespace;
+    } //-- setTargetNamespace
+
     /**
      * Checks the validity of this Attribute declaration
      * @exception ValidationException when this Attribute declaration
