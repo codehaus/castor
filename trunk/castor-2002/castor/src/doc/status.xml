@@ -8,20 +8,21 @@
       <section title="Castor XML">
         <ul>
           <li>Automatic XML data binding for class definitions which adhere
-              to the Java Beans design pattern.</li>
+              to the Java Beans design pattern (often referred to as default introspection).
+          </li>
+          <li>Java to XML mapping automates transformation of Java objects to and from
+              XML documents and provides Java object validation</li>
 
-          <li>Java to XML mapping automates transformation of Java objects from
-              and into XML documents and provides Java object validation</li>
-
-          <li>An XML based mapping file to specify XML bindings.
+          <li>
+             An XML based mapping file to specify XML bindings for existing object models.
           </li>
 
           <li>Source Code generator can produce Java class definitions,
-              XML binding information and validation code based on
+              XML binding information, and validation code based on
               a given XML schema.
           </li>
 
-          <li>Supports W3C XML Schema October 24, 2000 Candidate Recommendation.
+          <li>Supports the W3C XML Schema Recommendation (2001-05-02).
               For more information refer to the
               <a href="sourcegen.xml">Source Code Generator</a>
           </li>
@@ -115,20 +116,28 @@
          </ul>
        </section>
        <section title="XML">
+          <section title="Marshalling Framework">
+            <ul>
+               <li>Integrate Castor's internal XML event API (kvisco)</li>
+            </ul>
+          </section>
           <section title="Source Code Generator">
             <ul>
-               <li>Upgrade W3C XML Schema support to the March 16, 2001 Proposed
-                   Recommendation.</li>
-               <li>Support for element and object Containers (also called Wrappers)</li>
-               <li>Create "customization" input file</li>
+               <li>Create "customization" binding file used in conjunction with
+                   an XML Schema for greater control over the generated source code.
+                   (Arnaud)
+               </li>
+               <li>Support Union type</li>
                <li>Extensibility API</li>
             </ul>
          </section>
          <section title="Mapping">
-            <p>
-               Finish mapping/binding file support. Collection support in the mapping
-               is currently limited on the XML side.
-            </p>
+            <ul>
+               <li>Support for element containers, also called element wrappers.
+                   (Sebastien G.)
+               </li>
+               <li>Improve mapping of Hashtables + Maps.</li>
+            </ul>
          </section>
        </section>
     </section>
