@@ -39,14 +39,14 @@
       href="http://www.jboss.org/index.html?module=html&amp;op=userdisplay&amp;id=developers/projects/jboss/jbossmx">JMX</a>
       server environment provided by JBoss. The plug-in consists
       of a JMX MBean or managed bean that implements the Castor <a
-      href="http://castor.exolab.org/javadoc/org/exolab/castor/jdo/DataObjects.html">DataObjects</a>
+      href="http://castor.codehaus.org/javadoc/org/exolab/castor/jdo/DataObjects.html">DataObjects</a>
       interface by wrapping a <a
-      href="http://castor.exolab.org/javadoc/org/exolab/castor/jdo/JDO.html">JDO</a>
+      href="http://castor.codehaus.org/javadoc/org/exolab/castor/jdo/JDO.html">JDO</a>
       object. The MBean accomplishes the following tasks at the startup
       of JBoss 3.x:
       <ol>
         <li>
-        Creates a Castor <a href="http://castor.exolab.org/javadoc/org/exolab/castor/jdo/JDO.html">JDO</a> 
+        Creates a Castor <a href="http://castor.codehaus.org/javadoc/org/exolab/castor/jdo/JDO.html">JDO</a> 
         object
         </li>
         <li>
