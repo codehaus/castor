@@ -236,7 +236,7 @@ public class SourceFactory  {
         //-- make class abstract?
 		//-- when mapping elements to Java classes this class forms the 
 		//-- base for elements that reference this type.
-		if (Configuration.mappingSchemaElement2Java())
+		if (SourceGeneratorConfiguration.mappingSchemaElement2Java())
 			jClass.getModifiers().setAbstract(true);        
 
 		//-- name information
@@ -260,8 +260,8 @@ public class SourceFactory  {
 
         //-- #validate()
         createValidateMethods(jClass);
-		//-- Marshalling methods are not required if the class is abstract
-		if (jClass.getModifiers().isAbstract())
+		//-- Output Marshalling methods for none abstract classes
+		if (jClass.getModifiers().isAbstract()==false)
 		{
 			//-- #marshal()
 			createMarshalMethods(jClass);
@@ -464,7 +464,7 @@ public class SourceFactory  {
     private void createUnmarshalMethods(JClass parent) {
 
         //-- create main marshal method
-        JMethod jMethod = new JMethod(parent,"unmarshal"+parent.getName()); 
+        JMethod jMethod = new JMethod(parent,"unmarshal"+parent.getName(true)); 
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
@@ -553,25 +553,32 @@ public class SourceFactory  {
 
                 String className = null;
 
-                ClassInfo cInfo = state.resolve(base);
-                if (cInfo == null) {
+				//-- Is thie base type from the schema we are currently generating source for?
+				if (base.getSchema()==schema)
+				{
+					ClassInfo cInfo = state.resolve(base);
+					if (cInfo == null) {
 
-                    String packageName = state.jClass.getPackageName();
-                    JClass jClass = createSourceCode((ComplexType)base,
-                                                     state,
-                                                     packageName);
-                    cInfo = state.resolve(base);
-                    className = jClass.getName();
-                }
-                else className = cInfo.getJClass().getName();
+					    String packageName = state.jClass.getPackageName();
+					    JClass jClass = createSourceCode((ComplexType)base,
+					                                     state,
+					                                     packageName);
+					    cInfo = state.resolve(base);
+					    className = jClass.getName();
+					}
+					else className = cInfo.getJClass().getName();
+				}
+				else
+				{
+					//-- Create package qualified class name to a base type class from another package
+					className = 
+						SourceGeneratorConfiguration.getQualifiedClassName(
+								base.getSchema().getTargetNamespace(),
+								JavaXMLNaming.toJavaClassName(base.getName()));
+				}
 
-
+				//-- Set super class
                 state.jClass.setSuperClass(className);
-
-                //-- copy members from super class
-                classInfo.addFieldInfo(cInfo.getAttributeFields());
-                classInfo.addFieldInfo(cInfo.getElementFields());
-                classInfo.addFieldInfo(cInfo.getTextField());
             }
             else {
                 //-- will this ever be null, if we have a valid Schema?
@@ -675,10 +682,10 @@ public class SourceFactory  {
                     
 					//-- Output source for element definition?
 					boolean elementSource = false;
-					if (Configuration.mappingSchemaElement2Java())
+					if (SourceGeneratorConfiguration.mappingSchemaElement2Java())
 						//-- If mapping elements to Java classes
 						elementSource = true;
-					else if (Configuration.mappingSchemaType2Java() &
+					else if (SourceGeneratorConfiguration.mappingSchemaType2Java() &
 							 eDecl.getType()==null)
 						//-- If mapping schema types to Java classes
 						//-- only when anonymous complexType used by element

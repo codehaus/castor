@@ -248,9 +248,9 @@ public class MemberFactory {
         int minOccurs = element.getMinimumOccurance();
 
         ElementDecl eDecl = element;
-		
+
 		//-- If mapping schema elements, replace element passed in with referenced element
-		if (Configuration.mappingSchemaElement2Java())
+		if (SourceGeneratorConfiguration.mappingSchemaElement2Java())
 		{
 			if (eDecl.isReference()) {
 			    ElementDecl eRef = eDecl.getReference();
@@ -295,14 +295,26 @@ public class MemberFactory {
         else {
 			String className = null;
 			//-- Java class name depends on mapping setup in properties file
-			if (Configuration.mappingSchemaElement2Java())
-				className = eDecl.getName();
-			else if (Configuration.mappingSchemaType2Java())
-				className = getElementType(eDecl);
-			if (className==null)
-				return null;
-			//-- Convert XML name to class name
-			className = JavaXMLNaming.toJavaClassName(className);
+			if (SourceGeneratorConfiguration.mappingSchemaElement2Java())
+			{
+				// Java class name is element name
+				className = JavaXMLNaming.toJavaClassName(eDecl.getName());
+				if (className==null)
+					return null;
+			}
+			else if (SourceGeneratorConfiguration.mappingSchemaType2Java())
+			{
+				// Java class name is schema type name
+				className = JavaXMLNaming.toJavaClassName(getElementType(eDecl));
+				// Prefix package qualifier?
+				if (eDecl.getType()!=null)
+				{
+					Schema elementSchema = eDecl.getSchema();
+					Schema typeSchema = eDecl.getType().getSchema();
+					if (elementSchema!=typeSchema)
+						className = SourceGeneratorConfiguration.getQualifiedClassName(typeSchema.getTargetNamespace(),className);
+				}
+			}
             xsType = new XSClass(new JClass(className));
         }
 
