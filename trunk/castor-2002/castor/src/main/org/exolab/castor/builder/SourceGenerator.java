@@ -107,18 +107,18 @@ public class SourceGenerator {
     private static final String DEFAULT_HEADER =
         "This class was automatically generated with \n"+"<a href=\"" +
         appURI + "\">" + appName + " " + version +
-        "</a>, using an XML Schema.\n$" + "Id";
+        "</a>, using an XML Schema.\n$" + "Id"+"$";
 
     private String lineSeparator = null;
     private JComment header = null;
 
     private boolean warnOnOverwrite = true;
-    
+
     /**
      * Determines whether or not to print extra messages
     **/
     private boolean verbose         = false;
-    
+
     private String  destDir = null;
 
     /**
@@ -131,7 +131,7 @@ public class SourceGenerator {
     private SourceFactory sourceFactory = null;
 
     private ConsoleDialog dialog = null;
-    
+
     /**
      * Names of properties used in the configuration file.
      *
@@ -149,14 +149,14 @@ public class SourceGenerator {
          */
          public static final String BOUND_PROPERTIES =
             "org.exolab.castor.builder.boundproperties";
-         
+
 		/**
          * Property specifying how element's and type's are mapped into a Java
-         * class hierarchy by the Source Generator. 
+         * class hierarchy by the Source Generator.
          * The value must contain one of the following.
-         * 'element' outputs a Java class hierarchy based on element 
+         * 'element' outputs a Java class hierarchy based on element
          * names used in the XML Schema. This is the default.
-         * 'type' outputs a Java class hierarchy based on the type 
+         * 'type' outputs a Java class hierarchy based on the type
          * information defined in the XML Schema.
          * <pre>
          * org.exolab.castor.builder.javaclassmapping
@@ -178,9 +178,9 @@ public class SourceGenerator {
         public static final String FileName = "castorbuilder.properties";
 
         static final String ResourceName = "/org/exolab/castor/builder/castorbuilder.properties";
-        
+
     } //--Property
-    
+
 
     // Some static string definitions
 	private static final String ELEMENT_VALUE = "element";
@@ -188,18 +188,18 @@ public class SourceGenerator {
 
     private static final int    ELEMENT_BINDING = 0;
     private static final int    TYPE_BINDING    = 1;
-    
+
     /**
      * The flag indicating which type of binding we are
      * configured for
     **/
     private static int  _bindingType = ELEMENT_BINDING;
-    
+
     /**
      * bound properties flag
     **/
     private static boolean _boundProperties = false;
-    
+
 	/**
      * The default properties loaded from the configuration file.
      */
@@ -209,7 +209,7 @@ public class SourceGenerator {
 	 * Namespace URL to Java package mapping
 	 */
 	private static java.util.Hashtable _nspackages;
-	
+
     /**
      * Creates a SourceGenerator using the default FieldInfo factory
      */
@@ -238,7 +238,7 @@ public class SourceGenerator {
 
     } //-- SourceGenerator
 
-	
+
 
     /**
      * Creates Java Source code (Object model) for the given XML Schema
@@ -340,7 +340,7 @@ public class SourceGenerator {
     public void setSuppressNonFatalWarnings(boolean suppress) {
         warnOnOverwrite = (!suppress);
     } //-- setSuppressNonFatalWarnings
-    
+
     /**
      * Sets whether or not the source code generator prints
      * additional messages during generating source code
@@ -350,7 +350,7 @@ public class SourceGenerator {
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     } //-- setVerbose
-    
+
     /**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
@@ -385,7 +385,7 @@ public class SourceGenerator {
         //-- verbose flag
         desc = "Prints out additional messages when creaing source";
         allOptions.addFlag("verbose", "", desc, true);
-        
+
         //-- source generator types name flag
         desc = "Sets the source generator types name (SGTypeFactory)";
         allOptions.addFlag("types", "types", desc, true);
@@ -525,7 +525,7 @@ public class SourceGenerator {
     } //-- createClasses
 
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
-        
+
 		//-- when mapping schema types, only interested in producing classes
 		//-- for elements with anonymous complex types
 		if (SourceGenerator.mappingSchemaType2Java())
@@ -533,20 +533,20 @@ public class SourceGenerator {
 				(elementDecl.getType()!=null &&
 				 elementDecl.getType().getName()!=null))
 				return;
-		
+
 		if (sInfo.verbose()) {
 		    System.out.print("Creating classes for element: ");
 		    System.out.println(elementDecl.getName());
 		}
         //-- create classes for sub-elements if necessary
         XMLType xmlType = elementDecl.getType();
-		
+
         //-- No type definition
         if (xmlType == null) {
             System.out.print("Type not found for element: ");
             System.out.println(elementDecl.getName());
             return;
-        }	
+        }
         //-- ComplexType
         else if (xmlType.isComplexType()) {
 
@@ -573,7 +573,7 @@ public class SourceGenerator {
     private void processComplexType(ComplexType complexType, SGStateInfo sInfo) {
 
         if (complexType == null) return;
-        
+
         ClassInfo classInfo = sInfo.resolve(complexType);
 
         if (classInfo == null) {
@@ -593,7 +593,7 @@ public class SourceGenerator {
             XMLType baseType= complexType.getBaseType();
             if (baseType != null &&
 				baseType.getSchema() == complexType.getSchema()) {
-				    
+
 				if (baseType.isComplexType())
                     processComplexType((ComplexType)baseType, sInfo);
             }
@@ -718,6 +718,9 @@ public class SourceGenerator {
 
         //-- print class
         if (allowPrinting) {
+            //hack for the moment
+            //to avoid the compiler complaining with java.util.Date
+            jClass.removeImport("org.exolab.castor.types.Date");
             jClass.setHeader(header);
             jClass.print(destDir,lineSeparator);
         }
@@ -779,7 +782,7 @@ public class SourceGenerator {
     {
         return getDefault().getProperty( name, defValue );
     }
-   
+
     /**
      * Returns true if bound properties are enabled.
      *
@@ -794,31 +797,31 @@ public class SourceGenerator {
         getDefault();
         return _boundProperties;
     } //-- boundPropertiesEnabled
-    
+
 	/**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
 	 * @return True if the Source Generator is mapping schema elements to Java classes.
-	 */	
+	 */
 	public static boolean mappingSchemaElement2Java()
 	{
 	    //-- call getDefault to ensure we loaded the properties
 	    getDefault();
-	    
-	    return (_bindingType == ELEMENT_BINDING);  
+
+	    return (_bindingType == ELEMENT_BINDING);
 	} //-- mappingSchemaElement2Java
 
 	/**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'type' value.
 	 * @return True if the Source Generator is mapping schema types to Java classes.
-	 */	
+	 */
 	public static boolean mappingSchemaType2Java()
 	{
 	    //-- call getDefault to ensure we loaded the properties
 	    getDefault();
-	    
-	    return (_bindingType == TYPE_BINDING);  	    
+
+	    return (_bindingType == TYPE_BINDING);
 	} //-- mappingSchemaType2Java
-	
+
 	/**
 	 * Gets a Java package to an XML namespace URL
 	 */
@@ -826,7 +829,7 @@ public class SourceGenerator {
 	{
 		//-- Ensure properties have been loaded
 		getDefault();
-		
+
 		// Lookup Java package via NS
 		String javaPackage = (String) _nspackages.get(nsURL);
 		if(javaPackage==null)
@@ -842,14 +845,14 @@ public class SourceGenerator {
 	{
 		//-- Ensure properties have been loaded
 		getDefault();
-		
+
 		// Lookup Java package via NS and append class name
 		String javaPackage = getJavaPackage(nsURL);
 		if (javaPackage.length()>0)
 			javaPackage+='.';
 		return javaPackage+className;
 	}
-	
+
     /**
      * Called by {@link #getDefault} to load the configuration the
      * first time. Will not complain about inability to load
@@ -860,10 +863,10 @@ public class SourceGenerator {
     protected static void load()
     {
 		_default = Configuration.loadProperties( Property.ResourceName, Property.FileName);
-		
+
 		// Parse XML namespace and package list
 		_nspackages = new Hashtable();
-		String prop = _default.getProperty( Property.NamespacePackages, "");		
+		String prop = _default.getProperty( Property.NamespacePackages, "");
 		StringTokenizer tokens = new StringTokenizer(prop, ",");
 		while(tokens.hasMoreTokens())
 		{
@@ -875,15 +878,15 @@ public class SourceGenerator {
 			String javaPackage = token.substring(comma+1).trim();
 			_nspackages.put(ns, javaPackage);
 		}
-		
+
 		//-- bound properties
 		prop = _default.getProperty( Property.BOUND_PROPERTIES, "");
 		_boundProperties = prop.equalsIgnoreCase("true");
-		
-		initBindingType();		
-		
+
+		initBindingType();
+
     } //-- load
-    
+
     /**
      * Called by #load to initialize the binding type
     **/
