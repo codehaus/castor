@@ -829,6 +829,7 @@ public class FieldMolder {
             this._getSequence = cloneMethods ( refSrv._getSequence );
             this._setSequence = cloneMethods ( refSrv._setSequence );
             this._getMethod = cloneMethod( refSrv._getMethod );
+            this._addMethod = cloneMethod( refSrv._addMethod );
             this._setMethod = cloneMethod( refSrv._setMethod );
             this._hasMethod = cloneMethod( refSrv._hasMethod );
             this._deleteMethod = cloneMethod( refSrv._deleteMethod );
