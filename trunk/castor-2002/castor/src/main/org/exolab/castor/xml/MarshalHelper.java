@@ -328,7 +328,7 @@ public class MarshalHelper {
         
         if (( !type.isInterface() || (type == Object.class))) {
             
-            if (!type.isPrimitive()) {
+            if (!isPrimitive(type)) {
                 
                 //-- make sure type is serializable
                 // if (!Serializable.class.isAssignableFrom( type ))
@@ -515,7 +515,7 @@ public class MarshalHelper {
         
         if ( (!type.isInterface())  && 
              (type != Object.class) &&
-             (!type.isPrimitive())) {
+             (!isPrimitive(type))) {
             
             //-- make sure type is serializable
             //if (!Serializable.class.isAssignableFrom( type ))
@@ -536,5 +536,29 @@ public class MarshalHelper {
         }
         return true;
     } //-- isDescriptable
+
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    private static boolean isPrimitive(Class type) {
+
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class)   ||
+            (type == Byte.class)      ||
+            (type == Character.class) ||
+            (type == Double.class)    ||
+            (type == Float.class)     ||
+            (type == Integer.class)   ||
+            (type == Long.class)      ||
+            (type == Short.class)) 
+            return true;
+            
+       return false;
+       
+    } //-- isPrimitive
     
 } //-- MarshalHelper
