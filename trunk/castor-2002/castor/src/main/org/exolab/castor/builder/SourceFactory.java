@@ -164,10 +164,11 @@ public class SourceFactory  {
         }
         // ComplexType
         else if (type.isComplexType()) {
-
             ComplexType complexType = (ComplexType)type;
 
-            if (element.getTypeReference() == null) {
+            if ((element.getTypeReference() == null) || 
+               (!complexType.isTopLevel()))
+            {
                 processComplexType( (ComplexType)type, state);
             }
             else {
