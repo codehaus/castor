@@ -327,6 +327,19 @@ public class FieldMolder {
         }
     }
 
+    public boolean isDefault( Object value ) {
+        if ( _default == value )
+            return true;
+
+        if ( _default == null )
+            return false;
+
+        if ( _default.equals( value ) )
+            return true;
+
+        return false;
+    }
+
     // ======================================================
     //  copy from FieldHanlder.java and modified
     // ======================================================
@@ -445,14 +458,11 @@ public class FieldMolder {
             // return type of set/get method.
             _fType = fieldMap.getType();
 
-            // ssa, multi classloader feature
-            // ssa, FIXME : Better exception handling necessary ...
-            //Class             javaClass = eMold.getJavaClass();
-            Class               javaClass = null;
+            Class javaClass;
             try {
                 javaClass = ds.resolve(eMold.getName());
             } catch (ClassNotFoundException e) {
-                throw new MappingException( "mapping.classNotFound", javaClass );
+                throw new MappingException( "mapping.classNotFound", eMold.getName() );
             }
             // ssa, multi classloader feature
             // set the default classloader to the hash table
@@ -462,17 +472,24 @@ public class FieldMolder {
             if ( null != _defaultReflectService._loader )
                 _reflectServices.put (_defaultReflectService._loader, this._defaultReflectService);
 
-            Class             fieldType = null;
-            String            fieldName;
+            String fieldName = fieldMap.getName();
+            String fieldType = fieldMap.getType();
+            Class  declaredClass = null;
+            if ( fieldType != null ) {
+                try {
+                    declaredClass = Types.typeFromName( javaClass.getClassLoader(), fieldType );
+                } catch ( ClassNotFoundException cnfe ) {
+                }
+            }
 
             if ( fieldMap.getDirect() ) {
 
                 // No accessor, map field directly.
-
-                fieldName = fieldMap.getName();
-                _defaultReflectService._field = findField( javaClass, fieldName, _defaultReflectService._fClass );
+                Class  fieldClass = _colClass!=null? _colClass : null;
+                _defaultReflectService._field = findField( javaClass, fieldName, fieldClass );
                 if ( _defaultReflectService._field == null )
                     throw new MappingException( Messages.format("mapping.fieldNotAccessible", fieldName, javaClass.getName()) );
+                _defaultReflectService._fClass = _defaultReflectService._field.getType();
                 if ( _defaultReflectService._field.getModifiers() != Modifier.PUBLIC &&
                      _defaultReflectService._field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
                     throw new MappingException( Messages.format("mapping.fieldNotAccessible", _defaultReflectService._field.getName(),
@@ -483,7 +500,6 @@ public class FieldMolder {
                 int point;
                 ArrayList getSeq = new ArrayList();
                 ArrayList setSeq = new ArrayList();
-                Class sgClass = _colClass==null? _colClass : _defaultReflectService._fClass;
                 String name = fieldMap.getName();
                 Class last;
                 Method method;
@@ -523,19 +539,17 @@ public class FieldMolder {
                            methodName, null, javaClass.getName() );
                 }
                 if ( getSeq.size() > 0 ) {
-                      _defaultReflectService._getSequence = (Method[]) getSeq.toArray( new Method[ 0 ] );
+                    _defaultReflectService._getSequence = (Method[]) getSeq.toArray( new Method[ 0 ] );
                     _defaultReflectService._setSequence = (Method[]) setSeq.toArray( new Method[ 0 ] );
                 }
-                _defaultReflectService._getMethod = findAccessor( javaClass, "get" + capitalize( name ), sgClass, true );
+                Class methodClass = _colClass!=null? _colClass: null;
+                _defaultReflectService._getMethod = findAccessor( javaClass, "get" + capitalize( name ), methodClass, true );
 
                 if ( _defaultReflectService._getMethod == null )
                     throw new MappingException( "mapping.accessorNotFound",
                             "get" + name, null, javaClass.getName() );
 
-                if ( _colClass == null && sgClass != _defaultReflectService._fClass )
-                    _defaultReflectService._fClass = _defaultReflectService._getMethod.getReturnType();
-
-                _defaultReflectService._setMethod = findAccessor( javaClass, "set" + capitalize( name ), sgClass, false );
+                _defaultReflectService._setMethod = findAccessor( javaClass, "set" + capitalize( name ), methodClass, false );
 
                 if ( _defaultReflectService._setMethod == null )
                     _defaultReflectService._addMethod
@@ -543,33 +557,14 @@ public class FieldMolder {
 
                 if ( _defaultReflectService._addMethod == null && name.endsWith("s") )
                     _defaultReflectService._addMethod
-                        = findAccessor( javaClass, "add" + capitalize( name ).substring(0,name.length()-1), null, false );
+                        = findAccessor( javaClass, "add" + capitalize( name ).substring(0,name.length()-1), declaredClass, false );
 
                 if ( _defaultReflectService._setMethod == null && _defaultReflectService._addMethod == null )
                     throw new MappingException( "mapping.accessorNotFound",
-                        "set/add" + capitalize( name ), null, javaClass.getName() );
+                        "set/add" + capitalize( name ), declaredClass, javaClass.getName() );
 
                 if ( _defaultReflectService._addMethod != null )
                     _addable = true;
-                /*
-                try {
-                    if ( _fClass == null ) {
-                        if ( _fType != null )
-                            _fClass = Types.typeFromName( (_setMethod!=null?_setMethod:_addMethod).getClass().getClassLoader(), _fType );
-                        else {
-                            Class[] params = _addMethod.getParameterTypes();
-                            if ( params != null && params.length == 1 ) {
-                                _fClass = params[0];
-                                _fType = _fClass.getName();
-                            }
-                        }
-                    }
-                } catch ( ClassNotFoundException e ) {
-                    throw new MappingException("Field type of "+_fType+" can not be found!");
-                }*/
-                fieldName = fieldMap.getName();
-                if ( fieldName == null )
-                    fieldName = ( _defaultReflectService._getMethod == null ? _defaultReflectService._setMethod.getName() : _defaultReflectService._getMethod.getName() );
 
             } else {
 
@@ -589,17 +584,14 @@ public class FieldMolder {
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
-                    _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), _defaultReflectService._fClass, false );
+                    Class methodClass = _colClass!=null? _colClass: javaClass;
+                    _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
                     if ( _defaultReflectService._setMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
                                 fieldMap.getSetMethod(), _defaultReflectService._fClass, javaClass.getName() );
                     if ( _defaultReflectService._fClass == null )
                         _defaultReflectService._fClass = _defaultReflectService._setMethod.getParameterTypes()[ 0 ];
                 }
-                fieldName = fieldMap.getName();
-
-                if ( fieldName == null )
-                    fieldName = ( _defaultReflectService._getMethod == null ? _defaultReflectService._setMethod.getName() : _defaultReflectService._getMethod.getName() );
             }
 
 
@@ -661,6 +653,7 @@ public class FieldMolder {
         if ( ( _defaultReflectService._field != null && ! _defaultReflectService._field.getType().isPrimitive() ) ||
              ( _defaultReflectService._setMethod != null && ! _defaultReflectService._setMethod.getParameterTypes()[0].isPrimitive() ) )
             _default = null;
+
     }
 
     /**
