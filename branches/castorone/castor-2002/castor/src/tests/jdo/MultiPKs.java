@@ -206,7 +206,7 @@ public class MultiPKs extends CWTestCase {
 			
 			if ( loadPerson.getBirthday().equals(new Date(1922, 2, 2)) &&
 					loadPerson.getFirstName().equals("First") && loadPerson.getLastName().equals("Person") ) {
-				System.out.println("OK: Employee is valid");
+				stream.write("OK: Employee is valid");
 
 				ArrayList address = loadPerson.getAddress();
 				Iterator itor = address.iterator();
@@ -216,7 +216,7 @@ public class MultiPKs extends CWTestCase {
 				    addr = (TestPKsAddress)itor.next();
 					if ( addr.getId() < 1 || addr.getId() > 3 ) {
 						_db.rollback();
-						System.out.println("Error: Address id is wrong");
+						stream.write("Error: Address id is wrong");
 						return false;
 					}
 					addresses[addr.getId()-1] = addr;
@@ -225,41 +225,38 @@ public class MultiPKs extends CWTestCase {
 				if ( addresses[0] == null || !addresses[0].getStreet().equals("#1 Address Street") 
 						|| !addresses[0].getCity().equals("First City") || !addresses[0].getState().equals("AB") 
 						|| !addresses[0].getZip().equals("10000") || addresses[0].getPerson() != loadPerson ) {
-					System.out.println("Error: Address 1 is wrong");
+					stream.write("Error: Address 1 is wrong");
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: Address 1 are valid");
+				stream.write("OK: Address 1 are valid");
 
 				if ( addresses[1] == null || !addresses[1].getStreet().equals("2nd Ave") 
 						|| !addresses[1].getCity().equals("Second City") || !addresses[1].getState().equals("BC") 
 						|| !addresses[1].getZip().equals("22222") || addresses[1].getPerson() != loadPerson ) {
-					System.out.println("Error: Address 2 is wrong");
+					stream.write("Error: Address 2 is wrong");
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: Address 2 are valid");
+				stream.write("OK: Address 2 are valid");
 
 				TestPKsPayRoll payroll = loadPerson.getPayRoll();
 				if ( payroll == null || payroll.getId() != 1 || payroll.getHoliday() != 15 
 						|| payroll.getEmployee() != loadPerson || payroll.getHourlyRate() != 25 ) {
-					System.out.println("Error: PayRoll loaded wrong");
+					stream.write("Error: PayRoll loaded wrong");
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: PayRoll is valid");
+				stream.write("OK: PayRoll is valid");
 
 				TestPKsContract cont = loadPerson.getContract();
 				if ( cont == null || cont.getPolicyNo() != 1001 || cont.getEmployee() != loadPerson 
 						|| cont.getContractNo() != 78 ) {
-					System.out.println("Error: Contract are not what expected!");
-					System.out.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
-					System.out.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());					
-					System.out.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());					
-					_db.rollback();
+					stream.write("Error: Contract are not what's expected!");
+			    	_db.rollback();
 					return false;
 				}
-				System.out.println("OK: Contract is valid");
+				stream.write("OK: Contract is valid");
 
 				ArrayList catelist = cont.getCategory();
 				itor = catelist.iterator();
@@ -269,19 +266,19 @@ public class MultiPKs extends CWTestCase {
 					if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
 					} else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
 					} else {
-						System.out.println("Error: Category is wrong");
+						stream.write("Error: Category is wrong");
 						_db.rollback();
 						return false;
 					}							
 				}
-				System.out.println("OK: Categories are valid");
+				stream.write("OK: Categories are valid");
 
 				// now modify it!
 				address.remove( addresses[0] );
 				addresses[1].setStreet("New Second Street");
 			} else {
 				_db.rollback();
-				System.out.println("Error: FirstName, LastName or Birthday is wrong!");
+				stream.write("Error: FirstName, LastName or Birthday is wrong!");
 				return false;
 			}				
 			_db.commit();
@@ -291,7 +288,7 @@ public class MultiPKs extends CWTestCase {
 			loadPerson = (TestPKsEmployee) _db.load( TestPKsEmployee.class, fullname );
 			if ( loadPerson.getBirthday().equals(new Date(1922, 2, 2)) &&
 					loadPerson.getFirstName().equals("First") && loadPerson.getLastName().equals("Person") ) {
-				System.out.println("OK: Employee is valid");
+				stream.write("OK: Employee is valid");
 
 				ArrayList address = loadPerson.getAddress();
 				Iterator itor = address.iterator();
@@ -301,48 +298,48 @@ public class MultiPKs extends CWTestCase {
 				    addr = (TestPKsAddress)itor.next();
 					if ( addr.getId() < 1 || addr.getId() > 3 ) {
 						_db.rollback();
-						System.out.println("Error: Address id is wrong");
+						stream.write("Error: Address id is wrong");
 						return false;
 					}
 					addresses[addr.getId()-1] = addr;
 				}
 
 				if ( addresses[0] != null ) {
-					System.out.println("Error: Address 1 is not deleted");
+					stream.write("Error: Address 1 is not deleted");
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: Address 1 is deleted");
+				stream.write("OK: Address 1 is deleted");
 
 				if ( addresses[1] == null || !addresses[1].getStreet().equals("New Second Street") 
 						|| !addresses[1].getCity().equals("Second City") || !addresses[1].getState().equals("BC") 
 						|| !addresses[1].getZip().equals("22222") || addresses[1].getPerson() != loadPerson ) {
-					System.out.println("Error: Address 2 is wrong");
+					stream.write("Error: Address 2 is wrong");
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: Address 2 are valid");
+				stream.write("OK: Address 2 are valid");
 
 				TestPKsPayRoll payroll = loadPerson.getPayRoll();
 				if ( payroll == null || payroll.getId() != 1 || payroll.getHoliday() != 15 
 						|| payroll.getEmployee() != loadPerson || payroll.getHourlyRate() != 25 ) {
-					System.out.println("Error: PayRoll loaded wrong");
+					stream.write("Error: PayRoll loaded wrong");
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: PayRoll is valid");
+				stream.write("OK: PayRoll is valid");
 
 				TestPKsContract cont = loadPerson.getContract();
 				if ( cont == null || cont.getPolicyNo() != 1001 || cont.getEmployee() != loadPerson 
 						|| cont.getContractNo() != 78 ) {
-					System.out.println("Error: Contract are not what expected!");
-					System.out.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
-					System.out.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());					
-					System.out.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());					
+					stream.write("Error: Contract are not what expected!");
+					stream.write("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
+					stream.write("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());					
+					stream.write("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());					
 					_db.rollback();
 					return false;
 				}
-				System.out.println("OK: Contract is valid");
+				stream.write("OK: Contract is valid");
 
 				ArrayList catelist = cont.getCategory();
 				itor = catelist.iterator();
@@ -352,19 +349,19 @@ public class MultiPKs extends CWTestCase {
 					if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
 					} else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
 					} else {
-						System.out.println("Error: Category is wrong");
+						stream.write("Error: Category is wrong");
 						_db.rollback();
 						return false;
 					}							
 				}
-				System.out.println("OK: Categories are valid");
+				stream.write("OK: Categories are valid");
 
 				// now modify it!
 				address.remove( addresses[0] );
 				addresses[1].setStreet("New Second Street");
 			} else {
 				_db.rollback();
-				System.out.println("Error: FirstName, LastName or Birthday is wrong!");
+				stream.write("Error: FirstName, LastName or Birthday is wrong!");
 				return false;
 			}				
 			_db.commit();
