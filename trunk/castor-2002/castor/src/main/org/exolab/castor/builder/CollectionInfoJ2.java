@@ -40,40 +40,36 @@ public class CollectionInfoJ2 extends CollectionInfo {
     //- Public Methods -/
     //------------------/
     
-    public JMethod[] createAccessMethods() {
-        
-        JMethod[] methods = new JMethod[4];
-        
+    public void createAccessMethods(JClass jClass) {
         JMethod method = null;
         
-        JParameter contentParam 
-            = new JParameter(getContentType().getJType(), getContentName());
+        JType jType = getContentType().getJType();
+        
+        JParameter contentParam = new JParameter(jType, getContentName());
             
         JSourceCode jsc = null;
         
         String cName = JavaXMLNaming.toJavaClassName(getElementName());
         
         method = new JMethod(null, "add"+cName);
-        methods[ 0 ] = method;
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(contentParam);
         createAddMethod(method);
                             
-        JType jType = getContentType().getJType();
+        jClass.addMethod(method);
         method = new JMethod(new JClass("java.util.Enumeration"), "get"+cName);
-        methods[ 1 ] = method;
         createGetMethod(method);
+        jClass.addMethod(method);
 
         method = new JMethod(JType.Boolean, "remove"+cName);
-        methods[ 2 ] = method;
         method.addParameter(contentParam);
         createRemoveMethod(method);
+        jClass.addMethod(method);
         
         method = new JMethod(null, "clear"+cName);
-        methods[ 3 ] = method;
         createClearMethod(method);
         
-        return methods;
+        jClass.addMethod(method);
     } //-- createAccessMethods
 
 
