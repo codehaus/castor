@@ -304,7 +304,7 @@ public abstract class XMLTestCase extends TestCase {
                     writer.close();
                 }
 
-                assert("Generated object and unmarshalled reference document differ", result);
+                assert("The hardcoded reference object and unmarshalled document differ", result);
             }
         } else if (generated != null) {
             // We don't have an input file, but we can use the hardcoded object for the next steps
