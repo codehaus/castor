@@ -74,6 +74,8 @@ package org.exolab.castor.jdo;
  * while ( results.hasMore() ) {
  *   System.out.println( results.next(); );
  * }
+ * results.close();
+ * oql.close();
  * </pre>
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
