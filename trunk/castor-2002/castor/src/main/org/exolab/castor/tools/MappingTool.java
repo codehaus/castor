@@ -55,7 +55,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.MarshalHelper;
+import org.exolab.castor.xml.Introspector;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
@@ -81,6 +81,7 @@ public class MappingTool
 
     private Hashtable _mappings = new Hashtable();
 
+    private Introspector _intro = new Introspector();
 
     public static void main( String[] args )
     {
@@ -125,7 +126,7 @@ public class MappingTool
         FieldMapping       fieldMap;
 
         try {
-            xmlClass = MarshalHelper.generateClassDescriptor( cls );
+            xmlClass = _intro.generateClassDescriptor( cls );
         } catch ( MarshalException except ) {
             throw new MappingException( except );
         }
