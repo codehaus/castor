@@ -48,7 +48,7 @@ package org.exolab.castor.jdo;
 
 
 import org.exolab.castor.persist.types.Complex;
-import org.exolab.castor.persist.DatabaseRegistry;
+import org.exolab.castor.persist.session.DatabaseRegistry;
 
 /**
  * An open connection to the database. This object represents an open
