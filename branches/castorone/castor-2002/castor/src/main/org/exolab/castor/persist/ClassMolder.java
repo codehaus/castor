@@ -1225,6 +1225,15 @@ public class ClassMolder {
         if ( updateCache || modified )
             tx.writeLock( object, timeout );
 
+
+        if ( getCallback() != null ) {
+            try {
+                getCallback().storing( object, (updateCache || modified) );
+            } catch ( Exception except ) {
+                throw new PersistenceException( except.getMessage(), except );
+            }
+        }
+
         return updateCache;
         // checkValidity
         // call store of each fieldMolder
@@ -1270,36 +1279,6 @@ public class ClassMolder {
 
 
         newfields = new Object[_fhs.length];
-
-        if ( getCallback() != null ) {
-            // Preliminary check for modifications - needed for jdoStore()
-            // To make it faster we will check only PRIMITIVE and PERSISTANCECAPABLE
-            modified = false;
-            for ( int i=0; i<newfields.length; i++ ) {
-                fieldType = _fhs[i].getFieldType();
-                if ( fieldType == FieldMolder.PRIMITIVE ||
-                     fieldType == FieldMolder.PERSISTANCECAPABLE ) {
-                    if ( fieldType == FieldMolder.PRIMITIVE ) {
-                        Object[] temp = new Object[1];
-                        temp[0] = _fhs[i].getValue( object );
-                        newfields[i] = temp;
-                    } else {
-                        o = _fhs[i].getValue( object );
-                        if ( o != null ) 
-                            newfields[i] = _fhs[i].getFieldClassMolder().getIdentities( o );
-                    }
-                    if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
-                        modified = true;
-                        break;
-                    }
-                }
-            }
-            try {
-                getCallback().storing( object, modified );
-            } catch ( Exception except ) {
-                throw new PersistenceException( except.getMessage(), except );
-            }
-        }
         
         ids = oid.getIdentities();
 
@@ -1338,7 +1317,7 @@ public class ClassMolder {
     public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
         throws PersistenceException, ObjectModifiedException {
 
-        //System.out.println("ClassMolder.update(): Oid: "+oid);
+        System.out.println("ClassMolder.update(): Oid: "+oid);
 
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -1378,6 +1357,7 @@ public class ClassMolder {
                     /*Messages.format( "persist.objectModified", object.getClass(), OID.flatten( ids ) ) ); */
             } 
         }
+        System.out.println("time stamp work");
 
         // load the original field into the transaction. so, store will
         // have something to compare later.
@@ -1388,35 +1368,54 @@ public class ClassMolder {
                 case FieldMolder.PRIMITIVE:
                     break;
                 case FieldMolder.PERSISTANCECAPABLE:
-                    if ( _fhs[i].isLazy() )
-                        System.err.println( "Warning: Lazy loading of object is not yet support!" );
-
-                    // depedent class won't have persistenceInfo in LockEngine
-                    // must look at fieldMolder for it
+                    System.out.println("persistcapable");
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
+                    if ( _fhs[i].isDependent() ) {
+                        // depedent class won't have persistenceInfo in LockEngine
+                        // must look at fieldMolder for it
 
-                    value = tx.load( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
+                        // load all the cached dependent object 
+                        value = tx.load( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
+                    } else {
+                        System.out.println("not dependent");
+                        o = _fhs[i].getValue( object );
+                        if ( !tx.isPersistent( o ) ) {
+                            //tx.update( fieldEngine, fieldClassMolder, o, null );
+                        } else {
+                            //tx.create( fieldEngine, fieldClassMolder, o, null );
+                        }
+                    }
                     break;
                 case FieldMolder.ONE_TO_MANY:
-                    if ( !_fhs[i].isLazy() ) {
-                        ArrayList col = new ArrayList();
-                        //(ArrayList)_fhs[i].getCollectionType().newInstance();
-                        fieldClassMolder = _fhs[i].getFieldClassMolder();
-                        fieldEngine = _fhs[i].getFieldLockEngine();
-
-                        ArrayVector v = (ArrayVector)fields[i];
-                        if ( v != null ) {
-                            for ( int j=0,l=v.size(); j<l; j++ ) {
-                                //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
-                                col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
-                            }
-                        } 
+                    System.out.println("one to many");
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    if ( _fhs[i].isDependent() ) {
+                        if ( !_fhs[i].isLazy() ) {
+                            ArrayList col = new ArrayList();
+                            //(ArrayList)_fhs[i].getCollectionType().newInstance();
+                            ArrayVector v = (ArrayVector)fields[i];
+                            if ( v != null ) {
+                                for ( int j=0,l=v.size(); j<l; j++ ) {
+                                    //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
+                                    col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
+                                }
+                            } 
+                        } else {
+                            ArrayVector avlist = (ArrayVector) fields[i];
+                            fieldClassMolder = _fhs[i].getFieldClassMolder();
+                            fieldEngine = _fhs[i].getFieldLockEngine();
+                            RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, avlist );
+                        }
                     } else {
-                        ArrayVector avlist = (ArrayVector) fields[i];
-                        fieldClassMolder = _fhs[i].getFieldClassMolder();
-                        fieldEngine = _fhs[i].getFieldLockEngine();
-                        RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, avlist );
+                        System.out.println("not dependent");
+                        o = _fhs[i].getValue( object );
+                        if ( !tx.isPersistent( o ) ) {
+                            //tx.update( fieldEngine, fieldClassMolder, o, null );
+                        } else {
+                            //tx.create( fieldEngine, fieldClassMolder, o, null );
+                        }                        
                     }
                     break;                
                 case FieldMolder.MANY_TO_MANY:

@@ -686,7 +686,7 @@ public abstract class TransactionContext
             //}
 
             // rehash the object with new oid
-            addObjectEntry( oid, object );
+            //addObjectEntry( oid, object );
         } catch ( ObjectModifiedException e ) {
             removeObjectEntry( object );
             throw e;
