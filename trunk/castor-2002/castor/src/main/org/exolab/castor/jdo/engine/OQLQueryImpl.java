@@ -151,7 +151,7 @@ public class OQLQueryImpl
 
     public void bind( String value )
     {
-        bind( value );
+        bind( (Object) value );
     }
 
 
