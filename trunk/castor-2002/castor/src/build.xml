@@ -307,7 +307,7 @@
 -->
     </target>
     <!-- Build the documentation -->
-    <target name="doc" depends="prepare">
+    <target name="doc" depends="prepare,clean">
         <mkdir dir="${build}/doc"/>
         <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl" includes="**.xml" excludes="style/**,project.xml"/>
         <copy todir="${build}/doc">
