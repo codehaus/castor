@@ -447,6 +447,9 @@ public class DatabaseImpl
     }
 
 
+    /**
+     * @deprecated Use {@link #commit} and {@link #rollback} instead
+     */
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
