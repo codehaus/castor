@@ -83,6 +83,7 @@ public class ParseTreeWalker implements TokenTypes
   private Class _objClass;
   private QueryExpression _queryExpr;
   
+  private int _SQLParamIndex; //Alex
   private Hashtable _paramInfo;
   private Hashtable _fieldInfo;
   private Hashtable _pathInfo;
@@ -114,6 +115,7 @@ public class ParseTreeWalker implements TokenTypes
     _parseTree = parseTree;
     _classLoader = classLoader;
 
+    _SQLParamIndex = 1; //Alex
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
     _pathInfo = new Hashtable();
@@ -228,6 +230,9 @@ public class ParseTreeWalker implements TokenTypes
           break;
         case KEYWORD_ORDER:
           checkOrderClause( _parseTree.getChild(curChild) );
+          break;
+        case KEYWORD_LIMIT:
+          checkLimitClause( _parseTree.getChild(curChild) );
           break;
       }
     }
@@ -491,6 +496,30 @@ public class ParseTreeWalker implements TokenTypes
     }
   }
 
+
+  /**
+   * Traverses the limit clause sub-tree and checks for errors. Creates
+   * a Hashtable of paramInfo with type information for query parameters
+   * (i.e. $1).
+   * @throws QueryException if an error is detected.
+   */
+  private void checkLimitClause(ParseTreeNode limitClause)
+        throws QueryException {
+
+    int tokenType = limitClause.getToken().getTokenType();
+    switch (tokenType) {
+      case DOLLAR:
+        checkParameter(limitClause);
+        break;
+
+      default:
+        for (Enumeration e = limitClause.children(); e.hasMoreElements(); ) {
+          checkLimitClause( (ParseTreeNode) e.nextElement() );
+        }
+    }
+  }
+
+
   /**
    * Checks whether the field passed in is valid within this object.  Also
    * adds this field to a Hashtable.
@@ -569,6 +598,7 @@ public class ParseTreeWalker implements TokenTypes
     switch (operation) {
       case PLUS: case MINUS: case TIMES:
       case DIVIDE: case KEYWORD_MOD: case KEYWORD_ABS:
+      case KEYWORD_LIMIT: //Alex
         systemType = "java.lang.Number";
         break;
       case KEYWORD_LIKE:  case CONCAT:
@@ -711,6 +741,9 @@ public class ParseTreeWalker implements TokenTypes
           break;
         case KEYWORD_ORDER:
           _queryExpr.addOrderClause( getOrderClause( curChild ) );
+        case KEYWORD_LIMIT:
+          addLimitClause(curChild);
+          break;
       }
     }
   }
@@ -804,6 +837,43 @@ public class ParseTreeWalker implements TokenTypes
       sb.append( sqlExpr.substring( startPos ) );
   
     _queryExpr.addWhereClause( sb.toString() ); 
+
+    _SQLParamIndex = SQLParamIndex; //Alex
+  }
+
+  /**
+   * Returns a SQL version of an OQL limit clause.
+   *
+   * @param limitClause the parse tree node with the limit clause
+   * @return The SQL translation of the limit clause.
+   */
+  private void addLimitClause(ParseTreeNode limitClause) {
+    String sqlExpr = getSQLExpr(limitClause/*.getChild(0)*/);
+
+    //Map numbered parameters
+    StringBuffer sb = new StringBuffer();
+    int startPos = 0;
+    int pos = sqlExpr.indexOf("?", startPos);
+    int SQLParamIndex = _SQLParamIndex;
+    while ( pos != -1 ) {
+      int endPos = sqlExpr.indexOf(" ", pos);
+      Integer paramNumber = null;
+      if ( endPos != -1 )
+        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
+      else
+        paramNumber = new Integer(sqlExpr.substring(pos + 1));
+      ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
+      paramInfo.mapToSQLParam( SQLParamIndex++ );
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      startPos = endPos < 0 ? sqlExpr.length() : endPos;
+      pos = sqlExpr.indexOf("?", startPos);
+    }
+    if ( startPos < sqlExpr.length() )
+      sb.append( sqlExpr.substring( startPos ) );
+
+    _queryExpr.addLimitClause( sb.toString() );
+     System.out.println(sb.toString());
+    _SQLParamIndex = SQLParamIndex;
   }
 
   /**
@@ -1007,6 +1077,8 @@ public class ParseTreeWalker implements TokenTypes
       case KEYWORD_NIL:
       case KEYWORD_UNDEFINED:
         return " NULL ";
+      case KEYWORD_LIMIT: //Proceed it with it's own getSQLExpr
+        return getSQLExprForLimit(exprTree);
     }
 
     return "";
@@ -1014,6 +1086,30 @@ public class ParseTreeWalker implements TokenTypes
     
   }
   
+
+  private String getSQLExprForLimit(ParseTreeNode limitClause) {
+
+    StringBuffer sb = new StringBuffer();
+    for (Enumeration e = limitClause.children(); e.hasMoreElements(); ) {
+        ParseTreeNode exprTree = (ParseTreeNode) e.nextElement();
+      int tokenType =  exprTree.getToken().getTokenType();
+          switch( tokenType ) {
+      //parameters
+        case DOLLAR:
+        //return a question mark with the parameter number.  The calling function
+        //will do a mapping
+          sb.append( "?" + exprTree.getChild(exprTree.getChildCount() - 1)
+                                .getToken().getTokenValue());
+          break;
+              case COMMA:
+                sb.append(" , ");
+                break;
+          }
+      }
+      return sb.toString();
+  }
+
+
   /**
    * Returns a SQL version of an OQL order by clause.
    *

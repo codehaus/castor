@@ -121,6 +121,9 @@ public final class PostgreSQLQueryExpression
 
         if ( _order != null )
           sql.append(JDBCSyntax.OrderBy).append(_order);
+        if ( _limit != null )
+          sql.append(JDBCSyntax.Limit).append(_limit);
+
           
         // Use FOR UPDATE to lock selected tables.
         if ( lock )

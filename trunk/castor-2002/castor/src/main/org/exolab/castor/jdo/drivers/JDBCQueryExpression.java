@@ -84,6 +84,9 @@ public class JDBCQueryExpression
     protected String    _order;
 
 
+    protected String    _limit;
+
+
     protected boolean   _distinct = false;
 
 
@@ -130,9 +133,9 @@ public class JDBCQueryExpression
 
     public String encodeColumn( String tableName, String columnName )
     {
-	return _factory.quoteName( tableName + 
-				   JDBCSyntax.TableColumnSeparator +
-				   columnName );
+    return _factory.quoteName( tableName + 
+                   JDBCSyntax.TableColumnSeparator +
+                   columnName );
     }
  
 
@@ -168,6 +171,11 @@ public class JDBCQueryExpression
 
     public void addOrderClause( String order ) {
         _order = order;
+    }
+
+
+    public void addLimitClause( String limit ) {
+        _limit = limit;
     }
 
 
@@ -211,10 +219,10 @@ public class JDBCQueryExpression
             }
         }
         if ( _where != null ) {
-	    sql.append( first ? JDBCSyntax.Where : ( JDBCSyntax.And + "( " ) );
+        sql.append( first ? JDBCSyntax.Where : ( JDBCSyntax.And + "( " ) );
             sql.append( _where );
-	    if ( ! first )
-		sql.append( " )" );
+        if ( ! first )
+        sql.append( " )" );
         }
         return first;
     }
