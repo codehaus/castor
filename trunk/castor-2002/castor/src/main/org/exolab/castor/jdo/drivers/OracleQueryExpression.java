@@ -112,12 +112,16 @@ public final class OracleQueryExpression
 
                 sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
                                                 join.leftColumns[ j ] ) );
-                if ( join.outer )
-                    sql.append( "(+)=" );
-                else
-                    sql.append( OpEquals );
+
+                //if ( join.outer )
+                //    sql.append( "(+)=" );
+                //else
+                //    sql.append( OpEquals );
+                sql.append( OpEquals );
                 sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
                                                 join.rightColumns[ j ] ) );
+                if ( join.outer )
+                    sql.append( "(+)" );
             }
         }
         first = addWhereClause( sql, first );
