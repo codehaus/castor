@@ -22,11 +22,9 @@
 package org.exolab.adaptx.xslt.handlers;
 
 
-import org.xml.sax.Attributes;
 import org.xml.sax.AttributeList;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -346,10 +344,12 @@ public class ResultHandlerAdapter2 implements ResultHandler {
         if (idx >= 0) {
             String prefix = name.substring(0, idx);
             String uri = _namespaces.getNamespaceURI(prefix);
+            if (uri == null) uri = "";
             _handler.startElement(uri, name.substring(idx+1), name, attributes);
         }
         else {
             String uri = _namespaces.getNamespaceURI("");
+            if (uri == null) uri = "";
             _handler.startElement(uri, name, name, attributes);
         }
         
