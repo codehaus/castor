@@ -49,11 +49,14 @@ package org.exolab.castor.jdo.drivers;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
+import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
@@ -95,8 +98,12 @@ public class JDBCQueryExpression
 
 
     protected String    _limit;
+    protected int	    _limitFirstBindIdx;
+    protected int	    _limitLastBindIdx;
     
     protected String    _offset;
+    protected int	    _offsetFirstBindIdx;
+    protected int	    _offsetLastBindIdx;
 
 
     protected boolean   _distinct = false;
@@ -267,22 +274,26 @@ public class JDBCQueryExpression
     }
 
 
-    public void addLimitClause( String limit ) 
+    public void addLimitClause( String limit, int paramIndexFrom, int paramIndexTo ) 
     	throws SyntaxNotSupportedException 
 	{
     	if (isLimitClauseSupported()) {
     		_limit = limit;
+    		_limitFirstBindIdx = paramIndexFrom;
+    		_limitLastBindIdx = paramIndexTo;
     	} else {
     		throw new SyntaxNotSupportedException (Messages.format ("query.limitClauseNotSupported", _factory.getFactoryName()));
     	}
     }
 
 
-    public void addOffsetClause( String offset ) 
+    public void addOffsetClause( String offset, int paramIndexFrom, int paramIndexTo ) 
     	throws SyntaxNotSupportedException
 	{
     	if (isOffsetClauseSupported()) {
     		_offset = offset;
+    	    _offsetFirstBindIdx = paramIndexFrom;
+    	    _offsetLastBindIdx = paramIndexTo;
     	} else {
     		throw new SyntaxNotSupportedException (Messages.format ("query.offsetClauseNotSupported", _factory.getFactoryName()));
     	}
@@ -344,7 +355,7 @@ public class JDBCQueryExpression
     /**
      * This should work for JDBC drivers with a full support of JDBC specification.
      */
-    public String getStatement( boolean lock )
+    public String getStatement( boolean lock ) throws SyntaxNotSupportedException
     {
         return getStandardStatement( lock, true ).toString();
     }
@@ -496,9 +507,14 @@ public class JDBCQueryExpression
     }
 
     public String toString()
-    {	StringBuffer buffer = new StringBuffer ();
-    	buffer.append ("<").append (getStatement(false)).append (">");
-        return buffer.toString();
+    {
+    	StringBuffer buffer = new StringBuffer ();
+        try {
+			buffer.append ("<").append (getStatement( false )).append(">");
+		} catch (SyntaxNotSupportedException e) {
+			_log.error ("Problem turning this to a String", e);
+		}
+		return buffer.toString();
     }
 
 
@@ -589,28 +605,52 @@ public class JDBCQueryExpression
         }
     }
 
-
-
     /** 
      * Provides a default implementation of {@link QueryExpression#isLimitClauseSupported()}.
      * @return false to indicate that this feature is not supported by default. 
 	 * @see org.exolab.castor.persist.spi.QueryExpression#isLimitClauseSupported()
 	 */
-	public boolean isLimitClauseSupported() {
+	public boolean isLimitClauseSupported()
+	{
 		return false;
 	}
 
-
     /** 
-     * Provides a default implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
+     * Provides a default implementation of {@link QueryExpression#isOffsetClauseSupported()}.
      * @return false to indicate that this feature is not supported by default. 
 	 * @see org.exolab.castor.persist.spi.QueryExpression#isOffsetClauseSupported()
 	 */
-	public boolean isOffsetClauseSupported() {
+	public boolean isOffsetClauseSupported()
+	{
 		return false;
 	}
 
+    /**
+     * @param paramInfo
+     * @return re-ordered bind parameter info
+     */
+    public Map postProcessParamInfo(Map paramInfo)
+    {
+        return paramInfo;
+    }
 
+    protected Map reorderParamInfo(Map paramInfo, int idx1From, int idx1To, int idx2From, int idx2To)
+    {
+        Map newInfo = new Hashtable(paramInfo.size());
+
+        for(Iterator it=paramInfo.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry e = (Map.Entry) it.next();
+            ParamInfo info = (ParamInfo) e.getValue();
+            int idx = ((Integer)e.getKey()).intValue();
+
+            if (idx>=idx1From && idx<=idx1To)
+                idx += idx2From - idx1From;
+            else if (idx>=idx2From && idx<=idx2To)
+                idx += idx1From - idx2To;
+
+            newInfo.put(new Integer(idx), info);
+        }
+
+        return newInfo;
+    }
 }
-
-
