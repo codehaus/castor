@@ -84,10 +84,7 @@ public final class SQLServerQueryExpression
           if ( _limit.equals("") == false )
             sql.append("TOP ").append(_limit).append(" ");
 
-        if ( _select == null )
-          sql.append( getColumnList() );
-        else
-          sql.append( _select ).append(" ");
+        sql.append( getColumnList() );
 
         sql.append( JDBCSyntax.From );
 

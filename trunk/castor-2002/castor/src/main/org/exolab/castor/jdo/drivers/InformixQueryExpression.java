@@ -88,10 +88,7 @@ public final class InformixQueryExpression
         if ( _distinct )
           buffer.append( JDBCSyntax.Distinct );
 
-        if ( _select == null )  
-          buffer.append( getColumnList() );
-        else
-          buffer.append( _select ).append(" ");
+        buffer.append( getColumnList() );
     }
     
     private void addFromClause(StringBuffer buffer)

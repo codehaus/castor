@@ -126,10 +126,7 @@ public final class HsqlQueryExpression
         if ( _distinct )
           buffer.append( JDBCSyntax.Distinct );
 
-        if ( _select == null )  
-          addColumnList(buffer, aliasInfo);
-        else
-          buffer.append( _select ).append(" ");
+	addColumnList(buffer, aliasInfo);
     }
     
     /**
