@@ -146,7 +146,7 @@ public class FieldInfo extends XMLInfo {
         if (_default != null)
             field.setInitString(_default);
 
-        if (_fixed != null)
+        if (_fixed != null && !getSchemaType().isDateTime())
                field.setInitString(_fixed);
 
         //-- set Javadoc comment
@@ -415,10 +415,18 @@ public class FieldInfo extends XMLInfo {
         //set the default value
         if (!getSchemaType().isPrimitive()) {
             String value = getDefaultValue();
+            boolean dateTime = getSchemaType().isDateTime();
             if (value == null)
                 value = getFixedValue();
             if (value != null) {
                 StringBuffer buffer = new StringBuffer(50);
+                //date/time constructors throw ParseException that
+                //needs to be catched in the constructor--> not the prettiest solution
+                //when mulitple date/time in a class.
+                if (dateTime) {
+                    jsc.add("try {");
+                    jsc.indent();
+                }
                 buffer.append("set");
                 buffer.append(methodSuffix());
                 buffer.append('(');
@@ -429,6 +437,14 @@ public class FieldInfo extends XMLInfo {
                     buffer.deleteCharAt(buffer.length()-1);
                  buffer.append(");");
                  jsc.add(buffer.toString());
+                 if (dateTime) {
+                     jsc.unindent();
+                     jsc.add("} catch (java.text.ParseException pe) {");
+                     jsc.indent();
+                     jsc.add("throw new IllegalStateException(pe.getMessage());");
+                     jsc.unindent();
+                     jsc.add("}");
+                 }
             }
         }
     } //-- generateInitializerCode
