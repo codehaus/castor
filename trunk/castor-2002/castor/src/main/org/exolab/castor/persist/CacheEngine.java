@@ -1029,13 +1029,20 @@ public final class CacheEngine
                     oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                           fields, identity, original, oid.getStamp() ) );
                 } catch ( ObjectModifiedException except ) {
-                    // If object modified in database, remove it from cache
+                    // If object modified in database, remove it from cache (only if we have a
+                    // write lock)
                     typeInfo.cache.removeLock( oid );
-                    lock.delete( tx );
+                    if ( lock.hasLock( tx, true ) )
+                        lock.delete( tx );
+                    else {
+                        try {
+                            lock.acquire( tx, true, 0 );
+                            lock.delete( tx );
+                        } catch ( LockNotGrantedException except2 ) { }
+                    }
                     throw except;
                 }
             }
-
         }
         return oid;
     }
