@@ -53,19 +53,24 @@ import org.xml.sax.*;
 /**
  * A class for Unmarshalling ModelGroups
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class GroupUnmarshaller extends SaxUnmarshaller {
 
       //--------------------------/
      //- Static Class Variables -/
     //--------------------------/
-     
+
     private static final int ALL         = 1;
     private static final int CHOICE      = 2;
     private static final int MODEL_GROUP = 3;
     private static final int SEQUENCE    = 4;
-        
+
+    /**
+     * The value of the maximum occurance wild card
+     */
+    private static final String MAX_OCCURS_WILDCARD = "unbounded";
+
       //--------------------/
      //- Member Variables -/
     //--------------------/
@@ -74,32 +79,32 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The ModelGroup reference for the ModelGroup we are constructing
     **/
     private Group _group = null;
-    
+
     /**
      * The Schema being "unmarshalled"
     **/
     private Schema _schema = null;
-    
+
     /**
      * The element name of the Group to be unmarshalled.
     **/
     private String _element = SchemaNames.GROUP;
 
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
-    
+
     /**
      * Creates a new GroupUnmarshaller
      * @param schema the Schema to which the Group belongs
@@ -108,25 +113,25 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
      * @param resolver the resolver being used for reference resolving
     **/
     public GroupUnmarshaller
-        (Schema schema, String element, AttributeList atts, Resolver resolver) 
-    {        
+        (Schema schema, String element, AttributeList atts, Resolver resolver)
+    {
         super();
         setResolver(resolver);
         this._schema = schema;
-        
+
         _group = new Group();
-        
+
         //-- handle attributes
         String attValue = null;
-        
-        
+
+
         //-- MODEL GROUP
         if (SchemaNames.GROUP.equals(element)) {
             //-- set name
             _group.setName(atts.getValue("name"));
         }
         else {
-            
+
             if (SchemaNames.SEQUENCE.equals(element)) {
                 _group.setOrder(Order.seq);
             }
@@ -139,28 +144,39 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             else {
                 String err = "Invalid group element name: '" +
                     element + "'";
-                throw new IllegalArgumentException(err); 
+                throw new IllegalArgumentException(err);
             }
         }
-        
+
         _element = element;
-        
+
         //-- maxOccurs
-        attValue = atts.getValue("maxOccurs");
-        if (attValue != null) 
-            _group.setMaxOccurs(toInt(attValue));
-            
+        /*attValue = atts.getValue("maxOccurs");
+        if (attValue != null)
+            _group.setMaxOccurs(toInt(attValue));*/
+        /*
+         * @maxOccurs
+         * If maxOccurs is present, the value is either unbounded
+         * or the int value of the attribute, otherwise maxOccurs
+         * equals the minOccurs value.
+         */
+        attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
+        if (attValue != null) {
+            if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
+            int maxOccurs = toInt(attValue);
+            _group.setMaxOccurs(maxOccurs);
+        }
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
-        if (attValue != null) 
+        if (attValue != null)
             _group.setMaxOccurs(toInt(attValue));
-        
+
         //-- id
         _group.setId(atts.getValue("id"));
-        
+
         //-- ref
         //Not yet supported
-        
+
     } //-- GroupUnmarshaller
 
       //-----------/
@@ -177,7 +193,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         return _element;
     } //-- elementName
 
-    
+
     /**
      * Returns the Group that was unmarshalled by this Unmarshaller.
      * This method should only be called after unmarshalling
@@ -188,7 +204,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     public Group getGroup() {
         return _group;
     } //-- getGroup
-    
+
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -198,11 +214,11 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     } //-- getObject
 
     /**
-     * @param name 
-     * @param atts 
+     * @param name
+     * @param atts
      * @see org.xml.sax.DocumentHandler
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
         //-- Do delagation if necessary
@@ -211,13 +227,13 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         if (SchemaNames.ELEMENT.equals(name)) {
-            unmarshaller 
+            unmarshaller
                 = new ElementUnmarshaller(_schema, atts, getResolver());
         }
         else if (SchemaNames.isGroupName(name)) {
-            unmarshaller 
+            unmarshaller
                 = new GroupUnmarshaller(_schema, name, atts, getResolver());
         }
         else {
@@ -226,24 +242,24 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             err.append("> found in <group>.");
             throw new SAXException(err.toString());
         }
-    
+
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
-        
+
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
             unmarshaller.endElement(name);
             --depth;
             return;
         }
-        
+
         //-- check for name mismatches
         if (unmarshaller != null) {
             if (!name.equals(unmarshaller.elementName())) {
@@ -252,12 +268,12 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
                 throw new SAXException(err);
             }
         }
-        
+
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
-        
+
         if (SchemaNames.ELEMENT.equals(name)) {
-            ElementDecl element = 
+            ElementDecl element =
                 ((ElementUnmarshaller)unmarshaller).getElement();
             _group.addElementDecl(element);
         }
@@ -268,7 +284,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         unmarshaller = null;
     } //-- endElement
 
-    public void characters(char[] ch, int start, int length) 
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary
@@ -276,5 +292,5 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             unmarshaller.characters(ch, start, length);
         }
     } //-- characters
-    
+
 } //-- GroupUnmarshaller
