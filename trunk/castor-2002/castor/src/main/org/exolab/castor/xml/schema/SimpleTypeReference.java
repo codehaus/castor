@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,10 +47,11 @@ package org.exolab.castor.xml.schema;
 
 
 /**
- * Package private class to handles type references.
+ * Package private class to handles simple-type references.
  *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
- * @version $Revision:
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @version $Revision$ $Date$
 **/
 class SimpleTypeReference extends SimpleType
 {
@@ -59,6 +60,29 @@ class SimpleTypeReference extends SimpleType
      */
     private SimpleType referredType= null;
 
+    /**
+     * Creates a new SimpleTypeReference.
+     *
+     * @param name the name of the simple type being referenced,
+     *  must not be null.
+     * @param schema the parent Schema of the simple type being referenced, 
+     * must not be null.
+    **/
+    SimpleTypeReference(Schema schema, String name) {
+        if (schema == null) {
+            String err = "The schema argument to the constructor of " +
+             "SimpleTypeReference is not allowed to be null.";
+            throw new IllegalArgumentException(err);
+        }
+        if (name == null) {
+            String err = "The name argument to the constructor of " +
+             "SimpleTypeReference is not allowed to be null.";
+            throw new IllegalArgumentException(err);
+        }
+        super.setName(name);
+        super.setSchema(schema);
+    } //-- SimpleTypeReference
+    
     /**
      * Returns the referred type
      */
@@ -85,6 +109,36 @@ class SimpleTypeReference extends SimpleType
     public short getStructureType() {
         return Structure.UNKNOWN;
     } //-- getStructureType
+
+    /**
+     * Sets the Schema for this Union. This method overloads the 
+     * SimpleType#setSchema method to prevent the Schema from being
+     * changed.
+     *
+     * @param the schema that this Union belongs to.
+    **/
+    public void setName(String name) {
+        if (name != getName()) {
+            String err = "The name of a SimpleTypeReference cannot be changed.";
+            throw new IllegalStateException(err);
+        }
+    } //-- void setName
+    
+    /**
+     * Sets the Schema for this SimpleTypeReference. This method overloads the 
+     * SimpleType#setSchema method to prevent the Schema from being
+     * changed.
+     *
+     * @param the schema that this SimpleType that is being referenced 
+     * belongs to.
+    **/
+    public void setSchema(Schema schema) {
+        if (schema != getSchema()) {
+            String err = "The Schema of a SimpleTypeReference cannot be changed.";
+            throw new IllegalStateException(err);
+        }
+    } //-- void setSchema
+    
 }
 
 
