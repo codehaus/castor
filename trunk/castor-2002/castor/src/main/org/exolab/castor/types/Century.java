@@ -88,7 +88,7 @@ public class Century extends TimePeriod {
             short zhour = (short) (temp / (60*60*1000));
             temp = temp % (60*60*1000);
             short zmin = (short)(temp / (60*1000));
-            this.setZone(zhour, zmin);
+            super.setZone(zhour, zmin);
         } catch (OperationNotSupportedException e) {
             //we are sure that we are dealing with a Century type
             //so we can never reach that point
