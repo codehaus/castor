@@ -1,19 +1,19 @@
 Version 0.8.9
 -------------
 
-XML:	Update of the XML Schema syntax to the April 7th draft
-	The following things in the April draft are supported :
-	  - datatype -> simpletype
-	  - type -> complextype
-	  - the "fixed" attribute in an attribute element now is
-	    part of the "use" attribute
-	  - the "default" attribute, which is used to specify the default
-	    value of an attribute, now is "value"
-	  - the "minoccurs" attribute of an attribute element has been removed,
-	    the attribute "use" has to be used instead. "use" can have the
-	    following values : default, optional, required, fixed and 
-	    prohibited
-	(Remy Maucherat <maucherat@intalio.com>)
+XML:    Update of the XML Schema syntax to the April 7th draft
+    The following things in the April draft are supported :
+      - datatype -> simpletype
+      - type -> complextype
+      - the "fixed" attribute in an attribute element now is
+        part of the "use" attribute
+      - the "default" attribute, which is used to specify the default
+        value of an attribute, now is "value"
+      - the "minoccurs" attribute of an attribute element has been removed,
+        the attribute "use" has to be used instead. "use" can have the
+        following values : default, optional, required, fixed and 
+        prohibited
+    (Remy Maucherat <maucherat@intalio.com>)
 
 
 Version 0.8.8  June 20, 2000
@@ -32,15 +32,6 @@ XML:     Added support for fixed attributes, this currently works for string
 
 JDO:     Fixed bug: NULL value in database was read as 0 for Java wrappers
          of primitive types (Long, Integer, etc.), now they are read as "null".
-         (Oleg Nitz <on@ibis.odessa.ua>)
-
-JDO:     Changes to org.exolab.castor.jdo.Persistent interface:
-         - now it can be used to perform additional database operations during
-           loading/storing/creating/deleting objects, e.g. to implement some
-           types of relations that are not supported by Castor yet,
-           see TestPersistent.java and Persistent.java in src/test/jdo.
-         - now jdoStore has the boolean parameter "modified", which is
-           convenient for setting fields like "modification time".
          (Oleg Nitz <on@ibis.odessa.ua>)
 
 JDO:     Changed the inner SELECT syntax in MaxKeyGenerator to make it work
@@ -84,30 +75,30 @@ JDO:     Added type convertors BigDecimal <-> Boolean
          (contributed by Markus Fritz <mfritz@justis.de>)
 
 JDO:     Fixes multiple request of same object with DBLocked
-	 (Oleg Nitz and Markus Fritz)
+     (Oleg Nitz and Markus Fritz)
 
-JDO:	 Hypersonic SQL driver 
-	 (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>;
+JDO:     Hypersonic SQL driver 
+     (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>;
 
-JDO:	 Changes to Persistent interface enable developer to use database 
-	 operations inside jdoStore, jdoCreate, jdoRemove.
-	 (Oleg Nitz <on@ibis.odessa.ua>)
+JDO:     Changes to Persistent interface enable developer to use database 
+     operations inside jdoStore, jdoCreate, jdoRemove.
+     (Oleg Nitz <on@ibis.odessa.ua>)
 
-JDO:	 Cache control at JDO configuration and mapping file specification - 
-	 no-cache option, cache count limit, cache time limit, LRU removal 
-	 deamon (Thomas Yip <yip@intalio.com>)
+JDO:     Cache control at JDO configuration and mapping file specification - 
+     no-cache option, cache count limit, cache time limit, LRU removal 
+     deamon (Thomas Yip <yip@intalio.com>)
 
-JDO:	 Bug fix: for created objects fetch() returned oid instead of object 
-	 (contributed by Chris Stevenson <chris@ssabsa.sa.gov.au>)
+JDO:     Bug fix: for created objects fetch() returned oid instead of object 
+     (contributed by Chris Stevenson <chris@ssabsa.sa.gov.au>)
 
 JDO:     SQL Date types handling is improved.
-	 (Oleg Nitz <on@ibis.odessa.ua>)
+     (Oleg Nitz <on@ibis.odessa.ua>)
 
-JDO:	 Bug fix: small bugs w/ BETWEEN in parser...reported by Vladmir Sekissov.
-	 (<nissim@panix.com>)
+JDO:     Bug fix: small bugs w/ BETWEEN in parser...reported by Vladmir Sekissov.
+     (<nissim@panix.com>)
 
-JDO:	 fix string conversion to surround with ' and escape internal ' fix for 
-	 bug with like. (<nissim@panix.com>)
+JDO:     fix string conversion to surround with ' and escape internal ' fix for 
+     bug with like. (<nissim@panix.com>)
 
 
 Version 0.8.7  June 2, 2000
