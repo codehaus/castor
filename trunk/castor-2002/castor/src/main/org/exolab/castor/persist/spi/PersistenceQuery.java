@@ -47,6 +47,7 @@
 package org.exolab.castor.persist.spi;
 
 
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.ObjectNotFoundException;
@@ -125,12 +126,12 @@ public interface PersistenceQuery
      * providing new query parameters and calling {@link #execute}.
      *
      * @param conn An open connection
-     * @param lock True if must acquire a write lock
+     * @param accessMode The access mode (null equals shared)
      * @throws QueryException An invalid query
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void execute( Object conn, boolean lock )
+    public void execute( Object conn, AccessMode accessMode )
         throws QueryException, PersistenceException;
 
 
