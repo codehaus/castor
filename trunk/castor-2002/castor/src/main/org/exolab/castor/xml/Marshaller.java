@@ -54,6 +54,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.Messages;
@@ -138,7 +139,7 @@ public class Marshaller extends MarshalFramework {
 	 * Name of the root element to use
 	 */
 	private String _rootElement  = null;
-	
+
     /**
      * The default namespace
     **/
@@ -149,8 +150,7 @@ public class Marshaller extends MarshalFramework {
     **/
     private boolean _validate = false;
 
-
-    /**
+   /**
      * The current namespace scoping
     **/
     private List _nsScope = null;
@@ -171,7 +171,7 @@ public class Marshaller extends MarshalFramework {
      * marshalling as a complete document or not.
     **/
     private boolean _asDocument = true;
-    
+
     /**
      * The depth of the sub tree, 0 denotes document level
     **/
@@ -218,17 +218,17 @@ public class Marshaller extends MarshalFramework {
         _serializer = Configuration.getSerializer();
 
         if (_serializer == null)
-            throw new RuntimeException("Unable to obtain serailizer");
+            throw new RuntimeException("Unable to obtain serializer");
 
         _serializer.setOutputCharStream( out );
-        
+
         _handler = _serializer.asDocumentHandler();
         if ( _handler == null ) {
             String err = Messages.format( this.SERIALIZER_NOT_SAX_CAPABLE,
                                           _serializer.getClass().getName() );
             throw new RuntimeException( err );
         }
-        
+
     } //-- Marshaller
 
 	/**
@@ -259,7 +259,7 @@ public class Marshaller extends MarshalFramework {
         _parents         = new Stack();
         _validate        = Configuration.marshallingValidation();
         _naming          = XMLNaming.getInstance();
-        
+
         setNamespaceMapping( XSI_PREFIX, XSI_NAMESPACE );
     } //-- initialize();
 
@@ -275,7 +275,7 @@ public class Marshaller extends MarshalFramework {
     public void setMarshalAsDocument(boolean asDocument) {
 
         _asDocument = asDocument;
-        
+
         if (_serializer != null) {
             OutputFormat format = Configuration.getOutputFormat();
             format.setOmitXMLDeclaration( ! asDocument );
@@ -350,7 +350,7 @@ public class Marshaller extends MarshalFramework {
 	{
 		return _rootElement;
 	} //-- getRootElement
-	
+
 	/**
 	 * Set to True to declare the given namespace mappings at the root node. Default is False.
 	 * @param nsPrefixAtRoot
@@ -455,7 +455,6 @@ public class Marshaller extends MarshalFramework {
         throws MarshalException, ValidationException
     {
         Marshaller marshaller;
-
         marshaller = new Marshaller(handler);
         marshaller.marshal(object);
     } //-- marshal
@@ -487,21 +486,30 @@ public class Marshaller extends MarshalFramework {
     public void marshal(Object object)
         throws MarshalException, ValidationException
     {
-        validate(object);
-        
-        if (_asDocument) {
-            try {
-                _handler.startDocument();
-                marshal(object, null, _handler);
-                _handler.endDocument();
-            }
-            catch (SAXException sx) {
-                throw new MarshalException(sx);
-            }
+        if (object instanceof AnyNode) {
+           try{
+              AnyNode2SAX.fireEvents((AnyNode)object, _handler);
+           } catch(SAXException e) {
+                throw new MarshalException(e);
+           }
         }
-        else marshal(object, null, _handler);
+        else {
+             validate(object);
+             if (_asDocument) {
+                try {
+                    _handler.startDocument();
+                    marshal(object, null, _handler);
+                    _handler.endDocument();
+                } catch (SAXException sx) {
+                    throw new MarshalException(sx);
+                }
+             }
+             else marshal(object, null, _handler);
+        }
+
     } //-- marshal
-    
+
+
 
     /**
      * Marshals the given object, using the given descriptor
@@ -530,6 +538,14 @@ public class Marshaller extends MarshalFramework {
             throw new IllegalArgumentException(err);
         }
 
+        if (object instanceof AnyNode) {
+           try {
+               AnyNode2SAX.fireEvents((AnyNode) object, handler);
+           }catch (SAXException e) {
+               throw new MarshalException(e);
+           }
+           return;
+        }
 
         boolean containerField = false;
 
@@ -547,7 +563,7 @@ public class Marshaller extends MarshalFramework {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
 
-		boolean atRoot = false;
+	    boolean atRoot = false;
         if (descriptor == null) {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
 			atRoot = true;
@@ -571,20 +587,16 @@ public class Marshaller extends MarshalFramework {
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
         boolean saveType = false; /* flag for xsi:type */
-
         if (_class == descriptor.getFieldType())
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
 
         if (classDesc == null) {
-
             //-- check for primitive or String, we need to use
             //-- the special #isPrimitive method of this class
             //-- so that we can check for the primitive wrapper
             //-- classes
             if (isPrimitive(_class) || byteArray) {
-
                 classDesc = _StringClassDescriptor;
-
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
                 saveType = (_class != descriptor.getFieldType());
@@ -597,25 +609,22 @@ public class Marshaller extends MarshalFramework {
                     String pkgName = className.substring(0,idx+1);
                     if (!_packages.contains(pkgName))
                         _packages.add(pkgName);
-                }
+            }
 
-				if (_marshalExtendedType)
-				{
-					//  marshall as the actual value
-					classDesc = getClassDescriptor(_class);
-					saveType = (_class != descriptor.getFieldType());
-				}
-				else
-				{
-					// marshall as the base field type
-					_class = descriptor.getFieldType();
-					classDesc = getClassDescriptor(_class);
-				}
+    		if (_marshalExtendedType) {
+				//  marshall as the actual value
+				classDesc = getClassDescriptor(_class);
+				saveType = (_class != descriptor.getFieldType());
+			} else {
+			    // marshall as the base field type
+				_class = descriptor.getFieldType();
+				classDesc = getClassDescriptor(_class);
+            }
 
-				if (atRoot && _rootElement!=null)
-					name = _rootElement;
-				else if (descriptor.getXMLName()==null)
-                    name = classDesc.getXMLName();
+			if (atRoot && _rootElement!=null)
+				name = _rootElement;
+			else if (descriptor.getXMLName()==null)
+                  name = classDesc.getXMLName();
             }
 
             if (classDesc == null) {
@@ -634,30 +643,29 @@ public class Marshaller extends MarshalFramework {
         }
 
 
-        //-- Suppress 'xsi:type' attributes when Castor is able to infer the 
+        //-- Suppress 'xsi:type' attributes when Castor is able to infer the
         //-- information from the mapping file
         if (saveType) {
             // XML Name associated with the class we are marshalling
             String xmlElementName = classDesc.getXMLName();
-
-            // We try to find if there is a XMLClassDescriptor associated 
+            // We try to find if there is a XMLClassDescriptor associated
             // with the XML name of this class
-            XMLClassDescriptor xmlElementNameClassDesc = 
+            XMLClassDescriptor xmlElementNameClassDesc =
                 _cdResolver.resolveByXMLName(xmlElementName, null);
-
             // Make sure ClassDescriptor was not created by the introspector
             if (xmlElementNameClassDesc != null &&
-                ! (Introspector.introspected(xmlElementNameClassDesc))) {
-                    
+                ! (Introspector.introspected(xmlElementNameClassDesc)))
+            {
+
                 // Make sure Castor can unmarshal instances of this type
-                // by using the element name by checking that the 
+                // by using the element name by checking that the
                 // ClassDescriptorResolver can find a ClassDescriptor for the
                 // same java type (or a subclass) as the current object.
-                // This mecanism should be equivalent to the one performed
-                // during unmarshalling (UnmarshalHandler). 
-                
+                // This mechanism should be equivalent to the one performed
+                // during unmarshalling (UnmarshalHandler).
+
                 //-- This approach is not fool proof however, since it
-                //-- may require the same mapping file or 
+                //-- may require the same mapping file or
                 //-- ClassDescriptorResolver to be used during unmarshalling.
 
                 // Try to find if the type of the field is a super class of the
@@ -667,7 +675,7 @@ public class Marshaller extends MarshalFramework {
                 while ((superclass != null)  &&  (superclass.getJavaClass() != fieldType))
                     superclass = superclass.getExtends();
 
-                // here, superclass is null if we didn't find that 
+                // here, superclass is null if we didn't find that
                 // xmlElementNameClassDesc extends the type of field
 
                 // The 'isAssignableFrom' is a security, Castor should have detected
@@ -675,12 +683,23 @@ public class Marshaller extends MarshalFramework {
                 if (fieldType.isAssignableFrom(xmlElementNameClassDesc.getJavaClass()) &&
                     (xmlElementNameClassDesc.getJavaClass() == fieldType ||
                      (superclass != null  &&  superclass.getJavaClass() == fieldType))) {
-                    // If the test is true, we know that Castor is able to 
+                    // If the test is true, we know that Castor is able to
                     // find the proper class to instantiate using the element
                     // name so we don't need the 'xsi:type' attribute
                     saveType = false;
                     name     = xmlElementName;
                 }
+            }
+            if (xmlElementName == null) {
+                //in case we are dealing with field and not class
+                //make sure we don't have a provided class descriptor
+                //if we have one we don't need the xsi:type
+                if (descriptor.getContainingClassDescriptor() != null) {
+                    xmlElementNameClassDesc =
+                        (XMLClassDescriptor)descriptor.getContainingClassDescriptor();
+                    if (!Introspector.introspected(xmlElementNameClassDesc))
+                        saveType = false;
+               }
             }
         }//--- End of "Supress 'xsi:type' ..."
 
@@ -693,9 +712,7 @@ public class Marshaller extends MarshalFramework {
             if (descriptors[i] == null) continue;
 
             XMLFieldDescriptor attDescriptor = descriptors[i];
-
             String xmlName = attDescriptor.getXMLName();
-
             //-- handle attribute namespaces
             //-- [need to add this support]
 
@@ -774,39 +791,39 @@ public class Marshaller extends MarshalFramework {
             XMLClassDescriptor containerClassDesc = (XMLClassDescriptor)((XMLFieldDescriptorImpl)elemDescriptor).getClassDescriptor();
 
             containerObject = elemDescriptor.getHandler().getValue(containerObject);
-            
+
             if (containerObject == null) continue;
 
             // Look for container field to visit later
             XMLFieldDescriptor[] containerElemDescriptors = containerClassDesc.getElementDescriptors();
             for (int i = 0; i < containerElemDescriptors.length; i++) {
                 if (containerElemDescriptors[i] == null) continue;
-                if (containerElemDescriptors[i].isContainer()) 
+                if (containerElemDescriptors[i].isContainer())
                     descriptorList.addLast(new Object[] {containerElemDescriptors[i], containerObject});
             }
 
             // Look for attributes
             XMLFieldDescriptor[] containerAttrDescriptors = containerClassDesc.getAttributeDescriptors();
             for (int i = 0; i < containerAttrDescriptors.length; i++) {
-                
+
                 if (containerAttrDescriptors[i] == null) continue;
 
                 XMLFieldDescriptor attContainerDescriptor = containerAttrDescriptors[i];
-                
+
                 String xmlName = attContainerDescriptor.getXMLName();
                 Object value = null;
-                
+
                 try {
                     value = attContainerDescriptor.getHandler().getValue(containerObject);
                 }
                 catch(IllegalStateException ise) {
                     continue;
                 }
-                
+
                 if (value == null) continue;
-                
+
                 atts.addAttribute(xmlName, null, value.toString());
-                
+
             }
         }//-- End of container attributes
 
@@ -919,8 +936,6 @@ public class Marshaller extends MarshalFramework {
             }
         }
 
-
-
         //-- handle daughter elements
         descriptors = classDesc.getElementDescriptors();
 
@@ -941,7 +956,6 @@ public class Marshaller extends MarshalFramework {
 
             //-- handle arrays
             if (type.isArray()) {
-
                 //-- special case for byte[]
                 if (type.getComponentType() == Byte.TYPE) {
                     marshal(obj, elemDescriptor, handler);
@@ -951,8 +965,9 @@ public class Marshaller extends MarshalFramework {
                     for (int j = 0; j < length; j++) {
                         Object item = Array.get(obj, j);
                         if (item != null)
-                            marshal(item, elemDescriptor, handler);
+                           marshal(item, elemDescriptor, handler);
                     }
+
                 }
             }
             //-- handle enumerations
@@ -961,21 +976,12 @@ public class Marshaller extends MarshalFramework {
                 while (enum.hasMoreElements()) {
                     Object item = enum.nextElement();
                     if (item != null)
-                        marshal(item, elemDescriptor, handler);
+                       marshal(item, elemDescriptor, handler);
                 }
             }
-            //-- handle vectors
-            else if (obj instanceof java.util.Vector) {
-                marshal(obj, elemDescriptor, handler);
-                //Vector v = (Vector) obj;
-                //int length = v.size();
-                //for (int j = 0; j < length; j++) {
-                //    marshal(v.elementAt(j), elemDescriptor, handler);
-                //}
-            }
+
             else marshal(obj, elemDescriptor, handler);
         }
-
         //-- finish element
         try {
             if (!containerField)
@@ -1009,7 +1015,7 @@ public class Marshaller extends MarshalFramework {
 
         boolean declared = false;
 
-        if (nsURI != null) {
+        if ( (nsURI != null) && (nsURI.length() != 0)) {
 
             if (!_nsScope.contains(nsURI)) {
                 String attName = XMLNS;
@@ -1062,7 +1068,6 @@ public class Marshaller extends MarshalFramework {
         throws MarshalException
     {
         XMLClassDescriptor classDesc = null;
-
         if (!isPrimitive(_class))
             classDesc = _cdResolver.resolve(_class);
 
