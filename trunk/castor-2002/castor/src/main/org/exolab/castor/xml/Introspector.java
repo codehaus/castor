@@ -217,6 +217,7 @@ public final class Introspector {
                 
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
+                fieldName = JavaNaming.toJavaMemberName(fieldName);
                 String xmlName   = _naming.toXMLName(fieldName);
                 
                 Class type = method.getReturnType();
@@ -298,6 +299,7 @@ public final class Introspector {
                 
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
+                fieldName = JavaNaming.toJavaMemberName(fieldName);
                 String xmlName   = _naming.toXMLName(fieldName);
                 
                 Class type = method.getParameterTypes()[0];
@@ -383,6 +385,7 @@ public final class Introspector {
                 
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(CREATE.length());
+                fieldName = JavaNaming.toJavaMemberName(fieldName);
                 String xmlName   = _naming.toXMLName(fieldName);
                 
                 Class type = method.getReturnType();
