@@ -65,11 +65,14 @@ import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.Persistence;
+import org.exolab.castor.persist.PersistenceQuery;
+import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.ObjectDeletedException;
 import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.FatalPersistenceException;
 
 
 
@@ -112,13 +115,27 @@ public class MozillaEngine
 	fields = objDesc.getFields();
 	_fields = new Hashtable();
 	for ( int i = 0 ; i < fields.length ; ++i ) {
-	    if ( _fields.put( ( (DAXFieldDesc) fields[ i ] ).getLdapName(), fields[ i ] ) != null )
-		throw new MappingException( "Duplicate LDAP attribute" );
+	    if ( fields[ i ] instanceof ContainerFieldDesc ) {
+		FieldDesc[] contained;
+
+		contained = ( (ContainerFieldDesc) fields[ i ] ).getContainedFields();
+		for ( int j = 0 ; j < contained.length ; ++j ) {
+		    if ( _fields.put( ( (DAXFieldDesc) contained[ j ] ).getLdapName(),
+				      new DAXContainedFieldDesc( (DAXFieldDesc) contained[ j ], (ContainerFieldDesc) fields[ i ] ) ) != null )
+			throw new MappingException( "Duplicate LDAP attribute" );
+		}
+	    } else {
+		if ( _fields.put( ( (DAXFieldDesc) fields[ i ] ).getLdapName(), fields[ i ] ) != null )
+		    throw new MappingException( "Duplicate LDAP attribute" );
+	    }
 	}
 
 	dnField = _objDesc.getIdentityField();
 	if ( dnField instanceof ContainerFieldDesc ) {
-	    _dnFields = (DAXFieldDesc[]) ( (ContainerFieldDesc) dnField ).getContainedFields();
+	    fields = ( (ContainerFieldDesc) dnField ).getContainedFields();
+	    _dnFields = new DAXFieldDesc[ fields.length ];
+	    for ( int i = 0 ; i < fields.length ; ++i )
+		_dnFields[ i ] = (DAXFieldDesc) fields[ i ];
 	} else {
 	    _dnFieldName = ( (DAXFieldDesc) _objDesc.getIdentityField() ).getLdapName();
 	}
@@ -157,6 +174,9 @@ public class MozillaEngine
 	} catch ( LDAPException except ) {
 	    if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
 		throw new DuplicateIdentityException( obj.getClass(), identity );
+	    if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		throw new FatalPersistenceException( except );
 	    throw new PersistenceException( except );
 	}
     }
@@ -180,6 +200,9 @@ public class MozillaEngine
 	} catch ( LDAPException except ) {
 	    if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
 		throw new ObjectNotFoundException( obj.getClass(), identity );
+	    if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		throw new FatalPersistenceException( except );
 	    throw new PersistenceException( except );
 	}
 
@@ -246,6 +269,9 @@ public class MozillaEngine
 	} catch ( LDAPException except ) {
 	    if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
 		throw new ObjectDeletedException( obj.getClass(), identity );
+	    if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		throw new FatalPersistenceException( except );
 	    throw new PersistenceException( except );
 	}
 	ldapSet = entry.getAttributeSet();
@@ -305,6 +331,9 @@ public class MozillaEngine
 	    ( (LDAPConnection) conn ).modify( dn, modifs );
 	    return null;
 	} catch ( LDAPException except ) {
+	    if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		throw new FatalPersistenceException( except );
 	    throw new PersistenceException( except );
 	}
     }
@@ -319,6 +348,9 @@ public class MozillaEngine
 	try {
 	    ( (LDAPConnection) conn ).delete( dn );
 	} catch ( LDAPException except ) {
+	    if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		throw new FatalPersistenceException( except );
 	    throw new PersistenceException( except );
 	}
     }
@@ -332,19 +364,53 @@ public class MozillaEngine
 
     public void changeIdentity( Object conn, Object obj,
 				Object oldIdentity, Object newIdentity )
-	throws DuplicateIdentityException, PersistenceException
+	throws ObjectDeletedException, DuplicateIdentityException, PersistenceException
     {
+	String oldDN;
+	String newRDN;
+
+	oldDN = getDN( oldIdentity, true );
+	newRDN = getDN( newIdentity, false );
+	try {
+	    ( (LDAPConnection) conn ).rename( oldDN, newRDN, false );
+	} catch ( LDAPException except ) {
+	    if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
+		throw new ObjectDeletedException( obj.getClass(), oldIdentity );
+	    if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
+		throw new DuplicateIdentityException( obj.getClass(), newIdentity );
+	    if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		throw new FatalPersistenceException( except );
+	    throw new PersistenceException( except );
+	}
+    }
+
+
+    public PersistenceQuery createQuery( String query, Class[] types )
+	throws QueryException
+    {
+	return null;
     }
 
 
     private String getDN( Object identity )
     {
+	return getDN( identity, true );
+    }
+
+
+    private String getDN( Object identity, boolean withRootDN )
+    {
 	StringBuffer dn;
+	boolean      first;
 
 	dn = new StringBuffer();
 	if ( _dnFields != null ) {
-	    for ( int i = 0 ; i < _dnFields.length ; ++i ) {
-		if ( i > 0 )
+	    first = true;
+	    for ( int i = _dnFields.length ; i-- > 0 ; ) {
+		if ( first )
+		    first = false;
+		else
 		    dn.append( ',' );
 		dn.append( _dnFields[ i ].getLdapName() ).append( '=' );
 		dn.append( _dnFields[ i ].getValue( identity ).toString() );
@@ -353,7 +419,7 @@ public class MozillaEngine
 	    dn.append( _dnFieldName );
 	    dn.append( '=' ).append( identity.toString() );
 	}
-	if ( _rootDN != null )
+	if ( withRootDN && _rootDN != null )
 	    dn.append( ',' ).append( _rootDN );
 	return dn.toString();
     }
