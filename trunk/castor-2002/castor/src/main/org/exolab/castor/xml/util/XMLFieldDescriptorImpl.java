@@ -227,7 +227,7 @@ public class XMLFieldDescriptorImpl
 
         this();
 
-	if ( fieldDesc instanceof XMLFieldDescriptor )
+	    if ( fieldDesc instanceof XMLFieldDescriptor )
           this._contClsDescriptor =
               ( (XMLFieldDescriptor)fieldDesc
                 ).getContainingClassDescriptor();
@@ -283,6 +283,18 @@ public class XMLFieldDescriptorImpl
     //- Public Methods -/
     //------------------/
 
+    /** 
+     * Returns true if two XMLFieldDescriptors should be treated as
+     * equal. Any XMLFieldDescriptor that handles the same field
+     * is considered equal.
+    **/
+    public boolean equals(Object obj) {
+        if (!(obj instanceof XMLFieldDescriptor))
+            return false;
+        XMLFieldDescriptor descriptor = (XMLFieldDescriptor)obj;
+        return (_handler.equals(descriptor.getHandler()));
+    } //-- equals
+    
     /**
      * Set the class which contains this field
      */
