@@ -2605,32 +2605,23 @@ public class ClassMolder
      * Return a new instance of the base class with the provided ClassLoader object
      *
      * @param loader the ClassLoader object to use to create a new object
-     * @return Object the object reprenseted by this ClassMolder, and instanciated
-     * with the provided ClassLoader instance.
+     * @return Object the object reprenseted by this ClassMolder, and instanciated with the provided ClassLoader instance.
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public Object newInstance( ClassLoader loader ) {
-        try {
-            if (loader != null )
-                return loader.loadClass(_name).newInstance();
-            else
-                return Class.forName(_name).newInstance();
-        } catch (ClassNotFoundException e) {
-            _log.warn (e);
-        } catch (IllegalAccessException e) {
-            _log.warn (e);
-        } catch (InstantiationException e) {
-            _log.warn (e);
-        } catch (ExceptionInInitializerError e) {
-            _log.warn (e);
-        } catch (SecurityException e) {
-            _log.warn (e);
-        }
-        return null;
+    public Object newInstance(ClassLoader loader) 
+    	throws InstantiationException, IllegalAccessException, ClassNotFoundException 
+	{
+        if (loader != null)
+            return loader.loadClass(_name).newInstance();
+
+        return Class.forName(_name).newInstance();
     }
 
     /**
      * Get the effective accessMode of the the base type
-     *
+     * 
      * @param txMode - the default transaction accessMode
      * @return the effective acessMode of the base type
      */
