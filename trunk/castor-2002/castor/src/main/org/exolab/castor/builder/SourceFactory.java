@@ -188,11 +188,17 @@ public class SourceFactory  {
         className = resolveClassName(className, sgState.packageName);
 
         state = new FactoryState(className, sgState);
+        
         //-- mark this element as being processed in this current
         //-- state to prevent the possibility of endless recursion
         ElementDecl tmpDecl = element;
         while (tmpDecl.isReference()) tmpDecl = tmpDecl.getReference();
         state.markAsProcessed(tmpDecl);
+        //-- ignore references to elements from imported Schema.
+        if (tmpDecl.getSchema() != element.getSchema()) {
+            return new JClass[0];
+        }
+
 
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
