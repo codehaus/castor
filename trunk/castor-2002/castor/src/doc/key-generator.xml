@@ -28,7 +28,7 @@
            <tr><td>UUID</td><td>UUID generic algorithm</td></tr>
            <tr><td>IDENTITY</td><td>Supports autoincrement identity fields in
                                   Sybase ASE/ASA, MS SQL Server and Hypersonic SQL</td></tr>
-           <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle and PostgreSQL</td></tr>
+           <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle, PostgreSQL and Interbase</td></tr>
          </table></p>
 
       <p>Some of these algorithms have parameters, which can be specified 
@@ -165,7 +165,8 @@
     </section>
 
     <section title="SEQUENCE key generator">
-      <p>SEQUENCE key generator can be used only with Oracle and PostgreSQL.
+      <p>SEQUENCE key generator can be used only with Oracle, PostgreSQL
+         and Interbase.
          It generates keys using sequences.</p>    
       <p>The key generator has two parameters:
          <table border="1" cellpadding="4">
@@ -174,6 +175,8 @@
            <tr><td>returning</td><td>RETURNING mode for Oracle8i, values:
                                 "true"/"false"</td>
                                 <td>Optional, default="false"</td></tr>
+           <tr><td>increment</td><td>Increment for Interbase</td>
+                                <td>Optional, default="1"</td></tr>
          </table></p>
       <p>Usually one sequence is used for one table, so in general you have to
          define one key generator per table.
@@ -184,9 +187,12 @@
          of the key generator to "{0}_seq" (the default value).
          In this case the key generator will use sequence "a_seq" for table 
          "a", "b_seq" for table "b", etc.</p>
-      <p>Actually the SEQUENCE key generator is "3 in 1". 
+      <p>Actually the SEQUENCE key generator is "4 in 1". 
          With PostgreSQL it performs "SELECT nextval(sequenceName)" before 
          INSERT and produces identity value that is then used in INSERT.
+         Similarly, with Interbase it performs
+         "select gen_id(sequenceName, increment) from rdb$database" before
+         INSERT.
          With Oracle by default (returning=false) it transforms the
          Castor-generated INSERT statement into the form
          "INSERT INTO tableName (pkName,...) VALUES 
