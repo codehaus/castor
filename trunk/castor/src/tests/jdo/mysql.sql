@@ -305,7 +305,7 @@ create table list_types (
 );
 
 -- test_conv
-drop table test_conv;
+drop table if exists test_conv;
 
 create table test_conv (
     id               int     not null,
