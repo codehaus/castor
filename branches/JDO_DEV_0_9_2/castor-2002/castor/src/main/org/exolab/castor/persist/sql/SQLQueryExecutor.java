@@ -313,6 +313,15 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             // Skip identity fields
             count += _info.idNames.length;
             count = readEntity(values[0], rs, count, _info, temp);
+            // Now fill all fields that are a part of identity
+            if (_info.idPos.length == 1) {
+                values[0][_info.idPos[0]] = entity.identity;
+            } else {
+                Complex complex = (Complex) entity.identity;
+                for (int i = 0; i < _info.idPos.length; i++) {
+                    values[0][_info.idPos[i]] = complex.get(i);
+                }
+            }
             if (_info.subEntities == null) {
                 entity.entityClasses = entityClasses;
                 entity.values = values;
