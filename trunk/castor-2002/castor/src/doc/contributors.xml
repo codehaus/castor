@@ -47,7 +47,7 @@
     <name surname="Yip" given="Thomas"/>
     <email>yip@intalio.com</email>
     <company id="intalio"/>
-    <description>JDO enhancements.</description>
+    <description>Assaf's replacement! ;-) - JDO enhancements.</description>
   </contributor>
 
   <contributor type="Committer">
@@ -207,6 +207,13 @@
     <description>Patch to make 'Map' collection really generic.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Hall" given="John"/>
+    <email>jhall@solant.com</email>
+    <company id="avolent"/>
+    <description>Patch to upgrade Mapping.xsd to latest XML Schema draft</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
@@ -219,6 +226,11 @@
   <company id="coda">
     <name>CODA</name>
     <url>www.coda.com</url>
+  </company>
+
+  <company id="avolent">
+    <name>Avolent, Inc.</name>
+    <url>www.avolent.com</url>
   </company>
 
   <company id="apache">
