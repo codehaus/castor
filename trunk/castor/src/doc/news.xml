@@ -20,6 +20,24 @@
               <span class="newsSummary"-->
 
         <news>
+            <title>Castor 0.9.6 - 3rd release candidates</title>
+            <author>Werner Guttmann</author>
+            <date>11 Jan 2005</date>
+            <time>23:25:00</time>
+            <summary>
+                I've placed a copy of the <b>3rd</b> and <b>final</b> Castor 0.9.6 release candidate on the
+                <a href="ftp://ftp.exolab.org/pub/castor/castor_0.9.6/">FTP Server</a>.<br/><br/>
+
+                This is a bug fix release only. For details about the bugs fixed sinc the last 
+                release candidate, please have a look at (an interim version of) the
+                <a href="http://brainopolis.dnsalias.com/castorwiki/Wiki.jsp?page=ReleaseNotes096">release notes</a>.<br/><br/>
+
+                The release candidate will be replaced by the official version within about a week, 
+                so please try this version and report any regression issues (where applicable).
+            </summary>
+        </news>
+
+        <news>
             <title>Castor 0.9.5.4 Final Release</title>
             <author>Keith Visco</author>
             <date>18 Nov 2004</date>
