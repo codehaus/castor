@@ -112,7 +112,8 @@ public class MappingHelper
 	try {
 	    objClass = loader.loadClass( objMap.getType() );
 	} catch ( ClassNotFoundException except ) {
-	    throw new MappingException( "Could not locate the class " + objMap.getType() );
+	    throw new MappingException( "Could not locate the class " + objMap.getType() +
+					" using the class loader " + loader );
 	}
 
 	tableName = objMap.getTable();

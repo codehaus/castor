@@ -69,13 +69,14 @@ public final class TransactionImpl
 {
 
 
-    private TransactionContext  _txContext;
+    private TransactionContext     _txContext;
 
 
-    private int                 _threadCount;
+    private int                    _threadCount;
 
 
     private static FastThreadLocal _txLocal = new FastThreadLocal();
+
 
 
     public TransactionImpl()
@@ -199,7 +200,7 @@ public final class TransactionImpl
 	if ( _txContext.getStatus() == TransactionContext.Status.Rolledback )
 	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txRolledback" ) );
 	try {
-	    _txContext.checkpoint();
+	    _txContext.prepare();
 	} catch ( TransactionAbortedException except ) {
 	    _txContext = null;
 	    throw except;
