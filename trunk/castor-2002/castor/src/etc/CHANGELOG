@@ -160,6 +160,8 @@ DSML:   Add a more detailed policies :
         in the Ldap are not created.
         Submitted by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
 
+DSML:   An ASCII string encoding bug is fixed.
+	Submiited by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
 
 Version 0.8.11 December, 15 2000
 --------------------------------
