@@ -158,19 +158,82 @@ JDO:    Fixed a problem causing unexpected ObjectModifiedException being thrown
         transaction. (yip)
         (Reported by Sharma, Naveen [Naveen.Sharma@lmco.com])
 
-JDO:    Fixed the default value not being used for primitives bug. (yip)
+JDO:    Fixed the default value not being used for primitives bug. (yip) 20011025
 
 JDO:    Fixed the 1:1 dependent object not being created when the it is newly
         link, or replaced to the master object in both long and short 
-        transaction. (yip)
+        transaction. (yip) 20011025
 
 JDO:    Added support of read-only field for Castor JDO. Read only can be
         enable setting read-only attribute to true inside sql element in
         the mapping file. (eg. <field><sql read-only="true".../></field> )
+        20011029
         (Patch submitted by Jakob Braeuchi [jbraeuchi@hotmail.com])
 
-JDO:    Enabled sql function in the "Order By" clause of an OQL.
+JDO:    Enabled sql function in the "Order By" clause of an OQL. 20011029
         (Patch submitted by Low Heng Sin [lowhs@comline.com.my])
+
+JDO:    Made compilable with javac 1.2.
+        [reported by BEDNARIK,LASLO laslo_bednarik@hp.com]
+
+JDO:    Fixed a problem that causes Castor JDO always requesting writeLock for a
+        data object with a lazy-loaded collection. (yip) 20011126
+        (bug reported by Dominik Baranowski [dbaranowski@saltare.com] and
+        Ned Wolpert [ned.wolpert@knowledgenet.com])
+
+JDO:    Fixed a problem that causes <field set-method="..."/> doesn't work.
+        20011130
+        (reported by Matthew Baird [matthew_baird@againtech.com]
+        patch submitted by Jakob Braeuchi [jbraeuchi@hotmail.com])
+
+JDO:    Fixed the integrity problem with many-to-many relationship.
+        (reported by many users...) (yip) 20011130
+
+JDO:    Made TxDatbaseMap implementing Serializable.
+        TxDatabaseMap must implement Serializable.
+        TxDatabaseMap is a member of JDO. (bug 792) 20011203
+        (Reported by Guenter Gartner[guenter.gartner@gillardon.de])
+
+JDO:    Fixed bug 801(b): bugs in RelationCollection.clear().
+        (yip) 20011203
+        (Bug reported by tysonsinger@metatv.com) 
+
+
+JDO:    Fixed bug 801(a): bugs in RelationCollection.addAll() 20011203
+        (Bug reported and fixed by tysonsinger@metatv.com) 
+
+JDO:    Fixed Bug 579: dirty="ignore" on sql fields in the mapping
+        file does not work. 20011203
+        (Bug reported and fix submitted by ryoder@q-markets.com)
+
+JDO:    Fixed a potential problem with lazy collection consistency.
+  
+        If an object is removed from database, and the lazy collection
+        still link to it at the end of transaction, the cache would
+        still "think" the object is in the database in the next
+        transaction.
+
+        Although the test can detect that in some case, it is not
+        recommended to depends on this behavior. Always dis-link it,
+        before calling db.remove(). (yip) 20011204
+
+JDO:    Added sqldate and sqltime as supported field type. (yip) 20011204
+
+JDO:    Added timestamp as supported java field type. 20011204
+        (submitted by Markus Fritz [mfritz@justis.de])
+
+JDO:    Added try/catch to clear the _creating flag, which conserves the
+        internal consistency when exception was thrown. 20011204
+        (bug reported and fixed by Todd Rader [trader@saltare.com]
+        and Dominik Baranowski [dbaranowski@saltare.com])
+
+JDO:    Fixed a NPE which occurs when removing an data object with empty many-many
+        relationship. (yip) 20011205
+        (bug reported Jan Kanzleiter [mailto:idefix@tfh-berlin.de])
+
+JDO:    Fixed a problem which occurs when two long-transactional objects
+        are linked together in a many-many relationship. (yip) 20011205
+        (bug reported by Toni Charlot [toni@fdplus.com]) 
 
 JDO:    (doc) Added FAQs for OQL and data model issues.
 
@@ -204,6 +267,8 @@ JDO:    (test) Added a test case for depedent objects with
 
 XML & JDO:  (doc) Fixed most of the javadoc warnings. (yip)
 
+DSML:   Fixed a NPE. 20011205
+        (bug reported and fixed by Gilbert Pilz [gilbert.pilz@e2open.com])
 
 
 Version 0.9.3 July 3, 2001
