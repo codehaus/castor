@@ -456,7 +456,8 @@ public class FieldMolder {
             else
                 _store = true;
 
-            _readonly = fieldMap.getSql().getReadonly();
+            if ( fieldMap.getSql() != null )
+                _readonly = fieldMap.getSql().getReadonly();
 
             if ( fieldMap.getCollection() != null )
                 _multi = true;
