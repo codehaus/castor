@@ -260,6 +260,14 @@ public class FieldInfo extends XMLInfo {
     } //-- getReadMethodName
     
     /**
+     * Returns the name of the has method for this FieldInfo
+     * @return the name of the has method for this FieldInfo
+    **/
+    public String getHasMethodName() {
+        return "has" + methodSuffix();
+    } //-- getReadMethodName
+    
+    /**
      * Returns the name of the write method for this FieldInfo
      * @return the name of the write method for this FieldInfo
     **/

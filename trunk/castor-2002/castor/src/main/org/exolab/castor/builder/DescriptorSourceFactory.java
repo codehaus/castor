@@ -486,6 +486,15 @@ public class DescriptorSourceFactory {
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
+			//-- Handle optional primatives?
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!classInfo.isRequired()))
+			{
+				jsc.add("if(!target."+member.getHasMethodName()+"())");
+				jsc.indent();
+				jsc.add("return null;");
+				jsc.unindent();
+			}				
+			//-- Return field value
             jsc.add("return ");
             String value = "target."+member.getReadMethodName()+"()";
             if (member.isMultivalued()) jsc.append(value);
