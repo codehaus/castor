@@ -46,7 +46,6 @@
 
 package org.exolab.castor.xml.util;
 
-
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -55,6 +54,7 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.xml.*;
 
 import org.exolab.castor.util.List;
+
 
 /**
  * An implementation of XMLClassDescriptor
@@ -232,7 +232,8 @@ public class XMLClassDescriptorImpl extends Validator
     **/
     public void addFieldDescriptor(XMLFieldDescriptor descriptor) {
 
-        boolean added = false;
+	    boolean added = false;
+
         NodeType nodeType = descriptor.getNodeType();
         switch(nodeType.getType()) {
             case NodeType.ATTRIBUTE:
@@ -378,6 +379,7 @@ public class XMLClassDescriptorImpl extends Validator
         return nsURI;
     } //-- getNameSpaceURI
 
+
     /**
      * Returns a specific validator for the class described by
      * this ClassDescriptor. A null value may be returned
@@ -494,7 +496,7 @@ public class XMLClassDescriptorImpl extends Validator
         this._identity = fieldDesc;
     } //-- setIdentity
 
-    /**
+     /**
      * Sets the namespace prefix used when marshalling as XML.
      * @param nsPrefix the namespace prefix used when marshalling
      * the "described" object
@@ -673,6 +675,30 @@ public class XMLClassDescriptorImpl extends Validator
                         if (fieldValidator != null)
                             fieldValidator.validate(object, resolver);
                     }
+
+                    //if there is nothing, we check if at least one field is required
+                    //and print the grammar that the choice must match.
+                    if (!found) {
+                        StringBuffer buffer = new StringBuffer(40);
+                        boolean error = false;
+                        for (i = 0; i < elementDescriptors.size(); i++) {
+                            desc = (XMLFieldDescriptor) elementDescriptors.get(i);
+                            FieldValidator fieldValidator = desc.getValidator();
+                            if (fieldValidator.getMinOccurs() > 0) {
+                                error = true;
+                                buffer.append('(');
+                                buffer.append(desc.getXMLName());
+                                buffer.append(") ");
+                            }
+                        }
+                        if (error) {
+                             String err = "In the choice contained in <"+ this.getXMLName()
+                                          +">, at least one of these elements must appear:\n"
+                                          + buffer.toString();
+                             throw new ValidationException(err);
+                        }
+                    }
+
                 }
                 //-- handle attributes, not affected by choice
                 for (int i = 0; i < attributeDescriptors.size(); i++) {
@@ -788,6 +814,8 @@ public class XMLClassDescriptorImpl extends Validator
     public AccessMode getAccessMode() {
         return _accessMode;
     } //-- getAccessMode
+
+
 
 
     //---------------------/
