@@ -582,10 +582,10 @@ public abstract class TransactionContext
             // to prevent circular references.
             engine.create( this, object, identity );
         } catch ( DuplicateIdentityException except ) {
-            removeObjectEntry( entry );
+            removeObjectEntry( object );
             throw except;
         } catch ( PersistenceException except ) {
-            removeObjectEntry( entry );
+            removeObjectEntry( object );
             throw except;
         }
         return oid;
@@ -821,6 +821,8 @@ public abstract class TransactionContext
                 entry = (ObjectEntry) enum.nextElement();
                 entry.prepared = false;
             }
+            if ( except instanceof TransactionAbortedException )
+                throw (TransactionAbortedException) except;
             // Any error is reported as transaction aborted
             throw new TransactionAbortedExceptionImpl( except );
         }
