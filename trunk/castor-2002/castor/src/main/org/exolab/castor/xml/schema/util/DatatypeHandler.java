@@ -46,6 +46,13 @@
 package org.exolab.castor.xml.schema.util;
 
 
+import org.exolab.castor.types.Date;
+import org.exolab.castor.types.Time;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  * A class used for "guessing" the proper datatype of
  * an XML attribute or an XML element with simpleContent.
@@ -61,9 +68,24 @@ public class DatatypeHandler {
     public static final String BOOLEAN_TYPE = "boolean";
     
     /**
+     * The name of the XML Schema date type
+    **/
+    public static final String DATE_TYPE    = "date";
+
+    /**
+     * The name of the XML Schema dateTime type
+    **/
+    public static final String DATETIME_TYPE    = "dateTime";
+    
+    /**
      * The name of the XML Schema double type
     **/
-    public static final String DOUBLE_TYPE = "double";
+    public static final String DOUBLE_TYPE  = "double";
+    
+    /**
+     * The name of the XML Schema float type
+    **/
+    public static final String FLOAT_TYPE  = "float";
     
     /**
      * The name of the XML Schema integer type
@@ -71,13 +93,29 @@ public class DatatypeHandler {
     public static final String INTEGER_TYPE = "integer";
 
     /**
+     * The name of the XML Schema long type
+    **/
+    public static final String LONG_TYPE    = "long";
+    
+    /**
      * The name of the XML Schema string type
     **/
     public static final String STRING_TYPE = "string";
     
+    /**
+     * The name of the XML Schema time type
+    **/
+    public static final String TIME_TYPE    = "time";
+
+    
     
     private static final String TRUE    = "true";
     private static final String FALSE   = "false";
+    
+    private static final String DATE_FORMAT =
+        "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    private static final String DATE_FORMAT_2 =
+        "yyyy-MM-dd'T'HH:mm:ss";
     
     
     /**
@@ -101,10 +139,24 @@ public class DatatypeHandler {
     public static String guessType(String value) {
         if (value == null) return null;
 
-        //-- check for integer
+        //-- check for integer, must be done before check for long
         try {
             Integer.parseInt(value);
             return INTEGER_TYPE;
+        }
+        catch(NumberFormatException nfe) {};
+        
+        //-- check for long
+        try {
+            Long.parseLong(value);
+            return LONG_TYPE;
+        }
+        catch(NumberFormatException nfe) {};
+
+        //-- check for float, must be done before check for double
+        try {
+            Float.parseFloat(value);
+            return FLOAT_TYPE;
         }
         catch(NumberFormatException nfe) {};
         
@@ -120,8 +172,37 @@ public class DatatypeHandler {
             return BOOLEAN_TYPE;
         }
             
+        //-- check for date
+        try {
+            Date.parseDate(value);
+            return DATE_TYPE;
+        }
+        catch(ParseException px) {};
+        
+        //-- check for time
+        try {
+            Time.parseTime(value);
+            return TIME_TYPE;
+        }
+        catch(ParseException px) {};
+        
+        //-- check for dateTime
+        DateFormat df = null;
+        if (value.indexOf('.') < 0)
+            df = new SimpleDateFormat(DATE_FORMAT);
+        else 
+            df = new SimpleDateFormat(DATE_FORMAT_2);
+
+        try {
+            df.parse(value);
+            return DATETIME_TYPE;
+        }
+        catch (java.text.ParseException ex) {}
+        
+        
         //-- when all else fails :-)
         return STRING_TYPE;
     } //-- guessType
+    
     
 } //-- DatatypeHandler
