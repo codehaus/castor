@@ -82,6 +82,9 @@ public class AttributeDecl extends Annotated {
     **/
     private Schema schema = null;
     
+    
+    private String _default = null;
+    
     /**
      * Creates a default Attribute declaration.
      * Since name is required for a valid Attribute declaration
@@ -136,6 +139,14 @@ public class AttributeDecl extends Annotated {
     } //-- getDatatypeRef
     
     /**
+     * Returns the default value, or null if none was defined
+     * @return the default value, or null if none was defined
+    **/
+    public String getDefault() {
+        return _default;
+    } //-- getDefault
+    
+    /**
      * Returns the maximum occurance that attributes defined by this
      * definition must appear
      * @return the maximum occurance that attributes defined by this
@@ -172,6 +183,15 @@ public class AttributeDecl extends Annotated {
         this.typeRef = name;
     } //-- setDataTypeRef
     
+    
+    /**
+     * Sets the default value for instances of this Attribute 
+     *
+     * @param value the default value
+    **/
+    public void setDefault(String value) {
+        this._default = value;
+    } //-- setDefault
     
     /**
      * Sets the minimum occurance that attributes defined by this

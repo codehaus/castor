@@ -92,6 +92,9 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         //-- handle remaining attributes
         String attValue = null;
         
+        //-- default
+        _attribute.setDefault(atts.getValue("default"));
+        
         //-- type
         attValue = atts.getValue("type");
         if (attValue != null) {
@@ -102,6 +105,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         if (attValue != null) {
             _attribute.setMinOccurs(toInt(attValue));
         }
+        
         
     } //-- AttributeUnmarshaller
 
