@@ -153,6 +153,7 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             }
         } );
         desc.setHandler(handler);
+        desc.setRequired(false);
         desc.setMultivalued(false);
         elements[0] = desc;
         
@@ -185,6 +186,7 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             }
         } );
         desc.setHandler(handler);
+        desc.setRequired(false);
         desc.setMultivalued(false);
         elements[1] = desc;
         
@@ -217,6 +219,7 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             }
         } );
         desc.setHandler(handler);
+        desc.setRequired(false);
         desc.setMultivalued(false);
         elements[2] = desc;
         
