@@ -14,13 +14,13 @@
          specification file (<tt>mapping.xml</tt>), in the 
          <tt>key-generator</tt> attribute of the <tt>class</tt> element, 
          for example:
-         <pre><![CDATA[
+         <code><![CDATA[
   <class name="myapp.ProductGroup"
          identity="id" key-generator="MAX">
     <field name="id">
     </field>
   </class>]]>
-         </pre></p>
+         </code></p>
       <p>The following key generator names are supported in Castor 1.0:
          <table border="1" cellpadding="4">
            <tr><td>MAX</td><td>"MAX( pk ) + 1" generic algorithm</td></tr>
@@ -33,7 +33,7 @@
       <p>Some of these algorithms have parameters, which can be specified 
          in the <tt>key-generator</tt> element of the mapping
          specification file, for example:
-         <pre><![CDATA[
+         <code><![CDATA[
   <key-generator name="HIGH/LOW">
     <param name="table" value="SEQ"/>
     <param name="key-column" value="SEQ_TableName"/>
@@ -46,13 +46,13 @@
     <field name="id">
     </field>
   </class>]]>
-         </pre></p>
+         </code></p>
 
       <p>It is possible to create several key generators with the same
          algorithms but diffent parameters.
          In this case you have to specify the <tt>alias</tt> attribute
          in the <tt>key-generator</tt> element, for example:
-         <pre><![CDATA[
+         <code><![CDATA[
   <key-generator name="SEQUENCE" alias="A">
     <param name="sequence" value="a_seq"/>
   </key-generator>
@@ -66,7 +66,7 @@
     <field name="id">
     </field>
   </class>]]>
-         </pre></p>
+         </code></p>
       <p>Below all supported key generators a described in details.</p>
     </section>
 
