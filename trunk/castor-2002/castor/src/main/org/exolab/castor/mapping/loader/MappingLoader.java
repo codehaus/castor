@@ -534,8 +534,10 @@ public abstract class MappingLoader
                         setSeq.addElement( method );
                     }
                     if ( getSeq.size() > 0 ) {
-                        getSequence = (Method[]) getSeq.toArray(new Method[0]);
-                        setSequence = (Method[]) setSeq.toArray(new Method[0]);
+                        getSequence = new Method[ getSeq.size() ];
+                        getSeq.copyInto( getSequence );
+                        setSequence = new Method[ setSeq.size() ];
+                        setSeq.copyInto( setSequence );
                     }
                     getMethod = findAccessor( javaClass, "get" + capitalize( fieldName ),
                                             ( colType == null ? fieldType : colType ), true );
@@ -621,11 +623,11 @@ public abstract class MappingLoader
 
             try {
                 hasMethod = javaClass.getMethod( "has" + capitalize( fieldName ), null );
-                if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) == 0 ||
+                if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) != 0 ||
                      ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                     hasMethod = null;
                 try {
-                    if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) == 0 ||
+                    if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) != 0 ||
                          ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                         deleteMethod = null;
                     deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldName ), null );
