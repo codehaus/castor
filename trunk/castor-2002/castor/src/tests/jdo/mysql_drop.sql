@@ -50,3 +50,10 @@ drop table test_persistent;
 drop table test_identity;
 
 drop table test_identity_ext;
+
+drop table test_col;
+
+drop table test_col;
+
+drop table test_item;
+
