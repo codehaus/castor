@@ -29,6 +29,7 @@
     <case class="jdo.Collections" />
     <case class="jdo.OqlExtends" />
     <case class="jdo.ManyToManyKeyGen" />
+    <case class="jdo.DependentKeyGen" />
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
@@ -70,6 +71,7 @@
     <case class="jdo.SerializableObject" />
     <case class="jdo.OqlExtends" />
     <case class="jdo.ManyToManyKeyGen" />
+    <case class="jdo.DependentKeyGen" />
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
