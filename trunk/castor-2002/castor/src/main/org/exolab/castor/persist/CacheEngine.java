@@ -238,7 +238,6 @@ public final class CacheEngine
                 // reference it (extends, relation, etc) and we don't want an infinite loop
                 handler = new ClassHandler( clsDesc );
                 _handlers.put( javaClass, handler );
-                handler.normalize( this );
 
                 // Create a new persistence engine for that type and add the type info
                 persist = _factory.getPersistence( handler.getDescriptor(), _logInterceptor );
@@ -280,6 +279,9 @@ public final class CacheEngine
                     }
                 } else if ( _logInterceptor != null )
                     _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
+                // Note: this should be done at the very end, otherwise
+                // the implicit recursion may cause unpleasant surprises
+                handler.normalize( this );
             }
         }
         return handler;
