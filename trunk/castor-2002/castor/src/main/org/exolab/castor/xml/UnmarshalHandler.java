@@ -217,7 +217,7 @@ public class UnmarshalHandler implements DocumentHandler {
      * Sets the flag for validation
      * @param validate, a boolean to indicate whether or not 
      * validation should be done during umarshalling. <br />
-     * By default validation will be performed.
+     * By default, validation will be performed.
     **/
     public void setValidation(boolean validate) {
         this._validate = validate;
@@ -658,6 +658,8 @@ public class UnmarshalHandler implements DocumentHandler {
             
             FieldHandler handler = descriptor.getHandler();
             
+            boolean useHandler = true;
+            
             /*
             Method creator = descriptor.getCreateMethod();
             if (creator == null) {
@@ -744,6 +746,7 @@ public class UnmarshalHandler implements DocumentHandler {
                             throw new SAXException(err);
                         }
                         _class = instanceClass;
+                        useHandler = false;
                     } 
                     catch(Exception ex) {
                         String msg = "unable to instantiate " + instanceType;
@@ -755,31 +758,41 @@ public class UnmarshalHandler implements DocumentHandler {
                 //-- Handle support for "Any" type
                 if (_class == Object.class) {
                     
-                    Class pClass = parentState.classDesc.getJavaClass();
+                    Class pClass = parentState.type;
                     ClassLoader loader = pClass.getClassLoader();
                     
                     //-- first look for a descriptor based
                     //-- on the XML name
-                    
                     classDesc = _cdResolver.resolveByXMLName(name, loader);
                     
                     //-- if null, create classname, and try resolving
+                    String cname = null;
                     if (classDesc == null) {
                         //-- create class name
-                        String cname = MarshalHelper.toJavaName(name,true);
-                        
+                        cname = MarshalHelper.toJavaName(name,true);
+                        classDesc = getClassDescriptor(cname, loader);
+                    }
+                    
+                    //-- if still null, try using parents package
+                    if (classDesc == null) {
                         //-- use parent to get package information
                         String pkg = pClass.getName();
                         int idx = pkg.lastIndexOf('.');
                         if (idx > 0) {
-                            pkg = pkg.substring(0,idx);
+                            pkg = pkg.substring(0,idx+1);
                             cname = pkg + cname;
+                            classDesc = getClassDescriptor(cname, loader);
                         }
-                        classDesc = getClassDescriptor(cname, loader);
                     }
                     
                     if (classDesc != null) {
                         _class = classDesc.getJavaClass();
+                        useHandler = false;
+                    }
+                    else {
+                        String err = "unable to determine class for " + 
+                            "element: " + name;
+                        throw new SAXException(err);
                     }
                 }
                 
@@ -798,7 +811,7 @@ public class UnmarshalHandler implements DocumentHandler {
                 else {
                     //-- XXXX should remove this test once we can
                     //-- XXXX come up with a better solution
-                    if (!state.derived) 
+                    if ((!state.derived) && useHandler) 
                         state.object = handler.newInstance(parentState.object);
                     //-- reassign class in case there is a conflict
                     //-- between descriptor#getFieldType and
