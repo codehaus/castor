@@ -299,10 +299,10 @@ public abstract class TransactionContext
                 throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
                 return entry.object;
-            if ( ( accessMode == AccessMode.Exclusive ||
-                   accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
-                // If we are in exclusive mode and object has not been
-                // loaded in exclusive mode before, then we have a
+            if ( ( accessMode == AccessMode.Exclusive && ! entry.engine.hasLock( this, oid, true ) )
+                    || ( accessMode == AccessMode.DbLocked && ! entry.oid.isDbLock() ) ) {
+                // If we are in db-lock mode and object has not been
+                // loaded in db-lock mode before, then we have a
                 // problem. We cannot return an object that is not
                 // synchronized with the database, but we cannot
                 // synchronize a live object.

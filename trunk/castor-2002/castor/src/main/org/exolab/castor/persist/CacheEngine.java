@@ -112,25 +112,25 @@ public final class CacheEngine
      *
      */
 
-	/**
-	 *	The Default time limit for cache is 100.  
-	 */
-	public final static int DEFAULT_COUNT_LIMIT = 100;
+    /**
+     *  The Default time limit for cache is 100.  
+     */
+    public final static int DEFAULT_COUNT_LIMIT = 100;
 
-	/**
-	 *	The Default time limit in second is 30.  
-	 */
-	public final static int DEFAULT_TIME_LIMIT = 30;
+    /**
+     *  The Default time limit in second is 30.  
+     */
+    public final static int DEFAULT_TIME_LIMIT = 30;
 
-	/**
-	 * The Default cache mechansim which will be used for Caching of ObjectLock
-	 */
-	public final static int DEFAULT_CACHE_TYPE = Cache.CACHE_COUNT_LIMITED;
+    /**
+     * The Default cache mechansim which will be used for Caching of ObjectLock
+     */
+    public final static int DEFAULT_CACHE_TYPE = Cache.CACHE_COUNT_LIMITED;
 
-	/**
-	 * The Default cache value which will be used for Caching of ObjectLock
-	 */
-	public final static int DEFAULT_CACHE_VALUE = DEFAULT_COUNT_LIMIT;
+    /**
+     * The Default cache value which will be used for Caching of ObjectLock
+     */
+    public final static int DEFAULT_CACHE_VALUE = DEFAULT_COUNT_LIMIT;
 
 
     /**
@@ -363,9 +363,9 @@ public final class CacheEngine
                 // This is equivalent to object not existing
                 throw new ObjectNotFoundExceptionImpl( type, identity );
             } finally {
-				// signal cache that it's now safe to release the object
-				// from transcation state to cache state.
-				typeInfo.cache.finishLockForAquire( oid );
+                // signal cache that it's now safe to release the object
+                // from transcation state to cache state.
+                typeInfo.cache.finishLockForAquire( oid );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
@@ -493,9 +493,9 @@ public final class CacheEngine
                 throw new ObjectNotFoundExceptionImpl( query.getResultType(), identity );
             } finally {
 
-				// signal cache that it's now safe to release the object
-				// from transcation state to cache state.
-				typeInfo.cache.finishLockForAquire( oid );
+                // signal cache that it's now safe to release the object
+                // from transcation state to cache state.
+                typeInfo.cache.finishLockForAquire( oid );
 
             }
             // Get the actual OID of the object, this one contains the
@@ -620,9 +620,9 @@ public final class CacheEngine
                         throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
                     } finally {
 
-						// signal cache that it's now safe to release the object
-						// from transcation state to cache state.
-						typeInfo.cache.finishLockForAquire( oid );
+                        // signal cache that it's now safe to release the object
+                        // from transcation state to cache state.
+                        typeInfo.cache.finishLockForAquire( oid );
 
                     }
                     // Dump the memory image of the object, it might have been deleted
@@ -757,11 +757,11 @@ public final class CacheEngine
         Object[]   fields;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
-		try {	
-			lock = typeInfo.cache.getLockForAquire( oid );
-		} finally {
-			typeInfo.cache.finishLockForAquire( oid );
-		}
+        try {   
+            lock = typeInfo.cache.getLockForAquire( oid );
+        } finally {
+            typeInfo.cache.finishLockForAquire( oid );
+        }
 
         if ( lock == null || ! lock.hasLock( tx, false ) )
             throw new IllegalStateException( Messages.format( "persist.internal",
@@ -844,11 +844,11 @@ public final class CacheEngine
                 } catch ( LockNotGrantedException except ) {
                     // Someone else is using the object, definite duplicate key
                     throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
-	            } finally {
+                } finally {
 
-					// signal cache that it's now safe to release the object
-					// from transcation state to cache state.
-					typeInfo.cache.finishLockForAquire( oid );
+                    // signal cache that it's now safe to release the object
+                    // from transcation state to cache state.
+                    typeInfo.cache.finishLockForAquire( oid );
                 }
                 // Dump the memory image of the object, it might have been deleted
                 // from persistent storage
@@ -950,102 +950,102 @@ public final class CacheEngine
         oid = new OID( typeInfo.handler, identity );
         lock = typeInfo.cache.getLockForAquire( oid );
         if ( lock == null || ! lock.hasLock( tx, false ) ) {
-			typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid );
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to store object for which no lock was acquired" ) );
-		}															
+        }                                                           
 
         // Acquire a read lock first. Only if the object has been modified
         // do we need a write lock.
 
-		try {
-			original = (Object[]) lock.acquire( tx, false, 0 );
+        try {
+            original = (Object[]) lock.acquire( tx, false, 0 );
 
-	        // Get the real OID with the exclusive and stamp info.
-	        oid = lock.getOID();
+            // Get the real OID with the exclusive and stamp info.
+            oid = lock.getOID();
 
-	        // Store/create/delete all the dependent objects first. Must perform that
-	        // operation on all descendent classes.
-	        RelationHandler[] relations;
+            // Store/create/delete all the dependent objects first. Must perform that
+            // operation on all descendent classes.
+            RelationHandler[] relations;
 
-	        relations = typeInfo.handler.getRelations();
-	        for ( int i = 0 ; i < relations.length ; ++i ) {
-	            if ( relations[ i ] != null ) {
+            relations = typeInfo.handler.getRelations();
+            for ( int i = 0 ; i < relations.length ; ++i ) {
+                if ( relations[ i ] != null ) {
 
-	                // XXX Need validity check and better testing for null elements
+                    // XXX Need validity check and better testing for null elements
 
-	                // relations[ i ].checkValidity( object );
+                    // relations[ i ].checkValidity( object );
                     if ( relations[ i ].isMulti() ) {
-	                    Enumeration enum;
-	                    Object[]    origIdentity;
+                        Enumeration enum;
+                        Object[]    origIdentity;
 
-	                    enum = (Enumeration) relations[ i ].getRelated( object );
-	                    if ( original[ i ] == null )
-	                        origIdentity = new Object[ 0 ];
-	                    else {
-	                        origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
-	                        ( (Vector) original[ i ] ).copyInto( origIdentity );
-	                    }
-	                    if ( enum != null ) {
-	                        while ( enum.hasMoreElements() ) {
-	                            Object related;
-	                            Object relIdentity;
-	                            boolean isOriginal = false;
-	                            
-	                            related = enum.nextElement();
-	                            if ( related != null ) {
-	                                relIdentity = relations[ i ].getIdentity( related );
-	                                for ( int j = 0 ; j < origIdentity.length ; ++j ) {
-	                                    if ( origIdentity[ j ] != null &&
-	                                         origIdentity[ j ].equals( relIdentity ) ) {
-	                                        ClassHandler relHandler;
-	                                        OID relOid;
+                        enum = (Enumeration) relations[ i ].getRelated( object );
+                        if ( original[ i ] == null )
+                            origIdentity = new Object[ 0 ];
+                        else {
+                            origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
+                            ( (Vector) original[ i ] ).copyInto( origIdentity );
+                        }
+                        if ( enum != null ) {
+                            while ( enum.hasMoreElements() ) {
+                                Object related;
+                                Object relIdentity;
+                                boolean isOriginal = false;
+                                
+                                related = enum.nextElement();
+                                if ( related != null ) {
+                                    relIdentity = relations[ i ].getIdentity( related );
+                                    for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+                                        if ( origIdentity[ j ] != null &&
+                                             origIdentity[ j ].equals( relIdentity ) ) {
+                                            ClassHandler relHandler;
+                                            OID relOid;
 
-	                                        relHandler = ((TypeInfo) _typeInfo.get( related.getClass() )).handler;
-	                                        relOid = new OID( relHandler, origIdentity[ j ] );
-	                                        isOriginal = ! tx.getObjectEntry( this, relOid ).deleted;
-	                                        origIdentity[ j ] = null;
-	                                        break;
-	                                    }
-	                                }
-	                                if ( ! isOriginal && ! tx.isPersistent( related ) )
-	                                    tx.create( this, related, relIdentity );
-	                            }
-	                        }
-	                    }
-	                    if ( relations[ i ].isAttached() ) {
-	                        for ( int j = 0 ; j < origIdentity.length ; ++j ) {
-	                            if ( origIdentity[ j ] != null ) 
-	                                tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
-	                        }
-	                    }
-	                    
-	                }
-	            }
-	        }
+                                            relHandler = ((TypeInfo) _typeInfo.get( related.getClass() )).handler;
+                                            relOid = new OID( relHandler, origIdentity[ j ] );
+                                            isOriginal = ! tx.getObjectEntry( this, relOid ).deleted;
+                                            origIdentity[ j ] = null;
+                                            break;
+                                        }
+                                    }
+                                    if ( ! isOriginal && ! tx.isPersistent( related ) )
+                                        tx.create( this, related, relIdentity );
+                                }
+                            }
+                        }
+                        if ( relations[ i ].isAttached() ) {
+                            for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+                                if ( origIdentity[ j ] != null ) 
+                                    tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
+                            }
+                        }
+                        
+                    }
+                }
+            }
 
-	        // If the object has a identity, it was retrieved/created before and
-	        // need only be stored. If the object has no identity, the object must
-	        // be created at this point.
-	        oldIdentity = oid.getIdentity();
-	        if ( oldIdentity == null ) {
-	            // The object has no old identity. This is an object that was
-	            // created during this transaction and must now be created in
-	            // persistent storage. A new OID is required to check for
-	            // duplicate identity.
-	            try {
-	                return create( tx, object, identity );
-	            } catch ( ClassNotPersistenceCapableException except ) {
-	                throw new PersistenceExceptionImpl( "persist.internal", except.toString() );
-	            }
-	        } else {
-	            // Identity change not supported
-	            if ( ! identity.equals( oldIdentity ) )
-	                throw new PersistenceExceptionImpl( "persist.changedIdentity",
-	                                                    typeInfo.javaClass.getName(), identity );
+            // If the object has a identity, it was retrieved/created before and
+            // need only be stored. If the object has no identity, the object must
+            // be created at this point.
+            oldIdentity = oid.getIdentity();
+            if ( oldIdentity == null ) {
+                // The object has no old identity. This is an object that was
+                // created during this transaction and must now be created in
+                // persistent storage. A new OID is required to check for
+                // duplicate identity.
+                try {
+                    return create( tx, object, identity );
+                } catch ( ClassNotPersistenceCapableException except ) {
+                    throw new PersistenceExceptionImpl( "persist.internal", except.toString() );
+                }
+            } else {
+                // Identity change not supported
+                if ( ! identity.equals( oldIdentity ) )
+                    throw new PersistenceExceptionImpl( "persist.changedIdentity",
+                                                        typeInfo.javaClass.getName(), identity );
 
-	            // Check if object has been modified, and whether it can be stored.
-	            modified = typeInfo.handler.isModified( object, original );
+                // Check if object has been modified, and whether it can be stored.
+                modified = typeInfo.handler.isModified( object, original );
                 if ( typeInfo.handler.getCallback() != null ) {
                     try {
                         typeInfo.handler.getCallback().storing( object, modified != ClassHandler.Unmodified );
@@ -1054,58 +1054,58 @@ public final class CacheEngine
                     }
                     modified = typeInfo.handler.isModified( object, original );
                 }
-	            if ( modified == ClassHandler.Unmodified )
-	                return null;
-	            try {
-	                typeInfo.handler.checkValidity( object );
-	            } catch ( ValidityException except ) {
-	                throw new PersistenceExceptionImpl( except );
-	            }
+                if ( modified == ClassHandler.Unmodified )
+                    return null;
+                try {
+                    typeInfo.handler.checkValidity( object );
+                } catch ( ValidityException except ) {
+                    throw new PersistenceExceptionImpl( except );
+                }
 
-	            // Object has been modified, must write it. Acquire a write lock and
-	            // block is some other transaction has a read lock on the object.
-	            // First one to call this method gets to commit.
-				original = (Object[]) lock.acquire( tx, ( modified == ClassHandler.LockRequired ), timeout );
+                // Object has been modified, must write it. Acquire a write lock and
+                // block is some other transaction has a read lock on the object.
+                // First one to call this method gets to commit.
+                original = (Object[]) lock.acquire( tx, ( modified == ClassHandler.LockRequired ), timeout );
 
-	            // The object has an old identity, it existed before, one need
-	            // to store the new contents.
-	            if ( _logInterceptor != null )
-	                _logInterceptor.storing( typeInfo.javaClass, identity );
+                // The object has an old identity, it existed before, one need
+                // to store the new contents.
+                if ( _logInterceptor != null )
+                    _logInterceptor.storing( typeInfo.javaClass, identity );
 
-	            // Create a new field set, copy the object into that set and try
-	            // to update the database. Use the original fields for dirty checking.
-	            // If the update succeeded, time to reflect that in the cache and
-	            // proceed to the next step.
-	            fields = typeInfo.handler.newFieldSet();
-	            typeInfo.handler.copyInto( object, fields );
-	            if ( oid.isDbLock() )
-	                oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-	                                                      fields, identity, null, null ) );
-	            else {
-	                try {
-	                    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-	                                                          fields, identity, original, oid.getStamp() ) );
-	                } catch ( ObjectModifiedException except ) {
-	                    // If object modified in database, remove it from cache (only if we have a
-	                    // write lock)
-	                    typeInfo.cache.removeLock( oid );
-	                    if ( lock.hasLock( tx, true ) )
-	                        lock.delete( tx );
-	                    else {
-	                        try {
-	                            lock.acquire( tx, true, 0 );
-	                            lock.delete( tx );
-	                        } catch ( LockNotGrantedException except2 ) { }
-	                    }
-	                    throw except;
-	                }
-	            }
-	        }
-		} finally {
-			// signal cache that it's now safe to release the object
-			// from transcation state to cache state.
-			typeInfo.cache.finishLockForAquire( oid );
-		}
+                // Create a new field set, copy the object into that set and try
+                // to update the database. Use the original fields for dirty checking.
+                // If the update succeeded, time to reflect that in the cache and
+                // proceed to the next step.
+                fields = typeInfo.handler.newFieldSet();
+                typeInfo.handler.copyInto( object, fields );
+                if ( oid.isDbLock() )
+                    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
+                                                          fields, identity, null, null ) );
+                else {
+                    try {
+                        oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
+                                                              fields, identity, original, oid.getStamp() ) );
+                    } catch ( ObjectModifiedException except ) {
+                        // If object modified in database, remove it from cache (only if we have a
+                        // write lock)
+                        typeInfo.cache.removeLock( oid );
+                        if ( lock.hasLock( tx, true ) )
+                            lock.delete( tx );
+                        else {
+                            try {
+                                lock.acquire( tx, true, 0 );
+                                lock.delete( tx );
+                            } catch ( LockNotGrantedException except2 ) { }
+                        }
+                        throw except;
+                    }
+                }
+            }
+        } finally {
+            // signal cache that it's now safe to release the object
+            // from transcation state to cache state.
+            typeInfo.cache.finishLockForAquire( oid );
+        }
 
         return oid;
     }
@@ -1145,13 +1145,13 @@ public final class CacheEngine
 
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
-		try {
+        try {
         lock.acquire( tx, true, timeout );
         } finally {
 
-			// signal cache that it's now safe to release the object
-			// from transcation state to cache state.
-			typeInfo.cache.finishLockForAquire( oid );
+            // signal cache that it's now safe to release the object
+            // from transcation state to cache state.
+            typeInfo.cache.finishLockForAquire( oid );
         }
         try {
             typeInfo.persist.writeLock( tx.getConnection( this ), oid.getIdentity() );
@@ -1195,13 +1195,13 @@ public final class CacheEngine
 
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
-		try {
+        try {
         lock.acquire( tx, true, timeout );
         } finally {
-			// signal cache that it's now safe to release the object
-			// from transcation state to cache state.
-			typeInfo.cache.finishLockForAquire( oid );
-		}
+            // signal cache that it's now safe to release the object
+            // from transcation state to cache state.
+            typeInfo.cache.finishLockForAquire( oid );
+        }
 
     }
 
@@ -1251,9 +1251,9 @@ public final class CacheEngine
             throw new IllegalStateException( except.toString() );
         } finally {
 
-			// signal cache that it's now safe to release the object
-			// from transcation state to cache state.
-			typeInfo.cache.finishLockForAquire( oid );
+            // signal cache that it's now safe to release the object
+            // from transcation state to cache state.
+            typeInfo.cache.finishLockForAquire( oid );
         }
         typeInfo.handler.setIdentity( object, oid.getIdentity() );
         typeInfo.handler.copyInto( fields, object, new FetchContext( tx, this ) );
@@ -1298,9 +1298,9 @@ public final class CacheEngine
             // This should never happen
         } finally {
 
-			// signal cache that it's now safe to release the object
-			// from transcation state to cache state.
-			typeInfo.cache.finishLockForAquire( oid );
+            // signal cache that it's now safe to release the object
+            // from transcation state to cache state.
+            typeInfo.cache.finishLockForAquire( oid );
         }
     }
 
@@ -1325,11 +1325,11 @@ public final class CacheEngine
         Object[]   fields;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
-		try {
-	        lock = typeInfo.cache.getLockForAquire( oid );		
-		} finally {
-			typeInfo.cache.finishLockForAquire( oid );
-		}
+        try {
+            lock = typeInfo.cache.getLockForAquire( oid );      
+        } finally {
+            typeInfo.cache.finishLockForAquire( oid );
+        }
         if ( lock == null )
             return;
 
@@ -1369,10 +1369,10 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         oid.setDbLock( false );
-		//System.out.println("CacheEngine.realeaseLock!");
+        //System.out.println("CacheEngine.realeaseLock!");
         lock = typeInfo.cache.getLockForAquire( oid );
         lock.release( tx );
-		typeInfo.cache.finishLockForAquire( oid );
+        typeInfo.cache.finishLockForAquire( oid );
     }
 
 
@@ -1405,9 +1405,9 @@ public final class CacheEngine
                 _logInterceptor.message( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         } finally {
-			// signal cache that it's now safe to release the object
-			// from transcation state to cache state.
-			typeInfo.cache.finishLockForAquire( oid );
+            // signal cache that it's now safe to release the object
+            // from transcation state to cache state.
+            typeInfo.cache.finishLockForAquire( oid );
         }
     }
 
@@ -1420,6 +1420,23 @@ public final class CacheEngine
     public Hashtable getXATransactions()
     {
         return _xaTx;
+    }
+
+
+    boolean hasLock( TransactionContext tx, OID oid, boolean write )
+        throws PersistenceException
+    {
+        ObjectLock lock;
+        TypeInfo   typeInfo;
+
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
+        try {
+            lock = typeInfo.cache.getLockForAquire( oid );
+        } finally {
+            typeInfo.cache.finishLockForAquire( oid );
+        }
+
+        return ( lock != null && lock.hasLock( tx, write ) );
     }
 
 
