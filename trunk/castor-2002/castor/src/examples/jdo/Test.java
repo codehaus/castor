@@ -75,6 +75,7 @@ public class Test
         Enumeration   enum;
         Transaction   tx;
 
+
         // Must be associated with an open transaction in order to
         // use the ODMG database
         tx = odmg.newTransaction();

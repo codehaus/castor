@@ -1,5 +1,5 @@
-Version 0.7.12  March 15, 2000
-------------------------------
+Version 0.8  March 17, 2000
+---------------------------
 
 JDO:     Placed the ODMG API in the org.exolab.castor.jdo package,
          to be included in the JavaDocs and to enable the introduction
