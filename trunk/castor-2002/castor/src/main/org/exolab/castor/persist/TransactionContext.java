@@ -1411,11 +1411,10 @@ public abstract class TransactionContext
         ObjectEntry entry;
 
         entry = removeObjectEntry( object );
-        if ( entry == null )
-            throw new IllegalStateException( Messages.format( "persist.internal",
-                                                              "Attempt to make read-only object that is not in transaction" ) );
-        _readOnlyObjects.put( entry.oid, entry );
-        entry.engine.releaseLock( this, entry.oid );
+        if ( entry != null ) {
+            _readOnlyObjects.put( entry.oid, entry );
+            entry.engine.releaseLock( this, entry.oid );
+        }
     }
 
 
