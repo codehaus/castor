@@ -1148,7 +1148,7 @@ public class ClassMolder {
                     if (_fhs[i].isReadonly()) {
                         _fhs[i].setValue( object, fields[i], tx.getClassLoader() );
                     } else {
-                        if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
+                        if ( _fhs[i].isStored() /*&& _fhs[i].isCheckDirty()*/ )
                             updatePersist = true;
                         updateCache = true;
                     }
@@ -1164,7 +1164,7 @@ public class ClassMolder {
                         // do nothing
                     } else if ( fieldValue == null || bytes == null ) {
                         // indicate store is needed
-                        if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
+                        if ( _fhs[i].isStored() /*&& _fhs[i].isCheckDirty()*/ )
                             updatePersist = true;
                         updateCache = true;
                     } else { // both not null
