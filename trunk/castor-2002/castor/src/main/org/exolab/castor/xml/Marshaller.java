@@ -227,7 +227,7 @@ public class Marshaller extends MarshalFramework {
      * upon marshalling of the document
     **/
     private List _processingInstructions = null;
-    
+
 	/**
 	 * Name of the root element to use
 	 */
@@ -321,8 +321,6 @@ public class Marshaller extends MarshalFramework {
         _validate        = Configuration.marshallingValidation();
         _naming          = XMLNaming.getInstance();
         _processingInstructions = new List(3);
-
-        setNamespaceMapping( XSI_PREFIX, XSI_NAMESPACE );
     } //-- initialize();
 
     /**
@@ -333,7 +331,7 @@ public class Marshaller extends MarshalFramework {
      * @param data the processing instruction data
     **/
     public void addProcessingInstruction(String target, String data) {
-        
+
         if ((target == null) || (target.length() == 0)) {
             String err = "the argument 'target' must not be null or empty.";
             throw new IllegalArgumentException(err);
@@ -345,7 +343,7 @@ public class Marshaller extends MarshalFramework {
         }
         _processingInstructions.add(new ProcessingInstruction(target, data));
     } //-- addProcessingInstruction
-    
+
     /**
      * Sets whether or not to marshal as a document which includes
      * the XML declaration, and if necessary the DOCTYPE declaration.
@@ -612,7 +610,7 @@ public class Marshaller extends MarshalFramework {
                     for (int i = 0; i < _processingInstructions.size(); i++) {
                         ProcessingInstruction pi = (ProcessingInstruction)
                             _processingInstructions.get(i);
-                        _handler.processingInstruction(pi.getTarget(), 
+                        _handler.processingInstruction(pi.getTarget(),
                             pi.getData());
                     }
                     marshal(object, null, _handler);
@@ -776,7 +774,6 @@ public class Marshaller extends MarshalFramework {
         //-- XXXX end Date fix
 
         if (saveType) {
-
              // When the type of the instance of the field is not the
              // type specified for the field, it might be necessary to
              // store the type explicitly (using xsi:type) to avoid
@@ -831,8 +828,8 @@ public class Marshaller extends MarshalFramework {
 
                           boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
 
-                          boolean oneAndOnlyOneMatchedField 
-                            = ((fieldDescMatch != null) || 
+                          boolean oneAndOnlyOneMatchedField
+                            = ((fieldDescMatch != null) ||
                                 (matches[0].parentFieldDesc == descriptor));
 
                          // Can we remove the xsi:type ?
@@ -924,7 +921,6 @@ public class Marshaller extends MarshalFramework {
 
         //-- xsi:type
         if (saveType) {
-
             //-- declare XSI namespace, if necessary
             declareNamespace(XSI_PREFIX, XSI_NAMESPACE);
 
@@ -964,18 +960,25 @@ public class Marshaller extends MarshalFramework {
         else if ((nsPrefix == null) && (nsURI != null)) {
             nsPrefix = (String) _namespaces.getNamespacePrefix(nsURI);
         }
-
-		//-- declare namespace at this element scope?
-		if (nsURI != null) {
+        //-- declare namespace at this element scope?
+        if (nsURI != null) {
 		    if (nsPrefix == null) {
 		        nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
 		    }
 			declareNamespace(nsPrefix, nsURI);
 		}
 
-		//-- declare all necesssary namespaces
-		_namespaces.declareAsAttributes(atts, true);
+       //check if the value is a QName that needs to
+       //be resolved ({URI}value -> ns:value)
+       //This should be done BEFORE declaring the namespaces as attributes
+       //because we can declare new namespace during the QName resolution
+       String valueType = descriptor.getSchemaType();
+       if ((valueType != null) && (valueType.equals(QNAME_NAME)))
+           object = resolveQName(object, descriptor);
 
+
+        //-- declare all necesssary namespaces
+		_namespaces.declareAsAttributes(atts, true);
         String qName = null;
         if (nsPrefix != null) {
             int len = nsPrefix.length();
@@ -989,12 +992,6 @@ public class Marshaller extends MarshalFramework {
             else qName = name;
         }
         else qName = name;
-
-       //check if the value is a QName that needs to
-       //be resolved ({URI}value -> ns:value)
-       String valueType = descriptor.getSchemaType();
-       if ((valueType != null) && (valueType.equals(QNAME_NAME)))
-           object = resolveQName(object, descriptor);
 
         try {
             if (!containerField)
@@ -1109,7 +1106,7 @@ public class Marshaller extends MarshalFramework {
         --depth;
         _parents.pop();
         if (!atRoot) _namespaces = _namespaces.getParent();
-        
+
     } //-- void marshal(DocumentHandler)
 
     /**
