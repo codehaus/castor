@@ -47,6 +47,7 @@
 package org.exolab.castor.xml.util;
 
 import org.exolab.castor.xml.*;
+
 import java.util.Hashtable;
 
 /**
@@ -68,6 +69,7 @@ public class ClassDescriptorResolverImpl
     private boolean _error      = false;
     private String  _errMessage = null;
     
+    private XMLMappingLoader mappingLoader = null;
     
     public ClassDescriptorResolverImpl() {
         _cache = new Hashtable();
@@ -92,6 +94,10 @@ public class ClassDescriptorResolverImpl
         return _errMessage;
     } //-- getErrorMessage
     
+    public XMLMappingLoader getMappingLoader() {
+        return mappingLoader;
+    } //-- getXMLMappingLoader
+    
     /**
      * Returns true if an error was generated on the last call
      * to one of the resolve methods
@@ -114,7 +120,9 @@ public class ClassDescriptorResolverImpl
         if (type == null) return null;
         
         XMLClassDescriptor classDesc = (XMLClassDescriptor) _cache.get(type);
+        
         if (classDesc != null) return classDesc;
+        
         try {
             classDesc = MarshalHelper.getClassDescriptor(type);
         }
@@ -124,6 +132,9 @@ public class ClassDescriptorResolverImpl
             else setError(err);
         }
         
+        if ((classDesc == null) && (mappingLoader != null))
+            classDesc = (XMLClassDescriptor)mappingLoader.getDescriptor(type);
+            
         if (classDesc != null) {
             _cache.put(type, classDesc);
         }
@@ -191,6 +202,14 @@ public class ClassDescriptorResolverImpl
         return classDesc;
     } //-- resolve(String, ClassLoader)
     
+    public void setMappingLoader(XMLMappingLoader mappingLoader) {
+        this.mappingLoader = mappingLoader;
+    } //-- setMappingLoader
+    
+    
+    //-------------------/
+    //- Private Methods -/
+    //-------------------/
     
     /**
      * Clears the error flag

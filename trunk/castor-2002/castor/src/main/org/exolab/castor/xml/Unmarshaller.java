@@ -74,6 +74,11 @@ public class Unmarshaller {
     Class _class = null;
     
     /**
+     * The class descriptor resolver
+    **/
+    private ClassDescriptorResolver _cdResolver = null;
+    
+    /**
      * The EntityResolver used for resolving entities
     **/
     EntityResolver entityResolver = null;
@@ -108,6 +113,9 @@ public class Unmarshaller {
 	    this.debug = Configuration.debug();
     } //-- Unmarshaller(Class)
     
+    public void setResolver(ClassDescriptorResolver cdResolver) {
+        this._cdResolver = cdResolver;
+    } //-- setResolver
     
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
@@ -179,6 +187,7 @@ public class Unmarshaller {
         throws MarshalException, ValidationException
     {
         UnmarshalHandler handler = new UnmarshalHandler(_class);
+        handler.setResolver(_cdResolver);
         handler.setLogWriter(pw);
         handler.setDebug(debug);
         eventProducer.setDocumentHandler(handler);
@@ -223,6 +232,7 @@ public class Unmarshaller {
             parser.setEntityResolver(entityResolver);
             
         UnmarshalHandler handler = new UnmarshalHandler(_class);
+        handler.setResolver(_cdResolver);
         handler.setLogWriter(pw);
         handler.setDebug(debug);
         parser.setDocumentHandler(handler);

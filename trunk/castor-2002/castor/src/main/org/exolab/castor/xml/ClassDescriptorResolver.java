@@ -70,6 +70,8 @@ public interface ClassDescriptorResolver {
     **/
     public boolean error();
     
+    public XMLMappingLoader getMappingLoader();
+    
     /**
      * Returns the XMLClassDescriptor for the given class
      * @param type the Class to find the XMLClassDescriptor for
@@ -91,6 +93,8 @@ public interface ClassDescriptorResolver {
      * @return the XMLClassDescriptor for the given class name
     **/
     public XMLClassDescriptor resolve(String className, ClassLoader loader);
+    
+    public void setMappingLoader(XMLMappingLoader xmlMappingLoader);
     
     
 } //-- ClassDescriptorResolver

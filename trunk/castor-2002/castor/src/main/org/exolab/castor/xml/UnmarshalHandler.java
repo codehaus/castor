@@ -145,6 +145,10 @@ public class UnmarshalHandler implements DocumentHandler {
     } //-- getObject
     
     
+    public void setResolver(ClassDescriptorResolver cdResolver) {
+        this._cdResolver = cdResolver;
+    } //-- setResolver
+    
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
      * System.out will be used to display debug information
