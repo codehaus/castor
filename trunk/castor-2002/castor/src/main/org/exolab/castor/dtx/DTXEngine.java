@@ -66,12 +66,12 @@ import org.exolab.castor.xml.schema.reader.*;
  * An OQL query engine for hitting JDO data sources and generating SAX
  * events. It skips the intermediate Java class step used by
  * e.g. Castor JDO.
- * 
+ *
  * The engine uses the SQL and XML descriptions in an XML Schema file
  * and a Castor JDO mapping file to determine how to map results of
  * the query into SAX events.
  *
- * @author <a href="0@intalio.com">Evan Prodromou</a> 
+ * @author <a href="0@intalio.com">Evan Prodromou</a>
  * @version $Revision$ $Date$
  */
 
@@ -97,12 +97,12 @@ public class DTXEngine {
     /**
      * Construct a DTXEngine for the given JDO mapping file and
      * XML schema.
-     * 
+     *
      * @param databaseURL URL string for JDO mapping file.
      * @param schemaURL URL string for XML Schema file.
      */
 
-    public DTXEngine(String databaseURL, String schemaURL) 
+    public DTXEngine(String databaseURL, String schemaURL)
 	throws DTXException
     {
 	setDatabase(databaseURL);
@@ -111,7 +111,7 @@ public class DTXEngine {
 
     /**
      * Sets the XML Schema to use. Parses and prepares the Schema.
-     * 
+     *
      * @param schemaURL URL string for XML Schema file.  */
 
     public void setSchema(String schemaURL) {
@@ -126,11 +126,17 @@ public class DTXEngine {
             System.out.println("fatal error: unable to create SAX parser.");
             return;
         }
-        
-        SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller();
+
+        SchemaUnmarshaller schemaUnmarshaller = null;
+        try{
+            schemaUnmarshaller = new SchemaUnmarshaller();
+        } catch (SAXException e) {
+          //can never happen
+          //since SAXException is thrown only with included schema
+        }
         parser.setDocumentHandler(schemaUnmarshaller);
         parser.setErrorHandler(schemaUnmarshaller);
-        
+
         try {
             parser.parse(new InputSource((new URL(schemaURL)).openStream()));
         }
@@ -144,13 +150,13 @@ public class DTXEngine {
 	    e.printStackTrace();
             return;
         }
-        
+
         _schema = schemaUnmarshaller.getSchema();
     }
 
     /**
      * Sets the database options from a JDO database mapping file.
-     * 
+     *
      * @param databaseURL URL string for JDO database mapping file.
      */
 
@@ -216,7 +222,7 @@ public class DTXEngine {
      * Sets the log writer for this DTX engine. Individual
      * queries will use this writer by default, but it can be
      * overwritten on a per-query basis.
-     * 
+     *
      * @param logWriter A PrintWriter to use for logging.
      */
 
@@ -228,7 +234,7 @@ public class DTXEngine {
      * Sets the default SAX document handler for this DTX
      * engine. Individual queries will use this handler by default,
      * but it can be overwritten on a per-query basis.
-     * 
+     *
      * @param handler A DocumentHandler to receive query results as
      * SAX events.
      */
@@ -242,8 +248,8 @@ public class DTXEngine {
      * is currently limited only to SELECT statements that return a
      * single object type (although multiple results will appear as
      * multiple documents to the DocumentHandler).
-     * 
-     * @param oql OQL string for the query. 
+     *
+     * @param oql OQL string for the query.
      */
 
     public DTXQuery prepareQuery(String oql) throws DTXException {
@@ -298,7 +304,7 @@ public class DTXEngine {
 		    String jdbcUrl = driver.getUrl();
 		    Param[] params = driver.getParam();
 		    Properties props = new Properties();
-		
+
 		    for (int i = 0; i < params.length; i++) {
 			Param p = params[i];
 			props.setProperty(p.getName(), p.getValue());
