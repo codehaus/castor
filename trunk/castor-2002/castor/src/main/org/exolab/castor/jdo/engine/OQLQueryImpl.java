@@ -241,17 +241,13 @@ public class OQLQueryImpl
     public Object execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
-        TransactionContext tx;
         QueryResults       results = null;
         Object             obj;
         Object             identity;
         Vector             set;
         
         try {
-            tx = TransactionImpl.getCurrentContext();
-            if ( tx == null || ! tx.isOpen() )
-                throw new TransactionNotInProgressException( Messages.message( "jdo.dbTxNotInProgress" ) );
-            results = tx.query( _dbEngine, _query, AccessMode.Shared );
+            results = _dbImpl.getTransaction().query( _dbEngine, _query, AccessMode.Shared );
             _fieldNum = 0;
             
             set = new Vector();
