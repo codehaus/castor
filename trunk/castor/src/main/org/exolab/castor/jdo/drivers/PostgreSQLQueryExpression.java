@@ -75,7 +75,11 @@ public final class PostgreSQLQueryExpression
         sql = getStandardStatement( lock, false );
 
         if ( _limit != null )
-          sql.append(JDBCSyntax.Limit).append(_limit);
+        {
+            sql.append(JDBCSyntax.Limit).append(_limit);
+            if (_offset != null)
+                sql.append(JDBCSyntax.Offset).append(_offset);
+        }
 
         // Use FOR UPDATE to lock selected tables.
         if ( lock )
