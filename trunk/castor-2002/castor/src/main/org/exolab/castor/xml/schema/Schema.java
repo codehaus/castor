@@ -141,6 +141,8 @@ public class Schema extends Annotated {
             addSimpleType(new StringType(this));
             //-- timeInstant
             addSimpleType(new TimeInstantType(this));
+            //-- decimal
+            addSimpleType(new DecimalType(this));
         }
         catch (SchemaException sx) {
             //-- will never be thrown here since we

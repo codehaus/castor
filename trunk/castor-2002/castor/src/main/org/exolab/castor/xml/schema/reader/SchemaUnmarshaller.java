@@ -46,6 +46,7 @@
 package org.exolab.castor.xml.schema.reader;
 
 //-- imported classes and packages
+import java.util.Vector;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
@@ -95,6 +96,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
     private Hashtable namespaces = null;
 
+    private Vector includes = null;
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -104,6 +107,12 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         foundSchemaDef = false;
     } //-- SchemaUnmarshaller
 
+    public SchemaUnmarshaller(Vector includes) {
+        this(null, null);
+        foundSchemaDef = false;
+        this.includes = includes;
+    } //-- SchemaUnmarshaller
+
     public SchemaUnmarshaller(AttributeList atts, Resolver resolver) {
         super();
         _schema = new Schema();
@@ -111,6 +120,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         foundSchemaDef = true;
         namespaces = new Hashtable();
         init(atts);
+        includes = new Vector();
     } //-- SchemaUnmarshaller
 
     public Schema getSchema() {
@@ -282,8 +292,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {
-            unmarshaller
-                = new IncludeUnmarshaller(_schema, atts, _resolver);
+            unmarshaller 
+                = new IncludeUnmarshaller(_schema, atts, _resolver, includes);
         }
         else {
             //-- we should throw a new Exception here

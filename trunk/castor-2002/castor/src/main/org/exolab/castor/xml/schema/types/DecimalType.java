@@ -43,73 +43,32 @@
  * $Id$
  */
 
-package org.exolab.castor.xml.schema.reader;
+package org.exolab.castor.xml.schema.types;
 
-//-- imported classes and packages
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.util.Configuration;
-import org.xml.sax.*;
+import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Schema;
 
-import java.net.URL;
-import java.util.Vector;
-
-public class IncludeUnmarshaller extends SaxUnmarshaller
-{
-    public IncludeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver, Vector includes) 
-		throws SAXException
-    {
-        super();
-        setResolver(resolver);
-	
-		String include = atts.getValue("schemaLocation");
-		if (include==null)
-			throw new SAXException("'schemaLocation' attribute missing on 'include'");
-	
-		if (includes.contains(include))
-			return;
-		includes.addElement(include);
-		
-		Parser parser = null;
-		try {
-		parser = Configuration.getParser();
-		}
-		catch(RuntimeException rte) {}
-		if (parser == null) {
-		    throw new SAXException("Error failed to create parser for include");
-		}
-		else
-		{
-			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(includes);
-			schemaUnmarshaller.setSchema(schema);
-			parser.setDocumentHandler(schemaUnmarshaller);
-			parser.setErrorHandler(schemaUnmarshaller);
-		}			
-			
-		try {
-		    parser.parse(new InputSource(new URL(include).openStream()));
-		}
-		catch(java.io.IOException ioe) {
-		    throw new SAXException("Error reading include file '"+include+"'");
-		}	
-	}	
-	
-
-    /**
-     * Sets the name of the element that this UnknownUnmarshaller handles
-     * @param name the name of the element that this unmarshaller handles
+/**
+ * An implementation of the XML Schema built-in decimal simpletype.
+ * @author <a href="mailto:andrew.fawcett@coda.com">Andrew Fawcett</a>
+**/
+public class DecimalType extends BuiltInType
+{    
+	/**
+     * Creates a new DecimalType with the given Schema reference
+     * @param schema the schema reference
     **/
-    public String elementName() {
-        return SchemaNames.INCLUDE;
-    } //-- elementName
-	
+    public DecimalType(Schema schema) {
+        super(schema, BuiltInType.DECIMAL_NAME);
+    } //-- TimeInstantType
+    
     /**
-     * Returns the Object created by this SaxUnmarshaller
-     * @return the Object created by this SaxUnmarshaller
+     * Returns the type of this BuiltInType
+     * @return the type of this BuiltInType
     **/
-    public Object getObject() {
-        return null;
-    } //-- getObject
-	
-}
+    public short getType() {
+        return BuiltInType.DECIMAL_TYPE;
+    } //-- getType
+    
+} //-- DecimalType
+

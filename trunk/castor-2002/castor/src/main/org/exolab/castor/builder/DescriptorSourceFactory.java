@@ -350,9 +350,7 @@ public class DescriptorSourceFactory {
                 jsc.append("null;");
             }                
             else {
-                jsc.append("new ");
-                jsc.append(xsType.getJType().getName());
-                jsc.append("();");
+                jsc.append(xsType.newInstanceCode());
             }
             jsc.unindent();
             jsc.add("}");
@@ -369,6 +367,11 @@ public class DescriptorSourceFactory {
             }
             else if (xsType.getType() == XSType.TIME_INSTANT) {
                 jsc.add("desc.setHandler( new DateFieldHandler(");
+                jsc.append("handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
+            else if (xsType.getType() == XSType.DECIMAL) {
+                jsc.add("desc.setHandler( new DecimalFieldHandler(");
                 jsc.append("handler));");
                 jsc.add("desc.setImmutable(true);");
             }
@@ -557,9 +560,7 @@ public class DescriptorSourceFactory {
                 jsc.append("null;");
             }                
             else {
-                jsc.append("new ");
-                jsc.append(xsType.getJType().getName());
-                jsc.append("();");
+                jsc.append(xsType.newInstanceCode());
             }
             jsc.unindent();
             jsc.add("}");
@@ -576,6 +577,11 @@ public class DescriptorSourceFactory {
             }
             else if (xsType.getType() == XSType.TIME_INSTANT) {
                 jsc.add("desc.setHandler( new DateFieldHandler(");
+                jsc.append("handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
+            else if (xsType.getType() == XSType.DECIMAL) {
+                jsc.add("desc.setHandler( new DecimalFieldHandler(");
                 jsc.append("handler));");
                 jsc.add("desc.setImmutable(true);");
             }
