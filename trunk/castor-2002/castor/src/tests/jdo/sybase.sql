@@ -57,6 +57,22 @@ grant all on test_group to test
 go
 
 
+-- test_types
+drop table test_types
+go
+create table test_types (
+  id     numeric       not null,
+  tdt    datetime      not null,
+  ttm    smalldatetime not null,
+  tts    timestamp     not null
+)
+go
+create unique index test_types_pk on test_types ( id )
+go
+grant all on test_types to test
+go
+
+
 -- test_keygen
 drop table test_keygen
 go
