@@ -106,10 +106,6 @@
         <url>jdo-faq.xml</url>
         <display>FAQs</display>
       </navLink>
-	  <navLink>
-        <url>ora-mar-2k/castor.htm</url>
-        <display>Presentation</display>
-      </navLink>
     </section>
 
     <section name="Advanced JDO">
