@@ -301,6 +301,28 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         return null;
     }*/
 
+    /**
+     * This method is used by the bridge layer to insert an prefetched
+     * entity into the LockEngine. Each inserted entity is read-locked. 
+     * If the entity has already locked by this transaction or any 
+     * other transaction, calling this method result in no effect.
+     */
+    public void addEntity( TransactionContext tx, Entity entity ) {
+    }
+
+    /**
+     * This method is used by the bridge layer to insert an list of
+     * entities' identities into the LockEngine. Each inserted list
+     * will be read-locked. If the list has already locked by this
+     * transaction or any other transaciton, calling this method 
+     * results in no effect.
+     */
+    public void addRelated( TransactionContext tx, EntityInfo info, 
+            Object foreignId, EntityFieldInfo fieldInfo, List list ) {
+        // should I group foreignId, fieldInfo, info and list into
+        // an object? And, call it "ManyRelation"?
+    }
+
 
     public Persistence getPersistence( Class cls ) {
         TypeInfo type = (TypeInfo) _typeInfo.get( cls.getName() );
