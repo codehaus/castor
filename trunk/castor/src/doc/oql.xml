@@ -10,6 +10,8 @@
         <section title="News">
             <p><b>Release 0.9.6</b>:<br/>
                <ul>
+                  <li>In the case a RDBMS does not support LIMIT/OFFSET clauses, a
+                      SyntaxNotSupportedException is thrown.</li>
                   <li>Added support for a limit clause and an offset clause. Currently, only
                       HSQL, mySQL and postgreSQL are supported.</li>
                   <li>Added an <a href="#Examples">example section</a>.</li>
@@ -973,6 +975,9 @@ query.bind(10);
                </td>
             </tr>
          </table>
+         
+         <p>In the case a RDBMS does not support LIMIT/OFFSET clauses, a  SyntaxNotSupportedException 
+            will be thrown.</p>
       
       </section>
     </section>
