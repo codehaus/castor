@@ -1,6 +1,9 @@
 
 Version (CVS)
 -------------
+XML:	Added code to remove the xsi-type attribute when a mapping file is used (Arnaud 20020131)
+
+XML:	Fixed a bug that generated classes for "simpleContent" element (Arnaud 20020125)
 
 XML:    Added Rick Hogge's patch to the source generator that makes 
         java.lang.Object fully qualified to prevent errors when an element name
