@@ -75,6 +75,7 @@ import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -148,6 +149,12 @@ public class JDO
 
 
     /**
+     * The callback interceptor to which all persistent state events
+     * to be sent.
+     */
+    private CallbackInterceptor _callback;
+
+    /**
      * The lock timeout for this database. Zero for immediate
      * timeout, an infinite value for no timeout. The timeout is
      * specified in seconds.
@@ -158,7 +165,7 @@ public class JDO
     /**
      * The name of this database.
      */
-    private String          _dbName;
+    private String         _dbName;
 
 
     /**
@@ -241,6 +248,25 @@ public class JDO
     public void setLogInterceptor( LogInterceptor logInterceptor )
     {
         _logInterceptor = logInterceptor;
+    }
+
+
+    /**
+     * Overrides the default callback interceptor by a custom 
+     * interceptor for this database source.
+     * <p>
+     * The interceptor is a callback that notifies data objects 
+     * on persistent state events.
+     * <p>
+     * If callback interceptor is not overrided, events will be
+     * sent to data object that implements the org.exolab.castor.jdo.Persistent 
+     * interface.
+     *
+     * @param callback The callback interceptor, null if disabled
+     */
+    public void setCallbackInterceptor( CallbackInterceptor callback )
+    {
+        _callback = callback;
     }
 
 
@@ -480,7 +506,8 @@ public class JDO
                 }
                 tx = tm.getTransaction();
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx, _classLoader );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, 
+                            _callback, tx, _classLoader );
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
@@ -494,7 +521,8 @@ public class JDO
                     _logInterceptor.exception( except );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, null, _classLoader );
+        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, 
+                _callback, null, _classLoader );
     }
 
 
