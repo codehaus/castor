@@ -223,7 +223,7 @@ public class XSLong extends XSType {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Integer(");
+        StringBuffer sb = new StringBuffer("new Long(");
         sb.append(variableName);
         sb.append(")");
         return sb.toString();
