@@ -27,10 +27,10 @@ public class Product
 
     public String toString()
     {
-	return ( Integer.toString( id ) ) + " " +
-	    ( name == null ? "<no-name>" : name ) + " $" + price + " " +
-	    ( group == null ? "<no-group>" : "[" + group.toString() + "]" ) + " " +
-	    ( inventory == null ? "<no-stock>" : inventory.toString() );
+        return ( Integer.toString( id ) ) + " " +
+            ( name == null ? "<no-name>" : name ) + " $" + price + " " +
+            ( group == null ? "<no-group>" : "[" + group.toString() + "]" ) + " " +
+            ( inventory == null ? "<no-stock>" : inventory.toString() );
     }
 
 
