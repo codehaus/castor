@@ -2,22 +2,21 @@ Version 0.8     March 24, 2000
 ------------------------------
 
 XML:     Updated the Source code generator to work with new Framework
-         - Note I currently removed validation support, this will be back ASAP
-         - There is a known bug with using "binary" type...I'll have this fixed ASAP also.
+         - Note I currently removed validation support, this will be
+           back ASAP
+         - There is a known bug with using "binary" type...I'll have
+           this fixed ASAP also
 
-XML:     We are now one step closer to using the mapping files with Castor XML.
-         A lot of changes have gone into sharing the "descriptor" framework
-         between Castor XML and Castor JDO...I can't enumerate all the changes
-         in this log, but here are a few:
+XML:     We are now one step closer to using the mapping files with
+         Castor XML. A lot of changes have gone into sharing the "descriptor"
+         framework between Castor XML and Castor JDO...I can't enumerate all
+         the changes in this log, but here are a few:
 
-         - MarshalInfo and MarshalDescriptor have been changed to XMLClassDescriptor,
-           and XMLFieldDescriptor respectively, and the interfaces have changed so
-           be careful.
+         - MarshalInfo and MarshalDescriptor have been changed to
+           XMLClassDescriptor, and XMLFieldDescriptor respectively, and the
+           interfaces have changed so be careful
          - We added the XMLFieldHandler
          - Changed MarshalInfoResolver to ClassDescriptorResolver
-
-Version 0.7.12  March 15, 2000
-------------------------------
 
 JDO:     Placed the ODMG API in the org.exolab.castor.jdo package,
          to be included in the JavaDocs and to enable the introduction
@@ -52,6 +51,10 @@ SPI:     Added QueryExpression and KeyGenerator to the SPI. QueryExpression
          from the Castor properties file.
 
 Persist: No longer supports identity changes.
+
+Persist: Rollback of transaction no longer reverts object to their previous
+         state due to lock race condition that hampers efficiency. Eliminating
+         this feature improves concurrency with optimistic locks.
 
 Misc:    Documentation distribution includes API JavaDocs and JavaDocs for
          all Java classes. Tarball/zip include just the API JavaDocs.

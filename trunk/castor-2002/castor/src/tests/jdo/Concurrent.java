@@ -83,7 +83,7 @@ public class Concurrent
             object.id = TestObject.DefaultId;
             object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
-            _db.makePersistent( object );
+            _db.create( object );
         } else {
             object.name = TestObject.DefaultName;
             _logger.println( "Updating object: " + object );
