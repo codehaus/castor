@@ -298,11 +298,36 @@ public final class SQLEngine implements Persistence {
 
 
     public PersistenceQuery createCall( String spCall, Class[] types )
-        throws QueryException
     {
+        FieldDescriptor[] fields;   
+        String[] jdoFields0;
+        String[] jdoFields;
+        int[] sqlTypes0;
+        int[] sqlTypes;
+        int count; 
+
         if ( _logInterceptor != null )
             _logInterceptor.queryStatement( spCall );
-        return new StoredProcedure( this, spCall, types );
+
+        fields = _clsDesc.getFields();
+        jdoFields0 = new String[ fields.length + 1 ];
+        sqlTypes0 = new int[ fields.length + 1 ];
+        // the first field is the identity
+        count = 1;
+        jdoFields0[ 0 ] = _clsDesc.getIdentity().getFieldName();
+        sqlTypes0[ 0 ] = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof JDOFieldDescriptor ) {
+                jdoFields0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLName();
+                sqlTypes0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLType();
+                ++count;
+            }
+        }
+        jdoFields = new String[ count ];
+        sqlTypes = new int[ count ];
+        System.arraycopy( jdoFields0, 0, jdoFields, 0, count );
+        System.arraycopy( sqlTypes0, 0, sqlTypes, 0, count );
+        return ((BaseFactory) _factory).getCallQuery( spCall, types, _clsDesc.getJavaClass(), jdoFields, sqlTypes );
     }
 
 
@@ -1541,223 +1566,5 @@ public final class SQLEngine implements Persistence {
             return stamp;
         }
     }
- 
-
-
-    /**
-     * PersistenceQuery implementation for use with stored procedures.
-     * It can deals with multiple ResultSets.
-     *
-     * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
-     * @version $Revision$ $Date$
-     */
-    static final class StoredProcedure implements PersistenceQuery
-    {
-
-
-        private CallableStatement _stmt;
-
-
-        private ResultSet         _rs;
-
-
-        private final SQLEngine _engine;
-
-
-        private final Class[]   _types;
-
-
-        private final Object[]  _values;
-
-
-        private final String    _sql;
-
-
-        private Object[]         _lastIdentities;
-
-
-        private int            _identSqlType;
-
-
-        StoredProcedure( SQLEngine engine, String sql, Class[] types )
-        {
-            _engine = engine;
-            _types = types;
-            _values = new Object[ _types.length ];
-            _sql = sql;
-            _identSqlType = ( (JDOFieldDescriptor) _engine._clsDesc.getIdentity() ).getSQLType();
-        }
-
-
-        public int getParameterCount()
-        {
-            return _types.length;
-        }
-
-
-        public Class getParameterType( int index )
-            throws ArrayIndexOutOfBoundsException
-        {
-            return _types[ index ];
-        }
-
-
-        public void setParameter( int index, Object value )
-            throws ArrayIndexOutOfBoundsException, IllegalArgumentException
-        {
-            _values[ index ] = value;
-        }
-
-
-        public Class getResultType()
-        {
-            return _engine.getDescriptor().getJavaClass();
-        }
-
-
-        public void execute( Object conn, AccessMode accessMode )
-            throws QueryException, PersistenceException
-        {
-            //System.out.println("SQLQuery executed!");
-            _lastIdentities = null;
-            try {
-                _stmt = ( (Connection) conn ).prepareCall( _sql );
-                for ( int i = 0 ; i < _values.length ; ++i ) {
-                    _stmt.setObject( i + 1, _values[ i ] );
-                    _values[ i ] = null;
-                }
-                _stmt.execute();
-                _rs = _stmt.getResultSet();
-            } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
-            }
-        }
-
-
-        private boolean nextRow() throws SQLException {
-            while ( true ) {
-                if ( _rs != null && _rs.next() ) {
-                    return true;
-                }
-                if ( !_stmt.getMoreResults() && _stmt.getUpdateCount() == -1 ) {
-                    _rs = null;
-                    return false;
-                }
-                _rs = _stmt.getResultSet();
-            }
-        }
-
-
-        public Object[] nextIdentities( Object[] identities )
-            throws PersistenceException
-        {
-            try {
-                if ( _lastIdentities == null ) {
-                    if ( !nextRow() )
-                        return null;
-                    // need for loop
-                    _lastIdentities = new Object[_engine._ids.length];
-                    for ( int i=0; i<_engine._ids.length; i++ ) {
-                        _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
-                    }
-                    return _engine.toJava(_lastIdentities, _engine.ID_TYPE);
-                }
-
-                while ( _lastIdentities.equals( identities ) ) {
-                    if ( ! nextRow() ) {
-                        _lastIdentities = null;
-                        return null;
-                    }
-                    for ( int i=0; i<_engine._ids.length; i++ ) {
-                        _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
-                    }
-                }
-                return _engine.toJava( _lastIdentities, _engine.ID_TYPE );
-            } catch ( SQLException except ) {
-                _lastIdentities = null;
-                throw new PersistenceExceptionImpl( except );
-            }
-        }
-
-
-        public void close()
-        {
-            if ( _rs != null ) {
-                try {
-                    _rs.close();
-                } catch ( SQLException except ) { }
-                _rs = null;
-            }
-            if ( _stmt != null ) {
-                try {
-                    _stmt.close();
-                } catch ( SQLException except ) { }
-                _stmt = null;
-            }
-        }
-
-
-        public Object fetch( Object[] fields, Object[] identities )
-            throws ObjectNotFoundException, PersistenceException
-        {
-            int    count;
-            Object stamp = null;
-            Object[] sqlIdentities = null;
-            Object[] sqlFields = new Object[fields.length];
-
-
-            try {
-                count = _engine._ids.length + 1;
-
-                sqlIdentities = _engine.toSql( identities, _engine.ID_TYPE );
-
-                // Load all the fields of the object including one-one relations
-                for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
-                            if ( ! _engine._fields[ i ].load )
-                                continue;
-                    if ( _engine._fields[ i ].multi ) {
-                        Object value;
-
-                        sqlFields[ i ] = new Vector();
-                        value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
-                        if ( value != null )
-                            ( (Vector) sqlFields[ i ] ).addElement( value );
-                    } else
-                        sqlFields[ i ] = _rs.getObject( i + count );
-                }
-
-                if ( nextRow() ) {
-                    for ( int i=0; i<_engine._ids.length; i++ ) {
-                        _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
-                    }
-                    while ( OID.isEquals( sqlIdentities, _lastIdentities ) ) {
-                        for ( int i = 0; i < _engine._fields.length ; ++i  )
-                            if ( _engine._fields[ i ].multi ) {
-                                Object value;
-
-                                value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
-                                if ( value != null && ! ( (Vector) sqlFields[ i ] ).contains( value ) )
-                                    ( (Vector) sqlFields[ i ] ).addElement( value );
-                            }
-                        if ( nextRow() )
-                            for ( int i=0; i<_engine._ids.length; i++ ) {
-                                _lastIdentities[0] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
-                            }
-                        else
-                            _lastIdentities = null;
-                    }
-                } else
-                    _lastIdentities = null;
-            } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
-            }
-            Object[] tempFields = _engine.toJava( sqlFields, FIELD_TYPE );
-            System.arraycopy( tempFields, 0, fields, 0, fields.length );
-
-            return stamp;
-        }
-
-    }
-
 }
 

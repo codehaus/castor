@@ -185,7 +185,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
     }
 
 
-    public Object nextIdentity( Object identity )
+    public Object[] nextIdentities( Object[] identities )
         throws PersistenceException
     {
         try {
@@ -193,17 +193,17 @@ final class PostgreSQLCallQuery implements PersistenceQuery
                 if ( ! _rs.next() )
                     return null;
                 _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
-                return _lastIdentity;
+                return new Object[] { _lastIdentity };
             }
 
-            while ( _lastIdentity.equals( identity ) ) {
+            while ( _lastIdentity.equals( identities[0] ) ) {
                 if ( ! _rs.next() ) {
                     _lastIdentity = null;
                     return null;
                 }
                 _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
             }
-            return _lastIdentity;
+            return new Object[] { _lastIdentity };
         } catch ( SQLException except ) {
             _lastIdentity = null;
             throw new PersistenceExceptionImpl( except );
@@ -228,7 +228,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
     }
 
 
-    public Object fetch( Object[] fields, Object identity )
+    public Object fetch( Object[] fields, Object[] identities )
         throws ObjectNotFoundException, PersistenceException
     {
         Object stamp = null;

@@ -174,6 +174,12 @@ public class JDO
 
 
     /**
+     * The application class loader.
+     */
+    private ClassLoader    _classLoader;
+
+
+    /**
      * Constructs a new JDO database factory. Must call {@link
      * #setDatabaseName} before calling {@link #getDatabase}.
      */
@@ -233,6 +239,30 @@ public class JDO
     public LogInterceptor getLogInterceptor()
     {
         return _logInterceptor;
+    }
+
+
+    /**
+     * Sets the application class loader.
+     * This method should be used with application servers that use multiple
+     * class loaders. The default value is "null". It means that
+     * application classes are loaded through <code>Class.forName(className)</code>.
+     * Examples:
+     * <p><code>jdo.setClassLoader(getClass().getClassLoader());</code>
+     * <p><code>jdo.setClassLoader(Thread.currentThread().getContextClassLoader());</code>
+     */
+    public void setClassLoader( ClassLoader classLoader)
+    {
+        _classLoader = classLoader;
+    }
+
+
+    /**
+     * Returns the application classloader.
+     */
+    public ClassLoader getClassLoader()
+    {
+        return _classLoader;
     }
 
 
@@ -393,11 +423,11 @@ public class JDO
 
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
-        if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
+        if ( DatabaseRegistry.getDatabaseRegistry( _dbName, _classLoader ) == null ) {
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, null );
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, _classLoader );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( except );
             }
@@ -414,7 +444,7 @@ public class JDO
                 tm = (TransactionManager) ctx.lookup( _tmName );
                 tx = tm.getTransaction();
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx, _classLoader );
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
@@ -428,7 +458,7 @@ public class JDO
                     _logInterceptor.exception( except );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, null );
+        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, null, _classLoader );
     }
 
 

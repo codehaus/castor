@@ -76,8 +76,9 @@ public final class OracleFactory
 
     public Boolean isDuplicateKeyException( Exception except )
     {
-        if ( except instanceof SQLException )
-            return ( (SQLException) except ).getErrorCode() == 1 ? Boolean.TRUE : Boolean.FALSE;
+        // Sometime gives wrong results
+        //if ( except instanceof SQLException )
+        //    return ( (SQLException) except ).getErrorCode() == 1 ? Boolean.TRUE : Boolean.FALSE;
         return null;
     }
 

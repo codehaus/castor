@@ -133,8 +133,14 @@ public class DatabaseImpl
     private Transaction         _transaction;
 
 
+    /**
+     * The class loader for application classes (may be null).
+     */
+    private ClassLoader _classLoader;
+
+
     public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
-                         Transaction transaction )
+                         Transaction transaction, ClassLoader classLoader )
             throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
@@ -142,7 +148,7 @@ public class DatabaseImpl
         // locking mode.
         DatabaseRegistry dbs;
         
-        dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
+        dbs = DatabaseRegistry.getDatabaseRegistry( dbName, classLoader );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
@@ -156,6 +162,7 @@ public class DatabaseImpl
             _ctx = new TransactionContextImpl( this, true );
             _ctx.setLockTimeout( _lockTimeout );
         }
+        _classLoader = classLoader;
     }
 
     LockEngine getLockEngine()
@@ -164,6 +171,15 @@ public class DatabaseImpl
     }
     public PersistenceInfoGroup getScope() {
         return _scope;
+    }
+
+
+    /**
+     * Accessor method for the application class loader. For use in OQLQueryImpl.
+     */
+    ClassLoader getClassLoader()
+    {
+        return _classLoader;
     }
 
 

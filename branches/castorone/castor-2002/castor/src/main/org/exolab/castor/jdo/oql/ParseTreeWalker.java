@@ -78,6 +78,7 @@ public class ParseTreeWalker implements TokenTypes
   private String _fromClassName;
   private String _fromClassAlias;
 
+  private ClassLoader _classLoader;
   private Class _objClass;
   private QueryExpression _queryExpr;
   
@@ -105,11 +106,12 @@ public class ParseTreeWalker implements TokenTypes
    * @param parseTree The parse tree to walk
    * @throws QueryException Thrown by checkErrors.
    */
-  public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree) 
+  public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader )
       throws QueryException 
   {
     _dbEngine = dbEngine;
     _parseTree = parseTree;
+    _classLoader = classLoader;
 
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
@@ -276,7 +278,10 @@ public class ParseTreeWalker implements TokenTypes
     }
     
     try {
-      _objClass = Class.forName( _fromClassName );
+      if ( _classLoader == null )  
+        _objClass = Class.forName( _fromClassName );
+      else
+        _objClass = _classLoader.loadClass( _fromClassName );
     } 
     catch ( ClassNotFoundException except ) {
       throw new QueryException( "Could not find class " + _fromClassName );
