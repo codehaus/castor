@@ -91,7 +91,7 @@ public class ValueOf extends EmptyXSLObject {
         if (expr == null) return "";
 
         try {
-            return expr.evaluate(ps).toString();
+            return expr.evaluate(ps).stringValue();
         }
         catch (XPathException xpe) {
             
