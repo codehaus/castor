@@ -141,12 +141,12 @@ public class DirectoryImpl
     public Search createSearch( String expr )
         throws InvalidSearchException, DirectoryException
     {
-        Persistence   per;
-        int           next;
-        int           pos;
-        StringBuffer  query;
-        Vector        types;
-        Class[]       array;
+        Persistence         per;
+        int                 next;
+        int                 pos;
+        StringBuffer        query;
+        Vector              types;
+        Class[]             array;
         
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
@@ -154,7 +154,7 @@ public class DirectoryImpl
         try {
             next = expr.indexOf( '$' );
             if ( next <= 0 ) {
-                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( expr, new Class[ 0 ] ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( new LDAPQueryExpression( expr ), new Class[ 0 ] ) );
             } else {
                 pos = 0;
                 query = new StringBuffer();
@@ -179,7 +179,7 @@ public class DirectoryImpl
                 query.append( expr.substring( pos, next ) );
                 array = new Class[ types.size() ];
                 types.copyInto( array );
-                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( query.toString(), array ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( new LDAPQueryExpression( query.toString() ), array ) );
             }
         } catch ( QueryException except ) {
             throw new InvalidSearchException( except.getMessage() );
@@ -226,23 +226,12 @@ public class DirectoryImpl
     public synchronized void create( Object obj )
         throws DuplicateRDNException, DirectoryException
     {
-        ClassHandler handler;
         Object       rdn;
         
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
         
-        handler = _handler;
-        // clsDesc = _dirEngine.getClassDesc();
-        while ( handler != null ) {
-            if ( handler.getJavaClass().isAssignableFrom( obj.getClass() ) )
-                break;
-            handler = handler.getExtends();
-        }
-        if ( handler == null )
-            throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
-        
-        rdn = handler.getIdentity( obj );
+        rdn = _handler.getIdentity( obj );
         if ( rdn == null )
             throw new DirectoryException( "Object has no RDN" );
         try {
@@ -269,20 +258,8 @@ public class DirectoryImpl
     public synchronized void delete( Object obj )
         throws DirectoryException
     {
-        ClassHandler handler;
-        
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
-        
-        handler = _handler;
-        // clsDesc = _dirEngine.getClassDesc();
-        while ( handler != null ) {
-            if ( handler.getJavaClass().isAssignableFrom( obj.getClass() ) )
-                break;
-            handler = handler.getExtends();
-        }
-        if ( handler == null )
-            throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
         
         try {
             if ( _tx != null ) {
@@ -426,7 +403,7 @@ public class DirectoryImpl
             engine = (PersistenceEngine) _engines.get( url );
             if ( engine == null ) {
                 engine = new PersistenceEngineFactory().createEngine( new SingleMapping( clsDesc ),
-                                                                      new EngineFactory( url.getDN() ), logWriter );
+                                                                      new MozillaFactory( url.getDN() ), logWriter );
                 _engines.put( url, engine );
             }
             return engine;
@@ -464,27 +441,4 @@ public class DirectoryImpl
     }
     
     
-    static class EngineFactory
-        implements PersistenceFactory
-    {
-        
-        private String _rootDN;
-        
-        EngineFactory( String rootDN )
-        {
-            _rootDN = rootDN;
-        }
-        
-        public Persistence getPersistence( ClassHandler handler, PrintWriter logWriter )
-        {
-            try {
-                return new MozillaEngine( handler, _rootDN );
-            } catch ( MappingException except ) {
-                return null;
-            }
-        }
-        
-    }
-
-
 }
