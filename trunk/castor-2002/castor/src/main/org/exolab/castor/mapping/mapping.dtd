@@ -127,7 +127,7 @@
     attribute.
 
  -->
-<!ELEMENT field ( description?, sql?, xml?, ldap? )>
+<!ELEMENT field ( description?, sql?, bind-xml?, ldap? )>
 <!ATTLIST field
     name           NMTOKEN  #REQUIRED
     type           NMTOKEN  #IMPLIED
@@ -169,9 +169,14 @@
     attribute values. Only one field can be specified as the content
     model in a given object.
 
- -->
-<!ELEMENT xml EMPTY>
-<!ATTLIST xml
+    Note: This used to be called "xml" which is an invalid xml element name
+          according to the W3C XML 1.0 recommendation. We still support
+          the "xml" element for backward compatibility, but we will remove 
+          support for it in the future.
+-->
+
+<!ELEMENT bind-xml EMPTY>
+<!ATTLIST bind-xml
     name     NMTOKEN  #IMPLIED
     type     NMTOKEN  #IMPLIED
     matches  NMTOKEN  #IMPLIED
