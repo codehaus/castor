@@ -87,8 +87,9 @@ public final class EntityInfo {
     public final KeyGeneratorDescriptor keyGen;
 
     public EntityInfo( String entityClass, EntityFieldInfo[] idInfo,
-                       EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, EntityInfo superEntity,
-                       Object discriminator, KeyGeneratorDescriptor keyGen ) {
+                       EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, 
+                       EntityInfo superEntity, Object discriminator, 
+                       KeyGeneratorDescriptor keyGen ) {
         this.entityClass   = entityClass;
         this.fieldInfo     = fieldInfo;
         this.idInfo        = idInfo;
@@ -97,6 +98,39 @@ public final class EntityInfo {
         this.discriminator = discriminator;
         this.keyGen        = keyGen;
     }
+
+    /**
+     * Returns the offset of the first field in the entity
+     * (aka, the sum of the number of field for all super entities)
+     */
+    public int getFieldOffset() {
+
+        EntityInfo cur = this;
+        int offset = 0;
+        while ( cur.superEntity != null ) {
+            offset += cur.fieldInfo.length;
+            cur = cur.superEntity;
+        }
+        return offset;
+    }
+
+    /**
+     * Return the maximium number of field possible
+     * (aka, the sum of the number of fields of this and all sub entities)
+     */
+    public int getMaxLength() {
+        int fieldLen = fieldInfo==null?0:fieldInfo.length;
+        if ( subEntities == null || subEntities.length == 0 )
+            return fieldLen;
+
+        int max = 0;
+        for ( int i = 0; i < subEntities.length; i++ ) {
+            if ( subEntities[i].getMaxLength() > max )
+                max = subEntities[i].getMaxLength();
+        }
+        return max+fieldLen;
+    }
+
 
     public boolean equals( Object object ) {
         if ( !( object instanceof EntityInfo ) || object == null )
