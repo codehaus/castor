@@ -40,9 +40,9 @@ package org.exolab.castor.util;
 **/
 public class List implements Cloneable , java.io.Serializable {
 
-    private int DEFAULT_SIZE = 11;
+    private int DEFAULT_SIZE = 17;
 
-    private Object[] elements;
+    private Object[] elements = null;
 
     private int initialSize = DEFAULT_SIZE;
 
@@ -55,12 +55,10 @@ public class List implements Cloneable , java.io.Serializable {
      * Creates a new BasicSet with the default Size
     **/
     public List() {
-        elements = new Object[DEFAULT_SIZE];
     } //-- List
 
     public List(int size) {
         initialSize = size;
-        elements = new Object[size];
     } //-- List
 
     /**
@@ -69,6 +67,7 @@ public class List implements Cloneable , java.io.Serializable {
      * @return true if the Object is added to the list
     **/
     public boolean add(Object obj) {
+	    if(elements == null) elements = new Object[initialSize];
         if (elementCount == elements.length) increaseSize();
         elements[elementCount++] = obj;
         return true;
@@ -86,7 +85,8 @@ public class List implements Cloneable , java.io.Serializable {
         if ((index < 0) || (index > elementCount))
             throw new IndexOutOfBoundsException();
 
-        // make sure we have room to add the object
+        // make Sure we have room to add the object
+	    if(elements == null) elements = new Object[initialSize];
         if (elementCount == elements.length) increaseSize();
 
         if (index == elementCount) {
@@ -104,9 +104,9 @@ public class List implements Cloneable , java.io.Serializable {
      * Removes all elements from the list
     **/
     public void clear() {
-        for (int i = 0; i < elementCount; i++) {
-            elements[i] = null;
-        }
+	for (int i = 0; i < elementCount; i++) {
+	    elements[i] = null;
+	}
         elementCount = 0;
     } //-- clear
 
@@ -269,6 +269,8 @@ public class List implements Cloneable , java.io.Serializable {
      * freeing up unused memory.
     **/
     public void trimToSize() {
+	    if(elements == null)
+		    return;
         Object[] pointer = elements;
         elements = new Object[elementCount];
         System.arraycopy(pointer, 0, elements, 0, elementCount);
@@ -334,7 +336,8 @@ public class List implements Cloneable , java.io.Serializable {
     **/
     public Object[] toArray() {
         Object[] objArray = new Object[elementCount];
-        System.arraycopy(elements,0,objArray,0,elementCount);
+	if(elements != null)
+		System.arraycopy(elements,0,objArray,0,elementCount);
         return objArray;
     } //-- toArray
 
@@ -361,7 +364,8 @@ public class List implements Cloneable , java.io.Serializable {
             Class dstType = dst.getClass();
             objArray = (Object[]) java.lang.reflect.Array.newInstance(dstType, elementCount);
         }
-        System.arraycopy(elements, 0, objArray, offset, elementCount);
+	if(elements != null)
+		System.arraycopy(elements, 0, objArray, offset, elementCount);
         return objArray;
     } //-- toArray
 
@@ -377,7 +381,7 @@ public class List implements Cloneable , java.io.Serializable {
     private void increaseSize() {
         Object[] pointer = elements;
         int length = (pointer.length > 0) ? pointer.length : 1;
-        elements = new Object[(length*3)/2 + 1];
+        elements = new Object[length*2];
         System.arraycopy(pointer, 0, elements, 0, pointer.length);
         pointer = null;
     } //-- increaseSize
