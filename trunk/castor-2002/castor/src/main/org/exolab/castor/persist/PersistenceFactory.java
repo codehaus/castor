@@ -47,6 +47,7 @@
 package org.exolab.castor.persist;
 
 
+import java.io.PrintWriter;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.mapping.MappingException;
 
@@ -75,11 +76,14 @@ public interface PersistenceFactory
      *
      * @param cache The cache engine which will use this persistence
      * @param objDesc The object descriptor
+     * @param logWriter Writer to use for logging errors and tracing
+     *  messages (may be null)
      * @return A suiteable persistence implementation, or null
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( CacheEngine cache, ObjectDesc objDesc )
+    public Persistence getPersistence( CacheEngine cache, ObjectDesc objDesc,
+				       PrintWriter logWriter )
 	throws MappingException;
 
 

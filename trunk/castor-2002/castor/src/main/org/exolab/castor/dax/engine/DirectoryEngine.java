@@ -47,6 +47,7 @@
 package org.exolab.castor.dax.engine;
 
 
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import netscape.ldap.LDAPUrl;
@@ -75,10 +76,11 @@ final class DirectoryEngine
     private ObjectDesc  _objDesc;
 
 
-    DirectoryEngine( LDAPUrl url, ObjectDesc objDesc )
+    DirectoryEngine( LDAPUrl url, ObjectDesc objDesc, PrintWriter logWriter )
 	throws MappingException
     {
-	super( url.toString(), new SingleMapping( objDesc ), new EngineFactory( url.getDN() ) );
+	super( url.toString(), new SingleMapping( objDesc ),
+	       new EngineFactory( url.getDN() ), logWriter );
 	_objDesc = objDesc;
     }
 
@@ -89,7 +91,7 @@ final class DirectoryEngine
     }
 
 
-    public static DirectoryEngine getEngine( LDAPUrl url, ObjectDesc objDesc )
+    public static DirectoryEngine getEngine( LDAPUrl url, ObjectDesc objDesc, PrintWriter logWriter )
 	throws MappingException
     {
 	DirectoryEngine engine;
@@ -97,7 +99,7 @@ final class DirectoryEngine
 	synchronized ( _engines ) {
 	    engine = (DirectoryEngine) _engines.get( url );
 	    if ( engine == null ) {
-		engine = new DirectoryEngine( url, objDesc );
+		engine = new DirectoryEngine( url, objDesc, logWriter );
 		_engines.put( url, engine );
 	    }
 	    return engine;
@@ -146,7 +148,8 @@ final class DirectoryEngine
 	    _rootDN = rootDN;
 	}
 	
-	public Persistence getPersistence( CacheEngine cache, ObjectDesc objDesc )
+	public Persistence getPersistence( CacheEngine cache, ObjectDesc objDesc,
+					   PrintWriter logWriter )
 	{
 	    try {
 		return new MozillaEngine( (DAXObjectDesc) objDesc, _rootDN );

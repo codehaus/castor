@@ -97,6 +97,7 @@ public class DAXMappingHelper
         throws MappingException
     {
 	ObjectDesc objDesc;
+	FieldDesc  attrSet;
 
 	if ( objMap.getLdapEntry() == null )
 	    return null;
