@@ -195,7 +195,22 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
             unmarshaller
                 = new AttributeGroupUnmarshaller(_schema, atts);
         }
-        else if (SchemaNames.isGroupName(name)) {
+        //--<group>
+        else if ( name.equals(SchemaNames.GROUP) )
+        {
+            if (foundAttributes)
+                error("'" + name + "' must appear before any attribute "+
+                    "definitions when a child of 'complexType'.");
+            if (foundModelGroup)
+                error("'"+name+"' cannot appear as a child of 'complexType' "+
+                    "if another 'all', 'sequence', 'choice' or "+
+                    "'group' also exists.");
+
+            foundModelGroup = true;
+            unmarshaller
+                = new ModelGroupUnmarshaller(_schema, atts, getResolver());
+        }
+        else if (SchemaNames.isGroupName(name) && (name != SchemaNames.GROUP) ) {
             if (foundAttributes)
                 error("'"+name+"' must appear before attribute "+
                     "definitions in an 'extension' element.");
