@@ -74,6 +74,9 @@
     <field name="zip" type="string" >
       <sql name="zip" type="varchar" />
     </field>
+    <field name="Person" type="jdo.TestPKsPerson" >
+      <sql name="fname lname"/>
+    </field>
   </class>
 
   <class name="jdo.TestPKsEmployee" extends="jdo.TestPKsPerson">
@@ -98,6 +101,22 @@
     <field name="comment" type="string">
       <sql name="comment" type="varchar"/>
     </field>
+    <field name="category" type="jdo.TestPKsContractCategory" collection="collection" >
+      <sql many-table="contract_category" many-key="policy_no contract_no" name="cate_id" />
+    </field>
+    <field name="employee" type="jdo.TestPKsEmployee" >
+      <sql name="fname lname" />
+    </field>
+  </class>
+
+  <class name="jdo.TestPKsContractCategory" identity="id" >
+    <map-to table="test_pks_category" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="contract" type="jdo.TestPKsContract" collection="collection" >
+      <sql many-table="contract_category" many-key="cate_id" name="policy_no contract_no" />
+    </field>
   </class>
 
   <class name="jdo.TestPKsPayRoll" depends="jdo.TestPKsEmployee" identity="id">
@@ -111,6 +130,9 @@
     </field>
     <field name="hourlyRate" type="integer" >
       <sql name="hourly_rate" type="integer" />
+    </field>
+    <field name="employee" type="jdo.TestPKsEmployee" >
+      <sql name="fname lname" />
     </field>
   </class>
 
@@ -381,7 +403,7 @@
     <description>Test Persistent interface handling</description>
     <map-to table="test_persistent" />
     <field name="id" type="integer">
-      <sql name="id" />
+      <sql name="id" type="integer"/>
     </field>
     <field name="creationTime" type="java.util.Date" required="true">
       <sql name="ctime" type="timestamp" />
@@ -397,7 +419,7 @@
     </field>
   </class> 
 
-<!--
+  <!--
   <class name="jdo.TestNestedFields" access="shared" identity="id">
     <description>Table used for nested fields testing</description>
     <map-to table="test_table" />
