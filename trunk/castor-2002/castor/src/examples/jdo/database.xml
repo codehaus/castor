@@ -1,5 +1,5 @@
 <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                           "http://castor.exolab.org/jdo-conf.xsd">
+                           "http://castor.exolab.org/jdo-conf.dtd">
 <database name="test">
 <!--
   <data-source class-name="postgresql.PostgresqlDataSource">

@@ -1,14 +1,11 @@
 package jdo;
 
 
-import myapp.*;
 import java.io.PrintWriter;
-import org.odmg.Implementation;
-import org.odmg.Database;
-import org.odmg.Transaction;
-import org.odmg.OQLQuery;
-import org.odmg.ODMGException;
-import org.exolab.castor.jdo.ODMG;
+import org.exolab.castor.jdo.JDOSource;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.PersistenceException;
 
 
 /**
@@ -20,83 +17,75 @@ public class Deadlock
 {
 
 
-    private Implementation  odmg;
+    private JDOSource      _jdo;
 
 
-    private Database        db;
+    private Database       _db;
 
 
-    private PrintWriter     logger;
+    private PrintWriter    _logger;
 
 
-    static final int FirstGroup = 3;
-
-
-    static final int SecondGroup = 4;
-
-
-    public Deadlock( Implementation odmg, String dbName, PrintWriter logger )
-        throws ODMGException
+    public Deadlock( JDOSource jdo, PrintWriter logger )
+	throws PersistenceException
     {
-        this.odmg = odmg;
-        this.logger = logger;
-        db = odmg.newDatabase();
-        db.open( dbName, db.OPEN_READ_WRITE );
+        _jdo = jdo;
+        _logger = logger;
+        _db = _jdo.getDatabase();
+        _logger.println( "Opened JDO database " + _db );
     }
 
 
     public void run()
+	throws PersistenceException
     {
-        ProductGroup  group;
-        OQLQuery      oql;
-        OQLQuery      groupOql;
-        Transaction   tx;
+	OQLQuery      oql;
+        TestObject    object;
+
+        // Open transaction in order to perform JDO operations
+        _db.begin();
         
-        try {
-            // Must be associated with an open transaction in order to
-            // use the ODMG database
-            tx = odmg.newTransaction();
-            tx.begin();
-            logger.println( "Create objects in database" );
-            oql = odmg.newOQLQuery();
-            oql.create( "SELECT pg FROM myapp.ProductGroup pg WHERE id = $1" );
-            
-            // Create two groups in the database
-            oql.bind( new Integer( FirstGroup ) );
-            group = (ProductGroup) oql.execute();
-            if ( group == null ) {
-                group = new ProductGroup();
-                group.id = FirstGroup;
-                group.name = "first group";
-                logger.println( "Creating new group: " + group );
-                db.makePersistent( group );
-            }
-            oql.bind( new Integer( SecondGroup ) );
-            group = (ProductGroup) oql.execute();
-            if ( group == null ) {
-                group = new ProductGroup();
-                group.id = SecondGroup;
-                group.name = "second group";
-                logger.println( "Creating new group: " + group );
-                db.makePersistent( group );
-            }
-            tx.commit();
-            
-            FirstThread first;
-            SecondThread second;
-            
-            first = new FirstThread();
-            first.odmg = odmg;
-            first.logger = logger;
-            first.start();
-            second = new SecondThread();
-            second.odmg = odmg;
-            second.logger = logger;
-            second.start();
-        } catch ( Exception except ) {
-            logger.println( except );
-            except.printStackTrace( logger );
+        // Create two objects in the database -- need something to lock
+        oql = _db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute();
+        if ( object == null ) {
+            object = new TestObject();
+            object.id = TestObject.DefaultId;
+            object.name = TestObject.DefaultName;
+            _logger.println( "Creating new object: " + object );
+            _db.makePersistent( object );
+        } else {
+            _logger.println( "Found object: " + object );
         }
+        oql.bind( new Integer( TestObject.DefaultId + 1 ) );
+        object = (TestObject) oql.execute();
+        if ( object == null ) {
+            object = new TestObject();
+            object.id = TestObject.DefaultId + 1;
+            object.name = TestObject.DefaultName;
+            _logger.println( "Creating new object: " + object );
+            _db.makePersistent( object );
+        } else {
+            _logger.println( "Found object: " + object );
+        }
+        _db.commit();
+
+
+        // Run two threads in parallel attempting to update the
+        // two objects in a different order, with the first
+        // suceeding and second failing
+        FirstThread  first;
+        SecondThread second;
+            
+        first = new FirstThread();
+        first._jdo = _jdo;
+        first._logger = _logger;
+        first.start();
+        second = new SecondThread();
+        second._jdo = _jdo;
+        second._logger = _logger;
+        second.start();
     }
     
     
@@ -104,48 +93,54 @@ public class Deadlock
         extends Thread
     {
         
-        Implementation  odmg;
-        
-        PrintWriter     logger;
+
+        private JDOSource      _jdo;
+
+
+        private PrintWriter    _logger;
+
         
         public void run()
         {
-            Transaction  tx;
             OQLQuery     oql;
-            ProductGroup group;
-            
-            tx = odmg.newTransaction();
+            TestObject   object;
+            Database     db = null;
+
             try {
-                tx.begin();
-                oql = odmg.newOQLQuery();
-                oql.create( "SELECT pg FROM myapp.ProductGroup pg WHERE id = $1" );
+                db = _jdo.getDatabase();
+                db.begin();
+                oql = db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
                 
-                logger.println( "First: Loading group" );
-                oql.bind( new Integer( FirstGroup ) );
-                group = (ProductGroup) oql.execute();
-                logger.println( "First: " + group );
-                group.name = group.name + ":1";
-                tx.lock( group, tx.WRITE );
+                // Load first object and change something about it (otherwise will not write)
+                _logger.println( "First: Loading object " + TestObject.DefaultId );
+                oql.bind( new Integer( TestObject.DefaultId ) );
+                object = (TestObject) oql.execute();
+                _logger.println( "First: Loaded " + object );
+                object.name = object.name + ":1";
+                // db.lock( group );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( 2000 );
                 
-                logger.println( "First: Loading group" );
-                oql.bind( new Integer( SecondGroup ) );
-                group = (ProductGroup) oql.execute();
-                logger.println( "First: " + group );
-                group.name = group.name + ":1";
-                tx.lock( group, tx.WRITE );
+                _logger.println( "First: Loading object " + TestObject.DefaultId  + 1 );
+                oql.bind( new Integer( TestObject.DefaultId + 1 ) );
+                object = (TestObject) oql.execute();
+                _logger.println( "First: Loaded " + object );
+                object.name = object.name + ":1";
+                // db.lock( group );
                 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                logger.println( "First: Committing" );
-                tx.commit();
-                logger.println( "First: Completed" );
+                _logger.println( "First: Committing" );
+                db.commit();
+                _logger.println( "First: Committed" );
+                db.close();
             } catch ( Exception except ) {
-                except.printStackTrace( logger );
-                if ( tx.isOpen() )
-                    tx.abort();
+                _logger.println( "Second: " + except );
+                try {
+                    if ( db != null )
+                        db.close();
+                } catch ( PersistenceException except2 ) { }
             }
         }
         
@@ -155,55 +150,61 @@ public class Deadlock
     static class SecondThread
         extends Thread
     {
+
         
-        Implementation  odmg;
-        
-        PrintWriter     logger;
+        private JDOSource      _jdo;
+
+
+        private PrintWriter    _logger;
+
         
         public void run()
         {
-            Transaction  tx;
             OQLQuery     oql;
-            ProductGroup group;
-            
-            tx = odmg.newTransaction();
+            TestObject   object;
+            Database     db = null;
+
             try {
-                tx.begin();
-                oql = odmg.newOQLQuery();
-                oql.create( "SELECT pg FROM myapp.ProductGroup pg WHERE id = $1" );
-                
-                // Give the other thread a 2 second opportunity.
-                sleep( 1000 );
-                
-                // Retrieve the product (Acquires read lock) and change the
-                // product.
-                logger.println( "Second: Loading Group" );
-                oql.bind( new Integer( SecondGroup ) );
-                group = (ProductGroup) oql.execute();
-                logger.println( "Second: " + group );
-                group.name = group.name + ":2";
-                tx.lock( group, tx.WRITE );
+                db = _jdo.getDatabase();
+                db.begin();
+                oql = db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( 2000 );
                 
-                // Retrieve the product (Acquires read lock) and change the
-                // product.
-                logger.println( "Second: Loading Group" );
-                logger.println( "Will report deadlock detection" );
-                oql.bind( new Integer( FirstGroup ) );
-                group = (ProductGroup) oql.execute();
-                logger.println( "Second: " + group );
-                group.name = group.name + ":2";
-                tx.lock( group, tx.WRITE );
+                // Load first object and change something about it (otherwise will not write)
+                _logger.println( "Second: Loading object " + TestObject.DefaultId + 1 );
+                oql.bind( new Integer( TestObject.DefaultId + 1 ) );
+                object = (TestObject) oql.execute();
+                _logger.println( "Second: Loaded " + object );
+                object.name = object.name + ":2";
+                // db.lock( group );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( 2000 );
-                tx.commit();
+                
+                _logger.println( "Second: Loading object " + TestObject.DefaultId );
+                oql.bind( new Integer( TestObject.DefaultId ) );
+                object = (TestObject) oql.execute();
+                _logger.println( "Second: Loaded " + object );
+                object.name = object.name + ":2";
+                // db.lock( group );
+
+                // Give the other thread a 2 second opportunity.
+                sleep( 2000 );
+                
+                // Attempt to commit the transaction, must acquire a write
+                // lock blocking until the first transaction completes.
+                _logger.println( "Second: Committing" );
+                db.commit();
+                _logger.println( "Second: Committed" );
+                db.close();
             } catch ( Exception except ) {
-                logger.println( "Second: " + except );
-                if ( tx.isOpen() )
-                    tx.abort();
+                _logger.println( "Second: " + except );
+                try {
+                    if ( db != null )
+                        db.close();
+                } catch ( PersistenceException except2 ) { }
             }
         }
         

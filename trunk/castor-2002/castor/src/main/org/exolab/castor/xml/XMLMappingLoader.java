@@ -159,9 +159,6 @@ public class XMLMappingLoader
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
         if ( fieldMap.getSetMethod() != null && fieldMap.getSetMethod().startsWith( "add" ) )
             xmlDesc.setMultivalued( true );
-        if ( nodeType == NodeType.Element && Types.isSimpleType( fieldDesc.getFieldType() ) ) {
-            xmlDesc.setClassDescriptor( new StringMarshalInfo() );
-        }
         return xmlDesc; 
     }
 

@@ -1,39 +1,45 @@
 <html>
-  <title>Interface To The JDO Engine</title>
+  <title>The JDO Interface</title>
   <body>
-    <p><b>The ODGM interface to the JDO engine.</b></p>
+    <p><b>Interface for Persisting Java Objects</b></p>
 
     <dl>
       <dt><b>Version: </b></dt><dd>$Revision$ $Date$</dd>
       <dt><b>Author: </b></dt><dd><a href="mailto:arkin@exoffice.com">Assaf Arkin</a></dd>
     </dl>
 
-    <p>Use {@link org.exolab.castor.jdo.ODMG} to obtain an implementation of the
-       JDO engine and load mapping files. The ODMG API can be used to create a
-       new database, open a transaction, etc.</p>
+    <p>Use {@link org.exolab.castor.jdo.JDO} to open a database, open a transaction and
+       load database configuration and mapping files.</p>
 
     <p>The following example loads JDO configuration file specifying Java/SQL
        mapping, opens up a database for read/write access, and performs a query:
 
        <pre>
-  ODMG        odmg;
+  JDO         jdo;
   Database    db;
   Transaction tx;
   OQLQuery    oql;
- 
-  odmg = new ODMG();
-  odmg.loadDatabase( "database.xml", null );
 
-  db = odmg.newDatabase();
-  db.open( "test", db.OPEN_READ_WRITE );
-  tx = odmg.newTransaction();
-  tx.begin();
+  // Only needs to happen once in application's life time
+  JDO.loadDatabase( "database.xml", null );
 
-  oql = ODMG.newOQLQuery();
-  oql.create( "SELECT p FROM Product p" );
+  // Open a new database 
+  jdo = new JDO();
+  jdo.setDatabaseName( "test" );
+  db = jdo.getDatabase();
+
+  // Begin a new transaction
+  db.begin();
+
+  // Create and execute a query
+  oql = db.getOQLQuery( "SELECT p FROM Product p" );
   oql.execute();
 
   . . .
+
+  // Commit transaction, close database
+  db.commit();
+  db.close();
        </pre></p>
 
   </body>
