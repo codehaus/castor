@@ -2,7 +2,9 @@ package jdo;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.exolab.castor.persist.LRU;
+
+import org.exolab.castor.persist.cache.TimeLimited;
+
 import harness.CastorTestCase;
 import harness.TestHarness;
 
@@ -60,7 +62,7 @@ public class Cache extends CastorTestCase {
         }
     }
 
-    class TimeLimitedTest extends LRU.TimeLimited {
+    class TimeLimitedTest extends TimeLimited {
 
         private List _expiredTooFast;
 
