@@ -93,6 +93,8 @@
 					<!-- the qualified name of the root Object -->
 					<!-- later: define a pattern to describe a Java quailified name-->
 					<xsd:element name="Root_Object" type="test:RootType" minOccurs="1" maxOccurs="1"/>
+					<!-- the configuration for the marshalling framework -->
+					<xsd:element ref="test:Configuration" minOccurs="0" maxOccurs="1"/>
 					<!-- the test cases for the Marshalling Framework-->
 					<!-- for the moment it is shared with the test cases-->
 					<!-- for the SourceGenerator-->
@@ -122,6 +124,8 @@
                     <!-- all the schemas present in the directory or jar -->
                     <xsd:element name="Schema" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 				</xsd:choice>
+				<!-- the configuration for the marshalling framework -->
+                <xsd:element ref="test:Configuration" minOccurs="0" maxOccurs="1"/>
                 <!-- the input XML file for unmarshalling-->
 				<xsd:element name="Input" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 				<!-- the output file for marshalling -->
@@ -131,7 +135,7 @@
                 <!-- the ObjectBuilder class used for this test case -->
 				<xsd:element name="ObjectBuilder" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 			    <!-- a boolean that indicates if the test case intents to fail (Exception thrown)-->
-                <xsd:element name="Failure" type="test:FailureType" default="false" minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="Failure" type="test:FailureType" minOccurs="0" maxOccurs="1"/>
                 <!-- will cause the test to be ignored -->
                 <xsd:element name="Skip"   type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
                 <!-- the listener to use for unmarshalling, marshalling or both -->
@@ -139,6 +143,38 @@
             </xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:element name="Configuration">
+	    <xsd:complexType>
+	       <xsd:choice>
+	          <xsd:element name="Marshal" type="test:ConfigurationType"/>
+	          <xsd:element name="Unmarshal" type="test:ConfigurationType"/>
+	       </xsd:choice>
+	    </xsd:complexType>
+	</xsd:element>
+	
+	<xsd:complexType name="ConfigurationType">
+	    <xsd:sequence>
+	       <xsd:element name="Call-method" maxOccurs="unbounded">
+	           <xsd:complexType>
+	               <xsd:sequence>
+	                   <xsd:element name="Value" maxOccurs="unbounded">
+	                       <xsd:complexType>
+	                           <xsd:simpleContent>
+						            <xsd:extension base="xsd:string">
+										<!-- java type -->
+										<xsd:attribute name="type" type="xsd:string" required="true"/>
+									</xsd:extension>
+								</xsd:simpleContent>
+                           </xsd:complexType>  
+				       </xsd:element>
+	               </xsd:sequence>
+	               <!-- the name of the method to call -->
+	               <xsd:attribute name="name" type="xsd:string"/>
+	           </xsd:complexType>
+	       </xsd:element>
+	    </xsd:sequence>
+	</xsd:complexType>
 
 	<xsd:simpleType name="CategoryType">
 		<xsd:restriction base="xsd:string">

@@ -44,40 +44,36 @@
  */
 package org.exolab.castor.tests.framework;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-import org.exolab.castor.tests.framework.ObjectModelBuilder;
-import org.exolab.castor.tests.framework.CastorTestable;
-import org.exolab.castor.tests.framework.testDescriptor.MarshallingTest;
+import org.exolab.castor.tests.framework.testDescriptor.CallMethod;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
 import org.exolab.castor.tests.framework.testDescriptor.Failure;
 import org.exolab.castor.tests.framework.testDescriptor.Listener;
 import org.exolab.castor.tests.framework.testDescriptor.types.TypeType;
+import org.exolab.castor.tests.framework.testDescriptor.Configuration;
+import org.exolab.castor.tests.framework.testDescriptor.Marshal;
+import org.exolab.castor.tests.framework.testDescriptor.Unmarshal;
+import org.exolab.castor.tests.framework.testDescriptor.CallMethod;
+import org.exolab.castor.tests.framework.testDescriptor.Value;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.MarshalListener;
 import org.exolab.castor.xml.UnmarshalListener;
 
-import org.exolab.adaptx.xslt.dom.XPNReader;
-import org.exolab.adaptx.xslt.dom.XPNBuilder;
-import org.exolab.adaptx.xpath.XPathNode;
-import org.exolab.adaptx.xml.XMLDiff;
-
 import org.xml.sax.InputSource;
 
-import java.lang.reflect.Method;
-
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.util.Enumeration;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 
 /**
  * This class encapsulates all the common logic to run the test patterns for
@@ -197,7 +193,16 @@ public abstract class XMLTestCase extends TestCase {
      * Gold file for listener
      */
     protected String _listenerGoldFile;
+    
+    /**
+     * The Configuration the Marshalling Framework
+     */
+    protected Configuration _configuration;
 
+    /**
+     * valueOf
+     */
+    private static final String VALUE_OF = "valueOf";
   
     /**
      * The ouput the unmarshalling test.
@@ -561,9 +566,32 @@ public abstract class XMLTestCase extends TestCase {
 
         File marshalOutput    = new File(_outputRootFile, fileName);
         Marshaller marshaller = new Marshaller(new FileWriter(marshalOutput));
+        //--Configuration to use?
+        //-- The priority goes to the unit test case
+        Configuration config = _unitTest.getConfiguration();
+        if (config == null) 
+            config = _configuration;
 
+        if (config != null) {
+            Marshal marshal = config.getMarshal();
+            if (marshal != null) {
+                
+                Enumeration methods = marshal.enumerateCallMethod();
+                //-- For each method defined, we invoke it on marshaller just created.
+                while (methods.hasMoreElements()) {
+                    CallMethod method = (CallMethod) methods.nextElement();
+                    //-- search for the method to invoke
+                    Method toBeinvoked = getInvokeMethod(method.getName(), method.getValue());
+                    //-- construct the objects representing the arguments of the method
+                    Object[] arguments = getArguments(method.getValue());
+                    toBeinvoked.invoke(marshaller, arguments);
+                 }
+            }// --marshall != null
+        }//-- config != null
+        
         if (_mapping != null)
             marshaller.setMapping(_mapping);
+        
         if ( _listener != null && _listener instanceof MarshalListener
              && _listenerType.getType() != TypeType.UNMARSHAL_TYPE)
         {
@@ -606,6 +634,28 @@ public abstract class XMLTestCase extends TestCase {
 
         Unmarshaller unmar;
         Object result = null;
+        //--Configuration to use?
+        //-- The priority goes to the unit test case
+        Configuration config = _unitTest.getConfiguration();
+       if (config == null) 
+           config = _configuration;
+
+       if (config != null) {
+           Unmarshal unmarshal = config.getUnmarshal();
+           if (unmarshal != null) {                
+               Enumeration methods = unmarshal.enumerateCallMethod();
+               //-- For each method defined, we invoke it on marshaller just created.
+               while (methods.hasMoreElements()) {
+                   CallMethod method = (CallMethod) methods.nextElement();
+                   //-- search for the method to invoke
+                   Method toBeinvoked = getInvokeMethod(method.getName(), method.getValue());
+                   //-- construct the objects representing the arguments of the method
+                   Object[] arguments = getArguments(method.getValue());
+                   toBeinvoked.invoke(unmarshal, arguments);
+                }
+           }// --marshall != null
+       }//-- config != null
+       
         if (_mapping != null)
             unmar = new Unmarshaller(_mapping);
 
@@ -688,6 +738,47 @@ public abstract class XMLTestCase extends TestCase {
         if (_verbose)
             System.out.println(message);
     }
+    
+    private Method getInvokeMethod(String methodName, Value[] values) 
+        throws ClassNotFoundException, NoSuchMethodException {
+        if (methodName == null)
+            throw new IllegalArgumentException("The name of the method to invoke is null");
+        Method result = null;
+        Class[] argumentsClass = null;
+        
+        //-- the value object represent the arguments
+        //--of the method if any
+        if (values != null && values.length > 0) {
+            argumentsClass = new Class[values.length];
+            int i = 0;
+            while (i < values.length) {
+                Value value = values[i];
+                Class argumentClass = CTFUtils.getClass(value.getType(), _test.getClassLoader());
+                argumentsClass[i] = argumentClass;
+                i++;
+            }      
+        }         
+        result = Marshaller.class.getMethod(methodName, argumentsClass);
+        return result;
+    }
+    
+    private Object[] getArguments(Value[] values) 
+        throws ClassNotFoundException, MarshalException
+    {
+         
+        Object[] result = new Object[values.length];
+        int i = 0;
+        while (i < values.length) {
+            Value value = values[i];                
+            //-- Construct the arguments for the method
+            Object argument = null;
+            argument = CTFUtils.instantiateObject(value.getType(), value.getContent(), _test.getClassLoader());
+            result[i] = argument;
+            i++;
+        } 
+        return result;        
+    }
+    
     
     class TestWithReferenceDocument extends TestCase {
             
