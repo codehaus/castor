@@ -368,6 +368,39 @@ create unique index test_lob_pk on test_lob ( id );
 grant all on test_lobs to test;
 
 
+-- test_conv
+drop table test_conv;
+
+create table test_conv (
+    id               int     not null,
+    bool_byte        int     null,
+    bool_short       int     null,
+    bool_int         int     null,
+    bool_bigdec      numeric null,
+    byte_int         int     null,
+    short_int        int     null,
+    long_int         int     null,
+    double_int       int     null,
+    float_int        float   null,
+    byte_bigdec      numeric null,
+    short_bigdec     numeric null,
+    int_bigdec       numeric null,
+    float_bigdec     numeric null,
+    double_bigdec    numeric null,
+    short_string     varchar(20) null,
+    byte_string      varchar(20) null,
+    int_string       varchar(20) null,
+    long_string      varchar(20) null,
+    bigdec_string    varchar(20) null,
+    float_string     varchar(20) null,
+    double_string    varchar(20) null
+);
+
+create unique index test_conv_pk on test_conv( id );
+
+grant all on test_conv to test;
+
+
 -- test_keygen
 drop table   test_keygen;
 
