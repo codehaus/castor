@@ -462,24 +462,15 @@ public class SourceGenerator {
             err += ve.getMessage();
             throw new IllegalArgumentException(err);
         }
-        //--This code shouldn't be needed anymore since XMLBindingComponent
-        //--should handle the lookup(Arnaud 20030120)
-        /*if (packageName == null) {
-            String schemaLocation = schema.getSchemaLocation();
-            packageName = lookupPackageLocation(schemaLocation);
-            if (packageName == null) {
-                String targetNamespace = schema.getTargetNamespace();
-                packageName = lookupPackageNamespace(targetNamespace);
-            }
-        }*/
-        
+                
         //--map the targetNamespace of the schema with the packageName defined
         if (packageName != null) {
             String targetNamespace = schema.getTargetNamespace();
             //-- adjust targetNamespace
             if (targetNamespace == null)
                 targetNamespace = "";
-            _nspackages.put(targetNamespace, packageName);
+            if ((_nspackages.get(targetNamespace)) == null)
+                _nspackages.put(targetNamespace, packageName);
         }
         sInfo.packageName = packageName;
         sInfo.setDialog(_dialog);
@@ -1282,8 +1273,8 @@ public class SourceGenerator {
     private void processComplexType(ComplexType complexType, SGStateInfo sInfo) {
 
         if (complexType == null) return;
-
         _bindingComponent.setView(complexType);
+        
         ClassInfo classInfo = sInfo.resolve(complexType);
         if (classInfo == null) {
             //-- handle top-level complextypes
