@@ -15,7 +15,7 @@
     <case class="jdo.Concurrent" />
     <case class="jdo.ReadOnly" />
     <case class="jdo.Deadlock" />
-    <!-- <case class="jdo.Race" /> -->
+    <case class="jdo.Race" />
     <case class="jdo.CacheLeakage" />
 
     <!-- B -->
