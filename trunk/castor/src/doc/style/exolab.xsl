@@ -391,8 +391,8 @@
     <div>
       [
       <a href="mailto:{@manager}@{@server}?subject=subscribe {@name}">Subscribe</a> |
-      <a href="mailto:{@manager}@{@server}?subject=unsubscribe {@name}">Unsubscribe</a> |
-      <a href="mailto:{@name}@{@server}">Post Message</a>
+      <a href="mailto:{@manager}@{@server}?subject=unsubscribe {@name}">Unsubscribe</a>
+      <!-- | <a href="mailto:{@name}@{@server}">Post Message</a> -->
       <xsl:if test="@archive">
          | <a href="{@archive}">Archive</a>
     </xsl:if>
@@ -473,7 +473,7 @@
                   <xsl:when test="url">
                     <div align="center"><a href="{url}">[Read More/Comment]</a></div><br/>
                   </xsl:when>
-                  Submitted by <xsl:value-of select="author"/>, on <xsl:value-of select="date"/> 
+                  Submitted by <xsl:value-of select="author"/>, on <xsl:value-of select="date"/>
                   @ <xsl:value-of select="time"/>
               </span>
           </td></tr></table>
