@@ -881,11 +881,11 @@ public final class DatabaseEngine
     static class TypeInfo
     {
 
-	SQLEngine   engine;
+	SQLEngine     engine;
 
-	JDOObjectDesc  objDesc;
+	JDOObjectDesc objDesc;
 
-	Interceptor interceptor;
+	Interceptor   interceptor;
 
 	TypeInfo( SQLEngine engine, JDOObjectDesc objDesc, Interceptor interceptor )
 	{
