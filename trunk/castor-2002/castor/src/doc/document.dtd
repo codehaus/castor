@@ -1,0 +1,40 @@
+<!ELEMENT document ( properties?, body )>
+<!ATTLIST document
+    url ID #REQUIRED>
+<!ELEMENT properties ( title?, abstract?, author*, status? )>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT abstract (#PCDATA)>
+<!ELEMENT status (#PCDATA)>
+<!ELEMENT author (#PCDATA)>
+<!ATTLIST author
+    email   CDATA #IMPLIED
+    ldap    CDATA #IMPLIED
+<!ELEMENT body ( title?, header?, section+, footer*)>
+<!ELEMENT section ANY>
+<!ATTLIST section
+    title #REQUIRED>
+<!ELEMENT header ANY>
+<!ELEMENT footer ANY>
+
+
+<!ELEMENT project ( title, links, menu*, notice* )>
+<!ATTLIST project
+    name CDATA #REQUIRED
+    repository  CDATA #IMPLIED>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT links-bar ( link* )>
+<!ELEMENT link EMPTY>
+<!ATTLIST link
+    name  CDATA #REQUIRED
+    href  CDATA #REQUIRED
+    image CDATA #REQUIRED
+    height CDATA #IMPLIED
+    width  CDATA #IMPLIED>
+<!ELEMENT menu ( item* )>
+<!ATTLIST menu
+    name CDATA #REQUIRED>
+<!ELEMENT item EMPTY>
+<!ATTLIST item
+    name CDATA #REQUIRED
+    href CDATA #REQUIRED>
+<!ELEMENT notice (#PCDATA)>
