@@ -30,11 +30,11 @@
 
   <a name="top"/>
 
-    <table border="0" cellpadding="0" cellspacing="0" width="712" height="400">
+    <table border="0" cellpadding="0" cellspacing="0" height="400">
 
       <tr><td width="10" valign="top" align="left" bgcolor="#7270c2"><img
         src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
-        <td width="95" valign="top" align="left" bgcolor="#7270c2"><img
+        <td width="115" valign="top" align="left" bgcolor="#7270c2"><img
           src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
         <td width="7" valign="top" align="left"><img src="images/dotTrans.gif" border="0"
           width="1" height="1"/></td>
@@ -51,7 +51,7 @@
       <tr>
         <td width="10" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
-        <td width="95" bgcolor="#7270c2" valign="top" align="left"><img
+        <td width="115" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
         <td width="7" bgcolor="#ffffff" valign="top" align="left"></td>
         <td width="70" valign="top" align="left"><img
@@ -64,7 +64,7 @@
       <tr>
         <td width="10" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" width="10" height="3" border="0"/></td>
-        <td width="95" bgcolor="#7270c2" valign="top" align="left"><img
+        <td width="115" bgcolor="#7270c2" valign="top" align="right"><img
           src="images/line_sm.gif" width="105" height="3" border="0"/></td>
         <td width="7" bgcolor="#a9a5de" valign="top" align="left"><img
           src="images/line_sm.gif" width="7" height="3" border="0"/></td>
@@ -80,7 +80,7 @@
         <td bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" width="10" height="10" border="0"/></td>
 
-        <td width="95" bgcolor="#7270c2" valign="top" align="left"><img src="images/dotTrans.gif" width="1" height="2" border="0"/><br/>
+        <td width="115" bgcolor="#7270c2" valign="top" align="left"><img src="images/dotTrans.gif" width="1" height="2" border="0"/><br/>
 <xsl:apply-templates select="$project/navSections"/></td>
 
         <td width="7" bgcolor="#a9a5de" valign="top" align="left">&#160;</td>
@@ -135,9 +135,9 @@
 
       <tr height="5">
         <td width="10" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
-        <td width="95" height="5" bgcolor="#7270c2" valign="top">
+        <td width="115" height="5" bgcolor="#7270c2" valign="top">
         <img src="images/dotTrans.gif" width="1" height="15" border="0"/><br/>
-        <img src="images/line_sm.gif" width="105" height="3" border="0"/>
+        <img src="images/line_sm.gif" width="105" height="3" border="0" align="right"/>
 
 
         </td>
@@ -150,7 +150,7 @@
 
       <tr>
         <td width="10" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
-        <td width="95" bgcolor="#7270c2" valign="top"
+        <td width="115" bgcolor="#7270c2" valign="top"
           align="left"><xsl:apply-templates select="searchForm"/></td>
         <td width="7" bgcolor="#a9a5de" valign="top" align="left">
           <img src="images/dotTrans.gif" width="1" height="25" border="0"/>
@@ -166,7 +166,7 @@
       <tr height="5">
         <td width="10" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom"
           align="left"><img src="images/stripes1.gif" width="10" height="125" border="0"/></td>
-        <td width="95" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom"
+        <td width="115" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom"
           align="left"><img src="images/stripe105.gif" width="105" height="125" border="0"/></td>
         <td width="7" rowspan="2" height="100%" bgcolor="#a9a5de" valign="top"
           align="left">&#160;</td>
@@ -178,7 +178,7 @@
 
       <tr height="5">
         <!--td width="10" height="25" valign="top" align="left">&#160;</td>
-        <td width="95" height="25" valign="top" align="left">&#160;</td>
+        <td width="115" height="25" valign="top" align="left">&#160;</td>
         <td width="7" height="25" valign="top" align="left">&#160;</td-->
         <td width="70" height="25" valign="top" align="left">&#160;</td>
         <td width="400" height="25" valign="bottom" align="left">
