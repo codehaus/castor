@@ -37,6 +37,9 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Added support for in-lines SimpleTypes (anonymous) for 
+        attribute declarations (kvisco)
+
 XML:    Added support for in-lined SimpleTypes (anonymous) for 
         element declarations. (kvisco)
 
