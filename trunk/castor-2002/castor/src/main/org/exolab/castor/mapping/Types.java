@@ -50,6 +50,8 @@ package org.exolab.castor.mapping;
 import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.exolab.castor.util.Messages;
 
 
@@ -217,6 +219,23 @@ public abstract class Types
     }
 
 
+    /**
+     * Returns the default value for this Java type (e.g. 0 for integer, empty
+     * string) or null if no default value is known.
+     *
+     * @param type The Java type
+     * @return The default value or null
+     */
+    public static Object getDefault( Class type )
+    {
+	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+	    if ( _typeInfos[ i ].javaType == type )
+		return _typeInfos[ i ].defValue;
+	}
+	return null;
+    }
+
+
     public static class TypeInfo
     {
 
@@ -228,12 +247,16 @@ public abstract class Types
 
 	public final boolean immutable;
 
-	TypeInfo( String shortName, Class primitive, Class javaType, boolean immutable )
+	public final Object  defValue;
+
+	TypeInfo( String shortName, Class primitive, Class javaType,
+		  boolean immutable, Object defValue )
 	{
 	    this.shortName = shortName;
 	    this.primitive = primitive;
 	    this.javaType  = javaType;
 	    this.immutable = immutable;
+	    this.defValue  = defValue;
 	}
 
     }
@@ -243,20 +266,36 @@ public abstract class Types
      * List of all the simple types supported by Castor.
      */
     static TypeInfo[] _typeInfos = new TypeInfo[] {
-	new TypeInfo( "other",       null,                      java.lang.Object.class,     false ),
-	new TypeInfo( "string",      null,                      java.lang.String.class,     true ),
-	new TypeInfo( "integer",     java.lang.Integer.TYPE,    java.lang.Integer.class,    true ),
-	new TypeInfo( "long",        java.lang.Long.TYPE,       java.lang.Long.class,       true ),
-	new TypeInfo( "boolean",     java.lang.Boolean.TYPE,    java.lang.Boolean.class,    true ),
-	new TypeInfo( "double",      java.lang.Double.TYPE,     java.lang.Double.class,     true ),
-	new TypeInfo( "float",       java.lang.Float.TYPE,      java.lang.Float.class,      true ),
-	new TypeInfo( "big-decimal", null,                      java.math.BigDecimal.class, true ),
-	new TypeInfo( "byte",        java.lang.Byte.TYPE,       java.lang.Byte.class,       true ),
-	new TypeInfo( "date",        null,                      java.util.Date.class,       true ),
-	new TypeInfo( "short",       java.lang.Short.TYPE,      java.lang.Short.class,      true ),
-	new TypeInfo( "char",        java.lang.Character.TYPE,  java.lang.Character.class,  true ),
-	new TypeInfo( "bytes",       null,                      byte[].class,               false ),
-	new TypeInfo( "chars",       null,                      char[].class,               false ),
+	new TypeInfo( "other",       null,
+                      java.lang.Object.class,     false, null ),
+	new TypeInfo( "string",      null,
+                      java.lang.String.class,     true, "" ),
+	new TypeInfo( "integer",     java.lang.Integer.TYPE,
+		      java.lang.Integer.class,    true, new Integer( 0 ) ),
+	new TypeInfo( "long",        java.lang.Long.TYPE,
+		      java.lang.Long.class,       true, new Long( 0 ) ),
+	new TypeInfo( "boolean",     java.lang.Boolean.TYPE,
+		      java.lang.Boolean.class,    true, Boolean.FALSE ),
+	new TypeInfo( "double",      java.lang.Double.TYPE,
+		      java.lang.Double.class,     true, new Double( 0 ) ),
+	new TypeInfo( "float",       java.lang.Float.TYPE,
+		      java.lang.Float.class,      true, new Float( 0 ) ),
+	new TypeInfo( "big-decimal", null,
+                      java.math.BigDecimal.class, true, new BigDecimal( 0 ) ),
+	new TypeInfo( "big-integer", null,
+                      java.math.BigInteger.class, true, BigInteger.ZERO ),
+	new TypeInfo( "byte",        java.lang.Byte.TYPE,
+		      java.lang.Byte.class,       true, new Byte( (byte) 0 ) ),
+	new TypeInfo( "date",        null,
+                      java.util.Date.class,       true, new Date() ),
+	new TypeInfo( "short",       java.lang.Short.TYPE,
+		      java.lang.Short.class,      true, new Short( (short) 0 ) ),
+	new TypeInfo( "char",        java.lang.Character.TYPE,
+		      java.lang.Character.class,  true, new Character( (char) 0 ) ),
+	new TypeInfo( "bytes",       null,
+                      byte[].class,               false, new byte[ 0 ] ),
+	new TypeInfo( "chars",       null,
+                      char[].class,               false, new char[ 0 ] ),
 	/*
 	new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
 	new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
