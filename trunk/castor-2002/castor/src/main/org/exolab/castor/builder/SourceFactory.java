@@ -83,7 +83,7 @@ public class SourceFactory  {
 
 
     private short enumerationType = OBJECT_TYPE_ENUMERATION;
-    
+
     /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
@@ -207,8 +207,14 @@ public class SourceFactory  {
         //-- #unmarshal()
         createUnmarshalMethods(jClass);
 
+        //-- This boolean is set to create bound properties
+        //-- even if the user has set the SUPER CLASS property
+
+        boolean realDerived = derived;
+        if (base != null)
+            realDerived = false;
 		//-- create Bound Properties code
-		if (state.hasBoundProperties() && (!derived))
+		if (state.hasBoundProperties() && (!realDerived))
 		    createPropertyChangeMethods(jClass);
 
         if (resolver != null) {
@@ -897,8 +903,8 @@ public class SourceFactory  {
     private void processEnumeration
         (SimpleType simpleType, FactoryState state)
     {
-        
-        
+
+
         switch (enumerationType) {
             case BASE_TYPE_ENUMERATION:
                 processEnumerationAsBaseType(simpleType, state);
@@ -907,9 +913,9 @@ public class SourceFactory  {
                 processEnumerationAsNewObject(simpleType, state);
                 break;
         }
-        
+
     } //-- processEnumeration
-    
+
     /**
      * Creates all the necessary enumeration code from the given
      * SimpleType. Enumerations are handled a couple ways.
@@ -918,10 +924,10 @@ public class SourceFactory  {
     private void processEnumerationAsNewObject
         (SimpleType simpleType, FactoryState state)
     {
-        
+
         Enumeration enum = simpleType.getFacets("enumeration");
 
-        
+
         //-- select naming for types and instances
         boolean useValuesAsName = true;
         while (enum.hasMoreElements()) {
@@ -932,7 +938,7 @@ public class SourceFactory  {
                 break;
             }
         }
-        
+
         enum = simpleType.getFacets("enumeration");
 
         JClass jClass = state.jClass;
@@ -942,7 +948,7 @@ public class SourceFactory  {
         JField  fHash  = new JField(SGTypes.Hashtable, "_memberTable");
         fHash.setInitString("init()");
         fHash.getModifiers().setStatic(true);
-        
+
         JDocComment jdc = null;
         JSourceCode jsc = null;
 
@@ -992,11 +998,11 @@ public class SourceFactory  {
 
         //-- #init method
         JMethod mInit = new JMethod(SGTypes.Hashtable, "init");
-        jClass.addMethod(mInit);        
+        jClass.addMethod(mInit);
         mInit.getModifiers().makePrivate();
         mInit.getModifiers().setStatic(true);
         mInit.getSourceCode().add("Hashtable members = new Hashtable();");
-        
+
 
         //-- Loop through "enumeration" facets
         int count = 0;
@@ -1006,13 +1012,13 @@ public class SourceFactory  {
             Facet facet = (Facet) enum.nextElement();
 
             String value = facet.getValue();
-            
+
             String typeName = null;
             String objName = null;
-            
+
             if (useValuesAsName) objName = value.toUpperCase();
             else objName = "VALUE_" + count;
-            
+
             //-- create typeName
             //-- Note: this could cause name conflicts
             typeName = objName + "_TYPE";
@@ -1049,21 +1055,21 @@ public class SourceFactory  {
             field.setInitString(init.toString());
             jClass.addField(field);
 
-            
+
             //-- initializer method
             jsc = mInit.getSourceCode();
             jsc.add("members.put(\"");
             jsc.append(escapeValue(value));
-            jsc.append("\", ");                
+            jsc.append("\", ");
             jsc.append(objName);
             jsc.append(");");
-            
+
             ++count;
         }
 
-        //-- finish init method        
+        //-- finish init method
         mInit.getSourceCode().add("return members;");
-        
+
         //-- add memberTable to the class, we can only
         //-- add this after all the types, or we'll
         //-- create source code that will generate
@@ -1071,7 +1077,7 @@ public class SourceFactory  {
         //-- init() will try to add null values to
         //-- the hashtable.
         jClass.addField(fHash);
-        
+
         //-- add internal type
         field = new JField(JType.Int, "type");
         field.setInitString("-1");
@@ -1110,7 +1116,7 @@ public class SourceFactory  {
      *        // Returns true if the given value is part
      *        // of this enumeration
      *        public boolean contains({type} value);
-     *         
+     *
      *        // Returns the {type} value whose String value
      *        // is equal to the given String
      *        public {type} valueOf(String strValue);
@@ -1124,17 +1130,17 @@ public class SourceFactory  {
     {
 
 
-        SimpleType base = (SimpleType)simpleType.getBaseType();        
-        XSType baseType = null;        
-        
+        SimpleType base = (SimpleType)simpleType.getBaseType();
+        XSType baseType = null;
+
         if (base == null)
             baseType = new XSString();
         else
             baseType = TypeConversion.convertType(base);
-            
-            
+
+
         Enumeration enum = simpleType.getFacets("enumeration");
-            
+
         JClass jClass = state.jClass;
         String className = jClass.getLocalName();
 
@@ -1146,13 +1152,13 @@ public class SourceFactory  {
         //-- modify constructor
         JConstructor constructor = jClass.getConstructor(0);
         constructor.getModifiers().makePrivate();
-        
+
         fValues = new JField(baseType.getJType().createArray(), "values");
-        
+
         //-- Loop through "enumeration" facets
         //-- and create the default values for the type.
         int count = 0;
-        
+
         StringBuffer values = new StringBuffer("{\n");
 
         while (enum.hasMoreElements()) {
@@ -1160,34 +1166,34 @@ public class SourceFactory  {
             Facet facet = (Facet) enum.nextElement();
 
             String value = facet.getValue();
-            
+
             //-- Should we make sure the value is valid
             //-- before proceeding??
-            
-            
+
+
             //-- we need to move this code to XSType
             //-- so that we don't have to do special
             //-- code here for each type
-            
+
             if (count > 0) values.append(",\n");
-            
+
             //-- indent for fun
             values.append("    ");
-            
+
             if (baseType.getType() == XSType.STRING) {
                 values.append('\"');
                 //-- escape value
                 values.append(escapeValue(value));
                 values.append('\"');
-                
+
             }
             else values.append(value);
-            
+
             ++count;
         }
-        
+
         values.append("\n}");
-            
+
         fValues.setInitString(values.toString());
         jClass.addField(fValues);
 
@@ -1200,14 +1206,14 @@ public class SourceFactory  {
         jdc.appendComment("Returns the " + baseType.getJType());
         jdc.appendComment(" based on the given String value.");
         jsc = method.getSourceCode();
-        
+
         jsc.add("for (int i = 0; i < values.length; i++) {");
         jsc.add("}");
         jsc.add("throw new IllegalArgumentException(\"");
         jsc.append("Invalid value for ");
         jsc.append(className);
         jsc.append(": \" + string + \".\");");
-        
+
     } //-- processEnumerationAsBaseType
 
     /**
@@ -1240,8 +1246,8 @@ public class SourceFactory  {
 
     } //-- escapeValue
 
-    
-    
+
+
 } //-- SourceFactory
 
 
