@@ -332,7 +332,7 @@
         <jar jarfile="${dist}/CTF-${version}.jar" basedir="${build}/tests" manifest="${classes}/MANIFEST.MF" includes="LICENCE,README,org/**"/>
      </target>
     <!-- Build the documentation -->
-    <target name="doc" depends="prepare,clean">
+    <target name="doc" depends="clean,prepare">
         <mkdir dir="${build}/doc"/>
         <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl" includes="**.xml" excludes="style/**,project.xml"/>
         <copy todir="${build}/doc">
