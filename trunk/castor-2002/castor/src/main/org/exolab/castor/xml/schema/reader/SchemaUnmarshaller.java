@@ -117,6 +117,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         return _schema;
     }
     
+    public void setSchema(Schema schema) {
+        _schema = schema;
+    }
+    
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -271,6 +275,11 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         else if (name == SchemaNames.SIMPLE_TYPE) {
             unmarshaller 
                 = new SimpleTypeUnmarshaller(_schema, atts, _resolver);
+        }
+        //-- <include>
+        else if (name == SchemaNames.INCLUDE) {
+            unmarshaller 
+                = new IncludeUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here

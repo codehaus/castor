@@ -68,7 +68,7 @@ public class ElementDecl extends ContentModelType {
      * The maximum number of occurances of that elements of this type
      * may appear as children of it's context
     **/
-    private int maxOccurs = 0;
+    private int maxOccurs = -1;
     
     /**
      * The minimum number of occurances of this element that must

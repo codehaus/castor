@@ -9,15 +9,15 @@
 
   <contributor type="Committer">
     <name surname="Arkin" given="Assaf"/>
-    <email>arkin@exoffice.com</email>
-    <company id="exoffice"/>
+    <email>arkin@intalio.com</email>
+    <company id="intalio"/>
     <description>Responsible for all things wrong in JDO</description>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Visco" given="Keith"/>
-    <email>kvisco@exoffice.com</email>
-    <company id="exoffice"/>
+    <email>kvisco@intalio.com</email>
+    <company id="intalio"/>
     <description>Eliminated angle brackets on XML side</description>
   </contributor>
 
@@ -43,6 +43,20 @@
     <description>JDO bugfixes, enhancements.</description>
   </contributor>
 
+  <contributor type="Committer">
+    <name surname="Yip" given="Thomas"/>
+    <email>yip@intalio.com</email>
+    <company id="intalio"/>
+    <description>JDO enhancements.</description>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Maucherat" given="Remy"/>
+    <email>remm@apache.org</email>
+    <company id="intalio"/>
+    <description>XML enhancements, lots of testing.</description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Thelen" given="Frank"/>
     <email>Frank.Thelen@poet.de</email>
@@ -65,6 +79,11 @@
     <description>Added Informix and Hypersonic SQL to the list of supported databases.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Fawcett" given="Andrew"/>
+    <email>Andrew.Fawcett@coda.com</email>
+    <description>XML enhancements.</description>
+  </contributor>
 
   <contributor type="Feedback">
     <name surname="Sahuc" given="Sebastien"/>
@@ -88,9 +107,9 @@
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
   -->
-  <company id="exoffice">
-    <name>Exoffice Technologies</name>
-    <url>www.exoffice.com</url>
+  <company id="intalio">
+    <name>Intalio Inc</name>
+    <url>www.intalio.com</url>
   </company>
 
   <company id="poet">
