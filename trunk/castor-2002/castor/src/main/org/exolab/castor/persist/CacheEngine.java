@@ -142,16 +142,40 @@ final class CacheEngine
         Persistence   persist;
         
         _logWriter = logWriter;
-        enum = mapResolver.listDescriptors();
+        _mapResolver = mapResolver;
+        enum = mapResolver.listJavaClasses();
         while ( enum.hasMoreElements() ) {
-            handler = new ClassHandler( (ClassDescriptor) enum.nextElement(), mapResolver );
+            handler = addClassHandler( (Class) enum.nextElement() );
             persist = factory.getPersistence( handler, logWriter );
             if ( persist != null )
-                _typeInfo.put( handler.getJavaClass(), new TypeInfo( persist, handler ) );
-            else if ( _logWriter != null ) {
+                _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler.getJavaClass(), persist,
+                                                                     handler, handler.getFieldCount() ) );
+            else if ( _logWriter != null )
                 _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
+        }
+        _mapResolver = null;
+    }
+
+    private Hashtable _handlers = new Hashtable();
+
+    private MappingResolver _mapResolver;
+
+    ClassHandler addClassHandler( Class javaClass )
+    {
+        ClassHandler handler;
+
+        handler = (ClassHandler) _handlers.get( javaClass );
+        if ( handler == null ) {
+            ClassDescriptor clsDesc;
+
+            clsDesc = _mapResolver.getDescriptor( javaClass );
+            if ( clsDesc != null ) {
+                handler = new ClassHandler( clsDesc );
+                _handlers.put( javaClass, handler );
+                handler.normalize( this );
             }
         }
+        return handler;
     }
 
 
@@ -216,7 +240,7 @@ final class CacheEngine
         throws ObjectNotFoundException, LockNotGrantedException,
                PersistenceException, ClassNotPersistenceCapableException
     {
-        Object     obj;
+        Object[]   fields;
         OID        oid;
         ObjectLock lock;
         TypeInfo   typeInfo;
@@ -235,14 +259,14 @@ final class CacheEngine
             // Object has been loaded before, must acquire lock
             // on it (write in exclusive mode)
             try {
-                obj = lock.acquire( tx, accessMode == AccessMode.Exclusive, timeout );
+                fields = (Object[]) lock.acquire( tx, accessMode == AccessMode.Exclusive, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
                 throw new ObjectNotFoundException( type, identity );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
-            oid = getOID( obj );
+            oid = getOID( fields );
             
             // XXX Problem, obj might be parent class but attempting
             //     to load derived class, will still return parent class
@@ -253,23 +277,22 @@ final class CacheEngine
                 // the database and obtain a lock on the object.
                 try {
                     if ( _logWriter != null )
-                        _logWriter.println( "PE: Loading " + obj.getClass().getName() +
+                        _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
                                             " (" + identity + ")" );
                     oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
-                                                         new FetchContext( tx, this ),
-                                                         obj, identity, accessMode ) );
+                                                         fields, identity, accessMode ) );
                     oid.setExclusive( true );
                 } catch ( ObjectNotFoundException except ) {
                     // Object was not found in persistent storge, must dump
                     // it from the cache
                     removeLock( oid );
-                    removeOID( obj );
+                    removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 } catch ( PersistenceException except ) {
                     // Report any error talking to the persistence engine
                     removeLock( oid );
-                    removeOID( obj );
+                    removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 }
@@ -286,15 +309,15 @@ final class CacheEngine
             
             // Object has not been loaded yet, or cleared from the cache.
             // The object is now loaded and a lock is acquired.
-            obj = typeInfo.handler.newInstance();
-            typeInfo.handler.setIdentity( obj, identity );
+            fields = new Object[ typeInfo.fieldCount ];
+            // XXX obj = typeInfo.handler.newInstance();
+            // XXX typeInfo.handler.setIdentity( obj, identity );
             try {
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Loading " + obj.getClass().getName() + " ("
+                    _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() + " ("
                                         + identity + ")" );
                 oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
-                                                     new FetchContext( tx, this ),
-                                                     obj, identity, accessMode ) );
+                                                     fields, identity, accessMode ) );
             } catch ( ObjectNotFoundException except ) {
                 // Object was not found in persistent storge
                 throw except;
@@ -305,7 +328,7 @@ final class CacheEngine
             // Create a lock for the object, register the lock and OID.
             // The lock is created for read or write depending on the
             // mode.
-            lock = new ObjectLock( obj );
+            lock = new ObjectLock( fields );
             try {
                 lock.acquire( tx, accessMode == AccessMode.Exclusive, 0 );
             } catch ( Exception except ) {
@@ -314,7 +337,7 @@ final class CacheEngine
             if ( accessMode == AccessMode.Exclusive )
                 oid.setExclusive( true );
             setLock( oid, lock );
-            setOID( obj, oid );
+            setOID( fields, oid );
             return oid;
         }
     } 
@@ -349,7 +372,7 @@ final class CacheEngine
         throws ObjectNotFoundException, LockNotGrantedException,
                PersistenceException
     {
-        Object     obj;
+        Object[]   fields;
         OID        oid;
         ObjectLock lock;
         TypeInfo   typeInfo;
@@ -364,15 +387,15 @@ final class CacheEngine
 
             // Object has been loaded before, must acquire lock on it
             try {
-                obj = lock.acquire( tx, false, timeout );
+                fields = (Object[]) lock.acquire( tx, false, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
                 throw new ObjectNotFoundException( query.getResultType(), identity );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
-            oid = getOID( obj );
-            
+            oid = getOID( fields );
+
             // XXX Problem, obj might be parent class but attempting
             //     to load derived class, will still return parent class
             //     Need to solve by swapping to a new object
@@ -382,21 +405,21 @@ final class CacheEngine
                 // the database and obtain a lock on the object.
                 try {
                     if ( _logWriter != null )
-                        _logWriter.println( "PE: Loading " + typeInfo.handler.getJavaClass().getName() +
+                        _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
                                             " (" + identity + ")" );
-                    oid.setStamp( query.fetch( obj ) );
+                    oid.setStamp( query.fetch( fields, identity ) );
                     oid.setExclusive( true );
                 } catch ( ObjectNotFoundException except ) {
                     // Object was not found in persistent storge, must dump
                     // it from the cache
                     removeLock( oid );
-                    removeOID( obj );
+                    removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 } catch ( PersistenceException except ) {
                     // Report any error talking to the persistence engine
                     removeLock( oid );
-                    removeOID( obj );
+                    removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 }
@@ -413,13 +436,17 @@ final class CacheEngine
             
             // Object has not been loaded yet, or cleared from the cache.
             // The object is now loaded from the query and a lock is acquired.
-            obj = typeInfo.handler.newInstance();
-            typeInfo.handler.setIdentity( obj, identity );
+            fields = new Object[ typeInfo.fieldCount ];
+            // XXX obj = typeInfo.handler.newInstance();
+            // XXX typeInfo.handler.setIdentity( obj, identity );
             try {
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Loading " + typeInfo.handler.getJavaClass().getName() +
+                    _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
                                         " (" + identity + ")" );
-                oid.setStamp( query.fetch( obj ) );
+                oid.setStamp( query.fetch( fields, identity ) );
+            } catch ( ObjectNotFoundException except ) {
+                // Object was not found in persistent storge
+                throw except;
             } catch ( PersistenceException except ) {
                 // Report any error talking to the persistence engine
                 throw except;
@@ -427,7 +454,7 @@ final class CacheEngine
             // Create a lock for the object, register the lock and OID.
             // The lock is created for read or write depending on the
             // mode.
-            lock = new ObjectLock( obj );
+            lock = new ObjectLock( fields );
             try {
                 lock.acquire( tx, accessMode == AccessMode.Exclusive, 0 );
             } catch ( Exception except ) {
@@ -436,7 +463,7 @@ final class CacheEngine
             if ( accessMode == AccessMode.Exclusive )
                 oid.setExclusive( true );
             setLock( oid, lock );
-            setOID( obj, oid );
+            setOID( fields, oid );
             return oid;
         }
     }
@@ -469,7 +496,7 @@ final class CacheEngine
     {
         OID        oid;
         ObjectLock lock;
-        Object     locked;
+        Object[]   fields;
         TypeInfo   typeInfo;
         
         typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
@@ -511,12 +538,11 @@ final class CacheEngine
             oid = new OID( typeInfo.handler, identity );
             if ( identity != null ) {
                 // If the object has a known identity at creation time, perform
-                // duplicate identity check. Otherwise, create the object in
-                // persistent storage acquiring a lock on the object.
+                // duplicate identity check.
                 lock = getLock( oid );
                 if ( lock != null ) {
                     try {
-                        locked = lock.acquire( tx, true, 0 );
+                        fields = (Object[]) lock.acquire( tx, true, 0 );
                     } catch ( LockNotGrantedException except ) {
                         // Someone else is using the object, definite duplicate key
                         throw new DuplicateIdentityException( obj.getClass(), identity );
@@ -524,28 +550,34 @@ final class CacheEngine
                     // Dump the memory image of the object, it might have been deleted
                     // from persistent storage
                     removeLock( oid );
-                    removeOID( obj );
+                    removeOID( fields );
                     lock.delete( tx );
                 }
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Creating " + obj.getClass().getName() + " ("
+                    _logWriter.println( "PE: Creating " + typeInfo.javaClass.getName() + " ("
                                         + identity + ")" );
-                oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), obj, identity ) );
-                oid.setExclusive( true );
             }
 
+            // Check integrity of object before creating it, assuring no fields
+            // are null, and then place it in the cache. Create it in persistent
+            // store if the identity was known.
             try {
                 typeInfo.handler.checkIntegrity( obj );
             } catch ( IntegrityException except ) {
                 throw new PersistenceException( except );
             }
+            fields = new Object[ typeInfo.fieldCount ];
+            typeInfo.handler.copyInto( obj, fields );
+            if ( identity != null ) {
+                //  Create the object in persistent storage acquiring a lock on the object.
+                oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), fields, identity ) );
+                oid.setExclusive( true );
+            }
             
             // Copy the contents of the object we just created into the
             // cache engine. This copy will be deleted if the transaction
             // ends up rolling back.
-            locked = typeInfo.handler.newInstance();
-            typeInfo.handler.copyInto( obj, locked, null );
-            lock = new ObjectLock( locked );
+            lock = new ObjectLock( fields );
             try {
                 lock.acquire( tx, true, 0 );
             } catch ( Exception except ) {
@@ -553,7 +585,7 @@ final class CacheEngine
             }
             oid.setExclusive( true );
             setLock( oid, lock );
-            setOID( locked, oid );
+            setOID( fields, oid );
         }
         return oid;
     }
@@ -573,19 +605,20 @@ final class CacheEngine
      * </ul>
      *
      * @param tx The transaction context
-     * @param obj The object to delete
+     * @param type The object type
      * @param identity The object's identity
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void delete( TransactionContext tx, Object obj, Object identity )
+    public void delete( TransactionContext tx, Class type, Object identity )
         throws PersistenceException
     {
         ObjectLock lock;
         TypeInfo   typeInfo;
         OID        oid;
+        Object[]   fields;
         
-        typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
+        typeInfo = (TypeInfo) _typeInfo.get( type );
         oid = new OID( typeInfo.handler, identity );
         // Get the lock from the OID. Assure the object has a write
         // lock -- since this was done during the transaction, we
@@ -595,7 +628,7 @@ final class CacheEngine
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to delete object for which no lock was acquired" ) );
         try {
-            obj = lock.acquire( tx, true, 0 );
+            fields = (Object[]) lock.acquire( tx, true, 0 );
         } catch ( LockNotGrantedException except ) {
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to delete object for which no lock was acquired" ) );
@@ -649,7 +682,7 @@ final class CacheEngine
         }
 
         if ( _logWriter != null )
-            _logWriter.println( "PE: Deleting " + obj.getClass().getName() + " ("
+            _logWriter.println( "PE: Deleting " + typeInfo.javaClass.getName() + " ("
                                 + oid.getIdentity() + ")" );
         typeInfo.persist.delete( tx.getConnection( this ), oid.getIdentity() );
     }
@@ -688,7 +721,8 @@ final class CacheEngine
                ObjectModifiedException, DuplicateIdentityException,
                PersistenceException
     {
-        Object     locked;
+        Object[]   fields;
+        Object[]   original;
         ObjectLock lock;
         Object     oldIdentity;
         TypeInfo   typeInfo;
@@ -705,9 +739,9 @@ final class CacheEngine
         // Must acquire a write lock on the object in order to proceed to
         // storing the object. Will wait until another transaction releases
         // its lock on the object.
-        locked = lock.acquire( tx, true, timeout );
+        original = (Object[]) lock.acquire( tx, true, timeout );
         // Get the real OID with the exclusive and stamp info.
-        oid = getOID( locked );
+        oid = getOID( original );
         
         // If the object has a identity, it was retrieved/created before and
         // need only be stored. If the object has no identity, the object must
@@ -727,7 +761,7 @@ final class CacheEngine
             sameIdentity = identity.equals( oldIdentity );
 
             // Check if object has been modified, and whether it can be stored.
-            if ( sameIdentity || ! typeInfo.handler.isModified( obj, locked ) )
+            if ( sameIdentity || ! typeInfo.handler.isModified( obj, original ) )
                 return oid;
             try {
                 typeInfo.handler.checkIntegrity( obj );
@@ -738,14 +772,19 @@ final class CacheEngine
             // The object has an old identity, it existed before, one need
             // to store the new contents.
             if ( _logWriter != null )
-                _logWriter.println( "PE: Storing " + obj.getClass().getName() + " (" +
+                _logWriter.println( "PE: Storing " + typeInfo.javaClass.getName() + " (" +
                                     identity + ")" );
+
+            fields = new Object[ typeInfo.fieldCount ];
+            typeInfo.handler.copyInto( obj, fields );
             if ( oid.isExclusive() )
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-                                                      obj, oldIdentity, null, null ) );
+                                                      fields, oldIdentity, null, null ) );
             else
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-                                                      obj, oldIdentity, locked, oid.getStamp() ) );
+                                                      fields, oldIdentity, original, oid.getStamp() ) );
+            for ( int i = 0 ; i < fields.length ; ++i )
+                original[ i ] = fields[ i ];
             oid.setExclusive( false );
 
             if ( ! sameIdentity ) {
@@ -754,14 +793,14 @@ final class CacheEngine
                 // If the transaction is rolledback, both old and new OID will be
                 // removed.
                 typeInfo.persist.changeIdentity( tx.getConnection( this ),
-                                                 obj, oldIdentity, identity );
-                removeLock( removeOID( locked ) );
+                                                 oldIdentity, identity );
+                removeLock( removeOID( original ) );
                 oid = new OID( typeInfo.handler, identity );
                 if ( getLock( oid ) != null )
-                    throw new DuplicateIdentityException( obj.getClass(), identity );
-                removeLock( removeOID( locked ) );
+                    throw new DuplicateIdentityException( typeInfo.javaClass, identity );
+                removeLock( removeOID( original ) );
                 setLock( oid, lock );
-                setOID( locked, oid );
+                setOID( original, oid );
             }
         }
         return oid;
@@ -793,7 +832,7 @@ final class CacheEngine
     {
         ObjectLock lock;
         TypeInfo   typeInfo;
-        Object     obj;
+        Object[]   fields;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = getLock( oid );
@@ -803,17 +842,17 @@ final class CacheEngine
         
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
-        obj = lock.acquire( tx, true, timeout );
+        fields = (Object[]) lock.acquire( tx, true, timeout );
         try {
-            typeInfo.persist.writeLock( tx.getConnection( this ), obj, oid.getIdentity() );
+            typeInfo.persist.writeLock( tx.getConnection( this ), oid.getIdentity() );
         } catch ( ObjectDeletedException except ) {
             removeLock( oid );
-            removeOID( obj );
+            removeOID( fields );
             lock.delete( tx );
             throw except;
         } catch ( PersistenceException except ) {
             removeLock( oid );
-            removeOID( obj );
+            removeOID( fields );
             lock.delete( tx );
             throw except;
         }
@@ -838,7 +877,7 @@ final class CacheEngine
     {
         ObjectLock lock;
         TypeInfo   typeInfo;
-        Object     locked;
+        Object[]   fields;
         
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = getLock( oid );
@@ -850,10 +889,12 @@ final class CacheEngine
         // called after a successful return from load(), so we don't
         // want to wait for the lock.
         try {
-            locked = lock.acquire( tx, false, 0 );
+            fields = (Object[]) lock.acquire( tx, false, 0 );
+            /* XXX How do we handle this
             if ( ! obj.getClass().isAssignableFrom( locked.getClass() ) )
                 throw new IllegalArgumentException( Messages.format( "persist.typeMismatch",
                                                                      obj.getClass(), locked.getClass() ) );
+            */
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
@@ -861,7 +902,8 @@ final class CacheEngine
                 _logWriter.println( Messages.format( "persist.internal", "copyObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         }
-        typeInfo.handler.copyInto( locked, obj, new FetchContext( tx, this ) );
+        typeInfo.handler.setIdentity( obj, oid.getIdentity() );
+        typeInfo.handler.copyInto( fields, obj, new FetchContext( tx, this ) );
     }
 
 
@@ -880,7 +922,7 @@ final class CacheEngine
     {
         ObjectLock lock;
         TypeInfo   typeInfo;
-        Object     locked;
+        Object[]   fields;
         
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = getLock( oid );
@@ -891,8 +933,8 @@ final class CacheEngine
         // called after a successful return from store(), so we don't
         // need to wait for the lock
         try {
-            locked = lock.acquire( tx, true, 0 );
-            typeInfo.handler.copyInto( obj, locked, null );
+            fields = (Object[]) lock.acquire( tx, true, 0 );
+            typeInfo.handler.copyInto( obj, fields );
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
@@ -938,15 +980,15 @@ final class CacheEngine
     public void forgetObject( TransactionContext tx, OID oid )
     {
         ObjectLock lock;
-        Object     obj;
+        Object[]   fields;
         TypeInfo   typeInfo;
         
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = getLock( oid );
         try {
-            obj = lock.acquire( tx, true, 0 );
+            fields = (Object[]) lock.acquire( tx, true, 0 );
             removeLock( oid );
-            removeOID( obj );
+            removeOID( fields );
             lock.delete( tx );
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
@@ -987,21 +1029,21 @@ final class CacheEngine
     }
 
 
-    private OID getOID( Object obj )
+    private OID getOID( Object[] fields )
     {
-        return (OID) _oids.get( obj );
+        return (OID) _oids.get( fields );
     }
 
 
-    private void setOID( Object obj, OID oid )
+    private void setOID( Object[] fields, OID oid )
     {
-        _oids.put( obj, oid );
+        _oids.put( fields, oid );
     }
 
 
-    private OID removeOID( Object obj )
+    private OID removeOID( Object[] fields )
     {
-        return (OID) _oids.remove( obj );
+        return (OID) _oids.remove( fields );
     }
 
 
@@ -1013,15 +1055,21 @@ final class CacheEngine
      */
     static class TypeInfo
     {
+
+        final Class        javaClass;
         
         final ClassHandler handler;
         
         final Persistence  persist;
+
+        final int          fieldCount;
         
-        TypeInfo( Persistence persist, ClassHandler handler )
+        TypeInfo( Class javaClass, Persistence persist, ClassHandler handler, int fieldCount )
         {
+            this.javaClass = javaClass;
             this.persist = persist;
             this.handler = handler;
+            this.fieldCount = fieldCount;
         }
         
     }

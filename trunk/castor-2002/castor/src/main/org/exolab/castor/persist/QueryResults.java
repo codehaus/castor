@@ -146,69 +146,13 @@ public final class QueryResults
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException();
-        _lastIdentity = null;
-        _lastIdentity = _query.nextIdentity();
+        try {
+            _lastIdentity = _query.nextIdentity( _lastIdentity );
+        } catch ( PersistenceException except ) {
+            _lastIdentity = null;
+            throw except;
+        }
         return _lastIdentity;
-    }
-
-
-    /**
-     * Returns the identity of the object at the specified position.
-     * If the specified position is beyond the end of the result
-     * set, this method will return null. Indexes are one based.
-     * <p>
-     * This method will throw an exception if the query results are
-     * forward only.
-     *
-     * @param index The index of the requested identity (one based)
-     * @return The identity of the next object
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     * @throws TransactionNotInProgressException The transaction
-     *  has been closed
-     */
-    public Object getIdentity( int index )
-        throws TransactionNotInProgressException, PersistenceException
-    {
-        // Make sure transaction is still open.
-        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException();
-        _lastIdentity = null;
-        _lastIdentity = _query.getIdentity( index );
-        return _lastIdentity;
-    }
-
-
-    /**
-     * Returns the position of the last identity retrieved. The
-     * index is one based.
-     *
-     * @return The index of the last identity retruned (one based) 
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     * @throws TransactionNotInProgressException The transaction
-     *  has been closed
-     */
-    public int getPosition()
-        throws TransactionNotInProgressException, PersistenceException
-    {
-        // Make sure transaction is still open.
-        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException();
-        return _query.getPosition();
-    }
-
-
-    /**
-     * Returns true if this is a forward only result set. Forward only
-     * results set implement {@link #nextIdentity} but not {@link
-     * #getIdentity}.
-     *
-     * @return True if forward only result set
-     */
-    public boolean isForwardOnly()
-    {
-        return _query.isForwardOnly();
     }
 
 
@@ -256,7 +200,7 @@ public final class QueryResults
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException();
         if ( _lastIdentity == null )
-            throw new IllegalStateException( "Not called after 'nextIdentity' 'getIdentity' returned an identity" );
+            throw new IllegalStateException( "Not called after 'nextIdentity' returned an identity" );
 
         synchronized ( _tx ) {
             // Get the next OID from the query engine. The object is
@@ -298,18 +242,19 @@ public final class QueryResults
                 // must create a new record for this object. We only
                 // record the object in the transaction if in read-write
                 // or exclusive mode.
+                oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
+                obj = _engine.getClassHandler( oid.getJavaClass() ).newInstance();
                 try {
-                    oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-                    obj = handler.newInstance();
                     _engine.copyObject( _tx, oid, obj );
-                    if ( _accessMode == AccessMode.ReadOnly )
-                        _engine.releaseLock( _tx, oid );
-                    else
-                        _tx.addObjectEntry( obj, oid, _engine );
-                    return obj;
-                } finally {
-                    _lastIdentity = null;
-                }
+                } catch ( ObjectNotFoundException except ) {
+                    _engine.forgetObject( _tx, oid );
+                    throw except;
+                }                    
+                if ( _accessMode == AccessMode.ReadOnly )
+                    _engine.releaseLock( _tx, oid );
+                else
+                    _tx.addObjectEntry( obj, oid, _engine );
+                return obj;
             }
         }
     }

@@ -59,8 +59,8 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.IntegrityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.mapping.desc.Types;
-import org.exolab.castor.mapping.desc.IndirectFieldHandler;
+import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.loader.IndirectFieldHandler;
 import org.exolab.castor.util.Messages;
 
 
@@ -68,7 +68,7 @@ import org.exolab.castor.util.Messages;
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see ClassDesc
+ * @see ClassDescriptor
  */
 public class ClassHandler
 {
@@ -83,50 +83,71 @@ public class ClassHandler
     private FieldInfo[]       _fields;
 
 
-    private RelationHandler[] _relations;
-
-
     private FieldInfo         _identity;
 
 
     private FieldHandler      _relIdentity;
 
 
-    ClassHandler( ClassDescriptor clsDesc, MappingResolver mapResolver )
+    private int               _firstField;
+
+
+    private RelationHandler[] _relations;
+
+
+    ClassHandler( ClassDescriptor clsDesc )
     {
         _clsDesc = clsDesc;
-        if ( _clsDesc.getExtends() != null )
-            _extends = new ClassHandler( _clsDesc.getExtends(), mapResolver );
-        if ( _clsDesc.getIdentity() != null ) {
-            _identity = new FieldInfo( _clsDesc.getIdentity() );
-        }
+    }
 
+
+    void normalize( CacheEngine cache )
+    {
         Vector            rels;
         Vector            fields;
         FieldDescriptor[] descs;
 
+        if ( _clsDesc.getExtends() != null ) {
+            _extends = new ClassHandler( _clsDesc.getExtends() );
+            _extends.normalize( cache );
+            _firstField = _extends.getFieldCount();
+        } else
+            _firstField = 0;
+
+        if ( _clsDesc.getIdentity() != null )
+            _identity = new FieldInfo( _clsDesc.getIdentity(), null );
         rels = new Vector();
         fields = new Vector();
-        descs = clsDesc.getFields();
+        descs = _clsDesc.getFields();
         for ( int i = 0 ; i < descs.length ; ++i ) {
-            ClassDescriptor relDesc;
+            ClassHandler clsHandler;
 
-            relDesc = mapResolver.getDescriptor( descs[ i ].getFieldType() );
-            if ( relDesc == null )
-                fields.addElement( new FieldInfo( descs[ i ] ) );
-            else {
-                FieldHandler handler;
+            clsHandler = cache.addClassHandler( descs[ i ].getFieldType() );
+            if ( clsHandler == null ) {
+                fields.addElement( new FieldInfo( descs[ i ], null ) );
+            } else {
+                FieldHandler    handler;
+                RelationHandler relHandler;
+
                 if ( descs[ i ].getHandler() instanceof IndirectFieldHandler )
                     handler = ( (IndirectFieldHandler) descs[ i ].getHandler() ).getHandler();
                 else
                     handler = descs[ i ].getHandler();
-                rels.addElement( new RelationHandler( handler, new ClassHandler( relDesc, mapResolver ) ) );
+                relHandler = new RelationHandler( descs[ i ].getFieldName(), handler, clsHandler );
+                fields.addElement( new FieldInfo( descs[ i ], relHandler ) );
+                rels.addElement( relHandler );
             }
         }
         _fields = new FieldInfo[ fields.size() ];
         fields.copyInto( _fields );
         _relations = new RelationHandler[ rels.size() ];
         rels.copyInto( _relations );
+    }
+
+
+    public int getFieldCount()
+    {
+        return _fields.length + ( _extends == null ? 0 : _extends._fields.length );
     }
 
                       
@@ -262,79 +283,63 @@ public class ClassHandler
      * @param ctx The fetch context, or null
      * @throws PersistenceException An error fetching the related object
      */
-    public void copyInto( Object source, Object target, FetchContext ctx )
+    public void copyInto( Object[] fields, Object target, FetchContext ctx )
         throws PersistenceException
     {
         // Copy/clone all the fields.
         if ( _extends != null )
-            _extends.copyInto( source, target, ctx );
+            _extends.copyInto( fields, target, ctx );
 
-        for ( int i = 0 ; i < _fields.length ; ++i )
-            copyField( _fields[ i ], source, target );
-        if ( _identity != null )
-            copyField( _identity, source, target );
-
-        for ( int i = 0 ; i < _relations.length ; ++i ) {
-            Object relSource;
-            Object relTarget;
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            if ( _fields[ i ].relation == null )
+                _fields[ i ].handler.setValue( target, copyValue( _fields[ i ], fields[ _firstField + i ] ) );
+            else {
+                Object relSource;
+                Object relTarget;
             
-            relSource = _relations[ i ].getRelated( source );
-            if ( ctx == null ) {
-                relTarget = _relations[ i ].newInstance();
-                _relations[ i ].setRelated( target, relTarget );
-                copyField( _relations[ i ].getRelatedHandler()._identity, relSource, relTarget );
-            } else {
-                relTarget = ctx.fetch( _relations[ i ].getRelatedHandler(),
-                                       _relations[ i ].getIdentity( relSource ) );
-                _relations[ i ].setRelated( target, relTarget );
-            }
-        }
-
-        /*
-        for ( int i = 0 ; i < _relations.length ; ++i ) {
-            if ( _relations[ i ].isAttached() ) {
-                // Attached relation -- need to copy the entire object and
-                // make sure related object's identity points back to the
-                // object.
-                Object relSource;
-                Object relTarget;
-
-                relSource = _relations[ i ].getRelationField().getValue( source );
-                relTarget = _relations[ i ].getRelatedClass().getHandler().newInstance();
-                _relations[ i ].getRelatedClass().getHandler().copyInto( relSource, relTarget, ctx );
-                _relations[ i ].getRelationField().setValue( target, relTarget );
-                _relations[ i ].getRelatedClass().getIdentity().getHandler().setValue( relTarget, target );
-            } else {
-                // Detached relation -- 
-                Object relSource;
-                Object relTarget;
-
-                relSource = _relations[ i ].getRelationField().getValue( source );
-                if ( ctx == null ) {
-                    relTarget = _relations[ i ].getRelatedClass().getHandler().newInstance();
-                    _relations[ i ].getRelationField().setValue( target, relTarget );
-                    _relations[ i ].getRelatedClass().getIdentity().getHandler().copyInto( relSource, relTarget );
-                } else {
-                    relTarget = ctx.fetch( _relations[ i ].getRelatedClass(),
-                                           _relations[ i ].getRelatedClass().getIdentity().getHandler().getValue( relSource ) );
-                    _relations[ i ].getRelationField().setValue( target, relTarget );
+                if ( fields[ _firstField + i ] == null )
+                    _fields[ i ].relation.setRelated( target, null );
+                else {
+                    relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(),
+                                           fields[ _firstField + i ] );
+                    if ( relTarget == null )
+                        throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedHandler().getJavaClass(),
+                                                           fields[ _firstField + i ] );
+                    _fields[ i ].relation.setRelated( target, relTarget );
                 }
             }
         }
-        */
+    }
+
+
+    public void copyInto( Object source, Object[] fields )
+        throws PersistenceException
+    {
+        // Copy/clone all the fields.
+        if ( _extends != null )
+            _extends.copyInto( source, fields );
+
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            if ( _fields[ i ].relation == null )
+                fields[ _firstField + i ] = copyValue( _fields[ i ], _fields[ i ].handler.getValue( source ) );
+            else {
+                fields[ _firstField + i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity, 
+                                                       _fields[ i ].relation.getIdentity( _fields[ i ].relation.getRelated( source ) ) );
+            }
+        }
     }
 
 
     /**
      * Used by {@link #copyField(Object,Object)} to copy a single field.
      */
-    private void copyField( FieldInfo field, Object source, Object target )
+    private Object copyValue( FieldInfo field, Object source )
     {
         // Immutable objects are copied verbatim. Cloneable objects are
         // cloned, all other fields must be serializable and are
         // serialized.
         if ( field.immutable )
-            field.handler.setValue( target, field.handler.getValue( source ) );
+            return source;
         else {
             try {
                 ByteArrayOutputStream ba;
@@ -343,10 +348,10 @@ public class ClassHandler
                 
                 ba = new ByteArrayOutputStream();
                 os = new ObjectOutputStream( ba );
-                os.writeObject( field.handler.getValue( source ) );
+                os.writeObject( source );
                 os.flush();
                 is = new ObjectInputStream( new ByteArrayInputStream( ba.toByteArray() ) );
-                field.handler.setValue( target, is.readObject() );
+                return is.readObject();
             } catch ( IOException except ) {
                 throw new IllegalStateException( Messages.format( "mapping.schemaNotSerializable",
                                                                   field.fieldType.getName(), except.getMessage() ) );
@@ -367,21 +372,15 @@ public class ClassHandler
      * @param cached The cached copy
      * @return True if the object has been modified
      */
-    public boolean isModified( Object object, Object original )
+    public boolean isModified( Object object, Object[] original )
     {
         if ( _extends != null && _extends.isModified( object, original ) )
             return true;
 
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( isModified( _fields[ i ], object, original ) )
+            if ( isModified( _fields[ i ], object, original[ _firstField + i ] ) )
                 return true;
         }
-        /*
-        for ( int i = 0 ; i < _relations.length ; ++i ) {
-            if ( _relations[ i ].isModified( object, original ) )
-                return true;
-        }
-        */
         return false;
     }
 
@@ -395,9 +394,9 @@ public class ClassHandler
 
         value = field.handler.getValue( object );
         if ( value == null )
-            return ( field.handler.getValue( original ) == null );
+            return ( original == null );
         else
-            return value.equals( field.handler.getValue( original ) );
+            return value.equals( original );
     }
 
 
@@ -407,7 +406,7 @@ public class ClassHandler
         // Handle fields in the parent class.
         if ( _extends != null )
             _extends.checkIntegrity( object );
-        
+
         // Object cannot be saved if one of the required fields is null
         for ( int i = 0 ; i < _fields.length ; ++i )
             _fields[ i ].handler.checkIntegrity( object );
@@ -422,7 +421,7 @@ public class ClassHandler
     }
 
 
-    static class FieldInfo
+    final static class FieldInfo
     {
 
         final FieldHandler  handler;
@@ -435,13 +434,16 @@ public class ClassHandler
 
         final boolean       required;
 
-        FieldInfo( FieldDescriptor fieldDesc )
+        final RelationHandler relation;
+
+        FieldInfo( FieldDescriptor fieldDesc, RelationHandler relation )
         {
-            fieldName = fieldDesc.getFieldName();
-            fieldType = fieldDesc.getFieldType();
-            handler = fieldDesc.getHandler();
-            immutable = fieldDesc.isImmutable();
-            required = fieldDesc.isRequired();
+            this.fieldName = fieldDesc.getFieldName();
+            this.fieldType = fieldDesc.getFieldType();
+            this.handler = fieldDesc.getHandler();
+            this.immutable = fieldDesc.isImmutable();
+            this.required = fieldDesc.isRequired();
+            this.relation = relation;
         }
 
     }

@@ -60,19 +60,32 @@ public class RelationHandler
 {
 
 
-    private FieldHandler     _identity;
-
-
     private FieldHandler     _field;
 
 
     private ClassHandler     _relHandler;
 
 
-    RelationHandler( FieldHandler field, ClassHandler relHandler )
+    private String           _fieldName;
+
+
+    RelationHandler( String fieldName, FieldHandler field, ClassHandler relHandler )
     {
+        _fieldName = fieldName;
         _field = field;
         _relHandler = relHandler;
+    }
+
+
+    public String getFieldName()
+    {
+        return _fieldName;
+    }
+
+
+    public FieldHandler getFieldHandler()
+    {
+        return _field;
     }
 
 
