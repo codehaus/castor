@@ -994,7 +994,9 @@ public class SourceGenerator {
      * @param boolean the value we want to ues
      */
      public static void setEqualsMethod(boolean equals) {
-            _equalsMethod = equals;
+         //ensure the other properties are loaded
+         getDefault();
+         _equalsMethod = equals;
      }
     /**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
