@@ -169,6 +169,12 @@
     <description>Contributed MySQL driver.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Wise" given="Nic"/>
+    <email>nicw@xerxes.co.nz</email>
+    <description>Contributed SEQUENCE key generator for Interbase.</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company

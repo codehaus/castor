@@ -1,6 +1,8 @@
 Version 0.8.9
 -------------
 
+JDO:    SEQUENCE key generator for Interbase (contributed by Nic Wise <nicw@xerxes.co.nz>).
+
 JDO:    MySQL driver (contributed by Leonardo Souza Mario Bueno <leonardo@itera.com.br>).
 
 JDO:    Annoying type conversion problems solved:
