@@ -161,14 +161,13 @@ public final class DatabaseImpl
     public synchronized void close()
         throws PersistenceException
     {
-        if ( _ctx == null || ! _ctx.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         try {
-            _ctx.rollback();
+            if ( _ctx != null && _ctx.isOpen() )
+                _ctx.rollback();
         } finally {
             _ctx = null;
+            _dbEngine = null;
         }
-        _dbEngine = null;
     }
 
 
