@@ -122,6 +122,11 @@ public class JClass extends JType {
     private Vector packageClasses = null;
 
     /**
+     * The source code for static initialization
+    **/
+    private JSourceCode _staticInitializer = new JSourceCode();
+    
+    /**
      * Creates a new JClass with the given name
      * @param name the name of the JClass to create
      * @exception IllegalArgumentException when the given name
@@ -156,7 +161,7 @@ public class JClass extends JType {
         packageClasses   = new Vector();
         //-- initialize default Java doc
         jdc.addDescriptor(JDocDescriptor.createVersionDesc(version));
-
+        
     } //-- JClass
 
 
@@ -516,6 +521,17 @@ public class JClass extends JType {
         return result;
     } //-- removeImport
 
+    /**
+     * Returns the JSourceCode for the static initializer
+     * of this JClass
+     *
+     * @return the JSourceCode for the static initializer
+     * of this JClass
+    **/
+    public JSourceCode getStaticInitializationCode() {
+        return _staticInitializer;
+    } //-- getStaticInitializationCode
+    
     public static boolean isValidClassName(String name) {
         
         if (name == null) return false;
@@ -695,6 +711,18 @@ public class JClass extends JType {
             jsw.writeln();
         }
 
+        //----------------------/
+        //- Static Initializer -/
+        //----------------------/
+        
+        if (!_staticInitializer.isEmpty()) {
+            jsw.writeln();
+            jsw.writeln("static {");
+            jsw.writeln(_staticInitializer.toString());
+            jsw.writeln("};");
+            jsw.writeln();
+        }
+        
         //-- print constructors
         if (constructors.size() > 0) {
             jsw.writeln();
@@ -812,12 +840,19 @@ public class JClass extends JType {
         JClass testClass = new JClass("Test");
 
         testClass.addImport("java.util.Vector");
-        testClass.addMember(new JMember(JType.Int, "x"));
+        testClass.addMember(new JField(JType.Int, "x"));
         JClass jcString = new JClass("String");
 
-        JMember jMember = new JMember(jcString, "myString");
-        jMember.getModifiers().makePrivate();
-        testClass.addMember(jMember);
+        JField field = null;
+        field = new JField(JType.Int, "_z");
+        field.getModifiers().setStatic(true);
+        testClass.addField(field);
+        
+        testClass.getStaticInitializationCode().add("_z = 75;");
+        
+        field = new JField(jcString, "myString");
+        field.getModifiers().makePrivate();
+        testClass.addMember(field);
 
         //-- create constructor
         JConstructor cons = testClass.createConstructor();

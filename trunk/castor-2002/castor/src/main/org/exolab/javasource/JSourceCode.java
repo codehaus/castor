@@ -153,6 +153,14 @@ public class JSourceCode {
     } //-- indent();
     
     /**
+     * Returns true if this JSourceCode is empty (ie. no source).
+     * @return true if this JSourceCode is empty.
+    **/
+    public boolean isEmpty() {
+        return source.isEmpty();
+    } //-- isEmpty
+    
+    /**
      * Prints this JSourceCode to the given JSourceWriter
      * @param jsw the JSourceWriter to print to
     **/
