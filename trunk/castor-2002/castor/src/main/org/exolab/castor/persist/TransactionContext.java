@@ -110,7 +110,7 @@ public abstract class TransactionContext
      * mode or a persistent engine that does not support locking (e.g. LDAP)
      * an object may be deleted or modified concurrently through a direct
      * access mechanism.
-     */
+     */               
 
 
     /**
@@ -124,10 +124,10 @@ public abstract class TransactionContext
 
     /**
      * Collection of objects accessed during this transaction.
-     * The object is used as key and {@link ObjectEntry} is the value.
+     * Actually the vector contains instances of {@link ObjectEntry}.
      * @see #addObjectEntry
      */
-    private final Hashtable   _objects = new Hashtable();
+    private final Vector  _objects = new Vector();
 
 
     /**
@@ -1001,7 +1001,7 @@ public abstract class TransactionContext
         }
         // Forget about all the objects in this transaction,
         // and mark it as completed.
-        _objects.clear();
+        _objects.removeAllElements();
         _engineOids.clear();
         _status = Status.STATUS_COMMITTED;
     }
@@ -1057,7 +1057,7 @@ public abstract class TransactionContext
 
         // Forget about all the objects in this transaction,
         // and mark it as completed.
-        _objects.clear();
+        _objects.removeAllElements();
         _engineOids.clear();
         while ( _deletedList != null ) {
             entry = _deletedList;
@@ -1218,7 +1218,7 @@ public abstract class TransactionContext
 
         entry = new ObjectEntry( (CacheEngine) engine, object );
         entry.oid = oid;
-        _objects.put( object, entry );
+        _objects.addElement( entry );
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null ) {
             engineOids = new Hashtable();
@@ -1258,7 +1258,14 @@ public abstract class TransactionContext
      */
     ObjectEntry getObjectEntry( Object object )
     {
-        return (ObjectEntry) _objects.get( object );
+        ObjectEntry entry;
+
+        for ( Enumeration enum = _objects.elements(); enum.hasMoreElements(); ) {
+            entry = (ObjectEntry) enum.nextElement();
+            if ( entry.object == object )
+                return entry;
+        }
+        return null;
     }
 
 
@@ -1271,13 +1278,19 @@ public abstract class TransactionContext
      */
     ObjectEntry removeObjectEntry( Object object )
     {
+        int size;
         ObjectEntry entry;
 
-        entry = (ObjectEntry) _objects.remove( object );
-        if ( entry == null )
-            return null;
-        ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
-        return entry;
+        size = _objects.size();
+        for ( int i = 0; i < size; i++ ) {
+            entry = (ObjectEntry) _objects.elementAt( i );
+            if ( entry.object == object ) {
+                _objects.removeElementAt( i );
+                ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
+                return entry;
+            }
+        }
+        return null;
     }
 
 
