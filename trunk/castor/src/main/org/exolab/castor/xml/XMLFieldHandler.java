@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -46,21 +46,27 @@
 
 package org.exolab.castor.xml;
 
+import org.exolab.castor.mapping.AbstractFieldHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 
 /**
+ * This FieldHandler is used in the generated descriptors.
+ * <p>
  * A field handler knows how to perform various operations on the
  * field that require access to the field value.
+ * </p>
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see org.exolab.castor.mapping.FieldDescriptor
  */
 public class XMLFieldHandler
-    implements FieldHandler
+    extends AbstractFieldHandler
 {
 
+    private boolean
     /**
      * Creates a new default XMLFieldHandler
      */
@@ -102,6 +108,38 @@ public class XMLFieldHandler
         return null;
     } //-- getValue
     
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent )
+        throws IllegalStateException
+    {
+        //-- Do nothing, this method is overloaded by the
+        //-- source code generator
+        return null;
+    } //-- newInstance
+        
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @param args the set of constructor arguments
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent, Object[] args )
+        throws IllegalStateException 
+    {
+        //-- backward compatability...ignore args
+        return newInstance(parent);
+        
+    } //-- newInstance
 
     /**
      * Sets the value of the field on the object.
@@ -129,40 +167,6 @@ public class XMLFieldHandler
         //-- Do nothing, this method is overloaded by the
         //-- source code generator
     }
-        
-
-
-    /**
-     * Checks the field validity. Returns successfully if the field
-     * can be stored, is valid, etc, throws an exception otherwise.
-     *
-     * @param object The object
-     * @throws ValidityException The field is invalid, is required and
-     *  null, or any other validity violation
-     * @throws IllegalStateException The Java object has changed and
-     *  is no longer supported by this handler, or the handler
-     *  is not compatiable with the Java object
-     */
-    public void checkValidity( Object object )
-        throws ValidityException, IllegalStateException
-    {
-        // This is a deprecated method, do nothing
-    } //-- checkValidity
-
-
-    /**
-     * Creates a new instance of the object described by this field.
-     *
-     * @param parent The object for which the field is created
-     * @return A new instance of the field's value
-     * @throws IllegalStateException This field is a simple type and
-     *  cannot be instantiated
-     */
-    public Object newInstance( Object parent ) {
-        //-- Do nothing, this method is overloaded by the
-        //-- source code generator
-        return null;
-    } //-- newInstance
-
+     
 } //-- XMLFieldHandler
 
