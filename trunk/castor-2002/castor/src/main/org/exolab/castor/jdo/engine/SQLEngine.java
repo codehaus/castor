@@ -176,7 +176,7 @@ final class SQLEngine
      */
     JDOClassDescriptor getDescriptor()
     {
-    return _clsDesc;
+        return _clsDesc;
     }
 
 
@@ -225,9 +225,7 @@ final class SQLEngine
         return identity;
     }
 
-    /**
-     * @return identity (instead of stamp)
-     */
+
     public Object create( Object conn, Object[] fields, Object identity )
         throws DuplicateIdentityException, PersistenceException
     {
@@ -280,17 +278,15 @@ final class SQLEngine
             //    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
 
             // Good way: let PersistenceFactory try to determine
-            if ( _factory instanceof GenericFactory ) {
-                Boolean isDupKey;
+            Boolean isDupKey;
 
-                isDupKey = ((GenericFactory) _factory).isDuplicateKeyException( except );
-                if ( Boolean.TRUE.equals( isDupKey ) ) {
-                    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
-                } else if ( Boolean.FALSE.equals( isDupKey ) ) {
-                    throw new PersistenceExceptionImpl( except );
-                }
-                // else unknown, let's check directly.
+            isDupKey = _factory.isDuplicateKeyException( except );
+            if ( Boolean.TRUE.equals( isDupKey ) ) {
+                throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
+            } else if ( Boolean.FALSE.equals( isDupKey ) ) {
+                throw new PersistenceExceptionImpl( except );
             }
+            // else unknown, let's check directly.
 
             // [oleg] Check for duplicate key the old fashioned way,
             //        after the INSERT failed to prevent race conditions
