@@ -100,6 +100,11 @@ public class LDAPQueryExpression
     }
 
 
+    public void addWhereClause( String where )
+    {
+    }
+
+
     public String getStatement( boolean lock )
     {
         return _filter;

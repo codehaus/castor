@@ -112,15 +112,7 @@ public final class DB2QueryExpression
                 sql.append( JDBCSyntax.TableSeparator );
             sql.append( (String) enum.nextElement() );
         }
-
-        if ( _conds.size() > 0 ) {
-            if ( first ) {
-                sql.append( JDBCSyntax.Where );
-                first = false;
-            } else
-                sql.append( JDBCSyntax.And );
-            sql.append( getConditionList() );
-        }
+        addWhereClause( sql, true );
 
         // Do not use FOR UPDATE to lock query.
         return sql.toString();

@@ -103,14 +103,7 @@ public final class OracleQueryExpression
                 sql.append( join.rightTable + JDBCSyntax.TableColumnSeparator + join.rightColumns[ j ] );
             }
         }
-        if ( _conds.size() > 0 ) {
-            if ( first ) {
-                sql.append( JDBCSyntax.Where );
-                first = false;
-            } else
-                sql.append( JDBCSyntax.And );
-            sql.append( getConditionList() );
-        }
+        first = addWhereClause( sql, first );
         // Use FOR UPDATE to lock selected tables.
         if ( lock )
             sql.append( " FOR UPDATE" );
