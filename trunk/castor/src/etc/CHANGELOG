@@ -1,6 +1,10 @@
 
 Version (CVS) 
 -------------
+JDO:    Fixed bug 1376: Accessing the javax.sql.DataSource object from a 
+        DatabaseRegistry instance 
+        (bruce - 20030807)
+
 XML:    Fixed bug 1358: mixed content was not handle properly when used with collection
         (Arnaud 20030730)
 
