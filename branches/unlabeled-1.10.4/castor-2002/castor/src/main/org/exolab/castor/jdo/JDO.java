@@ -174,9 +174,22 @@ public class JDO
 
 
     /**
+     * The transaction manager
+     */
+    private TransactionManager tm = null;
+
+
+    /**
      * The application class loader.
      */
     private ClassLoader    _classLoader;
+
+
+    /**
+     * The resolver can be used to resolve cached entities, e.g.
+     * for external mapping documents. 
+     */
+    private EntityResolver _entityResolver;
 
 
     /**
@@ -266,6 +279,28 @@ public class JDO
     }
 
 
+    /**
+     * Sets the entity resolver.
+     * The resolver can be used to resolve cached entities, e.g.
+     * for external mapping documents.
+     * Note, that you cannot create two Database instances that differ
+     * only in a resolver.
+     */
+    public void setEntityResolver( EntityResolver entityResolver)
+    {
+        _entityResolver = entityResolver;
+    }
+
+
+    /**
+     * Returns the entity resolver.
+     */
+    public EntityResolver getEntityResolver()
+    {
+        return _entityResolver;
+    }
+    
+    
     /**
      * Sets the description of this database.
      * <p>
@@ -427,7 +462,7 @@ public class JDO
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, _classLoader );
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), _entityResolver, _logInterceptor, _classLoader );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( except );
             }
@@ -435,13 +470,14 @@ public class JDO
 
         if ( _tmName != null ) {
             InitialContext     ctx;
-            TransactionManager tm;
             Transaction        tx;
             DatabaseImpl       dbImpl;
             
             try {
-                ctx = new InitialContext();
-                tm = (TransactionManager) ctx.lookup( _tmName );
+                if(tm == null) {
+                    ctx = new InitialContext();
+                    tm = (TransactionManager) ctx.lookup( _tmName );
+                }
                 tx = tm.getTransaction();
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
                     dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx, _classLoader );
@@ -532,7 +568,7 @@ public class JDO
         if ( _dbConf != null )
             ref.add( new StringRefAddr( "configuration", _dbConf ) );
         if ( _tmName != null )
-            ref.add( new StringRefAddr( "transactionManager", _dbConf ) );
+            ref.add( new StringRefAddr( "transactionManager", _tmName ) );
         ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
  	return ref;
     }
