@@ -193,6 +193,7 @@ public class XMLFieldDescriptorImpl
         this._transient       = fieldDesc.isTransient();
         this._immutable       = fieldDesc.isImmutable();
         this._required        = fieldDesc.isRequired();
+        this.multivalued      = fieldDesc.isMultivalued();
         
         ClassDescriptor cd    = fieldDesc.getClassDescriptor();
         if (cd instanceof XMLClassDescriptor)
