@@ -1576,13 +1576,89 @@ public final class SQLEngine implements Persistence {
             return _engine._clsDesc.getJavaClass();
         }
 
+        /**
+         * use the jdbc 2.0 method to move to an absolute position in the
+         * resultset.
+         */
+         public boolean absolute(int row)
+            throws PersistenceException
+         {
+            boolean retval = false;
+            try
+            {
+               if (_rs != null)
+               {
+                  retval = _rs.absolute(row);
+               }
+            }
+            catch (SQLException e)
+            {
+               throw new PersistenceException(e.getMessage());
+            }
+            return retval;
+         }
+
+         /**
+          * Uses the underlying db's cursors to most to the last row in the
+          * result set, get the row number via getRow(), then move back to
+          * where ever the user was positioned in the resultset.
+          */
+         public int size()
+            throws PersistenceException
+         {
+            int whereIAm = 1; // first
+            int retval = 0; // default size is 0;
+            try
+            {
+               if (_rs != null)
+               {
+                  whereIAm = _rs.getRow();
+                  if (_rs.last())
+                  {
+                     retval = _rs.getRow();
+                  }
+                  else
+                  {
+                     retval = 0;
+                  }
+                  // go back from whence I came.
+                  if (whereIAm > 0)
+                  {
+                     _rs.absolute(whereIAm);
+                  }
+                  else
+                  {
+                     _rs.beforeFirst();
+                  }
+               }
+            }
+            catch (SQLException se)
+            {
+               throw new PersistenceException(se.getMessage());
+            }
+            return retval;
+         }
 
         public void execute( Object conn, AccessMode accessMode )
             throws QueryException, PersistenceException
         {
+            // backwards compatible, scrollable resultset is false;
+            execute(conn, accessMode, false);
+         }
+
+        public void execute( Object conn, AccessMode accessMode, boolean scrollable )
+            throws QueryException, PersistenceException
+        {
             _lastIdentity = null;
             try {
+                if (scrollable)
+                {
+                  _stmt = ( (Connection) conn ).prepareStatement( _sql, java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE, java.sql.ResultSet.CONCUR_READ_ONLY );
+                }
+                else
+                {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
+                }
                 for ( int i = 0 ; i < _values.length ; ++i ) {
                     _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;

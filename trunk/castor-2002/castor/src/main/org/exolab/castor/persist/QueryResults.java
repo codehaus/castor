@@ -241,7 +241,17 @@ public final class QueryResults
         _query.close();
     }
     
+    public boolean absolute(int row)
+	throws PersistenceException
+    {
+	return _query.absolute(row);
+    }
     
+    public int size()
+	throws PersistenceException
+    {
+	return _query.size();
+    }
 }
 
 

@@ -405,26 +405,42 @@ public class OQLQueryImpl
         return execute( null );
     }
 
+    public QueryResults execute(boolean scrollable)
+        throws QueryException, PersistenceException, TransactionNotInProgressException
+    {
+        return execute( null, scrollable );
+    }
 
     public QueryResults execute( short accessMode )
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
+      return execute(accessMode, false);
+    }
+
+    public QueryResults execute( short accessMode,  boolean scrollable )
+        throws QueryException, PersistenceException, TransactionNotInProgressException
+    {
         switch ( accessMode ) {
         case Database.ReadOnly:
-            return execute( AccessMode.ReadOnly );
+            return execute( AccessMode.ReadOnly, scrollable );
         case Database.Shared:
-            return execute( AccessMode.Shared );
+            return execute( AccessMode.Shared, scrollable );
         case Database.Exclusive:
-            return execute( AccessMode.Exclusive );
+            return execute( AccessMode.Exclusive, scrollable );
         case Database.DbLocked:
-            return execute( AccessMode.DbLocked );
+            return execute( AccessMode.DbLocked, scrollable );
         default:
             throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
         }
     }
 
-
     private QueryResults execute( AccessMode accessMode )
+        throws QueryException, PersistenceException, TransactionNotInProgressException
+    {
+      return execute(accessMode, false);
+    }
+
+    private QueryResults execute( AccessMode accessMode, boolean scrollable )
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         org.exolab.castor.persist.QueryResults      results;
@@ -455,7 +471,7 @@ public class OQLQueryImpl
                     } catch ( QueryException except ) {
                         throw new QueryException( except.getMessage() );
                     }
-                    results = _dbImpl.getTransaction().query( _dbEngine, _query, accessMode );
+                    results = _dbImpl.getTransaction().query( _dbEngine, _query, accessMode, scrollable );
                     _fieldNum = 0;
 
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
@@ -539,6 +555,17 @@ public class OQLQueryImpl
             _classDescriptor = null;
         }
 
+         public boolean absolute(int row)
+            throws PersistenceException
+         {
+               return _results.absolute(row);
+         }
+
+         public int size()
+            throws PersistenceException
+         {
+               return _results.size();
+         }
 
         public boolean hasMoreElements()
         {
