@@ -252,7 +252,7 @@ public final class FieldHandlerImpl
         _handler = null;
         _field = field;
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
-        _fieldName = field.getName() + "(" + _fieldType.getName() + ")";
+        _fieldName = field.getName() + "(" + field.getType().getName() + ")";
         _immutable = typeInfo.isImmutable();
         _required = typeInfo.isRequired();
         // If the field is of a primitive type or if it is required
@@ -353,6 +353,31 @@ public final class FieldHandlerImpl
             // If field is accessed directly, get it's value, if not
             // need to call get method. It's possible to not have a
             // way to access the field.
+            
+            //-- DEBUG
+            /*
+            if ( _handler != null )
+                System.out.println("FieldHandlerImpl: using nested handler.");
+            else if ( _field != null )
+                System.out.println("FieldHandlerImpl: using direct field access.");
+            else if ( _getMethod != null ) {
+                System.out.println("FieldHandlerImpl: using getMethod.");
+                if ( _getSequence != null ) {
+                    System.out.println("FieldHandlerImpl: using getter sequence.");
+                }
+                
+                if (_hasMethod != null) {
+                    System.out.println("FieldHandlerImpl: checking hasMethod.");
+                }
+                
+                System.out.println("FieldHandlerImpl: calling getMethod.");
+                System.out.println("FieldHandlerImpl: getter: " + _getMethod.toString());
+                System.out.println("FieldHandlerImpl: target: " + object.getClass().getName());
+                
+            }
+            */
+            //-- /DEBUG
+             
             if ( _handler != null )
                 value = _handler.getValue( object );
             else if ( _field != null )
@@ -470,7 +495,7 @@ public final class FieldHandlerImpl
                 // Graceful way of dealing with unwrapping exception
                 if ( value == null )
                     throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
-                else
+                else 
                     throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
                                                                          toString(), value.getClass().getName() ) );
             } catch ( IllegalAccessException except ) {
@@ -685,8 +710,9 @@ public final class FieldHandlerImpl
         if (_fieldType.isInterface() && _createMethod == null)
             return null;
             
-        if ( _immutable )
+        if (( _immutable ) && ((args == null) || (args.length == 0)))
             throw new IllegalStateException( Messages.format( "mapping.classNotConstructable", _fieldType ) );
+        
         if ( _handler != null ) {
             if (_handler instanceof ExtendedFieldHandler)
                 return ((ExtendedFieldHandler)_handler).newInstance( parent, args );
