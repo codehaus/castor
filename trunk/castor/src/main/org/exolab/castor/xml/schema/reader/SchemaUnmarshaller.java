@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -53,7 +53,15 @@ import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.net.URIResolver;
 import org.exolab.castor.net.util.URIResolverImpl;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -118,6 +126,8 @@ public class SchemaUnmarshaller extends ComponentReader {
      */
     private SchemaUnmarshallerState _state = null;
 
+    private RemappedPrefixes _prefixMappings = null;
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -160,7 +170,7 @@ public class SchemaUnmarshaller extends ComponentReader {
         _schema = new Schema();
         //--initialize the schema to ensure that the default namespace
         //--is not set
-        _schema.getNamespaces().removeNamespace("");
+        _schema.removeNamespace("");
         setResolver(resolver);
         if (uriResolver == null)
             uriResolver = new URIResolverImpl();
@@ -282,8 +292,55 @@ public class SchemaUnmarshaller extends ComponentReader {
                 throw new XMLException(error);
             }
 
+            boolean hasCollisions = false;
             for (int pIdx = 0; pIdx < prefixes.length; pIdx++) {
                 String prefix = prefixes[pIdx];
+                
+                //-- Since the Schema Object Model does not yet support
+                //-- namespace scoping, we need to checking for namespace
+                //-- prefix collisions...and remap the prefixes
+                String tmpURI = _schema.getNamespaceURI(prefix);
+                if ((tmpURI != null) && (foundSchemaDef)) {
+                    if (!tmpURI.equals(ns)) {
+                        if (!hasCollisions) {
+                            hasCollisions = true;
+                            if (_prefixMappings == null)
+                                _prefixMappings = new RemappedPrefixes();
+                            else
+                                _prefixMappings = _prefixMappings.newRemappedPrefixes();
+                        }
+                        
+                        //-- create a new prefix
+                        if (prefix.length() == 0) 
+                            prefix = "ns";
+                            
+                        int count = 1;
+                        String newPrefix = prefix + count;
+                        tmpURI = _schema.getNamespaceURI(newPrefix);
+                        while (tmpURI != null) {
+                            if (tmpURI.equals(ns)) {
+                                //-- no remapping necessary
+                                break;
+                            }
+                            ++count;
+                            newPrefix = prefix + count;
+                            tmpURI = _schema.getNamespaceURI(newPrefix);
+                        }
+                        _prefixMappings.addMapping(prefix, newPrefix);
+                        prefix = newPrefix;
+                    }
+                    //-- we may need to "reset" a currently mapped prefix
+                    else {
+                        if (_prefixMappings != null) {
+                            if (_prefixMappings.isRemappedPrefix(prefix)) {
+                                //-- reset mapping in this scope
+                                _prefixMappings.addMapping(prefix, prefix);
+                            }
+                        }
+                    }
+                }
+                //-- end collision handling
+                
                 if (prefix.length() == 0) {
                     defaultNS = ns;
                     //register the default namespace with the empty string
@@ -304,6 +361,32 @@ public class SchemaUnmarshaller extends ComponentReader {
 
     } //-- handleNamespaces
 
+    /** 
+     * Remaps any QName attributes for the given element and attributeSet.
+     * This method is a work around for the lack of namespace scoping 
+     * support in the Schema Object Model
+     */
+    private void handleRemapping(String name, String namespace, AttributeSetImpl atts) {
+        
+        if (_prefixMappings == null) return;
+        
+        //-- increase depth for scoping
+        _prefixMappings.depth++;
+        
+        String[] remapAtts = (String[]) RemappedPrefixes.QNAME_TABLE.get(name);
+        
+        if (remapAtts != null) {
+            for (int i = 0; i < remapAtts.length; i++) {
+                String value = atts.getValue(remapAtts[i]);
+                if (value != null) {
+                    value = _prefixMappings.remapQName(value);
+                    atts.setAttribute(remapAtts[i], value);
+                }
+            }
+        }
+        
+    } //-- handleRemapping
+    
 
     public void setResolver(Resolver resolver) {
         if (resolver == null) resolver = new ScopableResolver();
@@ -366,6 +449,13 @@ public class SchemaUnmarshaller extends ComponentReader {
             }
         }
 
+        //-- handle namespace prefix remapping
+        if (_annotationDepth == 0) { 
+            if (_prefixMappings != null) {
+                handleRemapping(name, namespace, (AttributeSetImpl)atts);
+            }
+        }
+        
         //-- Do delagation if necessary
         if (unmarshaller != null) {
             unmarshaller.startElement(name, namespace, atts, nsDecls);
@@ -456,6 +546,14 @@ public class SchemaUnmarshaller extends ComponentReader {
         //-- keep track of annotations
         if (name.equals(SchemaNames.ANNOTATION)) {
             --_annotationDepth;
+        }
+        
+        //-- remove namespace remapping, if necessary
+        if (_prefixMappings != null) {
+            if (_prefixMappings.depth == 0) {
+                _prefixMappings = _prefixMappings.getParent();
+            }
+            else --_prefixMappings.depth;
         }
 
         //-- Do delagation if necessary
@@ -552,5 +650,166 @@ public class SchemaUnmarshaller extends ComponentReader {
     } //-- characters
 
 
+    /**
+     * This class handles remapping of namespace prefixes
+     * for attributes of type QName. This is needed to 
+     * work around a limitation in Castor's Schema Object 
+     * Model, which does not support proper namespace
+     * scoping yet.
+     */
+    static class RemappedPrefixes {
+        
+        public static final String RESOURCE_NAME 
+            = "prefixremap.properties";
+        
+        public static final String RESOURCE_LOCATION =
+            "/org/exolab/castor/xml/schema/reader/";
+        
+        public static final HashMap QNAME_TABLE = new HashMap();
+        private static boolean initialized = false;
+        
+        static {
+            
+            synchronized(QNAME_TABLE) {
+                
+                if (!initialized) {
+                    
+                    initialized = true;
+                    
+                    //-- built in mappings
+                    
+                    //-- attribute                    
+                    QNAME_TABLE.put(SchemaNames.ATTRIBUTE, new String [] {
+                        SchemaNames.REF_ATTR, SchemaNames.TYPE_ATTR } );
+                        
+                    //-- attributeGroup
+                    QNAME_TABLE.put(SchemaNames.ATTRIBUTE_GROUP, new String [] {
+                        SchemaNames.REF_ATTR } );
+                        
+                    //-- element
+                    QNAME_TABLE.put(SchemaNames.ELEMENT, new String [] {
+                        SchemaNames.REF_ATTR, SchemaNames.TYPE_ATTR } );
+                        
+                    //-- extension
+                    QNAME_TABLE.put(SchemaNames.EXTENSION, new String [] {
+                        SchemaNames.BASE_ATTR } );
+
+                    //-- group
+                    QNAME_TABLE.put(SchemaNames.GROUP, new String [] {
+                        SchemaNames.REF_ATTR } );
+                        
+                    //-- restriction
+                    QNAME_TABLE.put(SchemaNames.RESTRICTION, new String [] {
+                        SchemaNames.BASE_ATTR } );
+                        
+                    
+                    //-- custom mappings
+                    String filename = RESOURCE_LOCATION + RESOURCE_NAME;
+                    InputStream is = SchemaUnmarshaller.class.getResourceAsStream(filename);
+                    Properties props = new Properties();
+                    if (is != null) {
+                        try {
+                            props.load(is);
+                        }
+                        catch(java.io.IOException iox) {
+                            //-- just use built-in mappings
+                        }
+                    }
+                    
+                                        
+                    Enumeration keys = props.propertyNames();
+                    while (keys.hasMoreElements()) {
+                        String name =  (String) keys.nextElement();
+                        StringTokenizer st = new StringTokenizer(props.getProperty(name), ",");
+                        String[] atts = new String[st.countTokens()];
+                        int index = 0;
+                        while (st.hasMoreTokens()) {
+                            atts[index++] = st.nextToken();
+                        }
+                        QNAME_TABLE.put(name, atts);
+                    }
+                    
+                }
+            }
+        }
+        
+        private HashMap _prefixes = null;
+        
+        private RemappedPrefixes _parent = null;
+        
+        int depth = 0;
+        
+        
+        
+        public boolean isRemappedPrefix(String prefix) {
+            
+            if (prefix == null) prefix = "";
+            
+            if (_prefixes != null) {
+                if (_prefixes.get(prefix) != null) return true;
+            }
+            
+            if (_parent != null) {
+                return _parent.isRemappedPrefix(prefix);
+            }
+            return false;
+        }
+        
+        public RemappedPrefixes getParent() {
+            return _parent;
+        }
+        
+        public String getPrefixMapping(String oldPrefix) {
+            
+            if (_prefixes != null) {
+                String newPrefix = (String)_prefixes.get(oldPrefix);
+                if (newPrefix != null)
+                    return newPrefix;
+            }
+            
+            if (_parent != null) {
+                return _parent.getPrefixMapping(oldPrefix);
+            }
+            
+            return oldPrefix;
+        }
+        
+        public RemappedPrefixes newRemappedPrefixes() {
+            RemappedPrefixes rp = new RemappedPrefixes();
+            rp._parent = this;
+            return rp;
+        }
+        
+        public void addMapping(String oldPrefix, String newPrefix) {
+            if (_prefixes == null) {
+                _prefixes = new HashMap();
+            }
+            _prefixes.put(oldPrefix, newPrefix);
+        }
+
+        public String remapQName(String value) {
+            if (value == null) return null;
+            
+            //-- non-default namespace
+            int idx = value.indexOf(':');
+            String prefix = "";
+            if (idx >= 0) {
+                prefix = value.substring(0, idx);
+            }
+            else idx = -1;            
+            String newPrefix = getPrefixMapping(prefix);
+            if (!prefix.equals(newPrefix)) {
+                if (newPrefix.length() == 0) 
+                    value = value.substring(idx+1);
+                else
+                    value = newPrefix + ":" + value.substring(idx+1);
+            }
+            
+            return value;
+        } //-- remapValue
+        
+    }
+    
+    
 } //-- SchemaUnmarshaller
 
