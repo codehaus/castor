@@ -68,6 +68,13 @@ public interface ContentModelGroup {
         throws SchemaException;
 
     /**
+     * Removes the given ElementDecl from this ContentModelGroup.
+     * @param elementDecl the ElementDecl to remove.
+     * @return true if the element has been successfully removed, false otherwise.
+     */
+     public boolean removeElementDecl(ElementDecl elementDecl);
+
+    /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
@@ -77,6 +84,13 @@ public interface ContentModelGroup {
         throws SchemaException;
 
     /**
+     * Removes the given Group from this ContentModelGroup.
+     * @param group the Group to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(Group group);
+
+    /**
      * Adds the given ModelGroup Definition to this ContentModelGroup
      * @param group the ModelGroup to add
      * @exception SchemaException when a group with the same name as the
@@ -84,6 +98,14 @@ public interface ContentModelGroup {
     **/
     public void addGroup(ModelGroup group)
         throws SchemaException;
+
+
+    /**
+     * Removes the given ModelGroup Definition from this ContentModelGroup.
+     * @param group the ModelGroup Definition to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(ModelGroup group);
 
     /**
      * Returns an enumeration of all the Particles contained
@@ -122,7 +144,7 @@ public interface ContentModelGroup {
      * A negative (n < 0) value indicates that the value is unspecified.
     **/
     public int getMinOccurs();
-    
+
     /**
      * Returns the number of particles contained within
      * this ContentModelGroup
@@ -137,6 +159,8 @@ public interface ContentModelGroup {
      * @returns the CMParticle at the specified index
     **/
     public Particle getParticle(int index);
+
+
 
 
 } //-- ContentModelGroup

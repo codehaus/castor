@@ -94,7 +94,7 @@ public class ComplexType extends XMLType
 	/**
 	 * The value of the 'block' attribute for this ComplexType
 	**/
-	private String block = null; 
+	private String block = null;
 
     /**
      * A wildcard that represents an <anyAttribute> element if any.
@@ -102,7 +102,7 @@ public class ComplexType extends XMLType
      * a complexType
     **/
     private Wildcard _anyAttribute = null;
-     
+
     /**
      * The parent structure for this ComplexType
      * (either an ElementDecl or a Schema)
@@ -149,6 +149,14 @@ public class ComplexType extends XMLType
     } //-- addAttributeDecl
 
     /**
+     * Removes the given AttributeDecl from this ComplexType
+     * @param attrDecl the AttributeDecl to remove.
+     */
+     public void removeAttributeDecl(AttributeDecl attrDecl) {
+        attributes.removeAttribute(attrDecl);
+     }
+
+    /**
      * Adds the given AttributeGroupReference to this ComplexType
      *
      * @param attrGroupRef the AttributeGroupReference to add to this
@@ -159,6 +167,15 @@ public class ComplexType extends XMLType
     {
         attributes.addReference(attrGroupRef);
     } //-- addAttributeGroupReference
+
+
+    /**
+     * Removes the given AttributeGroupReference from this ComplexType
+     * @param attrGroupRef the AttributeGroupReference to remove.
+     */
+     public void removeAttributeGroupReference(AttributeGroupReference attrGroupRef) {
+        attributes.removeReference(attrGroupRef);
+     }
 
     /**
      * Creates an AttributeDecl with the given name. The attribute
@@ -206,7 +223,7 @@ public class ComplexType extends XMLType
         }
         return super.getBaseType();
     } //-- getBaseType
-    
+
     /**
      * Returns the content type of this ComplexType
      * @return the content type of this ComplexType
@@ -225,7 +242,7 @@ public class ComplexType extends XMLType
     public Structure getParent() {
         return _parent;
     } //-- getParent
-    
+
     /**
      * Returns the Id used to Refer to this Object
      * @return the Id used to Refer to this Object
@@ -334,6 +351,17 @@ public class ComplexType extends XMLType
     } //-- addElementDecl
 
     /**
+     * Removes the given ElementDecl from this ContentModelGroup.
+     * @param elementDecl the ElementDecl to remove.
+     * @return true if the element has been successfully removed, false otherwise.
+     */
+     public boolean removeElementDecl(ElementDecl element) {
+         return _contentModel.removeElementDecl(element);
+     }
+
+
+
+    /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
@@ -343,10 +371,22 @@ public class ComplexType extends XMLType
         throws SchemaException
     {
         _contentModel.addGroup(group);
-        
+
         //-- set reference to parent
-        group.setParent(this);        
+        group.setParent(this);
     } //-- addGroup
+
+
+    /**
+     * Removes the given Group from this ContentModelGroup.
+     * @param group the Group to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(Group group){
+        boolean result = _contentModel.removeGroup(group);
+        group.setParent(null);
+        return result;
+     }
 
     /**
      * Adds the given ModelGroup Definition to this ContentModelGroup
@@ -358,10 +398,22 @@ public class ComplexType extends XMLType
         throws SchemaException
     {
         _contentModel.addGroup(group);
-        
+
         //-- set reference to parent
-        group.setParent(this);        
+        group.setParent(this);
     } //-- addGroup
+
+
+    /**
+     * Removes the given ModelGroup Definition from this ContentModelGroup.
+     * @param group the ModelGroup Definition to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(ModelGroup group) {
+         boolean result = _contentModel.removeGroup(group);
+         group.setParent(null);
+         return result;
+     }
 
     /**
      * Returns an enumeration of all the Particles of this
@@ -395,14 +447,14 @@ public class ComplexType extends XMLType
      * value is unspecified (ie. unbounded).
     **/
     public int getMaxOccurs() {
-        
+
         if (_contentModel.getParticleCount() > 0) {
             Particle particle = _contentModel.getParticle(0);
             if (particle instanceof ContentModelGroup) {
                 return particle.getMaxOccurs();
             }
         }
-        
+
         return _contentModel.getMaxOccurs();
     } //-- getMaxOccurs
 
@@ -422,7 +474,7 @@ public class ComplexType extends XMLType
         }
         return _contentModel.getMinOccurs();
     } //-- getMinOccurs
-    
+
     /**
      * Returns the Particle at the specified index
      * @param index the index of the particle to return
@@ -441,6 +493,7 @@ public class ComplexType extends XMLType
     public int getParticleCount() {
         return _contentModel.getParticleCount();
     } //-- getParticleCount
+
 
 	/**
 	 * Returns the value of the 'block' attribute for this element
@@ -505,7 +558,7 @@ public class ComplexType extends XMLType
     //---------------------/
     //- Protected Methods -/
     //---------------------/
-    
+
     /**
      * Sets the parent for this ComplexType
      *
@@ -524,6 +577,6 @@ public class ComplexType extends XMLType
         }
         _parent = parent;
     } //-- setParent
-    
+
 
 } //-- Complextype

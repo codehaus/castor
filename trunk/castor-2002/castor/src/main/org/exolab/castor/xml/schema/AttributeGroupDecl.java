@@ -244,16 +244,28 @@ public final class AttributeGroupDecl extends AttributeGroup {
      * Removes the given AttributeDecl from this AttributeGroup.
      * @param attr the attribute to remove.
     **/
-    public void removeAttribute(AttributeDecl attr) {
-        _attributes.removeElement(attr);
+    public boolean removeAttribute(AttributeDecl attr) {
+        if (attr == null )
+           return false;
+        if (_attributes.contains(attr)) {
+            _attributes.removeElement(attr);
+            return true;
+        }
+        else return false;
     } //-- removeAttribute
 
     /**
      * Removes the given AttributeGroupReference from this AttributeGroup.
      * @param attrGroup the AttributeGroupReference to remove.
     **/
-    public void removeReference(AttributeGroupReference attrGroupReference) {
-        _references.removeElement(attrGroupReference);
+    public boolean removeReference(AttributeGroupReference attrGroupReference) {
+         if (attrGroupReference == null )
+            return false;
+         if (_references.contains(attrGroupReference)) {
+            _references.removeElement(attrGroupReference);
+            return true;
+         }
+         else return false;
     } //-- removeReference
 
     /**
