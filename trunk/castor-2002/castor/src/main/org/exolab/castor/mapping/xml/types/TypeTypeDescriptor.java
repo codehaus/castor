@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package org.exolab.castor.mapping.xml;
+package org.exolab.castor.mapping.xml.types;
 
   //---------------------------------/
  //- Imported classes and packages -/
@@ -26,7 +26,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class IncludeDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class TypeTypeDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
 
       //--------------------------/
@@ -46,58 +46,18 @@ public class IncludeDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
      //- Constructors -/
     //----------------/
 
-    public IncludeDescriptor() {
+    public TypeTypeDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/";
-        xmlName = "include";
+        xmlName = "typeType";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        //-- _href
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_href", "href", NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Include target = (Include) object;
-                return target.getHref();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Include target = (Include) object;
-                    target.setHref( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
-        desc.setRequired(true);
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _href
-        fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
-        desc.setValidator(fieldValidator);
-        
         //-- initialize element descriptors
         
-    } //-- org.exolab.castor.mapping.xml.IncludeDescriptor()
+    } //-- org.exolab.castor.mapping.xml.types.TypeTypeDescriptor()
 
 
       //-----------/
@@ -129,7 +89,7 @@ public class IncludeDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
     **/
     public java.lang.Class getJavaClass()
     {
-        return org.exolab.castor.mapping.xml.Include.class;
+        return org.exolab.castor.mapping.xml.types.TypeType.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**

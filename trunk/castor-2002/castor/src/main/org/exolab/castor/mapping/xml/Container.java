@@ -1,8 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
- * $Id
+ * $Id$
  */
 
 package org.exolab.castor.mapping.xml;
@@ -14,8 +14,6 @@ package org.exolab.castor.mapping.xml;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.Enumeration;
-import java.util.Vector;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -28,27 +26,37 @@ import org.xml.sax.DocumentHandler;
 public class Container implements java.io.Serializable {
 
 
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
 
     private java.lang.String _name;
 
     private java.lang.String _type;
 
+    private boolean _required;
+
+    /**
+     * keeps track of state for field: _required
+    **/
+    private boolean _has_required;
+
+    private boolean _direct;
+
+    /**
+     * keeps track of state for field: _direct
+    **/
+    private boolean _has_direct;
+
+    private java.lang.String _getMethod;
+
     private java.lang.String _setMethod;
 
     private java.lang.String _createMethod;
 
-    private java.lang.String _getMethod;
-
-    private boolean _required = false;
-
-    private boolean _direct = false;
-
     private java.lang.String _description;
 
-    private java.util.Vector _fieldMappingList;
+    private FieldMapping _fieldMapping;
 
 
       //----------------/
@@ -57,7 +65,6 @@ public class Container implements java.io.Serializable {
 
     public Container() {
         super();
-        _fieldMappingList = new Vector();
     } //-- org.exolab.castor.mapping.xml.Container()
 
 
@@ -66,104 +73,100 @@ public class Container implements java.io.Serializable {
     //-----------/
 
     /**
-     * 
-     * @param vFieldMapping
     **/
-    public void addFieldMapping(FieldMapping vFieldMapping) 
-        throws java.lang.IndexOutOfBoundsException
+    public void deleteDirect()
     {
-        _fieldMappingList.addElement(vFieldMapping);
-    } //-- void addFieldMapping(FieldMapping) 
+        this._has_direct= false;
+    } //-- void deleteDirect() 
 
     /**
     **/
-    public java.util.Enumeration enumerateFieldMapping() {
-        return _fieldMappingList.elements();
-    } //-- java.util.Enumeration enumerateFieldMapping() 
+    public void deleteRequired()
+    {
+        this._has_required= false;
+    } //-- void deleteRequired() 
 
     /**
     **/
-    public java.lang.String getCreateMethod() {
+    public java.lang.String getCreateMethod()
+    {
         return this._createMethod;
     } //-- java.lang.String getCreateMethod() 
 
     /**
     **/
-    public java.lang.String getDescription() {
+    public java.lang.String getDescription()
+    {
         return this._description;
     } //-- java.lang.String getDescription() 
 
     /**
     **/
-    public boolean getDirect() {
+    public boolean getDirect()
+    {
         return this._direct;
     } //-- boolean getDirect() 
 
     /**
-     * 
-     * @param index
     **/
-    public FieldMapping getFieldMapping(int index) 
-        throws java.lang.IndexOutOfBoundsException
+    public FieldMapping getFieldMapping()
     {
-        //-- check bounds for index
-        if ((index < 0) || (index > _fieldMappingList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (FieldMapping) _fieldMappingList.elementAt(index);
-    } //-- FieldMapping getFieldMapping(int) 
+        return this._fieldMapping;
+    } //-- FieldMapping getFieldMapping() 
 
     /**
     **/
-    public FieldMapping[] getFieldMapping() {
-        int size = _fieldMappingList.size();
-        FieldMapping[] mArray = new FieldMapping[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (FieldMapping) _fieldMappingList.elementAt(index);
-        }
-        return mArray;
-    } //-- FieldMapping[] getFieldMapping() 
-
-    /**
-    **/
-    public int getFieldMappingCount() {
-        return _fieldMappingList.size();
-    } //-- int getFieldMappingCount() 
-
-    /**
-    **/
-    public java.lang.String getGetMethod() {
+    public java.lang.String getGetMethod()
+    {
         return this._getMethod;
     } //-- java.lang.String getGetMethod() 
 
     /**
     **/
-    public java.lang.String getName() {
+    public java.lang.String getName()
+    {
         return this._name;
     } //-- java.lang.String getName() 
 
     /**
     **/
-    public boolean getRequired() {
+    public boolean getRequired()
+    {
         return this._required;
     } //-- boolean getRequired() 
 
     /**
     **/
-    public java.lang.String getSetMethod() {
+    public java.lang.String getSetMethod()
+    {
         return this._setMethod;
     } //-- java.lang.String getSetMethod() 
 
     /**
     **/
-    public java.lang.String getType() {
+    public java.lang.String getType()
+    {
         return this._type;
     } //-- java.lang.String getType() 
 
     /**
     **/
-    public boolean isValid() {
+    public boolean hasDirect()
+    {
+        return this._has_direct;
+    } //-- boolean hasDirect() 
+
+    /**
+    **/
+    public boolean hasRequired()
+    {
+        return this._has_required;
+    } //-- boolean hasRequired() 
+
+    /**
+    **/
+    public boolean isValid()
+    {
         try {
             validate();
         }
@@ -177,11 +180,9 @@ public class Container implements java.io.Serializable {
      * 
      * @param out
     **/
-    public void marshal(java.io.Writer out) 
+    public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, out);
     } //-- void marshal(java.io.Writer) 
@@ -190,36 +191,19 @@ public class Container implements java.io.Serializable {
      * 
      * @param handler
     **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
+    public void marshal(org.xml.sax.DocumentHandler handler)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
-    **/
-    public void removeAllFieldMapping() {
-        _fieldMappingList.removeAllElements();
-    } //-- void removeAllFieldMapping() 
-
-    /**
-     * 
-     * @param index
-    **/
-    public FieldMapping removeFieldMapping(int index) {
-        Object obj = _fieldMappingList.elementAt(index);
-        _fieldMappingList.removeElementAt(index);
-        return (FieldMapping) obj;
-    } //-- FieldMapping removeFieldMapping(int) 
-
-    /**
      * 
      * @param _createMethod
     **/
-    public void setCreateMethod(java.lang.String _createMethod) {
+    public void setCreateMethod(java.lang.String _createMethod)
+    {
         this._createMethod = _createMethod;
     } //-- void setCreateMethod(java.lang.String) 
 
@@ -227,7 +211,8 @@ public class Container implements java.io.Serializable {
      * 
      * @param _description
     **/
-    public void setDescription(java.lang.String _description) {
+    public void setDescription(java.lang.String _description)
+    {
         this._description = _description;
     } //-- void setDescription(java.lang.String) 
 
@@ -235,30 +220,27 @@ public class Container implements java.io.Serializable {
      * 
      * @param _direct
     **/
-    public void setDirect(boolean _direct) {
+    public void setDirect(boolean _direct)
+    {
         this._direct = _direct;
+        this._has_direct = true;
     } //-- void setDirect(boolean) 
 
     /**
      * 
-     * @param vFieldMapping
-     * @param index
+     * @param _fieldMapping
     **/
-    public void setFieldMapping(FieldMapping vFieldMapping, int index) 
-        throws java.lang.IndexOutOfBoundsException
+    public void setFieldMapping(FieldMapping _fieldMapping)
     {
-        //-- check bounds for index
-        if ((index < 0) || (index > _fieldMappingList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        _fieldMappingList.setElementAt(vFieldMapping, index);
-    } //-- void setFieldMapping(FieldMapping, int) 
+        this._fieldMapping = _fieldMapping;
+    } //-- void setFieldMapping(FieldMapping) 
 
     /**
      * 
      * @param _getMethod
     **/
-    public void setGetMethod(java.lang.String _getMethod) {
+    public void setGetMethod(java.lang.String _getMethod)
+    {
         this._getMethod = _getMethod;
     } //-- void setGetMethod(java.lang.String) 
 
@@ -266,7 +248,8 @@ public class Container implements java.io.Serializable {
      * 
      * @param _name
     **/
-    public void setName(java.lang.String _name) {
+    public void setName(java.lang.String _name)
+    {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
@@ -274,15 +257,18 @@ public class Container implements java.io.Serializable {
      * 
      * @param _required
     **/
-    public void setRequired(boolean _required) {
+    public void setRequired(boolean _required)
+    {
         this._required = _required;
+        this._has_required = true;
     } //-- void setRequired(boolean) 
 
     /**
      * 
      * @param _setMethod
     **/
-    public void setSetMethod(java.lang.String _setMethod) {
+    public void setSetMethod(java.lang.String _setMethod)
+    {
         this._setMethod = _setMethod;
     } //-- void setSetMethod(java.lang.String) 
 
@@ -290,7 +276,8 @@ public class Container implements java.io.Serializable {
      * 
      * @param _type
     **/
-    public void setType(java.lang.String _type) {
+    public void setType(java.lang.String _type)
+    {
         this._type = _type;
     } //-- void setType(java.lang.String) 
 
@@ -298,7 +285,7 @@ public class Container implements java.io.Serializable {
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.Container unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Container unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.Container) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Container.class, reader);
@@ -306,7 +293,7 @@ public class Container implements java.io.Serializable {
 
     /**
     **/
-    public void validate() 
+    public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
         org.exolab.castor.xml.Validator.validate(this, null);
