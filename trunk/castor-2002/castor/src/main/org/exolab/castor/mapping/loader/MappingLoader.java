@@ -701,6 +701,8 @@ public abstract class MappingLoader
     {
         Method   method;
         Method[] methods;
+        Class[] parameterTypes;
+        Class fieldTypeFromPrimitive;
         int      i;
         
         try {
@@ -711,28 +713,39 @@ public abstract class MappingLoader
                 method = javaClass.getMethod( methodName, new Class[ 0 ] );
                 if ( fieldType == null )
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                else if ( ! Types.typeFromPrimitive( fieldType ).isAssignableFrom( Types.typeFromPrimitive( method.getReturnType() ) ) )
+                else if ( ! Types.typeFromPrimitive( method.getReturnType() ).isAssignableFrom( Types.typeFromPrimitive( fieldType ) ) )
                     throw new MappingException( "mapping.accessorReturnTypeMismatch",
                                                 method, fieldType.getName() );
             } else {
+                method = null;
+                fieldTypeFromPrimitive = null;
                 // Set method: look for the named method or prepend set to the
                 // method name. If the field type is know, look up a suitable
                 // method. If the fielf type is unknown, lookup the first
                 // method with that name and one parameter.
                 if ( fieldType != null ) {
+                    fieldTypeFromPrimitive = Types.typeFromPrimitive( fieldType );
                     try {
                         method = javaClass.getMethod( methodName, new Class[] { fieldType } );
                     } catch ( Exception except ) {
-                        method = javaClass.getMethod( methodName, new Class[] { Types.typeFromPrimitive( fieldType ) } );
+                        try {
+                            method = javaClass.getMethod( methodName, new Class[] { fieldTypeFromPrimitive } );
+                        } catch ( Exception except2 ) {
+                        }
                     }
-                } else {
+                } 
+                if ( null == method ) {
                     methods = javaClass.getMethods();
                     method = null;
                     for ( i = 0 ; i < methods.length ; ++i ) {
-                        if ( methods[ i ].getName().equals( methodName ) &&
-                             methods[ i ].getParameterTypes().length == 1 ) {
-                            method = methods[ i ];
-                            break;
+                        if ( methods[ i ].getName().equals( methodName ) ) {
+                            parameterTypes = methods[ i ].getParameterTypes();
+                            if (( parameterTypes.length == 1 ) &&
+                                (( fieldType == null ) || 
+                                 Types.typeFromPrimitive( parameterTypes[0] ).isAssignableFrom( fieldTypeFromPrimitive ) )) {
+                                method = methods[ i ];
+                                break;
+                            }
                         }
                     }
                     if ( method == null )
