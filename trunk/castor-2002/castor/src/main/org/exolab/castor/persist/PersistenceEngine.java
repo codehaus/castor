@@ -61,7 +61,17 @@ import org.exolab.castor.util.Messages;
 
 
 /**
- *
+ * An interface to a persistence engine. The persistence engine
+ * implements object caching, transaction isolatio and locking, and
+ * rollback. The persistence APIs interact with this interface and
+ * {@link TransactionContext}. A persistence engine is obtained from
+ * {@link PersistenceEngineFactory} given the SPI factory and list
+ * of object mappings that must be supported.
+ * <p>
+ * All operations against the persistence engine must be carried in
+ * the context of a transaction. For efficiency with caching and
+ * locking, a single persistence engine should be implemented on top
+ * of a given datastore.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
