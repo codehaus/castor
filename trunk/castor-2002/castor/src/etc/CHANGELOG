@@ -26,6 +26,10 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
+        for the April xML Schema draft
+        
+
 XML:    Added support for top-level annotations (kvisco)
 
 XML:    Made some changes in Unmarshalling code to handle "null" primitives. Based
