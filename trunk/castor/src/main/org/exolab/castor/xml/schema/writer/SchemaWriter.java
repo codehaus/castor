@@ -586,11 +586,13 @@ public class SchemaWriter {
             //add the targetNamespace prefix if necessary
             if (baseType.isComplexType()) {
                 String targetNamespace = baseType.getSchema().getTargetNamespace();
-                String nsPrefix = getNSPrefix(complexType.getSchema(), targetNamespace);
-                if ((nsPrefix != null) && (nsPrefix.length() != 0))
-                    baseTypeName = nsPrefix +':'+ baseTypeName;
-                targetNamespace = null;
-                nsPrefix = null;
+                if (targetNamespace != null ) {
+                    String nsPrefix = getNSPrefix(complexType.getSchema(), targetNamespace);
+                    if ((nsPrefix != null) && (nsPrefix.length() != 0))
+                        baseTypeName = nsPrefix +':'+ baseTypeName;
+                    targetNamespace = null;
+                    nsPrefix = null;
+                }
             }
             _atts.clear();
             _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, baseTypeName);
@@ -764,11 +766,13 @@ public class SchemaWriter {
                 String typeName = type.getName();
                 //add the targetNamespace prefix if necessary
                 String targetNamespace = element.getSchema().getTargetNamespace();
-                String nsPrefix = getNSPrefix(element.getSchema(), targetNamespace);
-                if ((nsPrefix != null) && (nsPrefix.length() != 0))
-                    typeName = nsPrefix +':'+ typeName;
-                targetNamespace = null;
-                nsPrefix = null;
+                if ( targetNamespace!=null ) {
+                    String nsPrefix = getNSPrefix(element.getSchema(), targetNamespace);
+                    if ((nsPrefix != null) && (nsPrefix.length() != 0))
+                        typeName = nsPrefix +':'+ typeName;
+                    targetNamespace = null;
+                    nsPrefix = null;
+                }
 
                 _atts.addAttribute(ATTR_TYPE, CDATA, typeName);
             }
