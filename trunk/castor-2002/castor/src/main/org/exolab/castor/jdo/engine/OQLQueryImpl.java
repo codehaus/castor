@@ -439,7 +439,7 @@ public class OQLQueryImpl
                     results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
                     _fieldNum = 0;
 
-                    System.out.println( _projectionType );
+                    //System.out.println( _projectionType );
                     
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
                       retVal = new OQLEnumeration( results );
@@ -481,7 +481,7 @@ public class OQLQueryImpl
         OQLEnumeration( org.exolab.castor.persist.QueryResults results,
                         Vector pathInfo, JDOClassDescriptor clsDesc )
         {
-            System.out.println( "OQLEnumeration initialized with pathInfo and class." );
+            //System.out.println( "OQLEnumeration initialized with pathInfo and class." );
             _results = results;
             _pathInfo = pathInfo;
             _classDescriptor = clsDesc;
@@ -646,7 +646,7 @@ public class OQLQueryImpl
 
 
         private Object followPath(Object parent) {
-            System.out.println("Following the path.");
+            //System.out.println("Following the path.");
             //follow the path
             JDOClassDescriptor curClassDesc = _classDescriptor;
             Object curObject = parent;
