@@ -115,22 +115,23 @@ public class MemberFactory {
     } //-- createFieldInfoForAny()
 
     /**
-     * Creates a FieldInfo for Text content
+     * Creates a FieldInfo for content.
+     * @param xsType the type of content
      * @return the new FieldInfo
     **/
-    public FieldInfo createFieldInfoForText() {
+    public FieldInfo createFieldInfoForContent(XSType xsType) {
 
-        XSType xsType = new XSString();
-        String fieldName = "_content";
-        FieldInfo fInfo = infoFactory.createFieldInfo(new XSString(),fieldName);
+        String fieldName = "_content";               //new xsType()???
+        FieldInfo fInfo = infoFactory.createFieldInfo(xsType,fieldName);
         fInfo.setNodeType(XMLInfo.TEXT_TYPE);
-        fInfo.setComment("internal character storage");
+        fInfo.setComment("internal content storage");
         fInfo.setRequired(false);
         fInfo.setNodeName("#text");
-        fInfo.setDefaultValue("\"\"");
+        if (xsType instanceof XSString)
+           fInfo.setDefaultValue("\"\"");
         return fInfo;
 
-    } //-- createFieldInfoForText
+    } //-- createFieldInfoForContent
 
 
     /**
