@@ -136,7 +136,13 @@
       <xsd:attribute name="type"       type="xsd:NMTOKENS"   use="optional"/>
       <xsd:attribute name="many-table" type="xsd:NMTOKEN"    use="optional"/>
       <xsd:attribute name="many-key"   type="xsd:NMTOKENS"   use="optional"/>
-      <xsd:attribute name="dirty"      default="check"       use="optional">
+      <xsd:attribute name="read-only"  type="xsd:boolean"    use="optional" default="false"/>
+
+      <!-- signals that this field is transient for database mapping (ie should be ignored) -->
+      <xsd:attribute name="transient" type="xsd:boolean" use="optional"/>
+
+
+      <xsd:attribute name="dirty"  default="check"  use="optional">
         <xsd:simpleType>
           <xsd:restriction base="xsd:string">
             <xsd:enumeration value="check"/>
@@ -199,6 +205,21 @@
                <xsd:enumeration value="deriveByField"/>
             </xsd:restriction>
          </xsd:simpleType>
+      </xsd:attribute>
+
+      <!--
+          Allows specifying a nested location path for this field,
+          the value should just be a simplified XPath like value
+          where names are separated by "/".
+       -->
+      <xsd:attribute name="location" type="xsd:string" use="optional">
+         <xsd:annotation>
+            <xsd:documentation>
+               Allows specifying a nested location path for this field,
+               the value should just be a simplified XPath like value
+               where names are separated by "/".
+            </xsd:documentation>
+         </xsd:annotation>
       </xsd:attribute>
 
       <!-- Allows overriding the matching rule -->

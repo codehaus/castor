@@ -168,7 +168,8 @@
     many-key    NMTOKENS  #IMPLIED
     many-table  NMTOKEN  #IMPLIED
     read-only   ( true | false )  "false"
-    dirty  ( check | ignore )  "check">
+    dirty       ( check | ignore )  "check"
+    transient   (true|false) "false">
 
 
 <!--
@@ -191,6 +192,7 @@
 <!ATTLIST bind-xml
     name         NMTOKEN   #IMPLIED
     type         NMTOKEN   #IMPLIED
+    location     CDATA     #IMPLIED
     matches      NMTOKENS  #IMPLIED
     QName-prefix NMTOKEN   #IMPLIED
     reference (true|false) "false"
