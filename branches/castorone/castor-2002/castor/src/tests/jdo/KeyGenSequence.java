@@ -64,7 +64,7 @@ public class KeyGenSequence
     public KeyGenSequence( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC09", "Key generator: SEQUENCE", category );
+        super( "TC42", "Key generator: SEQUENCE", category );
     }
 
     protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 

@@ -76,7 +76,7 @@ public class Join
     public Join( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC06", "Outer join tests" );
+        super( "TC21", "Outer join tests" );
         _category = (JDOCategory) category;
     }
 

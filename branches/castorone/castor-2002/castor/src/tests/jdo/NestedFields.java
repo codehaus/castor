@@ -77,7 +77,7 @@ public class NestedFields
     public NestedFields( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC15", "Nested fields" );
+        super( "TC27", "Nested fields" );
         _category = (JDOCategory) category;
     }
 

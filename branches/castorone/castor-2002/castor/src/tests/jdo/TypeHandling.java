@@ -77,7 +77,7 @@ public class TypeHandling
     public TypeHandling( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC05", "Type handling" );
+        super( "TC20", "Type handling" );
         _category = (JDOCategory) category;
     }
 

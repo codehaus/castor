@@ -76,7 +76,7 @@ public class KeyGenGeneric
     public KeyGenGeneric( CWTestCategory category )
         throws CWClassConstructorException
     {
-        this( "TC07", "Key generators: MAX, HIGH/LOW", category );
+        this( "TC41", "Key generators: MAX, HIGH/LOW", category );
     }
 
 
