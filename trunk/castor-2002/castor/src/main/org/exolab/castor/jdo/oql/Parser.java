@@ -137,7 +137,11 @@ public class Parser implements TokenTypes {
             throws InvalidCharException, OQLSyntaxException {
     
     if (_curToken.getTokenType() != tokenType)
-      throw (new OQLSyntaxException("An incorrect token type was found near " + _curToken.getTokenValue() ));
+      throw (new OQLSyntaxException("An incorrect token type was found near " + 
+				    _curToken.getTokenValue()+" ("+
+				    String.valueOf( _curToken.getTokenType() )+
+				    ", need "+
+				    String.valueOf( tokenType ) ));
 
     ParseTreeNode retNode = new ParseTreeNode(_curToken);
     _curToken = _nextToken;
@@ -332,19 +336,18 @@ public class Parser implements TokenTypes {
   private ParseTreeNode orExpr() 
             throws InvalidCharException, OQLSyntaxException {
     
-    ParseTreeNode retNode = null;
+    ParseTreeNode tmpNode = null;
     ParseTreeNode leftSide = andExpr();
 
-    if (_curToken.getTokenType() == KEYWORD_OR) {
-      retNode = match(KEYWORD_OR);
-      retNode.addChild(leftSide);
-      retNode.addChild(andExpr());
+    // consume all sequential OR's
+    while (_curToken.getTokenType() == KEYWORD_OR) {
+      tmpNode = match(KEYWORD_OR);
+      tmpNode.addChild(leftSide);
+      tmpNode.addChild(andExpr());
+      leftSide = tmpNode;
     }
     
-    if (retNode == null)
-      return leftSide;
-    else
-      return retNode;
+    return leftSide;
   }
   
   /**
@@ -358,19 +361,18 @@ public class Parser implements TokenTypes {
   private ParseTreeNode andExpr() 
             throws InvalidCharException, OQLSyntaxException {
     
-    ParseTreeNode retNode = null;
+    ParseTreeNode tmpNode = null;
     ParseTreeNode leftSide = equalityExpr();
 
-    if (_curToken.getTokenType() == KEYWORD_AND) {
-      retNode = match(KEYWORD_AND);
-      retNode.addChild(leftSide);
-      retNode.addChild(equalityExpr());
+    // consume all sequential AND's
+    while (_curToken.getTokenType() == KEYWORD_AND) {
+      tmpNode = match(KEYWORD_AND);
+      tmpNode.addChild(leftSide);
+      tmpNode.addChild(equalityExpr());
+      leftSide = tmpNode;
     }
-    
-    if (retNode == null)
-      return leftSide;
-    else
-      return retNode;
+        
+    return leftSide;
   }
   
   /**
@@ -662,7 +664,9 @@ public class Parser implements TokenTypes {
         retNode = match(tokenType);
         break;
       default:
-        throw (new OQLSyntaxException("An inapropriate token was encountered in an expression."));
+        throw (new OQLSyntaxException("An inapropriate token ("+
+				      String.valueOf( tokenType )+
+				      ") was encountered in an expression."));
     }
     
     if (retNode == null)
