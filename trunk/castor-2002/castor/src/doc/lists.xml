@@ -3,7 +3,9 @@
   <body>
     <title>Castor-Dev: Developers' Mailing List</title>
     <header>
-      <p>Medium volume (possibly more than 5 messages a day) mailing list dedicated to the developers of Castor.</p>
+      <p>Moderate volume (possibly more than 10 messages a day) mailing list dedicated to the developers of Castor.</p>
+
+      <p><a href="http://castor.exolab.org/list-archive/">List archive</a></p>
 
       <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
                        server="exolab.org" manager="minimalist"/></p>

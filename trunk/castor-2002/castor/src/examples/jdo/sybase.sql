@@ -1,64 +1,65 @@
-drop table prod
-go
-create table prod (
-  id        int not null,
-  name      varchar(200) not null,
-  price     float not null,
-  group_id  int not null
-)
-go
-create unique index prod_pk on prod ( id )
-go
-
-drop table prod_group
-go
-create table prod_group (
-  id    int not null,
-  name  varchar(200) not null
-)
-go
-create unique index prod_group_pk on prod_group ( id )
-go
-
-drop table prod_detail
-go
-create table prod_detail (
-  id      int not null,
-  prod_id int not null,
-  name    varchar(200) not null
-)
-go
-create unique index prod_detail_pk on prod_detail ( id )
-go
-
 drop table computer
 go
-create table computer (
-  id   int not null,
-  cpu  varchar(200) not null
-)
+drop table prod_detail
 go
-create unique index computer_pk on computer ( id )
+drop table prod
+go
+drop table prod_group
 go
 
-drop table category
+
+create table prod_group (
+  id    char(20)      not null primary key,
+  name  varchar(200)  not null
+)
 go
-create table category (
-  id   int not null,
+grant all on prod_group to test
+go
+
+create table prod (
+  id        int           not null primary key,
+  name      varchar(200)  not null,
+  price     float         not null,
+  group_id  char(20)      not null references prod_group( id )
+)
+go
+grant all on prod to test
+go
+
+create table prod_detail (
+  id       int           not null primary key,
+  prod_id  int           not null references prod( id ),
+  name     varchar(200)  not null
+)
+go
+grant all on prod_detail to test
+go
+
+create table computer (
+  id   int           not null primary key references prod( id ),
+  cpu  varchar(200)  not null
+)
+go
+grant all on computer to test
+go
+
+
+drop table prod_cat
+go
+create table prod_cat (
+  id   int not null primary key,
   name varchar(200) not null
 )
 go
-create unique index category_pk on category ( id )
-go
 
-drop table category_prod
+drop table prod_cat_prod
 go
-create table category_prod (
+create table prod_cat_prod (
   prod_id   int not null,
   category_id   int not null
 )
 go
-create unique index category_prod_pk on category_prod ( prod_id, category_id )
+create unique index prod_cat_prod_pk on prod_cat_prod ( prod_id, category_id )
 go
 
 

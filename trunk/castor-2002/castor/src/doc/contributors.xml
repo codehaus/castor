@@ -53,6 +53,11 @@
     <description>Submitted code for generating mapping file from existing SQL database.</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Sahuc" given="Sebastien"/>
+    <email>ssahuc@imediation.com</email>
+    <description>Testing for Oracle and Castor XML.</description>
+  </contributor>
 
   <contributor type="Feedback">
     <name surname="Sundaranatha" given="Venkatakrishnan"/>
