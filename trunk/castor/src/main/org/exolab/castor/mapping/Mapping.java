@@ -492,11 +492,11 @@ public class Mapping
         // Clear all the cached resolvers, so they can be reconstructed a
         // second time based on the new mappings loaded
         _resolvers.clear();
+        
         //check that the mapping has already been processed
         if ((source.getSystemId()!=null) && _state.processed(source.getSystemId()) ) {
-            String err = "The mapping located at:"+source.getSystemId();
-            err += " has already been processed.";
-            throw new MappingException(err);
+            //-- already processed...just return
+            return;
         }
         try {
             if ( _mapping == null ) {
@@ -515,6 +515,22 @@ public class Mapping
             loaded = (MappingRoot) unm.unmarshal( source );
 
 
+            //mark the mapping as being processed
+            if (source.getSystemId() != null)
+                _state.markAsProcessed(source.getSystemId(), _mapping);
+                
+            // Load all the included mapping by reference
+            Enumeration includes = loaded.enumerateInclude();
+            while ( includes.hasMoreElements() ) {
+                Include include = (Include) includes.nextElement();
+                try {
+                    loadMappingInternal( include.getHref() );
+                } 
+                catch ( Exception except ) {
+                    throw new MappingException( except );
+                }
+            }
+            
             // gather "class" tags
             enum = loaded.enumerateClassMapping();
             while ( enum.hasMoreElements() )
@@ -525,29 +541,16 @@ public class Mapping
             while ( enum.hasMoreElements() ) {
                 _mapping.addKeyGeneratorDef( (KeyGeneratorDef) enum.nextElement() );
             }
-            //mark the mapping as being processed
-            if (source.getSystemId() != null)
-                _state.markAsProcessed(source.getSystemId(), _mapping);
-
-            // Load all the included mapping by reference
-            Enumeration   includes;
-
-            includes = loaded.enumerateInclude();
-            while ( includes.hasMoreElements() ) {
-                try {
-                    loadMappingInternal( ( (Include) includes.nextElement() ).getHref() );
-                } catch ( Exception except ) {
-                    throw new MappingException( except );
-                }
-            }
-        } catch ( MarshalException except ) {
+        } 
+        catch ( MarshalException except ) {
             if ( except.getException() != null )
                 throw new MappingException( except.getException() );
             throw new MappingException( except );
-        } catch ( Exception except ) {
+        } 
+        catch ( Exception except ) {
             throw new MappingException( except );
         }
-    }
+    } //-- loadMappingInternal
 
     /**
      * An IDResolver to allow us to resolve ClassMappings
