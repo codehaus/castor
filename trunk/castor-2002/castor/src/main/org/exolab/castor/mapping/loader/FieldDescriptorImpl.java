@@ -206,6 +206,15 @@ public class FieldDescriptorImpl
     }
 
 
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    void setRequired( boolean required )
+    {
+        _required = required;
+    }
+
+
     public String toString()
     {
         return _fieldName + "(" + _fieldType.getName() + ")";

@@ -89,6 +89,12 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The method used to create a new instance of the field.
+     */
+    private Method  _createMethod;
+
+
+    /**
      * The Java field name.
      */
     private String  _fieldName;
@@ -309,8 +315,46 @@ public final class FieldHandlerImpl
     {
         if ( _immutable )
             throw new IllegalStateException( Messages.format( "mapping.classNotConstructable", _fieldType ) );
-        // XXX This is the place to call the create method
+        // If we have a create method and parent object, call the create method.
+        if ( _createMethod != null && object != null ) {
+            try {
+                return _createMethod.invoke( object, new Object[ 0 ] );
+            } catch ( IllegalAccessException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            } catch ( InvocationTargetException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                                  toString(), except.getMessage() ) );
+            }
+        }
         return Types.newInstance( _fieldType );
+    }
+
+
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    void setRequired( boolean required )
+    {
+        _required = required;
+    }
+
+
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    void setCreateMethod( Method method )
+        throws MappingException
+    {
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.createMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _createMethod = method;
     }
 
 

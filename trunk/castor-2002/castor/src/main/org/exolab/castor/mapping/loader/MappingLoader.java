@@ -511,7 +511,10 @@ public abstract class MappingLoader
             for ( int i = 0 ; i < fields.length ; ++i ) {
                 if ( fields[ i ].getFieldName().equals( clsMap.getIdentity().getFieldRef() ) ) {
                     identity = fields[ i ];
-                    // XXX   identity.setRequired( true );
+                    if ( identity instanceof FieldDescriptorImpl )
+                        ( (FieldDescriptorImpl) identity ).setRequired( true );
+                    if ( identity.getHandler() instanceof FieldHandlerImpl )
+                        ( (FieldHandlerImpl) identity.getHandler() ).setRequired( true );
                     fields[ i ] = fields[ fields.length - 1 ];
 
                     // Remove identity field from list of fields.
