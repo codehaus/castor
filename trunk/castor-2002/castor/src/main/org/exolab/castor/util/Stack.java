@@ -136,14 +136,16 @@ public class Stack {
     
     /**
      * Searches for the given Object in the stack and returns it's position
-     * relative to the top of the Stack.
+     * relative to the top of the Stack (ie the number of calls to #pop() 
+     * before the object is returned by #pop())
     **/
     public int search(Object object) {
         int idx = 0;
         StackItem item = top;
         while (item != null) {
             if (item.object == object) return idx;
-            item = item.next;
+            item = item.previous;
+            ++idx;
         }
         return -1;
     } //-- indexOf
