@@ -684,7 +684,9 @@ public final class SQLEngine implements Persistence {
                 // Close the insert/select statement
                 if ( stmt != null )
                     stmt.close();
-            } catch ( SQLException except2 ) { }
+            } catch ( SQLException except2 ) {
+                _log.warn("Problem closing JDBC statement", except2);
+            }
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
@@ -773,7 +775,7 @@ public final class SQLEngine implements Persistence {
             stmt = ( (Connection) conn ).prepareStatement( storeStatement );
             
             if(_log.isDebugEnabled()){
-                _log.debug( Messages.format( "jdo.storing", storeStatement ) );
+                _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), storeStatement ) );
             }
             
             count = 1;
@@ -856,7 +858,8 @@ public final class SQLEngine implements Persistence {
                     stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
                     
                     if(_log.isDebugEnabled()){
-                        _log.debug( Messages.format( "jdo.storing", _sqlLoad ) );
+                        _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), 
+                        							_sqlLoad ) );
                     }
                     
                     // bind the identity to the prepareStatement
@@ -890,7 +893,10 @@ public final class SQLEngine implements Persistence {
                 // Close the insert/select statement
                 if ( stmt != null )
                     stmt.close();
-            } catch ( SQLException except2 ) { }
+            } 
+            catch ( SQLException except2 ) {
+                _log.warn ("Problem closing JDBC statement", except2);
+            }
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
@@ -941,7 +947,9 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null ) {
                     stmt.close();
                 }
-            } catch ( Exception e ) { }
+            } catch ( Exception e ) {
+            	_log.warn ("Problem closing JDBC statement");
+            }
         }
     }
 
@@ -988,7 +996,9 @@ public final class SQLEngine implements Persistence {
                 // Close the insert/select statement
                 if ( stmt != null )
                     stmt.close();
-            } catch ( SQLException except2 ) { }
+            } catch ( SQLException except2 ) {
+                _log.warn("Problem closing JDBC statement", except2);
+            }
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
@@ -1006,7 +1016,7 @@ public final class SQLEngine implements Persistence {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             
             if(_log.isDebugEnabled()){
-                _log.debug( Messages.format( "jdo.loading", ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
+                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
             }
             
             int count = 1;
@@ -1112,10 +1122,12 @@ public final class SQLEngine implements Persistence {
             try {
                 if ( rs != null ) rs.close();
             } catch ( SQLException sqle ) {
+                _log.warn("Problem closing JDBC Connection instance", sqle);
             }
             try {
                 if ( stmt != null ) stmt.close();
             } catch ( SQLException sqle ) {
+                _log.warn("Problem closing JDBC statement", sqle);
             }
         }
         return stamp;
@@ -1691,7 +1703,10 @@ public final class SQLEngine implements Persistence {
                 if ( _stmt != null ) {
                     try {
                         _stmt.close();
-                    } catch ( SQLException e2 ) { }
+                    } 
+                    catch ( SQLException e2 ) {
+                    	_log.warn("Problem closing JDBC statement", e2);
+                    }
                 }
                 _resultSetDone = true;
                 throw new PersistenceException( Messages.format("persist.nested", except) + " while executing "+ _sql, except );
@@ -1771,13 +1786,17 @@ public final class SQLEngine implements Persistence {
             if ( _rs != null ) {
                 try {
                     _rs.close();
-                } catch ( SQLException except ) { }
+                } catch ( SQLException except ) {
+                    _log.warn("Problem closing JDBC ResultSet", except);
+                }
                 _rs = null;
             }
             if ( _stmt != null ) {
                 try {
                     _stmt.close();
-                } catch ( SQLException except ) { }
+                } catch ( SQLException except ) {
+                	_log.warn ("Problem closing JDBC statement", except);
+                }
                 _stmt = null;
             }
         }
