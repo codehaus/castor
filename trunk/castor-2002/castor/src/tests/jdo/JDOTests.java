@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.util.Logger;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.exceptions.CWClassConstructorException;
@@ -30,11 +31,13 @@ public class JDOTests
         
         CWTestCase tc;
         
-        tc = new DuplicateKey();
-        add( tc.name(), tc, true );
         tc = new Concurrent();
         add( tc.name(), tc, true );
         tc = new Deadlock();
+        add( tc.name(), tc, true );
+        tc = new DuplicateKey();
+        add( tc.name(), tc, true );
+        tc = new ReadOnly();
         add( tc.name(), tc, true );
     }
 
@@ -45,8 +48,9 @@ public class JDOTests
         JDO jdo;
 
         jdo = new JDO();
-        jdo.setConfiguration( Test.class.getResource( DatabaseFile ).toString() );
+        jdo.setConfiguration( JDOTests.class.getResource( DatabaseFile ).toString() );
         jdo.setDatabaseName( "test" );
+        jdo.setLogWriter( Logger.getSystemLogger() );
         return jdo.getDatabase();
     }
 

@@ -67,8 +67,29 @@ import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.DTDResolver;
 
 
-
 /**
+ * Utility class for loading mapping files and providing them to the
+ * XML marshaller, JDO engine etc. The mapping file can be loaded from
+ * a URL, input stream or SAX <tt>InputSource</tt>.
+ * <p>
+ * Multiple mapping files can be loaded with the same <tt>Mapping</tt>
+ * object. When loading master mapping files that include other mapping
+ * files it might be convenient to use {@link #setBaseURL} or {@link
+ * #setEntityResolver}.
+ * <p>
+ * If the desired class loader is different than the one used by Castor
+ * (e.g. if Castor is installed as a Java extension), the <tt>Mapping</tt>
+ * object can be constructed with the proper class loader.
+ * <p>
+ * The following example loads two mapping files:
+ * <pre>
+ * Mapping mapping;
+ *
+ * mapping = new Mapping( getClass().getClassLoader() );
+ * mapping.loadMapping( "mapping.xml" );
+ * mapping.loadMapping( url );
+ * </pre>
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
@@ -128,6 +149,7 @@ public class Mapping
         if ( loader == null )
             loader = getClass().getClassLoader();
         _loader = loader;
+        _resolver = new DTDResolver();
     }
 
 

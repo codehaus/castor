@@ -143,17 +143,9 @@ Person person = Unmarshaller.unmarshal(Person.class, reader);
          See <a href="#Class Descriptors">Class Descriptors</a> for more information.
       </p>
       <p>
-         There are two main restrictions to marshalling objects. The first is
-         that all Classes must implement "java.io.Serializable". The
-         reason we force this restriction is that we needed a way to prevent
-         marshalling of certain objects.
-         <body-note>We are contemplating changing this restriction, as long as we provide a way to
-         prevent objects from being marshalled.
-         </body-note>
-         There second, which applies only to classes that do NOT have associated descriptors.
-         These classes must have have a public default constructor
-         (ie. a constructor with no arguments) and adequete "getter" and "setter"
-         methods to be properly be marshalled and unmarshalled.
+         There is one main restrictions to marshalling objects. These classes must
+         have have a public default constructor (ie. a constructor with no arguments)
+         and adequete "getter" and "setter" methods to be properly be marshalled and unmarshalled.
       </p>
       <p>
          The example illustrated in the previous section

@@ -18,6 +18,7 @@ public class TestHarness
     static
     {
         _categories.addElement( jdo.JDOTests.class.getName() );
+        _categories.addElement( xml.XMLTests.class.getName() );
     }
 
 

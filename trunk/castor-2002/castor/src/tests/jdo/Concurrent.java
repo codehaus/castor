@@ -82,7 +82,6 @@ public class Concurrent
         try {
             OQLQuery      oql;
             TestObject    object;
-            Connection    conn;
             Enumeration   enum;
 
             // Open transaction in order to perform JDO operations

@@ -9,11 +9,11 @@
     <map-to table="prod_group" xml="group" />
     <field name="Id">
       <sql name="id" />
-      <xml name="id" />
+      <xml name="id" node="attribute"/>
     </field>
     <field name="Name">
       <sql name="name" dirty="check" />
-      <xml name="name" node="element" />
+      <xml name="name" node="text" />
     </field>
   </class>
 
@@ -25,7 +25,7 @@
     <map-to table="prod" xml="product" />
     <field name="Id">
       <sql name="id" />
-      <xml name="id" />
+      <xml name="id" node="attribute"/>
     </field>
     <field name="Name">
       <sql name="name" />
@@ -33,7 +33,7 @@
     </field>
     <field name="Price" type="float">
       <sql name="price" type="double" />
-      <xml name="name" node="element" />
+      <xml name="price" node="element" />
     </field>
 
     <!--  Product has reference to ProductGroup,
@@ -67,7 +67,7 @@
   <!--  Mapping for Computer, extending Product  -->
   <class name="myapp.Computer" extends="myapp.Product">
     <description>Computer definition, extends generic product</description>
-    <map-to table="computer" />
+    <map-to table="computer" xml="computer" />
     <field name="Cpu">
       <sql name="cpu"/>
       <xml name="cpu" node="element" />
@@ -78,18 +78,18 @@
   <!--  Mapping for Product Detail -->
   <class name="myapp.ProductDetail" identity="Id">
     <description>Product detail</description>
-    <map-to table="prod_detail" />
+    <map-to table="prod_detail" xml="detail" />
     <field name="Id">
       <sql name="id" />
-      <xml name="id" />
+      <xml name="id" node="attribute"/>
     </field>
     <field name="Product" type="myapp.Product">
       <sql name="prod_id" />
-      <xml name="product" node="element" />
+      <xml name="product" node="attribute" />
     </field>
     <field name="Name">
       <sql name="name" />
-      <xml name="name" node="element" />
+      <xml name="name" node="text" />
     </field>
   </class>
 
@@ -99,7 +99,7 @@
     <description>A product category, any number of products can belong to
                  the same category, a product can belong to any number of
                  categories</description>
-    <map-to table="category" />
+    <map-to table="category" xml="category" />
     <field name="Id">
       <sql name="id" />
       <xml name="id" />

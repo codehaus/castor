@@ -120,7 +120,7 @@
       <attribute name="node" type="string" minOccurs="0">
         <enumeration value="attribute"/>
         <enumeration value="element"/>
-        <enumeration value="content"/>
+        <enumeration value="text"/>
       </attribute>
     </type>
   </element>

@@ -52,8 +52,8 @@
   while ( enum.hasMoreElements() ) {
     <font color="red">// A 25% mark down for each product and mark as sale</font>
     prod = (Product) enum.nextElement();
-    prod.price = prod.price * 0.75;
-    prod.onSale = true;
+    prod.markDown( 0.25 );
+    prod.setOnSale( true );
   }
   <font color="red">// Commit all changes, close the database</font>
   db.commit();

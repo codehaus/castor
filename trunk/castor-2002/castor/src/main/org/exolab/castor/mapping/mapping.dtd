@@ -157,7 +157,7 @@
 <!ATTLIST xml
     name NMTOKEN #IMPLIED
     type NMTOKEN #IMPLIED
-    node (attribute|element|content) #IMPLIED>
+    node (attribute|element|text) #IMPLIED>
 
 
 <!--
