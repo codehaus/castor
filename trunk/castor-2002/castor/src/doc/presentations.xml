@@ -7,6 +7,13 @@
       <p><b>Presentations about Castor...</b></p>
 
       <p>
+         <b>XML One Amsterdam (September 2001)</b>
+         <p/>
+         Andrew Fawcett, of CODA - our main evangelist, gave a presentation on implementing XML data binding
+         solutions using web-services with Castor at the XML One conference in Amsterdam, September 2001.
+         <a href="http://ftp.exolab.org/ftp/castor/presentations/xml-one-amsterdam-20010919%20.zip">Download</a>
+      </p>
+      <p>
          <b>Professional XML (2nd Edition) Chapter 15 (June 2001)</b>
          <p/>
          A chapter written by Keith Visco about Castor XML. Available for
