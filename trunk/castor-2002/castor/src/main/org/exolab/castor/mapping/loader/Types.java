@@ -54,7 +54,6 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.TypeSystem;
@@ -341,7 +340,6 @@ public class Types
         new TypeInfo( "double",      java.lang.Double.TYPE,    java.lang.Double.class,     true,     new Double( 0 ) ),
         new TypeInfo( "float",       java.lang.Float.TYPE,     java.lang.Float.class,      true,     new Float( 0 ) ),
         new TypeInfo( "big-decimal", null,                     java.math.BigDecimal.class, true,     new BigDecimal( 0 ) ),
-        new TypeInfo( "big-integer", null,                     java.math.BigInteger.class, true,     BigInteger.ZERO ),
         new TypeInfo( "byte",        java.lang.Byte.TYPE,      java.lang.Byte.class,       true,     new Byte( (byte) 0 ) ),
         new TypeInfo( "date",        null,                     java.util.Date.class,       true,     new Date() ),
         new TypeInfo( "short",       java.lang.Short.TYPE,     java.lang.Short.class,      true,     new Short( (short) 0 ) ),
