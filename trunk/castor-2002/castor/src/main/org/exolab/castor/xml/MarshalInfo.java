@@ -69,19 +69,18 @@ public interface MarshalInfo {
     public MarshalDescriptor[] getAttributeDescriptors();
     
     /**
-     * Returns the set of element MarshalDescriptors
-     * @return an array of MarshalDescriptors for all members that
-     * should be marshalled as Elements
-    **/
-    public MarshalDescriptor[]  getElementDescriptors();
-    
-    
-    /**
      * Returns the descriptor for dealing with Text content
      * @return the MarshalDescriptor for dealing with Text content
     **/
     public MarshalDescriptor getContentDescriptor();
     
+    /**
+     * Returns the set of element MarshalDescriptors
+     * @return an array of MarshalDescriptors for all members that
+     * should be marshalled as Elements
+    **/
+    public MarshalDescriptor[]  getElementDescriptors();
+        
     /**
      * Returns the ValidationRule used for validating the instances
      * of the class associated with this MarshalInfo
