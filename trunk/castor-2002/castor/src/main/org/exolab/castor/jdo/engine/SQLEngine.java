@@ -60,8 +60,8 @@ import org.exolab.castor.jdo.desc.RelationDesc;
 import org.exolab.castor.jdo.desc.Relation;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ObjectDesc;
-import org.exolab.castor.persist.Persistence;
-import org.exolab.castor.persist.PersistenceQuery;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.PersistenceException;
@@ -92,9 +92,6 @@ class SQLEngine
 
 
     PrimaryKeyDesc           _primKey;
-
-
-    private boolean         _checkKeyOnCreate = true;
 
 
     private boolean         _specifyKeyForCreate = true;
@@ -198,6 +195,7 @@ class SQLEngine
 	int               count;
 	Object            value;
 
+	stmt = null;
 	try {
 	    if ( _related != null ) {
 		for ( i = 0 ; i < _related.length ; ++i ) {
@@ -214,29 +212,8 @@ class SQLEngine
 	    // that no such primary key exists in the table. This call will
 	    // also lock the table against creation of an object with such
 	    // a primary key.
-	    if ( _checkKeyOnCreate ) {
-		if ( identity == null )
-		    throw new PersistenceException( "This implementation requires a primary key to be set prior to object creation" );
-
-		// Check that there is no duplicity in the table
-		// [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
-		if ( _useCursorForLock )
-		    stmt = ( (Connection) conn ).prepareStatement( _pkLookup,
-		        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE );
-		else
-		    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-		if ( _primKey.isPrimitive() ) {
-		    stmt.setObject( 1, identity );
-		} else {
-		    descs = _primKey.getJDOFields();
-		    for ( i = 0 ; i < descs.length ; ++i ) {
-			descs[ i ].getValue( identity, stmt, i + 1 );
-		    }
-		}
-		if ( stmt.executeQuery().next() )
-		    throw new DuplicateIdentityException( obj.getClass(), identity );
-		stmt.close();
-	    }
+	    if ( _specifyKeyForCreate && identity == null )
+		throw new PersistenceException( "This implementation requires a primary key to be set prior to object creation" );
 	    
 	    // Must remember that SQL column index is base one
 	    count = 1;
@@ -291,7 +268,42 @@ class SQLEngine
 	    stmt.close();
 	    return null;
 	} catch ( SQLException except ) {
-	    //	    if ( 
+	    // [oleg] Check for duplicate key based on X/Open error code
+	    if ( except.getSQLState() != null &&
+		 except.getSQLState().startsWith( "23" ) )
+		throw new DuplicateIdentityException( obj.getClass(), identity );
+
+	    // [oleg] Check for duplicate key the old fashioned way,
+	    //        after the INSERT failed to prevent race conditions
+	    //        and optimize INSERT times
+	    try {
+		// Close the insert statement
+		if ( stmt != null )
+		    stmt.close();
+
+		stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+		if ( _primKey.isPrimitive() ) {
+		    stmt.setObject( 1, identity );
+		} else {
+		    descs = _primKey.getJDOFields();
+		    for ( i = 0 ; i < descs.length ; ++i ) {
+			descs[ i ].getValue( identity, stmt, i + 1 );
+		    }
+		}
+		if ( stmt.executeQuery().next() )
+		    throw new DuplicateIdentityException( obj.getClass(), identity );
+	    } catch ( SQLException except2 ) {
+		// Error at the stage indicates it wasn't a duplicate
+		// primary key problem. But best if the INSERT error is
+		// reported, not the SELECT error.
+	    }
+	    
+	    try {
+		// Close the insert/select statement
+		if ( stmt != null )
+		    stmt.close();
+	    } catch ( SQLException except2 ) { }
+
 	    throw new PersistenceException( except );
 	}
     }
