@@ -438,28 +438,18 @@ public abstract class MappingLoader
         String           fieldName;
         Method           getMethod = null;
         Method           setMethod = null;
-        ClassDescriptor  relDesc;
 
         // If the field type is supplied, grab it and use it to locate the
-        // field/accessor. If the field is declared as a collection, grab
-        // the collection type as well and use it to locate the field/accessor.
-        // The field type and collector type are respectively used to create
-        // the field TypeInfo.
+        // field/accessor. 
         if ( fieldMap.getType() != null ) {
             try {
                 fieldType = resolveType( fieldMap.getType() );
             } catch ( ClassNotFoundException except ) {
                 throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
             }
-
-            relDesc = getDescriptor( fieldType );
-            if ( relDesc == NoDescriptor ) {
-                // XXX Error message should come here
-            } else if ( relDesc != null ) {
-                fieldType = relDesc.getIdentity().getFieldType();
-            }
-        } else
-            relDesc = null;
+        }
+        // If the field is declared as a collection, grab the collection type as
+        // well and use it to locate the field/accessor.
         if ( fieldMap.getCollection() != null )
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
 
@@ -573,13 +563,7 @@ public abstract class MappingLoader
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-
-        FieldDescriptorImpl fieldDesc;
-
-        fieldDesc = new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
-        if ( relDesc != null )
-            fieldDesc.setClassDescriptor( relDesc );
-        return fieldDesc;
+        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
     }
 
 
