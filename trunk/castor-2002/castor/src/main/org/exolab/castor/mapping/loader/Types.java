@@ -720,7 +720,7 @@ public class Types
         new TypeConvertorInfo( java.util.Date.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
-                return new BigDecimal( _paramDateFormat.format( (Date) obj ) );
+                return new BigDecimal( _paramDateFormat.format( (Date) obj ) + ".0" );
             }
             public String toString() { return "Date->BigDecimal"; }
         } ),
