@@ -83,10 +83,10 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 
         // note: URI not supported (just system path), so remove any file://
         String absolute = include;
-		if (include.startsWith("file://")){
-            absolute = include.substring(7);
+		if (absolute.startsWith("file://")){
+            absolute = absolute.substring(7);
             if (java.io.File.separatorChar =='\\')
-                include = include.substring(1);
+                include = absolute.substring(1);
         }
 
 

@@ -79,8 +79,8 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 
 		// note: URI not supported (just system path), so remove any file://
 		String absolute = schemaLocation;
-		if (schemaLocation.startsWith("file://")){
-            absolute = schemaLocation.substring(7);
+		if (absolute.startsWith("file://")){
+            absolute = absolute.substring(7);
             if (java.io.File.separatorChar =='\\')
                 absolute = absolute.substring(1);
         }
