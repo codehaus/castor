@@ -90,6 +90,12 @@ public abstract class XSType {
     **/
     public static final String INTEGER_NAME        = "integer";
     
+    
+    /**
+     * The name of the long type
+    **/
+    public static final String LONG_NAME           = "long";
+    
     /**
      * The name of the NCName type
     **/
@@ -131,17 +137,19 @@ public abstract class XSType {
     //--
     public static final short BINARY             =  1;
     public static final short BOOLEAN            =  2;
-    public static final short ID                 =  3;
-    public static final short IDREF              =  4;
-    public static final short INTEGER            =  5;
-    public static final short LIST               =  6;
-    public static final short NCNAME             =  7;
-    public static final short NEGATIVE_INTEGER   =  8;
-    public static final short NMTOKEN            =  9;
-    public static final short POSITIVE_INTEGER   = 10;
-    public static final short REAL               = 11;
-    public static final short STRING             = 12;
-    public static final short TIME_INSTANT       = 13;
+    public static final short DECIMAL            =  3;
+    public static final short DOUBLE             =  4;
+    public static final short ID                 =  5;
+    public static final short IDREF              =  6;
+    public static final short INTEGER            =  7;
+    public static final short LIST               =  8;
+    public static final short LONG               =  9;
+    public static final short NCNAME             = 10;
+    public static final short NEGATIVE_INTEGER   = 11;
+    public static final short NMTOKEN            = 12;
+    public static final short POSITIVE_INTEGER   = 13;
+    public static final short STRING             = 14;
+    public static final short TIME_INSTANT       = 15;
     
     private short type = NULL;
     
@@ -197,10 +205,11 @@ public abstract class XSType {
     
     public boolean isPrimitive() {
         switch (type) {
+            case DOUBLE:
             case INTEGER:
+            case LONG:
             case NEGATIVE_INTEGER:
             case POSITIVE_INTEGER:
-            case REAL:
                 return true;
             default:
                 return false;
@@ -217,12 +226,18 @@ public abstract class XSType {
                 return BINARY_NAME;
             case BOOLEAN:
                 return BOOLEAN_NAME;
+            case DECIMAL:
+                return DECIMAL_NAME;
+            case DOUBLE:
+                return DOUBLE_NAME;
             case ID:
                 return ID_NAME;
             case IDREF:
                 return IDREF_NAME;
             case INTEGER:
                 return INTEGER_NAME;
+            case LONG:
+                return LONG_NAME;
             case NCNAME:
                 return NCNAME_NAME;
             case NEGATIVE_INTEGER:
@@ -231,8 +246,6 @@ public abstract class XSType {
                 return NMTOKEN_NAME;
             case POSITIVE_INTEGER:
                 return POSITIVE_INTEGER_NAME;
-            case REAL:
-                return DOUBLE_NAME;
             case STRING:
                 return STRING_NAME;
             case TIME_INSTANT:

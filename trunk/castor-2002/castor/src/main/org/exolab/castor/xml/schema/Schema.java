@@ -131,6 +131,8 @@ public class Schema extends Structure {
             addDatatype(new DoubleType(this));
             //-- integer
             addDatatype(new IntegerType(this));
+            //-- long
+            addDatatype(new LongType(this));
             //-- string
             addDatatype(new StringType(this));
             //-- timeInstant
