@@ -1,18 +1,5 @@
 <mapping>
 
-  <object type="dax.Record">
-    <ldap-entry object-class="person" misc-field="misc"/>
-    <identity field-ref="rdn"/>
-    <container name="rdn" type="dax.RDN">
-      <field name="ou" type="string" required="true">
-        <ldap-info name="ou"/>
-      </field>
-      <field name="uid" type="string" required="true">
-        <ldap-info name="uid"/>
-      </field>
-    </container>
-  </object>
-<!--
   <object type="dax.User">
     <ldap-entry object-class="person"/>
     <identity field-ref="uid"/>
@@ -35,6 +22,21 @@
       <ldap-info name="ou"/>
     </field>
   </object>
+
+<!--
+  <object type="dax.Record">
+    <ldap-entry object-class="person" misc-field="misc"/>
+    <identity field-ref="rdn"/>
+    <container name="rdn" type="dax.RDN">
+      <field name="ou" type="string" required="true">
+        <ldap-info name="ou"/>
+      </field>
+      <field name="uid" type="string" required="true">
+        <ldap-info name="uid"/>
+      </field>
+    </container>
+  </object>
+
 -->
 </mapping>
 
