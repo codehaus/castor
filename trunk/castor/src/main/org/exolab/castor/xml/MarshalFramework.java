@@ -100,6 +100,8 @@ abstract class MarshalFramework {
      */
     public static final String NIL_ATTR = "nil";
     
+    public static final String XSI_NIL_ATTR = "xsi:nil";
+    
     /**
      * The xml:space attribute name
      */    
@@ -115,6 +117,10 @@ abstract class MarshalFramework {
      */    
     public static final String TYPE_ATTR = "type";
     
+    /**
+     * The value of 'true'
+     */
+    public static final String TRUE_VALUE = "true";
     
 
     //-----------------------------/
@@ -480,9 +486,9 @@ abstract class MarshalFramework {
          *
          */
         public XMLFieldDescriptor getFieldDescriptor
-            (String name, NodeType nodeType) 
+            (String name, String namespace, NodeType nodeType) 
         {
-            return _classDesc.getFieldDescriptor(name, nodeType);
+            return _classDesc.getFieldDescriptor(name, namespace, nodeType);
         } //-- getFieldDescriptor
 
         /**
@@ -545,22 +551,13 @@ abstract class MarshalFramework {
             return Introspector.introspected(_classDesc);
         } //-- introspected
         
-        /**
-         * <p>Returns true if the given object represented by this XMLClassDescriptor
-         * can accept a member whose name is given.
-         * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
-         * the given name and if the given object can hold this field (i.e a value is not already set for
-         * this field).
-         * Different reasons can change the acceptance criteria, this is the reason why each implementation
-         * of XMLClassDescriptor must define these reasons.
-         *
-         * @param fieldName the name of the field to check
-         * @param object the object represented by this XMLCLassDescriptor
-         * @return true if the given object represented by this XMLClassDescriptor
-         * can accept a member whose name is given.
+        /*
+         *  (non-Javadoc)
+         * @see org.exolab.castor.xml.XMLClassDescriptor#canAccept
+         * (java.lang.String, java.lang.String, java.lang.Object)
          */
-        public boolean canAccept(String fieldName, Object object) {
-            return _classDesc.canAccept(fieldName, object);
+        public boolean canAccept(String name,String namespace, Object object) {
+            return _classDesc.canAccept(name, namespace, object);
         } //-- canAccept
 
 
