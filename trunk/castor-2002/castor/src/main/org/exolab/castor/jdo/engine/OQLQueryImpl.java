@@ -65,6 +65,7 @@ import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -84,19 +85,25 @@ public class OQLQueryImpl
 {
 
 
-    private int                _fieldNum;
-
-
     private PersistenceEngine  _dbEngine;
+
+
+    private DatabaseImpl       _dbImpl;
 
 
     private Class              _objClass;
 
 
-    private PersistenceQuery   _query;
+    private QueryExpression    _expr;
 
 
-    private DatabaseImpl       _dbImpl;
+    private Class[]            _bindTypes;
+
+
+    private Object[]           _bindValues;
+
+
+    private int                _fieldNum;
 
 
     OQLQueryImpl( DatabaseImpl dbImpl )
@@ -105,19 +112,20 @@ public class OQLQueryImpl
     }
 
 
-    public void bind( Object obj )
+    public void bind( Object value )
     {
-        if ( _query == null ) {
+        if ( _expr == null )
             throw new IllegalStateException( "Must create query before using it" );
-        }
-        if ( _fieldNum == _query.getParameterCount() )
-            throw new IllegalArgumentException( "Only " + _query.getParameterCount() +
+        if ( _fieldNum == _bindTypes.length )
+            throw new IllegalArgumentException( "Only " + _bindTypes.length +
                                                 " fields in this query" );
         try {
-            _query.setParameter( _fieldNum, obj );
-        } catch ( IndexOutOfBoundsException except ) {
-            throw new IllegalArgumentException( "Only " + _query.getParameterCount() +
-                                                " fields in this query" );
+            if ( value != null && ! _bindTypes[ _fieldNum ].isAssignableFrom( value.getClass() ) )
+                throw new IllegalArgumentException( "Query paramter " + _fieldNum + " is not of the expected type " + 
+                                                    _bindTypes[ _fieldNum ].getName() );
+            if ( _bindValues == null )
+                _bindValues = new Object[ _bindTypes.length ];
+            _bindValues[ _fieldNum ] = value;
         } catch ( IllegalArgumentException except ) {
             throw except;
         }
@@ -178,9 +186,9 @@ public class OQLQueryImpl
         SQLEngine          engine;
         Vector             types;
         Class[]            array;
-        QueryExpression    expr;
         
         _fieldNum = 0;
+        _expr = null;
         types = new Vector();
         sql = new StringBuffer();
         token = new StringTokenizer( oql );
@@ -210,25 +218,20 @@ public class OQLQueryImpl
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
         clsDesc = engine.getDescriptor();
 
-        expr = engine.getFinder();
+        _expr = engine.getFinder();
         if ( token.hasMoreTokens() ) {
             if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
                 throw new QueryException( "Missing WHERE clause" );
-            parseField( clsDesc, token, expr, types );
+            parseField( clsDesc, token, _expr, types );
             while ( token.hasMoreTokens() ) {
                 if ( ! token.nextToken().equals( "AND" ) )
                     throw new QueryException( "Only AND supported in WHERE clause" );
-                parseField( clsDesc, token, expr, types );
+                parseField( clsDesc, token, _expr, types );
             }
         }
-        
-        array = new Class[ types.size() ];
-        types.copyInto( array );
-        try {
-            _query = engine.createQuery( expr, array );
-        } catch ( QueryException except ) {
-            throw new QueryException( except.getMessage() );
-        }
+
+        _bindTypes = new Class[ types.size() ];
+        types.copyInto( _bindTypes );
     }
     
     
@@ -285,19 +288,55 @@ public class OQLQueryImpl
     public Enumeration execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
-        QueryResults       results = null;
-        
-        try {
-            results = _dbImpl.getTransaction().query( _dbEngine, _query, AccessMode.Shared );
-            _fieldNum = 0;
-            return new OQLEnumeration( results );
-        } catch ( PersistenceException except ) {
-            if ( results != null )
-                results.close();
-            throw except;
+        return execute( null );
+    }
+
+
+    public Enumeration execute( short accessMode )
+        throws QueryException, PersistenceException, TransactionNotInProgressException
+    {
+        switch ( accessMode ) {
+        case Database.ReadOnly:
+            return execute( AccessMode.ReadOnly );
+        case Database.Shared:
+            return execute( AccessMode.Shared );
+        case Database.Exclusive:
+            return execute( AccessMode.Exclusive );
+        case Database.Locked:
+            return execute( AccessMode.Locked );
+        default:
+            throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
         }
     }
 
+
+    private Enumeration execute( AccessMode accessMode )
+        throws QueryException, PersistenceException, TransactionNotInProgressException
+    {
+        QueryResults      results;
+        PersistenceQuery  query;
+        SQLEngine         engine;
+        
+        if ( _expr == null )
+            throw new IllegalStateException( "Must create query before using it" );
+        try {
+            try {
+                engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+                query = engine.createQuery( _expr, _bindTypes );
+                if ( _bindValues != null ) {
+                    for ( int i = 0 ; i < _bindValues.length ; ++i )
+                        query.setParameter( i, _bindValues[ i ] );
+                }
+            } catch ( QueryException except ) {
+                throw new QueryException( except.getMessage() );
+            }
+            results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
+            _fieldNum = 0;
+            return new OQLEnumeration( results );
+        } catch ( PersistenceException except ) {
+            throw except;
+        }
+    }
 
 
     static class OQLEnumeration
