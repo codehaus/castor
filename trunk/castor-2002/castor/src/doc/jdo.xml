@@ -176,7 +176,7 @@ db.close();
            Note that product and group are related objects, the JDBC query involves a join:
            <code>
 OQLQuery     oql;
-QueryResults resulst;
+QueryResults results;
 
 <comment>// Construct a new query and bind its parameters</comment>
 oql = db.getOQLQuery( "SELECT p FROM Product p WHERE Group=$" );

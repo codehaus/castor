@@ -35,6 +35,9 @@ JDO:     Added support for stored procedures in OQLQuery. Now it is possible to
          order as in mapping.xml). (Oleg Nitz <on@ibis.odessa.ua>)
 
 XML:     Support for ODMG 3.0 DArray collection in the XML source code generator.
+         When running the source code generator with the FieldInfoFactoryODMG30
+         collection fields will use org.odmg.DArray as the collection type for
+         interoperability with OODBMS using the ODMG 3.0.
          (Contributed by Frank Thelen <frank.thelen@poet.de>)
 
 Misc:    Support for Java 1.2 collections: Collection, Set, Map. Requires Java 1.2

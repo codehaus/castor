@@ -2,7 +2,50 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
-    <section title="Version 0.8.5  May 5, 2000"><pre>
+    <section title="Version 0.8.5  May 12, 2000"><pre>
+JDO:     Remove enumerate collection type. Only get method is required to support
+         java.util collections, get/set methods to support arrays. Extended the
+         CollectionHandler interface with size() method to assist in validation.
+
+JDO:     Revised the CacheEngine towards dependency support, adding FIFO list to
+         determine order of object removal, simplifying the prepare stage. Objects
+         will now be removed from the database in the same order they were removed
+         by calling Database.remove().
+
+JDO:     Fixes to outer query expressions:
+         - JDBCQueryExpression fixed and tested with Access (Christopher
+           Elkins &lt;celkins@scardini.com&gt;)
+         - OracleQueryExpression fixed not tested with Oracle
+           (Sebastien Sahuc &lt;ssahuc@imediation.com&gt;)
+
+JDO:     Now using new OQL parser by default. Added support for is_defined/
+         is_undefined (IS NULL), BETWEEN and DISTINCT. (Nissim
+         &lt;nissim@panix.com&gt;)
+
+JDO:     Added convertor between java.sql.Date and java.util.Date
+         (reported by &lt;Lincoln.Spiteri@mobisle.com&gt;).
+
+JDO:     Improved type convertion for key generators. MAX key generator now
+         should work with PostgreSQL. (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Added support for stored procedures in OQLQuery. Now it is possible to
+         create queries of the form "CALL sp_something($) AS myapp.Product",
+         where sp_something is a stored procedure returning one or more
+         ResultSets with the same sequence of fields as Castor-generated SELECT
+         for the OQL query "SELECT p FROM myapp.Product p" (for objects without
+         relations the sequence is: identity, then all other fields in the same
+         order as in mapping.xml). (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+XML:     Support for ODMG 3.0 DArray collection in the XML source code generator.
+         When running the source code generator with the FieldInfoFactoryODMG30
+         collection fields will use org.odmg.DArray as the collection type for
+         interoperability with OODBMS using the ODMG 3.0.
+         (Contributed by Frank Thelen &lt;frank.thelen@poet.de&gt;)
+
+Misc:    Support for Java 1.2 collections: Collection, Set, Map. Requires Java 1.2
+         to compile, but using reflection can be made to work on Java 1.1.
+    </pre></section>
+    <section title="Version 0.8.4  May 5, 2000"><pre>
 XML:     Fixed a ClassLoader issue with the ClassDescriptorResolver
 
 XML:     Added validation back into the generator sources
