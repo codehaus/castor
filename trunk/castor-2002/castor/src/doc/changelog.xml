@@ -18,15 +18,6 @@ JDO:     Fixed bug: NULL value in database was read as 0 for Java wrappers
          of primitive types (Long, Integer, etc.), now they are read as "null".
          (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
 
-JDO:     Changes to org.exolab.castor.jdo.Persistent interface:
-         - now it can be used to perform additional database operations during
-           loading/storing/creating/deleting objects, e.g. to implement some
-           types of relations that are not supported by Castor yet,
-           see TestPersistent.java and Persistent.java in src/test/jdo.
-         - now jdoStore has the boolean parameter "modified", which is
-           convenient for setting fields like "modification time".
-         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
-
 JDO:     Changed the inner SELECT syntax in MaxKeyGenerator to make it work
          with Hypersonic SQL.
          (Contributed by Santiago Arriaga &lt;santiago@catnet.com.mx&gt;)
@@ -68,30 +59,30 @@ JDO:     Added type convertors BigDecimal &lt;-&gt; Boolean
          (contributed by Markus Fritz &lt;mfritz@justis.de&gt;)
 
 JDO:     Fixes multiple request of same object with DBLocked
-	 (Oleg Nitz and Markus Fritz)
+     (Oleg Nitz and Markus Fritz)
 
-JDO:	 Hypersonic SQL driver 
-	 (Contributed by Santiago Arriaga &lt;santiago.arriaga@catnet.com.mx&gt;
+JDO:     Hypersonic SQL driver 
+     (Contributed by Santiago Arriaga &lt;santiago.arriaga@catnet.com.mx&gt;
 
-JDO:	 Changes to Persistent interface enable developer to use database 
-	 operations inside jdoStore, jdoCreate, jdoRemove.
-	 (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+JDO:     Changes to Persistent interface enable developer to use database 
+     operations inside jdoStore, jdoCreate, jdoRemove.
+     (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
 
-JDO:	 Cache control at JDO configuration and mapping file specification - 
-	 no-cache option, cache count limit, cache time limit, LRU removal 
-	 deamon (Thomas Yip &lt;yip@intalio.com&gt;)
+JDO:     Cache control at JDO configuration and mapping file specification - 
+     no-cache option, cache count limit, cache time limit, LRU removal 
+     deamon (Thomas Yip &lt;yip@intalio.com&gt;)
 
-JDO:	 Bug fix: for created objects fetch() returned oid instead of object 
-	 (contributed by Chris Stevenson &lt;chris@ssabsa.sa.gov.au&gt;)
+JDO:     Bug fix: for created objects fetch() returned oid instead of object 
+     (contributed by Chris Stevenson &lt;chris@ssabsa.sa.gov.au&gt;)
 
 JDO:     SQL Date types handling is improved.
-	 (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+     (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
 
-JDO:	 Bug fix: small bugs w/ BETWEEN in parser...reported by Vladmir Sekissov.
-	 (&lt;nissim@panix.com&gt;)
+JDO:     Bug fix: small bugs w/ BETWEEN in parser...reported by Vladmir Sekissov.
+     (&lt;nissim@panix.com&gt;)
 
-JDO:	 fix string conversion to surround with ' and escape internal ' fix for 
-	 bug with like. (&lt;nissim@panix.com&gt;)
+JDO:     fix string conversion to surround with ' and escape internal ' fix for 
+     bug with like. (&lt;nissim@panix.com&gt;)
     </pre></section>
     <section title="Version 0.8.7  June 2, 2000"><pre>
 JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga
@@ -422,8 +413,8 @@ JDO:     Upgraded to use QueryExpression to construct SQL query statements
          in database specific syntax.
 
 JDO:     Implemented dirty checking on objects loaded with a shared lock.
-	 Dirty checking performed on fields within UPDATE statement requiring
-	 a single SQL operation to update/check dirtyness.
+     Dirty checking performed on fields within UPDATE statement requiring
+     a single SQL operation to update/check dirtyness.
 
 SPI:     Added QueryExpression and KeyGenerator to the SPI. QueryExpression
          is generated from PersistenceFactory. Added way to load factories
