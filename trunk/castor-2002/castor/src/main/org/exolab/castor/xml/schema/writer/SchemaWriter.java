@@ -585,7 +585,7 @@ public class SchemaWriter {
             _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA,
                 "unbounded");
         }
-        else if (max > 1) {
+        else if (max != 1) {
             _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA,
                 Integer.toString(max));
         }
