@@ -72,21 +72,23 @@ import org.exolab.castor.jdo.oql.ParseTreeNode;
 import org.exolab.castor.jdo.oql.ParseTreeWalker;
 import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.ClassMolder;
+//import org.exolab.castor.persist.ClassMolder;
+import org.exolab.castor.persist.Resolver;
+import org.exolab.castor.persist.DatabaseRegistry;
 import org.exolab.castor.persist.LockEngine;
-import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.persist.OID;
-import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.types.Complex;
 
 /**
  *
@@ -124,22 +126,32 @@ public class OQLQueryImpl
 
     private Object[]           _bindValues;
 
+
     private Hashtable          _paramInfo;
 
-
+    
     private int                _fieldNum;
 
+    
     private int                _projectionType;
+    
+    
     private Vector             _pathInfo;
 
+
     private PersistenceQuery   _query;
+
 
     private QueryResults       _results;
 
 
-    OQLQueryImpl( DatabaseImpl dbImpl )
+    private DatabaseRegistry   _dbReg;
+
+
+    OQLQueryImpl( DatabaseImpl dbImpl, DatabaseRegistry dbReg )
     {
         _dbImpl = dbImpl;
+        _dbReg = dbReg;
     }
 
 
@@ -162,7 +174,7 @@ public class OQLQueryImpl
 
             if ( value != null ) {
                 if ( paramClass.isAssignableFrom( valueClass ) ) {
-                    ClassMolder molder = _dbImpl.getLockEngine().getClassMolder( valueClass );
+                    Resolver molder = _dbReg.getResolver( valueClass );
 
                     if ( molder != null ) {
                         value = molder.getActualIdentity( _dbImpl.getClassLoader(), value );
@@ -266,11 +278,12 @@ public class OQLQueryImpl
         Parser parser = new Parser(lexer);
         ParseTreeNode parseTree = parser.getParseTree();
 
-        _dbEngine = _dbImpl.getLockEngine();
+        /*
+        _dbEngine = _dbReg.getLockEngine();
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
-
-        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _dbImpl.getClassLoader());
+        */
+        ParseTreeWalker walker = new ParseTreeWalker(_dbReg.getLockEngine(), parseTree, _dbImpl.getClassLoader());
 
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
@@ -392,7 +405,7 @@ public class OQLQueryImpl
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = _dbImpl.getLockEngine();
+        _dbEngine = _dbReg.getLockEngine();
         if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
@@ -427,7 +440,7 @@ public class OQLQueryImpl
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         org.exolab.castor.persist.QueryResults      results;
-        SQLEngine         engine;
+        Persistence         engine;
 
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
@@ -441,7 +454,7 @@ public class OQLQueryImpl
                 case ParseTreeWalker.DEPENDANT_OBJECT_VALUE:
 
                     try {
-                        engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+                        engine = _dbEngine.getPersistence( _objClass );
                         if ( _expr != null ) {
                             _query = engine.createQuery( _expr, _bindTypes, accessMode );
                         } else {
