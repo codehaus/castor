@@ -443,7 +443,7 @@ public final class UnmarshalHandler extends MarshalFramework
             _namespaces = _namespaces.getParent();
             return;
         }
-
+        
         if (state.primitiveOrImmutable) {
 
             String str = null;
@@ -486,7 +486,18 @@ public final class UnmarshalHandler extends MarshalFramework
 
                 try {
                     FieldHandler handler = cdesc.getHandler();
-                    handler.setValue(state.object, value);
+                    boolean addObject = true;
+                    if (_reuseObjects) {
+                        //-- check to see if we need to
+                        //-- add the object or not
+                        Object tmp = handler.getValue(state.object);
+                        if (tmp != null) {
+                            //-- Do not add object if values
+                            //-- are equal
+                            addObject = (!tmp.equals(value));
+                        }
+                    }
+                    if (addObject) handler.setValue(state.object, value);
                 }
                 catch(java.lang.IllegalStateException ise) {
                     String err = "unable to add text content to ";
@@ -551,6 +562,9 @@ public final class UnmarshalHandler extends MarshalFramework
            _node = null;
         }
 
+        //-- save fieldState
+        UnmarshalState fieldState = state;
+        
         //-- get target object
         state = (UnmarshalState) _stateInfo.peek();
 
@@ -581,7 +595,18 @@ public final class UnmarshalHandler extends MarshalFramework
 
             if (state.container == null) {
 
-                handler.setValue(state.object, val);
+                boolean addObject = true;
+                if (_reuseObjects && fieldState.primitiveOrImmutable) {
+                    //-- check to see if we need to
+                    //-- add the object or not
+                    Object tmp = handler.getValue(state.object);
+                    if (tmp != null) {
+                        //-- Do not add object if values
+                        //-- are equal
+                        addObject = (!tmp.equals(val));
+                    }
+                }              
+                if (addObject) handler.setValue(state.object, val);
             }
             else {
                 state.ContainerFieldDesc.getHandler().setValue(state.container, val);
