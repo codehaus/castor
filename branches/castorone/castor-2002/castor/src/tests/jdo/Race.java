@@ -77,7 +77,7 @@ import org.exolab.exceptions.CWClassConstructorException;
  */
 public class Race extends CWTestCase {
 
-    private final static int NUM_OF_RACING_THREADS = 8;
+    private final static int NUM_OF_RACING_THREADS = 16;
 
     private final static int NUM_OF_VALUE_PAIRS = 4;
 
@@ -85,11 +85,22 @@ public class Race extends CWTestCase {
 
     private JDOCategory    _category;
 
+    Database _db;
+
+    Connection _conn;
+
+    String _className;
+
+    Class _classType;
+
+    boolean _leak;
+
     public Race( CWTestCategory category )
         throws CWClassConstructorException
     {
         super( "TC07", "Race" );
         _category = (JDOCategory) category;
+        _leak = false;
     }
 
 
@@ -104,8 +115,29 @@ public class Race extends CWTestCase {
         super.postExecute();
     }
 
-
     public boolean run( CWVerboseStream stream ) {
+        try {
+            _db = _category.getDatabase( stream.verbose() );
+            _conn = _category.getJDBCConnection();
+
+            boolean result = true;
+            for ( int i=0; i < 4; i++ ) {
+                if ( !runOnce( stream, i ) )
+                    result = false;
+            }
+            _db.close();
+            _conn.close();
+            if ( _leak )
+                System.out.println("Element leak happened!");
+            return result && !_leak;
+        } catch ( Exception e ) {
+            stream.write( "Error: "+ e );
+            return false;
+        }
+
+    }
+
+    public boolean runOnce( CWVerboseStream stream, int cachetype ) {
         OQLQuery      oql;
         TestObjectEx    object;
         Enumeration   enum;
@@ -114,8 +146,9 @@ public class Race extends CWTestCase {
         boolean result = true;
 
         try {
-            Database _db = _category.getDatabase( stream.verbose() );
-            Connection _conn = _category.getJDBCConnection();
+            //_db = _category.getDatabase( stream.verbose() );
+            //_conn = _category.getJDBCConnection();
+
 
             // clear the table
             int del = _conn.createStatement().executeUpdate( "DELETE FROM test_race" );
@@ -126,19 +159,62 @@ public class Race extends CWTestCase {
             _db.begin();
             TestRace[] jdos = new TestRace[NUM_OF_VALUE_PAIRS];
             TestRaceSyn[] controls = new TestRaceSyn[NUM_OF_VALUE_PAIRS];
-            for ( int i=0; i<jdos.length; i++ ) {
-                controls[i] = new TestRaceSyn();
-                jdos[i] = new TestRace();
-                _db.create( jdos[i] );
+            switch ( cachetype ) {
+            case 0:
+                _className = "jdo.TestRaceCount";
+                _classType = jdo.TestRaceCount.class;
+                for ( int i=0; i<jdos.length; i++ ) {
+                    jdos[i] = new TestRaceCount();
+                    jdos[i].setId(i);
+                    _db.create( jdos[i] );
+                    controls[i] = new TestRaceSyn();
+                }
+                break;
+            case 1:
+                _className = "jdo.TestRaceTime";
+                _classType = jdo.TestRaceTime.class;
+                for ( int i=0; i<jdos.length; i++ ) {
+                    jdos[i] = new TestRaceTime();
+                    jdos[i].setId(i);
+                    _db.create( jdos[i] );
+                    controls[i] = new TestRaceSyn();
+                }
+                break;
+            case 2:
+                _className = "jdo.TestRaceNone";
+                _classType = jdo.TestRaceNone.class;
+                for ( int i=0; i<jdos.length; i++ ) {
+                    jdos[i] = new TestRaceNone();
+                    jdos[i].setId(i);
+                    _db.create( jdos[i] );
+                    controls[i] = new TestRaceSyn();
+                }
+                break;
+            case 3:
+                _className = "jdo.TestRaceUnlimited";
+                _classType = jdo.TestRaceUnlimited.class;
+                for ( int i=0; i<jdos.length; i++ ) {
+                    jdos[i] = new TestRaceUnlimited();
+                    jdos[i].setId(i);
+                    _db.create( jdos[i] );
+                    controls[i] = new TestRaceSyn();
+                }
+                break;
             }
-            _db.commit();
+
+            try {
+                _db.commit();
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                return false;
+            }
 
             // create threads, make a race so each thread
             // keeping increment to the pairs of number.
             RaceThread[] ts = new RaceThread[NUM_OF_RACING_THREADS];
 
             for ( int i=0; i<ts.length; i++ ) {
-                ts[i] = new RaceThread( stream, _category, controls, NUM_OF_TRIALS );
+                ts[i] = new RaceThread( stream, _category, controls, cachetype, NUM_OF_TRIALS );
                 ts[i].start();
             }
 
@@ -161,7 +237,7 @@ public class Race extends CWTestCase {
             _db.begin();
             num = 0;
             for ( int i=0; i<jdos.length; i++ ) {
-                oql = _db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
+                oql = _db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
                 oql.bind( i );
                 enum = oql.execute();
                 if ( enum.hasMoreElements() ) {
@@ -185,10 +261,8 @@ public class Race extends CWTestCase {
             } else {
                 stream.writeVerbose("Racing condition passed! :)");
             }
-
-            _db.close();
-            _conn.close();
-
+            //_db.close();
+            //_conn.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
@@ -200,15 +274,17 @@ public class Race extends CWTestCase {
         Database db;
         TestRaceSyn[] tr;
         int trial;
+        int cachetype;
         boolean isDone;
         Random ran;
         CWVerboseStream stream;
-        RaceThread( CWVerboseStream stream, JDOCategory c, TestRaceSyn[] tr, int n ) throws Exception {
+        RaceThread( CWVerboseStream stream, JDOCategory c, TestRaceSyn[] tr, int cachetype, int n ) throws Exception {
             this.db = c.getDatabase( stream.verbose() );
             this.tr = tr;
             this.trial = n;
             this.stream = stream;
             this.ran = new Random();
+            this.cachetype = cachetype;
         }
         public void run() {
             try {
@@ -225,23 +301,9 @@ public class Race extends CWTestCase {
                         little:
                         while ( !isOk ) {
                             try {
-                                db.begin();
-
                                 if ( (i % 4) == 0  ) {
-                                    OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
-                                    oql.bind( i );
-                                    Enumeration enum = oql.execute();
-                                    if ( enum.hasMoreElements() ) {
-                                        TestRace tr = (TestRace) enum.nextElement();
-                                        tr.incValue1();
-                                        db.commit();
-                                        isOk = true;
-                                    } else {
-                                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
-                                        break some;
-                                    }
-                                } else if ( (i % 4) == 1  ) {
-                                    OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
+                                    db.begin();
+                                    OQLQuery oql = db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
                                     oql.bind( i );
                                     QueryResults enum = oql.execute();
                                     if ( enum.hasMore() ) {
@@ -252,56 +314,96 @@ public class Race extends CWTestCase {
                                     } else {
                                         stream.writeVerbose("Error: "+" element not found!! missed in cache????\n");
                                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
-                                        break little;
+                                        throw new NoSuchElementException("No element found (a).");
                                     }
-                                } else if ( (i % 3) == 2 ) {
+                                } else if ( (i % 4) == 1  ) {
+                                    db.begin();
+                                    OQLQuery oql = db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
+                                    oql.bind( i );
+                                    Enumeration enum = oql.execute();
+                                    if ( enum.hasMoreElements() ) {
+                                        TestRace tr = (TestRace) enum.nextElement();
+                                        tr.incValue1();
+                                        db.commit();
+                                        isOk = true;
+                                    } else {
+                                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
+                                        throw new NoSuchElementException("No element found (b).");
+                                    }
+                                } else if ( (i % 4) == 2 ) {
+                                    db.begin();
                                     stream.writeVerbose( "trying Database.load()" );
-                                    TestRace tr = (TestRace) db.load( TestRace.class, new Integer(i) );
-                                    tr.incValue1();
-                                    db.commit();
-                                    isOk = true;
+                                    TestRace tr = (TestRace) db.load( _classType, new Integer(i), Database.Shared );
+                                    if ( tr != null ) {
+                                        tr.incValue1();
+                                        db.commit();
+                                        isOk = true;
+                                    } else {
+                                        stream.writeVerbose("Error: "+" element not found!! missed in cache????\n");
+                                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
+                                        throw new NoSuchElementException("No element found (c).");                                        
+                                    }
+                                } else if ( (i % 4 == 3 ) ) {
+                                    db.begin();
+                                    stream.writeVerbose( "trying Database.load()" );
+                                    TestRace tr = (TestRace) db.load( _classType, new Integer(i), Database.Exclusive );
+                                    if ( tr != null ) {
+                                        tr.incValue1();
+                                        db.commit();
+                                        isOk = true;
+                                    } else {
+                                        stream.writeVerbose("Error: "+" element not found!! missed in cache????\n");
+                                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
+                                        throw new NoSuchElementException("No element found (c).");                                        
+                                    }
                                 } else {
-                                    stream.writeVerbose( "trying Database.load() access mode" );
-                                    TestRace tr = (TestRace) db.load( TestRace.class, new Integer(i), Database.Exclusive );
-                                    tr.incValue1();
-                                    db.commit();
-                                    isOk = true;
+                                    throw new IllegalArgumentException("??????????????");
                                 }
                             } catch ( TransactionAbortedException e ) {
                                 count++;
                                 // this exception should happen one in a while.
                                 stream.writeVerbose( "Excepted exception: " + e );
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-                                if ( count > 3 ) {
+                                if ( count > 10 ) {
                                     break some;
                                 }
                             } catch ( LockNotGrantedException e ) {
                                 count++;
                                 stream.writeVerbose( "Excepted exception: " + e);
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-                                if ( count > 3 ) {
+                                if ( count > 10 ) {
                                     break some;
                                 }
                             } catch ( QueryException e ) {
                                 stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                _leak = true;
                                 break out;
                             } catch ( TransactionNotInProgressException e ) {
                                 stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                _leak = true;
                                 break out;
                             } catch ( PersistenceException e ) {
                                 stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                _leak = true;
                                 break out;
-    //                        } catch ( Exception e ) {
-    //                            stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
-    //                            e.printStackTrace();
-    //                            if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-      //                          break out;
+                            } catch ( NoSuchElementException e ) {
+                                stream.writeVerbose( "Thread will be killed. Element not found: entry leakage in cache" );
+                                e.printStackTrace();
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                _leak = true;
+                                break out;
+                            } catch ( Exception e ) {
+                                stream.writeVerbose( "Thread will be killed. Element not found: other exception: "+e );
+                                e.printStackTrace();
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                _leak = true;
+                                break out;
                             }
                         }
 
@@ -312,14 +414,14 @@ public class Race extends CWTestCase {
 
                         // make some non-deterministicity. otherwise, we are just lining up
                         // thread and won't discover problem.
-                        if ( ran.nextDouble() < 0.3 ) {
+                        //if ( ran.nextDouble() < 0.3 ) {
                             try {
-                                Thread.currentThread().sleep( 100 );
+                                Thread.currentThread().sleep( (long) (100 * ran.nextDouble()) );
                             } catch ( InterruptedException e ) {
                                 System.out.println(e);
                                 break out;
                             }
-                        }
+                        //}
                     }
                 }
             } finally {
@@ -328,6 +430,11 @@ public class Race extends CWTestCase {
         }
         boolean isDone() {
             return isDone;
+        }
+    }
+    class NoSuchElementException extends Exception {
+        NoSuchElementException( String name ) {
+            super( name );
         }
     }
 }
