@@ -88,6 +88,10 @@
         <display>Types</display>
       </navLink>
       <navLink>
+        <url>oql.xml</url>
+        <display>OQL</display>
+      </navLink>
+	  <navLink>
         <url>sourcegen.xml</url>
         <display>Source generator</display>
       </navLink>

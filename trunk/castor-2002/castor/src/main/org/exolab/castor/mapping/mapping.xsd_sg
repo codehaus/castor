@@ -47,6 +47,7 @@
         <xsd:attribute name="extends"  type="IDREF"      use="optional"/>
         <xsd:attribute name="depends"  type="IDREF"      use="optional"/>
         <xsd:attribute name="identity" type="NMTOKENS"   use="optional"/>
+	<xsd:attribute name="timestamp" type="NMTOKEN"   use="optional"/>
         <xsd:attribute name="access"   value="shared"    use="optional">
 	  <xsd:simpleType>
 	      <xsd:restriction base="string">
