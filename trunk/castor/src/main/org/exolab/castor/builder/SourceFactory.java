@@ -96,6 +96,8 @@ import java.util.Vector;
 public class SourceFactory {
     
     
+    private static final String ENUM_ACCESS_INTERFACE =
+        "org.exolab.castor.types.EnumeratedTypeAccess";
 
     private static final short BASE_TYPE_ENUMERATION   = 0;
     private static final short OBJECT_TYPE_ENUMERATION = 1;
@@ -1520,6 +1522,11 @@ public class SourceFactory {
         (SimpleType simpleType, FactoryState state)
     {
 
+ 		// Added by robertlaferla at comcast dot net 01/21/2004
+ 	    if (_config.useEnumeratedTypeInterface()) {
+ 		    state.jClass.addImport(ENUM_ACCESS_INTERFACE);
+ 		    state.jClass.addInterface(ENUM_ACCESS_INTERFACE);
+ 	    } // end enumTypeInterface
 
         switch (enumerationType) {
             case BASE_TYPE_ENUMERATION:
