@@ -2,7 +2,7 @@
 Version (CVS) 
 -------------
 
-JDO:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
+ALL:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
        Updates Eclipse related project files.
        (Werner - 20040319)
 
