@@ -145,14 +145,14 @@
                <td align="center">binding-file</td><td>The binding file name.</td>
                <td>
                   Allows the setting of a Binding File to allow a fine-grained control the classes generated
-                </td>         
+                </td>
                <td>Optional</td>
              </tr>
              <tr>
                <td align="center">generateImportedSchemas</td><td><br/></td>
                <td>
                   Generates automatically sources for imported XML Schemas (default is false).
-                </td>         
+                </td>
                <td>Optional</td>
              </tr>
           </table>
@@ -166,9 +166,9 @@
                <li>Java 1.2: use the option <tt>-types j2</tt>, collection type is java.util.Collection</li>
                <li>ODMG 3.0: use the option <tt>-types odmg</tt>, collection tyoe is odmg.DArray</li>
             </ul>
-            You can also write your own FieldInfoFactory to handle specific collection types. All you have to do is to 
+            You can also write your own FieldInfoFactory to handle specific collection types. All you have to do is to
             pass in the fully qualified name of that FieldInfoFactory: <tt>-types com.personal.MyCoolFactory</tt>
-            
+
          </p>
          </section>
 
@@ -265,7 +265,7 @@
              </code>
             </p>
          </section>
-        
+
          <section title="Setting a super class">
             <p>Since version: 0.8.10</p>
             <p>
@@ -281,13 +281,17 @@
             </code>
             </p>
         </section>
-        
-       
-        <section title="Map XML namespaces to Java packages">
+
+
+        <section title="Mapping XML namespaces to Java packages" sub-title="Schema Imports">
             <p>Since version: 0.9.0</p>
             <p>
-                An XML Schema grammar is identified by a namespace. For data-binding purpose
-                it may be convenient to map namespaces to Java packages.
+                An XML Schema instance is identified by a namespace. For data-binding purposes,
+                especially code generation it may be necessary to map namespaces to Java packages.
+            </p>
+            <p>
+                This is needed for imported schema in order for Castor to generate the
+                correct imports during code generation for the primary schema.
             </p>
             <p> To allow the mapping between namespaces and Java packages , edit the castorbuilder.properties file :
             <code>
@@ -299,11 +303,11 @@
             </code>
             </p>
         </section>
-        
+
         <section title="Generate equals() method">
             <p>Since version: 0.9.1</p>
             <p>
-                The Source Generator can override the 'equals()' method for the 
+                The Source Generator can override the 'equals()' method for the
                 generated objects.
             </p>
             <p>Note: hashcode() is not currently overriden.</p>
@@ -317,11 +321,11 @@
             </code>
             </p>
         </section>
-        
+
         <section title="Maps java primitive types to wrapper object">
              <p>Since version 0.9.4</p>
              <p>
-		It may be convenient to use java objects instead of primitives, 
+		It may be convenient to use java objects instead of primitives,
 		the Source Generator provides a way to do it. Thus the following mapping can be used:
 		<ul>
 			<li>boolean to java.lang.Boolean</li>
@@ -342,23 +346,23 @@
 	     </code>
 	     </p>
 	</section>
-        
+
        </section>
     </section>
-    
+
     <section title="Binding File">
        <p>It may appear that the default binding used to generate the Java Object Model from an XML schema doesn't
-       meet one's expectation. For instance, the default binding won't deal with naming collision problems that can appear since XML Schema allows 
+       meet one's expectation. For instance, the default binding won't deal with naming collision problems that can appear since XML Schema allows
        an element declaration and a complexType definition to both share the same name. From a Java standpoint, it will result in the creation of
        two classes with the same qualified name: the second class generated will simply overwrite the first one.
        Another example is when one user wants to change the default datatype binding provided by Castor or to add validation rules by implementing his own validator
        and passing it to the SourceGenerator.</p>
-       
+
        <p>The Binding declaration is an XML based language that allows the user to define such control on the generated classes.
        The aim of this section is to provide an overview of the binding file as well as a definition of the several XML components used to define this binding file.
-       A more in-depth presentation  will be available soon in the 
+       A more in-depth presentation  will be available soon in the
       <a href="./SourceGeneratorUser.pdf">Source Generator User Document(PDF).</a></p>
-      
+
       <section title="&lt;binding> element">
           <table>
              <tr>
@@ -368,12 +372,12 @@
     (include*,package*,namingXML?,elementBinding*, attributeBinding, complexTypeBinding, groupBinding)
 &lt;/binding>
                </code>
-             </tr> 
+             </tr>
           </table>
-          <p>The binding element is the root element and contains the binding information. The attribute <code>defaultBindingType</code> controls the 
+          <p>The binding element is the root element and contains the binding information. The attribute <code>defaultBindingType</code> controls the
           <a href="#Class-Creation/Mapping">Class creation type</a></p>
       </section>
-      
+
       <section title="&lt;include> element">
           <table>
              <tr>
@@ -381,7 +385,7 @@
 &lt;include
     URI = xsd:anyURI/>
                </code>
-             </tr> 
+             </tr>
           </table>
           <ul>
              <li><b>URI:</b>The URI of the binding file to include.</li>
@@ -389,7 +393,7 @@
           <p>This element allows one to include the binding declaration defined in another file. This allows re-usability of Binding files defined for various
           XML Schemas.</p>
       </section>
-      
+
       <section title="&lt;package> element">
           <table>
              <tr>
@@ -400,7 +404,7 @@
 &lt;/package>
 
                </code>
-             </tr> 
+             </tr>
           </table>
           <ul>
              <li><b>name:</b>A fully qualified java package name.</li>
@@ -413,8 +417,8 @@
           one XML Schema using the &lt;xsd:include/> element (Please make sure you understand the difference between &lt;xsd:include/> and &lt;xsd:import/>).
           &lt;xsd:include/> relies on the URI of the included XML schema and it can be needed to keep the structure hierarchy defined in XML Schema in the Java
           package generated. Thus the binding file allows to define the mapping between a schemaLocation attribute and a Java package.</p>
-      </section> 
-    
+      </section>
+
      <section title="&lt;namingXML> element">
           <table>
              <tr>
@@ -426,9 +430,9 @@
 &lt;elementName|complexTypeName|modelGroupName>
     (prefix?, suffix?) = xsd:string
 &lt;/elementName|complexTypeName|modelGroupName>
-                  
+
                </code>
-             </tr> 
+             </tr>
           </table>
           <ul>
              <li><b>prefix:</b>The prefix to add to the names of the generated classes.</li>
@@ -440,8 +444,8 @@
           The aim of the &lt;naming/> XML element is to define a prefix and a suffix for the names of the classes generated for an element,
           a complexType or a model group definition.<br/>
           <b>Note:</b>It is not possible to control the names of the classes generated to represent nested model groups (all, choice, sequence).</p>
-       </section> 
-    
+       </section>
+
        <section title="&lt;componentBinding> element">
           <table>
              <tr>
@@ -450,9 +454,9 @@
     name = xsd:string>
    ((java-class|interface|member), elementBinding*, attributeBinding*, complexTypeBinding*, groupBinding*)
 &lt;/elementBinding|attributeBinding|complexTypeBinding|groupBinding>
-   
+
                </code>
-             </tr> 
+             </tr>
           </table>
           <ul>
              <li><b>name:</b>The name of the XML schema component for which we are defining a binding.</li>
@@ -476,13 +480,13 @@
           <p>The second option to identify a XML Schema Component is to embed its binding definition inside its parent binding definition.</p>
           <p>For instance, the following
           binding definition will be equivalent and will identify the element 'foo' defined in the top-level complexType 'fooType'.</p>
-          
+
           <pre>
              &lt;elementBinding name="complexType:fooType/foo>
                  &lt;member name="MyFoo" handler="mypackage.myHandler"/>
-             &lt;/elementBinding>   
+             &lt;/elementBinding>
           </pre>
-          
+
           <pre>
              &lt;complexTypeBinding name="fooType">
                 &lt;elementBinding name="foo>
@@ -490,10 +494,10 @@
                &lt;/elementBinding>
              &lt;complexTypeBinding>
           </pre>
-          
-          
-       </section> 
-       
+
+
+       </section>
+
        <section title="&lt;java-class> element">
           <table>
              <tr>
@@ -507,7 +511,7 @@
     bound? = xsd:boolean >
     (implements*,extends?)
 &lt;/java-class>
-  
+
                </code>
              </tr>
           </table>
@@ -521,8 +525,8 @@
                </ul>
                <p>This element defines all the options for the class to be generated.</p>
        </section>
-       
-       
+
+
        <section title="&lt;interface> element">
           <table>
              <tr>
@@ -530,18 +534,18 @@
 &lt;interface>
     name = xsd:string
 &lt;/interface>
-  
+
                </code>
              </tr>
-           </table>  
+           </table>
                <ul>
                  <li><b>name:</b>The name of the interface that will be generated.</li>
                </ul>
                <p>This element specifies the name of the interface to be generated for an XML schema component.</p>
-               
+
                <p><b>NOTE: this element is not yet implemented.</b></p>
        </section>
-       
+
        <section title="&lt;member> element">
           <table>
              <tr>
@@ -553,8 +557,8 @@
      handler? = xsd:string
      collection? = (array|vector|arraylist|hashtable|collection|odmg|set|map)
      validator? = xsd:string/>
-                  
-  
+
+
                </code>
              </tr>
           </table>
@@ -568,11 +572,11 @@
                  <li><b>validator:</b>The fully qualified name of the FieldValidator to use.</li>
                </ul>
                 <p>This element represents the binding for class member. It allows the definition
-                of its name and java type as well as an implementation of FieldHandler 
+                of its name and java type as well as an implementation of FieldHandler
                 to help the Marshalling framework in handling that member. Defining a validator is also
                 possible. The names given for the validator and the fieldHandler must be fully qualified.</p>
        </section>
-       
+
        <section title="todo">
           <ul>
             <li>
@@ -581,15 +585,15 @@
                   <code>
  &lt;enumBinding>
     (enumClassName|enumMemberName)
- &lt;/enumBinding>             
-  
+ &lt;/enumBinding>
+
                   </code>
                 </tr>
              </table>
              <p>This element will allow more control on the type safe enumerations generated to represent an XML Schema simpleType enumeration</p>
           </li>
           <li>
-            <table> 
+            <table>
                <tr>
                   <code>&lt;javadoc/></code>
                </tr>
@@ -598,16 +602,16 @@
           </li>
        </ul>
 
-       
+
        </section>
-       
+
     </section>
-    
+
     <section title="XML Schema">
 
        <p>
           The input file to the source code generator is an XML Schema<sup>2</sup>.
-          The current supported version is the <b>W3C XML Schema Recommendation</b><sup>1</sup>. 
+          The current supported version is the <b>W3C XML Schema Recommendation</b><sup>1</sup>.
           For more information about XML Schema Support, check the <a href="xmlschema.xml">XML Schema page</a>
        </p>
 
