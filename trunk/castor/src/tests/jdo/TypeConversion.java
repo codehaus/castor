@@ -58,6 +58,10 @@ import java.util.Enumeration;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -85,6 +89,8 @@ public class TypeConversion extends CastorTestCase {
 
     private OQLQuery        _oql;
 
+    private Connection     _conn;
+    
     /**
      * Constructor
      *
@@ -98,7 +104,7 @@ public class TypeConversion extends CastorTestCase {
 
 
     public void setUp() 
-            throws PersistenceException {
+            throws PersistenceException, SQLException {
 
         TestConversion      types;
         Enumeration         enum;
@@ -119,8 +125,11 @@ public class TypeConversion extends CastorTestCase {
             // reset all value to default
             types.setBoolByte(false);
             types.setBoolShort(false);
+            types.setBoolShortMinus(false);
             types.setBoolInt(false);
+            types.setBoolIntMinus(false);
             types.setBoolBigdec(false);
+            types.setBoolBigdecMinus(false);
 
             types.setByteInt((byte)0);
             types.setShortInt((short)0);
@@ -150,12 +159,15 @@ public class TypeConversion extends CastorTestCase {
             _db.create( types );
         }
         _db.commit();
+        
+        _conn = _category.getJDBCConnection(); 
     }
 
     public void runTest()
-            throws PersistenceException, ParseException {
+            throws PersistenceException, ParseException, SQLException {
 
         testConversion();
+        testValuesInDB();
     }
 
     private void testConversion()
@@ -171,8 +183,11 @@ public class TypeConversion extends CastorTestCase {
         types = (TestConversion) _db.load( TestConversion.class, new Integer(TestConversion.DefaultId) );
         types.setBoolByte(true);
         types.setBoolShort(true);
+        types.setBoolShortMinus(true);
         types.setBoolInt(true);
+        types.setBoolIntMinus(true);
         types.setBoolBigdec(true);
+        types.setBoolBigdecMinus(true);
 
         types.setByteInt((byte)123);
         types.setShortInt((short)123);
@@ -200,8 +215,11 @@ public class TypeConversion extends CastorTestCase {
 
         if (    types.getBoolByte()     != true &&
                 types.getBoolShort()    != true &&
+                types.getBoolShortMinus()    != true &&
                 types.getBoolInt()      != true &&
+                types.getBoolIntMinus()      != true &&
                 types.getBoolBigdec()   != true &&
+                types.getBoolBigdecMinus()   != true &&
                 types.getByteInt()      != (byte)123 &&
                 types.getShortInt()     != (short)123 &&
                 types.getLongInt()      != (long)123 &&
@@ -226,6 +244,27 @@ public class TypeConversion extends CastorTestCase {
         _db.commit();
         stream.println( "OK: Handled date/time types" );
 
+    }
+
+    private void testValuesInDB()
+    		throws SQLException {
+        // Create a statement and a resultset
+        Statement stmt = _conn.createStatement ();
+        ResultSet rset = stmt.executeQuery ("select bool_short, bool_short_minus, bool_int, "
+                                          + "bool_int_minus, bool_bigdec, bool_bigdec_minus "
+                                          + "from test_conv where (id = " + TestConversion.DefaultId + ")");
+        rset.next();
+        // Test values writen to db for boolean true
+        if (    //rset.getShort("bool_short")         != (short)1 &&
+                //rset.getShort("bool_short_minus")   != (short)-1 &&
+                rset.getInt("bool_int")             != 1 &&
+                rset.getInt("bool_int_minus")       != -1 &&
+                ( !rset.getBigDecimal("bool_bigdec").equals(new BigDecimal(1)) ) &&
+                ( !rset.getBigDecimal("bool_bigdec_minus").equals(new BigDecimal(-1)) )   ) {
+
+            stream.println( "Error: conversion failed! some value does not match what is expected" );
+            fail("conversion failed! some value does not match what is expected");
+        }
     }
 
     public void tearDown() 
