@@ -1141,7 +1141,7 @@ public class SourceFactory  {
                     method = null;
                     methodName = null;
                     tempName = null;
-                    jsc.add(name);
+                    jsc.add(temp.getName());
                     jsc.append(" = RandomHelper.getRandom(");
                     jsc.append(temp.getName());
                     jsc.append(", ");
