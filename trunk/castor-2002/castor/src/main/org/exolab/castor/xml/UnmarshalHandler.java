@@ -246,10 +246,35 @@ public final class UnmarshalHandler extends MarshalFramework
         _nsPackageMappings = new Hashtable();
     } //-- UnmarshalHandler(Class)
 
+    /**
+     * Returns the Object that the UnmarshalHandler is currently
+     * handling (within the object model), or null if the current 
+     * element is a simpleType.
+     *
+     * @return the Object currently being unmarshalled, or null if the
+     * current element is a simpleType.
+     */
+    public Object getCurrentObject() {
+        if (!_stateInfo.isEmpty()) {
+            UnmarshalState state = (UnmarshalState)_stateInfo.peek();
+            if (state != null)  {
+                return state.object;
+            }
+        }
+        return null;
+    } //-- getCurrentObject
+
+    /**
+     * Returns the "root" Object (ie. the entire object model) 
+     * being unmarshalled.
+     *
+     * @return the root Object being unmarshalled.
+    **/
     public Object getObject() {
         if (_topState != null) return _topState.object;
         return null;
     } //-- getObject
+
 
 
     /**
