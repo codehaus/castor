@@ -2,7 +2,13 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
-    <section title="Version 0.9.4 December 10, 2001"><pre>
+    <section title="Version 0.9.3.9 December 11, 2001"><pre>
+XML:    Added support to the Schema Object Model for a number of XML Schema
+        attributes / properties such as elementFormDefault, form,
+        attributeFormDefault, abstract, id...etc that were previously not
+        read in from the XML Schema. Validation still needs to be updated,
+        as well as the source code generator (kvisco - 20011129, 20011205)
+
 XML:    Added support for the extremely powerful 'handler' attribute on
         the field element for the mapping (kvisco - 20011205)
 
@@ -11,7 +17,7 @@ XML:    Patch to XMLMappingLoader to fix dropped multiple id fields. This is a
         implementation of ClassDescriptor (ClassDescriptorImpl). This fix should
         be moved once we have consensus from both JDO + XML teams (kvisco - 20011204).
 
-XML:    Support for Identity-Constraints in the Schema Object Model and 
+XML:    Support for Identity-Constraints in the Schema Object Model and
         SchemaWriter. Not yet supported in SourceGenerator (kvisco) 20011120
 
 XML:    Applied Nathan Green's patch to allow "all" option when prompting
@@ -19,10 +25,10 @@ XML:    Applied Nathan Green's patch to allow "all" option when prompting
 
 XML:    A number of improvements to SchemaWriter (kvisco) 20011112
 
-XML:    Applied Glenn Nielsen's patch to allow double qoutes in default/fixed 
+XML:    Applied Glenn Nielsen's patch to allow double qoutes in default/fixed
         schema values (kvisco) 20011111.
 
-XML:    Fixed bug that prevented elements that reference each other to generate 
+XML:    Fixed bug that prevented elements that reference each other to generate
         classes. It removes the StackOverFlow Exception. (Arnaud)
 
 XML:    Added code from Matt Small [msmall@clickability.com] that improves the SchemaWriter support (Arnaud)
@@ -155,14 +161,14 @@ JDO:    Fixed a StackOverflowException. The Exception was caused by an infinite
         (Submitted by Mark Lamb [Mark.Lamb@spirent.com])
 
 JDO:    Fixed a problem causing unexpected ObjectModifiedException being thrown
-        when an object in one side of 1:1 relationship is being added via a long 
+        when an object in one side of 1:1 relationship is being added via a long
         transaction. (yip)
         (Reported by Sharma, Naveen [Naveen.Sharma@lmco.com])
 
 JDO:    Fixed the default value not being used for primitives bug. (yip) 20011025
 
 JDO:    Fixed the 1:1 dependent object not being created when the it is newly
-        link, or replaced to the master object in both long and short 
+        link, or replaced to the master object in both long and short
         transaction. (yip) 20011025
 
 JDO:    Added support of read-only field for Castor JDO. Read only can be
@@ -197,7 +203,7 @@ JDO:    Made TxDatbaseMap implementing Serializable.
 
 JDO:    Fixed bug 801(b): bugs in RelationCollection.clear().
         (yip) 20011203
-        (Bug reported by tysonsinger@metatv.com) 
+        (Bug reported by tysonsinger@metatv.com)
 
 
 JDO:    Fixed bug 801(a): bugs in RelationCollection.addAll() 20011203
