@@ -68,7 +68,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see SequenceKeyGeneratorFactory
  */
-public class SequenceKeyGenerator implements KeyGenerator
+public final class SequenceKeyGenerator implements KeyGenerator
 {
 
 
@@ -89,13 +89,20 @@ public class SequenceKeyGenerator implements KeyGenerator
             throws MappingException
     {
         String fName = factory.getFactoryName();
-        if ( !fName.equals("oracle") && !fName.equals("postgresql")) {
+        boolean returning = "true".equals( params.getProperty("returning") );
+
+        if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
+        if ( fName.equals( "postgresql" ) && returning ) {
+            throw new MappingException( Messages.format( "mapping.keyGenParamNotCompat",
+                                        "returning=\"true\"", getClass().getName(), fName ) );
+        }
         _factory = factory;
         _seqName = params.getProperty("sequence", "{0}_seq");
-        _style = ( fName.equals("oracle") ? AFTER_INSERT : BEFORE_INSERT );
+        _style = ( fName.equals( "postgresql" ) ? BEFORE_INSERT :
+                                   ( returning  ? DURING_INSERT : AFTER_INSERT) );
     }
 
 
@@ -205,6 +212,12 @@ public class SequenceKeyGenerator implements KeyGenerator
         // don't change insert order, otherwise index becomes invalid
         sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
         sb.insert( lp1 + 1, primKeyName + "," );
+        if ( _style == DURING_INSERT ) {
+            // append 'RETURNING primKeyName INTO ?'
+            sb.append( " RETURNING " );
+            sb.append( _factory.quoteName( primKeyName ) );
+            sb.append( " INTO ?" );
+        }
         return sb.toString();
     }
 
