@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,11 +51,14 @@ import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
 /**
- * A class for Unmarshalling SimpleTypes
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$
+ * A class for unmarshalling list elements of a simpleType.
+ * Thanks to  <a href="mailto:cdchudasama@yahoo.com">Chetan Chudasama</a>
+ * for his help.
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @author <a href="mailto:kvsico@intalio.com">Keith Visco</a>
+ * @version $Revision$
 **/
-public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
+public class SimpleTypeListUnmarshaller extends SaxUnmarshaller {
 
 
       //--------------------/
@@ -73,38 +76,53 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
     private int depth = 0;
 
     /**
-     * The SimpleTypeDefinition we are unmarshalling
+     * The simpleType we are unmarshalling
     **/
-    private SimpleTypeDefinition _simpleTypeDef = null;
+    private SimpleTypeDefinition  _typeDefinition = null;
 
-    private boolean foundAnnotation   = false;
-    private boolean foundList         = false;
-    private boolean foundRestriction  = false;
-    private boolean foundUnion        = false;
+    private Schema      _schema          = null;
+    private boolean     foundAnnotation  = false;
+    private boolean     foundSimpleType  = false;
+    private boolean     foundItemType    = false;
+
 
       //----------------/
      //- Constructors -/
     //----------------/
 
     /**
-     * Creates a new SimpleTypeUnmarshaller
-     * @param schema the Schema to which the SimpleType belongs
+     * Creates a new ListUnmarshaller
+     * @param simpleType, the SimpleType being unmarshalled
      * @param atts the AttributeList
      * @param resolver the resolver being used for reference resolving
     **/
-    public SimpleTypeUnmarshaller
-        (Schema schema, AttributeList atts)
+    public SimpleTypeListUnmarshaller
+        (SimpleTypeDefinition typeDefinition, AttributeList atts)
         throws SAXException
     {
         super();
 
-        String name = atts.getValue(SchemaNames.NAME_ATTR);
-        String id   = atts.getValue(SchemaNames.ID_ATTR);
+        _typeDefinition  = typeDefinition;
+        _schema          = typeDefinition.getSchema();
 
-        _simpleTypeDef = new SimpleTypeDefinition(schema, name, id);
+        //-- itemType
+        String itemType = atts.getValue(SchemaNames.ITEM_TYPE_ATTR);
+        if ((itemType != null) && (itemType.length() > 0)) {
+
+            foundItemType = true;
+            XMLType baseType= _schema.getType(itemType);
+            if (baseType == null)
+                _typeDefinition.setBaseTypeName(itemType);
+            else if (baseType.getStructureType() == Structure.COMPLEX_TYPE) {
+                String err = "The item type of a list cannot "+
+                    "be a complexType.";
+                throw new IllegalStateException(err);
+            }
+            else _typeDefinition.setBaseType( (SimpleType) baseType);
+        }
 
 
-    } //-- SimpleTypeUnmarshaller
+    } //-- ListUnmarshaller
 
       //-----------/
      //- Methods -/
@@ -117,30 +135,16 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
      * handles
     **/
     public String elementName() {
-        return SchemaNames.SIMPLE_TYPE;
+        return SchemaNames.LIST;
     } //-- elementName
-
-    /**
-     * Returns the SimpleType created
-    **/
-    public SimpleType getSimpleType() {
-        return _simpleTypeDef.createSimpleType();
-    } //-- getSimpletype
 
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
     **/
     public Object getObject() {
-        return getSimpleType();
+        return null;
     } //-- getObject
-
-    public void finish() throws SAXException {
-        if (!(foundList || foundUnion || foundRestriction))
-            error ("Invalid 'simpleType'; missing 'restriction' "+
-                "| 'union' | 'list'.");
-
-    } //-- finish
 
     /**
      * @param name
@@ -157,46 +161,37 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-        if (SchemaNames.ANNOTATION.equals(name)) {
+
+        //-- annotation
+        if (name.equals(SchemaNames.ANNOTATION)) {
+
+            if (foundSimpleType)
+                error("An annotation must appear as the first child " +
+                    "of 'list' elements.");
 
             if (foundAnnotation)
                 error("Only one (1) annotation may appear as a child of "+
-                    "'simpleType'.");
-
-            if (foundList || foundUnion || foundRestriction)
-                error("An annotation may only appear as the first child "+
-                    "of 'simpleType'.");
+                    "'list' elements.");
 
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
-        else if (SchemaNames.RESTRICTION.equals(name)) {
+        else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
+            if (foundItemType)
+                error("A 'list' element can have either an 'itemType' or " +
+                      " 'simpleType'.");
 
-            if (foundList)
-                error("A 'simpleType' cannot have both a 'list' and a "+
-                    "'restriction' in the same definition.");
+            if (foundSimpleType)
+                error("Only one (1) 'simpleType' may appear as a child of "+
+                    "'list' elements.");
 
-            if (foundUnion)
-                error("A 'simpleType' cannot have both a 'union' and a "+
-                    "'restriction' in the same definition.");
+            foundSimpleType = true;
+            unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
 
-
-            foundRestriction = true;
-
-            unmarshaller
-                = new SimpleTypeRestrictionUnmarshaller(_simpleTypeDef, atts);
-        }
-        else if (SchemaNames.LIST.equals(name)) {
-           foundList = true;
-           unmarshaller = new SimpleTypeListUnmarshaller(_simpleTypeDef, atts);
-        }
-        else if (SchemaNames.UNION.equals(name)) {
-            foundUnion = true;
-
-            error("'union' elements are not yet supported.");
         }
         else illegalElement(name);
 
+        unmarshaller.setDocumentLocator(getDocumentLocator());
     } //-- startElement
 
     /**
@@ -217,10 +212,16 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
+        //-- annotation
         if (SchemaNames.ANNOTATION.equals(name)) {
-            Annotation annotation = (Annotation)unmarshaller.getObject();
-            _simpleTypeDef.setAnnotation(annotation);
+            Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
+            _typeDefinition.setAnnotation(ann);
         }
+        else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
+            SimpleType type = (SimpleType) unmarshaller.getObject();
+            _typeDefinition.setBaseType(type);
+        }
+
 
         unmarshaller = null;
     } //-- endElement
@@ -234,4 +235,4 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         }
     } //-- characters
 
-} //-- SimpleTypeUnmarshaller
+} //-- SimpleTypeListUnmarshaller
