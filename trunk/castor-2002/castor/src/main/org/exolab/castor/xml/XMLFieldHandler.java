@@ -62,9 +62,9 @@ public class XMLFieldHandler
 {
 
     /**
-     * The validation rule for doing a Validity Check
+     * The TypeValidator for doing a Validity Check
     **/
-    private ValidationRule validationRule = null;
+    private TypeValidator validator = null;
     
     /**
      * Creates a new default XMLFieldHandler
@@ -77,10 +77,9 @@ public class XMLFieldHandler
      * Sets the given ValidationRule used to perform validation
      * on the field 
     **/
-    public void setValidationRule(ValidationRule validationRule) {
-        this.validationRule = validationRule;
-    } //-- setValidationRule
-    
+    public void setValidator(TypeValidator validator) {
+        this.validator = validator;
+    } //-- setValidator
     /**
      * Returns the value of the field from the object.
      *
@@ -153,7 +152,6 @@ public class XMLFieldHandler
         //-- source code generator
         return null;
     } //-- newInstance
-
 
 } //-- XMLFieldHandler
 
