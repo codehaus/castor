@@ -21,7 +21,7 @@
     <description>Product definition</description>
     <field name="id" sql-name="id"/>
     <field name="name" sql-name="name" />
-    <field name="price" sql-name="price" />
+    <field name="price" type="float" sql-name="price" sql-type="double"/>
     <primary-key type="java.lang.Integer">
       <field-ref name="id"/>
     </primary-key>

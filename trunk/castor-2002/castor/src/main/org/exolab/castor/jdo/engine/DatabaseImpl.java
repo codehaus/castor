@@ -69,7 +69,7 @@ import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
-import org.exolab.castor.MappingException;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.util.Messages;
