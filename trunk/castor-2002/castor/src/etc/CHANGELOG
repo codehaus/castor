@@ -1,6 +1,11 @@
 Version (CVS)
 -------------
 
+XML & JDO:  
+        Check that an XML mapping file do not declare more identity attributes
+        for a given class than there are field elementsdefined for that
+        class.
+        (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)
 
 XML:	Added support for restriction in simpleContent and enhanced complexType support
 	(Arnaud <blandin@intalio.com>)	
