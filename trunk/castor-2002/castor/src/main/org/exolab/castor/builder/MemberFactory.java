@@ -402,7 +402,7 @@ public class MemberFactory {
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
-        if (maxOccurs != 1) {
+        if (maxOccurs > 1) {
             String vName = fieldName+"List";
             CollectionInfo cInfo
                 = infoFactory.createCollection(xsType, vName, eDecl.getName(false));
@@ -552,7 +552,7 @@ public class MemberFactory {
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
-        if (maxOccurs != 1) {
+        if (maxOccurs > 1) {
             String vName = fieldName+"List";
             CollectionInfo cInfo
                 = infoFactory.createCollection(xsType, vName, groupName);
