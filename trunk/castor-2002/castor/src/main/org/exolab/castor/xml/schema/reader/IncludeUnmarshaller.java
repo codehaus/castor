@@ -71,13 +71,24 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
         super();
         setResolver(resolver);
 
+		//-- Get schemaLocation
 		String include = atts.getValue("schemaLocation");
 		if (include == null)
 			throw new SAXException("'schemaLocation' attribute missing on 'include'");
-        //if the path is relative Xerces append the "user.Dir"
-        //we need to keep the base directory of the document
-        // note: URI not supported (just system path)
-        if (!new java.io.File(include).isAbsolute()) {
+
+		//-- Has this schema locaiton been processed?
+        if (state.processed(include))
+            return;
+		state.markAsProcessed(include, schema);
+		
+        // note: URI not supported (just system path), so remove any file:///
+		String absolute = include;
+		if (include.startsWith("file:///"))
+			absolute = include.substring(8);
+		
+        // if the path is relative Xerces append the "user.Dir"
+        // we need to keep the base directory of the document
+        if (!new java.io.File(absolute).isAbsolute()) {
              String temp = locator.getSystemId();
              if (include.startsWith("./"))
                 include = include.substring(2);
@@ -93,9 +104,6 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
                 temp = null;
             }
         }
-
-        if (schema.includeProcessed(include))
-            return;
 
         //just keep track of the schemaLocation
         schema.addInclude(include);

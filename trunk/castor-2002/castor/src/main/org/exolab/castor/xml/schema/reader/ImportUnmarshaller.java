@@ -75,10 +75,15 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 		String schemaLocation = atts.getValue("schemaLocation");
 		if (schemaLocation==null)
 			throw new SAXException("'schemaLocation' attribute missing on 'import'");
-		//if the path is relative Xerces append the "user.Dir"
-        //we need to keep the base directory of the document
-        // note: URI not supported (just system path)
-        if (!new java.io.File(schemaLocation).isAbsolute()) {
+		
+		// note: URI not supported (just system path), so remove any file:///
+		String absolute = schemaLocation;
+		if (schemaLocation.startsWith("file:///"))
+			absolute = schemaLocation.substring(8);
+		
+		// if the path is relative Xerces append the "user.Dir"
+        // we need to keep the base directory of the document
+        if (!new java.io.File(absolute).isAbsolute()) {
              String temp = locator.getSystemId();
              if (temp != null) {
                if (schemaLocation.startsWith("./"))
@@ -105,11 +110,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			throw new SAXException("namespace '"+namespace+"' not declared in schema");
         if (namespace.equals(schema.getTargetNamespace()) )
             throw new SAXException("the 'namespace' attribute in the <import> element cannot be the same of the targetNamespace of the global schema");
-		//-- Have we already imported this XML Schema file?
-		if (state.processed(schemaLocation)) {
-           schema.addImportedSchema(state.getSchema(schemaLocation));
-           return;
-		}
+		
         //-- Schema object to hold import schema
 		boolean addSchema = false;
 		Schema importedSchema = schema.getImportedSchema(namespace);
@@ -120,13 +121,11 @@ public class ImportUnmarshaller extends SaxUnmarshaller
                schema.addImportedSchema(state.getSchema(schemaLocation));
            return;
 		}
-
-
         if (importedSchema == null) {
 			importedSchema = new Schema();
 			addSchema = true;
 		}
-
+		
         state.markAsProcessed(schemaLocation, importedSchema);
 
         //-- Parser Schema
