@@ -125,7 +125,7 @@ public class RecurringDuration extends RecurringDurationBase{
      public RecurringDuration(String duration, String period, short[] values)
         throws OperationNotSupportedException
     {
-        new RecurringDuration(duration, period);
+        this(duration, period);
         if (values.length != 10) {
             throw new IllegalArgumentException("Wrong numbers of values");
         }
@@ -251,7 +251,7 @@ public class RecurringDuration extends RecurringDurationBase{
      /**
      * set all the fields by reading the values in an array
      * @param values an array of shorts with the values
-     * the array is supposed to be of length 6 and ordered like that:
+     * the array is supposed to be of length 10 and ordered like that:
      *<ul>
      *      <li>century</li>
      *      <li>year</li>
