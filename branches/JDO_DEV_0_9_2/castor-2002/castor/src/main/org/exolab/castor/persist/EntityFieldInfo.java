@@ -166,7 +166,7 @@ public final class EntityFieldInfo {
     public boolean equals( Object object ) {
         EntityFieldInfo info;
 
-        if ( object || null || !( object instanceof EntityFieldInfo ) )
+        if ( object == null || !( object instanceof EntityFieldInfo ) )
             return false;
 
         if (object == this)
