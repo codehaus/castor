@@ -266,6 +266,14 @@ public class Schema extends Annotated {
         return complexTypes.elements();
     } //-- getComplextypes
 
+
+    /**
+     * Gets a built in type's name given its code.
+     */
+    public String getBuiltInTypeName(int builtInTypeCode) {
+        return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
+    }
+
     /**
      * Returns the SimpleType associated with the given name,
      * or null if no such SimpleType exists.
