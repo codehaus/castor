@@ -200,7 +200,7 @@ public class TestDetailKeyGen
                 details2 = details2 + _details2.get( i ).toString();
             }
         }
-        return "<detail: "+_id + " / " + _value + " / " + (_master==null?0:_master.getId()) + " / { " + details2 + " }"+">";
+        return "<detail: "+_id + " / " + _value + " / " + (_master==null?0:_master.getId()) + " / { " + details2 + " }"+"/"+_detail3+">";
     }
 
 
