@@ -59,16 +59,19 @@ import java.util.Hashtable;
 
 /**
  * A Helper class for the Marshaller and Unmarshaller,
- * basically the common code base between the two.
+ * basically the common code base between the two. This
+ * class handles the introspection to dynamically create
+ * descriptors.
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class MarshalHelper {
     
           
-    private static final String ADD = "add";
-    private static final String GET = "get";
-    private static final String SET = "set";
+    private static final String ADD     = "add";
+    private static final String GET     = "get";
+    private static final String SET     = "set";
+    private static final String CREATE  = "create";
     
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
@@ -116,17 +119,26 @@ public class MarshalHelper {
             (c == Class.class)||
             (c == Object.class)) {
             throw new MarshalException (
-                                        MarshalException.BASE_CLASS_OR_VOID_ERR );
+                MarshalException.BASE_CLASS_OR_VOID_ERR );
         }
         
         XMLClassDescriptorImpl classDesc = new XMLClassDescriptorImpl(c);
         
-        //-- handle primitives...should we have default MarshalInfo classes
-        //-- for primitives...probably
+        //--------------------------/
+        //- handle complex objects -/
+        //--------------------------/
         
-        //-- handle complex objects
-        Hashtable descriptors = new Hashtable();
         Method[] methods = c.getMethods();
+        Hashtable descriptors   = null;
+        Hashtable createMethods = null;
+        
+        //-- make sure we have methods before creating
+        //-- the hashtables
+        if (methods.length > 0) {
+            descriptors = new Hashtable();
+            createMethods = new Hashtable();
+        }
+        
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             
@@ -176,13 +188,16 @@ public class MarshalHelper {
                 else {
                     try {
                         handler.setReadMethod(method);
+                        //-- look for createMethod
+                        method = (Method)createMethods.remove(xmlName);
+                        if (method != null) handler.setCreateMethod(method);
                     }
                     catch(MappingException mx) {
                         throw new MarshalException(mx);
                     }
                 }
                 
-            }
+            } //-- end read method
             //-- write methods
             else if (methodName.startsWith(ADD) ||
                      methodName.startsWith(SET) ) {
@@ -228,12 +243,45 @@ public class MarshalHelper {
                 else {
                     try {
                         handler.setWriteMethod(method);
+                        //-- look for createMethod
+                        method = (Method)createMethods.remove(xmlName);
+                        if (method != null) handler.setCreateMethod(method);
                     }
                     catch(MappingException mx) {
                         throw new MarshalException(mx);
                     }
                 }
-            }
+            } //-- end write methods
+            //-- create methods
+            else if (methodName.startsWith(CREATE)) {
+                if (method.getParameterTypes().length != 0) continue;
+                
+                //-- caclulate name from Method name
+                String fieldName = methodName.substring(CREATE.length());
+                String xmlName   = toXMLName(fieldName);
+                
+                Class type = method.getReturnType();
+                
+                if (!isDescriptable(type)) continue;
+                
+                XMLFieldDescriptorImpl fieldDesc 
+                    = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
+                
+                if (fieldDesc == null) {
+                    //-- add create method to hash and loop...
+                    createMethods.put(xmlName, method);
+                    continue;
+                }
+                
+                FieldHandlerImpl handler 
+                    = (FieldHandlerImpl)fieldDesc.getHandler();
+                try {
+                    handler.setCreateMethod(method);
+                }
+                catch(MappingException mx) {
+                    throw new MarshalException(mx);
+                }
+            } //-- end create method
         }
         return classDesc;
     } //-- generateClassDescriptor
