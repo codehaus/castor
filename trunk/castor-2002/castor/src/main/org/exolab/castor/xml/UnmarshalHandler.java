@@ -142,6 +142,9 @@ public class UnmarshalHandler extends MarshalFramework
 
     private ClassLoader _loader = null;
 
+    private static final StringClassDescriptor _stringDescriptor
+        = new StringClassDescriptor();
+        
     //----------------/
     //- Constructors -/
     //----------------/
@@ -1180,7 +1183,15 @@ public class UnmarshalHandler extends MarshalFramework
         throws SAXException
     {
         if (_class == null) return null;
+        
+        
+        //-- special case for strings
+        if (_class == String.class)
+            return _stringDescriptor;
+            
         if (_class.isArray()) return null;
+        
+            
 
         if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl();
