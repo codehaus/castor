@@ -11,6 +11,9 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Made some changes in Unmarshalling code to handle "null" primitives. Based
+        on suggestions from Fabrice Gomez. (kvisco)
+
 XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers using
         dynamic-introspection. (kvisco)
 
@@ -23,6 +26,7 @@ XML:    Update of the XML Schema syntax to the April 7th draft
         The following things in the April draft are supported :
           - datatype -> simpleType
           - type -> complexType
+          - the "source" attribute has been replaced by "base"
           - the "fixed" attribute in an attribute element now is
             part of the "use" attribute
           - the "default" attribute, which is used to specify the default
