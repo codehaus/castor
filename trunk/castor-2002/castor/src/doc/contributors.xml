@@ -361,7 +361,7 @@
   <contributor type="Contributor">
     <name surname="Thielen" given="Thorsten" />
     <email>thorsten@ipcon.de</email>
-    <description>Added support for aliases in generated SQL queries</description>
+    <description>Several improvements to OQL parser</description>
   </contributor>
 
   <!--
