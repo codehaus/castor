@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML:  Fix a bug in SimpleTypeFactory.
+      (Reported by Risheng Lin <rlin@eng.utoledo.edu>) (Arnaud)
+
 XML:  Add an option in the Source Generator that allows to use wrapper objects instead of primitives
       (Eg java.lang.Double instead of double) (Arnaud)
 
