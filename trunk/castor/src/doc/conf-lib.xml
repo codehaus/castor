@@ -115,6 +115,16 @@
            <tr><td><b>xerces.jar</b></td><td>Xerces XML library</td></tr>
            <tr><td>xslp.jar</td><td>XSL processor, used for documentation</td></tr>
          </table>
+         
+         <p>and optionally</p>
+         
+         <table cellpadding="4" border="1">
+           <tr><td>jakarta-oro-2.0.5.jar</td><td>Support for regular expressions</td></tr>
+           <tr><td>jakarta-regexp-1.1.jar</td><td>Support for regular expressions</td></tr>
+         </table>
+         
+         <p>The last two JAR files are required when using patterns with XML Schema type 
+            definitions.</p>
 
       <section title="Castor XML">
         <p>Castor XML is dependent on the latest release of Xerces available from
