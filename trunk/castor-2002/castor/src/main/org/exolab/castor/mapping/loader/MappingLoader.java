@@ -473,22 +473,19 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
             getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
                                       ( colType == null ? fieldType : colType ), true );
-            if ( getMethod == null )
-                throw new MappingException( "mapping.accessorNotFound",
-                                            "get" + capitalize( fieldMap.getName() ),
-                                            ( colType == null ? fieldType : colType ),
-                                            javaClass.getName() );
-            if ( fieldType == null && colType == null )
-                fieldType = getMethod.getReturnType();
-
-            if ( colType == null || getSetCollection ) {
-                setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
-                                          ( colType == null ? fieldType : colType ), false );
-                if ( setMethod == null )
-                    throw new MappingException( "mapping.accessorNotFound",
-                                                "set" + capitalize( fieldMap.getName() ),
-                                                ( colType == null ? fieldType : colType ),
-                                                javaClass.getName() );
+            if ( getMethod != null ) {
+                if ( fieldType == null && colType == null )
+                    fieldType = getMethod.getReturnType();
+        
+                if ( colType == null || getSetCollection ) {
+                    setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
+                                              ( colType == null ? fieldType : colType ), false );
+                    if ( setMethod == null )
+                        throw new MappingException( "mapping.accessorNotFound",
+                                                    "set" + capitalize( fieldMap.getName() ),
+                                                    ( colType == null ? fieldType : colType ),
+                                                    javaClass.getName() );
+                }
             }
 
         } else {
