@@ -266,9 +266,9 @@ final class ObjectLock
 	    if ( timeout > 0 ) {
 		try {
 		    if ( write )
-			tx.wait( timeout );
+			wait( timeout * 1000 );
 		    else
-			this.wait( timeout );
+			wait( timeout * 1000 );
 		} catch ( InterruptedException except ) {
 		    throw new LockNotGrantedException( write ? "persist.writeLockTimeout" :
 						       "persist.readLockTimeout" );
@@ -345,13 +345,11 @@ final class ObjectLock
 	    _writeLock = null;
 	    _readLock = null;
 	    if ( _writeWaiting != null ) {
-		synchronized ( _writeWaiting.tx ) {
-		    _writeWaiting.tx.notify();
-		}
+		notify();
 		_writeWaiting = _writeWaiting.next;
 	    } else {
 		_readWaiting = null;
-		this.notifyAll();
+		notifyAll();
 	    }
 	} else {
 	    // Release one read lock out of possible many, but don't notify
@@ -432,16 +430,22 @@ final class ObjectLock
 	// Only the last lock attempt in a dead-lock situation will cancel.
 
 	if ( _writeLock != null ) {
+	    // _writeLock is the blocking transaction. We are only interested in
+            // a blocked transacrtion.
+System.out.println( "Waiting for lock on " + _object + " by " + waitingTx );
 	    waitOn = _writeLock.getWaitOnLock();
 	    if ( waitOn != null ) {
 		LinkedTx read;
 
-		if ( waitOn._writeLock == waitingTx ) {
+System.out.println( "Has write lock by " + _writeLock );
+		// Is the blocked transaction blocked by the transaction locking
+		// this object? This is a deadlock.
+		if ( waitOn._writeLock == _writeLock ) {
 		    throw new LockNotGrantedException( "persist.deadlock" );
 		}
-		read = _readLock;
+		read = waitOn._readLock;
 		while ( read != null ) {
-		    if ( read.tx == waitingTx )
+		    if ( read.tx == _writeLock )
 			throw new LockNotGrantedException( "persist.deadlock" );
 		    read = read.next;
 		}
@@ -450,18 +454,23 @@ final class ObjectLock
 	} else {
 	    LinkedTx lock;
 
+System.out.println( "Waiting for lock on " + _object + " by " + waitingTx );
 	    lock = _readLock;
 	    while ( lock != null ) {
+		// lobk is the blocking transaction. We are only interested in
+		// a blocked transacrtion.
 		waitOn = lock.tx.getWaitOnLock();
-		if ( waitOn != null ) {
+System.out.println( "Has read lock by " + lock.tx );
+		if ( waitOn != null && lock.tx != waitingTx ) {
 		    LinkedTx read;
 
-		    if ( waitOn._writeLock == waitingTx ) {
+System.out.println( "Blocked tx " + lock.tx );
+		    if ( waitOn._writeLock == lock.tx ) {
 			throw new LockNotGrantedException( "persist.deadlock" );
 		    }
-		    read = _readLock;
+		    read = waitOn._readLock;
 		    while ( read != null ) {
-			if ( read.tx == waitingTx ) 
+			if ( read.tx == lock.tx )
 			    throw new LockNotGrantedException( "persist.deadlock" );
 			read = read.next;
 		    }
