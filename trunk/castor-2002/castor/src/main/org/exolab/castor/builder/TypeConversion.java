@@ -51,8 +51,11 @@ import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.JavaNaming;
+import org.exolab.castor.xml.schema.AttributeDecl;
+import org.exolab.castor.xml.schema.ElementDecl;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
+import org.exolab.castor.xml.schema.Structure;
 
 import java.text.ParseException;
 
@@ -300,8 +303,22 @@ public class TypeConversion {
                 {
                     //-- Enumeration ?
                     if (simpleType.hasFacet(Facet.ENUMERATION)) {
+                        
+                        String typeName = simpleType.getName();
+                        
+                        //-- anonymous type
+                        if (typeName == null) {
+                            Structure parent = simpleType.getParent();
+                            if (parent instanceof ElementDecl) {
+                                typeName = ((ElementDecl)parent).getName();
+                            }
+                            else {
+                                typeName = ((AttributeDecl)parent).getName();
+                            }
+                            typeName = typeName + "Type";
+                        }
                         String className
-                            = JavaNaming.toJavaClassName(simpleType.getName());
+                            = JavaNaming.toJavaClassName(typeName);
                         
                         String ns = simpleType.getSchema().getTargetNamespace();
                         String pkgName = SourceGenerator.getJavaPackage(ns);

@@ -301,14 +301,15 @@ public class SourceFactory  {
         // SimpleType
         else {
             SimpleType simpleType = (SimpleType)type;
-            classInfo.setSchemaType(TypeConversion.convertType(simpleType));
             //-- handle our special case for enumerated types
             if (simpleType.hasFacet(Facet.ENUMERATION))
 			{
 				//-- Don't create source code for simple types that
 				//-- don't belong in the elements target namespace
-				if (simpleType.getSchema()==element.getSchema())
-					createSourceCode(simpleType, sgState);
+				if (simpleType.getSchema()==element.getSchema()) {
+					JClass tmpClass = createSourceCode(simpleType, sgState);
+					classInfo.setSchemaType(new XSClass(tmpClass));
+				}
             } else
             // return nothing
                 return null;
@@ -557,9 +558,11 @@ public class SourceFactory  {
         String typeName = simpleType.getName();
         if (typeName == null) {
             Structure struct = simpleType.getParent();
+            FactoryState fstate = null;
             switch (struct.getStructureType()) {
                 case Structure.ATTRIBUTE:
                     typeName = ((AttributeDecl)struct).getName();
+                    fstate = sgState.getCurrentFactoryState();
                     break;
                 case Structure.ELEMENT:
                     typeName = ((ElementDecl)struct).getName();
@@ -567,15 +570,12 @@ public class SourceFactory  {
             }
             //-- In case of naming collision we append current
             //-- class name
-            FactoryState fstate = sgState.getCurrentFactoryState();
             if (fstate != null) {
                 typeName = JavaNaming.toJavaClassName(typeName);
                 typeName = fstate.jClass.getLocalName() + typeName;
             }
-            else {
-                //-- otherwise just append "Type"
-                typeName += "Type";
-            }
+            //-- otherwise just append "Type"
+            typeName += "Type";
         }
 
         String className   = JavaNaming.toJavaClassName(typeName);
