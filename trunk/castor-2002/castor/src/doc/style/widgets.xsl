@@ -4,7 +4,7 @@
 <!-- Ismael Ghalimi ghalimi@exoffice.com            -->
 <!-- Copyright (c) Exoffice Technologies, Inc. 1999 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/XSL/Transform/1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:template match="email">
     <a href="mailto:{.}"><xsl:copy-of select="."/></a>
