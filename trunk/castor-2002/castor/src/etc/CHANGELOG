@@ -2,6 +2,8 @@ Version (CVS)
 -------------
 JDO:    SAP DB driver, improved support for MySQL (Oleg Nitz)
 
+JDO:    Added possibility to close OQL queries in order to release resources (Oleg Nitz)
+
 Version 0.8.10
 --------------
 
