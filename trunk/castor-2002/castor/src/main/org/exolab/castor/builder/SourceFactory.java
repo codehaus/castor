@@ -1376,12 +1376,19 @@ public class SourceFactory  {
                         gInfo.setMinOccurs(group.getMinOccurs());
                     }
                     //set the compositor
+                    /* 
+                       Arnaud: the following breaks a Group test case for
+                       me, which I will send you via e-mail. Please have
+                       a look. Thanks...
+                       
                     if (group.getOrder() == Order.choice)
                         gInfo.setAsChoice();
                     else if (group.getOrder() == Order.all)
                         gInfo.setAsAll();
                     else if (group.getOrder() == Order.seq)
                         gInfo.setAsSequence();
+                        
+                    */
 
                     //-- if there some wildcard elements? (<any>)
                     Enumeration wildcards = group.getWildcard();
