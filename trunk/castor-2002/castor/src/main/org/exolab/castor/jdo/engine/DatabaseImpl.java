@@ -188,6 +188,18 @@ public class DatabaseImpl
         _autoStore = autoStore;
     }
 
+    /*
+     * Return if the current transaction is set to autoStore, it there is
+     * transaction active. If there is no active transaction, return if 
+     * the next transaction will be set to autoStore.
+     */
+    public boolean isAutoStore() {
+        if ( _ctx != null )
+            return _ctx.isAutoStore();
+        else
+            return _autoStore;
+    }
+
     /**
      * Gets the current application ClassLoader's instance. 
      * For use in OQLQueryImpl and TransactionContext.

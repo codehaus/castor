@@ -412,6 +412,25 @@ public interface Database
 
 
     /**
+     * Return if the current transaction is set to autoStore, it there is
+     * transaction active. If there is no active transaction, return if 
+     * the next transaction will be set to autoStore.
+     * <p>
+     * If autoStore is set on. AutoStore will create
+     * all reachable object if the object is not loaded from the
+     * transaction. If it is turn off, only dependent object will 
+     * be created automatically.
+     */
+    public boolean isAutoStore();
+
+
+    /**
+     * True if autoStore is set on. 
+     * It method should be called before begin.
+     */
+    public void setAutoStore( boolean autoStore );
+
+    /**
      * Commits and closes the transaction. All changes made to persistent
      * objects during the transaction are made persistent, objects
      * created during the transaction are made durable, and objects
