@@ -84,6 +84,10 @@ public class Parser implements TokenTypes {
           throws InvalidCharException, OQLSyntaxException {
     
     _treeRoot = match(KEYWORD_SELECT);
+    
+    if ( _curToken.getTokenType() == KEYWORD_DISTINCT )
+      _treeRoot.addChild(match(KEYWORD_DISTINCT));
+      
     _treeRoot.addChild(projectionAttributes());
     _treeRoot.addChild(fromClause());
     
@@ -417,6 +421,12 @@ public class Parser implements TokenTypes {
         retNode = match(tokenType);
         retNode.addChild(leftSide);
         retNode.addChild(additiveExpr());
+      case KEYWORD_BETWEEN:
+        retNode = match(KEYWORD_BETWEEN);
+        retNode.addChild(leftSide);
+        retNode.addChild(additiveExpr());
+        match(KEYWORD_AND);
+        retNode.addChild(additiveExpr());
     }
     
     if (retNode == null)
@@ -572,6 +582,9 @@ public class Parser implements TokenTypes {
         retNode.addChild(expr());
         match(RPAREN);
         break;
+      case KEYWORD_IS_DEFINED:
+      case KEYWORD_IS_UNDEFINED:
+        retNode = undefinedExpr();
       case DOLLAR:
         retNode = queryParam();
         break;
@@ -596,6 +609,42 @@ public class Parser implements TokenTypes {
       return primaryExpr();
     else
       return retNode;
+  }
+
+  /**
+   * Consumes tokens of undefinedExpr.
+   *
+   * @return Parse Tree with the root containing the function call and 
+   *    the child containing the parameter
+   * @throws InvalidCharException passed through from match()
+   * @throws OQLSyntaxException passed through from match() or if an
+   *    unexpected token is encountered here.
+   */
+  private ParseTreeNode undefinedExpr()
+            throws InvalidCharException, OQLSyntaxException {
+    
+    int tokenType = _curToken.getTokenType();
+    if ( tokenType == KEYWORD_IS_DEFINED || 
+         tokenType == KEYWORD_IS_UNDEFINED ) 
+    {
+      ParseTreeNode retNode = match( tokenType );
+      match( LPAREN );
+      if ( _nextToken.getTokenType() == DOT ) {
+        ParseTreeNode childNode = new ParseTreeNode(new Token( DOT, "." ));
+        childNode.addChild( match( IDENTIFIER ) );
+        while ( _curToken.getTokenType() == DOT ) {
+          match( DOT );
+          childNode.addChild( match( IDENTIFIER ) );
+        }
+        retNode.addChild( childNode );
+      }
+      else
+        retNode.addChild( match( IDENTIFIER ) );
+      match( RPAREN );
+      return( retNode );
+    }
+
+    throw new OQLSyntaxException( "Expected undefinedExpr and didn't find it at or near: " + _curToken.getTokenValue() );
   }
 
   /**

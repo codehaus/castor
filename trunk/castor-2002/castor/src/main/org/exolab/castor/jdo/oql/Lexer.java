@@ -87,6 +87,11 @@ public class Lexer implements TokenTypes {
     keywords.put("not", new Integer(KEYWORD_NOT));
     keywords.put("nil", new Integer(KEYWORD_NIL));
     keywords.put("undefined", new Integer(KEYWORD_UNDEFINED));
+    keywords.put("between", new Integer(KEYWORD_BETWEEN));
+    keywords.put("distinct", new Integer(KEYWORD_DISTINCT));
+    keywords.put("is_defined", new Integer(KEYWORD_IS_DEFINED));
+    keywords.put("is_undefined", new Integer(KEYWORD_IS_UNDEFINED));
+        
   }
 
   /**

@@ -93,4 +93,8 @@ public interface TokenTypes {
   int DATE_LITERAL = 37;
   int TIME_LITERAL = 38;
   int TIMESTAMP_LITERAL = 39;
+  int KEYWORD_BETWEEN = 40;
+  int KEYWORD_DISTINCT = 41;
+  int KEYWORD_IS_DEFINED = 42;
+  int KEYWORD_IS_UNDEFINED = 43;
 }
