@@ -182,6 +182,10 @@ final class ObjectLock implements DepositBox {
 
     private boolean            _invalidated;
 
+    private boolean            _isExpired;
+    
+    private Object             _expiredObject;
+
     /**
      * Create a new lock for the specified object. Must not create two
      * locks for the same object. This will be the object returned from
@@ -314,6 +318,40 @@ final class ObjectLock implements DepositBox {
             return true;
 
         return false;
+    }
+
+    
+    /**
+     * Return true if this entry has been expired from the cache
+     */
+    boolean isExpired() 
+    { 
+        return _isExpired; 
+    }
+
+    public Object getObject() { 
+        if ( (_expiredObject != null) && (_object == null) )
+            return _expiredObject;
+        else
+            return _object; 
+    }
+   
+    /**
+     * Indicate that object needs to be expired from the cache
+     */
+    public void expire() 
+    { 
+        _isExpired = true; 
+    }
+   
+    /**
+     * Indicate that object has been removed from the cache. Perform any 
+     * post expiration cleanup.  In particular, remove the reference to any
+     * saved cached objects.
+     */
+    public void expired() { 
+        _isExpired = false; 
+        _expiredObject = null;
     }
 
     synchronized void acquireLoadLock( TransactionContext tx, boolean write, int timeout ) 
@@ -553,6 +591,9 @@ final class ObjectLock implements DepositBox {
 
     public synchronized void setObject( TransactionContext tx, Object object ) {
 
+        _isExpired = false; // initialize cache expiration flag to false
+        _expiredObject = null;
+
         if ( _confirmWaiting != null && _confirmWaiting == tx ) {
             _timeStamp = System.currentTimeMillis();
             _object = object;
@@ -778,6 +819,10 @@ final class ObjectLock implements DepositBox {
                 _writeLock = null;
                 if ( _invalidated || _deleted ) {
                     _timeStamp = System.currentTimeMillis();
+                    // save a copy of the expired objects contents;
+                    // this will be used to expire all contained objects
+                    if (_isExpired) 
+                        _expiredObject = _object;
                     _object = null;
                 }
                 _deleted = false;

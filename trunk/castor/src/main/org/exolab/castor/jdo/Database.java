@@ -610,6 +610,28 @@ public interface Database
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException;
 
+    /**
+     * Expire objects from the cache. Objects expired from the cache will be
+     * read from persistent storage, as opposed to being read from the
+     * performance cache, during subsequent load/query operations.
+     * <p>
+     * Objects may be expired from the cache individually, using explicit
+     * type/identity pairs in the argument list, or whole classes of objects
+     * may be expired by specifying a class type without a corresponding 
+     * entry in the identity array.
+     * <p>
+     * When objects are expired from the cache individually, by identity, 
+     * objects contained within a "master" object, for example objects
+     * maintained in a one-to-many relationship, will automatically be expired
+     * from the cache, without the need to explicitly identify them.  This does
+     * not apply when expiring objects by type.  Each type, both container and
+     * contained objects need to be specified.
+     * <p>
+     * @param type An array of class types.
+     * @param identity An array of object identifiers.
+     */
+    public void expireCache( Class[] type, Object[] identity )
+        throws PersistenceException;
 
 }
 

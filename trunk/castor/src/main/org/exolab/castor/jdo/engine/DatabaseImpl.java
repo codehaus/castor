@@ -657,4 +657,52 @@ public class DatabaseImpl
         return _ctx.getConnection( _scope.getLockEngine() );
     }
 
+    /**
+     * Expire objects from the cache.  Objects expired from the cache will be
+     * read from persistent storage, as opposed to being read from the
+     * performance cache, during subsequent load/query operations.
+     *
+     * Objects may be expired from the cache individually, using explicit
+     * type/identity pairs in the argument list, or whole classes of objects
+     * may be expired by specifying a class type without a corresponding 
+     * entry in the identity array.
+     *
+     * Objects contained within a "master" object, for example objects
+     * maintained in a one-to-many relationship, will automatically be expired
+     * from the cache without the need to explicitly identify them.  This does
+     * not apply when expiring objects by type.  Each type, both container and
+     * contained objects need to be specified.
+     * 
+     * @param type An array of class types.
+     * @param identity An array of object identifiers.
+     */
+    public void expireCache( Class[] type, Object[] identity )
+        throws PersistenceException 
+    {
+        PersistenceInfo    info;
+        
+        for ( int i = 0; i < type.length; i++ ) {
+
+            LockEngine engine = getLockEngine();
+            
+            if ( identity != null ) {
+                if (identity.length >= i+1 ) {
+                    // the object with this type/identity should be
+                    // cleared from the cache
+                    ClassMolder molder = engine.getClassMolder(type[i]);
+                    begin();
+                    TransactionContext tx = getTransaction();
+                    tx.expireCache(engine, molder, identity[i]);
+                    commit();
+                } else {
+                    // all objects of this type should be cleared from the cache
+                    engine.expireCache(type[i]);
+                }
+            } else {
+                // all objects of this type should be cleared from the cache
+                engine.expireCache(type[i]);
+            }
+        }
+    }
+
 }                                

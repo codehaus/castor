@@ -3020,6 +3020,72 @@ public class ClassMolder {
         return _isKeyGenUsed || (_extends != null && _extends. isKeyGeneratorUsed());
     }
 
+    /**
+     * Inspect the fields stored in the object passed as an argument for
+     * contained objects.  Request an expireCache for each contained object.
+     *
+     * @param tx The {@link org.exolab.castor.persist.TransactionContext}
+     * @param locker The object that contains the fields to be inspected
+     */
+    public void expireCache( TransactionContext tx, ObjectLock locker ) 
+        throws PersistenceException
+    {
+ 
+        ClassMolder fieldClassMolder;
+        LockEngine fieldEngine;
+        Object[] fields;
+        int fieldType;
+ 
+        if (locker == null) 
+            return;
+         
+        fields = (Object[]) locker.getObject();
+
+        if ( fields == null ) 
+            return;
+ 
+        // iterates thru all the field of the object and expires contained
+        // objects
+        for ( int i = 0; i < _fhs.length; i++ ) {
+            fieldType = _fhs[i].getFieldType();
+            switch (fieldType) {
+            case FieldMolder.PRIMITIVE:
+                break;
+ 
+            case FieldMolder.SERIALIZABLE:
+                break;
+ 
+            case FieldMolder.PERSISTANCECAPABLE:
+                // field is not primitive type. Related object will be expired
+ 
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+ 
+                if ( fields[i] != null ) {
+                    // use the corresponding Persistent fields as the identity
+                    tx.expireCache(fieldEngine, fieldClassMolder, fields[i] );
+                }
+                break;
+                 
+            case FieldMolder.ONE_TO_MANY:
+            case FieldMolder.MANY_TO_MANY:
+                // field is one-to-many and many-to-many type. All the related
+                // objects will be expired
+                
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+
+                ArrayList v = (ArrayList)fields[i];
+                if ( v != null ) {
+                    for ( int j=0,l=v.size(); j<l; j++ ) {
+                        tx.expireCache(fieldEngine, fieldClassMolder, v.get(j));
+                    }
+                }
+                break;
+            default:
+            }
+        }
+    }
 }
 
 /**

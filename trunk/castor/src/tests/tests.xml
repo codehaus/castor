@@ -147,6 +147,8 @@
     <!-- D -->
     <!-- <case class="jdo.ListTypes" /> -->
     <case class="jdo.TimeStampMismatched" />
+    <case class="jdo.ExpireManyToMany" />
+    <case class="jdo.ExpireLazyEmployee" />
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">
