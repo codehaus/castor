@@ -62,7 +62,7 @@ import javax.transaction.xa.Xid;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ODMGSQLException;
-import org.exolab.castor.jdo.desc.ObjectDesc;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
 
 
 /**
@@ -129,16 +129,16 @@ public final class DatabaseEngine
     
     private DatabaseEngine( DatabaseSource dbs, PrintWriter logWriter )
     {
-	Enumeration  enum;
-	ObjectDesc   objDesc;
+	Enumeration   enum;
+	JDOObjectDesc objDesc;
 
 	if ( dbs == null )
 	    throw new NullPointerException( "Argument 'dbs' is null" );
 	_dbs = dbs;
 	enum = _dbs.getMappingTable().listDescriptors();
 	while ( enum.hasMoreElements() ) {
-	    objDesc = (ObjectDesc) enum.nextElement();
-	    _typeInfo.put( objDesc.getObjectClass(),
+	    objDesc = (JDOObjectDesc) enum.nextElement();
+	    _typeInfo.put( objDesc.getObjectType(),
 			   new TypeInfo( new SQLEngine( objDesc, logWriter ), objDesc, null ) );
 	}
     }
@@ -763,9 +763,9 @@ public final class DatabaseEngine
 
     Object copyInto( TransactionContext tx, OID oid, Object target )
     {
-	ObjectLock lock;
-	Object     source;
-	ObjectDesc objDesc;
+	ObjectLock    lock;
+	Object        source;
+	JDOObjectDesc objDesc;
 
 	// Get the source object based on the OID. We already have some
 	// sort of lock on the object, so acquire does not require a timeout.
@@ -774,7 +774,7 @@ public final class DatabaseEngine
 	objDesc = ( (TypeInfo) _typeInfo.get( source.getClass() ) ).objDesc;
 	// If no target object exists, create a new one
 	if ( target == null ) {
-	    target = objDesc.createNew( false );
+	    target = objDesc.createNew();
 	}
 	// Copy all the fields from the source to the target
 	objDesc.copyInto( source, target );
@@ -860,7 +860,7 @@ public final class DatabaseEngine
      * Used by {@link DatabaseImpl} to determine the object descriptor
      * for a given class. Returns true if no mapping is found.
      */
-    ObjectDesc getObjectDesc( Class type )
+    JDOObjectDesc getObjectDesc( Class type )
     {
 	TypeInfo   typeInfo;
 
@@ -883,11 +883,11 @@ public final class DatabaseEngine
 
 	SQLEngine   engine;
 
-	ObjectDesc  objDesc;
+	JDOObjectDesc  objDesc;
 
 	Interceptor interceptor;
 
-	TypeInfo( SQLEngine engine, ObjectDesc objDesc, Interceptor interceptor )
+	TypeInfo( SQLEngine engine, JDOObjectDesc objDesc, Interceptor interceptor )
 	{
 	    this.engine = engine;
 	    this.objDesc = objDesc;

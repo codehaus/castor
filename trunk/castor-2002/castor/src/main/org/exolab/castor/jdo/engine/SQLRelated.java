@@ -48,8 +48,9 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.io.PrintWriter;
-import org.exolab.castor.jdo.desc.ObjectDesc;
-import org.exolab.castor.jdo.desc.FieldDesc;
+import org.exolab.castor.desc.FieldDesc;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
+import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.jdo.desc.RelationDesc;
 import org.exolab.castor.jdo.desc.Relation;
 
@@ -70,7 +71,7 @@ class SQLRelated
     private FieldDesc  _parentField;
 
 
-    SQLRelated( RelationDesc objDesc, ObjectDesc parent, FieldDesc parentField,
+    SQLRelated( RelationDesc objDesc, JDOObjectDesc parent, FieldDesc parentField,
 		PrintWriter logWriter )
     {
 	super( objDesc, parent.getPrimaryKey(), logWriter );

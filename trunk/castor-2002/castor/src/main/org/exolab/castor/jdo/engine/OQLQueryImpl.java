@@ -62,8 +62,8 @@ import org.odmg.QueryException;
 import org.odmg.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.jdo.ODMGSQLException;
-import org.exolab.castor.jdo.desc.ObjectDesc;
-import org.exolab.castor.jdo.desc.FieldDesc;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
+import org.exolab.castor.jdo.desc.JDOFieldDesc;
 
 
 /**
@@ -119,7 +119,7 @@ public class OQLQueryImpl
 	String          objType;
 	String          objName;
 	StringBuffer    sql;
-	ObjectDesc      objDesc;
+	JDOObjectDesc   objDesc;
 
 	_sql = null;
 	_fieldNum = 0;
@@ -166,14 +166,14 @@ public class OQLQueryImpl
     }
 
 
-    private void parseField( ObjectDesc objDesc, StringTokenizer token, StringBuffer sqlWhere )
+    private void parseField( JDOObjectDesc objDesc, StringTokenizer token, StringBuffer sqlWhere )
 	throws QueryInvalidException
     {
-	String      name;
-	String      op;
-	String      value;
-	FieldDesc[] fields;
-	FieldDesc   field;
+	String         name;
+	String         op;
+	String         value;
+	JDOFieldDesc[] fields;
+	JDOFieldDesc   field;
 
 	if ( ! token.hasMoreTokens() )
 	    throw new QueryInvalidException( "Missing field name" );
@@ -187,20 +187,20 @@ public class OQLQueryImpl
 	value = token.nextToken();
 	if ( name.indexOf( "." ) > 0 )
 	    name = name.substring( name.indexOf( "." ) + 1 );
-	fields = objDesc.getFieldDescs();
+	fields = objDesc.getJDOFields();
 	field = null;
 	for ( int i = 0 ; i < fields.length ; ++i ) {
 	    if ( fields[ i ].getFieldName().equals( name ) ) {
-		sqlWhere.append( objDesc.getSqlName( fields[ i ].getSqlName() ) );
+		sqlWhere.append( objDesc.getSQLName( fields[ i ].getSQLName() ) );
 		field = fields[ i ];
 		break;
 	    }
 	}
 	if ( field == null ) {
-	    fields = objDesc.getPrimaryKey().getFieldDescs();
+	    fields = objDesc.getPrimaryKey().getJDOFields();
 	    for ( int i = 0 ; i < fields.length ; ++i ) {
 		if ( fields[ i ].getFieldName().equals( name ) ) {
-		    sqlWhere.append( objDesc.getSqlName( fields[ i ].getSqlName() ) );
+		    sqlWhere.append( objDesc.getSQLName( fields[ i ].getSQLName() ) );
 		    field = fields[ i ];
 		    break;
 		}
@@ -209,7 +209,7 @@ public class OQLQueryImpl
 	if ( fields == null ) {
 	    if ( objDesc.getPrimaryKey().isPrimitive() &&
 		 objDesc.getPrimaryKeyField().getFieldName().equals( name ) ) {
-		sqlWhere.append( objDesc.getSqlName( objDesc.getPrimaryKey().getSqlName() ) );
+		sqlWhere.append( objDesc.getSQLName( objDesc.getPrimaryKey().getSQLName() ) );
 		field = objDesc.getPrimaryKeyField();
 	    }
 	}
@@ -221,7 +221,7 @@ public class OQLQueryImpl
 	} else {
 	    sqlWhere.append( value );
 	}
-	_fields.addElement( field.getObjectClass() );
+	_fields.addElement( field.getFieldType() );
     }
 
 
