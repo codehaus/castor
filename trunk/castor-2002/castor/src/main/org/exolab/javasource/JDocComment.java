@@ -180,7 +180,7 @@ public class JDocComment {
     /**
      * Formats a given String for use within a Java Doc comment
     **/
-    class LineFormatter {
+    static class LineFormatter {
         
         static final int MAX_LENGTH = 60;
         

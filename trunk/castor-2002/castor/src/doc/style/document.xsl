@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE xsl:stylesheet [
-<!ENTITY % style SYSTEM "style.ent">%style;
-]>
 <!-- Document Stylesheet                            -->
 <!-- Ismael Ghalimi ghalimi@exoffice.com            -->
 <!-- Copyright (c) Exoffice Technologies, Inc. 1999 -->
@@ -19,18 +16,18 @@
         <td valign="top"><b>Author:</b></td>
         <td valign="top">
           <xsl:for-each select="authors/author">
-              <xsl:value-of select="firstname"/>&nbsp;
+              <xsl:value-of select="firstname"/><xsl:value-of select="$nbsp"/>
               <xsl:if test="initials">
-                <xsl:value-of select="initials"/>&nbsp;
+                <xsl:value-of select="initials"/><xsl:value-of select="$nbsp"/>
               </xsl:if>
-              <xsl:value-of select="lastname"/>&nbsp;&nbsp;
+              <xsl:value-of select="lastname"/><xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/>
               <a href="mailto:{@email}"><xsl:value-of select="@email"/></a><br/>
           </xsl:for-each>
         </td>
       </tr>
       <tr>
         <td valign="top"><b>Abstract:</b></td>
-        <td valign="top"><xsl:value-of select="abstract"/><br/>&nbsp;</td>
+        <td valign="top"><xsl:value-of select="abstract"/><br/><xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/></td>
       </tr>
       <tr>
         <td valign="top"><b>Status:</b></td>
@@ -62,17 +59,17 @@
     <xsl:choose>
       <xsl:when test='$level=2'>
         <a name="{@title}"><h2>
-          <xsl:number level="multiple" count="section" format="1.1"/>. &nbsp;<xsl:value-of select="@title"/>
+          <xsl:number level="multiple" count="section" format="1.1"/>. <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/><xsl:value-of select="@title"/>
         </h2></a>
       </xsl:when>
       <xsl:when test='$level=3'>
         <a name="{@title}"><h3>
-          <xsl:number level="multiple" count="section" format="1.1"/>. &nbsp;<xsl:value-of select="@title"/>
+          <xsl:number level="multiple" count="section" format="1.1"/>. <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/><xsl:value-of select="@title"/>
         </h3></a>
       </xsl:when>
       <xsl:when test='$level=4'>
         <a name="{@title}"><h4>
-          <xsl:number level="multiple" count="section" format="1.1"/>. &nbsp;<xsl:value-of select="@title"/>
+          <xsl:number level="multiple" count="section" format="1.1"/>. <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/><xsl:value-of select="@title"/>
         </h4></a>
       </xsl:when>
       <xsl:when test='$level>=5'>
