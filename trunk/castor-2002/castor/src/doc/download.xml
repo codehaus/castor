@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/cvs.xml">
+  <body>
+    <title>Download</title>
+    <header>
+      <ul>
+        <li><url>http://ftp.exolab.castor/pub/jars/castor-0.7.5.jar</url><br/>
+             The Castor JAR</li>
+        <li><url>http://ftp.exolab.castor/pub/jars/castor-0.7.5.tar.gz</url><br/>
+            The Castor JAR, dependent JARs, XML schemas, command line tools
+            and examples</li>
+        <li><url>http://ftp.exolab.castor/pub/jars/castor-0.7.5-doc.jar</url><br/>
+            Documentation and JavaDocs</li>
+        <li><url>http://ftp.exolab.castor/pub/jars/castor-0.7.5-src.tar.gz</url><br/>
+            Full CVS snapshot: all sources, docs, libraries</li>
+      </ul>
+
+      <p><small>The tarball includes all the JARs required by Castor. To fully install Castor,
+         simply extract all the JARs into the classpath.</small></p>
+
+      <p><small>The CVS snapshot includes additional JARs required to build Castor. It is self
+         sufficient and does not require any external components, except for javac.</small></p>
+
+      <p><small>All the JARs included with Castor and used for building Castor are available
+         for distribution free of charge and without restriction, subject to US export
+         regulation.</small></p>
+
+      <p><small>All implementation JARs (i.e. non APIs) are available under an open source
+         license and available from our FTP server or other sources. License in use include
+         ASF, Exolab, MPL, and public domain. All these licenses are fully compatible with
+         each other.</small></p>
+
+    </header>
+  </body>
+</document>

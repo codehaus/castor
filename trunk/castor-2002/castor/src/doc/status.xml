@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/contacts.xml">
+  <body>
+    <title>Status</title>
+
+    <section title="Supported Features">
+
+      <section title="Castor XML">
+        <ul>
+          <li>Java to XML mapping automates transformation of Java objects from
+              and into XML documents and provides Java object validation</li>
+
+          <li>Java to XML mapping uses an XML document to specify the mapping
+              textually (release 0.8), Bean-like descriptors to specify them
+              programattically, and introspection to create default mappings</li>
+
+          <li>Code generator can produce Java objects, validation and the proper
+              mapping based on an XML schema</li>
+
+          <li>Supports XML schema data types including integer, real (float/double),
+              NMTOKEN, NCName, timeInstant, ID/IDREF, boolean and binary (base 64 encoded)</li>
+
+          <li>Supports arbitrary object marshalling when object type is known at
+              run-time and XML schema is determined dynamically based on the
+              object type</li>
+
+          <li>Supports for creation of objects based on class name attribute</li>
+        </ul>
+      </section>
+
+      <section title="Castor JDO">
+        <ul>
+          <li>Java to SQL mapping (object/relational) automates Java persistence
+              into any relational database server using JDBC</li>
+
+          <li>Java to SQL mapping uses an XML document to specify the mapping
+              textually, and provides an API to specify them programatically</li>
+
+          <li>Supports one-one and one-many relation types (release 0.9),
+              SQL/Java inheritence, object graph to single row mapping, and
+              multiple column primary keys and automatic type conversion</li>
+
+          <li>Provides an ODMG compliant API for OODMBS-like persistence,
+              XML-based datasource definition, name binding</li>
+
+          <li>Optimistic and pessimistic locking modes, in-memory concurrency
+              engine, and dead-lock detection</li>
+
+          <li>Provides support for EJB 1.1 CMP entity beans (release 0.9)
+              and CMP finder declaration using OQL</li>
+
+          <li>Efficient implementation incurs little overhead compared to
+              direct JDBC access</li>
+
+          <li>Support for JTA transaction demaraction, inclusion as resource
+              in transactional environment, and JDBC connection pooling
+              (release 0.9 integrated with Tyrex)</li>
+        </ul>
+      </section>
+
+      <section title="Castor DSML">
+        <ul>
+          <li>Import/export an LDAP directory or search results to/from XML
+              based on the industry standard DSML schema</li>
+
+          <li>XML document for specifying LDAP queries and import rules</li>
+
+          <li>Supports both JNDI service providers and the Mozilla Directory SDK</li>
+        </ul>
+      </section>
+
+    </section>
+
+    <section title="What's missing">
+      <ul>
+        <li>This release of Castor JDO provides only preliminary support for OQL
+            queries with simple syntax and single object retrieval. A project
+            to extend the OQL engine is underway.</li>
+
+        <li>This release supports one-one relations but not one-many relations
+            (collections). One-many relations will be introduced
+            in release 0.9.</li>
+
+        <li>The DAX implementation is not complete. There are plans to replace
+            the ODMG API with a similar, but J2EE-compatible API.</li>
+
+        <li>A unified mapping model will be introduced in 0.8.</li>
+
+        <li>The EJB CMP implementation will be available for public review
+            prior to release 0.9 and will include a CMP engine, integration
+            with the transaction manager, and finder definition in the XML
+            mapping file.</li>
+
+        <li>This release of Castor JDO supports JTA transactional environments,
+            but lacks support for JTA factories. Integration with transaction
+            managers and Tomcat/OpenEJV will be introduced in release 0.9.</li>
+
+        <li>Dirty checking, key generation, database specific-locking,
+            store procedure support, etc need more work.</li>
+      </ul>
+    </section>
+
+    <section title="TODO List">
+<pre>
+  JDO: ObjectDesc/PrimaryKeyDesc are cloning return arrays to assure it
+       is immutable and prevent the caller from changing their contents.
+       This practice must be deprecated and checks made to assure these
+       arrays are not altered, or use an immutable return collection.
+
+  JDO: Check that required fields are not null prior to storing object.
+
+  JDO: Required, read/write attributes are currently ignored.
+
+  JDO: Inheritence is not fully working. Need to rethink over ODI model.
+
+  JDO: Need to think up a better alternative to the ODMG API.
+
+  JDO: identityChange, dirty checking, define SPI for key generation,
+       support Sybase HOLDLOCK
+
+  DAX: Type convertors to/from String, support for Vectors, might want
+       to replace AttributeSet with a hashtable
+</pre>
+    </section>
+
+  </body>
+</document>
+

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/contacts.xml">
+  <body>
+    <title>Change log</title>
+    <section title="Version 0.7.6  February 1, 2000"><pre>
+DAX:  First appearance of the DAX implementation based on the Mozilla
+      Directory SDK, using the persistence cache engine and the new
+      mapping DTD.
+
+Mapping: The mapping package has been upgraded to the new mapping DTD,
+      and gained an XML sub-package that can be used to serialize
+      mapping information. MappingResolver and MappingHelper are used
+      to convert mapping files into descriptors.
+    </pre></section>
+    <section title="Version 0.7.5  January 28, 2000"><pre>
+JDO:  Finalized the transaction and locking semantics and started working
+      on a document describing it. I would like to thank Chris Raber of
+      GemStone for validating some of the design choices.
+
+JDO:  SQLEngine now employs two schemes for detecting duplicate primary
+      keys. For some databases it will use a separate SELECT statement,
+      for those that properly return an SQL error it will use the X/Open
+      error code (contributed by Oleg Nitz).
+
+JDO:  Dirty check mechanism has been disabled since 0.7.4, although
+      the new API enables any number of approaches. The dirty check
+      mechanisms will be re-introduced in 0.7.6.
+
+JDO:  Duplicate keys are now only detected inside a transaction, unless
+      a similar object is locked by another transaction, fixing a
+      potential problem in duplicate key reporting when object is
+      removed from persistence storage directly.
+
+Persist: Fixed deadlock detection algorithm. Previous algorithm would
+      allow the second transaction to commit but rollback the first
+      one. New algorithm allows first transaction to complete, but
+      detects deadlock in second one and terminates it.
+
+CMP:  No CMP engine yet, but the design architecture has been reviewed
+      by RMH and supports the proper CMP semantics. Still need to
+      determine how to deal with out-of-transaction methods. New
+      architecture allows Castor to be used as CMP or BMP implementation.
+
+Docs: Finally there. Added an Ant taskdef (style) and a task (doc) to
+      produce documenation in build/doc and the doc JAR. Sources are
+      XML, output is HTML, magic is XSLT.
+
+Docs: Added document describing persistence architecture and started
+      working on document describing transaction and locking semantics.
+
+Misc: The examples have been broken to two packages: examples will contain
+      brief and illustrative code showing how to develop with Castor,
+      while tests will contain unit tests.
+    </pre></section>
+    <section title="Version 0.7.4  January 23, 2000"><pre>
+JDO:  New persistence engine. JDO package is now an ODMG API
+      implementation on top of the concurrency engine and an SQL 92
+      connector.
+
+JDO:  New query mechanism allows multiple objects to be retrieved as
+      an enumeration.
+
+JDO:  Revised concurrency engine with query mechanism, object caching,
+      transactions and locking, now resides in package
+      org.exolab.castor.persist.
+
+JDO:  Added SQL type conversion. A field mapping may now specify the
+      SQL datatype using SQL names (numeric, varchar, etc). If the SQL
+      type differs than the Java field type automatic conversion will
+      apply. Convertors are provided for short/int/long, float/double,
+      string, character/byte array, date and BigDecimal.
+
+JDO:  Added dirty check attribute to field mapping. Fields that are
+      marked for dirty check will be checked against the database to
+      prevent concurrent updates. A concurrent update attempt will
+      cause the transaction to rollback. When acquiring an exclusive
+      lock at the beginning of the transaction no dirty checking
+      occurs.
+
+XML:  Added support for positive-integer and negative-integer
+      (Source Generator)
+
+XML:  Added support for Validation during Unmarshalling. Enabled by
+      default.  (Marshalling Framework)
+
+XML:  Changed Exceptions from SAXException and IOException to
+      MarshalException and ValidationException (Framework + Source
+      Generator) -- Sorry for the inconvenience.
+
+Docs: This is the first release to see some documentation beyond the
+      README file. The docs are located in the directory src/doc in XML
+      and are transformed into HTML in the target directory build/doc.
+      The transformation stylesheets are contained in src/doc/style.
+
+Misc: Three layer persistence architecture introduced in this release.
+      Each package implements the top level applications API (EJB,
+      ODMG, DAX, JNDI), org.exolab.castor.persist implements the
+      concurrency layer (transaction, locking, caching) and connectors
+      are used to talk to the underlying persistent storage.
+
+Misc: ObjectDesc, FieldDesc and related classed have no been
+      consolidated from the three modules and placed in a single
+      package org.exolab.castor.mapping.
+
+Misc: FieldDesc adds required flag and readable/writeable flag.
+      ObjectDesc adds key field (formerly JDO primary key) that is
+      used across all the modules.
+
+Misc: Type conversion errors are now reported more accurately before,
+      and a type conversion mechanism is being concieved.
+    </pre></section>
+  </body>
+</document>
