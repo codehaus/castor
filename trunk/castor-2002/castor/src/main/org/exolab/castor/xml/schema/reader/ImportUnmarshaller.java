@@ -57,6 +57,9 @@ import java.util.Vector;
 public class ImportUnmarshaller extends SaxUnmarshaller
 {
 
+    private static final String HTTP_PROTOCOL = "http://";
+    private static final String FILE_PROTOCOL = "file://";
+    
     public ImportUnmarshaller
         (Schema schema, AttributeList atts, Resolver resolver, Locator locator)
 		throws SAXException
@@ -77,9 +80,9 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			throw new SAXException("'schemaLocation' attribute missing on 'import'");
 
 
-		// note: URI not supported (just system path), so remove any file://
+		// Remove any file:// if necessary
 		String absolute = schemaLocation;
-		if (absolute.startsWith("file://")){
+		if (absolute.startsWith(FILE_PROTOCOL)){
             absolute = absolute.substring(7);
             if (java.io.File.separatorChar =='\\')
                 absolute = absolute.substring(1);
@@ -87,7 +90,9 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 
 		// if the path is relative Xerces append the "user.Dir"
         // we need to keep the base directory of the document
-        if (!new java.io.File(absolute).isAbsolute()) {
+        if ((!absolute.startsWith(HTTP_PROTOCOL)) &&
+            (!(new java.io.File(absolute)).isAbsolute())) 
+        {
 
              String temp = locator.getSystemId();
              if (temp != null) {
