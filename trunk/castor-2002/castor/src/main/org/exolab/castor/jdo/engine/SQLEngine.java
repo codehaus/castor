@@ -858,7 +858,7 @@ public final class SQLEngine implements Persistence {
                     } else {
                         stmt.setObject( count++, idToSQL( 0, identity ) );
                     }
-
+                    
                     ResultSet res = stmt.executeQuery();
                     int c = res.getMetaData().getColumnCount();
                     if ( res.next() ) {
@@ -1394,7 +1394,7 @@ public final class SQLEngine implements Persistence {
                     this.tableName = classTable;//((JDOClassDescriptor)clsDesc).getTableName();;
                     this.jdoName = fieldDesc.getFieldName();
                     this.load = true;
-                    this.store = !ext;
+                    this.store = !ext && !((JDOFieldDescriptor)fieldDesc).isReadonly();
                     this.multi = false;
                     this.joined = false;
                     this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
@@ -1442,7 +1442,7 @@ public final class SQLEngine implements Persistence {
                 this.tableName = classTable;
                 this.jdoName = fieldDesc.getFieldName();
                 this.load = true;
-                this.store = !ext;
+                this.store = !ext && !((JDOFieldDescriptor)fieldDesc).isReadonly();
                 this.multi = false;
                 this.joined = false;
                 this.joinFields = null;

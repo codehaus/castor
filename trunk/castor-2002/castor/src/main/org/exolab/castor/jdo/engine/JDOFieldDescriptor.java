@@ -88,6 +88,7 @@ public class JDOFieldDescriptor
 
     private int[]          _sqlType;
 
+    private boolean        _readonly;
 
     /**
      * Construct a new field descriptor for the specified field. This is
@@ -98,7 +99,7 @@ public class JDOFieldDescriptor
      * @throws MappingException Invalid mapping information
      */
     public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String[] sqlName, int[] sqlType,
-                               boolean dirtyCheck, String manyTable, String[] manyKey )
+                               boolean dirtyCheck, String manyTable, String[] manyKey, boolean readonly)
         throws MappingException
     {
         super( fieldDesc );
@@ -111,6 +112,7 @@ public class JDOFieldDescriptor
         _manyTable = manyTable;
         _manyKey = (manyKey.length>0? manyKey : null);
         _sqlType = sqlType;
+        _readonly = readonly;
     }
 
 
@@ -165,6 +167,10 @@ public class JDOFieldDescriptor
     }
 
 
+    public boolean isReadonly()
+    {
+        return _readonly;
+    }
 }
 
 

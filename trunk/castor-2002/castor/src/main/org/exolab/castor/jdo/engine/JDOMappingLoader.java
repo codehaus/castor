@@ -266,7 +266,8 @@ public class JDOMappingLoader
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sType,
             ! DirtyType.IGNORE.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(),
-            fieldMap.getSql().getManyKey() );
+            fieldMap.getSql().getManyKey(),
+            fieldMap.getSql().getReadonly() );
     }
 
     public void loadMapping( MappingRoot mapping, Object param )
