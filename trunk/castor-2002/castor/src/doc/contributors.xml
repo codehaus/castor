@@ -214,10 +214,22 @@
 	<email>Guillaume.Rousse@univ-reunion.fr</email>
    <description>Mapping extension and other important feebback</description>
   </contributor>
+                                                           '
+  <contributor type="Feedback">
+    <name surname="Balsoy" given="Ozgur"/>
+    <email>ozgur@csit.fsu.edu</email>
+    <description>Castor XML feedback</description>
+  </contributor>
 
   <contributor type="Feedback">
     <name surname="Goetter" given="Stephan"/>
     <email>stephan.goetter@newtron.net</email>
+    <description>Castor XML feedback</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Judd" given="Struan"/>
+    <email>struan@motorweb.co.nz</email>
     <description>Castor XML feedback</description>
   </contributor>
 
