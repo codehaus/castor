@@ -21,9 +21,9 @@
       <p>Reference: <api package="org.exolab.castor.builder">The Source Builder API</api></p>
       <p>For a more detailled version of the Source Generator documentation, download the 
       <a href="./SourceGeneratorUser.pdf">
-      	Source Generator User Document(PDF).</a></p>
+        Source Generator User Document(PDF).</a></p>
     </header>
-	
+    
     <section title="Introduction">
 
       <p>Castor's source code generator creates a set of Java classes
@@ -120,7 +120,7 @@
                 </td>
                <td>Optional</td>
              </tr>
-			 <tr>
+             <tr>
                <td align="center">nomarshall</td><td><br/></td>
                <td>
                   Do not generate the marshalling framework methods (marshall, unmarshall, validate)
@@ -157,12 +157,12 @@
                "org/exolab/castor/builder/castorbuilder.properties" file:
                <code>
                   <comment>
-                  # To enable bound properties uncomment the following line. Please
-                  # note that currently *all* fields will be treated as bound properties
-                  # when enabled. This will change in the future when we introduce
-                  # fine grained control over each class and it's properties.
-                  #
-                  #org.exolab.castor.builder.boundproperties=true
+    # To enable bound properties uncomment the following line. Please
+    # note that currently *all* fields will be treated as bound properties
+    # when enabled. This will change in the future when we introduce
+    # fine grained control over each class and it's properties.
+    #
+    #org.exolab.castor.builder.boundproperties=true
                   </comment>
                </code>
                <p>
@@ -170,16 +170,16 @@
                   For each class that is generated a <b>setPropertyChangeListener</b>
                   method is created as follows:
                  <code>
-                    <comment>
-                    /**
-                     * Registers a PropertyChangeListener with this class.
-                     * @param pcl The PropertyChangeListener to register.
-                    **/
-                    </comment>
-                    public void addPropertyChangeListener(java.beans.PropertyChangeListener pcl)
-                    {
-                        propertyChangeListeners.addElement(pcl);
-                    } //-- void addPropertyChangeListener(java.beans.PropertyChangeListener)
+    <comment>
+    /**
+     * Registers a PropertyChangeListener with this class.
+     * @param pcl The PropertyChangeListener to register.
+    **/
+    </comment>
+    public void addPropertyChangeListener(java.beans.PropertyChangeListener pcl)
+    {
+        propertyChangeListeners.addElement(pcl);
+    } //-- void addPropertyChangeListener(java.beans.PropertyChangeListener)
                  </code>
                  Whenever a property of the class is changed, a <b>PropertyChangeEvent</b>
                  will be sent to all registered listeners. The property name, the old
@@ -231,9 +231,9 @@
               To change the "method" of class creation simple edit the
                 <b>castorbuilder.properties</b> file:
               <code>
-                 # Java class mapping of &lt;xsd:element&gt;'s and &lt;xsd:complexType&gt;'s
-                 #
-                 #org.exolab.castor.builder.javaclassmapping=element
+    # Java class mapping of &lt;xsd:element&gt;'s and &lt;xsd:complexType&gt;'s
+    #
+    #org.exolab.castor.builder.javaclassmapping=element
              </code>
             </p>
          </section>
@@ -241,18 +241,18 @@
          <section title="Setting a super class">
             <p>Since version: 0.8.10</p>
             <p>
-            	The source generator enables the user to set a super class to <b>all</b> the
-            	generated classes (of course class descriptors are not concerned by this option)
+                The source generator enables the user to set a super class to <b>all</b> the
+                generated classes (of course class descriptors are not concerned by this option)
             </p>
-        	<p> To set up the super class, edit the castorbuilder.properties file :
-        	<code>
-        		# This property allows one to specify the super class of *all*
-        		# generated classes
-        		#
-        		#org.exolab.castor.builder.superclass=com.xyz.BaseObject
-			</code>
-			</p>
-		</section>
+            <p> To set up the super class, edit the castorbuilder.properties file :
+            <code>
+    # This property allows one to specify the super class of *all*
+    # generated classes
+    #
+    #org.exolab.castor.builder.superclass=com.xyz.BaseObject
+            </code>
+            </p>
+        </section>
         
        </section>
     </section>
@@ -262,7 +262,7 @@
        <p>
           The input file to the source code generator is an XML Schema<sup>2</sup>.
           The current supported version is the <b>W3C XML Schema Candidate Recommendation</b><sup>1</sup>. 
-       	  For more information about XML Schema Support, check the <a href="xmlschema.xml">XML Schema page</a>
+          For more information about XML Schema Support, check the <a href="xmlschema.xml">XML Schema page</a>
        </p>
 
 
