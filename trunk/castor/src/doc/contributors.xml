@@ -204,6 +204,14 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Betteridge" given="Nick"/>
+    <email>n.betteridge@syntactics.com</email>
+    <description>
+       Added setErrorHandler() to SchemaReader, added removeFacet() to SimpleType.
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Bolwidt" given="Erwin"/>
     <email>erwin@klomp.org</email>
     <description>Patches for cleanup of docs</description>
