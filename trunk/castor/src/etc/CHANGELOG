@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Added example to src/examples/MappingTool to demonstrate the use of the 
+       MappingTool.
+       (Werner - 20040811)
+
 JDO:   Fixed bug 1677 using contribution from Matrin Fuchs [martin-fuchs@gmx.net]
        Updated list of available mapping types.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1677
