@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
@@ -86,13 +91,13 @@ import java.util.Enumeration;
 
 
 /**
- * A Marshaller to allow serializing Java Object's to XML
+ * A Marshaller that serializes Java Object's to XML
  *
  * Note: This class is not thread safe, and not intended to be, 
  * so please create a new Marshaller for each thread if it
  * is to be used in a multithreaded environment.
  *
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class Marshaller extends MarshalFramework {
@@ -283,6 +288,8 @@ public class Marshaller extends MarshalFramework {
      * A flag to allow suppressing the xsi:type attribute
      */
     private boolean _suppressXSIType = false;
+    
+    private boolean _useXSITypeAtRoot = false;
     
     /**
      * The set of optional top-level attributes
@@ -984,10 +991,18 @@ public class Marshaller extends MarshalFramework {
                         if (!atRoot) {
                             String nsURI = descriptor.getNameSpaceURI();
                             XMLClassDescriptor tmpDesc = null;
-                        	tmpDesc = _cdResolver.resolveByXMLName(name, nsURI, null);
+                            try {
+                                tmpDesc = _cdResolver.resolveByXMLName(name, nsURI, null);
+                            }
+                            catch(ResolverException rx) {
+                                //-- exception not important as we're simply
+                                //-- testing to see if we can resolve during
+                                //-- unmarshalling
+                            }
+                            
                             if (tmpDesc != null) {
                             	Class tmpType = tmpDesc.getJavaClass();
-                                if (tmpType != null) {
+                                if (tmpType == _class) {
                                 	containsDesc = (!tmpType.isInterface());
                                 }
                             }
@@ -999,10 +1014,18 @@ public class Marshaller extends MarshalFramework {
                             //-- load a compiled descriptor, or introspect
                             //-- one
                             if (atRoot) {
-                            	XMLMappingLoader ml = _cdResolver.getMappingLoader();
-                            	if (ml != null) {
-                            		containsDesc = (ml.getDescriptor(_class) != null);
-                            	}
+                                if (_useXSITypeAtRoot) {
+                                	XMLMappingLoader ml = _cdResolver.getMappingLoader();
+                                	if (ml != null) {
+                                		containsDesc = (ml.getDescriptor(_class) != null);
+                                    }
+                                }
+                                else {
+                                    //-- prevent xsi:type from appearing
+                                    //-- on root
+                                    containsDesc = true;
+                                }
+                                
                             }
                             
                             //-- The following logic needs to be expanded to use
@@ -1115,18 +1138,31 @@ public class Marshaller extends MarshalFramework {
 
              // We try to find if there is a XMLClassDescriptor associated
              // with the XML name of this class
-             XMLClassDescriptor xmlElementNameClassDesc = _cdResolver.resolveByXMLName(xmlElementName, null, null);
+             XMLClassDescriptor xmlElementNameClassDesc = null;
+             try {
+                 xmlElementNameClassDesc = _cdResolver.resolveByXMLName(xmlElementName, null, null);
+             }
+             catch(ResolverException rx) {
+                 //-- exception not important as we're simply
+                 //-- testing to see if we can resolve during
+                 //-- unmarshalling
+             }
 
              // Test if we are not dealing with a source generated vector
              if ((xmlElementName != null) && (xmlElementNameClassDesc != null)) {
                  // More than one class can map to a given element name
-                 ClassDescriptorEnumeration cdEnum= _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
-                 for (; cdEnum.hasNext();) {
-                     xmlElementNameClassDesc = cdEnum.getNext();
-                     if (_class == xmlElementNameClassDesc.getJavaClass())
-                         break;
-                      //reset the classDescriptor --> none has been found
-                      xmlElementNameClassDesc = null;
+                 try {
+                     ClassDescriptorEnumeration cdEnum = _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
+                     for (; cdEnum.hasNext();) {
+                         xmlElementNameClassDesc = cdEnum.getNext();
+                         if (_class == xmlElementNameClassDesc.getJavaClass())
+                             break;
+                          //reset the classDescriptor --> none has been found
+                          xmlElementNameClassDesc = null;
+                     }
+                 }
+                 catch(ResolverException rx) {
+                     xmlElementNameClassDesc = null;
                  }
 
                  //make sure we only run into this logic if the classDescriptor
@@ -2008,6 +2044,19 @@ public class Marshaller extends MarshalFramework {
         _suppressXSIType = suppressXSIType;
      } //-- setSuppressXSIType
 
+     /**
+      * Sets whether or not to output the xsi:type at the root
+      * element. This is usually needed when the root element
+      * type cannot be determined by the element name alone.
+      * By default xsi:type will not be output on the root
+      * element.
+      * 
+      * @param useXSITypeAtRoot a boolean that when true indicates
+      * that the xsi:type should be output on the root element.
+      */
+     public void setUseXSITypeAtRoot(boolean useXSITypeAtRoot) {
+         _useXSITypeAtRoot = useXSITypeAtRoot;
+     } //-- setUseXSITypeAtRoot
      
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
@@ -2021,11 +2070,20 @@ public class Marshaller extends MarshalFramework {
         throws MarshalException
     {
         XMLClassDescriptor classDesc = null;
-        if (!isPrimitive(_class))
-            classDesc = _cdResolver.resolve(_class);
-
-        if (_cdResolver.error()) {
-            throw new MarshalException(_cdResolver.getErrorMessage());
+        
+        try {
+            if (!isPrimitive(_class))
+                classDesc = _cdResolver.resolve(_class);
+        }
+        catch(ResolverException rx) {
+            Throwable actual = rx.getCause();
+            if (actual instanceof MarshalException) {
+                throw (MarshalException)actual;
+            }
+            if (actual != null) {
+                throw new MarshalException(actual);
+            }
+            throw new MarshalException(rx);
         }
         
         if (classDesc != null)
@@ -2046,9 +2104,20 @@ public class Marshaller extends MarshalFramework {
         (String className, ClassLoader loader)
         throws MarshalException
     {
-        XMLClassDescriptor classDesc = _cdResolver.resolve(className, loader);
-        if (_cdResolver.error()) {
-            throw new MarshalException(_cdResolver.getErrorMessage());
+        XMLClassDescriptor classDesc = null;
+        
+        try {
+            classDesc = _cdResolver.resolve(className, loader);
+        }
+        catch(ResolverException rx) {
+            Throwable actual = rx.getCause();
+            if (actual instanceof MarshalException) {
+                throw (MarshalException)actual;
+            }
+            if (actual != null) {
+                throw new MarshalException(actual);
+            }
+            throw new MarshalException(rx);
         }
         
         if (classDesc != null)
