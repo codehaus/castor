@@ -2,6 +2,13 @@
 Version (CVS) 
 -------------
 
+XML:   One fix and various minor enhancements to classes in 'javasource' package.
+       (afawcett - 20040510)
+
+XML:   Performance enhancement to AnyNode2SAX.java (use when processing xsd:any elements)
+       from various performance improvements contributed by Ian Richards (also CODA)
+       (afawcett - 20040508)
+
 XML:   Fixed bug 1506 - Enhancement for EnumeratedTypeAccess interface
        using patch contributed by Robert La Ferla.
        (kvisco - 20040505)
