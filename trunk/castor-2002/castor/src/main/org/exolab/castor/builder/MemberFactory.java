@@ -145,8 +145,10 @@ public class MemberFactory {
         (AttributeDecl attribute, ClassInfoResolver resolver)
     {
 
+        //don't need to check if it is a referenced attribute
+        //since it has already been checked in the SourceFactory
         String memberName
-            = JavaNaming.toJavaMemberName(attribute.getName());
+            = JavaNaming.toJavaMemberName(attribute.getName(false));
 
         if (!memberName.startsWith("_"))
             memberName = "_"+memberName;

@@ -1284,9 +1284,10 @@ public class SourceFactory  {
         if (complexType == null)
             return;
         Enumeration enum = complexType.getAttributeDecls();
-
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
+            if (attr.isReference())
+                attr = complexType.getSchema().getAttribute(attr.getName(false));
 
             //-- if we have a new SimpleType...generate ClassInfo
             SimpleType sType = attr.getSimpleType();

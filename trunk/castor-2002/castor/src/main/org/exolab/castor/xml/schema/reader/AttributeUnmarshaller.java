@@ -105,8 +105,6 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         String attValue = atts.getValue(SchemaNames.REF_ATTR);
         if (attValue != null) {
             _attribute.setReference(attValue);
-            //@todo: remove this limitation
-            System.out.println("Warning: attribute references are only supported in the SOM");
         }
 
         //-- @name
