@@ -226,6 +226,12 @@ public interface QueryExpression
      */
     public void addLimitClause( String limitClause );  
 
+    /**
+     * Adds an offset clause. 
+     * @param offsetClause The OFFSET clause to add (without the word 
+     *    OFFSET).
+     */
+    public void addOffsetClause( String offsetClause );  
 
     /**
      * Add an inner join.
