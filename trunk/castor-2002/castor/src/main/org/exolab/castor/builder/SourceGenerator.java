@@ -132,17 +132,20 @@ public class SourceGenerator {
             System.out.println("error reading XML Schema file");
             return;
         }
-        catch(org.xml.sax.SAXException se) {
-            if (se instanceof SAXParseException) {
-                SAXParseException spe = (SAXParseException)se;
+        catch(org.xml.sax.SAXException sx) {
+            
+            Exception except = sx.getException();
+            if (except == null) except = sx;
+            
+            if (except instanceof SAXParseException) {
+                SAXParseException spe = (SAXParseException)except;
                 System.out.println("SAXParseException: " + spe);
                 System.out.print(" - occured at line ");
                 System.out.print(spe.getLineNumber());
                 System.out.print(", column ");
                 System.out.println(spe.getColumnNumber());
             }
-            else System.out.println("SAXException: " + se);
-            se.printStackTrace();
+            else except.printStackTrace();
             return;
         }
         
@@ -298,19 +301,16 @@ public class SourceGenerator {
             jClass.print(lineSeparator);
         }
         else {
-            String typeRef = elementDecl.getTypeRef();
-            if (typeRef != null) {
-                if (TypeConversion.isBuiltInType(typeRef)) {
-                    jClass = MarshalInfoSourceFactory.createSource(classInfo);
-                    jClass.print(lineSeparator);
-                }
-                else {
-                    System.out.print("Archetype or DataType '");
-                    System.out.print(typeRef);
-                    System.out.print("' not found for element: ");
-                    System.out.println(elementDecl.getName());
-                }
-
+            Datatype datatype = elementDecl.getDatatype();
+            if (datatype != null) {
+                jClass = MarshalInfoSourceFactory.createSource(classInfo);
+                jClass.print(lineSeparator);
+            }
+            else {
+                String typeRef = elementDecl.getTypeRef();
+                System.out.print("'type' or 'datatype' with name '" + typeRef);
+                System.out.print("' not found for element: ");
+                System.out.println(elementDecl.getName());
             }
         }
         
@@ -353,20 +353,20 @@ public class SourceGenerator {
         
         while (enum.hasMoreElements()) {
                 
-            SchemaBase base = (SchemaBase)enum.nextElement();
+            Structure struct = (Structure)enum.nextElement();
                 
-            switch(base.getDefType()) {
+            switch(struct.getStructureType()) {
                     
-                case SchemaBase.ELEMENT:
-                    ElementDecl eDecl = (ElementDecl)base;
+                case Structure.ELEMENT:
+                    ElementDecl eDecl = (ElementDecl)struct;
                     if (eDecl.isReference()) continue;
                         
                     if (!alreadyGenerated) {
                         createClasses(eDecl, sInfo);
                     }
                     break;
-                case SchemaBase.GROUP:
-                    process((Group)base, sInfo);
+                case Structure.GROUP:
+                    process((Group)struct, sInfo);
                     break;
                 default:
                     break;

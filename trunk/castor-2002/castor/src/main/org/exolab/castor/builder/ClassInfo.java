@@ -46,11 +46,11 @@
 package org.exolab.castor.builder;
 
 import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.types.*;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.castor.xml.Resolver;
 import org.exolab.javasource.*;
-
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -105,25 +105,25 @@ public class ClassInfo  {
         this.elementName = element.getName();
         this.nsPrefix    = element.getSchemaAbbrev();
         this.nsURI       = element.getSchemaName();
-        
-        className = JavaXMLNaming.toJavaClassName(elementName);
+        this.className   = JavaXMLNaming.toJavaClassName(elementName);
         
         Archetype archetype = element.getArchetype();
         
-        String dataTypeName = null;
         boolean derived = false;
+        
         if (archetype != null) {
-            
             init(archetype, resolver);
-
-            dataTypeName = archetype.getName();
-            if (dataTypeName == null) 
-                dataTypeName = className;
         }
         else {
-            dataTypeName = element.getTypeRef();
+            Datatype datatype = element.getDatatype();
+            if (datatype != null) {
+                init(datatype, resolver);
+            }
+            else {
+                dataType = new XSClass(new JClass(this.className));
+            }
+                
         }
-        dataType = TypeConversion.createXSType(dataTypeName);
     } //-- ClassInfo
     
     /**
@@ -151,21 +151,44 @@ public class ClassInfo  {
     public ClassInfo(Archetype type, ClassInfoResolver resolver) 
     {
         if (type == null)
-            throw new IllegalArgumentException("Null Archetype");
+            throw new IllegalArgumentException("null archetype");
             
         if (!type.isTopLevel())
             throw new IllegalArgumentException("Archetype is not top-level.");
             
         this._abstract = true;
         
-        String name = type.getName();
-        this.elementName = name;
-        
-        className = JavaXMLNaming.toJavaClassName(name);
+        this.elementName = type.getName();
+        this.className   = JavaXMLNaming.toJavaClassName(elementName);
         init(type, resolver);
-        dataType = TypeConversion.createXSType(className);
         
     } //-- ClassInfo
+    
+    /**
+     * Initializes this ClassInfo using the given Datatype
+     * @param datatype the Datatype for this ClassInfo
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+    **/
+    private void init(Datatype datatype, ClassInfoResolver resolver) {
+        
+        this.dataType = TypeConversion.convertType(datatype);
+        if (datatype instanceof BuiltInType) return;
+        
+        //-- modify package name so we don't have
+        //-- name collisions, since XML Schema uses
+        //-- separate namespaces for elements and datatypes
+        if (this.packageName == null)
+            this.packageName = "types";
+        else
+            this.packageName += ".types";
+            
+        Schema schema = datatype.getSchema();
+        
+        if (schema != null) {
+            this.nsURI = schema.getTargetNamespace();
+        }
+        
+    } //-- init
     
     /**
      * Initializes this ClassInfo using the given Archetype
@@ -178,6 +201,8 @@ public class ClassInfo  {
         
         atts     = new Vector(3);
         elements = new Vector(5);
+        
+        this.dataType = new XSClass(new JClass(className));
         
         Schema schema = archetype.getSchema();
         
@@ -448,53 +473,43 @@ public class ClassInfo  {
     **/
     private void processAttribute(AttributeDecl attribute) {
         
-        String typeRef = attribute.getDataTypeRef();
+        String typeRef = attribute.getDatatypeRef();
         
         String memberName = "v"+
             JavaXMLNaming.toJavaClassName(attribute.getName());
             
         SGMember member = null;
                 
-        //-- handle built-in types
+        Datatype datatype = attribute.getDatatype();
+        XSType   xsType = null;
+        
+        if (datatype != null)
+            xsType = TypeConversion.convertType(datatype);
+        else
+            xsType = new XSString();
+            
+        switch (xsType.getType()) {
+            case XSType.INTEGER:
+                member = new SGMember(xsType, memberName);
+                member.setXMLNodeType(SGMember.ATTRIBUTE);
                 
-        if (typeRef.equals("integer")) {
-            XSInteger xsInteger = new XSInteger();
-            member = new SGMember(xsInteger, memberName);
-            member.setXMLNodeType(SGMember.ATTRIBUTE);
-            member.setCodeHelper(new IntegerCodeHelper(xsInteger));
-            //-- handle integer related facets
-            Datatype datatype = attribute.getDatatype();
-            NumberFacet facet = null;
+                member.setCodeHelper(
+                    new IntegerCodeHelper((XSInteger)xsType)
+                );
                     
-            //-- maxExclusive
-            facet = (NumberFacet) datatype.getFacet(Facet.MAX_EXCLUSIVE);
-            if (facet != null) xsInteger.setMaxExclusive(facet.toInt());
-                    
-            //-- maxInclusive
-            facet = (NumberFacet) datatype.getFacet(Facet.MAX_INCLUSIVE);
-            if (facet != null) xsInteger.setMaxInclusive(facet.toInt());
-                    
-            //-- minExclusive
-            facet = (NumberFacet) datatype.getFacet(Facet.MIN_EXCLUSIVE);
-            if (facet != null) xsInteger.setMinExclusive(facet.toInt());
-                    
-            //-- minInclusive
-            facet = (NumberFacet) datatype.getFacet(Facet.MIN_INCLUSIVE);
-            if (facet != null) xsInteger.setMinInclusive(facet.toInt());
-                    
+                break;
+            case XSType.ID:
+                member = new SGId(memberName);
+                break;
+            case XSType.IDREF:
+                member = new SGIdRef(memberName);
+                break;
+            default:
+                member = new SGMember(xsType, memberName);
+                member.setXMLNodeType(SGMember.ATTRIBUTE);
+                break;
         }
-        else if (typeRef.equals("ID")) {
-            member = new SGId(memberName);
-        }
-        else if (typeRef.equals("IDREF")) {
-            member = new SGIdRef(memberName);
-        }
-        else {
-            XSType xsType = TypeConversion.createXSType(typeRef);
-            member = new SGMember(xsType, memberName);
-            member.setXMLNodeType(SGMember.ATTRIBUTE);
-        }
-        member.setSchemaType(typeRef);
+        member.setSchemaType(attribute.getDatatypeRef());
         member.setXMLName(attribute.getName());
         member.setRequired(attribute.getRequired());
         atts.addElement(member);
@@ -516,14 +531,14 @@ public class ClassInfo  {
         SGMember member = null;
         while (enum.hasMoreElements()) {
                     
-            SchemaBase base = (SchemaBase)enum.nextElement();
-            switch(base.getDefType()) {
-                case SchemaBase.ELEMENT:
-                    member = MemberFactory.createMember((ElementDecl)base);
+            Structure struct = (Structure)enum.nextElement();
+            switch(struct.getStructureType()) {
+                case Structure.ELEMENT:
+                    member = MemberFactory.createMember((ElementDecl)struct);
                     addMember(member);
                     break;
-                case SchemaBase.GROUP:
-                    process((Group)base);
+                case Structure.GROUP:
+                    process((Group)struct);
                     break;
                 default:
                     break;
