@@ -52,13 +52,16 @@ import java.util.Enumeration;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
+import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 
+import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
@@ -104,6 +107,8 @@ public class XMLMappingLoader
                         fields[ i ] instanceof XMLFieldDescriptorImpl ) {
 		( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
                 ( (XMLFieldDescriptorImpl) fields[ i ] ).setNodeType( NodeType.Element );
+                if ( clsDesc instanceof XMLClassDescriptorImpl )
+                    ( (XMLClassDescriptorImpl) clsDesc ).sortDescriptors();
             }
         }
     }
@@ -135,9 +140,10 @@ public class XMLMappingLoader
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
     {
-        FieldDescriptor fieldDesc;
-        String          xmlName;
-        NodeType        nodeType;
+        FieldDescriptor        fieldDesc;
+        String                 xmlName;
+        NodeType               nodeType;
+        XMLFieldDescriptorImpl xmlDesc;
         
         // Create an XML field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
@@ -149,7 +155,30 @@ public class XMLMappingLoader
             nodeType = null;
         else
             nodeType = NodeType.getNodeType( fieldMap.getXmlInfo().getNodeType() );
-        return new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
+        xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
+        if ( fieldMap.getSetMethod() != null && fieldMap.getSetMethod().startsWith( "add" ) )
+            xmlDesc.setMultivalued( true );
+        if ( nodeType == NodeType.Element && Types.isSimpleType( fieldDesc.getFieldType() ) ) {
+            xmlDesc.setClassDescriptor( new StringMarshalInfo() );
+        }
+        return xmlDesc; 
+    }
+
+
+    protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
+        throws MappingException
+    {
+        TypeConvertor convertorTo;
+        TypeConvertor convertorFrom;
+
+        if ( Types.isSimpleType( fieldType ) && fieldMap.getXmlInfo() != null ) {
+            fieldType = Types.typeFromPrimitive( fieldType );
+            convertorTo = Types.getConvertor( String.class, fieldType );
+            convertorFrom = Types.getConvertor( fieldType, String.class );
+        } else
+            convertorTo = convertorFrom = null;
+        return new TypeInfo( fieldType, convertorTo, convertorFrom,
+                             fieldMap.getRequired(), null, colType );
     }
 
 
