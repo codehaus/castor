@@ -94,13 +94,20 @@ public class ParamInfo {
       try {
         userClass = Types.typeFromName(ClassLoader.getSystemClassLoader(),
                                        userDefinedType);
+
+        if ( userClass.isPrimitive() ) 
+          userClass = Types.typeFromPrimitive( userClass );
+
       } 
       catch (Exception e) {
         throw new QueryException( "The class " + userClass + " could not be found." );
       }
 
-      if ( ! systemClass.isAssignableFrom(userClass) )
-        throw new QueryException( "The class " + userDefinedType + " is incompatible with the system defined class " + systemType );
+      if ( ! systemClass.isAssignableFrom(userClass) ) {
+        if ( ! ( java.lang.Number.class.isAssignableFrom(userClass) &&
+                 java.lang.Number.class.isAssignableFrom(systemClass) ) )
+          throw new QueryException( "The class " + userClass + " is incompatible with the system defined class " + systemType );
+      }
 
       _class = userClass;
     }

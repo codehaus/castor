@@ -145,9 +145,7 @@ public class OQLQueryImpl
             //do type checking and conversion
             Class paramClass = info.getTheClass();
             Class valueClass = value.getClass();
-            Class numberClass = null;
-            try { numberClass = Class.forName("java.lang.Number"); }
-            catch ( ClassNotFoundException e ) {}
+            Class numberClass = java.lang.Number.class;
             
             if ( value != null && ! paramClass.isAssignableFrom( valueClass ) )
                 if ( info.isUserDefined() )
