@@ -58,27 +58,27 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class Schema extends Structure {
-    
+public class Schema extends Annotated {
+
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/TR/1999/09/24-xmlschema";
-        
-        
+
+
     private static final String NULL_ARGUMENT
-        = "A null argument was passed to " + 
+        = "A null argument was passed to " +
            Schema.class.getName() + "#";
-           
+
     private String name     = null;
     private String schemaNS = null;
     private String targetNS = null;
-    
-    
+
+
     /**
      * A list of defined architypes
     **/
     private Hashtable complexTypes = null;
-    
-    
+
+
     /**
      * A list of defined SimpleTypes
     **/
@@ -88,7 +88,7 @@ public class Schema extends Structure {
      * A list of defined elements
     **/
     private Hashtable elements = null;
-    
+
     /**
      * Creates a new SchemaDef
     **/
@@ -96,7 +96,7 @@ public class Schema extends Structure {
         this(DEFAULT_SCHEMA_NS);
     } //-- ScehamDef
 
-    
+
     /**
      * Creates a new SchemaDef
     **/
@@ -108,11 +108,11 @@ public class Schema extends Structure {
         this.schemaNS = schemaNS;
         init();
     } //-- ScehamDef
-    
+
     private void init() {
-        
+
         //-- create default built-in types for this Schema
-       
+
         try {
             //-- ID
             addSimpleType(new IDType(this));
@@ -122,7 +122,7 @@ public class Schema extends Structure {
             addSimpleType(new NCNameType(this));
             //-- NMTOKEN
             addSimpleType(new NMTokenType(this));
-            
+
             //-- binary
             addSimpleType(new BinaryType(this));
             //-- boooean
@@ -147,19 +147,19 @@ public class Schema extends Structure {
             //-- are not adding invalid SimpleTypes
         }
     } //-- init
-    
+
     /**
      * Adds the given Complextype definition to this Schema defintion
      * @param complextype the Complextype to add to this Schema
      * @exception SchemaException if the Complextype does not have
      * a name or if another Complextype already exists with the same name
     **/
-    public synchronized void addComplexType(ComplexType complexType) 
-        throws SchemaException 
+    public synchronized void addComplexType(ComplexType complexType)
+        throws SchemaException
     {
-        
+
         String name = complexType.getName();
-        
+
         if (name == null) {
             String err = "a global ComplexType must contain a name.";
             throw new SchemaException(err);
@@ -173,7 +173,7 @@ public class Schema extends Structure {
             throw new SchemaException(err + name);
         }
         complexTypes.put(name, complexType);
-        
+
     } //-- addComplextype
 
     /**
@@ -182,12 +182,12 @@ public class Schema extends Structure {
      * @exception SchemaException if the ComplexType does not have
      * a name or if another ComplexType already exists with the same name
     **/
-    public synchronized void addSimpleType(SimpleType simpleType) 
-        throws SchemaException 
+    public synchronized void addSimpleType(SimpleType simpleType)
+        throws SchemaException
     {
-        
+
         String name = simpleType.getName();
-        
+
         if (simpleType.getSchema() != this) {
             String err = "invalid attempt to add a SimpleType which ";
             err += "belongs to a different Schema; type name: " + name;
@@ -197,7 +197,7 @@ public class Schema extends Structure {
             throw new SchemaException(err + name);
         }
         simpleTypes.put(name, simpleType);
-        
+
     } //-- addSimpleType
 
     /**
@@ -206,12 +206,12 @@ public class Schema extends Structure {
      * @exception SchemaException when an ElementDecl already
      * exists with the same name as the given ElementDecl
     **/
-    public void addElementDecl(ElementDecl elementDecl) 
-        throws SchemaException 
+    public void addElementDecl(ElementDecl elementDecl)
+        throws SchemaException
     {
-        
+
         String name = elementDecl.getName();
-        
+
         if (name == null) {
             String err = "an element declaration must contain a name.";
             throw new SchemaException(err);
@@ -220,13 +220,13 @@ public class Schema extends Structure {
             String err = "an element declaration already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        
+
         elements.put(name, elementDecl);
-        
-        
+
+
     } //-- addElementDecl
-    
-    
+
+
     /**
      * Creates a new ComplexType using this Schema as the owning Schema
      * document. A call to #addComplexType must still be made in order
@@ -236,18 +236,18 @@ public class Schema extends Structure {
     public ComplexType createComplexType() {
         return new ComplexType(this);
     } //-- createComplexType
-    
+
     /**
      * Creates a new ComplexType using this Schema as the owning Schema
      * document. A call to #addComplexType must still be made in order
      * to add the complexType to this Schema.
-     * @param name the name of the ComplexType 
+     * @param name the name of the ComplexType
      * @return the new ComplexType
     **/
     public ComplexType createComplexType(String name) {
         return new ComplexType(this, name);
     } //-- createComplexType
-    
+
     /**
      * Creates a new SimpleType using this Schema as the owning Schema
      * document. A call to #addSimpleType must till be made in order
@@ -258,7 +258,7 @@ public class Schema extends Structure {
     public SimpleType createSimpleType(String name) {
         return new SimpleType(this, name);
     } //-- createSimpleType(String)
-    
+
     /**
      * Returns the ComplexType of associated with the given name
      * @return the ComplexType of associated with the given name, or
@@ -277,7 +277,7 @@ public class Schema extends Structure {
             canonicalName = name.substring(colon + 1);
         return (ComplexType)complexTypes.get(canonicalName);
     } //-- getComplexType
-    
+
     /**
      * Returns an Enumeration of all top-level ComplexType declarations
      * @return an Enumeration of all top-level ComplexType declarations
@@ -285,7 +285,7 @@ public class Schema extends Structure {
     public Enumeration getComplexTypes() {
         return complexTypes.elements();
     } //-- getComplextypes
-    
+
     /**
      * Returns the SimpleType associated with the given name,
      * or null if no such SimpleType exists.
@@ -305,7 +305,7 @@ public class Schema extends Structure {
             canonicalName = name.substring(colon + 1);
         return (SimpleType)simpleTypes.get(canonicalName);
     } //-- getSimpleType
-    
+
     /**
      * Returns an Enumeration of all SimpleType declarations
      * @return an Enumeration of all SimpleType declarations
@@ -313,7 +313,7 @@ public class Schema extends Structure {
     public Enumeration getSimpleTypes() {
         return simpleTypes.elements();
     } //-- getSimpleTypes
-    
+
     /**
      * Returns the ElementDecl of associated with the given name
      * @return the ElementDecl of associated with the given name, or
@@ -330,7 +330,7 @@ public class Schema extends Structure {
     public Enumeration getElementDecls() {
         return elements.elements();
     } //-- getElementDecls
-    
+
     /**
      * Returns the target namespace for this Schema, or null if no
      * namespace has been defined.
@@ -340,7 +340,7 @@ public class Schema extends Structure {
     public String getTargetNamespace() {
         return this.targetNS;
     } //-- getTargetNamespace
-    
+
     /**
      * Removes the given top level ComplexType from this Schema
      * @param complexType the ComplexType to remove
@@ -357,14 +357,14 @@ public class Schema extends Structure {
         }
         return false;
     } //-- removeComplexType
-    
+
     /**
      * Sets the name of this Schema definition
     **/
     public void setName(String name) {
         this.name = name;
     } //-- setName
-    
+
     /**
      * Sets the target namespace for this Schema
      * @param targetNamespace the target namespace for this Schema
@@ -377,7 +377,7 @@ public class Schema extends Structure {
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -385,7 +385,7 @@ public class Schema extends Structure {
     public short getStructureType() {
         return Structure.SCHEMA;
     } //-- getStructureType
-    
+
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
@@ -396,7 +396,7 @@ public class Schema extends Structure {
     {
         //-- do nothing
     } //-- validate
-    
+
 } //-- SchemaDef
-    
-    
+
+
