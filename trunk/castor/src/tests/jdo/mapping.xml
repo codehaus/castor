@@ -667,12 +667,22 @@
     </field>
     <field name="boolShort" type="boolean">
       <sql name="bool_short" type="smallint" />
-    </field>-->
+    </field>
+    <field name="boolShortMinus" type="boolean">
+      <sql name="bool_short_minus" type="smallint[-]" />
+    </field>
+    -->
     <field name="boolInt" type="boolean">
       <sql name="bool_int" type="integer" />
     </field>
+    <field name="boolIntMinus" type="boolean">
+      <sql name="bool_int_minus" type="integer[-]" />
+    </field>
     <field name="boolBigdec" type="boolean">
       <sql name="bool_bigdec" type="numeric" />
+    </field>
+    <field name="boolBigdecMinus" type="boolean">
+      <sql name="bool_bigdec_minus" type="numeric[-]" />
     </field>
     <field name="byteInt" type="byte">
       <sql name="byte_int" type="integer" />

@@ -66,9 +66,15 @@ public class TestConversion
 
     private boolean     boolShort;
 
+    private boolean     boolShortMinus;
+
     private boolean     boolInt;
 
+    private boolean     boolIntMinus;
+
     private boolean     boolBigdec;
+
+    private boolean     boolBigdecMinus;
 
     private byte        byteInt;
 
@@ -137,6 +143,14 @@ public class TestConversion
         return boolShort;
     }
 
+    public void setBoolShortMinus( boolean boolShortMinus ) {
+        this.boolShortMinus = boolShortMinus;
+    }
+
+    public boolean getBoolShortMinus() {
+        return boolShortMinus;
+    }
+
     public void setBoolInt( boolean boolInt ) {
         this.boolInt = boolInt;
     }
@@ -145,12 +159,28 @@ public class TestConversion
         return boolInt;
     }
 
+    public void setBoolIntMinus( boolean boolIntMinus ) {
+        this.boolIntMinus = boolIntMinus;
+    }
+
+    public boolean getBoolIntMinus() {
+        return boolIntMinus;
+    }
+
     public void setBoolBigdec( boolean boolBigdec ) {
         this.boolBigdec = boolBigdec;
     }
 
     public boolean getBoolBigdec() {
         return boolBigdec;
+    }
+
+    public void setBoolBigdecMinus( boolean boolBigdecMinus ) {
+        this.boolBigdecMinus = boolBigdecMinus;
+    }
+
+    public boolean getBoolBigdecMinus() {
+        return boolBigdecMinus;
     }
 
     public void setByteInt( byte byteInt ) {
