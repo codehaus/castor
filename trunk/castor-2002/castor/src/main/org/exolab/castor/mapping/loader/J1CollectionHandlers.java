@@ -78,7 +78,7 @@ public final class J1CollectionHandlers
      */
     private static CollectionHandlers.Info[] _colHandlers = new CollectionHandlers.Info[] {
         // For array (any)
-        new CollectionHandlers.Info( "array", Object[].class, new CollectionHandler() {
+        new CollectionHandlers.Info( "array", Object[].class, true, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 Object[] array;
                 if ( collection == null ) {
@@ -104,15 +104,12 @@ public final class J1CollectionHandlers
                     return 0;
                 return ( (Object[]) collection ).length;
             }
-            public boolean isGetSetCollection() {
-                return true;
-            }
             public String toString() {
                 return "Object[]";
             }
         } ),
         // For Vector (1.1)
-        new CollectionHandlers.Info( "vector", Vector.class, new CollectionHandler() {
+        new CollectionHandlers.Info( "vector", Vector.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new Vector();
@@ -134,15 +131,12 @@ public final class J1CollectionHandlers
                     return 0;
                 return ( (Vector) collection ).size();
             }
-            public boolean isGetSetCollection() {
-                return false;
-            }
             public String toString() {
                 return "Vector";
             }
         } ),
         // For Hashtable (1.1)
-        new CollectionHandlers.Info( "hashtable", Hashtable.class, new CollectionHandler() {
+        new CollectionHandlers.Info( "hashtable", Hashtable.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new Hashtable();
@@ -163,9 +157,6 @@ public final class J1CollectionHandlers
                 if ( collection == null )
                     return 0;
                 return ( (Hashtable) collection ).size();
-            }
-            public boolean isGetSetCollection() {
-                return false;
             }
             public String toString() {
                 return "Hashtable";

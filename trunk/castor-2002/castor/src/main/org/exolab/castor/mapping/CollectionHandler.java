@@ -108,17 +108,6 @@ public interface CollectionHandler
         throws ClassCastException;
 
 
-    /**
-     * Returns true if the collection requires get/set methods.
-     * <tt>java.util</tt> collections only require a get method,
-     * but an array collection required both get and set methods.
-     *
-     * @return True if collection requires get/set methods, false
-     *  if collection requires only get method
-     */
-    public boolean isGetSetCollection();
-
-
 }
 
 
