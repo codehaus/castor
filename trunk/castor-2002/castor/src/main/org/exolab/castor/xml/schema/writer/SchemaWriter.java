@@ -963,8 +963,10 @@ public class SchemaWriter {
 
         _handler.startElement(ELEMENT_NAME, _atts);
 
+        //-- process annotations
+        processAnnotated(simpleType, schemaPrefix);
+        
         //-- handle restriction
-
         SimpleType base = (SimpleType)simpleType.getBaseType();
         if (base != null) {
 
