@@ -148,7 +148,8 @@ public class Validator implements ClassValidator {
                         loc.addChild(fieldDesc.getXMLName());
                 }
             }
-            loc.addParent(classDesc.getXMLName());
+            if (classDesc.getXMLName() != null)
+                 loc.addParent(classDesc.getXMLName());
             throw vx;
         }
 
