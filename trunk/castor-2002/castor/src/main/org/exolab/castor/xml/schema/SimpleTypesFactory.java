@@ -165,6 +165,8 @@ public class SimpleTypesFactory
     public static final int UNSIGNED_BYTE_TYPE            = 43;
     public static final int POSITIVE_INTEGER_TYPE         = 44;
 
+    public static final int ANYSIMPLETYPE_TYPE            = 100;
+
     /**
      * The resource location for the built-in types
      * property files
@@ -416,7 +418,7 @@ public class SimpleTypesFactory
                 _typesByCode= new Hashtable();
 		        for( int index= 0; index < types.size(); index++)
 		        {
-		            Type type= (Type)(types.elementAt(index));
+                    Type type= (Type)(types.elementAt(index));
                     _typesByName.put(type.getName(), type);
                     type.setSimpleType(createSimpleType(type));
                     _typesByCode.put(new Integer( type.getSimpleType().getTypeCode() ), type);
@@ -495,6 +497,7 @@ public class SimpleTypesFactory
     private SimpleType createInstance(String builtInTypeName)
     {
         Type type= getType(builtInTypeName);
+
        //If the type is derived by list, return a new ListType.
         String derivation= type.getDerivedBy();
         ListType resultList = null;
@@ -515,22 +518,29 @@ public class SimpleTypesFactory
 
         if (implClass == null) return null;
 
-        AtomicType result;
-        try
-        {
-            result = (AtomicType)implClass.newInstance();
-        }
-        catch (Exception except)
-        {
-            except.printStackTrace();
-            result= null;
-        }
+        SimpleType result;
+        if (implClass.isAssignableFrom(UrType.class)) {
+                try {
+                     result = (UrType)implClass.newInstance();
+                } catch (Exception e) {
+                     //should never happen
+                     result = null;
+                     e.printStackTrace();
+                }
+        } else {
+             try {
+                 result = (AtomicType)implClass.newInstance();
+             } catch (Exception except) {
+                 except.printStackTrace();
+                 result= null;
+             }
 
-        if (resultList != null) {
-              resultList.setType(result);
-              return resultList;
+             if (resultList != null) {
+                  resultList.setType((AtomicType)result);
+                  return resultList;
+             }
         }
-        else return result;
+        return result;
     }
 
 }
