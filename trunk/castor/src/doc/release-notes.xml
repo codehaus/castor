@@ -29,13 +29,13 @@
     		<date>February 9, 2005</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
-				<p>Final release. Since the third release candidate, the following problem areas 
+				<p>Final release. Since the third release candidate, the following problem areas
 					have been addressed.</p>
             </summary>
 			<bugs>
 				<bug id="1855">
 					<description>
-						Fixed problem with TransactionContext.getObjectEntry(Object) that was 
+						Fixed problem with TransactionContext.getObjectEntry(Object) that was
 						introduced as a result of adding support for lazy loading 1:1 relations.
 					</description>
 					<contributor>
@@ -54,7 +54,7 @@
 
 				<bug id="1849">
 					<description>
-						Added F.A.Q. entry describing compatibility problems between various releases of 
+						Added F.A.Q. entry describing compatibility problems between various releases of
 						mySQL 4.1.x and its JDBC drivers.
 					</description>
 					<contributor>
@@ -86,9 +86,31 @@
 					<module>Tests</module>
 					<date>20050204</date>
 				</bug>
-				
+
+            <bug id="">
+               <description>
+       Fixed issue with GeneralizedFieldHandler not able to handle collections.
+       Collections are now automatically iterated over during getValue() calls
+       and each item in the collection is passed into the convertUponGet method.
+       To retain the old behavior simply add a call to #setCollectionIteration
+       with a value of false in the constructor of your GeneralizedFieldHandler.
+       The behavior for setter methods is not changed since only one item at a
+       time is passed into the setter already.
+               </description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <type>XML</type>
+               <module>Core</module>
+               <date>20050118</date>
+				</bug>
 			</bugs>
-			
+
 		</release>
 
 	    <release version="0.9.6 RC3">
@@ -96,7 +118,7 @@
     		<date>January 11, 2005</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
-				<p>Preparations for the final release have started. Since the second release candidate, 
+				<p>Preparations for the final release have started. Since the second release candidate,
 				   the following problem areas have been addressed.</p>
             </summary>
 			<bugs>
@@ -125,6 +147,26 @@
 					<type>Bug</type>
 					<project>JDO</project>
 					<module>Tests</module>
+				</bug>
+            <bug id="1372">
+               <description>
+                   Mapping.loadMapping(String) duplicates directory
+                   path. Fixed problem by making the given url a relative URL
+                   so that the document base isn't duplicated.
+               </description>
+					<contributor>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
+					</contributor>
+					<submitter>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
+               </submitter>
+               <reporter>Jesus Menendez</reporter>
+					<type>Bug</type>
+               <project>All</project>
+               <module>Core</module>
+               <date>20041217</date>
 				</bug>
 				<bug id="1824">
 					<description>Fixed various problems that prevented compilation under JDK 1.3.</description>
@@ -215,6 +257,7 @@
 					<type>Bug</type>
 					<project>JDO</project>
 					<module>Core</module>
+               <date>20041214</date>
 				</bug>
 				<bug id="1793">
 					<description>SimleQueryExecutor and data visibility issues</description>
@@ -230,6 +273,48 @@
 					<type>Bug</type>
 					<project>JDO</project>
 					<module>JDO</module>
+               <date>20041213</date>
+				</bug>
+
+            <bug id="1723">
+               <description>
+                   Added some additional support for nillable fields. There is still
+                   some more work needed in this area, but this gets us closer.
+               </description>
+					<contributor>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
+					</contributor>
+					<submitter>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
+               </submitter>
+               <reporter></reporter>
+               <type>Enhancement</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20041210</date>
+				</bug>
+
+            <bug id="">
+               <description>
+                   Added initial support to suppress namespaces during Marshalling. This
+                   has been a long asked for feature, so I figured it was about time I
+                   finally got around to doing this.
+               </description>
+					<contributor>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
+					</contributor>
+					<submitter>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
+               </submitter>
+               <reporter></reporter>
+               <type>Enhancement</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20041210</date>
 				</bug>
 			</bugs>
 		</release>
@@ -241,10 +326,10 @@
             <summary>
 				<h3>Open issues:</h3>
 
-				<p>There's an issue with Castor finding mapping files within JARs when the path to 
-				   the mapping file is specified relatively to the JDO configuration file. We are working 
-				   on this, but as there's a workaround (using InputSources as mentioned on the 
-				   mailing lists recently), we have decided to go ahead and not hold back this 
+				<p>There's an issue with Castor finding mapping files within JARs when the path to
+				   the mapping file is specified relatively to the JDO configuration file. We are working
+				   on this, but as there's a workaround (using InputSources as mentioned on the
+				   mailing lists recently), we have decided to go ahead and not hold back this
 				   second release candidate. Details on this bug can be found here.</p>
 
 				<p>Since the first release candidate, the following problem areas have been addressed.</p>
@@ -257,13 +342,14 @@
 						<email>keith@kvisco.com</email>
 					</contributor>
 					<submitter>
-						<name>Werner Guttmann</name>
-						<email>werner.guttmann@gmx.net</email>
+						<name>Keith Visco</name>
+						<email>keith@kvisco.com</email>
 					</submitter>
 					<reporter>Jeremy</reporter>
 					<type>Bug</type>
 					<project>XML</project>
 					<module>XML</module>
+               <date>20041214</date>
 				</bug>
 				<bug id="1676">
 					<description>Added support for lazy-loading simple 1:1 relations</description>
@@ -452,19 +538,19 @@
             <summary>
 				<h2>Download &amp; installation instructions</h2>
 
-				<p>Please note that we are providing the usual suspect (binaries, docs and 
+				<p>Please note that we are providing the usual suspect (binaries, docs and
 				   sources) for this release at <a href="ftp://ftp.exolab.org/pub/castor/castor_0.9.6.">
-				   the Exolab FTP server</a>. We recommend, though, to download the complete package, 
-				   as the HTML docs at <a href="http://castor.exolab.org">the main Castor site</a> have 
+				   the Exolab FTP server</a>. We recommend, though, to download the complete package,
+				   as the HTML docs at <a href="http://castor.exolab.org">the main Castor site</a> have
 				   not been updated, and build the documentation yourself.</p>
 
 				<h2>Changes</h2>
 
 				<h3>Format of the JDO configuration file</h3>
 
-				<p>Due to various internal refactorings, we decide to change the syntax of the 
-				   JDO configuration file, adding a new root element named &lt;jdo-conf&gt; and elements 
-				   to declare transaction demarcation semantics. Here's a sample of Castor JDO 
+				<p>Due to various internal refactorings, we decide to change the syntax of the
+				   JDO configuration file, adding a new root element named &lt;jdo-conf&gt; and elements
+				   to declare transaction demarcation semantics. Here's a sample of Castor JDO
 				   running against mySQL (with local transactions).</p>
 
 				<code>
@@ -488,19 +574,19 @@
 
 				<h3>Configuration of JDBC Datasources</h3>
 
-				<p>When setting up JDBC DataSources to be used with Castor JDO, configuration 
-				   of parameters now needs to occur as a sequence of &lt;param&gt; elements rather 
-				   than one &lt;params&gt; element. This is to stream-line the way these JDBC resources 
+				<p>When setting up JDBC DataSources to be used with Castor JDO, configuration
+				   of parameters now needs to occur as a sequence of &lt;param&gt; elements rather
+				   than one &lt;params&gt; element. This is to stream-line the way these JDBC resources
 				   are configured.</p>
 
 				<p>What used to be</p>
 
  				<code>
 &lt;data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource"&gt;
-    &lt;params user="thomas" 
-            password="thomas" 
-            port-number="2048" 
-            server-name="Dual1" 
+    &lt;params user="thomas"
+            password="thomas"
+            port-number="2048"
+            server-name="Dual1"
             database-name="thomas" /&gt;
 &lt;/data-source&gt;
 				</code>
@@ -517,11 +603,11 @@
 &lt;/data-source&gt;
 				</code>
 
-				<p>Please note the use of hyphens in the naming of properties. In other words, 
-				   in order for Castor to set the value of the portNumber property of the 
+				<p>Please note the use of hyphens in the naming of properties. In other words,
+				   in order for Castor to set the value of the portNumber property of the
 				   SybDataSource to '2048', please use the following &lt;param&gt; element</p>
 
-				<code>    
+				<code>
     &lt;param name="port-number" value="2048" /&gt;
    				</code>
 
@@ -535,29 +621,29 @@
 
 				<h3>Transaction demarcation</h3>
 
-				<p>A new way of configuring transaction demarcation has been added. This 
-				   configuration is now part of the main JDO configuration file (jdo-conf) 
-				   and mandates the specification of the transaction demarcation used within 
+				<p>A new way of configuring transaction demarcation has been added. This
+				   configuration is now part of the main JDO configuration file (jdo-conf)
+				   and mandates the specification of the transaction demarcation used within
 				   your application.</p>
 
-				<p>As part of this configuration file, the user has to specify which transaction 
-				   demarcation to use. This can either be 'local' or 'global', and is supplied 
+				<p>As part of this configuration file, the user has to specify which transaction
+				   demarcation to use. This can either be 'local' or 'global', and is supplied
 				   by the use of a &lt;transaction-demarcation&gt; element.</p>
 
 				<h4>Local Mode</h4>
 
-				<p>When using Castor JDO stand-alone and you want Castor to control 
-				   transaction demarcation ('local' mode), please use this element 
+				<p>When using Castor JDO stand-alone and you want Castor to control
+				   transaction demarcation ('local' mode), please use this element
 				   as follows:</p>
-						   
+
 				<code>
 &lt;transaction-demarcation mode="local" /&gt;
 				</code>
 
 				<h4>Global Mode</h4>
 
-				<p>When running inside a J2EE application server, and you want to use 
-				   container managed transactions ('global' transactions), please make 
+				<p>When running inside a J2EE application server, and you want to use
+				   container managed transactions ('global' transactions), please make
 				   sure you use this element as follows:</p>
 
 				<code>
@@ -566,11 +652,11 @@
   &lt;/transaction-demarcation&gt;
 				</code>
 
-				<p>In this mode, the XML element &lt;transaction-manager&gt; specifies the 
-				   transaction manager that is used by your application server/web container 
+				<p>In this mode, the XML element &lt;transaction-manager&gt; specifies the
+				   transaction manager that is used by your application server/web container
 				   to control these transactions.</p>
 
-				<p>The following transaction managers are supported in Castor at the 
+				<p>The following transaction managers are supported in Castor at the
 				   time of the release of Castor 0.9.6:</p>
 
 		        <table border="0" cellspacing="1" cellpadding="2" bgcolor="#990033"><tr><td>
@@ -589,12 +675,12 @@
 					</table></td></tr>
 				</table>
 
-				<p>In addition to specifying the transaction manager name, it is possible 
+				<p>In addition to specifying the transaction manager name, it is possible
 				   to pass arbitrary name/value pairs to the transaction manager instance.</p>
 
-				<p><b>Note:</b> At the moment, only the JNDI transaction manager factory 
-				   supports such an attribute. In this context, the jndiEnc attribute can be 
-				   used to specify what JNDI ENC to use to lookup the transaction manager as 
+				<p><b>Note:</b> At the moment, only the JNDI transaction manager factory
+				   supports such an attribute. In this context, the jndiEnc attribute can be
+				   used to specify what JNDI ENC to use to lookup the transaction manager as
 				   shown below:</p>
 
 				<code>
@@ -607,22 +693,22 @@
 
 				<h3>Using timezone information when accessing date/time/timestamp data</h3>
 
-				<p>Castor will use the JDBC ResultSet.getDate(int, Calendar) and related 
-				   methods which take a Calendar object to specify the timezone of the 
-				   data retrieved from the database when the timezone information is not 
-				   already specified in the data; this ensures that the 'current' timezone 
+				<p>Castor will use the JDBC ResultSet.getDate(int, Calendar) and related
+				   methods which take a Calendar object to specify the timezone of the
+				   data retrieved from the database when the timezone information is not
+				   already specified in the data; this ensures that the 'current' timezone
 				   is applied.</p>
 
-				<p>The default time zone can be configured in the castor.properties file; see 
-				   the configuration section for details on how to configure Castor with 
-				   information about your default time zone. To change the timezone to a different 
-				   timezone than the default, please set a (different) value on the 
+				<p>The default time zone can be configured in the castor.properties file; see
+				   the configuration section for details on how to configure Castor with
+				   information about your default time zone. To change the timezone to a different
+				   timezone than the default, please set a (different) value on the
 				   org.exolab.castor.jdo.defaultTimeZone property:</p>
 
 				<code>
-# Default time zone to apply to dates/times fetched from database fields, 
-# if not already part of the data.  Specify same format as in 
-# java.util.TimeZone.getTimeZone, or an empty string to use the computer's 
+# Default time zone to apply to dates/times fetched from database fields,
+# if not already part of the data.  Specify same format as in
+# java.util.TimeZone.getTimeZone, or an empty string to use the computer's
 # local time zone.
 # org.exolab.castor.jdo.defaultTimeZone=
 org.exolab.castor.jdo.defaultTimeZone=GMT+8:00
@@ -632,31 +718,31 @@ org.exolab.castor.jdo.defaultTimeZone=GMT+8:00
 
 				<h3>JDO configuration without a file and JDoConfFactory</h3>
 
-				<p>As part of this release, we have added a way to configure Castor JDO 
+				<p>As part of this release, we have added a way to configure Castor JDO
 				   without the need to provide an XML configuration file. As such,</p>
 
 				<code>
 JDO.setConfiguration(JdoConf)
 				</code>
 
-				<p>has been provided to pass in an instance of JdoConf. Too assist users 
-				   of this new approach in creating JdoConf instances, please have a look 
+				<p>has been provided to pass in an instance of JdoConf. Too assist users
+				   of this new approach in creating JdoConf instances, please have a look
 				   at org.exolab.castor.jdo.util.JdoConfFactory.</p>
 
 				<h3>Resetting database configurations</h3>
 
-				<p>In order to clear all previously registered Castor Database configurations 
-				   you can now call the new function 
-				   org.exolab.castor.jdo.engine.DatabaseRegistry.clear(). This is for 
-				   example usefull, if you want to log on using a user supplied login name 
-				   and database connection. It is especially needed if it's possible to change 
+				<p>In order to clear all previously registered Castor Database configurations
+				   you can now call the new function
+				   org.exolab.castor.jdo.engine.DatabaseRegistry.clear(). This is for
+				   example usefull, if you want to log on using a user supplied login name
+				   and database connection. It is especially needed if it's possible to change
 				   the login password of the database login account in interactive applications.</p>
 
 				<h3>CacheManager</h3>
 
-				<p>With this release, we have decided to remove several methods related to 
-				   clearing caches (partially) from Database(impl).java. Instead, we have 
-				   created a new CacheManager class in the util package that can be obtained from 
+				<p>With this release, we have decided to remove several methods related to
+				   clearing caches (partially) from Database(impl).java. Instead, we have
+				   created a new CacheManager class in the util package that can be obtained from
 				   a Database instance as follows:</p>
 
 				<code>
@@ -664,31 +750,31 @@ Database db = jdo.getDatabase();
 CacheManager manager = db.getCacheManager();
 				</code>
 
-				<p>Once such an instance has been obtained, cache content can be cleared 
-				   (partially) using one of several CacheManager?.clearCache() methods. In 
-				   addition, users might inquire about whether an object is currently cached 
+				<p>Once such an instance has been obtained, cache content can be cleared
+				   (partially) using one of several CacheManager?.clearCache() methods. In
+				   addition, users might inquire about whether an object is currently cached
 				   (or not) by using CacheManager.isCached (Class, Object).</p>
 
-				<p>Details about the functionality provided by this new class can be found 
+				<p>Details about the functionality provided by this new class can be found
 				   in the HTML docs and/or Javadocs.</p>
 
 				<h3>OQL - Support for LIMIT/OFFSET clauses</h3>
 
-				<p>On a selected number of RDBMS, Castor JDO now supports the use of LIMIT 
+				<p>On a selected number of RDBMS, Castor JDO now supports the use of LIMIT
 				   (and OFFSET clauses) as follows:</p>
 
 				<code>
-OQLQuery query = 
+OQLQuery query =
    db.getOQLQuery ("select a from Account order by id limit $1 offset $2");
 query.bind (10);
 query.bind (5);
 OQLResults results = query.execute();
 				</code>
 
-				<p>This will select accounts 6 to 15, given that numbers for account ids start 
+				<p>This will select accounts 6 to 15, given that numbers for account ids start
 				   at 1.</p>
 
-				<p>As per this release, the following RDBMS have full/partial support for this 
+				<p>As per this release, the following RDBMS have full/partial support for this
 				   new feature.</p>
 
 		        <table border="0" cellspacing="1" cellpadding="2" bgcolor="#990033"><tr><td>
@@ -711,12 +797,12 @@ OQLResults results = query.execute();
 					</table></td></tr>
 				</table>
 
-				<p>1) Oracle has full support for LIMIT/OFFSET clauses for release 8.1.6 and 
+				<p>1) Oracle has full support for LIMIT/OFFSET clauses for release 8.1.6 and
 				   later.</p>
 
 				<h3>OQL - bind variables in combination with "IN" operators</h3>
 
-				<p>Previously it was only possible to use OQL WHERE statements with "IN" 
+				<p>Previously it was only possible to use OQL WHERE statements with "IN"
 				   operators of the following form:</p>
 
 				<code>
@@ -725,7 +811,7 @@ OQLResults results = query.execute();
 "... WHERE DNAME in list(\"ABC\", nil)"
 				</code>
 
-				<p>To make it easier executing dynamic queries, it's now also allowed to 
+				<p>To make it easier executing dynamic queries, it's now also allowed to
 				   use bind variables, for example:</p>
 
 				<code>
@@ -734,36 +820,36 @@ OQLResults results = query.execute();
 
 				<h3>Add your own cache implementation</h3>
 
-				<p>If you are not satisfied with Castor's set of performance caches, we've 
-				   added a way for you to provide you own cache implementationa and register 
+				<p>If you are not satisfied with Castor's set of performance caches, we've
+				   added a way for you to provide you own cache implementationa and register
 				   it with Castor.</p>
 
 				<p>To provide a custom cache implementation, you need to</p>
 
 				<ol>
 					<li>Create a class that implements org.exolab.castor.persist.cache.Cache
-					   (we have provided an abstract base class that you can use at your 
+					   (we have provided an abstract base class that you can use at your
 					   convenience).</li>
 					<li>Create a class that implements org.exolab.castor.persist.cache.CacheFactory
-					   (we have provided an abstract base class that you can use at your 
+					   (we have provided an abstract base class that you can use at your
 					   convenience).</li>
-					<li>Register your custom cache implementation with Castor JDO in the 
+					<li>Register your custom cache implementation with Castor JDO in the
 					    castor.properties file.</li>
 				</ol>
 
-				<p>Detailed instructions can be found in the package.html file of the 
+				<p>Detailed instructions can be found in the package.html file of the
 				   org.exolab.castor.persist.cache package.</p>
 
 				<h3>Castor Source Generator Ant Task</h3>
 
-				<p>The Castor Source Generator Ant Task has been added to the CVS tree. Below 
+				<p>The Castor Source Generator Ant Task has been added to the CVS tree. Below
 				   is an example of how to use it from within an Ant build descriptor:</p>
 
 				<code>
-  &lt;target name="castor:gen:src" depends="init" 
+  &lt;target name="castor:gen:src" depends="init"
     description="Generate Java source files from XSD."&gt;
-    
-    &lt;taskdef name="castor-srcgen" 
+
+    &lt;taskdef name="castor-srcgen"
       classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask"
       classpathref="castor.class.path" /&gt;
     &lt;mkdir dir="${gen.src.d}" /&gt;
@@ -775,20 +861,20 @@ OQLResults results = query.execute();
   &lt;/target&gt;
 				</code>
 
-				<p>The only requirement is that the castor-srcgen-ant-task.jar must be on 
+				<p>The only requirement is that the castor-srcgen-ant-task.jar must be on
 				   the CLASSPATH.</p>
 
 				<h2>New features - experimental</h2>
 
 				<h3>JDO2 - a new approach</h3>
 
-				<p>Due to a couple of inconsistencies in the interface of the JDO class, we 
-				   have decided to refactor this class and provide users with a much improved 
-				   way of configuring and instantiating JDO instances (as explained below). 
-				   To provide backwards-compatibility, we have created a new JDO2 class 
+				<p>Due to a couple of inconsistencies in the interface of the JDO class, we
+				   have decided to refactor this class and provide users with a much improved
+				   way of configuring and instantiating JDO instances (as explained below).
+				   To provide backwards-compatibility, we have created a new JDO2 class
 				   and left the old untouched.</p>
 
-				<p>To create a Castor JDO instance (based upon a XML configuration file), 
+				<p>To create a Castor JDO instance (based upon a XML configuration file),
 				   users need to execute code similar to the following lines:</p>
 
 				<code>
@@ -796,11 +882,11 @@ JDO2.loadConfiguration ("jdo-conf.xml");
 JDO2 jdo = JDO2.createInstance ("test");
 				</code>
 
-				<p>Similar to what the old interface used to be, a couple of overloaded 
-				   loadConfiguration() methods are provided, to allow specification of 
+				<p>Similar to what the old interface used to be, a couple of overloaded
+				   loadConfiguration() methods are provided, to allow specification of
 				   class loaders and XML entity resolvers.</p>
             </summary>
-            
+
 			<bugs>
 				<bug id="">
 					<description>
@@ -818,6 +904,48 @@ JDO2 jdo = JDO2.createInstance ("test");
 					<project></project>
 					<module></module>
 					<date></date>
+				</bug>
+
+            <bug id="">
+               <description>
+                   Added support for namespace to package mappings on the Unmarshaller
+                   and UnmarshalHandler. This basically fixes issues where Castor
+                   can't find the right package to look for classes during
+                   unmarshalling. This is main for those people using generated
+                   source code, as using a mapping file you must specify the
+                   packages and namespaces appropriately.
+               </description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+					<type>Bug</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20041104</date>
+				</bug>
+
+            <bug id="">
+               <description>
+                   Fixed bug in SourceGenerator where class names for SimpleType
+                   instances with Enumeration facets were not getting resolved properly.
+               </description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+					<type>Bug</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20041104</date>
 				</bug>
 
 				<bug id="1790">
@@ -855,7 +983,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1262">
 					<description>
-						Castor JDO now uses timezone information when reading 
+						Castor JDO now uses timezone information when reading
 					    date/timestamp/time data from the RDBMS.
 					</description>
 					<contributor>
@@ -874,7 +1002,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1767">
 					<description>
-						Updated src/tests/jdo/oracle.xml and src/tests/jdo/postgresql.xml to be 
+						Updated src/tests/jdo/oracle.xml and src/tests/jdo/postgresql.xml to be
 						in-line with new grammar.
 					</description>
 					<contributor>
@@ -909,8 +1037,8 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1763">
 					<description>
-						Improved exception handling in the persist.cache package, by ensuring 
-						proper exception chaining.	
+						Improved exception handling in the persist.cache package, by ensuring
+						proper exception chaining.
 					</description>
 					<contributor>
 						<name>Werner Guttmann</name>
@@ -983,7 +1111,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1755">
 					<description>
-						Brought jdo-conf.dtd in-line with XML Schema instance, making 
+						Brought jdo-conf.dtd in-line with XML Schema instance, making
 						&lt;transaction-demarcation&gt; required.
 					</description>
 					<contributor>
@@ -1000,10 +1128,34 @@ JDO2 jdo = JDO2.createInstance ("test");
 					<module>Config</module>
 					<date>20041006</date>
 				</bug>
+
+            <bug id="1685">
+               <description>
+                   Fixed StackOverflowError that was occuring at certain times
+                   during container processing if the input XML was invalid.
+               </description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <reporter>
+                    <name>qiu, hong</name>
+                    <email>hq828 AT gmx DOT de</email>
+               </reporter>
+					<type>Bug</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20041005</date>
+				</bug>
+
 				<bug id="1594">
 					<description>
-						Added new (experimental) JDO2.java, adding factory method for 
-						instantiation, removing public constructor, changing way of 
+						Added new (experimental) JDO2.java, adding factory method for
+						instantiation, removing public constructor, changing way of
 						loading configuration.
 					</description>
 					<contributor>
@@ -1020,6 +1172,28 @@ JDO2 jdo = JDO2.createInstance ("test");
 					<module>Core</module>
 					<date>20041005</date>
 				</bug>
+
+            <bug id="1592">
+               <description>
+                   DecimalValidator was not taking into account a leading
+                   sign ('+' or '-').
+               </description>
+					<contributor>
+                   <email>technicallyrational@yahoo.com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <reporter>
+                   <email>technicallyrational@yahoo.com</email>
+               </reporter>
+					<type>Bug</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20041004</date>
+				</bug>
+
 				<bug id="1435">
 					<description>
 						Fixed problem with finding add&lt;FieldName&gt;() method.
@@ -1040,8 +1214,8 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="">
 					<description>
-						Framed &lt;driver&gt;, &lt;data-source&gt; and &lt;jndi&gt; elements in 
-						jdo-conf.xsd with an &lt;xsd:choice&gt; to indicate that at any time only 
+						Framed &lt;driver&gt;, &lt;data-source&gt; and &lt;jndi&gt; elements in
+						jdo-conf.xsd with an &lt;xsd:choice&gt; to indicate that at any time only
 						one should be present.
 					</description>
 					<contributor>
@@ -1094,6 +1268,143 @@ JDO2 jdo = JDO2.createInstance ("test");
 					<module>Config</module>
 					<date>20040927</date>
 				</bug>
+
+            <bug id="1723">
+					<description>
+                  Initial support for xsi:nil. xsi:nil support is not complete
+                  with these patches, but it was worth checking them in as it
+                  gets us closer to completion.
+					</description>
+					<contributor>
+                   <name>Marco Soeima</name>
+                   <email>marco.soeima AT siemens DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <reporter>
+                   <name>Marco Soeima</name>
+               </reporter>
+					<type>Enhancement</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20040916</date>
+				</bug>
+
+            <bug id="1666">
+					<description>
+                  UnmarshalState._markedList Vector is a performance
+                  bottleneck, replaced by a by HashSet.
+					</description>
+					<contributor>
+                   <name>David Thal</name>
+                   <email>dthal AT combimatrix DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <reporter>
+                   <name>David Thal</name>
+                   <email>dthal AT combimatrix DOT com</email>
+               </reporter>
+					<type>Enhancement</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20040910</date>
+				</bug>
+
+            <bug id="1658">
+					<description>
+                  Fixed Whitepspace handling where whitespace was not preserved for
+                  container objects.
+					</description>
+					<contributor>
+                   <name>Chris Giordano</name>
+                   <email>giordano AT more DOT net</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <reporter>
+                   <name>Chris Giordano</name>
+                   <email>giordano AT more DOT net</email>
+               </reporter>
+               <type>Bug</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20040910</date>
+				</bug>
+
+            <bug id="1634">
+					<description>
+                   Whilespace was not getting preserved correctly
+                   during unmarshalling when parser splits up calls
+                   to the UnmarshalHandler#characters method.
+					</description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <reporter>
+                   <name>David Green</name>
+                   <email>david.green AT maketechnologies DOT com</email>
+               </reporter>
+               <type>Bug</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20040910</date>
+				</bug>
+
+
+            <bug id="">
+					<description>
+                   Updated the Marshaller to use ContentHandler directly instead
+                   of wrapping in a ParserAdapter. Users Marshalling to a
+                   ContentHandler should see a significant speed up when
+                   Marshalling.
+					</description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <type>Enhancement</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20040910</date>
+				</bug>
+
+            <bug id="">
+					<description>
+                   Fixed a bug in the Marshaller with the xsi:type logic not being
+                   strict enough. Sometimes the Marshaller was not adding xsi:type
+                   when it was needed. I've modified this logic a bit to make it
+                   output xsi:type more often in order to preserve round tripping.
+					</description>
+					<contributor>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+               <type>Enhancement</type>
+               <project>XML</project>
+               <module>XML</module>
+               <date>20040910</date>
+				</bug>
+
 				<bug id="1727">
 					<description>
 						Added DB2-specifc support for the OQL LIMIT clause.
@@ -1133,8 +1444,8 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="1221">
 					<description>
-						Added the ability to specify an OFFSET clause with LIMIT clauses. This 
-						patch provides support for postgreSQL, mySQL and HSQL only.  
+						Added the ability to specify an OFFSET clause with LIMIT clauses. This
+						patch provides support for postgreSQL, mySQL and HSQL only.
 					</description>
 					<contributor>
 						<name>Lance Lavandowska</name>
@@ -1152,7 +1463,7 @@ JDO2 jdo = JDO2.createInstance ("test");
 				</bug>
 				<bug id="????">
 					<description>
-						Added example to src/examples/MappingTool to demonstrate the use of 
+						Added example to src/examples/MappingTool to demonstrate the use of
 						the MappingTool.
 					</description>
 					<contributor>
