@@ -35,8 +35,8 @@ public class Test
 	    results = search.execute();
 	    while ( results.hasMoreElements() ) {
                 user = (User) results.nextElement();
-                if ( user.full == null )
-                  user.full = user.first + " " + user.last;
+                if ( user.getFull() == null )
+                  user.setFull( user.getFirst() + " " + user.getLast() );
                 System.out.println( user );
 	    }
 	    dir.commit();
@@ -45,11 +45,11 @@ public class Test
 	    user = (User) dir.read( "kvisco" );
 	    if ( user == null || user != null ) {
 		user = new User();
-		user.uid = "kvisco";
-		user.first = "Keith";
-		user.last = "Visco";
-		user.full = "Keith Visco";
-		user.email = new String[] { "kvisco@exoffice.com" };
+		user.setUid( "kvisco" );
+		user.setFirst( "Keith" );
+		user.setLast( "Visco" );
+		user.setFull( "Keith Visco" );
+		user.setEmail( new String[] { "kvisco@exoffice.com" } );
 		System.out.println( "Creating: " + user );
 		dir.create( user );
 	    } else {
