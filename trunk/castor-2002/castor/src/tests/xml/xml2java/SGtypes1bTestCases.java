@@ -166,25 +166,57 @@ import junit.extensions.*;
 
         try {
             assert("both int are not equals: " + test_obj.getInt()
-                   + " and " + "-2147483648",
-                   (test_obj.getInt()==(-2147483648)));
+                   + " and " + "2147483647",
+                   (test_obj.getInt()==(2147483647)));
         } catch (Exception excep) {
             fail("error: " + excep);
         }
     }
 
+    public void testLong() {
 
+        try {
+            assert("both long are not equals: " + test_obj.getLong()
+                   + " and " + "9223372036854775807",
+                   (test_obj.getLong()==Long.MAX_VALUE));
+        } catch (Exception excep) {
+            fail("error: " + excep);
+        }
+    }
+ 
+    public void testFloat() {
+
+        try {
+            assert("both float are not equals: " + test_obj.getFloat()
+                   + " and " + "3.4028235E38",
+                   (test_obj.getFloat()==(float)(3.4028235E38)));
+        } catch (Exception excep) {
+            fail("error: " + excep);
+        }
+    }
  
     public void testShort() {
 
         try {
             assert("both short are not equals: " + test_obj.getShort()
-                   + " and " + "-32768",
-                   (test_obj.getShort()==(-32768)));
+                   + " and " + "32767",
+                   (test_obj.getShort()==(32767)));
         } catch (Exception excep) {
             fail("error: " + excep);
         }
     }
+    
+    public void testDouble() {
+
+        try {
+            assert("both double are not equals: " + test_obj.getDouble()
+                   + " and " + "1.7976931348623157E308",
+                   (test_obj.getDouble()==1.7976931348623157E308));
+        } catch (Exception excep) {
+            fail("error: " + excep);
+        }
+    }
+    
     
     public void testBoolean() {
 
@@ -197,13 +229,22 @@ import junit.extensions.*;
         }
     }
 
+    public void testInteger() {
+
+        try {
+            assert("both int are not equals: " + test_obj.getInteger()
+                   + " and 2147483647", (test_obj.getInteger() == 2147483647));
+        } catch (Exception excep) {
+            fail("error: " + excep);
+        }
+    }  
       
     public void testPositiveInteger() {
 
         try {
             assert("both positiveInteger are not equals: " + test_obj.getPositiveInteger()
-                   + " and " + "1",
-                   (test_obj.getPositiveInteger()==1));
+                   + " and " + "2147483647",
+                   (test_obj.getPositiveInteger()==2147483647));
         } catch (Exception excep) {
             fail("error: " + excep);
         }
@@ -213,10 +254,33 @@ import junit.extensions.*;
 
         try {
             assert("both nonNegativeInteger are not equals: " + test_obj.getNonNegativeInteger()
-                   + " and " + "1",
-                   (test_obj.getNonNegativeInteger()==1));
+                   + " and " + "2147483647",
+                   (test_obj.getNonNegativeInteger()==2147483647));
         } catch (Exception excep) {
             fail("error: " + excep);
         }
     }  
+    
+        public void testNegativeInteger() {
+
+        try {
+            assert("both negativeInteger are not equals: " + test_obj.getNegativeInteger()
+                   + " and " + "-2147483648",
+                   (test_obj.getNegativeInteger()==-2147483648));
+        } catch (Exception excep) {
+            fail("error: " + excep);
+        }
+    }
+      
+    public void testNonPositiveInteger() {
+
+        try {
+            assert("both nonPositiveInteger are not equals: " + test_obj.getNonPositiveInteger()
+                   + " and " + "-2147483648",
+                   (test_obj.getNonPositiveInteger()==-2147483648));
+        } catch (Exception excep) {
+            fail("error: " + excep);
+        }
+    }
+    
 }

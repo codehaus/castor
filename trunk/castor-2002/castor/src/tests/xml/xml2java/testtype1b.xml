@@ -16,19 +16,19 @@
 
 <string>A test text</string>
 
-<integer>-1000000</integer> <!-- min value not defined by the W3C -->
-<int>-2147483648</int>
-<long>-1000</long>   <!-- +-9223372036854775808 is too big for the java long type used by castor -->
-<short>-32768</short>
+<integer>2147483647</integer> <!-- min value not defined by the W3C -->
+<int>2147483647</int>
+<long>9223372036854775807</long>   <!-- +-9223372036854775808 is too big for the java long type used by castor -->
+<short>32767</short>
 <boolean>false</boolean>
-<float>-10</float>  <!-- INF not recognized by the unmarshaller -->
-<double>-10</double> <!-- INF not recognized by the unmarshaller -->
+<float>3.4028235E38</float>  <!-- INF not recognized by the unmarshaller -->
+<double>1.7976931348623157E308</double> <!-- INF not recognized by the unmarshaller -->
 <decimal>-1000000</decimal> <!-- min value not defined by the W3C -->
 
 
-<positiveInteger>1</positiveInteger>
-<negativeInteger>-1000000</negativeInteger> <!-- min value not defined by the W3C -->
-<nonPositiveInteger>-1000000</nonPositiveInteger> <!-- min value not defined by the W3C -->
-<nonNegativeInteger>1</nonNegativeInteger>
+<positiveInteger>2147483647</positiveInteger>
+<negativeInteger>-2147483648</negativeInteger> <!-- min value not defined by the W3C -->
+<nonPositiveInteger>-2147483648</nonPositiveInteger> <!-- min value not defined by the W3C -->
+<nonNegativeInteger>2147483647</nonNegativeInteger>
 
 </testtype1>
