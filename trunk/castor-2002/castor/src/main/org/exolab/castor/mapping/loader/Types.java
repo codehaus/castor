@@ -50,6 +50,7 @@ package org.exolab.castor.mapping.loader;
 import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.io.Serializable;
@@ -493,6 +494,13 @@ public class Types
      */
     private static SimpleDateFormat _paramDateFormat = new SimpleDateFormat();
 
+    /**
+     * Date format used by the double->date convertor.
+     */
+    private static DecimalFormat _decimalFormat = new DecimalFormat("#################0");
+
+
+
 
     /**
      * List of all the default convertors between Java types.
@@ -682,6 +690,13 @@ public class Types
                 return new Double( ( (BigDecimal) obj ).doubleValue() );
             }
             public String toString() { return "BigDecimal->Double"; }
+        } ),
+        new TypeConvertorInfo( java.util.Date.class, java.lang.Double.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
+                return new Double( _paramDateFormat.format( (Date) obj ) );
+            }
+            public String toString() { return "Date->Double"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Double.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
@@ -905,6 +920,17 @@ public class Types
                 }
             }
             public String toString() { return "BigDecimal->Date"; }
+        } ),
+        new TypeConvertorInfo( java.lang.Double.class, java.util.Date.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
+                    return _paramDateFormat.parse( _decimalFormat.format(obj).trim() );
+                } catch ( ParseException except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "Double->Date"; }
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
