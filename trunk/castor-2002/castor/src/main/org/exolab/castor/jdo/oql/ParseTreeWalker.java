@@ -202,9 +202,9 @@ public class ParseTreeWalker implements TokenTypes
     }
     _engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
     if ( _engine == null )
-      throw new QueryException( "Could not find an engine supporting class " + _fromClassName );
-      
+      throw new QueryException( "Could not find mapping for class " + _fromClassName );
     _clsDesc = _engine.getDescriptor();
+    // This should never happen
     if ( _clsDesc == null )
       throw new QueryException( "Could not get a descriptor for class " + _fromClassName );
 
