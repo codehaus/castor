@@ -179,11 +179,14 @@ public class HighLowKeyGenerator implements KeyGenerator
             PreparedStatement stmt = null;
             PreparedStatement stmt2 = null;
             ResultSet rs;
+            boolean success;
 
             try {
                 // Create SQL sentence of the form
                 // "SELECT seq_val FROM seq_table WHERE seq_key='table'"
                 // with database-dependent keyword for lock
+                // [george stewart] Note, that some databases (InstantDB, 
+                // HypersonicSQL) don't support such locks.
                 query = _factory.getQueryExpression();
                 query.addColumn( _seqTable, _seqValue );
                 query.addCondition( _seqTable, _seqKey, QueryExpression.OpEquals, 
@@ -191,71 +194,86 @@ public class HighLowKeyGenerator implements KeyGenerator
 
                 // SELECT and put lock on the last record
                 sql = query.getStatement( true );
+                // For the case if the "SELECT FOR UPDATE" is not supported
+                // we perform dirty checking
                 sql2 = "UPDATE "+  _seqTable +
                     " SET " + _seqValue + "=" + JDBCSyntax.Parameter +
                     JDBCSyntax.Where + _seqKey + QueryExpression.OpEquals +
-                    JDBCSyntax.Parameter;
+                    JDBCSyntax.Parameter + JDBCSyntax.And + 
+                    _seqValue + "=" + JDBCSyntax.Parameter;
 
                 stmt = conn.prepareStatement( sql );
                 stmt.setString(1, tableName);
                 stmt2 = conn.prepareStatement( sql2 );
                 stmt2.setString(2, tableName);
 
-                rs = stmt.executeQuery();
-
-                if ( rs.next() ) {
-                    if ( _sqlType == Types.INTEGER ) {
-                        int value;
-                        int maxVal;
-
-                        value = rs.getInt( 1 );
-                        last = new Integer( value + 1 );
-                        maxVal = value + _grabSizeI;
-                        max = new Integer( maxVal );
-                        stmt2.setInt(1, maxVal);
-                    } else {
-                        BigDecimal value;
-                        BigDecimal maxVal;
-
-                        value = rs.getBigDecimal( 1 );
-                        last = value.add( ONE );
-                        maxVal = value.add( _grabSizeD );
-                        max = maxVal;
-                        stmt2.setBigDecimal(1, maxVal);
-                    }
-                    stmt2.executeUpdate();
-                } else {
-                    // [Terry Child] Initialize the counter with MAX(pk) + 1
-                    // for the case of switching from some other key generator 
-                    // to HIGH/LOW
-                    stmt.close();
-                    stmt = conn.prepareStatement( JDBCSyntax.Select + "MAX(" + 
-                                                  primKeyName + ") FROM " + tableName);
+                // Retry 7 times (lucky number)
+                success = false;
+                for ( int i = 0 ; ! success && i < 7 ; i++ ) {
                     rs = stmt.executeQuery();
-                    if ( _sqlType == Types.INTEGER ) {
-                        int maxPK = 0;
 
-                        if ( rs.next() ) {
-                            maxPK = rs.getInt(1);
+                    if ( rs.next() ) {
+                        if ( _sqlType == Types.INTEGER ) {
+                            int value;
+                            int maxVal;
+
+                            value = rs.getInt( 1 );
+                            stmt2.setInt(3, value);
+                            last = new Integer( value + 1 );
+                            maxVal = value + _grabSizeI;
+                            max = new Integer( maxVal );
+                            stmt2.setInt(1, maxVal);
+                        } else {
+                            BigDecimal value;
+                            BigDecimal maxVal;
+
+                            value = rs.getBigDecimal( 1 );
+                            stmt2.setBigDecimal(3, value);
+                            last = value.add( ONE );
+                            maxVal = value.add( _grabSizeD );
+                            max = maxVal;
+                            stmt2.setBigDecimal(1, maxVal);
                         }
-                        last = new Integer( maxPK + 1 );
-                        max = new Integer( maxPK + _grabSizeI );
+                        // For the case if the "SELECT FOR UPDATE" is not supported
+                        // we perform dirty checking
+                        success = (stmt2.executeUpdate() == 1);
                     } else {
-                        BigDecimal maxPK = new BigDecimal( 0 );
+                        // [Terry Child] Initialize the counter with MAX(pk) + 1
+                        // for the case of switching from some other key generator 
+                        // to HIGH/LOW
+                        stmt.close();
+                        stmt = conn.prepareStatement( JDBCSyntax.Select + "MAX(" + 
+                                                    primKeyName + ") FROM " + tableName);
+                        rs = stmt.executeQuery();
+                        if ( _sqlType == Types.INTEGER ) {
+                            int maxPK = 0;
 
-                        if ( rs.next() ) {
-                            maxPK = rs.getBigDecimal(1);
+                            if ( rs.next() ) {
+                                maxPK = rs.getInt(1);
+                            }
+                            last = new Integer( maxPK + 1 );
+                            max = new Integer( maxPK + _grabSizeI );
+                        } else {
+                            BigDecimal maxPK = new BigDecimal( 0 );
+
+                            if ( rs.next() ) {
+                                maxPK = rs.getBigDecimal(1);
+                            }
+                            last = maxPK.add( ONE );
+                            max = maxPK.add( _grabSizeD );
                         }
-                        last = maxPK.add( ONE );
-                        max = maxPK.add( _grabSizeD );
+                        stmt2.close();
+                        stmt2 = conn.prepareStatement("INSERT INTO " + _seqTable +
+                                                    " (" + _seqKey + "," + _seqValue +
+                                                    ") VALUES (?, ?)");
+                        stmt2.setString( 1, tableName );
+                        stmt2.setObject( 2, max );
+                        stmt2.executeUpdate();
+                        success = true;
                     }
-                    stmt2.close();
-                    stmt2 = conn.prepareStatement("INSERT INTO " + _seqTable +
-                                                " (" + _seqKey + "," + _seqValue +
-                                                ") VALUES (?, ?)");
-                    stmt2.setString( 1, tableName );
-                    stmt2.setObject( 2, max );
-                    stmt2.executeUpdate();
+                }
+                if ( ! success ) {
+                    throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
                 }
             } catch ( SQLException ex ) {
                 throw new PersistenceException( Messages.format(
