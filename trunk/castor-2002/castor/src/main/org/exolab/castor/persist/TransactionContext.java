@@ -155,6 +155,9 @@ public class TransactionContext
     private Xid         _xid;
 
 
+    private int         _txTimeout = 30;
+
+
     /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
@@ -313,11 +316,11 @@ public class TransactionContext
      * @return A query result iterator
      * @throws TransactionNotInProgressException Method called while
      *   transaction is not in progress
-     * @throws QueryException Could not process the query
+     * @throws QueryException An invalid query
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized QueryResults query( CacheEngine cache, Query query, int accessMode )
+    public synchronized QueryResults query( CacheEngine cache, PersistenceQuery query, int accessMode )
 	throws TransactionNotInProgressException, QueryException,
 	       PersistenceException
     {
@@ -785,6 +788,18 @@ public class TransactionContext
 
 
     /**
+     * Returns true if the object is persistent in this transaction.
+     *
+     * @param obj The object
+     * @return True if persistent in transaction
+     */
+    public boolean isPersistent( Object obj )
+    {
+	return ( getObjectEntry( obj ) != null );
+    }
+
+
+    /**
      * Returns the status of this transaction.
      */
     public int getStatus()
@@ -816,6 +831,18 @@ public class TransactionContext
     protected Xid getXid()
     {
 	return _xid;
+    }
+
+
+    void setTransactionTimeout( int timeout )
+    {
+	_txTimeout = timeout;
+    }
+
+
+    int getTransactionTimeout()
+    {
+	return _txTimeout;
     }
 
 
