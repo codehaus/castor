@@ -111,13 +111,13 @@
               <xsl:variable name="level" select="count(ancestor::*)"/>
               <xsl:choose>
                 <xsl:when test='$level=2'>
-                  <a href="#{@title}"><xsl:value-of select="@title"/></a><br/>
+                  <a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
                 </xsl:when>
                 <xsl:when test='$level=3'>
-                  <a href="#{@title}"><xsl:value-of select="@title"/></a><br/>
+                  <a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
                 </xsl:when>
                 <xsl:otherwise>
-                  &#xA0;&#xA0;&#xA0;<a href="#{@title}"><xsl:value-of select="@title"/></a><br/>
+                  &#xA0;&#xA0;&#xA0;<a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
@@ -211,19 +211,19 @@
     <xsl:choose>
       <xsl:when test='$level=2'>
         <xsl:if test="@ref-id"><a name="{@ref-id}"/></xsl:if>
-        <a name="{@title}"><h2><xsl:value-of select="@title"/></h2></a>
+        <a name="{translate(@title,' ','-')}"><h2><xsl:value-of select="@title"/></h2></a>
       </xsl:when>
       <xsl:when test='$level=3'>
         <xsl:if test="@ref-id"><a name="{@ref-id}"/></xsl:if>
-        <a name="{@title}"><h3><xsl:value-of select="@title"/></h3></a>
+        <a name="{translate(@title,' ','-')}"><h3><xsl:value-of select="@title"/></h3></a>
       </xsl:when>
       <xsl:when test='$level=4'>
         <xsl:if test="@ref-id"><a name="{@ref-id}"/></xsl:if>
-        <a name="{@title}"><h4><xsl:value-of select="@title"/></h4></a>
+        <a name="{translate(@title,' ','-')}"><h4><xsl:value-of select="@title"/></h4></a>
       </xsl:when>
       <xsl:otherwise>
         <xsl:if test="@ref-id"><a name="{@ref-id}"/></xsl:if>
-        <a name="{@title}"><h5><xsl:value-of select="@title"/></h5></a>
+        <a name="{translate(@title,' ','-')}"><h5><xsl:value-of select="@title"/></h5></a>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:apply-templates/>
