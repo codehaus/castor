@@ -77,20 +77,26 @@ import java.net.URLConnection;
  * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  */
 public class URIUtils {
+
+    /**
+     * The File protocol name
+     */
+    private static final String FILE_PROTOCOL = "file";
     
     /**
-     * the File protocol
-    **/
+     * the File protocol prefix (name + :// + host + /)
+     * where host is empty, meaning local host
+     */
     private static final String FILE_PROTOCOL_PREFIX = "file:///";
     
     /**
      * the path separator for an URI
-    **/
+     */
     private static final char HREF_PATH_SEP = '/';
     
     /**
      * The Device separator for an URI
-    **/
+     */
     private static final char DEVICE_SEP = '|';
     
 	/**
@@ -103,7 +109,7 @@ public class URIUtils {
 	 * @return an InputStream to the desired resource
 	 * @exception java.io.FileNotFoundException when the file could not be
 	 * found
-	**/
+	 */
 	public static InputStream getInputStream(String href, String documentBase) 
 	    throws java.io.FileNotFoundException, java.io.IOException
 	{
@@ -146,7 +152,7 @@ public class URIUtils {
 	 * @return an OutputStream to the desired resource
 	 * @exception java.io.FileNotFoundException when the file could not be
 	 * found
-	**/
+	 */
 	public static OutputStream getOutputStream(String href, String documentBase) 
 	    throws java.io.FileNotFoundException, java.io.IOException
 	{
@@ -155,15 +161,41 @@ public class URIUtils {
 	    
 	    //-- try using href alone as it might already be a full URL
 	    if ((url = getURL(href)) != null) {
-	        URLConnection connection = url.openConnection();
-	        return connection.getOutputStream();
+	        
+	        //-- If we have a file protocol make sure we
+	        //-- don't use connection#getOutputStream
+	        //-- as it's not supported.
+	        if (FILE_PROTOCOL.equals(url.getProtocol())) {
+	            //-- try local file
+	            File file = new File(url.getFile());
+	            if (file.exists()) {
+	                return new FileOutputStream(file);
+	            }
+	        }
+	        else {
+	            URLConnection connection = url.openConnection();
+	            return connection.getOutputStream();
+	        }
 	    }
 	    
 	    //-- try using documentBase
 	    String absHref = makeAbsolute(href, documentBase);
+	    
 	    if ((url = getURL(absHref)) != null) {
-	        URLConnection connection = url.openConnection();
-	        return connection.getOutputStream();
+	        //-- If we have a file protocol make sure we
+	        //-- don't use connection#getOutputStream
+	        //-- as it's not supported.
+	        if (FILE_PROTOCOL.equals(url.getProtocol())) {
+	            //-- try local file
+	            File file = new File(url.getFile());
+	            if (file.exists()) {
+	                return new FileOutputStream(file);
+	            }
+	        }
+	        else {
+	            URLConnection connection = url.openConnection();
+	            return connection.getOutputStream();
+	        }
 	    }
 	        
 	    // Try local files
@@ -192,7 +224,7 @@ public class URIUtils {
 	 * @return an InputStream to the desired resource
 	 * @exception java.io.FileNotFoundException when the file could not be
 	 * found
-	**/
+	 */
 	public static Reader getReader(String href, String documentBase) 
 	    throws java.io.FileNotFoundException, java.io.IOException
 	{
@@ -210,7 +242,7 @@ public class URIUtils {
 	 * @return a Writer to the desired resource
 	 * @exception java.io.FileNotFoundException when the file could not be
 	 * found
-	**/
+	 */
 	public static Writer getWriter(String href, String documentBase) 
 	    throws java.io.FileNotFoundException, java.io.IOException
 	{
@@ -222,7 +254,7 @@ public class URIUtils {
 	/**
 	 * Returns the document base of the href argument
 	 * @return the document base of the given href
-	**/
+	 */
 	public static String getDocumentBase(String href) {
 	    
 	    String docBase = "";
