@@ -215,82 +215,11 @@ public final class QueryResults
 
         handler = _engine.getClassMolder( _query.getResultType() );
 
+        // load the object thur the transaction of the query
         object = _tx.load( _engine, handler, _lastIdentities, _accessMode );
 
         return object;
 
-        /*
-        synchronized ( _tx ) {
-            // Get the next OID from the query engine. The object is
-            // already loaded into the persistence engine at this point and
-            // has a lock based on the original query (i.e. read write
-            // or exclusive). If no next record return null.
-            handler = _engine.getClassMolder( _query.getResultType() );
-            oid = new OID( _engine, handler, _lastIdentity );
-            
-            // Did we already load (or created) this object in this
-            // transaction.
-            entry = _tx.getObjectEntry( _engine, oid );
-            if ( entry != null ) {
-                // The object has already been loaded in this transaction
-                // and is available from the persistence engine.
-                if ( entry.deleted )
-                    // Object has been deleted in this transaction, so skip
-                    // to next object.
-                    throw new ObjectNotFoundException( handler.getJavaClass(), _lastIdentity );
-                else {
-                    if ( ( _accessMode == AccessMode.Exclusive ||
-                           _accessMode == AccessMode.DbLocked ) &&
-                         ! oid.isDbLock() ) {
-                        // If we are in exclusive mode and object has not been
-                        // loaded in exclusive mode before, then we have a
-                        // problem. We cannot return an object that is not
-                        // synchronized with the database, but we cannot
-                        // synchronize a live object.
-                        throw new PersistenceException( "persist.lockConflict",
-                                                            _query.getResultType(), _lastIdentity );
-                    } else {
-                        // Either read only or exclusive mode, and we
-                        // already have an object in that mode, so we
-                        // return that object.
-                        return entry.object;
-                    }
-                }
-            } else {
-
-                // First time we see the object in this transaction,
-                // must create a new record for this object. We only
-                // record the object in the transaction if in read-write
-                // or exclusive mode.
-                ObjectBin bin;
-                bin = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-                //oid = bin.oid;
-                handler = _engine.getClassMolder( oid.getJavaClass() );
-                object = handler.newInstance();
-                entry = _tx.addObjectEntry( _engine, handler, oid, object );
-                try {
-                    //_engine.copyObject( _tx, oid, object );
-                    if ( handler.getCallback() != null ) {
-                        handler.getCallback().using( object, _db );
-                        handler.getCallback().loaded( object );
-                    }
-                } catch ( Exception except ) {
-                    _tx.removeObjectEntry( object );
-                    _engine.forgetObject( _tx, oid );
-                    if ( handler.getCallback() != null )
-                        handler.getCallback().releasing( object, false );
-                    if ( except instanceof PersistenceException )
-                        throw (PersistenceException) except;
-                    throw new PersistenceException( except );
-                }         
-           
-                if ( _accessMode == AccessMode.ReadOnly ) {
-                    _tx.removeObjectEntry( object );
-                    _engine.releaseLock( _tx, oid );
-                }
-                return object;
-            }
-        } */
     }
 
 

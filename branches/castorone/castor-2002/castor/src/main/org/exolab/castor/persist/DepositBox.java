@@ -38,18 +38,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Id: DepositBox.java
  */
 
 package org.exolab.castor.persist;
 
 
+/**
+ * DepositBox is an interface for {@link ClassMolder} to access the dirty 
+ * checking cache of an object. 
+ * <p>
+ * Checking for accessMode will be done to each access of the DepositBox. 
+ * Only if a transaction has write access may <tt>setObject()</tt> or 
+ * {@link java.lang.IllegalArgumentException()} will be thrown. 
+ * <p>
+ * Only if a transaction with read or write access may call
+ * <tt>getObject()</tt>. Multiple transactions may own read access of the
+ * same DespositBox at the same time. Only one transaction may own write access
+ * at any given time.
+ * <p>
+ * Every time <tt>setObject()</tt> is called, the internal timestamp will be updated.
+ *
+ * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
+ */
 public interface DepositBox {
 
     /** 
-     *  Set the object of into DespositBox, only the transaction
-     *  have the write lock can set it.
+     *  Set an object into the DespositBox, only a transaction
+     *  has the write lock may call it method or IllegalArgumentException
+     *  will be thrown.
      *
      *  @param  tx the transaction in action
      *  @param  object to be store into deposit box
@@ -59,7 +78,7 @@ public interface DepositBox {
     public void setObject( TransactionContext tx, Object object );
 
     /** 
-     *  Get the object of from DespositBox, only the transaction
+     *  Get the object from the DespositBox, only the transaction
      *  have the read or write lock can get it.
      *
      *  @param  tx the transaction in action
@@ -70,9 +89,7 @@ public interface DepositBox {
     public Object getObject( TransactionContext tx ); 
 
     /**
-     *  Get the time of the most recent method call on {@link setObject} 
-     *  to this box. 
-     *
+     *  Get the time of the most recent call on setObject(Object)}.
      */
     public long getTimeStamp();
 }

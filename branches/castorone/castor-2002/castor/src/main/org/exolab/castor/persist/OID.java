@@ -78,15 +78,20 @@ public final class OID {
      */
     private final Class        _javaClass;
 
-
-
+    /**
+     * The LockEngine of the object
+     */
     private final LockEngine  _engine;
 
-
-
+    /**
+     * The ClassMolder of the object
+     */
     private final ClassMolder _molder;
 
 
+    /**
+     * The OID of depended object
+     */
     private final OID         _depends;
 
     /**
@@ -112,9 +117,16 @@ public final class OID {
      */
     private Class _topClass;
 
+    /**
+     * Constructor
+     */
     OID( LockEngine engine, ClassMolder molder, Object[] identities ) {
         this( engine, molder, null, identities );
     }
+
+    /**
+     * Constructor
+     */
     OID( LockEngine engine, ClassMolder molder, OID depends, Object[] identities ){
 
         if ( engine == null )
@@ -146,6 +158,16 @@ public final class OID {
         _hashCode = temp;
     }
 
+    /**
+     * Utility method for testing if two array contains the same elements.
+     * It is different from java.util.Arrays.equals( Object[], Object[]).
+     * If the element of the Object[] is Object[], it method will iterately
+     * call itself to evaluate if the elements are equal.
+     *
+     * @param object1 - the first object to compare.
+     * @param object2 - the second object to compare.
+     * @return true if two object is equals
+     */
     public static boolean isEquals( Object[] object1, Object[] object2 ) {
         if ( object1 == object2 ) 
             return true;
@@ -173,6 +195,10 @@ public final class OID {
         return true;
     }
 
+    /**
+     * Utility method for comparing for equalness of two objects.
+     *
+     */
     public static boolean isEquals( Object object1, Object object2 ) {
         if ( object1 == object2 ) 
             return true;
@@ -184,6 +210,13 @@ public final class OID {
             return object1.equals( object2 );
     }
 
+    /**
+     * Utility method for comparing two Vector. 
+
+     * @param object1 - the first vector to compare.
+     * @param object2 - the second vector to compare.
+     * @return true if two object contains the same set of elements
+     */    
     public static boolean isEquals( Vector object1, Vector object2 ) {
         if ( object1 == object2 ) 
             return true;
@@ -201,6 +234,13 @@ public final class OID {
         return true;
     }
 
+    /**
+     * Utility method for comparing two ArrayVector. 
+
+     * @param object1 - the first vector to compare.
+     * @param object2 - the second vector to compare.
+     * @return true if two object contains the same set of elements
+     */    
     public static boolean isEquals( ArrayVector object1, ArrayVector object2 ) {
         if ( object1 == object2 ) 
             return true;
@@ -218,6 +258,10 @@ public final class OID {
         return true;
     }
 
+    /** 
+     * Utility method to convert an Object[] into a comma
+     * separated string.
+     */
     public static String flatten( Object[] objects ) {
         if ( objects == null )
             return null;
@@ -233,6 +277,12 @@ public final class OID {
         return sb.toString();
     }
 
+    /**
+     * Utility method to test if the identity is null.
+     *
+     * @return true if the parameter is null, or if any
+     *     element of the array is null.
+     */
     public static boolean isIdsNull( Object[] objects ) {
         if ( objects == null )
             return true;
@@ -246,6 +296,9 @@ public final class OID {
         return false;
     }
 
+    /**
+     * Returns true the identity is null
+     */
     public boolean isIdsNull() {
         if ( _identities == null )
             return true;
@@ -259,18 +312,34 @@ public final class OID {
         return false;
     }
 
+    /**
+     * Get the depended object's oid
+     *
+     * @return the depended object's oid
+     */
     public OID getDepends() {
         return _depends;
     }
 
+    /**
+     * Get the ClassMolder of this object
+     *
+     * @return the ClassMolder of this object
+     */ 
     ClassMolder getMolder() {
         return _molder;
     }
 
 
+    /**
+     * Get the LockEngine of this object
+     *
+     * @return the LockEngine of this object.
+     */
     LockEngine getLockEngine() {
         return _engine;
     }
+
     /**
      * Returns the OID's stamp. The stamp may be used to efficiently
      * implement dirty checking. The stamp is set with a call to
@@ -280,8 +349,7 @@ public final class OID {
      *
      * @return The OID's stamp, or null
      */
-    Object getStamp()
-    {
+    Object getStamp() {
         return _stamp;
     }
 
@@ -293,8 +361,7 @@ public final class OID {
      *
      * @param stamp The OID's stamp
      */
-    void setStamp( Object stamp )
-    {
+    void setStamp( Object stamp ) {
         _stamp = stamp;
     }
 
@@ -309,8 +376,7 @@ public final class OID {
      * @param dbLock True the object represented by this OID has
      *  a database lock
      */
-    void setDbLock( boolean dbLock )
-    {
+    void setDbLock( boolean dbLock ) {
         _dbLock = dbLock;
     }
 
@@ -325,8 +391,7 @@ public final class OID {
      * @return True the object represented by this OID is loaded
      *  with a datbase lock
      */
-    boolean isDbLock()
-    {
+    boolean isDbLock() {
         return _dbLock;
     }
 
@@ -341,8 +406,7 @@ public final class OID {
      *
      * @return The object's identity, or null
      */
-    Object[] getIdentities()
-    {
+    Object[] getIdentities() {
         return _identities;
     }
 
@@ -354,8 +418,7 @@ public final class OID {
      *
      * @return The object's type
      */
-    Class getJavaClass()
-    {
+    Class getJavaClass() {
         return _javaClass;
     }
 
@@ -387,14 +450,12 @@ public final class OID {
     }
 
 
-    public String toString()
-    {
+    public String toString() {
         return _javaClass.getName() + "/" + ( _identities == null ? "<new>" : OID.flatten( _identities ) );
     }
 
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return _hashCode;
     }
 

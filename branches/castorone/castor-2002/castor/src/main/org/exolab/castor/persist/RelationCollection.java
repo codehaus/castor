@@ -1,9 +1,49 @@
-
-
-
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Intalio, Inc.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ *
+ * $Id: RelationCollection,
+ */
 
 package org.exolab.castor.persist;
-
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,35 +58,63 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 
+/**
+ * RelationCollection implements {@link java.util.Collection}
+ * It is a lazy Colllection. The collection initially contains only the 
+ * identities of elements of one type. If any element is needed, it will 
+ * be fetched "on the fly".
+ *
+ * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
+ */
 public class RelationCollection implements Collection, Lazy {
 
-    TransactionContext _tx;
+    /**
+     * Transaction to fetch an element on the fly if needed.
+     */
+    private TransactionContext _tx;
 
-    LockEngine _engine;    
+    /**
+     * The LockEngine which the elements belong to.
+     */
+    private LockEngine _engine;    
     
-    ClassMolder _molder;
+    /**
+     * The ClassMolder of the elemtns.
+     */
+    private ClassMolder _molder;
 
-    AccessMode _accessMode;
+    /**
+     * AccessMode of the elements.
+     */
+    private AccessMode _accessMode;
 
-    OID _oid;
+    /**
+     * The oid of related object of all the elements.
+     */
+    private OID _oid;
 
     /* Vector of identity */
-    // to be change to oid for multi-pk support
-    ArrayVector _ids;
+    private ArrayVector _ids;
 
     /* Vector of identity */
-    ArrayVector _deleted;
+    private ArrayVector _deleted;
 
     /* Vector of identity */ 
-    ArrayVector _added;
+    private ArrayVector _added;
 
     /* Vector of object */
-    Map _loaded;
+    private Map _loaded;
 
-    int _changecount;
+    /* the change count of the collection */
+    private int _changecount;
 
-	int _size;
+    /* the number of elements in this collection */
+	private int _size;
 
+    /**
+     * Constructor
+     *
+     */ 
     public RelationCollection( TransactionContext tx, OID enclosing, LockEngine engine, 
             ClassMolder molder, AccessMode amode, ArrayVector ids ) {
         _tx = tx;

@@ -38,8 +38,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id: SQLRelationLoader.java,
  */
 
 
@@ -67,7 +68,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * SQLRelationLoader is a quick hack for creating and removing
+ * relation from a many-to-many relation database from ClassMolder. 
+ * Eventually, it will be merged into SQLEngine. But, it requires 
+ * chaning of the Persistence interface.
+ *
+ * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
+ */
 public class SQLRelationLoader {
+
     private String tableName;
 
 	private int[] leftType;
@@ -78,30 +88,25 @@ public class SQLRelationLoader {
     
     private String[] right;
 
+    /**
+     * the SQL statement for selecting the relation from the relation table.
+     */ 
 	private String select;
 
+    /**
+     * the SQL statement to insert the a new relation into the relation table.
+     */
 	private String insert;
 
+    /**
+     * the SQL statement to delete an relation from the relation table.
+     */
 	private String delete;
 
+    /**
+     * the SQL statement to delete all the relation assoicate with the left side type
+     */
 	private String deleteAll;
-
-
-	/*
-    public SQLRelationLoader( RelationDescriptor rd, String type ) throws MappingException {
-        if ( rd.type1 != type && rd.type2 != type )
-            throw new MappingException("Wrong relation descriptor for type:"+type);
-
-        left = type;
-        if ( rd.type1.equals(type) ) {
-            left = rd.sql1;
-            right = rd.sql2;
-        } else {
-            left = rd.sql2;
-            right = rd.sql1;
-        }
-        
-    }*/
 
     public SQLRelationLoader( String table, String[] key, int[] keyType, String[] otherKey, int[] otherKeyType ) {
         tableName = table;

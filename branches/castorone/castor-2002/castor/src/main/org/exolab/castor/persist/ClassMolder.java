@@ -40,6 +40,7 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id: ClassMolder.java,
  */
 
 
@@ -86,42 +87,114 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 
+/**
+ * ClassMolder is a binder for one type of data object and its 
+ * {@link Persistence}. For example, when ClassMolder is asked to load 
+ * an object, it acquires values from {@link Persistence} and binds it 
+ * into an target object. It also resolves relations via 
+ * {@link TransactionContext} and bind related object into an target object. 
+ * <p>
+ * Beside loading, ClassMolder is also repsonsible for storing, removing,
+ * creating an object to and from a persistence storage, as well as 
+ * reverting an object to previous state.
+ * <p>
+ * Each instance of ClassMolder deals with exactly one persistable type, 
+ * interacts with one instance of Persistent and belongs to one 
+ * {@link LockEngine}.
+ * <p>
+ *
+ * 
+ * @author <a href="yip@intalio.com">Thomas Yip</a>
+ */
+
 public class ClassMolder {
 
-    Class _base;
+    /**
+     * The java data object class which this ClassMolder corresponding to.
+     * (We calls it base class.)
+     */
+    private Class _base;
 
-    String _name;
+    /**
+     * The fully qualified name of the base class.
+     */ 
+    private String _name;
 
-    FieldMolder[] _ids;
+    /**
+     * <tt>FieldMolder</tt>s of the identity of the base class
+     */
+    private FieldMolder[] _ids;
 
-    FieldMolder[] _fhs;
+    /**
+     * <tt>FieldMolder</tt>s of the fields of the base class
+     */ 
+    private FieldMolder[] _fhs;
     
-    ClassMolder _extends;
+    /**
+     * <tt>ClassMolder</tt> of the java data object class's ClassMolder which 
+     * the base class extends.
+     */
+    private ClassMolder _extends;
 
-    ClassMolder _depends;
+    /**
+     * <tt>ClassMolder</tt> of the java data object class's ClassMolder which 
+     * the base class depends on. <tt>null</tt> if it class is an indenpendent
+     * class.
+     */
+    private ClassMolder _depends;
 
-    Vector _dependent;
+    /**
+     * A Vector of <tt>ClassMolder</tt>s for all the direct dependent class of the 
+     * base class.
+     */
+    private Vector _dependent;
 
-    Vector _extendent;
+    /**
+     * A Vector of <tt>ClassMolder</tt>s for all the direct extending class of the
+     * base class.
+     */ 
+    private Vector _extendent;
 
-    AccessMode _accessMode;
+    /**
+     * Default accessMode of the base class.
+     */
+    private AccessMode _accessMode;
 
-    Persistence _persistence;
+    /**
+     * The Persistent of the base class.
+     */
+    private Persistence _persistence;
 
-    LockEngine _engine;
+    /**
+     * The LockEngine which this instace of ClassMolder belong to.
+     */
+    private LockEngine _engine;
 
-    CallbackInterceptor _callback;
+    /**
+     * The CallbackInterceptor for the base class.
+     */
+    private CallbackInterceptor _callback;
 
-    int _cachetype;
+    /**
+     * The LRU mechanism to be used for caching freed instance of the base class.
+     */
+    private int _cachetype;
 
-    int _cacheparam;
-    /*
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append( _name );
-        return sb.toString();
-    }*/
+    /**
+     * The LRU parameter(or capcity) to be used for caching freed instance of the 
+     * base class.
+     */
+    private int _cacheparam;
 
+    /**
+     * Constructor
+     *
+     * @param ds      is the helper class for resolving depends and extends relationship
+     *                among all the ClassMolder in the same LockEngine.
+     * @param loader  is the mapping loader
+     * @param classDescriptor   the classDescriptor for the base class
+     * @param persist the Persistent for the base class
+     */
     ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist ) 
             throws ClassNotFoundException, MappingException {
 
@@ -155,21 +228,26 @@ public class ClassMolder {
 
         if ( clsDesc instanceof JDOClassDescriptor ) {
             if ( ((JDOClassDescriptor) clsDesc).getCacheType() != null ) {
-                _cachetype = ((JDOClassDescriptor) clsDesc).getCacheType().getType();
-                _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheType().getCapacity();
+                _cachetype = LRU.mapType( ((JDOClassDescriptor) clsDesc).getCacheType() );
+                _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheParam();
             }
         }
         
+        // construct <tt>FieldModler</tt>s for each of the identity fields of 
+        // the base class.
         FieldMapping[] fmId = getIdFields( clsMap );
         _ids = new FieldMolder[fmId.length];
         for ( int i=0; i<_ids.length; i++ ) {
             _ids[i] = new FieldMolder( ds, this, fmId[i] );
         }
 
+        // construct <tt>FieldModlers</tt>s for each of the fields of the base
+        // class.
         FieldMapping[] fmFields = getFullFields( clsMap );
         _fhs = new FieldMolder[fmFields.length];
         for ( int i=0; i<_fhs.length; i++ ) {
             if ( fmFields[i].getSql() != null && fmFields[i].getSql().getManyTable() != null ) {
+                // the fields is not primitive
                 String manyTable = null; 
                 String[] idSQL = null;
                 int[] idType = null;
@@ -235,6 +313,7 @@ public class ClassMolder {
         if ( Persistent.class.isAssignableFrom( _base ) )
             _callback = new JDOCallback();
     }
+
     /**
      * Break a string into array of substring which serparated 
      * by a delimitator
@@ -264,6 +343,7 @@ public class ClassMolder {
         v.copyInto( result );
         return result;
     }
+
     /* 
      * Get the all the id fields of a class
      * If the class, C, is a dependent class, then
@@ -288,10 +368,6 @@ public class ClassMolder {
             base = (ClassMapping) base.getExtends();
         }
         fmDepended = null; 
-        /*
-        if ( base.getDepends() != null ) {
-            fmDepended = getIdFields( (ClassMapping) base.getDepends() );
-        }*/
 
         identities = breakApart( base.getIdentity(), ' ' );
        
@@ -373,6 +449,15 @@ public class ClassMolder {
         return fields;
     }
 
+    /**
+     * Resolve and construct all the <tt>ClassMolder</tt>s given a MappingLoader.
+     *
+     * @param   loader    MappingLoader for the LockEngine
+     * @param   lock      LockEngine for all the ClassMolder 
+     * @param   factory   factory class for getting Persistent of the ClassMolder
+     *
+     * @return  Vector of all of the <tt>ClassMolder</tt>s from a MappingLoader
+     */
     public static Vector resolve( MappingLoader loader, LockEngine lock, 
             PersistenceFactory factory, LogInterceptor logInterceptor )
             throws MappingException, ClassNotFoundException {
@@ -401,6 +486,26 @@ public class ClassMolder {
         return result;
     }
 
+    /**
+     * Remove the reference of a related object from an object of. 
+     * the base class. <p>
+     *
+     * If the related object is PersistanceCapable, the field will
+     * be set null. If the related object is a Collection, then
+     * the related object will be removed from the Collection. <p>
+     *
+     * If any changed occured, transactionContext.markModified
+     * will be called, to indicate the object is modified. <p>
+     *
+     * It method will iterate thur all of the object's field and
+     * try to remove all the occurence.
+     *
+     * @param tx      the TransactionContext of the transaction in action
+     * @param object  the target object of the base type of this ClassMolder
+     * @param relatedMolder  the ClassMolder of the related object to be
+     *                       removed from the object
+     * @param related        the object to be removed
+     */
     private boolean removeRelation( TransactionContext tx, Object object, ClassMolder relatedMolder, Object relatedObject ) {
 
         boolean removed = false;
@@ -411,6 +516,7 @@ public class ClassMolder {
             ClassMolder fieldClassMolder;
             switch (fieldType) {
             case FieldMolder.PERSISTANCECAPABLE:
+                // de-reference the object
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 if ( fieldClassMolder == relatedMolder ) {
                     Object related = _fhs[i].getValue( object );
@@ -425,6 +531,7 @@ public class ClassMolder {
                 break;
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
+                // remove the object from the collection
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 if ( fieldClassMolder == relatedMolder ) {
                     // same action to be taken for lazy and non lazy collection
@@ -443,13 +550,20 @@ public class ClassMolder {
         tx.markModified( object, updatePersist, updateCache );
         return removed;
     }
-    //
-    // Methods of LockEngine, which called by TransactionContext
-    //
-    public OID load( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
 
+    /**
+     * Load an object with specified identity from the persistent storage.
+     *
+     * @param tx   the TransactionContext in action
+     * @param oid  the object identity of the desired object
+     * @param locker   the {@link DepositBox} of the object which is used to 
+     *                 store the dirty checking cache of the object.
+     * @param accessMode  the acessMode for the object
+     * @return the object stamp for the object in the persistent storage
+     */
+    public Object load( TransactionContext tx, OID oid, DepositBox locker, 
+            Object object, AccessMode accessMode )
             throws ObjectNotFoundException, PersistenceException {       
-        //System.out.println("ClassMolder.load(): Oid: "+oid);
 
         Connection conn;
         ClassMolder fieldClassMolder;
@@ -465,7 +579,9 @@ public class ClassMolder {
 
         if ( oid.isIdsNull() ) 
             throw new PersistenceException("The identities of the object to be loaded is null");
-            
+      
+        // load the fields from the persistent storage if the cache is empty
+        // and the accessMode is readOnly.
         fields = (Object[]) locker.getObject( tx );
         if ( fields == null ) {
             fields = new Object[_fhs.length];
@@ -475,27 +591,25 @@ public class ClassMolder {
             locker.setObject( tx, fields );
         }
 
+        // set the timeStamp of the data object to locker's timestamp
         if ( object instanceof TimeStampable ) {
             ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
         }
 
+        // set the identities into the target object
         ids = oid.getIdentities();
         for ( int i=0; i<_ids.length; i++ ) {
-            //System.out.println("Ids.length: "+ids.length);
             if ( ids[i] == null )
                 throw new PersistenceException( "One of the identities is null!" );
             _ids[i].setValue( object, ids[i] );
         }
 
-        for ( int i=0; i<_fhs.length; i++ ) {
-            //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
-        }
-        //System.out.println("  is loaded!");
-    
+        // iterates thur all the field of the object and bind all fields
         for ( int i = 0; i < _fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
+                // simply set the corresponding Persistent field value into the object
                 temp = (Object[]) fields[i];
                 if ( temp != null ) 
                     _fhs[i].setValue( object, temp[0] );
@@ -504,16 +618,20 @@ public class ClassMolder {
                 break;
 
             case FieldMolder.PERSISTANCECAPABLE:
+                // field is not primitive type. Related object will be loaded
+                // if needed thru the transaction in action.
+
+                // lazy loading for object (hollow object) is not support in 
+                // this version. Warns user if lazy loading is specified.
                 if ( _fhs[i].isLazy() )
                     System.err.println( "Warning: Lazy loading of object is not yet support!" );
 
-                // depedent class won't have persistenceInfo in LockEngine
-                // must look at fieldMolder for it
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
                 if ( !OID.isIdsNull( (Object[])fields[i] ) ) {
-                    // convert 
+                    // use the corresponding Persistent fields as the identity, 
+                    // and we ask transactionContext in action to load it.
                     value = tx.load( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
                     _fhs[i].setValue( object, value );
                 } else {
@@ -521,16 +639,21 @@ public class ClassMolder {
                 }
                 break;
             case FieldMolder.ONE_TO_MANY:
-                if ( !_fhs[i].isLazy() ) {
-                    ArrayList col = new ArrayList();
-                    //(ArrayList)_fhs[i].getCollectionType().newInstance();
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
+            case FieldMolder.MANY_TO_MANY:
+                // field is one-to-many and many-to-many type. All the related 
+                // object will be loaded and put in a Collection. And, the 
+                // collection will be set as the field.
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
 
+                if ( !_fhs[i].isLazy() ) {
+                    // lazy loading is not specified, load all objects into 
+                    // the collection and set the Collection as the data object
+                    // field.
+                    ArrayList col = new ArrayList();
                     ArrayVector v = (ArrayVector)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
                             col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
                         }
                         _fhs[i].setValue( object, col );
@@ -538,32 +661,10 @@ public class ClassMolder {
                         _fhs[i].setValue( object, null );
                     }
                 } else {
+                    // lazy loading is specified. Related object will not be loaded.
+                    // A lazy collection with all the identity of the related object
+                    // will constructed and set as the data object's field.
                     ArrayVector list = (ArrayVector) fields[i];
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
-                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
-                    _fhs[i].setValue( object, relcol );
-                }
-                break;
-            case FieldMolder.MANY_TO_MANY:
-                if ( !_fhs[i].isLazy() ) {
-                    ArrayList col = new ArrayList();
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
-
-                    ArrayVector v = (ArrayVector)fields[i];
-                    if ( v != null ) {                        
-                        for ( int j=0,l=v.size(); j<l; j++ ) {
-                            col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
-                        }
-                        _fhs[i].setValue( object, col );
-                    } else {
-                        _fhs[i].setValue( object, null );
-                    }
-                } else {
-                    ArrayVector list = (ArrayVector) fields[i];
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
                     RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
                     _fhs[i].setValue( object, relcol );
                 }
@@ -572,22 +673,20 @@ public class ClassMolder {
                 throw new PersistenceException("Unexpected field type!");
             }
         }
-
-        return oid;
+        return null;
     }
 
-    public ObjectBin fetch( TransactionContext tx, PersistenceQuery pq, OID oid, AccessMode accessMode )
-            throws ObjectNotFoundException, PersistenceException {
-        // seem like we don't need fetch anymore, queryresult now call 
-        // transactionContext.load instead of calling classmolder itself
-        // same as load, exception call pq.fetch, in place of load
-        throw new RuntimeException("ObjectBin.fetch() is not implemented!");        
-    }
-
+    /**
+     * Create an object of the base class with specified identity into the persistence storage.
+     *
+     * @param tx   transaction in action
+     * @param oid  the object identity of the object to be created. 
+     * @param locker the dirty checking cache of the object
+     * @param object  the object to be created
+     * @return  the identity of the object
+     */
     public Object[] create( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws DuplicateIdentityException, PersistenceException {
-
-        //System.out.println("ClassMolder.create(): Oid: "+oid);
 
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -609,9 +708,9 @@ public class ClassMolder {
         if ( _persistence == null )
             throw new PersistenceException("non persistence capable: "+oid.getJavaClass());        
 
-        // idea
-        // should optimize it into 3 phase
-        // because _fhs[i].getObject is expensive
+        // optimization note: because getObject is an expensive operation, 
+        // if this method divided into 3 phase, the performance will be
+        // enhanced.
         // 1/ getObject into array
         // 2/ put things in cache
         // 3/ deal with relations
@@ -670,34 +769,38 @@ public class ClassMolder {
             }
         }
 
+        // ask Persistent to create the object into the persistence storage
         createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()), 
                 fields, ids );
-
-        locker.setObject( tx, fields );
-        oid.setDbLock( true );
-
-        if ( object instanceof TimeStampable ) {
-            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
-        }
-
-        for ( int i=0; i<_ids.length; i++ ) {
-            _ids[i].setValue( object, createdId[i] );        
-        }
-        for ( int i=0; i<_fhs.length; i++ ) {
-            //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
-        }
-        //System.out.println(" will be created");
 
         if ( createdId == null || createdId[0] == null )
             throw new PersistenceException("Identity can't be created!");
 
-        // ================================================
+        // if the creation succeed, we set the field into the dirty checking
+        // cache.
+        locker.setObject( tx, fields );
+        oid.setDbLock( true );
+
+        // set the new timeStamp into the data object
+        if ( object instanceof TimeStampable ) {
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+        }
+
+        // set the identity into the object
+        for ( int i=0; i<_ids.length; i++ ) {
+            _ids[i].setValue( object, createdId[i] );        
+        }
+
+        // iterate all the fields and create all the dependent object.
         for ( int i=0; i<_fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
+                // nothing need to be done here for primitive
                 break;
+
             case FieldMolder.PERSISTANCECAPABLE:
+                // create dependent object if exists
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
@@ -717,6 +820,7 @@ public class ClassMolder {
                 }
                 break;
             case FieldMolder.ONE_TO_MANY:
+                // create dependent objects if exists
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
@@ -733,13 +837,19 @@ public class ClassMolder {
                                 if ( !tx.isDepended( oid, oo ) )
                                     throw new PersistenceException("Dependent object may not change its master");
                         } else {
-                            //if ( !tx.isPersistent( oo ) ) 
+                            // only dependent object will be created when 
+                            // master object is created. 
+                            // user should create all independent object 
+                            // manually.
+
+                            // if ( !tx.isPersistent( oo ) ) 
                             //    tx.create( fieldEngine, fieldClassMolder, oo, null );
                         }
                     }
                 }
                 break;
             case FieldMolder.MANY_TO_MANY:
+                // create relation if the relation table
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
@@ -748,35 +858,46 @@ public class ClassMolder {
                     // many-to-many relation is never dependent relation
                     while (itor.hasNext()) {
                         Object oo = itor.next();
-                        if ( !tx.isPersistent( oo ) ) {
-                            //System.out.println("Object Does not Exist!");
-                            //tx.create( fieldEngine, fieldClassMolder, oo, null );
-                        } else {
-                            //System.out.println("Object already created and will not be recreated!");
-                        }
-                        // create the relation in relation table too
-                        _fhs[i].getRelationLoader().createRelation( 
-                        (Connection)tx.getConnection(oid.getLockEngine()), 
-                        oid.getIdentities(), fieldClassMolder.getIdentities(oo) );
+                        if ( !tx.isPersistent( oo ) )                         
+                            _fhs[i].getRelationLoader().createRelation( 
+                            (Connection)tx.getConnection(oid.getLockEngine()), 
+                            oid.getIdentities(), fieldClassMolder.getIdentities(oo) );
                     }
                 }
                 break;
             default:
+                // should never happen
                 throw new IllegalArgumentException("Field type invalid!");
             }
         }
 
-        if ( createdId != ids ) 
+        if ( createdId != ids )
             return createdId;
         else 
             return null;
     }
 
-
+    /**
+     * Check the object for modification. If dpendent object is dereferenced, it 
+     * method will remove the object thru the transaction. If an related object 
+     * is dereferenced, it method will make sure the formally object will be 
+     * dereferenced from the other side as well.
+     * 
+     * This method is called in prepare (for commit) state of the transaction.
+     * This method indicates if the object needed to be persist or cache should
+     * be update using TransactionContext.markDelete.
+     *
+     * @param tx transaction in action
+     * @param oid the object identity of the object
+     * @param locker the dirty check cache for the object
+     * @param object the data object to be checked
+     * @param timeout  timeout of updating the lock if needed
+     *
+     * @return true if the object is modified
+     */
     public boolean preStore( TransactionContext tx, OID oid, DepositBox locker, Object object, int timeout )
             throws PersistenceException {
 
-        // if cached.id != object.id, rise exception
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         Object[] newfields;
@@ -820,6 +941,7 @@ public class ClassMolder {
         lockrequired = false;
         updateCache = false;
 
+        // iterate thru all the data object fields for modification
         for ( int i=0; i<newfields.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
@@ -846,6 +968,7 @@ public class ClassMolder {
                 if ( o != null ) 
                     newfields[i] = fieldClassMolder.getIdentities( o );
 
+                // the following code probably can be optimized if needed
                 if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
                     updateCache = true;
                     if ( _fhs[i].isStored() ) {
@@ -998,7 +1121,6 @@ public class ClassMolder {
                                 else
                                     fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );    
                             } else { 
-                                //System.out.println("Object to be delete is not found!");
                                 // what to do if it happens?
                             }
                         }
@@ -1024,7 +1146,6 @@ public class ClassMolder {
                                     tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
                                 } else {
                                     // what to do if it happens?
-                                    //System.out.println("Object to be added is not found!");
                                 }
                             }
                         } else {
@@ -1240,7 +1361,15 @@ public class ClassMolder {
         // update oid and setStamp
     }
 
-
+    /**
+     * Store a data object into the persistent storage of the base class of this
+     * ClassMolder.
+     *
+     * @param tx Transaction in action
+     * @param oid the object identity of the stored object
+     * @param locker the dirty check cache of the object
+     * @param object the object to be stored
+     */
     public void store( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws DuplicateIdentityException, PersistenceException,
             ObjectModifiedException, ObjectDeletedException {
@@ -1249,18 +1378,8 @@ public class ClassMolder {
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         Object[] newfields;
-        Object[] dependIds;
         Object[] fields;
-        Iterator itor;
-        ArrayVector list;
-        ArrayVector orgFields;
-        Object newobj;
-        Object oldobj;
-        Object fetched;
-        Object[] fids;
-        Object[] newids;
         Object[] ids;
-        Object[] ffid;
         Object o;
         int fieldType;
         boolean modified;
@@ -1314,10 +1433,17 @@ public class ClassMolder {
         oid.setStamp( stamp );
     }
 
+    /**
+     * Update the object which loaded or created in the other transaction to
+     * the persistent storage. 
+     *
+     * @param tx Transaction in action
+     * @param oid the object identity of the stored object
+     * @param locker the dirty check cache of the object
+     * @param object the object to be stored
+     */
     public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
-        throws PersistenceException, ObjectModifiedException {
-
-        System.out.println("ClassMolder.update(): Oid: "+oid);
+            throws PersistenceException, ObjectModifiedException {
 
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -1352,12 +1478,10 @@ public class ClassMolder {
         if ( object instanceof TimeStampable ) {
             TimeStampable ts = (TimeStampable) object;
             if ( ts.jdoGetTimeStamp() != timestamp ) {
-                System.out.println("object timestamp: "+ts.jdoGetTimeStamp()+" timeStamp: "+timestamp);
                 throw new ObjectModifiedException( "Time stamp mismatched!" );
                     /*Messages.format( "persist.objectModified", object.getClass(), OID.flatten( ids ) ) ); */
             } 
         }
-        System.out.println("time stamp work");
 
         // load the original field into the transaction. so, store will
         // have something to compare later.
@@ -1368,7 +1492,6 @@ public class ClassMolder {
                 case FieldMolder.PRIMITIVE:
                     break;
                 case FieldMolder.PERSISTANCECAPABLE:
-                    System.out.println("persistcapable");
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
                     if ( _fhs[i].isDependent() ) {
@@ -1378,7 +1501,6 @@ public class ClassMolder {
                         // load all the cached dependent object 
                         value = tx.load( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
                     } else {
-                        System.out.println("not dependent");
                         o = _fhs[i].getValue( object );
                         if ( !tx.isPersistent( o ) ) {
                             //tx.update( fieldEngine, fieldClassMolder, o, null );
@@ -1387,18 +1509,16 @@ public class ClassMolder {
                         }
                     }
                     break;
+
                 case FieldMolder.ONE_TO_MANY:
-                    System.out.println("one to many");
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
                     if ( _fhs[i].isDependent() ) {
                         if ( !_fhs[i].isLazy() ) {
                             ArrayList col = new ArrayList();
-                            //(ArrayList)_fhs[i].getCollectionType().newInstance();
                             ArrayVector v = (ArrayVector)fields[i];
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
-                                    //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
                                     col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
                                 }
                             } 
@@ -1409,13 +1529,14 @@ public class ClassMolder {
                             RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, avlist );
                         }
                     } else {
-                        System.out.println("not dependent");
+                        // related object should be update maually
+                        /*
                         o = _fhs[i].getValue( object );
-                        if ( !tx.isPersistent( o ) ) {
+                        if ( !tx.isPersistent( o ) ) 
                             //tx.update( fieldEngine, fieldClassMolder, o, null );
-                        } else {
+                        else 
                             //tx.create( fieldEngine, fieldClassMolder, o, null );
-                        }                        
+                        */
                     }
                     break;                
                 case FieldMolder.MANY_TO_MANY:
@@ -1425,86 +1546,18 @@ public class ClassMolder {
         } catch ( ObjectNotFoundException e ) {
             throw new ObjectModifiedException("dependent object deleted concurrently");
         }
-
-
-        /*
-        for ( int i=0; i<_fhs.length; i++ ) {
-            //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+(_fhs[i]==null?null:_fhs[i].getJavaClass())+">  ");
-        }
-        //System.out.println("  is updated!");
-        
-        for ( int i=0; i<_fhs.length; i++ ) {
-            fieldType = _fhs[i].getFieldType();
-            switch (fieldType) {
-            case FieldMolder.PRIMITIVE:
-                break;
-            case FieldMolder.PERSISTANCECAPABLE:
-                fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
-                o = _fhs[i].getValue( object );
-                if ( o != null ) {
-                    // need multi-pk
-                    if ( _fhs[i].isDependent() ) {
-                        if ( !tx.isPersistent( o ) ) {
-                            //tx.update( fieldEngine, fieldClassMolder, o, oid );
-                        } else {
-                            // fail-fast principle: if the object depend on another object,
-                            // throw exception
-                        }
-                            
-                            //if ( !tx.isDepended( oid, o ) )
-                            //    throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
-                    } else {
-                        //if ( !tx.isPersistent( o ) ) 
-                        //    tx.create( fieldEngine, fieldClassMolder, o, null );
-                    }
-                }
-                break;
-            case FieldMolder.ONE_TO_MANY:
-                fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
-                o = _fhs[i].getValue( object );
-                orgFields = (ArrayVector)fields[i];
-                if ( ! (o instanceof Lazy) ) {
-                    itor = getIterator( o );
-                    ArrayList v = (ArrayList) o;
-                    list = new ArrayVector( v.size() );
-                    for ( int j=0; j<v.size(); j++ ) {
-                        list.add( (fieldClassMolder.getIdentities( v.get(j) )) );
-                    }
-                    if ( !OID.isEquals( (ArrayVector)fields[i], list ) ) {
-                        if ( _fhs[i].isDependent() ) {
-                            if ( orgFields != null && list != null ) {
-                                // make sure that all dependent objects are included in the transaction,
-                                // otherwise objects that should be deleted won't be deleted
-                                for ( int j=0; j<orgFields.size(); j++ ) {
-                                    if ( !list.contains( orgFields.get(j) ) ) {
-                                        //tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
-                                    }
-                                }
-                                // update all dependent objects
-                                for ( int j=0; j<list.size(); j++ ) {
-                                    //tx.update( fieldEngine, fieldClassMolder, v.get(j), oid );
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // I guess that lazy loading cannot be used together with 
-                    // long transactions
-                }
-                break;
-            case FieldMolder.MANY_TO_MANY:
-                break;
-            default:
-                throw new IllegalArgumentException("Field type invalid!");
-            }
-        }*/
     }
 
-    public void updateCache( TransactionContext tx, OID oid, DepositBox locker, Object object )
-                        /*throws DuplicateIdentityException, PersistenceException*/ {
-        // similar to store, no recusrion is needed
+    /**
+     * Update the dirty checking cache. This method is called after a transaction completed successfully.
+     *
+     * @param tx - transaction in action
+     * @param oid - object's identity of the target object
+     * @param locker - the dirty checking cache of the target object
+     * @param object - the target object
+     */
+    public void updateCache( TransactionContext tx, OID oid, DepositBox locker, Object object ) {
+
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         Iterator itor;
@@ -1519,7 +1572,6 @@ public class ClassMolder {
         int fieldType;
 
         fields = new Object[_fhs.length];
-        //(Object[])locker.getObject( tx );
 
         if ( oid.isIdsNull() ) 
             throw new IllegalStateException("The identities of the cache to be updated is null");
@@ -1537,15 +1589,6 @@ public class ClassMolder {
                 }
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
-                /*
-                fieldClassMolder = _fhs[i].getFieldClassMolder();
-                o = _fhs[i].getValue( object );
-                if ( o != null ) {
-                    fid = fieldClassMolder.getIdentities( o );
-                    fields[i] = fid; // [oleg] IMHO was wrong: fid[0]
-                } else {
-                    fields[i] = null;
-                }*/
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
@@ -1618,6 +1661,11 @@ public class ClassMolder {
 
     }
 
+    /**
+     * It method is called by delete to delete the extended object of the base 
+     * type from the Persistence.
+     *
+     */
     private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object[] identities ) 
             throws ObjectNotFoundException, PersistenceException {
         // if the extend field contains dependent of field type,
@@ -1663,6 +1711,14 @@ public class ClassMolder {
         }
     }
 
+    /**
+     * Delete an object of the base type from the persistence storage. 
+     * All object to be deleted by this method will be <tt>markDelete</tt> 
+     * before it method is called.
+     *
+     * @param tx - transaction in action
+     * @param oid - the object identity of the target object
+     */
     public void delete( TransactionContext tx, OID oid ) 
             throws PersistenceException {
 
@@ -1700,6 +1756,16 @@ public class ClassMolder {
         }
     }
 
+    /**
+     * Prepare to delete an object with the specified identity. If any sub-object
+     * should be deleted along with the target object, it should be deleted
+     * by this method.
+     *
+     * @param tx - transaction in action
+     * @param oid - object's identity of the target object
+     * @param locker - the dirty checking cache of the target object
+     * @param object - the target object
+     */
     public void markDelete( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws ObjectNotFoundException, PersistenceException {
 
@@ -1833,6 +1899,16 @@ public class ClassMolder {
         }
     }
 
+    /** 
+     * Revert the object back to the state of begining of the transaction
+     * If the object is loaded, it will be revert as it was loaded. If the 
+     * object is created, it will be revert as it was just created.
+     *
+     * @param tx - transaction in action
+     * @param oid - the object identity of the target object
+     * @param locker - the dirty checking cache of the target object
+     * @param object - the target object
+     */
     public void revertObject( TransactionContext tx, OID oid, DepositBox locker, Object object ) 
             throws PersistenceException {
 
@@ -1914,13 +1990,24 @@ public class ClassMolder {
         }
     }
 
+    /**
+     * Acquire a write lock on an object of the base type with the specified 
+     * identity from the persistence storage.
+     * 
+     * @param tx - Transaction in action
+     * @param oid - the object identity of the target object
+     * @param locker - the dirty checking cache of the object
+     * @param object - the target object
+     */
     public void writeLock( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws PersistenceException {
         // call SQLEngine to lock an record
     }
 
-    // ***********************
-    // Methods of ClassHandler
+    /**
+     * Return a new instance of the base class
+     *
+     */
     public Object newInstance() {
         try {
             return _base.newInstance();
@@ -1932,6 +2019,12 @@ public class ClassMolder {
         return null;
     }
 
+    /**
+     * Get the effective accessMode of the the base type
+     *
+     * @param txMode - the default transaction accessMode
+     * @return the effective acessMode of the base type
+     */
     public AccessMode getAccessMode( AccessMode txMode ) {
 
         if ( txMode == null )
@@ -1947,12 +2040,19 @@ public class ClassMolder {
 
     }
 
+    /**
+     * Get the callback interceptor of the base type
+     *
+     */
     public CallbackInterceptor getCallback() {
         return _callback;
     }
 
     /**
-     * @param o -- cannot be null
+     * Get the identity from a object of the base type
+     *
+     * @param o - object of the base type
+     * return an Object[] contains the identity of the object
      */
     public Object[] getIdentities( Object o ) {
         Object[] osIds = new Object[_ids.length];
@@ -1962,97 +2062,171 @@ public class ClassMolder {
         return osIds;
     }
 
-    public void setFieldsNull(Object o) {
-    }
-
+    /**
+     * Get the Persisetence of the base type
+     *
+     */
     public Persistence getPersistence() {
         return _persistence;
     }
 
+    /**
+     * Mutator method to set the PersistenceEngine of
+     *
+     */
     public void setPersistence( Persistence persist ) {
         _persistence = persist;
     }
 
-    public int getSQLType() {
-        return 0;
-    }
-
-    // Methods of ClassInfo
+    /**
+     * Get the base type of this ClassMolder
+     *
+     */
     public Class getJavaClass() {
         return _base;
     }
 
+    /**
+     * Get the fully qualified name of the base type of this ClassMolder
+     *
+     */
     public String getName() {
         return _name;
     }
 
+    /**
+     * Get the FieldMolder of the fields of the base type,
+     * except the identity fields.
+     */ 
     public FieldMolder[] getFields() {
         return _fhs;
     }
 
+    /**
+     * Get the FieldMolders of the identity fields
+     */
     public FieldMolder[] getIds() {
         return _ids;
     }
 
+    /**
+     * Get the extends class' ClassMolder
+     *
+     */
     public ClassMolder getExtends() {
         return _extends;
     }
 
+    /**
+     * Get the depends class' ClassMolder
+     */
     public ClassMolder getDepends() {
         return _depends;
     }
     
+    /**
+     * Get the LockEngine which this ClassMolder belongs to.
+     *
+     */
     public LockEngine getLockEngine() {
         return _engine;
     }
+    /**
+     * Return the preferred LRU cache mechanism for caching object of this type
+     *
+     */
     public int getCacheType() {
         return _cachetype;
     }
+    /**
+     * Return the preferred LRU cache capacity for caching object of this type
+     *
+     */
     public int getCacheParam() {
         return _cacheparam;
     }
+    /**
+     * Return true if the base type of this ClassMolder is an dependent
+     * class.
+     */
     public boolean isDependent() {
         return _depends != null;
     }
 
+    /**
+     * Set all persistence fields of object of the base type to null.
+     * 
+     * @param object - target object
+     */
+    public void setFieldsNull( Object object ) {
+        /*
+        for ( int i=0; i < _ids.length; i++ ) {
+            _ids[i].setValue( object, null );
+        }
+        for ( int i=0; i < _fhs.length; i++ ) {
+            _fhs[i].setValue( object, null );
+        }*/
+    }
+
+    /**
+     * Mutator method to add a extent ClassMolder
+     *
+     */
     void addExtendent( ClassMolder ext ) {
         if ( _extendent == null )
             _extendent = new Vector();
         _extendent.add( ext );
     }
 
+    /**
+     * Mutator method to add a dependent ClassMolder
+     *
+     */
     void addDependent( ClassMolder dep ) {
         if ( _dependent == null )
             _dependent = new Vector();
         _dependent.add( dep );
     }
-    /*
-     * Mutator method
+    /**
+     * Mutator method to set the extends ClassMolder
+     *
      */
     void setExtends( ClassMolder ext ) {
         _extends = ext;
         ext.addExtendent( this );
     }
 
-    /*
-     * Mutator method
+    /**
+     * Mutator method to set the deepends ClassMolder
+     *
      */
     void setDepends( ClassMolder dep ) {
         _depends = dep;
         dep.addDependent( this );
     }
+
+    /**
+     * Return the iterator of a Collection
+     *
+     * @param o - a Collection
+     */
     private Iterator getIterator( Object o ) {
         if ( o instanceof Collection ) {
             return ((Collection) o).iterator();
         } else if ( o instanceof Vector ) {
-            //System.out.println("expect colleciton");
             return null;            
         } else {
             return null;
         }
     }
+
     /**
-     *  Vector of Object[]
+     * Return all the object identity of a Collection of object of the same 
+     * type.
+     * 
+     * @param molder - class molder of the type of the objects
+     * @param o - a Collection or Vector containing 
+     * @return a list of <tt>Object[]</tt>s which contains object identity
      */
     private ArrayVector getIds( ClassMolder molder, Object o ) {
         ArrayVector v = null;
@@ -2076,7 +2250,6 @@ public class ClassMolder {
             }
         } else if ( o != null ) {
             v = null;
-            //System.out.println("expecting collection");
             throw new RuntimeException("expecting collection");
         }
         return v;
