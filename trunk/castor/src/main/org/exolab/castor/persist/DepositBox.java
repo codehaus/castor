@@ -82,14 +82,14 @@ public interface DepositBox {
      *  have the read or write lock can get it.
      *
      *  @param  tx the transaction in action
-     *  @param  object to be store into deposit box
+     *  @return An object instance.
      *  @throw  IllegalArgumentException if tx doesn't own the box
-     *
      */
     public Object getObject( TransactionContext tx ); 
 
     /**
-     *  Get the time of the most recent call on setObject(Object)}.
+     * Get the time of the most recent call on setObject(Object)}.
+     * @return The timestamp of this object.
      */
     public long getTimeStamp();
 }
