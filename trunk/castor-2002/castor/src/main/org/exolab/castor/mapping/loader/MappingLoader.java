@@ -349,14 +349,15 @@ public abstract class MappingLoader
                         ( (FieldDescriptorImpl) identity ).setRequired( true );
                     if ( identity.getHandler() instanceof FieldHandlerImpl )
                         ( (FieldHandlerImpl) identity.getHandler() ).setRequired( true );
-                    fields[ i ] = fields[ fields.length - 1 ];
 
                     // Remove identity field from list of fields.
                     FieldDescriptor[] newFields;
 
                     newFields = new FieldDescriptor[ fields.length - 1 ];
-                    for ( int j = 0 ; j < fields.length - 1 ; ++j )
+                    for ( int j = 0 ; j < i ; ++j )
                         newFields[ j ] = fields[ j ];
+                    for ( int j = i + 1 ; j < fields.length ; ++j )
+                        newFields[ j - 1 ] = fields[ j ];
                     fields = newFields;
                     break;
                 }
@@ -393,9 +394,8 @@ public abstract class MappingLoader
         if ( fieldMaps == null || fieldMaps.length == 0 )
             return new FieldDescriptor[ 0 ];
         fields = new FieldDescriptor[ fieldMaps.length ];
-        for ( int i = 0 ; i < fieldMaps.length ; ++i ) {
+        for ( int i = 0 ; i < fieldMaps.length ; ++i )
             fields[ i ] = createFieldDesc( javaClass, fieldMaps[ i ] );
-        }
         return fields;
     }
 
