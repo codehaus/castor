@@ -298,6 +298,18 @@
    <description>An improvement for generated SQL statement syntax</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Ballanger" given="Andrew" />
+	<email>AWBALLAN@smumn.edu</email>
+   <description>An improvement for generated SQL statement syntax</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Snowsill" given="David" />
+	<email>david.snowsill@calibreft.com.au</email>
+   <description>JDO bugfixes</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
