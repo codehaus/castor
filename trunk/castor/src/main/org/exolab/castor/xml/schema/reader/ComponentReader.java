@@ -197,6 +197,24 @@ public abstract class ComponentReader {
 
         throw new XMLException(err);
     } //-- error
+    
+    /**
+     * This method is called for a general error.
+     *
+     * @param ex the Exception that caused the error.
+     * @exception org.xml.sax.SAXException always thrown.
+     */
+    public void error(Exception ex)
+        throws XMLException
+    {
+
+        if (_locator != null) {
+            String err =  "An error occured at line: " + _locator.getLineNumber();
+            throw new XMLException(err, ex);
+        }
+        throw new XMLException(ex);
+    } //-- error
+    
 
     /**
      * This method is called when an illegal Attribute is encountered.
