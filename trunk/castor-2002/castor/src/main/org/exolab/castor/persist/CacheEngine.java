@@ -1194,8 +1194,8 @@ public final class CacheEngine
                         }
                         throw except;
                     }
-                    setObjectTimeStamp( object, oid.getStamp() );
                 }
+                setObjectTimeStamp( object, oid.getStamp() );
             }
         } finally {
             // signal cache that it's now safe to release the object
