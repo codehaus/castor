@@ -1606,14 +1606,15 @@ public class DescriptorSourceFactory {
         if (str == null) return str;
 
         //-- make sure we have characters to escape
-        if (str.indexOf('\\') < 0) return str;
-
+        if (str.indexOf('\\') < 0 && str.indexOf('\"') < 0) return str;
+        
         StringBuffer sb = new StringBuffer();
         char[] chars = str.toCharArray();
 
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
             if (ch == '\\') sb.append(ch);
+            if (ch == '\"') sb.append('\\');
             sb.append(ch);
         }
         return sb.toString();
