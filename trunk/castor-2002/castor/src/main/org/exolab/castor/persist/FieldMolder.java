@@ -135,7 +135,7 @@ public class FieldMolder {
     private SQLRelationLoader _manyToManyLoader;
 
     public String toString() {
-        return "FieldMolder: "+_defaultReflectService._fClass+" inside "+_eMold.getName();
+        return "FieldMolder("+_fType+")"+_defaultReflectService._fClass+" inside "+_eMold.getName();
     }
     
     /*
@@ -176,17 +176,17 @@ public class FieldMolder {
     }
 
     public boolean isDependent() {
-		if ( _fMold == null )
-			return false;
-		ClassMolder extendPath = _eMold;
-		ClassMolder depends = _fMold.getDepends();
-		while ( extendPath != null ) {
-			if ( extendPath == depends ) {
-				return true;
-			} else 
-				extendPath = extendPath.getExtends();
-		}
-		return false;
+        if ( _fMold == null )
+            return false;
+        ClassMolder extendPath = _eMold;
+        ClassMolder depends = _fMold.getDepends();
+        while ( extendPath != null ) {
+            if ( extendPath == depends ) {
+                return true;
+            } else 
+                extendPath = extendPath.getExtends();
+        }
+        return false;
     }
 
     public boolean isMulti() {
@@ -428,6 +428,7 @@ public class FieldMolder {
 
     public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap ) 
             throws MappingException {
+
         try {
             // create the reflection service with the ClassLoader hold in the 
             // SatingService object as default
