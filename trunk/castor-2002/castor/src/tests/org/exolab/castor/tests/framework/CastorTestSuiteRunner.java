@@ -109,10 +109,15 @@ public class CastorTestSuiteRunner extends TestCase {
     public static Test suite() {
 
         TEST_ROOT = System.getProperty(TEST_ROOT_PROPERTY);
-        //some clean up needed because URLClassLoader can't handle URL with '.'
-        if (TEST_ROOT.charAt(0) == '.')
+        
+        //-- some clean up needed because URLClassLoader can't handle a
+        //-- file URL that starts with "./"
+        if (TEST_ROOT.startsWith("./")) {
             TEST_ROOT = TEST_ROOT.substring(2);
+        }
+        
         File testRoot = new File(TEST_ROOT);
+        
         if (!testRoot.exists()) {
             System.out.println("Unable to locate the root directory for the test cases");
             System.exit(1);
