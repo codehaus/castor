@@ -123,7 +123,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         _factory = factory;
         _seqName = params.getProperty("sequence", "{0}_seq");
 
-        _style = ( _factoryName.equals( "postgresql" ) || _factoryName.equals("interbase")
+        _style = ( _factoryName.equals( "postgresql" ) || _factoryName.equals("interbase")  || _factoryName.equals("db2")
                 ? BEFORE_INSERT : ( returning  ? DURING_INSERT : AFTER_INSERT) );
         if (_triggerPresent && !returning) {
             _style = AFTER_INSERT;
@@ -162,18 +162,18 @@ public final class SequenceKeyGenerator implements KeyGenerator
         int value;
         String seqName;
         String currval;
+        String table;
 
         seqName = MessageFormat.format( _seqName, new String[] {tableName});
-        if (_factoryName.equals("db2")) {
-            currval = "(currval for " + seqName + ")";
-        } else {
-            currval = _factory.quoteName(seqName + ".currval");
-        }
+        table = _factory.quoteName(tableName);
         try {
             if (_factory.getFactoryName().equals("interbase")) {
                 //interbase only does before_insert, and does it its own way
-                stmt = conn.prepareStatement("select gen_id(" + seqName +
-                        "," + _increment + ") from rdb$database");
+                stmt = conn.prepareStatement("SELECT gen_id(" + seqName +
+                        "," + _increment + ") FROM rdb$database");
+                rs = stmt.executeQuery();
+            } else if (_factory.getFactoryName().equals("db2")) {
+                stmt = conn.prepareStatement("SELECT nextval FOR \"" + seqName + "\" FROM " + table);
                 rs = stmt.executeQuery();
             } else {
                 if ( _style == BEFORE_INSERT ) {
@@ -185,13 +185,12 @@ public final class SequenceKeyGenerator implements KeyGenerator
                     Method getInsertedOID = psqlStmtClass.getMethod("getInsertedOID", null);
                     int insertedOID = ((Integer) getInsertedOID.invoke(insStmt, null)).intValue();
                     stmt = conn.prepareStatement("SELECT " + _factory.quoteName( primKeyName ) +
-                            " FROM " + _factory.quoteName( tableName ) +
-                            " WHERE OID=?");
+                            " FROM " + table + " WHERE OID=?");
                     stmt.setInt(1, insertedOID);
                     rs = stmt.executeQuery();
 
                 } else {
-                    stmt = conn.prepareStatement("SELECT " + currval + " FROM " + _factory.quoteName(tableName));
+                    stmt = conn.prepareStatement("SELECT " + _factory.quoteName(seqName + ".currval") + " FROM " + table);
                     rs = stmt.executeQuery();
                 }
             }
@@ -269,12 +268,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
             tableName = tableName.substring( 1, tableName.length() - 1 );
         }
         seqName = MessageFormat.format( _seqName, new String[] {tableName});
-        if (_factoryName.equals("db2")) {
-            nextval = "(nextval for " + seqName + ")";
-        } else {
-            nextval = _factory.quoteName(seqName + ".nextval");
-        }
-
+        nextval = _factory.quoteName(seqName + ".nextval");
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );
         if ( lp1 < 0 ) {
