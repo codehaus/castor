@@ -12,6 +12,7 @@ public class TestPKsPayRoll {
     private int _id;
     private int _holiday;
     private int _hourlyRate;
+	private TestPKsEmployee _employee;
 
     public void setId( int id ) {
         _id = id;
@@ -31,4 +32,10 @@ public class TestPKsPayRoll {
     public int getHourlyRate() {
         return _hourlyRate;
     }
+	public void setEmployee( TestPKsEmployee employee ) {
+		_employee = employee;
+	}
+	public TestPKsEmployee getEmployee() {
+		return _employee;
+	}
 }
