@@ -13,7 +13,7 @@ The Castor moto is simplifying the exchange and persistence
 of information.
 
 This release of Castor includes the following persistence/
-exchange packages:
+exchange modules:
 
 Castor XML  -- Java object to XML document mapping
 
@@ -22,6 +22,11 @@ Castor JDO  -- Java object to SQL relational database
 
 Castor DSML -- LDAP directory exchange through XML
 
+Future releases will include the following modules:
+
+Castor DAX  -- Java directory access (JNDI/LDAP)
+
+Castor SHO  -- Shared object space
 
 
 Supported Features
@@ -59,9 +64,9 @@ Castor JDO
 * Java to SQL mapping uses an XML document to specify the mapping
   textually, and provides an API to specify them programatically
 
-* Supports one-one and one-many relation types (release 0.8),
+* Supports one-one and one-many relation types (release 0.9),
   SQL/Java inheritence, object graph to single row mapping, and
-  multiple column primary keys
+  multiple column primary keys and automatic type conversion
 
 * Provides an ODMG compliant API for OODMBS-like persistence,
   XML-based datasource definition, name binding
@@ -69,7 +74,7 @@ Castor JDO
 * Optimistic and pessimistic locking modes, in-memory concurrency
   engine, and dead-lock detection
 
-* Provides support for EJB 1.1 CMP entity beans (release 0.8)
+* Provides support for EJB 1.1 CMP entity beans (release 0.9)
   and CMP finder declaration using OQL
 
 * Efficient implementation incurs little overhead compared to
@@ -77,7 +82,7 @@ Castor JDO
 
 * Support for JTA transaction demaraction, inclusion as resource
   in transactional environment, and JDBC connection pooling
-  (release 0.8 integrated with Tyrex)
+  (release 0.9 integrated with Tyrex)
 
 
 Castor DSML
@@ -298,6 +303,8 @@ lib
                          support (used in default example)
     *xerces.jar          Xerces XML library
      utils-0.5.jar       Required for JDO performance testing
+     xalan.jar           Xalan XSL processor, used for styling
+                         documentation pages
 
 build
   When using Ant the Java classes are build in this directory,
@@ -403,29 +410,20 @@ What's missing
 
 * This release supports one-one relations but not one-many relations
   (collections). Preliminary one-many relations will be introduced
-  in release 0.8.
+  in release 0.9.
 
 * The EJB CMP implementation will be available for public review
-  prior to release 0.8 and will include a CMP engine, integration
+  prior to release 0.9 and will include a CMP engine, integration
   with the transaction manager, and finder definition in the XML
   mapping file.
 
-* This release of Castor JDO does not rupport JTA transactional
-  environments, support for JTA/XA and integration with Tyrex/Tomcat
-  will be introduced in release 0.8.
+* This release of Castor JDO supports JTA transactional environments,
+  but lacks support for JTA factories. Integration with transaction
+  managers and Tyrex/Tomcat in particular will be introduced in release
+  0.9.
 
-* Support for dirty checks, default values, validation, and additional
-  data types (binary, XML, streams) will be introduced in release 0.8.
-  Validation will be based on XML schemas using Castor XML.
+* Castor DAX and Castor SHO are not fully implemented yet
 
-* Upgraded XML Schema support for Decemeber 17th versions of the
-  XML Schema working drafts, currently based of November 5th versions.
-
-* Castor XML is lacking many of the XML Schema Datatypes, the built-in
-  datatypes should be complete by release 0.8.
-
-* Castor XML Source Generator doesn't support the complete XML Schema
-  Structures, more will be added for release 0.8
-
+* A unified mapping model will be introduced in 0.9
 
 
