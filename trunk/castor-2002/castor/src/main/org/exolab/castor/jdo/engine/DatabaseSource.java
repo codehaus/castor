@@ -337,6 +337,16 @@ public class DatabaseSource
     }
 
 
+    public Connection createConnection()
+        throws SQLException
+    {
+        if ( _dataSource != null )
+            return _dataSource.getConnection();
+        else
+            return DriverManager.getConnection( _jdbcUrl, _jdbcProps );
+    }
+
+
     static PersistenceEngine getPersistenceEngine( Class objType )
     {
         Enumeration    enum;
@@ -373,7 +383,7 @@ public class DatabaseSource
     }
 
 
-    static synchronized DatabaseSource getDatabaseSource( String dbName )
+    public static synchronized DatabaseSource getDatabaseSource( String dbName )
         throws MappingException
     {
         DatabaseSource dbs;
