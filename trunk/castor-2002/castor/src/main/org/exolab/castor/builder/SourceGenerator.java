@@ -92,7 +92,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.9";
+    static final String version = "0.9.2";
 
     /**
      * The application URI
