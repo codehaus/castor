@@ -77,6 +77,9 @@ public class Concurrent
     private Connection     _conn;
 
 
+    private JDOCategory    _category;
+
+
     static final String    JDBCValue = "jdbc value";
 
 
@@ -87,12 +90,7 @@ public class Concurrent
         throws CWClassConstructorException
     {
         super( name, description );
-        try {
-            _db = ( (JDOCategory) category ).getDatabase();
-            _conn = ( (JDOCategory) category ).getJDBCConnection(); 
-        } catch ( Exception except ) {
-            throw new CWClassConstructorException( except.toString() );
-        }
+        _category = (JDOCategory) category;
     }
 
 
@@ -113,6 +111,9 @@ public class Concurrent
         boolean result = true;
 
         try {
+            _db = _category.getDatabase( stream.verbose() );
+            _conn = _category.getJDBCConnection(); 
+
             stream.writeVerbose( "Running in access mode shared" );
             if ( ! runOnce( stream, Database.Shared ) )
                 result = false;
@@ -125,6 +126,7 @@ public class Concurrent
             if ( ! runOnce( stream, Database.DbLocked ) )
                 result = false;
             stream.writeVerbose( "" );
+
             _db.close();
             _conn.close();
         } catch ( Exception except ) {

@@ -136,7 +136,7 @@ public class Category
     }
 
 
-    public CWTestCategory createTestCategory( boolean verbose )
+    public CWTestCategory createTestCategory()
         throws CWClassConstructorException
     {
         Class          catClass;
@@ -146,10 +146,8 @@ public class Category
 
         try {
             catClass = getClass().getClassLoader().loadClass( _className );
-            cnst = catClass.getConstructor( new Class[] { String.class, String.class,
-                                                          Boolean.TYPE, Object.class } );
-            category = (CWTestCategory) cnst.newInstance( new Object[] { _name, _description,
-                                                                         new Boolean( verbose), _object } );
+            cnst = catClass.getConstructor( new Class[] { String.class, String.class, Object.class } );
+            category = (CWTestCategory) cnst.newInstance( new Object[] { _name, _description, _object } );
             for ( int i = 0 ; i < _cases.size() ; ++i ) {
                 tc = ( (Case) _cases.elementAt( i ) ).createTestCase( category );
                 category.add( tc.name(), tc, true );

@@ -71,23 +71,19 @@ public class JDOCategory
     private JDO      _jdo;
 
 
-    private boolean  _verbose;
-
-
-    public JDOCategory( String name, String description, boolean verbose, Object jdo )
+    public JDOCategory( String name, String description, Object jdo )
         throws CWClassConstructorException
     {
         super( name, description );
         _jdo = (JDO) jdo;
         _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
-        _verbose = verbose;
     }
 
 
-    public Database getDatabase()
+    public Database getDatabase( boolean verbose )
         throws PersistenceException
     {
-        if ( _verbose )
+        if ( verbose )
             _jdo.setLogWriter( Logger.getSystemLogger() );
         return _jdo.getDatabase();
     }

@@ -1,9 +1,20 @@
-Version 0.8.3  April 17, 2000
+Version 0.8.3  April 28, 2000
 -----------------------------
 
 JDO:     Added support for null fields by calling the relevant setNull() method
          when setting a null field. Does not apply to query parameters yet, does
          not apply to identity fields.
+
+JDO:     Added package org.exolab.castor.jdo.drivers which includes RDBMS specific
+         factories, query expressions and key generators. Added factories for DB2,
+         and SQL Server.
+
+JDO:     Added and tested outer joins.
+
+Persist: Added getIdentity() method to TransactionContext().
+
+Misc:    Modified the test harness to run from an XML test file. Added test case
+         for type handling (only null fields at the moment) and outer joins.
 
 
 Version 0.8.2   April 7, 2000

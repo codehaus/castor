@@ -54,6 +54,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -67,18 +68,14 @@ public class TypeHandling
 {
 
 
-    private Database       _db;
+    private JDOCategory    _category;
 
 
     public TypeHandling( String name, String description, CWTestCategory category )
         throws CWClassConstructorException
     {
         super( name, description );
-        try {
-            _db = ( (JDOCategory) category ).getDatabase();
-        } catch ( Exception except ) {
-            throw new CWClassConstructorException( except.toString() );
-        }
+        _category = (JDOCategory) category;
     }
 
 
@@ -97,6 +94,7 @@ public class TypeHandling
     public boolean run( CWVerboseStream stream )
     {
         boolean result = true;
+        Database db;
 
         try {
             OQLQuery      oql;
@@ -104,12 +102,13 @@ public class TypeHandling
             Enumeration   enum;
             
             // Open transaction in order to perform JDO operations
-            _db.begin();
+            db = _category.getDatabase( stream.verbose() );
+            db.begin();
             
             // Determine if test object exists, if not create it.
             // If it exists, set the name to some predefined value
             // that this test will later override.
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
@@ -118,23 +117,42 @@ public class TypeHandling
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
-                _db.create( object );
+                db.create( object );
             }
-            _db.commit();
+            db.commit();
 
-            _db.begin();
+            stream.writeVerbose( "Testing null in required field" );
+            db.begin();
             stream.writeVerbose( "Creating new object: " + object );
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 object.setFirst( null );
+            }
+            try {
+                db.commit();
+                stream.writeVerbose( "OK: Failed to detect validity exception" );
+                result = false;
+            } catch ( TransactionAbortedException except ) {
+                stream.writeVerbose( "OK: Detected validity exception: " + except.getMessage() );
+            }
+            
+            stream.writeVerbose( "Testing null in non-required field" );
+            db.begin();
+            stream.writeVerbose( "Creating new object: " + object );
+            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+            oql.bind( TestObject.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                object = (TestObject) enum.nextElement();
                 object.setSecond( null );
             }
-            _db.commit();
-            
-            _db.close();
+            db.commit();
+            stream.writeVerbose( "OK: Stored null in non-required field" );
+
+            db.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
             except.printStackTrace();

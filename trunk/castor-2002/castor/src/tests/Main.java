@@ -69,7 +69,7 @@ public class Main
             mapping.loadMapping( Main.class.getResource( "harness/mapping.xml" ) );
             unm.setMapping( mapping );
             harness = (Harness) unm.unmarshal( new InputStreamReader( Main.class.getResourceAsStream( "tests.xml" ) ) );
-            testApp = harness.createTestHarness( false );
+            testApp = harness.createTestHarness();
             testApp.run( args );
         } catch ( Exception except ) {
             except.printStackTrace();
