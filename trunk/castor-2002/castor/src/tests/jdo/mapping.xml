@@ -73,8 +73,9 @@
     <field name="date" type="java.util.Date">
       <sql name="tdt" type="date" />
     </field>
+    <!-- Note: cannot do dirty checking on time field do to unknown conversion error -->
     <field name="time" type="java.util.Date">
-      <sql name="ttm" type="time" />
+      <sql name="ttm" type="time" dirty="ignore" />
     </field>
     <field name="intValue" type="integer">
       <sql name="int_val" type="integer" />
