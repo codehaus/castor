@@ -278,6 +278,24 @@ public class RandomHelper {
     }
 
     /**
+     * Returns a random printable char.
+     * @returns a random printable char
+     */
+    public static char getRandom(char c) {
+        return rndPrintableChar();
+    }
+
+    /**
+     * Returns a random byte
+     * @returns a random byte
+     */
+    public static byte getRandom(byte b) {
+        byte[] tmp = new byte[1]; // TODO: Cache more...
+        _rand.nextBytes(tmp);
+        return tmp[0];
+    }
+
+    /**
      * Returns a random printable character from the PRINTABLE_CHAR string
      * @returns a random printable character from the PRINTABLE_CHAR string
      */
