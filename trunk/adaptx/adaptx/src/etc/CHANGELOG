@@ -4,6 +4,17 @@ Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P contributors
 The following are changes from different versions of Adaptx
 
 
+Version 0.9.4.9, March 19, 2003
+-------------------------------
+
+-- Fixed the value-of implementation to correctly call the
+   XPathResult#stringValue method. It was incorrectly using
+   the XPathResult#toString method, which produces the
+   correct result for many cases, but is not guaranteed to
+   be equivalent to the stringValue() method.
+   (kvisco - 2003-03-19)
+
+
 Version 0.9.4.8, March 04, 2003
 -------------------------------
 
