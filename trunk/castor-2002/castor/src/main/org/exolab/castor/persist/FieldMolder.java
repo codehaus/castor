@@ -327,6 +327,10 @@ public class FieldMolder {
         }
     }
 
+    /**
+     * Check if the specified value is the default value of the Field
+     * represented by this FieldMolder
+     */
     public boolean isDefault( Object value ) {
         if ( _default == value )
             return true;
@@ -478,7 +482,9 @@ public class FieldMolder {
             if ( fieldType != null ) {
                 try {
                     declaredClass = Types.typeFromName( javaClass.getClassLoader(), fieldType );
+                    _defaultReflectService._fClass = declaredClass;
                 } catch ( ClassNotFoundException cnfe ) {
+                    throw new MappingException( "mapping.classNotFound", declaredClass );
                 }
             }
 
@@ -549,6 +555,11 @@ public class FieldMolder {
                     throw new MappingException( "mapping.accessorNotFound",
                             "get" + name, null, javaClass.getName() );
 
+                // update fClass, because we can't tell between primitive 
+                // and primitive wrapper from the mapping
+                if ( _colClass == null )
+                    _defaultReflectService._fClass = _defaultReflectService._getMethod.getReturnType();
+
                 _defaultReflectService._setMethod = findAccessor( javaClass, "set" + capitalize( name ), methodClass, false );
 
                 if ( _defaultReflectService._setMethod == null )
@@ -578,7 +589,7 @@ public class FieldMolder {
                         throw new MappingException( "mapping.accessorNotFound",
                                 fieldMap.getGetMethod(), _defaultReflectService._fClass, javaClass.getName() );
 
-                    if ( _defaultReflectService._fClass == null )
+                    if ( _colClass == null )
                         _defaultReflectService._fClass = _defaultReflectService._getMethod.getReturnType();
                 }
 
@@ -648,10 +659,11 @@ public class FieldMolder {
             throw new MappingException("Unexpected Null pointer!\n"+e);
         }
         _fieldName = fieldMap.getName();
+
         // If the field is of a primitive type we use the default value
         _default = Types.getDefault( _defaultReflectService._fClass );
-        if ( ( _defaultReflectService._field != null && ! _defaultReflectService._field.getType().isPrimitive() ) ||
-             ( _defaultReflectService._setMethod != null && ! _defaultReflectService._setMethod.getParameterTypes()[0].isPrimitive() ) )
+        // make the default to null for wrappers of primitives
+        if ( !_defaultReflectService._fClass.isPrimitive() )
             _default = null;
 
     }
