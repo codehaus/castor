@@ -173,6 +173,12 @@ public interface PersistenceQuery
      */
     public Object fetch( Object[] fields, Object identity )
         throws ObjectNotFoundException, PersistenceException;
+
+
+    /**
+     * Close the query and release all resources held by the query.
+     */
+    public void close();
     
 
 }

@@ -260,6 +260,15 @@ public final class QueryResults
             }
         }
     }
+
+
+    /**
+     * Close the query and release all resources held by the query.
+     */
+    public void close()
+    {
+        _query.close();
+    }
     
     
 }
