@@ -40,7 +40,7 @@
  *
  * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
  */
 package org.exolab.castor.persist.resolvers;
 
@@ -84,7 +84,8 @@ public class DataObjectResolver extends Resolver {
     // 5b/ it is released/forgotten
     // EBNF grammer for the sequence of actions of an data object 
     // is as of the following:
-    //   BEGIN         := ( Create() | Load() | Update() )  ( FAILED | UPGRADE )
+    //   BEGIN         := ( CREATE | Load() | Update() )  ( FAILED | UPGRADE )
+    //   CREATE        := preCreate() | create() | postCreate()
     //   FAILED        := releaseLock() DONE 
     //   UPGRADE       := ( [ softLock() | lock() ]*  FAILEDUPGRADE ) PERSISTENCE
     //   FAILEDUPGRADE := PERSISTENCE
