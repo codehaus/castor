@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -168,7 +168,14 @@ public class Unmarshaller {
     } //-- initConfig
     
     /**
-     * Sets the ClassLoader to use when loading new classes
+     * Sets the ClassLoader to use when loading new classes.
+     * <br />
+     * <b>Note:</b>This ClassLoader is used for classes
+     * loaded by the unmarshaller only. If a Mapping has
+     * been set, the Mapping has it's own ClassLoader and
+     * may also need to be set propertly.
+     * <br /> 
+     *
      * @param loader the ClassLoader to use
     **/
     public void setClassLoader(ClassLoader loader) {
@@ -218,16 +225,22 @@ public class Unmarshaller {
     } //-- setLogWriter
 
     /**
-     * Sets the Mapping to use during unmarshalling.
+     * Sets the Mapping to use during unmarshalling. If the
+     * Mapping has a ClassLoader it will be used during
+     * unmarshalling.
+     *
      * @param mapping the Mapping to use during unmarshalling.
      * @see #setResolver
     **/
     public void setMapping( Mapping mapping )
         throws MappingException
     {
-        if (_cdResolver == null)
+        if (_loader == null) {
+            _loader = mapping.getClassLoader();
+        }
+        if (_cdResolver == null) {
             _cdResolver = new ClassDescriptorResolverImpl(_loader);
-
+        }
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
