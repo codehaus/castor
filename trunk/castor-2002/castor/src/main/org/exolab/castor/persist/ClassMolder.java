@@ -1347,15 +1347,17 @@ public class ClassMolder {
                         Object id = removedItor.next();
                         // must be loaded thur transaction, so that the related object
                         // is properly locked and updated before we delete it.
-                        Object reldel = tx.load( fieldEngine, fieldClassMolder, id, null, null );
-                        if ( reldel != null && tx.isPersistent( reldel ) ) {
-                            tx.writeLock( reldel, tx.getLockTimeout() );
+                        if ( !tx.isDeletedByOID( new OID( fieldEngine, fieldClassMolder, id ) ) ) {
+                            Object reldel = tx.load( fieldEngine, fieldClassMolder, id, null, null );
+                            if ( reldel != null && tx.isPersistent( reldel ) ) {
+                                tx.writeLock( reldel, tx.getLockTimeout() );
 
-                            _fhs[i].getRelationLoader().deleteRelation(
-                            (Connection)tx.getConnection(oid.getLockEngine()),
-                            oid.getIdentity(), id );
+                                _fhs[i].getRelationLoader().deleteRelation(
+                                (Connection)tx.getConnection(oid.getLockEngine()),
+                                oid.getIdentity(), id );
 
-                            fieldClassMolder.removeRelation( tx, reldel, this, object );
+                                fieldClassMolder.removeRelation( tx, reldel, this, object );
+                            }
                         }
                     }
 
@@ -1732,21 +1734,30 @@ public class ClassMolder {
                         if ( !_fhs[i].isLazy() ) {
                             Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
                             ArrayList v = (ArrayList)fields[i];
+                            ArrayList newSetOfIds = new ArrayList();
                             if ( v != null ) {
                                 while ( itor.hasNext() ) {
                                     Object element = itor.next();
-                                    if ( v.contains( fieldClassMolder.getActualIdentity( tx, element ) ) ) {
-                                        tx.update( fieldEngine, fieldClassMolder, element, oid );
+                                    Object actualIdentity = fieldClassMolder.getActualIdentity( tx, element );
+                                    newSetOfIds.add( actualIdentity );
+                                    if ( v.contains( actualIdentity ) ) {
+                                        if ( !tx.isRecorded( element ) )
+                                            tx.update( fieldEngine, fieldClassMolder, element, oid );
                                     } else {
-                                        tx.create( fieldEngine, fieldClassMolder, element, oid );
+                                        if ( !tx.isRecorded( element ) )
+                                            tx.create( fieldEngine, fieldClassMolder, element, oid );
                                     }
                                 }
                             }
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
-                                    // load all the dependent object in cache for modification
-                                    // check at commit time.
-                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+                                    if ( !newSetOfIds.contains( v.get(j) ) ) {
+                                        System.out.println( "load object with id of: "+v.get(j) );
+                                        // load all the dependent object in cache for modification
+                                        // check at commit time.
+                                        tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+
+                                    }
                                 }
                             }
                         } else {
@@ -1758,17 +1769,25 @@ public class ClassMolder {
                     } else if ( tx.isAutoStore() ) {
                         Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
                         ArrayList v = (ArrayList)fields[i];
+                        ArrayList newSetOfIds = new ArrayList();
                         if ( v != null ) {
                             while ( itor.hasNext() ) {
                                 Object element = itor.next();
-                                if ( v.contains( fieldClassMolder.getActualIdentity( tx, element ) ) ) {
-                                    tx.update( fieldEngine, fieldClassMolder, element, null );
+                                Object actualIdentity = fieldClassMolder.getActualIdentity( tx, element );
+                                newSetOfIds.add( actualIdentity );
+                                if ( v.contains( actualIdentity ) ) {
+                                    if ( !tx.isRecorded( element ) )
+                                        tx.update( fieldEngine, fieldClassMolder, element, null );
                                 } else {
-                                    tx.create( fieldEngine, fieldClassMolder, element, null );
+                                    if ( !tx.isRecorded( element ) )
+                                        tx.create( fieldEngine, fieldClassMolder, element, null );
                                 }
                             }
-                            if ( v != null ) {
-                                for ( int j=0,l=v.size(); j<l; j++ ) {
+                        }
+                        if ( v != null ) {
+                            for ( int j=0,l=v.size(); j<l; j++ ) {
+                                if ( !newSetOfIds.contains( v.get(j) ) ) {
+                                    System.out.println( "load object with id of: "+v.get(j) );
                                     // load all the dependent object in cache for modification
                                     // check at commit time.
                                     tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
