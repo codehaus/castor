@@ -16,13 +16,16 @@
       		<!-- the schemaLocation attribute is not the same -->
       		<Failure exception="junit.framework.AssertionFailedError">true</Failure>
          </UnitTestCase>
-         
+
          <UnitTestCase>
       		<Schema>TestForRedefine_2.xsd</Schema>
       		<!-- the schemaLocation attribute is not the same -->
-      		<Failure exception="junit.framework.AssertionFailedError">true</Failure>
+            <!--
+                <Failure exception="junit.framework.AssertionFailedError">true</Failure>
+            -->
+      		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
+
          <UnitTestCase>
       		<Schema>TestForRedefine_3.xsd</Schema>
          </UnitTestCase>
@@ -31,39 +34,39 @@
       		<Schema>TestForRedefine_error1.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
+
          <UnitTestCase>
       		<Schema>TestForRedefine_error2.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
+
           <UnitTestCase>
       		<Schema>TestForRedefine_error3.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
-         
+
+
           <UnitTestCase>
       		<Schema>TestForRedefine_error4.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
+
           <UnitTestCase>
       		<Schema>TestForRedefine_error5.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
+
          <UnitTestCase>
       		<Schema>TestForRedefine_error6.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
+
           <UnitTestCase>
       		<Schema>TestForRedefine_error7.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
          </UnitTestCase>
-         
-         
+
+
           <UnitTestCase>
       		<Schema>TestForRedefine_error8.xsd</Schema>
       		<Failure exception="org.exolab.castor.xml.XMLException">true</Failure>
