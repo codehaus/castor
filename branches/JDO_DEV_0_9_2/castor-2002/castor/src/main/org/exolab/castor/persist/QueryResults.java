@@ -55,6 +55,9 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.resolvers.Resolver;
+import org.exolab.castor.persist.session.OID;
+import org.exolab.castor.persist.session.DatabaseRegistry;
+import org.exolab.castor.persist.session.TransactionContext;
 import org.exolab.castor.util.Messages;
 
 
@@ -111,7 +114,7 @@ public final class QueryResults
 
 
 
-    QueryResults( TransactionContext tx, DatabaseRegistry dbReg,
+    public QueryResults( TransactionContext tx, DatabaseRegistry dbReg,
                   PersistenceQuery query, AccessMode accessMode, Database db )
     {
         _tx = tx;
