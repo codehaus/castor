@@ -28,7 +28,7 @@
             </p>
             </section>
             <section title="I'm getting an error about 'xml' prefix already declared?">
-            <p>For Castor 0.9.5.2</p>
+            <p>For Castor 0.9.5.2 only</p>
             <p>
             The issue occurs with newer versions of Xerces than the version 1.4 that ships
             with Castor. The older version works ok. For some reason, when the newer
@@ -113,6 +113,9 @@
                      <code>Unmarshaller unm = new Unmarshaller(myObjectRoot);</code>
                      <code>unm.setReuseObjects(true);</code>
                      </p>
+                  </li>
+                  <li>If you have enabled pretty-printing (indenting), then disable it. The
+                      Xerces Serializer is much slower with indenting enabled.
                   </li>
                   <li>Try changing parsers to something other than Xerces.</li>
                 </ol>
@@ -242,6 +245,24 @@
 
         </section>
 
+    </section>
+
+    <section title="Marshalling">
+       <section>
+            <section title="The XML is marshalled on one line, how do I force line-breaks?">
+            <p>For all versions of Castor:</p>
+            <p>
+               To enable pretty-printing (indenting, line-breaks) just modify the
+               <i><b>castor.properties</b></i> file and uncomment the following:
+               <code>
+         # True if all documents should be indented on output by default
+         #
+         #org.exolab.castor.indent=true
+                </code>
+            </p>
+            <p>Note: This will slow down the marshalling process</p>
+            </section>
+        </section>
     </section>
 
     <section title="Source Code Generator">
