@@ -65,6 +65,7 @@ import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.ContainerMapping;
+import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.util.Messages;
@@ -192,17 +193,6 @@ public abstract class MappingHelper
 
 
     /**
-     * Loads the mapping from the specified mapping object. Derived
-     * classes implement this method to perform engine-specified
-     * loading of mapping objects into mapping descriptors.
-     *
-     * @throws MappingException The mapping file is invalid
-     */
-    protected abstract void loadMapping( Mapping mapping )
-        throws MappingException;
-
-
-    /**
      * Loads the mapping from the specified URL. If an entity resolver
      * was specified, will use the entity resolver to resolve the URL.
      * This method is also used to load mappings referenced from another
@@ -263,6 +253,79 @@ public abstract class MappingHelper
 
 
     /**
+     * Loads the mapping from the specified mapping object. Calls {@link
+     * #createDescriptor} to create each descriptor and {@link
+     * #addDescriptor} to store it. Also loads all the included mapping
+     * files.
+     *
+     * @param mapping The mapping information
+     * @throws MappingException The mapping file is invalid
+     */
+    protected void loadMapping( Mapping mapping )
+        throws MappingException
+    {
+        Enumeration   enum;
+
+        // Load all the included mapping files first.
+        enum = mapping.enumerateIncludes();
+        while ( enum.hasMoreElements() ) {
+            Include       include;
+
+            include = (Include) enum.nextElement();
+            try {
+                loadMapping( include.getHref() );
+            } catch ( IOException except ) {
+                throw new MappingException( except );
+            }
+        }
+        
+        // Load the mapping for all the classes.
+        enum = mapping.enumerateClassMapping();
+        while ( enum.hasMoreElements() ) {
+            ClassMapping  clsMap;
+            ClassDesc     clsDesc;
+
+            clsMap = (ClassMapping) enum.nextElement();
+            clsDesc = createDescriptor( clsMap );
+            addDescriptor( clsDesc );
+            // If the return value is NoDescriptor then the derived
+            // class was not successful in constructing a descriptor.
+            if ( clsDesc == ClassDesc.NoDescriptor && _logWriter != null )
+                _logWriter.println( Messages.format( "mapping.ignoringMapping", clsMap.getClassName() ) );
+        }
+
+        // Iterate through all the types. In the first step, resolve
+        // all relations in the descriptors and keep all the descriptors.
+        Vector types;
+        
+        types = new Vector();
+        enum = _clsDescs.keys();
+        while ( enum.hasMoreElements() )
+            types.add( enum.nextElement() );
+        for ( int i = 0 ; i < types.size() ; ++i ) {
+            ClassDesc clsDesc;
+            Class     type;
+            
+            type = (Class) types.elementAt( i );
+            clsDesc = getDescriptor( type );
+            if ( clsDesc != ClassDesc.NoDescriptor )
+                resolveRelations( clsDesc );
+        }
+        // In the second stage, clean all the descriptors, removing those
+        // for which there is insufficient mapping.
+        for ( int i = 0 ; i < types.size() ; ++i ) {
+            ClassDesc clsDesc;
+            Class     type;
+            
+            type = (Class) types.elementAt( i );
+            clsDesc = getDescriptor( type );
+            if ( clsDesc == ClassDesc.NoDescriptor )
+                _clsDescs.remove( type );
+        }
+    }
+
+
+    /**
      * Adds a class descriptor. Will throw a mapping exception if a
      * descriptor for this class already exists.
      *
@@ -274,8 +337,75 @@ public abstract class MappingHelper
         throws MappingException
     {
         if ( _clsDescs.contains( clsDesc.getJavaClass() ) )
-            throw new MappingException( "mapping.duplicateDescriptors", clsDesc.getJavaClass() );
+            throw new MappingException( "mapping.duplicateDescriptors", clsDesc.getJavaClass().getName() );
         _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
+    }
+
+
+    protected void resolveRelations( ClassDesc clsDesc )
+        throws MappingException
+    {
+        FieldDesc[]    fields;
+        Vector         allRels;
+        Vector         allFields;
+        RelationDesc[] rels;
+
+        allRels = new Vector();
+        allFields = new Vector();
+        fields = clsDesc.getFields();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( Types.isSimpleType( fields[ i ].getFieldType() ) ) {
+                // Simple type -- this is a field
+                allFields.add( fields[ i ] );
+            } else {
+                ClassDesc relClass;
+
+                relClass = getDescriptor( fields[ i ].getFieldType() );
+                if ( relClass == null ) {
+                    // Not simple type but no class desc -- this field must be serializable
+                    if ( Types.isSerializable( fields[ i ].getFieldType() ) )
+                        allFields.add( fields[ i ] );
+                    else
+                        throw new MappingException( "The field " + fields[ i ] +
+                                                    " is not a simple type, a relation or a serialzable object" );
+                } else if ( relClass == ClassDesc.NoDescriptor ) {
+                    // NoDescriptor was found for this field, meaning the
+                    // field could not be mapped to this engine.
+                    throw new MappingException( "The field " + fields[ i ] +
+                                                " requires a class descriptor of type " + fields[ i ].getFieldType().getName() +
+                                                " -- no such descriptor could be created for this engine" );
+                } else {
+                    // This is definitely a relation, no go figure out which type.
+                    RelationDesc relDesc;
+                    boolean      attached;
+
+                    // One-one relation: related object is pointing back to this object.
+                    attached = ( relClass.getIdentity().getFieldType() == clsDesc.getJavaClass() ) ;
+                    relDesc = new RelationDesc( relClass, fields[ i ], attached );
+                    allRels.add( relDesc );
+                }
+            }
+        }
+
+        if ( fields.length != allFields.size() ) {
+            // Update the field and relations of the descriptor
+            fields = new FieldDesc[ allFields.size() ];
+            allFields.copyInto( fields );
+            rels = clsDesc.getRelations();
+            for ( int i = 0 ; i < rels.length ; ++i )
+                allRels.add( rels[ i ] );
+            rels = new RelationDesc[ allRels.size() ];
+            allRels.copyInto( rels );
+            clsDesc.setFields( fields );
+            clsDesc.setRelations( rels );
+        }
+
+        ClassDesc idClsDesc;
+        FieldDesc identity;
+
+        idClsDesc = getDescriptor( clsDesc.getIdentity().getFieldType() );
+        if ( idClsDesc != null )
+            clsDesc.setRelatedIdentity( idClsDesc.getIdentity() );
     }
 
 
@@ -297,6 +427,7 @@ public abstract class MappingHelper
         Class            javaClass;
         ClassDesc        extend;
         ContainerMapping contMaps[];
+        Vector           relations;
         
         // Obtain the Java class.
         try {
@@ -313,20 +444,23 @@ public abstract class MappingHelper
                 if ( extend == null )
                     throw new MappingException( "mapping.extendsMissing",
                                                 clsMap.getExtends(), javaClass.getName() );
+                if ( extend == ClassDesc.NoDescriptor )
+                    throw new MappingException( "mapping.extendsNoMapping",
+                                                clsMap.getExtends(), javaClass.getName() );
             } catch ( ClassNotFoundException except ) {
                 throw new MappingException( except );
             }
         } else
             extend = null;
         
-        // Create all the field descriptors followed by all the container
-        // field descriptors. Order is preserved for fields, but not for
-        // container fields.
+        // Get field descriptors first. Note: order must be preserved for fields,
+        // but not for relations or container fields. Add all the container fields
+        // in there.
         fields = createFieldDescs( javaClass, clsMap.getFieldMapping() );
         contMaps = clsMap.getContainerMapping();
         if ( contMaps != null && contMaps.length > 0 ) {
             FieldDesc[] allFields;
-            
+
             allFields = new FieldDesc[ fields.length + contMaps.length ];
             for ( int i = 0 ; i < fields.length ; ++i )
                 allFields[ i ] = fields[ i ];
@@ -334,13 +468,35 @@ public abstract class MappingHelper
                 allFields[ i + fields.length ] = createContainerFieldDesc( javaClass, contMaps[ i ] );
             fields = allFields;
         }
+
+        // Make sure there are no two fields with the same name.
+        // Crude but effective way of doing this.
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            for ( int j = i + 1 ; j < fields.length ; ++j ) {
+                if ( fields[ i ].getFieldName().equals( fields[ j ].getFieldName() ) )
+                    throw new MappingException( "The field " + fields[ i ].getFieldName() +
+                                                " appears twice in the descriptor for " +
+                                                javaClass.getName() );
+            }
+        }
         
         // Obtain the identity field from one of the above fields.
+        // The identity field is removed from the list of fields.
         identity = null;
         if ( clsMap.getIdentity() != null ) {
             for ( int i = 0 ; i < fields.length ; ++i ) {
                 if ( fields[ i ].getFieldName().equals( clsMap.getIdentity().getFieldRef() ) ) {
                     identity = fields[ i ];
+                    identity.setRequired( true );
+                    fields[ i ] = fields[ fields.length - 1 ];
+
+                    // Remove identity field from list of fields.
+                    FieldDesc[] newFields;
+
+                    newFields = new FieldDesc[ fields.length - 1 ];
+                    for ( int j = 0 ; j < fields.length - 1 ; ++j )
+                        newFields[ j ] = fields[ j ];
+                    fields = newFields;
                     break;
                 }
             }
@@ -348,7 +504,10 @@ public abstract class MappingHelper
                 throw new MappingException( "mapping.identityMissing", clsMap.getIdentity().getFieldRef(),
                                             javaClass.getName() );
         }
-        return new ClassDesc( javaClass, fields, identity, extend );
+
+        // Create the class descriptor.
+        return new ClassDesc( javaClass, fields, new RelationDesc[ 0 ], identity, extend,
+                              AccessMode.getAccessMode( clsMap.getAccessMode() ) );
     }
 
 
