@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1221 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added support for LIMIT/OFFSET clauses for HSQL, and extended HSQL-specific test case.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1221
+       (Werner - 20041001)
+       
 JDO:   Fixed bug 1548 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Changed Log4J configuration to use XML file (log4j.xml).
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1548
