@@ -776,7 +776,9 @@ class Employee {
 
             <code><![CDATA[
 ...
-JDO jdo = JDO.createInstance ("myDB");
+JDO jdo = new JDO();
+jdo.setDatabaseName("...");
+jdo.setConfiguration (..);
 ...
 Database db = jdo.getDatabase();
             ]]></code>
