@@ -174,4 +174,7 @@ public final class EntityFieldInfo {
     }
 
 
+    public String toString() {
+        return entityClass + (fieldNames == null ? relatedEntityClass.toString() : fieldNames[0].toString());
+    }
 }

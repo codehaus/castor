@@ -42,70 +42,59 @@
  *
  * $Id $
  */
+
 package org.exolab.castor.persist;
 
-
-import org.exolab.castor.persist.sql.KeyGeneratorDescriptor;
-
+import java.util.List;
 
 /**
- * EntityInfo specify a Entity
- *
+ * A Relation represents an identity on "one" side and a list of identities on "many" side.
+ * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
+ * @version $Revision$ $Date$
  */
-public final class EntityInfo {
+public final class Relation {
 
     /**
-     * The base entity class which this object represent.
+     * The Collection field on "one" side.
      */
-    public final String entityClass;
+    public final EntityFieldInfo fieldInfo;
 
     /**
-     * The information of all logical fields
+     * The identity on "one" side.
      */
-    public final EntityFieldInfo[] fieldInfo;
+    public final Object identity;
 
     /**
-     * The information of all identity fields
+     * The list of identities on "many" side.
      */
-    public final EntityFieldInfo[] idInfo;
+    public List list;
 
-    /**
-     * All entities which extends the base entities
-     */
-    public final EntityInfo[] subEntities;
-
-    /**
-     *
-     */
-    public final Object discriminator;
-
-    public final KeyGeneratorDescriptor keyGen;
-
-    public EntityInfo( String entityClass, EntityFieldInfo[] idInfo,
-                       EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities,
-                       Object discriminator, KeyGeneratorDescriptor keyGen ) {
-        this.entityClass   = entityClass;
-        this.fieldInfo     = fieldInfo;
-        this.idInfo        = idInfo;
-        this.subEntities   = subEntities;
-        this.discriminator = discriminator;
-        this.keyGen        = keyGen;
+    public Relation(EntityFieldInfo fieldInfo, Object identity) {
+        this(fieldInfo, identity, null);
     }
 
-    public boolean equals( Object object ) {
-        if ( !( object instanceof EntityInfo ) || object == null )
+    public Relation(EntityFieldInfo fieldInfo, Object identity, List list) {
+        this.fieldInfo = fieldInfo;
+        this.identity = identity;
+        this.list = list;
+    }
+
+    public boolean equals(Object obj) {
+        Relation rel;
+
+        if (obj == null || !(obj instanceof Relation)) {
             return false;
-
-        EntityInfo info = (EntityInfo) object;
-
-        return entityClass.equals(info.entityClass);
+        }
+        rel = (Relation) obj;
+        return (fieldInfo.equals(rel.fieldInfo) && identity.equals(rel.identity));
     }
 
     public int hashCode() {
-        return entityClass == null ? 0 : entityClass.hashCode();
+        return fieldInfo.hashCode() + (identity == null ? 0 : identity.hashCode());
     }
 
     public String toString() {
-        return entityClass;
+        return fieldInfo + "<" + identity + ";" + list + ">";
     }
+
 }
