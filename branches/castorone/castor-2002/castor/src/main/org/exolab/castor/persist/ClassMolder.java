@@ -580,7 +580,7 @@ public class ClassMolder implements CacheHolder {
                 }
                 break;
             default:
-                throw new PersistenceException("Unexpect field type!");
+                throw new PersistenceException("Unexpected field type!");
             }
         }
 
@@ -979,6 +979,7 @@ public class ClassMolder implements CacheHolder {
 								if ( toBeDeleted != null && tx.isPersistent( toBeDeleted ) ) {
 									tx.delete( toBeDeleted );
 								} else { 
+									System.out.println("Object to be delete is not found!");
 									// what to do if it happens?
 								}
 							}
@@ -1004,6 +1005,7 @@ public class ClassMolder implements CacheHolder {
 									tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
 								} else {
 									// what to do if it happens?
+									System.out.println("Object to be added is not found!");
 								}
 							}
 						}
@@ -1332,7 +1334,7 @@ public class ClassMolder implements CacheHolder {
 			if ( base._extendent != null ) 
 				for ( int i=0; i < base._extendent.size(); i++ ) 
 					if ( !extendPath.contains( base._extendent.get(i) ) ) {
-						deleteExtend( tx, (ClassMolder)base._extendent.get(i), ids );
+						//deleteExtend( tx, (ClassMolder)base._extendent.get(i), ids );
 					} else {
 					}
 
@@ -1341,8 +1343,9 @@ public class ClassMolder implements CacheHolder {
 
 		if ( _extendent != null ) {
 			for ( int i=0; i < _extendent.size(); i++ ) {
-				if ( !extendPath.contains( _extendent.get(i) ) )
-					deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
+				if ( !extendPath.contains( _extendent.get(i) ) ) {
+					//deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
+				}
 			}
 		}
     }
