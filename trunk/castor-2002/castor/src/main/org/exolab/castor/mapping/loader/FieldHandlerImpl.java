@@ -291,7 +291,9 @@ public final class FieldHandlerImpl
         _field = null;
         if ( fieldName == null )
             throw new IllegalArgumentException( "Argument 'fieldName' is null" );
-        if ( getMethod == null && setMethod == null )
+            
+        // Originally commented out by Oleg....not sure why?
+        // if ( getMethod == null && setMethod == null )
         //    throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
         _getSequence = getSequence;
