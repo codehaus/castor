@@ -44,42 +44,52 @@
  */
 package org.exolab.castor.persist;
 
+
+import org.exolab.castor.persist.sql.KeyGeneratorDescriptor;
+
+
 /**
  * EntityInfo specify a Entity
  *
  */
 public final class EntityInfo {
 
-	/**
-	 * The base entity class which this object represent.
-	 */
+    /**
+     * The base entity class which this object represent.
+     */
     public final String entityClass;
 
-	/**
-	 * The information of all logical fields
-	 */
+    /**
+     * The information of all logical fields
+     */
     public final EntityFieldInfo[] fieldInfo;
 
-	/**
-	 * The information of all identity fields
-	 */
-	public final EntityFieldInfo[] idInfo;
+    /**
+     * The information of all identity fields
+     */
+    public final EntityFieldInfo[] idInfo;
 
-	/**
-	 * All entities which extends the base entities
-	 */
-    public final EntityInfo[] subEntities; 
+    /**
+     * All entities which extends the base entities
+     */
+    public final EntityInfo[] subEntities;
 
-	/**
-	 * 
-	 */
-    public final Object discriminator; 
+    /**
+     *
+     */
+    public final Object discriminator;
 
-    public EntityInfo( String entityClass, EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, Object discriminator ) {
+    public final KeyGeneratorDescriptor keyGen;
+
+    public EntityInfo( String entityClass, EntityFieldInfo[] idInfo,
+                       EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities,
+                       Object discriminator, KeyGeneratorDescriptor keyGen ) {
         this.entityClass   = entityClass;
         this.fieldInfo     = fieldInfo;
+        this.idInfo        = idInfo;
         this.subEntities   = subEntities;
         this.discriminator = discriminator;
+        this.keyGen        = keyGen;
     }
 
     public boolean equals( Object object ) {

@@ -49,58 +49,58 @@ package org.exolab.castor.persist;
  */
 public final class Entity {
 
-	/**
-	 * The type of the entity.
-	 */
+    /**
+     * The type of the entity.
+     */
     public EntityInfo info;
 
-	/**
-	 * The identity of this entity.
-	 */
+    /**
+     * The identity of this entity.
+     */
     public Object identity;
 
-	/**
-	 * The timestamp or counter of the entity in long.
-	 */
+    /**
+     * The timestamp or counter of the entity in long.
+     */
     public long longStamp;
 
-	/**
-	 * The timestamp or counter of the entity in object type.
-	 */
+    /**
+     * The timestamp or counter of the entity in object type.
+     */
     public Object objectStamp;
 
-	/**
-	 * Indicate this entity is locked in the data store.
-	 */ 
+    /**
+     * Indicate this entity is locked in the data store.
+     */
     public boolean locked;
 
-	/**
-	 * The values of an entity.
-	 * Notice that not every entity span all entity class and sub entity 
-	 * classes in the EntityInfo.
-	 */
+    /**
+     * The values of an entity.
+     * Notice that not every entity span all entity class and sub entity
+     * classes in the EntityInfo.
+     */
     public Values[] values;
 
-	/**
-	 * Values of an entity.
-	 */
-	public final class Values {
+    /**
+     * Values of an entity.
+     */
+    public final class Values {
 
-		/**
-		 * The sub entity name which this values belongs to.
-		 */
-		public String entityClass;
+        /**
+         * The sub entity name which this values belongs to.
+         */
+        public String entityClass;
 
-		/**
-		 * The fieldInfo of the values
-		 */
-		public EntityFieldInfo[] fieldInfo;
-		
-		/**
-		 * The values of the entity that is stored in the same order
-		 * and indicated in the fieldInfo.
-		 */
-		Object[] values;
+        /**
+         * The fieldInfo of the values
+         */
+        public EntityFieldInfo[] fieldInfo;
+
+        /**
+         * The values of the entity that is stored in the same order
+         * and indicated in the fieldInfo.
+         */
+        Object[] values;
 
 	}
 }
