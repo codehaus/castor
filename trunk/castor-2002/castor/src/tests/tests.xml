@@ -27,7 +27,7 @@
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
     <case class="jdo.LazyLoading" />
-    <!-- <case class="jdo.NestedFields" /> -->
+    <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
     <!-- -->
     <!-- -->
@@ -106,6 +106,7 @@
     <case class="jdo.DependentUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
+    <case class="jdo.Collections" />
     <!-- -->
     <!-- -->
     <!-- <case class="jdo.Complex" /> -->
@@ -141,6 +142,7 @@
     <case class="jdo.DependentUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
+    <case class="jdo.Collections" />
     <!-- -->
     <!-- -->
     <!-- <case class="jdo.Complex" /> -->
