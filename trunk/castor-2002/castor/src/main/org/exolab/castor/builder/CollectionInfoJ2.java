@@ -105,18 +105,18 @@ public class CollectionInfoJ2 extends CollectionInfo {
     
                     
     /** 
-     * Creates implementation of Collection get() method.
+     * Creates implementation of Enumeration get() method.
     **/
     public void createGetMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
                     
-        jsc.add("return ");
+        jsc.add("return new org.exolab.castor.util.IteratorEnumeration( ");
         jsc.append(getName());
-        jsc.append(";");
+        jsc.append(".iterator() );");
     } //-- createGetMethod
-    
+
     /** 
      * Creates implementation of remove(Object) method.
     **/
