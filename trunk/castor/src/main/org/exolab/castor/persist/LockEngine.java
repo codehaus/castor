@@ -228,6 +228,7 @@ public final class LockEngine {
                 }
                 throw new MappingException("Some base class can not be resolved!");
             }
+            // XXX [SMH]: Remove this comment-block or is it something we need?
             /*
             while ( enum.hasMoreElements() ) {
                 molder = (ClassMolder) enum.nextElement();
@@ -437,8 +438,6 @@ public final class LockEngine {
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName()) );
             
-        boolean write = true;   // just for readability
-
         lock = null;
 
         if ( oid.getIdentity() != null ) {
@@ -527,14 +526,12 @@ public final class LockEngine {
      *
      * @param tx The transaction context
      * @param oid The object's identity
-     * @param object The object type
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void delete( TransactionContext tx, OID oid, Object object )
+    public void delete( TransactionContext tx, OID oid )
             throws PersistenceException {
-        TypeInfo   typeInfo;
-        typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
+        TypeInfo   typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
 
         try {
             typeInfo.assure( oid, tx, true );
@@ -992,9 +989,37 @@ public final class LockEngine {
      * ClassMolder and identity.  If identity is null then expire
      * all objects of the type represented by ClassMolder.
      */
-    public void expireCache( Class cls ) {
-        TypeInfo typeInfo = (TypeInfo) _typeInfo.get( cls.getName() );
-        if (typeInfo != null) typeInfo.expireCache();
+    public void expireCache(Class cls) {
+        TypeInfo typeInfo = (TypeInfo) _typeInfo.get(cls.getName());
+        if (typeInfo != null) {
+            typeInfo.expireCache();
+        }
+    }
+    /**
+     * Expires all objects of all types from cache.
+     */
+    public void expireCache() {
+        for (Iterator iter = _typeInfo.values().iterator(); iter.hasNext();) {
+            ((TypeInfo) iter.next()).expireCache();
+        }
+    }
+    /**
+     * Dump cached objects of all types to output.
+     */
+    public void dumpCache() {
+        for (Iterator iter = _typeInfo.values().iterator(); iter.hasNext();) {
+            ((TypeInfo) iter.next()).dumpCache();
+        }
+    }
+
+    /**
+     * Dump cached objects of specific type to output.
+     */
+    public void dumpCache(Class cls) {
+        TypeInfo typeInfo = (TypeInfo) _typeInfo.get(cls.getName());
+        if (typeInfo != null) {
+            typeInfo.dumpCache();
+        }
     }
 
     /**
@@ -1115,26 +1140,43 @@ public final class LockEngine {
         }
    
         /**
+         * Dump all objects in cache or lock to output.
+         */
+        public void dumpCache() {
+			_log.info(name + ".dumpCache()...");
+            synchronized (locks) {
+                for (Iterator iter = locks.values().iterator(); iter.hasNext();) {
+                    ObjectLock entry = (ObjectLock) iter.next();
+                    _log.info("In locks: " + entry);
+                }
+
+                for (Enumeration enum = cache.elements(); enum.hasMoreElements();) {
+                    ObjectLock entry = (ObjectLock) enum.nextElement();
+                    _log.info("In cache: " + entry.getOID());
+                }
+            }
+        }
+        
+        /**
          * Expire all objects of this class from the cache.
          */
         public void expireCache() {
-            ObjectLock entry = null;
-            synchronized( locks ) {
-                // mark all objects currently participating in a
+            synchronized (locks) {
+                // Mark all objects currently participating in a
                 // transaction as expired.  They will be not be added back to
                 // the LRU when the transaction's complete (@see release)
-                Iterator iter = locks.values().iterator();
-                while (iter.hasNext()) {
-                    entry = (ObjectLock)iter.next();
-                    entry.expire();
+                // XXX [SMH]: Reconsider removing from locks (unknown side-effects?).
+                for (Iterator iter = locks.values().iterator(); iter.hasNext();) {
+                    ObjectLock objectLock = (ObjectLock) iter.next();
+                    objectLock.expire();
+                    iter.remove();
                 }
-                 
-                // remove all objects not participating in a transaction
-                // from the LRU cache.
-                Enumeration enum = cache.elements();
-                while (enum.hasMoreElements()) {
-                    entry = (ObjectLock)enum.nextElement();
-                    cache.expire(entry.getOID());
+                
+                // Remove all objects not participating in a transaction
+                // from the cache.
+                for (Enumeration enum = cache.elements(); enum.hasMoreElements();) {
+                    ObjectLock objectLock = (ObjectLock) enum.nextElement();
+                    cache.expire(objectLock.getOID());
                 }
             }
         }
