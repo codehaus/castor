@@ -94,7 +94,7 @@ public class ScopableResolver implements Resolver {
     public void removeResolvable( String id ) {
         Object obj = ids.get(id);
         if (obj != null) {
-            ids.remove(obj);
+            ids.remove(id);
         }
     } //-- removeResolvable
 
