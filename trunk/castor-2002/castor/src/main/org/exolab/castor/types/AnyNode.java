@@ -264,6 +264,8 @@ public final class AnyNode {
        else if ( (_firstChildNode.getNodeType() == ATTRIBUTE) ||
                  (_firstChildNode.getNodeType() == NAMESPACE) )
             _firstChildNode.addChild(node);
+       else if (_firstChildNode.getNodeType()==TEXT)
+           mergeTextNode(_firstChildNode,node);
        else _firstChildNode.appendSibling(node);
     }
 
@@ -567,17 +569,9 @@ public final class AnyNode {
                       sb.append(siblingNode.toString());
 
              }//ELEMENT
-             else {
-                //in case we are dealing with a TEXT node
-                // we got to make sure that there is no sibling TEXT nodes
-                //(<tag>text text</tag> contains indeed 2 text nodes)
-                AnyNode temp = this;
-                while (temp != null) {
-                    sb.append(temp.getStringValue());
-                    temp = temp.getNextSibling();
-                }
-                temp = null;
-             }
+             else
+                return this.getStringValue();
+
             return sb.toString();
           }
           return sb.toString();
@@ -613,6 +607,21 @@ public final class AnyNode {
          return _firstChildNode;
      }
 
-
+     /**
+      * Adds the text value of a TEXT node to another
+      * TEXT node.
+      * @param node1 the AnyNode that receives the text value
+      * @param node2 the AnyNode that needs to be merges with node1.
+      */
+     private void mergeTextNode(AnyNode node1, AnyNode node2) {
+         if (node1.getNodeType() != node2.getNodeType())
+            return;
+        if (node1.getNodeType() != AnyNode.TEXT)
+            return;
+        StringBuffer temp = new StringBuffer(node1.getStringValue());
+        temp.append(node2.getStringValue());
+        node1._value = temp.toString();
+        node2 = null;
+     }
 
 }

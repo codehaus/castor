@@ -105,6 +105,10 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
      */
      private Locator _locator;
 
+    /**
+     * A flag that indicates we are in a character section.
+     */
+     private boolean _character = false;
 
     /**
      * Sets the document locator of the current parsed inputsource
@@ -150,6 +154,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     public void startElement(String name, AttributeList atts)
            throws SAXException
     {
+          _character = false;
           createNodeElement(null, getLocalPart(name), name);
           AnyNode tempNode = null;
           String prefix = null;
@@ -214,6 +219,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     public void endElement(String namespaceURI, String localName, String qName)
            throws SAXException
     {
+        _character = false;
         //if it is the starting element just returns
         if (_startingNode.getLocalName().equals(localName))
            return;
@@ -237,10 +243,13 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
         //create a Text Node
         String temp = new String(ch, start, length);
         //skip whitespaces
-        if (isWhitespace(temp))
+        if (isWhitespace(temp) & !_character)
             return;
-        AnyNode tempNode = new AnyNode(AnyNode.TEXT, null, null, null, temp);
-        _node.addChild(tempNode);
+        else {
+            AnyNode tempNode = new AnyNode(AnyNode.TEXT, null, null, null, temp);
+           _node.addChild(tempNode);
+           _character = true;
+        }
     }
 
 
