@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -50,7 +50,6 @@ import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.ObjectFactory;
 import org.exolab.castor.util.DefaultObjectFactory;
 import org.exolab.castor.util.MimeBase64Decoder;
-import org.exolab.castor.util.List;
 import org.exolab.castor.xml.descriptors.PrimitivesClassDescriptor;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
@@ -62,11 +61,8 @@ import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 
 //-- xml related imports
 import org.xml.sax.*;
-import org.xml.sax.helpers.ParserFactory;
-import org.xml.sax.helpers.AttributeListImpl;
 
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringWriter;
 
@@ -542,6 +538,8 @@ public final class UnmarshalHandler extends MarshalFramework
         else {
              UnmarshalState state = (UnmarshalState)_stateInfo.peek();
              //-- handle whitespace
+             boolean removedTrailingWhitespace = false;
+             boolean removedLeadingWhitespace = false;
              if (!state.wsPreserve) {
                 //-- trim leading whitespace characters
                 while (length > 0) {
@@ -551,12 +549,13 @@ public final class UnmarshalHandler extends MarshalFramework
                         case '\r':
                         case '\n':
                         case '\t':
-                            whitespace = true;
+                        	whitespace = true;
                             break;
                         default:
                             break;
                     }
                     if (!whitespace) break;
+                    removedLeadingWhitespace = true;
                     ++start;
                     --length;
                 }
@@ -575,10 +574,21 @@ public final class UnmarshalHandler extends MarshalFramework
                             break;
                     }
                     if (!whitespace) break;
+                    removedTrailingWhitespace = true;
                     --length;
                 }
              }
              if (state.buffer == null) state.buffer = new StringBuffer();
+             else {
+                //-- content exists, add a space
+                if (!state.wsPreserve) {
+                	if (state.trailingWhitespaceRemoved || removedLeadingWhitespace)
+                    {
+                		state.buffer.append(' ');
+                    }
+                }
+             }
+             state.trailingWhitespaceRemoved = removedTrailingWhitespace;
              state.buffer.append(ch, start, length);
         }
     } //-- characters
@@ -1423,7 +1433,6 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- check for xsi:type
                 instanceClassname = getInstanceType(atts, null);
                 if (instanceClassname != null) {
-                        
                     //-- first try loading class directly
                     try {
                         _topClass = loadClass(instanceClassname, null);
@@ -1814,7 +1823,9 @@ public final class UnmarshalHandler extends MarshalFramework
             
             //-- clear current state and re-use for the container
             state.clear();
-
+            //-- inherit whitespace preserving from the parentState
+            state.wsPreserve = parentState.wsPreserve;
+            
             //here we can hard-code a name or take the field name
             state.elementName = descriptor.getFieldName();
             state.fieldDesc = descriptor;
@@ -2360,6 +2371,7 @@ public final class UnmarshalHandler extends MarshalFramework
         String type = atts.getValue(XSI_TYPE, XSI_NAMESPACE);
 
         if (type != null) {
+            
             if (type.startsWith(JAVA_PREFIX)) {
                 return type.substring(JAVA_PREFIX.length());
             }
