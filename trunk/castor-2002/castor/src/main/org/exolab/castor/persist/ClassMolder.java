@@ -348,7 +348,6 @@ public class ClassMolder {
             }
         }
         
-        // ssa, multi classloader feature
         // ssa, FIXME : Are the two statements equivalents ?
 //        if ( Persistent.class.isAssignableFrom( _base ) )
         if ( Persistent.class.isAssignableFrom( ds.resolve(_name) ) )
@@ -2306,28 +2305,13 @@ public class ClassMolder {
         // call SQLEngine to lock an record
     }
 
-    // ssa, multi classloader feature
-    // ssa, FIXME : Is that necessary ?
-//    /**
-//     * Return a new instance of the base class
-//     *
-//     */
-//    public Object newInstance() {
-//        try {
-//            return _base.newInstance();
-//        } catch ( IllegalAccessException e ) {
-//        } catch ( InstantiationException e ) {
-//        } catch ( ExceptionInInitializerError e ) {
-//        } catch ( SecurityException e ) {
-//        }
-//        return null;
-//    }
     
-    // ssa, multi classloader feature
-    // ssa, FIXME : Is that necessary ?
     /**
-     * Return a new instance of the base class
+     * Return a new instance of the base class with the provided ClassLoader object
      *
+     * @param laoder the ClassLoader object to use to create a new object
+     * @return Object the object reprenseted by this ClassMolder, and instanciated 
+     * with the provided ClassLoader instance.
      */
     public Object newInstance( ClassLoader loader ) {
         try {
@@ -2336,11 +2320,8 @@ public class ClassMolder {
             else 
                 return Class.forName(_name).newInstance();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch ( IllegalAccessException e ) {
-            e.printStackTrace();
         } catch ( InstantiationException e ) {
-            e.printStackTrace();
         } catch ( ExceptionInInitializerError e ) {
         } catch ( SecurityException e ) {
         }
@@ -2460,8 +2441,7 @@ public class ClassMolder {
         return result;
     }
     
-    // ssa, multi classloader feature
-    // ssa, FIXME : is that necessary ?
+    // ssa, FIXME : is that method necessary ?
     /**
      * check if the current ClassModlder is assignable from the <code>class</code> 
      * instance.
