@@ -69,7 +69,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-final class CacheEngine
+public final class CacheEngine
     implements PersistenceEngine
 {
 

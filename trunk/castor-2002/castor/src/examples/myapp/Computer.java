@@ -8,6 +8,9 @@ public class Computer
     public String cpu;
 
 
+    public String getCpu() { return cpu; }
+
+
     public String toString()
     {
 	return super.toString() + " " + cpu;

@@ -7,6 +7,7 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,8 @@ import org.odmg.Transaction;
 import org.odmg.OQLQuery;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.jdo.ODMG;
-
+import org.exolab.castor.xml.Marshaller;
+import org.apache.xml.serialize.*;
 
 
 public class Test
@@ -26,6 +28,7 @@ public class Test
 
 
     public static final String DatabaseFile = "database.xml";
+
     
     public static final String Usage = "Usage: example jdo";
     
@@ -51,15 +54,6 @@ public class Test
             odmgTest( odmg, db, logger );
             db.close();
 
-            /* (Future mechanism for SQL -> XML)
-            org.exolab.castor.jdo.engine.QueryParser   qp;
-            org.apache.xml.serialize.XMLSerializer ser;
-
-            qp = new org.exolab.castor.jdo.engine.QueryParser( org.exolab.castor.jdo.engine.DatabaseSource.getDatabaseSource( "test" ), Product.class );
-            ser = new org.apache.xml.serialize.XMLSerializer( System.out, null );
-            qp.execute( ser.asDocumentHandler() );
-            */
-            
         } catch ( Exception except ) {
             logger.println( except );
             except.printStackTrace( logger );
@@ -205,23 +199,32 @@ public class Test
         logger.println( "Commit transaction" );
         tx.commit();
 
+
+        Object     result;
+        Serializer ser;
+
         tx = odmg.newTransaction();
         tx.begin();
         productOql = odmg.newOQLQuery();
         productOql.create( "SELECT p FROM myapp.Product p" );
-        Object result;
 
         result = productOql.execute();
+        ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
+        ser.setOutputCharStream( logger );
+        ser.asDocumentHandler().startDocument();
+        ser.asDocumentHandler().startElement( "products", null );
         if ( result instanceof Enumeration ) {
             enum = (Enumeration) result;
-            while( enum.hasMoreElements() ) {
-                logger.println( "Query result: " + enum.nextElement() );
-            }
+            while( enum.hasMoreElements() )
+                Marshaller.marshal( enum.nextElement(), ser.asDocumentHandler() );
         } else 
-            logger.println( "Query result: " + result );
+            Marshaller.marshal( result, ser.asDocumentHandler() );
+        ser.asDocumentHandler().endElement( "products" );
+        ser.asDocumentHandler().endDocument();
         tx.commit();
     }
-    
+
+
 
 }
 

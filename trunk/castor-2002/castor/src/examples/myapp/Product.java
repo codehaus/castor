@@ -2,6 +2,7 @@ package myapp;
 
 
 import java.util.Vector;
+import java.util.Enumeration;
 import java.io.Serializable;
 
 
@@ -25,6 +26,13 @@ public class Product
 
 
     public Vector           detail;
+
+
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public float getPrice() { return price; }
+    public ProductGroup getGroup() { return group; }
+    public Enumeration getDetail() { return detail.elements(); }
 
 
     public String toString()
