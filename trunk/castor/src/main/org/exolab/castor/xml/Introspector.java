@@ -334,12 +334,18 @@ public final class Introspector {
         
         int methodCount = 0;
         
+        Class superClass = c.getSuperclass();
+        
         //-- create method sets
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             
             //-- if method comes from the Object base class, ignore
             if (method.getDeclaringClass() == Object.class) continue;
+                        
+            //-- ignore methods from super-class, that will be
+            //-- introspected separately, if necessary
+            if (method.getDeclaringClass() == superClass) continue;
             
             //-- if method is static...ignore
             if ((method.getModifiers() & Modifier.STATIC) != 0) continue;
@@ -620,7 +626,15 @@ public final class Introspector {
             for (int i = 0; i < fields.length; i++) {                
                 Field field = fields[i];
                 
-                Class type = field.getType();       
+                
+                //-- if field comes from the Object base class, ignore
+                if (field.getDeclaringClass() == Object.class) continue;
+                
+                //-- ignore fields from super-class, that will be
+                //-- introspected separately, if necessary
+                if (field.getDeclaringClass() == superClass) continue;
+            
+                Class type = field.getType();
                 
                 if (!isDescriptable(type)) continue;
                 
@@ -721,7 +735,24 @@ public final class Introspector {
             }
         }
         
-        
+        //-- Add reference to superclass...if necessary
+        if ((superClass != null) &&
+            (superClass != Void.class) &&
+            (superClass != Object.class) &&
+            (superClass != Class.class)) 
+        {
+            try {
+                XMLClassDescriptor parent = generateClassDescriptor(superClass, errorWriter);
+                if (parent != null) {
+                    classDesc.setExtends(parent);
+                }
+            }
+            catch(MarshalException mx) {
+                //-- Ignore for now.
+            }
+
+        }
+             
         return classDesc;
     } //-- generateClassDescriptor
     
@@ -1224,5 +1255,4 @@ class IntrospectedXMLClassDescriptor
         setIntrospected(true);        
     } //-- XMLClassDescriptorImpl
     
-        
 } //-- IntrospectedClassDescriptor
