@@ -89,20 +89,25 @@ public final class DB2QueryExpression
         
         sql.append( JDBCSyntax.From );
 
+        /* Thomas Fach reported that this variant doesn't work
         // Use join syntax for all joins (LEFT OUTER and INNER).
         // Tables the appear in the join are removed from the
         // tables list in the FROM clause.
+        */
+        // Use outer join syntax for all outer joins. Inner joins come later.
         tables = (Hashtable) _tables.clone();
         first = true;
         for ( int i = 0 ; i < _joins.size() ; ++i ) {
             Join join;
 
+            join = (Join) _joins.elementAt( i );
+
+            if ( ! join.outer ) 
+                continue;
             if ( first )
                 first = false;
             else
                 sql.append( JDBCSyntax.TableSeparator );
-            join = (Join) _joins.elementAt( i );
-
             sql.append(  _factory.quoteName( join.leftTable ) );
             if ( join.outer )
                 sql.append( JDBCSyntax.LeftJoin );
@@ -129,7 +134,30 @@ public final class DB2QueryExpression
                 sql.append( JDBCSyntax.TableSeparator );
             sql.append( _factory.quoteName( (String) enum.nextElement() ) );
         }
-        addWhereClause( sql, true );
+
+        // Use standard join syntax for all inner joins 
+        first = true;
+        for ( int i = 0 ; i < _joins.size() ; ++i ) {
+            Join join;
+            
+            join = (Join) _joins.elementAt( i );
+            if ( ! join.outer ) {
+                if ( first ) {
+                    sql.append( JDBCSyntax.Where );
+                    first = false;
+                } else
+                    sql.append( JDBCSyntax.And );
+                for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
+                    if ( j > 0 )
+                        sql.append( JDBCSyntax.And );
+                    sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
+                                                    join.leftColumns[ j ] ) ).append( OpEquals );
+                    sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
+                                                    join.rightColumns[ j ] ) );
+                }
+            }
+        } 
+        first = addWhereClause( sql, first );
 
         if ( _order != null )
           sql.append(JDBCSyntax.OrderBy).append(_order);
