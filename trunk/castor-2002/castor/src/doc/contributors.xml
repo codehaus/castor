@@ -314,6 +314,12 @@
     <description>Gives helps fellow users on the mailing list</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Braeuchi" given="Jakob"/>
+    <email>jbraeuchi@hotmail.com</email>
+    <description>Submitted a patch to enable readonly field support</description>
+  </contributor>
+
   <!-- ******** -->
   <!-- FEEDBACK -->
   <!-- ******** -->
