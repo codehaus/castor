@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/castor-one.xml">
+  <body>
+    <title>Caching</title>
+
+    <header>
+      <p>Reference: <api package="org.exolab.castor.persist.cache">API documentation</api></p>
+    </header>
+
+    <section title="Introduction">
+    
+       <p>As explained in <api package="org.exolab.castor.jdo.persist">API docs for the persists package</api>,
+          <api class="org.exolab.castor.persist.LockEngine">LockEngine</api> implements 
+          a persistence engine that caches objects in memory for performance reasons and thus 
+          eliminates the number of operations against the persistence storage.</p>
+    
+       <p>The main component of this package is the interface 
+          <api class="org.exolab.castor.persist.cache.Cache">Cache</api>, which declares 
+          the external functionality of a performance cache. Existing (and future) cache implementations
+          have to implement this interface, which is closely modelled after java.util.Map.</p>
+
+    </section>
+    
+    <section title="Configuration">
+    
+       <p>Castor (as of release 0.9.6) allows for addition of user-defined cache implementations.</p>
+
+       <p>By default, the file <i>castor.properties</i> includes a section as follows:</p>    
+
+       <code-panel>
+          <code>
+# 
+# Cache implementations
+# 
+org.exolab.castor.jdo.cacheFactories=\
+  org.exolab.castor.persist.cache.NoCacheFactory,\
+  org.exolab.castor.persist.cache.TimeLimitedFactory,\
+  org.exolab.castor.persist.cache.CountLimitedFactory,\
+  org.exolab.castor.persist.cache.UnlimitedFactory
+          </code>
+       </code-panel>
+
+       <p>To add your own performance cache implementation, please append the fully-qualified
+          class name to this list as shown here:</p>
+       
+       <code-panel>
+          <code>
+# 
+# Cache implementations
+# 
+org.exolab.castor.jdo.cacheFactories=\
+  org.exolab.castor.persist.cache.NoCacheFactory,\
+  org.exolab.castor.persist.cache.TimeLimitedFactory,\
+  org.exolab.castor.persist.cache.CountLimitedFactory,\
+  org.exolab.castor.persist.cache.UnlimitedFactory,\
+  <b>org.whatever.somewhere.nevermind.CustomCache</b>
+          </code>
+       </code-panel>
+       
+       <p>In addition, you will have to provide the implementations of 
+          <api class="org.exolab.castor.persist.cache.Cache">Cache</api> and 
+          <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api>
+          for your new cache instance.</p>
+          
+       <section title="CacheFactory implementation">
+          
+          <p>For this, please add an implementation 
+             of <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api> and 
+             make sure that you provide valid values for the two properties <i>name</i> and 
+             <i>className</i>.</p>    
+       
+          <p>To assist users in this task, a 
+             <api class="org.exolab.castor.persist.cache.AbstractCacheFactory">AbstractCacheFactory</api> 
+             class has been supplied, which users should derive their custom 
+             <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api> instances 
+             from, if they wish so. Please consult existing 
+             <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api> implementations 
+             such as <api class="org.exolab.castor.persist.cache.TimeLimitedFactory">TimeLimitedFactory</api>} or 
+             <api class="org.exolab.castor.persist.cache.CountLimitedFactory">CountLimitedFactory</api> 
+             for code samples.</p>    
+
+          <code-panel>
+             <code>
+/**
+ * My own cache factory implementation
+ */ 
+ public class <b>CustomCacheFactory</b> extends <b>AbstractCacheFactory</b> {
+ 
+    /**
+     * The name of the factory
+     */
+    <b>private static final String NAME = "custom"</b>;
+
+    /**
+     * Full class name of the underlying cache implementation.
+     */
+    <b>private static final String CLASS_NAME = "my.company.project.CustomCache"</b>; 
+    
+    /**
+     * Returns the short alias for this factory instance.
+     * @return The short alias name. 
+     */
+    <b>public String getName()</b> {
+    {
+        return NAME;
+    }
+    
+    /**
+     * Returns the full class name of the underlying cache implementation.
+     * @return The full cache class name. 
+     */
+    <b>public String getCacheClassName()</b> {
+        return CLASS_NAME;   
+    }
+    
+ }
+             </code>
+          </code-panel>
+                 
+       </section>
+       
+       <section title="Cache implementation">
+
+          <p>For this, please create an implementation 
+             of <api class="org.exolab.castor.persist.cache.Cache">Cache</api>.</p>    
+       
+          <p>To assist users in this task, a 
+             <api class="org.exolab.castor.persist.cache.AbstractBaseCache">AbstractBaseCache</api> 
+             class has been supplied, which users should derive their custom 
+             <api class="org.exolab.castor.persist.cache.Cache">Cache</api> instances 
+             from, if they wish so. Please consult existing 
+             <api class="org.exolab.castor.persist.cache.Cache">Cache</api> implementations 
+             such as <api class="org.exolab.castor.persist.cache.TimeLimited">TimeLimited</api>} or 
+             <api class="org.exolab.castor.persist.cache.CountLimited">CountLimited</api> 
+             for code samples.</p>
+          <code-panel>
+             <code>
+/**
+ * My own cache implementation
+ */ 
+ public class <b>CustomCache</b> extends <b>AbstractBaseCache</b> {
+ 
+    ...
+    
+ }
+             </code>
+          </code-panel>
+       </section>
+
+   </section>
+       
+   </body>       
+</document>
