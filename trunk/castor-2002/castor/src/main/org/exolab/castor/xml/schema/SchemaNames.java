@@ -93,6 +93,7 @@ public class SchemaNames {
     public static final String TYPE_ATTR        = "type";
     public static final String USE_ATTR         = "use";
     public static final String VALUE_ATTR       = "value";
+    public static final String VERSION_ATTR     = "version";
 
     //--Derivation methods
     public static final String DERIVED_BY       = "derivedBy";
