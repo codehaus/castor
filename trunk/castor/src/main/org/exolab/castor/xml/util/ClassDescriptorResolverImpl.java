@@ -67,8 +67,15 @@ public class ClassDescriptorResolverImpl
     
     /**
      * internal cache for class descriptors
-    **/
-    private Hashtable _cache      = null;
+     * with the class as the key
+     */
+    private Hashtable _cacheViaClass = null;
+    
+    /**
+     * internal cache for class descriptors
+     * with the xml-name as the key
+     */
+    private Hashtable _cacheViaName = null;
     
     /**
      * A flag indicating an error has occured
@@ -83,7 +90,7 @@ public class ClassDescriptorResolverImpl
     private XMLMappingLoader mappingLoader = null;
     
     private ClassLoader _loader  = null;
-    
+   
     /**
      * The introspector to use, if necessary, to 
      * create dynamic ClassDescriptors
@@ -99,8 +106,9 @@ public class ClassDescriptorResolverImpl
      * Creates a new ClassDescriptorResolverImpl
      */
     public ClassDescriptorResolverImpl() {
-        _cache        = new Hashtable();
-        _introspector = new Introspector();
+        _cacheViaClass = new Hashtable();
+        _cacheViaName  = new Hashtable();
+        _introspector  = new Introspector();
     } //-- ClassDescriptorResolverImpl
 
 
@@ -116,12 +124,30 @@ public class ClassDescriptorResolverImpl
 
     
     /**
-     * Associates (or binds) a class type with a given MarshalInfo
-     * @param type the Class to associate
-     * @param mInfo the MarshalInfo to associate the given class with
-    **/
+     * Associates (or binds) a class type with a given ClassDescriptor
+     *
+     * @param type the Class to associate with the given descriptor
+     * @param classDesc the ClassDescriptor to associate the given 
+     * class with
+     */
     public void associate(Class type, XMLClassDescriptor classDesc) {
-        _cache.put(type, classDesc);
+        
+        if (type == null) {
+            throw new IllegalArgumentException("argument 'type' must not be null.");
+        }
+        
+        //-- handle remove
+        if (classDesc == null) {
+            if (type != null) {
+                _cacheViaClass.remove(type);
+            }
+        }
+        else {
+            _cacheViaClass.put(type, classDesc);
+            if (classDesc.getXMLName() != null) {
+                _cacheViaName.put(classDesc.getXMLName(), classDesc);
+            }
+        }
     } //-- associate
     
     /**
@@ -169,7 +195,7 @@ public class ClassDescriptorResolverImpl
 
         if (type == null) return null;
         
-        XMLClassDescriptor classDesc = (XMLClassDescriptor) _cache.get(type);
+        XMLClassDescriptor classDesc = (XMLClassDescriptor) _cacheViaClass.get(type);
         
         if (classDesc != null) return classDesc;
 
@@ -178,7 +204,7 @@ public class ClassDescriptorResolverImpl
         if (mappingLoader != null) {            
             classDesc = (XMLClassDescriptor)mappingLoader.getDescriptor(type);
             if (classDesc != null) {
-               _cache.put(type, classDesc);
+               _cacheViaClass.put(type, classDesc);
                return classDesc;
             }
         }
@@ -189,7 +215,7 @@ public class ClassDescriptorResolverImpl
             ClassLoader loader = type.getClassLoader();
             Class dClass = loadClass(className, loader);            
             classDesc = (XMLClassDescriptor) dClass.newInstance();
-            _cache.put(type, classDesc);
+            _cacheViaClass.put(type, classDesc);
         }
         catch(ClassNotFoundException cnfe) { 
             /* 
@@ -209,7 +235,7 @@ public class ClassDescriptorResolverImpl
             try {
                 classDesc = _introspector.generateClassDescriptor(type);
                 if (classDesc != null) {
-                    _cache.put(type, classDesc);
+                    _cacheViaClass.put(type, classDesc);
                 }
             }
             catch (MarshalException mx) {
@@ -298,12 +324,18 @@ public class ClassDescriptorResolverImpl
         XMLClassDescriptor classDesc = null;
         Enumeration enum             = null;
         
-        //-- check mapping loader first
+        //-- check name cache first...
+        classDesc = (XMLClassDescriptor)_cacheViaName.get(xmlName);
+        if(classDesc != null)
+            return classDesc;
+
+        //-- next check mapping loader...
         if (mappingLoader != null) {
             enum = mappingLoader.listDescriptors();
             while (enum.hasMoreElements()) {
                 classDesc = (XMLClassDescriptor)enum.nextElement();
                 if (xmlName.equals(classDesc.getXMLName())) {
+                    _cacheViaName.put(xmlName, classDesc);
                     return classDesc;
                 }
                 classDesc = null;
@@ -311,10 +343,11 @@ public class ClassDescriptorResolverImpl
         }
         
         //-- next look in local cache
-        enum = _cache.elements();
+        enum = _cacheViaClass.elements();
         while (enum.hasMoreElements()) {
             classDesc = (XMLClassDescriptor)enum.nextElement();
             if (xmlName.equals(classDesc.getXMLName())) {
+                _cacheViaName.put(xmlName, classDesc);
                 return classDesc;
             }
             classDesc = null;
@@ -357,7 +390,7 @@ public class ClassDescriptorResolverImpl
         }
         
         //-- next look in local cache
-        enum = _cache.elements();
+        enum = _cacheViaClass.elements();
         while (enum.hasMoreElements()) {
             classDesc = (XMLClassDescriptor)enum.nextElement();
             if (xmlName.equals(classDesc.getXMLName())) {
