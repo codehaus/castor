@@ -112,6 +112,7 @@ final class Namespaces {
             _first = new Namespace(prefix, uri);
             _last  = _first;
         }
+
         //-- check for existing namespace declaration for
         //-- prefix
         else {
@@ -150,6 +151,7 @@ final class Namespaces {
         if (prefix == null) prefix = "";
 
         Namespace ns = _first;
+
         while (ns != null) {
             if (ns.prefix.equals(prefix)) {
                 return ns.uri;
@@ -225,9 +227,13 @@ final class Namespaces {
                     buf.append(':');
                     buf.append(ns.prefix);
                     attName = buf.toString();
+                    atts.addAttribute(attName, CDATA, getNamespaceURI(ns.prefix));
                 }
-                atts.addAttribute(attName, CDATA, getNamespaceURI(ns.prefix));
-            }
+                //case with no prefix but a nsURI
+                else if (getNamespaceURI(ns.prefix) != null) {
+                   atts.addAttribute(XMLNS, CDATA, getNamespaceURI(ns.prefix));
+                }
+            } //ns.prefix!=null
 
             ns = ns.next;
         }
