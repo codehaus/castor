@@ -209,10 +209,9 @@ public class Race extends CWTestCase {
 			stream.writeVerbose("start testing");
 			out:
 			for ( int j=0; j<trial; j++ ) {
+				some:
 				for ( int i=0; i<tr.length; i++ ) {
 					boolean isOk = false;
-					// inc the control value. (these objects are thread safe)
-					tr[i].incValue1();
 
 					// select and inc the jdo object.
 					little:
@@ -246,9 +245,11 @@ public class Race extends CWTestCase {
 							stream.writeVerbose( "Excepted exception: "+e );
 							stream.writeVerbose( "Excepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+							break some;
 						} catch ( LockNotGrantedException e ) {
 							stream.writeVerbose( "Excepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+							break some;
 						} catch ( QueryException e ) {
 							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
@@ -267,6 +268,9 @@ public class Race extends CWTestCase {
 							break out;
 						}
 					}
+
+					// inc the control value. (these objects are thread safe)
+					tr[i].incValue1();
 
 					// make some non-deterministicity. otherwise, we are just lining up
 					// thread and won't discover problem.
