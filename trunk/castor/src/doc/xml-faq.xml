@@ -14,7 +14,17 @@
             <section title="How do I set the encoding?">
             <p>
                Create a new instance of the Marshaller class and use the
-               setEncoding method.
+               setEncoding method. You'll also need to make sure the
+               encoding for the Writer is set properly as well:
+               <code>
+                  ...
+                  String encoding = "ISO-8859-1";
+                  FileOutputStream fos = new FileOutputStream("result.xml");
+                  OutputStreamWriter osw = new OuputStreamWriter(fos, encoding);
+                  Marshaller marshaller = new Marshaller(osw);
+                  marshaller.setEncoding(encoding);
+                  ...
+               </code>
             </p>
             </section>
             <section title="Why is my 'get' method called twice?">
