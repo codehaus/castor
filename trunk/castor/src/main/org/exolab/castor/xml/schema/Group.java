@@ -342,16 +342,20 @@ public class Group extends Particle
     public Enumeration enumerate() {
         //-- Some trickery to properly handle
         //-- XML Schema spec 20000407 section 4.3.5
+        
         if (_contentModel.getParticleCount() == 1) {
             Particle particle = _contentModel.getParticle(0);
             if (particle.getStructureType() == Structure.GROUP) {
-                if ((getMinOccurs() == 1) && (getMaxOccurs() == 1))
-                    return ((Group)particle).enumerate();
+                Group temp = (Group)particle;
+                if ( ((getMinOccurs() == 1) && (getMaxOccurs() == 1)) 
+                     && ((temp.getMinOccurs() ==1) && (temp.getMaxOccurs() ==1)))
+                    return temp.enumerate();
             }
         }
         return _contentModel.enumerate();
     } //-- enumerate
-
+    
+     
     /**
      * Returns the element declaration with the given name, or null if no
      * element declaration with that name exists in this ContentModelGroup.
