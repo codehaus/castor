@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,52 +51,76 @@ class UnmarshalState {
 
     /**
      * The xml element name of the current object
-    **/
+     */
     String elementName = null;
 
     /**
      * Characters read in during unmarshalling
-    **/
+     */
     StringBuffer buffer = null;
 
     /**
      * The key for the object. This may be null if no key
      * or identity has been specified.
-    **/
+     */
     Object key = null;
     
     /**
      * The current that we are unmarshalling to
-    **/
+     */
     Object object = null;
 
     
     /**
      * The class of the object, mainly used for primitives
-    **/
+     */
     Class type = null;
 
     /**
      * The field descriptor for the Object
-    **/
+     */
     XMLFieldDescriptor fieldDesc = null;
 
 
     /**
      * The class descriptor for the Object, in case
      * FieldDescriptor#getClassDescriptor returns null
-    **/
+     */
     XMLClassDescriptor classDesc = null;
 
+    /**
+     * Is the field a primitive or immutable type?
+     */
     boolean primitiveOrImmutable = false;
 
-    private Vector markedList = null;
+    /**
+     * The list of *used* field descriptors
+     * Note: Initialized upon demand, no need to create
+     * the list for primitive fields
+     */
+    private Vector _markedList = null;
 
+    /**
+     * Is this a derived field? 
+     */
     boolean derived = false;
-
+    
+    /**
+     * Is this a wrapper state?
+     */
+    boolean wrapper = false;
+    
+    
+    /**
+     * The UnmarshalState which contains information
+     * about the parent object for object containted
+     * within this state. Used when handling
+     * element containers/wrappers.
+     */
+    UnmarshalState targetState = null;
+    
     UnmarshalState() {
         super();
-        markedList = new Vector(5);
     }
 
     /**
@@ -104,15 +128,19 @@ class UnmarshalState {
      * @param descriptor the XMLFieldDescriptor to mark
     **/
     void markAsUsed(XMLFieldDescriptor descriptor) {
-        markedList.addElement(descriptor);
+        if (_markedList == null)
+            _markedList = new Vector(5);
+        _markedList.addElement(descriptor);
     } //-- markAsUsed
 
     void markAsNotUsed(XMLFieldDescriptor descriptor) {
-        markedList.remove(descriptor);
+        if (_markedList == null) return;
+        _markedList.remove(descriptor);
     }
 
     boolean isUsed(XMLFieldDescriptor descriptor) {
-        return markedList.contains(descriptor);
+        if (_markedList == null) return false;
+        return _markedList.contains(descriptor);
     } //-- isUsed
 
 
