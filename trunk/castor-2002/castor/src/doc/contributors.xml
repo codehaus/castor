@@ -401,6 +401,14 @@
     <description>Improve the documentation of Castor JDO. Also, bug reports and feedback.</description>
   </contributor>
 
+  <contributor type="Documentor">
+    <name surname="Suez" given="Eitan"/>
+    <email>eitan@uptodata.com</email>
+    <description>
+        xml-mapping documentation clean-up and documentation on xsi:type.
+    </description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Viet" given="Julien"/>
     <email>julien.viet@int-evry.fr</email>

@@ -191,7 +191,7 @@
       <section title="3.2 The &lt;class> element  "> 
 
         <code>
-        &lt;!ELEMENT class ( description?, cache-type-mapping?, map-to?, (field|container)+ )>
+        &lt;!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
         &lt;!ATTLIST class
                   name            ID       #REQUIRED
                   extends         IDREF    #IMPLIED
@@ -203,8 +203,8 @@
         </code>
 
 
-        <p>The  &lt;class&gt; element contains all the information used to map a Java class into an
-          XML document. The content of &lt;class&gt; is mainly used to describe the fields that
+        <p>The  &lt;class> element contains all the information used to map a Java class into an
+          XML document. The content of &lt;class> is mainly used to describe the fields that
             will be mapped.</p>
 
         <p>Description of the attributes:</p>
@@ -323,7 +323,7 @@ public class myclass {
 
       </section>
 
-      <section title="3.3 The &lt;map-to&gt; element">
+      <section title="3.3 The &lt;map-to> element">
 
         <code>
         &lt;!ELEMENT map-to EMPTY>
@@ -336,8 +336,8 @@ public class myclass {
                   ldap-oc    NMTOKEN  #IMPLIED>
         </code>
 
-        <p>&lt;map-to&gt; is used to specify the name of the element that should be associated
-          with the given class.&lt;map-to&gt; is only used for the root class. If this
+        <p>&lt;map-to> is used to specify the name of the element that should be associated
+          with the given class.&lt;map-to> is only used for the root class. If this
           information is not present, Castor will:</p>
 
         <ul>
@@ -366,24 +366,24 @@ public class myclass {
       </section>
 
 
-      <section title="3.4 The &lt;field&gt; element">
+      <section title="3.4 The &lt;field> element">
 
         <code>
         &lt;!ELEMENT field ( description?, sql?, xml?, ldap? )>
         &lt;!ATTLIST field
-   		     name           NMTOKEN  #REQUIRED
-                     type           NMTOKEN  #IMPLIED
-                     required       ( true | false )  "false"
-                     direct         ( true | false )  "false"
-                     lazy           ( true | false )  "false"
-                     get-method     NMTOKEN  #IMPLIED
-                     set-method     NMTOKEN  #IMPLIED
-                     create-method  NMTOKEN  #IMPLIED
-                     transient      (true|false) "false"
-                     collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate )  #IMPLIED>
+                  name           NMTOKEN  #REQUIRED
+                  type           NMTOKEN  #IMPLIED
+                  required       ( true | false )  "false"
+                  direct         ( true | false )  "false"
+                  lazy           ( true | false )  "false"
+                  transient      ( true | false )  "false"
+                  get-method     NMTOKEN  #IMPLIED
+                  set-method     NMTOKEN  #IMPLIED
+                  create-method  NMTOKEN  #IMPLIED
+                  collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
         </code> 
 
-        <p>&lt;field&gt; is used to describe a property of a Java object we want to
+        <p>&lt;field> is used to describe a property of a Java object we want to
           marshal/unmarshal. It gives:</p>
         <ul>
           <li>its identity ('name')</li>
@@ -397,7 +397,7 @@ public class myclass {
         <p>In order to determine the signature that Castor expects, there are two easy
           rules to apply.</p>
 
-        <p><b>1. Determine &lt;type&gt;.</b></p> 
+        <p><b>1. Determine &lt;type>.</b></p> 
 
         <ul>
           <li><p><b>If there is no 'collection' attribute</b>, the &lt;type> is just the Java type
@@ -458,7 +458,7 @@ public class myclass {
             given signature:</p>
 
           <code>
-            public &lt;type%gt; &lt;name&gt;;
+            public &lt;type> &lt;name>;
           </code>
 
           <li><p><b>If 'direct' is set to false or omitted</b>, Castor will access the property
@@ -467,28 +467,28 @@ public class myclass {
               try to find a function with the following signature:</p>
 
             <code>
-              public &lt;type&gt; &lt;get-method&gt;();
+              public &lt;type> &lt;get-method>();
             </code>
             or
             <code>
-              public void &lt;set-method&gt;(&lt;type&gt; value);
+              public void &lt;set-method>(&lt;type> value);
             </code>
 
             <p>If 'get-method' or 'set-method' attributes are not provided, Castor will try to
               find the following function:</p>
 
             <code>
-              public &lt;type&gt; get&lt;capitalized-name&gt;();
+              public &lt;type> get&lt;capitalized-name>();
             </code>
             or
             <code>
-              public void set&lt;capitalized-name&gt;(&lt;type&gt; value);
+              public void set&lt;capitalized-name>(&lt;type> value);
             </code>
             
-            <p>&lt;capitalized-name&gt; means that Castor takes the &lt;name&gt; attribute and put its first
+            <p>&lt;capitalized-name> means that Castor takes the &lt;name> attribute and put its first
               letter in uppercase without modifying the other letters.</p>
 
-            <p>The content of &lt;field&gt; will contain the information on how to map this given
+            <p>The content of &lt;field> will contain the information on how to map this given
               field to SQL, XML, ...</p>
           </li>
         </li>
@@ -540,12 +540,12 @@ public class myclass {
         <p>Description of the content:</p>
 
         <p>In the case of XML mapping, the content of a field element should be one and
-          only one &lt;xml&gt; element describing how this given field will be mapped into the
+          only one &lt;xml> element describing how this given field will be mapped into the
           XML document.</p>
       </section>
           
 
-      <section title="3.5 The &lt;bind-xml&gt; element">
+      <section title="3.5 The &lt;bind-xml> element">
 
         <code>
         &lt;!ELEMENT bind-xml EMPTY>
@@ -553,31 +553,22 @@ public class myclass {
                   name     NMTOKEN  #IMPLIED
                   type     NMTOKEN  #IMPLIED
                   matches  NMTOKEN  #IMPLIED
-                  QName-prefix NMTOKEN #IMPLIED
-                  reference (true|false) "false"
                   node     ( attribute | element | text )  #IMPLIED>
         </code> 
 
-        <p>&lt;bind-xml&gt; is used to describe how a given Java field should appear in an XML
+        <p>&lt;bind-xml> is used to describe how a given Java field should appear in an XML
           document. It is used both for marshalling and unmarshalling.</p>
 
         <p>Description of the attributes:</p>
         <ul>
           <li><b>name:</b> the name of the element or attribute</li>
 
-          <li><b>type:</b>XML Schema type (of the value of this field) that requires specific handling in the
-                          Castor Marshalling Framework (such as 'QName' for instance).</li>
+          <li><b>type:</b> xsi::type</li>
           
-          <li><b>matches:</b> Allows overriding the matches rules</li>
-          
-          <li><b>QName-prefix:</b> When using a QName value, you can provide a default prefix that 
-             is used when marshalling value of type QName. More information on the use of 'QName-prefix'
-             can be found in the <a href="./SourceGeneratorUser.pdf">SourceGenerator Documentation</a></li>
-           
-          <li><b>reference:</b> Indicates if this field has to be treated as a reference by the unmarshaller.
-          In order to work properly, you must specify the node type to 'attribute' 
-          for both the 'id' and the 'reference'.</li>
-          
+          <li><b>matches:</b> Allows overriding the matches rules for
+          the name of the element. It is a standard regular
+          expression and will be used instead of the 'name'
+          field.</li>
           
           <li><b>node:</b> indicates if the name corresponds to an attribute, an element,
             or text content. By default, primitive types are assumed to be an attribute
@@ -908,10 +899,80 @@ public class main {
 
     </section>
 
-    <section title="5. TODO">
+    <section title="5. xsi:type">
 
-      <p>Discuss about the use of XSI:type + xsi:type="java:xxx"</p>
+      <p>Ordinarily, a mapping will only reference types that are concrete classes (i.e. not interfaces
+        nor abstract classes).  The reason is that to unmarshal a type requires instantiating it and
+        one cannot instantiate an interface.  However, in many real situations, object models depend
+        on the use of interfaces.  Many class properties are defined to have interface types to support
+        the ability to swap implementations.  This is often the case in frameworks.</p>
+        
+      <p>The problem is that a different mapping must be used each time the same model is to be
+       used to marshal/unmarshal an implementation that uses different concrete types.  This is
+       not convenient.  The mapping should represent the model and the specific concrete type
+       used to unmarshal a document is a configuration parameter; it should be specified in the
+       instance document to be unmarshalled, not the mapping.</p>
+       
+      <p>For example, assume a very simple object model of an engine that has one property that
+      is a processor:</p>
+      
+            <code>
+            public interface IProcessor
+            {
+              public void process();
+            }
+            ..
+            public class Engine
+            {
+              private IProcessor processor;
+              public IProcessor getProcessor()
+              {
+                return processor;
+              }
+              public void setProcessor(IProcessor processor)
+              {
+                this.processor = processor;
+              }
+            }
+            </code>
+            
+      <p>The mapping file for such a system ought to be:</p>
+      
+            <code>
+            &lt;mapping>
+              &lt;class name="Engine">
+      
+                &lt;map-to xml="engine" />
+              
+                &lt;field name="processor" type="IProcessor" required="true">
+                 &lt;bind-xml name="processor" node="element" />
+                &lt;/field>
+                
+              &lt;/class>
+            &lt;/mapping>
+            </code>
+            
+      <p>It is possible to use such a mapping and still have the marshal/unmarshal process work
+       by specifying the concrete implementation of IProcessor in the document to be unmarshalled,
+       using the xsi:type attribute, as follows:</p>
+       
+            <code>
+            &lt;engine>
+              &lt;processor xsi:type="java:com.abc.MyProcessor" />
+            &lt;/engine>
+            </code>
+      
+      <p>In this manner, one is still able to maintain only a single mapping, but vary the
+      manner in which the document is unmarshalled from one instance document to the next.
+      This flexibility is powerful because it enables the support of polymorphism within
+      the castor xml marshalling framework.</p>
+      
+    </section>
 
+    <section title="6. TODO">
+
+      <p>?</p>
+      
     </section>
   </body>
 </document>
