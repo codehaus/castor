@@ -160,9 +160,9 @@ public class DescriptorSourceFactory {
         if (classInfo.allowContent())
            createDescriptor(classDesc, classInfo.getTextField(), localClassName, null, jsc);
 
+        ClassInfo base = classInfo.getBaseClass();
 
         FieldInfo[] atts = classInfo.getAttributeFields();
-
         //--------------------------------/
         //- Create attribute descriptors -/
         //--------------------------------/
@@ -174,7 +174,9 @@ public class DescriptorSourceFactory {
             FieldInfo member = atts[i];
             //-- skip transient members
             if (member.isTransient()) continue;
-            createDescriptor(classDesc, member, localClassName, nsURI, jsc);
+            if (base != null && base.getAttributeField(member.getNodeName()) != null)
+                createRestrictedDescriptor(member, jsc);
+            else createDescriptor(classDesc, member, localClassName, nsURI, jsc);
        }
 
 
@@ -190,7 +192,10 @@ public class DescriptorSourceFactory {
             FieldInfo member = elements[i];
             //-- skip transient members
             if (member.isTransient()) continue;
-            createDescriptor(classDesc, member, localClassName, nsURI, jsc);
+            boolean collection = (member.getSchemaType().getType() == XSType.COLLECTION);
+            if (base != null && !collection && base.getElementField(member.getNodeName()) != null)
+                createRestrictedDescriptor(member, jsc);
+            else createDescriptor(classDesc, member, localClassName, nsURI, jsc);
         }
 
         return classDesc;
@@ -200,6 +205,26 @@ public class DescriptorSourceFactory {
     //-------------------/
     //- Private Methods -/
     //-------------------/
+    /**
+     * Create special code for handling a member that is a restriction.
+     * This will only change the Validation Code
+     * @param member the restricted member for which we generate the restriction handling.
+     * @param jsc the source code to which we append the valdiation code.
+     */
+
+    private static void createRestrictedDescriptor(FieldInfo member, JSourceCode jsc)
+    {
+          jsc.add("desc = (XMLFieldDescriptorImpl) getFieldDescriptor(\"");
+          jsc.append(member.getNodeName());
+          jsc.append("\"");
+          if (member.getNodeType() == FieldInfo.ELEMENT_TYPE)
+              jsc.append(", NodeType.Element);");
+          else if (member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE)
+             jsc.append(", NodeType.Attribute);");
+          //modify the validation code
+          validationCode(member, jsc);
+    }
+
     /**
      * Create a specific descriptor for a given member (whether an attribute or
      * an element) represented by a given Class name
@@ -499,12 +524,7 @@ public class DescriptorSourceFactory {
         jsc.add("");
 
         //-- Add Validation Code
-        jsc.add("//-- validation code for: ");
-        jsc.append(member.getName());
-        jsc.add("fieldValidator = new FieldValidator();");
         validationCode(member, jsc);
-        jsc.add("desc.setValidator(fieldValidator);");
-        jsc.add("");
 
     }//--CreateDescriptor
 
@@ -525,6 +545,10 @@ public class DescriptorSourceFactory {
     } //-- classType
 
     private static void validationCode(FieldInfo member, JSourceCode jsc) {
+
+        jsc.add("//-- validation code for: ");
+        jsc.append(member.getName());
+        jsc.add("fieldValidator = new FieldValidator();");
 
         //-- a hack, I know, I will change later
         if (member.getName().equals("_anyObject")) return;
@@ -1589,6 +1613,8 @@ public class DescriptorSourceFactory {
             default:
                 break;
         }
+        jsc.add("desc.setValidator(fieldValidator);");
+        jsc.add("");
     } //-- validationCode
 
     /**
