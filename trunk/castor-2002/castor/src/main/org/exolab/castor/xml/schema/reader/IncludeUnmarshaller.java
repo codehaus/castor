@@ -69,9 +69,8 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 			throw new SAXException("'schemaLocation' attribute missing on 'include'");
         //if the path is relative Xerces append the "user.Dir"
         //we need to keep the base directory of the document
-        //if the doesn't exist we suppose 'include' is a relative path
         // note: URI not supported (just system path)
-        if (!new java.io.File(include).exists()) {
+        if (!new java.io.File(include).isAbsolute()) {
              String temp = locator.getSystemId();
              if (temp != null) {
                 //remove 'file://'
