@@ -62,6 +62,7 @@ import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.BindXml;
+import org.exolab.castor.mapping.xml.MapTo;
 
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
@@ -137,14 +138,24 @@ public class XMLMappingLoader
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
         clsDesc = super.createDescriptor( clsMap );
-        if ( clsMap.getMapTo() == null || clsMap.getMapTo().getXml() == null )
+        MapTo mapTo = clsMap.getMapTo();
+        if (( mapTo == null) || (mapTo.getXml() == null))
             xmlName = _naming.toXMLName( clsDesc.getJavaClass().getName() );
-        else
+        else {
             xmlName = clsMap.getMapTo().getXml();
             
-        return new XMLClassDescriptorAdapter( clsDesc, xmlName );
-    }
-
+        }
+            
+        XMLClassDescriptorImpl xmlClassDesc
+            = new XMLClassDescriptorAdapter( clsDesc, xmlName );
+         
+        //-- copy ns-uri + ns-prefix
+        if (mapTo != null) {
+            xmlClassDesc.setNameSpacePrefix(mapTo.getNsPrefix());
+            xmlClassDesc.setNameSpaceURI(mapTo.getNsUri());
+        }
+        return xmlClassDesc;
+    } //-- createDescriptor
 
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
