@@ -31,6 +31,17 @@ create unique index test_detail_pk
 grant all on test_detail to test;
 
 
+-- test_detail2
+drop table test_detail2;
+create table test_detail2 (
+  detail2_id  numeric(10,0)  not null,
+  detail_id  numeric(10,0)  not null,
+  value      varchar(200 )  not null
+);
+create unique index test_detail2_pk on test_detail2 ( detail2_id );
+grant all on test_detail2 to test;
+
+
 drop table   test_group;
 create table test_group (
   id     numeric(10,0)  not null,

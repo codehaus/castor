@@ -523,31 +523,23 @@ public abstract class TransactionContext
                             throw new PersistenceExceptionImpl( "persist.deletedNotFound", identity );
                     }
                 }
-                removeObjectEntry( object );
                 try {
                     // Emulate object deleting
                     if ( handler.getCallback() != null )
                         handler.getCallback().removing( entry.object );
-                    // Emulate object creating
-                    if ( handler.getCallback() != null ) {
-                        handler.getCallback().using( object, _db );
-                        handler.getCallback().storing( object );
-                    }
                 } catch ( Exception except ) {
                     if ( handler.getCallback() != null )
                         handler.getCallback().releasing( object, false );
                     throw new PersistenceExceptionImpl( except );
                 }
-                entry = addObjectEntry( object, oid, engine );
-                entry.created = true;
-                return oid;    
             }
         }
 
         try {
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
-            entry = addObjectEntry( object, oid, engine );
+            if ( entry == null) 
+                entry = addObjectEntry( object, oid, engine );
             if ( handler.getCallback() != null ) {
                 handler.getCallback().using( object, _db );
                 handler.getCallback().storing( object );
@@ -1052,7 +1044,10 @@ public abstract class TransactionContext
      */
     public boolean isPersistent( Object object )
     {
-        return ( getObjectEntry( object ) != null );
+        ObjectEntry entry;
+
+        entry = getObjectEntry( object );
+        return ( ( entry != null ) && ( ! entry.deleted ) );
     }
 
 

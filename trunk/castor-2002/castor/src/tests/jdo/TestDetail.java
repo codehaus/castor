@@ -47,6 +47,10 @@
 package jdo;
 
 
+import java.util.Enumeration;
+import java.util.Vector;
+
+
 /**
  * Test object mapping to test_detaul used to conduct relation tests.
  */
@@ -63,6 +67,9 @@ public class TestDetail
     private TestMaster _master;
 
 
+    private Vector     _details2;
+
+
     static final int       DefaultId = 5;
 
 
@@ -71,13 +78,15 @@ public class TestDetail
 
     public TestDetail( int id )
     {
+        this();
         _id = id;
-        _value = DefaultValue;
     }
 
 
     public TestDetail()
     {
+        _value = DefaultValue;
+        _details2 = new Vector();
     }
 
 
@@ -117,9 +126,57 @@ public class TestDetail
     }
 
 
+    public void addDetail2( TestDetail2 detail2 )
+    {
+        _details2.addElement( detail2 );
+        detail2.setDetail( this );
+    }
+
+
+    public Vector getDetails2()
+    {
+        return _details2;
+    }
+
+
+    public TestDetail2 createDetail2()
+    {
+        return new TestDetail2();
+    }
+
+
+    public TestDetail2 findDetail2( int id )
+    {
+        Enumeration enum;
+        TestDetail2 detail2;
+
+        if ( _details2 == null ) {
+            return null;
+        }
+
+        enum = _details2.elements();
+        while ( enum.hasMoreElements() ) {
+            detail2 = (TestDetail2) enum.nextElement();
+            if ( detail2.getId() == id ) {
+                return detail2;
+            }
+        }
+        return null;
+    }
+
+
     public String toString()
     {
-        return _id + " / " + _value + " / " + _master.getId();
+        String details2 = "";
+
+        if ( _details2 != null ) {
+            for ( int i = 0 ; i < _details2.size() ; ++i ) {
+                if ( i > 0 )
+                    details2 = details2 + ", ";
+                details2 = details2 + _details2.elementAt( i ).toString();
+            }
+        }
+        return _id + " / " + _value + " / " + _master.getId() + " / { " + details2 + " }";
     }
 
 
