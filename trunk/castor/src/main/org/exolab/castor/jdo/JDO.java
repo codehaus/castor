@@ -125,6 +125,7 @@ import org.xml.sax.InputSource;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
+ * @deprecated Please consider using {@link JDO2} instead.
  * @version $Revision$ $Date$
  */
 public class JDO
@@ -236,7 +237,7 @@ public class JDO
      */
     public JDO()
     {
-    	// no code
+    	// default constructor, no code
     }
 
 
@@ -527,11 +528,11 @@ public class JDO
                 return;
             } else
                 throw new IllegalStateException("JDO Pooling started. It can not be set to false");
-        } else {
-            if ( _txDbPool == null ) 
-                _txDbPool = new TxDatabaseMap();
-            return;
         }
+        
+        if ( _txDbPool == null ) 
+        	_txDbPool = new TxDatabaseMap();
+        return;
     }
 
     /**
@@ -777,9 +778,10 @@ public class JDO
     		ref.add( new StringRefAddr( "description", _description ) );
     	if ( _dbName != null )
     		ref.add( new StringRefAddr( "databaseName", _dbName ) );
-    	if ( _jdoConfURI != null )
+    	if ( _jdoConf != null )
     		ref.add( new StringRefAddr( "configuration", _jdoConfURI ) );
     	ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
+    	
     	return ref;
     }
 
@@ -795,14 +797,12 @@ public class JDO
     	
     	// Can only reconstruct from a reference.
     	if ( refObj instanceof Reference ) {
-    		
     		ref = (Reference) refObj;
-    		
     		// Make sure reference is of datasource class.
     		if (!ref.getClassName().equals( getClass().getName() ) ) {
     			throw new NamingException( "JDO: Reference not constructed from class " + getClass().getName() );
     		}    			
-    			
+    		
     		JDO     ds;
     		RefAddr addr;
     		
@@ -811,7 +811,6 @@ public class JDO
     		} catch ( Exception except ) {
     			throw new NamingException( except.toString() );
     		}
-    		
     		addr = ref.get( "description" );
     		if ( addr != null )
     			ds._description = (String) addr.getContent();
@@ -826,6 +825,7 @@ public class JDO
     			ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
     		return ds;
     			
+    		
     	} else if ( refObj instanceof Remote )
     		return refObj;
     	else
