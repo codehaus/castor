@@ -43,15 +43,16 @@
 
 package org.exolab.castor.persist.cache;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-
 
 /**
  * TimeLimited is a time limted least-recently-used <tt>Map</tt>.
@@ -65,49 +66,56 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
  * @author <a href="werner DOT guttmann AT gmx DOT com">Werner Guttmann</a>
+ * @author <a href="mailto:dulci@start.no">Stein M. Hugubakken</a> 
  * @version $Revision$ $Date$
  */
-public class TimeLimited 
-extends AbstractBaseCache
-implements Cache 
-{
-    
+public class TimeLimited extends AbstractBaseCache implements Cache {
+
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
      */
-    private static Log _log = LogFactory.getFactory().getInstance(TimeLimited.class);
-    
+    private static Log _log = LogFactory.getFactory().getInstance(Class.class);
+
     /**
-     *  The Default precision in millisecond is 1000. Percision is the interval 
+     * Seconds between ticks, default is 1 second.
+     * This value is used to decrease QueueItem.time on each tick.
+     */
+    final private static int TICK_DELAY = 1;
+
+    /**
+     *  The Default precision in millisecond is 1000. Precision is the interval 
      *  between each time which the timer thread will wake up and trigger 
      *  clean up of least-recently-used Object.
      */
-    public final static int DEFAULT_PRECISION = 1000;
+    final private static int DEFAULT_PRECISION = 1000 * TICK_DELAY;
+
+    /**
+     * Timer is used to start a task that runs the tick-method.
+     */
+    //private static Timer timer = new Timer(true);
+    private static TickThread timer = new TickThread(DEFAULT_PRECISION);
     
     /**
-     * Thread instance responsible for removing least-recently-used objects
-     * after the specified interval.
+     * interval is the number of ticks an object lives before it will be disposed. 
      */
-    private static TimeThread ticker = new TimeThread( DEFAULT_PRECISION );
-    
     private int interval;
-    private int tailtime;
-    private QueueItem head;
-    private QueueItem tail;
-    private Hashtable map;
-    
+
+    /**
+     * Container for cached objects.
+     */
+    private Hashtable map = new Hashtable();
+
     /**
      * Creates an instance of TimeLimited. 
      *
      * @param interval the number of ticks an object lives before it will be disposed.
      */
-    public TimeLimited( int interval ) {
-        map = new Hashtable();
-        this.interval = interval+1;
-        ticker.addListener( this );
+    public TimeLimited(int interval) {
+        this.interval = interval;
+        timer.addTickerTask(this);
     }
-    
+
     /**
      * Maps the specified <code>key</code> to the specified 
      * <code>value</code> in this Map. Neither the key nor the 
@@ -126,20 +134,26 @@ implements Cache
      */
     public synchronized Object put(Object key, Object value) {
         QueueItem oldItem = (QueueItem) map.get(key);
-        if ( oldItem != null ) {
-            Object oldObject = oldItem.item;
-            oldItem.item = value;
-            remove(oldItem);
-            add(oldItem);
+        if (oldItem != null) {
+            // TODO [SMH]: The way things are today this code-block is never reached, but should be fixed since not doing so is expensive for performance.
+            if (_log.isDebugEnabled()) {
+                _log.trace("TimeLimitedLRU: update(" + value + ")");
+            }
+            Object oldObject = oldItem.value;
+            oldItem.value = value;
+            oldItem.time = interval;
             return oldObject;
         } else {
-            QueueItem newitem = new QueueItem(key,value);
-            map.put(key,newitem);
-            add(newitem);
+            if (_log.isDebugEnabled()) {
+                _log.trace("TimeLimitedLRU: put(" + value + ")");
+            }
+            QueueItem newitem = new QueueItem(key, value);
+            newitem.time = interval;
+            map.put(key, newitem);
             return null;
         }
     }
-    
+
     /**
      *Returns the value to which the specified key is mapped in this Map.
      *@param key - a key in the Map.
@@ -148,12 +162,13 @@ implements Cache
      */
     public synchronized Object get(Object key) {
         Object o = map.get(key);
-        if ( o == null )
+        if (o == null) {
             return null;
-        else 
-            return ((QueueItem)o).item;
+        } else {
+            return ((QueueItem) o).value;
+        }
     }
-    
+
     /**
      * Removes the key (and its corresponding value) from this 
      * Map. This method does nothing if the key is not in the Map.
@@ -163,22 +178,20 @@ implements Cache
      *          or <code>null</code> if the key did not have a mapping.
      */
     public synchronized Object remove(Object key) {
-        
         QueueItem queueItem = (QueueItem) map.remove(key);
         if (queueItem == null) {
             if (_log.isDebugEnabled()) {
-            _log.trace ("TimeLimitedLRU: not in cache ... remove(" + key + ")");
+                _log.trace("TimeLimitedLRU: not in cache ... remove(" + key + ")");
             }
             return null;
         } else {
             if (_log.isDebugEnabled()) {
-            _log.trace ("TimeLimitedLRU: remove(" + key + ") = " + queueItem.item);
+                _log.trace("TimeLimitedLRU: remove(" + key + ") = " + queueItem.value);
             }
-            remove(queueItem);
-            return queueItem.item;
+            return queueItem.value;
         }
     }
-    
+
     /**
      * Returns an enumeration of the values in this LRU map.
      * Use the Enumeration methods on the returned object to fetch the elements
@@ -188,9 +201,9 @@ implements Cache
      * @see     java.util.Enumeration
      */
     public synchronized Enumeration elements() {
-        return new ValuesEnumeration(map.elements());
+        return new ValuesEnumeration(map.values());
     }
-    
+
     /**
      * Remove the object identified by key from the cache.
      *
@@ -203,217 +216,105 @@ implements Cache
         remove(key);
         dispose(key);
     }
-    
-    /* Indicates whether the cache holds a valuze object for the specified key.
+
+    /** 
+     * Indicates whether the cache holds a valuze object for the specified key.
      * @see org.exolab.castor.persist.cache.Cache#contains(java.lang.Object)
      */
     public boolean contains(Object key) {
         if (_log.isDebugEnabled()) {
-            _log.trace ("Testing for entry for key " + key);
+            _log.trace("Testing for entry for key " + key);
         }
-        return (this.get(key) != null);
+        return map.containsKey(key);
     }
-    
+
     /**
      * This method is called when an object is disposed.
      * Override this method if you interested in the disposed object.
      *
      * @param o - the disposed object
      */
-    protected void dispose( Object o ) {
-        if (_log.isDebugEnabled()) 
+    protected void dispose(Object o) {
+        if (_log.isDebugEnabled()) {
             _log.trace("Disposing " + o);
-    }
-    
-    private void remove(QueueItem item) {
-        //_log.trace ( "removing: <" + item + "> while...head=<"+head+"> tail=<"+tail+">" );
-        QueueItem temp;
-        if ( item == null ) 
-            throw new NullPointerException();
-        
-        if ( item == head ) {
-            temp = item;
-            
-            head = head.next;
-            if ( head == null ) {
-                tail = null;
-            } else {
-                head.prev = null;
-                head.time += temp.time;
-            }
-            temp.prev = null;
-            temp.next = null;
-            temp.time = 0;
-        } else if ( item == tail ) {
-            tail = tail.prev;
-            tailtime = 0;
-        } else {
-            temp = item;
-            
-            temp.prev.next = temp.next;
-            temp.next.prev = temp.prev;
-            temp.next.time += temp.time;
-            
-            temp.prev = null;
-            temp.next = null;
-            temp.time = 0;
         }
     }
-    
-    private void add(QueueItem item) {
-        ticker.startTick();
-        if ( head == null ) {
-            head = tail = item;
-            item.prev = null;
-            item.next = null;
-            item.time = interval;
-            tailtime = interval;
-        } else {
-            tail.next = item;
-            item.prev = tail;
-            item.next = null;
-            item.time = interval-tailtime;
-            tailtime = interval;
-            tail = item;
-        }
-    }
-    
-    /* 
-     * call by ticker daemon
+
+    /**
+     * Called by TickThread
      */
     private synchronized void tick() {
-        QueueItem temp;
-        Object o;
-        
-        if ( head != null ) {
-            head.time--;
-            tailtime--;
-        }
-        while ( head != null && head.time <= 0 ) {
-            
-            temp = head;
-            
-            o = head.item;
-            remove(temp);
-            map.remove(temp.key);
-            dispose(o);
-        }
-        //      if ( head == null ) {
-        //          ticker.stopTick();
-        //      }
-    }
-    
-    private class ValuesEnumeration implements Enumeration {
-        private Vector v = new Vector();
-        private int cur;
-        
-        private ValuesEnumeration( Enumeration e ) {
-            while ( e.hasMoreElements() ) {
-                v.add(e.nextElement());
+        if (!map.isEmpty()) {
+            for (Iterator iter = map.values().iterator(); iter.hasNext();) {
+                QueueItem queueItem = (QueueItem) iter.next();
+                Object value = queueItem.value;
+                if (queueItem.time <= 0) {
+                    iter.remove();
+                    dispose(value);
+                } else {
+                    queueItem.time -= TICK_DELAY;
+                }
             }
-            v.trimToSize();
+        }
+    }
+
+    private class ValuesEnumeration implements Enumeration {
+        private Enumeration enum;
+        private ValuesEnumeration(Collection coll) {
+            enum = (new Vector(coll)).elements();
         }
         public boolean hasMoreElements() {
-            if ( v.size() > cur ) 
-                return true;
-            return false;
+            return enum.hasMoreElements();
         }
         public Object nextElement() throws NoSuchElementException {
-            if ( v.size() <= cur )
-                throw new NoSuchElementException();
-            Object o = v.get(cur++);
-            if ( o != null )
-                return ((QueueItem)o).item;
-            else 
-                return null;
+            return ((QueueItem) enum.nextElement()).value;
         }
     }
     
     private class QueueItem {
-        private QueueItem next;
-        private QueueItem prev;
         private Object key;
-        private Object item;
         private int time;
-        
-        private QueueItem( Object key, Object item ) {
+        private Object value;
+
+        private QueueItem(Object key, Object item) {
             this.key = key;
-            this.item = item;
+            this.value = item;
         }
     }
-    
-    /*
-     * Ticker daemon. Generate tick in fixed interval of time.
+
+    /**
+     * TickThread. Generate tick in fixed interval of time.
      */
-    private static class TimeThread extends Thread {
-        private int[] listenerLock = new int[0];
-        private LinkList listener;
-        private int[] lock = new int[0];
-        private int tick;
+    private static class TickThread extends Thread {
         private long lastTime;
-        private boolean isStopped;
-        private boolean isStarted;
-        
-        public TimeThread(int tick) {
+        private ArrayList list = new ArrayList();
+        private int tick;
+        public TickThread(int tick) {
             super("Time-limited cache daemon");
             this.tick = tick;
             setDaemon(true);
-            setPriority( MIN_PRIORITY );
-            isStopped = true;
+            setPriority(MIN_PRIORITY);
             start();
         }
-        public void startTick() {
-            //_log.trace ( "start tick" );
-            if ( isStarted && isStopped ) {
-                synchronized(lock) {
-                    lastTime = System.currentTimeMillis();
-                    lock.notify();
-                }
-            }
-        }
-        public void stopTick() {
-            // _log.trace ( "stop tick" );
-            isStopped = true;
+        void addTickerTask(TimeLimited cache) {
+            list.add(cache);
         }
         public void run() {
-            isStarted = true;
             try {
-                while ( true ) {
-                    if ( isStopped ) {
-                        synchronized(lock) { lock.wait(); }
-                        isStopped = false;
-                    } else {                            
-                        long time = System.currentTimeMillis();
-                        if ( time - lastTime < tick ) 
-                            sleep(tick-(time-lastTime));
-                        lastTime = System.currentTimeMillis();
+                while (true) {
+                    long time = System.currentTimeMillis();
+                    if (time - lastTime < tick) {
+                        sleep(tick - (time - lastTime));
                     }
-                    
-                    LinkList temp = listener;
-                    while ( temp != null ) {
-                        temp.t.tick();
-                        temp = temp.next;
+                    lastTime = System.currentTimeMillis();
+                    for (int i = 0; i < list.size(); i++) {
+                        ((TimeLimited) list.get(i)).tick();
                     }
                 }
-            } catch ( InterruptedException e ) {
-                /*
-                 * kindly disregard this exception
-                 */ 
-            }
-        }
-        public void addListener( TimeLimited t ) {
-            synchronized ( listenerLock ) {
-                listener = new LinkList( listener, t );
-            }
-        }
-        private class LinkList {
-            private LinkList next;
-            private TimeLimited t;
-            LinkList( LinkList next, TimeLimited t ) {
-                this.next = next;
-                this.t = t;
+            } catch (InterruptedException e) {
             }
         }
     }
-    
+
+
 }
