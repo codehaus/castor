@@ -1385,7 +1385,7 @@ public final class SQLEngine implements Persistence {
         // this is only a quick hack.
         if ( entity.info.equals( _entityInfo ) )
             if ( entity.values != null && entity.values.length == 0 ) 
-                return entity.values[0].values;
+                return entity.values[0];
         throw new PersistenceException( "Entity of a wrong class passed" );
     }
 
