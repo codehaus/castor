@@ -199,6 +199,7 @@ public final class SQLEngine
         if ( conn == null ) {
             try {
                 conn = DatabaseRegistry.createConnection( engine );
+                conn.setAutoCommit( false );
                 _separateConnections.put( engine, conn );
             } catch ( SQLException except ) {
                 throw new PersistenceExceptionImpl( "persist.cannotCreateSeparateConn" );
