@@ -208,17 +208,19 @@ public class SourceFactory  {
         // ComplexType
         else if (type.isComplexType()) {
             ComplexType complexType = (ComplexType)type;
-			if ( ! element.hasTypeReference() ) {
+            
+            //-- If anonymous complex type, we need to process
+            //-- the complex type
+			if ( ! complexType.isTopLevel() ) {
 				//process the complexType only if it has not been proceed
 				 if (!state.processed(complexType))
 					processComplexType( complexType, state);
 				 derived = (state.jClass.getSuperClass() != null);
             }
+            //-- top-level complex type...just extend it
             else {
-
                 String typeName = complexType.getName();
                 String superClass = JavaNaming.toJavaClassName(typeName);
-
                 superClass = resolveClassName(superClass, packageName);
                 jClass.setSuperClass(superClass);
                 derived = true;
@@ -331,16 +333,17 @@ public class SourceFactory  {
         jClass.addImport("java.io.Reader");
 
 		if (_createMarshalMethods) {
-           //-- #validate()
-           createValidateMethods(jClass);
-		   //-- Output Marshalling methods for non abstract classes
-		   if (jClass.getModifiers().isAbstract()==false)
-		   {
-			  //-- #marshal()
-			  createMarshalMethods(jClass);
-			  //-- #unmarshal()
-			  createUnmarshalMethods(jClass);
-		    }
+            boolean isAbstract = jClass.getModifiers().isAbstract();
+            //-- #validate()
+            createValidateMethods(jClass);           
+            
+			//-- #marshal()
+			createMarshalMethods(jClass, isAbstract);
+			
+			//-- #unmarshal()
+			if (!isAbstract) {
+			    createUnmarshalMethods(jClass);
+			}
 		}
 
 		//-- create Bound Properties code
@@ -495,16 +498,16 @@ public class SourceFactory  {
             //-- add imports required by the marshal methods
             jClass.addImport("java.io.Writer");
             jClass.addImport("java.io.Reader");
-           //-- #validate()
-           createValidateMethods(jClass);
-		   //-- Output Marshalling methods for non abstract classes
-		   if (jClass.getModifiers().isAbstract()==false)
-		   {
-			  //-- #marshal()
-			  createMarshalMethods(jClass);
-			  //-- #unmarshal()
-			  createUnmarshalMethods(jClass);
-		    }
+            
+            boolean isAbstract = jClass.getModifiers().isAbstract();
+            //-- #validate()
+            createValidateMethods(jClass);
+			//-- #marshal()
+			createMarshalMethods(jClass, isAbstract);
+			//-- #unmarshal()
+			if (!isAbstract) {
+			    createUnmarshalMethods(jClass);
+			}
 		}
 
 		//-- create Bound Properties code
@@ -705,6 +708,14 @@ public class SourceFactory  {
      * @param parent the JClass to create the #marshal methods for
     **/
     private void createMarshalMethods(JClass parent) {
+        createMarshalMethods(parent, false);
+    } //-- createMarshalMethods
+
+    /**
+     * Creates the #marshal methods for the given JClass
+     * @param parent the JClass to create the #marshal methods for
+    **/
+    private void createMarshalMethods(JClass parent, boolean isAbstract) {
 
         //-- create main marshal method
         JMethod jMethod = new JMethod(null,"marshal");
@@ -712,9 +723,15 @@ public class SourceFactory  {
         jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(SGTypes.Writer, "out"));
         parent.addMethod(jMethod);
-        JSourceCode jsc = jMethod.getSourceCode();
-        jsc.add("");
-        jsc.add("Marshaller.marshal(this, out);");
+        
+        if (isAbstract) {
+            jMethod.getModifiers().setAbstract(true);
+        }
+        else {
+            JSourceCode jsc = jMethod.getSourceCode();
+            jsc.add("");
+            jsc.add("Marshaller.marshal(this, out);");
+        }
 
 
         //-- create helper marshal method
@@ -726,9 +743,16 @@ public class SourceFactory  {
         jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(jc, "handler"));
         parent.addMethod(jMethod);
-        jsc = jMethod.getSourceCode();
-        jsc.add("");
-        jsc.add("Marshaller.marshal(this, handler);");
+        
+        if (isAbstract) {
+            jMethod.getModifiers().setAbstract(true);
+        }
+        else {
+            JSourceCode jsc = jMethod.getSourceCode();
+            jsc = jMethod.getSourceCode();
+            jsc.add("");
+            jsc.add("Marshaller.marshal(this, handler);");
+        }
 
     } //-- createMarshalMethods
 
@@ -746,6 +770,7 @@ public class SourceFactory  {
         jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(SGTypes.Reader, "reader"));
         parent.addMethod(jMethod);
+        
         JSourceCode jsc = jMethod.getSourceCode();
         jsc.add("return (");
         jsc.append(parent.getName());
