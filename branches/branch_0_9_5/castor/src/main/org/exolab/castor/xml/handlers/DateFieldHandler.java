@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -46,7 +46,6 @@
 package org.exolab.castor.xml.handlers;
 
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.xml.XMLFieldHandler;
 
 import java.lang.reflect.Array;
@@ -59,11 +58,11 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 /**
- * A specialized FieldHandler for the XML Schema
- * Date/Time related types
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * A specialized FieldHandler for the XML Schema Date/Time related types
+ * 
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class DateFieldHandler extends XMLFieldHandler {
 
 
@@ -570,6 +569,11 @@ public class DateFieldHandler extends XMLFieldHandler {
                 cal.set(Calendar.SECOND, value);
                 break;
             case MILLIS_FLAG:
+                //-- adjust milliseconds
+                while (count < 3) {
+                	value = value*10;
+                    ++count;
+                }
                 cal.set(Calendar.MILLISECOND, value);
                 break;
             case DAY_FLAG:
@@ -777,6 +781,29 @@ public class DateFieldHandler extends XMLFieldHandler {
         }
         return buffer.toString();
     } //-- format
+    
+    
+    /* For Testing
+    public static void main(String[] args) {
+        
+        String[] dates = new String[] {                
+            "2004-01-01T00:00:00.1", 
+            "2004-01-01T00:00:00.01", 
+            "2004-01-01T00:00:00.001"
+        };
+        
+        for (int i = 0; i < dates.length; i++) {
+        	System.out.println("parsing: " + dates[i]);
+            System.out.print("parse-result: ");
+            try {
+                System.out.println(format(parse(dates[i])));
+            }
+            catch(Exception ex) {
+            	System.out.println(ex.getMessage());
+            }
+        }
+    } //-- main
+    /* */
 
     /**
      * Formats the given object. If the object is a Date, a call
