@@ -46,6 +46,7 @@
 -->
     <item name="Key Generators" href="key-generator.xml"/>
     <item name="Long Transactions" href="long-transact.xml"/>
+    <item name="Nested Attributes" href="nested-attr.xml"/>
   </menu>
   <menu name="Misc">
     <item name="Contributors" href="contributors.xml"/>
