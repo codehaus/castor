@@ -117,7 +117,7 @@ public class XSLSort extends XSLObject {
             // Check for empty string to solve changes from 
             // XML4J 1.1.9 to 1.1.14 as suggested by Domagoj Cosic.
             if ((attValue != null) && (attValue.length() > 0))
-                select = createSelectExpression(attValue);
+                select = createExpression(attValue);
         }
         return select;
     } //-- getSelectExpr
@@ -128,7 +128,7 @@ public class XSLSort extends XSLObject {
         if (name == null) return;
         if (name.equals(Names.SELECT_ATTR)) {
             try {
-                setSelectExpr(createSelectExpression(value));
+                setSelectExpr(createExpression(value));
             }
             catch(XPathException xpe) {
                 throw new XSLException("Invalid SelectExpr in xsl:sort - " + 
@@ -144,7 +144,7 @@ public class XSLSort extends XSLObject {
     public void setSelectExpr(XPathExpression selectExpr) {
         
         if (selectExpr == null) {
-            try { this.select = createSelectExpression("."); }
+            try { this.select = createExpression("."); }
             catch(XPathException xpe) {};
         }
         else select = selectExpr;
