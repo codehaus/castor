@@ -286,6 +286,14 @@ public class DescriptorSourceFactory {
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
+			//-- Handle optional primatives?
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()))
+			{
+				jsc.add("if(!target."+member.getHasMethodName()+"())");
+				jsc.indent();
+				jsc.add("return null;");
+				jsc.unindent();
+			}							
             String value = "target."+member.getReadMethodName()+"()";
             jsc.add("return ");
             jsc.append(xsType.createToJavaObjectCode(value));
@@ -487,7 +495,7 @@ public class DescriptorSourceFactory {
             jsc.append(localClassName);
             jsc.append(") object;");
 			//-- Handle optional primatives?
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!classInfo.isRequired()))
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()))
 			{
 				jsc.add("if(!target."+member.getHasMethodName()+"())");
 				jsc.indent();
