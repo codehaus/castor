@@ -737,7 +737,7 @@ public class XMLFieldDescriptorImpl
                 return false;
         }
         else if (_nsURI == null) {
-            if (namespace.length() > 0) {
+            if ((namespace.length() > 0) && (!_isWild)) {
                 return false;
             }
         }
