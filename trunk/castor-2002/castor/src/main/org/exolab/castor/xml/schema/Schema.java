@@ -107,6 +107,11 @@ public class Schema extends Annotated {
     private Hashtable _attributes = null;
 
     /**
+     * The value of the block attribute.
+    **/
+    private BlockList _block = null;
+    
+    /**
      * A list of defined architypes
     **/
     private Hashtable _complexTypes = null;
@@ -121,6 +126,11 @@ public class Schema extends Annotated {
     **/
     private Hashtable _elements = null;
 
+    /**
+     * The value of the final attribute.
+    **/
+    private FinalList _final = null;
+    
     /**
      * A list of defined top-levels groups
      */
@@ -629,6 +639,15 @@ public class Schema extends Annotated {
     } //-- getAttributeGroup
 
     /**
+     * Returns the default BlockList for this Schema.
+     *
+     * @return the default BlockList for this Schema.
+    **/
+    public BlockList getBlockDefault() {
+        return _block;
+    } //-- getBlockDefault
+    
+    /**
      * Gets a built in type's name given its code.
      */
     public String getBuiltInTypeName(int builtInTypeCode) {
@@ -752,6 +771,15 @@ public class Schema extends Annotated {
     public Form getElementFormDefault() {
         return _elementFormDefault;
     } //-- getElementFormDefault
+    
+    /**
+     * Returns the default FinalList for this Schema.
+     *
+     * @return final the default FinalList for this Schema.
+    **/
+    public FinalList getFinalDefault() {
+        return _final;
+    } //-- getFinalDefault
     
     /**
      * Returns the SimpleType associated with the given name,
@@ -1077,6 +1105,24 @@ public class Schema extends Annotated {
     } //-- setAttributeFormDefault
 
     /**
+     * Sets the default BlockList for this Schema.
+     *
+     * @param block the default BlockList to set for this Schema.
+    **/
+    public void setBlockDefault(BlockList block) {
+        _block = block;
+    } //-- setBlockDefault
+
+    /**
+     * Sets the default Block values for this Schema. 
+     *
+     * @param block the default Block values to set for this Schema.
+    **/
+    public void setBlockDefault(String block) {
+        _block = new BlockList(block);
+    } //-- setBlockDefault
+
+    /**
      * Sets the elementFormDefault property of this Schema.
      *
      * @param elementFormDefault the Form value of the elementFormDefault
@@ -1085,6 +1131,24 @@ public class Schema extends Annotated {
     public void setElementFormDefault(Form elementFormDefault) {
         _elementFormDefault = elementFormDefault;
     } //-- setElementFormDefault
+    
+    /**
+     * Sets the default FinalList for this Schema.
+     *
+     * @param final the default FinalList to set for this Schema.
+    **/
+    public void setFinalDefault(FinalList finalList) {
+        _final = finalList;
+    } //-- setFinalDefault
+
+    /**
+     * Sets the default final values for this Schema. 
+     *
+     * @param finalValues the default final values to set for this Schema.
+    **/
+    public void setFinalDefault(String finalValues) {
+        _final = new FinalList(finalValues);
+    } //-- setFinalDefault
     
     /**
      * Set the schemaLocation for this schema. This is useful

@@ -186,6 +186,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     {
         if (atts == null) return;
 
+        String attValue = null;
+        
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
         if ((nsURI != null) && (nsURI.length() > 0)) {
             //if we are including a schema we must take care
@@ -214,6 +216,17 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             _schema.setElementFormDefault(Form.valueOf(form));
         }
         
+        //-- @blockDefault
+        attValue = atts.getValue(SchemaNames.BLOCK_DEFAULT_ATTR);
+        if (attValue != null) {
+            _schema.setBlockDefault(attValue);
+        }
+
+        //-- @finalDefault
+        attValue = atts.getValue(SchemaNames.FINAL_DEFAULT_ATTR);
+        if (attValue != null) {
+            _schema.setFinalDefault(attValue);
+        }
 
     } //-- init
 
