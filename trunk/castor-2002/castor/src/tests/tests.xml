@@ -194,11 +194,5 @@
     <!-- <case class="jdo.ListTypes" /> -->
   </category>
 
-  <category name="xml" class="xml.XMLCategory">
-    <description>Tests for XML marshalling framework</description>
-    <case class="xml.TypeHandling" />
-    <case class="xml.Inheritance" />
-  </category>
-
 </harness>
 
