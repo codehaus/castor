@@ -56,9 +56,9 @@ package org.exolab.castor.persist;
  * entity class.
  * <p>
  * The EntityInfo contains the type information for a base class and all its
- * directy or indirect sub classes. Each sub class EntityInfo describes the 
- * field in additional to the super class EntityInfo and is not repeated and 
- * cannot be overrided, except if it is a identity. In most case, the actual 
+ * direct or indirect sub classes. Each sub class EntityInfo describes the 
+ * fields in additional to the super EntityInfo and are not repeated and 
+ * are not overrided, except if it is a identity. In most case, the actual 
  * entity doesn't span all the classes described in the EntityInfo.
  * <p>
  * An entity can be distinguished from any other entity with the same base by 
