@@ -1,3 +1,13 @@
+
+Version 0.8.4  May 0? 2000
+-----------------------------
+
+XML:    Added validation back into the generator sources
+
+XML:    Added some changes from Frank Thelen to allow subclassing FieldInfoFactory
+
+XML:    Fixed bug that occur when an enumeration uses uppercase values
+
 Version 0.8.3  April 28, 2000
 -----------------------------
 
