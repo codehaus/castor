@@ -859,8 +859,13 @@ public class UnmarshalHandler implements DocumentHandler {
             if (xsiTypeAttribute.startsWith("java:")) {
                 return xsiTypeAttribute.substring(5);
             }
-            // TODO : Retrieve the type corresponding to the schema name and
+            // Retrieve the type corresponding to the schema name and
             // return it.
+            XMLClassDescriptor classDesc = 
+                _cdResolver.resolveByXMLName(xsiTypeAttribute, null);
+            
+            if (classDesc != null) 
+                return classDesc.getJavaClass().getName();
         }
         return null;
     } //-- getInstanceType
