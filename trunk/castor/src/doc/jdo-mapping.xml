@@ -170,7 +170,8 @@
                   get-method     NMTOKEN  #IMPLIED
                   set-method     NMTOKEN  #IMPLIED
                   create-method  NMTOKEN  #IMPLIED
-                  collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
+                  collection     ( array | enumerate | collection | set | 
+                                   arraylist | vector | map | hashtable )  #IMPLIED>
         </code>
 
         <p>The &lt;field> element is used to describe a property of a Java object. It provides:</p>
@@ -232,12 +233,13 @@
             <table border="1" cellpadding="4">
               <tr><th>name</th><th>type</th><th>default implementation</th></tr>
               <tr><td>array</td><td>&lt;type_attribute>[]</td><td>&lt;type_attribute>[]</td></tr>
-              <tr><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td></tr>
-              <tr><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td></tr>
+              <tr><td>enumerate</td><td>java.util.Enumeration</td><td>-</td></tr>
               <tr><td>collection</td><td>java.util.Collection</td><td>java.util.ArrayList </td></tr>
-              <tr><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td></tr>
               <tr><td>set</td><td>java.util.Set</td><td>java.util.HashSet</td></tr>
+              <tr><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td></tr>
+              <tr><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td></tr>
               <tr><td>map</td><td>java.util.Map</td><td>java.util.HashMap</td></tr>
+              <tr><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td></tr>
             </table>
 
             <p>The type of the object inside the collection is the 'type' attribute. The 'default
