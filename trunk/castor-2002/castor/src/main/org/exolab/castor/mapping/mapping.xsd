@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+<!DOCTYPE schema PUBLIC "-//W3C/DTD XML Schema Version 1.0//EN"
+                        "http://www.w3.org/XML/Group/1999/09/23-xmlschema/structures/structures.dtd">
+-->
+<!--
+    Castor Object Mapping XML Schema
+
+    Namespace: http://castor.exolab.org/
+    System:    http://castor.exolab.org/mapping.xsd
+    Public:    -//EXOLAB/Castor Object Mapping Schema Version 1.0//EN
+
+    *Note*: This schema is under evolution and subject to change.
+
+ -->
+<schema>
+
+  <element name="mapping">
+    <type content="elemOnly" order="seq">
+      <element ref="description" minOccurs="0" maxOccurs="1" />
+      <element ref="include" minOccurs="0" />
+      <element ref="class" minOccurs="1" />
+    </type>
+  </element>
+
+  <element name="include">
+    <type content="empty">
+      <attribute name="href" type="string" minOccurs="1"/>
+    </type>
+  </element>
+
+  <element name="class">
+    <type content="elemOnly" order="seq">
+      <element ref="description" minOccurs="0" maxOccurs="1" />
+      <element ref="sql-table" minOccurs="0" maxOccurs="1" />
+      <element ref="xml-schema" minOccurs="0" maxOccurs="1" />
+      <element ref="ldap-entry" minOccurs="0" maxOccurs="1" />
+      <element ref="identity" minOccurs="0" maxOccurs="1" />
+      <group order="choice" minOccurs="1">
+        <element ref="field"/>
+        <element ref="container"/>
+      </group>
+      <attribute name="class-name" type="ID" minOccurs="1"/>
+      <attribute name="extends" type="IDREF" minOccurs="0"/>
+    </type>
+  </element>
+
+  <element name="sql-table">
+    <type content="empty">
+      <attribute name="table-name" type="NMTOKEN" minOccurs="1"/>
+      <attribute name="locking" type="string" minOccurs="0" default="optimistic">
+        <enumeration value="optimistic"/>
+        <enumeration value="pessimistic"/>
+      </attribute>
+    </type>
+  </element>
+
+  <element name="xml-schema">
+    <type content="empty">
+      <attribute name="public-id" type="string" minOccurs="0"/>
+      <attribute name="system-id" type="string" minOccurs="0"/>
+      <attribute name="namespace" type="string" minOccurs="0"/>
+      <attribute name="prefix" type="NMTOKEN" minOccurs="0"/>
+    </type>
+  </element>
+
+  <element name="ldap-entry">
+    <type content="empty">
+      <attribute name="object-class" type="NMTOKEN" minOccurs="1"/>
+    </type>
+  </element>
+
+  <element name="identity">
+    <type content="empty">
+      <attribute name="field-ref" type="NMTOKEN" minOccurs="1"/>
+    </type>
+  </element>
+
+  <element name="field">
+    <type content="elemOnly" order="seq">
+      <element ref="description" minOccurs="0" maxOccurs="1"/>
+      <element ref="sql-info" minOccurs="0" maxOccurs="1"/>
+      <element ref="xml-info" minOccurs="0" maxOccurs="1"/>
+      <element ref="ldap-info" minOccurs="0" maxOccurs="1"/>
+      <attribute name="name" type="NMTOKEN" minOccurs="1"/>
+      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <attribute name="collection" type="string" minOccurs="0">
+        <enumeration value="vector"/>
+        <enumeration value="list"/>
+        <enumeration value="collection"/>
+        <enumeration value="bag"/>
+      </attribute>
+    </type>
+  </element>
+
+  <element name="sql-info">
+    <type content="empty">
+      <attribute name="name" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="for-key" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="dirty" type="string" minOccurs="0" default="check">
+        <enumeration value="check"/>
+        <enumeration value="ignore"/>
+      </attribute>
+      <attribute name="access" type="string" minOccurs="0" default="both">
+        <enumeration value="none"/>
+        <enumeration value="read"/>
+        <enumeration value="write"/>
+        <enumeration value="both"/>
+      </attribute>
+    </type>
+  </element>
+
+  <element name="xml-info">
+    <type content="empty">
+      <attribute name="name" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="node-type" type="string" minOccurs="0">
+        <enumeration value="attribute"/>
+        <enumeration value="element"/>
+        <enumeration value="content"/>
+      </attribute>
+    </type>
+  </element>
+
+  <element name="ldap-info">
+    <type content="empty">
+      <attribute name="name" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="access" type="string" minOccurs="0" default="both">
+        <enumeration value="none"/>
+        <enumeration value="read"/>
+        <enumeration value="write"/>
+        <enumeration value="both"/>
+      </attribute>
+    </type>
+  </element>
+
+  <element name="container">
+    <type content="elemOnly" order="seq">
+      <element ref="description" minOccurs="0" maxOccurs="1"/>
+      <element ref="field" minOccurs="1"/>
+      <attribute name="name" type="NMTOKEN" minOccurs="1"/>
+      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="required" type="boolean" minOccurs="0" default="false"/>
+    </type>
+  </element>
+
+  <element name="description" type="string">
+    <type content="textOnly">
+    </type>
+  </element>
+
+</schema>
