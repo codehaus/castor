@@ -340,6 +340,12 @@
     <description>A patch to JDO: the same-connection="false" mode of HIGH/LOW key generator didn't work</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Moallemi" given="Ciamac" />
+    <email>ciamac@neogenesis.com</email>
+    <description>A patch to OQL parser: retrieving fields from a superclass</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
