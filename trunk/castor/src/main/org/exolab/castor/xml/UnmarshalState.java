@@ -128,6 +128,11 @@ class UnmarshalState {
      */
     UnmarshalState targetState = null;
     
+    /**
+     * A reference to the parent state.
+     */
+    UnmarshalState parent = null;
+
     UnmarshalState() {
         super();
     }
@@ -152,6 +157,7 @@ class UnmarshalState {
         wrapper = false;
         targetState = null;
         wsPreserve = false;
+        parent = null;
     } //-- clear
 
     /**
