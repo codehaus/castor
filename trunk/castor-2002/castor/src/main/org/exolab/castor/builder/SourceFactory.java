@@ -208,7 +208,7 @@ public class SourceFactory  {
         // ComplexType
         else if (type.isComplexType()) {
             ComplexType complexType = (ComplexType)type;
-            
+
             //-- If anonymous complex type, we need to process
             //-- the complex type
 			if ( ! complexType.isTopLevel() ) {
@@ -335,11 +335,11 @@ public class SourceFactory  {
 		if (_createMarshalMethods) {
             boolean isAbstract = jClass.getModifiers().isAbstract();
             //-- #validate()
-            createValidateMethods(jClass);           
-            
+            createValidateMethods(jClass);
+
 			//-- #marshal()
 			createMarshalMethods(jClass, isAbstract);
-			
+
 			//-- #unmarshal()
 			if (!isAbstract) {
 			    createUnmarshalMethods(jClass);
@@ -498,7 +498,7 @@ public class SourceFactory  {
             //-- add imports required by the marshal methods
             jClass.addImport("java.io.Writer");
             jClass.addImport("java.io.Reader");
-            
+
             boolean isAbstract = jClass.getModifiers().isAbstract();
             //-- #validate()
             createValidateMethods(jClass);
@@ -723,7 +723,7 @@ public class SourceFactory  {
         jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(SGTypes.Writer, "out"));
         parent.addMethod(jMethod);
-        
+
         if (isAbstract) {
             jMethod.getModifiers().setAbstract(true);
         }
@@ -743,7 +743,7 @@ public class SourceFactory  {
         jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(jc, "handler"));
         parent.addMethod(jMethod);
-        
+
         if (isAbstract) {
             jMethod.getModifiers().setAbstract(true);
         }
@@ -770,7 +770,7 @@ public class SourceFactory  {
         jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(SGTypes.Reader, "reader"));
         parent.addMethod(jMethod);
-        
+
         JSourceCode jsc = jMethod.getSourceCode();
         jsc.add("return (");
         jsc.append(parent.getName());
@@ -874,7 +874,7 @@ public class SourceFactory  {
                     methodName = null;
                     tempName = null;
                     jsc.add(name+" = RandomHelper.getRandom("+name+", "+componentName+".class);");
-               }
+               }//Vector or ArrayList
                else if (type.isPrimitive())
                   jsc.add(setName+"(RandomHelper.getRandom("+name+"));");
                else
@@ -1053,12 +1053,6 @@ public class SourceFactory  {
 
             FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
             handleField(fieldInfo, state);
-
-            if (contentType == ContentType.any) {
-                fieldInfo = memberFactory.createFieldInfoForAny();
-                handleField(fieldInfo, state);
-            }
-
         }
         processContentModel(complexType, state);
     } //-- processComplextype
@@ -1172,17 +1166,28 @@ public class SourceFactory  {
                             state.classInfo.setAsSequence();
                         else
                             state.classInfo.setAsAll();
-                    } 
+                    }
+
                     //-- handle named groups
                     else if (group.getName() != null) {
-                        JClass groupClass 
+                        JClass groupClass
                             = createSourceCode(group, state, state.packageName);
                         fieldInfo = memberFactory.createFieldInfo(group, state);
                         handleField(fieldInfo, state);
-                        break;    
+                        break;
                     }
-                    
+
+                    //-- if there some wildcard elements? (<any>)
+                    Enumeration wildcards = group.getWildcard();
+
+                    while (wildcards.hasMoreElements()) {
+                        Wildcard wildcard = (Wildcard)wildcards.nextElement();
+                        FieldInfo fieldForAny = memberFactory.createFieldInfoForAny();
+                        handleField(fieldForAny, state);
+                    }
+
                     processContentModel(group, state);
+
                     break;
                 //--In case of a ModelGroup:
                 //-- 1- it contains another group (all, choice, sequence)
@@ -1378,7 +1383,7 @@ public class SourceFactory  {
 
             if (useValuesAsName) objName = value.toUpperCase();
             else objName = "VALUE_" + count;
-                
+
             //-- create typeName
             //-- Note: this could cause name conflicts
             typeName = objName + "_TYPE";
@@ -1429,7 +1434,7 @@ public class SourceFactory  {
 
 
             //-- initializer method
-            
+
             if (addInitializerCode) {
                 jsc = mInit.getSourceCode();
                 jsc.add("members.put(\"");
