@@ -90,7 +90,7 @@ public abstract class LRU {
     /**
      * Specify the default LRU parameter
      */
-    public final static int DEFAULT_PARAM = 30;
+    public final static int DEFAULT_PARAM = 100;
 
     /**
      * Maps the specified <code>key</code> to the specified 

@@ -241,6 +241,14 @@
     </description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Eliassen" given="Stein"/>
+    <email>stein.m.eliassen@start.no</email>
+    <description>
+       Fix for but 1313, count-limited cache type is 30 not 100.
+    </description>
+  </contributor>
+
   <!-- Last names begin with E-H -->
 
   <contributor type="Contributor">
