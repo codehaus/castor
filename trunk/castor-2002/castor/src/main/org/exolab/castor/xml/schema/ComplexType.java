@@ -127,7 +127,7 @@ public class ComplexType extends XMLType
     {
         attributes.addReference(attrGroupRef);
     } //-- addAttributeGroupReference
-    
+
     /**
      * Creates an AttributeDecl with the given name. The attribute
      * declaration will still need to be added to this Complextype,
@@ -158,6 +158,11 @@ public class ComplexType extends XMLType
     public Enumeration getAttributeDecls() {
         return attributes.getAttributes();
     } //-- getAttributeDecls
+
+    /**
+     * Returns the attribute group.
+     */
+    public AttributeGroupDecl getAttributeGroup() { return attributes; }
 
     /**
      * Returns the content type of this ComplexType
@@ -267,7 +272,7 @@ public class ComplexType extends XMLType
     public Particle getParticle(int index) {
         return _contentModel.getParticle(index);
     } //-- getParticle
-    
+
     /**
      * Returns the number of particles contained within
      * this ContentModelGroup
