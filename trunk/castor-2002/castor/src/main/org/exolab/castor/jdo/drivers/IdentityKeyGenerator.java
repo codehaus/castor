@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -73,7 +74,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
     private final int _sqlType;
 
 
-    private final String _identityFunc;
+    private final boolean _isHSQL;
 
 
     /**
@@ -87,9 +88,12 @@ public final class IdentityKeyGenerator implements KeyGenerator
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
-        _identityFunc = ( fName.equals("hsql") ? "IDENTITY()" : "@@identity" );
+        _isHSQL = fName.equals("hsql");
         _sqlType = sqlType;
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
+        if ( sqlType != Types.INTEGER && _isHSQL )
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
     }
@@ -109,15 +113,24 @@ public final class IdentityKeyGenerator implements KeyGenerator
     {
         Statement stmt = null;
         ResultSet rs;
-        int value;
 
         try {
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery( "SELECT " + _identityFunc );
+            if ( _isHSQL ) {
+                CallableStatement cstmt;
 
+                cstmt = conn.prepareCall( "{call IDENTITY()}" );
+                stmt = cstmt; //  for "finally"
+                cstmt.execute();
+                rs = cstmt.getResultSet();
+            } else {
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery( "SELECT @@identity");
+            }
             if ( rs.next() ) {
+                int value;
+
                 value = rs.getInt( 1 );
-                if ( _sqlType == Types.INTEGER ) 
+                if ( _sqlType == Types.INTEGER )
                     return new Integer( value );
                 else
                     return new BigDecimal( value );
