@@ -94,9 +94,9 @@ public class InvoiceTest implements PropertyChangeListener {
 
         ShipTo shipTo = invoice.getShipTo();
 
-        System.out.println("   " + shipTo.getName());
+        System.out.println("   " + shipTo.getCustomer().getName());
 
-        Address address = shipTo.getAddress();
+        Address address = shipTo.getCustomer().getAddress();
 
 	    System.out.println("   " + address.getStreet1());
 	    String street2 = address.getStreet2();
@@ -106,7 +106,7 @@ public class InvoiceTest implements PropertyChangeListener {
 	    System.out.print(", " + address.getState());
 	    System.out.println("  " + address.getZipCode());
 
-        System.out.println("  "+shipTo.getPhone());
+        System.out.println("   "+shipTo.getCustomer().getPhone());
 
 	    System.out.println();
         System.out.println("Item:");

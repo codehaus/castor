@@ -1,140 +1,145 @@
 <?xml version="1.0"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
 		targetNamespace="http://castor.exolab.org/Test/Invoice">
 
-   <annotation>
-      <documentation>
+   <xsd:annotation>
+      <xsd:documentation>
          This is a test XML Schema for Castor XML.
-      </documentation>
-   </annotation>
+      </xsd:documentation>
+   </xsd:annotation>
 
    <!--
        A simple representation of an invoice. This is simply an example
        and not meant to be an exact or even complete representation of an invoice.
      -->
-   <element name="invoice">
-      <annotation>
-         <documentation>
+   <xsd:element name="invoice">
+      <xsd:annotation>
+         <xsd:documentation>
              A simple representation of an invoice
-         </documentation>
-      </annotation>
+         </xsd:documentation>
+      </xsd:annotation>
 
-      <complexType>
-      	 <sequence>
-      		<element name="ship-to">
-            	<complexType>
-                 	<sequence>
-                 		<element name="name" type="string"/>
-                 		<element ref="address"/>
-                 		<element name="phone" type="TelephoneNumber"/>
-             		</sequence>
-             	</complexType>
-         	</element>
-        	<element ref="item" maxOccurs="unbounded" minOccurs="1"/>
-        	<element ref="shipping-method"/>
-        	<element ref="shipping-date"/>
-      	</sequence>
-      </complexType>
-   </element>
+      <xsd:complexType>
+      	 <xsd:sequence>
+      		<xsd:element name="ship-to">
+            	<xsd:complexType>
+                 	<xsd:group ref="customer"/>
+                </xsd:complexType>
+         	</xsd:element>
+        	<xsd:element ref="item" maxOccurs="unbounded" minOccurs="1"/>
+        	<xsd:element ref="shipping-method"/>
+        	<xsd:element ref="shipping-date"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+   </xsd:element>
 
+   <!-- Description of a customer -->
+   <xsd:group name="customer">
+        <xsd:sequence>
+             <xsd:element name="name" type="xsd:string"/>
+             <xsd:element ref="address"/>
+             <xsd:element name="phone" type="TelephoneNumberType"/>
+         </xsd:sequence>
+	</xsd:group>
+  
    <!-- Description of an item -->
-   <element name="item">
-   		<complexType>
-   			<sequence>
-   				<element name="Id" type="ID" minOccurs="1" maxOccurs="1"/>
-   		    	<element name="Quantity" type="integer" minOccurs="1" maxOccurs="1"/>
-        		<element name="Price" type="PriceType" minOccurs="1" maxOccurs="1"/>
-    		</sequence>
-    		<attributeGroup ref="ItemAttributes"/>
-    	</complexType>
-   	</element>
+   <xsd:element name="item">
+   		<xsd:complexType>
+   			<xsd:sequence>
+   				<xsd:element name="Quantity" type="xsd:integer" minOccurs="1" maxOccurs="1"/>
+        		<xsd:element name="Price" type="PriceType" minOccurs="1" maxOccurs="1"/>
+    		</xsd:sequence>
+    		<xsd:attributeGroup ref="ItemAttributes"/>
+    	</xsd:complexType>
+   	</xsd:element>
    	
    <!-- Shipping Method -->
-   <element name="shipping-method">
-      <complexType>
-      	  <sequence>
-          	<element name="carrier" type="string"/>
-          	<element name="option"  type="string"/>
-          	<element name="estimated-delivery" type="duration"/>
-      	  </sequence>
-      </complexType>
-   </element>
+   <xsd:element name="shipping-method">
+      <xsd:complexType>
+      	  <xsd:sequence>
+          	<xsd:element name="carrier" type="xsd:string"/>
+          	<xsd:element name="option"  type="xsd:string"/>
+          	<xsd:element name="estimated-delivery" type="xsd:duration"/>
+      	  </xsd:sequence>
+      </xsd:complexType>
+   </xsd:element>
 
    <!-- Shipping date -->
-   <element name="shipping-date">
-   		<complexType>
-   			<sequence>
-   				<element name="date" type="date"/>
-   				<element name="time" type="time"/>
-   			</sequence>
-   		</complexType>
-   	</element>
+   <xsd:element name="shipping-date">
+   		<xsd:complexType>
+   			<xsd:sequence>
+   				<xsd:element name="date" type="xsd:date"/>
+   				<xsd:element name="time" type="xsd:time"/>
+   			</xsd:sequence>
+   		</xsd:complexType>
+   	</xsd:element>
    
    <!-- A simple U.S. based Address structure -->
-   <element name="address">
-      <annotation>
-         <documentation>
+   <xsd:element name="address">
+      <xsd:annotation>
+         <xsd:documentation>
             Represents a U.S. Address
-         </documentation>
-      </annotation>
+         </xsd:documentation>
+      </xsd:annotation>
 
-      <complexType>
-      	 <sequence>
+      <xsd:complexType>
+      	 <xsd:sequence>
          	<!-- street address 1 -->
-         	<element name="street1" type="string"/>
+         	<xsd:element name="street1" type="xsd:string"/>
          	<!-- optional street address 2 -->
-         	<element name="street2" type="string" minOccurs="0"/>
+         	<xsd:element name="street2" type="xsd:string" minOccurs="0"/>
          	<!-- city-->
-         	<element name="city" type="string"/>
+         	<xsd:element name="city" type="xsd:string"/>
          	<!-- state code -->
-         	<element name="state" type="state-code"/>
+         	<xsd:element name="state" type="stateCodeType"/>
          	<!-- zip-code -->
-         	<element ref="zip-code"/>
-      	</sequence>
-      </complexType>
-   </element>
+         	<xsd:element ref="zip-code"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+   </xsd:element>
 
    <!-- A U.S. Zip Code -->
-   <element name="zip-code">
-      <simpleType>
-         <restriction base="string">
-        	 <pattern value="[0-9]{5}(-[0-9]{4})?"/>
-      	 </restriction>
-      </simpleType>
-   </element>
+   <xsd:element name="zip-code">
+      <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+        	 <xsd:pattern value="[0-9]{5}(-[0-9]{4})?"/>
+      	 </xsd:restriction>
+      </xsd:simpleType>
+   </xsd:element>
 
    <!-- State Code
         obviously not a valid state code....but this is just
         an example and I don't feel like creating all the valid
         ones.
     -->
-	<simpleType name="state-code">
-		<restriction base="string">
-      		<pattern value="[A-Z]{2}"/>
-   		</restriction>
-   </simpleType>
+	<xsd:simpleType name="stateCodeType">
+		<xsd:restriction base="xsd:string">
+      		<xsd:pattern value="[A-Z]{2}"/>
+   		</xsd:restriction>
+   </xsd:simpleType>
    
    <!-- Telephone Number -->
-   <simpleType name="TelephoneNumber">
-   		<restriction base="string">
-   			<length value="12"/>
-   			<pattern value="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
-   		</restriction>
-   </simpleType> 
+   <xsd:simpleType name="TelephoneNumberType">
+   		<xsd:restriction base="xsd:string">
+   			<xsd:length value="12"/>
+   			<xsd:pattern value="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
+   		</xsd:restriction>
+   </xsd:simpleType> 
 
    <!-- Cool price type -->
-   <simpleType name="PriceType">
-   		<restriction base="decimal">
-   			<fractionDigits value="2"/>
-    		<totalDigits value="5"/>
-    		<minInclusive value="1"/>
-   			<maxInclusive value="100"/>
-   		</restriction>
-   </simpleType>
+   <xsd:simpleType name="PriceType">
+   		<xsd:restriction base="xsd:decimal">
+   			<xsd:fractionDigits value="2"/>
+    		<xsd:totalDigits value="5"/>
+    		<xsd:minInclusive value="1"/>
+   			<xsd:maxInclusive value="100"/>
+   		</xsd:restriction>
+   </xsd:simpleType>
 
    <!-- The attributes for an Item -->
-   <attributeGroup name="ItemAttributes">
-   		<attribute name="InStock" type="boolean" use="default" value="false"/>
-   		<attribute name="Category" type="string" use="required"/>
-    </attributeGroup>
-</schema>
+   <xsd:attributeGroup name="ItemAttributes">
+        <xsd:attribute name="Id" type="xsd:ID" minOccurs="1" maxOccurs="1"/>
+   		<xsd:attribute name="InStock" type="xsd:boolean" default="false"/>
+   		<xsd:attribute name="Category" type="xsd:string" use="required"/>
+    </xsd:attributeGroup>
+</xsd:schema>
