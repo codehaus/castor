@@ -50,7 +50,7 @@ package org.exolab.castor.xml;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ValidationException extends CastorException {
+public class ValidationException extends XMLException {
     
     /**
      * A nested exception
@@ -99,7 +99,7 @@ public class ValidationException extends CastorException {
      * @param exception the nested exception
     **/
     public ValidationException(Exception exception) {
-        super();
+        super(exception);
         if (exception != null) {
             super.setMessage(exception.getMessage());
             this._exception = exception;
@@ -113,7 +113,7 @@ public class ValidationException extends CastorException {
      * @param exception the nested exception
     **/
     public ValidationException(String message, Exception exception) {
-        super(message);
+        super(message, exception);
         this._exception = exception;
     } //-- ValidationException(String, Exception)
 
@@ -127,7 +127,7 @@ public class ValidationException extends CastorException {
     public ValidationException
         (String message, Exception exception, int errorCode) 
     {
-        super(message, errorCode);
+        super(message, exception, errorCode);
         this._exception = exception;
     } //-- ValidationException(String, Exception, int)
     
@@ -171,6 +171,31 @@ public class ValidationException extends CastorException {
     } //-- setLocation
     
     /**
+     * Removes the given ValidationException from the current
+     * list of ValidationException.
+     *
+     * @param exception the ValidationException to remove
+     * @return true if the given ValidationException was
+     * successfully removed.
+     */
+    protected boolean remove(ValidationException exception) {
+        
+        if (exception == null) return false;
+        
+        ValidationException current = _next;
+        ValidationException previous = this;
+        while (current != null) {
+            if (current == exception) {
+                previous._next = current._next; 
+                current._next = null;
+                return true;
+            }
+            current = current._next;
+        }
+        return false;
+    } //-- remove
+    
+    /**
      * Adds the given ValidationException as the last exception
      * in the list. This is equivalent to calling #setNext if no
      * additional ValidationException(s) exist.
@@ -179,10 +204,13 @@ public class ValidationException extends CastorException {
      * exception in the list.
      */
     protected void setLast(ValidationException exception) {
-        if (_next != null) {
-            _next.setLast(exception);
+        if (exception == null) return;
+        
+        ValidationException current = this;
+        while (current._next != null) {
+            current = current._next;
         }
-        _next = exception;
+        current._next = exception;
     } //-- setLast
     
     /**
@@ -197,6 +225,7 @@ public class ValidationException extends CastorException {
     protected void setNext(ValidationException exception) {
         _next = exception;
     } //-- setNext
+    
 
     /**
      * Returns the String representation of this Exception
@@ -232,6 +261,10 @@ public class ValidationException extends CastorException {
             if (_location != null) {
                 sb.append(";\n   - location of error: ");
                 sb.append(_location.toString());
+            }
+            if (_exception != null) {
+                sb.append("\n");
+                sb.append(_exception.getMessage());
             }
         }
         return sb.toString();
