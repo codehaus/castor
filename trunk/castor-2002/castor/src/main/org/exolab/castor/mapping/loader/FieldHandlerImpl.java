@@ -318,7 +318,7 @@ public final class FieldHandlerImpl
         }
 
         // If there is a convertor, apply it
-        if ( _convertFrom == null )
+        if ( _convertFrom == null || value == null )
             return value;
         try {
             return _convertFrom.convert( value );
