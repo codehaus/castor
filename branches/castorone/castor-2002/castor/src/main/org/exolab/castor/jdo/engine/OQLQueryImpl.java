@@ -254,7 +254,7 @@ public class OQLQueryImpl
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
-        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree);
+        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _dbImpl.getClassLoader());
 
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
@@ -291,9 +291,6 @@ public class OQLQueryImpl
          
     }
 
-    /**
-     * The simple parser for CALL-type queries (using stored procedured)
-     */
     public void createCall( String oql ) throws QueryException {
         StringBuffer sql;
         int as;
@@ -315,7 +312,6 @@ public class OQLQueryImpl
         leftParen = oql.indexOf( "(" );
         rightParen = oql.indexOf( ")" );
         sql = new StringBuffer();
-        sql.append( "{call " );
         paramCnt = 0;
         _paramInfo = new Hashtable();
         if ( leftParen < 0 && rightParen < 0 ) {
@@ -356,29 +352,34 @@ public class OQLQueryImpl
             }
             for ( int i = 0; i < paramCnt; i++ ) {
                 sql.append( '?' );
-                sql.append( ( i == paramCnt - 1 ? ')' : ',' ) );
+                if ( i < paramCnt - 1 )
+                    sql.append( ',' );
             }
+            sql.append( ')' );
         }
-        sql.append( '}' );
         _spCall = sql.toString();
         _projectionType = ParseTreeWalker.PARENT_OBJECT;
         _bindTypes = new Class[ paramCnt ];
-        java.util.Arrays.fill( _bindTypes, Object.class );
+        for ( int i = 0; i < paramCnt; i++ ) 
+            _bindTypes[ i ] = Object.class;
 
         objType = oql.substring( as + 4 ).trim();
         if ( objType.length() == 0 ) {
             throw new QueryException( "Missing object name" );
         }
         try {
-            _objClass = Class.forName( objType );
+            if ( _dbImpl.getClassLoader() == null )
+                _objClass = Class.forName( objType );
+            else
+                _objClass = _dbImpl.getClassLoader().loadClass( objType );
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = _dbImpl.getLockEngine();
+        _dbEngine = _dbImpl.getLockEngine(); 
         if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
-    
+
    
     public QueryResults execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
