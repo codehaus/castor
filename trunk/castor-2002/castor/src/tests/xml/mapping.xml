@@ -29,4 +29,34 @@
     </field>
   </class>
 
+
+
+  <class name="xml.Types">
+    <map-to xml="types" />
+
+    <field name="boolean" >
+      <xml name="boolean" node="element" type="boolean" />
+    </field>
+<!--
+    <field name="chars" >
+      <xml name="chars" node="element" />
+    </field>
+-->
+    <field name="bytes" >
+      <xml name="bytes" node="element" />
+    </field>
+    <field name="integer" >
+      <xml name="integer" node="element" />
+    </field>
+    <field name="float" >
+      <xml name="float" node="element" />
+    </field>
+    <field name="string" >
+      <xml name="string" node="element" />
+    </field>
+    <field name="date" >
+      <xml name="date" node="element" />
+    </field>
+  </class>
+
 </mapping>

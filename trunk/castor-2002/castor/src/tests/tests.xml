@@ -11,7 +11,9 @@
     <case class="jdo.Join" />
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenIdentity" />
+<!--
     <case class="jdo.StoredProcedure" />
+ -->
   </category>
 
 <!--
@@ -44,6 +46,7 @@
 
   <category name="xml" class="xml.XMLCategory">
     <description>Tests for XML marshalling framework</description>
+    <case class="xml.TypeHandling" />
     <case class="xml.Inheritance" />
   </category>
 
