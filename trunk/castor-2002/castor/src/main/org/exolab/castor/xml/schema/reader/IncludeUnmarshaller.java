@@ -102,7 +102,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		}
 		else
 		{
-			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller();
+			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(true);
 			schemaUnmarshaller.setSchema(schema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);

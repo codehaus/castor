@@ -75,7 +75,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
     private static final String XMLNS        = "xmlns";
     private static final String XMLNS_PREFIX = "xmlns:";
-
+    /**
+     * is this a included schema?
+     */
+    private boolean _include = false;
     /**
      * The current SaxUnmarshaller
     **/
@@ -106,12 +109,23 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
      //- Constructors -/
     //----------------/
 
-    public SchemaUnmarshaller() {
+    public SchemaUnmarshaller()
+           throws SAXException
+    {
         this(null, null);
         foundSchemaDef = false;
     } //-- SchemaUnmarshaller
 
-    public SchemaUnmarshaller(AttributeList atts, Resolver resolver) {
+    public SchemaUnmarshaller(boolean include)
+           throws SAXException
+    {
+        this();
+        _include = include;
+    }
+
+    public SchemaUnmarshaller(AttributeList atts, Resolver resolver)
+           throws SAXException
+    {
         super();
         _schema = new Schema();
         setResolver(resolver);
@@ -151,12 +165,20 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
      * initializes the Schema object with the given attribute list
      * @param atts the AttributeList for the schema
     **/
-    private void init(AttributeList atts) {
+    private void init(AttributeList atts)
+            throws SAXException
+    {
         if (atts == null) return;
 
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
-        if ((nsURI != null) && (nsURI.length() > 0))
-            _schema.setTargetNamespace(nsURI);
+        if ((nsURI != null) && (nsURI.length() > 0)) {
+            //if we are including a schema we must take care
+            //that the namespaces are the same
+            if ( (_include) &&(!_schema.getTargetNamespace().equals(nsURI)) ) {
+               throw new SAXException("The target namespace of the included components must be the same as the target namespace of the including schema");
+            }
+               _schema.setTargetNamespace(nsURI);
+        }
 
         _schema.setId(atts.getValue(SchemaNames.ID_ATTR));
         _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
