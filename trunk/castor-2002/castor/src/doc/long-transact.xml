@@ -38,8 +38,6 @@
          org.exolab.castor.jdo.TimeStampable
          having two methods: <code>long jdoGetTimeStamp()</code> and
          <code>void jdoSetTimeStamp(long timeStamp)</code>
-         Note, that for a new objects jdoGetTimeStamp() must 
-         return 0, in this case db.update(object) acts as db.create(object).
          There are two types of timestamps: local (in the Castor cache) and 
          global (in the database). 
          Respectively, the are two dirty checking algorithms: 
