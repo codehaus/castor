@@ -198,7 +198,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             Facet tmpFacet = (Facet)unmarshaller.getObject();
             
             NumberFacet facet = new NumberFacet(name);
-            facet.setValue(facet.getValue());
+            facet.setValue(tmpFacet.getValue());
             
             _attribute.getSimpleType().addFacet(facet);
         }
