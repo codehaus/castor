@@ -193,7 +193,8 @@ public class Types
     public static boolean isPrimitiveType( Class type )
     {
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-            if ( (_typeInfos[ i ].javaType == type) && (_typeInfos[ i ].primitive != null) )
+            if (_typeInfos[ i ].primitive == type || 
+                (_typeInfos[ i ].javaType == type && _typeInfos[ i ].primitive != null))
                 return true;
         }
         return false;

@@ -158,7 +158,7 @@ public class ClassDescriptorResolverImpl
         
         if (classDesc != null) return classDesc;
 
-        if (Types.isPrimitiveType(type))
+        if (Types.isPrimitiveType(type) && !(type instanceof Object))
             return null;
 
         //-- check mapping loader first 
