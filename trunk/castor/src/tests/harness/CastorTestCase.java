@@ -47,13 +47,13 @@
 package harness;
 
 
-import java.util.Vector;
-import java.util.Enumeration;
 import java.io.PrintStream;
 
-import junit.framework.TestSuite;
+import jdo.JDOCategory;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import org.exolab.castor.jdo.engine.DatabaseImpl;
 
 public class CastorTestCase extends TestCase {
 
@@ -73,6 +73,17 @@ public class CastorTestCase extends TestCase {
         setDescription( description );
         setSuite( suite );
     }
+    private void clearCache() {
+        try {
+            if (suite instanceof JDOCategory) {
+                DatabaseImpl db = (DatabaseImpl) ((JDOCategory) suite).getDatabase(verbose);
+                db.getCacheManager().expireCache();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
 	 * @param name2
 	 */
@@ -116,9 +127,10 @@ public class CastorTestCase extends TestCase {
     public void printInfo( PrintStream ps, String branch ) {
         //System.out.println( " branch: " + branch + " name: " + getName()  );
         if ( branch == null || branch.equals("") || branch.startsWith( getName() ) ) {
-            String sub = null;
-            if ( branch != null && branch.startsWith( getName() ) )
-                sub = branch.substring( branch.indexOf(".")==-1?branch.length():branch.indexOf(".")+1 );
+        	// XXX [SMH]: sub is never used, delete?
+            //String sub = null;
+            //if ( branch != null && branch.startsWith( getName() ) )
+            //    sub = branch.substring( branch.indexOf(".")==-1?branch.length():branch.indexOf(".")+1 );
             StringBuffer sb = new StringBuffer();
             sb.append( getName() );
             TestHarness upper = suite;
@@ -139,6 +151,7 @@ public class CastorTestCase extends TestCase {
         System.out.println();
         System.out.print( "Test: "+getName()+" "+getDescription()+" " );
         super.run( result );
+		clearCache(); // XXX [SMH]: call to clearCache() added
     }
     public void run( TestResult result, String branch ) {
         System.out.println( "Test: "+getName()+" Branch: "+branch );
