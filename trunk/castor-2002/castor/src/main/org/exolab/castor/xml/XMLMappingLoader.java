@@ -160,7 +160,7 @@ public class XMLMappingLoader
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
         
         //-- matches
-        if (xml.getMatch() != null)
+        if ((xml != null) && (xml.getMatch() != null))
             xmlDesc.setMatches(xml.getMatch());
             
         return xmlDesc; 
