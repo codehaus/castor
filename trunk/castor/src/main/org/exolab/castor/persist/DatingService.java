@@ -86,9 +86,7 @@ class DatingService {
         Enumeration e;
         ClassMolder initiateCm, targetCm;
         FieldMolder initiateFm;
-        ClassMolder molder, extend;
-        Object o;
-
+        
         // resolve extends
         if ( needExtendsClassMolder != null ) {
             e = needExtendsClassMolder.elements();
@@ -196,11 +194,13 @@ class DatingService {
 
     /**
      * Pair the FieldMolder with the ClassMolder of typeName
-     * @param fh  the fieldMolder to be paired.
-     * @param typeName the type of the field which the FieldMolder
-     *        represent
+     * @param fieldMolder the fieldMolder to be paired.
+     * @param typeName Type of the field which the FieldMolder represents
+     * @exception MappingException indicates that the pairing failed.
      */
-    boolean pairFieldClass( FieldMolder fh, String typeName ) throws MappingException {
+    boolean pairFieldClass( FieldMolder fieldMolder, String typeName ) 
+        throws MappingException 
+    {
         
         try {
             if ( typeName == null || typeName.equals("") )
@@ -211,14 +211,16 @@ class DatingService {
 
             ClassMolder clsMold = (ClassMolder) clsMolders.get( typeName );
             if ( clsMold != null ) {
-                fh.setFieldClassMolder( clsMold );
+                fieldMolder.setFieldClassMolder( clsMold );
                 return true;
             }
 
-            if ( needFieldClass == null ) needFieldClass = new Vector();
-            needFieldClass.add( new Pair( typeName, fh ) );
+            if ( needFieldClass == null ) 
+                needFieldClass = new Vector();
+            needFieldClass.add( new Pair( typeName, fieldMolder ) );
             return false;
-        } catch ( ClassNotFoundException e ) {
+        } 
+        catch ( ClassNotFoundException e ) {
             throw new MappingException("ClassNotFound :\n"+e);
         }
     }
