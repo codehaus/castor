@@ -781,7 +781,14 @@ public final class Introspector {
                     (XMLFieldDescriptorImpl) dateDescriptors.get(i);
                 FieldHandler handler = fieldDesc.getHandler();
                 fieldDesc.setImmutable(true);
-                fieldDesc.setHandler(new DateFieldHandler(handler));
+                DateFieldHandler dfh = new DateFieldHandler(handler);
+                
+                //-- patch for java.sql.Date
+                Class type = fieldDesc.getFieldType();
+                if (java.sql.Date.class.isAssignableFrom(type)) {
+                    dfh.setUseSQLDate(true);
+                }
+                fieldDesc.setHandler(dfh);
             }
         }
         
@@ -1133,6 +1140,7 @@ public final class Introspector {
             
             //-- make sure we can construct the Object
             if (!type.isArray() ) {
+                
                 //-- try to get the default constructor and make
                 //-- sure we are only looking at classes that can 
                 //-- be instantiated by calling Class#newInstance
@@ -1140,6 +1148,10 @@ public final class Introspector {
                     type.getConstructor( EMPTY_CLASS_ARGS );
                 }
                 catch ( NoSuchMethodException e ) { 
+                    
+                    //-- allow java.sql.Date
+                    if (type == java.sql.Date.class) return true;
+                    
                     return false;
                 }
             }
