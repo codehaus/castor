@@ -603,7 +603,7 @@ public final class ClassHandler
 	    this.handler = fieldDesc.getHandler();
             this.immutable = fieldDesc.isImmutable();
             this.relation = relation;
-            this.multi = fieldDesc.isMulti();
+            this.multi = fieldDesc.isMultivalued();
         }
 
     }

@@ -97,7 +97,7 @@ public final class RelationHandler
 	_handler = fieldDesc.getHandler();
         _relHandler = relHandler;
         _attached = attached;
-        _multi = fieldDesc.isMulti();
+        _multi = fieldDesc.isMultivalued();
     }
 
 
