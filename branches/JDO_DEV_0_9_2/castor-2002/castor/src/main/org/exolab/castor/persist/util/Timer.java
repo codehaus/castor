@@ -52,39 +52,20 @@ import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
 
 /**
- * A Timer generates tick periodically. To listen to ticks, a listener adds 
- * itself using {@link addTimerListener} method. 
+ * A Timer generates ticks periodically. To listen to ticks, a listener adds 
+ * itself using the {@link addTimerListener} method. 
  * <p>
- * This implementation links its listeners using {java.lang.ref.WeakReference} 
+ * This timer implementation links to listeners by {java.lang.ref.WeakReference} 
  * so that the timer will not prohibit the listeners from being garbage collected.
  * <p>
- * @author Thomas Yip <mailto:yip@intalio.com>
+ * @author <a href="yip@intalio.com">Thomas Yip</a>
  */
 public final class Timer extends Thread {
-
-    // --- static stuffs ---
-    public static interface TimeListener {
-        public void tick();
-    }
-
-    private Iterator nullItor = new Iterator() {
-        public boolean hasNext() {
-            return false;
-        }
-        public Object next() throws NoSuchElementException {
-            throw new NoSuchElementException();
-        }
-        public void remove() throws IllegalStateException {
-            throw new IllegalStateException();
-        }
-    };
 
     // --- instance stuffs ---
     private ReferenceQueue refQ = new ReferenceQueue();
 
     private ArrayList listeners = new ArrayList();
-
-    private long lasttime;
 
     private long period;
 
@@ -93,14 +74,14 @@ public final class Timer extends Thread {
     public Timer( int period ) {
         this.period = period;
         setDaemon( true );
-        lasttime = System.currentTimeMillis();
         start();
     }
 
     public void run() {
+        long lasttime = System.currentTimeMillis();
         while ( !stopped ) {
             long wantedTime = lasttime + period;
-            long sleepMore = System.currentTimeMillis() - wantedTime;
+            long sleepMore = wantedTime - System.currentTimeMillis();
             if ( sleepMore > 0 ) {
                 try {
                     sleep( sleepMore );
@@ -158,5 +139,32 @@ public final class Timer extends Thread {
             }
         }
     }
-    
+
+    // --- static stuffs ---
+    public static interface TimeListener {
+        public void tick();
+    }
+
+    private Iterator nullItor = new Iterator() {
+        public boolean hasNext() {
+            return false;
+        }
+        public Object next() throws NoSuchElementException {
+            throw new NoSuchElementException();
+        }
+        public void remove() throws IllegalStateException {
+            throw new IllegalStateException();
+        }
+    };
+
+    private static class Test implements TimeListener {
+        public static void main( String args[] ) throws Exception {
+            Timer t = new Timer( 1000 );
+            t.addTimeListener( new Test() );
+            Thread.currentThread().sleep( 10 * 1000 );
+        }
+        public void tick() {
+            System.out.println( System.currentTimeMillis() );
+        }
+    }
 }
