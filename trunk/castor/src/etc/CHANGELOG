@@ -1,7 +1,10 @@
 
 Version (CVS) 
 -------------
-
+XML:   Added the Source Generator command-line option 
+       '-generateImportedSchemas' that lets you specify 
+       the automatic generation of Java for imported XML Schemas.
+       (Arnaud - 20031010)
 
 Version 0.9.5.2, September 28, 2003
 -----------------------------------
