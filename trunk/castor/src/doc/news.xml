@@ -20,6 +20,25 @@
               <span class="newsSummary"-->
 
         <news>
+            <title>Castor - A new home</title>
+            <author>Werner Guttmann</author>
+            <date>14 Feb 2005</date>
+            <time>22:21:20</time>
+            <summary>
+                After over five years of <a href="http://www.exolab.org">Exolab</a> sponsoring Castor, 
+				the Castor team recently decided to move the entire project to a new home over at 
+				the <a href="http://www.codehaus.org">Codehaus</a>. The team would like to thank 
+				Exolab and it's parent company Intalio, Inc. for it's long-standing support of 
+				the project.<br/><br/>
+				
+				Please use the below links for access to ...<br/><br/>
+				
+				- <a href="http://castor.codehaus.org">Main documentation</a><br/>
+				- <a href="http://cvs.castor.codehaus.org">CVS Repository</a><br/>
+				- <a href="http://dist.codehaus.org/castor">Download</a>
+            </summary>
+        </news>
+        <news>
             <title>Castor JDO - New committers</title>
             <author>Werner Guttmann</author>
             <date>14 Feb 2005</date>
@@ -34,7 +53,6 @@
 				can be found at <a href="http://castor.codehaus.org/contributors.html">here</a>.
             </summary>
         </news>
-
         <news>
             <title>Castor 0.9.6 - Final release</title>
             <author>Werner Guttmann</author>
@@ -54,7 +72,6 @@
 				mailing lists.
             </summary>
         </news>
-
         <news>
             <title>Castor 0.9.6 - 3rd release candidates</title>
             <author>Werner Guttmann</author>
