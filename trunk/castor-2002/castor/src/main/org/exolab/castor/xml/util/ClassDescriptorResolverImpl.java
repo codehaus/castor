@@ -68,15 +68,30 @@ public class ClassDescriptorResolverImpl
     **/
     private Hashtable _cache      = null;
     
+    /**
+     * A flag indicating an error has occured
+    **/
     private boolean   _error      = false;
+    
+    /**
+     * Error message
+    **/
     private String    _errMessage = null;
     
     private XMLMappingLoader mappingLoader = null;
     
     private ClassLoader _loader  = null;
     
+    /**
+     * The introspector to use, if necessary, to 
+     * create dynamic ClassDescriptors
+    **/
     private Introspector _introspector = null;
     
+    /** 
+     * A flag to indicate the use of introspection
+    **/
+    private boolean _useIntrospection = true;
     
     /**
      * Creates a new ClassDescriptorResolverImpl
@@ -178,7 +193,7 @@ public class ClassDescriptorResolverImpl
         }
         
         //-- create classDesc automatically if necessary
-        if (classDesc == null) {
+        if ((classDesc == null) && _useIntrospection) {
             try {
                 classDesc = _introspector.generateClassDescriptor(type);
                 if (classDesc != null) {
@@ -299,6 +314,17 @@ public class ClassDescriptorResolverImpl
     public void setClassLoader(ClassLoader loader) {
         this._loader = loader;
     } //-- setClassLoader
+    
+    /**
+     * Enables or disables introspection. Introspection is
+     * enabled by default.
+     *
+     * @param enable a flag to indicate whether or not introspection
+     * is allowed.
+    **/
+    public void setIntrospection(boolean enable) {
+        _useIntrospection = enable;
+    } //-- setIntrospection
     
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
         this.mappingLoader = mappingLoader;
