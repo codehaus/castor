@@ -41,8 +41,8 @@ public class Test
 
 
     private JDO      _jdo;
-    
-    
+
+
     public static void main( String[] args )
     {
         PrintWriter   writer;
@@ -72,8 +72,8 @@ public class Test
         _jdo.setConfiguration( getClass().getResource( DatabaseFile ).toString() );
         _jdo.setDatabaseName( "test" );
     }
-    
-    
+
+
     public void run( PrintWriter writer )
         throws Exception
     {
@@ -86,12 +86,12 @@ public class Test
         OQLQuery      groupOql;
         OQLQuery      computerOql;
         QueryResults  results;
-        
+
         db = _jdo.getDatabase();
 
         db.begin();
         writer.println( "Begin transaction" );
-        
+
         // Look up the product and if found in the database,
         // delete this object from the database
         productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE id = $1" );
@@ -145,7 +145,7 @@ public class Test
             group = (ProductGroup) results.next();
             writer.println( "Query result: " + group );
         }
-        
+
         // If no such product exists in the database, create a new
         // object and persist it
         // Note: product uses group, so group object has to be
@@ -171,7 +171,7 @@ public class Test
         } else {
             writer.println( "Query result: " + results.next() );
         }
-        
+
         // If no such computer exists in the database, create a new
         // object and persist it
         // Note: computer uses group, so group object has to be
@@ -201,26 +201,17 @@ public class Test
         writer.println( "Commit transaction" );
         db.commit();
 
-        Serializer     ser;
-        Marshaller     marshal;
-        ContentHandler handler;
+        Marshaller     marshaller;
 
-        ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
-        ser.setOutputCharStream( writer );
-        handler = ser.asContentHandler();
-        marshal = new Marshaller( ser.asDocumentHandler() );
-        marshal.setMapping( _mapping );
+        marshaller = new Marshaller( writer );
+        marshaller.setMapping( _mapping );
 
         db.begin();
-        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p" );
-        results = productOql.execute();
-        handler.startDocument();
-        handler.startElement( null, null, "products", null );
+        marshaller.marshal( db.load( Product.class, new Integer( 4 ) ) );
+        computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c" );
+        results = computerOql.execute();
         while( results.hasMore() )
-            marshal.marshal( results.next() );
-        handler.endElement( null, null, "products" );
-        handler.endDocument();
-
+            marshaller.marshal( results.next() );
         db.commit();
 
         db.close();
