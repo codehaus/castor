@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999, 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -50,10 +50,11 @@ import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.DefaultNaming;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.List;
 
@@ -326,7 +327,6 @@ public final class Introspector {
                 isCollection = true;
             }
             
-            Class colType = null;
             //-- if there was no add method, use get/set methods
             //-- to calculate type.
             if (type == null) {
@@ -342,30 +342,35 @@ public final class Introspector {
                     continue;
                 }
             }
-            //-- other calculate type of collection
-            else {
-                if (methodSet.get != null) {
-                    colType = methodSet.get.getReturnType();
-                }
-                else if (methodSet.set != null) {
-                    colType = methodSet.set.getParameterTypes()[0];
-                }
-            }
             
             //-- Handle Collections
             isCollection = (isCollection || isCollection(type));
-                
+            
+            TypeInfo typeInfo = null;
+            CollectionHandler colHandler = null;
+            
+            //-- If the type is a collection and there is no add method, 
+            //-- then we obtain a CollectionHandler
+            if (isCollection && (methodSet.add == null)) {
+                typeInfo = new TypeInfo(type);
+                colHandler = typeInfo.getCollectionHandler();
+                //-- Find component type
+                if (type.isArray()) {
+                    type = type.getComponentType();
+                }
+            }
+            
             XMLFieldDescriptorImpl fieldDesc 
                 = createFieldDescriptor(type, methodSet.fieldName, xmlName);
                 
-            classDesc.addFieldDescriptor(fieldDesc);
-                
+            
+            typeInfo = new TypeInfo(type, null, null, false, null, colHandler);
+            
             if (isCollection) {
                 fieldDesc.setMultivalued(true);
                 fieldDesc.setNodeType(NodeType.Element);
             }
-                
-            TypeInfo typeInfo = new TypeInfo(type);
+            
             FieldHandlerImpl handler = null;
             try {
                 handler = new FieldHandlerImpl(methodSet.fieldName,
@@ -394,6 +399,10 @@ public final class Introspector {
                         
             fieldDesc.setHandler(handler);
             
+            //-- add FieldDescriptor to ClassDescriptor
+            classDesc.addFieldDescriptor(fieldDesc);
+
+            
         } //-- end of method loop
         
         //-- If we didn't find any methods we can try
@@ -406,21 +415,27 @@ public final class Introspector {
                 Field field = fields[i];
                 
                 Class type = field.getType();       
-                boolean isCollection = false;
-                //-- contentType of collection
-                Class contentType = type;
-                if (type.isArray()) {
-                    type = type.getComponentType();
-                    isCollection = true;
-                    //contentType = type;
-                }                
+                
                 if (!isDescriptable(type)) continue;
                 
                 //-- Built-in support for JDK 1.1 Collections
                 //-- we need to a pluggable interface for 
                 //-- JDK 1.2+
-                if (!isCollection) {
-                    isCollection = isCollection(type);
+                boolean isCollection = isCollection(type);
+                
+                
+                TypeInfo typeInfo = null;
+                CollectionHandler colHandler = null;
+                
+                //-- If the type is a collection and there is no add method, 
+                //-- then we obtain a CollectionHandler
+                if (isCollection) {
+                    typeInfo = new TypeInfo(type);
+                    colHandler = typeInfo.getCollectionHandler();
+                    //-- Find component type
+                    if (type.isArray()) {
+                        type = type.getComponentType();
+                    }
                 }
                 
                 String fieldName = field.getName();
@@ -436,7 +451,7 @@ public final class Introspector {
                 descriptors.put(xmlName, fieldDesc);
                 classDesc.addFieldDescriptor(fieldDesc);
                 
-                TypeInfo typeInfo = new TypeInfo(type);
+                typeInfo = new TypeInfo(type, null, null, false, null, colHandler);
                 
                 FieldHandler handler = null;
 
