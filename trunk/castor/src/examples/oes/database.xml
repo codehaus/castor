@@ -1,12 +1,18 @@
 <?xml version="1.0" ?>
-<!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+<!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
                            "http://castor.exolab.org/jdo-conf.dtd">
-<database name="oes" engine="sybase" >
-  <data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource">
-    <params user="oes_user" password="secret" 
-            port-number="4100" server-name="arkin" />
-  </data-source>
-  <mapping href="mapping.xml" />
-</database>
+                           
+<jdo-conf>
+   <database name="oes" engine="sybase" >
+      <data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource">
+         <param name="user" value="oes_user" />
+         <param name="password" value="secret" />
+         <param name="portNumber" value="4100" />
+         <param name="serverName" value="arkin" />
+      </data-source>
+      <mapping href="mapping.xml" />
+   </database>
+   <transaction-demarcation mode="local" />
+</jdo-conf>
 
 
