@@ -1063,6 +1063,21 @@ public class Schema extends Annotated {
      * Returns the imported schema with the given namespace
      * 
      * @param ns the namespace of the imported schema to return
+     * @param localOnly a boolean that indicates only local imports
+     * should be searched.
+     * @return the imported schema
+     */
+    public Schema getImportedSchema(String ns, boolean localOnly) {
+        if (localOnly) 
+            return (Schema) _importedSchemas.get(ns);
+        else
+            return getImportedSchema(ns, null);
+    } //-- getImportedSchema
+    
+    /**
+     * Returns the imported schema with the given namespace
+     * 
+     * @param ns the namespace of the imported schema to return
      * @return the imported schema
      */
     private Schema getImportedSchema(String ns, Schema caller) {
