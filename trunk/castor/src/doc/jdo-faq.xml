@@ -410,7 +410,7 @@ query.bind(false);
             <p>
             When using Weblogic Portal 4.0 with Oracle I am receiving the following error:
             <code><![CDATA[
-            java.sql.SQLException: ORA-01461: can bind a LONG value only for insert into a LONG column
+java.sql.SQLException: ORA-01461: can bind a LONG value only for insert into a LONG column
             ]]></code>
             According to 
             <a href="http://edocs.bea.com/wlp/docs40/relnotes/relnotes.htm#300245">Weblogic Release Notes</a>,
