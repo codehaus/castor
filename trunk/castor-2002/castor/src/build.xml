@@ -293,7 +293,7 @@
         
         <jar jarfile="${dist}/${archive}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,org/**"/>
         <jar jarfile="${dist}/${archive}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,
-              org/exolab/castor/xml/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,org/exolab/castor/types/**,
+              org/exolab/castor/builder/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,org/exolab/castor/types/**,org/exolab/castor/xml/**,
               org/exolab/castor/*"/>
         <!--
     <delete   file="${classes}/MANIFEST.MF" />
