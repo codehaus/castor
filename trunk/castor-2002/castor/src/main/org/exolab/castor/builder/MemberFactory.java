@@ -345,10 +345,12 @@ public class MemberFactory {
                 if (className==null)
 					return null;
                 else {
-                   //make sure we append namespaces information
-                   //if defined in the property file
-                   String packageName = SourceGenerator.getJavaPackage(eDecl.getSchema().getTargetNamespace());
-                   className = (packageName != null)?packageName+"."+className:className;
+                    //make sure we append namespaces information
+                    //if defined in the property file
+                    String packageName = SourceGenerator.getJavaPackage(eDecl.getSchema().getTargetNamespace());
+                    if ((packageName != null) && (packageName.length() > 0)) {
+                        className = packageName + '.' + className;
+                    }
                    packageName = null;
                 }
 			}
