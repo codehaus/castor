@@ -785,6 +785,13 @@
     <description>Castor XML feedback</description>
   </contributor>
 
+
+  <contributor type="Feedback">
+    <name surname="Kleser" given="Gerald"/>
+    <email>gerald@neofonie.de</email>
+    <description>Addition feedback and proposed workaround for bug 1449</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Kovacs" given="Zsolt"/>
     <email>Zsolt.Kovacs@cern.ch</email>
@@ -798,6 +805,12 @@
   </contributor>
 
   <!-- Last names begin with M-P -->
+
+  <contributor type="Feedback">
+    <name surname="Ohlrogge" given="Joakim"/>
+    <email>j_ohlrogge@hotmail.com</email>
+    <description>Patch for bug 1449</description>
+  </contributor>
 
   <contributor type="Feedback">
     <name surname="Paradies" given="Thomas"/>
