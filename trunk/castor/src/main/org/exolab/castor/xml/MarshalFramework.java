@@ -262,6 +262,11 @@ abstract class MarshalFramework {
     } //-- primitiveOrWrapperEquals
     
     /**
+     * 
+     */
+    private static final InheritanceMatch[] NO_MATCH_ARRAY = new InheritanceMatch[0];
+    
+    /**
      * Search there is a field descriptor which can accept one of the class
      * descriptor which match the given name and namespace.
      * @returns an array of InheritanceMatch.
@@ -288,10 +293,10 @@ abstract class MarshalFramework {
                 className = pkg + className;
             }
         }
-        cdResolver.resolve(className);
+        cdResolver.resolve(className, classDesc.getClass().getClassLoader());
         //-- end Not-Yet-Loaded descriptor logic
 
-        Vector inheritanceList = new Vector(3);
+        Vector inheritanceList = null;
         XMLFieldDescriptor descriptor  = null;
         ClassDescriptorEnumeration cde = cdResolver.resolveAllByXMLName(name, namespace, null);
         XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
@@ -311,6 +316,8 @@ abstract class MarshalFramework {
                     // It is possible that the superclass is of type object if we use any node.
                     if (superclass.isAssignableFrom(subclass) && (superclass != Object.class)) {
                         descriptor = descriptors[i];
+                        if (inheritanceList == null)
+                            inheritanceList = new Vector(3);
                         inheritanceList.addElement(new InheritanceMatch(descriptor, cdInherited));
                     }
                 }
@@ -318,10 +325,14 @@ abstract class MarshalFramework {
             //-- reset inherited class descriptor, if necessary
             if (descriptor == null) cdInherited = null;
         }
-
-        InheritanceMatch[] result = new InheritanceMatch[inheritanceList.size()];
-        inheritanceList.toArray(result);
-        return result;
+        
+        if (inheritanceList != null) {
+            InheritanceMatch[] result = new InheritanceMatch[inheritanceList.size()];
+            inheritanceList.toArray(result);
+            return result;
+        }
+        return NO_MATCH_ARRAY;
+        
     }
 
      /**
