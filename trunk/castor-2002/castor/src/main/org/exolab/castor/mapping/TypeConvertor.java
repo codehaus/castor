@@ -44,17 +44,30 @@
  */
 
 
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.mapping;
 
 
 /**
+ * Interface for a type convertor. A type convertor converts a Java
+ * object from one type to another. A type convertor implementation is
+ * required for each type of conversion.
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public interface TypeConvertor
 {
-    
-    public Object convert( Object obj )
-        throws IllegalArgumentException;
-    
+
+
+    /**
+     * Convert the object from one type to another.
+     *
+     * @param object The object to convert
+     * @return The converted object
+     * @throws ClassCastException The object is not of the type
+     *  supported by this convertor
+     */
+    public Object convert( Object object )
+        throws ClassCastException;
+
 }
