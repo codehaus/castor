@@ -258,12 +258,12 @@
                <tr>
                   <td valign="top">decimal</td>
                   <td>
-                  	 maxExclusive
-                  	 minExclusive
-                  	 maxInclusive
-                  	 minInclusive
-                  	 precision
-                  	 scale
+                  	 maxExclusive<br/>
+                  	 minExclusive<br/>
+                  	 maxInclusive<br/>
+                  	 minInclusive<br/>
+                  	 precision<br/>
+                  	 scale<br/>
                   </td>
                </tr>
                <tr>
@@ -280,10 +280,10 @@
                <tr>
                   <td valign="top">timeDuration</td>
                   <td>
-                  	  maxExclusive
-                  	  minExclusive
-                  	  maxInclusive
-                  	  minInclusive
+                  	  maxExclusive<br/>
+                  	  minExclusive<br/>
+                  	  maxInclusive<br/>
+                  	  minInclusive<br/>
                   </td>
                </tr>
                <tr>
