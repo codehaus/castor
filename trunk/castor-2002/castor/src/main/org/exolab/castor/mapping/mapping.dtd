@@ -67,7 +67,7 @@
 <!ATTLIST class
     name            ID       #REQUIRED
     extends         IDREF    #IMPLIED
-    depends         NMTOKEN  #IMPLIED
+    depends         IDREF    #IMPLIED
     identity        CDATA    #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
     key-generator   IDREF    #IMPLIED >
