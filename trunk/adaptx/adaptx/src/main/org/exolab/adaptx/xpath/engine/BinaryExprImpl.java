@@ -148,13 +148,20 @@ abstract class BinaryExprImpl implements BinaryExpr {
         else 
             sb.append(NULL);
         
+        sb.append(' ');
+        
         Operator op = getOperator();
         if (op != null)
             sb.append(op.toString());
+        else 
+            sb.append('?');
             
-        tmp = getRightSide();
+        sb.append(' ');
+        
+            
+        tmp = getRightSide();        
         if (tmp != null) 
-            sb.append(sb.toString());
+            sb.append(tmp.toString());
         else 
             sb.append(NULL);
             
