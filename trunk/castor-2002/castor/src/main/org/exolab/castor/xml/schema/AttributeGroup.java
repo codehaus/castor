@@ -59,6 +59,11 @@ import java.util.Enumeration;
 public abstract class AttributeGroup extends Annotated {
 
     /**
+     * The id of this AttributeGroup
+    **/
+    private String _id = null;
+
+    /**
      * Returns the AttributeDecl associated with the given name
      * @return the AttributeDecl associated with the given name, or
      *  null if no AttributeDecl with the given name was found.
@@ -76,6 +81,15 @@ public abstract class AttributeGroup extends Annotated {
     public abstract Enumeration getAttributes();
     
     /**
+     * Returns the id of this AttributeGroup
+     * @return the id of this AttributeGroup, or null, if
+     * no id was defined.
+    **/
+    public String getId() {
+        return _id;
+    } //-- getId
+    
+    /**
      * Returns true if this AttributeGroup does not contain any
      * AttributeDecls or any non-empty AttributeGroupReferences
      *
@@ -91,6 +105,14 @@ public abstract class AttributeGroup extends Annotated {
     public short getStructureType() {
         return Structure.ATTRIBUTE_GROUP;
     } //-- getStructureType
+
+    /**
+     * Sets the id of this AttributeGroup
+     * @param id the id of this AttributeGroup
+    **/
+    public void setId(String id) {
+        this._id = id;
+    } //-- setId
 
     /**
      * Checks the validity of this Attribute declaration
