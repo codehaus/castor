@@ -91,13 +91,13 @@ org.exolab.castor.indent=true
 
     <section title="XML:Marshall validation">
     	<p>It is possible to disable the validation in the marshalling framework by
-    	   simply modifying the Castor properties file or create a new properties file in the classpath 
+    	   simply modifying the Castor properties file or create a new properties file in the classpath
     	   (named <tt>castor.properties</tt>) with the following content:
          <pre>
 org.exolab.castor.marshalling.validation=true
          </pre></p>
-    </section> 
-    
+    </section>
+
     <section title="JDO: Views of Same Object">
 
       <p>It is possible to use different objects and mappings to the same tables. For example,
@@ -146,8 +146,29 @@ org.exolab.castor.marshalling.validation=true
 
     </section>
 
-    <section title="XML/JDO: Create method">
+    <section title="XML/JDO: NoClassDefFoundError">
+       <p>
+          Check your CLASSPATH, check it often, there is no reason not too!
+       </p>
+    </section>
 
+    <section title="XML: Mapping: auto-complete">
+       <p>
+          <b>Note: this only works with Castor-XML</b>
+       </p>
+       <p>
+          To save time when writing your mappings, try using the <i>auto-complete</i>
+          attribute of <i>class</i>. When using auto-complete, Castor will introspect
+          your class and automatically fill in any missing fields.
+       </p>
+       <p>
+          <b>Example:</b>
+          <code>&lt;class name="com.acme.Foo" auto-complete="true"/&gt;</code>
+       </p>
+    </section>
+
+    <section title="XML/JDO: Create method">
+       <p>Section to be added</p>
     </section>
 
 
