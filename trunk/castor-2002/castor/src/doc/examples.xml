@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/contacts.xml">
+  <body>
+    <title>Status</title>
+
+    <section title="Running The Examples">
+
+      <p>The script files <tt>example.sh</tt> and <tt>example.bat</tt> can
+         be used to run the provided examples. The first argument is the example
+         package name. For example, to build and run the JDO example:
+<pre>
+  build.sh examples
+  test.sh jdo odmg
+</pre>
+      </p>
+
+    </section>
+
+    <section title="Castor JDO">
+
+      <p>The JDO sample will test persistence between a set of Java classes
+         (Product, ProductGroup, ProductInventory) and a known SQL schema.
+         You can use the <tt>create.sql</tt> file to generate the database schema
+         for the purpose of this test.</p>
+
+      <p>The mapping between the Java objects and SQL schema is described in
+         the file <tt>mapping.xml</tt>. The JDBC connection to use is describes
+         in the file <tt>database.xml</tt>. The provided file uses PostgreSQL as
+         the database server and JDBC driver, you can modify this file for your database
+         server and use any JDBC 1.0 or 2.0 driver.</p>
+
+      <p>The database information and mapping are automatically read from the
+         JDO example directory, there is no need to provide any parameters on
+         the command line.</p>
+
+      <p>The performance test uses the ODMG engine as well as direct JDBC
+         access. You must provide the JDBC URI and class name to use for
+         this test on the command line.</p>
+
+      <p>Usage:
+<pre><![CDATA[
+  test.sh jdo [mapping|odmg|perf <driver-class> <jdbc-uri>]
+
+  mapping  Reads the Java/SQL mapping from the mapping files and
+           displays the SQL statements used by the engine
+
+  odmg     Performs a persistence test using the ODMG API
+           Will attempt to query, deleter and create product,
+           group and computer objects in the database
+
+  perf     Performs a performance test comparing direct JDBC
+           query performance with ODMG query performance.
+           Requires the JDBC driver class name and JDBC URI
+           to be specified.
+]]></pre>
+         For example:
+<pre><![CDATA[
+  test.sh jdo odmg
+  test.sh jdo perf postgresql.Driver "jdbc:postgresql:test?user=test&password=test"
+]]></pre>
+      </p>
+    </section>
+
+    <section title="Castor DSML">
+
+      <p>Do not run this sample against a production LDAP server unless you
+         are sure it will not affect the information in your directory!</p>
+
+      <p>The DSML sample will attempt to import the supplied directory
+         information from the test.xml file using the import policy described
+         in the <tt>import.xml</tt>. file. It will then run a search against the
+         LDAP server using the search criteria in the search.xml file and dump it
+         to the console.</p>
+
+      <p>You must modify <tt>search.xml</tt>, <tt>import.xml</tt> and
+         <tt>test.xml</tt> and adapt them to your LDAP directory structure.
+         The default files assumes the root directory dc=exoffice,dc=com and
+         includes some sample LDAP entries.</p>
+
+      <p>Usage:
+<pre><![CDATA[
+  test.sh dsml [jndi|mozilla] <host> <root-dn> <root-pwd>
+
+  jndi|mozilla  Selects whether to use the JNDI or Mozilla Directory
+	        SDK implementations
+  host          The LDAP host name (port number is optional)
+  rood-dn       The root DN used for authenticating when importing
+  root-pwd      The root password used for authenticating when importing
+]]></pre>
+         For example:
+<pre><![CDATA[
+  test.sh dsml mozilla ldap.exoffice.org dc=exoffice,dc=com secret
+]]></pre>
+      </p>
+    </section>
+
+  </body>
+</document>
