@@ -125,9 +125,13 @@ public final class Namespaces {
 
         //-- Make sure prefix is not equal to "xml"
         if (XML_NAMESPACE_PREFIX.equalsIgnoreCase(prefix)) {
-            String err = "The prefix 'xml' is reserved (XML 1.0 Specification) " +
-                "and cannot be declared.";
-            throw new IllegalArgumentException(err);
+            if (!XML_NAMESPACE.equals(uri)) {
+                String err = "The prefix 'xml' is reserved (XML 1.0 Specification) " +
+                    "and cannot be declared.";
+                throw new IllegalArgumentException(err);
+            }
+            //-- if we make it here, just ignore it (it's already supported internally)
+            return;
         }
         //-- make sure URI is not equal to the XML 1.0 namespace
         else if (XML_NAMESPACE.equals(uri)) {
@@ -313,6 +317,12 @@ public final class Namespaces {
         if (_parent != null) {
             return _parent.getNonDefaultNamespacePrefix(nsURI);
         }
+        
+        //-- handle built-in namespace prefixes
+        if (XML_NAMESPACE.equals(nsURI)) {
+            return XML_NAMESPACE_PREFIX;
+        }
+        
         return null;
 
     } //-- method: getNonDefaultNamespacePrefix
