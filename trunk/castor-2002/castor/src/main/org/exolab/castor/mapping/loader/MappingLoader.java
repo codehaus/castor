@@ -305,7 +305,7 @@ public abstract class MappingLoader
         // class and make sure this class indeed extends it.
         if ( clsMap.getExtends() != null ) {
             try {
-                extend = getDescriptor( resolveType( clsMap.getExtends() ) );
+                extend = getDescriptor( resolveType( ( (ClassMapping) clsMap.getExtends() ).getName() ) );
                 if ( extend == null )
                     throw new MappingException( "mapping.extendsMissing",
                                                 clsMap.getExtends(), javaClass.getName() );
