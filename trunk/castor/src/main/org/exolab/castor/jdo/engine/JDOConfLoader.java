@@ -122,17 +122,31 @@ public class JDOConfLoader {
     	}
 	}
 
-    public static Database getDatabase (JdoConf jdoConf) 
+    public static Database[] getDatabases (JdoConf jdoConf) 
 	{
     	loadConfiguration (jdoConf);
     	return _jdoConf.getDatabase();
 	}
     
-    public static Database getDatabase (InputSource source, EntityResolver resolver) 
-        throws MappingException 
+    public static Database[] getDatabases (InputSource source, EntityResolver resolver) 
+    throws MappingException 
     {
         loadConfiguration (source, resolver);
         return _jdoConf.getDatabase();
+    }
+    
+    public static Database getDatabase (String databaseName, InputSource source, EntityResolver resolver) 
+        throws MappingException 
+    {
+        Database database = null;
+        loadConfiguration (source, resolver);
+        Database[] databases = getDatabases (source, resolver);
+        for (int i = 0; i < databases.length ;i++) {
+            if (databases[i].getName().equals (databaseName)) {
+                database =databases[i];
+            }
+        }
+        return database;
     }
     
     public static TransactionDemarcation getTransactionDemarcation (InputSource source, EntityResolver resolver)
@@ -142,11 +156,11 @@ public class JDOConfLoader {
         return _jdoConf.getTransactionDemarcation();
     }
     
-    public static Mapping[] getMapping (InputSource source, EntityResolver resolver) 
+    public static Mapping[] getMapping (String databaseName, InputSource source, EntityResolver resolver) 
         throws MappingException 
     {
         loadConfiguration  (source, resolver);
-        return _jdoConf.getDatabase().getMapping();
+        return getDatabase (databaseName, source, resolver).getMapping();
     }
     
     /**
