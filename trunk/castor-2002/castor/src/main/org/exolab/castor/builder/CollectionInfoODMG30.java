@@ -37,9 +37,8 @@ public class CollectionInfoODMG30 extends CollectionInfo {
      * @param jsc the JSourceCode in which to add the source to
     **/
     public void generateInitializerCode(JSourceCode jsc) {
-        jsc.add(getName());
-        //jsc.append(" = new Vector();");
-		jsc.append(" = ODMG.getImplementation().newDArray();");
+            jsc.add(getName());
+            jsc.append(" = ODMG.getImplementation().newDArray();");
     } //-- generateConstructorCode
 
     //------------------/
