@@ -82,7 +82,6 @@ public class InvoiceTest implements PropertyChangeListener {
 	    Invoice invoice = null;
 	    invoice = Invoice.unmarshal(new FileReader("invoice1.xml"));
 
-
 	    System.out.println();
 	    System.out.println("unmarshalled...performing tests...");
 	    System.out.println();
@@ -113,6 +112,9 @@ public class InvoiceTest implements PropertyChangeListener {
         System.out.println("Item:");
         Item[] item = invoice.getItem();
         for (int i=0; i<item.length; i++) {
+                String result = item[i].getInStock()? "yes":"no";
+                System.out.println("  In Stock: "+result);
+                System.out.println("  Category:"+item[i].getCategory());
                 System.out.println("  ID:"+item[i].getId());
                 System.out.println("  Quantity:"+item[i].getQuantity());
                 System.out.println("  Price:"+item[i].getPrice());
@@ -166,11 +168,12 @@ public class InvoiceTest implements PropertyChangeListener {
 
         System.out.println("   Date :"+day.toString());
         System.out.println("   Time :"+time.toString());
-	  System.out.println();
+	    System.out.println();
 
         System.out.println("----End of Invoice----");
+        invoice.marshal(new FileWriter("invoice2.xml"));
 
-	} catch (Exception e) {
+    } catch (Exception e) {
 	    e.printStackTrace();
 	}
 
