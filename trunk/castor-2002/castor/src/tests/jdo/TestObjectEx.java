@@ -76,7 +76,6 @@ public class TestObjectEx {
     {
         _value1 = DefaultValue1;
 		synchronized ( DefaultValue1 ) {
-			System.out.println("creating Testobject: id=" + idcount);
 	        _id = idcount;
 			_value2 = String.valueOf(idcount);
 			idcount++;

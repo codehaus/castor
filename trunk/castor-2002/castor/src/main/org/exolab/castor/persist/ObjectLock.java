@@ -294,7 +294,7 @@ final class ObjectLock
 		    // Detect possibility of dead-lock. Must remain in wait-on-lock
 		    // position until lock is granted or exception thrown.
 		    tx.setWaitOnLock( this );
-		    detectDeadlock( tx );
+		    detectDeadlock( tx, 10 );
 		    
 		    // Must wait for lock and then attempt to reacquire
 		    if ( write )
@@ -423,10 +423,12 @@ final class ObjectLock
      *
      * @param waitingTx The transaction waiting to acquire this lock
      */
-    private void detectDeadlock( TransactionContext waitingTx )
+    private void detectDeadlock( TransactionContext waitingTx, int numOfRec )
         throws LockNotGrantedException
     {
         ObjectLock waitOn;
+
+		if ( numOfRec <= 0 ) return;
 
         // Inspect write lock and all read locks (the two are mutually exclusive).
 
@@ -459,7 +461,7 @@ final class ObjectLock
                         throw new LockNotGrantedExceptionImpl( "persist.deadlock" );
                     read = read.next;
                 }
-                waitOn.detectDeadlock( waitingTx );
+                waitOn.detectDeadlock( waitingTx, numOfRec - 1 );
             }
         } else {
             LinkedTx lock;
@@ -485,7 +487,7 @@ final class ObjectLock
                             throw new LockNotGrantedExceptionImpl( "persist.deadlock" );
                         read = read.next;
                     }
-                    waitOn.detectDeadlock( waitingTx );
+                    waitOn.detectDeadlock( waitingTx, numOfRec - 1 );
                 }
                 lock = lock.next;
             }

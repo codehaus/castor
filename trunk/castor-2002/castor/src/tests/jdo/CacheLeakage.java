@@ -93,7 +93,7 @@ public class CacheLeakage extends CWTestCase {
     static final String    JDOValue = "jdo value";
 
 
-	static final int CACHE_SIZE = CacheEngine.DEFAULT_CACHE_VALUE;
+	static final int CACHE_SIZE = 10; //CacheEngine.DEFAULT_CACHE_VALUE;
 
 
     public CacheLeakage( CWTestCategory category ) throws CWClassConstructorException {
@@ -149,41 +149,45 @@ public class CacheLeakage extends CWTestCase {
 				_db.create( ooo[i] );
 			}
 
+			int count;
 			// create the same object again. see if DuplicatedIdentity throws 
-			db2 = _category.getDatabase( stream.verbose() );
-			db2.begin();
-			int count = 0;
-			// - create "cachesize - 5" objects for count limited
-			for ( int i=0; i<ooo.length; i++ ) {
-				try {
-					db2.create( ooo[i] );
-				} catch ( DuplicateIdentityException e ) {
-					// good. expected exception throws
-					count++;
+			for ( int j=0; j<100; j++ ) {
+				db2 = _category.getDatabase( stream.verbose() );
+				db2.begin();
+				count = 0;
+				// - create "cachesize - 5" objects for count limited
+				for ( int i=0; i<ooo.length; i++ ) {
+					try {
+						db2.create( ooo[i] );
+					} catch ( DuplicateIdentityException e ) {
+						// good. expected exception throws
+						count++;
+					}
 				}
-			}
-			db2.commit();
+				db2.commit();
 
-			if ( count != ooo.length ) {
-				result = false;
-				stream.writeVerbose( "Error: some object ate by the cache" );
-			} else {
-				stream.writeVerbose( "all objects in the cache" );
+				if ( count != ooo.length ) {
+					result = false;
+					stream.writeVerbose( "Error: some object ate by the cache" );
+				} else {
+					stream.writeVerbose( "all objects in the cache" );
+				}
 			}
 
 			// - check if each object have the right value
 			stream.writeVerbose( "checking if each object have the right value" );
+            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObjectEx object WHERE id = $1" );
 			breakpoint:
 			for ( int i=0; i<ooo.length; i++ ) {
 				//stream.writeVerbose( "Object identity of " + i + " " + _db.getIdentity(ooo[i]) );
 
-	            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObjectEx object WHERE id = $1" );
 	            oql.bind( i );
 	            enum = oql.execute();
 	            if ( enum.hasMoreElements() ) {
 	                object = (TestObjectEx) enum.nextElement();
 	                //stream.writeVerbose( "Retrieved object: " + object );
 					if ( object.getId() != i || object.getIntValue2() != i ) {
+						System.out.println("selecting for check: "+object.getId());
 						stream.writeVerbose( "Error: wrong object" );
 						result = false;
 						break breakpoint;
