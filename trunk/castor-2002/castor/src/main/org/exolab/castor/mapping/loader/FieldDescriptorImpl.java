@@ -174,6 +174,14 @@ public class FieldDescriptorImpl
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
         this._multi = fieldDesc.isMultivalued();
+    }
+
+    /**
+     * Constructor used by derived clases.
+     */
+    protected FieldDescriptorImpl( FieldDescriptorImpl fieldDesc )
+    {
+        this((FieldDescriptor) fieldDesc);
         this._convertor = fieldDesc.getConvertor();
         this._convertorParam = fieldDesc.getConvertorParam();
     }
