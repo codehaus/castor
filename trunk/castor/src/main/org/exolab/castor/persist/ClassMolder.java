@@ -3132,7 +3132,14 @@ abstract class CollectionProxy {
     }
 
     private static class ColProxy extends CollectionProxy {
-        private Collection _col;
+    	
+        /**
+         * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+         * Commons Logging</a> instance used for all logging.
+         */
+    	private static Log _log = LogFactory.getFactory().getInstance(ColProxy.class);
+    	
+    	private Collection _col;
         private FieldMolder _fm;
         private Object _object;
         private ClassLoader _cl;
@@ -3146,9 +3153,10 @@ abstract class CollectionProxy {
             return _col;
         }
         void add( Object key, Object value ) {
-            if ( !_fm.isAddable() )
+            if ( !_fm.isAddable() ) {
+            	_log.warn(Messages.format ("jdo.fieldMolder.not.addable", _fm, value.getClass().getName()));            	
                 _col.add( value );
-            else
+            } else
                 _fm.addValue( _object, value, _cl );
         }
         void close() {
