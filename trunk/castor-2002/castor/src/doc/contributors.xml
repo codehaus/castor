@@ -358,6 +358,12 @@
     <description>Proposed "trigger" mode of SEQUENCE key generator for PostgreSQL</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Thielen" given="Thorsten" />
+    <email>thorsten@ipcon.de</email>
+    <description>Added support for aliases in generated SQL queries</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
