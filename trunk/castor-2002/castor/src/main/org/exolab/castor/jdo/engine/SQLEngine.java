@@ -291,8 +291,8 @@ public final class SQLEngine
                     ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName(), null );
         }
 
-        if ( identity == null ) 
-            throw new PersistenceExceptionImpl( "persist.noIdentity" );
+        if ( identity == null )
+            throw new PersistenceExceptionImpl( "persist.noIdentity", _clsDesc.getJavaClass().getName() );
 
         return identity;
     }
@@ -312,13 +312,13 @@ public final class SQLEngine
                 identity = _extends.create( conn, fields, identity );
 
             if ( _keyGen == null && identity == null )
-                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+                throw new PersistenceExceptionImpl( "persist.noIdentity", _clsDesc.getJavaClass().getName() );
 
             // Generate key before INSERT
-            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) 
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT )
                 identity = generateKey( conn );
 
-            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) 
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
                 stmt = ( (Connection) conn ).prepareCall( _sqlCreate );
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
@@ -802,7 +802,7 @@ public final class SQLEngine
                 JDOClassDescriptor relDesc;
 
                 relDesc = (JDOClassDescriptor) fields[ i ].getClassDescriptor();
-                if ( relDesc == null )
+                if ( relDesc == null || ! fields[ i ].isMultivalued() )
                     allFields.addElement( new FieldInfo( fields[ i ], false ) );
                 else {
                     FieldDescriptor[] relFields;
