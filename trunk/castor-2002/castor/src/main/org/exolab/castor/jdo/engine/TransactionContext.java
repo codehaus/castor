@@ -56,6 +56,7 @@ import org.odmg.ObjectDeletedException;
 import org.odmg.LockNotGrantedException;
 import org.odmg.ClassNotPersistenceCapableException;
 import org.odmg.TransactionNotInProgressException;
+import org.odmg.TransactionAbortedException;
 import org.odmg.ODMGException;
 import org.odmg.ODMGRuntimeException;
 import org.exolab.castor.jdo.ODMGSQLException;
@@ -132,7 +133,6 @@ final class TransactionContext
 	oid = dbEngine.create( obj, this );
 	entry = addObjectEntry( obj, oid, dbEngine );
 	entry.created = true;
-	entry.writeLock = true;
     }
 
 
@@ -164,7 +164,6 @@ final class TransactionContext
 	if ( write ) {
 	    try {
 		entry.dbEngine.writeLock( obj, this );
-		entry.writeLock = true;
 	    } catch ( ODMGRuntimeException except ) {
 		throw new LockNotGrantedException( "Lock not granted for the following reason: " +
 						   except.toString() );
@@ -235,7 +234,7 @@ final class TransactionContext
 	    enum = _objects.elements();
 	    while ( enum.hasMoreElements() ) {
 		entry = (ObjectEntry) enum.nextElement();
-		if ( entry.deleted ) {
+		if ( entry.deleted && ! entry.prepared ) {
 		    entry.dbEngine.delete( entry.oid, this );
 		}
 	    }
@@ -244,7 +243,7 @@ final class TransactionContext
 		// If object has been deleted, delete it, if not
 		// store it (also creates)
 		entry = (ObjectEntry) enum.nextElement();
-		if (  ! entry.deleted ) {
+		if (  ! entry.deleted && ! entry.prepared ) {
 		    entry.dbEngine.store( entry.oid, this );
 		}
 	    }
@@ -277,17 +276,20 @@ final class TransactionContext
     }
 
 
-    synchronized void checkpoint()
+    synchronized boolean prepare()
+	throws TransactionAbortedException
     {
 	Enumeration enum;
 	ObjectEntry entry;
 	Object      obj;
 	Connection  conn;
+	boolean     readOnly;
 
 	if ( _status != Status.Open )
 	    throw new TransactionNotInProgressException( "Transaction has been closed" );
 
 	try {
+	    readOnly = true;
 	    enum = _objects.elements();
 	    while ( enum.hasMoreElements() ) {
 		entry = (ObjectEntry) enum.nextElement();
@@ -299,38 +301,18 @@ final class TransactionContext
 		// holding to the object, update to the new OID.
 		if ( entry.deleted ) {
 		    entry.dbEngine.delete( entry.oid, this );
+		    entry.prepared = true;
 		} else {
 		    entry.oid = entry.dbEngine.store( entry.oid, this );
-		    entry.created = false;
+		    entry.prepared = true;
 		}
+		readOnly = false;
 	    }
 
-	    enum = _conns.elements();
-	    while ( enum.hasMoreElements() ) {
-		conn = (Connection) enum.nextElement();
-		conn.commit();
-		conn.setAutoCommit( false );
-	    }
-	    _conns.clear();
-
-	    enum = _objects.keys();
-	    while ( enum.hasMoreElements() ) {
-		obj = enum.nextElement();
-		entry = (ObjectEntry) _objects.get( obj );
-		if ( entry.deleted ) {
-		    // Forget about deleted objects
-		    entry.dbEngine.forgetObject( entry.oid, this );
-		    _objects.remove( obj );
-		    enum = _objects.keys();
-		} else if ( entry.writeLock ) {
-		    // If object has been locked before, must reacquire lock.
-		    entry.dbEngine.writeLock( obj, this );
-		}
-	    }
 	} catch ( Exception except ) {
-	    rollback();
 	    throw new TransactionAbortedReasonException( except );
 	}
+	return ( ! readOnly );
     }
 
 
@@ -360,11 +342,15 @@ final class TransactionContext
 	    // its creation), otherwise release all locks. Recover
 	    // from any error.
 	    try {
+		// XXX Temporary hack until dirty cache is working
+		entry.dbEngine.forgetObject( entry.oid, this );
+		/*
 		if ( entry.created ) {
 		    entry.dbEngine.forgetObject( entry.oid, this );
 		} else {
 		    entry.dbEngine.releaseLock( entry.oid, this );
 		}
+		*/
 	    } catch ( Exception except ) { }
 	}
 	_objects.clear();
@@ -439,7 +425,7 @@ final class TransactionContext
 	OID            oid;
 	boolean        deleted;
 	boolean        created;
-	boolean        writeLock;
+	boolean        prepared;
     }
 
 
