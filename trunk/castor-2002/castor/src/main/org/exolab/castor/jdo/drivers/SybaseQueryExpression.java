@@ -101,12 +101,12 @@ public final class SybaseQueryExpression
             for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                 if ( j > 0 )
                     sql.append( JDBCSyntax.And );
-                sql.append( join.leftTable + JDBCSyntax.TableColumnSeparator + join.leftColumns[ j ] );
+                sql.append( join.leftTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.leftColumns[ j ] );
                 if ( join.outer )
                     sql.append( "*=" );
                 else
                     sql.append( OpEquals );
-                sql.append( join.rightTable + JDBCSyntax.TableColumnSeparator + join.rightColumns[ j ] );
+                sql.append( join.rightTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.rightColumns[ j ] );
             }
         }
         first = addWhereClause( sql, first );

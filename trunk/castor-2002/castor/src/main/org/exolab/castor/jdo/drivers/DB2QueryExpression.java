@@ -100,7 +100,8 @@ public final class DB2QueryExpression
             for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                 if ( j > 0 )
                     sql.append( JDBCSyntax.And );
-                sql.append( join.leftColumns[ j ] ).append( OpEquals ).append( join.rightColumns[ j ] );
+                sql.append( join.leftTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.leftColumns[ j ] ).append( OpEquals );
+                sql.append( join.rightTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.rightColumns[ j ] );
             }
             
             tables.remove( join.leftTable );
