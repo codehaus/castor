@@ -266,7 +266,7 @@ public class TypeConversion {
     {
 
         //-- copy valid facets
-        Enumeration enum = simpleType.getFacets();
+        Enumeration enum = getFacets(simpleType);
         while (enum.hasMoreElements()) {
 
             Facet facet = (Facet)enum.nextElement();
@@ -300,7 +300,7 @@ public class TypeConversion {
     {
 
         //-- copy valid facets
-        Enumeration enum = simpleType.getFacets();
+        Enumeration enum = getFacets(simpleType);
         while (enum.hasMoreElements()) {
 
             Facet facet = (Facet)enum.nextElement();
@@ -332,7 +332,7 @@ public class TypeConversion {
         (SimpleType simpleType, XSShort xsShort)
     {
         //-- copy valid facets
-        Enumeration enum = simpleType.getFacets();
+        Enumeration enum = getFacets(simpleType);
         while (enum.hasMoreElements()) {
 
             Facet facet = (Facet)enum.nextElement();
@@ -355,7 +355,25 @@ public class TypeConversion {
 
     } //-- toXSShort
 
-
+	/**
+	 * Returns a list of Facets from the simpleType 
+	 *	(duplicate facets due to extension are filtered out)
+     * @param simpletype the Simpletype we want the facets for
+     * @return Unique list of facets from the simple type
+	 */
+	private static Enumeration getFacets(SimpleType simpleType)
+	{
+		Hashtable hashTable = new Hashtable();
+        Enumeration enum = simpleType.getFacets();
+		while (enum.hasMoreElements()) {
+			
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();			
+			hashTable.put(name, facet);
+		}
+		return hashTable.elements();
+	}
+	
     /**
      * Converts the given simpletype to an XSString
      * @param simpletype the Simpletype to convert
