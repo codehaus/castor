@@ -325,11 +325,8 @@ public class XMLClassDescriptorImpl extends Validator
                 desc = (XMLFieldDescriptor)elementDescriptors.get(i);
                 if (desc == null) continue;
                 if (desc.matches(name)) {
-                   if (desc.matches(name)) {
-                      if (!desc.matches(WILDCARD)) return desc;
-                      result = desc;
-                   }
-
+                    if (!desc.matches(WILDCARD)) return desc;
+                    result = desc;
                 }
             }
             if (result != null)
