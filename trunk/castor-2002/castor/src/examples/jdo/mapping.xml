@@ -85,7 +85,7 @@
     </field>
     <field name="Product" type="myapp.Product">
       <sql name="prod_id" />
-      <xml name="product" node="attribute" />
+      <xml name="product" node="element" />
     </field>
     <field name="Name">
       <sql name="name" />
