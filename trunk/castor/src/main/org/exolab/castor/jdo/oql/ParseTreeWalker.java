@@ -1085,15 +1085,16 @@ public class ParseTreeWalker implements TokenTypes
     int pos = sqlExpr.indexOf("?", startPos);
     int SQLParamIndex = 1;
     while ( pos != -1 ) {
+      String paramString;
       int endPos = sqlExpr.indexOf(" ", pos);
-      Integer paramNumber = null;
       if ( endPos != -1 )
-        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
+        paramString = sqlExpr.substring(pos + 1, endPos);
       else
-        paramNumber = new Integer(sqlExpr.substring(pos + 1));
+        paramString = sqlExpr.substring(pos + 1);
+      Integer paramNumber = new Integer(paramString);
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
       paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );	// including trailing "?"
       startPos = endPos < 0 ? sqlExpr.length() : endPos;
       pos = sqlExpr.indexOf("?", startPos);
     }
@@ -1122,22 +1123,23 @@ public class ParseTreeWalker implements TokenTypes
     int pos = sqlExpr.indexOf("?", startPos);
     int SQLParamIndex = _SQLParamIndex;
     while ( pos != -1 ) {
+      String paramString;
       int endPos = sqlExpr.indexOf(" ", pos);
-      Integer paramNumber = null;
       if ( endPos != -1 )
-        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
+        paramString = sqlExpr.substring(pos + 1, endPos);
       else
-        paramNumber = new Integer(sqlExpr.substring(pos + 1));
+        paramString = sqlExpr.substring(pos + 1);
+      Integer paramNumber = new Integer(paramString);
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
       paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );	// including trailing "?"
       startPos = endPos < 0 ? sqlExpr.length() : endPos;
       pos = sqlExpr.indexOf("?", startPos);
     }
     if ( startPos < sqlExpr.length() )
       sb.append( sqlExpr.substring( startPos ) );
 
-    _queryExpr.addLimitClause( sb.toString() );
+    _queryExpr.addLimitClause(sb.toString(), _SQLParamIndex, SQLParamIndex-1);
     // System.out.println(sb.toString());
     _SQLParamIndex = SQLParamIndex;
   }
@@ -1158,22 +1160,23 @@ private void addOffsetClause(ParseTreeNode offsetClause)
     int pos = sqlExpr.indexOf("?", startPos);
     int SQLParamIndex = _SQLParamIndex;
     while ( pos != -1 ) {
+      String paramString;
       int endPos = sqlExpr.indexOf(" ", pos);
-      Integer paramNumber = null;
       if ( endPos != -1 )
-        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
+        paramString = sqlExpr.substring(pos + 1, endPos);
       else
-        paramNumber = new Integer(sqlExpr.substring(pos + 1));
+        paramString = sqlExpr.substring(pos + 1);
+      Integer paramNumber = paramNumber = new Integer(paramString);
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
       paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );	// including trailing "?"
       startPos = endPos < 0 ? sqlExpr.length() : endPos;
       pos = sqlExpr.indexOf("?", startPos);
     }
     if ( startPos < sqlExpr.length() )
       sb.append( sqlExpr.substring( startPos ) );
 
-    _queryExpr.addOffsetClause( sb.toString() );
+    _queryExpr.addOffsetClause(sb.toString(), _SQLParamIndex, SQLParamIndex-1);
     _SQLParamIndex = SQLParamIndex;
   }
 
