@@ -122,7 +122,7 @@ public final class EntityFieldInfo {
     /**
      * The type conversion parameter of the expected type and declared type.
      */
-    public Object[] typeParam;
+    public String[] typeParam;
 
     /**
      * The Entity in which this field belongs to.
