@@ -615,6 +615,9 @@ public class DescriptorSourceFactory {
                 return "java.lang.Integer.TYPE";
             else if (jType == JType.Double)
                 return "java.lang.Double.TYPE";
+            else if (jType == JType.Boolean) {
+                return "java.lang.Boolean.TYPE";
+            }
         }
         return jType.toString() + ".class";
     } //-- classType
