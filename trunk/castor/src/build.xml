@@ -115,8 +115,9 @@
             tarball          Builds the binary distribution in the dist directory
             cvs              Update the sources from the CVS
 
-            gen.jdo.conf     Use the Source Generator to create the classes for the jdo-conf.xsd
-            gen.pvd          Use the Source Generator to create the classes for the pvd.xsd
+            gen.jdo.conf     Use the Source Generator to create the Java classes for jdo-conf.xsd
+            gen.mapping      Use the Source Generator to create the Java classes for mapping.xsd
+            gen.pvd          Use the Source Generator to create the Java classes for the pvd.xsd
             
             prepare-eclipse  Put Eclipse project files into place (src/main only).
             prepare-eclipse-complete  Put Eclipse project files into place.
@@ -492,7 +493,7 @@
    </target>
 
     <target name="gen.jdo.conf"
-            description="Use the Source Generator to create the classes for the jdo-conf.xsd">
+            description="Use the Source Generator to create the Java classes for jdo-conf.xsd">
         <delete dir="${gen.src}"/>
         <mkdir dir="${gen.src}"/>
         <java classname="org.exolab.castor.builder.SourceGenerator"
@@ -512,6 +513,27 @@
             <src path="${gen.src}" />
             <classpath refid="build.classpath"/>
         </javac>
+    </target>
+
+    <target name="gen.mapping"
+            description="Use the Source Generator to create the Java classes for mapping.xsd">
+        <delete dir="${gen.src}/mapping"/>
+        <mkdir dir="${gen.src}/mapping"/>
+        <java classname="org.exolab.castor.builder.SourceGenerator"
+              classpathref="build.classpath">
+            <arg value="-i"/>
+            <arg value="${main}/org/exolab/castor/mapping/mapping.xsd"/>
+            <arg value="-binding-file" />
+            <arg value="${main}/org/exolab/castor/mapping/mapping-binding.xml" />
+            <arg value="-package"/>
+            <arg value="org.exolab.castor.mapping.xml"/>
+            <arg value="-dest"/>
+            <arg value="${gen.src}/mapping"/>
+            <arg value="-line-separator"/>
+            <arg value="unix"/>
+            <arg value="-types"/>
+            <arg value="j2"/>
+        </java>
     </target>
 
     <target name="gen.pvd"
