@@ -59,13 +59,20 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 
     public IncludeUnmarshaller
         (Schema schema, AttributeList atts, Resolver resolver, Locator locator)
+        throws SAXException
+    {
+      this(schema, atts, resolver, locator, null);
+    }
+
+    public IncludeUnmarshaller
+        (Schema schema, AttributeList atts, Resolver resolver, Locator locator, SchemaUnmarshallerState state)
 		throws SAXException
     {
         super();
         setResolver(resolver);
 
 		String include = atts.getValue("schemaLocation");
-		if (include==null)
+		if (include == null)
 			throw new SAXException("'schemaLocation' attribute missing on 'include'");
         //if the path is relative Xerces append the "user.Dir"
         //we need to keep the base directory of the document
@@ -87,10 +94,10 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
             }
         }
 
-        if (schema.includeProcessed(include))
-			return;
+        if (state.processed(include))
+            return;
 
-        schema.addInclude(include);
+        state.markAsProcessed(include);
 
 		Parser parser = null;
 		try {
@@ -102,7 +109,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		}
 		else
 		{
-			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(true);
+			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(true, state);
 			schemaUnmarshaller.setSchema(schema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
