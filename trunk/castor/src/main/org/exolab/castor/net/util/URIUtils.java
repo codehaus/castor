@@ -48,6 +48,8 @@ package org.exolab.castor.net.util;
 import java.io.*;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
 /**
  * A utility class for URI handling
@@ -203,6 +205,57 @@ public class URIUtils {
 	    return href;
 	} //-- getRelativeURI
 
+    /**
+     * This method removes "." or ".." from absolute URL.
+     * I needed this method because the JDK doesn't do this
+     * automatically when creating URLs.
+     *
+     * @param uri the absolute URI to normalize
+     */
+    public static String normalize(String absoluteURL) 
+        throws MalformedURLException
+    {
+        if (absoluteURL == null) return absoluteURL;
+        if (absoluteURL.indexOf('.') < 0) return absoluteURL;
+        
+        //-- Note: using StringTokenizer and Stacks
+        //-- is not very efficient, this may need        
+        //-- some optimizing
+        Stack tokens = new Stack();
+        StringTokenizer st = new StringTokenizer(absoluteURL, "/", true);
+        String last = null;
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if ("/".equals(token)) {
+                if ("/".equals(last)) {
+                    tokens.push("");
+                }
+            }
+            else if ("..".equals(token)) {
+                if (tokens.empty()) {
+                    //-- this should be an error
+                    throw new MalformedURLException("invalid absolute URL: " + absoluteURL);
+                }
+                tokens.pop();
+            }
+            else {
+                if (!".".equals(token)) {
+                    tokens.push(token);
+                }
+            }
+            last = token;
+        }
+        
+        //-- rebuild URL
+        StringBuffer buffer = new StringBuffer(absoluteURL.length());
+        for (int i = 0; i < tokens.size(); i++) {
+            if (i > 0) buffer.append('/');
+            buffer.append(tokens.elementAt(i).toString());
+        }
+        return buffer.toString();
+    } //-- normalize
+    
+    
 	/**
 	 *
 	**/
@@ -229,7 +282,6 @@ public class URIUtils {
 	    }
 	    else absolute = href;
 	    
-
 	    try {
 	        //-- try to create a new URL and see if MalformedURLExcetion is
 	        //-- ever thrown
@@ -248,16 +300,20 @@ public class URIUtils {
 	                return absolute;
 	            }
 	        }
+	        
 	    }
+	    
 
 	    // Try local files
 	    String fileURL = absolute;
 	    File iFile = new File(href);
-	    if (iFile.isAbsolute())
-	        fileURL = createFileURL(iFile.getAbsolutePath());
-	    else {
-	        iFile = new File(fileURL);
-	        fileURL = createFileURL(iFile.getAbsolutePath());
+	    boolean exists = iFile.exists();
+	    fileURL = createFileURL(iFile.getAbsolutePath());
+	    if (!iFile.isAbsolute()) {
+	        iFile = new File(absolute);
+	        if (iFile.exists() || (!exists)) {
+	            fileURL = createFileURL(iFile.getAbsolutePath());
+	        }
 	    }
 	    
 	    //-- one last sanity check
@@ -304,5 +360,6 @@ public class URIUtils {
 	    }
 	    return sb.toString();
 	} //-- createFileURL
+
 
 } //-- URIUtils
