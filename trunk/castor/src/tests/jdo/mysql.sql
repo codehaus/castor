@@ -1,3 +1,6 @@
+# NOTE: to make all the tests for mysql pass, you need InnoDB-support:
+# http://dev.mysql.com/doc/mysql/en/InnoDB_in_MySQL_3.23.html
+
 drop table if exists test_table;
 
 create table test_table (
@@ -269,7 +272,7 @@ create table test_types (
   char_val  char(1)        null,
   bool_val  char(1)        null,
   int_date  integer        null,
-  str_time  char(12)       null,
+  str_time  char(23)       null,
   num_date  bigint         null,
   blob_val  longblob       null,
   clob_val  longtext       null,
