@@ -883,6 +883,8 @@ public class SourceGenerator
             if (!sInfo.processed(jClass)) {
                 processJClass(jClass, sInfo);
             }
+            if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS)
+                break;
         }
 
     } //-- createClasses
@@ -926,6 +928,8 @@ public class SourceGenerator
 
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
 
+        if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS) return;
+
 	    if (elementDecl == null) return;
         //-- when mapping schema types, only interested in producing classes
 	    //-- for elements with anonymous complex types
@@ -959,8 +963,11 @@ public class SourceGenerator
         else if (xmlType.isComplexType()) {
 
 		    JClass[] classes = _sourceFactory.createSourceCode(_bindingComponent, sInfo);
-            for (int i = 0; i < classes.length; i++)
+            for (int i = 0; i < classes.length; i++) {
                 processJClass(classes[i], sInfo);
+                if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS)
+                    return;
+            }
             
             //only create classes for types that are not imported
             if (xmlType.getSchema() == _bindingComponent.getSchema())
@@ -997,8 +1004,11 @@ public class SourceGenerator
         _bindingComponent.setView(group);
         JClass[] classes = _sourceFactory.createSourceCode(_bindingComponent, sInfo);
         processContentModel(group, sInfo);
-        for (int i = 0; i < classes.length; i++)
+        for (int i = 0; i < classes.length; i++) {
             processJClass(classes[i], sInfo);
+            if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS)
+                return;
+        }
     } //-- createClasses
 
     /**
@@ -1007,7 +1017,10 @@ public class SourceGenerator
      * @param complexType the ComplexType to process
     **/
     private void processComplexType(ComplexType complexType, SGStateInfo sInfo) {
-
+        
+        if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS)
+            return;
+        
         if (complexType == null) return;
         _bindingComponent.setView(complexType);
         
@@ -1016,8 +1029,11 @@ public class SourceGenerator
             //-- handle top-level complextypes
             if (complexType.isTopLevel()) {
                 JClass[] classes = _sourceFactory.createSourceCode(_bindingComponent, sInfo);
-                for (int i = 0; i < classes.length; i++)
+                for (int i = 0; i < classes.length; i++) {
                     processJClass(classes[i], sInfo);
+                    if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS)
+                        return;
+                }
             }
 
             
@@ -1055,6 +1071,8 @@ public class SourceGenerator
     **/
     private void processAttributes(ComplexType complexType, SGStateInfo sInfo) {
 
+        if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS) return;
+
         if (complexType == null) return;
         Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements()) {
@@ -1070,6 +1088,9 @@ public class SourceGenerator
      * @param sInfo the current source generator state information
     **/
     private void processContentModel(ContentModelGroup cmGroup, SGStateInfo sInfo) {
+        
+        if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS) return;
+
 
         if (cmGroup == null)
             return;
@@ -1110,6 +1131,8 @@ public class SourceGenerator
      * @param sInfo
      */
     private void processSimpleType(SimpleType simpleType, SGStateInfo sInfo) {
+
+        if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS) return;
 
         if (simpleType == null) 
             return;
@@ -1179,9 +1202,66 @@ public class SourceGenerator
     **/
     private void processJClass(JClass jClass, SGStateInfo state) {
 
-
+        if (state.getStatusCode() == SGStateInfo.STOP_STATUS) return;
+        
         if (state.processed(jClass))
-           return;
+            return;
+                        
+        ClassInfo classInfo = state.resolve(jClass);
+            
+        //-- check for class name conflicts
+        JClass conflict = state.getProcessed(jClass.getName());
+        
+        if (conflict != null) {
+            ClassInfo temp = state.resolve(conflict);
+            
+            //-- if the ClassInfo are equal, we can just return
+            if (temp == classInfo) return;
+            
+            //-- Find the Schema structures that are conflicting
+            Annotated a1 = null;
+            Annotated a2 = null;
+            
+            Enumeration enum = state.keys();
+            while (enum.hasMoreElements()) {
+                Object key = enum.nextElement();
+                if (!(key instanceof Annotated)) continue; 
+                ClassInfo cInfo = state.resolve(key);
+                if (classInfo == cInfo) a1 = (Annotated)key;
+                else if (temp == cInfo) a2 = (Annotated)key;
+                
+                if ((a1 != null) && (a2 != null)) break;                
+            }
+            
+            
+            StringBuffer error = new StringBuffer();
+            error.append("Warning: A class name generation conflict has occured between ");
+            if (a1 != null) {
+                error.append(SchemaNames.getStructureName(a1));
+            }
+            else {
+                error.append(classInfo.getNodeTypeName());
+            }
+            error.append(" '");
+            error.append(classInfo.getNodeName());
+            error.append("' and ");
+            if (a2 != null) {
+                error.append(SchemaNames.getStructureName(a2));
+            }
+            else {
+                error.append(temp.getNodeTypeName());
+            }
+            error.append(" '");
+            error.append(temp.getNodeName());
+            error.append("'. Please use a Binding file to solve this problem.");
+            error.append("Continue anyway [not recommended] ");
+            
+            char ch = _dialog.confirm(error.toString(), "yn", "y = yes, n = no");
+            if (ch == 'n') state.setStatusCode(SGStateInfo.STOP_STATUS);
+            return;
+        }
+        
+        state.markAsProcessed(jClass);
 
         boolean allowPrinting = true;
 
@@ -1216,7 +1296,6 @@ public class SourceGenerator
         //- Create ClassDescriptor and print -/
         //------------------------------------/
 
-        ClassInfo classInfo = state.resolve(jClass);
 
         if (_createDescriptors && (classInfo != null)) {
 
@@ -1247,7 +1326,6 @@ public class SourceGenerator
             }
         }
 
-        state.markAsProcessed(jClass);
     } //-- processJClass
 
     /**
