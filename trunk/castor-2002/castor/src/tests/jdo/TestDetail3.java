@@ -38,25 +38,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
+ * $Id $
  */
 
 
 package jdo;
 
 
-import java.util.Enumeration;
-import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-
 /**
- * Test object mapping to test_detaul used to conduct relation tests.
+ * Test object mapping to test_detail2 used to conduct relation tests.
  */
-public class TestDetail
+public class TestDetail3
 {
 
 
@@ -66,32 +60,25 @@ public class TestDetail
     private String     _value;
 
 
-    private TestMaster _master;
+    private TestDetail _detail;
 
 
-    private ArrayList     _details2;
+    static final int       DefaultId = 100;
 
 
-    private TestDetail3   _detail3;
+    static final String    DefaultValue = "value";
 
 
-    static final int       DefaultId = 5;
-
-
-    static final String    DefaultValue = "group";
-
-
-    public TestDetail( int id )
+    public TestDetail3( int id )
     {
-        this();
         _id = id;
+        _value = DefaultValue;
     }
 
 
-    public TestDetail()
+    public TestDetail3()
     {
         _value = DefaultValue;
-        _details2 = new ArrayList();
     }
 
 
@@ -119,89 +106,21 @@ public class TestDetail
     }
 
 
-    public void setMaster( TestMaster master )
+    public void setDetail( TestDetail detail )
     {
-        _master = master;
+        _detail = detail;
     }
 
 
-    public TestMaster getMaster()
+    public TestDetail getDetail()
     {
-        return _master;
-    }
-
-
-    public void addDetail2( TestDetail2 detail2 )
-    {
-        _details2.add( detail2 );
-        detail2.setDetail( this );
-    }
-
-
-    public ArrayList getDetails2()
-    {
-        return _details2;
-    }
-
-
-    public void setDetail3( TestDetail3 detail3 )
-    {
-        if ( _detail3 != null )
-            _detail3.setDetail( null );
-
-        if ( detail3 != null ) 
-            detail3.setDetail( this );
-        _detail3 = detail3;
-    }
-
-
-    public TestDetail3 getDetail3() {
-        return _detail3;
-    }
-
-
-    public void setDetails2( ArrayList list ) {
-        _details2 = list;
-    }
-
-    public TestDetail2 createDetail2()
-    {
-        return new TestDetail2();
-    }
-
-
-    public TestDetail2 findDetail2( int id )
-    {
-        Iterator enum;
-        TestDetail2 detail2;
-
-        if ( _details2 == null ) {
-            return null;
-        }
-
-        enum = _details2.iterator();
-        while ( enum.hasNext() ) {
-            detail2 = (TestDetail2) enum.next();
-            if ( detail2.getId() == id ) {
-                return detail2;
-            }
-        }
-        return null;
+        return _detail;
     }
 
 
     public String toString()
     {
-        String details2 = "";
-
-        if ( _details2 != null ) {
-            for ( int i = 0 ; i < _details2.size() ; ++i ) {
-                if ( i > 0 )
-                    details2 = details2 + ", ";
-                details2 = details2 + _details2.get( i ).toString();
-            }
-        }
-        return "<detail: "+_id + " / " + _value + " / " + (_master==null?0:_master.getId()) + " / { " + details2 + " }"+">";
+        return _id + " / " + _value + " / " + (_detail==null?0:_detail.getId());
     }
 
 
@@ -213,8 +132,8 @@ public class TestDetail
     {
         if ( other == this )
             return true;
-        if ( other != null && other instanceof TestDetail ) {
-           return ( ( (TestDetail) other )._id == _id );
+        if ( other != null && other instanceof TestDetail3 ) {
+           return ( ( (TestDetail3) other )._id == _id );
         }
         return false;
     }
