@@ -665,7 +665,7 @@ public abstract class LRU {
 		 */
 		public final static int DEFAULT_PRECISION = 1000;
 
-		private TimeThread ticker = new TimeThread( DEFAULT_PRECISION );
+		private static TimeThread ticker = new TimeThread( DEFAULT_PRECISION );
 
 		private int interval;
 		private int tailtime;
@@ -902,6 +902,7 @@ public abstract class LRU {
 			private boolean isStarted;
 
 			public TimeThread(int tick) {
+                super("Time-limited cache daemon");
 				this.tick = tick;
 				setDaemon(true);
 				setPriority( MIN_PRIORITY );
@@ -979,7 +980,7 @@ public abstract class LRU {
 						super.dispose(o);
 					}
 				}
-				TimeLimited cl = new TestLRU(2);
+				TimeLimited cl = new TestLRU(5);
 				Thread t = Thread.currentThread();
 
 				Enumeration e = cl.elements();
