@@ -282,7 +282,7 @@ public final class CacheEngine
                 // Note: this should be done at the very end, otherwise
                 // the implicit recursion may cause unpleasant surprises
                 handler.normalize( this );
-            }
+            } 
         }
         return handler;
     }
@@ -523,13 +523,14 @@ public final class CacheEngine
                 } catch ( ObjectNotFoundException except ) {
                     // Object was not found in persistent storge, must dump
                     // it from the cache
-                    typeInfo.cache.removeLock( oid );
                     lock.delete( tx );
+                    typeInfo.cache.removeLock( oid );
+
                     throw except;
                 } catch ( PersistenceException except ) {
                     // Report any error talking to the persistence engine
-                    typeInfo.cache.removeLock( oid );
                     lock.delete( tx );
+                    typeInfo.cache.removeLock( oid );
                     throw except;
                 }
                 // At this point the object is known to exist in
@@ -620,7 +621,17 @@ public final class CacheEngine
                 lock = typeInfo.cache.getLockForAquire( oid );
                 if ( lock != null ) {
                     try {
-                        fields = (Object[]) lock.acquire( tx, true, 0 );
+                        int count = 10;
+                        while ( true ) {
+                            try {
+                                fields = (Object[]) lock.acquire( tx, true, 0 );
+                                break;
+                            } catch ( ObjectDeletedWaitingForLockException e ) {
+                                count--;
+                                if ( count <= 0 )
+                                    throw e;
+                            }                            
+                        }
                     } catch ( LockNotGrantedException except ) {
                         // Someone else is using the object, definite duplicate key
                         throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
@@ -742,12 +753,12 @@ public final class CacheEngine
         // Get the lock from the OID. Assure the object has a write
         // lock -- since this was done during the transaction, we
         // don't wait to acquire the lock.
-        lock = typeInfo.cache.getLockForAquire( oid );
-        if ( lock == null )
-            throw new IllegalStateException( Messages.format( "persist.internal",
-                                                              "Attempt to delete object for which no lock was acquired" ) );
-        try {
-            fields = (Object[]) lock.acquire( tx, true, 0 );
+        try {            
+            lock = typeInfo.cache.getLockForAquire( oid );
+            lock.acquire( tx, true, 0 );
+            if ( lock == null )
+                throw new IllegalStateException( Messages.format( "persist.internal",
+                        "Attempt to delete object for which no lock was acquired" ) );
         } catch ( LockNotGrantedException except ) {
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to delete object for which no lock was acquired" ) );
@@ -1149,7 +1160,7 @@ public final class CacheEngine
                 // Object has been modified, must write it. Acquire a write lock and
                 // block is some other transaction has a read lock on the object.
                 // First one to call this method gets to commit.
-                original = (Object[]) lock.acquire( tx, ( modified == ClassHandler.LockRequired ), timeout );
+                original = (Object[]) lock.acquire( tx, /*(*/ ClassHandler.Unmodified != modified /* == ClassHandler.LockRequired )*/, timeout );
 
                 // The object has an old identity, it existed before, one need
                 // to store the new contents.
