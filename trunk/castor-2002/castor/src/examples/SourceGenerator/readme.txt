@@ -1,5 +1,5 @@
 
-A simple example using the SourceGenerator
+A simple example using the Source Generator
 
 
 files: 
@@ -26,9 +26,6 @@ You will be prompted to continue at each step.
 
 The example unmarshals "invoice1.xml" and displays the shipping information.
 
-Note : be sure to have included the required librairies in your classpath (located in the 'lib' directory in castor project):
-       xerces.jar
-       jakarta-regexp-1.1.jar
 
 
 

@@ -1,4 +1,3 @@
-<!-- edited with XML Spy v3.0.7 NT (http://www.xmlspy.com) by Arnaud (gna) -->
 <project name="Castor" default="main" basedir=".">
     <target name="init">
         <property name="source" value="src"/>
