@@ -1,9 +1,19 @@
 <?xml version='1.0'?>
+<!--
+    Castor Testing Framework Test Descriptor XML Schema
+    Namespace: http://castor.exolab.org/Test
+    
+    This schema is used to generate the
+    org.exolab.castor.tests.framework.testdescriptor package
+    *Note*: This schema is under evolution and subject to change.
+ 	This schema is under the Exolab license
+ -->
+<!-- $Id$ -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2000/10/XMLSchema"
   			targetNamespace="http://castor.exolab.org/Test"
   			elementFormDefault="qualified">
   	
-  	<!-- blabla to come-->	
+  	<!-- The root element which contains an header and a test element-->	
 	<xsd:element name="TestDescriptor">
 		<xsd:complexType>
 			<xsd:sequence>
@@ -68,7 +78,7 @@
 		<xsd:complexType>
 			<xsd:sequence>
 					<!-- the qualified name of the root Object -->
-					<!-- later: define a patter to describe a Java quailified name-->
+					<!-- later: define a pattern to describe a Java quailified name-->
 					<xsd:element name="Root_Object" type="RootType" minOccurs="1" maxOccurs="1"/>
 					<!-- the mapping file used (if any) -->
 					<xsd:element name="Mapping_File" type="xsd:string" minOccurs="0" maxOccurs="1"/>
@@ -102,11 +112,14 @@
 			<!-- Extensible-->
 		</xsd:restriction>
 	</xsd:simpleType>		
-
+	
+	<!--A root object in an object model-->
 	<xsd:complexType name="RootType">
 		<xsd:complexContent>
 			<xsd:extension base="StringType">
+				<!--set to true to generate randomly the given Object Model-->
 				<xsd:attribute name="random" type="boolean" use="default" value="false"/>
+				<!--set to true to dump the given Object Model states in specific files-->
 				<xsd:attribute name="dump"   type="boolean" use="default" value="false"/>
 			</xsd:extension>
 		</xsd:complexContent>
