@@ -224,4 +224,9 @@ public class DriverDescriptor implements org.exolab.castor.xml.XMLClassDescripto
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }

@@ -196,4 +196,9 @@ public class ParamDescriptor implements org.exolab.castor.xml.XMLClassDescriptor
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }

@@ -227,4 +227,9 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }

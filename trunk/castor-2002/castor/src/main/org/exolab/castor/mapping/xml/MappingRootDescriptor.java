@@ -258,4 +258,10 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }
