@@ -900,22 +900,39 @@ public abstract class MappingLoader
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
-
+                    
                     String methodName = fieldMap.getSetMethod();
                     Class type = fieldType;
                     if (colType != null) {
                         if (!methodName.startsWith(ADD_METHOD_PREFIX))
                             type = colType;
                     }
-
-                    setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
-                                              type , false );
-                    if ( setMethod == null )
-                        throw new MappingException( "mapping.accessorNotFound",
-                                                    fieldMap.getSetMethod(), type,
-                                                    javaClass.getName() );
-                    if ( fieldType == null )
-                        fieldType = setMethod.getParameterTypes()[ 0 ];
+                    
+                    //-- set via constructor?
+                    if (methodName.startsWith("%")) {
+                        //-- validate index value
+                        String sIdx = methodName.substring(1);
+                        int index = 0;
+                        try {
+                            index = Integer.parseInt(sIdx);
+                        }
+                        catch(NumberFormatException nfe) {
+                            throw new MappingException("mapping.invalidParameterIndex", sIdx);
+                        }
+                        if ((index < 1) || (index > 9)) {
+                            throw new MappingException("mapping.invalidParameterIndex", sIdx);
+                        }
+                    }
+                    else {
+                        setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
+                                                type , false );
+                        if ( setMethod == null )
+                            throw new MappingException( "mapping.accessorNotFound",
+                                                        fieldMap.getSetMethod(), type,
+                                                        javaClass.getName() );
+                        if ( fieldType == null )
+                            fieldType = setMethod.getParameterTypes()[ 0 ];
+                    }
                 }
             }
 
