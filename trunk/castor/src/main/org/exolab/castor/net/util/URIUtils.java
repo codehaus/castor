@@ -54,7 +54,7 @@ import java.util.StringTokenizer;
 /**
  * A utility class for URI handling
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
 **/
 public class URIUtils {
 
@@ -65,13 +65,34 @@ public class URIUtils {
 
     /**
      * the path separator for an URI
-    **/
+     */
     private static final char HREF_PATH_SEP = '/';
+    
+    /**
+     * the path separate for a URL as a String
+     */
+    private static final String URL_PATH_SEP_STR = "/";
 
     /**
      * The Device separator for an URI
-    **/
+     */
     private static final char DEVICE_SEP = '|';
+
+    /**
+     * The current directory designator
+     */
+    private static final String CURRENT_DIR_OP = ".";
+    
+    /**
+     * The parent directory designator
+     */
+    private static final String PARENT_DIR_OP  = "..";
+    
+    /**
+     * Used when checking for "." or ".." in a path
+     */
+    private static final String DOT_SLASH = "./";
+    
 
 	/**
 	 * Returns an InputStream for the file represented by the href
@@ -81,9 +102,10 @@ public class URIUtils {
 	 * is a relative href
 	 * set documentBase to null if there is none.
 	 * @return an InputStream to the desired resource
-	 * @exception java.io.FileNotFoundException when the file could not be
+	 * @throws java.io.FileNotFoundException when the file could not be
 	 * found
-	**/
+     * @throws java.io.IOException
+	 */
 	public static InputStream getInputStream(String href, String documentBase)
 	    throws java.io.FileNotFoundException, java.io.IOException
 	{
@@ -222,16 +244,16 @@ public class URIUtils {
         //-- is not very efficient, this may need        
         //-- some optimizing
         Stack tokens = new Stack();
-        StringTokenizer st = new StringTokenizer(absoluteURL, "/", true);
+        StringTokenizer st = new StringTokenizer(absoluteURL, URL_PATH_SEP_STR, true);
         String last = null;
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if ("/".equals(token)) {
-                if ("/".equals(last)) {
+            if (URL_PATH_SEP_STR.equals(token)) {
+                if (URL_PATH_SEP_STR.equals(last)) {
                     tokens.push("");
                 }
             }
-            else if ("..".equals(token)) {
+            else if (PARENT_DIR_OP.equals(token)) {
                 if (tokens.empty()) {
                     //-- this should be an error
                     throw new MalformedURLException("invalid absolute URL: " + absoluteURL);
@@ -239,7 +261,7 @@ public class URIUtils {
                 tokens.pop();
             }
             else {
-                if (!".".equals(token)) {
+                if (!CURRENT_DIR_OP.equals(token)) {
                     tokens.push(token);
                 }
             }
@@ -249,7 +271,7 @@ public class URIUtils {
         //-- rebuild URL
         StringBuffer buffer = new StringBuffer(absoluteURL.length());
         for (int i = 0; i < tokens.size(); i++) {
-            if (i > 0) buffer.append('/');
+            if (i > 0) buffer.append(HREF_PATH_SEP);
             buffer.append(tokens.elementAt(i).toString());
         }
         return buffer.toString();
@@ -279,12 +301,20 @@ public class URIUtils {
 	            absolute = documentBase+href;
 	        else
 	            absolute = documentBase+HREF_PATH_SEP+href;
+            
+            
 	    }
 	    else absolute = href;
 	    
+        
 	    try {
 	        //-- try to create a new URL and see if MalformedURLExcetion is
 	        //-- ever thrown
+            
+            if (absolute.indexOf("./") >= 0) {
+                //-- normalize . or .. from URL
+            	absolute = normalize(absolute);
+            }
 	        URL url = new URL(absolute);
 	        url = null; //-- to remove compiler warnings
 	        return absolute;
