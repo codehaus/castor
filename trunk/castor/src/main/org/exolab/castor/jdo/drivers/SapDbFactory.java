@@ -76,9 +76,9 @@ public final class SapDbFactory
     }
 
 
-    /** 
-     * Quotes words in SQL statements. This method must recieve a non null, 
-     * non empty string. 
+    /**
+     * Quotes words in SQL statements. This method must recieve a non null,
+     * non empty string.
      *
      * @param name The SQL string that needs quotes added
      */
@@ -91,7 +91,7 @@ public final class SapDbFactory
 
 
         buffer.append('\"');
-        buffer.append(tokens.nextToken());
+        buffer.append(tokens.nextToken().toUpperCase());
 
         while(tokens.hasMoreTokens()) {
             token = tokens.nextToken();
@@ -104,6 +104,7 @@ public final class SapDbFactory
             else
             {
                 buffer.append("\".\"");
+                token = token.toUpperCase();
             }
 
             buffer.append( token );
@@ -117,7 +118,7 @@ public final class SapDbFactory
 
     /**
      * Tests a text string against a known list of functions to determine
-     * if it is a function. 
+     * if it is a function.
      *
      * @param text The text to be checked
      * @see #quoteName(String)
@@ -127,7 +128,7 @@ public final class SapDbFactory
         boolean isAFunction = false;
 
         // Add all supported functions in SAP DB here
-        String[] knownFunctions = new String[] 
+        String[] knownFunctions = new String[]
         {
             "nextval",
             "currval"
