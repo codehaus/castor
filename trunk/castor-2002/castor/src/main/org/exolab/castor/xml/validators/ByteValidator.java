@@ -159,9 +159,6 @@ public class ByteValidator extends PatternValidator
         throws ValidationException
     {
 
-        System.out.println("Validating :"+b);
-        System.out.println(useMax);
-        System.out.println(max);
         if (useFixed) {
             if (b != fixed) {
                 String err = b + " is not equal to the fixed value of "
