@@ -58,7 +58,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectDeletedWaitingForLockException
+class ObjectDeletedWaitingForLockException
     extends LockNotGrantedException
 {
 

@@ -53,7 +53,7 @@ import java.util.NoSuchElementException;
  *
  * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
  */
-public abstract class LRU {
+abstract class LRU {
 
     /**
      * Map type for no caching as the caching mechanism. All object
