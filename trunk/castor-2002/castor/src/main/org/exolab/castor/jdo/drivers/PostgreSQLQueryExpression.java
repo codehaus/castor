@@ -92,13 +92,6 @@ public final class PostgreSQLQueryExpression
 
 
         sql.append( JDBCSyntax.From );
-        // Add all the tables to the FROM clause
-        enum = _tables.elements();
-        while ( enum.hasMoreElements() ) {
-            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
-            if ( enum.hasMoreElements() )
-                sql.append( JDBCSyntax.TableSeparator );
-        }
         // Use outer join syntax for all outer joins. Inner joins come later.
         tables = (Hashtable) _tables.clone();
         first = true;
