@@ -12,6 +12,22 @@ XML:     Added support for specifying the destination output directory for the
 XML:     Added support for fixed attributes, this currently works for string
          or integer values
 
+JDO:     Fixed bug: NULL value in database was read as 0 for Java wrappers
+         of primitive types (Long, Integer, etc.), now they are read as "null".
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:     Changes to org.exolab.castor.jdo.Persistent interface:
+         - now it can be used to perform addition database operations during
+           loading/storing/creating/deleting objects, e.g. to implement some
+           types of relations that are not supported by Castor yet,
+           see TestPersistent.java and Persistent.java in src/test/jdo.
+         - now jdoStore has the parameter "boolean modified" that is convenient
+           for setting fields like "modification time".
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:     Changed the inner SELECT syntax in MaxKeyGenerator to make it work
+         with hsql. (Contributed by Santiago Arriaga <santiago@catnet.com.mx>)
+
 Version 0.8.7  June 2, 2000
 ---------------------------
 

@@ -79,21 +79,32 @@ public interface CallbackInterceptor
      * stored.
      *
      * @param object The object
+     * @param modified Is the object modified?
      * @throws Exception An exception occured, the object cannot be stored
      */
-    public void storing( Object object )
+    public void storing( Object object, boolean modified )
         throws Exception;
 
 
     /**
-     * Called to indicate that an object has been deleted.
+     * Called to indicate that an object has been created.
+     *
+     * @param object The object
+     */
+    public void created( Object object )
+        throws Exception;
+
+
+    /**
+     * Called to indicate that an object is to be deleted.
      * <p>
      * This method is made at commit time on objects deleted during the
      * transaction before setting their fields to null.
      *
      * @param object The object
      */
-    public void removing( Object object );
+    public void removing( Object object )
+        throws Exception;
 
 
     /**

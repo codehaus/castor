@@ -156,7 +156,7 @@ public class TypeHandling
             stream.writeVerbose( "OK: Handled date/time types" );
 
 
-            stream.writeVerbose( "Testing null in integer field" );
+            stream.writeVerbose( "Testing null in integer and long fields" );
             db.begin();
             oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
@@ -164,6 +164,7 @@ public class TypeHandling
                 types = (TestTypes) enum.nextElement();
                 types.setIntValue( 5 );
                 types.deleteIntValue();
+                types.setLongValue( null );
             }
             db.commit();
             db.begin();
@@ -172,10 +173,15 @@ public class TypeHandling
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
                 if ( types.getIntValue() != 0 || types.hasIntValue() ) {
-                    stream.writeVerbose( "Error: null integer value was set" );
+                    stream.writeVerbose( "Error: null integer value was not set" );
+                    result = false;
+                }
+                if ( types.getLongValue() != null ) {
+                    stream.writeVerbose( "Error: null long value was not set" );
                     result = false;
                 }
                 types.setIntValue( 5 );
+                types.setLongValue( new Long( 5 ) );
             } else {
                 stream.writeVerbose( "Error: failed to load object" );
                 result = false;
@@ -187,7 +193,11 @@ public class TypeHandling
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
                 if ( types.getIntValue() != 5 || ! types.hasIntValue() ) {
-                    stream.writeVerbose( "Error: null integer value was not set" );
+                    stream.writeVerbose( "Error: non-null integer value was not set" );
+                    result = false;
+                }
+                if ( ! types.getLongValue().equals( new Long( 5 ) ) ) {
+                    stream.writeVerbose( "Error: non-null long value was not set" );
                     result = false;
                 }
             } else {
@@ -198,7 +208,7 @@ public class TypeHandling
             if ( ! result )
                 return false;
             else
-                stream.writeVerbose( "OK: null in integer field passed" );
+                stream.writeVerbose( "OK: null in integer and long field passed" );
 
 
             stream.writeVerbose( "Testing value in char field" );

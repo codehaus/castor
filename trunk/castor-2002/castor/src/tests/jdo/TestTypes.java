@@ -75,6 +75,9 @@ public class TestTypes
     private boolean        _intExists = false;
 
 
+    private Long           _longValue;
+
+
     private char           _charValue;
 
 
@@ -175,6 +178,18 @@ public class TestTypes
     public void deleteIntValue()
     {
         _intExists = false;
+    }
+
+
+    public void setLongValue( Long value )
+    {
+        _longValue = value;
+    }
+
+
+    public Long getLongValue()
+    {
+        return _longValue;
     }
 
 

@@ -198,10 +198,6 @@ public class Dependent
                 stream.writeVerbose( "Error: failed to create master with details and group" );
                 result = false;
             }
-            if ( qres.hasMoreElements() ) {
-                stream.writeVerbose( "Error: loaded detail 5 with details2: " + qres.next() );
-                result  = false;
-            }
             if ( result )
                 stream.writeVerbose( "Created master with details: " + master );
             db.commit();

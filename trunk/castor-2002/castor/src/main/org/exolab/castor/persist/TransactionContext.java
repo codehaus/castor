@@ -523,15 +523,6 @@ public abstract class TransactionContext
                             throw new PersistenceExceptionImpl( "persist.deletedNotFound", identity );
                     }
                 }
-                try {
-                    // Emulate object deleting
-                    if ( handler.getCallback() != null )
-                        handler.getCallback().removing( entry.object );
-                } catch ( Exception except ) {
-                    if ( handler.getCallback() != null )
-                        handler.getCallback().releasing( object, false );
-                    throw new PersistenceExceptionImpl( except );
-                }
             }
         }
 
@@ -540,14 +531,14 @@ public abstract class TransactionContext
             // to prevent circular references.
             if ( entry == null) 
                 entry = addObjectEntry( object, oid, engine );
-            if ( handler.getCallback() != null ) {
-                handler.getCallback().using( object, _db );
-                handler.getCallback().storing( object );
-            }
             oid = engine.create( this, object, identity );
             removeObjectEntry( object );
             entry = addObjectEntry( object, oid, engine );
             entry.created = true;
+            if ( handler.getCallback() != null ) {
+                handler.getCallback().using( object, _db );
+                handler.getCallback().created( object );
+            }
             return oid;
         } catch ( Exception except ) {
 
@@ -647,6 +638,16 @@ public abstract class TransactionContext
         // Cannot delete same object twice
         if ( entry.deleted )
             throw new ObjectDeletedExceptionImpl( object.getClass(), entry.oid.getIdentity() );
+
+        try {
+            ClassHandler handler;
+                
+            handler = entry.engine.getClassHandler( entry.object.getClass() );
+            if ( handler != null && handler.getCallback() != null )
+                handler.getCallback().removing( entry.object );
+        } catch ( Exception except ) {
+            throw new PersistenceExceptionImpl( except );
+        }
 
         // Must acquire a write lock on the object in order to delete it,
         // prevents object form being deleted while someone else is
@@ -848,7 +849,6 @@ public abstract class TransactionContext
 
         try {
             done = new Vector();
-            _status = Status.STATUS_PREPARING;
             while ( _objects.size() != done.size() ) {
                 todo = new Vector();
                 enum = _objects.elements();
@@ -870,8 +870,6 @@ public abstract class TransactionContext
                         // if the primary identity has been changed
                         handler = entry.engine.getClassHandler( entry.object.getClass() );
                         identity = handler.getIdentity( entry.object );
-                        if ( handler.getCallback() != null )
-                            handler.getCallback().storing( entry.object );
                         oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
                         if ( oid != null ) {
                             entry.oid = oid;
@@ -882,6 +880,8 @@ public abstract class TransactionContext
                 }
             }
 
+            _status = Status.STATUS_PREPARING;
+
             // Process all deleted objects last in FIFO order.
             while ( _deletedList != null ) {
                 ClassHandler handler;
@@ -889,8 +889,6 @@ public abstract class TransactionContext
                 entry = _deletedList;
                 _deletedList = _deletedList.nextDeleted;
                 handler = entry.engine.getClassHandler( entry.object.getClass() );
-                if ( handler.getCallback() != null )
-                    handler.getCallback().removing( entry.object );
                 entry.engine.delete( this, entry.object.getClass(), entry.oid.getIdentity() );
             }
 
@@ -1135,6 +1133,15 @@ public abstract class TransactionContext
 
         entry = getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) );
         if ( entry != null && ! entry.deleted ) {
+            try {
+                ClassHandler handler;
+                
+                handler = entry.engine.getClassHandler( entry.object.getClass() );
+                if ( handler != null && handler.getCallback() != null )
+                    handler.getCallback().removing( entry.object );
+            } catch ( Exception except ) {
+                throw new PersistenceExceptionImpl( except );
+            }
             try {
                 entry.deleted = true;
                 entry.engine.softLock( this, entry.oid, _lockTimeout );
