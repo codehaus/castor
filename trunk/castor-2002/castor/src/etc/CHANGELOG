@@ -1,6 +1,9 @@
 Version 0.8.9
 -------------
 
+JDO:    Added UUID key generator.
+        (contributed by Thomas Fach <thomas.fach@publica.de>)
+
 JDO:    jdoBeforeCreate() callback method has been added to Persistent
         interface. It is called during db.create() just before creating
         object in the persistent storage (Oleg Nitz).
