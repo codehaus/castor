@@ -1,6 +1,10 @@
 
 Version (CVS) 
 -------------
+XML:   Add a new option in the CTF to allow dynamic configuration
+       of the marshalling framework by using the java reflection.
+       (Arnaud - 20031017)
+
 XML:   Fix attribute processing when marshalling an AnyNode.
        Namespace handling was not enabled
        (Arnaud - 20031016)       
