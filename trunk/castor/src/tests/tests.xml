@@ -299,7 +299,6 @@
     <!-- <case class="jdo.ListTypes" /> -->
     <case class="jdo.TestLimitClause" id="TC62" />
   </category>
-  </category>
 
   <category name="hsql" class="jdo.JDOCategory">
     <description>JDO tests for Hypersonic SQL</description>
