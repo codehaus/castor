@@ -145,8 +145,23 @@ public class MemberFactory {
         Datatype datatype = attribute.getDatatype();
         XSType   xsType = null;
         
-        if (datatype != null)
+        boolean enumeration = false;
+        
+        if (datatype != null) {
             xsType = TypeConversion.convertType(datatype);
+            //-- This is NOT clean...we need a different approach
+            //-- here...
+            //-- modify package name if necessary
+            if (datatype.hasFacet(Facet.ENUMERATION)) {
+                enumeration = true;
+                JClass jClass = (JClass) xsType.getJType();
+                String packageName = jClass.getPackageName();
+                if ((packageName != null) && (packageName.length() > 0))
+                    jClass.setPackageName(packageName + ".types");
+                else
+                    jClass.setPackageName("types");
+            }
+        }
         else
             xsType = new XSString();
             
