@@ -48,6 +48,8 @@ package org.exolab.castor.util;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 
 /**
@@ -86,21 +88,27 @@ import org.exolab.castor.jdo.engine.JDBCSyntax;
  */
 final public class SqlBindParser
 {
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance(SqlBindParser.class);
+
 	/** 
 	 * complete SQL expression to be parsed 
 	 */
     private String _sql;	
-    
+
     /** 
      * current parse position 
      */
     private int _pos;
-    
+
     /** 
      * last parse position 
      */
     private int _lastPos;	
-    
+
     /** 
      * position of the current bind variable 
      */
@@ -226,7 +234,15 @@ final public class SqlBindParser
             if (bindNum == 0)
                 bindNum = i;	// handle CALL SQL statements with unnumbered bind variables
 
-            stmt.setObject(i, values[bindNum-1]);
+            Object value = values[bindNum-1];
+
+            if (_log.isDebugEnabled())
+                if (value == null)
+                    _log.debug(Messages.format("jdo.bindSqlNull", Integer.toString(i)));
+                else
+                    _log.debug(Messages.format("jdo.bindSql", Integer.toString(i), value, value.getClass().getName()));
+
+            stmt.setObject(i, value);
         }
     }
 }
