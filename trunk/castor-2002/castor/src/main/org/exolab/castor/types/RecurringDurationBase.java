@@ -39,7 +39,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author          Changes
@@ -71,7 +71,8 @@ import java.text.SimpleDateFormat;
  * @see TimeInstant
  * @see TimePeriod
  */
-abstract class RecurringDurationBase {
+public abstract class RecurringDurationBase
+    implements java.io.Serializable {
 
     /**
      * the period facet of this recurringDuration
@@ -113,7 +114,7 @@ abstract class RecurringDurationBase {
     private boolean _zoneNegative = false;
     private boolean _isNegative = false;
 
-    public RecurringDurationBase() {
+    protected RecurringDurationBase() {
     }
 
     /**
@@ -124,7 +125,7 @@ abstract class RecurringDurationBase {
      * @return a recurringDurationBase with the facets
      *           duration and period set up
      */
-    public RecurringDurationBase(TimeDuration duration, TimeDuration period)
+    protected RecurringDurationBase(TimeDuration duration, TimeDuration period)
     {
         try {
             this.setDuration(duration);
@@ -145,7 +146,7 @@ abstract class RecurringDurationBase {
      * @throws IllegalArgumentException this exception is thrown when the parameter strings
      *                                  are not corresponding to valid TimeDuration
      */
-    public RecurringDurationBase(String duration, String period)
+    protected RecurringDurationBase(String duration, String period)
         throws IllegalArgumentException
     {
         try {
@@ -170,7 +171,7 @@ abstract class RecurringDurationBase {
      * @see setValues
      */
 
-    public RecurringDurationBase(String duration, String period, short[] values)
+    protected RecurringDurationBase(String duration, String period, short[] values)
         throws OperationNotSupportedException
     {
         new RecurringDuration(duration, period);

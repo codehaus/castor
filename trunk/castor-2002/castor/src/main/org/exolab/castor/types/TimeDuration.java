@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author           Changes
@@ -60,7 +60,9 @@ import java.text.ParseException;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  **/
-public class TimeDuration  {
+public class TimeDuration
+    implements java.io.Serializable
+{
 
     /** Set to true and recompile to include debugging code in class. */
     private static final boolean DEBUG = false;
