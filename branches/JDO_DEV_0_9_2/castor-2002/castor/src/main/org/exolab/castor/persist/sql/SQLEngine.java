@@ -491,12 +491,11 @@ public final class SQLEngine implements Persistence {
      * @param tx The transaction context
      * @param conn An open connection
      * @param entity The entity to create
-     * @return The object's identity
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object create( TransactionContext tx, Object conn, Entity entity )
+    public void create( TransactionContext tx, Object conn, Entity entity )
         throws DuplicateIdentityException, PersistenceException {
 
         PreparedStatement stmt = null;
@@ -603,9 +602,6 @@ public final class SQLEngine implements Persistence {
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT ) {
                 entity.identity = generateKey( conn );
             }
-
-            return entity.identity;
-
         } catch ( SQLException except ) {
             // [oleg] Check for duplicate key based on X/Open error code
             // Bad way: all validation exceptions are reported as DuplicateKey
@@ -756,14 +752,13 @@ public final class SQLEngine implements Persistence {
      * @param conn An open connection
      * @param entity The entity to store
      * @param original The original entity, or null
-     * @return The object's stamp, or null
      * @throws ObjectModifiedException The object has been modified
      *  in persistence storage since it was last loaded
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( TransactionContext tx, Object conn, Entity entity, Entity original )
+    public void store( TransactionContext tx, Object conn, Entity entity, Entity original )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
 
         PreparedStatement stmt = null;
@@ -887,7 +882,6 @@ public final class SQLEngine implements Persistence {
                 throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), entity.identity) );
             }
             stmt.close();
-            return null;
         } catch ( SQLException except ) {
             try {
                 // Close the insert/select statement
@@ -1033,7 +1027,7 @@ public final class SQLEngine implements Persistence {
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
+    public void load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException {
 
         PreparedStatement stmt;
@@ -1161,7 +1155,6 @@ public final class SQLEngine implements Persistence {
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
         entity.objectStamp = stamp;
-        return stamp;
     }
 
     /**
@@ -1177,9 +1170,8 @@ public final class SQLEngine implements Persistence {
      * @param accessMode The access mode (null equals shared)
      * @throws PersistenceException A persistence error occured
      */
-    public Object loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
+    public void loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
             throws PersistenceException {
-        return null;
     }
 
     private void buildSql() throws QueryException {
