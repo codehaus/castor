@@ -155,7 +155,7 @@ public class DatabaseImpl
         // locking mode.
         DatabaseRegistry dbs;
         
-        dbs = DatabaseRegistry.getDatabaseRegistry( dbName, classLoader );
+        dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
@@ -182,13 +182,15 @@ public class DatabaseImpl
 
 
     /**
-     * Accessor method for the application class loader. For use in OQLQueryImpl.
+     * Gets the current application ClassLoader's instance. 
+     * For use in OQLQueryImpl and TransactionContext.
+     * @return the current ClassLoader's instance, or <code>null</code> if not provided
      */
-    ClassLoader getClassLoader()
+    public ClassLoader getClassLoader()
     {
         return _classLoader;
     }
-
+    
 
     public synchronized void close()
         throws PersistenceException
