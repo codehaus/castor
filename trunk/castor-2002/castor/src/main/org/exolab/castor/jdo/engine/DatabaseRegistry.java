@@ -215,6 +215,7 @@ public class DatabaseRegistry
         Database           database;
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
+        Key                key;  
 
         unm = new Unmarshaller( Database.class );
         try {
@@ -226,7 +227,8 @@ public class DatabaseRegistry
             else
                 unm.setEntityResolver( new DTDResolver( resolver ) );
             database = (Database) unm.unmarshal( source );
-            if ( _databases.get( database.getName() ) != null )
+            key = new Key( database.getName(), loader );
+            if ( _databases.get( key ) != null )
                 return;
 
             // Complain if no database engine was specified, otherwise get
@@ -308,7 +310,7 @@ public class DatabaseRegistry
             }
 
             // Register the new registry object for the given database name.
-            _databases.put( dbs.getName(), dbs );
+            _databases.put( key, dbs );
 
         } catch ( MappingException except ) {
             throw except;
@@ -364,11 +366,11 @@ public class DatabaseRegistry
     }
 
 
-    public static synchronized DatabaseRegistry getDatabaseRegistry( String name )
+    public static synchronized DatabaseRegistry getDatabaseRegistry( String name, ClassLoader loader )
     {
         DatabaseRegistry dbs;
 
-        dbs = (DatabaseRegistry) _databases.get( name );
+        dbs = (DatabaseRegistry) _databases.get( new Key( name, loader ) );
         return dbs;
     }
 
@@ -385,5 +387,45 @@ public class DatabaseRegistry
             return DriverManager.getConnection( dbs._jdbcUrl, dbs._jdbcProps );
     }
 
+
+
+    /**
+     * Keys for Hashtable  _databases
+     */
+    private static class Key {
+        
+        /**
+         * The database name. Not null.
+         */
+        private String _name;
+
+        /**
+         * The application class loader. May be null.
+         */
+        private ClassLoader _classLoader;
+        
+        Key( String name, ClassLoader classLoader ) {
+            _name = name;
+            _classLoader = classLoader; 
+        }
+
+        public boolean equals( Object obj ) {
+            Key other;
+            
+            if ( obj == null || ! (obj instanceof Key) ) {
+                return false;
+            }
+            other = (Key) obj;
+            return (_name.equals(other._name) && _classLoader == other._classLoader );
+        }
+
+        public int hashCode() {
+            return _name.hashCode() + ( _classLoader == null ? 0 : _classLoader.hashCode() );
+        }
+
+        public String toString() {
+            return _name + "/" + _classLoader;
+        }
+    }
 
 }

@@ -86,7 +86,6 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
-import org.exolab.castor.util.ClassUtils;
 
 
 /**
@@ -255,7 +254,7 @@ public class OQLQueryImpl
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
-        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree);
+        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _dbImpl.getClassLoader());
 
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
@@ -372,7 +371,10 @@ public class OQLQueryImpl
             throw new QueryException( "Missing object name" );
         }
         try {
-            _objClass = ClassUtils.loadAppClass( objType );
+            if ( _dbImpl.getClassLoader() == null )
+                _objClass = Class.forName( objType );
+            else
+                _objClass = _dbImpl.getClassLoader().loadClass( objType );
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
