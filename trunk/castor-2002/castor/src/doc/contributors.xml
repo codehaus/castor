@@ -110,6 +110,12 @@
     <description>Responsible for uncovering bugs that no one else noticed.</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Arias" given="Luis"/>
+    <email>luis@elysia.com</email>
+    <description>XML Schema related issues</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
@@ -163,7 +169,7 @@
   </type>
 
   <type name="Feedback">
-    The following have offered valuable feedback that has been beneficial
+    The following have offered valuable feedback (including bug reports) that has been beneficial
     to the development and stability.
   </type>
 
