@@ -26,6 +26,8 @@
          Note, that if the object doesn't exist in the database, 
          db.update(object) is equivalent to 
          db.create(object).
+         Also note, that it is natural to read the object in the first
+         transaction in the read-only mode.
       </p>
       <p>Since the time interval between the first and the second 
          transaction is relatively big, it is desirable to perform dirty 
