@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,6 +52,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
+import org.exolab.castor.mapping.AbstractFieldHandler;
+import org.exolab.castor.mapping.ExtendedFieldHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
@@ -74,7 +76,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public final class FieldHandlerImpl
-    implements FieldHandler
+    extends AbstractFieldHandler
 {
 
 
@@ -415,6 +417,16 @@ public final class FieldHandlerImpl
                     throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor", value.getClass().getName() ) );
                 }
             }
+            else {
+                //-- unwrap MapItem if necessary
+                //if (_colHandler != null) {
+                //    if ((value instanceof MapItem) && (_fieldType != MapItem.class))
+                //    {
+                //        value = ((MapItem)value).getValue();
+                //    }
+                //}
+            }
+
 
             try {
                 if ( _handler != null )
@@ -645,15 +657,29 @@ public final class FieldHandlerImpl
 
 
     /**
-     * @deprecated
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
      */
-    public void checkValidity( Object object )
-        throws ValidityException
+    public Object newInstance( Object parent )
+        throws IllegalStateException
     {
+        return newInstance( parent, null);
     }
 
-
-    public Object newInstance( Object object )
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @param args the set of constructor arguments
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent, Object[] args )
         throws IllegalStateException
     {
         if (_fieldType.isInterface() && _createMethod == null)
@@ -661,12 +687,16 @@ public final class FieldHandlerImpl
             
         if ( _immutable )
             throw new IllegalStateException( Messages.format( "mapping.classNotConstructable", _fieldType ) );
-        if ( _handler != null )
-            return _handler.newInstance( object );
+        if ( _handler != null ) {
+            if (_handler instanceof ExtendedFieldHandler)
+                return ((ExtendedFieldHandler)_handler).newInstance( parent, args );
+            else
+                return _handler.newInstance( parent );
+        }
         // If we have a create method and parent object, call the create method.
-        if ( _createMethod != null && object != null ) {
+        if ( _createMethod != null && parent != null ) {
             try {
-                return _createMethod.invoke( object, null );
+                return _createMethod.invoke( parent, args );
             } catch ( IllegalAccessException except ) {
                 // This should never happen
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
@@ -675,9 +705,8 @@ public final class FieldHandlerImpl
                 throw new MappingRuntimeException(except.getTargetException());
             }
         }
-        return Types.newInstance( _fieldType );
-    }
-
+        return Types.newInstance( _fieldType, args );
+    } //-- newInstance
 
     /**
      * Mutator method used by {@link MappingLoader}.
