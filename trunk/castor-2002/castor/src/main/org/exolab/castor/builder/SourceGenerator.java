@@ -728,19 +728,12 @@ public class SourceGenerator {
 
         //-- print class
         if (allowPrinting) {
-            
+
             //hack for the moment
             //to avoid the compiler complaining with java.util.Date
             jClass.removeImport("org.exolab.castor.types.Date");
             jClass.setHeader(header);
-            
-            //-- set super class if necessary
-            if (jClass.getSuperClass() == null) {
-                String base = this.getProperty(Property.SUPER_CLASS, null);
-                if (base != null)
-                    jClass.setSuperClass(base);
-            }
-                
+
             jClass.print(destDir,lineSeparator);
         }
 
