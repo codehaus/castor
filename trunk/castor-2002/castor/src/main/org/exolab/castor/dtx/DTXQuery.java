@@ -66,6 +66,33 @@ import org.exolab.castor.xml.schema.reader.*;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
 
+/**
+ * A single query that takes OQL query language, reads data from an
+ * RDBMS, and returns the results as SAX events. The query can be
+ * parameterized, and be re-used with different bound values.
+ * 
+ * There are currently some severe limitations on the contents of the
+ * OQL query. The query needs to be a SELECT and must return a single
+ * class.  However, it can handle multiple returned objects, which are
+ * sent to the DocumentHandler as multiple documents.
+ *
+ * DTXQuery's can't be created on their own; use the DTXEngine to
+ * prepare a new query.
+ *
+ * An additional note: the bind() methods take the parameters in order
+ * that they appear, NOT using the number value of the parameter
+ * name. So, if you have a query like:
+ * 
+ * <pre>... WHERE foo.id = $2 AND bar.name = $1 ... </pre>
+ * 
+ * then the statement bind(1, 12) will bind the value 12 to the first
+ * parameter, even though it's named "$2." This may or may not be
+ * changed in future releases.
+ *
+ * @author <a href="0@exoffice.com">Evan Prodromou</a>
+ * @version $Revision$ $Date$
+ */
+
 public class DTXQuery {
 
     protected DTXEngine _eng = null;
@@ -80,13 +107,173 @@ public class DTXQuery {
     protected HashMap _cols = null;
     protected HashMap _classes = null;
 
+    /**
+     * Set the DocumentHandler that will receive the results (as SAX
+     * events) for this query. By default, the query will use the
+     * document handler of its DTXEngine.
+     * 
+     * Changing the DocumentHandler in the middle of a query is
+     * ill-advised.
+     *
+     * @param handler The DocumentHandler to use.
+     */
+     
     public void setHandler(DocumentHandler handler) {
 	_handler = handler;
     }
 
+    /**
+     * Set the DocumentHandler that will receive the results (as SAX
+     * events) for this query. By default, the query will use the
+     * document handler of its DTXEngine.
+     * 
+     * @param handler The DocumentHandler to use.
+     */
+     
     public void setLogWriter(PrintWriter logWriter) {
 	_logWriter = logWriter;
     }
+
+    /**
+     * Binds an Object value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value Object to bind.
+     */
+
+    public void bind(int param, Object value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setObject(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * Binds an String value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value String to bind.
+     */
+
+    public void bind(int param, String value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setString(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * Binds an integer value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value int to bind.
+     */
+
+    public void bind(int param, int value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setInt(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * Binds a long integer value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value long integer to bind.
+     */
+
+    public void bind(int param, long value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setLong(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * Binds a float value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value float to bind.
+     */
+
+    public void bind(int param, float value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setFloat(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * Binds a double value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value double to bind.
+     */
+
+    public void bind(int param, double value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setDouble(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * Binds a boolean value to a parameter in the query.
+     * 
+     * @param param 1-based index of the param (see note above).
+     * @param value boolean to bind.
+     */
+
+    public void bind(int param, boolean value) throws DTXException {
+	if (_stmt == null) {
+	    throw new DTXException("No prepared statement.");
+	}
+
+	try {
+	    _stmt.setBoolean(param, value);
+	} catch (SQLException sqle) {
+	    throw new DTXException(sqle);
+	}
+    }
+
+    /**
+     * This method executes the query. All results of the query are
+     * sent to the DocumentHandler specified by setHandler() as SAX
+     * events. 
+     *  
+     * @param handler The DocumentHandler to use.
+     */
 
     public void execute() throws DTXException {
 	if (_stmt == null) {
@@ -102,98 +289,23 @@ public class DTXQuery {
 	}
     }
 
-    public void bind(int param, Object value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setObject(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
-    public void bind(int param, String value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setString(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
-    public void bind(int param, int value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setInt(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
-    public void bind(int param, long value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setLong(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
-    public void bind(int param, float value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setFloat(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
-    public void bind(int param, double value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setDouble(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
-    public void bind(int param, boolean value) throws DTXException {
-	if (_stmt == null) {
-	    throw new DTXException("No prepared statement.");
-	}
-
-	try {
-	    _stmt.setBoolean(param, value);
-	} catch (SQLException sqle) {
-	    throw new DTXException(sqle);
-	}
-    }
-
     /* Package scope */
+
+    /* Default do-nothing constructor. */
 
     DTXQuery() {
     }
 
+    /* Sets the engine to use for getting connections and
+       descriptors. */
+
     void setEngine(DTXEngine eng) {
 	_eng = eng;
     }
+
+    /* Prepares this query for use. Parses the OQL into SQL (plus some
+       residual information), connects to the database and prepares a
+       SQL statement. */
 
     void prepare(String oql) throws DTXException {
 	try {
@@ -207,18 +319,28 @@ public class DTXQuery {
 
     /* protected */
 
+    /* Translates a JDBC resultset into SAX events. Uses the recursive
+       helper to get started. */
+
     protected void emitSaxEvents(ResultSet rs) throws DTXException {
 
 	try {
 	    if (rs.next()) {
 		emitSaxInt(rs, 0);
 	    }
-
 	} catch (Exception e) {
 	    e.printStackTrace(_logWriter);
 	    throw new DTXException(e);
 	}
     }
+
+    /* Recursive SAX emitter. Emits top-level elements, attributes,
+       and simple (non-object) elements, then descends recursively
+       into lower and lower child elements.
+       
+       This code is -highly- loopy, and it makes some assumptions
+       about the ordering of sub-elements that may be unacceptable.
+    */
 
     protected boolean emitSaxInt(ResultSet rs, int idIndex) throws DTXException {
 
@@ -335,6 +457,14 @@ public class DTXQuery {
 	return hasValue;
     }
 
+    /* OQL parser. Most of this code is highjacked from the JDO
+       OQLQueryImpl, with a lot of changes to keep from using
+       JDOClassDescriptors, which depend on loading a Java class.
+
+       It'd be nice to refactor this so there's only one OQL-parsing
+       class.
+    */
+
     protected String parseOQL(String oql) throws DTXException {
 
 	try {
@@ -421,6 +551,17 @@ public class DTXQuery {
 	    throw new DTXException(e);
 	}
     }
+
+
+    /* This makes the basic parts of a query. Again, a lot of code was
+       lifted from e.g. SQLEngine, and edited to use *Mapping instead
+       of *Descriptor. It also should probably be re-factored
+       somewhere.
+
+       Additionally, contained ("rel") elements go through the same
+       kind of manipulation as the main class; this stuff should be
+       re-factored, too.
+    */
 
     protected void initQuery(ClassMapping clsMapping, QueryExpression expr)
         throws DTXException
@@ -587,6 +728,9 @@ public class DTXQuery {
 	    }
         }
     }
+
+    /* A misnomer, addField() actually adds a condition. Lifted, once
+       again, from JDO stuff. */
 
     private void addField(ClassMapping clsMapping, StringTokenizer token, QueryExpression expr)
         throws DTXException
