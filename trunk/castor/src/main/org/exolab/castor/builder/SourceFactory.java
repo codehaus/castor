@@ -245,7 +245,6 @@ public class SourceFactory  {
             className = JavaNaming.toJavaClassName(className);
             className = resolveClassName(className, packageName);
         }
-
         //2-- check if we have to create an Item class
         boolean createGroupItem = component.createGroupItem();
         if (createGroupItem) {
@@ -1393,9 +1392,11 @@ public class SourceFactory  {
                     if (!( (contentModel instanceof ComplexType)||
                             (contentModel instanceof ModelGroup)) )
                     {
-                        fieldInfo = memberFactory.createFieldInfo(component,
-                                                                   state.getSGStateInfo());
-                        handleField(fieldInfo, state);
+                        if (contentModel.getParticleCount() > 0) {
+	                        fieldInfo = memberFactory.createFieldInfo(component,
+	                                                                   state.getSGStateInfo());
+	                        handleField(fieldInfo, state);
+                        }
                     } else {
                        //--else we just flatten the group
                        processContentModel(group, state);
@@ -1411,9 +1412,11 @@ public class SourceFactory  {
                         //create the field info for the element
                         //that is referring to a model group in order
                         //not to loose the Particle information
-                        fieldInfo = memberFactory.createFieldInfo(component,
-                                                  state.getSGStateInfo());
-                        handleField(fieldInfo, state);
+                        if (modelgroup.getParticleCount() > 0) {
+	                        fieldInfo = memberFactory.createFieldInfo(component,
+	                                                  state.getSGStateInfo());
+	                        handleField(fieldInfo, state);
+                        }
                         break;
                     } else {
                         //--else we just flatten the group
