@@ -61,13 +61,14 @@ package org.exolab.castor.persist;
  * cannot be overrided, except if it is a identity. In most case, the actual 
  * entity doesn't span all the classes described in the EntityInfo.
  * <p>
- * An entity can be distinguish from any other entity by an identity. An identity 
- * can be one of the value, or composed by multiple values in an entity. Multiple
- * values identity is wrapped in {@link org.exolab.castor.persist.types.Complex}.
+ * An entity can be distinguished from any other entity with the same base by 
+ * an identity. An identity can be one of the value, or composed by multiple 
+ * values in an entity. Multiple values identity is wrapped in 
+ * {@link org.exolab.castor.persist.types.Complex}.
  * <p>
  * An entity may has a stamp. A stamp is a value in an entity that can be used to 
- * identify the state of an entity. The state of entity is changing overtime, and 
- * a stamp is a value in the entity that always change when the state of the 
+ * identify the state of an entity. The state of entity is change in every update, 
+ * and a stamp is a value in the entity that always change when the state of the 
  * entity change.
  * <p>
  * For example, the time of the last modification on an entity can be used as a 
@@ -77,42 +78,44 @@ package org.exolab.castor.persist;
 public final class Entity implements Cloneable {
 
     /**
-     * The type of the entity.
+     * The base type of the entity.
      */
-    public EntityInfo info;
+    public EntityInfo   base;
 
     /**
      * The identity of this entity.
      */
-    public Object identity;
+    public Object       identity;
 
     /**
      * The timestamp or counter of the entity in long.
      */
-    public long longStamp;
+    public long         longStamp;
 
     /**
      * The timestamp or counter of the entity in object type.
      */
-    public Object objectStamp;
+    public Object       objectStamp;
 
     /**
      * Indicate this entity is locked in the data store.
      */
-    public boolean locked;
+    public boolean      locked;
 
     /** 
      * Indicate which entity classes is this entity actually belongs to
+     * The super-most entity of "actual" must equal to "root".
      */ 
-    public String[] entityClasses;
+    public EntityInfo   actual;
 
     /**
-     * Represent the actual values in the data store. The first dimension
-     * of the array corresponds to entityClasses. The second dimension
-     * corresponds to the field order in as declared in EntityInfo.fieldInfo
-     * of the entityClasses.
+     * Represent the actual values in the data store. The values is
+     * ordered in "super-most first" order. In the other words, the value 
+     * representing the root.fieldInfo[0] is stored in position zero of 
+     * values. Assuming actual is an immediate sub entity of root, the
+     * first values of actual is stored in value[root.fieldInfo.lenght].
      */
-    public Object[][] values;
+    public Object[]     values;
 
     /**
      * Constructor
@@ -124,15 +127,25 @@ public final class Entity implements Cloneable {
     /**
      * Constructor
      */ 
-    public Entity( EntityInfo info, Object identity ) {
+    public Entity( EntityInfo base, Object identity ) {
         super();
-        this.info = info;
+        this.base = base;
+        this.identity = identity;
+    }
+
+    /**
+     * Constructor
+     */
+    public Entity( EntityInfo base, EntityInfo actual, Object identity ) {
+        super();
+        this.base = base;
+        this.actual = actual;
         this.identity = identity;
     }
 
     /**
      * Test if this object belongs to the same entity type and has the 
-     * same identity. (warning! it behavior subject to change)
+     * same identity. (warning! this behavior subject to change)
      *
      * @specify by java.lang.Object.equals(Object)
      */
@@ -143,7 +156,7 @@ public final class Entity implements Cloneable {
             return false;
         }
         ent = (Entity) obj;
-        return (info.equals(ent.info) && identity.equals(ent.identity));
+        return (base.equals(ent.base) && identity.equals(ent.identity));
     }
 
     /**
@@ -152,7 +165,7 @@ public final class Entity implements Cloneable {
      * @specify by java.lang.Object.hashCode()
      */
     public int hashCode() {
-        return info.hashCode() + (identity == null ? 0 : identity.hashCode());
+        return base.hashCode() + (identity == null ? 0 : identity.hashCode());
     }
 
     /**
@@ -161,7 +174,7 @@ public final class Entity implements Cloneable {
      * @return a string representing this entity
      */
     public String toString() {
-        return info + "[" + identity + "]";
+        return base + "[" + identity + "]";
     }
 
     /**
@@ -172,22 +185,10 @@ public final class Entity implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
 
         Entity target = (Entity) super.clone();
-        if ( entityClasses != null ) {
-            target.entityClasses = new String[target.entityClasses.length];
-            System.arraycopy( entityClasses, 0, 
-                target.entityClasses, 0, entityClasses.length );
-        } else {
-            target.entityClasses = null;
-        }
+        target.actual = actual;
         if ( values != null ) {
-            target.values = new Object[values.length][];
+            target.values = new Object[values.length];
             System.arraycopy( values, 0, target.values, 0, values.length );
-            for ( int i = 0; i <= values.length; i++ ) {
-                if ( values[i] != null ) {
-                    target.values[i] = new Object[values[i].length];
-                    System.arraycopy( values[i], 0, target.values[i], 0, values[i].length );
-                }
-            }
         } else {
             target.values = null;
         }
@@ -201,63 +202,91 @@ public final class Entity implements Cloneable {
      */
     public void copyInto( Entity target ) {
 
-        target.info        = info;
+        target.base        = base;
         target.identity    = identity;
         target.longStamp   = longStamp;
         target.objectStamp = objectStamp;
         target.locked      = locked;
-        if ( entityClasses != null ) {
-            target.entityClasses = new String[target.entityClasses.length];
-            System.arraycopy( entityClasses, 0,
-                target.entityClasses, 0, entityClasses.length );
-        } else {
-            target.entityClasses = null;
-        }
+        target.actual      = actual;
         if ( values != null ) {
-            target.values = new Object[values.length][];
+            target.values = new Object[values.length];
             System.arraycopy( values, 0, target.values, 0, values.length );
         } else {
             target.values = null;
         }
     }
 
-    public Object getFieldValue(EntityFieldInfo fieldInfo) {
-        int level = 0;
-        String entityClass;
-        EntityInfo curInfo;
-        boolean found;
+    /**
+     * Obtain the value of a field represented by fieldInfo, if this entity
+     * is initalized. FieldInfo must belongs to one of the entity that is lay 
+     * in the path between root and actual.
+     * <p>
+     * If this entity is not initalized, it method always return false
+     * <p>
+     */
+    public Object getFieldValue( EntityFieldInfo fieldInfo ) 
+            throws IllegalArgumentException {
 
-        entityClass = fieldInfo.entityClass.entityClass;
-        found = false;
-        for (int i = 0; i < entityClasses.length; i++) {
-            if (entityClasses[i].equals(entityClass)) {
-                level = i;
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            throw new IllegalStateException("Entity " + entityClass + " for the field " + fieldInfo + " not found in " + this);
-        }
-        curInfo = info;
-        for (int i = 1; i < level; i++) {
-            found = false;
-            for (int j = 0; j < curInfo.subEntities.length; j++) {
-                if (curInfo.subEntities[j].entityClass.equals(entityClasses[i])) {
-                    curInfo = curInfo.subEntities[j];
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new IllegalStateException("Sub-entity " + entityClasses[i] + " not found in " + curInfo);
-            }
-        }
-        for (int i = 0; i < curInfo.fieldInfo.length; i++) {
-            if (curInfo.fieldInfo[i].equals(fieldInfo)) {
-                return values[level][i];
-            }
-        }
-        throw new IllegalStateException("Field " + fieldInfo + " not found in " + curInfo);
+        if ( base == null || actual == null || values == null )
+            return null;
+
+        // make sure fieldInfo is in the path between actual and root
+        if ( !fieldInfo.entityClass.isSuper( actual ) )
+            throw new IllegalArgumentException("Entity " + fieldInfo.entityClass 
+                      + " for the field " + fieldInfo + " not found in " + this);
+
+        // get the field
+        int pos  = fieldInfo.entityClass.getFieldOffset();
+            pos += fieldInfo.getFieldPos();
+        return values[pos];
     }
+
+    /**
+     * Set the value of the field represents by the specified fieldInfo
+     * to be the specified value.
+     * <p>
+     * If this entity is uninitialized, this method will initalized it.
+     * <p>
+     * This method throws IllegalArgumentException if the fieldInfo 
+     * is not compatible with the existing state. For example, fieldInfo
+     * does not belong to the path between {@link #actual} and {@link #base}
+     */
+    public void setFieldValue( EntityFieldInfo fieldInfo, Object value ) 
+            throws IllegalArgumentException {
+
+        // check the state of root
+        if ( base == null )
+            // set root if it is not already been set
+            base = fieldInfo.entityClass.getBase();
+        else if ( !fieldInfo.entityClass.getBase().equals( base ) ) 
+            throw new IllegalArgumentException("EntityFieldInfo does not contains the same root");
+
+        // check the state of actual
+        if ( actual == null ) {
+            // set actual if not already been set
+            actual = fieldInfo.entityClass;
+        } else if ( !fieldInfo.entityClass.isSuper( actual ) ) {
+            // make sure the new field is compatible with the path between
+            // rooto and actual
+            if ( actual.isSuper( fieldInfo.entityClass ) )
+                // upgrade the entity to a sub entity
+                actual = fieldInfo.entityClass;
+            else
+                throw new IllegalStateException("Field represented by "+fieldInfo+" is not compatible");
+        }
+
+        // check the state of value
+        if ( values==null ) {
+            values = new Object[base.getMaxLength()];
+        } else if ( values.length < (actual.getFieldOffset()+actual.fieldInfo.length) ) {
+            Object[] old = values;
+            values = new Object[base.getMaxLength()];
+            System.arraycopy( old, 0, values, 0, old.length );
+        }
+
+        int pos  = fieldInfo.entityClass.getFieldOffset();
+            pos += fieldInfo.getFieldPos();
+        values[pos] = value;
+    }
+
 }
