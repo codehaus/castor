@@ -44,38 +44,36 @@
  */
 package org.exolab.castor.persist;
 
-
+/**
+ * EntityInfo specify a Entity
+ *
+ */
 public final class EntityInfo {
 
-    public final int TYPE_UNDEFINED = 0;
-    
-    public final int TYPE_ID = 1;
-
-    public final int TYPE_VALUE = 2;
-
-    public final int TYPE_FOREGIN_KEY = 3;
-
-    public final int TYPE_FOREGIN_KEYS = 4;
-
-    public final int TYPE_JOIN_KEY = 5;
-
-    public final int TYPE_CLOB = 6;
-
-    public final int CARDINALITY_UNDEFINED = 0;
-
-    public final int CARDINALITY_ONE_TO_ONE = 1;
-
-    public final int CARDINALITY_ONE_TO_MANY = 2;
-
-    public final int CARDINALITY_MANY_TO_ONE = 3;
-
+	/**
+	 * The base entity class which this object represent.
+	 */
     public final String entityClass;
 
+	/**
+	 * The information of all logical fields
+	 */
     public final EntityFieldInfo[] fieldInfo;
 
-    public final EntityInfo[] subEntities; /* added */
+	/**
+	 * The information of all identity fields
+	 */
+	public final EntityFieldInfo[] idInfo;
 
-    public final Object discriminator; /* added */
+	/**
+	 * All entities which extends the base entities
+	 */
+    public final EntityInfo[] subEntities; 
+
+	/**
+	 * 
+	 */
+    public final Object discriminator; 
 
     public EntityInfo( String entityClass, EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, Object discriminator ) {
         this.entityClass   = entityClass;

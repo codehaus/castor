@@ -47,40 +47,103 @@ package org.exolab.castor.persist;
 
 import java.util.Arrays;
 
-
+/**
+ * This class specify a logic field of an entity. 
+ * <p>
+ * In general, one logical field maps to an actual field of the entity. 
+ * Exception happens when a logical field is a foreign identity, and 
+ * the foreign identity spans more than one actually field. In such
+ * case, the logical field is said to be complex.
+ */
 public final class EntityFieldInfo {
 
+    public final int CARDINALITY_UNDEFINED = 0;
+
+    public final int CARDINALITY_ONE_TO_ONE = 1;
+
+    public final int CARDINALITY_ONE_TO_MANY = 2;
+
+    public final int CARDINALITY_MANY_TO_ONE = 3;
+
+
+	/**
+	 * Indicate this field is an identity field.
+	 */
     public boolean id;
 
+	/**
+	 * Indicate this field is a foreign identitiy. 
+	 */
     public boolean foreign;
 
+	/**
+	 * Indicate this field 
+	 */
     public boolean complex;
 
+	/**
+	 * Indicate this field is virtual field and is obtained by a join of this
+	 * entity and another entitiy.
+	 */
     public boolean join;
 
+	/**
+	 * Indicate this field is a large binary field.
+	 */
     public boolean blob;
 
+	/**
+	 * Indicate this field is a foreign identity which corresponds to a foregin 
+	 * entity, which is stored in a different data store than this entity.
+	 */
     public boolean sameDataStore;
 
+	/**
+	 * Specify the cardinality number of this logical field
+	 */
     public int cardinality;
 
+	/**
+	 * Indicate the bridge should perform dirty check on this field when
+	 * it the entity is stored.
+	 */
     public boolean dirtyCheck;
 
-    public Class expectedType;
+	/**
+	 * The expected types of this data store.
+	 */
+    public Class[] expectedType;
 
-    public Class declaredType;
+	/**
+	 * The native type of this field in the data store.
+	 */
+    public Class[] declaredType;
 
-    public String entityClass;
+	/**
+	 * The type conversion parameter of the expected type and declared type.
+	 */
+	public Object[] typeParam;
 
-    public String fieldName;
+	/**
+	 * The Entity in which this field belongs to.
+	 */ 
+    public Entity entityClass;
 
+	/**
+	 * The native field name(s) of this entity.
+	 */
     public String[] fieldNames;
 
-    public String relatedEntityClass;
+	/**
+	 * The foreign entity that this field corresponds to.
+	 */
+    public Entity relatedEntityClass;
 
-    public String relatedEntityIdFieldName;
-
-    public String[] relatedEntityIdFieldNames;
+	/**
+	 * The foreign entity which this field correspond to  
+	 */
+    // we don't need it if we have relatedEntityClass right?
+	//public String[] relatedEntityIdFieldNames;
 
     public EntityFieldInfo() {
         // implements it....
