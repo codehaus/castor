@@ -487,7 +487,10 @@ public abstract class TransactionContext
             try {
                 // Must perform creation after object is recorded in transaction
                 // to prevent circular references.
+                oid = new OID( handler, identity );
+                entry = addObjectEntry( object, oid, engine );
                 oid = engine.create( this, object, identity );
+                removeObjectEntry( object );
             } catch ( DuplicateIdentityException except ) {
                 removeObjectEntry( object );
                 throw except;
