@@ -1038,33 +1038,6 @@ public final class SQLEngine implements Persistence {
         return stamp;
     }
 
-    private static String[] breakApart( String strings, char delimit ) {
-        if ( strings == null )
-            return null;
-
-        Vector v = new Vector();
-        int start = 0;
-        int count = 0;
-        while ( count < strings.length() ) {
-            if ( strings.charAt( count ) == delimit ) {
-                if ( start < (count - 1) ) {
-                    v.add( strings.substring( start, count ) );
-                    count++;
-                    start = count;
-                    continue;
-                }
-            }
-            count++;
-        }
-        if ( start < (count - 1) ) {
-            v.add( strings.substring( start, count ) );
-        }
-
-        String[] result = new String[v.size()];
-        v.copyInto( result );
-        return result;
-    }
-
     private void buildSql() throws QueryException {
 
         StringBuffer         sql;
