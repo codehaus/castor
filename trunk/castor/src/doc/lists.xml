@@ -14,7 +14,7 @@
 
       <section title="castor-announce">
          <p><b>castor-announce</b></p>
-         <p>Low volume (possibly more than 1 message per week) mailing list for special 
+         <p>Low volume (possibly more than 1 message per week) mailing list for special
             announcements about Castor, such as new releases.</p>
 
          <p><mailing-list name="castor-announce" description="The Castor Announcement Mailing List"
@@ -26,9 +26,9 @@
          <p>Moderate volume expected (possibly more than 15 messages a day) mailing list dedicated
             to the <b>users</b> of Castor.</p>
 
-         <p>This list will be used by users and committers equally to discuss the following 
+         <p>This list will be used by users and committers equally to discuss the following
             items (amongst many others):</p>
-            
+
          <ul>
            <li>General usage questions.</li>
            <li>Problems using Castor.</li>
@@ -39,35 +39,33 @@
 
          <p><b>Note:</b> Please familiarize yourself with the <a href="#Guidelines">guidelines</a>
              before posting to the list.</p>
-             
+
          <p><b>Archives:</b></p>
          <p><b>Note:</b> There may be a delay of one (1) or two (2) days for messages
             to be archived at that site.</p>
-          
-         <ul>   
-            <li><url>http://www.mail-archive.com/castor-user%40exolab.org *)</url></li>
+
+         <ul>
+            <li><url>http://www.mail-archive.com/castor-user%40exolab.org</url></li>
          </ul>
-       
-         <p><i><b>*)</b>: This archive was just set up and may not yet be available at mail-archive.com.</i></p>
 
       </section>
 
       <section title="castor-dev">
          <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated
             to the <b>developers</b> of Castor.</p>
-            
+
          <p>This list will be used by the main committers to discuss the following items:</p>
-            
+
          <ul>
            <li>Bug reports/enhancement requests.</li>
            <li>On-going development activities.</li>
            <li>New features to be incorporated into the product.</li>
          </ul>
-         
-         <p>We invite everybody (interested) to subscribe to this mailing list, as we 
-            believe that feedback from the user community on many of these issues is 
+
+         <p>We invite everybody (interested) to subscribe to this mailing list, as we
+            believe that feedback from the user community on many of these issues is
             essential for the progress of the project.</p>
-            
+
          <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
                        server="exolab.org" manager="minimalist"/></p>
 
@@ -78,41 +76,41 @@
          <p><b>Note:</b> There may be a delay of one (1) or two (2) days for messages
             to be archived at that site.</p>
 
-         <ul>   
+         <ul>
             <li><a href="http://marc.theaimsgroup.com/?l=castor-dev">Mailing list ARCives at AIMS</a></li>
             <li><url>http://www.mail-archive.com/castor-dev%40exolab.org</url></li>
             <li><url>http://hypermail.linklord.com/castor-dev/</url></li>
          </ul>
-            
+
       </section>
 
     </section>
-    
+
     <section title="castor-users vs. castor-dev">
-    
-       <p>Please use above mailing lists for what they are intended for. Please use 
+
+       <p>Please use above mailing lists for what they are intended for. Please use
           the descriptions above to target your message to the correct mailing list.</p>
-       
-       <p>By all means, please avoid <b>cross-posting</b> messages to both lists, 
+
+       <p>By all means, please avoid <b>cross-posting</b> messages to both lists,
           as it will decrease the quality of service we would like to offer.</p>
-          
-       <p><b>Note</b>: Having said that, there might be a valid case for cross-posting 
+
+       <p><b>Note</b>: Having said that, there might be a valid case for cross-posting
           a message (e.g. us confirming that a problem is a result of a bug, and hence
-          referring you to castor-dev for further discussions), but in general 
+          referring you to castor-dev for further discussions), but in general
           the use of this should be restricted as much as possible.</p>
     </section>
 
     <section title="Interaction and acronyms">
-    
+
        <p>As we believe that an effective interaction with the user community is
-          essential for Castor to progress as a project, we have decided to establish a 
+          essential for Castor to progress as a project, we have decided to establish a
           slightly more structured approach in dealing with many of the issues we
           and you encounter.</p>
-         
+
        <section title="Acronyms">
-          <p>Especially on (but not necessarily restricted to) 'castor-dev', we will be much 
-             more interactive about many of the issues mentioned above. As such, we have 
-             decided to structure our messages more thoroughly, and have come up with the 
+          <p>Especially on (but not necessarily restricted to) 'castor-dev', we will be much
+             more interactive about many of the issues mentioned above. As such, we have
+             decided to structure our messages more thoroughly, and have come up with the
              following set of acronyms to show our intention:</p>
 
           <ul>
@@ -121,19 +119,19 @@
               <li><i>ANN</i> - <b>ANN</b>ouncement</li>
               <li><i>RFR</i> - <b>R</b>equest <b>F</b>or <b>R</b>eview</li>
           </ul>
-          
+
        </section>
-      
+
        <section title="[XML] or [JDO]">
-      
-          <p>Please prefix your messages to all mailing list with either [XML] or [JDO]. 
-             This will help us to improve the time it takes us to react to your needs. 
+
+          <p>Please prefix your messages to all mailing list with either [XML] or [JDO].
+             This will help us to improve the time it takes us to react to your needs.
              Having said that, all committers will monitor both areas.</p>
 
        </section>
-      
+
     </section>
-    
+
     <section title="Guidelines">
     <p>
     The following are some general "common-sense" guidelines for using the
