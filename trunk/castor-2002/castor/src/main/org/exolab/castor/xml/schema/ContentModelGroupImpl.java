@@ -60,7 +60,7 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
 
 
     private Vector _contentModel = null;
-    private ScopableResolver _resolver = null;
+    private transient ScopableResolver _resolver = null;
 
     /**
      * Creates a new ContentModelGroup.
