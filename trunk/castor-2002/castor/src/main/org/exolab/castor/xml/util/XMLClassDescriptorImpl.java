@@ -153,6 +153,9 @@ public class XMLClassDescriptorImpl
     public XMLClassDescriptorImpl(Class type, String xmlName) {
         this._class = type;
         this._xmlName = xmlName;
+        attributeDescriptors = new List(7);
+        elementDescriptors = new List(7);
+        validationRules = new List();
     } //-- XMLClassDescriptorImpl
 
     //------------------/
