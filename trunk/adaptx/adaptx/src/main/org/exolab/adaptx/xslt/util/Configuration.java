@@ -1,11 +1,11 @@
 /*
- * (C) Copyright Keith Visco 1999  All rights reserved.
+ * (C) Copyright Keith Visco 1999-2003  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -22,15 +22,25 @@ package org.exolab.adaptx.xslt.util;
 
 
 import java.io.*;
+import java.util.Properties;
+
 import org.exolab.adaptx.xml.parser.DOMParser;
+import org.exolab.adaptx.xslt.XSLTProcessor;
+
+//-- SAX
 import org.xml.sax.Parser;
 import org.xml.sax.helpers.ParserFactory;
-import java.util.Properties;
-import org.exolab.adaptx.xslt.XSLTProcessor;
+import org.xml.sax.XMLReader;
+import org.xml.sax.SAXException;
+
+//-- JAXP 1.1
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A simple configuration class for the XSLT processor
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class Configuration {
@@ -59,6 +69,16 @@ public class Configuration {
     **/
     public static final String SAX_PARSER = "parser.sax";
     
+    /**
+     * The JAXP parser flag
+    **/
+    public static final String JAXP_PARSER = "parser.JAXP";
+    
+    
+    /**
+     * A flag to indicate that JAXP should be used
+     */
+    public static final boolean useJAXP = true;
     
     /**
      * The Name of the properties file
@@ -74,6 +94,12 @@ public class Configuration {
      * Used to create instances of the DOMParser
     **/
     private static DOMParser _DOMParser = null;
+    
+    /**
+     * An instance of the JAXP SAXParserFactory class
+     */
+    private static SAXParserFactory _saxParserFactory = null;
+    
     
     /**
      * Create a new Configuration
@@ -171,6 +197,43 @@ public class Configuration {
         
         return parser;
     } //-- getSAXParser
+    
+    
+    /**
+     * Returns the configured XMLReader
+     *
+     * @return an instance of the configured XMLReader
+    **/
+    public static XMLReader getXMLReader() {
+        
+        if (_saxParserFactory == null) {
+            _saxParserFactory = SAXParserFactory.newInstance();
+            _saxParserFactory.setNamespaceAware(false);
+            _saxParserFactory.setValidating(false);
+        }
+        
+        SAXParser parser = null;
+        XMLReader reader = null;
+        try {
+            parser = _saxParserFactory.newSAXParser();
+            reader = parser.getXMLReader();
+        }
+        catch(SAXException sx) {
+            String err = "An exception of type '" + sx.getClass().getName();
+            err += "' occurred while attempting to create a new XMLReader " +
+                "instance; " + sx.getMessage();
+            throw new IllegalStateException(err);
+        }
+        catch(ParserConfigurationException pcx) {
+            String err = "An exception of type '" + pcx.getClass().getName();
+            err += "' occurred while attempting to create a new XMLReader " +
+                "instance; " + pcx.getMessage();
+            throw new IllegalStateException(err);
+        }
+        
+        return reader;
+    } //-- getXMLReader
+    
     
     /**
      * Sets the DOMParser to return when a call to getDOMParser
