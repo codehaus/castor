@@ -1,8 +1,21 @@
 
 Version (CVS)
 -------------
-XML:	Fixed bug 916 and other problems in the Validation code related to generated classes.
-         (Arnaud - 20020418)
+
+XML:    Added Glenn Nielsen's Patch for loading the Castor configuration 
+        files in the proper order.
+        (kvisco - 20020429)
+
+XML:    Fixed problem with introspection of primitive arrays.
+        (kvisco - 20020427)
+
+XML:    Added support for saving and retrieving namespace node mappings from
+        the object model. Only applies when using a mapping file.
+        (kvisco - 20020419)
+
+XML:	Fixed bug 916 and other problems in the Validation code related to 
+        generated classes.
+        (Arnaud - 20020418)
 
 XML:	Fixed bug 879: The generated classes now reflect the 'Restriction' inheritence
         model for complexType as defined by W3C XML Schema (Arnaud - 20020405)
@@ -25,7 +38,11 @@ XML:    Added methods to Marshaller for setting schemaLocation and
 XML:    Added some support for SAX 2 in Marshalling Framework.
         (kvisco - 20020309)
 
-XML:	Refactored the entire container support. A lot of changes have been made during          the Unmarshalling process and a method (canAccept) has been added to the                 XMLClassDescriptor interface. These changes fix bug 884 (and potentially many            others) (Arnaud - 20020306)
+XML:	Refactored the entire container support. A lot of changes have been 
+        made during the Unmarshalling process and a method (canAccept) has 
+        been added to the XMLClassDescriptor interface. These changes fix 
+        bug #884 (and potentially many others) 
+        (Arnaud - 20020306)
 
 XML:    Added initial support for Unmarshaller#setReuseObjects.
         (kvisco - 20020227)
