@@ -86,7 +86,7 @@ public class Unmarshaller {
      * A user specified IDResolver for resolving IDREFs
     **/
     private IDResolver _idResolver = null;
-    
+
     /**
      * The EntityResolver used for resolving entities
     **/
@@ -201,7 +201,7 @@ public class Unmarshaller {
     public void setIDResolver(IDResolver idResolver) {
         _idResolver = idResolver;
     } //-- idResolver
-    
+
     /**
      * Sets the PrintWriter used for logging
      * @param printWriter the PrintWriter to use for logging
@@ -224,8 +224,8 @@ public class Unmarshaller {
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
-    
-    
+
+
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
      * @param cdr the ClassDescriptorResolver to use
@@ -332,8 +332,8 @@ public class Unmarshaller {
 
         UnmarshalHandler handler = createHandler();
         parser.setDocumentHandler(handler);
+        parser.setErrorHandler(handler);
 
-        //parser.setErrorHandler(unmarshaller);
         try {
             parser.parse(source);
         }
@@ -373,7 +373,7 @@ public class Unmarshaller {
     {
 		return unmarshal(new DOMEventProducer(node));
     } //-- unmarshal(EventProducer)
-	
+
     /**
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
@@ -435,15 +435,15 @@ public class Unmarshaller {
         handler.setLogWriter(pw);
         handler.setDebug(debug);
         handler.setValidation(validate);
-        
-        if (_idResolver != null) 
+
+        if (_idResolver != null)
             handler.setIDResolver(_idResolver);
-            
+
         if (_loader != null)
             handler.setClassLoader(_loader);
-            
+
         return handler;
     } //-- createHandler
-    
+
 } //-- Unmarshaller
 
