@@ -69,6 +69,16 @@ XML & JDO:
 	Note, that now "arraylist" can be used as a value of "collection"
 	attribute in mapping.xml 
 
+JDO:    Added an AutoStore option to JDO. Method of setAutoStore and isAutoStore
+	are added into the jdo.Database interface. If autoStore is set, Castor 
+	will try to create or update** all reachable object if it is not
+	exist in the transaction, and store all reachable modified object at the 
+	commit time. If autoStore is not set, Castor will only create/update/store
+	dependent object, and related objects must be created/update explicitly.
+	(* update is used for long transaction only, all modified object 
+	created/loaded from the short transaction will be store properly
+	at commit time)
+
 JDO:    Added "trigger" mode for SEQUENCE key generator. 
         (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
 
