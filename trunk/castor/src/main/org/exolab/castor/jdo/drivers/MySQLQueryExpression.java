@@ -103,7 +103,7 @@ public final class MySQLQueryExpression
     }
     
     /** 
-     * Provides an default implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
+     * Provides an implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
      * @return true to indicate that this feature is supported by mySQL. 
      * @see org.exolab.castor.persist.spi.QueryExpression#isOffsetClauseSupported()
      */
