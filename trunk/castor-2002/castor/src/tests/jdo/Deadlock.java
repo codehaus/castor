@@ -1,14 +1,16 @@
 package jdo;
 
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.Enumeration;
-import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.jtf.CWVerboseStream;
+import org.exolab.jtf.CWTestCase;
+import org.exolab.exceptions.CWClassConstructorException;
 
 
 /**
@@ -17,85 +19,109 @@ import org.exolab.castor.jdo.TransactionAbortedException;
  * will succeed, the second will fail.
  */
 public class Deadlock
+    extends CWTestCase
 {
-
-
-    private DataObjects    _jdo;
 
 
     private Database       _db;
 
 
-    private PrintWriter    _logger;
-
-
     public static final long  Wait = 2000;
 
 
-    public Deadlock( DataObjects jdo, PrintWriter logger )
-	throws PersistenceException
+    public Deadlock()
+        throws CWClassConstructorException
     {
-        _jdo = jdo;
-        _logger = logger;
-        _db = _jdo.getDatabase();
-        _logger.println( "Opened JDO database " + _db );
+        super( "TC02", "Test deadlock detection" );
+        try {
+            _db = JDOTests.getDatabase();
+        } catch ( Exception except ) {
+            throw new CWClassConstructorException( except.toString() );
+        }
     }
 
 
-    public void run()
-	throws PersistenceException
+    public void preExecute()
     {
-	OQLQuery      oql;
-        TestObject    object;
-        Enumeration   enum;
+        super.preExecute();
+    }
 
-        // Open transaction in order to perform JDO operations
-        _db.begin();
-        
-        // Create two objects in the database -- need something to lock
-        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-        oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
-            _logger.println( "Found object: " + object );
-        } else {
-            object = new TestObject();
-            object.id = TestObject.DefaultId;
-            _logger.println( "Creating new object: " + object );
-            _db.create( object );
-        }
-        object.name = TestObject.DefaultName;
-        oql.bind( TestObject.DefaultId + 1 );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
-            _logger.println( "Found object: " + object );
-        } else {
-            object = new TestObject();
-            object.id = TestObject.DefaultId + 1;
-            _logger.println( "Creating new object: " + object );
-            _db.create( object );
-        }
-        object.name = TestObject.DefaultName;
-        _db.commit();
 
-        _logger.println( "Note: this test uses a 2 second delay between threads. CPU and database load might cause the test to not perform synchronously, resulting in erroneous results. Make sure that execution is not hampered by CPU/datebase load." );
+    public void postExecute()
+    {
+        super.postExecute();
+    }
 
-        // Run two threads in parallel attempting to update the
-        // two objects in a different order, with the first
-        // suceeding and second failing
-        FirstThread  first;
-        SecondThread second;
+
+    public boolean run( CWVerboseStream stream )
+    {
+        boolean result = true;
+
+        try {
+            OQLQuery      oql;
+            TestObject    object;
+            Enumeration   enum;
             
-        first = new FirstThread();
-        first._jdo = _jdo;
-        first._logger = _logger;
-        first.start();
-        second = new SecondThread();
-        second._jdo = _jdo;
-        second._logger = _logger;
-        second.start();
+            // Open transaction in order to perform JDO operations
+            _db.begin();
+            
+            // Create two objects in the database -- need something to lock
+            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE Id = $1" );
+            oql.bind( TestObject.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                object = (TestObject) enum.nextElement();
+                stream.writeVerbose( "Retrieved object: " + object );
+                object.setName( TestObject.DefaultName );
+            } else {
+                object = new TestObject();
+                stream.writeVerbose( "Creating new object: " + object );
+                _db.create( object );
+            }
+            oql.bind( TestObject.DefaultId + 1 );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                object = (TestObject) enum.nextElement();
+                stream.writeVerbose( "Retrieved object: " + object );
+            } else {
+                object = new TestObject();
+                object.setId( TestObject.DefaultId + 1 );
+                stream.writeVerbose( "Creating new object: " + object );
+                _db.create( object );
+            }
+            object.setName( TestObject.DefaultName );
+            _db.commit();
+
+            stream.writeVerbose( "Note: this test uses a 2 second delay between threads. CPU and database load might cause the test to not perform synchronously, resulting in erroneous results. Make sure that execution is not hampered by CPU/datebase load." );
+        
+            // Run two threads in parallel attempting to update the
+            // two objects in a different order, with the first
+            // suceeding and second failing
+            FirstThread  first;
+            SecondThread second;
+            
+            first = new FirstThread();
+            first._db = JDOTests.getDatabase();
+            first._stream = stream;
+            first.start();
+            second = new SecondThread();
+            second._db = JDOTests.getDatabase();
+            second._stream = stream;
+            second.start();
+
+            first.join();
+            second.join();
+            result = first._result & second._result;
+            
+        } catch ( Exception except ) {
+            try {
+                stream.writeVerbose( "Error: " + except );
+            } catch ( IOException except2 ) { }
+            except.printStackTrace();
+            result = false;
+        }
+        return result;
+
     }
     
     
@@ -103,58 +129,57 @@ public class Deadlock
         extends Thread
     {
         
+        private Database         _db;
 
-        private DataObjects    _jdo;
+
+        private CWVerboseStream  _stream;
 
 
-        private PrintWriter    _logger;
+        private boolean          _result = true;
 
 
         public void run()
         {
             TestObject   object;
-            Database     db = null;
             long         start;
 
             try {
-                db = _jdo.getDatabase();
-                db.begin();
-                
+                _db.begin();
                 start = System.currentTimeMillis();
 
                 // Load first object and change something about it (otherwise will not write)
-                _logger.println( "First: Loading object " + TestObject.DefaultId );
-                object = (TestObject) db.load( TestObject.class,
+                _stream.writeVerbose( "First: Loading object " + TestObject.DefaultId );
+                object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId ) );
-                object.name = TestObject.DefaultName + ":1";
-                _logger.println( "First: Modified to " + object );
+                object.setName( TestObject.DefaultName + ":1" );
+                _stream.writeVerbose( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
                 start = System.currentTimeMillis();
                 
-                _logger.println( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
-                object = (TestObject) db.load( TestObject.class,
+                _stream.writeVerbose( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
+                object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ) );
-                object.name = TestObject.DefaultName + ":1";
-                _logger.println( "First: Modified to " + object );
+                object.setName( TestObject.DefaultName + ":1" );
+                _stream.writeVerbose( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( Math.max( start + Wait - System.currentTimeMillis(), 0 ) );
 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                _logger.println( "First: Committing" );
-                db.commit();
-                _logger.println( "First: Committed" );
-                db.close();
+                _stream.writeVerbose( "First: Committing" );
+                _db.commit();
+                _stream.writeVerbose( "First: Committed" );
+                _db.close();
             } catch ( Exception except ) {
-                _logger.println( "First: " + except );
-                except.printStackTrace( _logger );
+                _result = false;
                 try {
-                    if ( db != null )
-                        db.close();
-                } catch ( PersistenceException except2 ) { }
+                    _stream.writeVerbose( "First: " + except );
+                } catch ( IOException e2 ) { }
+                except.printStackTrace();
+                _result = false;
             }
         }
         
@@ -166,12 +191,15 @@ public class Deadlock
     {
 
         
-        private DataObjects    _jdo;
+        private Database         _db;
 
 
-        private PrintWriter    _logger;
+        private CWVerboseStream  _stream;
 
-        
+
+        private boolean          _result = true;
+
+
         public void run()
         {
             TestObject   object;
@@ -179,29 +207,28 @@ public class Deadlock
             long         start;
 
             try {
-                db = _jdo.getDatabase();
-                db.begin();
+                _db.begin();
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( Wait / 2 );
                 start = System.currentTimeMillis();
                 
                 // Load first object and change something about it (otherwise will not write)
-                _logger.println( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
-                object = (TestObject) db.load( TestObject.class,
+                _stream.writeVerbose( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
+                object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ) );
-                object.name = TestObject.DefaultName + ":2";
-                _logger.println( "Second: Modified to " + object );
+                object.setName( TestObject.DefaultName + ":2" );
+                _stream.writeVerbose( "Second: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
                 start = System.currentTimeMillis();
                 
-                _logger.println( "Second: Loading object " + TestObject.DefaultId );
-                object = (TestObject) db.load( TestObject.class,
+                _stream.writeVerbose( "Second: Loading object " + TestObject.DefaultId );
+                object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId ) );
-                object.name = TestObject.DefaultName + ":2";
-                _logger.println( "Second: Modified to " + object );
+                object.setName( TestObject.DefaultName + ":2" );
+                _stream.writeVerbose( "Second: Modified to " + object );
 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
@@ -209,25 +236,28 @@ public class Deadlock
                 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                _logger.println( "Second: Committing" );
-                db.commit();
-                _logger.println( "Error: deadlock not detected" );
-                _logger.println( "Second: Committed" );
-                db.close();
+                _stream.writeVerbose( "Second: Committing" );
+                _db.commit();
+                _result = false;
+                _stream.writeVerbose( "Error: deadlock not detected" );
+                _stream.writeVerbose( "Second: Committed" );
+                _db.close();
             } catch ( TransactionAbortedException except ) {
-                if ( except.getException() instanceof LockNotGrantedException )
-                    _logger.println( "OK: Deadlock detected" );
-                else
-                    _logger.println( "Error: " + except );
-                _logger.println( "Second: aborting" );
-            } catch ( Exception except ) {
-                except.printStackTrace( _logger );
-                _logger.println( "Error: " + except );
-            } finally {
                 try {
-                    if ( db != null )
-                        db.close();
-                } catch ( PersistenceException except2 ) { }
+                    if ( except.getException() instanceof LockNotGrantedException )
+                        _stream.writeVerbose( "OK: Deadlock detected" );
+                    else {
+                        _result = false;
+                        _stream.writeVerbose( "Error: " + except );
+                    }
+                    _stream.writeVerbose( "Second: aborting" );
+                } catch ( IOException e2 ) { }
+            } catch ( Exception except ) {
+                _result = false;
+                try {
+                    _stream.writeVerbose( "Error: " + except );
+                } catch ( IOException e2 ) { }
+                except.printStackTrace();
             }
         }
         

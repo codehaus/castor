@@ -5,10 +5,10 @@ public class TestObject
 {
 
 
-    public int  id;
+    private int    _id;
 
 
-    public String name;
+    private String _name;
 
 
     static final int       DefaultId = 3;
@@ -17,9 +17,40 @@ public class TestObject
     static final String    DefaultName = "three";
 
 
+    public TestObject()
+    {
+        _id = DefaultId;
+        _name = DefaultName;
+    }
+
+
+    public void setId( int id )
+    {
+        _id = id;
+    }
+
+
+    public int getId()
+    {
+        return _id;
+    }
+
+
+    public void setName( String name )
+    {
+        _name = name;
+    }
+
+
+    public String getName()
+    {
+        return _name;
+    }
+
+
     public String toString()
     {
-        return id + "/" + name;
+        return _id + " / " + _name;
     }
 
 

@@ -4,15 +4,14 @@
 
   <!-- Mapping for TestObject to test_table
        Single object mapping, shared access, dirty checking on all fields -->
-  <class class-name="jdo.TestObject" access="shared">
-    <sql-table table-name="test_table"/>
+  <class name="jdo.TestObject" access="shared" identity="Id">
     <description>Table used for concurrency and performance testing</description>
-    <identity field-ref="id" />
-    <field name="id" type="integer">
-      <sql-info name="id" type="integer" />
+    <map-to table="test_table" />
+    <field name="Id" type="integer">
+      <sql name="id" type="integer" />
     </field>
-    <field name="name" type="string">
-      <sql-info name="name" type="varchar" />
+    <field name="Name" type="string">
+      <sql name="name" type="varchar" />
     </field>
   </class>
 
