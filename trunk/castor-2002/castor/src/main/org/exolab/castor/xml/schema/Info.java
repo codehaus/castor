@@ -45,22 +45,97 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.ValidationException;
+
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
- * This class is temporary until I finish the implementation
+ * A class which represents the XML Schema Info element
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date$ 
 **/
-public class UnknownDef extends Structure {
+public class Info extends Structure {
+    
     
     /**
-     * Creates a new UnknownDef
+     * The text content of this AppInfo
     **/
-    public UnknownDef() {
-        super();
-    } //-- UnknownDef
+    private String content = null;
     
+    /**
+     * List of any elements
+    **/
+    private Vector objects = null;
+    
+    /**
+     * The source attribute
+    **/
+    private String source = null;
+    
+    /**
+     * Creates a new Info
+    **/
+    public Info() {
+        objects = new Vector(3);
+    } //-- Annotation
+    
+    /**
+     * Adds the given Object to this Info
+     * @param object the Object to add
+    **/
+    public void add(Object object) {
+        if (object != null)
+            objects.addElement(object);
+    } //-- add
+    
+    /**
+     * Returns the String content of this Info
+     * @return the String content of this Info
+    **/
+    public String getContent() {
+        return content;
+    } //-- getContent
+    
+    /**
+     * Returns an Enumeration of all objects contained by this Info.
+     * @return an Enumeration of all objects contained by this Info.
+    **/
+    public Enumeration getObjects() {
+        return objects.elements();
+    } //-- getObjects
+    
+    /**
+     * Returns the source property of this Info
+     * @return the source property of this Info
+    **/
+    public String getSource() {
+        return source;
+    } //-- getSource
+    
+    /**
+     * Removes the given Object from this Info
+     * @param object the Object to remove
+    **/
+    public void remove(Object object) {
+        if (object != null) objects.removeElement(object);
+    } //-- remove
+
+    /**
+     * Sets the String content for this Info
+     * @param content the String content for this Info
+    **/
+    public void setContent(String content) {
+        this.content = content;
+    } //-- setContent
+    
+    /**
+     * Sets the source property for this Info
+     * @param source the value of the source property
+    **/
+    public void setSource(String source) {
+        this.source = source;
+    } //-- setSource
     
     //-------------------------------/
     //- Implementation of Structure -/
@@ -71,7 +146,7 @@ public class UnknownDef extends Structure {
      * @return the type of this Schema Structure
     **/
     public short getStructureType() {
-        return Structure.UNKNOWN;
+        return Structure.INFO;
     } //-- getStructureType
     
     /**
@@ -80,9 +155,9 @@ public class UnknownDef extends Structure {
      * is invalid.
     **/
     public void validate()
-        throws ValidationException
+        throws ValidationException 
     {
         //-- do nothing
     } //-- validate
     
-} //-- UnknownDef
+} //-- Info

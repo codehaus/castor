@@ -45,12 +45,14 @@
  
 package org.exolab.castor.xml.schema;
 
+import org.exolab.castor.xml.ValidationException;
+
 /**
  * Represents the base type for XML Schema Facets
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public abstract class Facet {
+public abstract class Facet extends Annotated {
     
     public static final String MAX_EXCLUSIVE    = "maxExclusive";
     public static final String MAX_INCLUSIVE    = "maxInclusive";
@@ -61,13 +63,14 @@ public abstract class Facet {
     /**
      * The character value of this Facet
     **/
-    private String _value = null;
+    private String  _value      = null;
     
     /**
      * Returns the name of this Facet
      * @return the name of this Facet
     **/
     public abstract String getName();
+    
     
     
     /**
@@ -77,6 +80,15 @@ public abstract class Facet {
     public String getValue() {
         return this._value;
     } //-- getValue
+    
+    /**
+     * Returns true if this Facet can occur more than once, such
+     * as the "enumeration" facet.
+     * @return true if this Facet can occur more than once.
+    **/
+    public boolean isMultivalued() {
+        return false;
+    } //-- isMultivalued
     
     /**
      * Sets the value of this facet
@@ -101,6 +113,25 @@ public abstract class Facet {
     public double toDouble() throws NumberFormatException {
         return Double.valueOf(_value).doubleValue();
     } //-- toInt
+    
+    /**
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
+    **/
+    public short getStructureType() {
+        return Structure.FACET;
+    } //-- getStructureType
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate() 
+        throws ValidationException
+    {
+         //-- do nothing for now
+    } //-- validate
     
 } //-- Facet
 

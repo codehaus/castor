@@ -105,16 +105,6 @@ public class Group extends ContentModelGroup
         return this.collection;
     } //-- getCollection
 
-    
-    /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
-    **/
-    public short getDefType() {
-        return SchemaBase.GROUP;
-    } //-- getDefType
-    
     /**
      * Returns the maximum number of occurances that this grouping may appear
      * @return the maximum number of occurances that this grouping may appear.
@@ -194,12 +184,26 @@ public class Group extends ContentModelGroup
         else this.order = order;
     } //-- setOrder
     
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
+    
     /**
-     * Checks the validity of this ModelGroup declaration
-     * @exception ValidationException when this ModelGroup declaration
-     * is invalid
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
     **/
-    public void validate() throws ValidationException {
+    public short getStructureType() {
+        return Structure.GROUP;
+    } //-- getStructureType
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
         //-- do nothing
     } //-- validate
     

@@ -140,15 +140,6 @@ public class ModelGroup extends ContentModelType {
     } //-- addModelGroup
     
     
-    /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
-    **/
-    public short getDefType() {
-        return SchemaBase.MODELGROUP;
-    } //-- getDefType
-    
     /** 
      * Returns an ordered Enumeration of all the ContentModelType
      * definitions (element, group, modelGroupRef)+
@@ -186,12 +177,26 @@ public class ModelGroup extends ContentModelType {
         this.order = order;
     }
     
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
+    
     /**
-     * Checks the validity of this ModelGroup declaration
-     * @exception ValidationException when this ModelGroup declaration
-     * is invalid
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
     **/
-    public void validate() throws ValidationException {
+    public short getStructureType() {
+        return Structure.MODELGROUP;
+    } //-- getStructureType
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
         //-- do nothing
     } //-- validate
     

@@ -54,9 +54,15 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ElementDecl extends ContentModelType 
-    implements Referable
-{
+public class ElementDecl extends ContentModelType {
+    
+    
+    /**
+     * Error message for a null argument
+    **/
+    private static String NULL_ARGUMENT
+        = "A null argument was passed to the constructor of " +
+           ElementDecl.class.getName();
     
     /**
      * The maximum number of occurances of that elements of this type
@@ -81,18 +87,10 @@ public class ElementDecl extends ContentModelType
     **/
     private String typeRef = null;
     
-    
     /**
-     * the element definition that this element definition references
+     * A reference to a top-level element declaration
     **/
-    ResolvableReference reference = null;
-    
-    /**
-     * The reference id for the resolvable reference, I need
-     * this since ResolvableReference will not give me
-     * access to the ID
-    **/
-    String ref = null;
+    String elementRef = null;
     
     
     /**
@@ -110,29 +108,33 @@ public class ElementDecl extends ContentModelType
     **/
     private Archetype archetype = null;
     
-    /**
-     * The Datatype of this ElementDecl
-    **/
-    private Datatype datatype   = null;
     
-    Resolver _resolver = null;
+    private Schema schema = null;
     
     /**
      * Creates a new default element definition
+     * @param schema, the XML Schema to which this element declartion
+     * belongs
      * <BR />This element definition will not be valid until a name has
      * been set
     **/
-    public ElementDecl() {
-        super();
+    public ElementDecl(Schema schema) {
+        this(schema, null);
     } //-- ElementDecl
     
     /**
      * Creates a new default element definition
-     * <BR />This element definition will not be valid until a name has
-     * been set
+     * @param schema, the XML Schema to which this Element Declartion
+     * belongs
+     * @param name the name of the Element being declared
     **/
-    public ElementDecl(String name) {
+    public ElementDecl(Schema schema, String name) {
         super();
+        if (schema == null) {
+            String err = NULL_ARGUMENT + "; 'schema' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        this.schema = schema;
         this.name = name;
     } //-- ElementDecl
     
@@ -166,7 +168,7 @@ public class ElementDecl extends ContentModelType
     
     public String getName() {
         if (isReference()) {
-            return ref;
+            return elementRef;
         }
         else return name;
     } //-- getName
@@ -179,19 +181,20 @@ public class ElementDecl extends ContentModelType
      * @return the archetype of this ElementDecl
     **/
     public Archetype getArchetype() {
+        
+        if (isReference()) {
+            ElementDecl element = getReference();
+            if (element != null)
+                return element.getArchetype();
+            return null;
+        }
+        
         if (archetype == null) {
-            
-            //-- try resolving
-            if (_resolver != null) {
-                Object obj = null;
-                //-- check datatype first
-                obj = _resolver.resolve("datatype:"+typeRef);
-                
-                //-- if datatype found...return null archetype
-                //-- since datatype has higher precedence
-                if (obj != null) return null;
-                obj = _resolver.resolve("archetype:"+typeRef);
-                if (obj != null) archetype = (Archetype)obj;
+            //-- check datatype first since it has higher
+            //-- precedence
+            if (typeRef != null) {
+                if (schema.getDatatype(typeRef) != null) return null;
+                archetype = schema.getArchetype(typeRef);
             }
         }
         return archetype;
@@ -204,41 +207,17 @@ public class ElementDecl extends ContentModelType
      * @return the archetype of this ElementDecl
     **/
     public Datatype getDatatype() {
-        
         if (archetype != null) return null;
-        
-        if (datatype == null) {
-            //-- try resolving
-            if (_resolver != null) {
-                Object obj = null;
-                //-- check datatype first
-                obj = _resolver.resolve("datatype:"+typeRef);
-                if (obj != null) datatype = (Datatype)obj;
-            }
+        if (isReference()) {
+            ElementDecl element = getReference();
+            if (element != null)             
+                return element.getDatatype();
+            else 
+                return null;
         }
-        return datatype;
-        
+        return schema.getDatatype(typeRef);
     } //-- getDatatype
 
-    /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
-    **/
-    public short getDefType() {
-        return SchemaBase.ELEMENT;
-    } //-- getDefType
-    
-    /**
-     * Returns the Id used to Refer to this Object
-     * @return the Id used to Refer to this Object
-     * @see Referable
-    **/
-    public String getReferenceId() {
-        if (ref != null) return "node:"+ref;
-        return "node:"+name;
-    } //-- getReferenceId
-    
     /**
      * Returns the ElementDecl that this element definition references.
      * This will return null if this element definition does not reference
@@ -246,7 +225,9 @@ public class ElementDecl extends ContentModelType
      * @return the ElementDecl that this element definition references
     **/
     public ElementDecl getReference() {
-        return (ElementDecl)reference.get();
+        if (elementRef != null)
+            return schema.getElementDecl(elementRef);
+        return null;
     } //-- getReference
     
     /**
@@ -271,7 +252,7 @@ public class ElementDecl extends ContentModelType
      * @return true if this element definition is a reference
     **/
     public boolean isReference() {
-        return (reference != null);
+        return (elementRef != null);
     } //-- isReference
     
     /** 
@@ -303,44 +284,23 @@ public class ElementDecl extends ContentModelType
     } //-- setName
     
     /**
-     * Sets the reference for this element definition. 
-     * @param id the id of the element definition in which to reference
-     * @param resovler the Resolver in which to resolve the reference
-     * when the getReference method is invoked. If this is null, the 
-     * default resolver will be used. 
-     * @see useResolver
-    **/
-    public void setReference(String id, Resolver resolver) {
-        if (resolver == null) resolver = _resolver;
-        
-        //-- create new reference...add namespace "node:" to id
-        
-        this.reference = new ResolvableReference("node:"+id, resolver);
-        this.ref = id;
-    } //-- setReference
-    
-    
-    /**
      * Sets the reference for this element definition
      * @param reference the Element definition that this definition references
     **/
     public void setReference(ElementDecl reference) {
-        if (reference == null) this.reference = null;
-        else {
-            //-- safegaurd agaist referencing a reference
-            //-- which could get ugly, this will never happen
-            //-- if reading from an XML Schema since you
-            //-- cannot express a reference in such a fashion
-            //-- but someone could programmitcally try to do it
-            if (reference.isReference()) {
-                reference = reference.getReference();
-                setReference(reference);
-            }
-            else {
-                this.reference = new ResolvableReference(reference);
-                this.ref = reference.getName();
-            }
-        }
+        if (reference == null) 
+            this.elementRef = null;
+        else
+            this.elementRef = reference.getName();
+    } //-- setReference
+    
+    /**
+     * Sets the reference for this element definition
+     * @param reference the name of the element definition that this 
+     * definition references
+    **/
+    public void setReference(String reference) {
+        this.elementRef = reference;
     } //-- setReference
     
     /**
@@ -374,13 +334,18 @@ public class ElementDecl extends ContentModelType
     public String getTypeRef() {
         return typeRef;
     } //-- getTypeRef
+
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
     
     /**
-     * Sets the Resolver to be used for resolving IDREFs
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
     **/
-    public void useResolver(Resolver resolver) {
-        _resolver = resolver;
-    } //-- useResolver
+    public short getStructureType() {
+        return Structure.ELEMENT;
+    } //-- getStructureType
     
     /**
      * Checks the validity of this element definition
@@ -391,14 +356,16 @@ public class ElementDecl extends ContentModelType
         
         //-- if this merely references another element definition
         //-- just check that we can resolve the reference
-        if (reference != null) {
-            if (!reference.resolvable()) {
-                String err = "<element ref=\"" + ref + "\">  is not resolvable.";
+        if (elementRef != null) {
+            if (schema.getElementDecl(elementRef) == null) {
+                String err = "<element ref=\"" + elementRef + "\"> "+
+                    "is not resolvable.";
                 throw new ValidationException(err);
             }
         }
         else if (name == null)  {
-            String err = "<element> is missing required 'name' or 'ref' attribute.";
+            String err = "<element> is missing required 'name' or " +
+                "'ref' attribute.";
             throw new ValidationException(err);
         }
     } //-- validate

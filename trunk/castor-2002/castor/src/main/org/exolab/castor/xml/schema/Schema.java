@@ -46,6 +46,7 @@
 package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.schema.types.*;
 
 import java.util.Vector;
 import java.util.Hashtable;
@@ -57,7 +58,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class Schema extends SchemaBase {
+public class Schema extends Structure {
     
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/TR/1999/09/24-xmlschema";
@@ -105,8 +106,41 @@ public class Schema extends SchemaBase {
         datatypes  = new Hashtable();
         elements   = new Hashtable();
         this.schemaNS = schemaNS;
+        init();
     } //-- ScehamDef
     
+    private void init() {
+        
+        //-- create default built-in types for this Schema
+       
+        try {
+            //-- ID
+            addDatatype(new IDType(this));
+            //-- IDREF
+            addDatatype(new IDREFType(this));
+            //-- NCName
+            addDatatype(new NCNameType(this));
+            //-- NMTOKEN
+            addDatatype(new NMTokenType(this));
+            
+            //-- binary
+            addDatatype(new BinaryType(this));
+            //-- boooean
+            addDatatype(new BooleanType(this));
+            //-- double
+            addDatatype(new DoubleType(this));
+            //-- integer
+            addDatatype(new IntegerType(this));
+            //-- string
+            addDatatype(new StringType(this));
+            //-- timeInstant
+            addDatatype(new TimeInstantType(this));
+        }
+        catch (SchemaException sx) {
+            //-- will never be thrown here since we
+            //-- are not adding invalid datatypes
+        }
+    } //-- init
     
     /**
      * Adds the given Archetype definition to this Schema defintion
@@ -243,15 +277,6 @@ public class Schema extends SchemaBase {
     } //-- getDatatype
     
     /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
-    **/
-    public short getDefType() {
-        return SchemaBase.SCHEMA;
-    } //-- getDefType
-    
-    /**
      * Returns the ElementDecl of associated with the given name
      * @return the ElementDecl of associated with the given name, or
      *  null if no ElementDecl with the given name was found.
@@ -313,13 +338,27 @@ public class Schema extends SchemaBase {
         this.targetNS = targetNamespace;
     } //-- setTargetNamespace
 
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
+    
     /**
-     * Checks the validity of this Attribute declaration
-     * @exception ValidationException when this Attribute declaration
-     * is invalid
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
     **/
-    public void validate() throws ValidationException {
-        
+    public short getStructureType() {
+        return Structure.SCHEMA;
+    } //-- getStructureType
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- do nothing
     } //-- validate
     
 } //-- SchemaDef

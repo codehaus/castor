@@ -169,16 +169,6 @@ public class Archetype extends ContentModelGroup
         return content;
     } //-- getContent
     
-    
-    /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
-    **/
-    public short getDefType() {
-        return SchemaBase.ARCHETYPE;
-    } //-- getDefType
-    
     /**
      * Returns the name of this Archetype, or null if no name was defined
      * @return the name of this Archetype, or null if no name was defined
@@ -255,13 +245,27 @@ public class Archetype extends ContentModelGroup
         // do nothing for now
     }
     
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
+    
     /**
-     * Checks the validity of this Archetype declaration
-     * @exception ValidationException when this Archetype declaration
-     * is invalid
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
     **/
-    public void validate() throws ValidationException {
-        // -- add later
+    public short getStructureType() {
+        return Structure.ARCHETYPE;
+    } //-- getStructureType
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- do nothing
     } //-- validate
         
 } //-- Archetype

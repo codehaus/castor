@@ -45,22 +45,85 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.ValidationException;
+
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
- * This class is temporary until I finish the implementation
+ * A class representing the XML Schema Annotation
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date$ 
 **/
-public class UnknownDef extends Structure {
+public class Annotation extends Structure {
+    
     
     /**
-     * Creates a new UnknownDef
+     * List of <appinfo> objects
     **/
-    public UnknownDef() {
-        super();
-    } //-- UnknownDef
+    private Vector appInfoList = null;
     
+    /**
+     * List of <info> objects
+    **/
+    private Vector infoList = null;
+    
+    
+    /**
+     * Creates a new Annotation
+    **/
+    public Annotation() {
+        appInfoList = new Vector();
+        infoList = new Vector();
+    } //-- Annotation
+    
+    /**
+     * Adds the given AppInfo to this Annotation
+     * @param appInfo the AppInfo to add
+    **/
+    public void addAppInfo(AppInfo appInfo) {
+        if (appInfo != null) appInfoList.addElement(appInfo);
+    } //-- addAppInfo
+    
+    /**
+     * Adds the given Info to this Annotation
+     * @param info the info to add to this Annotation
+    **/
+    public void addInfo(Info info) {
+        if (info != null) infoList.addElement(info);
+    } //-- addInfo
+
+    /**
+     * Returns an enumeration of all AppInfo elements for this Annotation
+     * @return an enumeration of all AppInfo elements for this Annotation
+    **/
+    public Enumeration getAppInfo() {
+        return appInfoList.elements();
+    } //-- getAppInfo
+    
+    /**
+     * Returns an enumeration of all info elements for this Annotation
+     * @return an enumeration of all info elements for this Annotation
+    **/
+    public Enumeration getInfo() {
+        return infoList.elements();
+    } //-- getInfo
+    
+    /**
+     * Removes the given AppInfo from this Annotation
+     * @param appInfo the AppInfo to remove
+    **/
+    public void removeAppInfo(AppInfo appInfo) {
+        if (appInfo != null) appInfoList.removeElement(appInfo);
+    } //-- removeAppInfo
+
+    /**
+     * Removes the given Info from this Annotation
+     * @param info the Info to remove
+    **/
+    public void removeInfo(Info info) {
+        if (info != null) infoList.removeElement(info);
+    } //-- removeInfo
     
     //-------------------------------/
     //- Implementation of Structure -/
@@ -71,7 +134,7 @@ public class UnknownDef extends Structure {
      * @return the type of this Schema Structure
     **/
     public short getStructureType() {
-        return Structure.UNKNOWN;
+        return Structure.ANNOTATION;
     } //-- getStructureType
     
     /**
@@ -85,4 +148,4 @@ public class UnknownDef extends Structure {
         //-- do nothing
     } //-- validate
     
-} //-- UnknownDef
+} //-- Annotation
