@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1601 using contribution from Tomasz Piontek [piontek@man.poznan.pl]
+       Added code to support org.exolab.castor.types.Duration as a native type
+       in Castor JDO. Added convertors for type conversion org.exolab.castor.types.Duration 
+       <--> java.lang.Long.
+       (Werner - 20040421)
+       
 JDO:   Fixed bug 1554 using contribution from Stein M. Hugubakken [dulci@start.no]
        Fixes a memory leak with the linked-list implementation by removing LinkedList
        completely; uses the Hashtable directly, resulting in much better performance.
