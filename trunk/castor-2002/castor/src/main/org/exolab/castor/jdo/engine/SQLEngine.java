@@ -285,7 +285,7 @@ Will be adding this later.
             count = 1;
             if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
                 stmt.setObject( 1, identity );
-                count++;
+                ++count;
             }
 
             for ( int i = 0 ; i < _fields.length ; ++i )
@@ -707,7 +707,7 @@ Will be adding this later.
                     if ( relDesc == null )
                         allFields.addElement( new FieldInfo( fields[ i ], store ) );
                     else
-                        allFields.addElement( new FieldInfo( fields[ i ], true,
+                        allFields.addElement( new FieldInfo( fields[ i ], store,
                                                              ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLType() ) );
                 } else {
                     expr.addColumn( ( (JDOFieldDescriptor) fields[ i ] ).getManyTable(),
@@ -739,7 +739,7 @@ Will be adding this later.
                         expr.addColumn( relDesc.getTableName(), ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLName() );
                         expr.addOuterJoin( clsDesc.getTableName(), ( (JDOFieldDescriptor) identity ).getSQLName(),
                                            relDesc.getTableName(), foreKey );
-                        allFields.addElement( new FieldInfo( (JDOFieldDescriptor) relDesc.getIdentity(), false ) );
+                        allFields.addElement( new FieldInfo( fields[ i ], false ) );
                     }
                 }
             }
@@ -932,16 +932,14 @@ Will be adding this later.
                 // Load all the fields of the object including one-one relations
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
                     Object value;
-
+                    
+                    value = _rs.getObject( i + count );
                     if ( _engine._fields[ i ].multi ) {
                         fields[ i ] = new Vector();
-                        value = _rs.getObject( i + count );
                         if ( ! _rs.wasNull() )
                             ( (Vector) fields[ i ] ).addElement( value );
-                    } else {
-                        value = _rs.getObject( i + count );
+                    } else
                         fields[ i ] =  _rs.wasNull() ? null : value;
-                    }
                 }
 
                 if ( _rs.next() ) {
