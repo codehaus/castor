@@ -56,16 +56,19 @@ import java.util.Enumeration;
 import java.util.Vector;
 import java.lang.reflect.*;
 
+import org.exolab.castor.util.Stack;
+
 /**
  * The class which performs Validation on an Object model
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class Validator {
+public class Validator implements TypeValidator {
     
     private ClassDescriptorResolver _cdResolver = null;
     
     private static Object[] emptyParams = new Object[0];
+    
     
     /**
      * Creates a new Validator
@@ -106,71 +109,81 @@ public class Validator {
         //-- we cannot validate object if ClassDescriptor is null
         if (classDesc == null) return;
         
-        FieldDescriptor[] fields = classDesc.getFields();
+        TypeValidator validator = classDesc.getValidator();
         
-        if (fields != null) {
-            for (int i = 0; i < fields.length; i++) {
-                FieldDescriptor fieldDesc = fields[i];
-                if (fieldDesc == null) continue;
-                FieldHandler handler = fieldDesc.getHandler();
-                try {
-                    if (handler != null) handler.checkValidity(object);
+        XMLFieldDescriptor fieldDesc = null;
+        
+        try {
+            if (validator != null)
+                validator.validate(object);
+            //-- default validation
+            else {
+                //-- just validate each field
+                FieldDescriptor[] fields = classDesc.getFields();
+                if (fields != null) {
+                    for (int i = 0; i < fields.length; i++) {
+                        fieldDesc = (XMLFieldDescriptor)fields[i];
+                        if (fieldDesc == null) continue;
+                        validate(object, fieldDesc);
+                    }
                 }
-                catch(ValidityException vx) {
-                    throw new ValidationException(vx);
+            }
+        }
+        catch (ValidationException vx) {
+            //-- add location information
+            XPathLocation loc = (XPathLocation)vx.getLocation();
+            if (loc == null) {
+                loc = new XPathLocation();
+                vx.setLocation(loc);
+                if (fieldDesc != null) {
+                    if (fieldDesc.getNodeType() == NodeType.Attribute)
+                        loc.addAttribute(fieldDesc.getXMLName());
+                    else
+                        loc.addChild(fieldDesc.getXMLName());
                 }
+            }
+            loc.addParent(classDesc.getXMLName());
+            throw vx;
+        }
+        
+    } //-- validate
+    
+    /**
+     * Validates the field described by the given FieldDescriptor
+     * @param parent the object containing the field to validate
+     * @param fieldDesc the XMLFieldDescriptor of the field to validate
+    **/
+    private void validate(Object parent, XMLFieldDescriptor fieldDesc) 
+        throws ValidationException
+    {
+            
+       FieldValidator validator = fieldDesc.getValidator();
+        
+        if (validator != null) {
+            validator.validate(parent, this);
+        }
+        //-- do default validation
+        else {
+            FieldHandler handler = fieldDesc.getHandler();
+            if (handler != null) {
+                Object value = handler.getValue(parent);
+                if (fieldDesc.isRequired()) {
+                    if (value == null) {
+                        String err = "The xml field: " + fieldDesc.getXMLName();
+                        err += " is a required field, but it's value is null.";
+                        throw new ValidationException(err);
+                    }
+                }
+                //-- recursively handle validation
+                validate(value);
             }
         }
         
     } //-- validate
     
     /*
-    private void validate
-        (Object object, FieldDescriptor fieldDesc) 
-        throws ValidationException
-    {
-     
-        //-- probably pointless, but just to be safe
-        if (fieldDesc == null) return;
-        
-        switch(vRule.getType()) {
-            case ValidationRule.ATTRIBUTE:
-                MarshalDescriptor[] atts = mInfo.getAttributeDescriptors();
-                for (int i = 0; i < atts.length; i++) {
-                    if (atts[i].matches(vRule.getName())) {
-                        validate(object, vRule, atts[i]);
-                        break;
-                    }
-                }
-                break;
-            case ValidationRule.ELEMENT:
-                MarshalDescriptor[] elements = mInfo.getElementDescriptors();
-                for (int i = 0; i < elements.length; i++) {
-                    if (elements[i].matches(vRule.getName())) {
-                        validate(object, vRule, elements[i]);
-                        break;
-                    }
-                }
-                break;
-            case ValidationRule.TEXT:
-                MarshalDescriptor content = mInfo.getContentDescriptor();
-                if (content != null) {
-                    validate(object, vRule, content);
-                }
-                break;
-            case ValidationRule.GROUP:
-                GroupValidationRule gvr = (GroupValidationRule)vRule;
-                Enumeration enum = gvr.rules();
-                while (enum.hasMoreElements()) {
-                    ValidationRule rule = (ValidationRule)enum.nextElement();
-                    validate(object, rule, mInfo);
-                }
-                break;
-            default:
-                break;
-        }
-    } //-- validate
-    
+      *** Moved to FieldValidator ***
+      
     private void validate
         (Object object, ValidationRule vRule, MarshalDescriptor desc) 
         throws ValidationException
@@ -270,35 +283,6 @@ public class Validator {
         validator.validate(object);
     } //-- validate
     
-    //-------------------/
-    //- Private Methods -/
-    //-------------------/
     
-    /**
-     * Returns true if the given class type should be
-     * treated as a primitive. Wrapper objects such
-     * as java.lang.Integer, and java.lang.Float, will
-     * be treated as primitives.
-     * @param type the Class to check
-     * @return true if the given class should be treated
-     * as a primitive type.
-    **/
-    private boolean isPrimitive(Class type) {
-        
-        if (type.isPrimitive()) return true;
-        
-        if ((type == Boolean.class)   ||
-            (type == Byte.class)      ||
-            (type == Character.class) ||
-            (type == Double.class)    ||
-            (type == Float.class)     ||
-            (type == Integer.class)   ||
-            (type == Long.class)      ||
-            (type == Short.class)) 
-            return true;
-            
-       return false;
-       
-    } //-- isPrimitive
     
 } //-- Validator

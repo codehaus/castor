@@ -48,6 +48,7 @@ package org.exolab.castor.xml;
 
 
 import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.ValidityException;
 
 /**
  * A class descriptor for describing relationships between a Class
@@ -58,6 +59,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
  * @version $Revision$ $Date$
  */
 public interface XMLClassDescriptor extends ClassDescriptor {
+
 
     /**
      * Returns the set of XMLFieldDescriptors for all members
@@ -94,10 +96,21 @@ public interface XMLClassDescriptor extends ClassDescriptor {
     public String getNameSpaceURI();
     
     /**
+     * Returns a specific validator for the class described by
+     * this ClassDescriptor. A null value may be returned
+     * if no specific validator exists. 
+     *
+     * @return the type validator for the class described by this
+     * ClassDescriptor. 
+    **/
+    public TypeValidator getValidator();
+
+    /**
      * Returns the XML Name for the Class being described.
      * @return the XML name.
     **/
     public String getXMLName();
+
 
     
 } //-- XMLClassDescriptor
