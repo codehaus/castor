@@ -70,6 +70,12 @@ public class JDOConfLoader {
     private static boolean _loaded = false;
     private static JdoConf _jdoConf = null;
     
+    /**
+     * Loads the JDO configuration from the specified InputSource.
+     * @param source An InputSource pointing to the JDO configuration to be loaded.
+     * @param resolver An EntityResolver instance.
+     * @throws MappingException If the JDO configuration cannot be loaded/unmarshalled. 
+     */
     public static synchronized void loadConfiguration (InputSource source, EntityResolver resolver) 
         throws MappingException 
     {
@@ -99,6 +105,28 @@ public class JDOConfLoader {
             _log.debug( "Loaded jdo conf successfully" ); 
         }
     }
+
+    /**
+     * Loads the JDO configuration from the specified InputSource.
+     * @param jdoConf An JDoConf instance representing a JDO configuration to be loaded.
+     */
+    public static synchronized void loadConfiguration (JdoConf jdoConf) 
+	{
+    	
+    	if (!_loaded) {
+    		
+    		_jdoConf = jdoConf;
+    		
+    		_loaded = true;
+    		_log.debug( "Loaded jdo conf successfully" ); 
+    	}
+	}
+
+    public static Database getDatabase (JdoConf jdoConf) 
+	{
+    	loadConfiguration (jdoConf);
+    	return _jdoConf.getDatabase();
+	}
     
     public static Database getDatabase (InputSource source, EntityResolver resolver) 
         throws MappingException 
