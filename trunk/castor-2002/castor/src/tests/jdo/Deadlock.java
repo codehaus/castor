@@ -54,7 +54,7 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-
+import org.exolab.castor.jdo.TransactionNotInProgressException;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.framework.Assert;
@@ -75,22 +75,22 @@ public class Deadlock extends CastorTestCase {
     /**
      * The JDO database used for setUp
      */
-    private Database       _db;
+    private Database        _db;
 
     /**
      * The JDO database used for first concurrent transactions
      */
-    private Database       _firstDb;
+    private Database        _firstDb;
 
     /**
      * The JDO database used for second concurrent transactions
      */
-    private Database       _secondDb;
+    private Database        _secondDb;
 
     /**
      * The JDO test suite for this test case
      */
-    private JDOCategory    _category;
+    private JDOCategory     _category;
 
     /**
      * The time a transaction sleep and wait for another transaction to
@@ -101,23 +101,29 @@ public class Deadlock extends CastorTestCase {
     /**
      * AccessMode used in the tests
      */
-    private short            _accessMode;
+    private short           _accessMode;
 
     /**
      * The java object to be synchronized on
      */
-    private Object           _lock;
+    private Object          _lock;
 
     /**
      * The thread that the first transaction is running on
      */
-    private Thread           _first;
+    private FirstThread     _first;
+
+
+    private Exception       _firstProblem;
+
 
     /**
      * The thread that the second transaction is running on
      */
-    private Thread           _second;
+    private SecondThread    _second;
 
+
+    private Exception       _secondProblem;
 
     /**
      * Constructor
@@ -215,13 +221,27 @@ public class Deadlock extends CastorTestCase {
         _accessMode = accessMode;
         _lock = new Object();
         _first = new FirstThread( _firstDb, this );
+        _firstProblem = null;
         _second = new SecondThread( _secondDb, this );
+        _secondProblem = null;
 
         _second.start();
         _first.start();
 
         _first.join();
         _second.join();
+
+        if ( !_first._resultOk || !_second._resultOk ) {
+            if ( _firstProblem != null )
+                _firstProblem.printStackTrace( stream );
+            if ( _secondProblem != null )
+                _secondProblem.printStackTrace( stream );
+            if ( !_first._resultOk )
+                stream.println("first failed");
+            if ( !_second._resultOk )
+                stream.println("second failed");
+            fail("unexpected deadlock behavior");
+        }
     }
     
     /**
@@ -241,7 +261,7 @@ public class Deadlock extends CastorTestCase {
         
         private Database         _db;
 
-        private boolean          _result = true;
+        private boolean          _resultOk;
 
         private Deadlock         _theTest;
 
@@ -252,7 +272,7 @@ public class Deadlock extends CastorTestCase {
 
 
         boolean result() {
-            return _result;
+            return _resultOk;
         }
 
 
@@ -291,7 +311,7 @@ public class Deadlock extends CastorTestCase {
                 if ( _second.isAlive() ) {
                     synchronized ( _lock ) {
                         _lock.notify();
-                        _lock.wait();
+                        _lock.wait( 2000 );
                     }
                 }
                 // Give the other thread a 2 second opportunity.
@@ -301,9 +321,24 @@ public class Deadlock extends CastorTestCase {
                 // lock blocking until the first transaction completes.
                 _theTest.stream.println( "1.5: Committing" );
                 _db.commit();
+
+                if ( _second.isAlive() ) {
+                    synchronized ( _lock ) {
+                        _lock.notify();
+                    }
+                }
+
                 _theTest.stream.println( "1.6: Committed" );
+                _resultOk = true;
             } catch ( Exception except ) {
-                fail( "1.X: " + except );
+                _theTest._firstProblem = except;
+                _theTest.stream.println( "1.X: " + except );
+            } finally {
+                try {
+                    if ( _db.isActive() )
+                        _db.rollback();
+                } catch ( TransactionNotInProgressException e ) {
+                }
             }
         }
         
@@ -316,7 +351,7 @@ public class Deadlock extends CastorTestCase {
 
         private Deadlock         _theTest;
 
-        private boolean          _result = true;
+        private boolean          _resultOk;
 
 
         SecondThread( Database db, Deadlock theTest ) {
@@ -326,7 +361,7 @@ public class Deadlock extends CastorTestCase {
 
 
         boolean result() {
-            return _result;
+            return _resultOk;
         }
 
 
@@ -337,8 +372,11 @@ public class Deadlock extends CastorTestCase {
             long         start;
 
             try {
-                _db.begin();
-                
+
+                int xx = 0;
+
+                _db.begin(); 
+
                 // Suspend
                 synchronized ( _lock ) {
                     _lock.wait();
@@ -372,10 +410,11 @@ public class Deadlock extends CastorTestCase {
                          _accessMode == Database.DbLocked ) {
                         _theTest.stream.println( "2.X OK: Deadlock detected" );
                     } else {
-                        _result = false;
+                        _theTest._secondProblem = except;
                         _theTest.stream.println( "2.X Error: " + except );
                     }
                     _db.rollback();
+                    _resultOk = true;
                     return;
                 }
                 object.setValue1( TestObject.DefaultValue1 + ":2" );
@@ -394,21 +433,31 @@ public class Deadlock extends CastorTestCase {
                 // lock blocking until the first transaction completes.
                 _theTest.stream.println( "2.5: Committing" );
                 _db.commit();
-                _result = false;
+
+                synchronized ( _lock ) {
+                    _lock.notify();
+                }
                 _theTest.stream.println( "2.6 Error: deadlock not detected" );
                 _theTest.stream.println( "2.6 Second: Committed" );
+                _theTest._secondProblem = new Exception("deadlock not detected");
             } catch ( TransactionAbortedException except ) {
-                if ( except.getException() instanceof LockNotGrantedException )
+                if ( except.getException() instanceof LockNotGrantedException ) {
                     _theTest.stream.println( "2.X OK: Deadlock detected" );
-                else {
-                    _result = false;
+                    _resultOk = true;
+                } else {
+                    _theTest._secondProblem = except;
                     _theTest.stream.println( "2.X Error: " + except );
                 }
                 _theTest.stream.println( "2.X Second: aborting" );
             } catch ( Exception except ) {
-                _result = false;
+                _theTest._secondProblem = except;
                 _theTest.stream.println( "2.X Error: " + except );
-                except.printStackTrace();
+            } finally {
+                try {
+                    if ( _db.isActive() )
+                        _db.rollback();
+                } catch ( TransactionNotInProgressException e ) {
+                }
             }
         }
         
