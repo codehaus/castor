@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Updated documentation to explain that no auto-mapping of
+       java.util.Date takes place; users must decide whether to
+       map a particular date field to java.sql.Date, java.sql.Time,
+       or java.sql.Timestamp.
+
 XML:   Fixed bug with auto-complete and text-nodes. Basically the field
        descriptor for text-nodes was not getting copied to the new
        ClassDescriptor causing an error with "illegal text content"

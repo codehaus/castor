@@ -153,7 +153,6 @@ org.exolab.castor.jdo.defaultTimeZone=
         <tr><td>blob</td><td>java.io.InputStream</td></tr>
         <tr><td>char</td><td>java.lang.String</td></tr>
         <tr><td>clob</td><td>java.sql.Clob</td></tr>
-        <tr><td>date</td><td>java.sql.Date</td></tr>
         <tr><td>decimal</td><td>java.math.BigDecimal</td></tr>
         <tr><td>double</td><td>java.lang.Double</td></tr>
         <tr><td>float</td><td>java.lang.Double</td></tr>
@@ -175,6 +174,18 @@ org.exolab.castor.jdo.defaultTimeZone=
   <field name="prodId" type"integer">
     <sql name="prod_id" type="numeric"/>
   </field>]]></pre>
+  
+      <p>Please note that java.util.Date is not automatically converted into a java.sql.Date object;
+         while it is in theory possible to do so, there are three different possible storage formats
+         for date information:  as a java.sql.Date, java.sql.Time, and java.sql.Timestamp.  Rather than
+         impose a possibly inappropriate data mapping on an entry, no automatic transformation will take
+         place.</p>
+      <p>JDBC drivers which do not, themselves, perform a mapping between java.util.Date and the
+         sql format specified on the database will throw an error when java.util.Date is passed to them
+         on the prepared statement.  Moreover, auto-conversion of java.util.Date is outside of the JDBC
+         specification; it is not a supported auto-convert format.</p>
+      <p>Users wishing to store date information into the database should ensure that they set date, time,
+         or timestamp as the sql type on the <i>sql-type</i> attribute.</p>
 
     </section>
 
