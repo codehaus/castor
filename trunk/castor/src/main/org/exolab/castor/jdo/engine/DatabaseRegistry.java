@@ -217,7 +217,12 @@ public class DatabaseRegistry
     {
         return _name;
     }
-    
+
+    public DataSource getDataSource()
+    {
+        return _dataSource;
+    }
+
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver,
                                                   LogInterceptor logInterceptor, ClassLoader loader )
         throws MappingException
