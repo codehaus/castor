@@ -16,6 +16,7 @@ JAVA=$JAVA_HOME/bin/java
 
 CLASSPATH=$CLASSPATH:./build/classes:./build/tests
 CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=`echo lib/tests/*.jar | tr ' ' ':'`:$CLASSPATH
 
 $JAVA -cp $CLASSPATH Main -execute $1 $2 $3 $4 $5 $6
 
