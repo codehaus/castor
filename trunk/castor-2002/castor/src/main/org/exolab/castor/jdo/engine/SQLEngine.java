@@ -318,6 +318,56 @@ class SQLEngine
     }
 
 
+    public boolean dirtyCheck( Connection conn, Object obj, Object primKey )
+	throws  ODMGSQLException
+    {
+	PreparedStatement stmt;
+	ResultSet         rs;
+	FieldDesc[]       pkDescs = null;
+	Object            pk;
+	Object            thisPk;
+
+	try {
+	    stmt = conn.prepareStatement( _sqlLoad );
+	    if ( _primKey.isPrimitive() ) {
+		stmt.setObject( 1, primKey );
+	    } else {
+		pkDescs = _primKey.getFieldDescs();
+		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
+		    stmt.setObject( 1 + i, pkDescs[ i ].getValue( primKey ) );
+		}
+	    }
+	    
+	    rs = stmt.executeQuery();
+	    if ( ! rs.next() ) {
+		return false;
+	    }
+	    
+	    do {
+		// First iteration for a PK: traverse all the fields
+		for ( int i = 0; i < _loadFields.length ; ++i  ) {
+		    Object objValue;
+		    Object sqlValue;
+
+		    // Usinging typed setValue so float/double, int/long
+		    // can be intermixed with automatic conversion, something
+		    // that throws an exception in the untyped version
+		    objValue = _loadFields[ i ].getValue( obj );
+		    sqlValue = rs.getObject( i + 1 );
+		    if ( ( objValue == null && sqlValue != null ) ||
+			 ( objValue != null && ! objValue.equals( sqlValue ) ) )
+			return false;
+		}
+	    } while ( rs.next() );
+	    rs.close();
+	    stmt.close();
+	} catch ( SQLException except ) {
+	    throw new ODMGSQLException( except );
+	}
+	return true;
+    }
+
+
     public Object query( Connection conn, String sql, Object[] values )
 	throws  ODMGSQLException
     {

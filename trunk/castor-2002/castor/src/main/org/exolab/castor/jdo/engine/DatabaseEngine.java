@@ -58,7 +58,9 @@ import org.odmg.ClassNotPersistenceCapableException;
 import org.odmg.ObjectDeletedException;
 import org.odmg.ODMGException;
 import org.odmg.ODMGRuntimeException;
+import javax.transaction.xa.Xid;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ODMGSQLException;
 import org.exolab.castor.jdo.desc.ObjectDesc;
 
@@ -120,6 +122,9 @@ public final class DatabaseEngine
      * used as the key.
      */
     private static Hashtable  _dbEngines = new Hashtable();
+
+
+    private static Hashtable  _txXid = new Hashtable();
 
     
     private DatabaseEngine( DatabaseSource dbs, PrintWriter logWriter )
@@ -259,7 +264,7 @@ public final class DatabaseEngine
      * @throws ObjectDeletedException The object has been deleted from
      *   persistent storage
      */
-    OID load( Class type, Object primKey, TransactionContext tx,
+    OID load( TransactionContext tx, Class type, Object primKey,
 	      boolean exclusive, int timeout )
 	throws ODMGException, LockNotGrantedException, ObjectDeletedException
     {
@@ -343,227 +348,7 @@ public final class DatabaseEngine
     } 
 
 
-    /**
-     * Creates a new object in this engine. The object must not have been
-     * persisted before. If the object has a primary key, that primary key
-     * is used to create a copy of the object in the persistence engine and
-     * an {@link OID} with that primary key is returned. If the object has
-     * no primary key, a unique {@link OID} is created, the object is not
-     * created in the persistence engine until the transaction commits and
-     * the object cannot be queried inside the transaction.
-     *
-     * @param obj The object to create
-     * @param tx The transaction context
-     * @throws ODMGRuntimeException The object is already persisted or an error
-     *   occured talking to the persistence engine
-     * @throws DuplicatePrimaryKeyExceptionImpl An object with the same
-     *   primary key already exists in this transaction or outside it
-     * @throws ClassNotPersistentCapableException Persistence not
-     *  supported for this class
-     */
-    OID create( Object obj, TransactionContext tx )
-	throws ODMGRuntimeException, DuplicatePrimaryKeyException,
-	       ClassNotPersistenceCapableException
-    {
-	OID        oid;
-	ObjectLock lock;
-	TypeInfo   typeInfo;
-
-	typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
-	synchronized ( tx ) {
-	    if ( typeInfo == null )
-		throw new ClassNotPersistenceCapableExceptionImpl( obj.getClass() );
-	    oid = new OID( this, typeInfo.objDesc, null );
-	    // Make sure object is not persistent. If object has been created,
-	    // deleted or retrieve, this is an error.
-	    if ( getObjectOID( obj ) != null  )
-		throw new ODMGRuntimeException( "Attempt to persist an object that is already persisted" );
-
-	    // If the object has a primary key, perform duplicate primary
-	    // key check at this point and report duplicates.
-	    if ( oid.getPrimaryKey() != null ) {
-		// If we can grab a lock for the object, then a duplicate primary
-		// key exists.
-		if ( getLock( oid ) != null )
-		    throw new DuplicatePrimaryKeyException( obj.getClass(), oid.getPrimaryKey() );
-		// Create the object in the database, preventing concurrent
-		// object creation and further complaining about duplicate key.
-		typeInfo.engine.create( tx.getConnection( this ), obj, oid.getPrimaryKey() );
-	    }
-		
-	    // Record the object as created in this database and acquire
-	    // write lock on the object. The object will only be retrieved
-	    // by this transaction until the lock is released on commit.
-	    lock = new ObjectLock( obj );
-	    try {
-		lock.acquire( tx, true, 0 );
-	    } catch ( Exception except ) {
-		// This should never happen
-	    }
-	    setLock( oid, lock );
-	}
-	return oid;
-    }
-
-
-    /**
-     * Acquires a write lock on the object. The object must have been
-     * created or queried in this transaction (hence have a read lock).
-     * The object can only be deleted/stored after a lock has been
-     * obtained.
-     * 
-     * @param obj The object to lock
-     * @param tx The transaction context
-     * @throws ObjectNotPersistentException The object is not persistent
-     *   in this database
-     * @throws ODMGRuntimeException The object has not been queried/created in
-     *   this transaction
-     * @throws LockNotGrantedException Attempt to acquire the lock
-     *   timed out or a deadlock has been detected
-     * @throws ObjectDeletedException The object has been deleted
-     */
-    void writeLock( Object obj, TransactionContext tx )
-	throws ODMGRuntimeException, LockNotGrantedException
-    {
-	OID        oid;
-	ObjectLock lock;
-	TypeInfo   typeInfo;
-
-	typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
-	synchronized ( tx ) {
-	    oid = getOID( obj );
-	    // If we do not know about the object in this engine, the
-	    // object is not persistent. An object cannot be deleted
-	    // if it was not created/deleted from a given database.
-	    if ( oid == null )
-		throw new ObjectNotPersistentExceptionImpl( obj );
-	    lock = getLock( oid );
-
-	    // If this transaction has no read/write lock on the object,
-	    // the object has not been queried/retrieved in this transaction.
-	    if ( ! lock.hasLock( tx, false ) )
-		throw new ODMGRuntimeException( "Object has not been queried/created in this transaction" );
-
-	    synchronized ( tx ) {
-		// Must acquire write lock on the object in order to delete
-		// it. Will complain if timeout/deadlock occurs.
-		lock.acquire( tx, true, _lockTimeout );
-
-		// Attempt to obtain a lock on the database. If this attempt
-		// fails, release the lock and report the exception.
-		try {
-		    typeInfo.engine.writeLock( tx.getConnection( this ),
-					       obj, oid.getPrimaryKey() );
-		} catch ( ODMGSQLException except ) {
-		    lock.release( tx );
-		    throw new LockNotGrantedException( "Persistence engine reported:" +
-						       except.toString() );
-		}
-	    }
-	}
-    }
-
-
-    /**
-     * Deletes the object. The object must have been write locked
-     * prior to this call. The object is deleted from the persistence
-     * engine, but not removed from memory. Called when the transaction
-     * commits, must call {@link #forgetObject} afterwards.
-     *
-     * @param oid The object OID
-     * @param tx The transaction context
-     * @throws ODMGException An error occured with the persistence
-     *   engine
-     */
-    void delete( OID oid, TransactionContext tx )
-	throws ODMGException
-    {
-	ObjectLock lock;
-	Object     obj;
-	TypeInfo   typeInfo;
-
-	synchronized ( tx ) {
-	    lock = getLock( oid );
-	    // If this transaction has no write lock on the object,
-	    // something went foul.
-	    obj = lock.acquire( tx, true, 0 );
-	    typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
-	    typeInfo.engine.delete( tx.getConnection( this ),
-				    obj, oid.getPrimaryKey() );
-	}
-    }
-
-
-    /**
-     * Stores the object. The object must have been write locked
-     * prior to this call. The object is updated in the database and
-     * the lock is released. If the object is created at this point
-     * or the primary key has changed, an new {@link OID} will be
-     * returned and must be used for subsequent object access.
-     *
-     * @param oid The object OID
-     * @param tx The transaction context
-     * @param oid The object OID
-     * @throws ODMGException An error occured with the persistence
-     *   engine
-     * @throws LockNotGrantedException Timeout or deadlock occured
-     *   attempting to obtain write lock on object
-     * @throws ObjectDeletedException The object has been deleted
-     */
-    OID store( OID oid, Object obj, TransactionContext tx )
-	throws ODMGException, LockNotGrantedException, ObjectDeletedException
-    {
-	Object     locked;
-	ObjectLock lock;
-	Object     newPrimKey;
-	Object     oldPrimKey;
-	TypeInfo   typeInfo;
-
-	synchronized ( tx ) {
-	    lock = getLock( oid );
-	    // Must acquire a write lock on the object in order to proceed
-	    locked = lock.acquire( tx, true, _lockTimeout );
-	    typeInfo = (TypeInfo) _typeInfo.get( locked.getClass() );
-	    if ( typeInfo.interceptor != null )
-		typeInfo.interceptor.storing( obj );
-
-	    // If the object has a primary key, it was retrieved/created
-	    // before and need only be stored. If the object has no
-	    // primary key, the object must be created at this point.
-	    oldPrimKey = oid.getPrimaryKey();
-	    newPrimKey = typeInfo.objDesc.getPrimaryKeyField().getValue( obj );
-	    if ( newPrimKey == null )
-		throw new ODMGException( "Attempt to create/store object without setting the primary key" );
-	    if ( oldPrimKey == null ) {
-		oid = new OID( this, typeInfo.objDesc, newPrimKey );
-		if ( getLock( oid ) != null )
-		    throw new DuplicatePrimaryKeyException( obj.getClass(), newPrimKey );
-		removeOID( obj );
-		removeLock( oid );
-		typeInfo.engine.create( tx.getConnection( this ), obj, newPrimKey );
-		typeInfo.objDesc.copyInto( obj, locked );
-		setLock( oid, lock );
-		setOID( locked, oid );
-	    } else if ( newPrimKey == oldPrimKey ||
-			typeInfo.objDesc.getPrimaryKey().equals( oldPrimKey, newPrimKey ) ) {
-		typeInfo.engine.store( tx.getConnection( this ), obj, oldPrimKey );
-	    } else {
-		// XXX
-		// typeInfo.engine.changePK( tx.getConnection( this ), oldPrimKey, newPrimKey );
-		removeOID( obj );
-		removeLock( oid );
-		typeInfo.engine.store( tx.getConnection( this ), obj, newPrimKey );
-		oid = new OID( this, typeInfo.objDesc, newPrimKey );
-		setLock( oid, lock );
-		setOID( locked, oid );
-	    }
-	    
-	}
-	return oid;
-    }
-
-
-    OID query( Class type, String sql, Object[] values, TransactionContext tx,
+    OID query( TransactionContext tx, Class type, String sql, Object[] values,
 	       boolean exclusive, int timeout )
 	throws ODMGException, LockNotGrantedException, ObjectDeletedException
     {
@@ -639,6 +424,254 @@ public final class DatabaseEngine
 
 
     /**
+     * Creates a new object in this engine. The object must not have been
+     * persisted before. If the object has a primary key, that primary key
+     * is used to create a copy of the object in the persistence engine and
+     * an {@link OID} with that primary key is returned. If the object has
+     * no primary key, a unique {@link OID} is created, the object is not
+     * created in the persistence engine until the transaction commits and
+     * the object cannot be queried inside the transaction.
+     *
+     * @param obj The object to create
+     * @param primKey The primary key, if known at time of creation
+     * @param tx The transaction context
+     * @throws ODMGRuntimeException The object is already persisted or an error
+     *   occured talking to the persistence engine
+     * @throws DuplicatePrimaryKeyExceptionImpl An object with the same
+     *   primary key already exists in this transaction or outside it
+     * @throws ClassNotPersistentCapableException Persistence not
+     *  supported for this class
+     */
+    OID create( TransactionContext tx, Object obj, Object primKey )
+	throws ODMGRuntimeException, DuplicatePrimaryKeyException,
+	       ClassNotPersistenceCapableException
+    {
+	OID        oid;
+	ObjectLock lock;
+	TypeInfo   typeInfo;
+
+	typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
+	synchronized ( tx ) {
+	    if ( typeInfo == null )
+		throw new ClassNotPersistenceCapableExceptionImpl( obj.getClass() );
+	    oid = new OID( this, typeInfo.objDesc, primKey );
+	    // Make sure object is not persistent. If object has been created,
+	    // deleted or retrieve, this is an error.
+	    if ( getObjectOID( obj ) != null  )
+		throw new ODMGRuntimeException( "Attempt to persist an object that is already persisted" );
+
+	    // If the object has a primary key, perform duplicate primary
+	    // key check at this point and report duplicates.
+	    if ( oid.getPrimaryKey() != null ) {
+		// If we can grab a lock for the object, then a duplicate primary
+		// key exists.
+		if ( getLock( oid ) != null )
+		    throw new DuplicatePrimaryKeyException( obj.getClass(), oid.getPrimaryKey() );
+		// Create the object in the database, preventing concurrent
+		// object creation and further complaining about duplicate key.
+		typeInfo.engine.create( tx.getConnection( this ), obj, oid.getPrimaryKey() );
+	    }
+		
+	    // Record the object as created in this database and acquire
+	    // write lock on the object. The object will only be retrieved
+	    // by this transaction until the lock is released on commit.
+	    lock = new ObjectLock( obj );
+	    try {
+		lock.acquire( tx, true, 0 );
+	    } catch ( Exception except ) {
+		// This should never happen
+	    }
+	    setLock( oid, lock );
+	}
+	return oid;
+    }
+
+
+    /**
+     * Acquires a write lock on the object. The object must have been
+     * created or queried in this transaction (hence have a read lock).
+     * The object can only be deleted/stored after a lock has been
+     * obtained.
+     * 
+     * @param obj The object to lock
+     * @param tx The transaction context
+     * @throws ObjectNotPersistentException The object is not persistent
+     *   in this database
+     * @throws ODMGRuntimeException The object has not been queried/created in
+     *   this transaction
+     * @throws LockNotGrantedException Attempt to acquire the lock
+     *   timed out or a deadlock has been detected
+     * @throws ObjectDeletedException The object has been deleted
+     */
+    void writeLock( TransactionContext tx, OID oid )
+	throws ODMGRuntimeException, LockNotGrantedException
+    {
+	ObjectLock lock;
+	TypeInfo   typeInfo;
+	Object     obj;
+
+	synchronized ( tx ) {
+	    lock = getLock( oid );
+	    // If we do not know about the object in this engine, the
+	    // object is not persistent. An object cannot be deleted
+	    // if it was not created/deleted from a given database.
+	    if ( lock == null )
+		throw new ObjectNotPersistentExceptionImpl( oid );
+
+	    // If this transaction has no read/write lock on the object,
+	    // the object has not been queried/retrieved in this transaction.
+	    if ( ! lock.hasLock( tx, false ) )
+		throw new ODMGRuntimeException( "Object has not been queried/created in this transaction" );
+
+	    // Must acquire write lock on the object in order to delete
+	    // it. Will complain if timeout/deadlock occurs.
+	    obj = lock.acquire( tx, true, _lockTimeout );
+	    typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
+	    
+	    // Attempt to obtain a lock on the database. If this attempt
+	    // fails, release the lock and report the exception.
+	    try {
+		typeInfo.engine.writeLock( tx.getConnection( this ),
+					   obj, oid.getPrimaryKey() );
+	    } catch ( ODMGSQLException except ) {
+		lock.release( tx );
+		throw new LockNotGrantedException( "Persistence engine reported:" +
+						   except.toString() );
+	    }
+	}
+    }
+
+
+    void acquire( TransactionContext tx, OID oid, boolean write, int timeout )
+    {
+	ObjectLock lock;
+
+	synchronized ( tx ) {
+	    lock = getLock( oid );
+	    // If we do not know about the object in this engine, the
+	    // object is not persistent. An object cannot be deleted
+	    // if it was not created/deleted from a given database.
+	    if ( lock == null )
+		throw new ObjectNotPersistentExceptionImpl( oid );
+
+	    lock.acquire( tx, write, timeout );
+	    if ( write ) {
+		try {
+		    typeInfo.engine.writeLock( tx.getConnection( this ),
+					       obj, oid.getPrimaryKey() );
+		} catch ( ODMGSQLException except ) {
+		    lock.release( tx );
+		    throw new LockNotGrantedException( "Persistence engine reported:" +
+						       except.toString() );
+		}
+	    }
+	}
+    }
+
+
+    /**
+     * Deletes the object. The object must have been write locked
+     * prior to this call. The object is deleted from the persistence
+     * engine, but not removed from memory. Called when the transaction
+     * commits, must call {@link #forgetObject} afterwards.
+     *
+     * @param oid The object OID
+     * @param tx The transaction context
+     * @throws ODMGException An error occured with the persistence
+     *   engine
+     */
+    void delete( TransactionContext tx, OID oid )
+	throws ODMGException
+    {
+	ObjectLock lock;
+	Object     obj;
+	TypeInfo   typeInfo;
+
+	synchronized ( tx ) {
+	    lock = getLock( oid );
+	    // If this transaction has no write lock on the object,
+	    // something went foul.
+	    obj = lock.acquire( tx, true, 0 );
+	    typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
+	    typeInfo.engine.delete( tx.getConnection( this ),
+				    obj, oid.getPrimaryKey() );
+	}
+    }
+
+
+    /**
+     * Stores the object. The object must have been write locked
+     * prior to this call. The object is updated in the database and
+     * the lock is released. If the object is created at this point
+     * or the primary key has changed, an new {@link OID} will be
+     * returned and must be used for subsequent object access.
+     *
+     * @param oid The object OID
+     * @param tx The transaction context
+     * @param oid The object OID
+     * @throws ODMGException An error occured with the persistence
+     *   engine
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *   attempting to obtain write lock on object
+     * @throws ObjectDeletedException The object has been deleted
+     */
+    OID store( TransactionContext tx, OID oid, Object obj )
+	throws ODMGException, LockNotGrantedException, ObjectDeletedException,
+	       ObjectModifiedException
+    {
+	Object     locked;
+	ObjectLock lock;
+	Object     newPrimKey;
+	Object     oldPrimKey;
+	TypeInfo   typeInfo;
+
+	synchronized ( tx ) {
+	    lock = getLock( oid );
+	    // Must acquire a write lock on the object in order to proceed
+	    locked = lock.acquire( tx, true, _lockTimeout );
+	    typeInfo = (TypeInfo) _typeInfo.get( locked.getClass() );
+	    if ( typeInfo.interceptor != null )
+		typeInfo.interceptor.storing( obj );
+
+	    // If the object has a primary key, it was retrieved/created
+	    // before and need only be stored. If the object has no
+	    // primary key, the object must be created at this point.
+	    oldPrimKey = oid.getPrimaryKey();
+	    newPrimKey = typeInfo.objDesc.getPrimaryKeyField().getValue( obj );
+	    if ( newPrimKey == null )
+		throw new ODMGException( "Attempt to create/store object without setting the primary key" );
+	    if ( oldPrimKey == null ) {
+		oid = new OID( this, typeInfo.objDesc, newPrimKey );
+		if ( getLock( oid ) != null )
+		    throw new DuplicatePrimaryKeyException( obj.getClass(), newPrimKey );
+		removeOID( obj );
+		removeLock( oid );
+		typeInfo.engine.create( tx.getConnection( this ), obj, newPrimKey );
+		typeInfo.objDesc.copyInto( obj, locked );
+		setLock( oid, lock );
+		setOID( locked, oid );
+	    } else if ( newPrimKey == oldPrimKey ||
+			typeInfo.objDesc.getPrimaryKey().equals( oldPrimKey, newPrimKey ) ) {
+		if ( ! typeInfo.engine.dirtyCheck( tx.getConnection( this ), locked, newPrimKey ) )
+		    throw new ObjectModifiedException( obj, newPrimKey );
+		typeInfo.engine.store( tx.getConnection( this ), obj, newPrimKey );
+	    } else {
+		// XXX
+		// typeInfo.engine.changePK( tx.getConnection( this ), oldPrimKey, newPrimKey );
+		removeOID( obj );
+		removeLock( oid );
+		typeInfo.engine.store( tx.getConnection( this ), obj, newPrimKey );
+		oid = new OID( this, typeInfo.objDesc, newPrimKey );
+		setLock( oid, lock );
+		setOID( locked, oid );
+	    }
+	    
+	}
+	return oid;
+    }
+
+
+    /**
      * Releases a lock on the object. Must be called when the
      * transaction commits/aborts on all objects that were not
      * created by the transaction.
@@ -646,7 +679,7 @@ public final class DatabaseEngine
      * @param oid The object OID
      * @param tx The transaction context
      */
-    void releaseLock( OID oid, TransactionContext tx )
+    void releaseLock( TransactionContext tx, OID oid )
     {
 	ObjectLock lock;
 
@@ -665,7 +698,7 @@ public final class DatabaseEngine
      * @param oid The object OID
      * @param tx The transaction context
      */
-    void forgetObject( OID oid, TransactionContext tx )
+    void forgetObject( TransactionContext tx, OID oid )
     {
 	ObjectLock lock;
 	Object     obj;
@@ -695,15 +728,17 @@ public final class DatabaseEngine
      * @param tx The transaction context
      * @return The object
      */
-    Object getObject( OID oid, TransactionContext tx )
-    {
-	try {
-	    return getLock( oid ).acquire( tx, false, 0 );
-	} catch ( LockNotGrantedException except ) {
-	    // This should never happen
-	    throw new ODMGRuntimeException( except.getMessage() );
-	}
-    }
+    /*
+      Object getObject( TransactionContext tx, OID oid )
+      {
+      try {
+      return getLock( oid ).acquire( tx, false, 0 );
+      } catch ( LockNotGrantedException except ) {
+      // This should never happen
+      throw new ODMGRuntimeException( except.getMessage() );
+      }
+      }
+    */
 
 
     void update( TransactionContext tx, OID oid, Object source )
@@ -784,6 +819,37 @@ public final class DatabaseEngine
 	throws SQLException
     {
 	return _dbs.getConnection();
+    }
+
+
+    TransactionContext getTransaction( Xid xid )
+    {
+	synchronized ( _txXid ) {
+	    return (TransactionContext) _txXid.get( xid );
+	}
+    }
+
+
+    TransactionContext newTransaction( Xid xid )
+    {
+	TransactionContext tx;
+
+	synchronized ( _txXid ) {
+	    tx = (TransactionContext) _txXid.get( xid );
+	    if ( tx == null ) {
+		tx = new TransactionContext( xid );
+		_txXid.put( xid, tx );
+	    }
+	    return tx;
+	}
+    }
+
+
+    TransactionContext removeTransaction( Xid xid )
+    {
+	synchronized ( _txXid ) {
+	    return (TransactionContext) _txXid.remove( xid );
+	}
     }
 
 

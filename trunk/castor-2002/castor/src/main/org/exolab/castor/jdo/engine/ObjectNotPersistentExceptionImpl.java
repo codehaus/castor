@@ -69,4 +69,10 @@ public class ObjectNotPersistentExceptionImpl
     }
 
 
+    ObjectNotPersistentExceptionImpl( OID oid )
+    {
+	super( "The object [" + oid + "] is not found in persistent storage" );
+    }
+
+
 }
