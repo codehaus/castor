@@ -1,3 +1,15 @@
+Version 0.8  January 21, 2000
+-----------------------------
+
+Misc: ObjectDesc, FieldDesc and related classed have no been
+      consolidated from the three modules and placed in a single
+      package org.exolab.castor.desc.
+
+Misc: FieldDesc adds required flag, readable/writeable flag, and
+      target type. Some conversions are implemented between field type
+      and target type.
+
+
 Version 0.7.2  January 12, 2000
 -------------------------------
 
