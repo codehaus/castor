@@ -164,8 +164,6 @@ public class JNDIProducer
                                     encode = true;
                         }
                         if (encode) {
-                            MimeBase64Encoder encoder;
-                            encoder = new MimeBase64Encoder();
                             if (wchar) {
                                 bytes = new byte[chars.length << 1];
                                 int j = 0;
@@ -180,11 +178,16 @@ public class JNDIProducer
                                         bytes[i] = (byte)chars[i];
                                 }
                             }
-                            encoder.translate( bytes );
-                            chars = encoder.getCharArray();
-                            attrList.addAttribute( XML.Entries.Attributes.Encoding, "NMTOKEN",
-                                                   XML.Entries.Attributes.Encodings.Base64 );
                         }
+                    }
+
+                    if (bytes != null)
+                    {
+                        MimeBase64Encoder encoder = new MimeBase64Encoder();
+                        encoder.translate( bytes );
+                        chars = encoder.getCharArray();
+                        attrList.addAttribute( XML.Entries.Attributes.Encoding, "NMTOKEN", 
+                                               XML.Entries.Attributes.Encodings.Base64 );
                     }
                     _docHandler.startElement( prefix( XML.Entries.Elements.Value ), attrList );
                     _docHandler.characters( chars, 0, chars.length );
