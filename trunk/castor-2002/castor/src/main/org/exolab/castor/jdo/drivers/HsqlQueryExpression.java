@@ -297,7 +297,7 @@ public final class HsqlQueryExpression
 
           first = addWhereOrAnd(buffer, first);
 
-          addJoin(buffer, join);
+          addJoin(buffer, aliasInfo, join);
         }
 
         first = addOuterJoins(buffer, aliasInfo, first);
@@ -305,19 +305,32 @@ public final class HsqlQueryExpression
         return first;
     }
 
-    private void addJoin(StringBuffer buffer, Join join)
+    private void addJoin(StringBuffer buffer, HsqlAliasInfo aliasInfo, Join join)
     {
+        String where;
+
         for ( int j = 0 ; j < join.leftColumns.length ; ++j )
         {
             if ( j > 0 )
                 buffer.append( JDBCSyntax.And );
 
+            where = quoteTableAndColumn( join.leftTable, join.leftColumns[j] );
             buffer.append
-              ( quoteTableAndColumn( join.leftTable, join.leftColumns[j] ) );
+              ( checkForAlias(aliasInfo, join.leftTable, where) );
             buffer.append( OpEquals );
+
+            where = quoteTableAndColumn( join.rightTable, join.rightColumns[j] );
             buffer.append
-              ( quoteTableAndColumn( join.rightTable, join.rightColumns[j] ) );
+              (  checkForAlias(aliasInfo,join.rightTable, where) );
         }
+    }
+
+    private String checkForAlias(HsqlAliasInfo aliasInfo, String tableName, String where) {
+        String alias = aliasInfo.getAnAliasFor(tableName);
+        if( alias != null ) {
+            return substituteAlias(where,tableName,alias);
+        }
+        return where;
     }
 
     /**
