@@ -54,8 +54,13 @@ package org.exolab.castor.xml;
 public class StringValidator implements TypeValidator {
     
     
-    private String regex     = null;
-    private boolean required = false;
+    private String  regex     = null;
+    
+    private boolean required  = false;
+    
+    private int minLength = 0;
+    
+    private int maxLength = -1;
     
     /**
      * Creates a new StringValidator with no restrictions
@@ -64,6 +69,23 @@ public class StringValidator implements TypeValidator {
         super();
     } //-- StringValidator
     
+    
+    /**
+     * Sets the maximum length of that a valid String must be.
+     * To remove the max length facet, use a negative value.
+     * @param maxLength the maximum length for valid Strings
+    **/
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    } //-- setMaxLength
+    
+    /**
+     * Sets the minimum length that valid Strings must be
+     * @param minLength the minimum length that valid Strings must be
+    **/
+    public void setMinLength(int minLength) {
+        this.minLength = minLength;
+    } //-- setMinLength
     
     /**
      * Sets the Regular Expression that Strings validated with this
@@ -84,8 +106,26 @@ public class StringValidator implements TypeValidator {
     public void validate(String value) 
         throws ValidationException 
     {
-        //-- do nothing for now, add regex code later
         
+        if (value == null) {
+            if (required) {
+                String err = "this is a required field and cannot be null.";
+                throw new ValidationException(err);
+            }
+        }
+        else {
+            int len = value.length();
+            if ((minLength > 0) && (len < minLength)) {
+                String err = "strings of this type must have a minimum "
+                    + "length of " + minLength;
+                throw new ValidationException(err);
+            }
+            else if ((maxLength >= 0) && (len > maxLength)) {
+                String err = "strings of this type must have a maximum "
+                    + "length of " + maxLength;
+                throw new ValidationException(err);
+            }
+        }
     } //-- validate
     
     /**

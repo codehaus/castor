@@ -62,6 +62,19 @@ public class XSString extends XSType {
         
     private String value = null;
     
+    /**
+     * The max length facet
+    **/
+    private int maxLength = -1;
+    
+    /**
+     * The min length facet
+    **/
+    private int minLength =  0;
+    
+    /**
+     * Creates a new XSString
+    **/
     public XSString() {
         super(XSType.STRING);
     } //-- XSString
@@ -84,8 +97,62 @@ public class XSString extends XSType {
     **/
     public JType getJType() {
         return this.jType;
-    }
+    } //-- getJType
     
+    /**
+     * Returns the maximum length occurances of this type can be.
+     * A negative value denotes no maximum length     
+     * @return the maximum length facet
+    **/
+    public int getMaxLength() {
+        return maxLength;
+    } //-- getMaxLength
+    
+    /**
+     * Returns the minimum length occurances of this type can be.
+     * @return the minimum length facet
+    **/
+    public int getMinLength() {
+        return minLength;
+    } //-- getMinLength
+    
+    /**
+     * Returns true if a maximum length has been set
+     * @return true if a maximum length has been set
+    **/
+    public boolean hasMaxLength() {
+        return (maxLength >= 0);
+    } //-- hasMaxLength
+    
+    /**
+     * Returns true if a minimum length has been set
+     * @return true if a minimum length has been set
+    **/
+    public boolean hasMinLength() {
+        return (minLength > 0);
+    } //-- hasMinLength
+    
+    /**
+     * Sets the maximum length of this XSString. To remove the max length
+     * facet, use a negative value.
+     * @param maxLength the maximum length for occurances of this type
+    **/
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    } //-- setMaxLength
+    
+    /**
+     * Sets the minimum length of this XSString. 
+     * @param minLength the minimum length for occurances of this type
+    **/
+    public void setMinLength(int minLength) {
+        this.minLength = minLength;
+    } //-- setMinLength
+    
+    /**
+     * Returns the String value of this XSString
+     * @return thr String value of this XSString
+    **/
     public String toString() {
         return value;
     }

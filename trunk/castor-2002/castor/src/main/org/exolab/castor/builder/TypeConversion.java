@@ -283,6 +283,17 @@ public class TypeConversion {
     **/
     private static XSString toXSString(Datatype datatype) {
         XSString xsString = new XSString();
+        //-- copy valid facets
+        Enumeration enum = datatype.getFacets();
+        while (enum.hasMoreElements()) {
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+            //-- maxlength
+            if (Facet.MAX_LENGTH.equals(name))
+                xsString.setMaxLength(facet.toInt());
+            else if (Facet.MIN_LENGTH.equals(name))
+                xsString.setMinLength(facet.toInt());
+        }
         return xsString;
     } //-- toXSString
     

@@ -672,7 +672,23 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
             case XSType.STRING:
-                jsc.add("fieldValidator.setValidator(new StringValidator());");
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("StringValidator sv = new StringValidator();");
+                XSString xsString = (XSString)xsType;
+                if (xsString.hasMinLength()) {
+                    jsc.add("sv.setMinLength(");
+                    jsc.append(Integer.toString(xsString.getMinLength()));
+                    jsc.append(");");
+                }
+                if (xsString.hasMaxLength()) {
+                    jsc.add("sv.setMaxLength(");
+                    jsc.append(Integer.toString(xsString.getMaxLength()));
+                    jsc.append(");");
+                }
+                jsc.add("fieldValidator.setValidator(sv);");
+                jsc.unindent();
+                jsc.add("}");
                 break;
             case XSType.NCNAME:
                 jsc.add("fieldValidator.setValidator(new NameValidator());");
