@@ -768,13 +768,13 @@ public abstract class XMLTestCase extends TestCase {
         classpath.setPath(System.getProperty("java.class.path"));
         compiler.setClasspath(classpath);
         
-        compileDirectory(srcDir, compiler);
+        compileDirectory(srcDir, srcDir, compiler);
         
         
     } //-- compileDirectory
     
         
-    private void compileDirectory(File srcDir, Javac compiler) 
+    private void compileDirectory(File srcDir, File root, Javac compiler) 
         throws BuildException
     {
         
@@ -792,23 +792,25 @@ public abstract class XMLTestCase extends TestCase {
             compiler.setClasspath(classpath);
         }
         
+        if (root == null) root = srcDir;
+        
         //--no argument checking
         File[] entries = srcDir.listFiles();
         
         for(int i=0; i<entries.length; i++) {
             File entry = entries[i];
             if (entry.isDirectory() && !entry.getName().endsWith("CVS")) {
-                 compileDirectory(entry, compiler);
+                 compileDirectory(entry, root, compiler);
             }
         }
         entries = null;
         
         Path sourcepath = compiler.createSrc(); 
         //--Are we compiling nested packages?
-        //if (srcDir.equals(_outputRootFile))
+        if (srcDir.equals(root))
              sourcepath.setLocation(srcDir);
-        //else 
-            //sourcepath.setLocation(directory.getParentFile());
+        else 
+            sourcepath.setLocation(root);
         compiler.setSrcdir(sourcepath);
         compiler.execute();
         
