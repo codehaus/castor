@@ -170,19 +170,17 @@ class EqualityExprImpl extends BinaryExprImpl
                             return BooleanResult.TRUE;
                     }
                 }
+                return BooleanResult.FALSE;                
             }
             //-- only left-side object is a node-set
-            else if (rType != XPathResult.BOOLEAN) {
+            else if (rType != XPathResult.BOOLEAN) {                
                 for (int i = 0; i < lnodes.size(); i++) {
                     lResult = new StringResult(lnodes.item(i).getStringValue());
                     if (compare(lResult, rResult))
                         return BooleanResult.TRUE;
                 }
+                return BooleanResult.FALSE;
             }
-            if (_op == NOT_EQUAL) {
-                return BooleanResult.TRUE;
-            }
-            return BooleanResult.FALSE;
         }
         else if ((rType == XPathResult.NODE_SET) && 
                  (lType != XPathResult.BOOLEAN)) 
@@ -193,9 +191,6 @@ class EqualityExprImpl extends BinaryExprImpl
                 rResult = new StringResult(rnodes.item(i).getStringValue());
                 if (compare(lResult, rResult))
                     return BooleanResult.TRUE;
-            }
-            if (_op == NOT_EQUAL) {
-                return BooleanResult.TRUE;
             }
             return BooleanResult.FALSE;
         }
