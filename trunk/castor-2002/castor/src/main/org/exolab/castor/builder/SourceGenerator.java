@@ -50,6 +50,7 @@ import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.types.BuiltInType;
 
 import org.exolab.javasource.*;
+import org.exolab.castor.builder.util.ConsoleDialog;
 import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.util.Configuration;
 
@@ -118,6 +119,7 @@ public class SourceGenerator {
     */
     private SourceFactory sourceFactory = null;
 
+    private ConsoleDialog dialog = null;
     /**
      * Creates a SourceGenerator using the default FieldInfo factory
      */
@@ -132,6 +134,8 @@ public class SourceGenerator {
     public SourceGenerator(FieldInfoFactory infoFactory) {
         super();
 
+        dialog = new ConsoleDialog();
+        
         if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
@@ -554,7 +558,7 @@ public class SourceGenerator {
             File file = new File(filename);
             if (file.exists()) {
                 String message = filename + " already exists. overwrite?";
-                allowPrinting = confirm(message);
+                allowPrinting = dialog.confirm(message);
             }
         }
 
@@ -579,7 +583,7 @@ public class SourceGenerator {
                 File file = new File(filename);
                 if (file.exists()) {
                     String message = filename + " already exists. overwrite?";
-                    allowPrinting = confirm(message);
+                    allowPrinting = dialog.confirm(message);
                 }
             }
 
@@ -593,49 +597,5 @@ public class SourceGenerator {
     } //-- processClassInfo
 
 
-    private boolean confirm(String message) {
-
-        try {
-            while (true) {
-                System.out.println();
-                System.out.print(message);
-                System.out.print( "(y|n|?) : ");
-
-                int ch = System.in.read();
-
-                //-- read eoln, or extra characters
-                while (System.in.available() > 0) {
-                    switch (System.in.read()) {
-                        case '\n':
-                        case '\r':
-                            break;
-                        default:
-                            ch = '\0';
-                    }
-                }
-
-                System.out.println();
-
-                //-- check ch
-                switch (ch) {
-                    case 'y':
-                        return true;
-                    case 'n':
-                        return false;
-                    case '?':
-                        System.out.println("y = yes, n = no");
-                        break;
-                    default:
-                        System.out.print("invalid input, expecting ");
-                        System.out.println("'y', 'n', or '?'.");
-                        break;
-                }
-            }
-        }
-        catch (java.io.IOException ix) {
-            System.out.println(ix);
-        }
-        return false;
-    }
 } //-- SourceGenerator
 

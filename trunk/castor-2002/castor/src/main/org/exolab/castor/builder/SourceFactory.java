@@ -554,6 +554,14 @@ public class SourceFactory  {
         Enumeration enum = archetype.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
+            
+            //-- if we have a new datatype...generate ClassInfo
+            Datatype dtype = attr.getDatatype();
+            if (dtype != null) {
+                if ( ! (dtype instanceof BuiltInType) )
+                createSourceCode(dtype, state, state.packageName);
+            }
+                
             FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
             handleField(fieldInfo, state);
         }
