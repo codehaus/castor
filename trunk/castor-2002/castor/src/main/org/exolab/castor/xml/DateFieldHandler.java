@@ -162,6 +162,13 @@ public class DateFieldHandler extends XMLFieldHandler {
         
     } //-- setValue
     
+    public void resetValue(Object target)
+        throws java.lang.IllegalStateException
+    {
+        handler.resetValue(target);
+    }
+
+
     /**
      * Checks the field validity. Returns successfully if the field
      * can be stored, is valid, etc, throws an exception otherwise.
