@@ -107,7 +107,7 @@ public final class Entity {
      * Notice that not every entity span all entity class and sub entity
      * classes in the EntityInfo.
      */
-    public Values[] values;
+    public Values values;
 
     public boolean equals(Object obj) {
         Entity ent;
@@ -130,7 +130,7 @@ public final class Entity {
     /**
      * Values of an entity.
      */
-    public final class Values {
+    public final static class Values {
 
         /**
          * The sub entity name which this values belongs to.
