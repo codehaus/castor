@@ -328,7 +328,7 @@ public class FieldInfo extends XMLInfo {
                 "' has the following description: ";
             mComment += _comment;
         }
-        jDocComment.appendComment(mComment);
+        jDocComment.setComment(mComment);
         jDocComment.addDescriptor(JDocDescriptor.createReturnDesc(at_return));
     } //-- createGetterComment
 
@@ -355,7 +355,8 @@ public class FieldInfo extends XMLInfo {
                 "' has the following description: ";
             mComment += _comment;
         }
-        jDocComment.appendComment(mComment);
+            
+        jDocComment.setComment(mComment);
 
         JDocDescriptor paramDesc = jDocComment.getParamDescriptor(fieldName);
         if (paramDesc == null) {
