@@ -404,8 +404,6 @@ public class SourceGenerator {
     {
         if (filename.startsWith("./"))
              filename = filename.substring(2);
-        if (filename.startsWith("/"))
-             filename = filename.substring(1);
         FileReader reader = new FileReader(filename);
         InputSource source = new InputSource(reader);
         source.setSystemId(toURIRepresentation((new File(filename)).getAbsolutePath()));
