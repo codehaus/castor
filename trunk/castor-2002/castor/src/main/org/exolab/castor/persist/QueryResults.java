@@ -158,8 +158,7 @@ public final class QueryResults
 
     /**
      * Loads the specified object with the identity. The identity must
-     * have been retrieved with a call to {@link #nextIdentity} or
-     * {@link #getIdentity(int)}.
+     * have been retrieved with a call to {@link #nextIdentity}.
      * <p>
      * If the object is locked by another transaction this method will
      * block until the lock is released, or a timeout occured. If a
@@ -176,7 +175,7 @@ public final class QueryResults
      * with a know cache engine, identity and lock and acts on the query
      * results rather than issuing a new query to load the object.
      *
-     * @return obj The loaded object
+     * @return The loaded object
      * @throws ObjectNotFoundException The object was not found in
      *  persistent storage
      * @throws LockNotGrantedException Could not acquire a lock on
@@ -194,7 +193,7 @@ public final class QueryResults
         TransactionContext.ObjectEntry entry;
         OID              oid;
         ClassHandler     handler;
-        Object           obj;
+        Object           object;
         
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
@@ -234,7 +233,7 @@ public final class QueryResults
                         // Either read only or exclusive mode, and we
                         // already have an object in that mode, so we
                         // return that object.
-                        return entry.obj;
+                        return entry.object;
                     }
                 }
             } else {
@@ -243,18 +242,21 @@ public final class QueryResults
                 // record the object in the transaction if in read-write
                 // or exclusive mode.
                 oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-                obj = _engine.getClassHandler( oid.getJavaClass() ).newInstance();
+
+                object = _engine.getClassHandler( oid.getJavaClass() ).newInstance();
+                entry = _tx.addObjectEntry( object, oid, _engine );
                 try {
-                    _engine.copyObject( _tx, oid, obj );
-                } catch ( ObjectNotFoundException except ) {
+                    _engine.copyObject( _tx, oid, object );
+                } catch ( PersistenceException except ) {
+                    _tx.removeObjectEntry( object );
                     _engine.forgetObject( _tx, oid );
                     throw except;
                 }                    
-                if ( _accessMode == AccessMode.ReadOnly )
+                if ( _accessMode == AccessMode.ReadOnly ) {
+                    _tx.removeObjectEntry( object );
                     _engine.releaseLock( _tx, oid );
-                else
-                    _tx.addObjectEntry( obj, oid, _engine );
-                return obj;
+                }
+                return object;
             }
         }
     }
