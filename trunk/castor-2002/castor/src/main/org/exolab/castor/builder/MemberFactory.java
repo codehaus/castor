@@ -203,6 +203,16 @@ public class MemberFactory {
         fieldInfo.setNodeType(XMLInfo.ATTRIBUTE_TYPE);
         fieldInfo.setRequired(attribute.isRequired());
 
+        //-- handle namespace URI / prefix
+        Schema schema = attribute.getSchema();
+        if (schema != null) {
+            String nsURI = schema.getTargetNamespace();
+            if ((nsURI != null) && (nsURI.length() > 0)) {
+                fieldInfo.setNamespaceURI(nsURI);
+            }
+        }
+
+
         String value = attribute.getValue();
         if (value != null) {
 
@@ -409,6 +419,16 @@ public class MemberFactory {
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName(false));
         fieldInfo.setContainer(isContainer);
+        
+        //-- handle namespace URI / prefix
+        Schema schema = eDecl.getSchema();
+        if (schema != null) {
+            String nsURI = schema.getTargetNamespace();
+            if ((nsURI != null) && (nsURI.length() > 0)) {
+                fieldInfo.setNamespaceURI(nsURI);
+            }
+        }
+        
         //handle fixed or default values
         String value = (eDecl.getDefaultValue() != null)?eDecl.getDefaultValue():eDecl.getFixedValue();
 
