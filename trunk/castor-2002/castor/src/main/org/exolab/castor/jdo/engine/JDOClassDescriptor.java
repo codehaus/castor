@@ -81,9 +81,14 @@ public class JDOClassDescriptor
      */
     private final KeyGeneratorDescriptor _keyGenDesc;
 
+    /**
+     * The mechanism used for caching this class
+     */
+    private final CacheType _cacheType;
+
 
     public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName,
-                                KeyGeneratorDescriptor keyGenDesc)
+                                KeyGeneratorDescriptor keyGenDesc, CacheType cacheType )
         throws MappingException
     {
         super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getIdentity(),
@@ -98,6 +103,7 @@ public class JDOClassDescriptor
         if ( getExtends() != null && ! ( getExtends() instanceof JDOClassDescriptor ) )
             throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
         _keyGenDesc = keyGenDesc;
+        _cacheType = cacheType;
     }
 
 
@@ -109,6 +115,16 @@ public class JDOClassDescriptor
     public String getTableName()
     {
         return _tableName;
+    }
+
+    /**
+     * Returns the preferred mechanism of cache of this class
+     *
+     * @return Cache Type
+     */
+    public CacheType getCacheType()
+    {
+        return _cacheType;
     }
 
     /**

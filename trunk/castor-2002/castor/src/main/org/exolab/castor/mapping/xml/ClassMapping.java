@@ -44,6 +44,8 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.String _description;
 
+    private CacheTypeMapping _cacheType;
+
     private MapTo _mapTo;
 
     private java.util.Vector _fieldMappingList;
@@ -103,6 +105,12 @@ public class ClassMapping implements java.io.Serializable {
     public java.lang.String getAccess() {
         return this._access;
     } //-- java.lang.String getAccess() 
+
+    /**
+    **/
+    public CacheTypeMapping getCacheTypeMapping() {
+        return this._cacheType;
+    } //-- CacheTypeMapping getCacheTypeMapping() 
 
     /**
      * 
@@ -287,6 +295,14 @@ public class ClassMapping implements java.io.Serializable {
     public void setAccess(java.lang.String _access) {
         this._access = _access;
     } //-- void setAccess(java.lang.String) 
+
+    /**
+     * 
+     * @param _cacheType
+    **/
+    public void setCacheTypeMapping(CacheTypeMapping _cacheType) {
+        this._cacheType = _cacheType;
+    } //-- void setCacheType(CacheType) 
 
     /**
      * 

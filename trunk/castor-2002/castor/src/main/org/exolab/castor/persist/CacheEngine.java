@@ -61,12 +61,15 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.engine.CacheType;
+import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
+import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
@@ -255,8 +258,21 @@ public final class CacheEngine
                                     new TypeInfo( handler, persist, typeInfo.cache ) );
                         }
                     } else {
+                        int type = -1;
+                        int cap = 0;
+                        if ( clsDesc instanceof JDOClassDescriptor ) {
+                            CacheType ctype = ((JDOClassDescriptor) clsDesc).getCacheType();
+                            if ( ctype != null ) {
+                                type = ctype.getType();
+                                cap = ctype.getCapacity();
+                            } 
+                        } else {
+                            System.err.println("Warning: JDOClassDescriptor expected! Default Cache setting will be used.");
+                            type = DEFAULT_CACHE_TYPE;
+                            cap = DEFAULT_CACHE_VALUE;
+                        }
                         _typeInfo.put( handler.getJavaClass(),
-                                new TypeInfo( handler, persist, new Cache(DEFAULT_CACHE_TYPE,DEFAULT_CACHE_VALUE) ) );
+                                new TypeInfo( handler, persist, new Cache(type, cap) ) );
                     }
                 } else if ( _logInterceptor != null )
                     _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
@@ -1380,7 +1396,6 @@ public final class CacheEngine
                 _logInterceptor.message( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         } finally {
-
 			// signal cache that it's now safe to release the object
 			// from transcation state to cache state.
 			typeInfo.cache.finishLockForAquire( oid );

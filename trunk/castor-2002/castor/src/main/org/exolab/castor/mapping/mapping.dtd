@@ -63,7 +63,7 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, map-to?, ( field | container )+ )>
+<!ELEMENT class ( description?, cache-type?, map-to?, ( field | container )+ )>
 <!ATTLIST class
     name            ID     #REQUIRED
     extends         IDREF  #IMPLIED
@@ -71,6 +71,13 @@
     access          ( read-only | shared | exclusive | db-locked )  "shared"
     key-generator   IDREF  #IMPLIED>
 
+<!--
+    Specifies the cache type and capacity used for this class
+ -->
+<!ELEMENT cache-type EMPTY>
+<!ATTLIST cache-type
+    type           ( none | count-limited | time-limited | unlimited ) "count-limited"
+    capacity	   NMTOKEN  #IMPLIED>
 
 <!--
     Specifies the mapping between a Java class and an SQL table.
