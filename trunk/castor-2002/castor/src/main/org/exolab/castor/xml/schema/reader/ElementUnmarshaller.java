@@ -57,6 +57,7 @@ import org.xml.sax.*;
 **/
 public class ElementUnmarshaller extends SaxUnmarshaller {
 
+    private static final String MAX_OCCURS_WILDCARD = "*";
 
       //--------------------/
      //- Member Variables -/
@@ -126,6 +127,8 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         }
         //-- @maxOccurs
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
+        if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = null;
+        
         if (attValue != null) {
             int maxOccurs = toInt(attValue);
             _element.setMaximumOccurance(maxOccurs);
