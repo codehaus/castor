@@ -225,7 +225,6 @@ public abstract class XMLTestCase extends TestCase {
         assertNotNull("Randomized object model is null", randomizedObject);
 
         randomizedObject.randomizeFields();
-        System.out.println(randomizedObject.dumpFields());
 
         // 2. Dump the object in a file if possible
         if (_hasDump) {
@@ -248,7 +247,6 @@ public abstract class XMLTestCase extends TestCase {
         verbose("Unmarshal the file");
         Object  unmarshalledRandomizedObject = testUnmarshal(marshal_output);
         assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", unmarshalledRandomizedObject);
-        System.out.println( ((CastorTestable)unmarshalledRandomizedObject).dumpFields());
         // 6. Dump the unmarshalled object in a file if possible
         if (_hasDump) {
             verbose("Dump the object into '" + outputName + "-unmar.dump" +"'");
@@ -257,9 +255,8 @@ public abstract class XMLTestCase extends TestCase {
             writer.close();
         }
 
-        // 6. compare to initial model instance
+        // 7. compare to initial model instance
         boolean result = unmarshalledRandomizedObject.equals(randomizedObject);
-        System.out.println("Result:"+result);
         verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
         assert("The initial randomized object and the one that have been created by marshal/unmrashal are different", result);
     }//testWithRandomObject
