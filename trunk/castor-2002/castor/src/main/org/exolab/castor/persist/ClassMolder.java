@@ -1242,8 +1242,9 @@ public class ClassMolder {
                                 tx.delete( reldel );
                         }
 
-                        if ( newfields[i] != null && !tx.isRecorded( value ) )
+                        if ( value != null && !tx.isRecorded( value ) ) {
                             tx.markCreate( fieldEngine, fieldClassMolder, value, oid );
+                        }
 
                     } else if ( tx.isAutoStore() ) {
                         if ( fields[i] != null ) {
@@ -1880,7 +1881,7 @@ public class ClassMolder {
                 throw new ObjectModifiedException("dependent object deleted concurrently");
             }
             return false;
-        } else if ( objectTimestamp == TimeStampable.NO_TIMESTAMP ) {
+        } else if ( objectTimestamp == TimeStampable.NO_TIMESTAMP || objectTimestamp == 1 ) {
             // work almost like create, except update the sub field instead of create
             // iterate all the fields and mark all the dependent object.
             boolean updateCache = false;
