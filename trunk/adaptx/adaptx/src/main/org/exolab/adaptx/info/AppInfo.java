@@ -46,7 +46,7 @@ public class AppInfo {
     /**
      * The current Version Number
     **/
-    public static final String VERSION = "0.9.7";
+    public static final String VERSION = "0.9.8";
     
     
 } //-- AppInfo
