@@ -281,17 +281,12 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             foundSimpleType = true;
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
-        else if (SchemaNames.KEY.equals(name)) {
+        else if (SchemaNames.KEY.equals(name) || 
+                 SchemaNames.KEYREF.equals(name) ||
+                 SchemaNames.UNIQUE.equals(name)) 
+        {
             foundIdentityConstraint = true;
-            error("Identity constraints are not yet supported");
-        }
-        else if (SchemaNames.KEYREF.equals(name)) {
-            foundIdentityConstraint = true;
-            error("Identity constraints are not yet supported");
-        }
-        else if (SchemaNames.UNIQUE.equals(name)) {
-            foundIdentityConstraint = true;
-            error("Identity constraints are not yet supported");
+            unmarshaller = new IdentityConstraintUnmarshaller(name, atts);
         }
         else illegalElement(name);
 
@@ -343,6 +338,14 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             XMLType xmlType
                 = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
             _element.setType(xmlType);
+        }
+        else if (SchemaNames.KEY.equals(name) || 
+                 SchemaNames.KEYREF.equals(name) ||
+                 SchemaNames.UNIQUE.equals(name)) 
+        {
+            IdentityConstraint constraint 
+                = (IdentityConstraint) unmarshaller.getObject();
+            _element.addIdentityConstraint(constraint);
         }
 
         unmarshaller = null;
