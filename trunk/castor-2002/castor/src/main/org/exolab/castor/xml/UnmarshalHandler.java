@@ -79,7 +79,7 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public class UnmarshalHandler extends MarshalFramework
-    implements DocumentHandler 
+    implements DocumentHandler
 {
 
 
@@ -144,7 +144,7 @@ public class UnmarshalHandler extends MarshalFramework
 
     private static final StringClassDescriptor _stringDescriptor
         = new StringClassDescriptor();
-        
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -582,18 +582,18 @@ public class UnmarshalHandler extends MarshalFramework
                 Class instanceClass = null;
                 Object instance = null;
                 try {
-                    
+
                     XMLClassDescriptor xcd =
                         getClassDescriptor(instanceClassname);
-                        
+
                     if (xcd != null)
                         instanceClass = xcd.getJavaClass();
-                        
+
                     if (instanceClass == null) {
-                        throw new SAXException("Class not found: " + 
+                        throw new SAXException("Class not found: " +
                             instanceClassname);
                     }
-                    
+
                     if (!_topClass.isAssignableFrom(instanceClass)) {
                         String err = instanceClass + " is not a subclass of "
                             + _topClass;
@@ -690,8 +690,18 @@ public class UnmarshalHandler extends MarshalFramework
         if (descriptor == null) {
             String msg = "unable to find FieldDescriptor for '" + name;
             msg += "' in ClassDescriptor of " + classDesc.getXMLName();
-            message(msg);
-            return;
+            //if we have no field descriptor and
+            //the class descriptor was introspected
+            //just log it
+            if (Introspector.introspected(classDesc)) {
+               message(msg);
+               return;
+            } else
+            //but if we could not find the field descriptor
+            //where as a class descriptor has been provided (using the
+            //Source Generator for instance)
+            //it means that we try to unmarshal a 'not allowed' element
+                 throw new SAXException(msg);
         }
 
         //-- Find object type and create new Object of that type
@@ -737,7 +747,7 @@ public class UnmarshalHandler extends MarshalFramework
             //-- the FieldDescriptor
             if (classDesc != null) {
                 _class = classDesc.getJavaClass();
-                
+
                 //-- XXXX This is a hack I know...but we
                 //-- XXXX can't use the handler if the field
                 //-- XXXX types are different
@@ -1014,7 +1024,6 @@ public class UnmarshalHandler extends MarshalFramework
         for (int i = 0; i < descriptors.length; i++) {
 
             XMLFieldDescriptor descriptor = descriptors[i];
-
             /* <update>
             if (!descriptor.getAccessRights().isWritable()) {
                 if (debug) {
@@ -1161,7 +1170,7 @@ public class UnmarshalHandler extends MarshalFramework
     private XMLClassDescriptor getClassDescriptor (String className)
         throws SAXException
     {
-        Class type = null;        
+        Class type = null;
         try {
             //-- use specified ClassLoader if necessary
 		    if (_loader != null) {
@@ -1174,7 +1183,7 @@ public class UnmarshalHandler extends MarshalFramework
 		    return null;
 		}
         return getClassDescriptor(type);
-        
+
     } //-- getClassDescriptor
 
     /**
@@ -1187,12 +1196,12 @@ public class UnmarshalHandler extends MarshalFramework
         throws SAXException
     {
         if (_class == null) return null;
-        
-        
+
+
         //-- special case for strings
         if (_class == String.class)
             return _stringDescriptor;
-            
+
         if (_class.isArray()) return null;
         if (isPrimitive(_class)) return null;
 
@@ -1200,7 +1209,8 @@ public class UnmarshalHandler extends MarshalFramework
             _cdResolver = new ClassDescriptorResolverImpl();
 
         XMLClassDescriptor classDesc = null;
-            
+
+
         classDesc = _cdResolver.resolve(_class);
 
         if (classDesc != null) return classDesc;
