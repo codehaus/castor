@@ -298,8 +298,6 @@
     <target name="doc" depends="prepare" description="Build the HTML docs">
         <delete dir="${build}/doc"/>
         <mkdir dir="${build}/doc"/>
-        <property name="cp" refid="build.classpath" />
-        <echo>Using CLASSPATH: ${cp}</echo>
         <style basedir="${doc}" destdir="${build}/doc" style="${doc}/style/exolab.xsl"
             classpathref="build.classpath" includes="**.xml" excludes="style/**,project.xml"
             processor="org.exolab.adaptx.util.JakartaAntAdapter">
