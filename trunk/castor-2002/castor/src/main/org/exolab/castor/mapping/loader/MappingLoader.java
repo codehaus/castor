@@ -93,7 +93,7 @@ public abstract class MappingLoader
     /**
      * The suffix for the name of a compiled class.
      */
-    private static final String CompiledSuffix = "ClassDesc";
+    private static final String CompiledSuffix = "ClassDescriptor";
 
 
     /**
@@ -417,6 +417,7 @@ public abstract class MappingLoader
 
         ClassDesc idClsDesc;
         FieldDesc identity;
+
 
         idClsDesc = getDescriptor( clsDesc.getIdentity().getFieldType() );
         if ( idClsDesc != null )
