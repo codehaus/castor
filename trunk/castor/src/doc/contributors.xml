@@ -59,6 +59,7 @@
     <name surname="Guttmann" given="Werner" />
     <email>werner.guttmann@gmx.net</email>
     <project>JDO</project>
+	<company id="anecon" />
     <description>
        JDO enhancements including TransactionManagerFactory API, the API for JDBC
        parameters and much more.
@@ -1104,6 +1105,11 @@
   -->
 
   <!-- Company Names (A-D) -->
+
+  <company id="anecon">
+    <name>Anecon Softwaredesign und Beratung Ltd.</name>
+    <url>www.anecon.com</url>
+  </company>
 
   <company id="apache">
     <name>Apache Software Foundation</name>
