@@ -81,27 +81,27 @@ public class XMLMappingLoader
     extends MappingLoader
 {
 
-    
+
     /**
      * naming conventions
     **/
     private static XMLNaming    _naming = null;
-    
+
     /**
      * Introspector
     **/
     private static NodeType _primitiveNodeType = null;
-    
+
     static {
         _naming = XMLNaming.getInstance();
-        
+
         if (_primitiveNodeType == null) {
             _primitiveNodeType = Configuration.getPrimitiveNodeType();
-            if (_primitiveNodeType == null) 
+            if (_primitiveNodeType == null)
                 _primitiveNodeType = NodeType.Attribute;
         }
     }
-    
+
     /**
      * Creates a new XMLMappingLoader
     **/
@@ -109,7 +109,7 @@ public class XMLMappingLoader
         throws MappingException
     {
         super( loader, logWriter );
-        
+
     } //-- XMLMappingLoader
 
 
@@ -125,14 +125,14 @@ public class XMLMappingLoader
             relDesc = getDescriptor( fields[ i ].getFieldType() );
             if ( relDesc == NoDescriptor ) {
                 // XXX Error message should come here
-            } 
-            else if ( relDesc != null && 
+            }
+            else if ( relDesc != null &&
                       relDesc instanceof XMLClassDescriptor &&
                       fields[ i ] instanceof XMLFieldDescriptorImpl )
             {
 		        ( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
-		        
-		        //-- removed kvisco 20010814 
+
+		        //-- removed kvisco 20010814
                 // ( (XMLFieldDescriptorImpl) fields[ i ] ).setNodeType( NodeType.Element );
             }
         }
@@ -146,7 +146,7 @@ public class XMLMappingLoader
     {
         ClassDescriptor clsDesc;
         String          xmlName;
-        
+
         // See if we have a compiled descriptor.
         clsDesc = loadClassDescriptor( clsMap.getName() );
         if ( clsDesc != null && clsDesc instanceof XMLClassDescriptor )
@@ -160,9 +160,9 @@ public class XMLMappingLoader
             xmlName = _naming.toXMLName( clsDesc.getJavaClass().getName() );
         else {
             xmlName = clsMap.getMapTo().getXml();
-            
+
         }
-            
+
         XMLClassDescriptorImpl xmlClassDesc
             = new XMLClassDescriptorAdapter( clsDesc, xmlName );
 
@@ -177,12 +177,12 @@ public class XMLMappingLoader
             } catch (MarshalException mx) {
                 throw new MappingException("Unable to introspect class for auto-complete: " + mx);
             }
-            
+
             //-- check for identity
             String identity = "";
-            if (clsMap.getIdentityCount() > 0) 
-                identity = clsMap.getIdentity(0);            
-                
+            if (clsMap.getIdentityCount() > 0)
+                identity = clsMap.getIdentity(0);
+
             FieldDescriptor[] fields = xmlClassDesc.getFields();
 
             // Attributes
@@ -198,7 +198,7 @@ public class XMLMappingLoader
                     }
                 }
             }
-            
+
             // Elements
             introFields = introspectedDesc.getElementDescriptors();
             for (int i = 0; i<introFields.length; ++i) {
@@ -220,10 +220,10 @@ public class XMLMappingLoader
                     // If there is no field with this name, we can add
                     xmlClassDesc.addFieldDescriptor(field);
 
-            
+
         } //-- End of auto-complete
-        
-         
+
+
         //-- copy ns-uri + ns-prefix
         if (mapTo != null) {
             xmlClassDesc.setNameSpacePrefix(mapTo.getNsPrefix());
@@ -232,7 +232,7 @@ public class XMLMappingLoader
         return xmlClassDesc;
     } //-- createDescriptor
 
-    
+
     /**
      * Match if a field named <code>fieldName</code> is in fields
      */
@@ -254,50 +254,55 @@ public class XMLMappingLoader
         String                 match    = null;
         XMLFieldDescriptorImpl xmlDesc;
         boolean                isReference = false;
-        
+
         // Create an XML field descriptor
-        
+
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
         BindXml xml = fieldMap.getBindXml();
-        
+
         if (xml != null) {
             //-- xml name
             xmlName = xml.getName();
-          
+
             //-- node type
             if ( xml.getNode() != null )
                 nodeType = NodeType.getNodeType( xml.getNode().toString() );
-            
+
             //-- matches
             match = xml.getMatches();
-            
+
             //-- reference
             isReference = xml.getReference();
         }
-        
+
         if (nodeType == null) {
             if (isPrimitive(javaClass))
                 nodeType = _primitiveNodeType;
-            else 
+            else
                 nodeType = NodeType.Element;
         }
-        
+
         if ((xmlName == null) && (match == null)) {
             xmlName = _naming.toXMLName( fieldDesc.getFieldName() );
             match = xmlName + ' ' + fieldDesc.getFieldName();
         }
-        
+
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
-        
+
         //-- matches
         if (match != null) xmlDesc.setMatches(match);
-        
+
         //-- reference
         xmlDesc.setReference(isReference);
-            
+
         xmlDesc.setContainer(fieldMap.getContainer());
 
-        return xmlDesc; 
+        //is the value type needs specific handling
+        //such as QName support?
+        xmlDesc.setSchemaType(xml.getType());
+        xmlDesc.setQNamePrefix(xml.getQNamePrefix());
+
+        return xmlDesc;
     }
 
 
@@ -318,12 +323,12 @@ public class XMLMappingLoader
     private static boolean isPrimitive(Class type) {
 
         if (type.isPrimitive()) return true;
-        
+
         if ((type == Boolean.class) || (type == Character.class))
             return true;
-            
+
         return (type.getSuperclass() == Number.class);
-       
+
     } //-- isPrimitive
 
 }

@@ -92,16 +92,22 @@ public final class UnmarshalHandler extends MarshalFramework
     private static final Class[]  EMPTY_CLASS_ARGS  = new Class[0];
     private static final Object[] EMPTY_OBJECT_ARGS = new Object[0];
     private static final String   EMPTY_STRING      = "";
-    
-    /**
-     * Attribute name for default namespace declaration
-    **/
+
+
+    // constants used for namespace declaration.
+   /**
+    * Attribute name for default namespace declaration
+    */
     private static final String   XMLNS             = "xmlns";
-    
+   /**
+    * Attribute prefix for prefixed namespace declaration
+    */
+    private final static String XMLNS_PREFIX        = "xmlns:";
+    private final static int    XMLNS_PREFIX_LENGTH = XMLNS_PREFIX.length();
     /**
-     * Attribute prefix for prefixed namespace declaration
-    **/
-    private static final String   XMLNS_PREFIX      = "xmlns:";
+     * The name of the QName type
+     */
+    private static final String QNAME_NAME = "QName";
 
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
@@ -176,7 +182,7 @@ public final class UnmarshalHandler extends MarshalFramework
       * The namespace stack
       */
      private Namespaces _namespaces = null;
-     
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -330,21 +336,18 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             else return;
         }
-        
+
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
         }
 
         //-- * Begin Namespace Handling
         //-- XXX Note: This code will change when we update the XML event API
-        
-        int idx = name.indexOf(':');
-        if (idx >= 0) {
-            name = name.substring(idx+1);
-        }
-        //-- remove current namespace scoping
-        _namespaces = _namespaces.getParent();
-        
+
+         int idx = name.indexOf(':');
+         if (idx >= 0) {
+             name = name.substring(idx+1);
+         }
         //-- * End Namespace Handling
 
         UnmarshalState state = (UnmarshalState) _stateInfo.pop();
@@ -365,6 +368,8 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- is turned on...how should we handle this case?
             //-- should it be a fatal error?
             message("Ignoring " + state.elementName + " no descriptor was found");
+            //-- remove current namespace scoping
+            _namespaces = _namespaces.getParent();
             return;
         }
 
@@ -376,8 +381,11 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- If we don't have an instance object and the Class type
         //-- is not a primitive or a byte[] we must simply return
-        if ((state.object == null) && (!state.primitiveOrImmutable))
+        if ((state.object == null) && (!state.primitiveOrImmutable)) {
+            //-- remove current namespace scoping
+            _namespaces = _namespaces.getParent();
             return;
+        }
 
         if (state.primitiveOrImmutable) {
 
@@ -414,7 +422,7 @@ public final class UnmarshalHandler extends MarshalFramework
             (state.buffer.length() > 0) &&
             (state.classDesc != null)) {
            XMLFieldDescriptor cdesc = state.classDesc.getContentDescriptor();
-           if (cdesc != null) {
+            if (cdesc != null) {
                Object value = state.buffer.toString();
                if (isPrimitive(cdesc.getFieldType()))
                   value = toPrimitiveObject(cdesc.getFieldType(), (String)value);
@@ -442,8 +450,8 @@ public final class UnmarshalHandler extends MarshalFramework
         }
 
         //-- if we are at root....just validate and we are done
-        if (_stateInfo.empty()) {
-            if (_validate) {
+         if (_stateInfo.empty()) {
+             if (_validate) {
                 try {
                     Validator validator = new Validator();
                     validator.validate(state.object, _cdResolver);
@@ -472,7 +480,11 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- Add object to parent if necessary
 
-        if (descriptor.isIncremental()) return; //-- already added
+        if (descriptor.isIncremental()) {
+            //-- remove current namespace scoping
+           _namespaces = _namespaces.getParent();
+           return; //-- already added
+        }
 
         Object val = state.object;
 
@@ -500,6 +512,12 @@ public final class UnmarshalHandler extends MarshalFramework
 
         try {
             FieldHandler handler = descriptor.getHandler();
+            //check if the value is a QName that needs to
+            //be resolved (ns:value -> {URI}value
+            String valueType = descriptor.getSchemaType();
+            if ((valueType != null) && (valueType.equals(QNAME_NAME)))
+                 val = resolveNamespace(val);
+
             if (state.container == null)
                 handler.setValue(state.object, val);
             else {
@@ -533,6 +551,9 @@ public final class UnmarshalHandler extends MarshalFramework
             err += ">>>---- End Exception ----<<< \n";
             throw new SAXException(err);
         }
+
+         //-- remove current namespace scoping
+        _namespaces = _namespaces.getParent();
 
     } //-- endElement
 
@@ -578,22 +599,23 @@ public final class UnmarshalHandler extends MarshalFramework
            _anyUnmarshaller.startElement(name,atts);
            return;
         }
-        
+
         //-- The namespace of the given element
         String namespace = null;
-        
+
         //-- Begin Namespace Handling :
         //-- XXX Note: This code will change when we update the XML event API
-        
+
         _namespaces = _namespaces.createNamespaces();
         processNamespaces(atts);
-        
+
         String prefix = "";
         int idx = name.indexOf(':');
         if (idx >= 0) {
-            prefix = name.substring(0,idx);
-            name = name.substring(idx+1);
+             prefix = name.substring(0,idx);
+             name = name.substring(idx+1);
         }
+
         namespace = _namespaces.getNamespaceURI(prefix);
         //-- End Namespace Handling
 
@@ -744,13 +766,13 @@ public final class UnmarshalHandler extends MarshalFramework
         XMLFieldDescriptor descriptor = null;
         descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
 
-
         /*
           XXXX Search for container, hopefully this is a temporary fix
         */
         if (descriptor == null) {
             descriptor = searchContainers(name, classDesc);
         }
+
         /* end of container fix */
 
         /*
@@ -804,8 +826,6 @@ public final class UnmarshalHandler extends MarshalFramework
             //Source Generator for instance)
             else throw new SAXException(msg);
         }
-
-
 
         //-- Handle Container field (handle container in container too)
         Object object = parentState.object;
@@ -1147,7 +1167,6 @@ public final class UnmarshalHandler extends MarshalFramework
         return null;
     } //-- getInstanceType
 
-
     /**
      * Processes the given attribute list, and attempts to add each
      * Attribute to the current Object on the stack
@@ -1172,6 +1191,7 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             return;
         }
+
 
         UnmarshalState state = (UnmarshalState)_stateInfo.peek();
         Object object = state.object;
@@ -1221,6 +1241,7 @@ public final class UnmarshalHandler extends MarshalFramework
             for (int i = 0; i < len; i++) {
                 String attName = atts.getName(i);
                 if (processedAtts.contains(attName)) continue;
+
                 XMLFieldDescriptor descriptor =
                     classDesc.getFieldDescriptor(attName, NodeType.Attribute);
 
@@ -1251,7 +1272,6 @@ public final class UnmarshalHandler extends MarshalFramework
     {
 
         Object value = attValue;
-
         while (descriptor.isContainer()) {
             FieldHandler handler = descriptor.getHandler();
             Object containerObject = handler.getValue(parent);
@@ -1298,18 +1318,24 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- simply return
             return;
         }
+
         //-- check for proper type and do type
         //-- conversion
         Class type = descriptor.getFieldType();
         if (isPrimitive(type))
             value = toPrimitiveObject(type, attValue);
-            
+
+        //check if the value is a QName that needs to
+        //be resolved (ns:value -> {URI}value)
+        String valueType = descriptor.getSchemaType();
+        if ((valueType != null) && (valueType.equals(QNAME_NAME)))
+                value = resolveNamespace(value);
         FieldHandler handler = descriptor.getHandler();
 
         if (handler != null)
             handler.setValue(parent, value);
     } //-- processAttribute
-    
+
     /**
      * Processes the given IDREF
      *
@@ -1318,7 +1344,7 @@ public final class UnmarshalHandler extends MarshalFramework
      * @param parent the current parent object
     **/
     private void processIDREF
-        (String idRef, XMLFieldDescriptor descriptor, Object parent) 
+        (String idRef, XMLFieldDescriptor descriptor, Object parent)
     {
         Object value = _idResolver.resolve(idRef);
         if (value == null) {
@@ -1343,20 +1369,40 @@ public final class UnmarshalHandler extends MarshalFramework
     **/
     private void processNamespaces(AttributeList atts) {
         if (atts == null) return;
-        
+
         for (int i = 0; i < atts.getLength(); i++) {
             String attName = atts.getName(i);
             if (attName.equals(XMLNS)) {
                 _namespaces.addNamespace("", atts.getValue(i));
             }
             else if (attName.startsWith(XMLNS_PREFIX)) {
-                String prefix = attName.substring(XMLNS_PREFIX.length());
+                String prefix = attName.substring(XMLNS_PREFIX_LENGTH);
                 _namespaces.addNamespace(prefix, atts.getValue(i));
             }
         }
-        
+
     } //-- method: processNamespaces
-    
+
+    /**
+     * Extracts the prefix and resolves it given the the class descriptor.
+     * The resolution will change the prefix:value as {NamespaceURI}value
+     */
+    private Object resolveNamespace(Object value) {
+
+        if ( (value == null) || !(value instanceof String))
+            return value;
+        String result = (String)value;
+        int idx = result.indexOf(':');
+        String prefix = null;
+        if (idx > 0) {
+            prefix = result.substring(0,idx);
+            result = result.substring(idx+1);
+        }
+        result = "{"+_namespaces.getNamespaceURI(prefix)+"}"+result;
+        return result;
+    }
+
+
     /**
      * Sends a message to all observers. Currently the only observer is
      * the logger.
@@ -1726,6 +1772,7 @@ public final class UnmarshalHandler extends MarshalFramework
             return null;
         } //-- resolve
 
+
         void setResolver(IDResolver idResolver) {
             _idResolver = idResolver;
         }
@@ -1753,6 +1800,7 @@ public final class UnmarshalHandler extends MarshalFramework
             this.descriptor = descriptor;
         }
     }
+
 
 } //-- Unmarshaller
 

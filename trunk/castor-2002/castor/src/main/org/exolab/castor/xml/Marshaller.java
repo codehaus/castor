@@ -114,6 +114,14 @@ public class Marshaller extends MarshalFramework {
     **/
     private static final String CDATA = "CDATA";
 
+    /**
+     * Constants used for the QName handling
+     */
+    private static final String QNAME_NAME = "QName";
+
+    private static final String DEFAULT_PREFIX = "ns";
+
+    private static int NAMESPACE_COUNTER = 0;
 
     /**
      * A static flag used to enable debugging when using
@@ -133,15 +141,6 @@ public class Marshaller extends MarshalFramework {
     **/
     private PrintWriter _logWriter = null;
 
-    /**
-     * The NameSpace Prefix to URI table
-    **/
-    private Hashtable _nsPrefixKeyHash = null;
-
-    /**
-     * The NameSpace URI to Prefix table
-    **/
-    private Hashtable _nsURIKeyHash = null;
 
 	/**
 	 * Insert NameSpace prefix declarations at the root node
@@ -172,6 +171,11 @@ public class Marshaller extends MarshalFramework {
      * The ClassDescriptorResolver used for resolving XMLClassDescriptors
     **/
     private ClassDescriptorResolver _cdResolver = null;
+
+     /**
+      * The namespace stack
+      */
+     private Namespaces _namespaces = null;
 
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
@@ -207,7 +211,7 @@ public class Marshaller extends MarshalFramework {
     public Marshaller( DocumentHandler handler ) {
         if ( handler == null )
             throw new IllegalArgumentException( "Argument 'handler' is null." );
-        _handler         = handler;
+        _handler = handler;
 
         // call internal initializer
         initialize();
@@ -263,8 +267,7 @@ public class Marshaller extends MarshalFramework {
     **/
     private void initialize() {
         _debug           = enableDebug;
-        _nsPrefixKeyHash = new Hashtable(3);
-        _nsURIKeyHash    = new Hashtable(3);
+        _namespaces      = new Namespaces();
         _nsScope         = new List(3);
         _packages        = new List(3);
         _cdResolver      = new ClassDescriptorResolverImpl();
@@ -340,8 +343,7 @@ public class Marshaller extends MarshalFramework {
             return;
         }
 
-        _nsPrefixKeyHash.put(nsPrefix, nsURI);
-        _nsURIKeyHash.put(nsURI, nsPrefix);
+        _namespaces.addNamespace(nsPrefix, nsURI);
 
     } //-- setNamespacePrefix
 
@@ -775,6 +777,7 @@ public class Marshaller extends MarshalFramework {
 
             //-- handle IDREF(S)
             if (attDescriptor.isReference() && (value != null)) {
+
                 if (attDescriptor.isMultivalued()) {
                     Object[] objects = (Object[])value;
                     if (objects.length == 0) continue;
@@ -789,8 +792,14 @@ public class Marshaller extends MarshalFramework {
                     value = getObjectID(value);
                 }
             }
-            
+
             if (value == null) continue;
+
+            //check if the value is a QName that needs to
+            //be resolved ({URI}value -> ns:value).
+            String valueType = attDescriptor.getSchemaType();
+            if ((valueType != null) && (valueType.equals(QNAME_NAME)))
+                 value = resolveQName(value, attDescriptor, atts);
 
             atts.addAttribute(xmlName, CDATA, value.toString());
         }
@@ -801,7 +810,6 @@ public class Marshaller extends MarshalFramework {
         /* REMOVED For now (KV)
         processContainerAttributes(object, classDesc, atts);
         */
-
 
 
         //-- xsi:type
@@ -815,6 +823,7 @@ public class Marshaller extends MarshalFramework {
         //------------------/
 
         //-- namespace management
+
         String nsPrefix = descriptor.getNameSpacePrefix();
         if (nsPrefix == null) nsPrefix = classDesc.getNameSpacePrefix();
 
@@ -822,10 +831,10 @@ public class Marshaller extends MarshalFramework {
         if (nsURI == null) nsURI = classDesc.getNameSpaceURI();
 
         if ((nsURI == null) && (nsPrefix != null)) {
-            nsURI = (String) _nsPrefixKeyHash.get(nsPrefix);
+            nsURI = _namespaces.getNamespaceURI(nsPrefix);
         }
         else if ((nsPrefix == null) && (nsURI != null)) {
-            nsPrefix = (String) _nsURIKeyHash.get(nsURI);
+            nsPrefix = (String) _namespaces.getNamespacePrefix(nsURI);
         }
 
         boolean declaredNS = false;
@@ -839,10 +848,7 @@ public class Marshaller extends MarshalFramework {
 		if (_nsPrefixAtRoot && atRoot)
 		{
 			//-- insert all namespace declarations at the root level
-			Enumeration keys = _nsPrefixKeyHash.keys();
-			Enumeration elements = _nsPrefixKeyHash.elements();
-			while(keys.hasMoreElements())
-				declareNamespace((String)keys.nextElement(), (String)elements.nextElement(), atts);
+			_namespaces.declareAsAttributes(atts);
 		}
 
         String qName = null;
@@ -858,6 +864,12 @@ public class Marshaller extends MarshalFramework {
             else qName = name;
         }
         else qName = name;
+
+       //check if the value is a QName that needs to
+       //be resolved ({URI}value -> ns:value)
+       String valueType = descriptor.getSchemaType();
+       if ((valueType != null) && (valueType.equals(QNAME_NAME)))
+           object = resolveQName(object, descriptor, atts);
 
         try {
             if (!containerField)
@@ -904,6 +916,7 @@ public class Marshaller extends MarshalFramework {
         }
         /* special case for Strings and primitives */
         else if (isPrimitive(_class)) {
+
             char[] chars = object.toString().toCharArray();
             try {
                 handler.characters(chars,0,chars.length);
@@ -977,15 +990,15 @@ public class Marshaller extends MarshalFramework {
 
     /**
      * Retrieves the ID for the given Object
-     * 
+     *
      * @param object the Object to retrieve the ID for
      * @return the ID for the given Object
     **/
-    private Object getObjectID(Object object) 
+    private Object getObjectID(Object object)
         throws MarshalException
     {
         if (object == null) return null;
-        
+
         Object id = null;
         XMLClassDescriptor cd = getClassDescriptor(object.getClass());
         String err = null;
@@ -1012,14 +1025,14 @@ public class Marshaller extends MarshalFramework {
             err = "Unable to resolve ClassDescriptor.";
         }
         if (err != null) {
-            String errMsg = "Unable to resolve ID for instance of class '"; 
+            String errMsg = "Unable to resolve ID for instance of class '";
             errMsg += object.getClass().getName();
             errMsg += "' due to the following error: ";
             throw new MarshalException(errMsg + err);
         }
-        return id;        
+        return id;
     } //-- getID
-        
+
 
     /**
      * Declares the given namespace, if not already in scope
@@ -1167,6 +1180,37 @@ public class Marshaller extends MarshalFramework {
 
     } //-- processContainerAttributes
 
+    /**
+     * Resolve a QName value ({URI}value) by declaring a namespace after
+     * having retrieved the prefix.
+     */
+    private Object resolveQName(Object value, XMLFieldDescriptor fieldDesc, AttributeListImpl atts) {
+        if ( (value == null) || !(value instanceof String))
+            return value;
+        if (!(fieldDesc instanceof XMLFieldDescriptorImpl))
+           return value;
+        String result = (String)value;
+        if (result.indexOf('}') <= 0) {
+             String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
+             throw new IllegalArgumentException(err);
+        }
+        int idx = result.indexOf('}');
+        if (idx <= 0){
+             String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
+             throw new IllegalArgumentException(err);
+        }
+        String nsURI = result.substring(1, idx);
+        String prefix = ((XMLFieldDescriptorImpl)fieldDesc).getQNamePrefix();
+        //no prefix provided, check if one has been previously defined
+        if (prefix == null)
+            prefix = _namespaces.getNamespacePrefix(nsURI);
+        //if still no prefix, use a naming algorithm (ns+counter).
+        if (prefix == null)
+            prefix = DEFAULT_PREFIX+(++NAMESPACE_COUNTER);
+        result = (prefix.length() != 0)?prefix+":"+result.substring(idx+1):result.substring(idx+1);
+        declareNamespace(prefix, nsURI, atts);
+        return result;
+    }
 
     private void validate(Object object)
         throws ValidationException

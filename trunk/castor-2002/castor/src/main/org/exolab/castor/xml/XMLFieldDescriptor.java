@@ -60,8 +60,8 @@ import org.exolab.castor.mapping.FieldDescriptor;
  * @version $Revision$ $Date$
  */
 public interface XMLFieldDescriptor extends FieldDescriptor {
-    
-    
+
+
     /**
      * Return the "suggested" namespace prefix to use when marshalling
      * as XML.
@@ -69,15 +69,15 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * @return the "suggested" namespace prefix.
     **/
     public String getNameSpacePrefix();
-    
+
     /**
-     * Returns the namespace URI to be used when marshalling and 
+     * Returns the namespace URI to be used when marshalling and
      * unmarshalling as XML.
-     * 
+     *
      * @return the namespace URI.
     **/
     public String getNameSpaceURI();
-    
+
     /**
      * Returns the NodeType of the Field being described. The
      * NodeType represents the Type of Node that the Field will
@@ -90,18 +90,23 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     /**
      * Returns a specific validator for the field described by
      * this descriptor. A null value may be returned
-     * if no specific validator exists. 
+     * if no specific validator exists.
      *
      * @return the field validator for the described field
     **/
     public FieldValidator getValidator();
-    
+
     /**
      * Returns the XML Name for the field being described.
      *
      * @return the XML name.
     **/
     public String getXMLName();
+
+    /**
+     * Returns the XML Schema type of the XML field being described.
+     */
+     public String getSchemaType();
 
 
     /**
@@ -112,7 +117,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * is finished unmarshalling the Object.
     **/
     public boolean isIncremental();
-    
+
     /**
      * Returns true if the field described by this descriptor can
      * contain more than one value
@@ -120,14 +125,14 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * contain more than one value
     **/
     public boolean isMultivalued();
-    
+
     /**
      * Returns true if the field described by this descriptor is
-     * a reference (ie. IDREF) to another object in the 
+     * a reference (ie. IDREF) to another object in the
      * "Object Model" (XML tree)
     **/
     public boolean isReference();
-    
+
     /**
      * Returns true if the field described by this descriptor is a container
      * field.
@@ -144,8 +149,8 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * or attributes with the given XML name.
     **/
     public boolean matches(String xmlName);
-    
-    
+
+
 } //-- XMLFieldDescriptor
 
 
