@@ -165,15 +165,16 @@ public class MarshalException extends CastorException {
      * @return the String representation of this Exception
     **/
     public String toString() {
-        StringBuffer sb = new StringBuffer("MarshalException: ");
-        String message = getMessage();
-        if (message != null) sb.append(message);
-        if (_location != null) {
-            sb.append(" { ");
-            sb.append(_location.toString());
-            sb.append(" }");
-        }
-        return sb.toString();
+        String message;
+
+        if (_exception == null )
+            message = getMessage();
+        else
+            message = _exception.toString();
+        if (_location == null)
+            return message;
+        else
+            return message + "{" + _location.toString() + "}";
     } //-- toString
 
 
