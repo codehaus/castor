@@ -57,6 +57,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
@@ -179,7 +180,7 @@ public class JDOMappingLoader
     }
 
 
-    protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
+    protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
     {
         TypeConvertor convertorTo = null;
@@ -196,7 +197,7 @@ public class JDOMappingLoader
             }
         }
         return new TypeInfo( fieldType, convertorTo, convertorFrom,
-                             fieldMap.getRequired(), null, colType );
+                             fieldMap.getRequired(), null, colHandler );
     }
 
 
