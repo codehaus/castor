@@ -724,9 +724,7 @@ public final class CacheEngine
         for ( int i = 0 ; i < relations.length ; ++i ) {
             if ( relations[ i ] != null && fields[ i ] != null &&
                  relations[ i ].isAttached() ) {
-                if ( ! relations[ i ].isMulti() ) {
-                    tx.markDelete( this, relations[ i ].getRelatedClass(), fields[ i ] );
-                } else {
+                if ( relations[ i ].isMulti() ) {
                     Vector  related;
                     Object  relIdentity;
 
@@ -915,7 +913,6 @@ public final class CacheEngine
 
                 // relations[ i ].checkValidity( object );
                 if ( ! relations[ i ].isMulti() ) {
-
                     Object related;
                     Object relIdentity;
 
@@ -952,6 +949,7 @@ public final class CacheEngine
                         while ( enum.hasMoreElements() ) {
                             Object related;
                             Object relIdentity;
+                            boolean isOriginal = false;
                             
                             related = enum.nextElement();
                             if ( related != null ) {
@@ -959,18 +957,20 @@ public final class CacheEngine
                                 for ( int j = 0 ; j < origIdentity.length ; ++j ) {
                                     if ( origIdentity[ j ] != null &&
                                          origIdentity[ j ].equals( relIdentity ) ) {
-                                        if ( ! tx.isPersistent( related ) )
-                                            tx.create( this, related, relIdentity );
+                                        isOriginal = true;
                                         origIdentity[ j ] = null;
                                     }
                                 }
+                                if ( ! isOriginal && ! tx.isPersistent( related ) )
+                                    tx.create( this, related, relIdentity );
                             }
                         }
                     }
                     if ( relations[ i ].isAttached() ) {
-                        for ( int j = 0 ; j < origIdentity.length ; ++j )
-                            if ( origIdentity[ j ] != null )
+                        for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+                            if ( origIdentity[ j ] != null ) 
                                 tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
+                        }
                     }
                     
                 }

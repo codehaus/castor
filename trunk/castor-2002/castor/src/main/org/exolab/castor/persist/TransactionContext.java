@@ -500,13 +500,49 @@ public abstract class TransactionContext
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
         // add a new entry for this object and use this object as the view
-        if ( identity != null && getObjectEntry( engine, new OID( handler, identity ) ) != null )
-            throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
+        oid = new OID( handler, identity );
+        entry = getObjectEntry( engine, oid );
+        if ( identity != null && entry != null ) {
+            if ( ! entry.deleted ) 
+                throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
+            else {
+                // If the object was already deleted in this transaction, 
+                // just undelete it.
+                // Remove the entry from a FIFO linked list of deleted entries.
+                if ( _deletedList != null ) {
+                    ObjectEntry deleted;
+                    
+                    deleted = _deletedList;
+                    while ( deleted.nextDeleted != null && deleted.nextDeleted != entry )
+                        deleted = deleted.nextDeleted;
+                    if ( deleted.nextDeleted == entry ) {
+                        deleted.nextDeleted = entry.nextDeleted;
+                    }
+                }
+                removeObjectEntry( entry.object );
+                try {
+                    // Emulate object deleting
+                    if ( handler.getCallback() != null )
+                        handler.getCallback().removing( entry.object );
+                    // Emulate object creating
+                    if ( handler.getCallback() != null ) {
+                        handler.getCallback().using( object, _db );
+                        handler.getCallback().storing( object );
+                    }
+                } catch ( Exception except ) {
+                    if ( handler.getCallback() != null )
+                        handler.getCallback().releasing( object, false );
+                    throw new PersistenceExceptionImpl( except );
+                }
+                entry = addObjectEntry( object, oid, engine );
+                entry.created = true;
+                return oid;    
+            }
+        }
 
         try {
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
-            oid = new OID( handler, identity );
             entry = addObjectEntry( object, oid, engine );
             if ( handler.getCallback() != null ) {
                 handler.getCallback().using( object, _db );
@@ -1093,7 +1129,7 @@ public abstract class TransactionContext
 
                 // Add the entry to a FIFO linked list of deleted entries.
                 if ( _deletedList == null )
-                _deletedList = entry;
+                   _deletedList = entry;
                 else {
                     ObjectEntry deleted;
                     
