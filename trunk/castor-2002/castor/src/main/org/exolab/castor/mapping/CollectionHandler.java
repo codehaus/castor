@@ -108,6 +108,24 @@ public interface CollectionHandler
         throws ClassCastException;
 
 
+    /**
+     * Clears the collection of any objects. The collection is provided
+     * as a parameter and is returned as the return value if the returned
+     * collection is a different object. That way the handler can create
+     * a new collection or change the collection as necessary (e.g. when
+     * resizing an array).
+     *
+     * @param collection The collection, null if no collection has
+     *  been created yet
+     * @return The empty collection if a different
+     *  instance than the <tt>collection</tt> parameter, null otherwise
+     * @throws ClassCastException The collection handler does not
+     *  support collections of this type
+     */
+    public Object clear( Object collection )
+        throws ClassCastException;
+
+
 }
 
 

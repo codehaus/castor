@@ -104,6 +104,9 @@ public final class J1CollectionHandlers
                     return 0;
                 return ( (Object[]) collection ).length;
             }
+            public Object clear( Object collection ) {
+                return null;
+            }
             public String toString() {
                 return "Object[]";
             }
@@ -131,6 +134,11 @@ public final class J1CollectionHandlers
                     return 0;
                 return ( (Vector) collection ).size();
             }
+            public Object clear( Object collection ) {
+                if ( collection != null )
+                    ( (Vector) collection ).clear();
+                return null;
+            }
             public String toString() {
                 return "Vector";
             }
@@ -157,6 +165,11 @@ public final class J1CollectionHandlers
                 if ( collection == null )
                     return 0;
                 return ( (Hashtable) collection ).size();
+            }
+            public Object clear( Object collection ) {
+                if ( collection != null )
+                    ( (Hashtable) collection ).clear();
+                return null;
             }
             public String toString() {
                 return "Hashtable";
