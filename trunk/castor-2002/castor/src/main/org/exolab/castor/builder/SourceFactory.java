@@ -466,6 +466,7 @@ public class SourceFactory  {
                 //-- copy members from super class
                 classInfo.addFieldInfo(cInfo.getAttributeFields());
                 classInfo.addFieldInfo(cInfo.getElementFields());
+                classInfo.addFieldInfo(cInfo.getTextField());
             }
             else {
                 //-- will this ever be null, if we have a valid Schema?
