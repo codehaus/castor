@@ -58,7 +58,8 @@ import javax.transaction.Status;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.FastThreadLocal;
 import org.exolab.castor.util.Messages;
-
+import org.exolab.castor.util.Logger;
+import org.exolab.castor.util.Configuration;
 
 
 /**
@@ -173,6 +174,8 @@ public final class TransactionImpl
             _txContext.prepare();
             _txContext.commit();
         } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+            if ( Configuration.debug() )
+                except.printStackTrace( Logger.getSystemLogger() );
             try {
                 _txContext.rollback();
             } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
@@ -219,12 +222,17 @@ public final class TransactionImpl
         try {
             _txContext.checkpoint();
         } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+            if ( Configuration.debug() )
+                except.printStackTrace( Logger.getSystemLogger() );
+            try {
+                _txContext.rollback();
+            } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
+                // This should never happen
+            }
+            _txContext = null;
             throw new TransactionAbortedException( except.getMessage() );
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
             throw new TransactionNotInProgressException( except.getMessage() );
-        } catch ( TransactionAbortedException except ) {
-            _txContext = null;
-            throw except;
         }
     }
 
