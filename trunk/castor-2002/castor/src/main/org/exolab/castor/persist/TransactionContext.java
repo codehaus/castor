@@ -298,7 +298,7 @@ public abstract class TransactionContext
             if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
-                return oid;
+                return entry.object;
             if ( ( accessMode == AccessMode.Exclusive ||
                    accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
                 // If we are in exclusive mode and object has not been
