@@ -94,12 +94,8 @@ public class JDBCQueryExpression
     protected String    _order;
 
     protected String    _limit;
-    protected int	    _limitFirstBindIdx;
-    protected int	    _limitLastBindIdx;
     
     protected String    _offset;
-    protected int	    _offsetFirstBindIdx;
-    protected int	    _offsetLastBindIdx;
 
     protected boolean   _distinct = false;
 
@@ -283,26 +279,22 @@ public class JDBCQueryExpression
     }
 
 
-    public void addLimitClause( String limit, int paramIndexFrom, int paramIndexTo ) 
+    public void addLimitClause( String limit ) 
     	throws SyntaxNotSupportedException 
 	{
     	if (isLimitClauseSupported()) {
     		_limit = limit;
-    		_limitFirstBindIdx = paramIndexFrom;
-    		_limitLastBindIdx = paramIndexTo;
     	} else {
     		throw new SyntaxNotSupportedException (Messages.format ("query.limitClauseNotSupported", _factory.getFactoryName()));
     	}
     }
 
 
-    public void addOffsetClause( String offset, int paramIndexFrom, int paramIndexTo ) 
+    public void addOffsetClause( String offset ) 
     	throws SyntaxNotSupportedException
 	{
     	if (isOffsetClauseSupported()) {
     		_offset = offset;
-    	    _offsetFirstBindIdx = paramIndexFrom;
-    	    _offsetLastBindIdx = paramIndexTo;
     	} else {
     		throw new SyntaxNotSupportedException (Messages.format ("query.offsetClauseNotSupported", _factory.getFactoryName()));
     	}
@@ -638,15 +630,6 @@ public class JDBCQueryExpression
 	{
 		return false;
 	}
-
-    /**
-     * @param paramInfo
-     * @return re-ordered bind parameter info
-     */
-    public Map postProcessParamInfo(Map paramInfo)
-    {
-        return paramInfo;
-    }
 
     protected Map reorderParamInfo(Map paramInfo, int idx1From, int idx1To, int idx2From, int idx2To)
     {

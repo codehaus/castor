@@ -48,7 +48,6 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.util.Enumeration;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -113,7 +112,7 @@ public final class OracleQueryExpression
             }
 			sql.append ( " ) rnk ");
         }
-        
+
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
         enum = _tables.keys();
@@ -165,22 +164,22 @@ public final class OracleQueryExpression
         // add ORDER BY clause, but only if no LIMIT clause has been specified
         if ( _order != null && _limit == null)
           sql.append(JDBCSyntax.OrderBy).append(_order);
- 
+
         // Use FOR UPDATE to lock selected tables.
         if ( lock )
             sql.append( " FOR UPDATE" );
-        
+
         // add LIMIT/OFFSET clause - part 2
         if ( _limit != null ) {
-        	sql.insert (0, " select * from ( ");
-        	
+        	sql.insert (0, "select * from ( ");	// leads to problems when used with Castor's outer joins for master-details queries: "ORA-00918: Spalte nicht eindeutig definiert"
+
         	if ( _offset != null ) {
         		sql.append (" ) where rnk - " + _offset + " between 1 and " + _limit + " ");
         	} else {
         		sql.append (" ) where rnk <= " + _limit + " ");
         	}
         }
-        
+
         _log.debug ("SQL statement = " + sql.toString());
         return sql.toString();
     }
@@ -205,16 +204,4 @@ public final class OracleQueryExpression
 	{
 	    return _dbInfo!=null? _dbInfo.compareDbVersion("8.1.6")>=0: false;
 	}
-
-    /**
-     * @param paramInfo
-     * @return re-ordered bind parameter info
-     */
-    public Map postProcessParamInfo(Map paramInfo)
-    {
-        if (_limit!=null && _offset!=null)
-            return reorderParamInfo(paramInfo, _limitFirstBindIdx, _limitLastBindIdx, _offsetFirstBindIdx, _offsetLastBindIdx);
-        else
-            return paramInfo;
-    }
 }
