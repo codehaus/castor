@@ -40,21 +40,23 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
 package org.exolab.castor.xml;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.PrintStream;
 
 /**
  * An exception that is used to signal marshalling exceptions.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class MarshalException extends XMLException {
     
     //------------------/
@@ -103,7 +105,7 @@ public class MarshalException extends XMLException {
      *
      * @param exception the nested exception
     **/
-    public MarshalException(Exception exception) {
+    public MarshalException(Throwable exception) {
         super(exception);
     } //-- MarshalException(Exception)
 
@@ -114,7 +116,7 @@ public class MarshalException extends XMLException {
      * @param message the detail message for this exception
      * @param exception the nested exception
     **/
-    public MarshalException(String message, Exception exception) {
+    public MarshalException(String message, Throwable exception) {
         super(message, exception);
     } //-- MarshalException(String, Exception)
 
@@ -127,7 +129,7 @@ public class MarshalException extends XMLException {
      * @param errorCode the errorCode for this Exception
     **/
     public MarshalException
-        (String message, Exception exception, int errorCode) 
+        (String message, Throwable exception, int errorCode) 
     {
         super(message, exception, errorCode);
     } //-- MarshalException(String, Exception, int)
