@@ -2306,7 +2306,7 @@ public class ClassMolder {
     public Object getIdentity( TransactionContext tx, Object o ) {
         // [oleg] In the case where key generator is used,
         // the value of identity is dummy, set it to null
-        if ( isKeyGeneratorUsed() && !tx.isPersistent(o) ) {
+        if ( isKeyGeneratorUsed() && ! (tx.isPersistent(o) || tx.isReadOnly(o))) {
             return null;
         } else {
             return getActualIdentity( tx, o );

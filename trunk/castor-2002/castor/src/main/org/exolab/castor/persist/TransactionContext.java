@@ -1418,17 +1418,17 @@ public abstract class TransactionContext
             // see if it is readonly
             Iterator values = _readOnlyObjects.values().iterator();
             while ( values.hasNext() ) {
-                if ( object == values.next() )
+                if ( object == ((ObjectEntry) values.next()).object )
                     return OBJECT_STATE_READ_ONLY;
             }
             return OBJECT_STATE_TRANSIENT;
         }
     }
-    
+
     /**
      * Get the current application ClassLoader.
      *
-     * @return the current ClassLoader's instance. <code>null</code> if none 
+     * @return the current ClassLoader's instance. <code>null</code> if none
      * has been provided
      */
     public ClassLoader getClassLoader () 
@@ -1612,6 +1612,9 @@ public abstract class TransactionContext
         return (ObjectEntry) _readOnlyObjects.get( oid );
     }
 
+    public boolean isReadOnly( Object object ) {
+        return (getObjectState(object) == OBJECT_STATE_READ_ONLY);
+    }
 
     /**
      * Converts AccessMode constant to Database short constant
