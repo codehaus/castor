@@ -122,7 +122,7 @@ public class StringValidator extends PatternValidator
     } //-- setRequired
 
      /**
-     * <p>Sets the whiteSpace facet of this XSString.
+     * <p>Sets the whiteSpace facet of the validator
      * <p>The value of the whiteSpace facet must be one of the following:
      * <ul>
      *  <li>preserve</li>
@@ -138,7 +138,7 @@ public class StringValidator extends PatternValidator
         else if (value.equals("replace"))
             this._whiteSpace = value;
         else if (value.equals("collapse"))
-            this._whiteSpace = "preserved";
+            this._whiteSpace = value;
         else {
             System.out.println("Warning : "+value+" is a bad entry for the whiteSpace value");
             this._whiteSpace = value;
