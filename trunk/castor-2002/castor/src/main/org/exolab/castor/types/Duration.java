@@ -284,36 +284,43 @@ public class Duration
      public String toString() {
         StringBuffer result = new StringBuffer();
         result.append("P");
-        if (_year != 0) {
-            result.append(_year);
-            result.append("Y");
+        if (this.toLong() == 0) {
+            // if the duration is empty
+            //we chose as a standard to return "PTOS"
+            result.append("T0S");
         }
-        if (_month != 0) {
-           result.append(_month);
-           result.append("M");
-        }
-        if (_day !=0 ) {
-            result.append(_day);
-            result.append("D");
-        }
-        boolean isThereTime = ( (_hour != 0) || (_minute != 0) || (_second != 0) );
-        if (isThereTime) {
-            result.append("T");
-            if (_hour !=0 ) {
-                result.append(_hour);
-                result.append("H");
+        else {
+            if (_year != 0) {
+                result.append(_year);
+                result.append("Y");
             }
-            if (_minute !=0) {
-                result.append(_minute);
+            if (_month != 0) {
+                result.append(_month);
                 result.append("M");
             }
-            if (_second != 0) {
-                result.append(_second);
-                result.append("S");
+            if (_day !=0 ) {
+                result.append(_day);
+                result.append("D");
             }
+            boolean isThereTime = ( (_hour != 0) || (_minute != 0) || (_second != 0) );
+            if (isThereTime) {
+                result.append("T");
+                if (_hour !=0 ) {
+                    result.append(_hour);
+                    result.append("H");
+                }
+                if (_minute !=0) {
+                    result.append(_minute);
+                    result.append("M");
+                }
+                if (_second != 0) {
+                    result.append(_second);
+                    result.append("S");
+                }
+            }
+            if (_isNegative)
+                result.insert(0,'-');
         }
-        if (_isNegative)
-           result.insert(0,'-');
         return result.toString();
     } //toString
 
