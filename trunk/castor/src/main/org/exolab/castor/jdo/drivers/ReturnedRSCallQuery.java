@@ -52,6 +52,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
@@ -71,7 +73,12 @@ import org.exolab.castor.util.Messages;
 final class ReturnedRSCallQuery implements PersistenceQuery
 {
 
-
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance(ReturnedRSCallQuery.class);
+    
     private CallableStatement _stmt;
 
 
@@ -166,7 +173,9 @@ final class ReturnedRSCallQuery implements PersistenceQuery
             if ( _stmt != null ) {
                 try {
                     _stmt.close();
-                } catch ( SQLException e2 ) { }
+                } catch ( SQLException e2 ) {
+                    _log.warn (Messages.message ("persist.stClosingFailed"), e2);
+                }
             }
             throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
@@ -203,13 +212,17 @@ final class ReturnedRSCallQuery implements PersistenceQuery
         if ( _rs != null ) {
             try {
                 _rs.close();
-            } catch ( SQLException except ) { }
+            } catch ( SQLException except ) {               
+                _log.warn (Messages.message ("persist.rsClosingFailed"), except);
+            }
             _rs = null;
         }
         if ( _stmt != null ) {
             try {
                 _stmt.close();
-            } catch ( SQLException except ) { }
+            } catch ( SQLException except ) {
+                _log.warn (Messages.message ("persist.stClosingFailed"), except);
+            }
             _stmt = null;
         }
     }
