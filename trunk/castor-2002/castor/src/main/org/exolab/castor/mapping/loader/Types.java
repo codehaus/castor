@@ -323,7 +323,7 @@ public class Types
             case 'h':           sb.append( "hh" ); break;
             case 'm':           sb.append( "mm" ); break;
             case 's':           sb.append( "ss" ); break;
-            case 'S': case 'n': sb.append( "SSS" ); break;
+            case 'S':           sb.append( "SSS" ); break;
             }
         }
         
