@@ -428,7 +428,7 @@ public final class ClassHandler
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].relation == null )
                 _fields[ i ].handler.setValue( target, copyValue( _fields[ i ], fields[ i ] ) );
-            else {
+            else if ( ctx != null ) {
                 Object relSource;
 
                 if ( fields[ i ] == null )

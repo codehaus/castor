@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 
 
@@ -59,6 +60,12 @@ import org.exolab.castor.persist.spi.CallbackInterceptor;
 public class JDOCallback
     implements CallbackInterceptor
 {
+
+
+    public void using( Object object, Database db )
+    {
+        ( (Persistent) object ).setDatabase( db );
+    }
 
 
     public void loaded( Object object )
@@ -81,7 +88,7 @@ public class JDOCallback
     }
 
 
-    public void releasing( Object object )
+    public void releasing( Object object, boolean committed )
     {
         ( (Persistent) object ).unsetDatabase();
     }

@@ -47,6 +47,7 @@
 package org.exolab.castor.persist;
 
 
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 
 

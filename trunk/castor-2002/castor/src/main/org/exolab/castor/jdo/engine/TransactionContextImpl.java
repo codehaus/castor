@@ -54,6 +54,7 @@ import java.sql.SQLException;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.PersistenceEngine;
@@ -96,9 +97,9 @@ final class TransactionContextImpl
     /**
      * Create a new transaction context.
      */
-    public TransactionContextImpl( boolean globalTx )
+    public TransactionContextImpl( Database db, boolean globalTx )
     {
-        super();
+        super( db );
         _globalTx = globalTx;
     }
 

@@ -67,14 +67,14 @@ final class TransactionContextImpl
 
     public TransactionContextImpl( LDAPConnection conn )
     {
-        super();
+        super( null );
         _conn = conn;
     }
 
 
     public TransactionContextImpl( LDAPConnection conn, Xid xid )
     {
-        super( xid );
+        super( null, xid );
         _conn = conn;
     }
 
