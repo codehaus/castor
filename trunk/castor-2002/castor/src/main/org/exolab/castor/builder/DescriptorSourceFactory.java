@@ -47,6 +47,7 @@ package org.exolab.castor.builder;
 
 import org.exolab.javasource.*;
 import org.exolab.castor.builder.types.*;
+import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.builder.util.DescriptorJClass;
 
 /**
@@ -56,31 +57,31 @@ import org.exolab.castor.builder.util.DescriptorJClass;
 **/
 public class DescriptorSourceFactory {
 
-        
+
     //-- org.exolab.castor.mapping
-    private static JClass _ClassDescriptorClass 
+    private static JClass _ClassDescriptorClass
         = new JClass("org.exolab.castor.mapping.ClassDescriptor");
 
-    private static JClass _FieldDescriptorClass 
+    private static JClass _FieldDescriptorClass
         = new JClass("org.exolab.castor.mapping.FieldDescriptor");
-        
+
     //-- org.exolab.castor.xml
     private static JClass fdImplClass
         = new JClass("org.exolab.castor.xml.util.XMLFieldDescriptorImpl");
-        
-        
-    private static JClass fdClass 
+
+
+    private static JClass fdClass
         = new JClass("org.exolab.castor.xml.XMLFieldDescriptor");
-        
-        
+
+
     private static JType fdArrayClass = fdClass.createArray();
 
-    private static JClass gvrClass 
+    private static JClass gvrClass
         = new JClass("org.exolab.castor.xml.GroupValidationRule");
-        
-    private static JClass vrClass 
+
+    private static JClass vrClass
         = new JClass("org.exolab.castor.xml.ValidationRule");
-        
+
 
     /**
      * Creates the Source code of a MarshalInfo for a given XML Schema
@@ -89,27 +90,27 @@ public class DescriptorSourceFactory {
      * @return the JClass representing the MarshalInfo source code
     **/
     public static JClass createSource(ClassInfo classInfo) {
-        
-        
+
+
         JMethod     method          = null;
         JSourceCode jsc             = null;
         JSourceCode vcode           = null;
         JClass      jClass          = classInfo.getJClass();
         String      className       = jClass.getName();
         String      localClassName  = jClass.getLocalName();
-        
-        
+
+
         String variableName = "_"+className;
-        
-        DescriptorJClass classDesc 
+
+        DescriptorJClass classDesc
             = new DescriptorJClass(className+"Descriptor", jClass);
-                                            
+
         //-- get handle to default constuctor
-        
+
         JConstructor cons = classDesc.getConstructor(0);
         jsc = cons.getSourceCode();
 		jsc.add("super();");
-        
+
         //-- Set namespace prefix
         String nsPrefix    = classInfo.getNamespacePrefix();
         if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
@@ -117,7 +118,7 @@ public class DescriptorSourceFactory {
             jsc.append(nsPrefix);
             jsc.append("\";");
         }
-        
+
         //-- Set namespace URI
         String nsURI       = classInfo.getNamespaceURI();
         if ((nsURI != null) && (nsURI.length() > 0)) {
@@ -125,7 +126,7 @@ public class DescriptorSourceFactory {
             jsc.append(nsURI);
             jsc.append("\";");
         }
-        
+
         //-- set XML Name
         String xmlName     = classInfo.getNodeName();
         if (xmlName != null) {
@@ -133,37 +134,37 @@ public class DescriptorSourceFactory {
             jsc.append(xmlName);
             jsc.append("\";");
         }
-        
+
         jsc.add("XMLFieldDescriptorImpl  desc           = null;");
         jsc.add("XMLFieldHandler         handler        = null;");
         jsc.add("FieldValidator          fieldValidator = null;");
-        
+
         //jsc.add("Class[] emptyClassArgs = new Class[0];");
         //jsc.add("Class[] classArgs = new Class[1];");
-        
+
         //-- create validation method
         //method = new JMethod(vrClass.createArray(), "getValidationRules");
         //vcode = method.getSourceCode();
         //vcode.add("return rules;");
         //marshalInfo.addMethod(method);
-        
-        
+
+
         //-- create GroupValidationRule
-        
+
         //jsc.add("gvr = new GroupValidationRule();");
         //jsc.add("BasicValidationRule bvr = null;");
 
-        
+
         //-- handle text content
         if (classInfo.allowsTextContent()) {
-            
+
             jsc.add("XMLFieldDescriptorImpl contentDesc = new XMLFieldDescriptorImpl(");
             jsc.append("String.class, \"_content\", \"PCDATA\", ");
             jsc.append("NodeType.Text);");
-                    
+
             jsc.add("contentDesc.setHandler( new XMLFieldHandler() {");
             jsc.indent();
-            
+
             //-- read method
             jsc.add("public Object getValue( Object object ) ");
             jsc.indent();
@@ -178,7 +179,7 @@ public class DescriptorSourceFactory {
             jsc.add("return target.getContent();");
             jsc.unindent();
             jsc.add("}");
-            
+
             //-- write method
             jsc.add("public void setValue( Object object, Object value) ");
             jsc.indent();
@@ -202,46 +203,46 @@ public class DescriptorSourceFactory {
             jsc.add("}");
             jsc.unindent();
             jsc.add("}");
-                
+
             //-- newInstance method
             jsc.add("public Object newInstance( Object parent ) {");
             jsc.indent();
             jsc.add("return new String();");
             jsc.unindent();
             jsc.add("}");
-            
-            
+
+
             jsc.unindent();
             jsc.add("} );");
 			jsc.add("addFieldDescriptor(contentDesc);");
         }
-        
+
         FieldInfo[] atts = classInfo.getAttributeFields();
-        
+
         //-- initialized rules
         //jsc.add("rules = new ValidationRule[");
         //jsc.append(Integer.toString(atts.length+1));
         //jsc.append("];");
-        
+
         //--------------------------------/
         //- Create attribute descriptors -/
         //--------------------------------/
-        
+
         jsc.add("//-- initialize attribute descriptors");
         jsc.add("");
-        
+
         for (int i = 0; i < atts.length; i++) {
-            
+
             FieldInfo member = atts[i];
-            
+
             //-- skip transient members
             if (member.isTransient()) continue;
-            
+
             boolean isEnumerated = false;
-            
+
             jsc.add("//-- ");
             jsc.append(member.getName());
-                
+
             XSType xsType = member.getSchemaType();
             jsc.add("desc = new XMLFieldDescriptorImpl(");
             jsc.append(classType(xsType.getJType()));
@@ -250,10 +251,10 @@ public class DescriptorSourceFactory {
             jsc.append("\", \"");
             jsc.append(member.getNodeName());
             jsc.append("\", NodeType.Attribute);");
-                
-            
+
+
             switch (xsType.getType()) {
-                
+
                 case XSType.STRING:
                     jsc.add("desc.setImmutable(true);");
                     break;
@@ -270,11 +271,11 @@ public class DescriptorSourceFactory {
                     break;
             }
             //-- handler access methods
-                
-            
+
+
             jsc.add("handler = (new XMLFieldHandler() {");
             jsc.indent();
-            
+
             //-- read method
             jsc.add("public Object getValue( Object object ) ");
             jsc.indent();
@@ -293,14 +294,14 @@ public class DescriptorSourceFactory {
 				jsc.indent();
 				jsc.add("return null;");
 				jsc.unindent();
-			}							
+			}
             String value = "target."+member.getReadMethodName()+"()";
             jsc.add("return ");
             jsc.append(xsType.createToJavaObjectCode(value));
             jsc.append(";");
             jsc.unindent();
             jsc.add("}");
-            
+
             //-- write method
             jsc.add("public void setValue( Object object, Object value) ");
             jsc.indent();
@@ -332,7 +333,7 @@ public class DescriptorSourceFactory {
                 jsc.append(") value");
             }
             jsc.append(");");
-            
+
             jsc.unindent();
             jsc.add("}");
             jsc.add("catch (Exception ex) {");
@@ -342,29 +343,29 @@ public class DescriptorSourceFactory {
             jsc.add("}");
             jsc.unindent();
             jsc.add("}");
-                
+
             //-- newInstance method
             jsc.add("public Object newInstance( Object parent ) {");
             jsc.indent();
             jsc.add("return ");
-            
+
             if (xsType.isEnumerated()       ||
-                xsType.isPrimitive()        || 
+                xsType.isPrimitive()        ||
                 xsType.getJType().isArray() ||
                 (xsType.getType() == XSType.STRING))
             {
                 jsc.append("null;");
-            }                
+            }
             else {
                 jsc.append(xsType.newInstanceCode());
             }
             jsc.unindent();
             jsc.add("}");
-            
-            
+
+
             jsc.unindent();
             jsc.add("} );");
-            
+
             if (isEnumerated) {
                 jsc.add("desc.setHandler( new EnumFieldHandler(");
                 jsc.append(classType(xsType.getJType()));
@@ -382,22 +383,22 @@ public class DescriptorSourceFactory {
                 jsc.add("desc.setImmutable(true);");
             }
             else jsc.add("desc.setHandler(handler);");
-            
+
             //-- namespace
             if (nsURI != null) {
                 jsc.add("desc.setNameSpaceURI(\"");
                 jsc.append(nsURI);
                 jsc.append("\");");
             }
-            
+
             if (member.isRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
-            
-            
+
+
 			jsc.add("addFieldDescriptor(desc);");
             jsc.add("");
-            
+
             //-- Add Validation Code
             jsc.add("//-- validation code for: ");
             jsc.append(member.getName());
@@ -406,37 +407,37 @@ public class DescriptorSourceFactory {
             jsc.add("desc.setValidator(fieldValidator);");
             jsc.add("");
         }
-        
-        
+
+
         //------------------------------/
         //- Create element descriptors -/
         //------------------------------/
-        
+
         //jsc.add("rules[");
         //jsc.append(Integer.toString(atts.length));
         //jsc.append("] = gvr;");
-        
+
         FieldInfo[] elements = classInfo.getElementFields();
-        
+
         jsc.add("//-- initialize element descriptors");
         jsc.add("");
-        
+
         for (int i = 0; i < elements.length; i++) {
-            
+
             FieldInfo member = elements[i];
-            
+
             //-- skip transient members
             if (member.isTransient()) continue;
-            
+
             XSType xsType = member.getSchemaType();
-            
-            
+
+
             jsc.add("//-- ");
             jsc.append(member.getName());
 
             boolean any = false;
             boolean isEnumerated = false;
-            
+
             //-- a hack, I know, I will change later (kv)
             if (member.getName().equals("_anyList")) {
                 any = true;
@@ -452,16 +453,16 @@ public class DescriptorSourceFactory {
                 jsc.add("});");
             }
             else {
-                
+
                 if (xsType.getType() == XSType.COLLECTION)
                     xsType = ((CollectionInfo)member).getContent().getSchemaType();
-                    
+
                 jsc.add("desc = new XMLFieldDescriptorImpl(");
                 jsc.append(classType(xsType.getJType()));
                 jsc.append(", \"");
                 jsc.append(member.getName());
                 jsc.append("\", ");
-                
+
                 String nodeName = member.getNodeName();
                 if (nodeName != null) {
                     jsc.append("\"");
@@ -471,11 +472,11 @@ public class DescriptorSourceFactory {
                 else {
                     jsc.append("(String)null");
                 }
-                
+
                 jsc.append(", NodeType.Element);");
-                
+
                 switch (xsType.getType()) {
-                    
+
                     case XSType.CLASS:
                         isEnumerated = ((XSClass)xsType).isEnumerated();
                         break;
@@ -485,14 +486,14 @@ public class DescriptorSourceFactory {
                     default:
                         break;
                 }
-                
+
             }
-            
+
             //-- handler access methods
-                
+
             jsc.add("handler = (new XMLFieldHandler() {");
             jsc.indent();
-            
+
             //-- read method
             jsc.add("public Object getValue( Object object ) ");
             jsc.indent();
@@ -511,7 +512,7 @@ public class DescriptorSourceFactory {
 				jsc.indent();
 				jsc.add("return null;");
 				jsc.unindent();
-			}				
+			}
 			//-- Return field value
             jsc.add("return ");
             String value = "target."+member.getReadMethodName()+"()";
@@ -520,7 +521,7 @@ public class DescriptorSourceFactory {
             jsc.append(";");
             jsc.unindent();
             jsc.add("}");
-            
+
             //-- write method
             jsc.add("public void setValue( Object object, Object value) ");
             jsc.indent();
@@ -555,7 +556,7 @@ public class DescriptorSourceFactory {
                 jsc.append(") value");
             }
             jsc.append(");");
-            
+
             jsc.unindent();
             jsc.add("}");
             jsc.add("catch (Exception ex) {");
@@ -565,30 +566,30 @@ public class DescriptorSourceFactory {
             jsc.add("}");
             jsc.unindent();
             jsc.add("}");
-                
+
             //-- newInstance method
             jsc.add("public Object newInstance( Object parent ) {");
             jsc.indent();
             jsc.add("return ");
-            
-                
+
+
             if (any || isEnumerated ||
-                xsType.isPrimitive() || 
+                xsType.isPrimitive() ||
                 xsType.getJType().isArray() ||
                 (xsType.getType() == XSType.STRING))
             {
                 jsc.append("null;");
-            }                
+            }
             else {
                 jsc.append(xsType.newInstanceCode());
             }
             jsc.unindent();
             jsc.add("}");
-            
-            
+
+
             jsc.unindent();
             jsc.add("} );");
-            
+
             if (isEnumerated) {
                 jsc.add("desc.setHandler( new EnumFieldHandler(");
                 jsc.append(classType(xsType.getJType()));
@@ -606,7 +607,7 @@ public class DescriptorSourceFactory {
                 jsc.add("desc.setImmutable(true);");
             }
             else jsc.add("desc.setHandler(handler);");
-            
+
             //-- namespace
             if (nsURI != null) {
                 jsc.add("desc.setNameSpaceURI(\"");
@@ -617,14 +618,14 @@ public class DescriptorSourceFactory {
             if (member.isRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
-            
+
             //-- mark as multi or single valued
             jsc.add("desc.setMultivalued("+member.isMultivalued());
             jsc.append(");");
-            
+
 			jsc.add("addFieldDescriptor(desc);");
             jsc.add("");
-            
+
             //-- Add Validation Code
             jsc.add("//-- validation code for: ");
             jsc.append(member.getName());
@@ -633,15 +634,15 @@ public class DescriptorSourceFactory {
             jsc.add("desc.setValidator(fieldValidator);");
             jsc.add("");
         }
-        
+
         return classDesc;
-        
+
     } //-- createSource
-    
+
     //-------------------/
     //- Private Methods -/
     //-------------------/
-    
+
     /**
      * Returns the Class type (as a String) for the given XSType
     **/
@@ -657,32 +658,32 @@ public class DescriptorSourceFactory {
         }
         return jType.toString() + ".class";
     } //-- classType
-    
+
     private static void validationCode(FieldInfo member, JSourceCode jsc) {
-        
+
         //-- a hack, I know, I will change later
         if (member.getName().equals("_anyObject")) return;
-        
+
         XSType xsType = member.getSchemaType();
-        
+
         //-- create local copy of field
         //JMember jMember = member.createMember();
-        
+
         if (xsType.getType() != XSType.COLLECTION) {
             if (member.isRequired()) {
                 jsc.add("fieldValidator.setMinOccurs(1);");
             }
         }
-        
+
         String fixed = member.getFixedValue();
         String pattern = null;
-        
+
         //-- create proper validator
-        
+
         switch (xsType.getType()) {
-            
+
             case XSType.NEGATIVE_INTEGER:
-            case XSType.POSITIVE_INTEGER:             
+            case XSType.POSITIVE_INTEGER:
             case XSType.INTEGER:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -710,12 +711,12 @@ public class DescriptorSourceFactory {
                     jsc.append(max.toString());
                     jsc.append(");");
                 }
-                
+
                 //-- fixed values
                 if (fixed != null) {
                     //-- make sure we have a valid value...
                     Integer.parseInt(fixed);
-                    
+
                     jsc.add("iv.setFixedValue(");
                     jsc.append(fixed);
                     jsc.append(");");
@@ -727,7 +728,7 @@ public class DescriptorSourceFactory {
                     jsc.append(pattern);
                     jsc.append("\");");
                 }
-                
+
                 jsc.add("fieldValidator.setValidator(iv);");
                 jsc.unindent();
                 jsc.add("}");
@@ -759,12 +760,12 @@ public class DescriptorSourceFactory {
                     jsc.append(max.toString());
                     jsc.append(");");
                 }
-                
+
                 //-- fixed values
                 if (fixed != null) {
                     //-- make sure we have a valid value...
                     Integer.parseInt(fixed);
-                    
+
                     jsc.add("iv.setFixedValue(");
                     jsc.append(fixed);
                     jsc.append(");");
@@ -776,12 +777,12 @@ public class DescriptorSourceFactory {
                     jsc.append(pattern);
                     jsc.append("\");");
                 }
-                
+
                 jsc.add("fieldValidator.setValidator(iv);");
                 jsc.unindent();
                 jsc.add("}");
                 break;
-            //-- long
+            //-- int
             case XSType.LONG:
             {
                 jsc.add("{ //-- local scope");
@@ -810,12 +811,12 @@ public class DescriptorSourceFactory {
                     jsc.append(max.toString());
                     jsc.append("L);");
                 }
-                
+
                 //-- fixed values
                 if (fixed != null) {
                     //-- make sure we have a valid value...
                     Long.parseLong(fixed);
-                    
+
                     jsc.add("lv.setFixedValue(");
                     jsc.append(fixed);
                     jsc.append(");");
@@ -827,7 +828,7 @@ public class DescriptorSourceFactory {
                     jsc.append(pattern);
                     jsc.append("\");");
                 }
-                
+
                 jsc.add("fieldValidator.setValidator(lv);");
                 jsc.unindent();
                 jsc.add("}");
@@ -861,7 +862,7 @@ public class DescriptorSourceFactory {
                     jsc.append(pattern);
                     jsc.append("\");");
                 }
-                
+
                 jsc.add("fieldValidator.setValidator(sv);");
                 jsc.unindent();
                 jsc.add("}");
@@ -877,7 +878,7 @@ public class DescriptorSourceFactory {
                 XSList xsList = (XSList)xsType;
                 CollectionInfo cInfo = (CollectionInfo)member;
                 FieldInfo content = cInfo.getContent();
-                
+
                 jsc.add("fieldValidator.setMinOccurs(");
                 jsc.append(Integer.toString(xsList.getMinimumSize()));
                 jsc.append(");");
@@ -887,10 +888,52 @@ public class DescriptorSourceFactory {
                     jsc.append(");");
                 }
                 break;
+            case XSType.TIME_DURATION:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("TimeDurationValidator tv = new TimeDurationValidator();");
+                XSTimeDuration xsTimeD = (XSTimeDuration)xsType;
+                if (xsTimeD.hasMinimum()) {
+                    TimeDuration min = xsTimeD.getMinExclusive();
+                    if (min != null)
+                        jsc.add("tv.setMinExclusive(");
+                    else {
+                        min = xsTimeD.getMinInclusive();
+                        jsc.add("tv.setMinInclusive(");
+                    }
+                    /* it is better for a good understanding to use
+                    the parse method with 'min.toSring()' but in that case
+                    we have to deal with the ParseException*/
+                    jsc.append("new org.exolab.castor.types.TimeDuration("+min.toLong()+"L)");
+                    jsc.append(");");
+                }
+                if (xsTimeD.hasMaximum()) {
+                    TimeDuration max = xsTimeD.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("tv.setMaxExclusive(");
+                    else {
+                        max = xsTimeD.getMaxInclusive();
+                        jsc.add("tv.setMaxInclusive(");
+                    }
+                    /* it is better for a good understanding to use
+                    the parse method woth 'min.toSring()' but in that case
+                    we have to deal with the ParseException*/
+                    jsc.append("new org.exolab.castor.types.TimeDuration("+max.toLong()+"L)");
+                    jsc.append(");");
+                }
+
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(tv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+            //-- TimeDuration
+
             default:
                 break;
         }
     } //-- validationCode
-    
-            
+
+
 } //-- MarshalInfoSourceFactory
