@@ -159,14 +159,14 @@ public final class DatabaseImpl
     {
         // Check that we are opening this database in a valid mode.
         if ( _mode != NOT_OPEN )
-            throw new DatabaseOpenException( Messages.message( "castor.jdo.odmg.dbAlreadyOpen" ) );
+            throw new DatabaseOpenException( Messages.message( "jdo.odmg.dbAlreadyOpen" ) );
         switch ( mode ) {
         case OPEN_READ_ONLY:
         case OPEN_READ_WRITE:
         case OPEN_EXCLUSIVE:
             break;
         default:
-            throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.dbIllegalOpenMode" ) );
+            throw new ODMGRuntimeException( Messages.message( "jdo.odmg.dbIllegalOpenMode" ) );
         }
         _mode = mode;
         
@@ -182,7 +182,7 @@ public final class DatabaseImpl
             throw new DatabaseNotFoundException( except.getMessage() );
         }
         if ( dbs == null )
-            throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoMapping", dbName ) );
+            throw new DatabaseNotFoundException( Messages.format( "jdo.odmg.dbNoMapping", dbName ) );
         _dbEngine = DatabaseSource.getPersistenceEngine( dbs );
     }
     
@@ -198,7 +198,7 @@ public final class DatabaseImpl
         while ( enum.hasMoreElements() ) {
             tx = (TransactionContext) enum.nextElement();
             if ( tx.isOpen() )
-                throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.dbTxInProgress" ) );
+                throw new TransactionInProgressException( Messages.message( "jdo.odmg.dbTxInProgress" ) );
         }
         _dbEngine = null;
         _mode = NOT_OPEN;
@@ -211,7 +211,7 @@ public final class DatabaseImpl
         ClassDesc         clsDesc;
         
         if ( _mode == Database.OPEN_READ_ONLY )
-            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+            throw new DatabaseIsReadOnlyException( Messages.message( "jdo.odmg.dbOpenReadOnly" ) );
         tx = getTransaction();
         clsDesc = _dbEngine.getClassDesc( obj.getClass() );
         if ( clsDesc == null || clsDesc.getIdentity() == null )
@@ -235,7 +235,7 @@ public final class DatabaseImpl
         TransactionContext tx;
         
         if ( _mode == Database.OPEN_READ_ONLY )
-            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+            throw new DatabaseIsReadOnlyException( Messages.message( "jdo.odmg.dbOpenReadOnly" ) );
         tx = getTransaction();
         try {
             tx.delete( obj );
@@ -296,7 +296,7 @@ public final class DatabaseImpl
         ClassDesc         clsDesc;
         
         if ( _mode == Database.OPEN_READ_ONLY )
-            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+            throw new DatabaseIsReadOnlyException( Messages.message( "jdo.odmg.dbOpenReadOnly" ) );
         tx = getTransaction();
         makePersistent( obj );
         clsDesc = _dbEngine.getClassDesc( obj.getClass() );
@@ -322,7 +322,7 @@ public final class DatabaseImpl
         NameBinding binding;
         
         if ( _mode == Database.OPEN_READ_ONLY )
-            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+            throw new DatabaseIsReadOnlyException( Messages.message( "jdo.odmg.dbOpenReadOnly" ) );
         tx = getTransaction();
         try {
             binding = new NameBinding();
@@ -385,7 +385,7 @@ public final class DatabaseImpl
         TransactionContext tx;
         
         if ( _dbEngine == null )
-            throw new DatabaseClosedException( Messages.message( "castor.jdo.odmg.dbClosed" ) );
+            throw new DatabaseClosedException( Messages.message( "jdo.odmg.dbClosed" ) );
         if ( _ctx != null )
             return _ctx;
         
@@ -393,7 +393,7 @@ public final class DatabaseImpl
         // Cannot persist outside of a transaction.
         tx = TransactionImpl.getCurrentContext();
         if ( tx == null || ! tx.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.dbTxNotInProgress" ) );
         // Must register transaction with this database.
         if ( ! _txOpen.contains( tx ) )
             _txOpen.addElement( tx );

@@ -226,16 +226,15 @@ public class DatabaseSource
             try {
                 obj = new InitialContext().lookup( dbName );
             } catch ( NameNotFoundException except ) {
-                throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
+                throw new MappingException( "jdo.jndiNameNotFound", dbName );
             } catch ( NamingException except ) {
                 throw new MappingException( except );
             }
-            if ( obj instanceof DataSource ) {
+            if ( obj instanceof DataSource )
                 dbs = new DatabaseSource( dbName, _defaultMapping, new SQLEngineFactory(),
                                           (DataSource) obj, logWriter );
-            } else {
-                throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
-            }
+            else
+                throw new MappingException( "jdo.jndiNameNotFound", dbName );
             _databases.put( dbName, dbs );
         }
         return null;
@@ -287,8 +286,7 @@ public class DatabaseSource
                     }
                 }
                 if ( DriverManager.getDriver( database.getDriver().getUrl() ) == null )
-                    throw new MappingException( "No suitable driver found for URL " + database.getDriver().getUrl() +
-                                                " - check if URL is correct and driver accessible in classpath" );
+                    throw new MappingException( "jdo.missingDriver", database.getDriver().getUrl() );
 
                 props = new Properties();
                 params = database.getDriver().listParams();
@@ -303,8 +301,7 @@ public class DatabaseSource
           
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
-                    throw new MappingException( "No data source specified for database " +
-                                                database.getDbName() );
+                    throw new MappingException( "jdo.missingDataSource", database.getDbName() );
                 dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(),
                                           ds, logWriter );
             } else if ( database.getDataSourceRef() != null ) {
@@ -313,18 +310,17 @@ public class DatabaseSource
                 try {
                     ds = new InitialContext().lookup( database.getDbName() );
                 } catch ( NameNotFoundException except ) {
-                    throw new MappingException( "The JNDI name " + database.getDbName() +
-                                                " does not map to a DataSource" );
+                    throw new MappingException( "jdo.jndiNameNotFound", database.getDbName() );
                 } catch ( NamingException except ) {
                     throw new MappingException( except );
                 }
                 if ( ! ( ds instanceof DataSource ) )
-                    throw new MappingException( "The JNDI name " + database.getDbName() +
-                                                " does not map to a DataSource" );
+                    throw new MappingException( "jdo.jndiNameNotFound", database.getDbName() );
+
                 dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(),
                                           (DataSource) ds, logWriter );
             } else {
-                throw new MappingException( "Bad" );
+                throw new MappingException( "jdo.missingDataSource", database.getDbName() );
             }
 
             _databases.put( dbs.getDBName(), dbs );
