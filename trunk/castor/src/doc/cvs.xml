@@ -3,18 +3,33 @@
   <body>
     <title>CVS Access</title>
 
-    <section title="WebCVS, Snapshots, Bugzilla">
+    <section title="Bugzilla: Bug Reports and Tracking">
 
-      <p><a href="http://virtuals.intalio.com/cgi-bin/cvsweb.cgi/castor/?cvsroot=castor">WebCVS access to the repository.</a></p>
+      <p>
+         Please use our <a href="http://bugzilla.exolab.org">Bugzilla</a> server for bug reporting/tracking.
+      </p>
+      <p>
+         Before submitting bugs, please read the
+         <a href="http://bugzilla.mozilla.org/page.cgi?id=etiquette.html">Bugzilla Etiguette</a> and
+         <a href="http://bugzilla.mozilla.org/bugwritinghelp.html">Bug Writing Guidelines</a> from Mozilla.org.
+      </p>
+   </section>
 
-      <p>Or, <a href="download.xml">download the full source distribution</a>
-         containing the latest snapshot of the CVS.</p>
+   <section title="WebCVS, CVS Snapshots">
+      <p>
+         To get the latest, most up-to-date source code, you'll need to use CVS, please see
+         <a href="#Anonymous-CVS-Access">Anonymous CVS Access</a> below. If you wish to
+         simply browse the CVS for specific files or to view changes and commit logs use
+         <a href="http://project.exolab.org/cgi-bin/viewcvs.cgi/castor/?cvsroot=castor">
+         ViewCVS access to the repository.</a>
+      </p>
 
-      <p><a href="http://bugzilla.exolab.org">Use Bugzilla for bug tracking.</a></p>
-
+      <p>Or, <a href="download.xml">download</a> the full source distribution
+         for a given release, or the latest daily snapshot of the CVS.
+      </p>
     </section>
 
-    <section title="Anonymous Access">
+    <section title="Anonymous CVS Access">
 
       <p>The source code, documentation and libraries are available for anonymous access
          from the Exolab CVS server.</p>
@@ -75,18 +90,18 @@ againsts the up-to-date cvs version, or
   diff -u <file>
 ]]></pre></p>
 
-      <p>It is very important for sending test cases along with the patch of a 
+      <p>It is very important for sending test cases along with the patch of a
          new feature and a bug fix.</p>
 
-      <p>A test case, showing a feature being added, a bug being fixed, 
-         proves that the patch plays along nicely with other code, ensures 
-         the committer understands what the patch does and also encourages 
+      <p>A test case, showing a feature being added, a bug being fixed,
+         proves that the patch plays along nicely with other code, ensures
+         the committer understands what the patch does and also encourages
          promptly reviewing and checking in.</p>
 
       <p>Committer commits a patch only if s/he fully understands the patch.</p>
 
-      <p>Also, a test case is the easiest way to ensure your contribution will 
-         not be broken by another patch later. It becomes even more important 
+      <p>Also, a test case is the easiest way to ensure your contribution will
+         not be broken by another patch later. It becomes even more important
          if your project depends on a feature that you're contributing.</p>
 
     </section>

@@ -6,6 +6,16 @@
     <header>
 
       <p>
+         <b>Note:</b> <font color="red">Due to the hard-drive crash we had two weeks ago
+         (Februrary 27, 2003) we had to rebuild the Exolab server. While we have been
+          able to restore most of our infrastructure, we did lose the subscriber list
+          for the 'castor-announce' mailing list. If you were a subscriber to that list
+          you'll have to re-subscribe. We apologize for the inconvenience.
+          </font>
+          <p />
+          The Castor Team - 12 Mar 2003.
+      </p>
+      <p>
          Castor is an open source data binding framework for Java[tm].
          It's basically the shortest path between Java objects, XML documents and SQL tables.
          Castor provides Java to XML binding, Java to SQL persistence, and then
@@ -16,6 +26,13 @@
         <br />
         <b>$RELEASE_DATE$</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.
         <ul>
+            <li><b>12 Mar 2003</b> - We're pleased to announce that the folks at
+               <a href="http://www.refactorit.com/index.html?id=649">RefactorIt</a>
+               have included Castor as part of their Open Source Community License.
+               This means anyone who works on the Castor code base can download a
+               copy of RefactorIt and use it when working on the Castor code.
+            </li>
+
             <li><b>14 Nov 2002</b> - <b>Congratulations</b>
                to Bruce Synder and his family on the birth of their second daughter,
                the youngest member of the Castor team, we can't wait until she's old enough
@@ -52,11 +69,15 @@
           <li>
              Castor XML: Java object model to and from XML
              <br/>&#160;&#160; - Generate source code from an XML Schema
+             <br/>&#160;&#160; - Default introspector or mapping file for existing object models
           </li>
-          <li>Castor JDO: Java object persistence to RDBMS</li>
-          <li>Castor DAX: Java object persistence to LDAP</li>
-          <li>Castor DSML: LDAP directory exchange through XML</li>
-          <li>XML-based mapping file specify the mapping between one model and another</li>
+          <li>Castor JDO: Java object persistence to RDBMS
+              <li>Castor JDO is not the same-as or compatible with Sun's JDO. We have
+                  a different approach to handling data object to RDBMS mappings.
+                  Please see the <a href="jdo-faq.html">JDO FAQ</a> for more information.
+              </li>
+          </li>
+          <li>XML-based mapping file to specify bindings for existing object models</li>
           <li>Support for schema-less Java to XML binding</li>
           <li>In memory caching and write-at-commit reduces JDBC operations</li>
           <li>Two phase commit transactions, object rollback and deadlock detection</li>
