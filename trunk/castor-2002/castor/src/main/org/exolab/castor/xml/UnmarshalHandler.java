@@ -59,7 +59,6 @@ import java.io.Serializable;
 
 import java.lang.reflect.*;
 
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
@@ -756,6 +755,7 @@ public class UnmarshalHandler implements DocumentHandler {
             String attValue = atts.getValue(attName);
             if (attValue == null) {
                 //-- error handling
+                /*
                 if (debug) {
                     buf.setLength(0);
                     buf.append("no attribute value with name \'");
@@ -765,6 +765,7 @@ public class UnmarshalHandler implements DocumentHandler {
                     buf.append("\'");
                     message(buf.toString());
                 }
+                */
                 continue;
             }
             
@@ -800,9 +801,6 @@ public class UnmarshalHandler implements DocumentHandler {
     **/
     private void message(String msg) {
         if (_logWriter != null) {
-            _logWriter.print("[");
-            _logWriter.print(new Date());
-            _logWriter.print("] ");
             _logWriter.println(msg);
         }
     } //-- message

@@ -237,36 +237,38 @@ public class Unmarshaller {
         catch(org.xml.sax.SAXException sx) {
             
             MarshalException marshalEx = new MarshalException(sx);
-/*         
-            String message = null;
-            FileLocation fileLocation = null;
-            
-            Exception ex = sx.getException();
-            if (ex != null) {
-                message = ex.getMessage();
-                if (ex instanceof org.xml.sax.SAXParseException) {
-                    SAXParseException sxpe = (SAXParseException)sx;
-                    fileLocation = new FileLocation();
-                    fileLocation.setFilename(sxpe.getSystemId());
-                    fileLocation.setLineNumber(sxpe.getLineNumber());
-                    fileLocation.setColumnNumber(sxpe.getColumnNumber());
-                    marshalEx.setLocation(fileLocation);
-                }
+            /*
+              String message = null;
+              FileLocation fileLocation = null;
+              
+              Exception ex = sx.getException();
+              if (ex != null) {
+              message = ex.getMessage();
+              if (ex instanceof org.xml.sax.SAXParseException) {
+              SAXParseException sxpe = (SAXParseException)sx;
+              fileLocation = new FileLocation();
+              fileLocation.setFilename(sxpe.getSystemId());
+              fileLocation.setLineNumber(sxpe.getLineNumber());
+              fileLocation.setColumnNumber(sxpe.getColumnNumber());
+              marshalEx.setLocation(fileLocation);
+              }
+              }
+              else message = sx.getMessage();
+            */
+            if ( handler.getDocumentLocator() != null ) {
+                FileLocation location = new FileLocation();
+                location.setFilename(handler.getDocumentLocator().getSystemId());
+                location.setLineNumber(handler.getDocumentLocator().getLineNumber());
+                location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
+                marshalEx.setLocation(location);
             }
-	    else message = sx.getMessage();
-*/
-	    FileLocation location = new FileLocation();
-	    location.setFilename(handler.getDocumentLocator().getSystemId());
-	    location.setLineNumber(handler.getDocumentLocator().getLineNumber());
-	    location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
-	    marshalEx.setLocation(location);
-
-/*
-            if (message == null) 
-                message = sx.toString();
-
-            marshalEx.setMessage(message);
-*/
+            
+            /*
+              if (message == null) 
+              message = sx.toString();
+              
+              marshalEx.setMessage(message);
+            */
             throw marshalEx;
         }
         
