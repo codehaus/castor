@@ -112,6 +112,16 @@ public class ModelGroup extends Group {
         }
     } //-- addModelGroup
 
+    /**
+     * Returns an enumeration of all the Particles of this
+     * ContentModelGroup
+     *
+     * @return an enumeration of the Particles contained
+     * within this ContentModelGroup
+    **/
+    public Enumeration enumerate() {
+        return this.getContentModelGroup().enumerate();
+    } //-- enumerate
 
     /**
      * Returns an ordered Enumeration of all the ContentModelType

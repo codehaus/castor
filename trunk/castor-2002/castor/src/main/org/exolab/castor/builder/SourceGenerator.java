@@ -691,7 +691,7 @@ public class SourceGenerator {
         //-- handle all top-level groups
         structures = schema.getModelGroups();
         while (structures.hasMoreElements())
-            createClasses((Group)structures.nextElement(), sInfo);
+            createClasses((ModelGroup)structures.nextElement(), sInfo);
 
 
     } //-- createClasses
@@ -856,7 +856,6 @@ public class SourceGenerator {
         while (enum.hasMoreElements()) {
 
             Structure struct = (Structure)enum.nextElement();
-
             switch(struct.getStructureType()) {
                 case Structure.ELEMENT:
                     ElementDecl eDecl = (ElementDecl)struct;
@@ -865,7 +864,10 @@ public class SourceGenerator {
                     break;
                 case Structure.GROUP:
                     processContentModel((Group)struct, sInfo);
-                    if (!(cmGroup instanceof ComplexType)) {
+                    //handle nested groups
+                    if (!((cmGroup instanceof ComplexType) ||
+                           (cmGroup instanceof ModelGroup)))
+                    {
                         createClasses((Group)struct, sInfo);
                     }
                     break;
@@ -890,6 +892,8 @@ public class SourceGenerator {
                                                     sInfo,
                                                     sInfo.packageName);
 
+
+        processContentModel(group, sInfo);
         for (int i = 0; i < classes.length; i++)
             processJClass(classes[i], sInfo);
 
