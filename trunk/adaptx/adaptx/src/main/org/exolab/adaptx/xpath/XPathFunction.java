@@ -39,10 +39,29 @@ public abstract class XPathFunction
      * @param context The XPath context
      * @param params A list of zero or more arguments
      * @return An XPath result (not null)
-     * @throws XPathException An error occured while invoking this function
+     * @throws XPathException if an error occured while invoking this function
      */
     public abstract XPathResult call( XPathContext context, XPathResult[] args )
         throws XPathException;
+
+    /**
+     * Invokes the function and returns the XPath result.
+     *
+     * @param context The XPath context
+     * @param params A list of zero or more arguments
+     * @param state the FunctionState for obtaining additional
+     * information about the Function call, such as the actual
+     * parameter expressions.
+     * @return An XPath result (not null)
+     * @throws XPathException if an error occured while invoking this function
+     */
+    public XPathResult call( XPathContext context, XPathResult[] args, FunctionState state )
+        throws XPathException
+    {
+        //-- default implementation for backward compatibility
+        return call(context, args);
+        
+    } //-- call
 
 
     /**
