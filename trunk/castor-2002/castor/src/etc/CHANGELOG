@@ -1,11 +1,20 @@
+Version 0.8.x  June xx, 2000
+----------------------------
+
+XML:     Added support for specifying the destination output directory for the
+         generated source code
+
+XML:     Added support for fixed attributes, this currently works for string
+         or integer values
+
 Version 0.8.7  June 2, 2000
 ---------------------------
 
 JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga
          <santiago.arriaga@catnet.com.mx>)
 
-JDO:     SEQUENCE key generator now works with Oracle. It has a special 
-         RETURNING mode for Oracle8i which is more efficient because 
+JDO:     SEQUENCE key generator now works with Oracle. It has a special
+         RETURNING mode for Oracle8i which is more efficient because
          obtains the identity during INSERT, without any additional SQL queries.
          (Oleg Nitz <on@ibis.odessa.ua>)
 
