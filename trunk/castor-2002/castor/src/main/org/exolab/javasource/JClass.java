@@ -126,20 +126,7 @@ public class JClass extends JType {
     public JClass(String name) 
         throws IllegalArgumentException
     {
-        this(name, false);
-    } //-- JClass
-
-
-    /**
-     * Creates a new Class with the given name
-     * @param name the name of the Class to create
-     * @exception IllegalArgumentException when the given name
-     * is not a valid Class name
-    **/
-    public JClass(String name, boolean isArray) 
-        throws IllegalArgumentException
-    {
-        super(name, isArray);
+        super(name);
         this.packageName = getPackageFromClassName(name);
         imports       = new Vector();
         interfaces    = new Vector();
@@ -225,6 +212,7 @@ public class JClass extends JType {
         // if member is of a type not imported by this class
         // then add import
         JType type = jMember.getType();
+        while (type.isArray()) type = type.getComponentType();
         if (!type.isPrimitive()) {
             addImport( ((JClass)type).getName());
         }
@@ -237,13 +225,34 @@ public class JClass extends JType {
         if (jMethod == null) {
             throw new IllegalArgumentException("Class methods cannot be null");
         }
-        //-- check method name and signatures
         
-        //if (methods.get(jMember.getName()) != null) {
-        //    String err = "duplicate name found: " + jMember.getName();
-        //    throw new IllegalArgumentException(err);
-        //}
-        methods.addElement(jMethod);
+        //-- check method name and signatures *add later*
+        
+        //-- keep method list sorted for esthetics when printing
+        //-- START SORT :-)
+        boolean added = false;
+        short modifierVal = 0;
+        JModifiers modifiers = jMethod.getModifiers();
+        
+        for (int i = 0; i < methods.size(); i++) {
+            JMethod tmp = (JMethod) methods.elementAt(i);
+            //-- first compare modifiers
+            if (tmp.getModifiers().isPrivate()) {
+                if (!modifiers.isPrivate()) {
+                    methods.insertElementAt(jMethod, i);
+                    added = true;
+                    break;
+                }
+            }
+            //-- compare names
+            if (jMethod.getName().compareTo(tmp.getName()) < 0) {
+                    methods.insertElementAt(jMethod, i);
+                    added = true;
+                    break;
+            }
+        }
+        //-- END SORT
+        if (!added) methods.addElement(jMethod);
         
         //-- check parameter packages to make sure we have them
         //-- in our import list
@@ -256,9 +265,11 @@ public class JClass extends JType {
         //-- import list
         JType jType = jMethod.getReturnType();
         if (jType != null) {
-            if (!jType.isPrimitive()) {
+            while (jType.isArray()) 
+                jType = jType.getComponentType();
+            
+            if (!jType.isPrimitive())
                 addImport( ((JClass)jType).getName());
-            }
         }
         //-- check exceptions 
         JClass[] exceptions = jMethod.getExceptions();
@@ -277,10 +288,6 @@ public class JClass extends JType {
     public JConstructor createConstructor() {
         return new JConstructor(this);
     } //-- createConstructor
-    
-    public JType createArray() {
-        return new JClass(getName(), true);
-    } //-- createArray
     
     public JConstructor getConstructor(int index) {
         return (JConstructor)constructors.elementAt(index);
@@ -521,7 +528,25 @@ public class JClass extends JType {
             if (comment != null) comment.print(jsw);
             
             // -- print member
-            jsw.write((JMember)members.get(i));
+            jsw.write(jMember.getModifiers().toString());
+            jsw.write(' ');
+            
+            JType type = jMember.getType();
+            String typeName = type.toString();
+            //-- for esthetics use short name in some cases
+            if (typeName.equals(toString())) {
+                typeName = type.getLocalName();
+            }
+            jsw.write(typeName);
+            jsw.write(' ');
+            jsw.write(jMember.getName());
+            
+            String init = jMember.getInitString();
+            if (init != null) {
+                jsw.write(" = ");
+                jsw.write(init);
+            }
+            
             jsw.writeln(';');
             jsw.writeln();
         }
@@ -569,6 +594,15 @@ public class JClass extends JType {
     public void setHeader(JComment comment) {
         this.header = comment;
     } //-- setHeader
+    
+    /**
+     * Allows changing the package name of this JClass
+     * @param packageName the package name to use
+    **/
+    public void setPackageName(String packageName)  {
+        this.packageName = packageName;
+        changePackage(packageName);
+    } //-- setPackageName
     
     /**
      * Sets the super Class that this class extends

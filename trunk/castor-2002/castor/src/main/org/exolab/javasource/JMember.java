@@ -64,6 +64,8 @@ public class JMember {
 
     private JDocComment comment = null;
 
+    private String initString = null;
+    
     /**
      * The Class in this JMember has been declared
     **/
@@ -99,6 +101,16 @@ public class JMember {
         return this.declaringClass;
     } //-- getDeclaringClass
 
+    /**
+     * Returns the initialization String for this JMember
+     * @return the initialization String for this JMember,
+     * or null if no initialization String was specified.
+    **/
+    public String getInitString() {
+        return initString;
+    } //-- getInitString
+    
+     
     /**
      * Returns the modifiers for this JMember
      * @return the modifiers for this JMember     
@@ -142,6 +154,15 @@ public class JMember {
         this.comment.setComment(comment);
     } //-- setComment
 
+    /**
+     * Sets the initialization string for this JMember;
+     * Allows some flexibility in declaring default values.
+     * @param init the initialization string for this member.
+    **/
+    public void setInitString(String init) {
+        this.initString = init;
+    } //-- setInitString
+    
     /**
      * Sets the name of this JMember
      * @param name the name of this JMember

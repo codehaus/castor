@@ -345,9 +345,10 @@ public class JMethod {
         
         for (int i = 0; i < params.size(); i++) {
             
-            JType  jtype  = ((JParameter)params.get(i)).getType();
-            if (!jtype.isPrimitive()) {
-                JClass jclass = (JClass)jtype;
+            JType  jType  = ((JParameter)params.get(i)).getType();
+            while (jType.isArray()) jType = jType.getComponentType();
+            if (!jType.isPrimitive()) {
+                JClass jclass = (JClass)jType;
                 names.addElement( jclass.getName() );
             }
         }
