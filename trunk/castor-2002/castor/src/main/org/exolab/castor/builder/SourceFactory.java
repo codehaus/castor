@@ -840,10 +840,16 @@ public class SourceFactory  {
 						//-- make sure we haven't processed this element yet
 						//-- to prevent endless recursion.
 						ElementDecl tmpDecl = eDecl;
-						while (tmpDecl.isReference())
+						while (tmpDecl.isReference()) {
 						    tmpDecl = tmpDecl.getReference();
-
-						boolean processed = state.processed(tmpDecl);
+                            if (tmpDecl == null) {
+                                String err = "Unable to find element referenced :\" ";
+                                err += eDecl.getName();
+                                err +="\"";
+                                throw new IllegalStateException(err);
+                            }
+		                }
+                        boolean processed = state.processed(tmpDecl);
 
 						//-- make sure we process the element first
 						//-- so that it's available to the MemberFactory
