@@ -289,7 +289,9 @@ public class Marshaller {
                     String pkgName = (String)_packages.get(i);
                     String className = pkgName+cname;
                     
-                    classDesc = MarshalHelper.getClassDescriptor(className);
+                    
+                    ClassLoader loader = _class.getClassLoader();
+                    classDesc = getClassDescriptor(className, loader);
                     
                     if (classDesc != null) break;
                 }
@@ -556,6 +558,24 @@ public class Marshaller {
         return classDesc;
     } //-- getClassDescriptor
     
+    /**
+     * Finds and returns an XMLClassDescriptor for the given class. If
+     * a XMLClassDescriptor could not be found, this method will attempt to 
+     * create one automatically using reflection. 
+     * @param _class the Class to get the XMLClassDescriptor for
+     * @exception MarshalException when there is a problem 
+     * retrieving or creating the XMLClassDescriptor for the given class
+    **/
+    private XMLClassDescriptor getClassDescriptor
+        (String className, ClassLoader loader) 
+        throws MarshalException
+    {
+        XMLClassDescriptor classDesc = _cdResolver.resolve(className, loader);
+        if (_cdResolver.error()) {
+            throw new MarshalException(_cdResolver.getErrorMessage());
+        }
+        return classDesc;
+    } //-- getClassDescriptor
     
     private void validate(Object object) 
         throws ValidationException

@@ -59,15 +59,13 @@ public class ClassDescriptorResolverImpl
     implements ClassDescriptorResolver 
 {
     
+    /**
+     * internal cache for class descriptors
+    **/
+    private Hashtable _cache      = null;
     
-    private String IO_ERR = 
-        "IOException was thrown in MarshalHelper#getMarshalInfo(Class), " +
-        "no additional information available.";
-        
-    private Hashtable _cache = null;
-    
-    private boolean _error      = false;
-    private String  _errMessage = null;
+    private boolean   _error      = false;
+    private String    _errMessage = null;
     
     private XMLMappingLoader mappingLoader = null;
     
@@ -123,20 +121,39 @@ public class ClassDescriptorResolverImpl
         
         if (classDesc != null) return classDesc;
         
+        String className = type.getName() + "Descriptor";
         try {
-            classDesc = MarshalHelper.getClassDescriptor(type);
+	        Class dClass = Class.forName(className);
+            classDesc = (XMLClassDescriptor) dClass.newInstance();
+            _cache.put(type, classDesc);
         }
-        catch(MarshalException mx) {
-            String err = mx.toString();
-            if (err == null) setError(IO_ERR);
-            else setError(err);
+        catch(ClassNotFoundException cnfe) { 
+            /* 
+             This is ok, since we are just checking if the
+             Class exists...if not we check them MappingLoader,
+             or we create one
+            */ 
+        }
+        catch(Exception ex) {
+            String err = ex.toString();
+            setError(err);
+            return null;
         }
         
         if ((classDesc == null) && (mappingLoader != null))
             classDesc = (XMLClassDescriptor)mappingLoader.getDescriptor(type);
             
-        if (classDesc != null) {
-            _cache.put(type, classDesc);
+        //-- create classDesc automatically if necessary
+        if (classDesc == null) {
+            try {
+                classDesc = MarshalHelper.generateClassDescriptor(type);
+                _cache.put(type, classDesc);
+            }
+            catch (MarshalException mx) {
+                String err = mx.toString();
+                setError(err);
+                return null;
+            }
         }
         return classDesc;
     } //-- resolve
@@ -161,13 +178,14 @@ public class ClassDescriptorResolverImpl
         XMLClassDescriptor classDesc = null;
         
         if ((className == null) || (className.length() == 0)) {
-            clearError(); //-- clear error flag
-            return classDesc;
+            clearError(); //-- clear previous error flag
+            setError("Cannot resolve a null or zero-length class name.");
+            return null;
         }
             
 
 
-        //-- try and load class and check cache,
+        //-- try and load class to check cache,
         Class _class = null;
         try {
 	        if ( loader != null )
@@ -175,18 +193,21 @@ public class ClassDescriptorResolverImpl
 	        else
 		        _class = Class.forName(className);
         }
-        catch(ClassNotFoundException cnfe) {}
+        catch(ClassNotFoundException cnfe) { 
+            //-- do nothing for now
+        }
         
         if (_class != null) {
             classDesc = resolve(_class);
         }
         else clearError(); //-- clear error flag
         
-        //-- try to load just MarshalInfo
+        //-- try to load ClassDescriptor with no class being
+        //-- present...does this make sense?
         if ((classDesc == null) && (_class == null)) {
             String dClassName = className+"Descriptor";
             try {
-	            Class dClass;
+	            Class dClass = null;
 	            if ( loader != null )
 		            dClass = loader.loadClass(dClassName);
 	            else
