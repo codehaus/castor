@@ -322,6 +322,12 @@
    <description>JDO bugfixes</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name given="Kesha" />
+    <email>ksibilev@powernetinc.com</email>
+    <description>Patches to JDO</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
