@@ -74,7 +74,7 @@ public class ContentType {
     /* Private Members */
     
     private static final String[] names = 
-    { "elemOnly", "textOnly", "mixed", "empty", "any" };
+    { "elementOnly", "textOnly", "mixed", "empty", "any" };
     
     private short type = TEXT_ONLY;
     
@@ -115,11 +115,11 @@ public class ContentType {
     public static ContentType valueOf(String contentType) 
         throws IllegalArgumentException 
     {
-        if (contentType.equals("elemOnly")) return elemOnly;
-        else if (contentType.equals("textOnly")) return textOnly;
-        else if (contentType.equals("mixed")) return mixed;
-        else if (contentType.equals("empty")) return empty;
-        else if (contentType.equals("any")) return any;
+        if (contentType.equals(names[ELEMENT_ONLY])) return elemOnly;
+        else if (contentType.equals(names[TEXT_ONLY])) return textOnly;
+        else if (contentType.equals(names[MIXED])) return mixed;
+        else if (contentType.equals(names[EMPTY])) return empty;
+        else if (contentType.equals(names[ANY])) return any;
         else {
             String err = contentType;
             err += " is not a valid ContentType";
