@@ -122,7 +122,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
                                         "trigger=\"true\"", getClass().getName(), fName ) );
 
         _sqlType = sqlType;
-        if (sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+        if (sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
         try {
@@ -173,6 +173,8 @@ public final class SequenceKeyGenerator implements KeyGenerator
                 value = rs.getInt( 1 );
                 if ( _sqlType == Types.INTEGER )
                     return new Integer( value );
+                else if ( _sqlType == Types.BIGINT )
+                    return new Long( value );
                 else
                     return new BigDecimal( value );
             } else {
