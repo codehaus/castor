@@ -238,8 +238,7 @@ public abstract class MappingLoader
 
     /**
      * Loads the mapping from the specified input source. This method
-     * loads the mapping objects from the specified input source and
-     * calls {@link #loadMapping(Mapping)}.
+     * loads the mapping objects from the specified input source.
      *
      * @param source The input source
      * @throws IOException An error occured when reading the mapping
@@ -355,7 +354,7 @@ public abstract class MappingLoader
                 handler = new IndirectFieldHandler( relDesc.getIdentity().getHandler(), handler,
                                                     fields[ i ].isRequired() );
                 ( (FieldDescriptorImpl) fields[ i ] ).setHandler( handler );
-                ( (FieldDescriptorImpl) fields[ i ] ).setTypeDescriptor( relDesc );
+                ( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
             }
         }
 
