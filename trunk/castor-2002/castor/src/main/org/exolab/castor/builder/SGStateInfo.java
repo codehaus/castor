@@ -64,22 +64,34 @@ class SGStateInfo extends ClassInfoResolverImpl {
     **/
     protected String  packageName = null;
         
-    private Hashtable classTypes = null;
+    private Hashtable classTypes  = null;
     
-    private Vector    processed = null;
+    private Vector    processed   = null;
     
     private boolean   promptForOverwrite = true;
     
+    
     /**
-     * Constructor
+     * Creates a new SGStateInfo
     **/
-    protected SGStateInfo() {
+    protected SGStateInfo() {        
         super();
-        classTypes       = new Hashtable();
-        packageName      = "";
-        processed = new Vector();
+        classTypes    = new Hashtable();
+        packageName   = "";
+        processed     = new Vector();
     } //-- SGStateInfo
     
+    
+    /**
+     * Marks the given JClass as having been processed.
+     * @param jClass the JClass to mark as having been processed.
+    **/
+    void markAsProcessed(JClass jClass) {
+        String className = jClass.getName();
+        if (!processed.contains(className))
+            processed.addElement(className);
+    } //-- markAsProcessed
+        
     /**
      * Returns true if the given JClass has been marked as processed
      * @param jClass the JClass to check for being marked as processed
@@ -88,15 +100,9 @@ class SGStateInfo extends ClassInfoResolverImpl {
         return processed.contains(jClass.getName());
     } //-- processed
     
-    void markAsProcessed(JClass jClass) {
-        String className = jClass.getName();
-        if (!processed.contains(className))
-            processed.addElement(className);
-    } //-- markAsProcessed
-    
     boolean promptForOverwrite() {
         return promptForOverwrite;
-    }
+    } //-- promptForOverwrite
 
     void setPromptForOverwrite(boolean promptForOverwrite) {
         this.promptForOverwrite = promptForOverwrite;
