@@ -62,7 +62,7 @@ import java.lang.reflect.Method;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.Date;
-import org.exolab.castor.jdo.oql.*;
+import org.exolab.castor.persist.oql.*;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
 

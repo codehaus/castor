@@ -44,44 +44,69 @@
  */
 
 
-package org.exolab.castor.persist.sql.drivers;
-
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-import org.exolab.castor.persist.sql.JDBCSyntax;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-
+package org.exolab.castor.persist.oql;
 
 /**
- * QueryExpression for DB 2.
+ * Interface used to store Token Type Constants.
  *
- * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="nissim@nksystems.com">Nissim Karpenstein</a>
  * @version $Revision$ $Date$
  */
-public final class DB2QueryExpression
-    extends JDBCQueryExpression
-{
-
-
-    public DB2QueryExpression( PersistenceFactory factory )
-    {
-        super( factory );
-    }
-
-
-    public String getStatement( boolean lock )
-    {
-        StringBuffer sql;
-
-        sql = getStandardStatement( lock, false );
-        if (lock) {
-            sql.append( " FOR UPDATE" );
-        }
-        return sql.toString();
-    }
-
+public interface TokenTypes {
+  int END_OF_QUERY = 0;
+  int KEYWORD_SELECT = 1;
+  int IDENTIFIER = 2;
+  int KEYWORD_AS = 3;
+  int COLON = 4;
+  int KEYWORD_FROM = 5;
+  int KEYWORD_IN = 6;
+  int KEYWORD_WHERE = 7;
+  int KEYWORD_OR = 8;
+  int KEYWORD_AND = 9;
+  int EQUAL = 10;
+  int NOT_EQUAL = 11;
+  int KEYWORD_LIKE = 12;
+  int LT = 13;
+  int LTE = 14;
+  int GT = 15;
+  int GTE = 16;
+  int PLUS = 17;
+  int MINUS = 18;
+  int CONCAT = 19;  // || string concatenation operator
+  int TIMES = 20;
+  int DIVIDE = 21;
+  int KEYWORD_MOD = 22;
+  int KEYWORD_ABS = 23;
+  int KEYWORD_NOT = 24;
+  int LPAREN = 25;
+  int RPAREN = 26;
+  int DOLLAR = 27;
+  int KEYWORD_NIL = 28;
+  int KEYWORD_UNDEFINED = 29;
+  int DOT = 30;
+  int ARROW = 31; // -> method call operator
+  int BOOLEAN_LITERAL = 32;
+  int LONG_LITERAL = 33;
+  int DOUBLE_LITERAL = 34;
+  int CHAR_LITERAL = 35;
+  int STRING_LITERAL = 36;
+  int DATE_LITERAL = 37;
+  int TIME_LITERAL = 38;
+  int TIMESTAMP_LITERAL = 39;
+  int KEYWORD_BETWEEN = 40;
+  int KEYWORD_DISTINCT = 41;
+  int KEYWORD_IS_DEFINED = 42;
+  int KEYWORD_IS_UNDEFINED = 43;
+  int KEYWORD_LIST = 44;
+  int COMMA = 45;
+  int KEYWORD_ORDER = 46;
+  int KEYWORD_BY = 47;
+  int KEYWORD_ASC = 48;
+  int KEYWORD_DESC = 49;
+  int KEYWORD_COUNT = 50;
+  int KEYWORD_SUM = 51;
+  int KEYWORD_MIN = 52;
+  int KEYWORD_MAX = 53;
+  int KEYWORD_AVG = 54;
+  int KEYWORD_LIMIT = 55;//Alex
 }
-
-

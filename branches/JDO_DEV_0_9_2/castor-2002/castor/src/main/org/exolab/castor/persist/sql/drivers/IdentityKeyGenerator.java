@@ -84,7 +84,8 @@ public final class IdentityKeyGenerator implements KeyGenerator
     {
         String fName = factory.getFactoryName();
         if ( !fName.equals("sybase") && !fName.equals("sql-server") &&
-                !fName.equals("hsql") && !fName.equals("mysql")) {
+                !fName.equals("hsql") && !fName.equals("mysql") &&
+                !fName.equals("informix")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
@@ -124,6 +125,10 @@ public final class IdentityKeyGenerator implements KeyGenerator
                 rs = cstmt.getResultSet();
             } else if ( _fName.equals("mysql") ) {
                 stmt = conn.prepareStatement("SELECT LAST_INSERT_ID()");
+                rs = stmt.executeQuery();
+            } else if ( _fName.equals("informix") ) {
+                stmt = conn.prepareStatement(
+                    "select dbinfo('sqlca.sqlerrd1') from systables where tabid = 1");
                 rs = stmt.executeQuery();
             } else {
                 stmt = conn.prepareStatement("SELECT @@identity");
