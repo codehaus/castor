@@ -115,7 +115,13 @@ public class SourceGenerator {
     private static final String DISABLE_DESCRIPTORS_MSG
         = "Disabling generation of Class descriptors";
 
-    //----------------------/
+    /**
+     * Message used when marshalling methods creation is disabled
+    **/
+    private static final String DISABLE_MARSHALL_MSG
+        = "Disabling generation of Marshalling framework methods (marshall, unmarshall, validate).";
+
+	//----------------------/
     //- Instance Variables -/
     //----------------------/
 
@@ -138,6 +144,11 @@ public class SourceGenerator {
     private boolean _createDescriptors = true;
 
     /**
+	 * A flag indicating whether or not to generate XML marshalling
+	 * framework specific methods.
+	 */
+	 private boolean _createMarshall  = true;
+	/**
      * The field info factory.
     **/
     private FieldInfoFactory infoFactory = null;
@@ -393,6 +404,20 @@ public class SourceGenerator {
     } //-- setDescriptorCreation
 
     /**
+     * Sets whether or not to create the XML marshalling framework specific
+     * methods (marshall, unmarshall, validate) in the generated classes.
+	 * By default, these methods are generated.
+	 *
+     * @param createMarshall a boolean, when true indicates
+     * to generated the marshalling framework methods
+     *
+     */
+    public void setMarshallCreation(boolean createMarshall) {
+        if (sourceFactory != null)
+		   sourceFactory.setMarshallCreation(createMarshall);
+    } //-- setDescriptorCreation
+
+  	/**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
     **/
@@ -438,7 +463,11 @@ public class SourceGenerator {
         //-- XXX maintained temporarily
         allOptions.addFlag("type-factory", "classname", "", true);
 
-        //-- Process the specified command line options
+        //-- no marshalling framework methods
+		desc = "Disables the generation of the methods specific to the XML marshalling framework";
+		allOptions.addFlag("nomarshall","",desc,true);
+
+		//-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
 
         //-- check for help option
@@ -517,8 +546,13 @@ public class SourceGenerator {
             sgen.setDescriptorCreation(false);
             System.out.print("-- ");
             System.out.println(DISABLE_DESCRIPTORS_MSG);
-        }
+		}
 
+		if (options.getProperty("nomarshall") != null) {
+		    sgen.sourceFactory.setMarshallCreation(false);
+		    System.out.print("-- ");
+            System.out.println(DISABLE_MARSHALL_MSG);
+		}
 
         try {
             sgen.generateSource(schemaFilename, packageName);
@@ -809,7 +843,7 @@ public class SourceGenerator {
         }
 
         state.markAsProcessed(jClass);
-    } //-- processClassInfo
+    } //-- processJClass
 
 
     /**

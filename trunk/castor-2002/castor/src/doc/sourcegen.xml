@@ -120,6 +120,14 @@
                 </td>
                <td>Optional</td>
              </tr>
+			 <tr>
+               <td align="center">nomarshall</td><td><br/></td>
+               <td>
+                  Do not generate the marshalling framework methods (marshall, unmarshall, validate)
+                </td>
+               <td>Optional</td>
+             </tr>
+
           </table>
 
          <section title="Collection Types">
