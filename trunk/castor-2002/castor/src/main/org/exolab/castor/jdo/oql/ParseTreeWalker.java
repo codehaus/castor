@@ -913,10 +913,11 @@ public class ParseTreeWalker implements TokenTypes
       //String literals: change \" to ""
       case STRING_LITERAL:
         //char replace function should really be somewhere else
+        //first change \" to "
         sb = new StringBuffer();
         String copy = new String(exprTree.getToken().getTokenValue());
         
-        int pos = copy.indexOf("\\\"");
+        int pos = copy.indexOf("\\\"", 1);
         while ( pos != -1 ) {
           sb.append(copy.substring(0, pos)).append("\"\"");
           copy = copy.substring(pos + 2);
@@ -924,6 +925,25 @@ public class ParseTreeWalker implements TokenTypes
         }
         
         sb.append(copy);
+
+        //Then change surrounding double quotes to single quotes, and change
+        //' to ''
+
+        copy = sb.deleteCharAt(0).toString();
+
+        sb.setLength(0);
+        sb.append("'");
+        pos = copy.indexOf("'", 1);
+        while ( pos != -1 ) {
+          sb.append(copy.substring(0, pos)).append("''");
+          copy = copy.substring(pos + 1);
+          pos = copy.indexOf("'");
+        }
+        
+        sb.append(copy);
+        //replace final double quote with single quote
+        sb.replace(sb.length() - 1, sb.length(), "'");
+        
 
         return sb.toString();
 
