@@ -16,6 +16,7 @@
         <property name="archive" value="${project}-${version}"/>
         <property name="excludes" value="**/package.html"/>
         <property name="testexcludes" value="**/package.html,**/xml/xml2java/**"/>
+	  <property name="exampleexcludes" value="SourceGenerator/*,dax/*"/>
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
@@ -81,7 +82,7 @@
     <target name="examples" depends="prepare">
         <mkdir dir="${build}/examples"/>
         <javac srcdir="${source}/examples" destdir="${build}/examples" classpath="${classpath}" debug="on" deprecation="${deprecation}"
-               excludes="SourceGenerator/*,dax/*"/>
+               excludes="${exampleexcludes}"/>
     </target>
     <!-- Build the test packages -->
     <target name="tests" depends="prepare">
