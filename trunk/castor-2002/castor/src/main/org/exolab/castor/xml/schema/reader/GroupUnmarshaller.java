@@ -141,6 +141,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
                 _group.setOrder(Order.choice);
             }
             else if (SchemaNames.ALL.equals(element)) {
+                foundAll = true;
                 _group.setOrder(Order.all);
             }
             else {

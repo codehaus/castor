@@ -203,10 +203,8 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-
         //-- <anyAttribute>
         if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
-
             if (foundComplexContent)
                 error("an anyAttribute element cannot appear as a child "+
                     "of 'complexType' if 'complexContent' also exists");
@@ -220,14 +218,16 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
         }
 
         //-- attribute declarations
-        if (SchemaNames.ATTRIBUTE.equals(name)) {
+        else if (SchemaNames.ATTRIBUTE.equals(name)) {
             if (foundComplexContent)
                 error("an attribute definition cannot appear as a child "+
                     "of 'complexType' if 'complexContent' also exists");
             if (foundSimpleContent)
-                error("an attribute definition cannot appear as a child "+
+                error("an 'attribute' definition cannot appear as a child "+
                     "of 'complexType' if 'simpleContent' also exists");
-
+            if (foundAnyAttribute)
+               error("an attribute definition cannot appear after "+
+                    "the definition of an 'anyAttribute' element");
             foundAttributes = true;
             allowAnnotation = false;
             unmarshaller
@@ -248,6 +248,9 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             if (foundSimpleContent)
                 error("an attributeGroup reference cannot appear as a child "+
                     "of 'complexType' if 'simpleContent' also exists");
+            if (foundAnyAttribute)
+               error("an 'attributeGroup' reference cannot appear after "+
+                    "the definition of an 'anyAttribute' element");
 
             foundAttributes = true;
             allowAnnotation = false;
@@ -277,7 +280,7 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             unmarshaller
                 = new SimpleContentUnmarshaller(_complexType, atts, getResolver());
         }
-        //-- simpleContent
+        //-- complexContent
         else if (SchemaNames.COMPLEX_CONTENT.equals(name)) {
 
             if (foundAttributes)
