@@ -60,55 +60,84 @@ public class ComplexType extends XMLType
    implements ContentModelGroup, Referable
 {
 
-    private AttributeGroupDecl attributes = null;
-
-    private ContentType content  = ContentType.elemOnly;
-
-    private String type = null;
-
-	/**
-	 * a flag set to true if this complexType is a complexContent
-	 */
-	 private boolean _complexContent = false;
 
     /**
-	 * a flag set to true if this complexType is a simpleContent
-	 */
-	 private boolean _simpleContent = false;
-
-    /**
-	 * a flag set to true if this complexType is a restriction
-	 */
-	 private boolean _restricted = false;
-
-	/**
-     * The base type used in <restriction> or <extension>
+     * The abstract flag for this ComplexType
     **/
-    private String base = null;
-
-    /**
-     * The ContentModel for this ComplexType
-    **/
-    private ContentModelGroup _contentModel = null;
-
-	/**
-	 * The value of the 'block' attribute for this ComplexType
-	**/
-	private String block = null;
-
+    private boolean _abstract = false;
+    
     /**
      * A wildcard that represents an <anyAttribute> element if any.
      * Only one <anyAttribute> can appear inside the global scope of
      * a complexType
     **/
     private Wildcard _anyAttribute = null;
+    
+    /**
+     * The attribute declarations for this ComplexType.
+    **/
+    private AttributeGroupDecl _attributes = null;
+    
+	/**
+     * The base type used in <restriction> or <extension>
+    **/
+    private String _baseType = null;
+    
+    /**
+     * The value of the 'block' property for this ComplexType. This
+     * value may be null.
+    **/
+    private BlockList _block = null;
+    
+	/**
+	 * a flag set to true if this complexType is a complexContent
+	 */
+	private boolean _complexContent = false;
 
+    /** 
+     * The content type ("mixed", "elemOnly") for this ComplexType.
+    **/
+    private ContentType _content  = ContentType.elemOnly;
+    
+    /**
+     * The ContentModel for this ComplexType
+    **/
+    private ContentModelGroup _contentModel = null;
+    
+    /**
+     * The final property for this ComplexType. This value may be null.
+    **/
+    private FinalList _final = null;
+    
+    /**
+     * The unique id for this ComplexType (optional)
+    **/
+    private String _id = null;
+    
     /**
      * The parent structure for this ComplexType
      * (either an ElementDecl or a Schema)
     **/
     private Structure _parent = null;
+    
+    /**
+	 * a flag set to true if this complexType is a restriction
+	 */
+	private boolean _restricted = false;
+	
+    /**
+	 * a flag set to true if this complexType is a simpleContent
+	 */
+	private boolean _simpleContent = false;
 
+
+
+
+
+    //------------------/
+    //- Constructor(s) -/
+    //------------------/
+    
     /**
      * Creates a new Complextype, with no name
      * @param schema the owning Schema document
@@ -131,7 +160,7 @@ public class ComplexType extends XMLType
 
         setSchema(schema);
         setName(name);
-        attributes = new AttributeGroupDecl(schema);
+        _attributes = new AttributeGroupDecl(schema);
         _contentModel = new ContentModelGroupImpl();
     } //-- Complextype
 
@@ -145,7 +174,7 @@ public class ComplexType extends XMLType
     public void addAttributeDecl(AttributeDecl attrDecl)
         throws SchemaException
     {
-        attributes.addAttribute(attrDecl);
+        _attributes.addAttribute(attrDecl);
     } //-- addAttributeDecl
 
     /**
@@ -153,7 +182,7 @@ public class ComplexType extends XMLType
      * @param attrDecl the AttributeDecl to remove.
      */
      public void removeAttributeDecl(AttributeDecl attrDecl) {
-        attributes.removeAttribute(attrDecl);
+        _attributes.removeAttribute(attrDecl);
      }
 
     /**
@@ -165,7 +194,7 @@ public class ComplexType extends XMLType
     public void addAttributeGroupReference
         (AttributeGroupReference attrGroupRef)
     {
-        attributes.addReference(attrGroupRef);
+        _attributes.addReference(attrGroupRef);
     } //-- addAttributeGroupReference
 
 
@@ -174,7 +203,7 @@ public class ComplexType extends XMLType
      * @param attrGroupRef the AttributeGroupReference to remove.
      */
      public void removeAttributeGroupReference(AttributeGroupReference attrGroupRef) {
-        attributes.removeReference(attrGroupRef);
+        _attributes.removeReference(attrGroupRef);
      }
 
     /**
@@ -190,12 +219,20 @@ public class ComplexType extends XMLType
     } //-- createAttributeDecl
 
     /**
+     * Returns the wilcard used in this complexType (can be null)
+     * @return the wilcard used in this complexType (can be null)
+     */
+    public Wildcard getAnyAttribute() {
+        return _anyAttribute;
+    }
+     
+    /**
      * Returns the AttributeDecl associated with the given name
      * @return the AttributeDecl associated with the given name, or
      *  null if no AttributeDecl with the given name was found.
     **/
     public AttributeDecl getAttributeDecl(String name) {
-        return attributes.getAttribute(name);
+        return _attributes.getAttribute(name);
     } //-- getAttributeDecl
 
     /**
@@ -205,34 +242,56 @@ public class ComplexType extends XMLType
      * declared within this Complextype
     **/
     public Enumeration getAttributeDecls() {
-        return attributes.getAttributes();
+        return _attributes.getAttributes();
     } //-- getAttributeDecls
 
     /**
-     * Returns the attribute group.
-     */
-    public AttributeGroupDecl getAttributeGroup() { return attributes; }
-
-   /**
      * Returns the base type that this type inherits from.
      * @return the parent type.
     **/
     public XMLType getBaseType() {
-        if ( (base != null) && (super.getBaseType() == null) ) {
-            setBaseType( getSchema().getType(base) );
+        if ( (_baseType != null) && (super.getBaseType() == null) ) {
+            setBaseType( getSchema().getType(_baseType) );
         }
         return super.getBaseType();
     } //-- getBaseType
 
+	/**
+	 * Returns the value of the 'block' attribute for this element
+	 *
+     * @return the value of the 'block' attribute for this element
+	 */
+	public BlockList getBlock() {
+		return _block;
+	} //-- getBlock
+	
     /**
      * Returns the content type of this ComplexType
      * @return the content type of this ComplexType
     **/
     public ContentType getContentType() {
-        return content;
+        return _content;
     } //-- getContentType
 
-
+    /**
+     * Returns the list of values for the final property for this 
+     * ComplexType, or null if no final values have been set.
+     *
+     * @return the FinalList for this ComplexType
+    **/
+    public FinalList getFinal() {
+        return _final;
+    } //-- getFinal
+    
+    /**
+     * Returns the Id for this ComplexType, or null if no Id has been set.
+     *
+     * @return the Id for this ComplexType, or null if no Id has been set.
+    **/
+    public String getId() {
+        return _id;
+    } //-- getId
+    
     /**
      * Returns the parent of this ComplexType, this value may be null if
      * no parent has been set.
@@ -253,7 +312,15 @@ public class ComplexType extends XMLType
     } //-- getReferenceId
 
 
-
+    /**
+     * Returns true if this ComplexType has been marked as Abstract.
+     *
+     * @return true if this ComplexType is "abstract".
+    **/
+    public boolean isAbstract() {
+        return _abstract;
+    } //-- isAbstract
+    
     /**
      * Returns true if this is a top level Complextype
      * @return true if this is a top level Complextype
@@ -288,6 +355,81 @@ public class ComplexType extends XMLType
 	       return _restricted;
 	}
 
+    /**
+     * Sets whether or not this ComplexType should be abstract.
+     *
+     * @param isAbstract a boolean that when true makes this ComplexType
+     * abstract.
+    **/
+    public void setAbstract(boolean isAbstract) {
+        _abstract = isAbstract;
+    } //-- setAbstract
+    
+    /**
+     * Sets the wildcard (anyAttribute) of the complexType
+     * @exception SchemaException thrown when a wildcard as already be set
+     * or when the wildCard is not an <anyAttribute>.
+     */
+     public void setAnyAttribute(Wildcard wildcard)
+            throws SchemaException
+     {
+        if (wildcard != null) {
+           if (_anyAttribute != null) {
+              String err = "<anyAttribute> already set in this complexType: "
+                           + this.getName();
+              throw new SchemaException(err);
+           }
+
+           if (!wildcard.isAttributeWildcard()){
+              String err = "In complexType, "+this.getName()
+                            +"the wildcard must be an <anyAttribute>";
+               throw new SchemaException(err);
+           }
+        }
+        _anyAttribute = wildcard;
+
+     }
+     	
+    /**
+     * Sets the base type that this type is derived from
+     * @param base the type that this type is derived from
+    **/
+    public void setBase(String base) {
+        _baseType = base;
+    } //-- setBase
+
+	/**
+	 * Sets the value of the 'block' attribute for this ComplexType.
+	 *
+	 * @param block the value of the block attribute for this
+	 * ComplexType definition.
+	**/
+	public void setBlock(BlockList block) {
+	    
+	    if (block != null) {
+	        if (block.hasSubstitution()) {
+	            String err = "'substitution' is an illegal value of the "+
+	                "'block' attribute for a complexType definition."; 
+	            throw new IllegalArgumentException(err);
+	        }
+	    }
+	    _block = block;
+	} //-- setBlock
+
+	/**
+	 * Sets the value of the 'block' attribute for this ComplexType.
+	 *
+	 * @param block the value of the block attribute for this
+	 * ComplexType definition.
+	**/
+	public void setBlock(String block) {
+	    if (block == null) 
+	        _block = null;
+	    else {
+	        setBlock(new BlockList(block));
+	    }
+	} //-- setBlock
+	
 	/**
 	 * Sets whether or not this complexType is a 'complexContent'
 	 * @param complexContent true if this complexType is a 'complexContent'
@@ -296,6 +438,50 @@ public class ComplexType extends XMLType
 	       this._complexContent = complexContent;
 	}
 
+	/**
+     * Sets the content type of this archetype
+     * @param contentType the ContentType for this archetype
+    **/
+    public void setContentType(ContentType contentType)
+    {
+        _content = contentType;
+    } //-- setContentType
+    
+	/**
+	 * Sets the value of the 'final' attribute for this ComplexType
+	 * definition.
+	 *
+	 * @param finalList the value of the final attribute for this
+	 * ComplexType definition.
+	**/
+	public void setFinal(FinalList finalList) {
+	        _final = finalList;
+	} //-- setFinal
+
+	/**
+	 * Sets the value of the 'final' attribute for this ComplexType
+	 * definition.
+	 *
+	 * @param finalValue the value of the final attribute for this
+	 * ComplexType definition.
+	**/
+	public void setFinal(String finalValue) {
+	    if (finalValue == null) 
+	        _final = null;
+	    else 
+	        _final = new FinalList(finalValue);
+	} //-- setFinal
+	
+    /**
+     * Sets the Id for this ComplexType. The Id must be globally unique
+     * within the Schema. Use a null value to remove the Id.
+     *
+     * @param id the unique Id for this ComplexType
+    **/
+    public void setId(String id) {
+        _id = id;
+    } //-- setId
+    
 	/**
 	 * Sets whether or not this complexType is a 'simpleContent'
 	 * @param complexContent true if this complexType is a 'simpleContent'
@@ -312,23 +498,6 @@ public class ComplexType extends XMLType
 	       this._restricted = restricted;
 	}
 
-	/**
-     * Sets the content type of this archetype
-     * @param contentType the ContentType for this archetype
-    **/
-    public void setContentType(ContentType contentType)
-    {
-        this.content = contentType;
-    } //-- setContentType
-
-
-    /**
-     * Sets the base type that this type is derived from
-     * @param base the type that this type is derived from
-    **/
-    public void setBase(String base) {
-        this.base = base;
-    } //-- setBase
 
     public void useResolver(Resolver resolver) {
         // do nothing for now
@@ -495,53 +664,8 @@ public class ComplexType extends XMLType
     } //-- getParticleCount
 
 
-	/**
-	 * Returns the value of the 'block' attribute for this element
-     * @return the value of the 'block' attribute for this element
-	 */
-	public String getBlock()
-	{
-		return block;
-	}
-
-    /**
-     * Returns the wilcard used in this complexType (can be null)
-     * @return the wilcard used in this complexType (can be null)
-     */
-     public Wildcard getAnyAttribute() {
-         return _anyAttribute;
-     }
-    /**
-     * Sets the wildcard (anyAttribute) of the complexType
-     * @exception SchemaException thrown when a wildcard as already be set
-     * or when the wildCard is not an <anyAttribute>.
-     */
-     public void setAnyAttribute(Wildcard wildcard)
-            throws SchemaException
-     {
-        if (wildcard != null) {
-           if (_anyAttribute != null) {
-              String err = "<anyAttribute> already set in this complexType: "
-                           + this.getName();
-              throw new SchemaException(err);
-           }
-
-           if (!wildcard.isAttributeWildcard()){
-              String err = "In complexType, "+this.getName()
-                            +"the wildcard must be an <anyAttribute>";
-               throw new SchemaException(err);
-           }
-        }
-        _anyAttribute = wildcard;
-
-     }
-	/**
-	 * Sets the value of the 'block' attribute for this element
-	 */
-	public void setBlock(String block)
-	{
-		this.block = block;
-	}
+     
+	
 
     //-------------------------------/
     //- Implementation of Structure -/
