@@ -86,7 +86,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.8.7";
+    static final String version = "0.8.9 (CVS)";
 
     /**
      * The application URI
@@ -135,7 +135,7 @@ public class SourceGenerator {
         super();
 
         dialog = new ConsoleDialog();
-        
+
         if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
