@@ -62,6 +62,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.conf.Database;
+import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -151,7 +152,7 @@ public class DatabaseRegistry
      * @param name The database name
      * @param mapResolver The mapping resolver
      * @param factory Factory for persistence engines
-     * @param jdbcURL The JDBC URL
+     * @param jdbcUrl The JDBC URL
      * @param jdbcProps The JDBC properties
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
@@ -219,21 +220,31 @@ public class DatabaseRegistry
         return _dataSource;
     }
 
+
+    public static synchronized void loadDatabase( JdoConf jdoConf, EntityResolver resolver, ClassLoader loader)
+    	throws MappingException
+	{
+    	Database database = JDOConfLoader.getDatabase(jdoConf);
+    	loadDatabase(database, resolver, loader, null);
+	}
+
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
+        throws MappingException
+    {
+        // Load the JDO configuration file from the specified input source.
+        Database database = JDOConfLoader.getDatabase (source, resolver);
+        loadDatabase (database, resolver, loader, source.getSystemId());
+    }
+    
+   	private static synchronized void loadDatabase(Database database, EntityResolver resolver, ClassLoader loader, String baseURI)
         throws MappingException
     {
         Mapping            mapping;
         Enumeration        mappings;
-        Database           database;
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
 
-
-
         try {
-            // Load the JDO configuration file from the specified input source.
-            database = JDOConfLoader.getDatabase (source, resolver);
-            
             // If the database was already configured, ignore
             // this database configuration (allowing multiple loadings).
             if ( _databases.get( database.getName() ) != null )
@@ -254,8 +265,8 @@ public class DatabaseRegistry
             mapping = new Mapping( loader );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
-            if ( source.getSystemId() != null )
-                mapping.setBaseURL( source.getSystemId() );
+            if ( baseURI != null )
+                mapping.setBaseURL( baseURI );
                 
             mappings = database.enumerateMapping();
             while ( mappings.hasMoreElements() )
@@ -411,5 +422,17 @@ public class DatabaseRegistry
             return DriverManager.getConnection( dbs._jdbcUrl, dbs._jdbcProps );
     }
 
+
+    /**
+     * Reset the database configuration.
+     */
+	public static void clear()
+	{
+		_databases.clear();
+		_byEngine.clear();
+
+		 // reset the JDO configuration data to re-enable loadConfiguration()
+		JDOConfLoader.deleteConfiguration();
+	}
 
 }
