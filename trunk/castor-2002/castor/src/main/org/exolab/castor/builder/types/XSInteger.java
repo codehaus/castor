@@ -62,6 +62,7 @@ public class XSInteger extends XSPatternBase {
     Integer maxExclusive = null;
     Integer minInclusive = null;
     Integer minExclusive = null;
+    private int  _totalDigits = -1;
 
     /**
      * The JType represented by this XSType
@@ -125,6 +126,15 @@ public class XSInteger extends XSPatternBase {
         return minInclusive;
     } //-- getMinInclusive
 
+    /**
+     * Returns the totalDigits facet value of this XSInteger.
+     * @return the totalDigits facet value of this XSInteger.
+     */
+    public int getTotalDigits() {
+        return _totalDigits;
+    }
+
+
     public boolean hasMaximum() {
         return ((maxInclusive != null) || (maxExclusive != null));
     } //-- hasMaximum
@@ -132,11 +142,6 @@ public class XSInteger extends XSPatternBase {
     public boolean hasMinimum() {
         return ((minInclusive != null) || (minExclusive != null));
     } //-- hasMinimum
-
-
-    //public String toString() {
-    //    return value.toString();
-    //}
 
 
     /**
@@ -220,8 +225,19 @@ public class XSInteger extends XSPatternBase {
         minExclusive = null;
     } //-- setMinInclusive
 
-     /**
-     * Reads and sets the facets for XSTimeDuration
+    /**
+     * Sets the totalDigits facet for this XSInteger.
+     * @param totalDig the value of totalDigits (must be >0)
+     */
+     public void setTotalDigits(int totalDig) {
+          if (totalDig <= 0)
+              throw new IllegalArgumentException(this.getName()+": the totalDigits facet must be positive");
+          else _totalDigits = totalDig;
+     }
+
+
+    /**
+     * Reads and sets the facets for this XSInteger.
      * override the readFacet method of XSType
      * @param simpletype the Simpletype containing the facets
      * @param xsType the XSType to set the facets of
@@ -249,9 +265,12 @@ public class XSInteger extends XSPatternBase {
             //-- minInclusive
             else if (Facet.MIN_INCLUSIVE.equals(name))
                 setMinInclusive(facet.toInt());
+            //--pattern
             else if (Facet.PATTERN.equals(name))
                 setPattern(facet.getValue());
-
+            //--totalDigits
+            else if (Facet.TOTALDIGITS.equals(name))
+                setTotalDigits(facet.toInt());
         }
 
     } //-- setFacets

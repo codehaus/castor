@@ -67,9 +67,8 @@ public class DecimalValidator implements TypeValidator
 
     private BigDecimal min = null;
     private BigDecimal max = null;
-    private Integer precision = null;
-    private Integer scale = null;
-
+    private int _totalDigits = -1 ;
+    private int _fractionDigits = -1;
     /**
      * Creates a new DecimalValidator with no restrictions
     **/
@@ -91,14 +90,6 @@ public class DecimalValidator implements TypeValidator
         useMin = false;
     } //-- clearMin
 
-    public void setPrecision(int p) {
-
-        precision = new Integer(p);
-    }
-
-    public void setScale(int s) {
-        scale = new Integer(s);
-    }
 
     /**
      * Sets the minimum value that decimals validated with this
@@ -144,6 +135,26 @@ public class DecimalValidator implements TypeValidator
         max = maxValue;
     } //-- setMaxInclusive
 
+    /**
+     * Sets the totalDigits facet for this XSInteger.
+     * @param totalDig the value of totalDigits (must be >0)
+     */
+     public void setTotalDigits(int totalDig) {
+          if (totalDig <= 0)
+              throw new IllegalArgumentException("DecimalValidator: the totalDigits facet must be positive");
+          else _totalDigits = totalDig;
+     }
+
+    /**
+     * Sets the fractionDigits facet for this XSInteger.
+     * @param fractionDig the value of fractionDigits (must be >=0)
+     */
+     public void setFractionDigits(int fractionDig) {
+          if (fractionDig < 0)
+              throw new IllegalArgumentException("DecimalValidator: the fractionDigits facet must be positive");
+          else _fractionDigits = fractionDig;
+     }
+
     public void validate(BigDecimal bd) throws ValidationException {
 
         if (useMin) {
@@ -162,32 +173,23 @@ public class DecimalValidator implements TypeValidator
             }
         }
 
-        if ( (scale!=null) && (bd.scale() > scale.intValue()) ) {
-                String err = "the SCALE of "+bd+": "+bd.scale()+" must be lower";
-                err += " than the value of " + scale;
+        //we need to handle it by using a String
+        if (_totalDigits != -1) {
+            String temp = bd.toString();
+            int length = (temp.indexOf('.') ==  -1)?temp.length():temp.length()-1;
+            if (length != _totalDigits){
+                String err = bd + " doesn't have the correct number of digits: "+_totalDigits;
                 throw new ValidationException(err);
+            }
+            temp = null;
         }
+        if (_fractionDigits != -1) {
 
-        if ( (precision != null) && (precision.intValue() < scale.intValue())) {
-                String err = "the SCALE of "+bd+": "+scale+" must be lower";
-                err += " than the value of the PRECISION :" + precision;
+            if (bd.scale() != _fractionDigits){
+                String err = bd + " doesn't have the correct number of digits in the fraction part: "+_fractionDigits;
                 throw new ValidationException(err);
+            }
         }
-
-        String temp = bd.toString();
-        //remove the '.'
-        int len = temp.indexOf(".")!=-1 ? temp.toCharArray().length-1 :
-                                          temp.toCharArray().length;
-
-
-        if ( (precision != null) &&
-            (precision.intValue() < len) ) {
-                String err = "the number of digits of "+bd+" must be lower";
-                err += " than the value of " + precision;
-                throw new ValidationException(err);
-        }
-        //return to the garbage collector
-        temp = null;
 
         //-- do the validation of pattern
 
