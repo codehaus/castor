@@ -45,6 +45,7 @@ Database db;
 jdo = new JDO();
 jdo.setDatabase( "mydb" );
 jdo.setConfiguration( "database.xml" );
+jdo.setClassLoader( getClass().getClassLoader() );
 
 <comment>// Obtain a new database</comment>
 db = jdo.getDatabase();
