@@ -383,6 +383,26 @@ public final class LockEngine {
     }
 
     /**
+     * Mark an object and its related or dependent object to be created
+     *
+     * @param tx The transaction context
+     * @param oid The identity of the object, or null
+     * @param object The newly created object
+     * @return The object's OID
+     */
+    public void markCreate( TransactionContext tx, OID oid, Object object )
+            throws PersistenceException, LockNotGrantedException {
+
+        TypeInfo   typeInfo;
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
+
+        if ( typeInfo == null )
+           throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", oid.getName() ) );
+
+        typeInfo.molder.markCreate( tx, oid, null, object );
+    }
+
+    /**
      * Creates a new object in the persistence storage. The object must not
      * be persistent and must have a unique identity within this engine.
      * If the identity is specified the object is created in
@@ -442,7 +462,7 @@ public final class LockEngine {
                 succeed = true;
 
                 oid.setDbLock( true );
-            
+
                 return oid;
                 // should catch some other exception if destory is not succeed
             } catch ( LockNotGrantedException except ) {
@@ -472,7 +492,6 @@ public final class LockEngine {
                 oid = lock.getOID();
 
                 Object newids = typeInfo.molder.create( tx, oid, lock, object );
-
                 succeed = true;
 
                 oid.setDbLock( true );
@@ -491,7 +510,6 @@ public final class LockEngine {
             }
         }
     }
-
 
     /**
      * Called at transaction commit time to delete the object. Object
@@ -576,7 +594,7 @@ public final class LockEngine {
      *  report that the object was modified in the database during the long
      *  transaction.
      */
-    public OID update( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout )
+    public boolean update( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout )
             throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
                    PersistenceException, ClassNotPersistenceCapableException,
                    ObjectDeletedWaitingForLockException {
@@ -619,17 +637,16 @@ public final class LockEngine {
             }*/
             oid = lock.getOID();
 
-            Object newid = typeInfo.molder.update( tx, oid, lock, object, suggestedAccessMode );
+            boolean creating = typeInfo.molder.update( tx, oid, lock, object, suggestedAccessMode );
 
-            succeed = true;
+            if ( creating )
+                succeed = false;
+            else
+                succeed = true;
 
-            if ( newid != null && !newid.equals(oid.getIdentity()) ) {
-                OID newoid = new OID( oid.getLockEngine(), oid.getMolder(), oid.getDepends(), newid );
+            
+            return creating;
 
-                typeInfo.rename( oid, newoid, tx );
-
-                return newoid;
-            }
             /*
             if ( accessMode == AccessMode.DbLocked )
                 oid.setDbLock( true );
@@ -638,7 +655,6 @@ public final class LockEngine {
             if ( accessMode == AccessMode.ReadOnly )
                 typeInfo.release( oid, tx );
             */
-            return oid;
         } catch ( ObjectModifiedException e ) {
             throw e;
         } catch ( ObjectDeletedWaitingForLockException except ) {
@@ -895,6 +911,7 @@ public final class LockEngine {
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
         lock = typeInfo.release( oid, tx );
         lock.getOID().setDbLock( false );
+
     }
 
 
@@ -1023,7 +1040,7 @@ public final class LockEngine {
             // sync on "locks" is, unfortunately, necessary if we employ
             // some LRU mechanism, especially if we allow NoCache, to avoid
             // duplicated LockEntry exist at the same time.
-            synchronized( this ) {
+            synchronized( locks ) {
                 entry = (ObjectLock) locks.get( oid );
                 if ( entry == null ) {
                     entry = (ObjectLock) cache.remove( oid );
@@ -1092,7 +1109,7 @@ public final class LockEngine {
                 failed = false;
                 return entry;
             } finally {
-                synchronized( this ) {
+                synchronized( locks ) {
                     entry.leave();
                     if ( failed ) {
                         // The need of this block may not be too obvious.
@@ -1124,7 +1141,7 @@ public final class LockEngine {
         private ObjectLock upgrade( OID oid, TransactionContext tx, int timeout ) 
                 throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
             ObjectLock entry = null;
-            synchronized ( this ) {
+            synchronized ( locks ) {
                 entry = (ObjectLock) locks.get( oid );
                 if ( entry == null ) 
                     throw new ObjectDeletedWaitingForLockException("Lock entry not found. Deleted?");
@@ -1137,7 +1154,7 @@ public final class LockEngine {
                 entry.upgrade( tx, timeout );
                 return entry;
             } finally {
-                synchronized ( this ) {
+                synchronized ( locks ) {
                     entry.leave();
                 }
             }
@@ -1154,14 +1171,17 @@ public final class LockEngine {
          * @param  timeout  time limit
          *
          */
-        private synchronized ObjectLock assure( OID oid, TransactionContext tx, boolean write ) 
+        private ObjectLock assure( OID oid, TransactionContext tx, boolean write )
                 throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
-            ObjectLock entry = (ObjectLock) locks.get( oid );
-            if ( entry == null ) 
-                throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
-            if ( !entry.hasLock( tx, write ) )
-                throw new IllegalStateException("Transaction "+tx+" does not hold the "+(write?"write":"read")+" lock: "+entry+"!");
-            return entry;
+
+            synchronized( locks ) {
+                ObjectLock entry = (ObjectLock) locks.get( oid );
+                if ( entry == null ) 
+                    throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
+                if ( !entry.hasLock( tx, write ) )
+                    throw new IllegalStateException("Transaction "+tx+" does not hold the "+(write?"write":"read")+" lock: "+entry+"!");
+                return entry;
+            }
         }
 
 
@@ -1174,35 +1194,39 @@ public final class LockEngine {
          * @param tx      the TransactionContext of the transaction in action
          *
          */
-        private synchronized ObjectLock rename( OID orgoid, OID newoid, TransactionContext tx ) 
+        private ObjectLock rename( OID orgoid, OID newoid, TransactionContext tx ) 
                 throws LockNotGrantedException {
-            ObjectLock entry, newentry;
-            boolean write;
 
-            entry = (ObjectLock) locks.get( orgoid );
-            newentry = (ObjectLock) locks.get( newoid );
+            synchronized( locks ) {
+                ObjectLock entry, newentry;
+                boolean write;
 
-            // validate locks
-            if ( orgoid == newoid ) 
-                throw new LockNotGrantedException("Locks are the same");
-            if ( entry == null ) 
-                throw new LockNotGrantedException("Lock doesn't exsit!");
-            if ( !entry.isExclusivelyOwned( tx ) ) 
-                throw new LockNotGrantedException("Lock to be renamed is not own exclusively by transaction!");
-            if ( entry.isEntered() ) 
-                throw new LockNotGrantedException("Lock to be renamed is being acquired by another transaction!");
-            if ( newentry != null ) 
-                throw new LockNotGrantedException("Lock is already existed for the new oid.");
+                entry = (ObjectLock) locks.get( orgoid );
+                newentry = (ObjectLock) locks.get( newoid );
 
-            entry = (ObjectLock) locks.remove( orgoid );
-            entry.setOID( newoid );
-            locks.put( newoid, entry );
+                // validate locks
+                if ( orgoid == newoid ) 
+                    throw new LockNotGrantedException("Locks are the same");
+                if ( entry == null ) 
+                    throw new LockNotGrantedException("Lock doesn't exsit!");
+                if ( !entry.isExclusivelyOwned( tx ) ) 
+                    throw new LockNotGrantedException("Lock to be renamed is not own exclusively by transaction!");
+                if ( entry.isEntered() ) 
+                    throw new LockNotGrantedException("Lock to be renamed is being acquired by another transaction!");
+                if ( newentry != null ) 
+                    throw new LockNotGrantedException("Lock is already existed for the new oid.");
 
-            // copy oid status
-            newoid.setDbLock( orgoid.isDbLock() );
-            newoid.setStamp( orgoid.getStamp() );
+                entry = (ObjectLock) locks.remove( orgoid );
+                entry.setOID( newoid );
+                locks.put( newoid, entry );
 
-            return newentry;
+                // copy oid status
+                newoid.setDbLock( orgoid.isDbLock() );
+                newoid.setStamp( orgoid.getStamp() );
+
+                return newentry;
+            }
+
         }
 
         /**
@@ -1214,8 +1238,9 @@ public final class LockEngine {
          *
          */
         private ObjectLock delete( OID oid, TransactionContext tx ) {
+
             ObjectLock entry;
-            synchronized( this ) {
+            synchronized( locks ) {
                 entry = (ObjectLock) locks.get( oid );
 
                 if ( entry == null )
@@ -1227,7 +1252,7 @@ public final class LockEngine {
                 entry.delete(tx);
                 return entry;
             } finally {
-                synchronized( this ) {
+                synchronized( locks ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
                         locks.remove( oid );
@@ -1247,7 +1272,7 @@ public final class LockEngine {
         private ObjectLock release( OID oid, TransactionContext tx ) {
             boolean failed = true;
             ObjectLock entry = null;
-            synchronized( this ) {
+            synchronized( locks ) {
                 entry = (ObjectLock) locks.get( oid );
 
                 if ( entry == null ) 
@@ -1260,7 +1285,7 @@ public final class LockEngine {
                 failed = false;
                 return entry;
             } finally {
-                synchronized( this ) {
+                synchronized( locks ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
                         cache.put( oid, entry );
