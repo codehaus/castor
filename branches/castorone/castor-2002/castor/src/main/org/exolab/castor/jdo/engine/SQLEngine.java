@@ -146,9 +146,6 @@ public final class SQLEngine implements Persistence {
     private ColumnInfo[]         _ids;
 
 
-    private ColumnInfo[]        _dependedIds;
-
-
     private SQLEngine           _extends;
 
 
@@ -1026,8 +1023,9 @@ public final class SQLEngine implements Persistence {
             System.out.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
 
             for ( int i=0; i<_ids.length; i++ ) {
-                System.out.println("set id");
-                stmt.setObject( i+1, sqlIdentities[i], _ids[i].sqlType );
+                System.out.println("set id: "+identities[i]+"/"+identities[i].getClass().getName());
+				System.out.println("after convert: "+idToSQL(i,identities[i]).getClass().getName());
+                stmt.setObject( i+1, idToSQL(i,identities[i]), _ids[i].sqlType );
             }
 
             //sqlFields = new Object[fields.length];
@@ -1290,16 +1288,16 @@ public final class SQLEngine implements Persistence {
         for ( int i=0; i<_fields.length; i++ ) {
             if ( _fields[i].load ) {
                 if ( _fields[i].joined /*&& !joinTables.contains( _fields[i].tableName )*/ ) {
-                    System.out.println("join field: "+_fields[i].jdoName);
-                    System.out.println("current table: "+_mapTo+" other table: "+_fields[i].tableName);
+                    //System.out.println("join field: "+_fields[i].jdoName);
+                    //System.out.println("current table: "+_mapTo+" other table: "+_fields[i].tableName);
                     int offset = 0;
                     //clsDesc.getDepends()!=null? clsDesc.getIdentities().length : 0;
                     String[] rightCol = _fields[i].joinFields;
                     String[] leftCol = new String[_ids.length-offset];
                     for ( int j=0; j<leftCol.length; j++ ) {
                         leftCol[j] = _ids[j+offset].name;
-                        System.out.println("this id: "+leftCol);
-                        System.out.println("other table id: "+rightCol[j]);
+                        //System.out.println("this id: "+leftCol);
+                        //System.out.println("other table id: "+rightCol[j]);
                     }
                     expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
                     find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
