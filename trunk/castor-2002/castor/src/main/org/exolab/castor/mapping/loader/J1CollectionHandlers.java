@@ -189,7 +189,31 @@ public final class J1CollectionHandlers
             public String toString() {
                 return "Hashtable";
             }
+        } ),
+        // For Enumeration (1.1)
+        new CollectionHandlers.Info( "enumerate", Enumeration.class, false, new CollectionHandler() {
+            public Object add( Object collection, Object object ) {
+                //-- do nothing, cannot add elements to an enumeration
+                return null;
+            }
+            public Enumeration elements( Object collection ) {
+                if ( collection == null )
+                    return new CollectionHandlers.EmptyEnumerator();
+                return ( (Enumeration) collection );
+            }
+            public int size( Object collection ) {
+                //-- Nothing we can do without destroying the enumeration
+                return 0;
+            }
+            public Object clear( Object collection ) {
+                //-- Should we iterate over nextElement?
+                return null;
+            }
+            public String toString() {
+                return "Enumeration";
+            }
         } )
+        
     };
 
 
