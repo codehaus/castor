@@ -17,6 +17,9 @@ JDO:     Added three paramaterized type convertors: Date<->Integer,
 
 XML:     Identity field will now use XML name provided in mapping file.
 
+Misc:    Fixed security bug when running as an Applet. (Reported by Remus Pereni
+         <remus@nolimits.ro>).
+
 
 Version 0.8.6  May 24, 2000
 ---------------------------
