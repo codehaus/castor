@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -238,7 +238,7 @@ public final class XSString extends XSPatternBase {
 
 			Facet facet = (Facet) enum.nextElement();
 			String name = facet.getName();
-
+            
 			//-- maxLength
 			if (Facet.MAX_LENGTH.equals(name))
 				setMaxLength(facet.toInt());
@@ -249,7 +249,7 @@ public final class XSString extends XSPatternBase {
 			else if (Facet.LENGTH.equals(name))
 				setLength(facet.toInt());
 			else if (Facet.PATTERN.equals(name))
-				setPattern(facet.getValue());
+				addPattern(facet.getValue());
 			else if (Facet.WHITESPACE.equals(name))
 				setWhiteSpace(facet.getValue());
 
@@ -299,12 +299,19 @@ public final class XSString extends XSPatternBase {
 			jsc.append(");");
 		}
 		//-- pattern facet
-		String pattern = getPattern();
-		if (pattern != null) {
-			jsc.add("typeValidator.setPattern(\"");
-			jsc.append(escapePattern(pattern));
-			jsc.append("\");");
-		}
+        String[] patterns = getPatterns();
+        if (patterns != null) {
+            int i = 0;
+            while (i<patterns.length) {
+                String pattern = patterns[i];
+                if (pattern != null) {
+                      jsc.add("typeValidator.addPattern(\"");
+                      jsc.append(escapePattern(pattern));
+                      jsc.append("\");");
+                }
+                i++;     
+            }
+        }
 		
 	    jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 

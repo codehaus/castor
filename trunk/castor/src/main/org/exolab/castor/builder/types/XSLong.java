@@ -255,7 +255,7 @@ public final class XSLong extends XSPatternBase {
 				setMinInclusive(facet.toLong());
 			//-- pattern
 			else if (Facet.PATTERN.equals(name))
-				setPattern(facet.getValue());
+				addPattern(facet.getValue());
 		} //setFacets
 
 	} //-- readLongFacets
@@ -270,7 +270,7 @@ public final class XSLong extends XSPatternBase {
 		if (_asWrapper)
 			return super.createToJavaObjectCode(variableName);
 		else {
-			StringBuffer sb = new StringBuffer("new Long(");
+			StringBuffer sb = new StringBuffer("new java.lang.Long(");
 			sb.append(variableName);
 			sb.append(")");
 			return sb.toString();
@@ -286,7 +286,7 @@ public final class XSLong extends XSPatternBase {
 	 * instance of this XSType
 	**/
 	public String createFromJavaObjectCode(String variableName) {
-		StringBuffer sb = new StringBuffer("((Long)");
+		StringBuffer sb = new StringBuffer("((java.lang.Long)");
 		sb.append(variableName);
 		sb.append(")");
 		if (!_asWrapper) {
@@ -343,13 +343,21 @@ public final class XSLong extends XSPatternBase {
 			jsc.append(fixedValue);
 			jsc.append(");");
 		}
-		//-- pattern facet
-		String pattern = getPattern();
-		if (pattern != null) {
-			jsc.add("typeValidator .setPattern(\"");
-			jsc.append(escapePattern(pattern));
-			jsc.append("\");");
-		}
+        //-- pattern facet
+        String[] patterns = getPatterns();
+        if (patterns != null) {
+            int i = 0;
+            while (i<patterns.length) {
+                 String pattern = patterns[i];
+                 if (pattern != null) {
+                       jsc.add("typeValidator.addPattern(\"");
+                       jsc.append(escapePattern(pattern));
+                       jsc.append("\");");
+                 }     
+                 i++;
+             }
+         }
+
 		jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 		
 	}

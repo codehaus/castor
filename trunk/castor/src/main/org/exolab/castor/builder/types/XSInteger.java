@@ -278,7 +278,7 @@ public class XSInteger extends XSPatternBase {
                 setMinInclusive(facet.toInt());
             //--pattern
             else if (Facet.PATTERN.equals(name))
-                setPattern(facet.getValue());
+                addPattern(facet.getValue());
             //--totalDigits
             else if (Facet.TOTALDIGITS.equals(name))
                 setTotalDigits(facet.toInt());
@@ -297,7 +297,7 @@ public class XSInteger extends XSPatternBase {
         if (_asWrapper)
            return super.createToJavaObjectCode(variableName);
         else {
-            StringBuffer sb = new StringBuffer("new Integer(");
+            StringBuffer sb = new StringBuffer("new java.lang.Integer(");
             sb.append(variableName);
             sb.append(")");
             return sb.toString();
@@ -313,7 +313,7 @@ public class XSInteger extends XSPatternBase {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Integer)");
+        StringBuffer sb = new StringBuffer("((java.lang.Integer)");
         sb.append(variableName);
          if (_asWrapper)
            sb.append(")");
@@ -374,12 +374,20 @@ public class XSInteger extends XSPatternBase {
             jsc.append(");");
         }
         //-- pattern facet
-        String pattern = getPattern();
-        if (pattern != null) {
-            jsc.add("typeValidator.setPattern(\"");
-            jsc.append(escapePattern(pattern));
-            jsc.append("\");");
-        }
+         String[] patterns = getPatterns();
+         if (patterns != null) {
+             int i = 0;
+             while (i<patterns.length) {
+                  String pattern = patterns[i];
+                  if (pattern != null) {
+                        jsc.add("typeValidator.addPattern(\"");
+                        jsc.append(escapePattern(pattern));
+                        jsc.append("\");");
+                  }     
+              }
+          }
+         jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
+
         //-- totalDigits
         int totalDigits = getTotalDigits();
 
