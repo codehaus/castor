@@ -411,7 +411,7 @@ public class Types
         new TypeInfo( "stream",      null,
                       java.io.InputStream.class,  true,     null ),
         new TypeInfo( "clob",      null,
-                      java.sql.Clob.class,        true,     null ),
+                      getClobClass(),        true,     null ),
         new TypeInfo( "serializable", null,
                       java.io.Serializable.class, false,   null ), 
 
@@ -440,6 +440,21 @@ public class Types
           new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
         */
     };
+
+    /**
+     * A hack for JDK 1.1 Compatibility
+    **/
+    private static final Class getClobClass() {        
+        Class type = null;
+        try {
+            type = Class.forName("java.sql.Clob");
+        }
+        catch(ClassNotFoundException cnfe) {
+            /// If this is thrown we are probably in JDK 1.1, so
+            /// that's ok, otherwise there is some nasty ClassLoader problem :-)
+        }
+        return type;
+    } //-- getClobClass
 
 }
 
