@@ -331,7 +331,6 @@ public class MemberFactory {
             }
         }
 
-        Form form = null;
         boolean createForElement = false;
         boolean createForAttribute = false;
         //--initialize the field
@@ -341,7 +340,6 @@ public class MemberFactory {
             case Structure.ELEMENT:
                  fieldInfo.setNodeType(XMLInfo.ELEMENT_TYPE);
                  ElementDecl element = (ElementDecl)component.getAnnotated();
-                 form = element.getForm();
                  createForElement = true;
                  break;
             case Structure.ATTRIBUTE:
@@ -356,24 +354,13 @@ public class MemberFactory {
         }
 
         //-- handle namespace URI / prefix
-        Schema schema = component.getSchema();
-        if (schema != null) {
-            if (form == null) {
-                if (createForAttribute)
-                    form = schema.getAttributeFormDefault();
-                else if (createForElement)
-                    form = schema.getElementFormDefault();
-            }
-            if ((form != null) && form.isQualified()) {
-                String nsURI = component.getTargetNamespace();
-                if ((nsURI != null) && (nsURI.length() > 0)) {
-                    fieldInfo.setNamespaceURI(nsURI);
-                    /**
-                     * @todo set the prefix used in the XML Schema in 
-                     * order to use it inside the Marshalling Framework
-                     */
-                }
-            }
+        String nsURI = component.getTargetNamespace();
+        if ((nsURI != null) && (nsURI.length() > 0)) {
+            fieldInfo.setNamespaceURI(nsURI);
+            /**
+             * @todo set the prefix used in the XML Schema in 
+             * order to use it inside the Marshalling Framework
+             */
         }
 
         //--handle default value
