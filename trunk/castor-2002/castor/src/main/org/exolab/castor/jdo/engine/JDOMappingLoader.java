@@ -81,7 +81,7 @@ public class JDOMappingLoader
     private static final String CompiledType = "JDO";
 
 
-    private static final String DirtyCheck = "check";
+    private static final String IgnoreDirty = "ignore";
 
 
     public JDOMappingLoader( ClassLoader loader )
@@ -162,7 +162,7 @@ public class JDOMappingLoader
         else
             sqlName = fieldMap.getSqlInfo().getName();
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName,
-            DirtyCheck.equals( fieldMap.getSqlInfo().getDirty() ),
+            ! IgnoreDirty.equals( fieldMap.getSqlInfo().getDirty() ),
             fieldMap.getSqlInfo().getManyTable(), fieldMap.getSqlInfo().getManyKey() );
     }
 
