@@ -801,18 +801,34 @@ public class SourceFactory  {
         jsc.add("return true;");
         jsc.unindent();
         jsc.add("");
-        jsc.add("if (obj instanceof "+jclass.getName(true)+") {");
+        jsc.add("if (obj instanceof ");
+        jsc.append(jclass.getName(true));
+        jsc.append(") {");
         jsc.add("");
         jsc.indent();
-        jsc.add(jclass.getName(true)+" temp = ("+jclass.getName(true)+")obj;");
+        jsc.add(jclass.getName(true));
+        jsc.append(" temp = (");
+        jsc.append(jclass.getName(true));
+        jsc.append(")obj;");
         for (int i = 0; i <fields.length; i++) {
             JField temp = fields[i];
             //Be careful to arrayList....
 
             String name = temp.getName();
-            if (temp.getType().isPrimitive())
-               jsc.add("if (this."+ name +" != temp."+name+")");
-            else jsc.add("if (!(this."+ name +".equals(temp."+name+"))) ");
+            if (temp.getType().isPrimitive()) {
+              jsc.add("if (this.");
+              jsc.append(name);
+              jsc.append(" != temp.");
+              jsc.append(name);
+              jsc.append(")");
+            }
+            else {
+                jsc.add("if (!(this.");
+                jsc.append(name);
+                jsc.append(".equals(temp.");
+                jsc.append(name);
+                jsc.append("))) ");
+            }
             jsc.indent();
             jsc.add("return false;");
             jsc.unindent();
@@ -873,13 +889,29 @@ public class SourceFactory  {
                     method = null;
                     methodName = null;
                     tempName = null;
-                    jsc.add(name+" = RandomHelper.getRandom("+name+", "+componentName+".class);");
+                    jsc.add(name);
+                    jsc.append(" = RandomHelper.getRandom(");
+                    jsc.append(name);
+                    jsc.append(", ");
+                    jsc.append(componentName);
+                    jsc.append(".class);");
                }//Vector or ArrayList
-               else if (type.isPrimitive())
-                  jsc.add(setName+"(RandomHelper.getRandom("+name+"));");
-               else
-                 jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+type.getName()+".class));");
-                 //jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class));");
+               else if (type.isPrimitive()) {
+                 jsc.add(setName);
+                 jsc.append("(RandomHelper.getRandom(");
+                 jsc.append(name);
+                 jsc.append("));");
+               }
+               else {
+                 jsc.add(setName);
+                 jsc.append("((");
+                 jsc.append(type.getName());
+                 jsc.append(")RandomHelper.getRandom(");
+                 jsc.append(name);
+                 jsc.append(", ");
+                 jsc.append(type.getName());
+                 jsc.append(".class));");
+               }
                 jsc.add("");
             }
         }
@@ -889,20 +921,37 @@ public class SourceFactory  {
         jMethod.setComment("implementation of org.exolab.castor.tests.framework.CastorTestable");
         jclass.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
-        jsc.add("String result = \"DumpFields() for element: "+jclass.getName()+"\\n\";");
+        jsc.add("String result = \"DumpFields() for element: ");
+        jsc.append(jclass.getName());
+        jsc.append("\\n\";");
         for (int i = 0; i <fields.length; i++) {
 
             JField temp = fields[i];
             String name = temp.getName();
             if ( (temp.getType().isPrimitive()) ||
-                 (temp.getType().getName().equals("java.lang.String")))
-                  jsc.add("result += \"Field "+name+":\" +"+name+"+\"\\n\";");
+                 (temp.getType().getName().equals("java.lang.String"))) {
+                  jsc.add("result += \"Field ");
+                  jsc.append(name);
+                  jsc.append(":\" +");
+                  jsc.append(name);
+                  jsc.append("+\"\\n\";");
+            }
             else {
-                jsc.add("if ( ("+name+" != null) && ("+name+".getClass().isAssignableFrom(CastorTestable.class)))");
+                jsc.add("if ( (");
+                jsc.add(name);
+                jsc.add(" != null) && (");
+                jsc.add(name);
+                jsc.add(".getClass().isAssignableFrom(CastorTestable.class)))");
                 jsc.indent();
-                jsc.add("result += ((CastorTestable)"+name+").dumpFields();");
+                jsc.add("result += ((CastorTestable)");
+                jsc.append(name);
+                jsc.append(").dumpFields();");
                 jsc.unindent();
-                jsc.add("else result += \"Field "+name+":\" +"+name+"+\"\\n\";");
+                jsc.append("else result += \"Field ");
+                jsc.append(name);
+                jsc.append(":\" +");
+                jsc.append(name);
+                jsc.append("+\"\\n\";");
             }
             jsc.add("");
         }
