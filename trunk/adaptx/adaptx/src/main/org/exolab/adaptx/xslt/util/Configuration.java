@@ -25,11 +25,9 @@ import java.io.*;
 import java.util.Properties;
 
 import org.exolab.adaptx.xml.parser.DOMParser;
-import org.exolab.adaptx.xslt.XSLTProcessor;
 
 //-- SAX
 import org.xml.sax.Parser;
-import org.xml.sax.helpers.ParserFactory;
 import org.xml.sax.XMLReader;
 import org.xml.sax.SAXException;
 
@@ -37,6 +35,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
 
 /**
  * A simple configuration class for the XSLT processor
@@ -100,6 +100,7 @@ public class Configuration {
      */
     private static SAXParserFactory _saxParserFactory = null;
     
+    private static final Logger LOGGER = Logger.getLogger("org.exolab.adaptx.xslt");
     
     /**
      * Create a new Configuration
@@ -285,16 +286,27 @@ public class Configuration {
 	        InputStream is = null;
 	        // look in local working directory
 	        File propsFile = new File(PROPERTIES_FILE);
-	        if (propsFile.exists())
+	        if (propsFile.exists()) {
 	            is = new FileInputStream(propsFile);
+                if (LOGGER.isDebugEnabled()) {
+                	LOGGER.debug("loading properties from: " + propsFile.getAbsolutePath());
+                }
+            }
 	        // look in class directory
 	        else {
 	            propsFile = new File(PROPERTIES_PATH, PROPERTIES_FILE);
-	            if (propsFile.exists())
+	            if (propsFile.exists()) {
+                    if (LOGGER.isDebugEnabled()) {
+                    	LOGGER.debug("loading properties from: " + propsFile.getAbsolutePath());
+                    }
     	            is = new FileInputStream(propsFile);
-	            else 
-	                is = getResourceAsStream("/" + PROPERTIES_PATH + "/" +
-	                    PROPERTIES_FILE);
+                }
+	            else  {
+	                is = getResourceAsStream("/" + PROPERTIES_PATH + "/" + PROPERTIES_FILE);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("loading properties as resource from classpath!");
+                    }
+                }
 	        }
 	        
 	        if (is != null) props.load(is);
@@ -302,7 +314,8 @@ public class Configuration {
 
 	    }
 	    catch(IOException iox) {
-	        System.out.println(iox.toString());
+            LOGGER.warn("unable to load properties file due to the following exception:");
+            LOGGER.warn(iox);
 	        createDefaultProperties();
 	    }
 	    loaded = true;
