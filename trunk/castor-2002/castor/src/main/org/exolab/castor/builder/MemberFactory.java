@@ -94,7 +94,7 @@ public class MemberFactory {
         fInfo.setComment("internal character storage");
         fInfo.setRequired(false);
         fInfo.setNodeName("#text");
-        fInfo.setDefaultValue("new String();");
+        fInfo.setDefaultValue("\"\"");
         return fInfo;
         
     } //-- createFieldInfoForText
