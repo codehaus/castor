@@ -42,6 +42,9 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Added Patrick Higgins changes to the javasource package to fix
+        support for abstract methods (kvisco)
+
 XML:    Added support for in-lines SimpleTypes (anonymous) for 
         attribute declarations (kvisco)
 
