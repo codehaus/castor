@@ -1,0 +1,251 @@
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Exoffice Technologies.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 2000 (C) Exoffice Technologies Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+package org.exolab.castor.dtx;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
+import java.sql.*;
+import org.xml.sax.*;
+import org.exolab.castor.jdo.conf.*;
+import org.exolab.castor.persist.*;
+import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.xml.*;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.xml.MappingRoot;
+import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.jdo.engine.*;
+import org.exolab.castor.util.*;
+import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.reader.*;
+
+/**
+ * An OQL query engine for hitting JDO data sources and generating SAX
+ * events. It skips the intermediate Java class step used by
+ * e.g. Castor JDO.
+ *
+ */
+
+public class DTXEngine {
+
+    protected DocumentHandler _handler = null;
+    protected String _databaseURL = null;
+    protected PrintWriter _logWriter = Logger.getSystemLogger();
+    protected Database _database = null;
+    protected String _schemaURL = null;
+    protected Schema _schema = null;
+    protected HashMap _classMappings = null;
+    protected Connection _conn = null;
+    protected PersistenceFactory _factory = null;
+
+    public DTXEngine() {
+    }
+
+    public DTXEngine(String databaseURL, String schemaURL) 
+	throws DTXException
+    {
+	setDatabase(databaseURL);
+	setSchema(schemaURL);
+    }
+
+    public void setSchema(String schemaURL) {
+	_schemaURL = schemaURL;
+
+        Parser parser = null;
+        try {
+	    parser = Configuration.getParser();
+        }
+        catch(RuntimeException rte) {}
+        if (parser == null) {
+            System.out.println("fatal error: unable to create SAX parser.");
+            return;
+        }
+        
+        SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller();
+        parser.setDocumentHandler(schemaUnmarshaller);
+        parser.setErrorHandler(schemaUnmarshaller);
+        
+        try {
+            parser.parse(new InputSource((new URL(schemaURL)).openStream()));
+        }
+        catch(SAXException sx) {
+            Exception except = sx.getException();
+            if (except == null) except = sx;
+            except.printStackTrace();
+            return;
+        }
+        catch(Exception e) {
+	    e.printStackTrace();
+            return;
+        }
+        
+        _schema = schemaUnmarshaller.getSchema();
+    }
+
+    public void setDatabase(String databaseURL) throws DTXException {
+	_databaseURL = databaseURL;
+        Unmarshaller unm = new Unmarshaller( Database.class );
+
+	unm.setEntityResolver( new DTDResolver() );
+
+	if ( _logWriter != null ) {
+	    unm.setLogWriter( _logWriter );
+	}
+
+	try {
+	    _database = (Database) unm.unmarshal(new InputSource((new URL(databaseURL)).openStream()));
+	} catch (Exception except) {
+	    throw new DTXException(except);
+	}
+
+	if ( _database.getEngine() == null  ) {
+	    _factory = PersistenceFactoryRegistry.getPersistenceFactory("generic");
+	} else {
+	    _factory = PersistenceFactoryRegistry.getPersistenceFactory(_database.getEngine());
+	}
+
+	if ( _factory == null ) {
+	    throw new DTXException("no engine");
+	}
+
+	// Class mappings
+
+	_classMappings = new HashMap();
+
+	// Load the specificed mapping source
+
+	Unmarshaller munm = new Unmarshaller( MappingRoot.class );
+
+	if ( _logWriter != null ) {
+	    munm.setLogWriter( _logWriter );
+	}
+
+ 	Mapping mappings[] = _database.getMapping();
+
+	for ( int i = 0 ; i < mappings.length ; ++i ) {
+	    try {
+		URL mappingURL = new URL(new URL(databaseURL), mappings[i].getHref());
+		MappingRoot mr = (MappingRoot) munm.unmarshal(new InputSource((mappingURL).openStream()));
+		ClassMapping[] classMaps = mr.getClassMapping();
+
+		for (int j = 0; j < classMaps.length; j++) {
+		    _classMappings.put(classMaps[j].getName(), classMaps[j]);
+		    if (_logWriter != null) {
+			_logWriter.println("Got class: " + classMaps[j].getName());
+		    }
+		}
+	    } catch (Exception e) {
+		throw new DTXException(e);
+	    }
+ 	}
+    }
+
+    public void setLogWriter(PrintWriter logWriter) {
+	_logWriter = logWriter;
+    }
+
+    public void setDocumentHandler(DocumentHandler handler) {
+	_handler = handler;
+    }
+
+    public DTXQuery prepareQuery(String oql) throws DTXException {
+
+	DTXQuery qry = new DTXQuery();
+	qry.setEngine(this);
+	qry.setHandler(_handler);
+	qry.setLogWriter(_logWriter);
+	qry.prepare(oql);
+
+	return qry;
+    }
+
+    /* Package scope -- for DTXQuery */
+
+    Database getDatabase() {
+	return _database;
+    }
+
+    Schema getSchema() {
+	return _schema;
+    }
+
+    PersistenceFactory getFactory() {
+	return _factory;
+    }
+
+    Connection getConnection() throws DTXException {
+	if (_conn == null) {
+	    DataSource datasource = _database.getDataSource();
+	    org.exolab.castor.jdo.conf.Driver driver = _database.getDriver();
+
+	    if (datasource != null) {
+		throw new DTXException("dtx.DataSourceUnimplemented");
+	    } else if (driver != null) {
+		try {
+		    String className = driver.getClassName();
+		    Class.forName(className);
+		    String jdbcUrl = driver.getUrl();
+		    Param[] params = driver.getParam();
+		    Properties props = new Properties();
+		
+		    for (int i = 0; i < params.length; i++) {
+			Param p = params[i];
+			props.setProperty(p.getName(), p.getValue());
+		    }
+
+		    _conn = DriverManager.getConnection(jdbcUrl, props);
+		} catch (Exception e) {
+		    throw new DTXException(e);
+		}
+	    }
+	}
+	return _conn;
+    }
+
+    ClassMapping getClassMapping(String className) {
+	return (ClassMapping) _classMappings.get(className);
+    }
+}
