@@ -84,6 +84,11 @@ public class Marshaller {
     private static final String SERIALIZER_NOT_SAX_CAPABLE
         = "conf.serializerNotSaxCapable";
 
+    /**
+     * The XSI Namespace URI
+    **/
+    public static final String XSI_NAMESPACE 
+        = "http://www.w3.org/2000/10/XMLSchema-instance";
 
     /**
      * The namespace declaration String
@@ -146,6 +151,7 @@ public class Marshaller {
     private Hashtable        _cdCache      = null;
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
+    private XMLNaming        _naming       = null;
 
     /**
      * The depth of the sub tree, 0 denotes document level
@@ -216,6 +222,7 @@ public class Marshaller {
         _cdCache         = new Hashtable(3);
         _parents         = new Stack();
         _validate        = Configuration.marshallingValidation();
+        _naming          = XMLNaming.getInstance();
     } //-- initialize();
 
     /**
@@ -421,7 +428,7 @@ public class Marshaller {
                 name = name.substring(idx+1);
             }
             //-- remove capitalization
-            name = MarshalHelper.toXMLName(name);
+            name = _naming.toXMLName(name);
         }
 
         //-- obtain the class descriptor
@@ -551,8 +558,7 @@ public class Marshaller {
 
         //-- xsi:type
         if (saveType) {
-            saveType = declareNamespace(XSI_PREFIX,
-                MarshalHelper.XSI_NAMESPACE, atts);
+            saveType = declareNamespace(XSI_PREFIX, XSI_NAMESPACE, atts);
             atts.addAttribute(XSI_TYPE, null, "java:"+_class.getName());
         }
 
@@ -714,7 +720,7 @@ public class Marshaller {
         --depth;
         _parents.pop();
         if (declaredNS) _nsScope.remove(nsURI);
-        if (saveType) _nsScope.remove(MarshalHelper.XSI_NAMESPACE);
+        if (saveType) _nsScope.remove(XSI_NAMESPACE);
 
     } //-- void marshal(DocumentHandler)
 

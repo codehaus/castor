@@ -69,6 +69,12 @@ public class XMLClassDescriptorImpl
         = "The Class passed as an argument to the constructor of " +
           "XMLClassDescriptorImpl may not be null.";
 
+
+    /**
+     * Naming Conventions
+    **/
+    private static XMLNaming _naming = null;
+
     /**
      * The Class that this ClassDescriptor describes
     **/
@@ -148,6 +154,13 @@ public class XMLClassDescriptorImpl
     
     
     /**
+     * Static initializer
+    **/
+    static {
+        _naming = XMLNaming.getInstance();
+    } 
+    
+    /**
      * Creates an XMLClassDescriptor class used by the Marshalling Framework.
      * @param type the Class type with which this ClassDescriptor describes.
     **/
@@ -180,7 +193,6 @@ public class XMLClassDescriptorImpl
     protected XMLClassDescriptorImpl() {
         attributeDescriptors = new List(7);
         elementDescriptors = new List(7);
-        //validationRules = new List();
     } //-- XMLClassDescriptor
     
     //------------------/
@@ -615,7 +627,7 @@ public class XMLClassDescriptorImpl
         String name = className;
         int idx = name.lastIndexOf('.');
         if (idx >= 0) name = name.substring(idx+1);
-        return MarshalHelper.toXMLName(name);
+        return _naming.toXMLName(name);
     }
     
     

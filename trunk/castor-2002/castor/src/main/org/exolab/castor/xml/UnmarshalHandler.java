@@ -324,7 +324,7 @@ public class UnmarshalHandler implements DocumentHandler {
                     state.object = decoder.getByteArray();
                 }
             }
-            else state.object = MarshalHelper.toPrimitiveObject(type,str);
+            else state.object = toPrimitiveObject(type,str);
         }
                
         //-- check for character content
@@ -734,7 +734,7 @@ public class UnmarshalHandler implements DocumentHandler {
                 String cname = null;
                 if (classDesc == null) {
                     //-- create class name
-                    cname = MarshalHelper.toJavaName(name,true);
+                    cname = JavaNaming.toJavaClassName(name);
                     classDesc = getClassDescriptor(cname, loader);
                 }
                     
@@ -1070,7 +1070,7 @@ public class UnmarshalHandler implements DocumentHandler {
             //-- conversion
             Class type = descriptor.getFieldType();
             if (isPrimitive(type))
-                value = MarshalHelper.toPrimitiveObject(type, attValue);
+                value = toPrimitiveObject(type, attValue);
         }
         FieldHandler handler = descriptor.getHandler();
                 
@@ -1258,6 +1258,87 @@ public class UnmarshalHandler implements DocumentHandler {
             refInfo = refInfo.next;
         }
     } //-- resolveReferences
+    
+    /**
+     * Converts a String to the given primitive object type
+     * @param type the class type of the primitive in which
+     * to convert the String to
+     * @param value the String to convert to a primitive
+     * @return the new primitive Object
+    **/
+    public static Object toPrimitiveObject(Class type, String value) {
+        
+        Object primitive = null;
+        
+        //-- I tried to order these in the order in which
+        //-- (I think) types are used more frequently
+        
+        boolean isNull = ((value == null) || (value.length() == 0));
+        
+        // int
+        if ((type == Integer.TYPE) || (type == Integer.class)) {
+            if (isNull)
+                primitive = new Integer(0);
+            else
+                primitive = new Integer(value);
+        }
+        // boolean
+        else if ((type == Boolean.TYPE) || (type == Boolean.class)) {
+            if (isNull)
+                primitive = new Boolean(false);
+            else				
+				primitive = (value.equals("1") || 
+							 value.toLowerCase().equals("true")) 
+								? Boolean.TRUE : Boolean.FALSE;
+        }
+        // double
+        else if ((type == Double.TYPE) || (type == Double.class)) {
+            if (isNull)
+                primitive = new Double(0.0);
+            else
+                primitive = new Double(value);
+        }
+        // long
+        else if ((type == Long.TYPE) || (type == Long.class)) {
+            if (isNull)
+                primitive = new Long(0);
+            else
+                primitive = new Long(value);
+        }
+        // char
+        else if (type == Character.TYPE) {
+            if (!isNull)
+                primitive = new Character(value.charAt(0));
+            else 
+                primitive = new Character('\0');
+        }
+        // short
+        else if ((type == Short.TYPE) || (type == Short.class)) {
+            if (isNull)
+                primitive = new Short((short)0);
+            else 
+                primitive = new Short(value);
+        }
+        // float
+        else if ((type == Float.TYPE) || (type == Float.class)) {
+            if (isNull)
+                primitive = new Float((float)0);
+            else
+                primitive = new Float(value);
+        }
+        // byte
+        else if (type == Byte.TYPE) {
+            if (isNull)
+                primitive = new Byte((byte)0);
+            else
+                primitive = new Byte(value);
+        }
+        // otherwise do nothing
+        else 
+            primitive = value;
+        
+        return primitive;
+    } //-- toPrimitiveObject
     
     /**
      * Internal class used to save state for reference resolving

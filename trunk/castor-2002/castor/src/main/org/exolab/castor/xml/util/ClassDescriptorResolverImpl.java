@@ -75,11 +75,15 @@ public class ClassDescriptorResolverImpl
     
     private ClassLoader _loader  = null;
     
+    private Introspector _introspector = null;
+    
+    
     /**
      * Creates a new ClassDescriptorResolverImpl
     **/
     public ClassDescriptorResolverImpl() {
         _cache        = new Hashtable();
+        _introspector = new Introspector();
     } //-- ClassDescriptorResolverImpl
 
     /**
@@ -87,7 +91,7 @@ public class ClassDescriptorResolverImpl
      * @param loader the ClassLoader to use when loading ClassDescriptors
     **/
     public ClassDescriptorResolverImpl(ClassLoader loader) {
-        _cache  = new Hashtable();
+        this();
         _loader = loader;
     } //-- ClassDescriptorResolverImpl
     
@@ -176,7 +180,7 @@ public class ClassDescriptorResolverImpl
         //-- create classDesc automatically if necessary
         if (classDesc == null) {
             try {
-                classDesc = MarshalHelper.generateClassDescriptor(type);
+                classDesc = _introspector.generateClassDescriptor(type);
                 if (classDesc != null) {
                     _cache.put(type, classDesc);
                 }
