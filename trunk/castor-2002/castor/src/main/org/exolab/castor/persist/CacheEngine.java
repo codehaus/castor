@@ -1,3 +1,4 @@
+
 /**
  * Redistribution and use of this software and associated documentation
  * ("Software"), with or without modification, are permitted provided
@@ -47,7 +48,6 @@
 package org.exolab.castor.persist;
 
 
-import java.io.PrintWriter;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -68,6 +68,7 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -119,12 +120,6 @@ public final class CacheEngine
 
 
     /**
-     * The log writer used to trace persistence operations. May be null.
-     */
-    private PrintWriter  _logWriter;
-
-
-    /**
      * Used by the constructor for creating handlers and temporarily
      * registering them to prevent circular references. See {@link
      * #addClassHandler}.
@@ -147,6 +142,12 @@ public final class CacheEngine
 
 
     /**
+     * The log interceptor used to trace persistence operations. May be null.
+     */
+    private LogInterceptor     _logInterceptor;
+
+
+    /**
      * Construct a new cache engine with the specified name, mapping
      * table and persistence engine.
      *
@@ -160,13 +161,13 @@ public final class CacheEngine
      *  invalid
      */
     CacheEngine( MappingResolver mapResolver,
-                 PersistenceFactory factory, PrintWriter logWriter )
+                 PersistenceFactory factory, LogInterceptor logInterceptor )
         throws MappingException
     {
         Enumeration   enum;
         ClassHandler  handler;
 
-        _logWriter = logWriter;
+        _logInterceptor = logInterceptor;
         _mapResolver = mapResolver;
         _factory = factory;
         _handlers = new Hashtable();
@@ -209,7 +210,7 @@ public final class CacheEngine
                 handler.normalize( this );
 
                 // Create a new persistence engine for that type and add the type info
-                persist = _factory.getPersistence( handler.getDescriptor(), _logWriter );
+                persist = _factory.getPersistence( handler.getDescriptor(), _logInterceptor );
                 if ( persist != null ) {
                     // At this point the extends typeInfo has been registered, so we know
                     // it exists. We need the extends in order to share cache between objects
@@ -222,14 +223,15 @@ public final class CacheEngine
                         while ( extend.getExtends() != null )
                             extend = extend.getExtends();
                         typeInfo = (TypeInfo) _typeInfo.get( extend.getJavaClass() );
-                        if ( typeInfo == null )
-                            _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
-                        else
+                        if ( typeInfo == null ) {
+                            if ( _logInterceptor != null )
+                                _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
+                        } else
                             _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, typeInfo.cache ) );
                     } else
                         _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, new Cache() ) );
-                } else if ( _logWriter != null )
-                    _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
+                } else if ( _logInterceptor != null )
+                    _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
             }
         }
         return handler;
@@ -257,19 +259,6 @@ public final class CacheEngine
             return null;
         else
             return typeInfo.handler;
-    }
-
-
-    public void setLogWriter( PrintWriter logWriter )
-    {
-        if ( logWriter != null )
-            _logWriter = logWriter;
-    }
-
-
-    public PrintWriter getLogWriter()
-    {
-        return _logWriter;
     }
 
 
@@ -318,7 +307,7 @@ public final class CacheEngine
         // have a lock (i.e. object is cached).
         oid = new OID( typeInfo.handler, identity );
         lock = typeInfo.cache.getLock( oid );
-        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.Locked );
+        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
 
         if ( lock != null ) {
             // Object has been loaded before, must acquire lock
@@ -337,16 +326,16 @@ public final class CacheEngine
             //     to load derived class, will still return parent class
             //     Need to solve by swapping to a new object
 
-            if ( writeLock && ! oid.isExclusive() ) {
-                // Exclusive mode we always synchronize the object with
+            if ( writeLock && ! oid.isDbLock() ) {
+                // Db-lock mode we always synchronize the object with
                 // the database and obtain a lock on the object.
                 try {
-                    if ( _logWriter != null )
-                        _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() +
-                                            " (" + identity + ")" );
+                    if ( _logInterceptor != null )
+                        _logInterceptor.loading( typeInfo.javaClass, identity );
                     oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
                                                          fields, identity, accessMode ) );
-                    oid.setExclusive( true );
+                    if ( accessMode == AccessMode.DbLocked )
+                        oid.setDbLock( true );
                 } catch ( ObjectNotFoundException except ) {
                     // Object was not found in persistent storge, must dump
                     // it from the cache
@@ -374,9 +363,8 @@ public final class CacheEngine
             // The object is now loaded and a lock is acquired.
             fields = typeInfo.handler.newFieldSet();
             try {
-                if ( _logWriter != null )
-                    _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() + " ("
-                                        + identity + ")" );
+                if ( _logInterceptor != null )
+                    _logInterceptor.loading( typeInfo.javaClass, identity );
                 oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
                                                      fields, identity, accessMode ) );
             } catch ( ObjectNotFoundException except ) {
@@ -395,8 +383,8 @@ public final class CacheEngine
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            if ( accessMode == AccessMode.Locked )
-                oid.setExclusive( true );
+            if ( accessMode == AccessMode.DbLocked )
+                oid.setDbLock( true );
             typeInfo.cache.addLock( oid, lock );
             return oid;
         }
@@ -443,7 +431,7 @@ public final class CacheEngine
         // have a lock (i.e. object is cached).
         oid = new OID( typeInfo.handler, identity );
         lock = typeInfo.cache.getLock( oid );
-        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.Locked );
+        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
 
         if ( lock != null ) {
 
@@ -462,15 +450,15 @@ public final class CacheEngine
             //     to load derived class, will still return parent class
             //     Need to solve by swapping to a new object
 
-            if ( writeLock && ! oid.isExclusive() ) {
-                // Exclusive mode we always synchronize the object with
+            if ( writeLock && ! oid.isDbLock() ) {
+                // In db-lock mode we always synchronize the object with
                 // the database and obtain a lock on the object.
                 try {
-                    if ( _logWriter != null )
-                        _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() +
-                                            " (" + identity + ")" );
+                    if ( _logInterceptor != null )
+                        _logInterceptor.loading( typeInfo.javaClass, identity );
                     oid.setStamp( query.fetch( fields, identity ) );
-                    oid.setExclusive( true );
+                    if ( accessMode == AccessMode.DbLocked )
+                        oid.setDbLock( true );
                 } catch ( ObjectNotFoundException except ) {
                     // Object was not found in persistent storge, must dump
                     // it from the cache
@@ -498,9 +486,8 @@ public final class CacheEngine
             // The object is now loaded from the query and a lock is acquired.
             fields = typeInfo.handler.newFieldSet();
             try {
-                if ( _logWriter != null )
-                    _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() +
-                                        " (" + identity + ")" );
+                if ( _logInterceptor != null )
+                    _logInterceptor.loading( typeInfo.javaClass, identity );
                 oid.setStamp( query.fetch( fields, identity ) );
             } catch ( ObjectNotFoundException except ) {
                 // Object was not found in persistent storge
@@ -518,8 +505,8 @@ public final class CacheEngine
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            if ( accessMode == AccessMode.Locked )
-                oid.setExclusive( true );
+            if ( accessMode == AccessMode.DbLocked )
+                oid.setDbLock( true );
             typeInfo.cache.addLock( oid, lock );
             return oid;
         }
@@ -585,9 +572,8 @@ public final class CacheEngine
                     typeInfo.cache.removeLock( oid );
                     lock.delete( tx );
                 }
-                if ( _logWriter != null )
-                    _logWriter.println( "Castor: Creating " + typeInfo.javaClass.getName() + " ("
-                                        + identity + ")" );
+                if ( _logInterceptor != null )
+                    _logInterceptor.creating( typeInfo.javaClass, identity );
             }
 
             // Store/create/delete all the dependent objects first.
@@ -633,7 +619,7 @@ public final class CacheEngine
             if ( identity != null ) {
                 //  Create the object in persistent storage acquiring a lock on the object.
                 oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), fields, identity ) );
-                oid.setExclusive( true );
+                oid.setDbLock( true );
             }
 
             // Copy the contents of the object we just created into the
@@ -644,7 +630,7 @@ public final class CacheEngine
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            oid.setExclusive( true );
+            oid.setDbLock( true );
             typeInfo.cache.addLock( oid, lock );
         }
         return oid;
@@ -693,10 +679,9 @@ public final class CacheEngine
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to delete object for which no lock was acquired" ) );
         }
-
-        if ( _logWriter != null )
-            _logWriter.println( "Castor: Deleting " + typeInfo.javaClass.getName() + " ("
-                                + oid.getIdentity() + ")" );
+        
+        if ( _logInterceptor != null )
+            _logInterceptor.deleting( typeInfo.javaClass, oid.getIdentity() );
         typeInfo.persist.delete( tx.getConnection( this ), oid.getIdentity() );
 
         // Store/create/delete all the dependent objects first. Must perform that
@@ -892,9 +877,8 @@ public final class CacheEngine
 
             // The object has an old identity, it existed before, one need
             // to store the new contents.
-            if ( _logWriter != null )
-                _logWriter.println( "Castor: Storing " + typeInfo.javaClass.getName() + " (" +
-                                    identity + ")" );
+            if ( _logInterceptor != null )
+                _logInterceptor.storing( typeInfo.javaClass, identity );
 
             // Create a new field set, copy the object into that set and try
             // to update the database. Use the original fields for dirty checking.
@@ -902,7 +886,7 @@ public final class CacheEngine
             // proceed to the next step.
             fields = typeInfo.handler.newFieldSet();
             typeInfo.handler.copyInto( object, fields );
-            if ( oid.isExclusive() )
+            if ( oid.isDbLock() )
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                       fields, identity, null, null ) );
             else {
@@ -916,7 +900,6 @@ public final class CacheEngine
                     throw except;
                 }
             }
-            oid.setExclusive( false );
         }
         return oid;
     }
@@ -1042,8 +1025,8 @@ public final class CacheEngine
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
-            if ( _logWriter != null )
-                _logWriter.println( Messages.format( "persist.internal", "copyObject: " + except.toString() ) );
+            if ( _logInterceptor != null )
+                _logInterceptor.message( Messages.format( "persist.internal", "copyObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         }
         typeInfo.handler.setIdentity( object, oid.getIdentity() );
@@ -1082,8 +1065,8 @@ public final class CacheEngine
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
-            if ( _logWriter != null )
-                _logWriter.println( Messages.format( "persist.internal", "updateObject: " + except.toString() ) );
+            if ( _logInterceptor != null )
+                _logInterceptor.message( Messages.format( "persist.internal", "updateObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         } catch ( PersistenceException except ) {
             // This should never happen
@@ -1105,7 +1088,7 @@ public final class CacheEngine
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
-        oid.setExclusive( false );
+        oid.setDbLock( false );
         lock = typeInfo.cache.releaseLock( oid );
         lock.release( tx );
     }
@@ -1136,8 +1119,8 @@ public final class CacheEngine
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
-            if ( _logWriter != null )
-                _logWriter.println( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
+            if ( _logInterceptor != null )
+                _logInterceptor.message( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         }
     }
