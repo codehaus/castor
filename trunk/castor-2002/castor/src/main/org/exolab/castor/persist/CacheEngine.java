@@ -959,20 +959,14 @@ public final class CacheEngine
             }
         } else {
             // Object has not been loaded yet, or cleared from the cache.
+            // If the object is not new, report an error
+            if ( ( object instanceof TimeStampable ) &&
+                    ( ( TimeStampable ) object ).jdoGetTimeStamp() != 0 ) {
+                throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), 
+                                                   typeInfo.handler.getIdentity( object ) ) );
+            }
+            // Otherwise indicate that the object should be created
             return null;
-
-            //if ( object instanceof TimeStampable ) {
-            //    // XXX If there is a database timestamp field, we must read it and 
-            //    //     compare with the object's timestamp.
-            //    // Otherwise report ObjectModifiedException
-            //    throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), 
-            //                                        typeInfo.handler.getIdentity( object ) ) );
-            //} else {
-            //    // Long transaction dirty checking is impossible, so merely 
-            //    // load the object (then it will be filled with the new values),
-            //    // assuming that the programmer knows what he does :-)
-            //    return load( tx, type, identity, accessMode, timeout );
-            //}
         }
     }
 
