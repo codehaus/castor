@@ -116,7 +116,7 @@
         <copydir src="${doc}/images" dest="${build}/doc/images"/>
         <copydir src="${doc}/style/images" dest="${build}/doc/images" includes="*.gif"/>
         <copydir src="${doc}/style" dest="${build}/doc/" includes="*.css"/>
-        <copydir src="${schema}" includes="*.dtd,*.xsd" dest="${build}/doc"/>
+        <copydir src="${schema}" includes="*.dtd,*.xsd,*.pdf" dest="${build}/doc"/>
         <replace file="${build}/doc/index.html" token="$$VERSION$$" value="${version}"/>
         <replace file="${build}/doc/index.html" token="$$RELEASE_DATE$$" value="${release_date}"/>
         <replace file="${build}/doc/download.html" token="$$VERSION$$" value="${version}"/>
