@@ -339,6 +339,7 @@ public class SourceFactory {
         XMLType type = component.getXMLType();
         boolean createForGroup = false;
         boolean creatingForAnElement = false;
+        
         if (type != null) {
 
             //5a--the type is a complexType
@@ -401,6 +402,7 @@ public class SourceFactory {
                 SimpleType simpleType = (SimpleType)type;
                 //-- handle our special case for enumerated types
                 if (simpleType.hasFacet(Facet.ENUMERATION)) {
+                    
 				    //-- Don't create source code for simple types that
 				    //-- don't belong in the elements target namespace
 				    String tns = simpleType.getSchema().getTargetNamespace();
@@ -409,9 +411,18 @@ public class SourceFactory {
 				        create = (component.getTargetNamespace() == null);
 				    else
                         create = tns.equals(component.getTargetNamespace());
+                        
+                        
                     if (create) {
-					    JClass tmpClass = createSourceCode(simpleType, sgState);
-					    classInfo.setSchemaType(new XSClass(tmpClass));
+                        ClassInfo tmpInfo = sgState.resolve(simpleType);
+                        JClass tmpClass = null;
+                        if (tmpInfo != null) {
+                            tmpClass = tmpInfo.getJClass();
+                        }
+                        else {
+					        tmpClass = createSourceCode(simpleType, sgState);
+					    }
+					    classInfo.setSchemaType(new XSClass(tmpClass));					        
 				    }
                 } else {
                     //////////////////////////////////////////////////////////
@@ -597,7 +608,7 @@ public class SourceFactory {
 		    if (component.hasBoundProperties()) 
 		        createPropertyChangeMethods(jClass);
 		}
-
+		
         sgState.bindReference(jClass, classInfo);
         sgState.bindReference(component.getAnnotated(), classInfo);
 
@@ -1283,7 +1294,9 @@ public class SourceFactory {
                 
                 if (sType.getSchema() == component.getSchema())
                 {
-                    createSourceCode(sType, state.getSGStateInfo());
+                    if (state.resolve(sType) == null) {
+                        createSourceCode(sType, state.getSGStateInfo());
+                    }
                 }
             }
             FieldInfo fieldInfo = memberFactory.createFieldInfo(component, state);
