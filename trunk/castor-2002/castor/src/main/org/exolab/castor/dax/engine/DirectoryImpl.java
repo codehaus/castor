@@ -429,6 +429,11 @@ public class DirectoryImpl
         {
             return _clsDescs.keys();
         }
+
+        public ClassLoader getClassLoader()
+        {
+            return null;
+        }
         
     }
     

@@ -19,6 +19,9 @@ JDO:     Added three paramaterized type convertors: Date<->Integer,
 JDO:     Fixes to handling of dependent objects create/delete/modify during
          transaction commit. (Oleg Nitz <on@ibis.odessa.ua>)
 
+JDO:     Added convertor from byte to short/integer. (Contributed by Harindranath P. R. Nair
+         <hari.nair@alopa.com>)
+
 XML:     Identity field will now use XML name provided in mapping file.
 
 XML:     Marshaller will now accept both primitive and non-primitive types and apply the
@@ -28,6 +31,9 @@ XML:     Marshaller will now accept both primitive and non-primitive types and a
 
 Misc:    Fixed security bug when running as an Applet. (Reported by Remus Pereni
          <remus@nolimits.ro>).
+
+Misc:    Added support for Java 1.2 Collection by running the source generator with the
+         option -types 'j2'. Vectors are used with 'j1' and ODMG 3.0 DArray with 'odmg'.
 
 
 Version 0.8.6  May 24, 2000

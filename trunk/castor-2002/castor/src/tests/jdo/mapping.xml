@@ -90,10 +90,10 @@
       <sql name="int_date" type="integer[YMD]" />
     </field>
     <field name="time2" type="java.util.Date" >
-      <sql name="str_time" type="char[hh:mm:ss.SSS]" />
+      <sql name="str_time" type="char[HH:mm:ss.SSS]" />
     </field>
     <field name="timestamp2" type="java.util.Date" >
-      <sql name="num_date" type="numeric[YMDhmsS]" />
+      <sql name="num_date" type="numeric[YMDHmsS]" />
     </field>
   </class>
 
