@@ -55,6 +55,12 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Support for Bound Properties
+
+XML:    Added support for Pattern Facet 
+         - currently works for string, integer, and long 
+        (kvisco)
+
 XML:    Updated the Schema Object model to support the new Grouping syntax
         - Groups are still not supported by the source code generator.
         (kvisco)
