@@ -37,8 +37,11 @@
 	   <p>Remember that the representation of XML Schema datatypes does not try to fit exactly the W3C XML Schema specifications,
 	   the aim is to map an XML Schema type to the java type that fit the most to the XML Schema type.</p>
       </p>
-
-
+		
+	   <p>For a detailled support of XML Schema structure, please refer to  <a href="./SourceGeneratorUser.pdf">
+        Source Generator User Document(PDF).</a></p>
+         
+     
     </section>
 
     <section title="Supported XML Schema Built-in Datatypes">
@@ -341,22 +344,20 @@
 
      <section title="Supported XML Schema Structures">
 
+         <p>For a detailled support of XML Schema structure, please refer to  <a href="./SourceGeneratorUser.pdf">
+        Source Generator User Document(PDF).</a></p>
          <p>The supported structures for XML Schema is currently limited to:</p>
 
          <p>Structural elements:
 
          <ul>
-            <li>annotation
-               <ul>
-                  <li>appinfo</li>
-                  <li>documentation</li>
-               </ul>
-            </li>
+            <li>annotation</li>
             <li>simpleType</li>
             <li>complexType</li>
             <li>element</li>
             <li>attribute</li>
             <li>attributeGroup</li>
+            <li>group</li>
          </ul>
          </p>
 
@@ -372,9 +373,6 @@
             <p>
                A work around for nested groups is to simply create
                a new complex type which represents the group.
-            </p>
-            <p>
-              Grouping support is a work in progress.
             </p>
          </section>
    </section>
