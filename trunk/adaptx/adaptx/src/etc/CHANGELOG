@@ -3,6 +3,22 @@ Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P contributors
 
 The following are changes from different versions of Adaptx
 
+
+Version 0.9.4.8, March 04, 2003
+-------------------------------
+
+-- The sum() function now throws an exception if any node
+   contained within the argument node-set contains a value
+   which cannot be converted to a numeric value. The old
+   behavior was simply to ignore non-numeric values.
+   (kvisco - 2003-02-26)
+
+-- Cleaned up exception handling in the ResultFormatter,
+   ResultHandler and DefaultHandler code.
+   (kvisco - 2003-02-25)
+
+
+
 Version 0.9.4.7, January 27, 2003
 ---------------------------------
 
