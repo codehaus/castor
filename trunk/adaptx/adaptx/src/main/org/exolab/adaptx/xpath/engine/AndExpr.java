@@ -30,13 +30,14 @@ import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.BooleanResult;
 import org.exolab.adaptx.xpath.XPathException;
 
+import org.exolab.adaptx.xpath.expressions.BinaryExpr;
 
 /**
  * Represents an AndExpr
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class AndExpr implements XPathExpression {
+class AndExpr implements BinaryExpr {
 
     
     private static String AND = " and ";
@@ -70,6 +71,29 @@ class AndExpr implements XPathExpression {
     public short getExprType() {
         return XPathExpression.BOOLEAN;
     } //-- getExprType
+    
+    
+    /**
+     * Returns the Expr that should be evaluated as the left hand side
+     * of this BinaryExpr
+     *
+     * @return the Expr that should be evaluated as the left hand side
+     * of this BinaryExpr
+     */
+    public XPathExpression getLeftSide() {
+        return leftExpr;
+    } //-- getLeftSide
+
+    /**
+     * Returns the Expr that should be evaluated as the right hand side
+     * of this BinaryExpr
+     *
+     * @return the Expr that should be evaluated as the right hand side
+     * of this BinaryExpr
+     */
+    public XPathExpression getRightSide() {
+        return rightExpr;
+    } //-- getRightSide
     
     /**
      * Evaluates the expression and returns the XPath result.

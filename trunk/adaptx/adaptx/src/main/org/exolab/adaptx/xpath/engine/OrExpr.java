@@ -28,14 +28,14 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.BooleanResult;
 import org.exolab.adaptx.xpath.XPathException;
-
+import org.exolab.adaptx.xpath.expressions.BinaryExpr;
 
 /**
  * Represents an OrExpr
  *
  * @author Keith Visco (kvisco@intalio.com)
  */
-class OrExpr implements XPathExpression {
+class OrExpr implements BinaryExpr {
 
     
     private static String OR = " or ";
@@ -69,6 +69,28 @@ class OrExpr implements XPathExpression {
     public short getExprType() {
         return XPathExpression.BOOLEAN;
     } //-- getExprType
+    
+    /**
+     * Returns the Expr that should be evaluated as the left hand side
+     * of this BinaryExpr
+     *
+     * @return the Expr that should be evaluated as the left hand side
+     * of this BinaryExpr
+     */
+    public XPathExpression getLeftSide() {
+        return leftExpr;
+    } //-- getLeftSide
+
+    /**
+     * Returns the Expr that should be evaluated as the right hand side
+     * of this BinaryExpr
+     *
+     * @return the Expr that should be evaluated as the right hand side
+     * of this BinaryExpr
+     */
+    public XPathExpression getRightSide() {
+        return rightExpr;
+    } //-- getRightSide
     
     /**
      * Evaluates the expression and returns the XPath result.
