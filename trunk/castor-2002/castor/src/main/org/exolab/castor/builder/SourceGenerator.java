@@ -278,7 +278,7 @@ public class SourceGenerator {
      private static boolean _equalsMethod = false;
 
     /**
-     * Set to true if we generate a 'public static final String' 
+     * Set to true if we generate a 'public static final String'
      * for each element and attribute in a class descriptor
      */
      private static boolean _classDescFieldNames = false;
@@ -905,11 +905,9 @@ public class SourceGenerator {
 
 		if (sInfo.verbose()) {
 		    System.out.print("Creating classes for group: ");
-		    System.out.println(group.getName());
-            if (group.getName() == null) {
-                System.out.println("cannot create classes for unnamed nested groups");
-                return;
-            }
+		    if (group.getName() == null) {
+                System.out.println(sInfo.getGroupNaming().createClassName(group));
+            } else  System.out.println(group.getName());
 		}
 
 		JClass[] classes = sourceFactory.createSourceCode(group, sInfo);
@@ -1049,7 +1047,7 @@ public class SourceGenerator {
      public static void setEqualsMethod(boolean equals) {
          _equalsMethod = equals;
      }
-	 
+
 	/**
      * Returns true if we generate a 'public static final String' for the
      * name of each attribute and element described by the class descriptor
@@ -1074,7 +1072,7 @@ public class SourceGenerator {
          getDefault();
          _classDescFieldNames = classDescFieldNames;
      } //-- setClassDescFieldNames
-	 
+
      /**
       * Returns true if primitive types have to be used
       * as Objects (eg. replacing float by java.lang.Float).
@@ -1185,7 +1183,7 @@ public class SourceGenerator {
         //-- Primitive to Wrapper
         prop = _default.getProperty(Property.Wrapper, "");
         _wrapper = _wrapper || prop.equalsIgnoreCase("true");
-		
+
 		//-- Generate public field names in class descriptors?
 		prop = _default.getProperty( Property.ClassDescFieldNames, "");
 		_classDescFieldNames = prop.equalsIgnoreCase("true");
