@@ -691,7 +691,11 @@ public class ClassMolder {
                 if ( fields[i] != null ) {
                     // use the corresponding Persistent fields as the identity,
                     // and we ask transactionContext in action to load it.
-                    temp = tx.load( fieldEngine, fieldClassMolder, fields[i], suggestedAccessMode );
+                    try {
+                        temp = tx.load( fieldEngine, fieldClassMolder, fields[i], suggestedAccessMode );
+                    } catch (Exception ex) {
+                        temp = null;
+                    }
                     _fhs[i].setValue( object, temp, tx.getClassLoader() );
                 } else {
                     _fhs[i].setValue( object, null, tx.getClassLoader() );
