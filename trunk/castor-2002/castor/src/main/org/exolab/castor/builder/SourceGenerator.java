@@ -1207,8 +1207,10 @@ public class SourceGenerator {
                }
 
                if (type.isPrimitive())
-                  jsc.add(name+"= RandomHelper.getRandom("+name+");");
-               else jsc.add(name+"= RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class);");
+                  jsc.add(name+" = RandomHelper.getRandom("+name+");");
+               else
+                   jsc.add(name+" = ("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class);");
+               jsc.add("");
             }
         }
 
@@ -1217,21 +1219,24 @@ public class SourceGenerator {
         jMethod.setComment("implementation of org.exolab.castor.tests.framework.CastorTestable");
         jclass.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
-        jsc.add("String result = \"DumpFields() for element:"+jclass.getName()+"\";");
+        jsc.add("String result = \"DumpFields() for element: "+jclass.getName()+"\";");
         for (int i = 0; i <fields.length; i++) {
 
             JField temp = fields[i];
             String name = temp.getName();
-            if (temp.getType().isPrimitive())
+            if ( (temp.getType().isPrimitive()) ||
+                 (temp.getType().getName().equals("java.lang.String")))
                   jsc.add("result += \"Field "+name+":\" +"+name+"+\"\\n\";");
             else {
-                jsc.add("if ("+name+" instanceof CastorTestable)");
+                jsc.add("if ("+name+".getClass().isAssignableFrom(CastorTestable.class))");
                 jsc.indent();
                 jsc.add("result += ((CastorTestable)"+name+").dumpFields();");
                 jsc.unindent();
                 jsc.add("else result += \"Field "+name+":\" +"+name+".toString()+\"\\n\";");
             }
+            jsc.add("");
         }
+        jsc.add("");
         jsc.add("return result;");
      }
 
