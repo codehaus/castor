@@ -43,7 +43,7 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.String _timestamp;
 
-    private org.exolab.castor.mapping.xml.types.AccessType _access = org.exolab.castor.mapping.xml.types.AccessType.valueOf("shared");;
+    private org.exolab.castor.mapping.xml.types.AccessType _access = org.exolab.castor.mapping.xml.types.AccessType.valueOf("shared");
 
     private java.lang.String _keyGenerator;
 

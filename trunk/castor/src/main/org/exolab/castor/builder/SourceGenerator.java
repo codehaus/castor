@@ -441,7 +441,7 @@ public class SourceGenerator
         generateSource(source, packageName);
         try {
             reader.close();
-        } catch(java.io.IOException iox) {};
+        } catch(java.io.IOException iox) {}
 
 
     } //-- generateSource

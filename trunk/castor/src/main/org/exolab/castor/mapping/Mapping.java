@@ -660,12 +660,12 @@ public class Mapping
         /* Not used for includes processing */
         public void initialized (Object object) {
             // not used
-        };
+        }
 
         /* Not used for includes processing */
         public void attributesProcessed(Object object) {
             // not used ...
-        };
+        }
 
         /* Not used for includes processing */
         public void fieldAdded (String fieldName, Object parent, Object child) 
