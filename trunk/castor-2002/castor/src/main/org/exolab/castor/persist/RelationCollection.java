@@ -60,8 +60,8 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 
 /**
  * RelationCollection implements {@link java.util.Collection}
- * It is a lazy Colllection. The collection initially contains only the 
- * identities of elements of one type. If any element is needed, it will 
+ * It is a lazy Colllection. The collection initially contains only the
+ * identities of elements of one type. If any element is needed, it will
  * be fetched "on the fly".
  *
  * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
@@ -76,8 +76,8 @@ public class RelationCollection implements Collection, Lazy {
     /**
      * The LockEngine which the elements belong to.
      */
-    private LockEngine _engine;    
-    
+    private LockEngine _engine;
+
     /**
      * The ClassMolder of the elemtns.
      */
@@ -99,7 +99,7 @@ public class RelationCollection implements Collection, Lazy {
     /* Vector of identity */
     private ArrayList _deleted;
 
-    /* Vector of identity */ 
+    /* Vector of identity */
     private ArrayList _added;
 
     /* Vector of object */
@@ -109,13 +109,13 @@ public class RelationCollection implements Collection, Lazy {
     private int _changecount;
 
     /* the number of elements in this collection */
-	private int _size;
+    private int _size;
 
     /**
      * Constructor
      *
-     */ 
-    public RelationCollection( TransactionContext tx, OID enclosing, LockEngine engine, 
+     */
+    public RelationCollection( TransactionContext tx, OID enclosing, LockEngine engine,
             ClassMolder molder, AccessMode amode, ArrayList ids ) {
         _tx = tx;
         _oid = enclosing;
@@ -123,7 +123,7 @@ public class RelationCollection implements Collection, Lazy {
         _engine = engine;
         _accessMode = amode;
         _ids = ids;
-		_size = _ids.size();
+        _size = _ids.size();
         _deleted = new ArrayList();
         _added = new ArrayList();
         _loaded = new HashMap();
@@ -138,19 +138,19 @@ public class RelationCollection implements Collection, Lazy {
                 _deleted.remove( id );
                 _loaded.put( id, o );
                 _changecount++;
-				_size++;
+                _size++;
                 return true;
             } else {
                 return (_loaded.put( id, o )!=o);
             }
         } else {
-            if ( _deleted.contains( id ) ) 
-				throw new RuntimeException("Illegal Internal State.");
+            if ( _deleted.contains( id ) )
+                throw new RuntimeException("Illegal Internal State.");
 
             if ( _added.add( id ) ) {
                 _loaded.put( id, o );
                 _changecount++;
-				_size++;
+                _size++;
                 return true;
             } else {
                 return (_loaded.put( id, o )!=o);
@@ -176,19 +176,19 @@ public class RelationCollection implements Collection, Lazy {
         Object id;
 
         for ( int i=0; i<_ids.size(); i++ ) {
-			id = _ids.get(i);
-			if ( !_deleted.contains(id) ) {
-				_ids.remove(id);
-				_size--;
-			}
+            id = _ids.get(i);
+            if ( !_deleted.contains(id) ) {
+                _ids.remove(id);
+                _size--;
+            }
         }
         for ( int i=0; i<_added.size(); i++ ) {
-			id = _added.get(i);
+            id = _added.get(i);
             _added.remove(id);
-			_size--;
+            _size--;
         }
-		if ( _size != 0 )
-			throw new RuntimeException("Illegal Internal State!");
+        if ( _size != 0 )
+            throw new RuntimeException("Illegal Internal State!");
 
         _changecount++; // need more accurate count?? or it's fine
     }
@@ -205,7 +205,7 @@ public class RelationCollection implements Collection, Lazy {
     public boolean containsAll(Collection c) {
         Object id;
         Iterator it = c.iterator();
-        while ( it.hasNext() ) 
+        while ( it.hasNext() )
             if ( !contains( it.next() ) )
                 return false;
         return true;
@@ -240,31 +240,31 @@ public class RelationCollection implements Collection, Lazy {
                 throw new ConcurrentModificationException("Concurrent Modification is not allowed!");
             if ( cursor >= parent._size )
                 throw new NoSuchElementException("Read after the end of iterator!");
-            
+
             Object id;
             Object o;
             if ( cursor < _added.size() ) {
                 id = _added.get( cursor++ );
-				o = _loaded.get( id );
-				if ( o != null )
-					return o;
+                o = _loaded.get( id );
+                if ( o != null )
+                    return o;
                 return lazyLoad( id );
             } else {
-				// skip to the first "not deleted" id
-				id = _ids.get(cursor++);
-				while ( _deleted.contains(id) ) {
-				    id = _ids.get(cursor++);
-				}
-				o = _loaded.get( id );
-				if ( o != null )
-					return o;
+                // skip to the first "not deleted" id
+                id = _ids.get(cursor++);
+                while ( _deleted.contains(id) ) {
+                    id = _ids.get(cursor++);
+                }
+                o = _loaded.get( id );
+                if ( o != null )
+                    return o;
                 return lazyLoad( id );
             }
         }
         private Object lazyLoad( Object ids ) {
             Object o;
 
-			if ( ! _tx.isOpen() ) 
+            if ( ! _tx.isOpen() )
                 throw new RuntimeException("Transaction is closed!");
 
             try {
@@ -275,7 +275,7 @@ public class RelationCollection implements Collection, Lazy {
                 throw new RuntimeException("Lock Not Granted for lazy loaded object\n"+e);
             } catch ( PersistenceException e ) {
                 throw new RuntimeException("PersistenceException for lazy loaded object\n"+e);
-            } 
+            }
         }
 
         public void remove() {
@@ -288,28 +288,28 @@ public class RelationCollection implements Collection, Lazy {
             cursor--;
             if ( cursor < _added.size() ) {
                 parent._added.remove( cursor );
-				parent._size--;
-				parent._changecount++;
-				changestamp = parent._changecount;
+                parent._size--;
+                parent._changecount++;
+                changestamp = parent._changecount;
             } else {
-				// backward to the first not deleted ids
+                // backward to the first not deleted ids
                 id = _ids.get(cursor);
-				while ( _deleted.contains(id) ) {
-				    id = _ids.get(cursor--);
-				}
-	            if ( cursor < _added.size() ) {
-	                parent._added.remove( id );
-					parent._size--;
-					parent._changecount++;
-					changestamp = parent._changecount;
-				} else {
-					parent._deleted.add( id );
-					parent._size--;
-					parent._changecount++;
-					changestamp = parent._changecount;
-	            }
-	        }
-		}
+                while ( _deleted.contains(id) ) {
+                    id = _ids.get(cursor--);
+                }
+                if ( cursor < _added.size() ) {
+                    parent._added.remove( id );
+                    parent._size--;
+                    parent._changecount++;
+                    changestamp = parent._changecount;
+                } else {
+                    parent._deleted.add( id );
+                    parent._size--;
+                    parent._changecount++;
+                    changestamp = parent._changecount;
+                }
+            }
+        }
     }
 
     public Iterator iterator() {
@@ -326,12 +326,12 @@ public class RelationCollection implements Collection, Lazy {
         if ( _added.contains( id ) ) {
             _added.remove( id );
             _changecount++;
-			_size--;
+            _size--;
             return true;
         } else if ( _ids.contains( id ) ) {
             _deleted.add( id );
             _changecount++;
-			_size--;
+            _size--;
             return true;
         }
 
@@ -373,56 +373,56 @@ public class RelationCollection implements Collection, Lazy {
 
     public Object[] toArray() {
         Object[] result = new Object[size()];
-		Iterator itor = iterator();
+        Iterator itor = iterator();
 
-		while ( itor.hasNext() ) {
-			result = (Object[])itor.next();
-		}
-		return result;
+        while ( itor.hasNext() ) {
+            result = (Object[])itor.next();
+        }
+        return result;
     }
 
     public Object[] toArray(Object[] a) {
-		if ( a == null )
-			throw new NullPointerException();
+        if ( a == null )
+            throw new NullPointerException();
 
         Object[] result;
-		int size = size();
+        int size = size();
 
-		if ( size < a.length )
-			result = a;
-		else 
-			result = (Object[])Array.newInstance( a.getClass().getComponentType(), size );
-		
-		Iterator itor = iterator();
-		int count = 0;
-		while ( itor.hasNext() ) {
-		    result[count++] = itor.next();
-		}
+        if ( size < a.length )
+            result = a;
+        else
+            result = (Object[])Array.newInstance( a.getClass().getComponentType(), size );
 
-		// patch the extra space with null
-		while ( count < result.length ) {
-			result[count++] = null;
-		}
-		return result;
+        Iterator itor = iterator();
+        int count = 0;
+        while ( itor.hasNext() ) {
+            result[count++] = itor.next();
+        }
+
+        // patch the extra space with null
+        while ( count < result.length ) {
+            result[count++] = null;
+        }
+        return result;
     }
 
     public ArrayList getIdentitiesList() {
-		ArrayList result = new ArrayList();
+        ArrayList result = new ArrayList();
         result.addAll(_ids);
-		result.addAll(_added);
-		result.removeAll(_deleted);
-		return result;
+        result.addAll(_added);
+        result.removeAll(_deleted);
+        return result;
     }
 
-	public Object find( Object ids ) {
-		return _loaded.get( ids );
-	}
+    public Object find( Object ids ) {
+        return _loaded.get( ids );
+    }
 
-	public ArrayList getDeleted() {
-		return (ArrayList)_deleted.clone();
-	}
+    public ArrayList getDeleted() {
+        return (ArrayList)_deleted.clone();
+    }
 
-	public ArrayList getAdded() {
-		return (ArrayList)_added.clone();
-	}
+    public ArrayList getAdded() {
+        return (ArrayList)_added.clone();
+    }
 }
