@@ -47,48 +47,77 @@
 package org.exolab.castor.persist.sql;
 
 import java.sql.Types;
+import java.util.HashMap;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
 import org.exolab.castor.persist.types.SQLTypes;
 
 /**
  * This class hold SQL-specific information and is used internally by the bridge layer.
- * It aggregates EntityFieldInfo.
+ * It aggregates EntityInfo.
+ * It follows the Factory pattern and caches instances.
  *
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public class SQLFieldInfo
+public class SQLEntityInfo
 {
+
+    private static HashMap _instances = new HashMap();
+
     /**
-     * The info for the value field;
+     * The info for the table;
      */
-    public final EntityFieldInfo info;
+    public final EntityInfo info;
 
-    public final int[] sqlType;
+    public final SQLFieldInfo[] idInfo;
 
-    public final TypeConvertor[] javaToSql;
+    /**
+     * The array is parallel to info.fieldInfo array, but on positions of join fields there are nulls.
+     */
+    public final SQLFieldInfo[] fieldInfo;
 
-    public final TypeConvertor[] sqlToJava;
+    /**
+     * The array is parallel to info.subEntities array.
+     */
+    public final SQLEntityInfo[] subEntities;
 
-    public SQLFieldInfo(EntityFieldInfo info) throws MappingException {
-        int len = info.fieldNames.length;
-
+    private SQLEntityInfo(EntityInfo info) throws MappingException {
         this.info = info;
-        sqlType = new int[len];
-        javaToSql = new TypeConvertor[len];
-        sqlToJava = new TypeConvertor[len];
-        for (int i = 0; i < len; i++) {
-            sqlType[i] = SQLTypes.getSQLType(info.declaredType[i]);
-            if (info.expectedType[i] != info.declaredType[i]) {
-                javaToSql[i] = SQLTypes.getConvertor(info.expectedType[i], info.declaredType[i]);
-                sqlToJava[i] = SQLTypes.getConvertor(info.declaredType[i], info.expectedType[i]);
+        idInfo = new SQLFieldInfo[info.idInfo.length];
+        for (int i = 0; i < idInfo.length; i++) {
+            idInfo[i] = new SQLFieldInfo(info.idInfo[i]);
+        }
+        fieldInfo = new SQLFieldInfo[info.fieldInfo.length];
+        for (int i = 0; i < fieldInfo.length; i++) {
+            if (!info.fieldInfo[i].join) {
+                fieldInfo[i] = new SQLFieldInfo(info.fieldInfo[i]);
+            }
+        }
+        if (info.subEntities == null) {
+            subEntities = null;
+        } else {
+            subEntities = new SQLEntityInfo[info.subEntities.length];
+            for (int i = 0; i < subEntities.length; i++) {
+                subEntities[i] = SQLEntityInfo.getInstance(info.subEntities[i]);
             }
         }
     }
 
+    public static SQLEntityInfo getInstance(EntityInfo info) throws MappingException {
+        SQLEntityInfo res;
+
+        res = (SQLEntityInfo) _instances.get(info);
+        if (res == null) {
+            res = new SQLEntityInfo(info);
+            _instances.put(info, res);
+        }
+        return res;
+    }
+
     public String toString() {
-        return info.entityClass.entityClass + "." + (info.fieldNames == null ? "null" : info.fieldNames[0]);
+        return info.toString();
     }
 }
