@@ -56,14 +56,15 @@ import java.lang.Math;
 import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.persist.CacheEngine;
-import org.exolab.castor.persist.Cache;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -77,29 +78,39 @@ import org.exolab.exceptions.CWClassConstructorException;
  */
 public class CacheLeakage extends CWTestCase {
 
+    private final static int NUM_OF_CREATE_DELETE = 50;
 
-    private Database       _db;
+    private final static int NUM_OF_READ = 200;
 
+    private final static int NUM_OF_RETRIAL = 20;
 
-    private Connection     _conn;
-
+    private final static int SLEEP_BASE_TIME = 10;
 
     private JDOCategory    _category;
 
+    Database _db;
 
-    static final String    JDBCValue = "jdbc value";
+    Connection _conn;
 
+    String _className;
 
-    static final String    JDOValue = "jdo value";
+    Class _classType;
 
+    int _cacheType;
 
-    static final int CACHE_SIZE = 10; //CacheEngine.DEFAULT_CACHE_VALUE;
+    boolean _errLeak;
 
+    boolean _errCount;
 
-    public CacheLeakage( CWTestCategory category ) throws CWClassConstructorException {
-        super( "TC17", "Cache Leakage" );
+    public CacheLeakage( CWTestCategory category )
+        throws CWClassConstructorException
+    {
+        super( "TC08", "Cache leakage" );
         _category = (JDOCategory) category;
+        _errLeak = false;
+        _errCount = false;
     }
+
 
     public void preExecute()
     {
@@ -112,19 +123,33 @@ public class CacheLeakage extends CWTestCase {
         super.postExecute();
     }
 
-    private int deleteTable( CWVerboseStream stream, Connection conn, String table ) {
-        // Perform direct JDBC access and delete everyting in the table
+    public boolean run( CWVerboseStream stream ) {
         try {
-            int del = _conn.createStatement().executeUpdate( "DELETE FROM "+ table );
-            stream.writeVerbose( "Rows deleted from " + table + ": " + del );
-            _conn.commit();
-            return del;
+            _db = _category.getDatabase( stream.verbose() );
+            _conn = _category.getJDBCConnection();
+
+            boolean result = true;
+            for ( int i=0; i < 4; i++ ) {
+                _cacheType = i;
+                if ( !runOnce( stream ) )
+                    result = false;
+            }
+            _db.close();
+            _conn.close();
+            if ( _errLeak )
+                System.out.println("Element leak happened!");
+            if ( _errCount )
+                System.out.println("Sum do not match!");
+
+            return result && !_errLeak && !_errCount;
         } catch ( Exception e ) {
-            return 0;
+            stream.write( "Error: "+ e );
+            return false;
         }
+
     }
 
-    public boolean run( CWVerboseStream stream ) {
+    public boolean runOnce( CWVerboseStream stream ) {
         OQLQuery      oql;
         TestObjectEx    object;
         Enumeration   enum;
@@ -133,148 +158,43 @@ public class CacheLeakage extends CWTestCase {
         boolean result = true;
 
         try {
-            _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection();
-            _conn.setAutoCommit( false );
-
-            // - delete all row of a table
-            deleteTable( stream, _conn, "test_table_ex" );
-
-            // Open transaction in order to perform JDO operations
-            _db.begin();
-            // - create "cachesize * 2" objects for count limited
-            Object[] ooo = new Object[Math.max(1,CACHE_SIZE*2)];
-            for ( int i=0; i<ooo.length; i++ ) {
-                ooo[i] = new TestObjectEx();
-                _db.create( ooo[i] );
-            }
-
-            int count;
-            int trial = 10;
-            // create the same object again. see if DuplicatedIdentity throws
-            count = 0;
-            for ( int j=0; j<trial; j++ ) {
-                db2 = _category.getDatabase( stream.verbose() );
-                db2.begin();
-
-                // - create "cachesize - 5" objects for count limited
-                for ( int i=0; i<ooo.length; i++ ) {
-                    try {
-                        db2.create( ooo[i] );
-                    } catch ( DuplicateIdentityException e ) {
-                        // good. expected exception throws
-                        count++;
-                    }
-                }
-                db2.commit();
-            }
-
-            if ( count != (ooo.length * trial) ) {
-                result = false;
-                stream.writeVerbose( "Error: some object ate by the cache" );
-            } else {
-                stream.writeVerbose( "all objects in the cache" );
-            }
-
-
-            // - check if each object have the right value
-            stream.writeVerbose( "checking if each object have the right value" );
-            count = 0;
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObjectEx object WHERE id = $1" );
-            breakpoint:
-            for ( int i=0; i<ooo.length; i++ ) {
-                //stream.writeVerbose( "Object identity of " + i + " " + _db.getIdentity(ooo[i]) );
-                oql.bind( i );
-                enum = oql.execute();
-                if ( enum.hasMoreElements() ) {
-                    object = (TestObjectEx) enum.nextElement();
-                    //stream.writeVerbose( "Retrieved object: " + object );
-                    if ( object.getId() != i || object.getIntValue2() != i ) {
-                        System.out.println("selecting for check: "+object.getId());
-                        stream.writeVerbose( "Error: wrong object" );
-                        result = false;
-                        break breakpoint;
-                    }
-
-                    if ( enum.hasMoreElements() ) {
-                        stream.writeVerbose( "Error: two objects with the same id" );
-                        result = false;
-                        break breakpoint;
-                    }
-                } else {
-                    result = false;
-                    stream.writeVerbose( "Error: Object id=" + i + " not exist!" );
-                    break breakpoint;
-                }
-            }
-            _db.commit();
-            if ( count == ooo.length ) {
-                stream.writeVerbose( "all objects has the right value" );
-            }
-
-            stream.writeVerbose( "checking if each object in the database" );
-            // check the database using sql, see if everything is there
-            ResultSet rs = _conn.createStatement().executeQuery( "SELECT * FROM test_table_ex" );
-            int temp = 0;
-            while ( rs.next() ) {
-                temp++;
-            }
+            // clear the table
+            int del = _conn.createStatement().executeUpdate( "DELETE FROM test_race" );
+            stream.writeVerbose( "row deleted in table test_race: " + del );
             _conn.commit();
-            if ( temp != ooo.length ) {
-                result = false;
-                stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
-            } else {
-                stream.writeVerbose( "size match!" );
+
+            switch ( _cacheType ) {
+            case 0:
+                _className = "jdo.TestRaceCount";
+                _classType = jdo.TestRaceCount.class;
+                break;
+            case 1:
+                _className = "jdo.TestRaceTime";
+                _classType = jdo.TestRaceTime.class;
+                break;
+            case 2:
+                _className = "jdo.TestRaceNone";
+                _classType = jdo.TestRaceNone.class;
+                break;
+            case 3:
+                _className = "jdo.TestRaceUnlimited";
+                _classType = jdo.TestRaceUnlimited.class;
+                break;
             }
 
-            stream.writeVerbose( "force the cache to dispose all the object and test if it is still valid" );
-            // force the cache to dispose all the object and test if it is still valid
-            if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_TIME_LIMITED ) {
-                Thread.currentThread().sleep( 1500 * CacheEngine.DEFAULT_CACHE_VALUE );
-                _db.begin();
-                count = 0;
-                // - create "cachesize - 5" objects for count limited
-                for ( int i=0; i<ooo.length; i++ ) {
-                    try {
-                        _db.create( ooo[i] );
-                    } catch ( DuplicateIdentityException e ) {
-                        count++;
-                        stream.writeVerbose( "expected exception: " + e );
-                    }
-                }
-                _db.commit();
+            CreateDeleteThread cdThread = new CreateDeleteThread( stream, _category, _cacheType, NUM_OF_CREATE_DELETE );
 
-                if ( count != ooo.length ) {
-                    result = false;
-                    stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
-                } else {
-                    stream.writeVerbose( "size match!" );
-                }
-            } else if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_COUNT_LIMITED ) {
-                _db.begin();
-                count = 0;
-                // - create "cachesize - 5" objects for count limited
-                for ( int i=0; i<ooo.length; i++ ) {
-                    try {
-                        _db.create( ooo[i] );
-                    } catch ( DuplicateIdentityException e ) {
-                        count++;
-                        stream.writeVerbose( "expected exception: " + e );
-                    }
-                }
-                _db.commit();
+            ReadThread rThread =  new ReadThread( stream, cdThread, _category, NUM_OF_READ );
 
-                if ( count != ooo.length ) {
-                    result = false;
-                    stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
-                } else {
-                    stream.writeVerbose( "size match!" );
-                }
+            cdThread.start();
+            rThread.start();
+
+            while ( !cdThread.isDone() /*&& !rThread.isDone()*/ ) {
+                Thread.currentThread().sleep( 500 );
             }
-
-            _db.close();
-            _conn.close();
-
+            
+            // create threads, make a race so each thread
+            // keeping increment to the pairs of number.
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
@@ -282,5 +202,243 @@ public class CacheLeakage extends CWTestCase {
         }
         return result;
     }
+    class ReadThread extends Thread {
+        Database db;
+        int trial;
+        int cachetype;
+        boolean isDone;
+        Random ran;
+        Integer id = new Integer(5);
+        CWVerboseStream stream;
+        CreateDeleteThread other;
+        ReadThread( CWVerboseStream stream, CreateDeleteThread other, JDOCategory c, int n ) throws Exception {
+            this.db = c.getDatabase( stream.verbose() );
+            this.trial = n;
+            this.stream = stream;
+            this.ran = new Random();
+            this.other = other;
+        }
+        public void run() {
+            boolean succeed;
+            int trials = 0;
+            TestRace tr;
+            try {
+                for ( int i=0; i < trial && !other.isDone(); i++ ) {
+                    try {
+                        // load it and modify it
+                        System.out.println("load it and modify it");
+                        db.begin();
+                        succeed = false;
+                        trials = 0;
+                        while ( !succeed && trials < NUM_OF_RETRIAL && !other.isDone() ) {
+                            trials++;
+                            try {
+                                tr = (TestRace) db.load( _classType, id, Database.Shared );
+                                                    // may throw ObjectNotFoundException
+                                                    // LockNotGrantedException
+                                db.commit();
+                                succeed = true;
+                            } catch ( LockNotGrantedException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            } catch ( ObjectNotFoundException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            } catch ( TransactionAbortedException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            }
+                            Thread.currentThread().sleep( 0 );
+                        }
+                        if ( db.isActive() ) 
+                            db.rollback();
+                    
+                    } catch ( Exception e ) {
+                    }
+                }
+            } finally {
+                isDone = true;
+            }
+        }
+        boolean isDone() {
+            return isDone;
+        }
+    }
+    class CreateDeleteThread extends Thread {
+        Database db;
+        int trial;
+        boolean isDone;
+        Random ran;
+        CWVerboseStream stream;
+        int cachetype;
+
+        CreateDeleteThread( CWVerboseStream stream, JDOCategory c, int cachetype, int n ) throws Exception {
+            this.db = c.getDatabase( stream.verbose() );
+            this.trial = n;
+            this.stream = stream;
+            this.ran = new Random();
+            this.cachetype = cachetype;
+        }
+        public void run() {
+            try {
+                int num = 0;
+                stream.writeVerbose("start testing");
+                TestRace tr;
+                TestRace testrace;
+                OQLQuery oql;
+                QueryResults qr;
+                boolean succeed;
+                int trials;
+                Integer id = new Integer(5);
+
+                out:
+                for ( int i=0; i<trial; i++ ) {
+                    // create, modified, delete object
+                    try {
+                        switch ( cachetype ) {
+                        case 0:
+                            testrace = new TestRaceCount();
+                            testrace.setId(5);
+                            break;
+                        case 1:
+                            testrace = new TestRaceTime();
+                            testrace.setId(5);
+                            break;
+                        case 2:
+                            testrace = new TestRaceNone();
+                            testrace.setId(5);
+                            break;
+                        case 3:
+                            testrace = new TestRaceUnlimited();
+                            testrace.setId(5);
+                            break;
+                        default:
+                            testrace = null;
+                        }
+     
+                        // create object
+                        //try {
+                            db.begin();
+                            db.create( testrace );  // may throw duplicateIdentityException
+                            db.commit();
+                        //} catch ( Exception e ) {
+                        //    e.printStackTrace();
+                        //}
+
+                        // load it and modify it
+                        succeed = false;
+                        trials = 0;
+                        while ( !succeed && trials < NUM_OF_RETRIAL ) {
+                            Thread.currentThread().sleep( 0 );
+                            trials++;
+                            try {
+                                db.begin();
+                                tr = (TestRace) db.load( _classType, id );
+                                                    // may throw ObjectNotFoundException
+                                                    // LockNotGrantedException
+                                tr.incValue1();
+                                db.commit();
+                                succeed = true;
+                            } catch ( LockNotGrantedException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                if ( db.isActive() ) db.rollback();
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            } catch ( TransactionAbortedException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                if ( db.isActive() ) db.rollback();
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            } 
+                        }
+                        if ( db.isActive() ) 
+                            db.rollback();
+
+                        // load it and release it
+                        succeed = false;
+                        trials = 0;
+                        while ( !succeed && trials < NUM_OF_RETRIAL ) {
+                            Thread.currentThread().sleep( 0 );
+                            trials++;
+                            try {
+                                db.begin();
+                                tr = (TestRace) db.load( _classType, id );
+                                                    // may throw ObjectNotFoundException
+                                                    // LockNotGrantedException
+                                db.commit();
+                                succeed = true;
+                            } catch ( LockNotGrantedException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                if ( db.isActive() ) db.rollback();
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            } 
+                        }
+                        if ( db.isActive() ) 
+                            db.rollback();
+
+                        // load it and delete it
+                        succeed = false;
+                        trials = 0;
+                        while ( !succeed && trials < NUM_OF_RETRIAL ) {
+                            Thread.currentThread().sleep( 0 );
+                            trials++;    
+                            try {
+                                db.begin();
+                                tr = (TestRace) db.load( _classType, id );
+                                                // may throw ObjectNotFoundException
+                                                // LockNotGrantedException
+                                db.remove( tr );
+                                db.commit();
+                                succeed = true;
+                            } catch ( LockNotGrantedException e ) {
+                                succeed = false;
+                                if ( db.isActive() ) db.rollback();
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            } catch ( TransactionAbortedException e ) {
+                                succeed = false;
+                                // ethernet way of retry
+                                if ( db.isActive() ) db.rollback();
+                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                            }
+                        }
+                        if ( db.isActive() ) 
+                            db.rollback();
+                        if ( !succeed )
+                            throw new Exception("Transaction can't not lock the object within "+trials+" trials");
+
+                    } catch ( TransactionNotInProgressException e ) {
+                        stream.writeVerbose( "Thread <CreateDelete> will be killed. Unexcepted exception: "+e.getException() );
+                        e.printStackTrace();
+                        if ( db.isActive() ) try { db.rollback(); } catch ( TransactionNotInProgressException ee ) {}
+                        _errLeak = true;
+                        break out;
+                    } catch ( PersistenceException e ) {
+                        stream.writeVerbose( "Thread <CreateDelete> will be killed. Unexcepted exception: " );
+                        e.printStackTrace();
+                        if ( db.isActive() ) try { db.rollback(); } catch ( TransactionNotInProgressException ee ) {}
+                        _errLeak = true;
+                        break out;
+                    } catch ( Exception e ) {
+                        stream.writeVerbose( "Thread <CreateDelete> will be killed. Element not found: other exception: "+e );
+                        e.printStackTrace();
+                        if ( db.isActive() ) try { db.rollback(); } catch ( TransactionNotInProgressException ee ) {}
+                        _errLeak = true;
+                        break out;
+                    }
+                }
+
+            } finally {
+                isDone = true;
+            }
+        }
+        boolean isDone() {
+            return isDone;
+        }
+    }
 }
+
 
