@@ -48,7 +48,8 @@ package org.exolab.castor.dax.engine;
 
 
 import netscape.ldap.LDAPConnection;
-import org.exolab.castor.persist.CacheEngine;
+import javax.transaction.xa.Xid;
+import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.TransactionContext;
 
 
@@ -71,6 +72,13 @@ final class TransactionContextImpl
     }
 
 
+    public TransactionContextImpl( LDAPConnection conn, Xid xid )
+    {
+	super( xid );
+	_conn = conn;
+    }
+
+
     protected void commitConnections( boolean keepOpen )
     {
     }
@@ -81,7 +89,7 @@ final class TransactionContextImpl
     }
 
 
-    public Object getConnection( CacheEngine cache )
+    public Object getConnection( PersistenceEngine engine )
     {
 	return _conn;
     }
