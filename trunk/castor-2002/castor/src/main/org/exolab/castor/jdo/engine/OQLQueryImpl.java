@@ -54,7 +54,9 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
@@ -70,7 +72,7 @@ import org.exolab.castor.jdo.oql.ParseTreeNode;
 import org.exolab.castor.jdo.oql.ParseTreeWalker;
 import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.QueryResults;
+//import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.mapping.AccessMode;
@@ -92,7 +94,7 @@ import org.exolab.castor.util.Logger;
  * @version $Revision$ $Date$
  */
 public class OQLQueryImpl
-    implements OQLQuery
+    implements Query, OQLQuery
 {
 
 
@@ -367,14 +369,14 @@ public class OQLQueryImpl
     }
     
    
-    public Enumeration execute()
+    public QueryResults execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         return execute( null );
     }
 
 
-    public Enumeration execute( short accessMode )
+    public QueryResults execute( short accessMode )
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         switch ( accessMode ) {
@@ -392,10 +394,10 @@ public class OQLQueryImpl
     }
 
 
-    private Enumeration execute( AccessMode accessMode )
+    private QueryResults execute( AccessMode accessMode )
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
-        QueryResults      results;
+        org.exolab.castor.persist.QueryResults      results;
         PersistenceQuery  query;
         SQLEngine         engine;
         
@@ -426,17 +428,17 @@ public class OQLQueryImpl
         
 
     static class OQLEnumeration
-        implements Enumeration
+        implements QueryResults, Enumeration
     {
 
         
         private Object       _lastObject;
 
 
-        private QueryResults _results;
+        private org.exolab.castor.persist.QueryResults _results;
 
 
-        OQLEnumeration( QueryResults results )
+        OQLEnumeration( org.exolab.castor.persist.QueryResults results )
         {
             _results = results;
         }
@@ -476,7 +478,12 @@ public class OQLQueryImpl
                         _lastObject = _results.fetch();
                         if ( _lastObject != null )
                             break;
+                    } catch ( ObjectNotFoundException except ) {
+                        // Object not found, deleted, etc. Just skip to next one.
+                        identity = _results.nextIdentity();
                     } catch ( PersistenceException except ) {
+                        // Error occured. If not throwing exception just skip to
+                        // next object.
                         identity = _results.nextIdentity();
                         if ( ! skipError )
                             throw except;
@@ -508,7 +515,7 @@ public class OQLQueryImpl
         }
 
 
-        private Object next()
+        public Object next()
             throws PersistenceException, NoSuchElementException
         {
             return next( false );
@@ -538,7 +545,11 @@ public class OQLQueryImpl
                         result = _results.fetch();
                         if ( result != null )
                             return result;
+                    } catch ( ObjectNotFoundException except ) {
+                        // Object not found, deleted, etc. Just skip to next one.
                     } catch ( PersistenceException except ) {
+                        // Error occured. If not throwing exception just skip to
+                        // next object.
                         if ( ! skipError )
                             throw except;
                     }

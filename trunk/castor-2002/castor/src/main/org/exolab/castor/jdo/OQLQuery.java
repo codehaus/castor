@@ -47,9 +47,6 @@
 package org.exolab.castor.jdo;
 
 
-import java.util.Enumeration;
-
-
 /**
  * An OQL query object. Obtained from the database and used to
  * construct and execute a query on that database. All query operations
@@ -66,24 +63,25 @@ import java.util.Enumeration;
  * <p>
  * For example:
  * <pre>
- * OQLQuery    oql;
+ * Query       oql;
  * Enumeration enum;
  *
  * <font color="red">// Construct a new query and bind the id value</font>
- * oql = db.getOQLQuery( "SELECT ... WHERE id=$" );
+ * oql = db.getQuery( "SELECT ... WHERE id=$" );
  * oql.bind( 5 );
  * enum = oql.execute();
  * <font color="red">// Iterate over all the results and print them</font>
- * while ( enum.hasMoreElements() ) {
- *   System.out.println( enum.nextElement(); );
+ * while ( enum.hasMore() ) {
+ *   System.out.println( enum.next(); );
  * }
  * </pre>
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see Database#getOQLQuery
+ * @see Query
  */
 public interface OQLQuery
+    extends Query
 {
 
 
@@ -97,146 +95,11 @@ public interface OQLQuery
         throws QueryException;
 
 
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( Object value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( boolean value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( short value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( int value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( long value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( float value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
-    public void bind( double value )
-      throws IllegalArgumentException;
-
-
-    /**
-     * Execute the query. The query is executed returning an enumeration
-     * of all the objects found. If no objects were found, the
-     * enumeration will be empty.
-     * <p>
-     * After execution the parameter list is reset. New parameters can
-     * be bound and the query re-executed.
-     *
-     * @return An enumeration of all objects found
-     * @throws QueryException The query expression cannot be processed,
-     *  or the query parameters are invalid
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public Enumeration execute()
-        throws QueryException, PersistenceException, TransactionNotInProgressException;
-
-
-    /**
-     * <b>Experimental</b>
-     * <p>
-     * Execute the query. The query is executed returning an enumeration
-     * of all the objects found. If no objects were found, the
-     * enumeration will be empty.
-     * <p>
-     * After execution the parameter list is reset. New parameters can
-     * be bound and the query re-executed.
-     *
-     * @param accessMode The access mode
-     * @return An enumeration of all objects found
-     * @throws QueryException The query expression cannot be processed,
-     *  or the query parameters are invalid
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public Enumeration execute( short accessMode )
-        throws QueryException, PersistenceException, TransactionNotInProgressException;
-
-
 }
+
+
+
+
+
+
 
