@@ -213,7 +213,7 @@ abstract class LRU {
      *
      * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
-	public static class CountLimited extends LRU {
+	private static class CountLimited extends LRU {
 
 		private final static int LRU_OLD = 0;
 		private final static int LRU_NEW = 1;
@@ -571,7 +571,7 @@ abstract class LRU {
      *
      * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
-	public static class NoCache extends LRU {
+	private static class NoCache extends LRU {
 
         /**
          * Maps the specified <code>key</code> to the specified 
@@ -657,7 +657,7 @@ abstract class LRU {
      *
      * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
 	 */
-	public static class TimeLimited extends LRU {
+	private static class TimeLimited extends LRU {
 		/**
 		 *	The Default precision in millisecond is 1000. Percision is the interval 
 		 *  between each time which the timer thread will wake up and trigger 
@@ -1073,7 +1073,7 @@ abstract class LRU {
 	 * <p>
      * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
-	public static class Unlimited extends LRU {
+	private static class Unlimited extends LRU {
 		private Hashtable map = new Hashtable();
 
 		/**
