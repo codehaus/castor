@@ -252,14 +252,17 @@ public abstract class TransactionContext
      * The derived class must implement this method and commit all the
      * connections used in this transaction. If the <tt>keepOpen</tt>
      * flag is true, the connections must remain open. Otherwise, the
-     * connections may be closed.
+     * connections may be closed. If the transaction could not commit
+     * fully or partially, this method will throw an {@link
+     * TransactionAbortedException}, causing a rollback to occur as
+     * the next step.
      *
      * @param keepOpen True if connections should be kept open
-     * @throws PersistenceException An error occured talking to the
-     *   persistence engine
+     * @throws TransactionAbortedException The transaction could not
+     *  commit fully or partially and should be rolled back
      */
     protected abstract void commitConnections( boolean keepOpen )
-	throws PersistenceException;
+	throws TransactionAbortedException;
 
 
     /**
@@ -742,6 +745,8 @@ public abstract class TransactionContext
 	    // Any error that happens, we're going to rollback the transaction.
 	    _status = Status.STATUS_MARKED_ROLLBACK;
 	    rollback();
+	    if ( except instanceof TransactionAbortedException )
+		throw (TransactionAbortedException) except;
 	    throw new TransactionAbortedException( except );
 	}
     }
