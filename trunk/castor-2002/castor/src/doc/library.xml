@@ -13,8 +13,8 @@
         Java Data Objects Specification</a></li>
       <li><a href="http://java.sun.com/products/jdbc">JDBC 2.0 and standard extensions</a></li>
       <li><a href="http://www.mozilla.org/directory">The Mozilla Directory SDK</a></li>
-      <li><a href="./SourceGenerator.pdf">The Source Generator User documentation</a></li>
-      <li><a href="./ExolabJavaConventions.pdf">The Exolab guidelines for writing Java code</a></li>
+      <li><a href="./SourceGeneratorUser.pdf">The Source Generator User documentation</a></li>
+      <li><a href="./ExolabJavaConventions.pdf">The Exolab guidelines for Java developers</a></li>
     </ul>
     </header>
   </body>

@@ -19,18 +19,16 @@
     <title>Using the Source Code Generator</title>
     <header>
       <p>Reference: <api package="org.exolab.castor.builder">The Source Builder API</api></p>
-      <p>For a more detailled version of the Source Generator documentation, download the 
-      <a href="./SourceGeneratorUser.pdf">
-        Source Generator User Document(PDF).</a></p>
+      <p>For a more detailed version of the Source Generator documentation, please download the 
+      <a href="./SourceGeneratorUser.pdf">Source Generator User Document(PDF).</a></p>
     </header>
     
     <section title="Introduction">
 
-      <p>Castor's source code generator creates a set of Java classes
+      <p>Castor's Source Code Generator creates a set of Java classes
          which represent an object model for an XML Schema
-         (W3C XML Schema, 200001024 Candidate Recommendation)<sup>1</sup>, as well as the
-         necessary Class Descriptors used by the
-         <a href="xml-framework.xml">marshalling framework</a>
+         (W3C XML Schema, 20010502 Recommendation)<sup>1</sup>, as well as the
+         necessary Class Descriptors used by the <a href="xml-framework.xml">marshalling framework</a>
          to obtain information about the generated classes.
          <note>
             Currently the generated source files will need to be compiled. We
@@ -128,7 +126,7 @@
                <td>Optional</td>
              </tr>
 			 <tr>
-               <td align="center">test</td><td><br/></td>
+               <td align="center">testable</td><td><br/></td>
                <td>
                   Generate the specific methods used by the Castor Marshalling Framework
                 </td>
@@ -163,14 +161,12 @@
             <p>To enable bound properties uncomment the appropriate line in the
                "org/exolab/castor/builder/castorbuilder.properties" file:
                <code>
-                  <comment>
     # To enable bound properties uncomment the following line. Please
     # note that currently *all* fields will be treated as bound properties
     # when enabled. This will change in the future when we introduce
     # fine grained control over each class and it's properties.
     #
     #org.exolab.castor.builder.boundproperties=true
-                  </comment>
                </code>
                <p>
                   When enabled, <b>all</b> properties will be treated as bound properties.
@@ -262,6 +258,23 @@
         </section>
         
        
+        <section title="Map XML namespaceS to Java packages">
+            <p>Since version: 0.9.0</p>
+            <p>
+                An XML Schema grammar is identified by a namespace. For data-binding purpose
+                it may be convenient to map namespaces to Java packages.
+            </p>
+            <p> To allow the mapping between namespaces and Java packages , edit the castorbuilder.properties file :
+            <code>
+	 # XML namespace mapping to Java packages
+         #
+         #org.exolab.castor.builder.nspackages=\
+               http://www.xyz.com/schemas/project=com.xyz.schemas.project,\
+               http://www.xyz.com/schemas/person=com.xyz.schemas.person
+            </code>
+            </p>
+        </section>
+        
         <section title="Generate equals() method">
             <p>Since version: 0.9.1</p>
             <p>
