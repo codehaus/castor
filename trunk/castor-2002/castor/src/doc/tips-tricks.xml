@@ -107,7 +107,17 @@ org.exolab.castor.indent=true
       <p>Use partial views with care. If you attempt to load the same record using a full
          object and a subset object, changes to one of these objects are allowed, but
          changes to both will result in a conflict and roll back the transaction.
-         Locking will not work properly between full and subset objects.</p>
+         Locking will not work properly between full and subset objects.
+         Also note, that each of the too objects will have its own cache, so
+         if you update the first object and load the second, you may obtain old values.
+         To avoid this situation you may turn off the cache for both objects:
+         <code><![CDATA[
+             <class ... >
+                <cache-type type="none">
+                ...
+             </class>
+         ]]></code>
+         </p>
 
     </section>
 
