@@ -58,7 +58,6 @@ import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.*;
-import org.exolab.castor.xml.ClassDescriptorEnumeration;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
@@ -687,12 +686,72 @@ public class Marshaller extends MarshalFramework {
                 return;
             }
         }
-         //-- Suppress 'xsi:type' attributes when Castor is able to infer the
-         //-- information from the mapping file
-         //-- XXXX Date fix
-         if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
-             saveType = false;
-         //-- XXXX end Date fix
+
+
+        //-- Suppress 'xsi:type' attributes when Castor is able to infer the
+        //-- information from the mapping file
+        //-- XXXX Date fix
+        if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
+            saveType = false;
+        //-- XXXX end Date fix
+        if (saveType) {
+
+            // XML Name associated with the class we are marshalling
+            String xmlElementName = classDesc.getXMLName();
+            // We try to find if there is a XMLClassDescriptor associated
+            // with the XML name of this class
+            XMLClassDescriptor xmlElementNameClassDesc =
+                _cdResolver.resolveByXMLName(xmlElementName, null, null);
+            // Make sure ClassDescriptor was not created by the introspector
+            if (xmlElementNameClassDesc != null &&
+                ! (Introspector.introspected(xmlElementNameClassDesc)))
+            {
+
+                // Make sure Castor can unmarshal instances of this type
+                // by using the element name by checking that the
+                // ClassDescriptorResolver can find a ClassDescriptor for the
+                // same java type (or a subclass) as the current object.
+                // This mechanism should be equivalent to the one performed
+                // during unmarshalling (UnmarshalHandler).
+
+                //-- This approach is not fool proof however, since it
+                //-- may require the same mapping file or
+                //-- ClassDescriptorResolver to be used during unmarshalling.
+
+                // Try to find if the type of the field is a super class of the
+                // class returned by the class resolver.
+                Class fieldType = descriptor.getFieldType();
+                ClassDescriptor superclass = xmlElementNameClassDesc.getExtends();
+                while ((superclass != null)  &&  (superclass.getJavaClass() != fieldType))
+                    superclass = superclass.getExtends();
+
+                // here, superclass is null if we didn't find that
+                // xmlElementNameClassDesc extends the type of field
+
+                // The 'isAssignableFrom' is a security, Castor should have detected
+                // a problem with the 'extends' already.
+                if (fieldType.isAssignableFrom(xmlElementNameClassDesc.getJavaClass()) &&
+                    (xmlElementNameClassDesc.getJavaClass() == fieldType ||
+                     (superclass != null  &&  superclass.getJavaClass() == fieldType))) {
+                    // If the test is true, we know that Castor is able to
+                    // find the proper class to instantiate using the element
+                    // name so we don't need the 'xsi:type' attribute
+                    saveType = false;
+                    name     = xmlElementName;
+                }
+            }
+            if (xmlElementName == null) {
+                //in case we are dealing with field and not class
+                //make sure we don't have a provided class descriptor
+                //if we have one we don't need the xsi:type
+                if (descriptor.getContainingClassDescriptor() != null) {
+                    xmlElementNameClassDesc =
+                        (XMLClassDescriptor)descriptor.getContainingClassDescriptor();
+                    if (!Introspector.introspected(xmlElementNameClassDesc))
+                        saveType = false;
+               }
+            }
+        }//--- End of "Supress 'xsi:type' ..."
 
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();
