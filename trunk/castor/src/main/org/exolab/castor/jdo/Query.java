@@ -47,7 +47,6 @@
 package org.exolab.castor.jdo;
 
 
-import java.util.Enumeration;
 
 
 /**

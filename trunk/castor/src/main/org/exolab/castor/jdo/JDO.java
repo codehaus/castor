@@ -56,15 +56,14 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
-import javax.naming.spi.ObjectFactory;
 import javax.naming.StringRefAddr;
+import javax.naming.spi.ObjectFactory;
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
@@ -80,7 +79,6 @@ import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
-
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
