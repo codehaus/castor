@@ -63,6 +63,7 @@ import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.mapping.xml.KeyGeneratorDef;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.DTDResolver;
 
@@ -416,9 +417,16 @@ public class Mapping
             if ( _logWriter != null )
                 unm.setLogWriter( _logWriter );
             loaded = (MappingRoot) unm.unmarshal( source );
+            // gather "class" tags
             enum = loaded.enumerateClassMapping();
             while ( enum.hasMoreElements() )
                 _mapping.addClassMapping( (ClassMapping) enum.nextElement() );
+
+            // gather "key-generator" tags
+            enum = loaded.enumerateKeyGeneratorDef();
+            while ( enum.hasMoreElements() ) {
+                _mapping.addKeyGeneratorDef( (KeyGeneratorDef) enum.nextElement() );
+            }
 
             // Load all the included mapping by reference
             Enumeration   includes;

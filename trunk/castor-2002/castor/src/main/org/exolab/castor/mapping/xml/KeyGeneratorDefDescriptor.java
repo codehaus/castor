@@ -22,7 +22,7 @@ import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
  * 
  * @version $Revision$ $Date$
 **/
-public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
+public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
 
 
       //--------------------/
@@ -48,32 +48,29 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
      //- Constructors -/
     //----------------/
 
-    public MappingRootDescriptor() {
-        xmlName = "mapping-root";
+    public KeyGeneratorDefDescriptor() {
+        xmlName = "key-generator";
         XMLFieldDescriptorImpl desc = null;
         XMLFieldHandler handler = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[0];
-        //-- initialize element descriptors
-        
-        elements = new XMLFieldDescriptorImpl[4];
-        //-- _description
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
+        attributes = new XMLFieldDescriptorImpl[2];
+        //-- _alias
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_alias", "alias", NodeType.Attribute);
         desc.setImmutable(true);
-        handler = (new XMLFieldHandler() {
+        desc.setHandler( new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
-                MappingRoot target = (MappingRoot) object;
-                return target.getDescription();
+                KeyGeneratorDef target = (KeyGeneratorDef) object;
+                return target.getAlias();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.setDescription( (java.lang.String) value);
+                    KeyGeneratorDef target = (KeyGeneratorDef) object;
+                    target.setAlias( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -83,96 +80,68 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                 return null;
             }
         } );
+        attributes[0] = desc;
+        
+        //-- _name
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
+        this.identity = desc;
+        desc.setHandler( new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                KeyGeneratorDef target = (KeyGeneratorDef) object;
+                return target.getName();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    KeyGeneratorDef target = (KeyGeneratorDef) object;
+                    target.setName( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setRequired(true);
+        attributes[1] = desc;
+        
+        //-- initialize element descriptors
+        
+        elements = new XMLFieldDescriptorImpl[1];
+        //-- _paramList
+        desc = new XMLFieldDescriptorImpl(Param.class, "_paramList", "param", NodeType.Element);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                KeyGeneratorDef target = (KeyGeneratorDef) object;
+                return target.getParam();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    KeyGeneratorDef target = (KeyGeneratorDef) object;
+                    target.addParam( (Param) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new Param();
+            }
+        } );
         desc.setHandler(handler);
-        desc.setMultivalued(false);
+        desc.setMultivalued(true);
         elements[0] = desc;
         
-        //-- _includeList
-        desc = new XMLFieldDescriptorImpl(Include.class, "_includeList", "include", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                MappingRoot target = (MappingRoot) object;
-                return target.getInclude();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.addInclude( (Include) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new Include();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(true);
-        elements[1] = desc;
-        
-        //-- _classMappingList
-        desc = new XMLFieldDescriptorImpl(ClassMapping.class, "_classMappingList", "class", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                MappingRoot target = (MappingRoot) object;
-                return target.getClassMapping();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.addClassMapping( (ClassMapping) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new ClassMapping();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        desc.setMultivalued(true);
-        elements[2] = desc;
-        
-        //-- _keyGeneratorDefList
-        desc = new XMLFieldDescriptorImpl(KeyGeneratorDef.class, "_keyGeneratorDefList", "key-generator", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                MappingRoot target = (MappingRoot) object;
-                return target.getKeyGeneratorDef();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.addKeyGeneratorDef( (KeyGeneratorDef) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new KeyGeneratorDef();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(true);
-        elements[3] = desc;
-        
-    } //-- org.exolab.castor.mapping.xml.MappingRootDescriptor()
+    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDefDescriptor()
 
 
       //-----------/
@@ -237,7 +206,7 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
     /**
     **/
     public java.lang.Class getJavaClass() {
-        return org.exolab.castor.mapping.xml.MappingRoot.class;
+        return org.exolab.castor.mapping.xml.KeyGeneratorDef.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**

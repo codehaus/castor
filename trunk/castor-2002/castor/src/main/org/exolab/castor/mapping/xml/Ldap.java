@@ -53,11 +53,67 @@ public class Ldap implements java.io.Serializable {
     } //-- java.lang.String getName() 
 
     /**
+    **/
+    public boolean isValid() {
+        try {
+            validate();
+        }
+        catch (org.exolab.castor.xml.ValidationException vex) {
+            return false;
+        }
+        return true;
+    } //-- boolean isValid() 
+
+    /**
+     * 
+     * @param out
+    **/
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * 
+     * @param handler
+    **/
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
+
+    /**
      * 
      * @param _name
     **/
     public void setName(java.lang.String _name) {
         this._name = _name;
     } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param reader
+    **/
+    public static org.exolab.castor.mapping.xml.Ldap unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.mapping.xml.Ldap) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Ldap.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Ldap unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

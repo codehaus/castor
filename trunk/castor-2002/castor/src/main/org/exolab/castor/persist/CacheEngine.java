@@ -51,6 +51,7 @@ package org.exolab.castor.persist;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Properties;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -60,11 +61,15 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.engine.GenericFactory;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
+import org.exolab.castor.persist.spi.KeyGenerator;
+import org.exolab.castor.persist.spi.KeyGeneratorFactory;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -183,7 +188,6 @@ public final class CacheEngine
         _factory = null;
     }
 
-
     /**
      * Used by the constructor and {@link ClassHandler} to create a
      * new class handler and register it. The class handler must be
@@ -198,8 +202,8 @@ public final class CacheEngine
         // If a handler exists for the class, return it, otherwise create a new one.
         handler = (ClassHandler) _handlers.get( javaClass );
         if ( handler == null ) {
-            ClassDescriptor clsDesc;
-            Persistence     persist;
+            ClassDescriptor     clsDesc;
+            Persistence         persist;
 
             clsDesc = _mapResolver.getDescriptor( javaClass );
             if ( clsDesc != null ) {
@@ -212,6 +216,10 @@ public final class CacheEngine
                 // Create a new persistence engine for that type and add the type info
                 persist = _factory.getPersistence( handler.getDescriptor(), _logInterceptor );
                 if ( persist != null ) {
+                    boolean createReturnsIdentity;
+
+                    createReturnsIdentity = (_factory instanceof GenericFactory);
+
                     // At this point the extends typeInfo has been registered, so we know
                     // it exists. We need the extends in order to share cache between objects
                     // in the same heirarchy.
@@ -226,10 +234,14 @@ public final class CacheEngine
                         if ( typeInfo == null ) {
                             if ( _logInterceptor != null )
                                 _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
-                        } else
-                            _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, typeInfo.cache ) );
-                    } else
-                        _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, new Cache() ) );
+                        } else {
+                            _typeInfo.put( handler.getJavaClass(),
+                                    new TypeInfo( handler, persist, typeInfo.cache, createReturnsIdentity ) );
+                        }
+                    } else {
+                        _typeInfo.put( handler.getJavaClass(),
+                                new TypeInfo( handler, persist, new Cache(), createReturnsIdentity ) );
+                    }
                 } else if ( _logInterceptor != null )
                     _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
             }
@@ -618,7 +630,13 @@ public final class CacheEngine
                 if ( _logInterceptor != null )
                     _logInterceptor.creating( typeInfo.javaClass, identity );
                 //  Create the object in persistent storage acquiring a lock on the object.
-                oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), fields, identity ) );
+                Object ret = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
+                if (typeInfo.createReturnsIdentity) {
+                    typeInfo.handler.setIdentity( object, ret );
+                    oid = new OID( typeInfo.handler, ret );
+                } else {
+                    oid.setStamp( ret );
+                }
                 oid.setDbLock( true );
             }
 
@@ -906,15 +924,15 @@ public final class CacheEngine
                 } else {
 
                     Enumeration enum;
-		    Object[]    origIdentity;
+            Object[]    origIdentity;
 
                     enum = (Enumeration) relations[ i ].getRelated( object );
-		    if ( original[ i ] == null )
-			origIdentity = new Object[ 0 ];
-		    else {
-			origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
-			( (Vector) original[ i ] ).copyInto( origIdentity );
-		    }
+            if ( original[ i ] == null )
+            origIdentity = new Object[ 0 ];
+            else {
+            origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
+            ( (Vector) original[ i ] ).copyInto( origIdentity );
+            }
                     if ( enum != null ) {
                         while ( enum.hasMoreElements() ) {
                             Object related;
@@ -923,21 +941,21 @@ public final class CacheEngine
                             related = enum.nextElement();
                             if ( related != null ) {
                                 relIdentity = relations[ i ].getIdentity( related );
-				for ( int j = 0 ; j < origIdentity.length ; ++j ) {
-				    if ( origIdentity[ j ] != null &&
-					 origIdentity[ j ].equals( relIdentity ) ) {
-					if ( ! tx.isPersistent( related ) )
-					    tx.create( this, related, relIdentity );
-					origIdentity[ j ] = null;
-				    }
+                for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+                    if ( origIdentity[ j ] != null &&
+                     origIdentity[ j ].equals( relIdentity ) ) {
+                    if ( ! tx.isPersistent( related ) )
+                        tx.create( this, related, relIdentity );
+                    origIdentity[ j ] = null;
+                    }
                                 }
                             }
                         }
                     }
                     if ( relations[ i ].isAttached() ) {
                         for ( int j = 0 ; j < origIdentity.length ; ++j )
-			    if ( origIdentity[ j ] != null )
-				tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
+                if ( origIdentity[ j ] != null )
+                tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
                     }
 
                 }
@@ -1242,6 +1260,7 @@ public final class CacheEngine
     }
 
 
+
     /**
      * Provides information about an object of a specific type
      * (class). This information includes the object's descriptor and
@@ -1271,12 +1290,18 @@ public final class CacheEngine
          */
         final Cache        cache;
 
-        TypeInfo( ClassHandler handler, Persistence persist, Cache cache )
+
+        final boolean      createReturnsIdentity;
+
+
+        TypeInfo( ClassHandler handler, Persistence persist, Cache cache,
+                  boolean createReturnsIdentity )
         {
             this.persist = persist;
             this.handler = handler;
             this.javaClass = handler.getJavaClass();
             this.cache = cache;
+            this.createReturnsIdentity = createReturnsIdentity;
         }
 
     }

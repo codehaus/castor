@@ -54,47 +54,28 @@ import org.exolab.castor.mapping.MappingException;
 
 
 /**
- * Interface for a key generator. The key generator is used for
- * producing identities for objects before they are created in the
- * database.
- * <p>
- * All the key generators belonging to the same database share the
- * same non-transactional connection to the database.
- * <p>
- * The key generator is configured from the mapping file using
- * Bean-like accessor methods.
- *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * Interface for a key generator factory. The key generator factory
+ * is used for producing key generators for concrete databases with
+ * given parameters
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public interface KeyGenerator
+public interface KeyGeneratorFactory
 {
     /**
-     * Generate a new key for the specified table. This method is
-     * called when a new object is about to be created. In some
-     * environments the name of the owner of the object is known,
-     * e.g. the principal in a J2EE server.
-     *
-     * @param conn An open connection within the given transaction
-     * @param tableName The table name
-     * @param primKeyName The primary key name
-     * @param props A temporary replacement for Principal object
-     * @return A new key
-     * @throws PersistenceException An error occured talking to persistent
-     *  storage
+     * Produce the key generator.
+     * @factory Helper object for obtaining database-specific QuerySyntax.
+     * @params Parameters for key generator.
      */
-    public Object generateKey( Connection conn, String tableName,
-            String primKeyName, Properties props )
-        throws PersistenceException;
+    public KeyGenerator getKeyGenerator( PersistenceFactory factory,
+            Properties params )
+            throws MappingException;
 
     /**
-     * Is key generated before INSERT? 
+     * Get the short name of the key generator. It is used to reference
+     * key generators in a mapping configuration file.
+     * If several key generators of the same type are used for the same
+     * database, then they are referenced by aliases.
      */
-    public boolean isBeforeInsert();
-
-    /**
-     * Is key generated in the same connection as INSERT?
-     */
-    public boolean isInSameConnection();
+    public String getName();
 }

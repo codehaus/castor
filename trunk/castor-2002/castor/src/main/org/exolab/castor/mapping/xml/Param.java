@@ -23,20 +23,14 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class Sql implements java.io.Serializable {
+public class Param implements java.io.Serializable {
 
 
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _manyKey;
-
-    private java.lang.String _dirty = "check";
-
-    private java.lang.String _manyTable;
-
-    private java.lang.String _type;
+    private java.lang.String _value;
 
     private java.lang.String _name;
 
@@ -45,32 +39,14 @@ public class Sql implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public Sql() {
+    public Param() {
         super();
-    } //-- org.exolab.castor.mapping.xml.Sql()
+    } //-- org.exolab.castor.mapping.xml.Param()
 
 
       //-----------/
      //- Methods -/
     //-----------/
-
-    /**
-    **/
-    public java.lang.String getDirty() {
-        return this._dirty;
-    } //-- java.lang.String getDirty() 
-
-    /**
-    **/
-    public java.lang.String getManyKey() {
-        return this._manyKey;
-    } //-- java.lang.String getManyKey() 
-
-    /**
-    **/
-    public java.lang.String getManyTable() {
-        return this._manyTable;
-    } //-- java.lang.String getManyTable() 
 
     /**
     **/
@@ -80,9 +56,9 @@ public class Sql implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getType() {
-        return this._type;
-    } //-- java.lang.String getType() 
+    public java.lang.String getValue() {
+        return this._value;
+    } //-- java.lang.String getValue() 
 
     /**
     **/
@@ -124,30 +100,6 @@ public class Sql implements java.io.Serializable {
 
     /**
      * 
-     * @param _dirty
-    **/
-    public void setDirty(java.lang.String _dirty) {
-        this._dirty = _dirty;
-    } //-- void setDirty(java.lang.String) 
-
-    /**
-     * 
-     * @param _manyKey
-    **/
-    public void setManyKey(java.lang.String _manyKey) {
-        this._manyKey = _manyKey;
-    } //-- void setManyKey(java.lang.String) 
-
-    /**
-     * 
-     * @param _manyTable
-    **/
-    public void setManyTable(java.lang.String _manyTable) {
-        this._manyTable = _manyTable;
-    } //-- void setManyTable(java.lang.String) 
-
-    /**
-     * 
      * @param _name
     **/
     public void setName(java.lang.String _name) {
@@ -156,21 +108,21 @@ public class Sql implements java.io.Serializable {
 
     /**
      * 
-     * @param _type
+     * @param _value
     **/
-    public void setType(java.lang.String _type) {
-        this._type = _type;
-    } //-- void setType(java.lang.String) 
+    public void setValue(java.lang.String _value) {
+        this._value = _value;
+    } //-- void setValue(java.lang.String) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.Sql unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Param unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.Sql) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Sql.class, reader);
-    } //-- org.exolab.castor.mapping.xml.Sql unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.Param) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Param.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Param unmarshal(java.io.Reader) 
 
     /**
     **/

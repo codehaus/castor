@@ -60,6 +60,7 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.persist.KeyGeneratorRegistry;
 import org.exolab.castor.persist.DuplicateIdentityExceptionImpl;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
@@ -69,6 +70,8 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.KeyGeneratorDescriptor;
+import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -136,6 +139,9 @@ final class SQLEngine
     private JDOClassDescriptor   _clsDesc;
 
 
+    private KeyGenerator         _keyGen;
+
+
     SQLEngine( JDOClassDescriptor clsDesc, LogInterceptor logInterceptor,
                PersistenceFactory factory, String stampField )
         throws MappingException
@@ -144,9 +150,18 @@ final class SQLEngine
         _stampField = stampField;
         _factory = factory;
         _logInterceptor = logInterceptor;
-        if ( _clsDesc.getExtends() != null )
+        _keyGen = null;
+        if ( _clsDesc.getExtends() != null ) {
             _extends = new SQLEngine( (JDOClassDescriptor) _clsDesc.getExtends(), null,
-				      _factory, _stampField );
+                      _factory, _stampField );
+        } else {
+            KeyGeneratorDescriptor keyGenDesc;
+
+            keyGenDesc = _clsDesc.getKeyGeneratorDescriptor();
+            if ( keyGenDesc != null ) {
+                _keyGen = KeyGeneratorRegistry.getKeyGenerator( _factory, keyGenDesc );
+            }
+        }
         try {
             buildSql( _clsDesc, _logInterceptor );
             buildFinder( _clsDesc, _logInterceptor );
@@ -161,7 +176,7 @@ final class SQLEngine
      */
     JDOClassDescriptor getDescriptor()
     {
-	return _clsDesc;
+    return _clsDesc;
     }
 
 
@@ -182,7 +197,37 @@ final class SQLEngine
         return (QueryExpression) _sqlFinder.clone();
     }
 
+    private Object generateKey( Object conn ) throws PersistenceException
+    {
+        Object identity;
+        String primKey;
+        Class idClass;
+        Class pkClass;
 
+        primKey = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName();
+
+        identity = _keyGen.generateKey( (Connection) conn,
+                                        _clsDesc.getTableName(), primKey, null );
+        if ( identity == null ) {
+            throw new PersistenceExceptionImpl( "persist.noIdentity" );
+        }
+
+        idClass = identity.getClass();
+        pkClass = _clsDesc.getIdentity().getFieldType();
+        if ( !idClass.equals( pkClass ) ) {
+            // Conversion is needed
+            if ( idClass.equals( java.math.BigDecimal.class ) &&
+                    pkClass.equals( Integer.class ) ) {
+                identity = new Integer( ( (java.math.BigDecimal) identity ).intValue() );
+            }
+        }
+
+        return identity;
+    }
+
+    /**
+     * @return identity (instead of stamp)
+     */
     public Object create( Object conn, Object[] fields, Object identity )
         throws DuplicateIdentityException, PersistenceException
     {
@@ -193,13 +238,23 @@ final class SQLEngine
         try {
             // Must create record in parent table first.
             // All other relations have been created before hand.
-            if ( _extends != null )
-                _extends.create( conn, fields, identity );
+            if ( _extends != null ) {
+                identity = _extends.create( conn, fields, identity );
+            }
+
+            // Generate key before INSERT
+            if ( _keyGen != null && _keyGen.isBeforeInsert() ) {
+                identity = generateKey( conn );
+            }
 
             // Must remember that SQL column index is base one
             stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
-            stmt.setObject( 1, identity );
-            count = 2;
+            count = 1;
+            if ( _keyGen == null || _keyGen.isBeforeInsert() ) {
+                stmt.setObject( 1, identity );
+                count++;
+            }
+
             for ( int i = 0 ; i < _fields.length ; ++i )
                 if ( _fields[ i ].store ) {
                     if ( fields[ i ] == null )
@@ -210,12 +265,32 @@ final class SQLEngine
                 }
             stmt.executeUpdate();
             stmt.close();
-            return null;
+
+            // Generate key after INSERT
+            if ( _keyGen != null && !_keyGen.isBeforeInsert() ) {
+                identity = generateKey( conn );
+            }
+
+            return identity;
         } catch ( SQLException except ) {
             // [oleg] Check for duplicate key based on X/Open error code
-            if ( except.getSQLState() != null &&
-                 except.getSQLState().startsWith( "23" ) )
-                throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
+            // Bad way: all validation exceptions are reported as DuplicateKey
+            //if ( except.getSQLState() != null &&
+            //     except.getSQLState().startsWith( "23" ) )
+            //    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
+
+            // Good way: let PersistenceFactory try to determine
+            if ( _factory instanceof GenericFactory ) {
+                Boolean isDupKey;
+
+                isDupKey = ((GenericFactory) _factory).isDuplicateKeyException( except );
+                if ( Boolean.TRUE.equals( isDupKey ) ) {
+                    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
+                } else if ( Boolean.FALSE.equals( isDupKey ) ) {
+                    throw new PersistenceExceptionImpl( except );
+                }
+                // else unknown, let's check directly.
+            }
 
             // [oleg] Check for duplicate key the old fashioned way,
             //        after the INSERT failed to prevent race conditions
@@ -228,9 +303,9 @@ final class SQLEngine
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
                 stmt.setObject( 1, identity );
                 if ( stmt.executeQuery().next() ) {
-		    stmt.close();
+                    stmt.close();
                     throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
-		}
+                }
             } catch ( SQLException except2 ) {
                 // Error at the stage indicates it wasn't a duplicate
                 // primary key problem. But best if the INSERT error is
@@ -273,31 +348,31 @@ final class SQLEngine
             stmt.setObject( count, identity );
             ++count;
 
-	    if ( original != null ) {
-		for ( int i = 0 ; i < _fields.length ; ++i )
-		    if ( _fields[ i ].dirtyCheck ) {
+        if ( original != null ) {
+        for ( int i = 0 ; i < _fields.length ; ++i )
+            if ( _fields[ i ].dirtyCheck ) {
                         if ( original[ i ] == null )
                             stmt.setNull( count, _fields[ i ].sqlType );
                         else
                             stmt.setObject( count, original[ i ] );
-			++count;
-		    }
-	    }
+            ++count;
+            }
+        }
 
             if ( stmt.executeUpdate() == 0 ) {
                 // If no update was performed, the object has been previously
                 // removed from persistent storage or has been modified if
-		// dirty checking. Determine which is which.
+        // dirty checking. Determine which is which.
                 stmt.close();
-		if ( original != null ) {
-		    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-		    stmt.setObject( 1, identity );
-		    if ( stmt.executeQuery().next() ) {
-			stmt.close();
-			throw new ObjectModifiedException( Messages.format( "persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
-		    }
-		    stmt.close();
-		}
+        if ( original != null ) {
+            stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+            stmt.setObject( 1, identity );
+            if ( stmt.executeQuery().next() ) {
+            stmt.close();
+            throw new ObjectModifiedException( Messages.format( "persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
+            }
+            stmt.close();
+        }
 
                 throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), identity );
             }
@@ -445,11 +520,16 @@ final class SQLEngine
         // using the specified primary key if one is required
         sql = new StringBuffer( "INSERT INTO " );
         sql.append( clsDesc.getTableName() ).append( " (" );
-        sql.append( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() );
-        count = 1;
+        count = 0;
+        if ( _keyGen == null || _keyGen.isBeforeInsert() ) {
+            sql.append( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() );
+            count++;
+        }
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null ) {
-                sql.append( ',' );
+                if ( count > 0 ) {
+                    sql.append( ',' );
+                }
                 sql.append( jdoFields[ i ].getSQLName() );
                 ++count;
             }
@@ -543,7 +623,7 @@ final class SQLEngine
             expr.addInnerJoin( clsDesc.getTableName(), identitySQL,
                                ( (JDOClassDescriptor) clsDesc.getExtends() ).getTableName(), identitySQL );
             addLoadSql( (JDOClassDescriptor) clsDesc.getExtends(), expr, allFields,
-			true, queryPk, false );
+            true, queryPk, false );
             loadPk = false;
             queryPk = false;
         }

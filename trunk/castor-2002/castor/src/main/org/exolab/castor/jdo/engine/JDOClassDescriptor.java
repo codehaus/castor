@@ -51,6 +51,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.KeyGeneratorDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 
@@ -76,7 +77,14 @@ public class JDOClassDescriptor
     private String  _tableName;
 
 
-    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName )
+    /**
+     * The key generator specified for this class.
+     */
+    private final KeyGeneratorDescriptor _keyGenDesc;
+
+
+    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName,
+                                KeyGeneratorDescriptor keyGenDesc)
         throws MappingException
     {
         super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getIdentity(),
@@ -90,6 +98,7 @@ public class JDOClassDescriptor
             throw new IllegalArgumentException( "Identity field must be of type JDOFieldDescriptor" );
         if ( getExtends() != null && ! ( getExtends() instanceof JDOClassDescriptor ) )
             throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
+        _keyGenDesc = keyGenDesc;
     }
 
 
@@ -101,6 +110,17 @@ public class JDOClassDescriptor
     public String getTableName()
     {
         return _tableName;
+    }
+
+
+    /**
+     * Returns the key generator specified for this class.
+     *
+     * @return The key generator descriptor
+     */
+    public KeyGeneratorDescriptor getKeyGeneratorDescriptor()
+    {
+        return _keyGenDesc;
     }
 
 

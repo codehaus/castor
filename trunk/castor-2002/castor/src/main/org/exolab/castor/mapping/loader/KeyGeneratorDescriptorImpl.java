@@ -44,57 +44,77 @@
  */
 
 
-package org.exolab.castor.persist.spi;
+package org.exolab.castor.mapping.loader;
 
 
-import java.sql.Connection;
 import java.util.Properties;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.KeyGeneratorDescriptor;
 
 
 /**
- * Interface for a key generator. The key generator is used for
- * producing identities for objects before they are created in the
- * database.
- * <p>
- * All the key generators belonging to the same database share the
- * same non-transactional connection to the database.
- * <p>
- * The key generator is configured from the mapping file using
- * Bean-like accessor methods.
+ * Describes the properties of a key generator for a given class, 
+ * with resolved alias and parameters.
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public interface KeyGenerator
+public final class KeyGeneratorDescriptorImpl implements KeyGeneratorDescriptor
 {
+
+    private final String _keyGenFactoryName;
+
+
+    private final Properties _params;
+
+
+    public KeyGeneratorDescriptorImpl( String keyGenFactoryName, Properties params ) {
+        _keyGenFactoryName = keyGenFactoryName;
+        _params = params;
+    }
+
     /**
-     * Generate a new key for the specified table. This method is
-     * called when a new object is about to be created. In some
-     * environments the name of the owner of the object is known,
-     * e.g. the principal in a J2EE server.
+     * Returns the name of the key generator factory.
      *
-     * @param conn An open connection within the given transaction
-     * @param tableName The table name
-     * @param primKeyName The primary key name
-     * @param props A temporary replacement for Principal object
-     * @return A new key
-     * @throws PersistenceException An error occured talking to persistent
-     *  storage
+     * @return Key generator factory name
      */
-    public Object generateKey( Connection conn, String tableName,
-            String primKeyName, Properties props )
-        throws PersistenceException;
+    public String getKeyGeneratorFactoryName() {
+        return _keyGenFactoryName;
+    }
+
 
     /**
-     * Is key generated before INSERT? 
+     * Returns the key generator parameters.
+     *
+     * @return key generator parameters.
      */
-    public boolean isBeforeInsert();
+    public Properties getParams() {
+        return _params;
+    }
 
-    /**
-     * Is key generated in the same connection as INSERT?
-     */
-    public boolean isInSameConnection();
+    public boolean equals( Object obj ) {
+        KeyGeneratorDescriptorImpl k;
+
+        if ( obj == null || !(obj instanceof KeyGeneratorDescriptorImpl) ) {
+            return false;
+        }
+
+        k = (KeyGeneratorDescriptorImpl) obj;
+
+        if ( _keyGenFactoryName == null && k._keyGenFactoryName != null ) {
+            return false;
+        }
+        if ( !_keyGenFactoryName.equals( k._keyGenFactoryName ) ) {
+            return false;
+        }
+
+        if ( _params == null && k._params != null ) {
+            return false;
+        }
+        if ( !_params.equals( k._params ) ) {
+            return false;
+        }
+
+        return true;
+    }
 }
+

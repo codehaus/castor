@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.sql.SQLException;
 import org.exolab.castor.persist.spi.QueryExpression;
 
 
@@ -72,6 +73,14 @@ public final class SybaseFactory
         return new SybaseQueryExpression();
     }
 
+    public Boolean isDuplicateKeyException( SQLException ex )
+    {
+        if ( ex.getErrorCode() == 2601 ) {
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
+        }
+    }
 
 }
 

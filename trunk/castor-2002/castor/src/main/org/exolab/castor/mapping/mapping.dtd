@@ -19,7 +19,7 @@
     same collection.
 
  -->
-<!ELEMENT mapping ( description?, include*, class+ )>
+<!ELEMENT mapping ( description?, include*, class+, key-generator* )>
 
 
 <!--
@@ -65,10 +65,11 @@
  -->
 <!ELEMENT class ( description?, map-to?, ( field | container )+ )>
 <!ATTLIST class
-    name       ID #REQUIRED
-    extends    IDREF #IMPLIED
-    identity   CDATA #IMPLIED
-    access     (read-only|shared|exclusive|db-locked) "shared">
+    name            ID #REQUIRED
+    extends         IDREF #IMPLIED
+    identity        CDATA #IMPLIED
+    access          (read-only|shared|exclusive|db-locked) "shared"
+    key-generator   IDREF #IMPLIED>
 
 
 <!--
@@ -192,3 +193,36 @@
 
  -->
 <!ELEMENT description (#PCDATA)>
+
+
+<!--
+    Specifies parameters for the KeyGenerator (if needed).
+    For example, to obtain sequential values from table SEQTAB use
+    <key-generator name="seqtable">
+        <param name="table" value="SEQTAB">
+        <param name="global" value="0">
+    </key-generator>
+    <class ... key-generator="seqtable"> ...
+    If you have to use several key generators of the same type for the same
+    database, use aliases:
+    <key-generator name="seqtable" alias="seq1">
+        <param name="table" value="SEQTAB">
+        <param name="global" value="0">
+    </key-generator>
+    <key-generator name="seqtable" alias="seq2">
+        <param name="table" value="SEQGLOBAL">
+        <param name="global" value="1">
+    </key-generator>
+    <class ... key-generator="seq2"> ...
+ -->
+
+<!ELEMENT key-generator  ( param* )>
+<!ATTLIST key-generator
+          name CDATA #REQUIRED
+          alias CDATA #IMPLIED>
+
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+          name  CDATA #REQUIRED
+          value CDATA #REQUIRED>
+

@@ -54,7 +54,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         XMLFieldHandler handler = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[4];
+        attributes = new XMLFieldDescriptorImpl[5];
         //-- _access
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_access", "access", NodeType.Attribute);
         desc.setImmutable(true);
@@ -136,6 +136,33 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         } );
         attributes[2] = desc;
         
+        //-- _keyGenerator
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_keyGenerator", "key-generator", NodeType.Attribute);
+        desc.setImmutable(true);
+        desc.setHandler( new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getKeyGenerator();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setKeyGenerator( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        attributes[3] = desc;
+        
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         this.identity = desc;
@@ -162,7 +189,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             }
         } );
         desc.setRequired(true);
-        attributes[3] = desc;
+        attributes[4] = desc;
         
         //-- initialize element descriptors
         

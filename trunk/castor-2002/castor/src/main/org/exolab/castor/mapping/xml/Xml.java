@@ -69,6 +69,44 @@ public class Xml implements java.io.Serializable {
     } //-- java.lang.String getType() 
 
     /**
+    **/
+    public boolean isValid() {
+        try {
+            validate();
+        }
+        catch (org.exolab.castor.xml.ValidationException vex) {
+            return false;
+        }
+        return true;
+    } //-- boolean isValid() 
+
+    /**
+     * 
+     * @param out
+    **/
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * 
+     * @param handler
+    **/
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
+
+    /**
      * 
      * @param _name
     **/
@@ -91,5 +129,23 @@ public class Xml implements java.io.Serializable {
     public void setType(java.lang.String _type) {
         this._type = _type;
     } //-- void setType(java.lang.String) 
+
+    /**
+     * 
+     * @param reader
+    **/
+    public static org.exolab.castor.mapping.xml.Xml unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.mapping.xml.Xml) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Xml.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Xml unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }
