@@ -393,6 +393,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Lin" given="Peter"/>
+    <email>woolfel@yahoo.com</email>
+    <description>Provided patch for bug 1272 (fix for bound properties)</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Low" given="Heng Sin"/>
     <email>lowhs@comline.com.my</email>
     <description>Gives helps fellow users on the mailing list</description>
@@ -513,6 +519,13 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Randall" given="Brett" />
+    <email>brett_s_r@hotmail.com</email>
+    <description>Patch for bug 1272 (fix for bound properties)</description>
+  </contributor>
+
+
+  <contributor type="Contributor">
     <name surname="Rehor" given="Petr" />
     <email>petr.rehor@decros.cz</email>
     <description>Patches to Castor OQL. Includes the support of 1:M N:M query.</description>
@@ -630,7 +643,7 @@
     <email>rhett-sutphin@uiowa.edu</email>
     <description>
        Fixes for mapping.xsd (the schema for the mapping object model) and the initial
-       contribution of the binding file for the mapping schema.
+       contribution of the binding file for the mapping schema. Patch for bug 1245.
     </description>
   </contributor>
 
