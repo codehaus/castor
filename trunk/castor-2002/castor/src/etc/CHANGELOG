@@ -1,5 +1,9 @@
-Version 0.8.11
+Version (CVS)
 -------------
+
+
+Version 0.8.11 December, 15 2000
+--------------------------------
 
 XML:    Updated Schema syntax and some of the Schema Object Model to support 
         the W3C XML Schema Candidate Release. (kvisco)
