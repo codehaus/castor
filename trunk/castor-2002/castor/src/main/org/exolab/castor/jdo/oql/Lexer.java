@@ -125,7 +125,15 @@ public class Lexer implements TokenTypes {
    */
   public Token nextToken() throws NoMoreTokensException, InvalidCharException {
   
-    char curChar;
+    char curChar, oldChar;
+
+    try {
+      oldChar = _queryString.charAt(_pos-1);
+    }
+    catch (IndexOutOfBoundsException e) {
+        oldChar = '\0';
+    }
+
     try {
       curChar = _queryString.charAt(_pos);
     }
@@ -140,6 +148,7 @@ public class Lexer implements TokenTypes {
   
     //consume white space
     while (isWhiteSpace(curChar)) {
+      oldChar = curChar;
       _pos++;
       try {
         curChar = _queryString.charAt(_pos);
@@ -156,7 +165,7 @@ public class Lexer implements TokenTypes {
       return numericLiteral();
 
     if ( isLetter(curChar) )
-      return identifier();
+      return identifier( oldChar );
     
     char nextChar = 0;
     try {
@@ -501,7 +510,7 @@ public class Lexer implements TokenTypes {
    *    all of the characters in the query have already been consumed.
    * @throws InvalidCharException if the first char is not a letter. 
    */
-  private Token identifier() throws NoMoreTokensException, InvalidCharException {
+  private Token identifier( char oldChar ) throws NoMoreTokensException, InvalidCharException {
   
     char curChar;
     try {
@@ -525,6 +534,10 @@ public class Lexer implements TokenTypes {
     }
 
     String ident = sb.toString().toLowerCase();
+
+    // If there's a dot before, we'll assume that it's an identifier in any case.
+    if( oldChar == '.' )
+        return (new Token( IDENTIFIER, sb.toString() ));
 
     if (ident.equals("date"))
       return dateLiteral(sb.toString());
