@@ -1,7 +1,11 @@
 Version (CVS)
 -------------
 
+XML: 	Add a command line property for the Source Generator to use the generated files in
+        the Castor Testing Framework(Arnaud)
+
 XML: 	Add a property in castorbuilder.properties to generate a clean 'equals' method (Arnaud)
+
 XML:	Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
 	
 Version 0.9 February, 15 2001
