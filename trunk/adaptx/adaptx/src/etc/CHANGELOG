@@ -1,7 +1,37 @@
-Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
+Adaptx (C) 1998-2004 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 
 
 The following are changes from different versions of Adaptx
+
+Version 0.9.10, February 02, 2004
+---------------------------------
+
+-- Fixed some NullPointerExceptions that were occurring when
+   attempting to create a StringResult with a null value.
+
+-- Fixed issue of possible incorrect context node
+   when processing certain expressions at the top-level.
+
+-- Fixed parse error when using variables in union expressions.
+
+-- Fixed issue with using the node-test keywords in
+   attribute expressions (eg: @text, @node, @pi)
+
+-- Added some improvements to the expressions API to
+   allow greater ability to "drill-down" and get to
+   the core components of the XPath expressions.
+
+
+Version 0.9.9, December 22, 2003
+--------------------------------
+
+-- Fixes issue with error occuring when "xml prefix" is being
+   declared by Xerces. Normally, the "xml" prefix shouldn't
+   be declared, but Xerces declares this, probably as a 
+   convenience. The error is changed to check only for
+   a redefinition of the "xml" prefix to a non-valid
+   URI.
+
 
 Version 0.9.8, October 07, 2003
 ---------------------------------
