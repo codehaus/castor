@@ -63,6 +63,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
+import org.exolab.castor.util.Configuration;
 
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
@@ -84,10 +85,21 @@ public class XMLMappingLoader
     /**
      * naming conventions
     **/
-    private static XMLNaming _naming = null;
+    private static XMLNaming    _naming = null;
+    
+    /**
+     * Introspector
+    **/
+    private static NodeType _primitiveNodeType = null;
     
     static {
         _naming = XMLNaming.getInstance();
+        
+        if (_primitiveNodeType == null) {
+            _primitiveNodeType = Configuration.getPrimitiveNodeType();
+            if (_primitiveNodeType == null) 
+                _primitiveNodeType = NodeType.Attribute;
+        }
     }
     
     /**
@@ -183,6 +195,13 @@ public class XMLMappingLoader
             match = xml.getMatches();
         }
         
+        if (nodeType == null) {
+            if (isPrimitive(javaClass))
+                nodeType = _primitiveNodeType;
+            else 
+                nodeType = NodeType.Element;
+        }
+        
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
         
         //-- matches
@@ -200,6 +219,22 @@ public class XMLMappingLoader
                              fieldMap.getRequired(), null, colHandler );
     }
 
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    private static boolean isPrimitive(Class type) {
+
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class) || (type == Character.class))
+            return true;
+            
+        return (type.getSuperclass() == Number.class);
+       
+    } //-- isPrimitive
 
 }
 

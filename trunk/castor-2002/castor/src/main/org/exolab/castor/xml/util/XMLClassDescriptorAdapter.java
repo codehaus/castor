@@ -51,6 +51,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.util.Configuration;
 
 import org.exolab.castor.xml.*;
 
@@ -67,6 +68,15 @@ public class XMLClassDescriptorAdapter
     
     private XMLClassDescriptor delegate = null;
     
+    private static NodeType _primitiveNodeType = null;
+    
+    static {
+        if (_primitiveNodeType == null) {
+            _primitiveNodeType = Configuration.getPrimitiveNodeType();
+            if (_primitiveNodeType == null)
+                _primitiveNodeType = NodeType.Attribute;
+        }
+    }
     
     /**
      * Creates a new XMLClassDescriptorAdapter using the
@@ -108,8 +118,14 @@ public class XMLClassDescriptorAdapter
                     String name = fieldDesc.getFieldName();
                     XMLNaming naming = XMLNaming.getInstance();
                     String xmlFieldName = naming.toXMLName(name);
-                    addFieldDescriptor(new XMLFieldDescriptorImpl(fieldDesc,xmlFieldName, 
-                        ( fieldDesc.getClassDescriptor() == null ? NodeType.Element : NodeType.Attribute )));
+                    
+                    NodeType nodeType = NodeType.Element;
+                    if (isPrimitive(fieldDesc.getFieldType()))
+                        nodeType = _primitiveNodeType;
+                        
+                    addFieldDescriptor(new XMLFieldDescriptorImpl(fieldDesc,
+                                                                  xmlFieldName, 
+                                                                  nodeType));
                 }
             }
             
@@ -143,5 +159,22 @@ public class XMLClassDescriptorAdapter
         setXMLName(xmlName);
 
     } //-- XMLClassDescriptorAdapter
+    
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    private static boolean isPrimitive(Class type) {
+
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class) || (type == Character.class))
+            return true;
+            
+        return (type.getSuperclass() == Number.class);
+       
+    } //-- isPrimitive
     
 } //-- XMLClassDescriptorAdapter
