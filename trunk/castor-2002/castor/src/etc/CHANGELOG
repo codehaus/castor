@@ -9,6 +9,9 @@ Misc: FieldDesc adds required flag, readable/writeable flag, and
       target type. Some conversions are implemented between field type
       and target type.
 
+Misc: Type conversion errors are now reported more accurately before,
+      and a type conversion mechanism is being concieved.
+
 
 Version 0.7.2  January 12, 2000
 -------------------------------
