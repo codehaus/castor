@@ -125,6 +125,12 @@
     <description>Enhancements to the Castor DSML and bug fixing.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Mauch" given="Thorsten"/>
+    <email>mauch@imkenberg.de</email>
+    <description>OQL Query tool, bug fixing for OQL.</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Sahuc" given="Sebastien"/>
     <email>ssahuc@citeweb.net</email>
