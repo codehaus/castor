@@ -1174,7 +1174,7 @@ public abstract class TransactionContext
                 } else if ( !entry.deleted && entry.molder.getCallback() != null ) {
                     try {
                         entry.molder.getCallback().storing( entry.object, entry.updateCacheNeeded );
-                        // updatePersistNeeded implies updatePersistNeeded
+                        // updatePersistNeeded implies updateCacheNeeded
                     } catch ( Exception except ) {
                         throw new TransactionAbortedException( 
                             Messages.format("persist.nested", except), except );
