@@ -333,7 +333,7 @@
 
        <code>
   <comment>// Configure the JDBC data source, in this case an Oracle data source</comment>
-  org.exolab.castor.jdo.conf.DataSource dsConf = JdoConfFactory.createJdoDSConf(s_jdo_driver_name_pooling);
+  org.exolab.castor.jdo.conf.DataSource dsConf = JdoConfFactory.createJdoDSConf("oracle.jdbc.pool.OracleConnectionCacheImpl");
 
   dsConf.addParam(JdoConfFactory.createJdoConfParam("URL", db_url));
   dsConf.addParam(JdoConfFactory.createJdoConfParam("user", username));
