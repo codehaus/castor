@@ -53,15 +53,13 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
+
 /**
- * The Time Descriptor
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * The gMonthDay Descriptor
+ * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
- * @see TimeDurationDescriptor
  */
-public class TimeDescriptor
-    implements XMLClassDescriptor
-{
+public class GMonthDayDescriptor implements XMLClassDescriptor {
 
 
     /**
@@ -89,7 +87,7 @@ public class TimeDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "time";
+    private static final String _xmlName = "gMonthDay";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
@@ -99,13 +97,13 @@ public class TimeDescriptor
     //- Constructors -/
     //----------------/
 
-    public TimeDescriptor() {
+    public GMonthDayDescriptor() {
         super();
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
             //-- setHandler
-            _contentDescriptor.setHandler(new TimeFieldHandler());
+            _contentDescriptor.setHandler(new GMonthDayFieldHandler());
         }
 
         if (_fields == null) {
@@ -113,7 +111,7 @@ public class TimeDescriptor
             _fields[0] = _contentDescriptor;
         }
 
-    } //-- TimeDescriptor
+    } //-- gMonthDayDescriptor
 
     //------------------/
     //- Public Methods -/
@@ -212,7 +210,7 @@ public class TimeDescriptor
     public String toString() {
 
         String str = super.toString() +
-            "; descriptor for class: Time";
+            "; descriptor for class: gMonthDay";
 
         //-- add xml name
         str += "; xml name: " + _xmlName;
@@ -231,7 +229,7 @@ public class TimeDescriptor
      * @return The Java class
      */
     public Class getJavaClass() {
-        return Time.class;
+        return GMonthDay.class;
     } //-- getJavaClass
 
 
@@ -281,7 +279,7 @@ public class TimeDescriptor
      * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
      * @version $Revision $ $Date $
     **/
-    class TimeFieldHandler extends XMLFieldHandler {
+    class GMonthDayFieldHandler extends XMLFieldHandler {
 
         //----------------/
         //- Constructors -/
@@ -290,9 +288,9 @@ public class TimeDescriptor
         /**
          * Creates a new TimeFieldHandler
         **/
-        public TimeFieldHandler() {
+        public GMonthDayFieldHandler() {
             super();
-        } //-- TimeFieldHandler
+        } //-- GMonthDayFieldHandler
 
         //------------------/
         //- Public Methods -/
@@ -308,11 +306,10 @@ public class TimeDescriptor
         public Object getValue(Object target)
             throws java.lang.IllegalStateException
         {
-
-            //-- check for TimeDuration class  -- add later
-            Time time = (Time) target;
-
-            return time.toString();
+           Object result = null;
+            if (target instanceof GMonthDay)
+                result = (GMonthDay) target;
+            return result;
         } //-- getValue
 
         /**
@@ -324,26 +321,27 @@ public class TimeDescriptor
             throws java.lang.IllegalStateException
         {
 
-            if (! (target instanceof Time) ) {
-               //-- throw exception
+            if (! (target instanceof GMonthDay) ) {
+               String err = "GMonthDayDescriptor#setValue: expected GMonthDay, received instead:"
+                            + target.getClass();
+               throw new IllegalStateException(err);
             }
 
-            Time timeTarget = (Time) target;
+            GMonthDay gMonthDayTarget = (GMonthDay) target;
 
             if (value == null) {
-               /// do something
+                String err = "GMonthDayDescriptor#setValue: null value";
+                throw new IllegalStateException(err);
             }
 
-            //-- update current instance of time with new time
             try {
-                Time temp = Time.parseTime(value.toString()) ;
-                timeTarget.setHour(temp.getHour());
-                timeTarget.setMinute(temp.getMinute());
+                GMonthDay temp = GMonthDay.parseGMonthDay(value.toString()) ;
+                gMonthDayTarget.setMonth(temp.getMonth());
+                gMonthDayTarget.setDay(temp.getDay());
                 if (temp.isUTC())
-                    timeTarget.setUTC();
-                timeTarget.setSecond(temp.getSeconds(), temp.getMilli());
-                timeTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
-
+                    gMonthDayTarget.setUTC();
+                gMonthDayTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                temp = null;
             }
             catch (Exception ex) {
                 //-- ignore for now
@@ -385,12 +383,12 @@ public class TimeDescriptor
         public Object newInstance( Object parent )
             throws IllegalStateException
         {
-            return new Time();
+            return new GMonthDay();
         } //-- newInstance
 
 
-    } //-- TimeFieldHandler
+    } //-- GmonthDayFieldHandler
 
 
-} //-- TimeDescriptor
+} //-- GMonthDayDescriptor
 

@@ -113,7 +113,7 @@ public class TimeValidator implements TypeValidator {
      */
     public void validate(Time recurrD) throws ValidationException {
 
-        boolean isThereMinInclusive = (_minInclusive != null);
+       /* boolean isThereMinInclusive = (_minInclusive != null);
         boolean isThereMinExclusive = (_minExclusive != null);
         boolean isThereMaxInclusive = (_maxInclusive != null);
         boolean isThereMaxExclusive = (_maxExclusive != null);
@@ -161,7 +161,7 @@ public class TimeValidator implements TypeValidator {
                 err += "value of " + _maxExclusive;
                 throw new ValidationException(err);
             }
-        }
+        }*/
 
         //use the pattern validator
         //if (hasPattern()) {

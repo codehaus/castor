@@ -38,11 +38,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
-
 
 package org.exolab.castor.types;
 
@@ -50,16 +49,22 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.util.*;
+import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.xml.XMLFieldDescriptor;
+import org.exolab.castor.xml.NodeType;
+import org.exolab.castor.xml.XMLFieldHandler;
+import org.exolab.castor.xml.TypeValidator;
+
+import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.ValidityException;
 /**
- * The Time Descriptor
+ * The Duration Descriptor
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
- * @see TimeDurationDescriptor
+ *
  */
-public class TimeDescriptor
+public class DurationDescriptor
     implements XMLClassDescriptor
 {
 
@@ -89,7 +94,7 @@ public class TimeDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "time";
+    private static final String _xmlName = "duration";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
@@ -99,13 +104,13 @@ public class TimeDescriptor
     //- Constructors -/
     //----------------/
 
-    public TimeDescriptor() {
+    public DurationDescriptor() {
         super();
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
             //-- setHandler
-            _contentDescriptor.setHandler(new TimeFieldHandler());
+            _contentDescriptor.setHandler(new DurationFieldHandler());
         }
 
         if (_fields == null) {
@@ -113,7 +118,7 @@ public class TimeDescriptor
             _fields[0] = _contentDescriptor;
         }
 
-    } //-- TimeDescriptor
+    } //-- DurationDescriptor
 
     //------------------/
     //- Public Methods -/
@@ -212,7 +217,7 @@ public class TimeDescriptor
     public String toString() {
 
         String str = super.toString() +
-            "; descriptor for class: Time";
+            "; descriptor for class: duration";
 
         //-- add xml name
         str += "; xml name: " + _xmlName;
@@ -231,7 +236,7 @@ public class TimeDescriptor
      * @return The Java class
      */
     public Class getJavaClass() {
-        return Time.class;
+        return Duration.class;
     } //-- getJavaClass
 
 
@@ -243,6 +248,7 @@ public class TimeDescriptor
     public FieldDescriptor[] getFields() {
         return _fields;
     } //-- getFields
+
 
 
     /**
@@ -281,16 +287,16 @@ public class TimeDescriptor
      * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
      * @version $Revision $ $Date $
     **/
-    class TimeFieldHandler extends XMLFieldHandler {
+    class DurationFieldHandler extends XMLFieldHandler {
 
         //----------------/
         //- Constructors -/
         //----------------/
 
         /**
-         * Creates a new TimeFieldHandler
+         * Creates a new TimeDurationFieldHandler
         **/
-        public TimeFieldHandler() {
+        public DurationFieldHandler() {
             super();
         } //-- TimeFieldHandler
 
@@ -308,11 +314,10 @@ public class TimeDescriptor
         public Object getValue(Object target)
             throws java.lang.IllegalStateException
         {
-
-            //-- check for TimeDuration class  -- add later
-            Time time = (Time) target;
-
-            return time.toString();
+            Object td = null;
+            if (target instanceof Duration)
+                td = (Duration) target;
+            return td;
         } //-- getValue
 
         /**
@@ -324,30 +329,34 @@ public class TimeDescriptor
             throws java.lang.IllegalStateException
         {
 
-            if (! (target instanceof Time) ) {
-               //-- throw exception
+
+            if (! (target instanceof Duration) ) {
+               String err = "DurationDescriptor#setValue: expected Duration, received instead:"
+                            + target.getClass();
+               throw new IllegalStateException(err);
             }
 
-            Time timeTarget = (Time) target;
+            Duration time = (Duration) target;
 
             if (value == null) {
-               /// do something
+                String err = "DurationDescriptor#setValue: null value";
+                throw new IllegalStateException(err);
             }
 
             //-- update current instance of time with new time
             try {
-                Time temp = Time.parseTime(value.toString()) ;
-                timeTarget.setHour(temp.getHour());
-                timeTarget.setMinute(temp.getMinute());
-                if (temp.isUTC())
-                    timeTarget.setUTC();
-                timeTarget.setSecond(temp.getSeconds(), temp.getMilli());
-                timeTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
+                Duration temp = Duration.parseDuration(value.toString()) ;
+                time.setYear(temp.getYear());
+                time.setMonth(temp.getMonth());
+                time.setDay(temp.getDay());
+                time.setHour(temp.getHour());
+                time.setMinute(temp.getMinute());
+                time.setSeconds(temp.getSeconds());
+            }
+            catch (java.text.ParseException ex) {
+                throw new IllegalStateException();
+            }
 
-            }
-            catch (Exception ex) {
-                //-- ignore for now
-            }
         } //-- setValue
 
         public void resetValue(Object target)
@@ -385,12 +394,13 @@ public class TimeDescriptor
         public Object newInstance( Object parent )
             throws IllegalStateException
         {
-            return new Time();
+            return new Duration();
         } //-- newInstance
 
 
-    } //-- TimeFieldHandler
+    } //-- DurationFieldHandler
 
 
-} //-- TimeDescriptor
+} //-- DurationDescriptor
+
 
