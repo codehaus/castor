@@ -218,12 +218,14 @@ public final class SQLEngine
     }
 
 
-    public PersistenceQuery createQuery( QueryExpression query, Class[] types )
+    public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
         throws QueryException
     {
         String sql;
 
-        sql = query.getStatement( _clsDesc.getAccessMode() == AccessMode.DbLocked);
+        if ( accessMode == null )
+            accessMode = _clsDesc.getAccessMode();
+        sql = query.getStatement( accessMode == AccessMode.DbLocked);
         if ( _logInterceptor != null )
             _logInterceptor.queryStatement( sql );
         return new SQLQuery( this, sql, types );

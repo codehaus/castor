@@ -359,7 +359,7 @@ public class MozillaEngine
     }
     
     
-    public PersistenceQuery createQuery( QueryExpression query, Class[] types )
+    public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
         throws QueryException
     {
         return new MozillaQuery( query.getStatement( false ), types );

@@ -149,7 +149,7 @@ public class DirectoryImpl
         try {
             next = expr.indexOf( '$' );
             if ( next <= 0 ) {
-                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( new LDAPQueryExpression( expr ), new Class[ 0 ] ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( new LDAPQueryExpression( expr ), new Class[ 0 ], null ) );
             } else {
                 pos = 0;
                 query = new StringBuffer();
@@ -174,7 +174,7 @@ public class DirectoryImpl
                 query.append( expr.substring( pos, next ) );
                 array = new Class[ types.size() ];
                 types.copyInto( array );
-                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( new LDAPQueryExpression( query.toString() ), array ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( new LDAPQueryExpression( query.toString() ), array, null ) );
             }
         } catch ( QueryException except ) {
             throw new InvalidSearchException( except.getMessage() );
