@@ -195,10 +195,10 @@ public interface Persistence {
      *
      * @param key The transaction context
      * @param conn An open connection
-     * @param entity The entity to delete
+     * @param original The entity to delete (the original value).
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Key key, Object conn, Entity entity )
+    public void delete( Key key, Object conn, Entity original )
         throws PersistenceException;
 
 
