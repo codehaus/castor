@@ -20,12 +20,20 @@
       </p>
       
       <p>
-         <b>O'Reilly Onjava.com(October 2001)</b>
+         <b>O'Reilly Onjava.com (October 2001)</b>
          <p/>
          Dion Almaer gives a good introduction to Castor XML.
          <a href="http://www.onjava.com/pub/a/onjava/2001/10/24/xmldatabind.html">Read</a>
       </p>
       
+      <p>
+         <b>XML Application Developer's Guide by BORLAND (2001)</b>
+         <p/>
+         Borland is using Castor among the XML features present in JBuilder 6. This book contains a
+         chapter on data-binding using Castor inside JBuilder 6.
+         <a href="ftp://ftpc.inprise.com/pub/jbuilder/techpubs/jbuilder6/xml.pdf">Download</a>
+      </p>
+
       <p>
          <b>XML One Amsterdam (September 2001)</b>
          <p/>
