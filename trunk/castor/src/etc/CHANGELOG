@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1696 using contribution from Matrin Fuchs [martin-fuchs@gmx.net]
+       Fixed NPE in SQL CALL statements with master/detail relation.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1696
+       (Werner - 20040817)
+
 JDO:   Fixed bug 1714 using contribution from Gregory Block [gblock@ctoforaday.com]
        Added log statement to identfy problems with missing collection.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1714
