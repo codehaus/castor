@@ -534,8 +534,15 @@ public class Schema extends Annotated {
             return (AttributeDecl)attributes.get(canonicalName);
         else {
             Schema schema = getImportedSchema(ns);
-            if (schema!=null)
-                return schema.getAttribute(canonicalName);
+            if (schema!=null) {
+                AttributeDecl att = schema.getAttribute(canonicalName);;
+                if (att!=null && att.getSimpleType()!=null && att.getSimpleType().hasFacet(Facet.ENUMERATION)) {
+                     String warning = "Warning : do not forget to generate the source ";
+                     warning += "for the schema with this targetNamespace: "+schema.getTargetNamespace();
+                     System.out.println(warning);
+                }
+                return att;
+            }
         }
 
         return null;
