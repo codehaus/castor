@@ -292,7 +292,7 @@ org.exolab.castor.jdo.defaultTimeZone=
         <sql name="novel" type="clob" dirty="ignore" />
       </field>
   </class>]]></pre>
-         Blob and Clob values cannot be cached, because they are alive only while ResultSet that
+         Blob and Clob values cannot be cached, because they are alive only while the ResultSet that
          produced them is open.
          In particular this means that you cannot use dirty checking for long transactions with such
          classes.</p>
