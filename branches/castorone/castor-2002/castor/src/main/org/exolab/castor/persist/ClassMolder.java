@@ -802,6 +802,7 @@ public class ClassMolder implements CacheHolder {
         Iterator itor;
         CacheItem ci;
         ArrayVector list;
+		ArrayVector orgFields;
         Object newobj;
         Object oldobj;
         Object fetched;
@@ -872,13 +873,32 @@ public class ClassMolder implements CacheHolder {
 
                     if ( o != null ) {
                         if ( _fhs[i].isDependent() ) {
-                            if ( !tx.isPersistent( o ) ) 
-                                // should be created if transaction have no record of the object
-                                tx.create( fieldEngine, fieldClassMolder, o, oid );
+							if ( !OID.isEquals( ci.fields[i], newfields[i] ) ) {
+								if ( ci.fields[i] != null ) { 
+									Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])ci.fields[i], null );
+									if ( reldel != null )
+										tx.delete( reldel );
+									else {
+										// should i notify user that the object does not exist?
+										// user can't delete dependent object himself. So, must
+										// error.									
+									}
+										
+								}
+								if ( newfields[i] != null ) {
+									if ( !tx.isPersistent( o ) ) {
+										// should be created if transaction have no record of the object
+										tx.create( fieldEngine, fieldClassMolder, o, oid );
+									} else {
+										// should i notify user that the object does not exist?
+										// user can't create dependent object himself. So, must
+										// error.									
+									}
+								}
+							}
                         } else {
-                            //if ( !tx.isPersistent( o ) ) 
-                                // should be created if transaction have no record of the object
-                            //    tx.create( fieldEngine, fieldClassMolder, o, null );
+							// need to do anything for non-dependent object.
+							// it seem not. should list all the case and make sure
                         }
                     }
                 }
@@ -887,12 +907,13 @@ public class ClassMolder implements CacheHolder {
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
+				orgFields = (ArrayVector)ci.fields[i];
                 if ( ! (o instanceof Lazy) ) {
                     itor = getIterator( o );
                     ArrayList v = (ArrayList) o;
                     list = new ArrayVector( v.size() );
                     for ( int j=0; j<v.size(); j++ ) {
-                        list.add( (fieldClassMolder.getIdentities( v.get(j) ))[0] );
+                        list.add( (fieldClassMolder.getIdentities( v.get(j) )) );
                     }
                     if ( !OID.isEquals( (ArrayVector)ci.fields[i], list ) ) {
                         if ( _fhs[i].isStored() ) {
@@ -904,22 +925,33 @@ public class ClassMolder implements CacheHolder {
                             }
                         }
 
-                        // need to add support for dependent object
-                        itor = getIterator( o );
-                        while ( itor.hasNext() ) {
-                            newobj = itor.next();
-                            fids = fieldClassMolder.getIdentities( newobj );
-
-                            if ( _fhs[i].isDependent() ) {
-                                if ( !tx.isPersistent( newobj ) ) 
-                                    // should be created if transaction have no record of the object
-                                    tx.create( fieldEngine, fieldClassMolder, newobj, oid );
-                            } else {
-                                //if ( !tx.isPersistent( newobj ) ) 
-                                    // should be created if transaction have no record of the object
-                                //   tx.create( fieldEngine, fieldClassMolder, newobj, null );
+                        if ( orgFields != null && list != null ) {
+                            for ( int j=0; j<orgFields.size(); j++ ) {
+                                if ( !list.contains( orgFields.get(j) ) ) {
+                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                    if ( reldel != null ) {
+										tx.delete( reldel );
+									} else {
+										// should i notify user that the object does not exist?
+										// user can't delete dependent object himself. So, must
+										// error.
+                                    }
+                                }
+                            }
+                            // add relation which added after it's created or loaded
+                            for ( int j=0; j<list.size(); j++ ) {
+                                if ( !orgFields.contains( list.get(j) ) ) {
+									if ( !tx.isPersistent( v.get(j) ) ) 
+										tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
+									else {
+										// should i notify user that the object does not exist?
+										// user can't create dependent object himself. So, must
+										// error.									
+									}
+                                }
                             }
                         }
+
                     }
                 } else {
                     /*
@@ -949,7 +981,7 @@ public class ClassMolder implements CacheHolder {
                     itor = getIterator( o );
                     ArrayList v = (ArrayList) o;
                     list = getIds( fieldClassMolder, o );
-                    ArrayVector orgFields = (ArrayVector)ci.fields[i];
+                    orgFields = (ArrayVector)ci.fields[i];
                     if ( !OID.isEquals( orgFields, list ) ) {
 
                         itor = getIterator( o );
