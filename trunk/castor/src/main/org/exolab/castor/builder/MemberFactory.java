@@ -172,7 +172,28 @@ public class MemberFactory {
         return result;
     } //-- createFieldInfoForAny()
 
+    /**
+     * Creates a FieldInfo to hold the value of a choice.
+     * 
+     * @param xsType the type of content
+     * @return the new FieldInfo
+     */
+    public FieldInfo createFieldInfoForChoiceValue() {
 
+        String fieldName = "_choiceValue";
+        XSType xsType = new XSClass(SGTypes.Object, "any");
+        FieldInfo fInfo = null;
+        fInfo = _infoFactory.createFieldInfo(xsType,fieldName);
+        fInfo.setNodeType(XMLInfo.ELEMENT_TYPE);
+        fInfo.setComment("Internal choice value storage");
+        fInfo.setRequired(false);
+        fInfo.setTransient(true);
+        fInfo.setNodeName("##any");
+        fInfo.setMethods(FieldInfo.READ_METHOD);
+        return fInfo;
+
+    } //-- createFieldInfoForChoiceValue
+    
     /**
      * Creates a FieldInfo for content.
      * @param xsType the type of content
@@ -201,6 +222,7 @@ public class MemberFactory {
         return fInfo;
 
     } //-- createFieldInfoForContent
+    
 
 
 
