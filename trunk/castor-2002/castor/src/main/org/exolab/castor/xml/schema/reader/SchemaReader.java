@@ -107,6 +107,45 @@ public class SchemaReader {
         _source = source;
         
     } //-- SchemaReader
+
+    /**
+     * Creates a new SchemaReader for the given Reader
+     *
+     * @param reader the Reader to read the Schema from.
+     * @param filename for reporting errors.
+    **/
+    public SchemaReader(Reader reader, String filename)
+        throws IOException
+    {
+        this();
+        
+        if (reader == null) {
+            String err = "The argument 'reader' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+            
+        _source = new InputSource(reader);
+        if (filename == null) filename = reader.toString();
+        _source.setPublicId(filename);
+        
+    } //-- SchemaReader
+
+    /**
+     * Creates a new SchemaReader for the given URL
+     *
+     * @param url the URL string 
+    **/
+    public SchemaReader(String url)
+        throws IOException
+    {
+        this();
+        if (url == null) {
+            String err = "The argument 'url' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        _source = new InputSource(url);
+        
+    } //-- SchemaReader
     
     /**
      * Reads the Schema from the source and returns the Schema
@@ -139,6 +178,7 @@ public class SchemaReader {
             else if (except instanceof SAXParseException) {
                 SAXParseException spe = (SAXParseException)except;
                 String filename = spe.getSystemId();
+                if (filename == null) filename = spe.getPublicId();
                 if (filename == null) filename = "<filename unavailable>";
                 
                 String err = spe.getMessage();
