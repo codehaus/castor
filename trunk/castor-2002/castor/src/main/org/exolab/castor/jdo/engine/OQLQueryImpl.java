@@ -132,6 +132,10 @@ public class OQLQueryImpl
     private int                _projectionType;
     private Vector             _pathInfo;
 
+    private PersistenceQuery   _query;
+
+    private QueryResults       _results;
+
 
     OQLQueryImpl( DatabaseImpl dbImpl )
     {
@@ -413,12 +417,13 @@ public class OQLQueryImpl
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         org.exolab.castor.persist.QueryResults      results;
-        PersistenceQuery  query;
         SQLEngine         engine;
-        QueryResults retVal = null;;
         
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
+        if (_results != null) {
+            _results.close();
+        }
         try {
             switch (_projectionType) {
                 case ParseTreeWalker.PARENT_OBJECT:
@@ -429,25 +434,25 @@ public class OQLQueryImpl
                     
                     engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
                     if ( _expr != null ) {
-                        query = engine.createQuery( _expr, _bindTypes );
+                        _query = engine.createQuery( _expr, _bindTypes );
                     } else {
-                        query = engine.createCall( _spCall, _bindTypes );
-                        if (query == null) 
+                        _query = engine.createCall( _spCall, _bindTypes );
+                        if (_query == null) 
                             throw new QueryException( Messages.message( "query.callNotSupported" ) );
                     }
                     if ( _bindValues != null ) {
                         for ( int i = 0 ; i < _bindValues.length ; ++i )
-                            query.setParameter( i, _bindValues[ i ] );
+                            _query.setParameter( i, _bindValues[ i ] );
                     }
-                    results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
+                    results = _dbImpl.getTransaction().query( _dbEngine, _query, accessMode );
                     _fieldNum = 0;
 
                     // System.out.println( _projectionType );
                     
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
-                      retVal = new OQLEnumeration( results );
+                      _results = new OQLEnumeration( results );
                     else
-                      retVal = new OQLEnumeration( results, _pathInfo, _clsDesc);
+                      _results = new OQLEnumeration( results, _pathInfo, _clsDesc);
                     break;
                 case ParseTreeWalker.DEPENDANT_VALUE:
                 case ParseTreeWalker.AGGREGATE:
@@ -456,15 +461,35 @@ public class OQLQueryImpl
                     //System.out.println("Executing simple query");
 
                     SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
-                    retVal =  sqe.execute( _expr, _bindValues);
+                    _results =  sqe.execute( _expr, _bindValues);
                     
             }
         } catch ( PersistenceException except ) {
             throw except;
         }
-        return ( retVal );
+        return _results;
     }
         
+    
+    public void close()
+    {
+        if ( _query != null ) {
+            _query.close();
+            _query = null;
+        }
+        if ( _results != null ) {
+            _results.close();
+            _results = null;
+        }
+    }
+
+
+    protected void finalize() throws Throwable
+    {
+        close();
+    }
+
+
 
     static class OQLEnumeration
         implements QueryResults, Enumeration
