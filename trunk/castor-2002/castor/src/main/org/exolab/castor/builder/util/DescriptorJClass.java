@@ -167,7 +167,7 @@ public class DescriptorJClass extends JClass {
         //-- create getValidator method
         method = new JMethod(_TypeValidatorClass, "getValidator");
         jsc = method.getSourceCode();
-        jsc.add("return null;");
+        jsc.add("return this;");
         addMethod(method);
         _getValidator = method;
 
