@@ -1025,6 +1025,16 @@ public abstract class TransactionContext
                 }
             }
 
+            // Process all modified objects
+            enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (ObjectEntry) enum.nextElement();
+                if ( !entry.deleted && entry.updatePersistNeeded )
+                    entry.engine.store( this, entry.oid, entry.object );
+                if ( !entry.deleted && entry.updateCacheNeeded )
+                    entry.engine.softLock( this, entry.oid, _lockTimeout );
+            }
+
             _status = Status.STATUS_PREPARING;
 
             // Process all deleted objects last in FIFO order.
@@ -1032,14 +1042,6 @@ public abstract class TransactionContext
                 entry = _deletedList;
                 _deletedList = _deletedList.nextDeleted;
                 entry.engine.delete( this, entry.oid, entry.object );
-            }
-
-            // Process all modified objects
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                if ( !entry.deleted && (entry.updatePersistNeeded || entry.updateCacheNeeded) )
-                    entry.engine.store( this, entry.oid, entry.object );
             }
 
             _status = Status.STATUS_PREPARED;
