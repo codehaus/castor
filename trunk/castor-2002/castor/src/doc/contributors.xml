@@ -261,12 +261,6 @@
   </contributor>
 
   <contributor type="Contributor">
-    <name surname="Ballanger" given="Andrew" />
-    <email>AWBALLAN@smumn.edu</email>
-   <description>An improvement for generated SQL statement syntax</description>
-  </contributor>
-
-  <contributor type="Contributor">
     <name surname="Snowsill" given="David" />
     <email>david.snowsill@calibreft.com.au</email>
    <description>JDO bugfixes</description>
@@ -308,6 +302,12 @@
     <description>Some patches for Castor XML + Castor JDO</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Small" given="Matt"/>
+    <email>msmall@clickability.com</email>
+    <description>Some patches for Castor XML Schema Writer</description>
+  </contributor>
+ 
   <contributor type="Contributor">
     <name surname="Low" given="Heng Sin"/>
     <email>lowhs@comline.com.my</email>
