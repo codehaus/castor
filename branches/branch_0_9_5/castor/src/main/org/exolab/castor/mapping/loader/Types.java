@@ -53,8 +53,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.types.Duration;
 import org.exolab.castor.util.Messages;
 
@@ -71,12 +69,6 @@ import org.exolab.castor.util.Messages;
 public class Types
 {
 
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static Log _log = LogFactory.getFactory().getInstance (Types.class);
-    
     /**
      * Returns the class name based on the supplied type name. The type name
      * can be a short name (e.g. int, byte) or any other Java class (e.g.
