@@ -137,5 +137,17 @@ public interface Cache {
      * @param capacity the cache capacity.
      */
     public void setCapacity (int capacity);
+    
+    /**
+     * Indicates the class name of objects stored in this cache.
+     * @return The class name.
+     */
+    public String getClassName();
+    
+    /**
+     * Sets the class name of objects cached here.
+     * @param className The class name.
+     */
+    public void setClassName (String className); 
 	
 }
