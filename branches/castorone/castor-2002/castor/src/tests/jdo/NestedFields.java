@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
@@ -102,16 +103,16 @@ public class NestedFields
         try {
             OQLQuery         oql;
             TestNestedFields t;
-            Enumeration      enum;
-            
+            QueryResults     res;
+
             // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
             db.begin();
             oql = db.getOQLQuery( "SELECT t FROM jdo.TestNestedFields t WHERE id = $1" );
             oql.bind( TestNestedFields.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                t = (TestNestedFields) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                t = (TestNestedFields) res.next();
                 db.remove( t );
                 stream.writeVerbose( "Deleting object: " + t );
             }
@@ -123,9 +124,9 @@ public class NestedFields
             db.commit();
             db.begin();
             oql.bind( TestNestedFields.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                t = (TestNestedFields) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                t = (TestNestedFields) res.next();
                 if ( t.getNested1().getValue1().equals(TestNestedFields.DefaultValue1)
                         && t.getNested2().getNested3().getValue2().equals(TestNestedFields.DefaultValue2)) {
                     stream.writeVerbose( "OK: Created object: " + t );
@@ -133,6 +134,19 @@ public class NestedFields
                     stream.writeVerbose( "Error: Created object: " + t );
                     result = false;
                 }
+            }
+            db.commit();
+
+            stream.writeVerbose( "Testing nested fields in OQLQuery..." );
+            db.begin();
+            oql = db.getOQLQuery( "SELECT t FROM jdo.TestNestedFields t WHERE nested2.nested3.value2 = $1" );
+            oql.bind( TestNestedFields.DefaultValue2 );
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                stream.writeVerbose( "OK" );
+            } else {
+                stream.writeVerbose( "Error" );
+                result = false;
             }
             db.commit();
 
