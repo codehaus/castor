@@ -91,21 +91,37 @@ public class OqlTests extends CastorTestCase {
         _category = (JDOCategory) category;
     }
 
-    /*
-     * @todo Populate the database
-     */
     public void setUp()
             throws PersistenceException 
     {
         _db = _category.getDatabase( verbose );
     }
 
+    /*
+     * @todo Populate the database
+     */
     public void runTest()
        throws PersistenceException, Exception 
     {
         // The following statement only prints in -verbose mode
         stream.println( "Not yet implemented" );
+
+        // Populate the database here rather than in setUp(). The setUp()
+        // method is run once before each test (and tearDown() is run once
+        // after each test and I don't think that we want to populate/truncate
+        // the database for each test. We're just selecting the data we're not
+        // manipulating it. 
+
+        populateDatabase();
     }
+
+    /*
+     * This method will truncate everything from the database and then
+     * repopulate it. It needs to be generic enough to work across databases
+     * so I would prefer to use straight JDBC calls. 
+     */
+    public void populateDatabase()
+    {}
 
     /*
      * Test many different variations of the basic SELECT statement.
