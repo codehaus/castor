@@ -396,17 +396,17 @@ public class MarshalHelper {
         //-- I tried to order these in the order in which
         //-- (I think) types are used more frequently
         // int
-        if (type == Integer.TYPE) {
+        if ((type == Integer.TYPE) || (type == Integer.class)) {
             primitive = new Integer(value);
         }
         // boolean
-        else if (type == Boolean.TYPE)
+        else if ((type == Boolean.TYPE) || (type == Boolean.class))
             primitive = new Boolean(value);
         // double
-        else if (type == Double.TYPE)
+        else if ((type == Double.TYPE) || (type == Double.class))
             primitive = new Double(value);
         // long
-        else if (type == Long.TYPE)
+        else if ((type == Long.TYPE) || (type == Long.class))
             primitive = new Long(value);
         // char
         else if (type == Character.TYPE) {
@@ -416,10 +416,10 @@ public class MarshalHelper {
                 primitive = new Character('\0');
         }
         // short
-        else if (type == Short.TYPE)
+        else if ((type == Short.TYPE) || (type == Short.class))
             primitive = new Short(value);
         // float
-        else if (type == Float.TYPE)
+        else if ((type == Float.TYPE) || (type == Float.class))
             primitive = new Float(value);
         // byte
         else if (type == Byte.TYPE)
