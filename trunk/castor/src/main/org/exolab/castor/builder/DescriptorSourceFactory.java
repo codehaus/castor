@@ -83,13 +83,31 @@ public class DescriptorSourceFactory {
 	private static final String FIELD_VALIDATOR_NAME = "fieldValidator";
 
 
+    /**
+     * The BuilderConfiguration instance
+     */
+    private BuilderConfiguration _config = null;
+    
+    /**
+     * Creates a new DescriptorSourceFactory with the given configuration
+     *
+     * @param config the BuilderConfiguration instance
+     */
+    public DescriptorSourceFactory(BuilderConfiguration config) {
+        if (config == null) {
+            String err = "The argument 'config' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        _config = config;
+    } //-- DescriptorSourceFactory
+    
 	/**
 	 * Creates the Source code of a MarshalInfo for a given XML Schema
 	 * element declaration
 	 * @param element the XML Schema element declaration
 	 * @return the JClass representing the MarshalInfo source code
-	**/
-	public static JClass createSource(ClassInfo classInfo) {
+	 */
+	public JClass createSource(ClassInfo classInfo) {
 
 		JMethod method = null;
 		JSourceCode jsc = null;
@@ -101,7 +119,7 @@ public class DescriptorSourceFactory {
 		String variableName = "_" + className;
 
 		DescriptorJClass classDesc =
-			new DescriptorJClass(className + DESCRIPTOR_NAME, jClass);
+			new DescriptorJClass(_config, className + DESCRIPTOR_NAME, jClass);
 
 		//-- get handle to default constuctor
 
@@ -236,9 +254,12 @@ public class DescriptorSourceFactory {
 	 * Create a specific descriptor for a given member (whether an attribute or
 	 * an element) represented by a given Class name
 	 */
-	private static void 
-        createDescriptor(DescriptorJClass classDesc,FieldInfo member,String localClassName,
-		                 String nsURI, JSourceCode jsc) 
+	private void createDescriptor
+	    (DescriptorJClass classDesc,
+	     FieldInfo member,
+	     String localClassName, 
+	     String nsURI, 
+	     JSourceCode jsc) 
     {
 
 		XSType xsType = member.getSchemaType();
@@ -265,7 +286,7 @@ public class DescriptorSourceFactory {
 		if ((nodeName != null) && (!isText)) {
 			//-- By default the node name parameter is a literal string
 			nodeNameParam = "\"" + nodeName + "\"";
-			if (SourceGenerator.classDescFieldNames()) {
+			if (_config.classDescFieldNames()) {
 				//-- The node name parameter is a reference to a public static final
 				nodeNameParam = member.getNodeName().toUpperCase();
 				//-- Expose node name as public static final (reused by XMLFieldDescriptorImpl)
@@ -380,11 +401,12 @@ public class DescriptorSourceFactory {
 
 	} //--CreateDescriptor
 
-	private static void createXMLFieldHandler(
-		FieldInfo member,
-		XSType xsType,
-		String localClassName,
-		JSourceCode jsc) {
+    /**
+     * Creates the XMLFieldHandler for the given FieldInfo
+     */
+	private void createXMLFieldHandler
+	    (FieldInfo member, XSType xsType, String localClassName, JSourceCode jsc) 
+	{
 
 		boolean any = false;
 		boolean isEnumerated = false;
@@ -449,7 +471,7 @@ public class DescriptorSourceFactory {
 		jsc.append(localClassName);
 		jsc.append(") object;");
 		//-- check for null primitives
-		if (xsType.isPrimitive() && !SourceGenerator.usePrimitiveWrapper()) {
+		if (xsType.isPrimitive() && !_config.usePrimitiveWrapper()) {
 			if ((!member.isRequired())
 				&& (!xsType.isEnumerated())
 				&& (!member.isMultivalued())) {
@@ -473,7 +495,7 @@ public class DescriptorSourceFactory {
 		jsc.add("target.");
 		jsc.append(member.getWriteMethodName());
 		jsc.append("( ");
-		if (xsType.isPrimitive() && !SourceGenerator.usePrimitiveWrapper()) {
+		if (xsType.isPrimitive() && !_config.usePrimitiveWrapper()) {
 			jsc.append(xsType.createFromJavaObjectCode("value"));
 		} else if (any) {
 			jsc.append(" value ");
