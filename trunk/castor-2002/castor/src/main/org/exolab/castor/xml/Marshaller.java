@@ -166,6 +166,8 @@ public class Marshaller {
     private List   _packages = null;
 
     private Stack   _parents  = null;
+	
+	private boolean _polymorph = true;
 
     /**
      * An instance of StringClassDescriptor
@@ -346,6 +348,26 @@ public class Marshaller {
         _validate = validate;
     } //-- setValidation
 
+	/**
+	 * If True the marshaller will use the 'xsi:type' attribute
+	 * to marshall a field value that extended the defined field type.
+	 * Default is True.
+	 */
+	public void setPolymorph(boolean polymorph)
+	{
+		_polymorph = polymorph;
+	} //-- setPolymorph
+	
+	/**
+	 * If True the marshaller will use the 'xsi:type' attribute
+	 * to marshall a field value that extended the defined field type.
+	 * Default is True.
+	 */
+	public boolean getPolymorph()
+	{
+		return _polymorph;
+	} //-- getPolymorph
+	
     /**
      * Marshals the given Object as XML using the given writer
      * @param obj the Object to marshal
@@ -488,13 +510,22 @@ public class Marshaller {
                         _packages.add(pkgName);
                 }
 
-                classDesc = getClassDescriptor(_class);
+				// XML polymorph?
+				if (_polymorph)
+				{
+					// Support XML polymorph, attempt to marshall actual value
+					classDesc = getClassDescriptor(_class);                    
+					saveType = (_class != descriptor.getFieldType());
+				}
+				else
+				{
+					// No XML polymorph, always marshall as field type
+					_class = descriptor.getFieldType();
+					classDesc = getClassDescriptor(_class);                    
+				}
+				
                 if (descriptor.getXMLName()==null)
                     name = classDesc.getXMLName();
-                    
-                //-- check to see if we to save the xsi:type
-                //-- for this class
-                saveType = (_class != descriptor.getFieldType());
             }
 
             if (classDesc == null) {
