@@ -1,6 +1,11 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1522 using contribution from Stein M. Hugubakken [dulci@start.no].
+	   Removed deprecated and unused methods from Database.java and 
+	   DatabaseImpl.java. 
+       (Werner - 20040205)
+       
 JDO:   Fixed bug 1499 using contribution from Stein M. Hugubakken [dulci@start.no].
 	   DatabaseImpl.finalize() now outputs a warning if the instance about to be 
 	   garbage-collected still has valid scope. In addition, improves code 
