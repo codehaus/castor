@@ -34,6 +34,7 @@ import java.io.Writer;
 //-- Adaptx imports
 import org.exolab.adaptx.net.URILocation;
 import org.exolab.adaptx.net.impl.URILocationImpl;
+import org.exolab.adaptx.net.impl.URIUtils;
 import org.exolab.adaptx.xml.parser.DOMParser;
 import org.exolab.adaptx.xslt.FunctionResolver;
 import org.exolab.adaptx.xslt.ResultHandler;
@@ -205,7 +206,7 @@ public class TransformerImpl
             }
             else if (streamResult.getSystemId() != null) {
                 try {
-                    writer = new FileWriter(streamResult.getSystemId());
+                    writer = URIUtils.getWriter(streamResult.getSystemId(), null);
                 }
                 catch(java.io.IOException iox) {
                     throw new TransformerException(iox);
