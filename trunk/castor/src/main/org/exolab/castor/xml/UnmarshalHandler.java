@@ -1186,9 +1186,9 @@ public final class UnmarshalHandler extends MarshalFramework
             
             //-- adjust name and try parent
             if (count == 0)
-                path = parentState.elementName;
+                path = targetState.elementName;
             else
-                path = parentState.elementName + "/" + path;
+                path = targetState.elementName + "/" + path;
                 
             //-- get 
             --pIdx;
