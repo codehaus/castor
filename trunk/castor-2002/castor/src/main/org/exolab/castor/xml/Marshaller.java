@@ -169,7 +169,7 @@ public class Marshaller {
 
     private Stack   _parents  = null;
 
-	private boolean _marshallExtendedType = true;
+	private boolean _marshalExtendedType = true;
 
     /**
      * An instance of StringClassDescriptor
@@ -368,9 +368,9 @@ public class Marshaller {
 	 * to marshall a field value that extended the defined field type.
 	 * Default is True.
 	 */
-	public void setMarshallExtendedType(boolean marshallExtendedType)
+	public void setMarshalExtendedType(boolean marshallExtendedType)
 	{
-		_marshallExtendedType = marshallExtendedType;
+		_marshalExtendedType = marshallExtendedType;
 	} //-- setMarshallExtendedType
 
 	/**
@@ -378,9 +378,9 @@ public class Marshaller {
 	 * to marshall a field value that extended the defined field type.
 	 * Default is True.
 	 */
-	public boolean getMarshallExtendedType()
+	public boolean getMarshalExtendedType()
 	{
-		return _marshallExtendedType;
+		return _marshalExtendedType;
 	} //-- setMarshallExtendedType
 
     /**
@@ -542,16 +542,16 @@ public class Marshaller {
                         _packages.add(pkgName);
                 }
 
-				// XML polymorph?
-				if (_marshallExtendedType)
+
+				if (_marshalExtendedType)
 				{
-					// Support XML polymorph, attempt to marshall actual value
+					//  marshall as the actual value
 					classDesc = getClassDescriptor(_class);
 					saveType = (_class != descriptor.getFieldType());
 				}
 				else
 				{
-					// No XML polymorph, always marshall as field type
+					// marshall as the base field type
 					_class = descriptor.getFieldType();
 					classDesc = getClassDescriptor(_class);
 				}
