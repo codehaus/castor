@@ -33,6 +33,7 @@
   <xsd:element name="class">
     <xsd:type content="elemOnly" order="seq">
       <xsd:element name="description" type="string" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="cache-type-mapping" minOccurs="0" maxOccurs="1" />
       <xsd:element ref="map-to" minOccurs="0" maxOccurs="1" />
       <xsd:group order="choice" minOccurs="1">
         <xsd:element ref="field" minOccurs="0"/>
@@ -40,7 +41,8 @@
       </xsd:group>
       <xsd:attribute name="name" type="ID" minOccurs="1"/>
       <xsd:attribute name="extends" type="IDREF" minOccurs="0"/>
-      <xsd:attribute name="identity" type="string" minOccurs="0"/>
+      <xsd:attribute name="depends" type="IDREF" minOccurs="0"/>
+      <xsd:attribute name="identity" type="NMTOKENS" minOccurs="0"/>
       <xsd:attribute name="access" type="string" minOccurs="0" default="shared">
         <xsd:enumeration value="read-only"/>
         <xsd:enumeration value="shared"/>
@@ -48,7 +50,7 @@
         <xsd:enumeration value="db-locked"/>
       </xsd:attribute>
       <xsd:attribute name="key-generator" type="IDREF" minOccurs="0"/>
-      <xsd:attribute name="complete" type="boolean" minOccurs="0" default="true"/>
+      <xsd:attribute name="auto-complete" type="boolean" minOccurs="0" default="true"/>
     </xsd:type>
   </xsd:element>
 
@@ -69,13 +71,15 @@
       <xsd:element ref="sql" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="bind-xml" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="ldap" minOccurs="0" maxOccurs="1"/>
-      <xsd:attribute name="name" type="NMTOKEN" minOccurs="1"/>
-      <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <xsd:attribute name="name" type="NMTOKENS" minOccurs="1"/>
+      <xsd:attribute name="type" type="NMTOKENS" minOccurs="0"/>
+      <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <xsd:attribute name="transient" type="boolean" minOccurs="0" default="false"/>
+      <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
+      <xsd:attribute name="lazy" type="boolean" minOccurs="0" default="false"/>      
       <xsd:attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
-      <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
-      <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="collection" type="string" minOccurs="0">
         <xsd:enumeration value="array"/>
         <xsd:enumeration value="vector"/>
@@ -83,6 +87,7 @@
         <xsd:enumeration value="collection"/>
         <xsd:enumeration value="set"/>
         <xsd:enumeration value="map"/>
+        <xsd:enumeration value="enumerate"/>
       </xsd:attribute>
     </xsd:type>
   </xsd:element>
@@ -93,6 +98,8 @@
       <xsd:element ref="field" minOccurs="1"/>
       <xsd:attribute name="name" type="NMTOKEN" minOccurs="1"/>
       <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
@@ -103,8 +110,8 @@
 
   <xsd:element name="sql">
     <xsd:type content="empty">
-      <xsd:attribute name="name" type="NMTOKEN" minOccurs="0"/>
-      <xsd:attribute name="type" type="string" minOccurs="0"/>
+      <xsd:attribute name="name" type="NMTOKENS" minOccurs="0"/>
+      <xsd:attribute name="type" type="NMTOKENS" minOccurs="0"/>
       <xsd:attribute name="many-table" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="many-key" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="dirty" type="string" minOccurs="0" default="check">
@@ -141,6 +148,18 @@
       <xsd:element ref="param" minOccurs="0" />
       <xsd:attribute name="name" type="ID" minOccurs="1" maxOccurs="1"/>
       <xsd:attribute name="alias" type="string" minOccurs="0" maxOccurs="1"/>
+    </xsd:type>
+  </xsd:element>
+
+  <xsd:element name="cache-type-mapping">
+    <xsd:type content="empty">
+      <xsd:attribute name="type" type="string" minOccurs="0" default="count-limited">
+        <xsd:enumeration value="none"/>
+        <xsd:enumeration value="count-limited"/>
+        <xsd:enumeration value="time-limited"/>
+        <xsd:enumeration value="unlimited"/>
+      </xsd:attribute>
+      <xsd:attribute name="capacity" type="integer" minOccurs="0"/>
     </xsd:type>
   </xsd:element>
 
