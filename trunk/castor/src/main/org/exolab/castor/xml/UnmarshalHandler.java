@@ -266,6 +266,12 @@ public final class UnmarshalHandler extends MarshalFramework
     private boolean _createNamespaceScope = true;
     
     /**
+     * Keeps track of the current element information
+     * as passed by the parser
+     */
+    private ElementInfo _elemInfo = null;
+    
+    /**
      * A "reusable" AttributeSet, for use when handling
      * SAX 2 ContentHandler
      */
@@ -292,15 +298,14 @@ public final class UnmarshalHandler extends MarshalFramework
     **/
     protected UnmarshalHandler(Class _class) {
         super();
-        _stateInfo    = new Stack();
-        _idResolver   = new IDResolverImpl();
-        _resolveTable = new Hashtable();
-        buf           = new StringBuffer();
-        _topClass     = _class;
-        _namespaces   = new Namespaces();
-        _nsPackageMappings = new Hashtable();
-        _reusableAtts = new AttributeSetImpl(5);
-        _statePool    = new Stack();
+        _stateInfo          = new Stack();
+        _idResolver         = new IDResolverImpl();
+        _resolveTable       = new Hashtable();
+        buf                 = new StringBuffer();
+        _topClass           = _class;
+        _namespaces         = new Namespaces();
+        _nsPackageMappings  = new Hashtable();
+        _statePool          = new Stack();
     } //-- UnmarshalHandler(Class)
 
     /**
@@ -506,23 +511,6 @@ public final class UnmarshalHandler extends MarshalFramework
         if (_anyUnmarshaller != null)
            _anyUnmarshaller.characters(ch, start, length);
         else {
-             
-             /* Commented out 2003-09-11 kvisco, this code is breaking
-                some of the test cases
-                
-             //-- we look for the proper state since we could be unmarshalling containers
-             //-- that don't hold text value
-             Object[] states = _stateInfo.toArray();
-             int counter = _stateInfo.size();
-             boolean found = false;
-             
-             UnmarshalState state = (UnmarshalState)states[counter-1];
-             
-             while (state.fieldDesc.isContainer() && counter > 0) {
-             	counter = counter - 1;
-             	state = (UnmarshalState)states[counter-1]; 	
-             }
-             */
              UnmarshalState state = (UnmarshalState)_stateInfo.peek();
              if (state.buffer == null) state.buffer = new StringBuffer();
              state.buffer.append(ch, start, length);
@@ -590,7 +578,28 @@ public final class UnmarshalHandler extends MarshalFramework
             //maybe there is still a container to end
             if (descriptor.isContainer()) {
                 _stateInfo.push(state);
+                //-- check for possible characters added to
+                //-- the container's state that should
+                //-- really belong to the parent state
+                StringBuffer tmpBuffer = null;
+                if (state.buffer != null) {
+                    if (!isWhitespace(state.buffer)) {
+                        if (state.classDesc.getContentDescriptor() == null) {
+                            tmpBuffer = state.buffer;
+                            state.buffer = null;
+                        }
+                    }
+                }
+                //-- end container
                 endElement(state.elementName);
+                
+                if (tmpBuffer != null) {
+                    state = (UnmarshalState) _stateInfo.peek();
+                    if (state.buffer == null)
+                        state.buffer = tmpBuffer;
+                    else
+                        state.buffer.append(tmpBuffer.toString());
+                }
                 endElement(name);
                 return;
             }
@@ -600,7 +609,8 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new SAXException(err);
             }
         }
-
+        
+        
         //-- clean up current Object
         Class type = state.type;
 
@@ -1012,8 +1022,19 @@ public final class UnmarshalHandler extends MarshalFramework
         else
             _createNamespaceScope = true;
             
-            
-        _reusableAtts.clear();
+        
+        if (_reusableAtts == null) {
+            if (atts != null) 
+                _reusableAtts = new AttributeSetImpl(atts.getLength());
+            else {
+                //-- we can't pass a null AttributeSet to the
+                //-- startElement
+                _reusableAtts = new AttributeSetImpl();
+            }
+        }
+        else {
+            _reusableAtts.clear();
+        }
         
         //-- process attributes
         boolean hasQNameAtts = false;
@@ -1079,7 +1100,13 @@ public final class UnmarshalHandler extends MarshalFramework
         
         //-- preserve parser passed arguments for any potential
         //-- delegation
-        ElementInfo elemInfo = new ElementInfo(null, atts);
+        if (_elemInfo == null) {
+            _elemInfo = new ElementInfo(null, atts);
+        }
+        else {
+            _elemInfo.clear();
+            _elemInfo.attributes = atts;
+        }
         
         if ((localName == null) || (localName.length() == 0)) {
             if ((qName == null) || (qName.length() == 0)) {
@@ -1087,17 +1114,17 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new SAXException(error);
             }
             localName = qName;
-            elemInfo.qName = qName;
+            _elemInfo.qName = qName;
         }
         else {
             if ((qName == null) || (qName.length() == 0)) {
                 if ((namespaceURI == null) || (namespaceURI.length() == 0)) {
-                    elemInfo.qName = localName;
+                    _elemInfo.qName = localName;
                 }
                 else {
                     String prefix = _namespaces.getNamespacePrefix(namespaceURI);
                     if ((prefix != null) && (prefix.length() > 0)) {
-                        elemInfo.qName = prefix + ":" + localName;
+                        _elemInfo.qName = prefix + ":" + localName;
                     }
                 }
                 
@@ -1119,7 +1146,7 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         
         //-- call private startElement
-        startElement(localName, namespaceURI, _reusableAtts, elemInfo);
+        startElement(localName, namespaceURI, _reusableAtts);
         
     } //-- startElement
     
@@ -1154,7 +1181,14 @@ public final class UnmarshalHandler extends MarshalFramework
            return;
         }
         
-        ElementInfo elemInfo = new ElementInfo(name, attList);
+        if (_elemInfo == null) {
+            _elemInfo = new ElementInfo(name, attList);
+        }
+        else {
+            _elemInfo.clear();
+            _elemInfo.qName = name;
+            _elemInfo.attributeList = attList;
+        }
         
         //-- The namespace of the given element
         String namespace = null;
@@ -1181,7 +1215,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- End Namespace Handling
         
         //-- call private startElement method
-        startElement(name, namespace, atts, elemInfo);
+        startElement(name, namespace, atts);
         
     } //-- startElement
         
@@ -1197,7 +1231,7 @@ public final class UnmarshalHandler extends MarshalFramework
      * with the element.
      */
     private void startElement
-        (String name, String namespace, AttributeSet atts, ElementInfo elemInfo) 
+        (String name, String namespace, AttributeSet atts) 
         throws SAXException
     {
 
@@ -1362,12 +1396,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- create new state object
         state = getState();
         state.elementName = name;
-        //-- save location
-        if (parentState.location.length() == 0)
-            state.location = parentState.elementName;
-        else
-            state.location = parentState.location + "/" + parentState.elementName;
-            
+        
         _stateInfo.push(state);
 
         //-- make sure we should proceed
@@ -1400,6 +1429,7 @@ public final class UnmarshalHandler extends MarshalFramework
         int pIdx = _stateInfo.size() - 2; //-- index of parentState
         UnmarshalState targetState = parentState;
         String path = "";
+        StringBuffer pathBuf = null;
         int count = 0;
         boolean isWrapper = false;
         XMLClassDescriptor oldClassDesc = classDesc;
@@ -1433,7 +1463,7 @@ public final class UnmarshalHandler extends MarshalFramework
                of the xml element in the mapping file. This logic might
                not be completely necessary, and perhaps we should remove it.
             */
-            if ((descriptor == null) && (count == 0)) {
+            if ((descriptor == null) && (count == 0) && (!targetState.wrapper)) {
                 MarshalFramework.InheritanceMatch[] matches = searchInheritance(name, namespace, classDesc, _cdResolver);
                 if (matches.length != 0) {
                     InheritanceMatch match = matches[0];
@@ -1449,8 +1479,14 @@ public final class UnmarshalHandler extends MarshalFramework
                 if (path.equals(tmpPath)) break; //-- found
             }
             else {
-                String location = path + "/" + name;
-                isWrapper = (isWrapper || hasFieldsAtLocation(location, classDesc));
+                if (pathBuf == null) 
+                    pathBuf = new StringBuffer();
+                else 
+                    pathBuf.setLength(0);
+                pathBuf.append(path);
+                pathBuf.append('/');
+                pathBuf.append(name);
+                isWrapper = (isWrapper || hasFieldsAtLocation(pathBuf.toString(), classDesc));
             }
             
             //-- Make sure there are more parent classes on stack
@@ -1460,8 +1496,16 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- adjust name and try parent
             if (count == 0)
                 path = targetState.elementName;
-            else
-                path = targetState.elementName + "/" + path;
+            else {
+                if (pathBuf == null) 
+                    pathBuf = new StringBuffer();
+                else 
+                    pathBuf.setLength(0);
+                pathBuf.append(targetState.elementName);
+                pathBuf.append('/');
+                pathBuf.append(path);
+                path = pathBuf.toString();
+            }
                 
             //-- get 
             --pIdx;
@@ -1579,7 +1623,7 @@ public final class UnmarshalHandler extends MarshalFramework
             //we need to recall startElement()
             //so that we can find a more appropriate descriptor in for the given name
             _namespaces = _namespaces.createNamespaces();
-            startElement(name, namespace, atts, elemInfo);
+            startElement(name, namespace, atts);
             return;
         }
         //--End of the container support
@@ -1734,15 +1778,15 @@ public final class UnmarshalHandler extends MarshalFramework
                     //1- creates a new SAX2ANY handler
                     _anyUnmarshaller = new SAX2ANY(_namespaces);
                     //2- delegates the element handling
-                    if (elemInfo.attributeList != null) {
+                    if (_elemInfo.attributeList != null) {
                         //-- SAX 1
-                        _anyUnmarshaller.startElement(elemInfo.qName, 
-                            elemInfo.attributeList);
+                        _anyUnmarshaller.startElement(_elemInfo.qName, 
+                            _elemInfo.attributeList);
                     }
                     else {
                         //-- SAX 2
-                        _anyUnmarshaller.startElement(namespace, name, elemInfo.qName, 
-                            elemInfo.attributes);
+                        _anyUnmarshaller.startElement(namespace, name, _elemInfo.qName, 
+                            _elemInfo.attributes);
                     }
                     //first element so depth can only be one at this point
                     _depth = 1;
@@ -2225,11 +2269,20 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- stack and find correct descriptor
                 int pIdx = _stateInfo.size() - 2; //-- index of parentState
                 String path = state.elementName;
+                StringBuffer pathBuf = null;
                 while (pIdx >= 0) {
                     UnmarshalState targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
                     --pIdx;
                     if (targetState.wrapper) {
-                        path = targetState.elementName + "/" + path;
+                        //path = targetState.elementName + "/" + path;
+                        if (pathBuf == null) 
+                            pathBuf = new StringBuffer();
+                        else
+                            pathBuf.setLength(0);
+                        pathBuf.append(targetState.elementName);
+                        pathBuf.append('/');
+                        pathBuf.append(path);
+                        path = pathBuf.toString();
                         continue;
                     }
                     classDesc = targetState.classDesc;
@@ -2241,7 +2294,15 @@ public final class UnmarshalHandler extends MarshalFramework
                         if (path.equals(tmpPath)) break; //-- found
                     }
                         
-                    path = targetState.elementName + "/" + path;
+                    if (pathBuf == null) 
+                        pathBuf = new StringBuffer();
+                    else
+                        pathBuf.setLength(0);
+                    pathBuf.append(targetState.elementName);
+                    pathBuf.append('/');
+                    pathBuf.append(path);
+                    path = pathBuf.toString();
+                    //path = targetState.elementName + "/" + path;
                     //-- reset descriptor to make sure we don't
                     //-- exit the loop with a reference to a 
                     //-- potentially incorrect one.
@@ -2299,12 +2360,21 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- stack and find correct descriptor
             int pIdx = _stateInfo.size() - 2; //-- index of parentState
             String path = state.elementName;
+            StringBuffer pathBuf = null;
             UnmarshalState targetState = null;
             while (pIdx >= 0) {
                 targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
                 --pIdx;
                 if (targetState.wrapper) {
-                    path = targetState.elementName + "/" + path;
+                    //path = targetState.elementName + "/" + path;
+                    if (pathBuf == null) 
+                        pathBuf = new StringBuffer();
+                    else
+                        pathBuf.setLength(0);
+                    pathBuf.append(targetState.elementName);
+                    pathBuf.append('/');
+                    pathBuf.append(path);
+                    path = pathBuf.toString();
                     continue;
                 }
                 classDesc = targetState.classDesc;
@@ -2325,7 +2395,16 @@ public final class UnmarshalHandler extends MarshalFramework
                 }
                 if (found) break;
                         
-                path = targetState.elementName + "/" + path;
+                //path = targetState.elementName + "/" + path;
+                if (pathBuf == null) 
+                    pathBuf = new StringBuffer();
+                else
+                    pathBuf.setLength(0);
+                pathBuf.append(targetState.elementName);
+                pathBuf.append('/');
+                pathBuf.append(path);
+                path = pathBuf.toString();
+                
                 //-- reset descriptor to make sure we don't
                 //-- exit the loop with a reference to a 
                 //-- potentially incorrect one.
@@ -2829,9 +2908,34 @@ public final class UnmarshalHandler extends MarshalFramework
      * @return true if the only whitespace characters were
      * found in the given StringBuffer
     **/
-    private boolean isWhitespace(StringBuffer sb) {
+    private static boolean isWhitespace(StringBuffer sb) {
         for (int i = 0; i < sb.length(); i++) {
             char ch = sb.charAt(i);
+            switch (ch) {
+                case ' ':
+                case '\n':
+                case '\t':
+                case '\r':
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return true;
+    } //-- isWhitespace
+    
+    /**
+     * Checks the given StringBuffer to determine if it only
+     * contains whitespace.
+     *
+     * @param sb the StringBuffer to check
+     * @return true if the only whitespace characters were
+     * found in the given StringBuffer
+    **/
+    private static boolean isWhitespace(char[] chars, int start, int length) {
+        
+        for (int i = start; i < length; i++) {
+            char ch = chars[i];
             switch (ch) {
                 case ' ':
                 case '\n':
