@@ -464,8 +464,6 @@ public abstract class MappingLoader
             if ( fieldType == null && colType == null )
                 fieldType = getMethod.getReturnType();
         } else if ( fieldMap.getName() != null ) {
-            if ( colType != null && CollectionHandlers.isEnumerate( colType ) )
-                getMethod = findAccessor( javaClass, "list" + capitalize( fieldMap.getName() ), Enumeration.class, true );
             if ( getMethod == null )
                 getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
                                           ( colType == null ? fieldType : colType ), true );
@@ -475,24 +473,15 @@ public abstract class MappingLoader
 
         // Second look up the set/add accessor
         if ( fieldMap.getSetMethod() != null ) {
-            if ( colType != null && CollectionHandlers.isEnumerate( colType ) ) {
-                setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), fieldType, false );
-                if ( setMethod == null )
-                    throw new MappingException( "mapping.accessorNotFound",
-                                                fieldMap.getSetMethod(), fieldType, javaClass.getName() );
-            } else {
-                setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
-                                          ( colType == null ? fieldType : colType ), false );
-                if ( setMethod == null )
-                    throw new MappingException( "mapping.accessorNotFound",
-                                                fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
-                                                javaClass.getName() );
-            }
+            setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
+                                      ( colType == null ? fieldType : colType ), false );
+            if ( setMethod == null )
+                throw new MappingException( "mapping.accessorNotFound",
+                                            fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
+                                            javaClass.getName() );
             if ( fieldType == null )
                 fieldType = setMethod.getParameterTypes()[ 0 ];
         } else if ( fieldMap.getName() != null ) {
-            if ( colType != null && CollectionHandlers.isEnumerate( colType ) )
-                setMethod = findAccessor( javaClass, "add" + capitalize( fieldMap.getName() ), fieldType, false );
             if ( setMethod == null )
                 setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
                                           ( colType == null ? fieldType : colType ), false );
@@ -639,7 +628,7 @@ public abstract class MappingLoader
                 method = javaClass.getMethod( methodName, new Class[ 0 ] );
                 if ( fieldType == null )
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                else if ( Types.typeFromPrimitive( fieldType ) != Types.typeFromPrimitive( method.getReturnType() ) )
+                else if ( ! Types.typeFromPrimitive( fieldType ).isAssignableFrom( Types.typeFromPrimitive( method.getReturnType() ) ) )
                     throw new MappingException( "mapping.accessorReturnTypeMismatch",
                                                 method, fieldType.getName() );
             } else {
