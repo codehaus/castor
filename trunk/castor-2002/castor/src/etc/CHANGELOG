@@ -1,6 +1,12 @@
+Version 0.7.1  January 11, 2000
+-------------------------------
 
-Version 0.7.1
-----------------------------
+- Temporary fix to rollback of objects in lieu of missing
+  CacheEngine (JDO)
+
+- Perliminary code for XAResource support in Castor JDO
+
+- First release of some DAX code
 
 - Added binary, and boolean types to the source code generator
   for Castor XML
