@@ -248,7 +248,7 @@ public class MemberFactory {
             //-- This is NOT clean...we need a different approach
             //-- here...
             //-- modify package name if necessary
-            if (datatype.hasFacet(Facet.ENUMERATION)) {
+            if (datatype.getSource() != null) {
                 JClass jClass = (JClass) xsType.getJType();
                 String packageName = jClass.getPackageName();
                 if ((packageName != null) && (packageName.length() > 0))
