@@ -744,6 +744,7 @@ public class ParseTreeWalker implements TokenTypes
           break;
         case KEYWORD_ORDER:
           _queryExpr.addOrderClause( getOrderClause( curChild ) );
+          break;
         case KEYWORD_LIMIT:
           addLimitClause(curChild);
           break;
