@@ -121,7 +121,6 @@ public abstract class MappingLoader
 
     public static final ClassDescriptor NoDescriptor = new ClassDescriptorImpl( Class.class );
 
-
     /**
      * Constructs a new mapping helper. This constructor is used by
      * a derived class.
@@ -903,8 +902,11 @@ public abstract class MappingLoader
      * @throws MappingException The method is not accessible or is not of the
      *  specified type
      */
-    private static Method findAccessor( Class javaClass, String methodName,
-                                        Class fieldType, boolean getMethod )
+    protected static final Method findAccessor
+        ( Class javaClass, 
+          String methodName,
+          Class fieldType, 
+          boolean getMethod )
         throws MappingException
     {
         Method   method;
@@ -991,6 +993,7 @@ public abstract class MappingLoader
         } catch ( MappingException except ) {
             throw except;
         } catch ( Exception except ) {
+            //System.out.println(except.toString());
         }
         return null;
     }
