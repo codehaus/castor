@@ -59,10 +59,17 @@ import java.io.Reader;
 import java.io.PrintWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Hashtable;
+import java.net.URL;
 
 /**
  * A Java Source generation tool which uses XML Schema definitions
@@ -126,6 +133,64 @@ public class SourceGenerator {
     private ConsoleDialog dialog = null;
     
     /**
+     * Names of properties used in the configuration file.
+     */
+    public static class Property
+    {
+		/**
+         * Property specifying how element's and type's are mapped into a Java
+         * class hierarchy by the Source Generator. 
+         * The value must contain one of the following.
+         * 'element' outputs a Java class hierarchy based on element 
+         * names used in the XML Schema. This is the default.
+         * 'type' outputs a Java class hierarchy based on the type 
+         * information defined in the XML Schema.
+         * <pre>
+         * org.exolab.castor.builder.javaclassmapping
+         * </pre>
+         */
+        public static final String JavaClassMapping = "org.exolab.castor.builder.javaclassmapping";
+
+		/**
+		 * Property listing mapping between XML namespaces and Java packages.
+		 */
+		public static final String NamespacePackages = "org.exolab.castor.builder.nspackages";
+
+        /**
+         * The name of the configuration file.
+         * <pre>
+         * castor.properties
+         * </pre>
+         */
+        public static final String FileName = "castorbuilder.properties";
+
+        static final String ResourceName = "/org/exolab/castor/builder/castorbuilder.properties";
+    }
+
+    // Some static string definitions
+	private static final String ELEMENT_VALUE = "element";
+	private static final String TYPE_VALUE = "type";
+
+    private static final int    ELEMENT_BINDING = 0;
+    private static final int    TYPE_BINDING    = 1;
+    
+    /**
+     * The flag indicating which type of binding we are
+     * configured for
+    **/
+    private static int  bindingType = ELEMENT_BINDING;
+    
+	/**
+     * The default properties loaded from the configuration file.
+     */
+    private static Properties _default;
+
+	/**
+	 * Namespace URL to Java package mapping
+	 */
+	private static java.util.Hashtable _nspackages;
+	
+    /**
      * Creates a SourceGenerator using the default FieldInfo factory
      */
     public SourceGenerator() {
@@ -153,6 +218,7 @@ public class SourceGenerator {
 
     } //-- SourceGenerator
 
+	
 
     /**
      * Creates Java Source code (Object model) for the given XML Schema
@@ -163,7 +229,7 @@ public class SourceGenerator {
         SGStateInfo sInfo = new SGStateInfo();
         sInfo.packageName = packageName;
 		if(sInfo.packageName==null)
-			sInfo.packageName=SourceGeneratorConfiguration.getJavaPackage(schema.getTargetNamespace());
+			sInfo.packageName=SourceGenerator.getJavaPackage(schema.getTargetNamespace());
 
         sInfo.setPromptForOverwrite(warnOnOverwrite);
         sInfo.setVerbose(verbose);
@@ -442,7 +508,7 @@ public class SourceGenerator {
         
 		//-- when mapping schema types, only interested in producing classes
 		//-- for elements with anonymous complex types
-		if (SourceGeneratorConfiguration.mappingSchemaType2Java())
+		if (SourceGenerator.mappingSchemaType2Java())
 			if (elementDecl.isReference() ||
 				(elementDecl.getType()!=null &&
 				 elementDecl.getType().getName()!=null))
@@ -664,6 +730,128 @@ public class SourceGenerator {
         state.markAsProcessed(jClass);
     } //-- processClassInfo
 
+
+    /**
+     * Returns the default configuration file. Changes to the returned
+     * properties set will affect all Castor functions relying on the
+     * default configuration.
+     *
+     * @return The default configuration
+     */
+    public static synchronized Properties getDefault()
+    {
+        if ( _default == null ) {
+            load();
+        }
+        return _default;
+    }
+
+    /**
+     * Returns a property from the default configuration file.
+     * Equivalent to calling <tt>getProperty</tt> on the result
+     * of {@link #getDefault}.
+     *
+     * @param name The property name
+     * @param default The property's default value
+     * @return The property's value
+     */
+    public static String getProperty( String name, String defValue )
+    {
+        return getDefault().getProperty( name, defValue );
+    }
+
+	/**
+	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
+	 * @return True if the Source Generator is mapping schema elements to Java classes.
+	 */	
+	public static boolean mappingSchemaElement2Java()
+	{
+	    //-- call getDefault to ensure we loaded the properties
+	    getDefault();
+	    
+	    return (bindingType == ELEMENT_BINDING);  
+	}
+
+	/**
+	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'type' value.
+	 * @return True if the Source Generator is mapping schema types to Java classes.
+	 */	
+	public static boolean mappingSchemaType2Java()
+	{
+	    //-- call getDefault to ensure we loaded the properties
+	    getDefault();
+	    
+	    return (bindingType == TYPE_BINDING);  
+	}
+	
+	/**
+	 * Gets a Java package to an XML namespace URL
+	 */
+	public static String getJavaPackage(String nsURL)
+	{
+		//-- Ensure properties have been loaded
+		getDefault();
+		
+		// Lookup Java package via NS
+		String javaPackage = (String) _nspackages.get(nsURL);
+		if(javaPackage==null)
+			return "";
+		else
+			return javaPackage;
+	}
+
+	/**
+	 * Gets the qualified class name given an XML namespace URL
+	 */
+	public static String getQualifiedClassName(String nsURL, String className)
+	{
+		//-- Ensure properties have been loaded
+		getDefault();
+		
+		// Lookup Java package via NS and append class name
+		String javaPackage = getJavaPackage(nsURL);
+		if (javaPackage.length()>0)
+			javaPackage+='.';
+		return javaPackage+className;
+	}
+	
+    /**
+     * Called by {@link #getDefault} to load the configuration the
+     * first time. Will not complain about inability to load
+     * configuration file from one of the default directories, but if
+     * it cannot find the JAR's configuration file, will throw a
+     * run time exception.
+     */
+    protected static void load()
+    {
+		_default = Configuration.loadProperties( Property.ResourceName, Property.FileName);
+		
+		// Parse XML namespace and package list
+		_nspackages = new Hashtable();
+		String prop = _default.getProperty( Property.NamespacePackages, "");		
+		StringTokenizer tokens = new StringTokenizer(prop, ",");
+		while(tokens.hasMoreTokens())
+		{
+			String token = tokens.nextToken();
+			int comma = token.indexOf("=");
+			if(comma==-1)
+				continue;
+			String ns = token.substring(0,comma).trim();
+			String javaPackage = token.substring(comma+1).trim();
+			_nspackages.put(ns, javaPackage);
+		}
+		
+		initBindingType();
+    }
+    
+    /**
+     * Called by #load to initialize the binding type
+    **/
+    protected static void initBindingType() {
+		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
+		if (prop.toLowerCase().equals(TYPE_VALUE))
+		    bindingType = TYPE_BINDING;
+    } //-- initBindingType
 
 } //-- SourceGenerator
 

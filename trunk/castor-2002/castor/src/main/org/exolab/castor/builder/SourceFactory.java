@@ -236,7 +236,7 @@ public class SourceFactory  {
         //-- make class abstract?
 		//-- when mapping elements to Java classes this class forms the 
 		//-- base for elements that reference this type.
-		if (SourceGeneratorConfiguration.mappingSchemaElement2Java())
+		if (SourceGenerator.mappingSchemaElement2Java())
 			jClass.getModifiers().setAbstract(true);        
 
 		//-- name information
@@ -463,8 +463,13 @@ public class SourceFactory  {
 
     private void createUnmarshalMethods(JClass parent) {
 
-        //-- create main marshal method
-        JMethod jMethod = new JMethod(parent,"unmarshal"); 
+        //-- mangle method name to avoid compiler errors when this class is extended
+		String methodName = "unmarshal";		
+		if (SourceGenerator.mappingSchemaType2Java())
+			methodName+= parent.getName(true);
+		
+		//-- create main marshal method
+        JMethod jMethod = new JMethod(parent,methodName); 
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
@@ -570,7 +575,7 @@ public class SourceFactory  {
 			{
 				//-- Create package qualified class name to a base type class from another package
 				className = 
-					SourceGeneratorConfiguration.getQualifiedClassName(
+					SourceGenerator.getQualifiedClassName(
 							base.getSchema().getTargetNamespace(),
 							JavaXMLNaming.toJavaClassName(base.getName()));
 			}
@@ -671,10 +676,10 @@ public class SourceFactory  {
                     
 					//-- Output source for element definition?
 					boolean elementSource = false;
-					if (SourceGeneratorConfiguration.mappingSchemaElement2Java())
+					if (SourceGenerator.mappingSchemaElement2Java())
 						//-- If mapping elements to Java classes
 						elementSource = true;
-					else if (SourceGeneratorConfiguration.mappingSchemaType2Java() &
+					else if (SourceGenerator.mappingSchemaType2Java() &
 							 eDecl.getType()==null)
 						//-- If mapping schema types to Java classes
 						//-- only when anonymous complexType used by element
