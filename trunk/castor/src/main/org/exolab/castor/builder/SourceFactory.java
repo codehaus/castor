@@ -45,19 +45,42 @@
 
 package org.exolab.castor.builder;
 
-import org.exolab.castor.builder.binding.BindingException;
 import org.exolab.castor.builder.binding.ExtendedBinding;
 import org.exolab.castor.builder.binding.XMLBindingComponent;
-
-import org.exolab.castor.builder.types.*;
-import org.exolab.castor.builder.util.*;
-import org.exolab.castor.mapping.*;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.util.*;
-import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.util.Configuration;
+import org.exolab.castor.builder.types.XSClass;
+import org.exolab.castor.builder.types.XSString;
+import org.exolab.castor.builder.types.XSType;
+import org.exolab.castor.xml.JavaNaming;
+import org.exolab.castor.xml.schema.Annotated;
+import org.exolab.castor.xml.schema.Annotation;
+import org.exolab.castor.xml.schema.AttributeDecl;
+import org.exolab.castor.xml.schema.ComplexType;
+import org.exolab.castor.xml.schema.ContentModelGroup;
+import org.exolab.castor.xml.schema.ContentType;
+import org.exolab.castor.xml.schema.Documentation;
+import org.exolab.castor.xml.schema.ElementDecl;
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.Group;
+import org.exolab.castor.xml.schema.ModelGroup;
+import org.exolab.castor.xml.schema.Order;
+import org.exolab.castor.xml.schema.Particle;
+import org.exolab.castor.xml.schema.Schema;
+import org.exolab.castor.xml.schema.SimpleContent;
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
-import org.exolab.javasource.*;
+import org.exolab.castor.xml.schema.Structure;
+import org.exolab.castor.xml.schema.Wildcard;
+import org.exolab.castor.xml.schema.XMLType;
+import org.exolab.javasource.JClass;
+import org.exolab.javasource.JConstructor;
+import org.exolab.javasource.JDocComment;
+import org.exolab.javasource.JDocDescriptor;
+import org.exolab.javasource.JField;
+import org.exolab.javasource.JMethod;
+import org.exolab.javasource.JModifiers;
+import org.exolab.javasource.JParameter;
+import org.exolab.javasource.JSourceCode;
+import org.exolab.javasource.JType;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -159,8 +182,8 @@ public class SourceFactory  {
      * methods (marshall, unmarshall, validate) in the generated classes.
 	 * By default, these methods are generated.
 	 *
-     * @param createMarshall a boolean, when true indicates
-     * to generated the marshalling framework methods
+     * @param testable a boolean, when true indicates
+     * to generate testing framework methods
      *
      */
     public void setTestable(boolean testable) {
@@ -446,6 +469,11 @@ public class SourceFactory  {
 
             //-- mark as a container
             classInfo.setContainer(true);
+           // -- if we have a superclass, make sure that the actual type extends it, not the
+           // xxxItem holder class.
+           String actSuperClass = classes[1].getSuperClass();
+           jClass.setSuperClass(actSuperClass);
+           classes[1].setSuperClass(null);
         }
 
 
@@ -535,7 +563,7 @@ public class SourceFactory  {
     /**
      * Creates the Java source code to support the given Simpletype
      *
-     * @param simpletype the Simpletype to create the Java source for
+     * @param simpleType the Simpletype to create the Java source for
      * @param sgState the current SGStateInfo (cannot be null).
      * @return the JClass representation of the given Simpletype
     **/
@@ -999,7 +1027,6 @@ public class SourceFactory  {
 
             JField temp = fields[i];
             JType type = temp.getType();
-            JType component = null;
             String name = temp.getName();
             if (name.startsWith("_"))
                 name = JavaNaming.toJavaClassName(name.substring(1));
@@ -1218,7 +1245,7 @@ public class SourceFactory  {
 
     /**
      * @param complexType the ComplexType to process
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
+     * @param state the FactoryState.
     **/
     private void processComplexType
         (ComplexType complexType, FactoryState state)
@@ -1410,7 +1437,7 @@ public class SourceFactory  {
     /**
      * Creates all the necessary enumeration code from the given
      * SimpleType. Enumerations are handled a couple ways.
-     * @see processEnumerationAsBaseType
+     * @see #processEnumerationAsBaseType
     **/
     private void processEnumeration
         (SimpleType simpleType, FactoryState state)
@@ -1431,7 +1458,7 @@ public class SourceFactory  {
     /**
      * Creates all the necessary enumeration code from the given
      * SimpleType. Enumerations are handled a couple ways.
-     * @see processEnumerationAsBaseType
+     * @see #processEnumerationAsBaseType
     **/
     private void processEnumerationAsNewObject
         (SimpleType simpleType, FactoryState state)
@@ -1971,7 +1998,7 @@ class FactoryState implements ClassInfoResolver {
     /**
      * Returns the SGStateInfo
      *
-     * @returns the SGStateInfo
+     * @return the SGStateInfo
     **/
     SGStateInfo getSGStateInfo() {
         return _sgState;
@@ -1980,7 +2007,7 @@ class FactoryState implements ClassInfoResolver {
     /**
      * Marks the given Annotated XML Schema structure as having been processed.
      *
-     * @param component the Annotated XML Schema structure to mark as having
+     * @param annotated the Annotated XML Schema structure to mark as having
      * been processed.
     **/
     void markAsProcessed(Annotated annotated) {
@@ -1990,7 +2017,7 @@ class FactoryState implements ClassInfoResolver {
     /**
      * Returns true if the given Annotated XML Schema structure has been marked as processed.
      *
-     * @param component the Annotated XML Schema structure to check for being marked as processed
+     * @param annotated the Annotated XML Schema structure to check for being marked as processed
     **/
     boolean processed(Annotated annotated) {
         boolean result = _processed.contains(annotated);
