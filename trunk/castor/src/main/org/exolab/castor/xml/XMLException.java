@@ -45,9 +45,6 @@
 
 package org.exolab.castor.xml;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import org.exolab.castor.core.exceptions.CastorException;
 
 /**
@@ -58,13 +55,6 @@ import org.exolab.castor.core.exceptions.CastorException;
  * @version $Revision$ $Date$
 **/
 public class XMLException extends CastorException {
-    
-
-    /**
-     * A nested exception
-    **/
-    private Exception _exception  = null;
-    
     /**
      * The location for this Exception
     **/
@@ -99,12 +89,8 @@ public class XMLException extends CastorException {
      *
      * @param exception the nested exception
     **/
-    public XMLException(Exception exception) {
-        super();
-        if (exception != null) {
-            super.setMessage(exception.getMessage());
-            this._exception = exception;
-        }
+    public XMLException(Throwable exception) {
+        super(exception);
     } //-- XMLException(Exception)
 
     /**
@@ -125,9 +111,8 @@ public class XMLException extends CastorException {
      * @param message the detail message for this exception
      * @param exception the nested exception
     **/
-    public XMLException(String message, Exception exception) {
-        super(message);
-        this._exception = exception;
+    public XMLException(String message, Throwable exception) {
+        super(message, exception);
     } //-- XMLException(String, Exception)
 
     /**
@@ -139,22 +124,11 @@ public class XMLException extends CastorException {
      * @param errorCode the errorCode for this Exception
     **/
     public XMLException
-        (String message, Exception exception, int errorCode) 
+        (String message, Throwable exception, int errorCode) 
     {
-        this(message, errorCode);
-        this._exception = exception;
+    		super(message, exception);
+    		this.errorCode = errorCode;
     } //-- XMLException(String, Exception, int)
-    
-    /**
-     * Returns the exception, which in turn caused this Exception to
-     * be thrown, or null if nested exception exists.
-     *
-     * @return the exception, which in turn caused this Exception to
-     * be thrown, or null if nested exception exists.
-    **/
-    public Exception getException() {
-        return _exception;
-    } //-- getException
     
     /**
      * Sets the location information for this Exception
@@ -174,48 +148,17 @@ public class XMLException extends CastorException {
     public String toString() {
         String message;
 
-        if (_exception == null )
+        Throwable t = getCause();
+        if (t==null)
             message = getMessage();
         else
-            message = _exception.toString();
+            message = t.getMessage();
+        
         if (_location == null)
             return message;
         else
             return message + "{" + _location.toString() + "}";
     } //-- toString
-
-
-
-    public void printStackTrace()
-    {
-        printStackTrace(System.err);
-    }
-
-    public void printStackTrace( PrintWriter printer )
-    {
-        if ( _exception == null )
-            super.printStackTrace( printer );
-        else {
-            String message = getMessage();
-            if (message != null) {
-                printer.println(message);
-            }
-            _exception.printStackTrace( printer);
-        }
-    }
-
-    public void printStackTrace( PrintStream printer )
-    {
-        if ( _exception == null )
-            super.printStackTrace( printer );
-        else {
-            String message = getMessage();
-            if (message != null) {
-                printer.println(message);
-            }
-            _exception.printStackTrace( printer );
-        }
-    }
 
     /**
      * Returns the error code for this Exception, or -1 if no error code exists.
