@@ -87,11 +87,12 @@ public class Time extends DateTimeBase {
      * @param the long value that represents the time instance.
      */
     public Time (long l) {
-        if (l>8640000L)
+        System.out.println("in time:"+l);
+        if (l>86400000L)
             throw new IllegalArgumentException("Bad Time: the long value can't represent more than 24h.");
-        this.setHour((short)(l/360000));
-        l = l % 360000;
-        this.setMinute((short)(l/6000));
+        this.setHour((short)(l/3600000));
+        l = l % 3600000;
+        this.setMinute((short)(l/60000));
         l = l % 6000;
         this.setSecond((short)(l / 100), (short)(l%100));
     }
