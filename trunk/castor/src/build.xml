@@ -505,7 +505,7 @@
             description="Use the Source Generator to create the Java classes for jdo-conf.xsd">
         <delete dir="${gen.src}"/>
         <mkdir dir="${gen.src}"/>
-        <java classname="org.exolab.castor.builder.SourceGenerator"
+        <java classname="org.exolab.castor.builder.SourceGenerator" fork="true"
               classpathref="build.classpath">
             <arg value="-i"/>
             <arg value="${main}/org/exolab/castor/jdo/conf/jdo-conf.xsd"/>
@@ -517,6 +517,7 @@
             <arg value="unix"/>
             <arg value="-types"/>
             <arg value="j2"/>
+            <classpath refid="build.classpath"/>
         </java>
         <javac destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">
             <src path="${gen.src}" />
