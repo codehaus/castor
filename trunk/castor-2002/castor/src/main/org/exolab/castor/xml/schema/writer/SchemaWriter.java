@@ -69,72 +69,72 @@ public class SchemaWriter {
     //------------------------/
     //- Schema element names -/
     //------------------------/
-    
+
     /**
      * Annotation element name.
      */
     private static final String ANNOTATION    =  "annotation";
-    
+
     /**
      * Attribute element name.
      */
     private static final String ATTRIBUTE     =  "attribute";
-    
+
     /**
      * ComplexType element name.
      */
     private static final String COMPLEX_TYPE  =  "complexType";
-    
+
     /**
      * Documentation element name.
      */
     private static final String DOCUMENTATION =  "documentation";
-    
+
     /**
      * Element element name.
      */
     private static final String ELEMENT       =  "element";
-    
+
     /**
      * ModelGroup element name.
      */
     private static final String GROUP         =  "group";
-    
+
     /**
      * Restriction element name.
      */
     private static final String RESTRICTION   =  "restriction";
-    
+
     /**
      * Schema element name.
      */
     private static final String SCHEMA        =  "schema";
-    
+
     /**
      * SimpleType element name
      */
     private static final String SIMPLE_TYPE   =  "simpleType";
-    
+
     //-------------------/
     //- Attribute names -/
     //-------------------/
-    
+
     private static final String ATTR_NAME   = "name";
     private static final String ATTR_TYPE   = "type";
     private static final String ATTR_VALUE  = "value";
-    
+
     private static final String VALUE_FALSE = "false";
     private static final String VALUE_TRUE  = "true";
-    
-    
-    /** 
+
+
+    /**
      * For use with SAX AttributeList
      */
     private static final String CDATA          =  "CDATA";
     private static final String XMLNS_PREFIX   =  "xmlns:";
     private static final String XMLNS_DEFAULT  =  "xmlns";
     private static final String DEFAULT_PREFIX =  "xsd";
-    
+
     /**
      * The DocumentHandler to send events to
      */
@@ -148,7 +148,7 @@ public class SchemaWriter {
     /**
      * This field is no longer used and only here for
      * backward compatibility.
-     * @deprecated 
+     * @deprecated
     **/
     public static boolean enable = false;
 
@@ -268,26 +268,26 @@ public class SchemaWriter {
         _atts.clear();
 
         boolean isReference = attribute.isReference();
-        
+
         //-- name
         if (!isReference) {
-            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA,
                 attribute.getName());
         }
         else {
             _atts.addAttribute(SchemaNames.REF_ATTR, CDATA,
                 attribute.getName(false));
         }
-        
+
 
         //-- type attribute
         boolean hasAnonymousType = false;
         SimpleType type = attribute.getSimpleType();
         if (!isReference) {
             if (type.getName() != null) {
-                
+
                 String typeName = type.getName();
-                
+
                 //-- add "xsd" prefix if necessary
                 if ((typeName.indexOf(':') < 0) && type.isBuiltInType()) {
                     typeName = schemaPrefix + typeName;
@@ -300,27 +300,27 @@ public class SchemaWriter {
         // default or fixed values?
         //-- @default
         if (attribute.isDefault()) {
-            _atts.addAttribute(SchemaNames.DEFAULT_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.DEFAULT_ATTR, CDATA,
                 attribute.getValue());
         }
-        //-- @fixed 
+        //-- @fixed
         else if (attribute.isFixed()) {
-            _atts.addAttribute(SchemaNames.FIXED_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.FIXED_ATTR, CDATA,
                 attribute.getValue());
         }
-        
+
         //-- @form
         if (attribute.getForm() != null) {
             _atts.addAttribute(SchemaNames.FORM, CDATA,
                 attribute.getForm().toString());
         }
-        
+
         //-- @id (optional)
         if (attribute.getId() != null) {
             _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
                 attribute.getId());
         }
-        
+
         //-- use : required
         if (attribute.isRequired()) {
             _atts.addAttribute(SchemaNames.USE_ATTR, CDATA,
@@ -328,10 +328,10 @@ public class SchemaWriter {
         }
         //-- use : prohibited
         else if (attribute.isProhibited()) {
-            _atts.addAttribute(SchemaNames.USE_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.USE_ATTR, CDATA,
                 AttributeDecl.USE_PROHIBITED);
         }
-        
+
 
         _handler.startElement(ELEM_ATTRIBUTE, _atts);
 
@@ -364,35 +364,35 @@ public class SchemaWriter {
 
         //-- handle top-level only attributes
         if (complexType.isTopLevel()) {
-            
+
             //-- @name
-            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA,
                 complexType.getName());
-            
+
             //-- @abstract
             if (complexType.isAbstract()) {
                 _atts.addAttribute(SchemaNames.ABSTRACT, CDATA, VALUE_TRUE);
             }
-            
+
             //-- @block
             if (complexType.getBlock() != null) {
                 _atts.addAttribute(SchemaNames.BLOCK_ATTR, CDATA,
                     complexType.getBlock().toString());
             }
-            
+
             //-- @final
             if (complexType.getFinal() != null) {
                 _atts.addAttribute(SchemaNames.FINAL_ATTR, CDATA,
                     complexType.getFinal().toString());
-            } 
+            }
         } //-- isTopLevel
-        
+
         //-- @id
         if (complexType.getId() != null) {
             _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
                 complexType.getId());
         }
-        
+
         //-- @mixed
         if (complexType.getContentType() == ContentType.mixed) {
             _atts.addAttribute(SchemaNames.MIXED, CDATA, VALUE_TRUE);
@@ -403,7 +403,7 @@ public class SchemaWriter {
         //-- process annotations
         processAnnotated(complexType, schemaPrefix);
 
-         
+
         //-- handle simpleContent/complexContent if we have a baseType.
         String ELEM_CONTENT    = null;
         String ELEM_DERIVATION = null;
@@ -413,7 +413,7 @@ public class SchemaWriter {
                 ELEM_CONTENT = schemaPrefix + SchemaNames.SIMPLE_CONTENT;
             else
                 ELEM_CONTENT = schemaPrefix + SchemaNames.COMPLEX_CONTENT;
-                                
+
             _atts.clear();
             if (complexType.isComplexContent()) {
                 if (complexType.getContentType() == ContentType.mixed) {
@@ -422,16 +422,16 @@ public class SchemaWriter {
                 }
             }
             _handler.startElement(ELEM_CONTENT, _atts);
-            
-            ELEM_DERIVATION = schemaPrefix + 
+
+            ELEM_DERIVATION = schemaPrefix +
                 complexType.getDerivationMethod();
-                
+
             _atts.clear();
-            _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA,
                 baseType.getName());
             _handler.startElement(ELEM_DERIVATION, _atts);
-        } 
-        
+        }
+
         //-- process content model group
         processContentModelGroup(complexType, schemaPrefix);
 
@@ -440,7 +440,7 @@ public class SchemaWriter {
         while (enum.hasMoreElements()) {
             processAttribute((AttributeDecl)enum.nextElement(), schemaPrefix);
         }
-        
+
         if (baseType != null) {
             _handler.endElement(ELEM_DERIVATION);
             _handler.endElement(ELEM_CONTENT);
@@ -487,7 +487,7 @@ public class SchemaWriter {
     {
 
         String ELEMENT_NAME = schemaPrefix + ELEMENT;
-        
+
         _atts.clear();
 
 
@@ -505,16 +505,16 @@ public class SchemaWriter {
         int min = element.getMinOccurs();
 
         if (min != 1) {
-            _atts.addAttribute(SchemaNames.MIN_OCCURS_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.MIN_OCCURS_ATTR, CDATA,
                 Integer.toString(min));
         }
 
         if (max < 0) {
-            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA,
                 "unbounded");
         }
         else if (max > 1) {
-            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA,
                 Integer.toString(max));
         }
 
@@ -522,7 +522,7 @@ public class SchemaWriter {
         boolean hasAnonymousType = false;
         if (!element.isReference()) {
             XMLType type = element.getType();
-             
+
             //-- no type?
             if (type == null) {
                 //-- do nothing
@@ -530,12 +530,12 @@ public class SchemaWriter {
             //-- anonymous (in-lined) type
             else if (type.getName() == null) {
                 hasAnonymousType = true;
-            } 
+            }
             //-- built-in simpleType
             else if (type instanceof SimpleType && ((SimpleType)type).isBuiltInType()){
-                _atts.addAttribute(ATTR_TYPE, CDATA, 
+                _atts.addAttribute(ATTR_TYPE, CDATA,
                     schemaPrefix+type.getName());
-            } 
+            }
             //-- type imported from another schema
             else if (isImportedType(type, element)) {
                 String namespace = type.getSchema().getTargetNamespace();
@@ -544,11 +544,11 @@ public class SchemaWriter {
                     //-- declare a temporary prefix
                     prefix = schemaPrefix + '2';
                     _atts.addAttribute("xmlns:" + prefix, CDATA, namespace);
-                } 
-                _atts.addAttribute(ATTR_TYPE, CDATA, 
+                }
+                _atts.addAttribute(ATTR_TYPE, CDATA,
                     prefix + ':' +type.getName());
             //-- otherwise...user defined type.
-            } 
+            }
             else {
                 _atts.addAttribute(ATTR_TYPE, CDATA, type.getName());
             }
@@ -558,31 +558,31 @@ public class SchemaWriter {
         if (element.isAbstract()) {
             _atts.addAttribute(SchemaNames.ABSTRACT, CDATA, VALUE_TRUE);
         }
-        
+
         //-- @block
         if (element.getBlock() != null) {
             _atts.addAttribute(SchemaNames.BLOCK_ATTR, CDATA,
                 element.getBlock().toString());
         }
-        
+
         //-- @default
         if (element.getDefaultValue() != null) {
             _atts.addAttribute(SchemaNames.DEFAULT_ATTR, CDATA,
                 element.getDefaultValue());
         }
-        
+
         //-- @fixed
         if (element.getFixedValue() != null) {
             _atts.addAttribute(SchemaNames.FIXED_ATTR, CDATA,
                 element.getFixedValue());
         }
-        
+
         //-- @final
         if (element.getFinal() != null) {
             _atts.addAttribute(SchemaNames.FINAL_ATTR, CDATA,
                 element.getFinal().toString());
         }
-        
+
         //-- @form
         Form form = element.getForm();
         if (form != null) {
@@ -591,22 +591,22 @@ public class SchemaWriter {
 
         //-- @id
         if (element.getId() != null) {
-            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
                 element.getId());
         }
-        
+
         //-- @nillable
         if (element.isNillable()) {
             _atts.addAttribute(SchemaNames.NILLABLE_ATTR, CDATA,
                 VALUE_TRUE);
         }
-        
+
         //-- @substitutionGroup
         if (element.getSubstitutionGroup() != null) {
             _atts.addAttribute(SchemaNames.SUBSTITUTION_GROUP_ATTR, CDATA,
                 element.getSubstitutionGroup());
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
 
         //-- process annotations
@@ -618,7 +618,7 @@ public class SchemaWriter {
             if (type.isComplexType())
                 processComplexType((ComplexType) type, schemaPrefix);
         }
-        
+
         //-- process any identity-constraints
         Enumeration enum = element.getIdentityConstraints();
         while(enum.hasMoreElements()) {
@@ -640,7 +640,7 @@ public class SchemaWriter {
         throws SAXException
     {
         String ELEMENT_NAME = schemaPrefix;
-        
+
         //-- ModelGroup
         String reference = null;
         if (group instanceof ModelGroup) {
@@ -668,7 +668,7 @@ public class SchemaWriter {
         else if (reference != null) {
             _atts.addAttribute("ref", CDATA, reference);
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
 
         //-- process annotations
@@ -687,18 +687,18 @@ public class SchemaWriter {
      * @param constraint the IdentityConstraint to process
     **/
     private void processIdentityConstraint
-        (IdentityConstraint constraint, String schemaPrefix) 
+        (IdentityConstraint constraint, String schemaPrefix)
         throws SAXException
     {
-        
+
         if (constraint == null) return;
-        
+
         String ELEMENT_NAME = schemaPrefix;
-        
+
         String name  = null;
         String id    = null;
         String refer = null;
-        
+
         switch (constraint.getStructureType()) {
             case Structure.KEYREF:
                 ELEMENT_NAME += SchemaNames.KEYREF;
@@ -711,35 +711,35 @@ public class SchemaWriter {
                 ELEMENT_NAME += SchemaNames.KEY;
                 break;
         }
-        
+
         name = constraint.getName();
         id   = constraint.getId();
-        
+
         _atts.clear();
-        
+
         //-- name
-        _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, 
+        _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA,
             constraint.getName());
-            
+
         //-- id
         if (id != null) {
             _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, id);
         }
-        
+
         //-- refer
         if (refer != null) {
             _atts.addAttribute(SchemaNames.REFER_ATTR, CDATA, refer);
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process annotations
         processAnnotated(constraint, schemaPrefix);
-        
+
         //-- process selector
         String ELEM_SELECTOR = schemaPrefix + SchemaNames.SELECTOR;
         String xpath = null;
-        
+
         IdentitySelector selector = constraint.getSelector();
         xpath = selector.getXPath();
         id = selector.getId();
@@ -751,7 +751,7 @@ public class SchemaWriter {
         _handler.startElement(ELEM_SELECTOR, _atts);
         processAnnotated(selector, schemaPrefix);
         _handler.endElement(ELEM_SELECTOR);
-        
+
         //-- process field(s)
         String ELEM_FIELD = schemaPrefix + SchemaNames.FIELD;
         Enumeration enum = constraint.getFields();
@@ -769,32 +769,32 @@ public class SchemaWriter {
             _handler.endElement(ELEM_FIELD);
         }
         _handler.endElement(ELEMENT_NAME);
-        
+
     } //-- processIdentityConstraint
-    
+
     private void processSchema(Schema schema)
         throws SAXException
     {
-        
+
         //-- calculate schema prefix
         String schemaPrefix = getNSPrefix(schema, schema.getSchemaNamespace());
         if (schemaPrefix == null) {
             schemaPrefix = DEFAULT_PREFIX;
         }
-        
+
         //-- namespace declaration for xsd
         _atts.clear();
         if (schemaPrefix.length() == 0) {
             //-- declared as default namespace
-            _atts.addAttribute(XMLNS_DEFAULT, CDATA, 
+            _atts.addAttribute(XMLNS_DEFAULT, CDATA,
                 schema.getSchemaNamespace());
         }
         else {
             //-- declare namespace + prefix
-            _atts.addAttribute(XMLNS_PREFIX + schemaPrefix, CDATA, 
+            _atts.addAttribute(XMLNS_PREFIX + schemaPrefix, CDATA,
                 schema.getSchemaNamespace());
         }
-        
+
 
 
         //-- namespace declarations
@@ -849,11 +849,11 @@ public class SchemaWriter {
         if (schemaPrefix.length() > 0) {
             schemaPrefix += ':';
         }
-        
+
         _handler.startDocument();
-        
+
         String ELEM_SCHEMA = schemaPrefix + SCHEMA;
-        
+
         _handler.startElement(ELEM_SCHEMA, _atts);
 
         //-- process annotations
@@ -865,34 +865,34 @@ public class SchemaWriter {
         while (enum.hasMoreElements()) {
             processImport((Schema)enum.nextElement(), schemaPrefix);
         }
-    
+
         //-- process all top level attribute declarations
         enum = schema.getAttributes();
         while (enum.hasMoreElements()) {
-            processAttribute((AttributeDecl) enum.nextElement(), 
+            processAttribute((AttributeDecl) enum.nextElement(),
                 schemaPrefix);
         }
-        
+
         //-- process all top level element declarations
         enum = schema.getElementDecls();
         while (enum.hasMoreElements()) {
-            processElement((ElementDecl) enum.nextElement(), 
+            processElement((ElementDecl) enum.nextElement(),
                 schemaPrefix);
         }
-        
+
         //-- process all top level complex types
         enum = schema.getComplexTypes();
         while (enum.hasMoreElements()) {
-            processComplexType((ComplexType) enum.nextElement(), 
+            processComplexType((ComplexType) enum.nextElement(),
                 schemaPrefix);
         }
-        
+
         //-- process all top level groups
         enum = schema.getModelGroups();
         while (enum.hasMoreElements()) {
             processGroup((Group)enum.nextElement(), schemaPrefix);
         }
-        
+
         //-- process all top level simple types
         enum = schema.getSimpleTypes();
         while (enum.hasMoreElements()) {
@@ -920,13 +920,13 @@ public class SchemaWriter {
 
         String namespace = schema.getTargetNamespace();
         String schemaLoc = schema.getSchemaLocation();
-        
+
         _atts.addAttribute("namespace", null, namespace);
         _atts.addAttribute("schemaLocation", null, schemaLoc);
         _handler.startElement(ELEMENT_NAME, _atts);
         _handler.endElement(ELEMENT_NAME);
     } //-- processImport
-    
+
     /**
      * Processes the given simple type definition
      *
@@ -959,9 +959,9 @@ public class SchemaWriter {
         if (base != null) {
 
             String ELEM_RESTRICTION = schemaPrefix + RESTRICTION;
-            
+
             _atts.clear();
-            
+
             String typeName = base.getName();
             //-- add "xsd" prefix if necessary
             if ((typeName.indexOf(':') < 0) && base.isBuiltInType()) {
@@ -976,7 +976,7 @@ public class SchemaWriter {
             while (enum.hasMoreElements()) {
                 Facet facet = (Facet) enum.nextElement();
                 _atts.clear();
-                _atts.addAttribute(SchemaNames.VALUE_ATTR, CDATA, 
+                _atts.addAttribute(SchemaNames.VALUE_ATTR, CDATA,
                     facet.getValue());
                 String facetName = schemaPrefix + facet.getName();
                 _handler.startElement(facetName, _atts);
@@ -1009,13 +1009,13 @@ public class SchemaWriter {
         _atts.clear();
 
         if (union.getId() != null) {
-            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, 
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
                 union.getId());
         }
 
         //-- process local simpleType references
         StringBuffer memberTypes = new StringBuffer();
-        Enumeration enum = union.getMemberTypes();        
+        Enumeration enum = union.getMemberTypes();
         while (enum.hasMoreElements()) {
             SimpleType simpleType = (SimpleType)enum.nextElement();
             //-- ignore local simpleTypes;
@@ -1032,26 +1032,26 @@ public class SchemaWriter {
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process local annotation
         Annotation annotation = union.getLocalAnnotation();
         if (annotation != null) {
             processAnnotation(annotation, schemaPrefix);
         }
-        
+
         //-- process local simpleType definitions
-        enum = union.getMemberTypes();        
+        enum = union.getMemberTypes();
         while (enum.hasMoreElements()) {
-            SimpleType simpleType = (SimpleType)enum.nextElement();            
+            SimpleType simpleType = (SimpleType)enum.nextElement();
             //-- ignore top-level simpleTypes;
-            if (simpleType.getParent() == union.getSchema()) 
+            if (simpleType.getParent() == union.getSchema())
                 continue;
             processSimpleType(simpleType, schemaPrefix);
         }
         _handler.endElement(ELEMENT_NAME);
 
     } //-- processUnion
-    
+
     /**
      * Determines if a given XMLType is imported by the
      * schema containing the element that refers to it.
@@ -1061,7 +1061,9 @@ public class SchemaWriter {
     **/
     private boolean isImportedType(XMLType type, ElementDecl element) {
         String targetNS = type.getSchema().getTargetNamespace();
-        return (element.getSchema().getImportedSchema(targetNS) != null);
+        if (targetNS != null)
+            return (element.getSchema().getImportedSchema(targetNS) != null);
+        else return false;
     } //-- isImportedType
 
     /**
