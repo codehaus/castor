@@ -554,6 +554,7 @@ public class myclass {
         &lt;!ATTLIST bind-xml
                   name     NMTOKEN     #IMPLIED
                   type     NMTOKEN     #IMPLIED
+                  location CDATA       #IMPLIED
                   matches  NMTOKENS    #IMPLIED
                   QName-prefix NMTOKEN #IMPLIED
                   reference   ( true | false ) "false"
@@ -579,7 +580,14 @@ public class myclass {
           </li>
 
           <li><b>type:</b>XML Schema type (of the value of this field) that requires specific handling in the
-                          Castor Marshalling Framework (such as 'QName' for instance).</li>
+                          Castor Marshalling Framework (such as 'QName' for instance).
+          </li>
+
+          <li><b>location:</b> (since 0.9.4.4) allows the user to specify the "sub-path" for which the value
+              should be marshalled to and from. This is useful for "wrapping" values in elements or for
+              mapping values that appear on sub-elements to the current "element" represented by the
+              class mapping. For more information see the <a href="#6.-Location-attribute">Location attribute</a> below.
+          </li>
 
           <li><b>QName-prefix:</b> When using a QName value, you can provide a default prefix that
               is used when marshalling value of type QName. More information on the use of 'QName-prefix'
@@ -1027,16 +1035,103 @@ public class main {
 
     </section>
 
-    <section title="6. Tips">
+    <section title="6. Location attribute">
+
+       <p>Since 0.9.4.4</p>
+
+       <p>
+          The location attribute allows the user to map fields from nested
+          elements or specify a wrapper element for a given field. Wrapper
+          elements are simply elements which appear in the XML instance, but
+          do not have a direct mapping to an object or field within the
+          object model.
+        </p>
+        <p>
+          For example to map an instance of the following class:
+          <code>
+
+           public class Foo {
+
+               private Bar bar = null;
+
+               public Foo();
+
+               public getBar() {
+                   return bar;
+               }
+
+               public void setBar(Bar bar) {
+                   this.bar = bar;
+               }
+           }
+
+          </code>
+
+          into the following XML instance:
+
+          <code>
+            &lt;?xml version="1.0"?&gt;
+            &lt;foo&gt;
+               &lt;abc&gt;
+                  &lt;bar&gt;...&lt;/bar&gt;
+               &lt;/abc&gt;
+            &lt;/foo&gt;
+          </code>
+
+          <i>(notice that an 'abc' field doesn't exist in the Bar class)</i>
+          <p/>
+          One would use the following mapping:
+          <code>
+            &lt;?xml version="1.0"?&gt;
+            &lt;mapping&gt;
+               ...
+               &lt;class name="Foo"&gt;
+                  &lt;field name="bar" type="Bar"&gt;
+                     &lt;bind-xml name="bar" location="abc"/&gt;
+                  &lt;/field&gt;
+               &lt;/class&gt;
+               ...
+            &lt;/mapping&gt;
+          </code>
+
+          Note the "location" attribute. The value of this attribute is the name
+          of the wrapper element. To use more than one wrapper element, the name
+          is separated by a forward-slash as such:
+
+          <code>
+             &lt;bind-xml name="bar" location="abc/xyz"/&gt;
+          </code>
+
+          Note that the name of the element is not part of the location itself and
+          that the location is always relative to the class in which the field is
+          being defined.
+
+          This works for attributes also:
+
+          <code>
+            &lt;bind-xml name="bar" location="abc" node="attribute"/&gt;
+          </code>
+          will produce the following:
+
+          <code>
+             &lt;?xml version="1.0"?&gt;
+             &lt;foo&gt;
+                &lt;abc bar="..."/&gt;
+             &lt;/foo&gt;
+          </code>
+        </p>
+    </section>
+
+    <section title="7. Tips">
        <p>Some helpful hints...</p>
-       <section title="6.1 Automatically create a mapping file">
+       <section title="7.1 Automatically create a mapping file">
        <p>
          Castor comes with a tool that can automatically create a mapping from
          class files. Please see the <a href="xml-faq.xml">XML FAQ</a> for more
          information.
        </p>
        </section>
-       <section title="6.2 Create your own FieldHandler">
+       <section title="7.2 Create your own FieldHandler">
        <p>
           Sometimes to handle complex situations you'll need to create your
           own FieldHandler. Normally a FieldHandler deals with a specific class
@@ -1046,12 +1141,6 @@ public class main {
           The FieldHandler can be specified on the &lt;field&gt; element.
        </p>
        </section>
-
-    </section>
-
-    <section title="7. TODO">
-
-      <p>?</p>
 
     </section>
   </body>
