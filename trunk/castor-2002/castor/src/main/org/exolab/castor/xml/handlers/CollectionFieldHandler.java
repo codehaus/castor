@@ -96,8 +96,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
         throws java.lang.IllegalStateException
     {
 
-        if ( value == null )
-            _handler.setValue(target,"");
+        if ( value == null ) return;
 
         if (value instanceof String) {
             StringTokenizer temp = new StringTokenizer((java.lang.String)value," ");
@@ -120,21 +119,23 @@ public class CollectionFieldHandler extends XMLFieldHandler {
     {
         // Needs to return the proper object
         Object temp = _handler.getValue(target);
-        String result = "";
+        
+        if (temp == null) return temp;
+        
+        String result = null;
         if (temp.getClass().isArray()) {
             int size = Array.getLength(temp);
             if (size !=0) {
+                result = "";
                 int i=0;
                 while (i < size) {
-                    Object obj = Array.get(temp, i);
-                    result += obj.toString()+' ';
-                    i++;
+                    if (i > 0) result += ' ';
+                    Object obj = Array.get(temp, i++);
+                    result += obj.toString();
                 }
-                //remove the last ' '
-                result=result.substring(0,result.length()-1);
             }
-            return result;
         }
+        else result = temp.toString();
         return result;
     }
 
