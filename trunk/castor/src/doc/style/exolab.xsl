@@ -420,7 +420,11 @@
         <xsl:for-each select="../contributor[@type=$type]">
           <tr>
             <td valign="top"><span class="bodyGrey">
-              <a href="mailto:{email}"><xsl:value-of select="name@given"/>&#xA0;<xsl:value-of select="name@surname"/></a></span>
+              <!-- a href="mailto:{email}" -->
+              <a>
+                  <xsl:attribute name="href">mailto:<xsl:apply-templates select="email"/></xsl:attribute>
+                  <xsl:value-of select="name/@given"/>&#xA0;<xsl:value-of select="name/@surname"/>
+              </a></span>
             </td>
             <td><span class="bodyGrey">
                <xsl:value-of select="description"/></span>
@@ -435,6 +439,10 @@
         </xsl:for-each>
       </table>
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="contributor/email">
+      <xsl:value-of select="substring-before(., '@')"/>@remove-no-spam.<xsl:value-of select="substring-after(., '@')"/>
   </xsl:template>
 
 </xsl:stylesheet>
