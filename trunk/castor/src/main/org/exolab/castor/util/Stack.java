@@ -57,10 +57,24 @@ package org.exolab.castor.util;
 **/
 public class Stack {
 
+    /**
+     * Maximum Size of the "free" StackItem pool
+     */
+    private static final int MAX_POOL_SIZE = 19;
 
     private int size = 0;
     
     private StackItem top = null;
+    
+    //-- To prevent excess object creation
+    //-- we hold onto some free stack items
+    private StackItem _freeItems = null;
+    
+    /**
+     * Keep track of the number of free items 
+     * to prevent going over the max
+     */
+    private int _freeItemsCount = 0;
     
       //----------------/
      //- Constructors -/
@@ -115,9 +129,11 @@ public class Stack {
     {
         if (empty()) throw new java.util.EmptyStackException();
         Object obj = top.object;
+        StackItem tmp = top;
         top = top.previous;
         if (top != null) top.next = null;
         --size;
+        releaseStackItem(tmp);
         return obj;
     } //-- pop
     
@@ -125,7 +141,7 @@ public class Stack {
      * Adds the given Object to the top of the Stack
     **/
     public void push(Object object) {
-        StackItem item = new StackItem();
+        StackItem item = getAvailableStackItem();
         item.previous = top;
         item.next = null;
         item.object = object;
@@ -158,10 +174,52 @@ public class Stack {
         return size; 
     }
     
+    /**
+     * Returns an available StackItem or creates
+     * a new one if none are available
+     */
+    private StackItem getAvailableStackItem() {
+        StackItem item = null;
+        if (_freeItems == null) {
+            item = new StackItem();
+        }
+        else {
+            item = _freeItems;
+            _freeItems = _freeItems.previous;
+            if (_freeItems != null) 
+                _freeItems.next = null;
+            --_freeItemsCount;
+            item.clear();
+        }
+        return item;
+    } //-- getAvailableStackItem
+    
+    /**
+     * Returns an available StackItem or creates
+     * a new one if none are available
+     */
+    private void releaseStackItem(StackItem item) {
+        if (_freeItemsCount < MAX_POOL_SIZE) {
+            item.clear();
+            item.previous = _freeItems;
+            item.next = null;
+            if (_freeItems != null) _freeItems.next = item;
+            _freeItems = item;
+            ++_freeItemsCount;
+        }
+    } //-- getAvailableStackItem
+    
+    
     private class StackItem {
         StackItem next = null;
         StackItem previous = null;
         Object object = null;
+        
+        void clear() {
+            object = null;
+            previous = null;
+            next = null;
+        }
     } //-- StackItem
     
     public class StackIterator implements Iterator {
