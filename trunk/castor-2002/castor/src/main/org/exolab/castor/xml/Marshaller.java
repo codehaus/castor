@@ -59,9 +59,9 @@ import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.List;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
-import org.exolab.castor.util.List;
 import org.exolab.castor.util.Stack;
 
 import org.xml.sax.helpers.AttributeListImpl;
@@ -222,6 +222,12 @@ public class Marshaller extends MarshalFramework {
     **/
     private Stack   _parents  = null;
 
+    /**
+     * A list of ProcessingInstructions to output
+     * upon marshalling of the document
+    **/
+    private List _processingInstructions = null;
+    
 	/**
 	 * Name of the root element to use
 	 */
@@ -314,10 +320,32 @@ public class Marshaller extends MarshalFramework {
         _parents         = new Stack();
         _validate        = Configuration.marshallingValidation();
         _naming          = XMLNaming.getInstance();
+        _processingInstructions = new List(3);
 
         setNamespaceMapping( XSI_PREFIX, XSI_NAMESPACE );
     } //-- initialize();
 
+    /**
+     * Adds the given processing instruction data to the set of
+     * processing instructions to output during marshalling.
+     *
+     * @param target the processing instruction target
+     * @param data the processing instruction data
+    **/
+    public void addProcessingInstruction(String target, String data) {
+        
+        if ((target == null) || (target.length() == 0)) {
+            String err = "the argument 'target' must not be null or empty.";
+            throw new IllegalArgumentException(err);
+        }
+
+        if (data == null) {
+            String err = "the argument 'data' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        _processingInstructions.add(new ProcessingInstruction(target, data));
+    } //-- addProcessingInstruction
+    
     /**
      * Sets whether or not to marshal as a document which includes
      * the XML declaration, and if necessary the DOCTYPE declaration.
@@ -580,18 +608,25 @@ public class Marshaller extends MarshalFramework {
              if (_asDocument) {
                 try {
                     _handler.startDocument();
+                    //-- handle processing instructions
+                    for (int i = 0; i < _processingInstructions.size(); i++) {
+                        ProcessingInstruction pi = (ProcessingInstruction)
+                            _processingInstructions.get(i);
+                        _handler.processingInstruction(pi.getTarget(), 
+                            pi.getData());
+                    }
                     marshal(object, null, _handler);
                     _handler.endDocument();
                 } catch (SAXException sx) {
                     throw new MarshalException(sx);
                 }
              }
-             else marshal(object, null, _handler);
+             else {
+                marshal(object, null, _handler);
+             }
         }
 
     } //-- marshal
-
-
 
     /**
      * Marshals the given object, using the given descriptor
