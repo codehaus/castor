@@ -63,11 +63,10 @@ go
 create table test_types (
   id     numeric       not null,
   tdt    datetime      not null,
-  ttm    smalldatetime not null,
-  tts    timestamp     not null
+  ttm    smalldatetime not null
 )
 go
-create unique index test_types_pk on test_types ( id )
+create unique index test_types_pk on test_types (id)
 go
 grant all on test_types to test
 go

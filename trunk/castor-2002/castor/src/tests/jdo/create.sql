@@ -37,6 +37,16 @@ create unique index test_group_pk on test_group ( id );
 grant all on test_group to test;
 
 
+drop table test_types;
+create table test_types (
+  id     numeric       not null,
+  tdt    datetime      not null,
+  ttm    time          not null
+);
+create unique index test_types_pk on test_types ( id );
+grant all on test_types to test;
+
+
 drop table test_keygen;
 create table test_keygen (
   id   int not null,
