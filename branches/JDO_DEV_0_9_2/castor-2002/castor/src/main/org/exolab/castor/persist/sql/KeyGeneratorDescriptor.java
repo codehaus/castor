@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.persist.sql;
 
 
 import java.util.Properties;
@@ -57,7 +57,7 @@ import java.util.Properties;
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-final class KeyGeneratorDescriptor
+public final class KeyGeneratorDescriptor
 {
 
     private final String _name;

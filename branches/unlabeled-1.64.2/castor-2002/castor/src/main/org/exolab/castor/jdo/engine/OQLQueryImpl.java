@@ -89,6 +89,8 @@ import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.types.Complex;
+import org.exolab.castor.persist.types.SQLTypes;
+import org.exolab.castor.persist.sql.SimpleQueryExecutor;
 
 /**
  *

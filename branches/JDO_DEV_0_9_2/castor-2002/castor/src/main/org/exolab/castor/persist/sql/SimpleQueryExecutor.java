@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.persist.sql;
 
 import java.util.NoSuchElementException;
 import java.sql.Connection;
@@ -54,6 +54,7 @@ import java.sql.SQLException;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.persist.spi.QueryExpression;
 
 /**

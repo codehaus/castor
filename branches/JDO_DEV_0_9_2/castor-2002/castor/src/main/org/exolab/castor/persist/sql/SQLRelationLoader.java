@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.persist;
+package org.exolab.castor.persist.sql;
 
 import org.exolab.castor.persist.types.Complex;
 import org.exolab.castor.persist.AccessMode;

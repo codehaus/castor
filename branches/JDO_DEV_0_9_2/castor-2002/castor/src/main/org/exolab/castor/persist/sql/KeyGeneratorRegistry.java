@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.persist.sql;
 
 
 import java.util.Hashtable;
@@ -66,7 +66,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-final class KeyGeneratorRegistry
+public final class KeyGeneratorRegistry
 {
 
     /**

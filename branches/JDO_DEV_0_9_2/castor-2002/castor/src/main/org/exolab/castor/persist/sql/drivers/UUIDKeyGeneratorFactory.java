@@ -40,6 +40,8 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id$
+ *
  */
 
 /**
@@ -65,7 +67,7 @@
 **/
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.persist.sql.drivers;
 
 
 import java.util.Properties;

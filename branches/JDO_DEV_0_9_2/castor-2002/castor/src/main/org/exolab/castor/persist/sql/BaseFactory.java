@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.persist.sql;
 
 
 import java.sql.DriverManager;
@@ -58,7 +58,6 @@ import javax.naming.NameNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.conf.*;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
-import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.LogInterceptor;

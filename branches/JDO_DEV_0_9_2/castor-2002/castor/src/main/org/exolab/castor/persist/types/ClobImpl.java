@@ -42,7 +42,7 @@
  *
  * $Id$
  */
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.persist.types;
 
 import java.io.Reader;
 import java.io.InputStream;

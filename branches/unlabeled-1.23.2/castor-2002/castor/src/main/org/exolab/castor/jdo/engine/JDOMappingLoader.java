@@ -69,6 +69,10 @@ import org.exolab.castor.mapping.xml.KeyGeneratorDef;
 import org.exolab.castor.mapping.xml.CacheTypeMapping;
 import org.exolab.castor.mapping.xml.Param;
 import org.exolab.castor.mapping.xml.types.DirtyType;
+import org.exolab.castor.persist.types.SQLTypes;
+import org.exolab.castor.persist.sql.BaseFactory;
+import org.exolab.castor.persist.sql.KeyGeneratorRegistry;
+import org.exolab.castor.persist.sql.KeyGeneratorDescriptor;
 import org.exolab.castor.util.Messages;
 
 /**

@@ -62,6 +62,7 @@ import javax.naming.NameNotFoundException;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
 import org.exolab.castor.xml.Unmarshaller;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.mapping.MappingException;
@@ -200,7 +201,7 @@ public class DatabaseRegistry
      */
     DatabaseRegistry( String name, MappingRoot mapping, PersistenceFactory factory,
             Database conf, LogInterceptor log )
-            throws MappingException {
+            throws MappingException, PersistenceException {
 
         _name = name;
 

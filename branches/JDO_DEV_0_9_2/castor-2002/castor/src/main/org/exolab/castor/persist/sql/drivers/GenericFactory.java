@@ -44,14 +44,14 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.persist.sql.drivers;
 
 
 import java.sql.SQLException;
 import java.util.StringTokenizer;
-import org.exolab.castor.jdo.engine.BaseFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.persist.sql.BaseFactory;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
