@@ -553,6 +553,8 @@ public class myclass {
                   name     NMTOKEN  #IMPLIED
                   type     NMTOKEN  #IMPLIED
                   matches  NMTOKEN  #IMPLIED
+                  QName-prefix NMTOKEN #IMPLIED
+                  reference (true|false) "false"
                   node     ( attribute | element | text )  #IMPLIED>
         </code> 
 
@@ -563,7 +565,16 @@ public class myclass {
         <ul>
           <li><b>name:</b> the name of the element or attribute</li>
 
-          <li><b>type:</b> xsi::type</li>
+          <li><b>type:</b>XML Schema type (of the value of this field) that requires specific handling in the           
+                          Castor Marshalling Framework (such as 'QName' for instance).</li>   
+              
+          <li><b>QName-prefix:</b> When using a QName value, you can provide a default prefix that    
+              is used when marshalling value of type QName. More information on the use of 'QName-prefix'   
+              can be found in the <a href="./SourceGeneratorUser.pdf">SourceGenerator Documentation</a></li>   
+               
+          <li><b>reference:</b> Indicates if this field has to be treated as a reference by the unmarshaller.   
+          In order to work properly, you must specify the node type to 'attribute'    
+          for both the 'id' and the 'reference'.</li> 
           
           <li><b>matches:</b> Allows overriding the matches rules for
           the name of the element. It is a standard regular
