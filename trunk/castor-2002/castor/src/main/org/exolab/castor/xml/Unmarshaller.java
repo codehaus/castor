@@ -74,13 +74,18 @@ public class Unmarshaller {
     /**
      * The Class that this Unmarshaller was created with
     **/
-    Class _class = null;
+    private Class _class = null;
 
     /**
      * The class descriptor resolver
     **/
     private ClassDescriptorResolver _cdResolver = null;
 
+    /**
+     * A user specified IDResolver for resolving IDREFs
+    **/
+    private IDResolver _idResolver = null;
+    
     /**
      * The EntityResolver used for resolving entities
     **/
@@ -182,6 +187,18 @@ public class Unmarshaller {
     } //-- entityResolver
 
     /**
+     * Sets the IDResolver to use when resolving IDREFs for
+     * which no associated element may exist in XML document.
+     *
+     * @param idResolver the IDResolver to use when resolving
+     * IDREFs for which no associated element may exist in the
+     * XML document.
+    **/
+    public void setIDResolver(IDResolver idResolver) {
+        _idResolver = idResolver;
+    } //-- idResolver
+    
+    /**
      * Sets the PrintWriter used for logging
      * @param printWriter the PrintWriter to use for logging
     **/
@@ -203,6 +220,8 @@ public class Unmarshaller {
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
+    
+    
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
      * @param cdr the ClassDescriptorResolver to use
@@ -261,11 +280,7 @@ public class Unmarshaller {
     public Object unmarshal(EventProducer eventProducer)
         throws MarshalException, ValidationException
     {
-        UnmarshalHandler handler = new UnmarshalHandler(_class);
-        handler.setResolver(_cdResolver);
-        handler.setLogWriter(pw);
-        handler.setDebug(debug);
-        handler.setValidation(validate);
+        UnmarshalHandler handler = createHandler();
         eventProducer.setDocumentHandler(handler);
         try {
             eventProducer.start();
@@ -309,11 +324,7 @@ public class Unmarshaller {
         if (entityResolver != null)
             parser.setEntityResolver(entityResolver);
 
-        UnmarshalHandler handler = new UnmarshalHandler(_class);
-        handler.setResolver(_cdResolver);
-        handler.setLogWriter(pw);
-        handler.setDebug(debug);
-        handler.setValidation(validate);
+        UnmarshalHandler handler = createHandler();
         parser.setDocumentHandler(handler);
 
         //parser.setErrorHandler(unmarshaller);
@@ -373,5 +384,21 @@ public class Unmarshaller {
         return unmarshaller.unmarshal(source);
     } //-- void unmarshal(Writer)
 
+    /**
+     * Creates and initalizes an UnmarshalHandler
+     * @return the new UnmarshalHandler
+    **/
+    private UnmarshalHandler createHandler() {
+        UnmarshalHandler handler = new UnmarshalHandler(_class);
+        handler.setResolver(_cdResolver);
+        handler.setLogWriter(pw);
+        handler.setDebug(debug);
+        handler.setValidation(validate);
+        
+        if (_idResolver != null) 
+            handler.setIDResolver(_idResolver);
+        return handler;
+    } //-- createHandler
+    
 } //-- Unmarshaller
 
