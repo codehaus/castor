@@ -154,7 +154,7 @@ public class DirectoryImpl
         try {
             next = expr.indexOf( '$' );
             if ( next <= 0 ) {
-                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( null, expr, new Class[ 0 ] ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( expr, new Class[ 0 ] ) );
             } else {
                 pos = 0;
                 query = new StringBuffer();
@@ -180,7 +180,7 @@ public class DirectoryImpl
                 array = new Class[ types.size() ];
                 types.copyInto( array );
                 System.out.println( query.toString() );
-                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( null, query.toString(), array ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( query.toString(), array ) );
             }
         } catch ( QueryException except ) {
             throw new InvalidSearchException( except.getMessage() );
@@ -457,7 +457,7 @@ public class DirectoryImpl
             return _clsDescs.elements();
         }
         
-        public Enumeration listObjectTypes()
+        public Enumeration listJavaClasses()
         {
             return _clsDescs.keys();
         }

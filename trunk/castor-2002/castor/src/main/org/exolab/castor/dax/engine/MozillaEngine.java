@@ -70,7 +70,6 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.persist.FetchContext;
 import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
@@ -97,7 +96,7 @@ public class MozillaEngine
     private ClassHandler         _handler;
 
 
-    private Hashtable            _fields;
+    private DAXFieldDescriptor[]  _fields;
 
 
     private DAXFieldDescriptor[] _dnFields;
@@ -112,6 +111,9 @@ public class MozillaEngine
     private String               _rootDN;
 
 
+    private int                  _firstField;
+
+
     public MozillaEngine( ClassHandler handler, String rootDN )
         throws MappingException
     {
@@ -119,38 +121,36 @@ public class MozillaEngine
         ClassDescriptor   clsDesc;
         
         _handler = handler;
+        _firstField = 0;
         /*
         _attrField = _clsDesc.getAttributeSetField();
         */
         clsDesc = (DAXClassDescriptor) _handler.getDescriptor();
         fields = clsDesc.getFields();
-        _fields = new Hashtable();
+        _fields = new DAXFieldDescriptor[ fields.length ];
         for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( _fields.put( ( (DAXFieldDescriptor) fields[ i ] ).getLdapName(), fields[ i ] ) != null )
-                throw new MappingException( "Duplicate LDAP attribute" );
+            if ( fields[ i ] instanceof DAXFieldDescriptor )
+                _fields[ i ] = (DAXFieldDescriptor) fields[ i ];
         }
         _dnFieldName = ( (DAXFieldDescriptor) clsDesc.getIdentity() ).getLdapName();
         _rootDN = rootDN;
     }
 
 
-    public Object create( Object conn, Object obj, Object identity )
+    public Object create( Object conn, Object[] fields, Object identity )
         throws DuplicateIdentityException, PersistenceException
     {
         LDAPAttributeSet   ldapSet;
         String             dn;
-        Enumeration        enum;
         DAXFieldDescriptor field;
         boolean            exists;
         
         dn = getDN( identity );
         try {
             ldapSet = new LDAPAttributeSet();
-            enum = _fields.elements();
-            while ( enum.hasMoreElements() ) {
-                field = (DAXFieldDescriptor) enum.nextElement();
-                ldapSet.add( field.getAttribute( obj ) );
-            }
+            for ( int i = 0 ; i < _fields.length ; ++i )
+                ldapSet.add( getAttribute( _fields[ i ].getLdapName(), fields[ _firstField + i ] ) );
+
             // XXX
             // Also need to create all the attributes in the attrSet
             DAXClassDescriptor type;
@@ -164,7 +164,7 @@ public class MozillaEngine
             return null;
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
-                throw new DuplicateIdentityException( obj.getClass(), identity );
+                throw new DuplicateIdentityException( _handler.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -173,7 +173,7 @@ public class MozillaEngine
     }
 
 
-    public Object load( Object conn, FetchContext ctx, Object obj, Object identity,
+    public Object load( Object conn, Object[] fields, Object identity,
                         AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException
     {
@@ -188,10 +188,10 @@ public class MozillaEngine
         try {
             entry = ( (LDAPConnection) conn ).read( dn );
             if ( entry == null )
-                throw new ObjectNotFoundException( obj.getClass(), identity );
+                throw new ObjectNotFoundException( _handler.getJavaClass(), identity );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectNotFoundException( obj.getClass(), identity );
+                throw new ObjectNotFoundException( _handler.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -199,6 +199,13 @@ public class MozillaEngine
         }
         
         ldapSet = entry.getAttributeSet();
+
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            fields[ _firstField + i ] = getValue( ldapSet.getAttribute( _fields[ i ].getLdapName() ),
+                                                  _fields[ i ].getFieldType() );
+            ldapSet.remove( _fields[ i ].getLdapName() );
+        }
+
         for ( int i = 0 ; i < ldapSet.size() ; ++i ) {
             ldapAttr = ldapSet.elementAt( i );
             if ( ldapAttr.getName().equals( "objectclass" ) ) {
@@ -221,34 +228,29 @@ public class MozillaEngine
                   }
                 */
                 
-            } else {
+            } else if ( _attrField != null ) {
+                /* XXX Should work with field directly
+                Hashtable     attrSet;
                 
-                field = (DAXFieldDescriptor) _fields.get( ldapAttr.getName() );
-                if ( field != null ) {
-                    field.setValue( obj, entry );
-                } else if ( _attrField != null ) {
-                    Hashtable     attrSet;
-                    
-                    attrSet = (Hashtable) _attrField.getValue( obj );
-                    if ( attrSet == null ) {
-                        attrSet = new Hashtable();
-                        _attrField.setValue( obj, attrSet );
-                    }
-                    attrSet.put( ldapAttr.getName(), ldapAttr.getStringValueArray() );
+                attrSet = (Hashtable) _attrField.getValue( obj );
+                if ( attrSet == null ) {
+                    attrSet = new Hashtable();
+                    _attrField.setValue( obj, attrSet );
                 }
+                attrSet.put( ldapAttr.getName(), ldapAttr.getStringValueArray() );
+                */
             }
         }
         return null;
     }
 
 
-    public Object store( Object conn, Object obj, Object identity,
-                         Object original, Object stamp )
+    public Object store( Object conn, Object[] fields, Object identity,
+                         Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException
     {
         LDAPModificationSet modifs;
         String              dn;
-        Enumeration         enum;
         LDAPEntry           entry;
         LDAPAttributeSet    ldapSet;
         boolean             exists;
@@ -257,10 +259,10 @@ public class MozillaEngine
         try {
             entry = ( (LDAPConnection) conn ).read( dn );
             if ( entry == null )
-                throw new ObjectDeletedException( obj.getClass(), identity );
+                throw new ObjectDeletedException( _handler.getJavaClass(), identity );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectDeletedException( obj.getClass(), identity );
+                throw new ObjectDeletedException( _handler.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -269,25 +271,23 @@ public class MozillaEngine
         ldapSet = entry.getAttributeSet();
         
         modifs = new LDAPModificationSet();
-        enum = _fields.elements();
-        while ( enum.hasMoreElements() ) {
-            DAXFieldDescriptor  field;
-            LDAPAttribute       attr;
-            
-            field = (DAXFieldDescriptor) enum.nextElement();
-            exists = ( ldapSet.getAttribute( field.getLdapName() ) != null );
-            attr = field.getAttribute( obj );
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            LDAPAttribute attr;
+
+            exists = ( ldapSet.getAttribute( _fields[ i ].getLdapName() ) != null );
+            attr = getAttribute( _fields[ i ].getLdapName(), fields[ _firstField + i ] );
             if ( exists )
-                ldapSet.remove( field.getLdapName() );
+                ldapSet.remove( _fields[ i ].getLdapName() );
             if ( attr == null ) {
                 if ( exists )
-                    modifs.add( LDAPModification.DELETE, new LDAPAttribute( field.getLdapName() ) );
+                    modifs.add( LDAPModification.DELETE, new LDAPAttribute( _fields[ i ].getLdapName() ) );
             } else {
                 modifs.add( ( exists ? LDAPModification.REPLACE : LDAPModification.ADD ), attr );
             }
         }
-        
+
         if ( _attrField != null ) {
+            /*
             Hashtable    attrSet;
             Enumeration  attrs;
             String       name;
@@ -308,7 +308,10 @@ public class MozillaEngine
                     modifs.add( ( exists ? LDAPModification.REPLACE : LDAPModification.ADD ),
                                 new LDAPAttribute( name, value.toString() ) );
             }
+            */
         }
+
+        Enumeration enum;
         
         enum = ldapSet.getAttributes();
         while ( enum.hasMoreElements() ) {
@@ -348,14 +351,13 @@ public class MozillaEngine
     }
 
 
-    public void writeLock( Object conn, Object obj, Object identity )
+    public void writeLock( Object conn, Object identity )
         throws ObjectDeletedException, PersistenceException
     {
     }
     
     
-    public void changeIdentity( Object conn, Object obj,
-                                Object oldIdentity, Object newIdentity )
+    public void changeIdentity( Object conn, Object oldIdentity, Object newIdentity )
         throws ObjectDeletedException, DuplicateIdentityException, PersistenceException
     {
         String oldDN;
@@ -367,9 +369,9 @@ public class MozillaEngine
             ( (LDAPConnection) conn ).rename( oldDN, newRDN, false );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectDeletedException( obj.getClass(), oldIdentity );
+                throw new ObjectDeletedException( _handler.getJavaClass(), oldIdentity );
             if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
-                throw new DuplicateIdentityException( obj.getClass(), newIdentity );
+                throw new DuplicateIdentityException( _handler.getJavaClass(), newIdentity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -378,7 +380,7 @@ public class MozillaEngine
     }
     
 
-    public PersistenceQuery createQuery( FetchContext ctx, String query, Class[] types )
+    public PersistenceQuery createQuery( String query, Class[] types )
         throws QueryException
     {
         return new MozillaQuery( query, types );
@@ -438,6 +440,84 @@ public class MozillaEngine
     }
 
 
+    private LDAPAttribute getAttribute( String ldapName, Object value )
+    {
+        if ( value == null ) {
+            return null;
+        } else if ( value instanceof byte[] ) {
+            return new LDAPAttribute( ldapName, (byte[]) value );
+        } else if ( value instanceof String[] ) {
+            return  new LDAPAttribute( ldapName, (String[]) value );
+        } else if ( value instanceof String ) {
+            return new LDAPAttribute( ldapName, (String) value );
+        } else if ( value instanceof char[] ) {
+            return new LDAPAttribute( ldapName, new String( (char[]) value ) );
+        } else if ( Types.isSimpleType( value.getClass() ) ) {
+            // Simple objects are stored as String
+            return new LDAPAttribute( ldapName, value.toString() );
+        } else {
+            return null;
+            // Complex objects are serialized
+            /*
+            try {
+                return new LDAPAttribute( ldapName, Serializer.serialize( value ) );
+            } catch ( IOException except ) {
+                throw new IllegalArgumentException( "Cannot serialize field value of type " +
+                                                    value.getClass().getName() );
+            }
+            */
+        }
+    }
+
+
+    private Object getValue( LDAPAttribute attr, Class fieldType )
+    {
+        if ( attr == null )
+            return null;
+        if ( fieldType == byte[].class ) {
+            byte[][] values;
+            int      count;
+            byte[]   bytes;
+            
+            // Pretty much takes an array of bytes and stuffs it
+            // into a single array of bytes
+            values = attr.getByteValueArray();
+            if ( values.length == 0 )
+                return null;
+            else if ( values.length == 1 )
+                return values[ 0 ];
+            else {
+                count = 0;
+                for ( int i = 0 ; i < values.length ; ++i )
+                    count += values[ i ].length;
+                bytes = new byte[ count ];
+                count = 0;
+                for ( int i = 0 ; i < values.length ; ++i ) {
+                    for ( int j = 0 ; j < values.length ; ++j )
+                        bytes[ count + j ] = values[ i ][ j ];
+                    count += values[ i ].length;
+                }
+                return values;
+            }
+        } else if ( fieldType == String[].class ) {
+            return attr.getStringValueArray();
+        } else {
+            // Type conversion comes here
+            String[]  values;
+            
+            values = attr.getStringValueArray();
+            if ( values.length == 0 )
+                return null;
+            else if ( values.length == 1 )
+                return values[ 0 ];
+            else
+                // Need to assemble all strings together
+                return values[ 0 ];
+        }
+    }
+
+
+
     class MozillaQuery
         implements PersistenceQuery
     {
@@ -452,9 +532,6 @@ public class MozillaEngine
         
         
         private LDAPSearchResults _results;
-        
-        
-        private int               _position;
         
         
         private final String[]    _query;
@@ -521,7 +598,6 @@ public class MozillaEngine
                         filter.append( _paramValues[ i ].toString() );
                 }
                 filter.append( _query[ _query.length - 1 ] );
-                _position = 0;
                 _lastResult = null;
                 _paramValues = new Object[ _paramTypes.length ];
                 _results = ( (LDAPConnection) conn ).search( _rootDN, LDAPv2.SCOPE_ONE, filter.toString(), null, false );
@@ -534,7 +610,7 @@ public class MozillaEngine
         }
         
         
-        public Object nextIdentity()
+        public Object nextIdentity( Object identity )
             throws PersistenceException
         {
             _lastResult = null;
@@ -551,48 +627,12 @@ public class MozillaEngine
                 } else if ( result instanceof LDAPException ) {
                     throw new PersistenceException( (LDAPException) result );
                 }
-                ++_position;
             }
             return null;
         }
         
         
-        public Object getIdentity( int index )
-            throws PersistenceException
-        {
-            // If just retrieved this record, return it.
-            if ( index == _position )
-                return getIdentityFromDN( _lastResult.getDN() );
-            // No going back in LDAP search results
-            if ( index < _position )
-                throw new PersistenceException( "Cannot obtain result at index " + index +
-                                                " after obtaining result at index " + _position );
-            // Traverse as much as needed until you reach new position
-            Object identity = null;
-            
-            while ( index < _position ) {
-                identity = nextIdentity();
-                if ( identity == null )
-                    return null;
-            }
-            return identity;
-        }
-
-
-        public int getPosition()
-            throws PersistenceException
-        {
-            return _position;
-        }
-        
-        
-        public boolean isForwardOnly()
-        {
-            return true;
-        }
-        
-        
-        public Object fetch( Object obj )
+        public Object fetch( Object[] fields, Object identity )
             throws ObjectNotFoundException, PersistenceException
         {
             LDAPAttributeSet   ldapSet;
@@ -604,25 +644,11 @@ public class MozillaEngine
                 throw new PersistenceException( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
             
             ldapSet = _lastResult.getAttributeSet();
-            for ( int i = 0 ; i < ldapSet.size() ; ++i ) {
-                ldapAttr = ldapSet.elementAt( i );
-                if ( ldapAttr.getName().equals( "objectclass" ) ) {
-                    // No need to load or match objectclass, query took care of that
-                } else {
-                    field = (DAXFieldDescriptor) _fields.get( ldapAttr.getName() );
-                    if ( field != null ) {
-                        field.setValue( obj, _lastResult );
-                    } else if ( _attrField != null ) {
-                        Hashtable     attrSet;
-                        
-                        attrSet = (Hashtable) _attrField.getValue( obj );
-                        if ( attrSet == null ) {
-                            attrSet = new Hashtable();
-                            _attrField.setValue( obj, attrSet );
-                        }
-                        attrSet.put( ldapAttr.getName(), ldapAttr.getStringValueArray() );
-                    }
-                }
+
+            for ( int i = 0 ; i < _fields.length ; ++i ) {
+                fields[ _firstField + i ] = getValue( ldapSet.getAttribute( _fields[ i ].getLdapName() ),
+                                                      _fields[ i ].getFieldType() );
+                ldapSet.remove( _fields[ i ].getLdapName() );
             }
             _lastResult = null;
             return null;
