@@ -162,6 +162,18 @@
         </p>
         </section>
 
+        <section title="Refactor the SQLTypeConvertors">
+        <b>Description:</b><br />
+        The SQLTypeConvertors inner class of SQLTypes should be refactored to 
+        make it easier to plug in additional convertors. 
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b> not started<br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        </section>
+
         <section title="Query Externalization">
         <p>
         <b>Description:</b><br />
