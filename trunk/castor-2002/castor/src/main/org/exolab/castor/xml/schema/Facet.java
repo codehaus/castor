@@ -177,6 +177,16 @@ public class Facet extends Annotated {
     /**
      * Returns a double representation of the value of this facet
      * @return a double representation of the value of this facet
+     */
+    public float toFloat() throws NumberFormatException {
+        if (_value.equals("INF")) return Float.POSITIVE_INFINITY;
+        if (_value.equals("-INF")) return Float.NEGATIVE_INFINITY;
+        return Float.valueOf(_value).floatValue();
+    } //-- toInt
+
+    /**
+     * Returns a double representation of the value of this facet
+     * @return a double representation of the value of this facet
     **/
     public double toDouble() throws NumberFormatException {
         return Double.valueOf(_value).doubleValue();

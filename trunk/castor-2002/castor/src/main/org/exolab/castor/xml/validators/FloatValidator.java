@@ -51,53 +51,53 @@ package org.exolab.castor.xml.validators;
 import org.exolab.castor.xml.*;
 
 /**
- * The Double Validation class. This class handles validation
- * for the double type.
+ * The Float Validation class. This class handles validation
+ * for the float type.
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
-public class DoubleValidator extends PatternValidator
+public class FloatValidator extends PatternValidator
     implements TypeValidator
 {
 
     private boolean _isFixed = false;
-    private double _fixed = 0;
+    private float _fixed = 0;
     private boolean _isThereMinInclusive = false;
-    private double _minInclusive = 0;
+    private float _minInclusive = 0;
     private boolean _isThereMaxInclusive = false;
-    private double _maxInclusive = 0;
+    private float _maxInclusive = 0;
     private boolean _isThereMinExclusive = false;
-    private double _minExclusive = 0;
+    private float _minExclusive = 0;
     private boolean _isThereMaxExclusive = false;
-    private double _maxExclusive = 0;
+    private float _maxExclusive = 0;
 
 
     /**
-     * Creates a new DoubleValidator with no restrictions
+     * Creates a new FloatValidator with no restrictions
     **/
-    public DoubleValidator() {
+    public FloatValidator() {
         super();
-    } //-- doubleValidator
+    } //-- FloatValidator
 
 
 
     /**
-     * Sets the fixed value the double to validate must
+     * Sets the fixed value the float to validate must
      * be equal to.
      * @param fixed the fixed value
      */
-    public void setFixed(double fixed) {
+    public void setFixed(float fixed) {
         _fixed = fixed;
         _isFixed = true;
     } //-- setMinExclusive
 
     /**
-     * Sets the minimum value that decimals validated with this
+     * Sets the minimum value that floats validated with this
      * validator must be greater than
-     * @param minValue the minimum value an doublevalidated with this
+     * @param minValue the minimum value an float validated with this
      * validator must be greater than
      */
-    public void setMinExclusive(double minValue) {
+    public void setMinExclusive(float minValue) {
         _minExclusive = minValue;
         _isThereMinExclusive = true;
     } //-- setMinExclusive
@@ -105,10 +105,10 @@ public class DoubleValidator extends PatternValidator
     /**
      * Sets the minimum value that decimals validated with this
      * validator are allowed to be
-     * @param minValue the minimum value an doublevalidated with this
+     * @param minValue the minimum value an floatvalidated with this
      * validator may be
     **/
-    public void setMinInclusive(double minValue) {
+    public void setMinInclusive(float minValue) {
         _minInclusive = minValue;
         _isThereMinInclusive = true;
     } //-- setMinInclusive
@@ -116,10 +116,10 @@ public class DoubleValidator extends PatternValidator
     /**
      * Sets the maximum value that decimals validated with this
      * validator must be less than
-     * @param maxValue the maximum value an doublevalidated with this
+     * @param maxValue the maximum value an floatvalidated with this
      * validator must be less than
     **/
-    public void setMaxExclusive(double maxValue) {
+    public void setMaxExclusive(float maxValue) {
         _maxExclusive = maxValue;
         _isThereMaxExclusive = true;
     } //-- setMaxExclusive
@@ -127,64 +127,64 @@ public class DoubleValidator extends PatternValidator
     /**
      * Sets the maximum value that decimals validated with this
      * validator are allowed to be
-     * @param maxValue the maximum value an doublevalidated with this
+     * @param maxValue the maximum value an floatvalidated with this
      * validator may be
     **/
-    public void setMaxInclusive(double maxValue) {
+    public void setMaxInclusive(float maxValue) {
         _maxInclusive = maxValue;
         _isThereMaxInclusive = true;
     } //--setMaxInclusive
 
 
     /**
-     * Sets the fixed value the double to validate must
+     * Sets the fixed value the float to validate must
      * be equal to.
      * @param fixed the fixed value
      */
-    public void setFixed(String fixed) {
-        setFixed(Double.parseDouble(fixed));
+    public void setFixed(Float fixed) {
+        setFixed(fixed.floatValue());
     }
     /**
      * Sets the minimum value that decimals validated with this
      * validator must be greater than
-     * @param minValue the minimum value an double validated with this
+     * @param minValue the minimum value an float validated with this
      * validator must be greater than
      */
-    public void setMinExclusive(String minValue) {
-        setMinExclusive(Double.parseDouble(minValue));
+    public void setMinExclusive(Float minValue) {
+        setMinExclusive(minValue.floatValue());
     } //-- setMinExclusive
 
     /**
      * Sets the minimum value that decimals validated with this
      * validator are allowed to be
-     * @param minValue the minimum value an double validated with this
+     * @param minValue the minimum value an float validated with this
      * validator may be
     **/
-    public void setMinInclusive(String minValue) {
-        setMinInclusive(Double.parseDouble(minValue));
+    public void setMinInclusive(Float minValue) {
+        setMinInclusive(minValue.floatValue());
     } //-- setMinInclusive
 
     /**
      * Sets the maximum value that decimals validated with this
      * validator must be less than
-     * @param maxValue the maximum value an double validated with this
+     * @param maxValue the maximum value an float validated with this
      * validator must be less than
     **/
-    public void setMaxExclusive(String maxValue) {
-        setMaxExclusive(Double.parseDouble(maxValue));
+    public void setMaxExclusive(Float maxValue) {
+        setMaxExclusive(maxValue.floatValue());
     } //-- setMaxExclusive
 
     /**
      * Sets the maximum value that decimals validated with this
      * validator are allowed to be
-     * @param maxValue the maximum value an double validated with this
+     * @param maxValue the maximum value an float validated with this
      * validator may be
     **/
-    public void setMaxInclusive(String maxValue) {
-        setMaxInclusive(Double.parseDouble(maxValue));
+    public void setMaxInclusive(Float maxValue) {
+        setMaxInclusive(maxValue.floatValue());
     } //--setMaxInclusive
 
-    public void validate(double d) throws ValidationException {
+    public void validate(float d) throws ValidationException {
 
         if (_isFixed) {
             if (d != _fixed) {
@@ -226,7 +226,7 @@ public class DoubleValidator extends PatternValidator
             }
         }
         if (hasPattern())
-            super.validate(Double.toString(d));
+            super.validate(Float.toString(d));
 
     } //-- validate
 
@@ -236,20 +236,20 @@ public class DoubleValidator extends PatternValidator
     **/
     public void validate(Object object) throws ValidationException {
         if (object == null) {
-            String err = "doubleValidator cannot validate a null object.";
+            String err = "FloatValidator cannot validate a null object.";
             throw new ValidationException(err);
         }
 
-        double value = 0;
+        float value = 0;
         try {
-             value = java.lang.Double.parseDouble(object.toString());
+             value = java.lang.Float.parseFloat(object.toString());
         }
         catch(Exception ex) {
-            String err = "Expecting a double, received instead: ";
+            String err = "Expecting a float, received instead: ";
             err += object.getClass().getName();
             throw new ValidationException(err);
         }
         validate(value);
     } //-- validate
 
-} //-- doubleValidator
+} //-- FloatValidator

@@ -759,7 +759,68 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
 
-            //-- double
+            //-- float
+            case XSType.FLOAT:
+            {
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("FloatValidator fv = new FloatValidator();");
+                XSFloat xsFloat = (XSFloat)xsType;
+                if (xsFloat.hasMinimum()) {
+                    Float min = xsFloat.getMinExclusive();
+                    if (min != null)
+                        jsc.add("fv.setMinExclusive( new Float(");
+                    else {
+                        min = xsFloat.getMinInclusive();
+                        jsc.add("fv.setMinInclusive( new Float(");
+                    }
+                    if ( (min.isInfinite()) && (min.compareTo(new Float(0))<0) )
+                        jsc.append("Float.NEGATIVE_INFINITY");
+                    else if ( (min.isInfinite()) && (min.compareTo(new Float(0))>0) )
+                        jsc.append("Float.POSITIVE_INFINITY");
+                    else jsc.append(min.toString());
+                    jsc.append("));");
+                }
+                if (xsFloat.hasMaximum()) {
+                    Float max = xsFloat.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("fv.setMaxExclusive( new Float(");
+                    else {
+                        max = xsFloat.getMaxInclusive();
+                        jsc.add("fv.setMaxInclusive( )");
+                    }
+                    if ( (max.isInfinite()) && (max.compareTo(new Float(0))<0) )
+                        jsc.append("Float.NEGATIVE_INFINITY");
+                    else if ( (max.isInfinite()) && (max.compareTo(new Float(0))>0) )
+                        jsc.append("Float.POSITIVE_INFINITY");
+                    else jsc.append(max.toString());
+                    jsc.append("));");
+                }
+
+                //-- fixed values
+                if (fixed != null) {
+                    //-- make sure we have a valid value...
+                    Float.parseFloat(fixed);
+
+                    jsc.add("fv.setFixedValue( new Float(");
+                    jsc.append(fixed);
+                    jsc.append("));");
+                }
+                //-- pattern facet
+                pattern = xsFloat.getPattern();
+                if (pattern != null) {
+                    jsc.add("fv.setPattern(\"");
+                    jsc.append(escapePattern(pattern));
+                    jsc.append("\");");
+                }
+
+                jsc.add("fieldValidator.setValidator(fv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+            }
+
+              //-- double
             case XSType.DOUBLE:
             {
                 jsc.add("{ //-- local scope");
@@ -811,6 +872,7 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
             }
+
             case XSType.NEGATIVE_INTEGER:
             case XSType.POSITIVE_INTEGER:
             case XSType.INTEGER:
