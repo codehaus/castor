@@ -156,16 +156,18 @@ public class DirectorySourceImpl
     public XADirectory getXADirectory()
 	throws DirectoryException
     {
-	return new XADirectoryImpl( new DirectoryImpl( getConnection( null, null ),
-						       _url, _mapResolver, _logWriter ) );
+	return null;
+	//	return new XADirectoryImpl( new DirectoryImpl( getConnection( null, null ),
+	//					       _url, _mapResolver, _logWriter ) );
     }
 
 
     public XADirectory getXADirectory(  String userDN, String password )
 	throws DirectoryException
     {
-	return new XADirectoryImpl( new DirectoryImpl( getConnection( userDN, password ),
-						       _url, _mapResolver, _logWriter ) );
+	return null;
+	//	return new XADirectoryImpl( new DirectoryImpl( getConnection( userDN, password ),
+	//					       _url, _mapResolver, _logWriter ) );
     }
 
 

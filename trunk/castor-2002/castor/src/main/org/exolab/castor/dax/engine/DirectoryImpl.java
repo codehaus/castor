@@ -48,6 +48,8 @@ package org.exolab.castor.dax.engine;
 
 
 import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.net.MalformedURLException;
 import netscape.ldap.LDAPUrl;
 import netscape.ldap.LDAPConnection;
@@ -65,6 +67,10 @@ import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.TransactionAbortedException;
 import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.PersistenceEngineFactory;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectNotPersistentException;
 import org.exolab.castor.persist.TransactionNotInProgressException;
@@ -88,7 +94,7 @@ public class DirectoryImpl
     private String          _dn;
 
 
-    private DirectoryEngine _dirEngine;
+    private PersistenceEngine _dirEngine;
 
 
     private PrintWriter     _logWriter;
@@ -100,6 +106,9 @@ public class DirectoryImpl
     private TransactionContext _tx;
 
 
+    private ObjectDesc        _objDesc;
+
+
     DirectoryImpl( LDAPConnection conn, LDAPUrl url, 
 		   MappingResolver mapResolver, PrintWriter logWriter )
 	throws DirectoryException
@@ -107,8 +116,9 @@ public class DirectoryImpl
 	_conn = conn;
 	_dn = url.getDN();
 	_mapResolver = mapResolver;
+	_objDesc = (ObjectDesc) _mapResolver.listDescriptors().nextElement();
 	try {
-	    _dirEngine = DirectoryEngine.getEngine( url, (ObjectDesc) _mapResolver.listDescriptors().nextElement() , logWriter );
+	    _dirEngine = getEngine( url, _objDesc , logWriter );
 	} catch ( MappingException except ) {
 	    throw new DirectoryException( except );
 	}
@@ -141,7 +151,8 @@ public class DirectoryImpl
 	if ( _dirEngine == null )
 	    throw new DirectoryException( "Directory closed" );
 
-	objDesc = _dirEngine.getObjectDesc();
+	objDesc = _objDesc;
+	// objDesc = _dirEngine.getObjectDesc();
 	obj = objDesc.createNew();
 	try {
 	    if ( _tx != null ) {
@@ -174,7 +185,8 @@ public class DirectoryImpl
 	if ( _dirEngine == null )
 	    throw new DirectoryException( "Directory closed" );
 
-	objDesc = _dirEngine.getObjectDesc();
+	objDesc = _objDesc;
+	// objDesc = _dirEngine.getObjectDesc();
 	while ( objDesc != null ) {
 	    if ( objDesc.getObjectType().isAssignableFrom( obj.getClass() ) )
 		break;
@@ -215,7 +227,8 @@ public class DirectoryImpl
 	if ( _dirEngine == null )
 	    throw new DirectoryException( "Directory closed" );
 
-	objDesc = _dirEngine.getObjectDesc();
+	objDesc = _objDesc;
+	// objDesc = _dirEngine.getObjectDesc();
 	while ( objDesc != null ) {
 	    if ( objDesc.getObjectType().isAssignableFrom( obj.getClass() ) )
 		break;
@@ -327,6 +340,82 @@ public class DirectoryImpl
 		_conn.disconnect();
 	} catch ( LDAPException except ) {
 	}
+    }
+
+
+
+
+
+    private static Hashtable  _engines = new Hashtable();
+
+
+    public static PersistenceEngine getEngine( LDAPUrl url, ObjectDesc objDesc, PrintWriter logWriter )
+	throws MappingException
+    {
+	PersistenceEngine engine;
+
+	synchronized ( _engines ) {
+	    engine = (PersistenceEngine) _engines.get( url );
+	    if ( engine == null ) {
+		engine = new PersistenceEngineFactory().createEngine( new SingleMapping( objDesc ),
+								      new EngineFactory( url.getDN() ), logWriter );
+		_engines.put( url, engine );
+	    }
+	    return engine;
+	}
+    }
+
+
+    static class SingleMapping
+	implements MappingResolver
+    {
+
+	private Hashtable _objDescs;
+
+	SingleMapping( ObjectDesc objDesc )
+	{
+	    _objDescs = new Hashtable();
+	    _objDescs.put( objDesc.getObjectType(), objDesc );
+	}
+
+	public ObjectDesc getDescriptor( Class type )
+	{
+	    return (ObjectDesc) _objDescs.get( type );
+	}
+
+	public Enumeration listDescriptors()
+	{
+	    return _objDescs.elements();
+	}
+
+	public Enumeration listObjectTypes()
+	{
+	    return _objDescs.keys();
+	}
+
+    }
+
+
+    static class EngineFactory
+	implements PersistenceFactory
+    {
+
+	private String _rootDN;
+
+	EngineFactory( String rootDN )
+	{
+	    _rootDN = rootDN;
+	}
+	
+	public Persistence getPersistence( ObjectDesc objDesc, PrintWriter logWriter )
+	{
+	    try {
+		return new MozillaEngine( (DAXObjectDesc) objDesc, _rootDN );
+	    } catch ( MappingException except ) {
+		return null;
+	    }
+	}
+
     }
 
 
