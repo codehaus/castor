@@ -38,14 +38,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.builder.types;
 
-import java.util.Vector;
 import org.exolab.javasource.*;
 
 /**
@@ -59,7 +58,7 @@ public abstract class XSPatternBase extends XSType {
     /**
      * The value of the pattern facet
     **/
-    private Vector _pattern = null;
+    private String _pattern = null;
 
 
     /**
@@ -75,24 +74,11 @@ public abstract class XSPatternBase extends XSType {
      * expression and type.
      *
      * @param type that this XSType represents
-     * @param patterns a vector containing regular expressions
-    **/
-    public XSPatternBase(short type, Vector pattern) {
-        super(type);
-        _pattern = pattern;
-    } //-- XSPatternBase
-
-    /**
-     * Creates a new XSPatternBase with the given regular
-     * expression and type.
-     *
-     * @param type that this XSType represents
      * @param pattern the regular expression
     **/
     public XSPatternBase(short type, String pattern) {
         super(type);
-        _pattern = new Vector();
-        _pattern.add(pattern);
+        _pattern = pattern;
     } //-- XSPatternBase
 
     /**
@@ -100,39 +86,17 @@ public abstract class XSPatternBase extends XSType {
      *
      * @return the pattern facet for this XSType
     **/
-    public String[] getPatterns() {
-        if (_pattern == null)
-            return null;
-        else {
-            int size = _pattern.size();
-            String[] result = new String[size];
-            int i = 0;
-            while (i < size) {
-                result[i] = (String)_pattern.get(i);         
-                i++;     
-            }
-            return result;
-        }
+    public String getPattern() {
+        return _pattern;
     } //-- setPattern
 
     /**
      * Sets the pattern facet for this XSType
      * @param pattern the regular expression for this XSType
     **/
-    public void setPattern(Vector pattern) {
+    public void setPattern(String pattern) {
         _pattern = pattern;
     } //-- setPattern
-    
-    /**
-     * Adds a pattern to the already existing patterns.
-     * 
-     * @param pattern a string representing a pattern to be added
-     * to the existing list of patterns.
-     */
-    public void addPattern(String pattern) {
-        if (_pattern == null)
-            _pattern = new Vector();
-        _pattern.add(pattern);
-    }
+
 
 } //-- XSPatternBase
