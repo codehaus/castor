@@ -31,33 +31,30 @@ import org.exolab.adaptx.xpath.BooleanResult;
 import org.exolab.adaptx.xpath.XPathException;
 
 import org.exolab.adaptx.xpath.expressions.BinaryExpr;
+import org.exolab.adaptx.xpath.expressions.Operator;
 
 /**
  * Represents an AndExpr
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class AndExpr implements BinaryExpr {
+class AndExpr extends BinaryExprImpl {
 
     
     private static String AND = " and ";
-    private static String NULL = "null";
     
-    private XPathExpression leftExpr = null;
-    private XPathExpression rightExpr = null;
     
+    /**
+     * The AndOperator instance
+     */
+    private static final Operator _operator = new AndOperator();
     
       //---------------/
      //- Constructor -/
     //---------------/
     
     public AndExpr(XPathExpression leftExpr, XPathExpression rightExpr) {
-        if ( leftExpr == null )
-            throw new IllegalArgumentException( "Argument leftExpr is null" );
-        if ( rightExpr == null )
-            throw new IllegalArgumentException( "Argument rightExpr is null" );
-        this.leftExpr = leftExpr;
-        this.rightExpr = rightExpr;
+        super(leftExpr, rightExpr);
     } //-- AndExpr 
     
       //------------------/
@@ -72,29 +69,15 @@ class AndExpr implements BinaryExpr {
         return XPathExpression.BOOLEAN;
     } //-- getExprType
     
-    
     /**
-     * Returns the Expr that should be evaluated as the left hand side
-     * of this BinaryExpr
+     * Returns the operator for this binary expression
      *
-     * @return the Expr that should be evaluated as the left hand side
-     * of this BinaryExpr
+     * @return the operator for this binary expression
      */
-    public XPathExpression getLeftSide() {
-        return leftExpr;
-    } //-- getLeftSide
+    public Operator getOperator() {
+        return _operator;
+    } //-- getOperator
 
-    /**
-     * Returns the Expr that should be evaluated as the right hand side
-     * of this BinaryExpr
-     *
-     * @return the Expr that should be evaluated as the right hand side
-     * of this BinaryExpr
-     */
-    public XPathExpression getRightSide() {
-        return rightExpr;
-    } //-- getRightSide
-    
     /**
      * Evaluates the expression and returns the XPath result.
      *
@@ -106,28 +89,77 @@ class AndExpr implements BinaryExpr {
     public XPathResult evaluate(XPathContext context) 
         throws XPathException
     {
-        if ((leftExpr == null) || (rightExpr == null))
-            return BooleanResult.FALSE;
-            
-        if (!leftExpr.evaluate(context).booleanValue())
-            return BooleanResult.FALSE;
-            
-        return BooleanResult.from( rightExpr.evaluate( context ) );
+        return _operator.execute(leftExpr, rightExpr, context);
     } //-- evaluate
     
     
     /**
-     * Returns the String representation of this AndExpr
-     * @return the String representation of this AndExpr
-    **/
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        if (leftExpr != null) sb.append(leftExpr.toString());
-        else sb.append(NULL);
-        sb.append(AND);
-        if (rightExpr != null) sb.append(rightExpr.toString());
-        else sb.append(NULL);
-        return sb.toString();
-    } //-- toString
-    /* */
-} //-- Expr
+     * The implementation of the "and" Operator.
+     */
+    static class AndOperator implements Operator {
+        
+        /**
+         * Returns the type for this Operator. The operator
+         * type may be one of the pre-defined types, or
+         * a user-defined type.
+         *
+         * @return the operator type
+         */
+        public int getOperatorType() {
+            return Operator.AND_OPERATOR;
+        } //-- getOperator
+        
+        /**
+         * Executes this operator on the given expressions
+         *
+         * @param left the left-side expression
+         * @param right the right-side expression
+         * @param context the XPathContext for expression evaluation
+         * @return the XPathResult
+         * @throws XPathException when an error occurs during execution
+         */
+        public XPathResult execute
+            (XPathExpression left, XPathExpression right, XPathContext context)
+            throws XPathException
+        {
+            if ((left == null) || (right == null))
+                return BooleanResult.FALSE;
+                
+            if (!left.evaluate(context).booleanValue())
+                return BooleanResult.FALSE;
+                
+            return BooleanResult.from( right.evaluate( context ) );
+            
+        } //-- execute
+        
+        /**
+         * Executes this operator on the given XPath values
+         *
+         * @param left the left-side expression
+         * @param right the right-side expression
+         * @return the XPathResult
+         * @throws XPathException when an error occurs during execution
+         */
+        public XPathResult execute
+            (XPathResult left, XPathResult right)
+            throws XPathException
+        {
+            if ((left == null) || (right == null))
+                return BooleanResult.FALSE;
+                
+            if (!left.booleanValue())
+                return BooleanResult.FALSE;
+                
+            return BooleanResult.from( right.booleanValue() );
+            
+        } //-- execute
+            
+        /**
+         * Returns the string representation of this operator
+         */
+        public String toString() {
+            return AND;
+        }
+    } //-- AndOperator
+    
+} //-- class: AndExpr
