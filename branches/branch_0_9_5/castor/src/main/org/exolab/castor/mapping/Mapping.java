@@ -65,6 +65,7 @@ import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
+import org.exolab.castor.net.util.URIUtils;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.DTDResolver;
 
@@ -402,8 +403,10 @@ public class Mapping
     public void loadMapping( String url )
         throws IOException, MappingException
     {
-        if ( _resolver.getBaseURL() == null )
+        if ( _resolver.getBaseURL() == null ) {
             setBaseURL( url );
+            url = URIUtils.getRelativeURI( url );
+        }
         loadMappingInternal( url );
     }
 
