@@ -2,6 +2,13 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1511 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added functionality to clear/reset the database configuration.
+       Added functionality to configure Castor JDO via an in-memory JDOConf instance
+       (plus a factoyr class for creating JdoConf instances).
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1511
+       (Werner - 20040917)
+
 JDO:   Fixed bug 1507 using contribution from Stein M. Hugubakken [dulci@start.no]
        Fixed problem using the HighLowKeyGenerator with the same-connection
        attribute set to 'true'.
@@ -16,7 +23,7 @@ JDO:   Fixed bug 1635 using contribution from Stein M. Hugubakken [dulci@start.n
 
 JDO:   Fixed bug 1518 using contribution from Stein M. Hugubakken [dulci@start.no].
        Fixed problem with delayed removal of cache entries when deleting objects.
-       (Werner - 20040321)
+       (Werner - 20040902)
        
 JDO:   Fixed bug 1445 using contribution from Stein M. Hugubakken [dulci@start.no]
        Added clearCache() method to CastorTestCase, and fixed a problem in test data setup in 
