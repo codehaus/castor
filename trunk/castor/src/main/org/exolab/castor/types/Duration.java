@@ -100,7 +100,7 @@ public class Duration
    /**
     * the potential number of milliseconds
     */
-    private short _millisecond = 0;
+    private long _millisecond = 0;
 
     /**
      * true if the Duration is negative
@@ -190,7 +190,7 @@ public class Duration
             System.out.println("nb seconds:"+seconds);
         }
 
-        short milliseconds =  (short)(l);
+        long milliseconds = l;
           if (DEBUG) {
             System.out.println("nb milliseconds:"+milliseconds);
         }
@@ -248,7 +248,7 @@ public class Duration
         _second = second;
     }
 
-    public void setMilli(short milli) {
+    public void setMilli(long milli) {
         if (milli < 0) {
              String err = "In a duration all fields have to be positive.";
              throw new IllegalArgumentException(err);
@@ -270,7 +270,7 @@ public class Duration
      * @param second the second value
      */
      public void setValue(short year, short month, short day,
-                         short hour, short minute, short second, short millisecond)
+                         short hour, short minute, short second, long millisecond)
     {
         this.setYear(year);
         this.setMonth(month);
@@ -308,7 +308,7 @@ public class Duration
         return(_second);
     }
 
-    public short getMilli() {
+    public long getMilli() {
         return(_millisecond);
     }
 
@@ -608,7 +608,7 @@ public class Duration
                                    number = number * 10;
                                 number = number * 10;
                             }
-                            result.setMilli((short)number);
+                            result.setMilli((long)number);
                             hasNumber = false;
                         }
                         else {
@@ -733,5 +733,6 @@ public class Duration
         result = this.toLong() > duration.toLong();
         return result;
      } //isGreater
-
+     
+    
 }//Duration
