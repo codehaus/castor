@@ -173,9 +173,9 @@ public class Dependent
                     result  = false;
                 }
                 if ( master.getDetails() == null ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ) {
+                     master.findDetail( 5 ) == null ||
+                     master.findDetail( 6 ) == null  ||
+                     master.findDetail( 7 ) == null  ) {
                     stream.writeVerbose( "Error: loaded master without three details: " + master );
                     result  = false;
                 }
@@ -186,15 +186,15 @@ public class Dependent
                 }
                 detail = master.findDetail( 6 );
                 if ( detail.getDetails2() == null ||
-                     ! detail.getDetails2().contains( new TestDetail2( 61 ) ) ||
-                     ! detail.getDetails2().contains( new TestDetail2( 62 ) ) ) {
+                     detail.findDetail2( 61 ) == null ||
+                     detail.findDetail2( 62 ) == null ) {
                     stream.writeVerbose( "Error: loaded detail 6 without two details: " + detail );
                     result  = false;
                 }
                 detail = master.findDetail( 7 );
                 if ( detail.getDetails2() == null ||
-                     ! detail.getDetails2().contains( new TestDetail2( 71 ) ) ||
-                     ! detail.getDetails2().contains( new TestDetail2( 72 ) ) ) {
+                     detail.findDetail2( 71 ) == null ||
+                     detail.findDetail2( 72 ) == null ) {
                     stream.writeVerbose( "Error: loaded detail 7 without two details: " + detail );
                     result  = false;
                 }
@@ -239,11 +239,11 @@ public class Dependent
             master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
-                     master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
+                     master.findDetail( 5 ) != null ||
+                     master.findDetail( 6 ) != null ||
+                     master.findDetail( 7 ) == null ||
+                     master.findDetail( 8 ) == null ||
+                     master.findDetail( 9 ) == null ) {
                     stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
                     result  = false;
                 } else {
@@ -286,8 +286,8 @@ public class Dependent
             stream.writeVerbose( "Test 2" );
             master2.addDetail( new TestDetail( 5 ) );
             master2.addDetail( new TestDetail( 6 ) );
-            master2.getDetails().removeElement( new TestDetail( 8 ) );
-            master2.getDetails().removeElement( new TestDetail( 9 ) );
+            master2.getDetails().removeElement( master2.findDetail( 8 ) );
+            master2.getDetails().removeElement( master2.findDetail( 9 ) );
             try {
                 db.begin();
                 db.update( master2 );
@@ -322,11 +322,11 @@ public class Dependent
             master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     master.getDetails().contains( new TestDetail( 9 ) ) ) {
+                     master.findDetail( 5 ) == null ||
+                     master.findDetail( 6 ) == null  ||
+                     master.findDetail( 7 ) == null  ||
+                     master.findDetail( 8 ) != null  ||
+                     master.findDetail( 9 ) != null  ) {
                     stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
                     result  = false;
                 } else {
@@ -336,7 +336,7 @@ public class Dependent
                 stream.writeVerbose( "Error: master not found" );
                 result = false;
             }
-            //db.remove( master );
+            db.remove( master );
             db.commit();
             if ( ! result )
                 return false;
