@@ -76,7 +76,7 @@ public final class XSFloat extends XSPatternBase {
     private boolean _asWrapper = false;
 
     public XSFloat() {
-        this(SourceGenerator.usePrimitiveWrapper());
+        this(false);
     }
 
     public XSFloat(boolean asWrapper) {
@@ -260,7 +260,7 @@ public final class XSFloat extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        if (SourceGenerator.usePrimitiveWrapper())
+        if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
              StringBuffer sb = new StringBuffer("new Float(");

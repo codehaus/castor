@@ -74,7 +74,7 @@ public final class XSByte extends XSPatternBase {
 
 
     public XSByte(){
-         this(SourceGenerator.usePrimitiveWrapper());
+         this(false);
     }
 
     public XSByte(boolean asWrapper) {
@@ -270,7 +270,7 @@ public final class XSByte extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        if (SourceGenerator.usePrimitiveWrapper())
+        if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
             StringBuffer sb = new StringBuffer("new Byte(");

@@ -39,7 +39,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,4 +51,10 @@ public class XSNonPositiveInteger extends XSInteger {
         super();
         setMaxExclusive(0);
     }
+    
+    public XSNonPositiveInteger(boolean asWrapper) {
+        super(asWrapper);
+        setMaxExclusive(0);
+    }
+    
 }
