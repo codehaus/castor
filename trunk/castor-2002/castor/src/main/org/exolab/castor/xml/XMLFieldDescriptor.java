@@ -127,6 +127,16 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     public boolean isMultivalued();
 
     /**
+     * Returns true if the field described by this descriptor
+     * is Map or Hashtable. If this method returns true, it
+     * must also return true for any call to #isMultivalued.
+     * 
+     * @return true if the field described by this desciptor is
+     * a Map or Hashtable, otherwise false.
+    **/
+    public boolean isMapped();
+    
+    /**
      * Returns true if the field described by this descriptor is
      * a reference (ie. IDREF) to another object in the
      * "Object Model" (XML tree)

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,6 +52,7 @@ import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.MapItem;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 
 //-- xml related imports
@@ -626,6 +627,13 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new SAXException(vx);
             }
             state.markAsUsed(descriptor);
+        }
+        else {
+            //-- special handling for mapped objects
+            if (descriptor.isMapped()) {
+                MapItem mapItem = new MapItem(fieldState.key, val);
+                val = mapItem;
+            }
         }
 
         try {
@@ -1541,6 +1549,11 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- if this is the identity then save id
         if (classDesc.getIdentity() == descriptor) {
             _idResolver.bind(attValue, parent);
+            
+            //-- save key in current state
+            UnmarshalState state = (UnmarshalState) _stateInfo.peek();
+            state.key = attValue;
+            
             //-- resolve waiting references
             resolveReferences(attValue, parent);
         }
