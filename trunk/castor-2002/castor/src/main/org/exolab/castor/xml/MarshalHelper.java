@@ -48,8 +48,11 @@ package org.exolab.castor.xml;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.util.List;
+
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -129,14 +132,16 @@ public class MarshalHelper {
         //--------------------------/
         
         Method[] methods = c.getMethods();
-        Hashtable descriptors   = null;
-        Hashtable createMethods = null;
+        Hashtable descriptors     = null;
+        Hashtable createMethods   = null;
+        List      dateDescriptors = null;
         
         //-- make sure we have methods before creating
         //-- the hashtables
         if (methods.length > 0) {
-            descriptors = new Hashtable();
-            createMethods = new Hashtable();
+            descriptors     = new Hashtable();
+            createMethods   = new Hashtable();
+            dateDescriptors = new List(3);
         }
         
         for (int i = 0; i < methods.length; i++) {
@@ -183,6 +188,12 @@ public class MarshalHelper {
                         throw new MarshalException(mx);
                     }
                     
+                    //-- check for instances of java.util.Date
+                    if (java.util.Date.class.isAssignableFrom(type)) {
+                        //handler = new DateFieldHandler(handler);
+                        dateDescriptors.add(fieldDesc);
+                    }
+                        
                     fieldDesc.setHandler(handler);
                 }
                 else {
@@ -238,6 +249,14 @@ public class MarshalHelper {
                     catch (MappingException mx) {
                         throw new MarshalException(mx);
                     }
+                   
+                    //-- check for instances of java.util.Date
+                    if (java.util.Date.class.isAssignableFrom(type)) {
+                        //handler = new DateFieldHandler(handler);
+                        dateDescriptors.add(fieldDesc);
+                    }
+                        
+                        
                     fieldDesc.setHandler(handler);
                 }
                 else {
@@ -283,6 +302,18 @@ public class MarshalHelper {
                 }
             } //-- end create method
         }
+        
+        //-- A temporary fix for java.util.Date
+        if (dateDescriptors != null) {
+            for (int i = 0; i < dateDescriptors.size(); i++) {
+                XMLFieldDescriptorImpl fieldDesc =
+                    (XMLFieldDescriptorImpl) dateDescriptors.get(i);
+                FieldHandler handler = fieldDesc.getHandler();
+                fieldDesc.setHandler(new DateFieldHandler(handler));
+            }
+        }
+        
+        
         return classDesc;
     } //-- generateClassDescriptor
     
