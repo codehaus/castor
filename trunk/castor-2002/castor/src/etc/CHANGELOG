@@ -2,6 +2,8 @@
 Version (CVS)
 -------------
 
+XML: 	Fix a bug in the validation framework. (Arnaud)
+
 XML:	Supports the <any> element in the Source Generator.(Arnaud)
 
 XML:	Support the wildcards <any> and <anyAttribute> in the Schema Object Model.
