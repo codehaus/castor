@@ -47,6 +47,8 @@ package org.exolab.castor.jdo.engine;
 import java.io.Reader;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.Writer;
+import java.io.OutputStream;
 import java.sql.Clob;
 import java.sql.SQLException;
 
@@ -146,4 +148,56 @@ public class ClobImpl implements Clob {
         return 0;
     }
 
+    /**
+     * Not implemented.   Added to make ClobImpl complient with
+     * JDBC 3.0, which is apart of JDK1.4 <p>
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     */
+    public OutputStream setAsciiStream(long pos)
+                                throws SQLException
+    {
+        return null;
+    }
+
+    /**
+     * Not implemented.   Added to make ClobImpl complient with
+     * JDBC 3.0, which is apart of JDK1.4 <p>
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     */
+    public Writer setCharacterStream(long pos)
+                              throws SQLException
+    {
+        return null;
+    }
+
+    /**
+     * Not implemented.   Added to make ClobImpl complient with
+     * JDBC 3.0, which is apart of JDK1.4 <p>
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     */
+    public int setString(long pos, String str) throws SQLException
+    {
+        return -1;
+    }
+
+    /**
+     * Not implemented.   Added to make ClobImpl complient with
+     * JDBC 3.0, which is apart of JDK1.4 <p>
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     */
+    public int setString(long pos, String str, int offset,
+			 int len) throws SQLException
+    {
+        return -1;
+    }
+
+    /**
+     * Not implemented.   Added to make ClobImpl complient with
+     * JDBC 3.0, which is apart of JDK1.4 <p>
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     */
+    public void truncate(long len) throws SQLException
+    {
+    }
+										 
 } 
