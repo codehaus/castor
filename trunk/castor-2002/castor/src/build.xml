@@ -22,6 +22,7 @@
         <property name="classpath" value="${classpath}:${classes}"/>
         <property name="deprecation" value="false"/>
         <property name="archive" value="${project}-${version}"/>
+        <property name="exampleexcludes" value="SourceGenerator/*,dax/*"/>
         <property name="excludes" value="**/package.html"/>
         <property name="testexcludes" value="**/package.html,**/xml2java/**,**/MasterTestSuite/**"/>
         <property name="apipackagenames" value="
@@ -130,7 +131,7 @@
     <target name="examples" depends="prepare, main" description="Builds the example packages (including debugging info) and creates the webapp war file for the servlet example">
         <mkdir dir="${build}/examples"/>
         <javac srcdir="${source}/examples" destdir="${build}/examples" classpath="${classpath}" debug="on" deprecation="${deprecation}"
-               excludes="SourceGenerator/*,dax/*"/>
+               excludes="${exampleexcludes}"/>
 
  		<copy todir="${build}/examples">
             <fileset dir="${source}/examples">
