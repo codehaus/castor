@@ -415,15 +415,15 @@ public abstract class Configuration
         
         // Get overriding configuration from the Java
         // library directory, ignore if not found.
-        file = new File( System.getProperty( "java.home" ), "lib" );
-        file = new File( file, Property.FileName );
-        if ( file.exists() ) {
-            _default = new Properties( _default );
-            try {
+        try {
+            file = new File( System.getProperty( "java.home" ), "lib" );
+            file = new File( file, Property.FileName );
+            if ( file.exists() ) {
+                _default = new Properties( _default );
                 _default.load( new FileInputStream( file ) );
-            } catch ( IOException except ) {
-                // Do nothing
             }
+        } catch ( IOException except ) {
+            // Do nothing
         }
         
         // Get overriding configuration from the classpath,
