@@ -40,6 +40,9 @@
  *
  * Copyright 2002-2003 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ * 
  * $Id$
  *
  * Date         Author              Changes
@@ -71,12 +74,13 @@ import org.exolab.adaptx.xml.XMLDiff;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 /**
  * A JUnit test case for testing the Castor Schema Object Model.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
@@ -169,22 +173,38 @@ public class SchemaTestCase extends XMLTestCase {
         } catch (java.io.IOException iox) {
             //Handling the failure feature
             if (_failure != null) {
-                Class exception = iox.getClass();
-                if (iox instanceof NestedIOException)
-                    exception = ((NestedIOException)iox).getException().getClass();
-                String exceptionName = _failure.getException();
-                if (exceptionName != null) {
+                Class actualExceptionClass = iox.getClass();
+                Exception actualException  = iox;
+                if (iox instanceof NestedIOException) {
+                    actualException = ((NestedIOException)iox).getException();
+                    actualExceptionClass = actualException.getClass();
+                }
+                String expectedExceptionName = _failure.getException();
+                if (expectedExceptionName != null) {
                     try {
-                        Class expected = Class.forName(exceptionName);
-                        if (expected.isAssignableFrom(exception) ) {
+                        Class expectedExceptionClass 
+                            = Class.forName(expectedExceptionName);
+                        if (expectedExceptionClass.isAssignableFrom(
+                                actualExceptionClass) ) {
                             assertTrue(_failure.getContent());
                             return null;
                         }
-                        else 
-                        	fail("Received: '"+exception+"' but expected:'"+exceptionName+"'.");
+                        else {
+                            StringWriter sw = new StringWriter();
+                            PrintWriter pw = new PrintWriter(sw);
+                            pw.print("Received: '");
+                            pw.print(actualExceptionClass.getName());
+                            pw.print("' but expected: '");
+                            pw.print(expectedExceptionName);
+                            pw.println("'.");
+                            pw.println("Actual exception stacktrace:");
+                            actualException.printStackTrace(pw);
+                            pw.flush();
+                        	fail(sw.toString());
+                        }
                     } catch (ClassNotFoundException ex) {
-                        //Class#forName
-                        fail("The exception specified:"+exceptionName+" cannot be found in the CLASSPATH");
+                        fail("The exception specified: '" + expectedExceptionName + 
+                                "' cannot be found in the CLASSPATH");
                     }
                 }
                 else {
