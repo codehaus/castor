@@ -61,6 +61,7 @@ public class SchemaNames {
     //-- element definitions
     public static final String ALL              = "all";
     public static final String ANNOTATION       = "annotation";
+    public static final String ANY              = "any";
     public static final String ANY_ATTRIBUTE    = "anyAttribute";
     public static final String APPINFO          = "appinfo";
     public static final String ATTRIBUTE        = "attribute";
@@ -101,8 +102,10 @@ public class SchemaNames {
     public static final String MIN_OCCURS_ATTR  = "minOccurs";
     public static final String MIXED            = "mixed";
 	public static final String NAME_ATTR        = "name";
+    public static final String NAMESPACE        = "namespace";
     public static final String NULLABLE_ATTR    = "nullable";
     public static final String ORDER_ATTR       = "order";
+    public static final String PROCESS_CONTENTS = "processContents";
     public static final String REF_ATTR         = "ref";
     public static final String TARGET_NS_ATTR   = "targetNamespace";
     public static final String TYPE_ATTR        = "type";
@@ -114,6 +117,17 @@ public class SchemaNames {
     public static final String INTEGER_TYPE     = "integer";
     public static final String INT_TYPE         = "int";
     public static final String STRING_TYPE      = "string";
+
+    //-- namespaces
+    public static final String NAMESPACE_ANY     ="##any";
+    public static final String NAMESPACE_LOCAL   ="##local";
+    public static final String NAMESPACE_OTHER   ="##other";
+    public static final String NAMESPACE_TARGET  ="##targetNamespace";
+
+    //-- processContents
+    public static final String LAX              = "lax";
+    public static final String SKIP             = "skip";
+    public static final String STRICT           = "strict";
 
     /**
      * Determines whether or not the given name is the name
@@ -127,5 +141,44 @@ public class SchemaNames {
                 SchemaNames.CHOICE.equals(name)   ||
                 SchemaNames.ALL.equals(name));
     } //-- isGroupName
+
+    /**
+     * Determines whether or not the given name is the name
+     * of an XML Schema namespace attributes.
+     * Note: it assumes that the URI used are valid URL
+     * @todo: change the above restriction
+     * @param name the name to test
+     * @return true if the given name is the name of a schema group
+    **/
+    public static boolean isNamespaceName(String name) {
+        boolean result = (SchemaNames.NAMESPACE_ANY.equals(name)    ||
+                SchemaNames.NAMESPACE_LOCAL.equals(name) ||
+                SchemaNames.NAMESPACE_OTHER.equals(name)   ||
+                SchemaNames.NAMESPACE_TARGET.equals(name));
+        if (result)
+            return result;
+        else try {
+            java.net.URL temp = new java.net.URL(name);
+            temp = null;
+            result = true;
+        } catch (java.net.MalformedURLException e){
+            //invalid URL
+            result = false;
+        }
+        return result;
+    } //-- isNamespaceName
+
+    /**
+     * Determines whether or not the given name is the name
+     * of an XML Schema Wildcard processContents attribute.
+     * @param name the name to test
+     * @return true if the given name is a valid name of a processContents attribute
+    **/
+    public static boolean isProcessName(String name) {
+        return (SchemaNames.LAX.equals(name)    ||
+                SchemaNames.SKIP.equals(name) ||
+                SchemaNames.STRICT.equals(name));
+    } //-- isProcessName
+
 
 } //-- SchemaNames
