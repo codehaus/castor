@@ -377,7 +377,7 @@ public final class LockEngine {
     }
 
     /**
-     * Creates a new object in the persistence storage. The object must not 
+     * Creates a new object in the persistence storage. The object must not
      * be persistent and must have a unique identity within this engine.
      * If the identity is specified the object is created in
      * persistent storage immediately with the identity. If the
@@ -995,19 +995,19 @@ public final class LockEngine {
          * user must call {@link ObjectLock.confirm} exactly once.
          *
          * @param oid  the OID of the lock
-         * @param tx   the transactionContext of the transaction to 
+         * @param tx   the transactionContext of the transaction to
          *             acquire lock
          * @param lockAction   the inital action to be performed on
          *                     the lock
          * @param timeout      the time limit to acquire the lock
          */
-        private ObjectLock acquire( OID oid, TransactionContext tx, short lockAction, 
-                int timeout ) throws ObjectDeletedWaitingForLockException, 
+        private ObjectLock acquire( OID oid, TransactionContext tx, short lockAction,
+                int timeout ) throws ObjectDeletedWaitingForLockException,
                 LockNotGrantedException, ObjectDeletedException {
             ObjectLock entry = null;
             boolean newentry = false;
             boolean failed = true;
-            // sync on "locks" is, unfortunately, necessary if we employ 
+            // sync on "locks" is, unfortunately, necessary if we employ
             // some LRU mechanism, especially if we allow NoCache, to avoid
             // duplicated LockEntry exist at the same time.
             synchronized( this ) {
@@ -1015,8 +1015,32 @@ public final class LockEngine {
                 if ( entry == null ) {
                     entry = (ObjectLock) cache.remove( oid );
                     if ( entry != null ) {
-                        oid = entry.getOID();
-                        locks.put( oid, entry );
+                        OID cacheOid = entry.getOID();
+                        // oid.getName() equals or is a superclass of cacheOid.getName()
+                        boolean isSuper;
+
+                        // Okay, cacheOid and oid have the same top level super class
+                        // We must check that oid has the same class as cacheOid
+                        // or oid is a superclass of cacheOid
+                        isSuper = oid.getName().equals(cacheOid.getName());
+                        if (!isSuper) {
+                            String[] superClassNames = cacheOid.getSuperClassNames();
+
+                            if (superClassNames != null) {
+                                for (int i = 0; i < superClassNames.length; i++) {
+                                    if (oid.getName().equals(superClassNames[i])) {
+                                        isSuper = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (isSuper) {
+                            oid = entry.getOID();
+                            locks.put( oid, entry );
+                        } else {
+                            entry = null;
+                        }
                     }
                 }
                 if ( entry == null ) {
@@ -1029,7 +1053,7 @@ public final class LockEngine {
                 entry.enter();
             }
             // ObjectLock.acquire() may call Object.wait(), so a thread can not
-            // been synchronized with ANY shared object before acquire(). 
+            // been synchronized with ANY shared object before acquire().
             // So, it must be called outside synchronized( locks ) block.
             try {
                 switch ( lockAction ) {
@@ -1107,7 +1131,7 @@ public final class LockEngine {
         }
 
         /** 
-         * Reaasure the lock which have been successfully acquired by the 
+         * Reaasure the lock which have been successfully acquired by the
          * transaction.
          *
          * @param  oid  the OID of the lock
