@@ -70,6 +70,7 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.persist.spi.Complex;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -198,13 +199,13 @@ public class LazyLoading extends CWTestCase {
             _db.commit();           
 
             _db.begin();
-            Object[] fullname = { "First", "Person" };
+            Complex fullname = new Complex( "First", "Person" );
 
             TestLazyEmployee loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
             
             if ( loadPerson.getBirthday().equals(new Date(1922, 2, 2)) &&
                     loadPerson.getFirstName().equals("First") && loadPerson.getLastName().equals("Person") ) {
-                System.out.println("OK: Employee is valid");
+                stream.writeVerbose("OK: Employee is valid");
 
                 Collection address = loadPerson.getAddress();
                 Iterator itor = address.iterator();
@@ -214,7 +215,7 @@ public class LazyLoading extends CWTestCase {
                     addr = (TestLazyAddress)itor.next();
                     if ( addr.getId() < 1 || addr.getId() > 3 ) {
                         _db.rollback();
-                        System.out.println("Error: Address id is wrong");
+                        stream.writeVerbose("Error: Address id is wrong");
                         return false;
                     }
                     addresses[addr.getId()-1] = addr;
@@ -223,41 +224,41 @@ public class LazyLoading extends CWTestCase {
                 if ( addresses[0] == null || !addresses[0].getStreet().equals("#1 Address Street") 
                         || !addresses[0].getCity().equals("First City") || !addresses[0].getState().equals("AB") 
                         || !addresses[0].getZip().equals("10000") || addresses[0].getPerson() != loadPerson ) {
-                    System.out.println("Error: Address 1 is wrong: "+addresses[0]);
+                    stream.writeVerbose("Error: Address 1 is wrong: "+addresses[0]);
                     _db.rollback();
                     return false;
                 } 
-                System.out.println("OK: Address 1 are valid");
+                stream.writeVerbose("OK: Address 1 are valid");
 
                 if ( addresses[1] == null || !addresses[1].getStreet().equals("2nd Ave") 
                         || !addresses[1].getCity().equals("Second City") || !addresses[1].getState().equals("BC") 
                         || !addresses[1].getZip().equals("22222") || addresses[1].getPerson() != loadPerson ) {
-                    System.out.println("Error: Address 2 is wrong");
+                    stream.writeVerbose("Error: Address 2 is wrong");
                     _db.rollback();
                     return false;
                 }
-                System.out.println("OK: Address 2 are valid");
+                stream.writeVerbose("OK: Address 2 are valid");
 
                 TestLazyPayRoll payroll = loadPerson.getPayRoll();
                 if ( payroll == null || payroll.getId() != 1 || payroll.getHoliday() != 15 
                         || payroll.getEmployee() != loadPerson || payroll.getHourlyRate() != 25 ) {
-                    System.out.println("Error: PayRoll loaded wrong");
+                    stream.writeVerbose("Error: PayRoll loaded wrong");
                     _db.rollback();
                     return false;
                 }
-                System.out.println("OK: PayRoll is valid");
+                stream.writeVerbose("OK: PayRoll is valid");
 
                 TestLazyContract cont = loadPerson.getContract();
                 if ( cont == null || cont.getPolicyNo() != 1001 || cont.getEmployee() != loadPerson 
                         || cont.getContractNo() != 78 ) {
-                    System.out.println("Error: Contract are not what expected!");
-                    System.out.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
-                    System.out.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());                   
-                    System.out.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());                   
+                    stream.writeVerbose("Error: Contract are not what expected!");
+                    stream.writeVerbose("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
+                    stream.writeVerbose("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());                   
+                    stream.writeVerbose("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());                   
                     _db.rollback();
                     return false;
                 }
-                System.out.println("OK: Contract is valid");
+                stream.writeVerbose("OK: Contract is valid");
 
                 Collection catelist = cont.getCategory();
                 itor = catelist.iterator();
@@ -267,12 +268,12 @@ public class LazyLoading extends CWTestCase {
                     if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
                     } else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
                     } else {
-                        System.out.println("Error: Category is wrong");
+                        stream.writeVerbose("Error: Category is wrong");
                         _db.rollback();
                         return false;
                     }                           
                 }
-                System.out.println("OK: Categories are valid");
+                stream.writeVerbose("OK: Categories are valid");
 
                 // now modified the object and store it
                 address.remove( addresses[0] );
@@ -280,7 +281,7 @@ public class LazyLoading extends CWTestCase {
                 
             } else {
                 _db.rollback();
-                System.out.println("Error: FirstName, LastName or Birthday is wrong!");
+                stream.writeVerbose("Error: FirstName, LastName or Birthday is wrong!");
                 return false;
             }
             _db.commit();
@@ -291,7 +292,7 @@ public class LazyLoading extends CWTestCase {
             
             if ( loadPerson.getBirthday().equals(new Date(1922, 2, 2)) &&
                     loadPerson.getFirstName().equals("First") && loadPerson.getLastName().equals("Person") ) {
-                System.out.println("OK: Employee is valid");
+                stream.writeVerbose("OK: Employee is valid");
 
                 Collection address = loadPerson.getAddress();
                 Iterator itor = address.iterator();
@@ -301,48 +302,48 @@ public class LazyLoading extends CWTestCase {
                     addr = (TestLazyAddress)itor.next();
                     if ( addr.getId() < 1 || addr.getId() > 3 ) {
                         _db.rollback();
-                        System.out.println("Error: Address id is wrong");
+                        stream.writeVerbose("Error: Address id is wrong");
                         return false;
                     }
                     addresses[addr.getId()-1] = addr;
                 }
 
                 if ( addresses[0] != null ) {
-                    System.out.println("Error: Address 1 is not deleted: "+addresses[0]);
+                    stream.writeVerbose("Error: Address 1 is not deleted: "+addresses[0]);
                     //_db.rollback();
                     //return false;
                 }
-                System.out.println("OK: Address 1 is deleted");
+                stream.writeVerbose("OK: Address 1 is deleted");
 
                 if ( addresses[1] == null || !addresses[1].getStreet().equals("New Second Street") 
                         || !addresses[1].getCity().equals("Second City") || !addresses[1].getState().equals("BC") 
                         || !addresses[1].getZip().equals("22222") || addresses[1].getPerson() != loadPerson ) {
-                    System.out.println("Error: Address 2 is wrong");
+                    stream.writeVerbose("Error: Address 2 is wrong");
                     _db.rollback();
                     return false;
                 }
-                System.out.println("OK: Address 2 are valid: "+addresses[1]);
+                stream.writeVerbose("OK: Address 2 are valid: "+addresses[1]);
 
                 TestLazyPayRoll payroll = loadPerson.getPayRoll();
                 if ( payroll == null || payroll.getId() != 1 || payroll.getHoliday() != 15 
                         || payroll.getEmployee() != loadPerson || payroll.getHourlyRate() != 25 ) {
-                    System.out.println("Error: PayRoll loaded wrong");
+                    stream.writeVerbose("Error: PayRoll loaded wrong");
                     _db.rollback();
                     return false;
                 }
-                System.out.println("OK: PayRoll is valid");
+                stream.writeVerbose("OK: PayRoll is valid");
 
                 TestLazyContract cont = loadPerson.getContract();
                 if ( cont == null || cont.getPolicyNo() != 1001 || cont.getEmployee() != loadPerson 
                         || cont.getContractNo() != 78 ) {
-                    System.out.println("Error: Contract are not what expected!");
-                    System.out.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
-                    System.out.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());                   
-                    System.out.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());                   
+                    stream.writeVerbose("Error: Contract are not what expected!");
+                    stream.writeVerbose("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
+                    stream.writeVerbose("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());                   
+                    stream.writeVerbose("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());                   
                     _db.rollback();
                     return false;
                 }
-                System.out.println("OK: Contract is valid");
+                stream.writeVerbose("OK: Contract is valid");
 
                 Collection catelist = cont.getCategory();
                 itor = catelist.iterator();
@@ -352,16 +353,16 @@ public class LazyLoading extends CWTestCase {
                     if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
                     } else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
                     } else {
-                        System.out.println("Error: Category is wrong");
+                        stream.writeVerbose("Error: Category is wrong");
                         _db.rollback();
                         return false;
                     }                           
                 }
-                System.out.println("OK: Categories are valid");
+                stream.writeVerbose("OK: Categories are valid");
 
             } else {
                 _db.rollback();
-                System.out.println("Error: FirstName, LastName or Birthday is wrong!");
+                stream.writeVerbose("Error: FirstName, LastName or Birthday is wrong!");
                 return false;
             }
             _db.commit();
