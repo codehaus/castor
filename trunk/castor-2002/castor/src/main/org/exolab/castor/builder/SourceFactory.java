@@ -901,7 +901,15 @@ public class SourceFactory  {
               jsc.append(")");
             }
             else {
-                jsc.add("if (!(this.");
+                //check first if the field
+                //is not null. This can occur while comparing
+                //two objects that contains non-mandatory fields.
+                //We only have to check one field since x.equals(null) should return
+                //false when equals() is correctly implemented.
+                jsc.add("if ( (this.");
+                jsc.append(name);
+                jsc.append(" != null) &&");
+                jsc.append("!(this.");
                 jsc.append(name);
                 jsc.append(".equals(temp.");
                 jsc.append(name);
