@@ -510,12 +510,15 @@ public final class FieldHandlerImpl
                         }
                         setCollection = true;
                     }
+                    else {
+                        setCollection = collect.getClass().isArray();
+                    }
 
                     Object tmp = _colHandler.add(collect, value);
                     
                     //-- make sure we do not overwrite collect unless
-                    //-- it's null
-                    if (collect == null) collect = tmp;
+                    //-- the new collection is not null
+                    if (tmp != null) collect = tmp;
 
                     if ( setCollection && (_setMethod != null))
                         _setMethod.invoke( object, new Object[] { collect } );
