@@ -116,6 +116,7 @@ public class LazyLoading extends CastorTestCase {
         stmt.executeUpdate("DELETE FROM test_pks_address");
         stmt.executeUpdate("DELETE FROM test_pks_contract");
         stmt.executeUpdate("DELETE FROM test_pks_category");
+        stmt.executeUpdate("DELETE FROM test_pks_project");
         _conn.commit();
 
         createDataObjects();
@@ -202,6 +203,7 @@ public class LazyLoading extends CastorTestCase {
 
         testCollection();
 
+        testComplex();
     }
 
     public void testGeneral() 
@@ -376,11 +378,10 @@ public class LazyLoading extends CastorTestCase {
 
     public void testCollection() 
             throws PersistenceException, SQLException {
-        // test against bug 801
 
         Complex fullname = new Complex( "First", "Person" );
 
-        // test java.util.Collection.clear() for lazy loading
+        // test java.util.Collection.clear() for lazy loading (bug 801)
         _db.begin();
         TestLazyPerson loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
         
@@ -392,13 +393,14 @@ public class LazyLoading extends CastorTestCase {
         loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
         addresses = loadPerson.getAddress();
 
+        // check if clear() work
         if ( !addresses.isEmpty() ) {
             stream.println("Error: Collection.clear() is not working!");
             fail("Error: Collection.clear() is not working!");
         }
 
         // modify the collection to test java.util.Collection.addAll() 
-        // for lazy loading
+        // for lazy loading (bug 801)
         Collection c = new ArrayList();
 
         TestLazyAddress address = new TestLazyAddress();
@@ -456,7 +458,103 @@ public class LazyLoading extends CastorTestCase {
             stream.println("Error: Collection.addAll( Collection ) fail");
             fail("Error: Collection.addAll( Collection ) fail");
         }
+        _db.commit();
+    }
 
+    public void testComplex()
+            throws PersistenceException, SQLException {
+
+        Complex fullname = new Complex( "First", "Person" );
+
+        // set up the data object
+        _db.begin();
+        TestLazyEmployee loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
+        Collection projects = loadPerson.getProjects();
+
+        TestLazyProject project = new TestLazyProject();
+        project.setId(1001);
+        project.setName("Project One");
+        project.setOwner(loadPerson);
+        projects.add( project );
+        _db.create( project );
+
+        project = new TestLazyProject();
+        project.setId(1002);
+        project.setName("Project Two");
+        project.setOwner(loadPerson);
+        projects.add( project );
+        _db.create( project );
+
+        project = new TestLazyProject();
+        project.setId(1003);
+        project.setName("Project Three");
+        project.setOwner(loadPerson);
+        projects.add( project );
+        _db.create( project );
+
+        _db.commit();
+
+        // reload and test bug 823
+        _db.begin();
+        project = (TestLazyProject) _db.load( TestLazyProject.class, new Integer(1002) );
+        _db.remove( project );
+
+        loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
+        projects = loadPerson.getProjects();
+
+        Iterator itor = projects.iterator();
+        while ( itor.hasNext() ) {
+            project = (TestLazyProject) itor.next();
+            if ( project.getId() == 1002 ) {
+                itor.remove();
+                break;
+            }
+        }
+
+        itor = projects.iterator();
+        while ( itor.hasNext() ) {
+            project = (TestLazyProject) itor.next();
+            if ( project.getId() == 1002 ) {
+                itor.remove();
+                break;
+            }
+        }
+        _db.commit();
+
+        // reload and make sure the cache is consistent
+        _db.begin();
+        loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
+        projects = loadPerson.getProjects();
+        itor = projects.iterator();
+        int id1 = 0;
+        if ( itor.hasNext() ) {
+            project = (TestLazyProject) itor.next();
+            id1 = project.getId();
+            if ( project.getId()!=1001 && project.getId()!=1003 ) {
+                stream.println("Error: found project1 with unexpected id "+project.getId());
+                fail("Error: found project1 with unexpected id "+project.getId());
+            }
+        } else {
+            stream.println("Error: expected project is not found");
+            fail("Error: expected project is not found");
+        }
+
+        if ( itor.hasNext() ) {
+            project = (TestLazyProject) itor.next();
+            if ( project.getId() == id1 || (project.getId() != 1001 && project.getId() != 1003) ) {
+                stream.println("Error: found project2 with unexpected id "+project.getId());
+                fail("Error: found project2 with unexpected id "+project.getId());
+            }
+        } else {
+            stream.println("Error: expected project is not found");
+            fail("Error: expected project is not found");
+        }
+
+        if ( itor.hasNext() ) {
+            project = (TestLazyProject) itor.next();
+            stream.println("Error: unexpected project is found: "+project.getId());
+            fail("Error: unexpected project is found: "+project.getId());
+        }
         _db.commit();
     }
 
