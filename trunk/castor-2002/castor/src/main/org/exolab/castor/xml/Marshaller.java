@@ -124,11 +124,11 @@ public class Marshaller {
      * Marshals the given Object as XML using the given Writer.
      * @param obj the Object to marshal
      * @param out the Writer to marshal to
-     * @exception java.io.IOException
-     * @exception org.xml.sax.SAXException
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
     **/
     public static void marshal(Object obj, Writer out) 
-        throws java.io.IOException, org.xml.sax.SAXException
+        throws MarshalException, ValidationException
     {
         marshal(obj, out, null);
     } //-- void marshal(Writer) 
@@ -138,11 +138,11 @@ public class Marshaller {
      * @param obj the Object to marshal
      * @param out the Writer to marshal to
      * @param logger the PrintWriter to write log information to
-     * @exception java.io.IOException
-     * @exception org.xml.sax.SAXException
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
     **/
     public static void marshal(Object obj, Writer out, PrintWriter logger) 
-        throws java.io.IOException, org.xml.sax.SAXException
+        throws MarshalException, ValidationException
     {
         marshal(obj, out, logger, Configuration.debug());
     } //-- void marshal(Writer) 
@@ -152,15 +152,20 @@ public class Marshaller {
      * @param obj the Object to marshal
      * @param out the Writer to marshal to
      * @param logger the PrintWriter to write log information to
-     * @exception java.io.IOException
-     * @exception org.xml.sax.SAXException
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
     **/
     public static void marshal
         (Object obj, Writer out, PrintWriter logger, boolean debug) 
-        throws java.io.IOException, org.xml.sax.SAXException
+        throws MarshalException, ValidationException
     {
         marshal(obj, Configuration.getSerializer( out ), logger, debug);
-        out.flush();
+        try {
+            out.flush();
+        }
+        catch(java.io.IOException ex) {
+            throw new MarshalException(ex);
+        }
     } //-- void marshal(Writer) 
 
 
@@ -168,11 +173,11 @@ public class Marshaller {
      * Marshals the given Object as XML using the given DocumentHandler.
      * @param obj the Object to marshal
      * @param handler the DocumentHandler to marshal to
-     * @exception java.io.IOException
-     * @exception org.xml.sax.SAXException
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
     **/
     public static void marshal(Object object, DocumentHandler handler) 
-        throws java.io.IOException, org.xml.sax.SAXException
+        throws MarshalException, ValidationException
     {
         Marshaller marshaller = new Marshaller();
         marshaller.validate(object);
@@ -186,8 +191,8 @@ public class Marshaller {
      * @param logger the PrintWriter to write log messages to
      * @param debug a flag indicating whether or not to generate debug 
      * information
-     * @exception java.io.IOException
-     * @exception org.xml.sax.SAXException
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
     **/
     public static void marshal 
     (
@@ -196,7 +201,7 @@ public class Marshaller {
         PrintWriter logger, 
         boolean debug 
     ) 
-        throws java.io.IOException, org.xml.sax.SAXException
+        throws MarshalException, ValidationException
     {
         Marshaller marshaller = new Marshaller();
         marshaller.validate(object);
@@ -208,18 +213,18 @@ public class Marshaller {
     /**
      * It is an error if this method is called with an AttributeDescriptor.
      * @param handler the DocumentHandler to marshal to
-     * @exception java.io.IOException 
-     * @exception org.xml.sax.SAXException when an error occurs
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
      * during marshaling
     **/
     public void marshal
         (Object object, MarshalDescriptor descriptor, DocumentHandler handler) 
-        throws java.io.IOException, org.xml.sax.SAXException
+        throws MarshalException, ValidationException
     {
         
         if (object == null) {
-            String err = "null passed as parameter to Marshaller#marshal"; 
-            throw new SAXException(err);
+            String err = "Marshaller#marshal: null parameter: 'object'"; 
+            throw new IllegalArgumentException(err);
         }
         
         Class _class = object.getClass();
@@ -367,10 +372,15 @@ public class Marshaller {
             }
         }
         
-        if ((nsPrefix != null) && (nsPrefix.length() > 0))
-            handler.startElement(nsPrefix+":"+name, atts);
-        else 
-            handler.startElement(name, atts);
+        try {
+            if ((nsPrefix != null) && (nsPrefix.length() > 0))
+                handler.startElement(nsPrefix+":"+name, atts);
+            else 
+                handler.startElement(name, atts);
+        }
+        catch (org.xml.sax.SAXException sx) {
+            throw new MarshalException(sx);
+        }
         
         
         //-- handle text content
@@ -386,7 +396,12 @@ public class Marshaller {
                 String str = obj.toString();
                 if ((str != null) && (str.length() > 0)) {
                     char[] chars = str.toCharArray();
-                    handler.characters(chars, 0, chars.length);
+                    try {
+                        handler.characters(chars, 0, chars.length);
+                    }
+                    catch(org.xml.sax.SAXException sx) {
+                        throw new MarshalException(sx);
+                    }
                 }
             }
         }
@@ -396,12 +411,22 @@ public class Marshaller {
             MimeBase64Encoder encoder = new MimeBase64Encoder();
             encoder.translate((byte[])object);
             char[] chars = encoder.getCharArray();
-            handler.characters(chars, 0, chars.length);
+            try {
+                handler.characters(chars, 0, chars.length);
+            }
+            catch(org.xml.sax.SAXException sx) {
+                throw new MarshalException(sx);
+            }
         }
         /* special case for Strings and primitives */
         else if ((_class == String.class) || isPrimitive(_class)) {
             char[] chars = object.toString().toCharArray();
-            handler.characters(chars,0,chars.length);
+            try {
+                handler.characters(chars,0,chars.length);
+            }
+            catch(org.xml.sax.SAXException sx) {
+                throw new MarshalException(sx);
+            }
         }
 
         
@@ -464,10 +489,15 @@ public class Marshaller {
         --depth;
         
         //-- finish element
-        if ((nsPrefix != null) && (nsPrefix.length() > 0))
-            handler.endElement(nsPrefix+":"+name);
-        else 
-            handler.endElement(name);
+        try {
+            if ((nsPrefix != null) && (nsPrefix.length() > 0))
+                handler.endElement(nsPrefix+":"+name);
+            else 
+                handler.endElement(name);
+        }
+        catch(org.xml.sax.SAXException sx) {
+            throw new MarshalException(sx);
+        }
         
         if (addedNamespace) _nsScope.removeElement(nsURI);
         
@@ -496,31 +526,33 @@ public class Marshaller {
      * a MarshalInfo could not be found one will attempt to 
      * be generated. 
      * @param _class the Class to get the MarshalInfo for
+     * @exception MarshalException when there is a problem 
+     * retrieving or creating the MarshalInfo for the given class
     **/
     private MarshalInfo getMarshalInfo(Class _class) 
-        throws java.io.IOException
+        throws MarshalException
     {
         MarshalInfo mInfo = _mResolver.resolve(_class);
         if (_mResolver.error()) {
-            throw new java.io.IOException(_mResolver.getErrorMessage());
+            throw new MarshalException(_mResolver.getErrorMessage());
         }
         return mInfo;
     } //-- getMarshalInfo
     
     
     private void validate(Object object) 
-        throws java.io.IOException
+        throws ValidationException
     {
         //-- we must have a valid element before marshalling
-        try {
-           Validator.validate(object, _mResolver);
-        }
-        catch(ValidationException valex) {
-            String err = "validation error: " + valex.getMessage();
-            throw new java.io.IOException(err);
-        }
+        Validator.validate(object, _mResolver);
     }
     
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
     private boolean isPrimitive(Class type) {
         
         if (type.isPrimitive()) return true;
