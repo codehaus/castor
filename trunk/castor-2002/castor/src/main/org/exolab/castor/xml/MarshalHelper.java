@@ -120,18 +120,6 @@ public class MarshalHelper {
                                         MarshalException.BASE_CLASS_OR_VOID_ERR );
         }
         
-        /*
-          if ((!c.isPrimitive()) && 
-          (!Serializable.class.isAssignableFrom( c ))) {
-          if (errorWriter != null) {
-          errorWriter.print("cannot create an XMLClassDescriptor for \'");
-          errorWriter.print(c.getName());
-          errorWriter.print("', it's not a primitive, or it doesn't");
-          errorWriter.println(" implement java.io.Serializable.");
-          }
-          return null;
-          }
-        */    
         XMLClassDescriptorImpl classDesc = new XMLClassDescriptorImpl(c);
         
         //-- handle primitives...should we have default MarshalInfo classes
