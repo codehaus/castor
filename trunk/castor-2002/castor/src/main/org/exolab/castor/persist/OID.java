@@ -72,11 +72,10 @@ public final class OID {
      */
     private final Object     _identity;
 
-
     /**
-     * The object's type.
+     * The full qualified name of the object's type.
      */
-    private final Class        _javaClass;
+    private final String    _name;
 
     /**
      * The LockEngine of the object
@@ -113,9 +112,9 @@ public final class OID {
 
 
     /**
-     * The top level class, used for equating OIDs based on commong parent.
+     * The full qualified name of the top level class, used for equating OIDs based on commong parent.
      */
-    private Class _topClass;
+    private String _topClassName;
 
     /**
      * Constructor
@@ -140,17 +139,17 @@ public final class OID {
         _engine = engine;
         _molder = molder;
         _identity = identity;
-        _javaClass = molder.getJavaClass();
+        _name = molder.getName();
         _depends = depends;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
         while ( molder.getExtends() != null )
             molder = (ClassMolder) molder.getExtends();
         
-        _topClass = molder.getJavaClass();
+        _topClassName = molder.getName();
 
         // calculate hashCode
-        _hashCode = _topClass.hashCode() + (_identity == null? 0 : _identity.hashCode());
+        _hashCode = _topClassName.hashCode() + (_identity == null? 0 : _identity.hashCode());
     }
 
     /**
@@ -253,16 +252,16 @@ public final class OID {
 
 
     /**
-     * Return the object's type. When using inheritance this is the
-     * type of the top most object in the inheritance heirarchy
+     * Return the full qualified name of the object's type. When using inheritance this is the
+     * type's full name of the top most object in the inheritance heirarchy
      * specified in the object mapping.
      *
-     * @return The object's type
+     * @return The object's type's full name
      */
-    Class getJavaClass() {
-        return _javaClass;
+    String getName() {
+        return _name;
     }
-
+    
 
     /**
      * Returns true if the two OID's are identical. Two OID's are
@@ -286,13 +285,15 @@ public final class OID {
         // have no primary identity, therefore all such objects are
         // not identical.
         other = (OID) obj;
-        return ( _topClass == other._topClass && _identity != null &&
+        // ssa, FIXME : should we replace the String.equals(String) with String == String test ?
+        return ( _topClassName.equals(other._topClassName) && _identity != null &&
                 _identity.equals( other._identity ) );
+        
     }
 
 
     public String toString() {
-        return _javaClass.getName() + "/" + ( _identity == null ? "<new>" : _identity.toString() );
+        return _name + "/" + ( _identity == null ? "<new>" : _identity.toString() );
     }
 
 
