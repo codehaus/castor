@@ -64,7 +64,7 @@ public class JDOCallback
 
     public void using( Object object, Database db )
     {
-        ( (Persistent) object ).setDatabase( db );
+        ( (Persistent) object ).jdoPersistent( db );
     }
 
 
@@ -90,7 +90,7 @@ public class JDOCallback
 
     public void releasing( Object object, boolean committed )
     {
-        ( (Persistent) object ).unsetDatabase();
+        ( (Persistent) object ).jdoTransient();
     }
 
 
