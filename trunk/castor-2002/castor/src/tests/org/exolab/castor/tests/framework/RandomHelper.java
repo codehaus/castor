@@ -93,6 +93,69 @@ public class RandomHelper {
 
 
     /**
+     * Create an array of int of random length and populate it.
+     *
+     * @param array the array to populate
+     * @param c not used
+     */
+    public static int[] getRandom(int[] array, Class c)
+        throws InstantiationException, IllegalAccessException {
+
+        int size = _rand.nextInt(MAX_COLLECTION_LENGTH);
+
+        int[] ret = new int[size];
+
+        for (int i=0; i<size; ++i)
+            ret[i] = _rand.nextInt();
+
+        return ret;
+    }
+
+    /**
+     * Create an array of String of random length and populate it.
+     *
+     * @param array the array to populate
+     * @param c not used
+     */
+    public static String[] getRandom(String[] array, Class c)
+        throws InstantiationException, IllegalAccessException {
+
+        int size = _rand.nextInt(MAX_COLLECTION_LENGTH);
+
+        String[] ret = new String[size];
+
+        for (int i=0; i<size; ++i)
+            ret[i] = getRandom(new String(), null);
+
+        return ret;
+    }
+
+    /**
+     * Create an array of type c of random length and populate it. If the class
+     * to put into the vector implement CastorTestable, randomizeFields() will
+     * be called on the objects.
+     *
+     * @param array the array to populate
+     * @param c the type of object to put in the array
+     */
+    public static Object[] getRandom(Object[] array, Class c)
+        throws InstantiationException, IllegalAccessException {
+
+        int size = _rand.nextInt(MAX_COLLECTION_LENGTH);
+
+        Object[] ret = new Object[size];
+
+        for (int i=0; i<size; ++i) {
+            ret[i] = c.newInstance();
+            if (CastorTestable.class.isAssignableFrom(c))
+                ((CastorTestable)ret[i]).randomizeFields();
+        }
+
+        return ret;
+    }
+
+
+    /**
      * Create a vector of random length and populate it. If the class to put
      * into the vector implement CastorTestable, randomizeFields() will be
      * called on the objects.
@@ -293,6 +356,21 @@ public class RandomHelper {
         byte[] tmp = new byte[1]; // TODO: Cache more...
         _rand.nextBytes(tmp);
         return tmp[0];
+    }
+
+
+    /**
+     * Return randomly true or false with the same propability. 
+     */
+    public static boolean flip() {
+        return _rand.nextBoolean();
+    }
+
+    /**
+     * Return randomly true with the probility p. 
+     */
+    public static boolean flip(double p) {
+        return (_rand.nextDouble() < p)? true : false;
     }
 
     /**

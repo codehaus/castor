@@ -294,8 +294,12 @@ public abstract class XMLTestCase extends TestCase {
                 verbose("Compare to reference object: " + ((result)?"OK":"Failed"));
 
                 if (result == false) {
-                    // try to dump the unmarshalled object
-                    FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
+                    // try to dump the unmarshalled object and the reference object
+                    FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-ref.dump"));
+                    writer.write(((CastorTestable)generated).dumpFields());
+                    writer.close();
+
+                    writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
                     writer.write(((CastorTestable)out).dumpFields());
                     writer.close();
                 }
