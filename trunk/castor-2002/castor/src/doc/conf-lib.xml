@@ -68,8 +68,9 @@
            <tr><td><b>odmg-3.0.jar</b></td><td>ODMG 3.0 API (JDO)</td></tr>
            <tr><td>postgresql-6.3.jar</td><td>PostgreSQL 6.3 driver with DataSource
                                               support (used in default example)</td></tr>
-           <tr><td><b>xerces.jar</b></td><td>Xerces XML library</td></tr>
+           <tr><td>servlet.jar</td><td>Used by the Servlet examples</td></tr>
            <tr><td>utils-0.5.jar</td><td>Required for JDO performance testing</td></tr>
+           <tr><td><b>xerces.jar</b></td><td>Xerces XML library</td></tr>
            <tr><td>xslp.jar</td><td>XSL processor, used for documentation</td></tr>
          </table>
 
@@ -135,7 +136,8 @@
            <tr><td>doc</td><td>Builds the documentation</td></tr>
            <tr><td>javadoc</td><td>Builds the API JavaDocs</td></tr>
            <tr><td>source</td><td>Builds the source tarball in the dist directory</td></tr>
-           <tr><td>tarball</td><td>Builds the binary distribution  in the dist directory</td></tr>
+           <tr><td>tarball</td><td>Builds the binary distribution in the dist directory</td></tr>
+           <tr><td>cvs</td><td>Update the sources from the CVS</td></tr>
          </table>
 
      <p>The tarball will includes the Castor JAR, all dependent library
@@ -158,6 +160,7 @@
            <tr><td>build/doc</td><td>When using Ant the HTML documentation is build in this directory</td></tr>
            <tr><td>build/examples</td><td>When using the examples are build in this directory</td></tr>
            <tr><td>build/test</td><td>When using the test cases are build in this directory</td></tr>
+           <tr><td>dist</td><td>The distribution directory</td></tr>
          </table>
 
    </section>

@@ -1,7 +1,9 @@
 package myapp;
 
 
+import java.util.Vector;
 import java.io.Serializable;
+
 
 public class Product
     implements Serializable
@@ -22,10 +24,8 @@ public class Product
     public ProductGroup     group;
 
 
-    public ProductInventory inventory;
-
-
-    public ProductDetail    detail;
+    //    public Vector           detail;
+    public ProductDetail     detail;
 
 
     public String toString()
@@ -33,7 +33,21 @@ public class Product
         return ( Integer.toString( id ) ) + " " +
             ( name == null ? "<no-name>" : name ) + " $" + price + " " +
             ( group == null ? "<no-group>" : "[" + group.toString() + "]" ) + " " +
-            ( inventory == null ? "<no-stock>" : inventory.toString() );
+            ( detail == null ? "<no-detail>" : detail.toString() );
+    }
+
+
+    private String toString( Vector vector )
+    {
+        String str;
+
+        str = "{";
+        for ( int i = 0 ; i < vector.size() ; ++ i ) {
+            if ( i > 0 )
+                str = str + ",";
+            str = str + vector.elementAt( i ).toString();
+        }
+        return str + "}";
     }
 
 

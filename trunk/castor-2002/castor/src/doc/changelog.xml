@@ -42,7 +42,9 @@ XML:    If annotations are used within elements, or attributes, I add
         example:
         &lt;attribute name="foo" type="string"&gt;
            &lt;annotation&gt;
-              &lt;info&gt;This comment will be included in the Java source&lt;/info&gt;
+              &lt;info&gt;
+                This comment will be included in the Java source
+              &lt;/info&gt;
            &lt;/annotation&gt;
         &lt;/attribute&gt;
 
