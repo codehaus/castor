@@ -36,8 +36,8 @@
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="map-to" minOccurs="0" maxOccurs="1" />
       <group order="choice" minOccurs="1">
-        <element ref="field"/>
-        <element ref="container"/>
+        <element ref="field" minOccurs="0"/>
+        <element ref="container" minOccurs="0"/>
       </group>
       <attribute name="name" type="ID" minOccurs="1"/>
       <attribute name="extends" type="IDREF" minOccurs="0"/>
@@ -138,16 +138,16 @@
   <element name="key-generator">
     <type content="elemOnly" order="seq">
       <element ref="param" minOccurs="0" />
-      <attribute name="name" type="ID" minOccurs="1" />
-      <attribute name="alias" type="string" minOccurs="0" />
+      <attribute name="name" type="ID" minOccurs="1" maxOccurs="1"/>
+      <attribute name="alias" type="string" minOccurs="0" maxOccurs="1"/>
     </type>
   </element>
 
 
   <element name="param">
     <type content="empty">
-      <attribute name="name" type="string" minOccurs="1" />
-      <attribute name="value" type="string" minOccurs="1" />
+      <attribute name="name" type="string" minOccurs="1" maxOccurs="1"/>
+      <attribute name="value" type="string" minOccurs="1" maxOccurs="1"/>
     </type>
   </element>
 
