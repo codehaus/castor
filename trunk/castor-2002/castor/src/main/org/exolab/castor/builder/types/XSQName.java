@@ -53,9 +53,7 @@ import java.util.Enumeration;
 
 /**
  * <p>The XML Schema QName type
- * <p>Note : this description does not fit exactly the W3C XML Schema definition
- * it only maps the xsd type to a string without taking care of the structure
- * <p> uriReference:NCName
+ * <p>Note : A QName (prefix:NCName) is mapped in memory {URI}NCName.
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
