@@ -235,7 +235,7 @@ public class JDOMappingLoader
 
         FieldDescriptor  fieldDesc;
         String[]           sqlName;
-        Class[]          sqlType;
+        Class            sqlType;
         int[]            sType;
 
         // If not an SQL field, return a stock field descriptor.
@@ -249,28 +249,23 @@ public class JDOMappingLoader
 
         int len = fieldMap.getSql().getType().length;
         if ( len > 0 ) {
-            sqlType = new Class[len];
             sType = new int[len];
             for ( int i=0; i < len; i++ ) {
-                sqlType[i] = SQLTypes.typeFromName( fieldMap.getSql().getType()[i] );
+                sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType()[i] );
                 if ( _factory != null )
-                    sqlType[i] = _factory.adjustSqlType( sqlType[i] );
-                sType[i] = SQLTypes.getSQLType( sqlType[i] );
+                    sqlType = _factory.adjustSqlType( sqlType );
+                sType[i] = SQLTypes.getSQLType( sqlType );
             }
         } else {
-            sqlType = null;
-            sType = new int[0];
-                /*new Class[1];
-            try {
-                sqlType[0] = Types.typeFromName( getClassLoader(), fieldMap.getType() );
-            } catch ( ClassNotFoundException e ) {
-                throw new MappingException( "SQLType not found, nor field type of, "+fieldMap.getType()+" convertable to sql type!" );
-            }*/
+            sqlType = fieldDesc.getFieldType();
+            if ( _factory != null )
+                sqlType = _factory.adjustSqlType( sqlType );
+            sType = new int[] {SQLTypes.getSQLType(sqlType)};
         }
 
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sType,
             ! DirtyType.IGNORE.equals( fieldMap.getSql().getDirty() ),
-            fieldMap.getSql().getManyTable(), 
+            fieldMap.getSql().getManyTable(),
             fieldMap.getSql().getManyKey() );
     }
 

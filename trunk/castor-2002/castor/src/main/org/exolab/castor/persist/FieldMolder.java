@@ -103,25 +103,25 @@ public class FieldMolder {
     private String _fType;
 
     private String        _fieldName;
-    
+
     private Object        _default;
 
     /**
      * Collection of reflection service keyed by ClassLoader instance.
      */
     private HashMap _reflectServices;
-    
+
     /**
      * Default reflection service
      */
     private ReflectService _defaultReflectService;
-    
+
     private SQLRelationLoader _manyToManyLoader;
 
     public String toString() {
-        return "FieldMolder("+_fType+")"+_defaultReflectService._fClass+" inside "+_eMold.getName();
+        return "FieldMolder("+_fieldName+","+_fType+")"+_defaultReflectService._fClass+" inside "+_eMold.getName();
     }
-    
+
     /*
     void setRelationDescriptor( RelationDescriptor rd ) throws MappingException {
         _loader = new SQLRelationLoader( rd, _eMold.getName() );
@@ -133,7 +133,7 @@ public class FieldMolder {
         if ( ! isPersistanceCapable() )
             if ( ! isSerializable() )
                 return PRIMITIVE;
-            else 
+            else
                 return SERIALIZABLE;
 
         if ( ! isMulti() )
@@ -400,32 +400,32 @@ public class FieldMolder {
      */
     public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap, String manyTable, 
             String[] idSQL, int[] idType, TypeConvertor[] idTo, TypeConvertor[] idFrom, String[] idParam,
-            String[] relatedIdSQL, int[] relatedIdType, TypeConvertor[] ridTo, TypeConvertor[] ridFrom, String[] ridParam ) 
+            String[] relatedIdSQL, int[] relatedIdType, TypeConvertor[] ridTo, TypeConvertor[] ridFrom, String[] ridParam )
             throws MappingException {
 
         this( ds, eMold, fieldMap );
 
-        _manyToManyLoader = new SQLRelationLoader( manyTable, 
+        _manyToManyLoader = new SQLRelationLoader( manyTable,
                 idSQL, idType, idTo, idFrom, idParam,
                 relatedIdSQL, relatedIdType, ridTo, ridFrom, ridParam );
     }
 
-    public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap ) 
+    public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap )
             throws MappingException {
 
         try {
-            // create the reflection service with the ClassLoader hold in the 
+            // create the reflection service with the ClassLoader hold in the
             // SatingService object as default
             _defaultReflectService = new ReflectService();
             _reflectServices = new HashMap();
-            
+
             // Set enclosing ClassMolder
             _eMold = eMold;
 
             // Set isLazy
             _lazy = fieldMap.getLazy();
 
-            if ( fieldMap.getSql() == null 
+            if ( fieldMap.getSql() == null
                     || fieldMap.getSql().getDirty() == null
                     || ! fieldMap.getSql().getDirty().equals("ignore") ) {
                 _check = true;
@@ -438,14 +438,14 @@ public class FieldMolder {
                 _store = false;
             else if ( fieldMap.getSql().getName() == null )
                 _store = false;
-            else if ( fieldMap.getSql().getManyTable() == null ) 
+            else if ( fieldMap.getSql().getManyTable() == null )
                 _store = false;
-            else 
+            else
                 _store = true;
 
             if ( fieldMap.getCollection() != null )
                 _multi = true;
-                
+
             // Set collection type
             if ( fieldMap.getCollection() != null ) {
                 _colClass = getCollectionType( fieldMap.getCollection().toString(), _lazy );
@@ -454,7 +454,7 @@ public class FieldMolder {
             // Set field name, if it is null, we try to discover it with
             // return type of set/get method.
             _fType = fieldMap.getType();
-                       
+
             // ssa, multi classloader feature
             // ssa, FIXME : Better exception handling necessary ...
             //Class             javaClass = eMold.getJavaClass();
@@ -466,29 +466,29 @@ public class FieldMolder {
             }
             // ssa, multi classloader feature
             // set the default classloader to the hash table
-            // ssa, FIXME : Shoudln't we have a ref to the Classloader used 
+            // ssa, FIXME : Shoudln't we have a ref to the Classloader used
             // instead of asking it to the newly created class ?
             _defaultReflectService._loader = javaClass.getClassLoader();
             if ( null != _defaultReflectService._loader )
                 _reflectServices.put (_defaultReflectService._loader, this._defaultReflectService);
-            
+
             Class             fieldType = null;
             String            fieldName;
 
             if ( fieldMap.getDirect() ) {
-                
+
                 // No accessor, map field directly.
-                
+
                 fieldName = fieldMap.getName();
                 _defaultReflectService._field = findField( javaClass, fieldName, _defaultReflectService._fClass );
                 if ( _defaultReflectService._field == null )
                     throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
-                if ( _defaultReflectService._field.getModifiers() != Modifier.PUBLIC && 
+                if ( _defaultReflectService._field.getModifiers() != Modifier.PUBLIC &&
                      _defaultReflectService._field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
                     throw new MappingException( "mapping.fieldNotAccessible", _defaultReflectService._field.getName(),
                                             _defaultReflectService._field.getDeclaringClass().getName() );
             } else if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
-                
+
                 // Container object, map field to fields of the container
                 int point;
                 ArrayList getSeq = new ArrayList();
@@ -502,7 +502,7 @@ public class FieldMolder {
                 try {
                     while ( true ) {
                         point = name.indexOf( '.' );
-                        if ( point < 0 ) 
+                        if ( point < 0 )
                             break;
                         last = javaClass;
                         methodName = "get" + capitalize( name.substring( 0, point ) );
@@ -548,17 +548,17 @@ public class FieldMolder {
                 _defaultReflectService._setMethod = findAccessor( javaClass, "set" + capitalize( name ), sgClass, false );
 
                 if ( _defaultReflectService._setMethod == null )
-                    _defaultReflectService._addMethod 
+                    _defaultReflectService._addMethod
                         = findAccessor( javaClass, "add" + capitalize( name ), null, false );
-                
+
                 if ( _defaultReflectService._addMethod == null && name.endsWith("s") )
-                    _defaultReflectService._addMethod 
+                    _defaultReflectService._addMethod
                         = findAccessor( javaClass, "add" + capitalize( name ).substring(0,name.length()-1), null, false );
 
                 if ( _defaultReflectService._setMethod == null && _defaultReflectService._addMethod == null )
                     throw new MappingException( "mapping.accessorNotFound",
                         "set/add" + capitalize( name ), null, javaClass.getName() );
-    
+
                 if ( _defaultReflectService._addMethod != null )
                     _addable = true;
                 /*
@@ -582,13 +582,13 @@ public class FieldMolder {
                     fieldName = ( _defaultReflectService._getMethod == null ? _defaultReflectService._setMethod.getName() : _defaultReflectService._getMethod.getName() );
 
             } else {
-                
+
                 // Bean type object, map field to get<Method>/set<Method>
 
                 // First look up the get accessors
                 if ( fieldMap.getGetMethod() != null ) {
                     _defaultReflectService._getMethod = findAccessor( javaClass, fieldMap.getGetMethod(), _defaultReflectService._fClass, true );
-                     
+
                     if ( _defaultReflectService._getMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
                                 fieldMap.getGetMethod(), _defaultReflectService._fClass, javaClass.getName() );
@@ -665,6 +665,7 @@ public class FieldMolder {
         } catch ( NullPointerException e ) {
             throw new MappingException("Unexpected Null pointer!\n"+e);
         }
+        _fieldName = fieldMap.getName();
         // If the field is of a primitive type we use the default value
         _default = Types.getDefault( _defaultReflectService._fClass );
         if ( ( _defaultReflectService._field != null && ! _defaultReflectService._field.getType().isPrimitive() ) ||
@@ -687,7 +688,7 @@ public class FieldMolder {
         throws MappingException
     {
         Field field;
-        
+
         try {
             // Look up the field based on its name, make sure it's only modifier
             // is public. If a type was specified, match the field type.
