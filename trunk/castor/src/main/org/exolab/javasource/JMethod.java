@@ -110,7 +110,7 @@ public class JMethod implements JMember {
         this.source       = new JSourceCode();
         _signature = new JMethodSignature(name, returnType);
         this.jdc          = _signature.getJDocComment();
-        jdc.appendComment("Method " + name);
+        jdc.appendComment("Method " + name + "\n\n");
     } //-- JMethod
 
     
