@@ -64,10 +64,10 @@ import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.spi.ObjectFactory;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.jdo.engine.TransactionImpl;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -86,6 +86,9 @@ public class JDO
 
 
     private String          _dbName;
+
+
+    private String          _dbConf;
 
 
     /**
@@ -144,6 +147,18 @@ public class JDO
     }
 
 
+    public void setConfiguration( String url )
+    {
+        _dbConf = url;
+    }
+
+
+    public String getConfiguration()
+    {
+        return _dbConf;
+    }
+
+
     public Database getDatabase()
         throws DatabaseNotFoundException
     {
@@ -151,6 +166,15 @@ public class JDO
         
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
+        if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
+            if ( _dbConf == null )
+                throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
+            try {
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logWriter, null );
+            } catch ( MappingException except ) {
+                throw new DatabaseNotFoundException( Messages.format( "persist.nested", except.toString() ) );
+            }
+        }
         db = new DatabaseImpl( _dbName, _logWriter );
         return db;
     }
@@ -180,13 +204,14 @@ public class JDO
      * 
      * @param url The JDO configuration file
      * @param loader The class loader to use, null for the default
+     * @param logWriter Mapping information is printed there, if not null
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadDatabase( String url, ClassLoader loader )
+    public static void loadDatabase( String url, ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, loader );
+        DatabaseRegistry.loadDatabase( new InputSource( url ), null, logWriter, loader );
     }
     
     
@@ -201,13 +226,15 @@ public class JDO
      * @param source The JDO configuration file
      * @param resolve An optional entity resolver
      * @param loader The class loader to use, null for the default
+     * @param logWriter Mapping information is printed there, if not null
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
+    public static void loadDatabase( InputSource source, EntityResolver resolver,
+                                     ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( source, resolver, null, loader );
+        DatabaseRegistry.loadDatabase( source, resolver, logWriter, loader );
     }
 
 
@@ -222,6 +249,8 @@ public class JDO
             ref.add( new StringRefAddr( "description", _description ) );
         if ( _dbName != null )
             ref.add( new StringRefAddr( "dbName", _dbName ) );
+        if ( _dbConf != null )
+            ref.add( new StringRefAddr( "dbConf", _dbConf ) );
  	return ref;
     }
 
@@ -251,6 +280,9 @@ public class JDO
 		addr = ref.get( "dbName" );
 		if ( addr != null )
 		    ds._dbName = (String) addr.getContent();
+		addr = ref.get( "dbConf" );
+		if ( addr != null )
+		    ds._dbConf = (String) addr.getContent();
 		return ds;
 
 	    } else
