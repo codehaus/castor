@@ -114,5 +114,15 @@ public interface PersistenceFactory
     public Boolean isDuplicateKeyException( Exception except );
 
 
+    /**
+     * Returns the quoted identifier suitable for preventing conflicts between
+     * database identifiers and reserved keywords.
+     *
+     * @param name The identifier (table, column, etc)
+     * @return The quoted identifier
+     */
+    public String quoteName( String name );
+
+
 }
 

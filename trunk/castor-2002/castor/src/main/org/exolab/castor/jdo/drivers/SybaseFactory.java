@@ -71,7 +71,7 @@ public class SybaseFactory
 
     public QueryExpression getQueryExpression()
     {
-        return new SybaseQueryExpression();
+        return new SybaseQueryExpression( this );
     }
 
 

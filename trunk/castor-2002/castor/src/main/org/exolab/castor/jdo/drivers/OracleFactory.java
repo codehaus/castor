@@ -69,7 +69,7 @@ public final class OracleFactory
 
     public QueryExpression getQueryExpression()
     {
-        return new OracleQueryExpression();
+        return new OracleQueryExpression( this );
     }
 
 

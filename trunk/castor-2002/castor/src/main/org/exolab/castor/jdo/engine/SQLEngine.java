@@ -555,7 +555,7 @@ Will be adding this later.
         query.addParameter( clsDesc.getTableName(), ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName(),
                             QueryExpression.OpEquals );
         _pkLookup = query.getStatement( true );
-        wherePK = JDBCSyntax.Where + ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() +
+        wherePK = JDBCSyntax.Where + _factory.quoteName( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() ) +
             QueryExpression.OpEquals + JDBCSyntax.Parameter;
 
         fields = clsDesc.getFields();
@@ -568,19 +568,19 @@ Will be adding this later.
         // Create statement to insert a new row into the table
         // using the specified primary key if one is required
         sql = new StringBuffer( "INSERT INTO " );
-        sql.append( clsDesc.getTableName() ).append( " (" );
+        sql.append( _factory.quoteName( clsDesc.getTableName() ) ).append( " (" );
         count = 0;
         primKeyName = ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName();
         if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-            sql.append( primKeyName );
-            count++;
+            sql.append( _factory.quoteName( primKeyName ) );
+            ++count;
         }
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null ) {
                 if ( count > 0 ) {
                     sql.append( ',' );
                 }
-                sql.append( jdoFields[ i ].getSQLName() );
+                sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) );
                 ++count;
             }
         }
@@ -609,7 +609,7 @@ Will be adding this later.
                                            ": " + _sqlCreate );
 
 
-        sql = new StringBuffer( "DELETE FROM " ).append( clsDesc.getTableName() );
+        sql = new StringBuffer( "DELETE FROM " ).append( _factory.quoteName( clsDesc.getTableName() ) );
         sql.append( wherePK );
         _sqlRemove = sql.toString();
         if ( logInterceptor != null )
@@ -618,13 +618,13 @@ Will be adding this later.
 
 
         sql = new StringBuffer( "UPDATE " );
-        sql.append( clsDesc.getTableName() ).append( " SET " );
+        sql.append( _factory.quoteName( clsDesc.getTableName() ) ).append( " SET " );
         count = 0;
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null ) {
                 if ( count > 0 )
                     sql.append( ',' );
-                sql.append( jdoFields[ i ].getSQLName() ).append( "=?" );
+                sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
                 ++count;
             }
         }
@@ -634,7 +634,7 @@ Will be adding this later.
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null ) {
                 if ( jdoFields[ i ].isDirtyCheck() )
-                    sql.append( " AND " ).append( jdoFields[ i ].getSQLName() ).append( "=?" );
+                    sql.append( " AND " ).append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
             }
         }
         _sqlStoreDirty = sql.toString();
@@ -862,10 +862,7 @@ Will be adding this later.
             try {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i ) {
-                    if ( _values[ i ] != null )
-                        _stmt.setObject( i + 1, _values[ i ], SQLTypes.getSQLType( _types[ i ] ) );
-                    else
-                        _stmt.setNull( i + 1, SQLTypes.getSQLType( _types[ i ] ) );
+                    _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;
                 }
                 _rs = _stmt.executeQuery();
@@ -1047,10 +1044,7 @@ Will be adding this later.
             try {
                 _stmt = ( (Connection) conn ).prepareCall( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i ) {
-                    if ( _values[ i ] != null )
-                        _stmt.setObject( i + 1, _values[ i ], SQLTypes.getSQLType( _types[ i ] ) );
-                    else
-                        _stmt.setNull( i + 1, SQLTypes.getSQLType( _types[ i ] ) );
+                    _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;
                 }
                 _stmt.execute();

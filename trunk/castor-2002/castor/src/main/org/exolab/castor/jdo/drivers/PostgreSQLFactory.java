@@ -69,7 +69,7 @@ public final class PostgreSQLFactory
 
     public QueryExpression getQueryExpression()
     {
-        return new PostgreSQLQueryExpression();
+        return new PostgreSQLQueryExpression( this );
     }
 
 
