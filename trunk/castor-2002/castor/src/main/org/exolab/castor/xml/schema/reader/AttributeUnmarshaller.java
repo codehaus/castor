@@ -99,9 +99,6 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
 
         _attribute = new AttributeDecl(schema);
 
-        //-- form (Not yet supported)
-        //_attribute.setForm(...);
-
         //--@ref
         String attValue = atts.getValue(SchemaNames.REF_ATTR);
         if (attValue != null) {
@@ -117,10 +114,18 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             }
             else _attribute.setName(attValue);
         }
-        //-- id
+        
+        //-- @default
+        attValue = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        if (attValue != null) {
+            _attribute.setValue(attValue);
+            _attribute.setDefault();
+        }
+        
+        //-- @id
         _attribute.setId(atts.getValue(SchemaNames.ID_ATTR));
 
-        //-- fixed
+        //-- @fixed
         attValue = atts.getValue(SchemaNames.FIXED_ATTR);
         if (attValue != null) {
             if (_attribute.isDefault())
@@ -129,16 +134,19 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             _attribute.setFixed();
         }
 
-        //-- default
-        attValue = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        //-- @form
+        attValue = atts.getValue(SchemaNames.FORM);
         if (attValue != null) {
-            if (_attribute.isFixed())
-                throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _attribute.setValue(attValue);
-            _attribute.setDefault();
+            _attribute.setForm(Form.valueOf(attValue));
         }
-
-        //-- use
+        
+        //-- @type
+        attValue = atts.getValue(SchemaNames.TYPE_ATTR);
+        if (attValue != null) {
+            _attribute.setSimpleTypeReference(attValue);
+        }
+        
+        //-- @use
         attValue = atts.getValue(SchemaNames.USE_ATTR);
         if (attValue != null) {
             if (_attribute.isDefault() && (!attValue.equals(AttributeDecl.USE_OPTIONAL)) )
@@ -146,12 +154,6 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
            _attribute.setUse(attValue);
         }
 
-        //-- type
-        attValue = atts.getValue(SchemaNames.TYPE_ATTR);
-        if (attValue != null) {
-            _attribute.setSimpleTypeReference(attValue);
-        }
-        attValue = null;
     } //-- AttributeUnmarshaller
 
       //-----------/
