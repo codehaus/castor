@@ -1185,6 +1185,19 @@ public class Marshaller extends MarshalFramework {
         //-- (also handle container in container)
         processContainerAttributes(object, classDesc, atts);
 
+        //-- xml:space
+        String attValue = descriptor.getProperty(XMLFieldDescriptor.PROPERTY_XML_SPACE);
+        if (attValue != null) {
+            atts.addAttribute(XML_SPACE_ATTR, CDATA, attValue);
+        }
+        
+        //-- xml:lang
+        attValue = descriptor.getProperty(XMLFieldDescriptor.PROPERTY_XML_LANG);
+        if (attValue != null) {
+            atts.addAttribute(XML_LANG_ATTR, CDATA, attValue);
+        }
+        
+        
         //------------------/
         //- Create element -/
         //------------------/
