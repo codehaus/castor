@@ -373,7 +373,7 @@ public class XMLClassDescriptorImpl extends Validator
                     //is it in this class descriptor?
                     XMLFieldDescriptor temp = xcd.getFieldDescriptor(name, NodeType.Attribute);
                     if (temp != null) {
-                        return temp;
+                        return desc;
                     }
                 }
             }
