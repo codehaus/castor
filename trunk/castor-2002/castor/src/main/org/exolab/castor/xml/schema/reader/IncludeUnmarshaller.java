@@ -94,11 +94,11 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
             }
         }
 
-        if (state.processed(include))
+        if (schema.includeProcessed(include))
             return;
 
         //just keep track of the schemaLocation
-        state.markAsProcessed(include, null);
+        schema.addInclude(include);
 
 		Parser parser = null;
 		try {
