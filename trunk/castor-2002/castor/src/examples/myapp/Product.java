@@ -75,6 +75,12 @@ public class Product
     }
 
 
+    public ProductDetail createDetail()
+    {
+        return new ProductDetail();
+    }
+
+
     public Enumeration getDetail()
     {
         return _details.elements();
