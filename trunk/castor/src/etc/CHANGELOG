@@ -1,6 +1,10 @@
 
 Version (CVS) 
 -------------
+
+XML:   Fixed java.util.Set support in the introspector.
+       (kvisco - 20040713)
+
 XML:   Fixed bug 1683 so that the Source Generator better supports XDoclet
        tags in an XSD. 
        (Bruce - 20040711)
