@@ -263,7 +263,7 @@ public class FieldInfo extends XMLInfo {
             jsc.append(";");
 			
 			//-- create nullMethod
-            method = new JMethod(null, "null"+mname);
+            method = new JMethod(null, "delete"+mname);
             jClass.addMethod(method);
             jsc = method.getSourceCode();
             jsc.add("this._has");
