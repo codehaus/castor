@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1827 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Fixed a problem related to dropping a tbale that does not exist in src/tests(jdo/mysql.sql.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1827
+       (Werner - 20041217)
+
 JDO:   Fixed bug 1676 using contribution from Werner Guttmann [werner DOT guttmann @ gmx DOT net]
        Added support for lazy-loading 1:1 relations.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1676
