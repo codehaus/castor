@@ -66,6 +66,12 @@ class UnmarshalState {
     String location = "";
     
     /**
+     * indicates if the xsi:nil='true' attribute
+     * was present on the element
+     */
+    boolean nil = false;
+    
+    /**
      * The xml element name of the current object
      */
     String elementName = null;
@@ -160,6 +166,7 @@ class UnmarshalState {
         elementName = null;
         buffer = null;
         key = null;
+        nil = false;
         object = null;
         type = null;
         fieldDesc = null;
