@@ -2,6 +2,18 @@
 Version (CVS) 
 -------------
 
+XML:   Added support for namespace to package mappings on the Unmarshaller
+       and UnmarshalHandler. This basically fixes issues where Castor
+       can't find the right package to look for classes during 
+       unmarshalling. This is main for those people using generated
+       source code, as using a mapping file you must specify the
+       packages and namespaces appropriately.
+       (kvisco - 20041104)
+
+XML:   Fixed bug in SourceGenerator where class names for SimpleType
+       instances with Enumeration facets were not getting resolved properly.
+       (kvisco - 20041104)
+
 JDO:   Fixed bug 1517.
        Added a new isCached() method to CacheManager.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1517
