@@ -71,6 +71,9 @@ public class LDAPQueryExpression
         _filter = filter;
     }
     
+    public void setDistinct( boolean distinct )
+    {
+    }
 
     public void addColumn( String tableName, String columnName )
     {
