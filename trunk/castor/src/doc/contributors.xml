@@ -781,6 +781,14 @@
   <!-- Last names begin with T-Z -->
 
   <contributor type="Contributor">
+    <name surname="Telcik" given="Tim"/>
+    <email>ttelcik@hbf.com.au</email>
+    <description>
+       Patch for bug 1916 and 1917
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Thal" given="David"/>
     <email>dthal@combimatrix.com</email>
     <description>
