@@ -1,5 +1,17 @@
-Version 0.8  March 24, 2000
----------------------------
+Version 0.8     March 24, 2000
+------------------------------
+
+XML:     We are now one step closer to using the mapping files with Castor XML.
+
+         - Changed MarshalInfoResolver to ClassDescriptorResolver
+         - Changed MarshalDescriptor to XMLFieldDescriptor which extends
+           the mapping framework FieldDescriptor interface.
+         - Added XMLFieldDescriptorImpl
+         - Changed MarshalInfo to XMLClassDescriptor, which extends
+           the mapping ClassDescriptor interface
+
+Version 0.7.12  March 15, 2000
+------------------------------
 
 JDO:     Placed the ODMG API in the org.exolab.castor.jdo package,
          to be included in the JavaDocs and to enable the introduction
