@@ -154,90 +154,13 @@ public class DescriptorSourceFactory {
             jsc.add("setCompositorAsSequence();");
         }
 
-        //jsc.add("Class[] emptyClassArgs = new Class[0];");
-        //jsc.add("Class[] classArgs = new Class[1];");
 
-        //-- create validation method
-        //method = new JMethod(vrClass.createArray(), "getValidationRules");
-        //vcode = method.getSourceCode();
-        //vcode.add("return rules;");
-        //marshalInfo.addMethod(method);
+        //-- handle  content
+        if (classInfo.allowContent())
+           createDescriptor(classInfo.getTextField(), localClassName, null, jsc);
 
-
-        //-- create GroupValidationRule
-
-        //jsc.add("gvr = new GroupValidationRule();");
-        //jsc.add("BasicValidationRule bvr = null;");
-
-
-        //-- handle text content
-        if (classInfo.allowsTextContent()) {
-
-            jsc.add("XMLFieldDescriptorImpl contentDesc = new XMLFieldDescriptorImpl(");
-            jsc.append("String.class, \"_content\", \"PCDATA\", ");
-            jsc.append("NodeType.Text);");
-
-            jsc.add("contentDesc.setHandler( new XMLFieldHandler() {");
-            jsc.indent();
-
-            //-- read method
-            jsc.add("public Object getValue( Object object ) ");
-            jsc.indent();
-            jsc.add("throws IllegalStateException");
-            jsc.unindent();
-            jsc.add("{");
-            jsc.indent();
-            jsc.add(localClassName);
-            jsc.append(" target = (");
-            jsc.append(localClassName);
-            jsc.append(") object;");
-            jsc.add("return target.getContent();");
-            jsc.unindent();
-            jsc.add("}");
-
-            //-- write method
-            jsc.add("public void setValue( Object object, Object value) ");
-            jsc.indent();
-            jsc.add("throws IllegalStateException, IllegalArgumentException");
-            jsc.unindent();
-            jsc.add("{");
-            jsc.indent();
-            jsc.add("try {");
-            jsc.indent();
-            jsc.add(localClassName);
-            jsc.append(" target = (");
-            jsc.append(localClassName);
-            jsc.append(") object;");
-            jsc.add("target.setContent( (String) value);");
-            jsc.unindent();
-            jsc.add("}");
-            jsc.add("catch (Exception ex) {");
-            jsc.indent();
-            jsc.add("throw new IllegalStateException(ex.toString());");
-            jsc.unindent();
-            jsc.add("}");
-            jsc.unindent();
-            jsc.add("}");
-
-            //-- newInstance method
-            jsc.add("public Object newInstance( Object parent ) {");
-            jsc.indent();
-            jsc.add("return new String();");
-            jsc.unindent();
-            jsc.add("}");
-
-
-            jsc.unindent();
-            jsc.add("} );");
-			jsc.add("addFieldDescriptor(contentDesc);");
-        }
 
         FieldInfo[] atts = classInfo.getAttributeFields();
-
-        //-- initialized rules
-        //jsc.add("rules = new ValidationRule[");
-        //jsc.append(Integer.toString(atts.length+1));
-        //jsc.append("];");
 
         //--------------------------------/
         //- Create attribute descriptors -/
@@ -247,452 +170,26 @@ public class DescriptorSourceFactory {
         jsc.add("");
 
         for (int i = 0; i < atts.length; i++) {
-
             FieldInfo member = atts[i];
-
             //-- skip transient members
             if (member.isTransient()) continue;
-
-            boolean isEnumerated = false;
-
-            jsc.add("//-- ");
-            jsc.append(member.getName());
-
-            XSType xsType = member.getSchemaType();
-            //--Attribute can handle COLLECTION type for NMTOKENS or IDREFS for instance
-            if (xsType.getType() == XSType.COLLECTION)
-                    xsType = ((CollectionInfo)member).getContent().getSchemaType();
-
-            jsc.add("desc = new XMLFieldDescriptorImpl(");
-            jsc.append(classType(xsType.getJType()));
-            jsc.append(", \"");
-            jsc.append(member.getName());
-            jsc.append("\", \"");
-            jsc.append(member.getNodeName());
-            jsc.append("\", NodeType.Attribute);");
-
-
-            switch (xsType.getType()) {
-
-                case XSType.STRING:
-                    jsc.add("desc.setImmutable(true);");
-                    break;
-                case XSType.CLASS:
-                    isEnumerated = ((XSClass)xsType).isEnumerated();
-                    break;
-                case XSType.IDREF:
-                    jsc.add("desc.setReference(true);");
-                    break;
-                case XSType.ID:
-                    jsc.add("this.identity = desc;");
-                    break;
-                default:
-                    break;
-            }
-            //-- handler access methods
-
-
-            jsc.add("handler = (new XMLFieldHandler() {");
-            jsc.indent();
-
-            //-- read method
-            jsc.add("public Object getValue( Object object ) ");
-            jsc.indent();
-            jsc.add("throws IllegalStateException");
-            jsc.unindent();
-            jsc.add("{");
-            jsc.indent();
-            jsc.add(localClassName);
-            jsc.append(" target = (");
-            jsc.append(localClassName);
-            jsc.append(") object;");
-			//-- handle primitives
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isMultivalued()))
-			{
-				jsc.add("if(!target."+member.getHasMethodName()+"())");
-				jsc.indent();
-				jsc.add("return null;");
-				jsc.unindent();
-			}
-            String value = "target."+member.getReadMethodName()+"()";
-            jsc.add("return ");
-            jsc.append(xsType.createToJavaObjectCode(value));
-            jsc.append(";");
-            jsc.unindent();
-            jsc.add("}");
-
-            //-- write method
-            jsc.add("public void setValue( Object object, Object value) ");
-            jsc.indent();
-            jsc.add("throws IllegalStateException, IllegalArgumentException");
-            jsc.unindent();
-            jsc.add("{");
-            jsc.indent();
-            jsc.add("try {");
-            jsc.indent();
-            jsc.add(localClassName);
-            jsc.append(" target = (");
-            jsc.append(localClassName);
-            jsc.append(") object;");
-            //-- check for null primitives
-            if (xsType.isPrimitive()) {
-
-                if ((!member.isRequired()) && (!xsType.isEnumerated()) && (!member.isMultivalued())) {
-                    jsc.add("// if null, use delete method for optional primitives ");
-                    jsc.add("if (value == null) {");
-                    jsc.indent();
-                    jsc.add("target.");
-                    jsc.append(member.getDeleteMethodName());
-                    jsc.append("();");
-                    jsc.add("return;");
-                    jsc.unindent();
-                    jsc.add("}");
-
-                }
-                else {
-                    jsc.add("// ignore null values for non optional primitives");
-                    jsc.add("if (value == null) return;");
-                    jsc.add("");
-                }
-            }
-            jsc.add("target.");
-            jsc.append(member.getWriteMethodName());
-            jsc.append("( ");
-            if (xsType.isPrimitive()) {
-                jsc.append(xsType.createFromJavaObjectCode("value"));
-            }
-
-            else {
-                jsc.append("(");
-                jsc.append(xsType.getJType().toString());
-                jsc.append(") value");
-            }
-            jsc.append(");");
-
-            jsc.unindent();
-            jsc.add("}");
-            jsc.add("catch (Exception ex) {");
-            jsc.indent();
-            jsc.add("throw new IllegalStateException(ex.toString());");
-            jsc.unindent();
-            jsc.add("}");
-            jsc.unindent();
-            jsc.add("}");
-
-            //-- newInstance method
-            jsc.add("public Object newInstance( Object parent ) {");
-            jsc.indent();
-            jsc.add("return ");
-
-            if (xsType.isEnumerated()       ||
-                xsType.isPrimitive()        ||
-                xsType.getJType().isArray() ||
-                (xsType.getType() == XSType.STRING))
-            {
-                jsc.append("null;");
-            }
-            else {
-                jsc.append(xsType.newInstanceCode());
-            }
-            jsc.unindent();
-            jsc.add("}");
-
-
-            jsc.unindent();
-            jsc.add("} );");
-
-            if (isEnumerated) {
-                jsc.add("desc.setHandler( new EnumFieldHandler(");
-                jsc.append(classType(xsType.getJType()));
-                jsc.append(", handler));");
-                jsc.add("desc.setImmutable(true);");
-            }
-            else if (xsType.getType() == XSType.TIME_INSTANT) {
-                jsc.add("desc.setHandler( new DateFieldHandler(");
-                jsc.append("handler));");
-                jsc.add("desc.setImmutable(true);");
-            }
-            else if (xsType.getType() == XSType.DECIMAL) {
-                jsc.add("desc.setHandler( new DecimalFieldHandler(");
-                jsc.append("handler));");
-                jsc.add("desc.setImmutable(true);");
-            }
-            else if (member.getSchemaType().getType() == XSType.COLLECTION) {
-                jsc.add("desc.setHandler( new CollectionFieldHandler(");
-                jsc.append("handler));");
-            }
-            else jsc.add("desc.setHandler(handler);");
-
-            //-- namespace
-            if (nsURI != null) {
-                jsc.add("desc.setNameSpaceURI(\"");
-                jsc.append(nsURI);
-                jsc.append("\");");
-            }
-
-            if (member.isRequired()) {
-                jsc.add("desc.setRequired(true);");
-            }
-
-
-			jsc.add("addFieldDescriptor(desc);");
-            jsc.add("");
-
-            //-- Add Validation Code
-            jsc.add("//-- validation code for: ");
-            jsc.append(member.getName());
-            jsc.add("fieldValidator = new FieldValidator();");
-            validationCode(member, jsc);
-            jsc.add("desc.setValidator(fieldValidator);");
-            jsc.add("");
-        }
+            createDescriptor(member, localClassName, nsURI, jsc);
+       }
 
 
         //------------------------------/
         //- Create element descriptors -/
         //------------------------------/
-
-        //jsc.add("rules[");
-        //jsc.append(Integer.toString(atts.length));
-        //jsc.append("] = gvr;");
-
-        FieldInfo[] elements = classInfo.getElementFields();
+       FieldInfo[] elements = classInfo.getElementFields();
 
         jsc.add("//-- initialize element descriptors");
         jsc.add("");
 
         for (int i = 0; i < elements.length; i++) {
-
             FieldInfo member = elements[i];
-
             //-- skip transient members
             if (member.isTransient()) continue;
-
-            XSType xsType = member.getSchemaType();
-
-
-            jsc.add("//-- ");
-            jsc.append(member.getName());
-
-            boolean any = false;
-            boolean isEnumerated = false;
-
-            //-- a hack, I know, I will change later (kv)
-            if (member.getName().equals("_anyList")) {
-                any = true;
-                jsc.add("desc = (new XMLFieldDescriptorImpl(");
-                jsc.append("Object.class, \"");
-                jsc.append(member.getName());
-                jsc.append("\", (String)null, NodeType.Element) { ");
-                jsc.indent();
-                jsc.add("public boolean matches(String xmlName) {");
-                jsc.add("    return true;");
-                jsc.add("}");
-                jsc.unindent();
-                jsc.add("});");
-            }
-            else {
-
-                if (xsType.getType() == XSType.COLLECTION)
-                    xsType = ((CollectionInfo)member).getContent().getSchemaType();
-
-                jsc.add("desc = new XMLFieldDescriptorImpl(");
-                jsc.append(classType(xsType.getJType()));
-                jsc.append(", \"");
-                jsc.append(member.getName());
-                jsc.append("\", ");
-
-                String nodeName = member.getNodeName();
-                if (nodeName != null) {
-                    jsc.append("\"");
-                    jsc.append(member.getNodeName());
-                    jsc.append("\"");
-                }
-                else {
-                    jsc.append("(String)null");
-                }
-
-                jsc.append(", NodeType.Element);");
-
-                switch (xsType.getType()) {
-
-                    case XSType.CLASS:
-                        isEnumerated = ((XSClass)xsType).isEnumerated();
-                        break;
-                    case XSType.STRING:
-                        jsc.add("desc.setImmutable(true);");
-                        break;
-                    default:
-                        break;
-                }
-
-            }
-
-            //-- handler access methods
-
-            jsc.add("handler = (new XMLFieldHandler() {");
-            jsc.indent();
-
-            //-- read method
-            jsc.add("public Object getValue( Object object ) ");
-            jsc.indent();
-            jsc.add("throws IllegalStateException");
-            jsc.unindent();
-            jsc.add("{");
-            jsc.indent();
-            jsc.add(localClassName);
-            jsc.append(" target = (");
-            jsc.append(localClassName);
-            jsc.append(") object;");
-			//-- handle primitives
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isMultivalued()))
-			{
-				jsc.add("if(!target."+member.getHasMethodName()+"())");
-				jsc.indent();
-				jsc.add("return null;");
-				jsc.unindent();
-			}
-			//-- Return field value
-            jsc.add("return ");
-            String value = "target."+member.getReadMethodName()+"()";
-            if (member.isMultivalued()) jsc.append(value);
-            else jsc.append(xsType.createToJavaObjectCode(value));
-            jsc.append(";");
-            jsc.unindent();
-            jsc.add("}");
-
-            //-- write method
-            jsc.add("public void setValue( Object object, Object value) ");
-            jsc.indent();
-            jsc.add("throws IllegalStateException, IllegalArgumentException");
-            jsc.unindent();
-            jsc.add("{");
-            jsc.indent();
-            jsc.add("try {");
-            jsc.indent();
-            jsc.add(localClassName);
-            jsc.append(" target = (");
-            jsc.append(localClassName);
-            jsc.append(") object;");
-            //-- check for null primitives
-            if (xsType.isPrimitive()) {
-
-                if ((!member.isRequired()) && (!xsType.isEnumerated()) && (!member.isMultivalued())) {
-                    jsc.add("// if null, use delete method for optional primitives ");
-                    jsc.add("if (value == null) {");
-                    jsc.indent();
-                    jsc.add("target.");
-                    jsc.append(member.getDeleteMethodName());
-                    jsc.append("();");
-                    jsc.add("return;");
-                    jsc.unindent();
-                    jsc.add("}");
-                }
-                else {
-                    jsc.add("// ignore null values for non optional primitives");
-                    jsc.add("if (value == null) return;");
-                    jsc.add("");
-                }
-            }
-
-            jsc.add("target.");
-            jsc.append(member.getWriteMethodName());
-            jsc.append("( ");
-            if (xsType.isPrimitive()) {
-                jsc.append(xsType.createFromJavaObjectCode("value"));
-            }
-            else if (any) {
-                jsc.append(" value ");
-            }
-            else {
-                jsc.append("(");
-                jsc.append(xsType.getJType().toString());
-                jsc.append(") value");
-            }
-            jsc.append(");");
-
-            jsc.unindent();
-            jsc.add("}");
-            jsc.add("catch (Exception ex) {");
-            jsc.indent();
-            jsc.add("throw new IllegalStateException(ex.toString());");
-            jsc.unindent();
-            jsc.add("}");
-            jsc.unindent();
-            jsc.add("}");
-
-            //-- newInstance method
-            jsc.add("public Object newInstance( Object parent ) {");
-            jsc.indent();
-            jsc.add("return ");
-
-
-            if (any || isEnumerated ||
-                xsType.isPrimitive() ||
-                xsType.getJType().isArray() ||
-                (xsType.getType() == XSType.STRING))
-            {
-                jsc.append("null;");
-            }
-            else {
-                jsc.append(xsType.newInstanceCode());
-            }
-            jsc.unindent();
-            jsc.add("}");
-
-
-            jsc.unindent();
-            jsc.add("} );");
-
-            if (isEnumerated) {
-                jsc.add("desc.setHandler( new EnumFieldHandler(");
-                jsc.append(classType(xsType.getJType()));
-                jsc.append(", handler));");
-                jsc.add("desc.setImmutable(true);");
-            }
-            else if (xsType.getType() == XSType.TIME_INSTANT) {
-                jsc.add("desc.setHandler( new DateFieldHandler(");
-                jsc.append("handler));");
-                jsc.add("desc.setImmutable(true);");
-            }
-            else if (xsType.getType() == XSType.DECIMAL) {
-                jsc.add("desc.setHandler( new DecimalFieldHandler(");
-                jsc.append("handler));");
-                jsc.add("desc.setImmutable(true);");
-            }
-            //--We need to handle NMTOKENS with the CollectionFieldHandler
-            else if (xsType.getType() == XSType.NMTOKENS) {
-                jsc.add("desc.setHandler( new CollectionFieldHandler(");
-                jsc.append("handler));");
-            }
-            //IDREFS?
-            else jsc.add("desc.setHandler(handler);");
-
-            //-- namespace
-            if (nsURI != null) {
-                jsc.add("desc.setNameSpaceURI(\"");
-                jsc.append(nsURI);
-                jsc.append("\");");
-            }
-
-            if (member.isRequired()) {
-                jsc.add("desc.setRequired(true);");
-            }
-
-            //-- mark as multi or single valued
-            jsc.add("desc.setMultivalued("+member.isMultivalued());
-            jsc.append(");");
-
-			jsc.add("addFieldDescriptor(desc);");
-            jsc.add("");
-
-            //-- Add Validation Code
-            jsc.add("//-- validation code for: ");
-            jsc.append(member.getName());
-            jsc.add("fieldValidator = new FieldValidator();");
-            validationCode(member, jsc);
-            jsc.add("desc.setValidator(fieldValidator);");
-            jsc.add("");
+            createDescriptor(member, localClassName, nsURI, jsc);
         }
 
         return classDesc;
@@ -702,6 +199,252 @@ public class DescriptorSourceFactory {
     //-------------------/
     //- Private Methods -/
     //-------------------/
+    /**
+     * Create a specific descriptor for a given member (whether an attribute or
+     * an element) represented by a given Class name
+     */
+    private static void createDescriptor(FieldInfo member, String localClassName,
+                                  String nsURI, JSourceCode jsc)
+    {
+
+       XSType xsType = member.getSchemaType();
+       boolean any = false;
+       boolean isEnumerated = false;
+       boolean isElement = (member.getNodeType() == FieldInfo.ELEMENT_TYPE);
+       boolean isAttribute = (member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
+       boolean isText = (member.getNodeType() == FieldInfo.TEXT_TYPE);
+
+       jsc.add("//-- ");
+       jsc.append(member.getName());
+
+
+       //-- a hack, I know, I will change later (kv)
+       if (member.getName().equals("_anyList")) {
+           any = true;
+           jsc.add("desc = (new XMLFieldDescriptorImpl(");
+           jsc.append("Object.class, \"");
+           jsc.append(member.getName());
+           jsc.append("\", (String)null, NodeType.Element) { ");
+           jsc.indent();
+           jsc.add("public boolean matches(String xmlName) {");
+           jsc.add("    return true;");
+           jsc.add("}");
+           jsc.unindent();
+           jsc.add("});");
+        } else {
+            if (xsType.getType() == XSType.COLLECTION)
+                //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
+                xsType = ((CollectionInfo)member).getContent().getSchemaType();
+
+            jsc.add("desc = new XMLFieldDescriptorImpl(");
+            jsc.append(classType(xsType.getJType()));
+            jsc.append(", \"");
+            jsc.append(member.getName());
+            jsc.append("\", ");
+            String nodeName = member.getNodeName();
+            if ( (nodeName != null) && (!isText)) {
+                jsc.append("\"");
+                jsc.append(member.getNodeName());
+                jsc.append("\"");
+            } else if (isText) {
+                jsc.append("\"PCDATA\"");
+            } else {
+                   jsc.append("(String)null");
+            }
+
+            if (isElement)
+               jsc.append(", NodeType.Element);");
+            else if (isAttribute)
+               jsc.append(", NodeType.Attribute);");
+            else if (isText)
+               jsc.append(", NodeType.Text);");
+            switch (xsType.getType()) {
+                case XSType.CLASS:
+                   isEnumerated = ((XSClass)xsType).isEnumerated();
+                   break;
+               case XSType.STRING:
+                   jsc.add("desc.setImmutable(true);");
+                   break;
+               //only for attributes
+               case XSType.IDREF:
+                       jsc.add("desc.setReference(true);" );
+                       break;
+               case XSType.ID:
+                       jsc.add("this.identity = desc;" );
+                       break;
+               /***********************/
+               default:
+                   break;
+           } //switch
+
+        }//else
+
+        //-- handler access methods
+
+       jsc.add("handler = (new XMLFieldHandler() {");
+       jsc.indent();
+
+       //-- read method
+       jsc.add("public Object getValue( Object object ) ");
+       jsc.indent();
+       jsc.add("throws IllegalStateException");
+       jsc.unindent();
+       jsc.add("{");
+       jsc.indent();
+       jsc.add(localClassName);
+       jsc.append(" target = (");
+       jsc.append(localClassName);
+       jsc.append(") object;");
+       //-- handle primitives
+	   if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isMultivalued()))
+       {
+		   jsc.add("if(!target."+member.getHasMethodName()+"())");
+		   jsc.indent();
+           jsc.add("return null;");
+           jsc.unindent();
+        }
+        //-- Return field value
+        jsc.add("return ");
+        String value = "target."+member.getReadMethodName()+"()";
+        if (member.isMultivalued()) jsc.append(value);//--Be careful : different for attributes
+        else jsc.append(xsType.createToJavaObjectCode(value));
+        jsc.append(";");
+        jsc.unindent();
+        jsc.add("}");
+        //--end of read method
+
+        //-- write method
+        jsc.add("public void setValue( Object object, Object value) ");
+        jsc.indent();
+        jsc.add("throws IllegalStateException, IllegalArgumentException");
+        jsc.unindent();
+        jsc.add("{");
+        jsc.indent();
+        jsc.add("try {");
+        jsc.indent();
+        jsc.add(localClassName);
+        jsc.append(" target = (");
+        jsc.append(localClassName);
+        jsc.append(") object;");
+        //-- check for null primitives
+        if (xsType.isPrimitive()) {
+            if ((!member.isRequired()) && (!xsType.isEnumerated()) && (!member.isMultivalued())) {
+                 jsc.add("// if null, use delete method for optional primitives ");
+                 jsc.add("if (value == null) {");
+                 jsc.indent();
+                 jsc.add("target.");
+                 jsc.append(member.getDeleteMethodName());
+                 jsc.append("();");
+                 jsc.add("return;");
+                 jsc.unindent();
+                 jsc.add("}");
+              } else {
+                 jsc.add("// ignore null values for non optional primitives");
+                 jsc.add("if (value == null) return;");
+                 jsc.add("");
+              }
+        }//if primitive
+
+        jsc.add("target.");
+        jsc.append(member.getWriteMethodName());
+        jsc.append("( ");
+        if (xsType.isPrimitive()) {
+             jsc.append(xsType.createFromJavaObjectCode("value"));
+        } else if (any) {
+            jsc.append(" value ");
+        } else {
+            jsc.append("(");
+            jsc.append(xsType.getJType().toString());
+            jsc.append(") value");
+        }
+        jsc.append(");");
+
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("catch (Exception ex) {");
+        jsc.indent();
+        jsc.add("throw new IllegalStateException(ex.toString());");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.unindent();
+        jsc.add("}");
+        //--end of write method
+
+
+        //-- newInstance method
+        jsc.add("public Object newInstance( Object parent ) {");
+        jsc.indent();
+        jsc.add("return ");
+
+        if (any || isEnumerated ||
+                xsType.isPrimitive() ||
+                xsType.getJType().isArray() ||
+                (xsType.getType() == XSType.STRING))
+         {
+             jsc.append("null;");
+         } else {
+                jsc.append(xsType.newInstanceCode());
+         }
+         jsc.unindent();
+         jsc.add("}");
+         //--end of new Instance method
+         jsc.unindent();
+         jsc.add("} );");
+         //--end of XMLFieldDescriptor
+
+         if (isEnumerated) {
+            jsc.add("desc.setHandler( new EnumFieldHandler(");
+            jsc.append(classType(xsType.getJType()));
+            jsc.append(", handler));");
+            jsc.add("desc.setImmutable(true);");
+         } else if (xsType.getType() == XSType.TIME_INSTANT) {
+            jsc.add("desc.setHandler( new DateFieldHandler(");
+            jsc.append("handler));");
+            jsc.add("desc.setImmutable(true);");
+         } else if (xsType.getType() == XSType.DECIMAL) {
+             jsc.add("desc.setHandler( new DecimalFieldHandler(");
+             jsc.append("handler));");
+             jsc.add("desc.setImmutable(true);");
+         }
+          //--We need to handle NMTOKENS with the CollectionFieldHandler
+          else if (xsType.getType() == XSType.NMTOKENS) {
+              jsc.add("desc.setHandler( new CollectionFieldHandler(");
+              jsc.append("handler));");
+          }
+          //IDREFS?
+
+          else jsc.add("desc.setHandler(handler);");
+
+          //-- namespace
+          if (nsURI != null) {
+             jsc.add("desc.setNameSpaceURI(\"");
+             jsc.append(nsURI);
+             jsc.append("\");");
+          }
+
+          if (member.isRequired()) {
+              jsc.add("desc.setRequired(true);");
+          }
+
+          //-- mark as multi or single valued for elements
+          if (isElement) {
+             jsc.add("desc.setMultivalued("+member.isMultivalued());
+             jsc.append(");");
+          }
+
+
+          jsc.add("addFieldDescriptor(desc);");
+          jsc.add("");
+
+          //-- Add Validation Code
+          jsc.add("//-- validation code for: ");
+          jsc.append(member.getName());
+          jsc.add("fieldValidator = new FieldValidator();");
+          validationCode(member, jsc);
+          jsc.add("desc.setValidator(fieldValidator);");
+          jsc.add("");
+
+    }//--CreateDescriptor
 
     /**
      * Returns the Class type (as a String) for the given XSType
@@ -1335,7 +1078,7 @@ public class DescriptorSourceFactory {
                         jsc.add("tv.setMaxInclusive(");
                     }
                     /* it is better for a good understanding to use
-                    the parse method woth 'min.toSring()' but in that case
+                    the parse method with 'min.toSring()' but in that case
                     we have to deal with the ParseException*/
                     jsc.append("new org.exolab.castor.types.TimeDuration("+max.toLong()+"L)");
                     jsc.append(");");
