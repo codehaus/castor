@@ -1704,10 +1704,21 @@ public final class UnmarshalHandler extends MarshalFramework
             if (type.startsWith(JAVA_PREFIX)) {
                 return type.substring(JAVA_PREFIX.length());
             }
+            
+            // check for namespace prefix in type
+            int idx = type.indexOf(':');
+            String typeNamespaceURI = null;
+            if (idx >= 0) {
+                // there is a namespace prefix
+                String prefix = type.substring(0, idx);
+                type = type.substring(idx + 1);
+                typeNamespaceURI = _namespaces.getNamespaceURI(prefix);
+            }
+
             //-- Retrieve the type corresponding to the schema name and
             //-- return it.
             XMLClassDescriptor classDesc =
-                _cdResolver.resolveByXMLName(type, null, _loader);
+                _cdResolver.resolveByXMLName(type, typeNamespaceURI, _loader);            
 
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
