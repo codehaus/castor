@@ -1,6 +1,21 @@
 
 Version (CVS)
 -------------
+
+
+XML: Added special code to prevent creating a default XML name when using the "matches" 
+     attribute for bind-xml element in the mapping file. (kvisco) 20010815
+
+XML: Fixed bug with introspector...first character of field name was not being 
+     decapitalized. This caused a bug in the "auto-complete" feature. 
+     (kvisco) 20010815
+
+XML: Fixed bug with "auto-complete" when specifying an identity field, the field
+     descriptor was not being set. (kvisco) 20010814
+
+XML: Added support for specifying that a field is a reference using the mapping file.
+     (kvisco) 20010814
+     
 XML: Fixed bug in the generated classes: the attributes of complexTypes which contained
      nested groups were wrongly located.
      (Reported by Joseph Campolongo [jvc@cascadeworks.com]) (Arnaud)
