@@ -138,11 +138,17 @@ public class ClassDescriptorImpl
         }
         _accessMode = accessMode;
 
-    // fritz: propagate containing class to fields
-    if ( _identity != null )
-        _identity.setContainingClassDescriptor( this );
-    for ( int i=0; i<_fields.length; i++ )
-        _fields[i].setContainingClassDescriptor( this );
+        // fritz: propagate containing class to fields
+        // oleg: don't alter the identity's info if the identity was taken
+        // from the ancestor class.
+        // So complicated condition is needed since for JDO fields first a pure
+        // ClassDescriptorImpl is created, and then JDOClassDescriptorImpl for
+        // the same class
+        if ( _identity != null && ( _identity.getContainingClassDescriptor() == null ||
+                                    _identity.getContainingClassDescriptor().getJavaClass() == _javaClass ) )
+            _identity.setContainingClassDescriptor( this );
+        for ( int i=0; i<_fields.length; i++ )
+            _fields[i].setContainingClassDescriptor( this );
     }
     
     
