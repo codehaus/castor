@@ -438,6 +438,28 @@ go
 grant all on test_persistent to test
 go
 
+
+-- test_col
+drop table test_col
+go
+create table test_col (
+  id       integer         not null,
+  dum    integer    null
+)
+go
+create unique index test_col_pk on test_col( id )
+go
+
+drop table test_item 
+go
+create table test_item (
+  iid       integer         not null,
+  id      integer         null
+)
+go
+create unique index test_item_pk on test_item( iid )
+go
+
 -- list_types
 drop table list_types
 go
