@@ -100,48 +100,61 @@ public class TimeStampMismatched extends CastorTestCase
     {
 
         OQLQuery      oql;
-        TestObject2    object;
+        TestObject2   object;
         QueryResults  enum;
 
-        // Either fetch or create the TestObject2
+        // Remove and create the object
         _db.begin();
         oql = _db.getOQLQuery( "select obj from jdo.TestObject2 obj" );
-        // oql.bind( 4 );
         enum = oql.execute();
 
         if ( enum.hasMore() ) 
         {
             object = ( TestObject2 ) enum.next();
-            stream.println( "Retrieved object: " + object );
+            stream.println( "Loaded object: " + object );
             stream.println( "Removing object: " + object );
             _db.remove( object );
         } 
-        else 
-        {
-            object = new TestObject2();
-            object.setValue1( TestObject2.DefaultValue1 );
-            // object.setId( 4 );
-            stream.println( "Creating new object: " + object );
-            _db.create( object );
-        }
-
+        
+        object = new TestObject2();
+        stream.println( "Creating new object: " + object );
+        _db.create( object );
         _db.commit();
         oql.close();
         _db.close();
 
-        stream.println( "object has timestamp: " + object.jdoGetTimeStamp() );
-        // Change an attribute on the TestObject2
-        object.setValue2( TestObject2.DefaultValue2 );
+        stream.println( "Object timestamp: " + object.jdoGetTimeStamp() );
 
         _db = _category.getDatabase( verbose );
 
-        // Update the TestObject2
+        // Load the object
+        _db.begin();
+        oql = _db.getOQLQuery( "select obj from jdo.TestObject2 obj" );
+        enum = oql.execute();
+
+        if ( enum.hasMore() ) 
+        {
+            object = ( TestObject2 ) enum.next();
+            stream.println( "Loaded object: " + object );
+        }
+        _db.rollback();
+        oql.close();
+        _db.close();
+
+        // Change an attribute on the TestObject2
+        object.setValue2( "changed value" );
+        stream.println( "Changed object: " + object );
+
+        _db = _category.getDatabase( verbose );
+
+        // Update the object
         _db.begin();
         stream.println( "Updating object: " + object );
+        // object.setValue2( "changed value" );
         _db.update( object );
         _db.commit();
 
-        stream.println( "object has timestamp: " + object.jdoGetTimeStamp() );
+        stream.println( "Object timestamp: " + object.jdoGetTimeStamp() );
     }
 
     public void tearDown() throws PersistenceException 
