@@ -102,6 +102,13 @@ public class JDOCallback
     }
 
 
+    public void updated( Object object )
+        throws Exception
+    {
+        ( (Persistent) object ).jdoUpdate();
+    }
+
+
 }
 
 

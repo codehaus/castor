@@ -129,6 +129,16 @@ public interface CallbackInterceptor
     public void using( Object object, Database db );
 
 
+    /**
+     * Called to indicate that an object has been updated at the end of
+     * a "long" transaction.
+     *
+     * @param object The object
+     */
+    public void updated( Object object )
+        throws Exception;
+
+
 }
 
 
