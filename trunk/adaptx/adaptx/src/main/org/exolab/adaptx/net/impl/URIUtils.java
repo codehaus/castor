@@ -56,15 +56,26 @@
 package org.exolab.adaptx.net.impl;
 
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * A utility class for URI handling
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
-**/
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
+ */
 public class URIUtils {
     
     /**
@@ -97,40 +108,79 @@ public class URIUtils {
 	    throws java.io.FileNotFoundException, java.io.IOException
 	{
 	    
-	    //-- check for absolute url
+	    //-- check for URL with only using href
 	    URL url = null;
-	    try {
-	        url = new URL(href);
-	        return url.openStream(); 
-	    }
-	    catch (MalformedURLException muex) {};
-	    
-	    //-- join document base + href
-	    String xHref = null;
-	    if ((documentBase != null) && (documentBase.length() > 0)) {
-	        int idx = documentBase.lastIndexOf(HREF_PATH_SEP);
-	        if (idx == (documentBase.length()-1))
-	            xHref = documentBase+href;
-	        else
-	            xHref = documentBase+HREF_PATH_SEP+href;
-	    }   
-	    else xHref = href;
-	        
-	    //-- check for relative url
-	    try {
-	        url = new URL(xHref);   
+	    if ((url = getURL(href)) != null) {
 	        return url.openStream();
 	    }
-	    catch(MalformedURLException muex) {};
+	    
+	    //-- join document base + href
+	    String absHref = makeAbsolute(href, documentBase);
+	    
+	    //-- try using absolute URI
+	    if ((url = getURL(absHref)) != null) {
+	        return url.openStream();
+	    }
 	    
 	    // Try local files
-	    File iFile = new File(href);
-	    if (iFile.isAbsolute()) return new FileInputStream(iFile);
-	    else iFile = new File(xHref);
-	    
-	    return new FileInputStream(iFile);
-	    
+	    File file = new File(href);
+	    if (file.exists()) {
+	        if (!file.isAbsolute()) {
+	            File tmpFile = new File(absHref);
+	            if (tmpFile.exists()) file = tmpFile;
+	        }
+	    }
+	    else {
+	        file = new File(absHref);
+	    }
+	    return new FileInputStream(file);
 	} //-- getInputStream
+	
+	/**
+	 * Returns an OutputStream for the file represented by the href
+	 * argument
+	 * @param href the href of the file to get the input stream for.
+	 * @param documentBase the document base of the href argument, if it
+	 * is a relative href
+	 * set documentBase to null if there is none.
+	 * @return an OutputStream to the desired resource
+	 * @exception java.io.FileNotFoundException when the file could not be
+	 * found
+	**/
+	public static OutputStream getOutputStream(String href, String documentBase) 
+	    throws java.io.FileNotFoundException, java.io.IOException
+	{
+	    
+	    URL url = null;
+	    
+	    //-- try using href alone as it might already be a full URL
+	    if ((url = getURL(href)) != null) {
+	        URLConnection connection = url.openConnection();
+	        return connection.getOutputStream();
+	    }
+	    
+	    //-- try using documentBase
+	    String absHref = makeAbsolute(href, documentBase);
+	    if ((url = getURL(absHref)) != null) {
+	        URLConnection connection = url.openConnection();
+	        return connection.getOutputStream();
+	    }
+	        
+	    // Try local files
+	    File file = new File(href);
+	    if (file.exists()) {
+	        if (!file.isAbsolute()) {
+	            File tmpFile = new File(absHref);
+	            if (tmpFile.exists()) file = tmpFile;
+	        }
+	    }
+	    else {
+	        file = new File(absHref);
+	    }
+	    return new FileOutputStream(file);
+	    
+	} //-- getOutputStream
+	
 
 	/**
 	 * Returns a Reader for the file represented by the href
@@ -149,6 +199,25 @@ public class URIUtils {
 	    InputStream is = getInputStream(href, documentBase);
         return new InputStreamReader(is);    
 	} //-- getReader
+	
+	/**
+	 * Returns a Writer for the file represented by the href
+	 * argument
+	 * @param href the href of the file to get the input stream for.
+	 * @param documentBase the document base of the href argument, if it
+	 * is a relative href
+	 * set documentBase to null if there is none.
+	 * @return a Writer to the desired resource
+	 * @exception java.io.FileNotFoundException when the file could not be
+	 * found
+	**/
+	public static Writer getWriter(String href, String documentBase) 
+	    throws java.io.FileNotFoundException, java.io.IOException
+	{
+	    OutputStream is = getOutputStream(href, documentBase);
+        return new OutputStreamWriter(is);    
+	} //-- getWriter
+	
 	
 	/**
 	 * Returns the document base of the href argument
@@ -186,7 +255,7 @@ public class URIUtils {
 	 * Returns the relative URI of the href argument
 	 *
 	 * @return the relative URI the given href 
-	**/
+	 */
 	public static String getRelativeURI(String href) {
 	    
 	    if (href == null) return href;
@@ -215,50 +284,31 @@ public class URIUtils {
 	} //-- getRelativeURI
 	
 	/**
-	 * 
-	**/
+	 * Returns the given href + documentBase
+	 *
+	 * @return the absolute URL as a string
+	 */
 	public static String resolveAsString(String href, String documentBase) {
 	    
-	    try {
-	        //-- try to create a new URL and see if MalformedURLExcetion is
-	        //-- ever thrown
-	        URL url = new URL(href);
-	        url = null; //-- to remove compiler warnings
+	    if (getURL(href) != null) {
 	        return href;
 	    }
-	    catch(MalformedURLException muex) {};
-
 	    
-	    //-- join document base + href
-	    String xHref = null;
-	    if ((documentBase != null) && (documentBase.length() > 0)) {
-	        int idx = documentBase.lastIndexOf(HREF_PATH_SEP);
-	        if (idx == (documentBase.length()-1))
-	            xHref = documentBase+href;
-	        else
-	            xHref = documentBase+HREF_PATH_SEP+href;
-	    }   
-	    else xHref = href;
-	        
-	    //-- check for relative url
-	    try {
-	        //-- try to create a new URL and see if MalformedURLExcetion is
-	        //-- ever thrown
-	        URL url = new URL(xHref);   
-	        url = null; //-- to remove compiler warnings
-	        return xHref;
+	    String absHref = makeAbsolute(href, documentBase);
+	    
+	    if (getURL(absHref) != null) {
+	        return absHref;
 	    }
-	    catch(MalformedURLException muex) {};
 	    
 	    // Try local files
-	    File iFile = new File(href);
-	    if (iFile.isAbsolute())
-	        xHref = createFileURL(iFile.getAbsolutePath());
+	    File file = new File(href);
+	    if (file.isAbsolute())
+	        absHref = createFileURL(file.getAbsolutePath());
 	    else {
-	        iFile = new File(xHref);
-	        xHref = createFileURL(iFile.getAbsolutePath());
+	        file = new File(absHref);
+	        absHref = createFileURL(file.getAbsolutePath());
 	    }
-	    return xHref;
+	    return absHref;
 	} //-- resolveHref
 	
 	/**
@@ -266,7 +316,7 @@ public class URIUtils {
 	 *
 	 * @param filename the name of the file
 	 * @return the String representation of the File URL
-	**/
+	 */
 	private static String createFileURL(String filename) {
 	    
 	    if (filename == null) return FILE_PROTOCOL_PREFIX;
@@ -289,4 +339,42 @@ public class URIUtils {
 	    return sb.toString();
 	} //-- createFileURL
     
-} //-- URIUtils
+    /**
+     * This is just a helper method so I don't have to write try/catch
+     * everywhere I'm testing if something is a URL or not.
+     * Returns the URL for the given uri, or null if the uri doesn't
+     * exist or is malformed.
+     *
+     * @return the URL or null.
+     */
+    private static URL getURL(String uri) {
+	    try {
+	        return new URL(uri);
+	    }
+	    catch (MalformedURLException muex) {};
+        return null;
+    } //-- getURL
+    
+    /**
+     * Returns the absolute URI for the given href
+     *
+     * @return the absolute URI for the given href
+     */
+    private static String makeAbsolute(String href, String documentBase) {
+        
+	    //-- join document base + href
+	    String absHref = null;
+	    if ((documentBase != null) && (documentBase.length() > 0)) {
+            if (href.startsWith(documentBase)) return href;	        
+	        int idx = documentBase.lastIndexOf(HREF_PATH_SEP);
+	        if (idx == (documentBase.length()-1))
+	            absHref = documentBase+href;
+	        else
+	            absHref = documentBase+HREF_PATH_SEP+href;
+	    }   
+	    else absHref = href;
+	    
+	    return absHref;	    
+    } //-- makeAbsolute
+    
+} //-- class: URIUtils
