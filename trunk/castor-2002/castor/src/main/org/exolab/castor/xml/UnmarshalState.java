@@ -84,6 +84,8 @@ class UnmarshalState {
     
     private Vector markedList = null;
     
+    boolean derived = false;
+    
     UnmarshalState() {
         super();
         markedList = new Vector(5);
