@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed typo with null check during validation code in
+       XMLClassDescriptorImpl 
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1560
+       (kvisco - 20041214)
+
 JDO:   Fixed bug 1725 using contribution from bonevich@umich.edu
        Changed the attribute definition of 'name' of key-gerator in mapping.dtd.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1725
