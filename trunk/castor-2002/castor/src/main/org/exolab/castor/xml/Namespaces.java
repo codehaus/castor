@@ -227,13 +227,16 @@ final class Namespaces {
                     buf.append(':');
                     buf.append(ns.prefix);
                     attName = buf.toString();
-                    atts.addAttribute(attName, CDATA, getNamespaceURI(ns.prefix));
+                    atts.addAttribute(attName, CDATA, ns.uri);
                 }
                 //case with no prefix but a nsURI
-                else if (getNamespaceURI(ns.prefix) != null) {
-                   atts.addAttribute(XMLNS, CDATA, getNamespaceURI(ns.prefix));
+                else {
+                   atts.addAttribute(XMLNS, CDATA, ns.uri);
                 }
             } //ns.prefix!=null
+            else {
+                atts.addAttribute(XMLNS, CDATA, ns.uri);
+            }
 
             ns = ns.next;
         }
