@@ -14,8 +14,8 @@ package org.exolab.castor.mapping.xml;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.mapping.xml.types.AutoNamingType;
-import org.exolab.castor.mapping.xml.types.NodeType;
+import org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType;
+import org.exolab.castor.mapping.xml.types.BindXmlNodeType;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -29,6 +29,7 @@ import org.xml.sax.DocumentHandler;
  * 'bind-xml' may only appear
  *           as a child of a 'field' element.
  *        
+ * 
  * @version $Revision$ $Date$
 **/
 public class BindXml implements java.io.Serializable {
@@ -61,7 +62,7 @@ public class BindXml implements java.io.Serializable {
      *  name is used as the XML name.
      *  
     **/
-    private org.exolab.castor.mapping.xml.types.AutoNamingType _autoNaming;
+    private org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType _autoNaming;
 
     private java.lang.String _matches;
 
@@ -72,9 +73,16 @@ public class BindXml implements java.io.Serializable {
     **/
     private boolean _has_reference;
 
-    private org.exolab.castor.mapping.xml.types.NodeType _node;
+    private org.exolab.castor.mapping.xml.types.BindXmlNodeType _node;
 
     private java.lang.String _QNamePrefix;
+
+    private boolean _transient;
+
+    /**
+     * keeps track of state for field: _transient
+    **/
+    private boolean _has_transient;
 
 
       //----------------/
@@ -98,6 +106,13 @@ public class BindXml implements java.io.Serializable {
     } //-- void deleteReference() 
 
     /**
+    **/
+    public void deleteTransient()
+    {
+        this._has_transient= false;
+    } //-- void deleteTransient() 
+
+    /**
      * Returns the value of field 'autoNaming'. The field
      * 'autoNaming' has the following description: Allows
      * specifying how Castor should automatically determines
@@ -111,15 +126,17 @@ public class BindXml implements java.io.Serializable {
      * field
      *  name is used as the XML name.
      *  
+     * 
      * @return the value of field 'autoNaming'.
     **/
-    public org.exolab.castor.mapping.xml.types.AutoNamingType getAutoNaming()
+    public org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType getAutoNaming()
     {
         return this._autoNaming;
-    } //-- org.exolab.castor.mapping.xml.types.AutoNamingType getAutoNaming() 
+    } //-- org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType getAutoNaming() 
 
     /**
      * Returns the value of field 'matches'.
+     * 
      * @return the value of field 'matches'.
     **/
     public java.lang.String getMatches()
@@ -133,6 +150,7 @@ public class BindXml implements java.io.Serializable {
      * specifying the XML name for the
      *  field associated with the 'bind-xml' element.
      *  
+     * 
      * @return the value of field 'name'.
     **/
     public java.lang.String getName()
@@ -142,15 +160,17 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Returns the value of field 'node'.
+     * 
      * @return the value of field 'node'.
     **/
-    public org.exolab.castor.mapping.xml.types.NodeType getNode()
+    public org.exolab.castor.mapping.xml.types.BindXmlNodeType getNode()
     {
         return this._node;
-    } //-- org.exolab.castor.mapping.xml.types.NodeType getNode() 
+    } //-- org.exolab.castor.mapping.xml.types.BindXmlNodeType getNode() 
 
     /**
      * Returns the value of field 'QNamePrefix'.
+     * 
      * @return the value of field 'QNamePrefix'.
     **/
     public java.lang.String getQNamePrefix()
@@ -160,6 +180,7 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Returns the value of field 'reference'.
+     * 
      * @return the value of field 'reference'.
     **/
     public boolean getReference()
@@ -168,7 +189,18 @@ public class BindXml implements java.io.Serializable {
     } //-- boolean getReference() 
 
     /**
+     * Returns the value of field 'transient'.
+     * 
+     * @return the value of field 'transient'.
+    **/
+    public boolean getTransient()
+    {
+        return this._transient;
+    } //-- boolean getTransient() 
+
+    /**
      * Returns the value of field 'type'.
+     * 
      * @return the value of field 'type'.
     **/
     public java.lang.String getType()
@@ -185,6 +217,13 @@ public class BindXml implements java.io.Serializable {
 
     /**
     **/
+    public boolean hasTransient()
+    {
+        return this._has_transient;
+    } //-- boolean hasTransient() 
+
+    /**
+    **/
     public boolean isValid()
     {
         try {
@@ -198,6 +237,7 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * 
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out)
@@ -208,6 +248,7 @@ public class BindXml implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * 
      * @param handler
     **/
@@ -232,15 +273,17 @@ public class BindXml implements java.io.Serializable {
      * field
      *  name is used as the XML name.
      *  
+     * 
      * @param autoNaming the value of field 'autoNaming'.
     **/
-    public void setAutoNaming(org.exolab.castor.mapping.xml.types.AutoNamingType autoNaming)
+    public void setAutoNaming(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType autoNaming)
     {
         this._autoNaming = autoNaming;
-    } //-- void setAutoNaming(org.exolab.castor.mapping.xml.types.AutoNamingType) 
+    } //-- void setAutoNaming(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType) 
 
     /**
      * Sets the value of field 'matches'.
+     * 
      * @param matches the value of field 'matches'.
     **/
     public void setMatches(java.lang.String matches)
@@ -254,6 +297,7 @@ public class BindXml implements java.io.Serializable {
      * specifying the XML name for the
      *  field associated with the 'bind-xml' element.
      *  
+     * 
      * @param name the value of field 'name'.
     **/
     public void setName(java.lang.String name)
@@ -263,15 +307,17 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Sets the value of field 'node'.
+     * 
      * @param node the value of field 'node'.
     **/
-    public void setNode(org.exolab.castor.mapping.xml.types.NodeType node)
+    public void setNode(org.exolab.castor.mapping.xml.types.BindXmlNodeType node)
     {
         this._node = node;
-    } //-- void setNode(org.exolab.castor.mapping.xml.types.NodeType) 
+    } //-- void setNode(org.exolab.castor.mapping.xml.types.BindXmlNodeType) 
 
     /**
      * Sets the value of field 'QNamePrefix'.
+     * 
      * @param QNamePrefix the value of field 'QNamePrefix'.
     **/
     public void setQNamePrefix(java.lang.String QNamePrefix)
@@ -281,6 +327,7 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Sets the value of field 'reference'.
+     * 
      * @param reference the value of field 'reference'.
     **/
     public void setReference(boolean reference)
@@ -290,7 +337,20 @@ public class BindXml implements java.io.Serializable {
     } //-- void setReference(boolean) 
 
     /**
+     * Sets the value of field 'transient'.
+     * 
+     * @param _transient
+     * @param transient the value of field 'transient'.
+    **/
+    public void setTransient(boolean _transient)
+    {
+        this._transient = _transient;
+        this._has_transient = true;
+    } //-- void setTransient(boolean) 
+
+    /**
      * Sets the value of field 'type'.
+     * 
      * @param type the value of field 'type'.
     **/
     public void setType(java.lang.String type)
@@ -299,6 +359,7 @@ public class BindXml implements java.io.Serializable {
     } //-- void setType(java.lang.String) 
 
     /**
+     * 
      * 
      * @param reader
     **/

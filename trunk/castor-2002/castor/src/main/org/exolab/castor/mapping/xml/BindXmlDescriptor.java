@@ -24,6 +24,7 @@ import org.exolab.castor.xml.validators.*;
 
 /**
  * 
+ * 
  * @version $Revision$ $Date$
 **/
 public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
@@ -59,13 +60,13 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         desc.setSchemaType("QName");
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
                 return target.getName();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -76,12 +77,11 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _name
@@ -91,13 +91,13 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         //-- _type
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
                 return target.getType();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -108,12 +108,11 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _type
@@ -122,32 +121,31 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         
         //-- _autoNaming
-        desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.AutoNamingType.class, "_autoNaming", "auto-naming", NodeType.Attribute);
+        desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType.class, "_autoNaming", "auto-naming", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
                 return target.getAutoNaming();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     BindXml target = (BindXml) object;
-                    target.setAutoNaming( (org.exolab.castor.mapping.xml.types.AutoNamingType) value);
+                    target.setAutoNaming( (org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
-        desc.setHandler( new EnumFieldHandler(org.exolab.castor.mapping.xml.types.AutoNamingType.class, handler));
+        desc.setHandler( new EnumFieldHandler(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType.class, handler));
         desc.setImmutable(true);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _autoNaming
@@ -158,13 +156,13 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_matches", "matches", NodeType.Attribute);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
                 return target.getMatches();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -175,12 +173,11 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _matches
@@ -195,7 +192,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         //-- _reference
         desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_reference", "reference", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
@@ -203,7 +200,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                     return null;
                 return new Boolean(target.getReference());
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -219,12 +216,11 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _reference
@@ -232,32 +228,31 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         
         //-- _node
-        desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.NodeType.class, "_node", "node", NodeType.Attribute);
+        desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.BindXmlNodeType.class, "_node", "node", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
                 return target.getNode();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     BindXml target = (BindXml) object;
-                    target.setNode( (org.exolab.castor.mapping.xml.types.NodeType) value);
+                    target.setNode( (org.exolab.castor.mapping.xml.types.BindXmlNodeType) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
-        desc.setHandler( new EnumFieldHandler(org.exolab.castor.mapping.xml.types.NodeType.class, handler));
+        desc.setHandler( new EnumFieldHandler(org.exolab.castor.mapping.xml.types.BindXmlNodeType.class, handler));
         desc.setImmutable(true);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _node
@@ -267,13 +262,13 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         //-- _QNamePrefix
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_QNamePrefix", "QName-prefix", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 BindXml target = (BindXml) object;
                 return target.getQNamePrefix();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -284,17 +279,54 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _QNamePrefix
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        desc.setValidator(fieldValidator);
+        
+        //-- _transient
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_transient", "transient", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                BindXml target = (BindXml) object;
+                if(!target.hasTransient())
+                    return null;
+                return new Boolean(target.getTransient());
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    BindXml target = (BindXml) object;
+                    // if null, use delete method for optional primitives 
+                    if (value == null) {
+                        target.deleteTransient();
+                        return;
+                    }
+                    target.setTransient( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _transient
+        fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
