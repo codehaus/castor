@@ -145,11 +145,11 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         if (attValue != null) _element.setTypeReference(attValue);
 
         //-- @nullable
-        attValue = atts.getValue(SchemaNames.NULLABLE_ATTR);
+        attValue = atts.getValue(SchemaNames.NILLABLE_ATTR);
         if (attValue != null) {
-            if (attValue.equals("true")) _element.setNullable(true);
+            if (attValue.equals("true")) _element.setNillable(true);
             else if (!attValue.equals("false")) {
-                String err = "Invalid value for the 'nullable' attribute of "+
+                String err = "Invalid value for the 'nillable' attribute of "+
                     "an element definition: " + attValue;
                 throw new IllegalArgumentException(err);
             }
