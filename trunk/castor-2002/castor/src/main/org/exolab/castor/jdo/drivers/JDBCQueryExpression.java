@@ -150,6 +150,7 @@ public class JDBCQueryExpression
         _order = order;
     }
 
+
     protected String getColumnList()
     {
         StringBuffer sql;
@@ -178,7 +179,7 @@ public class JDBCQueryExpression
             for ( int i = 0 ; i < _conds.size() ; ++i ) {
                 if ( i > 0 )
                     sql.append( JDBCSyntax.And );
-                sql.append( _factory.quoteName( (String) _conds.elementAt( i ) ) );
+                sql.append( (String) _conds.elementAt( i ) );
             }
         }
         if ( _where != null ) {
