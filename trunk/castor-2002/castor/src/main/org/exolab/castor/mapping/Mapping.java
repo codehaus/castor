@@ -97,6 +97,10 @@ public class Mapping
 {
 
 
+    /**
+     * Associates engine name (XML, JDO, etc) with the class of its
+     * mapping loader.
+     */
     static class EngineMapping
     {
 
@@ -123,13 +127,28 @@ public class Mapping
     }
         
 
-    public static final EngineMapping JDO = new EngineMapping( "jdo", "org.exolab.castor.jdo.engine.JDOMappingLoader" );
+    /**
+     * Use this object to obtain the mapping resolver for JDO from
+     * {@link #getResolver}.
+     */
+    public static final EngineMapping JDO =
+        new EngineMapping( "jdo", "org.exolab.castor.jdo.engine.JDOMappingLoader" );
 
 
-    public static final EngineMapping DAX = new EngineMapping( "jdo", "org.exolab.castor.dax.engine.DAXMappingLoader" );
+    /**
+     * Use this object to obtain the mapping resolver for DAX from
+     * {@link #getResolver}.
+     */
+    public static final EngineMapping DAX =
+        new EngineMapping( "jdo", "org.exolab.castor.dax.engine.DAXMappingLoader" );
 
 
-    public static final EngineMapping XML = new EngineMapping( "jdo", "org.exolab.castor.xml.XMLMappingLoader" );
+    /**
+     * Use this object to obtain the mapping resolver for XML from
+     * {@link #getResolver}.
+     */
+    public static final EngineMapping XML =
+        new EngineMapping( "jdo", "org.exolab.castor.xml.XMLMappingLoader" );
 
 
     /**
@@ -185,6 +204,21 @@ public class Mapping
     }
 
 
+    /**
+     * Returns a mapping resolver for the suitable engine. The engine's
+     * specific mapping loader is created and used to create engine
+     * specific descriptors, returning a suitable mapping resolver.
+     * The mapping resolver is cached in memory and returned in
+     * subsequent method calls.
+     *
+     * @param engine The mapping engine
+     * @return A mapping resolver
+     * @throws MappingException A mapping error occured preventing
+     *  descriptors from being generated from the loaded mapping
+     * @see #JDO
+     * @see #XML
+     * @see #DAX
+     */
     public MappingResolver getResolver( EngineMapping engine )
         throws MappingException
     {
