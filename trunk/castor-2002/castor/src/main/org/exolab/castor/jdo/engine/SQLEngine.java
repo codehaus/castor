@@ -50,6 +50,7 @@ package org.exolab.castor.jdo.engine;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Stack;
+import java.util.Properties;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.CallableStatement;
@@ -484,9 +485,10 @@ public final class SQLEngine implements Persistence {
      *
      * Result key will be in java type.
      */
-    private Object generateKey( Object conn ) throws PersistenceException {
+    private Object generateKey( Object conn, PreparedStatement stmt ) throws PersistenceException {
         Object identity;
         Connection connection;
+        Properties prop = null;
 
         if ( _keyGen.isInSameConnection() ) {
         	//System.out.println("using same connection as transaction. Dangerous!");
@@ -496,9 +498,13 @@ public final class SQLEngine implements Persistence {
             connection = getSeparateConnection();
         }
 
+        if (stmt != null) {
+            prop = new Properties();
+            prop.put("insertStatement", stmt);
+        }
 		synchronized (connection) {
 			identity = _keyGen.generateKey( connection, _clsDesc.getTableName(),
-                _ids[0].name, null );
+                _ids[0].name, prop );
         }
 
         if ( identity == null )
@@ -529,7 +535,7 @@ public final class SQLEngine implements Persistence {
 
             // Generate key before INSERT
             else if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT )
-                identity = generateKey( conn );   // genKey return identity in JDO type
+                identity = generateKey( conn, null );   // genKey return identity in JDO type
 
 
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
@@ -610,7 +616,7 @@ public final class SQLEngine implements Persistence {
 
             // Generate key after INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT ) {
-                identity = generateKey( conn );
+                identity = generateKey( conn, stmt );
             }
 
             return identity;
