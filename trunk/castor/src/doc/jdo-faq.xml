@@ -243,11 +243,12 @@ db.commit()
         then it can be changed into (for example):
         <code><![CDATA[
         <database name="..." engine="oracle" >
-            <driver URL="jdbc:oracle:thin:@localhost:1521:TEST" 
-                    class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
-                <param name="user" value="SYSTEM" />
-                <param name="password" value="manager"/>
-            </driver>
+            <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
+                <params url="jdbc:oracle:thin:@localhost:1521:TEST"
+                        user="scott" 
+                        password="tiger"
+                />
+            </data-source>
             ...
         </database>
         ]]></code>
