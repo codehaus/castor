@@ -795,7 +795,6 @@ public final class SQLEngine implements Persistence {
             stmt.close();
             return null;
         } catch ( SQLException except ) {
-            except.printStackTrace();
             try {
                 // Close the insert/select statement
                 if ( stmt != null )
