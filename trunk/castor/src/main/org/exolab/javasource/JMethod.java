@@ -242,6 +242,16 @@ public class JMethod implements JMember {
     public JSourceCode getSourceCode() {
         return this.source;
     } //-- getSourceCode
+
+	/**
+	 * Sets the name of this JMember.
+	 *
+	 * @param name the name of this method
+	 **/
+	public void setName(String name) 
+	{		
+		_signature.setName(name);
+	} //-- setName
     
     /**
      * Sets the comment describing this member. The comment 
@@ -251,7 +261,8 @@ public class JMethod implements JMember {
      * @param comment the comment for this member
      * @see #getJDocComment
     **/
-    public void setComment(String comment) {
+    public void setComment(String comment) 
+	{
         jdc.setComment(comment);
     } //-- setComment
     
