@@ -364,6 +364,8 @@ public class Types
                       char[].class,               false,    null ),
         new TypeInfo( "strings",     null,
                       String[].class,             false,    null ),
+        new TypeInfo( "locale",      null,
+                      java.util.Locale.class,     true,     null ),
         /*
           new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
           new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
@@ -718,6 +720,42 @@ public class Types
                 }
             }
             public String toString() { return "String->Date"; }
+        } ),
+        new TypeConvertorInfo( java.util.Date.class, java.sql.Date.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return new java.sql.Date( ( (java.util.Date) obj ).getTime() );
+            }
+            public String toString() { return "util.Date->sql.Date"; }
+        } ),
+        new TypeConvertorInfo( java.sql.Date.class, java.util.Date.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return obj;
+            }
+            public String toString() { return "sql.Date->util.Date"; }
+        } ),
+        new TypeConvertorInfo( java.util.Date.class, java.sql.Time.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return new java.sql.Time( ( (java.util.Date) obj ).getTime() );
+            }
+            public String toString() { return "util.Date->sql.Time"; }
+        } ),
+        new TypeConvertorInfo( java.sql.Time.class, java.util.Date.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return obj;
+            }
+            public String toString() { return "sql.Time->util.Date"; }
+        } ),
+        new TypeConvertorInfo( java.util.Date.class, java.sql.Timestamp.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return new java.sql.Timestamp( ( (java.util.Date) obj ).getTime() );
+            }
+            public String toString() { return "util.Date->sql.Timestamp"; }
+        } ),
+        new TypeConvertorInfo( java.sql.Timestamp.class, java.util.Date.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return obj;
+            }
+            public String toString() { return "sql.TimestampDate->util.Date"; }
         } )
     };
 
