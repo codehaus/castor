@@ -74,6 +74,11 @@ import java.util.Enumeration;
 import java.lang.reflect.Method;
 
 
+//-- Ant
+import org.apache.tools.ant.*;
+import org.apache.tools.ant.taskdefs.*;
+import org.apache.tools.ant.types.*;
+
 /**
  * This class encapsulates all the common logic to run the test patterns for
  * Castor XML. Basically it handle the marshalling/marshalling/comparing. This
@@ -86,6 +91,7 @@ import java.lang.reflect.Method;
  * @version $Revision$ $Date$
  */
 public abstract class XMLTestCase extends TestCase {
+
 
     /**
      * Name of this test
@@ -227,7 +233,7 @@ public abstract class XMLTestCase extends TestCase {
     */
     public XMLTestCase(String name) {
         super(name);
-        _name = name;
+        _name = name;        
     }
 
     /**
@@ -730,6 +736,84 @@ public abstract class XMLTestCase extends TestCase {
         return builder.buildInstance();
     }
 
+    protected void compileDirectory(File srcDir) 
+        throws BuildException
+    {
+        
+        if (srcDir == null) {
+            throw new IllegalArgumentException("The argument 'srcDir' must not be null.");
+        }
+        
+        compileDirectory( srcDir, srcDir );
+        
+    } //-- compileDirectory
+        
+    protected void compileDirectory(File srcDir, File destDir) 
+        throws BuildException
+    {
+        if (srcDir == null) {
+            throw new IllegalArgumentException("The argument 'srcDir' must not be null.");
+        }
+        
+        if (destDir == null) destDir = srcDir;
+        
+        Project project = new Project();
+        project.init();
+        project.setBasedir(".");
+        Javac compiler = new Javac();
+        compiler.setProject(project);
+        compiler.setFork(true);
+        compiler.setDestdir(destDir.getAbsoluteFile());
+        Path classpath = compiler.createClasspath();
+        classpath.setPath(System.getProperty("java.class.path"));
+        compiler.setClasspath(classpath);
+        
+        compileDirectory(srcDir, compiler);
+        
+        
+    } //-- compileDirectory
+    
+        
+    private void compileDirectory(File srcDir, Javac compiler) 
+        throws BuildException
+    {
+        
+        
+        if (compiler == null) {
+            Project project = new Project();
+            project.init();
+            project.setBasedir(".");
+            compiler = new Javac();
+            compiler.setProject(project);
+            compiler.setFork(true);
+            compiler.setDestdir(srcDir.getAbsoluteFile());
+            Path classpath = compiler.createClasspath();
+            classpath.setPath(System.getProperty("java.class.path"));
+            compiler.setClasspath(classpath);
+        }
+        
+        //--no argument checking
+        File[] entries = srcDir.listFiles();
+        
+        for(int i=0; i<entries.length; i++) {
+            File entry = entries[i];
+            if (entry.isDirectory() && !entry.getName().endsWith("CVS")) {
+                 compileDirectory(entry, compiler);
+            }
+        }
+        entries = null;
+        
+        Path sourcepath = compiler.createSrc(); 
+        //--Are we compiling nested packages?
+        //if (srcDir.equals(_outputRootFile))
+             sourcepath.setLocation(srcDir);
+        //else 
+            //sourcepath.setLocation(directory.getParentFile());
+        compiler.setSrcdir(sourcepath);
+        compiler.execute();
+        
+    }
+    
     /**
      * print the message if in verbose mode.
      */
