@@ -10,16 +10,10 @@ package org.exolab.castor.jdo;
  * @version $Revision$ $Date$
  */
 public class DatabaseNotFoundException
-    extends Exception
+    extends PersistenceException
 {
     
 
-    public DatabaseNotFoundException()
-    {
-        super();
-    }
-
-    
     public DatabaseNotFoundException( String message )
     {
         super( message );
