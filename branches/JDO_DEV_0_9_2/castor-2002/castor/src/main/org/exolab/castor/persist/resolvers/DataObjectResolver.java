@@ -54,7 +54,6 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.AccessMode;
-import org.exolab.castor.persist.Resolver;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -190,13 +189,25 @@ public class DataObjectResolver extends Resolver {
         return newInstance;
     }
 
+    public void preCreate( TransactionContext tx, OID oid, Object objectToBeCreated )
+            throws PersistenceException {
+
+        // must add to transaction first to to prevent circular references.
+        tx.addObjectEntry( oid, objectToBeCreated );
+
+        // iterate thru all avaliable strategies
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.preCreate( tx, oid, objectToBeCreated );
+        }
+
+    }
+
     public void create( TransactionContext tx, OID oid, Object objectToBeCreated )
             throws DuplicateIdentityException, PersistenceException {
 
         Entity entity = new Entity();
-
-        // must add to transaction first to to prevent circular references.
-        tx.addObjectEntry( oid, objectToBeCreated );
 
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
@@ -209,8 +220,19 @@ public class DataObjectResolver extends Resolver {
 
         le.create( tx.getKey(), entity );
 
+    }
+
+    public void postCreate( TransactionContext tx, OID oid, Object objectToBeCreated )
+            throws DuplicateIdentityException, PersistenceException {
+
+        // yip: should I do something to the LockEngine here?
+        Entity entity = new Entity();
+        LockEngine le        = getLockEngine( tx, oid );
+
+        le.create( tx.getKey(), entity );
+
         // iterate thru all avaliable strategies
-        itor = strategies.iterator();
+        Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
             ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
             strategy.postCreate( tx, oid, objectToBeCreated, entity );
