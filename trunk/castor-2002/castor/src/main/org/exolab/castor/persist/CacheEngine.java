@@ -934,14 +934,6 @@ public final class CacheEngine
                                 ClassHandler relHandler;
 
                                 relHandler = relations[ i ].getRelatedHandler();
-                                // The loading will also load the related objects.
-                                // We don't need this for future deletion of this object.
-                                // Moreover, this may yield errors if
-                                // the related object will be updated later
-                                // Therefore, we must clean all references to
-                                // the related objects before loading
-                                clearRelatedForDependent( tx,
-                                        relHandler.getJavaClass(), origIdentity[ j ] );
                                 tx.load( this, relHandler, origIdentity[ j ], accessMode );
                             }
                         }
@@ -990,59 +982,6 @@ public final class CacheEngine
             }
             // Otherwise indicate that the object should be created
             return null;
-        }
-    }
-
-
-    /**
-     * Clear all references to all related objects in the cache
-     * for the given identity. Used during update of the dependent objects.
-     */
-    void clearRelatedForDependent( TransactionContext tx, Class type, Object identity )
-        throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
-               PersistenceException, ClassNotPersistenceCapableException
-    {
-        Object[]   fields;
-        OID        oid;
-        ObjectLock lock;
-        TypeInfo   typeInfo;
-        boolean    writeLock;
-
-        typeInfo = (TypeInfo) _typeInfo.get( type );
-        if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
-
-        // Create an OID to represent the object and see if we
-        // have a lock (i.e. object is cached).
-        oid = new OID( typeInfo.handler, identity );
-        lock = typeInfo.cache.getLockForAquire( oid );
-
-        if ( lock == null ) {
-            // The dependent object not found in the cache
-            // This is an error, probably the cache capacity for the dependent
-            // class is not enough
-            throw new ObjectNotFoundExceptionImpl( type, identity );
-        } else {
-            // Object has been loaded before, must acquire lock
-            // on it (write in exclusive mode)
-            try {
-                fields = (Object[]) lock.acquire( tx, true, 0 );
-            } catch ( ObjectDeletedWaitingForLockException except ) {
-                // This is equivalent to object not existing
-                throw new ObjectNotFoundExceptionImpl( type, identity );
-            } finally {
-                // signal cache that it's now safe to release the object
-                // from transcation state to cache state.
-                typeInfo.cache.finishLockForAquire( oid );
-            }
-
-            // update all dependent and related objects
-            RelationHandler[] relations;
-
-            relations = typeInfo.handler.getRelations();
-            for ( int i = 0 ; i < relations.length ; ++i ) 
-                if ( relations[ i ] != null && ! relations[ i ].isMulti() ) 
-                    fields[ i ] = null;
         }
     }
 
