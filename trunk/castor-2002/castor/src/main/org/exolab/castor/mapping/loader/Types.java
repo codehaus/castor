@@ -171,6 +171,11 @@ public class Types
      */
     public static Class typeFromPrimitive( Class type )
     {
+        /// Fix for arrays
+        if ((type != null) & (type.isArray())) {
+            return typeFromPrimitive( type.getComponentType() );
+        }
+        /// end fix
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( _typeInfos[ i ].primitive == type )
                 return _typeInfos[ i ].javaType;
