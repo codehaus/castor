@@ -65,9 +65,6 @@ import java.util.Hashtable;
 public class TypeConversion {
 
 
-    public static final String TIME_FORMAT
-        = "CCYY-MM-DDThh:mm:ss.sss";
-
     private static OrderedMap sjNameMap = iCreateNameMap();
 
     /**
@@ -154,6 +151,7 @@ public class TypeConversion {
 
         //-- determine base type
         SimpleType base = simpleType;
+
         while ((base != null) && (!base.isBuiltInType())) {
             base = (SimpleType)base.getBaseType();
         }
@@ -189,6 +187,9 @@ public class TypeConversion {
                 //-- boolean
                 case SimpleTypesFactory.BOOLEAN_TYPE:
                     return new XSBoolean();
+                //-- date
+                case SimpleTypesFactory.DATE_TYPE:
+                    return new XSDate();
                 //-- double
                 case SimpleTypesFactory.DOUBLE_TYPE:
                     return new XSReal();
@@ -233,9 +234,16 @@ public class TypeConversion {
                 //-- string
                 case SimpleTypesFactory.STRING_TYPE:
                     return toXSString(simpleType);
+                //-- time
+                case SimpleTypesFactory.TIME_TYPE:
+                    return new XSTime();
                 //-- timeInstant
                 case SimpleTypesFactory.TIME_INSTANT_TYPE:
                     return new XSTimeInstant();
+                //-- Time duration
+                case SimpleTypesFactory.TIME_DURATION_TYPE:
+                    return new XSTimeduration();
+                    //return new XSLong();
                 //-- decimal
                 case SimpleTypesFactory.DECIMAL_TYPE:
                     return new XSDecimal();
@@ -362,7 +370,7 @@ public class TypeConversion {
 
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();
-            
+
             //-- maxExclusive
             if (Facet.MAX_EXCLUSIVE.equals(name))
                 xsLong.setMaxExclusive(facet.toLong());
@@ -381,7 +389,7 @@ public class TypeConversion {
         }
 
     } //-- readLongFacets
-    
+
     /**
      * Reads and sets the facets for XSShort
      * @param simpletype the Simpletype containing the facets
@@ -465,7 +473,7 @@ public class TypeConversion {
     **/
     private static OrderedMap iCreateNameMap() {
 
-        OrderedMap nameMap = new OrderedMap(10);
+        OrderedMap nameMap = new OrderedMap(20);
 
         //-- #IDREF...temporary this will be changed, once
         //-- I add in the Resolver code
@@ -481,11 +489,17 @@ public class TypeConversion {
         nameMap.put("uriReference",         "java.lang.String");
         nameMap.put("binary",              "byte[]");
         nameMap.put("boolean",             "boolean");
+        //nameMap.put("date",                "java.util.date");
+        nameMap.put("date",                "org.exolab.castor.types.Date");
         nameMap.put("integer",             "int");
         nameMap.put("negativeInteger",     "int");
         nameMap.put("positiveInteger",     "int");
         nameMap.put("real",                "double");
         nameMap.put("string",              "java.lang.String");
+        //nameMap.put("time",                "java.sql.Time");
+        nameMap.put("time",                "org.exolab.castor.types.Time");
+        nameMap.put("timeDuration",        "org.exolab.castor.types.TimeDuration");
+       // nameMap.put("timeDuration",        "long");
         nameMap.put("timeInstant",         "java.util.Date");
         nameMap.put("decimal",             "java.util.BigDecimal");
         nameMap.put("short",               "short");
