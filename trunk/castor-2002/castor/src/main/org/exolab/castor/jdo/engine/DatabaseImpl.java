@@ -134,6 +134,12 @@ public class DatabaseImpl
     private Transaction         _transaction;
 
 
+    /*
+     * True if user prefer all reachable object to be stored automatically.
+     * False if user want only dependent object to be stored.
+     */
+    private boolean _autoStore;
+
     /**
      * The class loader for application classes (may be null).
      */
@@ -161,6 +167,7 @@ public class DatabaseImpl
         if ( _transaction != null ) {
             _ctx = new TransactionContextImpl( this, true );
             _ctx.setLockTimeout( _lockTimeout );
+            _ctx.setAutoStore( _autoStore );
         }
         _classLoader = classLoader;
     }
@@ -173,6 +180,13 @@ public class DatabaseImpl
         return _scope;
     }
 
+    /*
+     * True if user prefer all reachable object to be stored automatically.
+     * False if user want only dependent object to be stored.
+     */
+    public void setAutoStore( boolean autoStore ) {
+        _autoStore = autoStore;
+    }
 
     /**
      * Gets the current application ClassLoader's instance. 
@@ -424,6 +438,7 @@ public class DatabaseImpl
 
         _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
+        _ctx.setAutoStore( _autoStore );
     }
 
 
