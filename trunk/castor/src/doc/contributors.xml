@@ -51,12 +51,21 @@
   </contributor>
 
   <contributor type="Committer">
+    <name surname="Guttman" given="Werner" />
+    <email>werner.guttman@gmx.de</email>
+    <description>
+    JDO enhancements including TransactionManagerFactory API, the API for JDBC
+    parameters and much more.
+    </description>
+  </contributor>
+
+  <contributor type="Committer">
     <name surname="Yip" given="Thomas"/>
     <email>yip@intalio.com</email>
     <company id="intalio"/>
     <description>
       Lead developer of Castor JDO from late v.0.8 to early v.0.9.
-      Enhancements to the lock model, LRU cache, lazy loading, multi-pk, m-n support, etc; bugs fixes, test cases, and documentation.
+      Enhancements to the lock model, LRU cache, lazy loading, multi-pk, m-n support, etc; bugs fixes, test cases, and documentation. (non-active)
     </description>
   </contributor>
 
