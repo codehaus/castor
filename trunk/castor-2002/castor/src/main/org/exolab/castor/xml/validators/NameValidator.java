@@ -54,7 +54,7 @@ import org.exolab.castor.xml.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class NameValidator implements TypeValidator {
+public class NameValidator extends StringValidator {
     
     
     public static final short NCNAME  = 0;
@@ -92,12 +92,7 @@ public class NameValidator implements TypeValidator {
     public void validate(String value) 
         throws ValidationException 
     {
-        if (value == null) {
-            if (required) {
-                String err = "this is a required field and cannot be null.";
-                throw new ValidationException(err);
-            }
-        }
+        super.validate(value);
         
         switch (type) {
             
