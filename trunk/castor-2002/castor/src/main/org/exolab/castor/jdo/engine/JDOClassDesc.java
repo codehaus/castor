@@ -81,6 +81,12 @@ public class JDOClassDesc
 
 
     /**
+     * All the related tables/classes.
+     */
+    private JDORelationDesc[]  _related;
+
+
+    /**
      * Constructs a new JDO descriptor. The field list must consist only of
      * JDO field, must not include the identity field, all contained fields
      * must be represented as {@link JDOContainedFieldDesc}. Order of fields
@@ -94,25 +100,40 @@ public class JDOClassDesc
      *   may be null
      * @param extend The descriptor of the class which this class extends,
      * or null if this is a top-level class
+     * @param related Describes all relations
      * @throws MappingException Invalid mapping information
      */
     public JDOClassDesc( Class javaClass, String tableName, JDOFieldDesc[] fields,
-			 FieldDesc identity, JDOClassDesc extend )
-	throws MappingException
+                         FieldDesc identity, JDORelationDesc[] related, JDOClassDesc extend )
+        throws MappingException
     {
-	super( javaClass, fields, identity, extend );
-	if ( tableName == null )
-	    throw new IllegalArgumentException( "Argument 'tableName' is null" );
-	_tableName = tableName;
-	if ( identity == null )
-	    throw new MappingException( "mapping.noIdentity", javaClass.getName() );
-	if ( ! ( identity instanceof JDOFieldDesc ) &&
-	     ! ( identity instanceof ContainerFieldDesc ) )
-	    throw new IllegalArgumentException( "Identity field must be of type JDOFieldDesc or ContainerFieldDesc" );
-	for ( int i = 0 ; i < fields.length ; ++i ) {
-	    if ( fields[ i ].isDirtyCheck() )
-		_dirtyCheck = true;
-	}
+        super( javaClass, fields, identity, extend );
+        if ( tableName == null )
+            throw new IllegalArgumentException( "Argument 'tableName' is null" );
+        _tableName = tableName;
+        if ( identity == null )
+            throw new MappingException( "mapping.noIdentity", javaClass.getName() );
+        if ( ! ( identity instanceof JDOFieldDesc ) &&
+             ! ( identity instanceof ContainerFieldDesc ) )
+            throw new IllegalArgumentException( "Identity field must be of type JDOFieldDesc or ContainerFieldDesc" );
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ].isDirtyCheck() )
+                _dirtyCheck = true;
+        }
+        _related = related;
+    }
+
+
+    /**
+     * Constructor used by derived classes.
+     */
+    protected JDOClassDesc( JDOClassDesc clsDesc )
+        throws MappingException
+    {
+        super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getIdentity(), clsDesc.getExtends() );
+        _tableName = clsDesc._tableName;
+        _dirtyCheck = clsDesc._dirtyCheck;
+        _related = clsDesc._related;
     }
 
 
@@ -182,7 +203,7 @@ public class JDOClassDesc
      */
     public boolean isDirtyCheck()
     {
-	return _dirtyCheck;
+        return _dirtyCheck;
     }
 
 
@@ -193,57 +214,22 @@ public class JDOClassDesc
      */
     public String getTableName()
     {
-	return _tableName;
+        return _tableName;
     }
 
 
+    /**
+     * Returns the relations (tables/classes).
+     *
+     * @return Relations, may be null
+     */
+    public JDORelationDesc[] getRelations()
+    {
+        return _related;
+    }
 
 
     /*
-    public JDOFieldDesc[] getJDOFields()
-    {
-	FieldDesc[]    fields = getFields();
-	JDOFieldDesc[] jdos = new JDOFieldDesc[ fields.length ];
-	for ( int i = 0 ; i < fields.length ; ++i )
-	    jdos[ i ] = (JDOFieldDesc) fields[ i ];
-	return jdos;
-    }
-
-
-    private PrimaryKeyDesc _primKey;
-    private RelationDesc[] _related;
-
-    public RelationDesc[] getRelated()
-    {
-	return (RelationDesc[]) _related.clone();
-    }
-
-    public PrimaryKeyDesc getPrimaryKey()
-    {
-	return _primKey;
-    }
-
-    public JDOFieldDesc getPrimaryKeyField()
-    {
-	return (JDOFieldDesc) getIdentityField();
-    }
-
-    public String getSQLName()
-    {
-	return _tableName;
-    }
-
-    public String getSQLName( String colName )
-    {
-	return _tableName + "." + colName;
-    }
-
-    public String getSQLName( JDOFieldDesc field )
-    {
-	return _tableName + "." + field.getSQLName();
-    }
-
-
     public void copyInto( Object source, Object target )
     {
 	super.copyInto( source, target );
@@ -265,6 +251,12 @@ public class JDOClassDesc
         }
     } 
     */
+
+
+    public String toString()
+    {
+        return super.toString() + " AS " + _tableName;
+    }
 
 
 }
