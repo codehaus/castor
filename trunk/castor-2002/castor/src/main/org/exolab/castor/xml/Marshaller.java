@@ -81,18 +81,30 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class Marshaller extends MarshalFramework {
-
+    
+       
+    //---------------------------/
+    //- Private Class variables -/
+    //---------------------------/
+    
+    /**
+     * The CDATA type..uses for SAX attributes
+    **/
+    private static final String CDATA = "CDATA";
+    
+    /**
+     * Default prefix for use when creating 
+     * namespace prefixes.
+    **/
+    private static final String DEFAULT_PREFIX = "ns";
+    
+    
     /**
      * Message name for a non sax capable serializer error
     **/
     private static final String SERIALIZER_NOT_SAX_CAPABLE
         = "conf.serializerNotSaxCapable";
 
-    /**
-     * The XSI Namespace URI
-    **/
-    public static final String XSI_NAMESPACE
-        = "http://www.w3.org/2001/XMLSchema-instance";
 
     /**
      * The namespace declaration String
@@ -110,103 +122,134 @@ public class Marshaller extends MarshalFramework {
     private static final String XSI_TYPE = "xsi:type";
 
     /**
-     * The CDATA type..uses for SAX attributes
+     * Namespace prefix counter
+     * Arnaud, why is this static?
     **/
-    private static final String CDATA = "CDATA";
-
-    /**
-     * Constants used for the QName handling
-     */
-    private static final String QNAME_NAME = "QName";
-
-    private static final String DEFAULT_PREFIX = "ns";
-
     private static int NAMESPACE_COUNTER = 0;
-
-    /**
-     * A static flag used to enable debugging when using
-     * the static marshal methods.
-    **/
-    public static boolean enableDebug = false;
-
-    /**
-     * A flag indicating whether or not to generate
-     * debug information
-    **/
-    private boolean _debug = false;
-
-
-    /**
-     * The print writer used for logging
-    **/
-    private PrintWriter _logWriter = null;
-
-
-	/**
-	 * Insert NameSpace prefix declarations at the root node
-	 */
-	private boolean _nsPrefixAtRoot = false;
-
-	/**
-	 * Name of the root element to use
-	 */
-	private String _rootElement  = null;
-
-    /**
-     * The default namespace
-    **/
-    private String _defaultNamespace = null;
-
-    /**
-     * The validation flag
-    **/
-    private boolean _validate = false;
-
-   /**
-     * The current namespace scoping
-    **/
-    private List _nsScope = null;
-
-    /**
-     * The ClassDescriptorResolver used for resolving XMLClassDescriptors
-    **/
-    private ClassDescriptorResolver _cdResolver = null;
-
-     /**
-      * The namespace stack
-      */
-     private Namespaces _namespaces = null;
-
-    private DocumentHandler  _handler      = null;
-    private Serializer       _serializer   = null;
-    private XMLNaming        _naming       = null;
-	private Node             _node         = null;
-
-    /**
-     * A boolean to indicate whether or not we are
-     * marshalling as a complete document or not.
-    **/
-    private boolean _asDocument = true;
-
-    /**
-     * The depth of the sub tree, 0 denotes document level
-    **/
-    int depth = 0;
-
-    private List   _packages = null;
-
-    private Stack   _parents  = null;
-
-	private boolean _marshalExtendedType = true;
 
     /**
      * An instance of StringClassDescriptor
     **/
     private static final StringClassDescriptor _StringClassDescriptor
         = new StringClassDescriptor();
+        
+    //---------------------------/
+    //- Public member variables -/
+    //---------------------------/
+    
+    /**
+     * A static flag used to enable debugging when using
+     * the static marshal methods.
+    **/
+    public static boolean enableDebug = false;
+
+    //----------------------------/
+    //- Private member variables -/
+    //----------------------------/
+    
+    /**
+     * A boolean to indicate whether or not we are
+     * marshalling as a complete document or not.
+    **/
+    private boolean _asDocument = true;
+    
+    /**
+     * The ClassDescriptorResolver used for resolving XMLClassDescriptors
+    **/
+    private ClassDescriptorResolver _cdResolver = null;
+    
+    /**
+     * A flag indicating whether or not to generate
+     * debug information
+    **/
+    private boolean _debug = false;
 
     /**
-     * Creates a new Marshaller
+     * The depth of the sub tree, 0 denotes document level
+    **/
+    int depth = 0;
+    
+    /**
+     * The default namespace
+    **/
+    private String _defaultNamespace = null;
+    
+    /**
+     * The document handler we are marshalling to
+    **/
+    private DocumentHandler  _handler      = null;
+    
+    /**
+     * The print writer used for logging
+    **/
+    private PrintWriter _logWriter = null;
+
+    /**
+     * flag to indicate whether or not to use xsi:type
+    **/
+	private boolean _marshalExtendedType = true;
+	
+    /**
+     * The namespace stack
+    **/
+    private Namespaces _namespaces = null;
+     
+    /**
+     * The XMLNaming instance being used.
+    **/
+    private XMLNaming _naming = null;
+    
+    /**
+     * A handle to the DOM node being marshalled. This
+     * will be null a DOM node was not passed in
+     * as an argument to a marshal method.
+    **/
+	private Node _node = null;
+	
+	/**
+	 * Insert NameSpace prefix declarations at the root node
+	 */
+	private boolean _nsPrefixAtRoot = false;
+
+    /**
+     * The current namespace scoping
+    **/
+    private List _nsScope = null;
+    
+    /**
+     * current java packages being used during marshalling
+    **/
+    private List   _packages = null;
+    
+    /**
+     * A stack of parent objects...to prevent circular
+     * references from being marshalled.
+    **/
+    private Stack   _parents  = null;
+    
+	/**
+	 * Name of the root element to use
+	 */
+	private String _rootElement  = null;
+
+    /**
+     * The serializer that is being used for marshalling.
+     * This may be null if the user passed in a DocumentHandler.
+    **/
+    private Serializer       _serializer   = null;
+    
+    /**
+     * The validation flag
+    **/
+    private boolean _validate = false;
+
+
+
+
+    /**
+     * Creates a new Marshaller with the given DocumentHandler.
+     *
+     * @param handler the DocumentHandler to "marshal" to.
     **/
     public Marshaller( DocumentHandler handler ) {
         if ( handler == null )
@@ -219,7 +262,8 @@ public class Marshaller extends MarshalFramework {
 
 
     /**
-     * Creates a new Marshaller with the given writer
+     * Creates a new Marshaller with the given writer.
+     *
      * @param out the Writer to serialize to
     **/
     public Marshaller( Writer out )
@@ -248,8 +292,10 @@ public class Marshaller extends MarshalFramework {
     } //-- Marshaller
 
 	/**
-	 * Creates a new Marshaller
-	 */
+	 * Creates a new Marshaller for the given DOM Node.
+	 * 
+	 * @param node the DOM node to marshal into.
+	**/
 	public Marshaller( Node node )
 	{
         if ( node == null )
@@ -814,8 +860,29 @@ public class Marshaller extends MarshalFramework {
 
         //-- xsi:type
         if (saveType) {
+            
+            //-- reassign saveType variable to indicate whether or not
+            //-- the xsi namespace was declared
             saveType = declareNamespace(XSI_PREFIX, XSI_NAMESPACE, atts);
-            atts.addAttribute(XSI_TYPE, CDATA, "java:"+_class.getName());
+            
+            //-- calculate type name, either use class name or
+            //-- schema type name. If XMLClassDescriptor is introspected,
+            //-- or is the default XMLClassDescriptorImpl, then
+            //-- use java:classname, otherwise use XML name.
+            String typeName = classDesc.getXMLName();
+            if ((typeName == null) || Introspector.introspected(classDesc)) {
+                typeName = JAVA_PREFIX + _class.getName();
+            }
+            else {
+                //-- Before uncommenting this, UnmarshalHandler needs
+                //-- to be updated...kv 20020115
+                String dcn = classDesc.getClass().getName();
+                if (dcn.equals(XMLClassDescriptorImpl.class.getName())) {
+                    typeName = JAVA_PREFIX + _class.getName();
+                }
+            }
+            //-- save type information
+            atts.addAttribute(XSI_TYPE, CDATA, typeName);
         }
 
         //------------------/
