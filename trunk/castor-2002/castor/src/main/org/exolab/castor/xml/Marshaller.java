@@ -937,7 +937,11 @@ public class Marshaller {
     private XMLClassDescriptor getClassDescriptor(Class _class)
         throws MarshalException
     {
-        XMLClassDescriptor classDesc = _cdResolver.resolve(_class);
+        XMLClassDescriptor classDesc = null;
+
+        if (! UnmarshalHandler.isPrimitive(_class))
+            classDesc = _cdResolver.resolve(_class);
+
         if (_cdResolver.error()) {
             throw new MarshalException(_cdResolver.getErrorMessage());
         }

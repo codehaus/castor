@@ -1148,7 +1148,10 @@ public class UnmarshalHandler implements DocumentHandler {
         if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl();
 
-        XMLClassDescriptor classDesc = _cdResolver.resolve(_class);
+        XMLClassDescriptor classDesc = null;
+
+        if (!isPrimitive(_class))
+            classDesc = _cdResolver.resolve(_class);
 
         if (classDesc != null) return classDesc;
 
@@ -1179,8 +1182,7 @@ public class UnmarshalHandler implements DocumentHandler {
         if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl();
 
-        XMLClassDescriptor classDesc
-            = _cdResolver.resolve(className, loader);
+        XMLClassDescriptor classDesc = _cdResolver.resolve(className, loader);
 
         if (classDesc != null) return classDesc;
 
@@ -1215,7 +1217,7 @@ public class UnmarshalHandler implements DocumentHandler {
      * @return true if the given class should be treated as a primitive
      * type
     **/
-    private boolean isPrimitive(Class type) {
+    public static boolean isPrimitive(Class type) {
 
         if (type.isPrimitive()) return true;
 
