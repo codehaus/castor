@@ -177,6 +177,7 @@
         </section>
 
         <section title="Refactor the SQLTypeConvertors">
+        <p>
         <b>Description:</b><br />
         The SQLTypeConvertors inner class of SQLTypes should be refactored to 
         make it easier to plug in additional convertors. 
@@ -186,6 +187,7 @@
         <b>Status:</b> not started<br />
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
+        </p>
         </section>
 
         <section title="Query Externalization">
