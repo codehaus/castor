@@ -131,6 +131,16 @@ public final class QueryResults
     
     
     /**
+     * Returns the associated query.
+     *
+     * @return The query
+     */
+    public PersistenceQuery getQuery()
+    {
+        return _query;
+    }
+    
+    /**
      * Returns the type of object returned by this query.
      *
      * @return The type of object returned by this query
@@ -216,7 +226,7 @@ public final class QueryResults
         handler = _engine.getClassMolder( _query.getResultType() );
 
         // load the object thur the transaction of the query
-        object = _tx.load( _engine, handler, _lastIdentity, null, _accessMode );
+        object = _tx.load( _engine, handler, _lastIdentity, null, _accessMode, this );
 
         return object;
 

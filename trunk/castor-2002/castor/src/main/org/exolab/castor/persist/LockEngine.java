@@ -321,6 +321,12 @@ public final class LockEngine {
     public OID load( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
             ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
+        return load( tx, oid, object, suggestedAccessMode, timeout, null );
+    }
+
+    public OID load( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout, QueryResults results )
+            throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
+            ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
 
         OID        lockedOid;
         ObjectLock lock;
@@ -352,7 +358,7 @@ public final class LockEngine {
 
             lockedOid = lock.getOID();
 
-            Object stamp = typeInfo.molder.load( tx, lockedOid, lock, object, suggestedAccessMode );
+            Object stamp = typeInfo.molder.load( tx, lockedOid, lock, object, suggestedAccessMode, results );
             // proposal change: lockedOid parameter is not really neccesary.
             // we can added getOID() method in DepositBox. It make code a little
             // bit clear?
