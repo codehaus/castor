@@ -70,18 +70,6 @@ public final class MySQLFactory
     {
         return "mysql";
     }
-
-    /**
-     * MySQL handles TIMESTAMP incorrectly: dirty checking fails???
-     */
-    public Class adjustSqlType( Class sqlType ) {
-        if (sqlType == java.sql.Timestamp.class) {
-            return java.sql.Date.class;
-        } else {
-            return sqlType;
-        }
-    }
-    
 }
 
 
