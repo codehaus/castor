@@ -51,6 +51,8 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
+
 import org.exolab.castor.util.Configuration;
 
 import org.exolab.castor.xml.*;
@@ -137,6 +139,31 @@ public class XMLClassDescriptorAdapter
         FieldDescriptor   identity = classDesc.getIdentity();
         FieldDescriptor[] fields   = classDesc.getFields();
         
+        //-- Note from Keith for anyone interested...
+        //-- hack for multiple identities if ClassDescriptor is
+        //-- an implementation of ClassDescriptorImpl...
+        //-- This is really a bug in ClassDescriptorImpl, but 
+        //-- since it's shared code between JDO + XML I don't
+        //-- want to change it there until both the XML and JDO 
+        //-- folks can both approve the change.
+        if (classDesc instanceof ClassDescriptorImpl) {
+            ClassDescriptorImpl cdImpl = (ClassDescriptorImpl)classDesc;
+            FieldDescriptor[] identities = cdImpl.getIdentities();
+            if ((identities != null) && (identities.length > 1)) {
+                int size = fields.length + identities.length;
+                FieldDescriptor[] newFields = new FieldDescriptor[size];
+                int idx = 0;
+                for ( ; idx < fields.length; idx++) {
+                    newFields[idx] = fields[idx];
+                }
+                for (int i = 0; i < identities.length; i++) {
+                    newFields[idx++] = identities[i];
+                }
+                fields = newFields;
+            }
+        }
+        //-- End ClassDescriptorImpl fix
+        
         for (int i = 0; i < fields.length; i++) {
             FieldDescriptor fieldDesc = fields[i];
             if (fieldDesc == null) continue;
@@ -171,7 +198,11 @@ public class XMLClassDescriptorAdapter
                 }
             }
         }
-        //-- handle Identity if it wasn't already handled
+        
+        //-- Handle Identity if it wasn't already handled. This occurs
+        //-- if the ClassDescriptor implementation doesn't return
+        //-- the identity field as part of the collection of fields
+        //-- returned by getFields (even though it should).
         if ( identity != null ) {
             String  xmlFieldName;
             if ( identity instanceof XMLFieldDescriptor ) {
@@ -183,6 +214,7 @@ public class XMLClassDescriptorAdapter
                 setIdentity(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
             }
         }
+        
         //-- handle inheritence
         XMLClassDescriptor xmlClassDesc = null;
         ClassDescriptor extendsDesc = classDesc.getExtends();
