@@ -92,6 +92,10 @@
         <display>Source generator</display>
       </navLink>
       <navLink>
+        <url>xmlschema.xml</url>
+        <display>XML Schema Support</display>
+      </navLink>
+      <navLink>
         <url>examples.xml</url>
         <display>Running The Examples</display>
       </navLink>
