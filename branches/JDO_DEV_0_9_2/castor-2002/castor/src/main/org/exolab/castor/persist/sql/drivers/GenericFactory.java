@@ -55,7 +55,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.LogInterceptor;
 
 
 /**
