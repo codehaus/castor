@@ -311,7 +311,7 @@ public final class SQLEngine implements Persistence {
                 break;
             }
         }
-        
+
         _log.debug ("hasFieldsToPersist = " + hasFieldsToPersist);
         
         try {
@@ -599,6 +599,7 @@ public final class SQLEngine implements Persistence {
                         if ( _fields[i].columns.length != 1 )
                             throw new PersistenceException( "Complex field expected! ");
 
+                        _log.debug( "Storing field: " + _fields[i] );
                         SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
                     }
                 }
@@ -927,7 +928,9 @@ public final class SQLEngine implements Persistence {
                             for(int i = 0; i < fields.length; i++){
                                 currentField = toJava(i, 0, res.getObject(_fields[i].columns[0].name));
                                 
-                                if (_fields[i].tableName.compareTo(_mapTo) == 0 && !original[i].equals(currentField)) {
+                                if ( currentField != null &&
+                                     _fields[i].tableName.compareTo(_mapTo) == 0 && 
+                                     !original[i].equals(currentField) ) {
                                     if (numberOfFieldsNotMatching >= 1) {
                                         enlistFieldsNotMatching.append (", ");
                                     }
