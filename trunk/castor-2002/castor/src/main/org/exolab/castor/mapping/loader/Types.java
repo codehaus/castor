@@ -330,9 +330,9 @@ public class Types
      * @return The full pattern
      */
     public static String getFullDatePattern( String pattern )
-    {        
+    {
         StringBuffer sb;
-        int len; 
+        int len;
 
         if ( pattern == null || pattern.length() == 0 )
             return "yyyyMMdd";
@@ -989,10 +989,41 @@ public class Types
 
         new TypeConvertorInfo( java.sql.Timestamp.class, java.util.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
+
                 java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
                 return new Date(timestamp.getTime() + timestamp.getNanos() / 1000000);
             }
             public String toString() { return "sql.Timestamp->util.Date"; }
+        } ),
+        new TypeConvertorInfo( java.lang.String.class, java.sql.Timestamp.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                long time;
+                if ( param == null || param.length() ==  0 ) {
+                    param = "yyyy-MM-dd HH:mm:ss.SSS";
+                }
+                try {
+                    _paramDateFormat.applyPattern( param );
+                    time = _paramDateFormat.parse( (String) obj ).getTime();
+                } catch ( ParseException except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+                java.sql.Timestamp timestamp = new java.sql.Timestamp(time);
+                timestamp.setNanos((int) ((time % 1000) * 1000000));
+                return timestamp;
+            }
+            public String toString() { return "String->sql.Timestamp"; }
+        } ),
+
+        new TypeConvertorInfo( java.sql.Timestamp.class, java.lang.String.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                if ( param == null || param.length() ==  0 ) {
+                    param = "yyyy-MM-dd HH:mm:ss.SSS";
+                }
+                java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
+                _paramDateFormat.applyPattern( param );
+                return _paramDateFormat.format( new Date(timestamp.getTime() + timestamp.getNanos() / 1000000) );
+            }
+            public String toString() { return "sql.Timestamp->String"; }
         } ),
         // InputStream convertors
         new TypeConvertorInfo( byte[].class, java.io.InputStream.class, new TypeConvertor() {
