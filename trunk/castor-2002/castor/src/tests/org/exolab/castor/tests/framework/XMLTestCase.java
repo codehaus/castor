@@ -171,7 +171,7 @@ public abstract class XMLTestCase extends TestCase {
         if (v!=null && v.equals("true"))
             _verbose = true;
         else
-            _verbose = false; 
+            _verbose = false;
     }
 
 
@@ -197,7 +197,7 @@ public abstract class XMLTestCase extends TestCase {
         _unitTest        = tc._unitTest;
         _outputRootFile  = tc._outputRootFile;
     }
-    
+
     /**
      * Create a new XMLTestCase with the given name.
      */
@@ -212,19 +212,20 @@ public abstract class XMLTestCase extends TestCase {
      * it to a file, unmarshall again and check that the object is equals to the
      * first object.
      */
-    public void testWithRandomObject()  
+    public void testWithRandomObject()
         throws java.lang.Exception {
 
         verbose("Test with randomly generated object");
 
         String outputName = _name.replace(' ', '_') + "-testWithRandomObject";
 
-        // 1. Randomize an object model instance 
+        // 1. Randomize an object model instance
         verbose("Randomize an object model instance with '" + _rootClassName + "' as root");
         CastorTestable randomizedObject = ((CastorTestable)_rootClass.newInstance());
         assertNotNull("Randomized object model is null", randomizedObject);
 
         randomizedObject.randomizeFields();
+        System.out.println(randomizedObject.dumpFields());
 
         // 2. Dump the object in a file if possible
         if (_hasDump) {
@@ -245,28 +246,29 @@ public abstract class XMLTestCase extends TestCase {
 
         // 5. Unmarshal
         verbose("Unmarshal the file");
-        Object  unmrashalledRandomizedObject= testUnmarshal(marshal_output);
-        assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", unmrashalledRandomizedObject);
-
+        Object  unmarshalledRandomizedObject = testUnmarshal(marshal_output);
+        assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", unmarshalledRandomizedObject);
+        System.out.println( ((CastorTestable)unmarshalledRandomizedObject).dumpFields());
         // 6. Dump the unmarshalled object in a file if possible
         if (_hasDump) {
             verbose("Dump the object into '" + outputName + "-unmar.dump" +"'");
             FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
-            writer.write(((CastorTestable)randomizedObject).dumpFields());
+            writer.write(((CastorTestable)unmarshalledRandomizedObject).dumpFields());
             writer.close();
         }
-        
+
         // 6. compare to initial model instance
-        boolean result = unmrashalledRandomizedObject.equals(randomizedObject);
+        boolean result = unmarshalledRandomizedObject.equals(randomizedObject);
+        System.out.println("Result:"+result);
         verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
         assert("The initial randomized object and the one that have been created by marshal/unmrashal are different", result);
-    }
+    }//testWithRandomObject
 
 
     /**
      * Use reference input, output file and ObjectModelInstanceBuilder if any to marshall, unmarshall
      */
-    public void testWithReferenceDocument()  
+    public void testWithReferenceDocument()
         throws java.lang.Exception {
 
         verbose("Test with reference document");
@@ -308,7 +310,7 @@ public abstract class XMLTestCase extends TestCase {
 
         // 4. Compare with output file if any
         if (_output != null) {
-            boolean result = XMLDiff.compareInputSource(new InputSource(_output), 
+            boolean result = XMLDiff.compareInputSource(new InputSource(_output),
                                                         new InputSource(new FileInputStream(marshal_output)));
             verbose("Compare to reference file '" + _outputName + "': " + ((result)?"OK":"Failed"));
             assert("Marshalled object differ from the reference file", result);
@@ -321,20 +323,20 @@ public abstract class XMLTestCase extends TestCase {
         verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
         assert("The unmarshalled object differ from the referene object", result);
     }
-    
+
 
     /**
      * Marshall the object with the configuration of the test.
      */
-    protected File testMarshal(Object object, String fileName) 
+    protected File testMarshal(Object object, String fileName)
         throws java.lang.Exception {
 
         File marshalOutput    = new File(_outputRootFile, fileName);
         Marshaller marshaller = new Marshaller(new FileWriter(marshalOutput));
-        
+
         if (_mapping != null)
             marshaller.setMapping(_mapping);
-        
+
         marshaller.marshal(object);
 
         return marshalOutput;
@@ -370,7 +372,7 @@ public abstract class XMLTestCase extends TestCase {
      * return an instance of the object model hardcoded in the given
      * ObjectModelInstanceBuilder.
      */
-    protected Object buildObjectModelInstance(String builderName) 
+    protected Object buildObjectModelInstance(String builderName)
         throws java.lang.Exception {
         Class builderClass = _jarTest.getClassLoader().loadClass(builderName);
         ObjectModelInstanceBuilder builder = (ObjectModelInstanceBuilder)builderClass.newInstance();
