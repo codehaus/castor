@@ -49,10 +49,17 @@ package org.exolab.castor.persist;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Externalizable;
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
 import java.io.OptionalDataException;
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +73,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Vector;
+
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -753,11 +764,6 @@ public class ClassMolder
                 // field is not primitive type. Related object will be loaded
                 // thru the transaction in action if needed.
 
-                // lazy loading for object (hollow object) is not support in
-                // this version. Warns user if lazy loading is specified.
-                if ( _fhs[i].isLazy() )
-                    _log.info("Lazy loading of object is not yet support!" );
-
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
@@ -765,7 +771,12 @@ public class ClassMolder
                     // use the corresponding Persistent fields as the identity,
                     // and we ask transactionContext in action to load it.
                     try {
-                        temp = tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
+						// should I use lazy loading for this object?
+						if (_fhs[i].isLazy()) {
+							temp = SingleProxy.getProxy(tx, fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode);
+						} else {
+							temp = tx.load(fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode);
+						}
                     } catch (ObjectNotFoundException ex) {
                         temp = null;
                     }
@@ -3187,3 +3198,159 @@ abstract class CollectionProxy {
     }
 }
 
+/**
+ * SingleProxy
+ */
+class SingleProxy 
+	implements MethodInterceptor, Serializable
+{
+	
+	private static Log _log = LogFactory.getFactory().getInstance(SingleProxy.class);
+	
+	TransactionContext _tx;
+	LockEngine _engine;
+	ClassMolder _classMolder;
+	Object _identity;
+	Object _object;
+	AccessMode _accessMode;
+	
+	boolean hasMaterialized = false;
+	
+	private SingleProxy(TransactionContext tx,
+			LockEngine engine,
+			ClassMolder classMolder,
+			Object identity,
+			Object object,
+			AccessMode accessMode) {
+		if ( _log.isDebugEnabled() ) {
+			_log.debug("create new SingleProxy -> " + classMolder.getName() + " with id " + identity);
+		}
+		_tx = tx;
+		_engine = engine;
+		_classMolder = classMolder;
+		_identity = identity;
+		_object = object;
+		_accessMode = accessMode;
+	}
+	
+	public static synchronized Object getProxy(TransactionContext tx, LockEngine engine, ClassMolder classMolder, Object identity, Object object, AccessMode accessMode) 
+		throws ObjectNotFoundException 
+	{
+		
+		SingleProxy sp = new SingleProxy(tx, engine, classMolder, identity, object, accessMode);
+		try {
+			Class clazz = Class.forName(classMolder.getName());
+			return Enhancer.create(clazz, new Class[]{LazyCGLIB.class}, sp);
+		} catch (Throwable ex) {
+			if ( _log.isErrorEnabled()) {
+				String msg = "error on enhance class";
+				if ( classMolder != null ) {
+					msg += " " + classMolder.getName();
+				}
+				_log.error(msg, ex);
+			}
+			throw new ObjectNotFoundException("lazy loading error - " + ex.getMessage());
+		}
+	}
+	
+	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) 
+		throws Throwable 
+	{
+	
+		String methodName = method.getName();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug ("Method " + methodName + " invoked on " + obj.getClass().getName() + "(MATERIALIZED = " + hasMaterialized + ")");
+		}
+		// to not load if method geClass() or finalize()
+		if ("writeReplace".equals(methodName)) {
+			_log.debug ("writeReplacing " + _classMolder.getName() + " with identity " + _identity);
+			if (!hasMaterialized) {
+				try {
+					_object = loadOnly ();
+				} catch (ObjectNotFoundException e) {
+					_log.error ("Object with identity " + _identity + " does not exist", e);
+					throw new NotSerializableException("Object with identity " + _identity + " does not exist");
+				} catch (PersistenceException e) {
+					_log.error ("Problem serializing object with identity " + _identity, e);
+					throw new NotSerializableException("Problem serializing object with identity " + _identity);
+				}
+			}
+			
+			_log.debug ("Serializing instance of " + _object.getClass().getName());
+			_log.debug ("_object = " + _object);
+			return _object;
+		} else if ( "getClass".equals(methodName) ) {
+			return method.invoke(obj, args);
+		} else if ( "finalize".equals(methodName) ) {
+			return method.invoke(obj, args);
+		} else if ("getId".equals(methodName)) {
+			if (!hasMaterialized) {
+				_log.debug ("Returning old identity: " + _identity + ", as object has NOT materialized.");
+				return _identity;
+			}
+		}
+		
+		// load object, if not previous loaded
+		if (_object == null) {
+			_object = load (obj);
+		}
+//			try {
+//				if ( _log.isDebugEnabled() && _classMolder != null ) {
+//					_log.debug("load object " + _classMolder.getName() + " with id " + _identity);
+//				}
+//				_object = _tx.load(_engine, _classMolder, _identity, _object, _accessMode);
+//				hasMaterialized = true;
+//			} catch (ObjectNotFoundException ex) {
+//				if ( _log.isDebugEnabled() ) {
+//					_log.debug("object not found -> " + ex.toString());
+//				}
+//				// if a ObjectNotFoundException occur then create a empty instance
+//				if ( obj instanceof net.sf.cglib.proxy.Factory ) {
+//					_object = obj.getClass().getSuperclass().newInstance();
+//				}
+//			}
+//		}
+		
+		// object found?
+		if ( _object == null ) {
+			return null;
+		}
+		
+		// invoke original method in loaded object
+		return method.invoke(_object, args);
+	}
+
+	private Object loadOnly ()
+		throws ObjectNotFoundException, PersistenceException  
+	{
+		Object instance = null;
+		if ( _log.isDebugEnabled() && _classMolder != null ) {
+			_log.debug("load object " + _classMolder.getName() + " with id " + _identity);
+		}
+		instance = _tx.load(_engine, _classMolder, _identity, _object, _accessMode);
+		hasMaterialized = true;
+		return instance;
+	}
+	
+
+	private Object load (Object proxiedObject)
+		throws PersistenceException, IllegalAccessException, InstantiationException  
+	{
+		Object instance = null;
+		try {
+			instance = loadOnly ();
+		}
+		catch (ObjectNotFoundException ex) {
+			if ( _log.isDebugEnabled() ) {
+				_log.debug("object not found -> " + ex.toString());
+			}
+			// if a ObjectNotFoundException occur then create a empty instance
+			if ( proxiedObject instanceof net.sf.cglib.proxy.Factory ) {
+				instance = proxiedObject.getClass().getSuperclass().newInstance();
+			}
+		}
+		return instance;
+	}
+	
+}
