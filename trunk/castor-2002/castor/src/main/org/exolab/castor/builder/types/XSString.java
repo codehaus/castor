@@ -80,10 +80,11 @@ public final class XSString extends XSPatternBase {
 
     /**
      * Creates a new XSString
-    **/
-    public XSString() {
+     */
+     public XSString() {
         super(XSType.STRING);
-    } //-- XSString
+    }
+
 
     /**
      * Returns the String necessary to convert an Object to

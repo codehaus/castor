@@ -213,5 +213,4 @@ public final class XSQName extends XSPatternBase {
         return this.jType;
     }
 
-
 } //-- XSQName
