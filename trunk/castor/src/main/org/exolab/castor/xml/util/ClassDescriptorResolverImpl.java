@@ -365,12 +365,22 @@ public class ClassDescriptorResolverImpl
         try {
             _class = loadClass(className, loader);
         }
+        catch(NoClassDefFoundError ncdfe){ 
+           /* A mapped element and a Java Class name can be spelled 
+              the same, but have different capitalization. This situation 
+              will throw this type of error- the ClassLoader will complain 
+              that the class is the 'wrong name' (i.e.
+              saltyfood vs. SaltyFood).
+            */
+            //-- save exception, for future calls with
+            //-- the same classname
+            saveClassNotFound(className, 
+                new ClassNotFoundException(ncdfe.getMessage()));
+        }
         catch(ClassNotFoundException cnfe) { 
             //-- save exception, for future calls with
             //-- the same classname
-            if (_classNotFoundList == null)
-                _classNotFoundList = new Hashtable();
-            _classNotFoundList.put(className, cnfe);
+            saveClassNotFound(className, cnfe);
         }
         
         if (_class != null) {
@@ -397,13 +407,29 @@ public class ClassDescriptorResolverImpl
             catch(ClassNotFoundException cnfe) { 
                 //-- save exception, for future calls with
                 //-- the same classname
-                if (_classNotFoundList == null)
-                    _classNotFoundList = new Hashtable();
-                _classNotFoundList.put(className, cnfe);
+                saveClassNotFound(className, cnfe);
             }
         }
         return classDesc;
     } //-- resolve(String, ClassLoader)
+    
+    /**
+     * Saves the ClassNotFoundException for future calls to the resolver
+     * 
+     * @param className
+     * @param cnfe
+     */
+    private void saveClassNotFound
+        (String className, ClassNotFoundException cnfe) 
+    {
+        //-- save exception, for future calls with
+        //-- the same classname
+        if (_classNotFoundList == null) {
+            _classNotFoundList = new Hashtable();
+        }
+        _classNotFoundList.put(className, cnfe);
+        
+    } //-- saveClassNotFound
     
     /**
      * Returns the first XMLClassDescriptor that matches the given
