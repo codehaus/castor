@@ -110,12 +110,11 @@ public interface Persistence {
      * @param tx The transaction context
      * @param conn An open connection
      * @param entity The entity to create
-     * @return The object's identity
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object create( TransactionContext tx, Object conn, Entity entity )
+    public void create( TransactionContext tx, Object conn, Entity entity )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -132,12 +131,11 @@ public interface Persistence {
      * @param conn An open connection
      * @param entity The entity to load into
      * @param accessMode The access mode (null equals shared)
-     * @return The object's stamp, or null
      * @throws ObjectNotFoundException The object was not found in
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
+    public void load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
 
@@ -154,7 +152,7 @@ public interface Persistence {
      * @param accessMode The access mode (null equals shared)
      * @throws PersistenceException A persistence error occured
      */
-    public Object loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
+    public void loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
         throws PersistenceException;
 
     /**
@@ -179,14 +177,13 @@ public interface Persistence {
      * @param conn An open connection
      * @param entity The entity to store
      * @param original The original entity, or null
-     * @return The object's stamp, or null
      * @throws ObjectModifiedException The object has been modified
      *  in persistence storage since it was last loaded
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( TransactionContext tx, Object conn, Entity entity, Entity orginal )
+    public void store( TransactionContext tx, Object conn, Entity entity, Entity orginal )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
 
