@@ -40,9 +40,15 @@
  *
  * Copyright 1999-2000 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
+<<<<<<< XSDecimal.java
  * $Id$
  * Date         Author          Changes
  * 10/31/00     Arnaud Blandin  support for min/max, scale&precision facets
+=======
+ * $Id$
+ * Date         Author          Changes
+ * 10/31/00     Arnaud Blandin  support for min/max, scale&precision facets
+>>>>>>> 1.2
  */
 
 package org.exolab.castor.builder.types;
@@ -245,16 +251,16 @@ public final class XSDecimal extends XSType
 
                 //-- maxExclusive
                 if (Facet.MAX_EXCLUSIVE.equals(name))
-                    setMaxExclusive(new java.math.BigDecimal(facet.toString()));
+                    setMaxExclusive(new java.math.BigDecimal(facet.getValue()));
                 //-- maxInclusive
                 else if (Facet.MAX_INCLUSIVE.equals(name))
-                    setMaxInclusive(new java.math.BigDecimal(facet.toString()));
+                    setMaxInclusive(new java.math.BigDecimal(facet.getValue()));
                 //-- minExclusive
                 else if (Facet.MIN_EXCLUSIVE.equals(name))
-                    setMinExclusive(new java.math.BigDecimal(facet.toString()));
+                    setMinExclusive(new java.math.BigDecimal(facet.getValue()));
                 //-- minInclusive
                 else if (Facet.MIN_INCLUSIVE.equals(name))
-                    setMinInclusive(new java.math.BigDecimal(facet.toString()));
+                    setMinInclusive(new java.math.BigDecimal(facet.getValue()));
                 //-- precision
                 else if (Facet.PRECISION.equals(name))
                     setPrecision(facet.toInt());
