@@ -384,6 +384,8 @@ public class MappingTool
             while ( enum.hasMoreElements() )
                 mapping.addClassMapping( (ClassMapping) enum.nextElement() );
             marshal = new Marshaller( writer );
+            marshal.setNamespaceMapping(null, "http://castor.exolab.org/");
+            marshal.setNamespaceMapping("cst", "http://castor.exolab.org/");
             marshal.marshal( mapping );
         } catch ( Exception except ) {
             throw new MappingException( except );
