@@ -1,9 +1,12 @@
 Version (CVS)
 -------------
 
+XML:    Added #setResolver method to Marshaller, thanks to George Stewart for
+        pointing out to me that I neglected to add this method. (kvisco)
+
 XML:    Changed name of xml element in the mapping.dtd to bind-xml. This change
         won't effect any existing mappings yet, because I've added backward
-        compatibility support.
+        compatibility support. (kvisco)
 
 JDO:    For HIGH/LOW key generator the paramater "global" has been added, it gives possibility
         to generate globally unique keys (Oleg Nitz).
