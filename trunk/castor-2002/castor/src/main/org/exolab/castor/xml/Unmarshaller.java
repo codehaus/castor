@@ -108,6 +108,7 @@ public class Unmarshaller {
     //- Constructors -/
     //----------------/
     
+
     /**
      * Creates a new Unmarshaller with the given Class
      * @param c the Class to create the Unmarshaller for, this
@@ -132,6 +133,22 @@ public class Unmarshaller {
         this.loader = loader;
         _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)
+    
+    
+    /**
+     * Creates a new Unmarshaller with the given Mapping
+     * @param mapping, the Mapping to use
+    **/
+    public Unmarshaller(Mapping mapping) 
+        throws MappingException
+    {
+        super();
+        this.debug = Configuration.debug();
+        if (mapping != null) {
+            setMapping(mapping);
+            this.loader = mapping.getClassLoader();
+        }
+    } //-- Unmarshaller(Mapping)
     
     /**
      * Sets the ClassLoader to use when loading new classes
