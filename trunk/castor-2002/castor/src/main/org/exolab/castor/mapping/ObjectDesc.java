@@ -69,12 +69,6 @@ public class ObjectDesc
     private Class          _objType;
 
 
-    /**
-     * The target name of this object.
-     */
-    private String         _targetName;
-
-
     /**    
      * The fields described for this object.
      */
@@ -91,44 +85,55 @@ public class ObjectDesc
     /**
      * The field of the identity for this object.
      */
-    private FieldDesc      _idField;
+    private FieldDesc      _identity;
 
 
     /**
-     * Constructs a new descriptor for the specified object and target
-     * mapping. The object type and target name are mandatory. When
-     * describing inheritence, the descriptor of the parent object may
-     * be used and only the fields added in this object must be
-     * supplied here.
+     * Constructs a new descriptor for the specified object. When describing
+     * inheritence, the descriptor of the parent object may be used and only
+     * the fields added in this object must be supplied here.
      * 
      * @param objType The Java type of this object
-     * @param targetName The target name of this object
      * @param fields The fields described for this object
-     * @param idField The field of the identity (key) of this object,
+     * @param identity The field of the identity (key) of this object,
      *   may be null
      * @param extend The descriptor of the object which this object extends,
      * or null if this is a top-level object
      * @throws MappingException The extended descriptor does not match
      *   a parent class of this object type
      */
-    public ObjectDesc( Class objType, String targetName, FieldDesc[] fields,
-		       FieldDesc idField, ObjectDesc extend )
+    public ObjectDesc( Class objType, FieldDesc[] fields, FieldDesc identity, ObjectDesc extend )
 	throws MappingException
     {
+	if ( ! Types.isConstructable( objType ) )
+	    throw new MappingException( "Type nor constuctable" );
 	_objType = objType;
-	_targetName = targetName;
 	if ( fields == null )
-	    _fields = new FieldDesc[ 0 ];
-	else
-	    _fields = fields;
-	_idField = idField;
+	    throw new IllegalArgumentException( "Argument 'fields' is null" );
+	_fields = fields;
+	_identity = identity;
 	if ( extend != null ) {
+	    FieldDesc[] allFields;
+
 	    if ( ! extend.getObjectType().isAssignableFrom( objType ) )
 		throw new MappingException( "The class " + objType.getName() +
 					    " does not extend the class " + extend.getObjectType().getName() +
 					    " supplied as the extended descriptor" );
 	    _extends = extend;
+	    allFields = new FieldDesc[ _fields.length + _extends._fields.length ];
+	    System.arraycopy( _fields, 0, allFields, 0, _fields.length );
+	    System.arraycopy( _extends._fields, 0, allFields, _fields.length, _extends._fields.length );
+	    _fields = allFields;
 	}
+    }
+
+
+    protected ObjectDesc( ObjectDesc objDesc )
+    {
+	_objType = objDesc._objType;
+	_fields = objDesc._fields;
+	_extends = objDesc._extends;
+	_identity = objDesc._identity;
     }
 
 
@@ -140,18 +145,6 @@ public class ObjectDesc
     public Class getObjectType()
     {
 	return _objType;
-    }
-
-
-    /**
-     * Returns the target name of this object. This might be an XML
-     * element name, an SQL table name, an LDAP name space, etc.
-     *
-     * @return The target name of this object
-     */
-    public String getTargetName()
-    {
-	return _targetName;
     }
 
 
@@ -203,7 +196,7 @@ public class ObjectDesc
      */
     public FieldDesc getIdentityField()
     {
-	return _idField;
+	return _identity;
     }
 
 
@@ -220,8 +213,8 @@ public class ObjectDesc
         for ( int i = 0 ; i < _fields.length ; ++i ) {
 	    _fields[ i ].copyInto( source, target );
         }
-	if ( _idField != null )
-	    _idField.copyInto( source, target );
+	if ( _identity != null )
+	    _identity.copyInto( source, target );
         if ( getExtends() != null )
             getExtends().copyInto( source, target );
     } 
