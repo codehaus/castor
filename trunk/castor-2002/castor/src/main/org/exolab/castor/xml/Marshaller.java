@@ -152,6 +152,12 @@ public class Marshaller {
     private Stack   _parents  = null;
     
     /**
+     * An instance of StringClassDescriptor
+    **/
+    private static final StringClassDescriptor _StringClassDescriptor
+        = new StringClassDescriptor();
+        
+    /**
      * Creates a new Marshaller
     **/
     public Marshaller( DocumentHandler handler ) {
@@ -397,8 +403,9 @@ public class Marshaller {
             //-- classes
             if (isPrimitive(_class) || (_class == String.class) || byteArray) 
             {
-                classDesc = getPrimitiveClassDescriptor(_class, name);
                 
+                classDesc = _StringClassDescriptor;
+                                
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
                 saveType = (descriptor.getFieldType() == Object.class);
@@ -711,40 +718,6 @@ public class Marshaller {
         }
         return declared;
     } //-- declareNamespace
-    
-    /**
-     * Gets a class descriptor for a primitive type. Will search for a
-     * specialized descriptor, but will return a plain string descriptor if
-     * one can't be found. As the search for a specialized descriptor can be
-     * slow, we cache the results.
-     * @param _class Class of object we want a ClassDescriptor for
-     * @param name XML element name of object
-     **/
-    private XMLClassDescriptor getPrimitiveClassDescriptor(Class _class, String name)
-        throws MarshalException
-    {
-        XMLClassDescriptor classDesc = (XMLClassDescriptor) _cdCache.get(name);
-        if (classDesc != null)
-            return classDesc;
-        
-        //-- look for marshalInfo based on element name
-        String cname = MarshalHelper.toJavaName(name,true);
-        
-        for (int i = 0; i < _packages.size(); i++) {
-            String pkgName = (String)_packages.get(i);
-            String className = pkgName+cname;
-            
-            ClassLoader loader = _class.getClassLoader();
-            classDesc = getClassDescriptor(className, loader);
-            
-            if (classDesc != null)
-                break;
-        }
-        if (classDesc == null)
-            classDesc = new StringClassDescriptor();
-        _cdCache.put(name, classDesc);
-        return classDesc;
-    }
     
     /**
      * Sets the flag to turn on and off debugging
