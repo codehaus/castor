@@ -137,6 +137,14 @@ public interface QueryExpression
      */    
     public void addColumn( String tableName, String columnName );
 
+    /**
+     * Add an entire select clause to the query with one call. The caller is
+     * responsible for making sure that all mentioned tables are included in
+     * the from clause.
+     *
+     * @param selectClause The entire sql select clause without the word SELECT
+     */
+    public void addSelect( String selectClause );
 
     /**
      * Set the query to be distinct.  No two rows which are the same will be returned.
@@ -145,6 +153,13 @@ public interface QueryExpression
      */
     public void setDistinct( boolean distinct );
 
+
+    /**
+     * Add a table to the from clause.
+     *
+     * @param tableName The name of the table to add to the select clause
+     */
+    public void addTable( String tableName );
 
     /**
      * Add a query paramater.
