@@ -54,10 +54,8 @@ import org.exolab.castor.jdo.conf.*;
 import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.jdo.engine.*;
 import org.exolab.castor.util.*;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.reader.*;
@@ -269,8 +267,8 @@ public class DTXEngine {
 
     Connection getConnection() throws DTXException {
 	if (_conn == null) {
-	    DataSource datasource = _database.getDataSource();
-	    org.exolab.castor.jdo.conf.Driver driver = _database.getDriver();
+	    DataSource datasource = _database.getDatabaseChoice().getDataSource();
+	    org.exolab.castor.jdo.conf.Driver driver = _database.getDatabaseChoice().getDriver();
 
 	    if (datasource != null) {
 		// FIXME: lame
