@@ -51,8 +51,6 @@ import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
-import org.exolab.castor.jdo.oql.OQLSyntaxException;
-
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -63,11 +61,8 @@ import java.sql.Statement;
 public class TestLimitClause extends CastorTestCase
 {
 
-	private static final int LIMIT = 5;
-	private static final int OFFSET = 2;
-
-    private JDOCategory    _category;
-
+	protected static final int LIMIT = 5;
+    protected JDOCategory    _category;
     private Database       _db;
 
     /**
@@ -81,6 +76,16 @@ public class TestLimitClause extends CastorTestCase
         _category = (JDOCategory) category;
     }
 
+	/**
+	 * @param suite
+	 * @param name
+	 * @param description
+	 */
+	public TestLimitClause(TestHarness suite, String name, String description) {
+		super(suite, name, description);
+		_category = (JDOCategory) suite;
+	}
+	
     /**
      * Get a JDO database
      */
@@ -121,38 +126,6 @@ public class TestLimitClause extends CastorTestCase
         _db.close();
     }
 
-    public void runTest() throws PersistenceException {
-		testLimit();
-    	testLimitWithOffset();
-    	testOffsetWithoutLimit();
-    }
-
-
-	public void testLimitWithOffset()
-    throws PersistenceException
-    {
-        TestObject testObject = null;
-
-        _db.begin();
-
-        OQLQuery query = _db.getOQLQuery("select t from jdo.TestObject t order by id limit $1 offset $2");
-
-        query.bind(LIMIT);
-        query.bind(OFFSET);
-
-        QueryResults results = query.execute();
-        assertNotNull (results);
-        /*size() not available using an Oracle DB
-        assertEquals (LIMIT, results.size()); */
-        for (int i = 1 + OFFSET; i <= OFFSET+LIMIT; i++) {
-            testObject = (TestObject) results.next();
-            assertEquals(i, testObject.getId());
-        }
-        assertTrue(!results.hasMore());
-
-    	_db.commit();
-    }
-
 	public void testLimit()
     throws PersistenceException
     {
@@ -174,19 +147,8 @@ public class TestLimitClause extends CastorTestCase
     	_db.commit();
     }
 
-	public void testOffsetWithoutLimit()
-		throws PersistenceException
-    {
-        _db.begin();
-        try {
-			_db.getOQLQuery("select t from jdo.TestObject t offset $1");
-		} catch (OQLSyntaxException e) {
-			assertEquals ("org.exolab.castor.jdo.oql.OQLSyntaxException", e.getClass().getName());
-			return;
-		}
-		finally {
-	    	_db.commit();
-		}
-    }
+	public void runTest() throws Exception {
+		testLimit();
+	}
 
 }
