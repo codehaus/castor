@@ -109,7 +109,18 @@ public class Date extends DateTimeBase{
         setValues(values);
     }
 
-
+    /**
+     * This constructor is used to convert a long value representing a Date
+     * to a new org.exolab.castor.types.Date instance.
+     * <p>Note : all the information concerning the time part of
+     * the java.util.Date is lost since a W3C Schema Date only represents
+     * CCYY-MM-YY
+     * @param dateAsLong Date represented in from of a long value.
+     */
+    public Date (long dateAsLong) {
+    	this (new java.util.Date (dateAsLong));
+    }
+    
     /**
      * This constructor is used to convert a java.util.Date into
      * a new org.exolab.castor.types.Date
@@ -211,6 +222,15 @@ public class Date extends DateTimeBase{
         return date;
     }//toDate()
 
+    /**
+     * Converts this date into a long value.
+     * @return This date instance as a long value.
+     */
+    public long toLong () {
+    	java.util.Date date = toDate();
+    	return date.getTime();
+    }
+    
     /**
      * convert this Date to a string
      * The format is defined by W3C XML Schema recommendation and ISO8601
