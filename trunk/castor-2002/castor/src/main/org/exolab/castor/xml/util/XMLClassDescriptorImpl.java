@@ -51,7 +51,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
-
 import org.exolab.castor.xml.*;
 
 import org.exolab.castor.util.List;
@@ -65,6 +64,10 @@ import org.exolab.castor.util.List;
 public class XMLClassDescriptorImpl 
     implements XMLClassDescriptor 
 {
+    
+    private static final String NULL_CLASS_ERR 
+        = "The Class passed as an argument to the constructor of " +
+          "XMLClassDescriptorImpl may not be null.";
 
     /**
      * The Class that this ClassDescriptor describes
@@ -145,7 +148,17 @@ public class XMLClassDescriptorImpl
     **/
     public XMLClassDescriptorImpl(Class type) {
         this();
+        if (type == null) 
+            throw new IllegalArgumentException(NULL_CLASS_ERR);
+            
         this._class = type;
+        
+        //-- create default XML name
+        String name = type.getName();
+        int idx = name.lastIndexOf('.');
+        if (idx >= 0) name = name.substring(idx+1);
+        this._xmlName = MarshalHelper.toXMLName(name);
+        
     } //-- XMLClassDescriptorImpl
 
     /**
@@ -154,8 +167,20 @@ public class XMLClassDescriptorImpl
     **/
     public XMLClassDescriptorImpl(Class type, String xmlName) {
         this();
+
+        if (type == null) 
+            throw new IllegalArgumentException(NULL_CLASS_ERR);
+            
         this._class = type;
-        this._xmlName = xmlName;
+        
+        if (xmlName == null) {
+            //-- create default XML name
+            String name = type.getName();
+            int idx = name.lastIndexOf('.');
+            if (idx >= 0) name = name.substring(idx+1);
+            this._xmlName = MarshalHelper.toXMLName(name);
+        }
+        else this._xmlName = xmlName;
     } //-- XMLClassDescriptorImpl
 
     /**
