@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author              Changes
+ * 11/16/2000   Arnaud Blandin      Constructor Date(java.util.Date)
  * 11/01/2000   Arnaud Blandin      Enhancements (constructor, methods access...)
  * 10/23/2000   Arnaud Blandin      Created
  */
@@ -52,6 +53,7 @@ import org.exolab.castor.types.TimePeriod;
 import java.text.ParseException;
 import java.util.StringTokenizer;
 import java.util.SimpleTimeZone;
+import java.util.GregorianCalendar;
 /**
  * Describe an XML schema Date
  * The date type is derived from time period by setting up the facet :
@@ -78,6 +80,27 @@ public class Date extends TimePeriod {
         temp = temp % (60*60*1000);
         _zoneMinute = (short)(temp / (60*1000));
     }
+
+    /**
+     * This constructor is used to convert a java.util.Date into
+     * a new org.exolab.castor.types.Date
+     * <p>Note : all the information concerning the time part of
+     * the java.util.Date is lost since a W3C Schema Date only represents
+     * CCYY-MM-YY
+     */
+    public Date(java.util.Date dateRef) {
+        new Date();
+        System.out.println(dateRef.toString());
+        GregorianCalendar tempCalendar = new GregorianCalendar();
+        tempCalendar.setTime(dateRef);
+        this.setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
+        this.setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
+        //we need to add 1 to the Month value returned by GregorianCalendar
+        //because 0<MONTH<11 (i.e January is 0)
+        this.setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
+        this.setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
+    } //Date(java.util.Date)
+
 
      /*Disallow the access to time method */
      public void setHour(short hour) {
