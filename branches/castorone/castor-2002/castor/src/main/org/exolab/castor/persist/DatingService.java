@@ -252,8 +252,6 @@ class DatingService {
             relations = new Hashtable();
         relations.put( rd.type1+"+"+rd.type2, rd );
         relations.put( rd.type2+"+"+rd.type1, rd );
-        System.out.println("put: "+ rd.type1+"+"+rd.type2 );
-        System.out.println("put: "+ rd.type2+"+"+rd.type1 );
     }
 
     boolean isRelated( String a, String b ) {

@@ -125,6 +125,7 @@ public class Dependent
                 db.remove( qres.next() );
             }
             stream.writeVerbose( "Deleting " + cnt + " master objects" );
+			/*
             oql = db.getOQLQuery( "SELECT detail FROM jdo.TestDetail detail" );
             qres = oql.execute();
             for ( cnt = 0; qres.hasMore(); cnt++ ) {
@@ -137,6 +138,7 @@ public class Dependent
                 db.remove( qres.nextElement() );
             }
             stream.writeVerbose( "Deleting " + cnt + " detail2 objects" );
+			*/
             oql = db.getOQLQuery( "SELECT group FROM jdo.TestGroup group" );
             qres = oql.execute();
             for ( cnt = 0; qres.hasMore(); cnt++ ) {
@@ -162,8 +164,9 @@ public class Dependent
             master.setGroup( group );
             db.create( master );
             db.commit();
+
             db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             if ( master != null ) {
                 if ( master.getGroup() == null ) {
                     stream.writeVerbose( "Error: loaded master without group: " + master );
@@ -211,7 +214,7 @@ public class Dependent
 
             stream.writeVerbose( "Attempt to change details" );
             db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             if ( master == null ) {
                 stream.writeVerbose( "Error: failed to find master with details group" );
                 return false;
@@ -221,22 +224,22 @@ public class Dependent
             // remove detail with id == 6 explicitly
             detail = (TestDetail) master.findDetail( 6 );
             master.getDetails().remove( master.getDetails().indexOf( detail ) );
-            db.remove( detail );
+            //db.remove( detail );
             // add new detail
             master.addDetail( new TestDetail( 8 ) );
             // add new detail and create it explicitely
             detail = new TestDetail( 9 );
             master.addDetail( detail );
-            db.create( detail );
+            //db.create( detail );
             // delete, then create detail with id == 7 explicitly
             detail = (TestDetail) master.findDetail( 7 );
             master.getDetails().remove( master.getDetails().indexOf( detail ) );
-            db.remove( detail );
+            //db.remove( detail );
             master.addDetail( detail );
-            db.create( detail );
+            //db.create( detail );
             db.commit();
             db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
                      master.getDetails().contains( new TestDetail( 5 ) ) ||
@@ -260,14 +263,14 @@ public class Dependent
 
             stream.writeVerbose( "Test long transaction with dirty checking" );
             db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             if ( master == null ) {
                 stream.writeVerbose( "Error: failed to find master with details group" );
                 return false;
             }
             db.commit();
             db.begin();
-            master2 = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master2 = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             master2.setValue( master2.getValue() + "2" );
             db.commit();
 
@@ -319,7 +322,7 @@ public class Dependent
                 stream.writeVerbose( "OK: Dirty checking works" );
             }
             db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
                      ! master.getDetails().contains( new TestDetail( 5 ) ) ||

@@ -31,9 +31,10 @@
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenSequence" />
     <case class="jdo.CacheLeakage" />
+    <case class="jdo.Dependent" />
     <case class="jdo.Race" />
     <case class="jdo.KeyGenReturning" />
-    <case class="jdo.Persistent" name="TC16" /> 
+    <case class="jdo.Persistent" /> 
     <case class="jdo.ManyToMany" />
   </category>
 <!--

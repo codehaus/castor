@@ -62,8 +62,7 @@ import java.util.Iterator;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public final class OID
-{
+public final class OID {
 
 
     /**
@@ -86,6 +85,8 @@ public final class OID
 
     private final ClassMolder _molder;
 
+
+	private final OID         _depends;
 
     /**
      * The object's stamp, used for efficient dirty checking.
@@ -110,13 +111,21 @@ public final class OID
      */
     private Class _topClass;
 
+	OID( LockEngine engine, ClassMolder molder, Object[] identities ) {
+		this( engine, molder, null, identities );
+	}
+    OID( LockEngine engine, ClassMolder molder, OID depends, Object[] identities ){
 
-    OID( LockEngine engine, ClassMolder molder, Object[] identities )
-    {
+        if ( engine == null )
+            throw new IllegalArgumentException("Engine can't be null");
+        if ( molder == null )
+            throw new IllegalArgumentException("molder can't be null");
+
         _engine = engine;
         _molder = molder;
         _identities = identities;
         _javaClass = molder.getJavaClass();
+		_depends = depends;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
         while ( molder.getExtends() != null )
@@ -124,6 +133,7 @@ public final class OID
         
         _topClass = molder.getJavaClass();
 
+		// calculate hashCode
         int temp = _topClass.hashCode();
         if ( _identities != null ) {
             for ( int i=0; i<identities.length; i++ ) {
@@ -133,7 +143,6 @@ public final class OID
             }
         }
         _hashCode = temp;
-        //System.out.println("OID is created: "+toString());
     }
 
     public static boolean isEquals( Object[] object1, Object[] object2 ) {
@@ -151,7 +160,6 @@ public final class OID
                 return false;
             }
             if ( (object1[i] instanceof Object[]) && (object2[i] instanceof Object[]) ) {
-                System.out.println("array of array");
                 if ( !isEquals( (Object[]) object1[i], (Object[]) object2[i] ) )
                     return false;
             } else if ( (object1[i] instanceof Vector) && (object2[i] instanceof Vector) ) {      
@@ -182,20 +190,6 @@ public final class OID
             return true;
         if ( object1 == null || object2 == null )
             return false;
-
-        System.out.println("Vector Object1:");
-        for ( int i=0; i<object1.size(); i++ ) {
-            if ( i > 0 ) System.out.print(", ");
-            System.out.print((object1.elementAt(i) instanceof Object[])?((Object[])object1.elementAt(i))[0]:object1.elementAt(i));
-        }
-        System.out.println();
-
-        System.out.println("Vector Object2:");
-        for ( int i=0; i<object2.size(); i++ ) {
-            if ( i > 0 ) System.out.print(", ");
-            System.out.print((object2.elementAt(i) instanceof Object[])?((Object[])object2.elementAt(i))[0]:object2.elementAt(i));
-        }
-        System.out.println();
         if ( object1.size() != object2.size() )
             return false;
 
@@ -213,20 +207,6 @@ public final class OID
             return true;
         if ( object1 == null || object2 == null )
             return false;
-
-        System.out.println("Vector Object1:");
-        for ( int i=0; i<object1.size(); i++ ) {
-            if ( i > 0 ) System.out.print(", ");
-            System.out.print((object1.get(i) instanceof Object[])?((Object[])object1.get(i))[0]:object1.get(i));
-        }
-        System.out.println();
-
-        System.out.println("Vector Object2:");
-        for ( int i=0; i<object2.size(); i++ ) {
-            if ( i > 0 ) System.out.print(", ");
-            System.out.print((object2.get(i) instanceof Object[])?((Object[])object2.get(i))[0]:object2.get(i));
-        }
-        System.out.println();
         if ( object1.size() != object2.size() )
             return false;
 
@@ -247,7 +227,9 @@ public final class OID
         for ( int i=0; i<objects.length; i++ ) {
             if ( i > 0 )
                 sb.append( "," );
+            sb.append( "<" );
             sb.append( objects[i] );            
+            sb.append( ">" );
         }
         return sb.toString();
     }
@@ -278,6 +260,9 @@ public final class OID
         return false;
     }
 
+	public OID getDepends() {
+		return _depends;
+	}
 
     ClassMolder getMolder() {
         return _molder;

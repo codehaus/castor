@@ -153,7 +153,8 @@ public class FieldMolder {
     }
 
     public boolean isDependent() {
-        return _eMold != null && _eMold.isDependent();
+		System.out.println("###### isDependent() is called in: "+_eMold+"."+_fMold+" result: "+(_fMold != null && (_fMold.getDepends() == _eMold)));
+        return _fMold != null && (_fMold.getDepends() == _eMold);
     }
 
     public boolean isMulti() {
@@ -233,10 +234,10 @@ public class FieldMolder {
                 System.out.println("_field: "+_field+"/"+object);
                 _field.set( object, value == null ? _default : value );
             } else if ( _setMethod != null ) {
+                System.out.println("_setMethod: "+_setMethod+" "+object);
                 if ( value == null && _deleteMethod != null )
                     _deleteMethod.invoke( object, null );
                 else {
-                   System.out.println("_setMethod: "+_setMethod+"/"+object);
                     _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                 }
             } else {
@@ -277,7 +278,6 @@ public class FieldMolder {
     protected Class getCollectionType( String coll, boolean lazy ) 
             throws MappingException {
         Class type;
-        //System.out.println("coll: "+coll);
 
         for ( int i=0; i<info.length; i++ ) {
             if ( info[i].name.equals( coll ) ) 
@@ -447,7 +447,6 @@ public class FieldMolder {
                 if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                     Class sgClass = _colClass==null? _colClass : _fClass;
 
-                    //System.out.println(javaClass+" "+fieldMap.getName()+" fieldMap.getCollection()..."+fieldMap.getCollection());
                     String name = capitalize( fieldMap.getName() );
 
                     _getMethod = findAccessor( javaClass, "get" + name, sgClass, true );

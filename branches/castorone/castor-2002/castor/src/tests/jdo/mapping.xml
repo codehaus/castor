@@ -183,7 +183,7 @@
   </class>
 
 
-  <class name="jdo.TestDetail" access="shared" identity="id">
+  <class name="jdo.TestDetail" depends="jdo.TestMaster" access="shared" identity="id">
     <description>Test detail table</description>
     <map-to table="test_detail" />
     <field name="id" type="integer">
@@ -200,7 +200,7 @@
   </class>
 
 
-  <class name="jdo.TestDetail2" access="shared" identity="id">
+  <class name="jdo.TestDetail2" depends="jdo.TestDetail" access="shared" identity="id">
     <description>Test detail2 table</description>
     <map-to table="test_detail2" />
     <field name="id" type="integer">

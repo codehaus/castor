@@ -119,7 +119,7 @@ public class TestDetail2
 
     public String toString()
     {
-        return _id + " / " + _value + " / " + _detail.getId();
+        return _id + " / " + _value + " / " + (_detail==null?0:_detail.getId());
     }
 
 

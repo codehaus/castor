@@ -422,8 +422,6 @@ public class OQLQueryImpl
                 case ParseTreeWalker.DEPENDANT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT_VALUE:
                     
-                    //System.out.println("Executing object query");
-                    
                     try {
                         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
                         if ( _expr != null ) {
@@ -441,8 +439,6 @@ public class OQLQueryImpl
                     results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
                     _fieldNum = 0;
 
-                    // System.out.println( _projectionType );
-                    
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
                       retVal = new OQLEnumeration( results );
                     else
@@ -452,8 +448,6 @@ public class OQLQueryImpl
                 case ParseTreeWalker.AGGREGATE:
                 case ParseTreeWalker.FUNCTION:
                 
-                    //System.out.println("Executing simple query");
-
                     SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
                     retVal =  sqe.execute( _expr, _bindValues);
                     
@@ -483,7 +477,6 @@ public class OQLQueryImpl
         OQLEnumeration( org.exolab.castor.persist.QueryResults results,
                         Vector pathInfo, JDOClassDescriptor clsDesc )
         {
-            //System.out.println( "OQLEnumeration initialized with pathInfo and class." );
             _results = results;
             _pathInfo = pathInfo;
             _classDescriptor = clsDesc;
@@ -528,8 +521,6 @@ public class OQLQueryImpl
             try {
                 identities = _results.nextIdentities();
                 while ( identities != null ) {
-                    System.out.println("While identities != null");
-                    System.out.println("id: "+OID.flatten( identities ));
                     try {
                         _lastObject = _results.fetch();
                         if ( _lastObject != null )

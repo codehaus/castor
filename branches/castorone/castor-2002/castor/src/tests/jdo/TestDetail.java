@@ -182,7 +182,7 @@ public class TestDetail
                 details2 = details2 + _details2.get( i ).toString();
             }
         }
-        return _id + " / " + _value + " / " + _master.getId() + " / { " + details2 + " }";
+        return "<detail: "+_id + " / " + _value + " / " + (_master==null?0:_master.getId()) + " / { " + details2 + " }"+">";
     }
 
 
