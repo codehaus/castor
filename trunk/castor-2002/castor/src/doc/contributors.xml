@@ -136,6 +136,12 @@
     <description>OQL Query tool, bug fixing for OQL.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Lavandowska" given="Lance"/>
+    <email>lance@aptura.com</email>
+    <description>Mapping GUI for Castor.</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Skolnik" given="Radovan"/>
     <email>rskolnik@inmail.sk</email>
