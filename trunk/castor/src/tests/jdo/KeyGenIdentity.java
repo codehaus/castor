@@ -47,11 +47,7 @@
 package jdo;
 
 import org.exolab.castor.jdo.PersistenceException;
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
-import harness.CastorTestCase;
 
 
 /**
