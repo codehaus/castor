@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004 (C) Intalio Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the course
+ * of employment at Intalio Inc.
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ *  
  * $Id$
  */
 
@@ -88,7 +93,7 @@ import java.util.Enumeration;
  * This class creates the Java Source classes for Schema
  * components
  *
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
@@ -1380,17 +1385,56 @@ public class SourceFactory {
 				component.setView(complexType);
                 //--only set a super class name if the current complexType
                 //--is not a restriction of a simpleContent (--> no object hierarchy, only content hierarchy)
-                if (! ( complexType.isRestricted() && ((ComplexType)base).isSimpleContent() ) )
-                    state.jClass.setSuperClass(baseClassName);
+                /*
+                 Note: There are times when a simpleContent restriction needs to
+                 extend the hierarchy, such as a restriction of a restriction, so
+                 I'm commenting out the following line for now. see bug 1875
+                 for more details. If this causes any regressions we'll need to
+                 find a more appropriate solution.
+                 if (! ( complexType.isRestricted() && ((ComplexType)base).isSimpleContent() ) )
+                */
+                state.jClass.setSuperClass(baseClassName);
             } //--complexType
 
             //--if the content type is a simpleType create a field info for it.
             if (complexType.getContentType().getType() == ContentType.SIMPLE) {
                 SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
                 SimpleType temp = simpleContent.getSimpleType();
+                SimpleType baseType = (SimpleType)temp.getBaseType();
                 XSType xsType = _typeConversion.convertType(temp, state.packageName);
-                FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
-		        handleField(fieldInfo,state);
+                FieldInfo fieldInfo = null;
+                if ((baseType != null)) {
+                    if (xsType.isEnumerated()) {
+                        fieldInfo = memberFactory.createFieldInfoForContent(xsType);
+                        fieldInfo.setBound(false);
+                        handleField(fieldInfo, state);
+                        //-- remove getter since we don't need to
+                        //-- override the original getter
+                        String mname = fieldInfo.getReadMethodName();
+                        JClass jClass = state.jClass;
+                        JMethod method = jClass.getMethod(mname, 0);
+                        jClass.removeMethod(method);
+                        //-- update setter method
+                        mname = fieldInfo.getWriteMethodName();
+                        method = jClass.getMethod(mname, 0);
+                        JSourceCode jsc = method.getSourceCode();
+                        jsc.add("super.");
+                        jsc.append(mname);
+                        jsc.append("(this.");
+                        jsc.append(fieldInfo.getName());
+                        jsc.append(".toString());");
+                    }
+                    //-- else just use superclass setters/getters
+                    //-- do nothing
+                }
+                else {
+                    while (temp.getBaseType() != null) {
+                    	temp = (SimpleType)temp.getBaseType();
+                    }
+                    xsType = _typeConversion.convertType(temp, state.packageName);
+                    fieldInfo = memberFactory.createFieldInfoForContent(xsType);
+    		        handleField(fieldInfo,state);
+                }
             }
 		}//--base not null
 		
