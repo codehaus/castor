@@ -122,16 +122,13 @@ public class ContainerFieldDesc
     }
     
     
-    public String canStore( Object obj )
+    public void canStore( Object obj )
+        throws IntegrityException
     {
         String reason;
         
-        for ( int i = 0 ; i < _contained.length ; ++i ) {
-            reason = _contained[ i ].canStore( obj );
-            if ( reason != null )
-                return reason;
-        }
-        return null;
+        for ( int i = 0 ; i < _contained.length ; ++i )
+            _contained[ i ].canStore( obj );
     }
 
 
