@@ -61,6 +61,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.LocalConfiguration;
@@ -77,7 +79,12 @@ import org.exolab.castor.util.MimeBase64Encoder;
 public final class SQLTypes
 {
 
-
+	/**
+	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+	 * Commons Logging</a> instance used for all logging.
+	 */
+	private static Log log = LogFactory.getFactory().getInstance(SQLTypes.class);
+	
     /**
      * Separator between words in SQL name.
      */
@@ -533,7 +540,7 @@ public final class SQLTypes
      * Date format used by the date convertor. Use the {@link #getDateFormat}
      * accessor to access this variable.
      * 
-     * @see #getDateFormat
+     * @see #getDateFormat()
      */
     private static DateFormat _dateFormat = new SimpleDateFormat();
 
@@ -554,7 +561,7 @@ public final class SQLTypes
      * is specified. Use the {@link #getParamDateFormat} accessor to access
      * this variable.
      *
-     * @see #getParamDateFormat
+     * @see #getParamDateFormat()
      */
     private static SimpleDateFormat _paramDateFormat = new SimpleDateFormat();
 
@@ -574,7 +581,7 @@ public final class SQLTypes
      * Date format used by the double->date convertor. Use the {@link #getDecimalFormat} 
      * accessor to access this variable.
      * 
-     * @see #getDecimalFormat
+     * @see #getDecimalFormat()
      */
     private static DecimalFormat _decimalFormat = new DecimalFormat("#################0");
 
@@ -1054,7 +1061,7 @@ public final class SQLTypes
             public Object convert( Object obj, String param ) {
                 long time = ( (java.util.Date) obj ).getTime();
                 java.sql.Timestamp timestamp = new java.sql.Timestamp(time);
-                timestamp.setNanos((int) ((time % 1000) * 1000000));
+                //timestamp.setNanos((int) ((time % 1000) * 1000000));
                 //timestamp.setNanos(0);  // this can workaround the bug in SAP DB
                 return timestamp;
             }
@@ -1062,7 +1069,7 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( java.sql.Timestamp.class, java.util.Date.class ) {
             public Object convert( Object obj, String param ) {
                 java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
-                return new java.util.Date(timestamp.getTime() + timestamp.getNanos() / 1000000);
+                return new java.util.Date(timestamp.getTime());
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.String.class, java.sql.Timestamp.class ) {
