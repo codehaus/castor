@@ -693,6 +693,8 @@ final class CacheEngine
         for ( int i = 0 ; i < relations.length ; ++i ) {
             if ( relations[ i ] != null ) {
 
+                // XXX Need validity check and better testing for null elements
+
                 // relations[ i ].checkValidity( object );
                 if ( ! relations[ i ].isMulti() ) {
 
@@ -710,7 +712,7 @@ final class CacheEngine
                                 tx.create( this, related, relIdentity );
                         } else if ( ! original[ i ].equals( relIdentity ) ) {
                             if ( relations[ i ].isAttached() )
-                                delete( tx, relations[ i ].getRelatedClass(), original );
+                                tx.markDelete( this, relations[ i ].getRelatedClass(), original );
                             if ( ! tx.isPersistent( related ) )
                                 tx.create( this, related, relIdentity );
                         }
@@ -740,9 +742,7 @@ final class CacheEngine
                     }
                     if ( relations[ i ].isAttached() && originals != null ) {
                         for ( int j = 0 ; j < originals.size() ; ++j )
-                            // XXX Should be able to run this delete directly on
-                            //     transaction
-                            delete( tx, relations[ i ].getRelatedClass(), originals.elementAt( j ) );
+                            tx.markDelete( this, relations[ i ].getRelatedClass(), originals.elementAt( j ) );
                     }
 
                 }
