@@ -94,6 +94,15 @@ public class OQLQueryImpl
     private PersistenceQuery   _query;
 
 
+    private DatabaseImpl       _dbImpl;
+
+
+    OQLQueryImpl( DatabaseImpl dbImpl )
+    {
+        _dbImpl = dbImpl;
+    }
+
+
     public void bind( Object obj )
     {
         if ( _query == null ) {
@@ -151,7 +160,7 @@ public class OQLQueryImpl
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = DatabaseSource.getPersistenceEngine( _objClass ); 
+        _dbEngine = _dbImpl.getPersistenceEngine(); 
         if ( _dbEngine == null )
             throw new QueryException( "Cold not find an engine supporting class " + objType );
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
@@ -241,7 +250,7 @@ public class OQLQueryImpl
         try {
             tx = TransactionImpl.getCurrentContext();
             if ( tx == null || ! tx.isOpen() )
-                throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.dbTxNotInProgress" ) );
+                throw new TransactionNotInProgressException( Messages.message( "jdo.dbTxNotInProgress" ) );
             results = tx.query( _dbEngine, _query, AccessMode.Shared );
             _fieldNum = 0;
             
