@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1445 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Fixed various small problems with SQL DDLs in src/tests/jdo.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1445
+       (Werner - 20040607)
+
 JDO:   Fixed bug 1648 using contribution from Nick Stuart [nick@newtsplace.com]
        Added code to extend the message generated for ObjectModifiedExceptions.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1648
