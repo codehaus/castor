@@ -256,6 +256,12 @@
         </code></p>
         <p>Be remember that the order of the fields listed must match what is defined in the mapping file.</p>
 
+        <p><b>Does Castor OQL support struct?</b></p>
+
+        <p>No, Castor OQL doesn't support struct. For example, the following query CANNOT be done: <code>
+    select c.name, c.age from Client c
+        </code></p>
+
     </section>
 
     <section title="Features requests">
