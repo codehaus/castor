@@ -74,21 +74,6 @@ public final class PostgreSQLFactory
     }
 
 
-    /**
-     * Determine if the given SQLException is DuplicateKeyException
-     * @return Boolean.TRUE means "yes",
-     *         Boolean.FALSE means "no",
-     *         null means "cannot determine"
-     */
-    public Boolean isDuplicateKeyException( Exception ex )
-    {
-        // Sometime gives wrong results
-        //if ( ex.getMessage().toUpperCase().indexOf("DUPLICATE KEY") >= 0 )
-        //    return Boolean.TRUE;
-        return null;
-    }
-
-
     public String quoteName( String name )
     {
         int index;

@@ -83,6 +83,7 @@ import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -179,14 +180,18 @@ public final class SQLEngine implements Persistence {
     //private ClassMolder          _mold;
 
 
+    private LockEngine           _lockEngine;
 
 
-    SQLEngine( /*JDOClassDescriptor clsDesc*/ EntityInfo entityInfo,
+
+
+    SQLEngine( /*JDOClassDescriptor clsDesc*/ EntityInfo entityInfo, LockEngine lockEngine,
                LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
         throws MappingException {
 
         _clsDesc = null; //clsDesc;
         _entityInfo = entityInfo;
+        _lockEngine = lockEngine;
         _stampField = stampField;
         _factory = factory;
         _logInterceptor = logInterceptor;
@@ -603,26 +608,8 @@ public final class SQLEngine implements Persistence {
                 entity.identity = generateKey( conn );
             }
         } catch ( SQLException except ) {
-            // [oleg] Check for duplicate key based on X/Open error code
-            // Bad way: all validation exceptions are reported as DuplicateKey
-            //if ( except.getSQLState() != null &&
-            //     except.getSQLState().startsWith( "23" ) )
-            //    throw new DuplicateIdentityException( _clsDesc.getJavaClass(), entity.identity );
-
-            // Good way: let PersistenceFactory try to determine
-            Boolean isDupKey;
-
-            isDupKey = _factory.isDuplicateKeyException( except );
-            if ( Boolean.TRUE.equals( isDupKey ) ) {
-                throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), entity.identity ) );
-            } else if ( Boolean.FALSE.equals( isDupKey ) ) {
-                throw new PersistenceException( Messages.format("persist.nested", except), except );
-            }
-            // else unknown, let's check directly.
-
-            // [oleg] Check for duplicate key the old fashioned way,
-            //        after the INSERT failed to prevent race conditions
-            //        and optimize INSERT times
+            // [oleg] Check for duplicate key after the INSERT failed 
+	    // to prevent race conditions and optimize INSERT times
             try {
                 // Close the insert statement
                 if ( stmt != null )

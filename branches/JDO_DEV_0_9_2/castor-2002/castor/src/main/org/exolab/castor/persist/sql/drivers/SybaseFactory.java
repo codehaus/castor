@@ -76,21 +76,6 @@ public class SybaseFactory
     }
 
 
-    public Boolean isDuplicateKeyException( Exception except )
-    {
-        // Sometime gives wrong results
-        //if ( except instanceof SQLException )
-        //    switch ( ( (SQLException) except ).getErrorCode() ) {
-        //        case 2601: 
-        //        case 548:  // sometimes Sybase ASA generates this code instead of 2601
-        //            return Boolean.TRUE;
-        //        default:
-        //            return Boolean.FALSE;
-        //    }
-        return null;
-    }
-
-
     public String quoteName( String name )
     {
         return doubleQuoteName( name );

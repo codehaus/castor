@@ -52,6 +52,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.conf.Database;
@@ -95,7 +96,7 @@ public interface PersistenceFactory
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( EntityInfo entity, LogInterceptor logInterceptor )
+    public Persistence getPersistence( EntityInfo entity, LockEngine lockEngine, LogInterceptor logInterceptor )
         throws MappingException;
 
 
@@ -110,15 +111,6 @@ public interface PersistenceFactory
      * @return New empty query expression
      */
     public QueryExpression getQueryExpression();
-
-
-    /**
-     * Determines it the given exception is indication of a duplicate
-     * key.
-     *
-     * @return TRUE means "yes", FALSE means "no", null means "cannot determine"
-     */
-    public Boolean isDuplicateKeyException( Exception except );
 
 
     /**

@@ -65,6 +65,7 @@ import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.Connector;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -83,7 +84,7 @@ public abstract class BaseFactory
 {
 
 
-    public Persistence getPersistence( EntityInfo entity, LogInterceptor log )
+    public Persistence getPersistence( EntityInfo entity, LockEngine lockEngine, LogInterceptor log )
         throws MappingException
     {
 
@@ -91,7 +92,7 @@ public abstract class BaseFactory
         //    return null;
 
         try {
-            return new SQLEngine( entity, log, this, null );
+            return new SQLEngine( entity, lockEngine, log, this, null );
         } catch ( MappingException except ) {
             if ( log != null )
                 log.exception( except );

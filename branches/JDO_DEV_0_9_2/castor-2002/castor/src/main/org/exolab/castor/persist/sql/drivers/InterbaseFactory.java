@@ -72,14 +72,6 @@ public final class InterbaseFactory
         return new InterbaseQueryExpression( this );
     }
 
-/*
-    public Boolean isDuplicateKeyException( Exception except )
-    {
-        if ( except instanceof SQLException )
-            return ( (SQLException) except ).getErrorCode() == 335544349 ? Boolean.TRUE : Boolean.FALSE;
-        return null;
-    }
-*/
 }
 
 
