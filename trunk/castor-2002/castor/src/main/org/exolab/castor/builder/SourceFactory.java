@@ -464,7 +464,7 @@ public class SourceFactory  {
     private void createUnmarshalMethods(JClass parent) {
 
         //-- create main marshal method
-        JMethod jMethod = new JMethod(parent,"unmarshal"+parent.getName(true)); 
+        JMethod jMethod = new JMethod(parent,"unmarshal"); 
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
@@ -546,48 +546,37 @@ public class SourceFactory  {
 
 
         //- Handle derived types
-        if (complexType.getBaseType() != null) {
+        XMLType base = complexType.getBaseType();
+        if ((base != null) && (base.isComplexType())) {
 
-            XMLType base = complexType.getBaseType();
-            if (base != null) {
+            String className = null;
 
-                String className = null;
+			//-- Is thie base type from the schema we are currently generating source for?
+			if (base.getSchema()==schema)
+			{
+				ClassInfo cInfo = state.resolve(base);
+				if (cInfo == null) {
 
-				//-- Is thie base type from the schema we are currently generating source for?
-				if (base.getSchema()==schema)
-				{
-					ClassInfo cInfo = state.resolve(base);
-					if (cInfo == null) {
-
-					    String packageName = state.jClass.getPackageName();
-					    JClass jClass = createSourceCode((ComplexType)base,
-					                                     state,
-					                                     packageName);
-					    cInfo = state.resolve(base);
-					    className = jClass.getName();
-					}
-					else className = cInfo.getJClass().getName();
+					String packageName = state.jClass.getPackageName();
+					JClass jClass = createSourceCode((ComplexType)base,
+					                                    state,
+					                                    packageName);
+					cInfo = state.resolve(base);
+					className = jClass.getName();
 				}
-				else
-				{
-					//-- Create package qualified class name to a base type class from another package
-					className = 
-						SourceGeneratorConfiguration.getQualifiedClassName(
-								base.getSchema().getTargetNamespace(),
-								JavaXMLNaming.toJavaClassName(base.getName()));
-				}
+				else className = cInfo.getJClass().getName();
+			}
+			else
+			{
+				//-- Create package qualified class name to a base type class from another package
+				className = 
+					SourceGeneratorConfiguration.getQualifiedClassName(
+							base.getSchema().getTargetNamespace(),
+							JavaXMLNaming.toJavaClassName(base.getName()));
+			}
 
-				//-- Set super class
-                state.jClass.setSuperClass(className);
-            }
-            else {
-                //-- will this ever be null, if we have a valid Schema?
-                //-- ignore for now...but add comment in case we
-                //-- ever see it.
-                System.out.print("ClassInfo#init: ");
-                System.out.print("A referenced complextype is null: ");
-                System.out.println(base.getName());
-            }
+			//-- Set super class
+            state.jClass.setSuperClass(className);
         }
 
         //---------------------/
