@@ -159,14 +159,8 @@ public class AnyNode2SAX implements EventProducer {
 
 
        }//ELEMENTS
-        else if (node.getNodeType() == AnyNode.TEXT) {
-             AnyNode tempNode = node;
-             while (tempNode != null) {
-                 processTextNode(tempNode, handler);
-                 tempNode =tempNode.getNextSibling();
-             }
-             tempNode = null;
-        }
+        else if (node.getNodeType() == AnyNode.TEXT)
+            processTextNode(node, handler);
 
     }
 
