@@ -48,86 +48,71 @@ package org.exolab.castor.mapping;
 
 
 /**
- * The access mode for a class. In persistent storage each class is
- * defined as having one of three access modes:
- * <ul>
- * <li>Read only
- * <li>Shared (aka optimistic locking)
- * <li>Exclusive (aka pessimistic locking)
- * </ul>
- * Transactions typically access objects based on the specified access
- * mode. A transaction may be requested to access any object as read
- * only or exclusive, but may not access exclusive objects as shared.
- *
+ * A field handler knows how to perform various operations on the
+ * field that require access to the field value.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
+ * @see FieldDesc
  */
-public class AccessMode
+public interface FieldHandler
 {
 
 
     /**
-     * Read only access. Objects can be read but are not made
-     * persistent and changes to objects are not reflected in
-     * persistent storage.
-     */
-    public static final AccessMode ReadOnly = new AccessMode( "read-only" );
-
-
-    /**
-     * Shared access. Objects can be read by multiple concurrent
-     * transactions. Equivalent to optimistic locking.
-     */
-    public static final AccessMode Shared = new AccessMode( "shared" );
-
-
-    /**
-     * Exclusive access. Objects can be access by a single transaction
-     * at any given time. Equivalent to pessimistic locking.
-     */
-    public static final AccessMode Exclusive = new AccessMode( "exclusive" );
-
-
-    /**
-     * Returns the access mode from the name. If <tt>accessMode</tt>
-     * is null, return the default access mode ({@link #Shared}).
-     * Otherwise returns the named access mode.
+     * Returns the value of the field from the object.
      *
-     * @param accessMode The access mode name
-     * @return The access mode
+     * @param object The object
+     * @return The value of the field
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler is not
+     *  compatiable with the Java object
      */
-    public static AccessMode getAccessMode( String accessMode )
-    {
-        if ( accessMode == null )
-            return Shared;
-        if ( accessMode.equals( Shared._name ) )
-            return Shared;
-        if ( accessMode.equals( Exclusive._name ) )
-            return Exclusive;
-        if ( accessMode.equals( ReadOnly._name ) )
-            return ReadOnly;
-        throw new IllegalArgumentException( "Unrecognized access mode" );
-    }
+    public Object getValue( Object object )
+        throws IllegalStateException;
+    
+
+    /**
+     * Sets the value of the field on the object.
+     *
+     * @param object The object
+     * @param value The new value
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler is not
+     *  compatiable with the Java object
+     * @thorws IllegalArgumentException The value passed is not of
+     *  a supported type
+     */
+    public void setValue( Object object, Object value )
+        throws IllegalStateException, IllegalArgumentException;
 
 
     /**
-     * The name of this access mode as it would appear in a
-     * mapping file.
+     * Checks the field integrity. Returns successfully if the field
+     * can be stored, is valid, etc, throws an exception otherwise.
+     *
+     * @param object The object
+     * @throws IntegrityException The field is invalid, is required and
+     *  null, or any other integrity violation
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler
+     *  is not compatiable with the Java object
      */
-    private String _name;
+    public void checkIntegrity( Object object )
+        throws IntegrityException, IllegalStateException;
 
 
-    private AccessMode( String name )
-    {
-        _name = name;
-    }
-
-
-    public String toString()
-    {
-        return _name;
-    }
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param object The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object object )
+        throws IllegalStateException;
 
 
 }
+

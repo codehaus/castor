@@ -48,86 +48,66 @@ package org.exolab.castor.mapping;
 
 
 /**
- * The access mode for a class. In persistent storage each class is
- * defined as having one of three access modes:
- * <ul>
- * <li>Read only
- * <li>Shared (aka optimistic locking)
- * <li>Exclusive (aka pessimistic locking)
- * </ul>
- * Transactions typically access objects based on the specified access
- * mode. A transaction may be requested to access any object as read
- * only or exclusive, but may not access exclusive objects as shared.
- *
+ * Describes the properties of a field. Implementations will extend
+ * this inteface to provide additional properties.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
+ * @see FieldHandler
  */
-public class AccessMode
+public interface FieldDescriptor
 {
 
 
     /**
-     * Read only access. Objects can be read but are not made
-     * persistent and changes to objects are not reflected in
-     * persistent storage.
-     */
-    public static final AccessMode ReadOnly = new AccessMode( "read-only" );
-
-
-    /**
-     * Shared access. Objects can be read by multiple concurrent
-     * transactions. Equivalent to optimistic locking.
-     */
-    public static final AccessMode Shared = new AccessMode( "shared" );
-
-
-    /**
-     * Exclusive access. Objects can be access by a single transaction
-     * at any given time. Equivalent to pessimistic locking.
-     */
-    public static final AccessMode Exclusive = new AccessMode( "exclusive" );
-
-
-    /**
-     * Returns the access mode from the name. If <tt>accessMode</tt>
-     * is null, return the default access mode ({@link #Shared}).
-     * Otherwise returns the named access mode.
+     * Returns the name of the field.
      *
-     * @param accessMode The access mode name
-     * @return The access mode
+     * @return Field name
      */
-    public static AccessMode getAccessMode( String accessMode )
-    {
-        if ( accessMode == null )
-            return Shared;
-        if ( accessMode.equals( Shared._name ) )
-            return Shared;
-        if ( accessMode.equals( Exclusive._name ) )
-            return Exclusive;
-        if ( accessMode.equals( ReadOnly._name ) )
-            return ReadOnly;
-        throw new IllegalArgumentException( "Unrecognized access mode" );
-    }
+    public String getFieldName();
 
 
     /**
-     * The name of this access mode as it would appear in a
-     * mapping file.
+     * Returns the Java type of the field.
+     *
+     * @return Field type
      */
-    private String _name;
+    public Class getFieldType();
 
 
-    private AccessMode( String name )
-    {
-        _name = name;
-    }
+    /**
+     * Returns true if the field is transient. Transient fields are
+     * never persisted or marshalled.
+     *
+     * @return True if transient field
+     */
+    public boolean isTransient();
 
 
-    public String toString()
-    {
-        return _name;
-    }
+    /**
+     * Returns true if the field type is immutable.
+     *
+     * @return True if the field type is immutable
+     */
+    public boolean isImmutable();
+
+
+    /**
+     * Returns true if the field type is required.
+     *
+     * @return True if the field type is required
+     */
+    public boolean isRequired();
+
+
+    /**
+     * Returns the handler of the field. In order to persist or marshal
+     * a field descriptor will be associated with a handler.
+     *
+     * @return The field handler
+     */
+    public FieldHandler getHandler();
 
 
 }
+

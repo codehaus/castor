@@ -77,5 +77,11 @@ public class IntegrityException
     }
 
 
+    public IntegrityException( Exception except )
+    {
+        super( "mapping.nested", except.getMessage() );
+    }
+
+
 }
 
