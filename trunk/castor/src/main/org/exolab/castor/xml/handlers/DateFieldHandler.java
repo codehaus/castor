@@ -124,6 +124,8 @@ public class DateFieldHandler extends XMLFieldHandler {
     private static boolean _suppressMillis = false;
     
     
+    private boolean _useSQLDate = false;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -142,8 +144,7 @@ public class DateFieldHandler extends XMLFieldHandler {
         }
         _handler = fieldHandler;
     } //-- DateFieldHandler
-
-
+    
     //------------------/
     //- Public Methods -/
     //------------------/
@@ -209,6 +210,10 @@ public class DateFieldHandler extends XMLFieldHandler {
 
             try {
                 date = parse(value.toString());
+                //-- java.sql.Date?
+                if ((_useSQLDate) && (date != null)) {
+                    date = new java.sql.Date(date.getTime());
+                }
             }
             catch (java.text.ParseException px) {
                 //-- invalid dateTime
@@ -299,6 +304,18 @@ public class DateFieldHandler extends XMLFieldHandler {
     public static void setSuppressMillis(boolean suppressMillis) {
         _suppressMillis = suppressMillis;
     } //-- setAlwaysUseUTCTime
+    
+    
+    /**
+     * Specifies that this DateFieldHandler should use
+     * java.sql.Date when creating new Date instances.
+     *
+     * @param useSQLDate a boolean that when true indicates
+     * that java.sql.Date should be used instead of java.util.Date.
+     */
+    public void setUseSQLDate(boolean useSQLDate) {
+        _useSQLDate = useSQLDate;
+    } //-- setUseSQLDate
     
 
     //-------------------/
