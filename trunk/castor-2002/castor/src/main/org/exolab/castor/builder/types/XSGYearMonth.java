@@ -38,36 +38,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  * $Id$
- * Date         Author              Changes
- * 11/01/2000   Arnaud Blandin      Created
  */
 
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.javasource.*;
+import org.exolab.castor.types.GYearMonth;
+import org.exolab.javasource.JType;
+import org.exolab.javasource.JClass;
 
 /**
- * The XML Schema Year type
+ * The XML Schema gYearMonth type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
- * @version $Revision$ $Date$
- * @see org.exolab.castor.types.Year
-**/
-public final class XSYear extends XSTimePeriod {
+ * @version $Revision $ $Date$
+ */
+
+public class XSGYearMonth extends XSType {
 
     /**
      * The JType represented by this XSType
-    **/
+     */
     private static final JType jType
-        = new JClass("org.exolab.castor.types.Year");
+        = new JClass ("org.exolab.castor.types.GYearMonth");
 
-    private String value = null;
 
-    public XSYear() {
-        super(XSType.YEAR,"P1Y");
-    } //-- XSYear
+    public XSGYearMonth() {
+       super(XSType.GYEARMONTH_TYPE);
+    }
 
     /**
      * Returns the Java code necessary to create a new instance of the
@@ -77,13 +76,10 @@ public final class XSYear extends XSTimePeriod {
          return "new "+getJType().getName()+"();";
     } //-- newInstanceCode
 
-
-    /**
-     * Returns the JType that this XSType represents
-     * @return the JType that this XSType represents
-    **/
     public JType getJType() {
         return this.jType;
     }
 
-} //-- XSYear
+    public void setFacets(SimpleType simpleType){
+    }
+}

@@ -63,7 +63,7 @@ public final class XSNMToken extends XSType {
 
 
     public XSNMToken() {
-        super(XSType.NMTOKEN);
+        super(XSType.NMTOKEN_TYPE);
     } //-- XSNMToken
 
     /**

@@ -48,15 +48,10 @@ package org.exolab.castor.xml.schema.simpletypes;
 import org.exolab.castor.xml.schema.Schema;
 
 /**
- * Represents timeDuration
+ *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class TimeDurationType extends AtomicType
+public class AnyURIType extends AtomicType
 {
-
 }
-
-
-
-

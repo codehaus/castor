@@ -52,17 +52,16 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public final class XSDate extends XSTimePeriod {
+public final class XSDate extends XSType{
 
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType
         = new JClass("org.exolab.castor.types.Date");
-        //("java.sql.Date");
 
     public XSDate() {
-        super(XSType.DATE,"P1D");
+        super(XSType.DATE_TYPE);
     } //-- XSDate
 
 
@@ -81,5 +80,12 @@ public final class XSDate extends XSTimePeriod {
     public JType getJType() {
         return this.jType;
     }
+
+    /**
+     * Reads and sets the facets for XSType
+     * @param simpleType the SimpleType containing the facets
+     */
+     public void setFacets(SimpleType simpleType){}
+
 
 } //-- XSDate

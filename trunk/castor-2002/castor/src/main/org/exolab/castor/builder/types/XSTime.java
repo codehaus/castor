@@ -49,21 +49,20 @@ import org.exolab.castor.types.Time;
 import org.exolab.javasource.*;
 
 /**
- * The XML Schema timeInstant type
+ * The XML Schema time type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public final class XSTime extends XSRecurringDuration {
+public final class XSTime extends XSType{
 
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType
         = new JClass ("org.exolab.castor.types.Time");
-        //("java.sql.Time");
 
    public XSTime() {
-        super(XSType.TIME,"P0Y","P1D");
+        super(XSType.TIME_TYPE);
    } //-- XSTime
 
     /**
@@ -81,4 +80,10 @@ public final class XSTime extends XSRecurringDuration {
     public JType getJType() {
         return this.jType;
     }
+    /**
+     * Reads and sets the facets for XSType
+     * @param simpleType the SimpleType containing the facets
+     */
+     public void setFacets(SimpleType simpleType){}
+
 } //-- XSTime

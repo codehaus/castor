@@ -119,51 +119,50 @@ public class SimpleTypesFactory
 
     //Primitive types
     public static final int STRING_TYPE                   =  1;
-    public static final int BOOLEAN_TYPE                  =  2;
-    public static final int FLOAT_TYPE                    =  3;
-    public static final int DOUBLE_TYPE                   =  4;
-    public static final int DECIMAL_TYPE                  =  5;
-    public static final int TIME_DURATION_TYPE            =  6;
-    public static final int RECURRING_DURATION_TYPE       =  7;
-    public static final int BINARY_TYPE                   =  8;
-    public static final int URIREFERENCE_TYPE             =  9;
-    public static final int ID_TYPE                       = 10;
-    public static final int IDREF_TYPE                    = 11;
-    public static final int ENTITY_TYPE                   = 12;
-    public static final int QNAME_TYPE                    = 13;
+    public static final int DURATION_TYPE                 =  2;
+    public static final int DATETIME_TYPE                 =  3;
+    public static final int TIME_TYPE                     =  4;
+    public static final int DATE_TYPE                     =  5;
+    public static final int GYEARMONTH_TYPE               =  6;
+    public static final int GYEAR_TYPE                    =  7;
+    public static final int GMONTHDAY_TYPE                =  8;
+    public static final int GDAY_TYPE                     =  9;
+    public static final int GMONTH_TYPE                   =  10;
+    public static final int BOOLEAN_TYPE                  =  11;
+    public static final int BASE64BINARY_TYPE             =  12;
+    public static final int HEXBINARY_TYPE                =  13;
+    public static final int FLOAT_TYPE                    =  14;
+    public static final int DOUBLE_TYPE                   =  15;
+    public static final int DECIMAL_TYPE                  =  16;
+    public static final int ANYURI_TYPE                   =  17;
+    public static final int QNAME_TYPE                    =  18;
+    public static final int NOTATION_TYPE                 =  19;
     //Derived datatypes
-    public static final int NOTATION_TYPE                 = 14;
-    public static final int CDATA_TYPE                    = 15;
-    public static final int LANGUAGE_TYPE                 = 16;
-    public static final int IDREFS_TYPE                   = 17;
-    public static final int ENTITIES_TYPE                 = 18;
-    public static final int NMTOKEN_TYPE                  = 19;
-    public static final int NMTOKENS_TYPE                 = 20;
-    public static final int NAME_TYPE                     = 21;
-    public static final int NCNAME_TYPE                   = 22;
-    public static final int INTEGER_TYPE                  = 23;
-    public static final int NON_POSITIVE_INTEGER_TYPE     = 24;
-    public static final int NEGATIVE_INTEGER_TYPE         = 25;
-    public static final int LONG_TYPE                     = 26;
-    public static final int INT_TYPE                      = 27;
-    public static final int SHORT_TYPE                    = 28;
-    public static final int BYTE_TYPE                     = 29;
-    public static final int NON_NEGATIVE_INTEGER_TYPE     = 30;
-    public static final int UNSIGNED_LONG_TYPE            = 31;
-    public static final int UNSIGNED_INT_TYPE             = 32;
-    public static final int UNSIGNED_SHORT_TYPE           = 33;
-    public static final int UNSIGNED_BYTE_TYPE            = 34;
-    public static final int POSITIVE_INTEGER_TYPE         = 35;
-    public static final int TIME_INSTANT_TYPE             = 36;
-    public static final int TIME_TYPE                     = 37;
-    public static final int TIME_PERIOD_TYPE              = 38;
-	public static final int TOKEN_TYPE                    = 39;
-    public static final int DATE_TYPE                     = 40;
-    public static final int MONTH_TYPE                    = 41;
-    public static final int YEAR_TYPE                     = 42;
-    public static final int CENTURY_TYPE                  = 43;
-    public static final int RECURRING_DATE_TYPE           = 44;
-    public static final int RECURRING_DAY_TYPE            = 45;
+    public static final int NORMALIZEDSTRING_TYPE         = 20;
+    public static final int TOKEN_TYPE                    = 21;
+    public static final int LANGUAGE_TYPE                 = 22;
+    public static final int NAME_TYPE                     = 23;
+    public static final int NCNAME_TYPE                   = 24;
+    public static final int ID_TYPE                       = 25;
+    public static final int IDREF_TYPE                    = 26;
+    public static final int IDREFS_TYPE                   = 27;
+    public static final int ENTITY_TYPE                   = 28;
+    public static final int ENTITIES_TYPE                 = 29;
+    public static final int NMTOKEN_TYPE                  = 30;
+    public static final int NMTOKENS_TYPE                 = 31;
+    public static final int INTEGER_TYPE                  = 32;
+    public static final int NON_POSITIVE_INTEGER_TYPE     = 33;
+    public static final int NEGATIVE_INTEGER_TYPE         = 34;
+    public static final int LONG_TYPE                     = 35;
+    public static final int INT_TYPE                      = 36;
+    public static final int SHORT_TYPE                    = 37;
+    public static final int BYTE_TYPE                     = 38;
+    public static final int NON_NEGATIVE_INTEGER_TYPE     = 39;
+    public static final int UNSIGNED_LONG_TYPE            = 40;
+    public static final int UNSIGNED_INT_TYPE             = 41;
+    public static final int UNSIGNED_SHORT_TYPE           = 42;
+    public static final int UNSIGNED_BYTE_TYPE            = 43;
+    public static final int POSITIVE_INTEGER_TYPE         = 44;
 
     /**
      * The resource location for the built-in types
@@ -403,7 +402,7 @@ public class SimpleTypesFactory
 		        unmarshaller.setValidation(false);
 
                 is = this.getClass().getResourceAsStream(TYPE_DEFINITIONS);
-		        TypeList typeList= (TypeList)unmarshaller.unmarshal( new org.xml.sax.InputSource(is) );
+		        TypeList typeList = (TypeList)unmarshaller.unmarshal( new org.xml.sax.InputSource(is) );
 
                 //print what we just read (only in debug mode and if we have a logWriter)
 		        if (Configuration.debug() && getLogWriter()!= null)
@@ -420,7 +419,7 @@ public class SimpleTypesFactory
                     _typesByName.put(type.getName(), type);
                     type.setSimpleType(createSimpleType(type));
                     _typesByCode.put(new Integer( type.getSimpleType().getTypeCode() ), type);
-		        }
+                }
 	        }
 	        catch (Exception except)
 	        {
@@ -441,12 +440,10 @@ public class SimpleTypesFactory
         //Creates the instance of a class derived from SimpleType representing the type.
         SimpleType result= createInstance(type.getName());
 
-
         if (result == null)
             throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
 
 	    result.setName(type.getName());
-
 
         //Load the result's typeCode
         int intCode;
@@ -459,7 +456,6 @@ public class SimpleTypesFactory
         }
 
         result.setTypeCode(intCode);
-
 
         //Find and set the result's SimpleType basetype (if any).
         if (type.getBase() != null) {
@@ -486,7 +482,6 @@ public class SimpleTypesFactory
                 }
             }
         }
-
         return result;
     }
 

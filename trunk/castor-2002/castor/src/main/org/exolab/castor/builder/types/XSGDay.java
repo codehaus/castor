@@ -38,24 +38,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
- *
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  * $Id$
  */
 
-package org.exolab.castor.xml.schema.simpletypes;
+package org.exolab.castor.builder.types;
 
-import org.exolab.castor.xml.schema.Schema;
+import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.types.GDay;
+import org.exolab.javasource.JType;
+import org.exolab.javasource.JClass;
 
 /**
- *
- * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
- * @version $Revision:
-**/
-public class UriReferenceType extends AtomicType
-{
+ * The XML Schema gDay type
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @version $Revision $ $Date$
+ */
+
+public class XSGDay extends XSType {
+
+    /**
+     * The JType represented by this XSType
+     */
+    private static final JType jType
+        = new JClass ("org.exolab.castor.types.GDay");
+
+
+    public XSGDay() {
+       super(XSType.GDAY_TYPE);
+    }
+
+    /**
+     * Returns the Java code necessary to create a new instance of the
+     * JType associated with this XSType
+     */
+    public String newInstanceCode() {
+         return "new "+getJType().getName()+"();";
+    } //-- newInstanceCode
+
+    public JType getJType() {
+        return this.jType;
+    }
+
+    public void setFacets(SimpleType simpleType){
+    }
 }
-
-
-
-

@@ -69,7 +69,7 @@ public final class XSLong extends XSPatternBase {
     private static final JType jType = JType.Long;
 
     public XSLong() {
-        super(XSType.LONG);
+        super(XSType.LONG_TYPE);
     } //-- XSLong
 
 

@@ -82,7 +82,7 @@ public  class XSDecimal extends XSType
     private String value = null;
 
     public XSDecimal() {
-        super(XSType.DECIMAL);
+        super(XSType.DECIMAL_TYPE);
     } //-- XSNMToken
 
     /**
@@ -237,7 +237,6 @@ public  class XSDecimal extends XSType
 
     public void setFacets(SimpleType simpleType) {
      Enumeration enum = getFacets(simpleType);
-        try {
             while (enum.hasMoreElements()) {
 
                 Facet facet = (Facet)enum.nextElement();
@@ -255,20 +254,7 @@ public  class XSDecimal extends XSType
                 //-- minInclusive
                 else if (Facet.MIN_INCLUSIVE.equals(name))
                     setMinInclusive(new java.math.BigDecimal(facet.getValue()));
-                //-- precision
-                else if (Facet.PRECISION.equals(name))
-                    setPrecision(facet.toInt());
-                //-- scale
-                else if (Facet.SCALE.equals(name)) {
-                     setScale(facet.toInt());
-                }
             }
-        } catch (ValidationException e) {
-            System.out.println("Error in setting up the Facets");
-            // perhaps could be better to throw a new exception?
-            System.out.println(e);
-            return;
-        }
 
     } //-- setFacets
     /**

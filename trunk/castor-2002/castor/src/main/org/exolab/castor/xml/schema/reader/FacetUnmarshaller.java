@@ -195,22 +195,18 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
 
     protected static boolean isFacet(String name) {
 
-        if (Facet.DURATION.equals(name))      return true;
-        if (Facet.ENCODING.equals(name))      return true;
         if (Facet.ENUMERATION.equals(name))   return true;
         if (Facet.LENGTH.equals(name))        return true;
         if (Facet.PATTERN.equals(name))       return true;
-        if (Facet.PRECISION.equals(name))     return true;
         if (Facet.MAX_EXCLUSIVE.equals(name)) return true;
         if (Facet.MIN_EXCLUSIVE.equals(name)) return true;
         if (Facet.MAX_INCLUSIVE.equals(name)) return true;
         if (Facet.MIN_INCLUSIVE.equals(name)) return true;
         if (Facet.MAX_LENGTH.equals(name))    return true;
         if (Facet.MIN_LENGTH.equals(name))    return true;
-        if (Facet.PERIOD.equals(name))        return true;
-        if (Facet.SCALE.equals(name))         return true;
         if (Facet.WHITESPACE.equals(name))    return true;
-
+        if (Facet.TOTALDIGITS.equals(name))   return true;
+        if (Facet.FRACTIONDIGITS.equals(name))return true;
         return false;
     } //-- isFacet
 

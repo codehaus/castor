@@ -38,16 +38,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
- *
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  * $Id$
  */
+
 package org.exolab.castor.builder.types;
 
-public class XSNonNegativeInteger extends XSInteger {
+import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.types.GMonthDay;
+import org.exolab.javasource.JType;
+import org.exolab.javasource.JClass;
 
-    public XSNonNegativeInteger() {
-        super();
-        setMaxInclusive(-1);
+/**
+ * The XML Schema gYearMonth type
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @version $Revision $ $Date$
+ */
+
+public class XSGMonthDay extends XSType {
+
+    /**
+     * The JType represented by this XSType
+     */
+    private static final JType jType
+        = new JClass ("org.exolab.castor.types.GMonthDay");
+
+
+    public XSGMonthDay() {
+       super(XSType.GMONTHDAY_TYPE);
+    }
+
+    /**
+     * Returns the Java code necessary to create a new instance of the
+     * JType associated with this XSType
+     */
+    public String newInstanceCode() {
+         return "new "+getJType().getName()+"();";
+    } //-- newInstanceCode
+
+    public JType getJType() {
+        return this.jType;
+    }
+
+    public void setFacets(SimpleType simpleType){
     }
 }

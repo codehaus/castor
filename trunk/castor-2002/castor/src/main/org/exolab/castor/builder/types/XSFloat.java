@@ -74,7 +74,7 @@ public final class XSFloat extends XSPatternBase {
 
 
     public XSFloat() {
-        super(XSType.FLOAT);
+        super(XSType.FLOAT_TYPE);
     } //-- XSReal
 
 

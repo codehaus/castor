@@ -61,34 +61,21 @@ import java.util.Enumeration;
 public abstract class XSType {
 
 
+    ////////////primitive types/////////////////////
     /**
-     * The name of the binary type
-    **/
-    public static final String BINARY_NAME = "binary";
+     * The name of the string type
+     */
+     public static final String STRING_NAME = "string";
 
     /**
      * The name of the boolean type
-    **/
+     */
     public static final String BOOLEAN_NAME = "boolean";
 
     /**
-     * The name of the CDATA type
+     * The name of the float type
      */
-     public static final String CDATA_NAME = "CDATA";
-    /**
-     * The name of the the century type
-     */
-     public static final String CENTURY_NAME = "century";
-
-    /**
-     * The name of the decimal type
-    **/
-    public static final String DECIMAL_NAME = "decimal";
-
-    /**
-     * The name of the date type
-     */
-    public static final String DATE_NAME = "date";
+     public static final String FLOAT_NAME = "float";
 
     /**
      * The name of the double type
@@ -96,13 +83,126 @@ public abstract class XSType {
     public static final String DOUBLE_NAME = "double";
 
     /**
-     * The name of the float type
+     * The name of the decimal type
+    **/
+    public static final String DECIMAL_NAME = "decimal";
+
+    /**
+     * the name of the duration type
      */
-     public static final String FLOAT_NAME  = "float";
+    public static final String DURATION_NAME = "duration";
+
+   /**
+     * The name of the the dateTime type
+     */
+     public static final String DATETIME_NAME = "dateTime";
+
+    /**
+     * the name of the time type
+     */
+     public static final String TIME_NAME = "time";
+
+    /**
+     * The name of the date type
+     */
+    public static final String DATE_NAME = "date";
+
+    /**
+     * The name of the gYearMonth type.
+     */
+    public static final String GYEARMONTH_NAME = "gYearMonth";
+
+    /**
+     * The name of the gYear type.
+     */
+    public static final String GYEAR_NAME = "gYear";
+
+    /**
+     * The name of the gMonthDay type.
+     */
+    public static final String GMONTHDAY_NAME  = "gMonthDay";
+
+    /**
+     * The name of the gDay type.
+     */
+    public static final String GDAY_NAME = "gName";
+
+    /**
+     * The name of the gMonth type.
+     */
+    public static final String GMONTH_NAME = "gMonth";
+
+    /**
+     * The name of the hexBinary type
+     */
+    public static final String HEXBINARY_NAME = "hexBinary";
+
+    /**
+     * The name of the base64Binary type
+     */
+    public static final String BASE64BINARY_NAME = "base64Binary";
+
+    /**
+     * the name of the anyURI type.
+     */
+    public static final String ANYURI_NAME = "anyURI";
+
+    /**
+     * the name of the QName type
+     */
+    public static final String QNAME_NAME = "QName";
+
+    /**
+     * the name of the notation type
+     */
+     public static final String NOTATION_NAME = "NOTATION";
+
+    /////////////derived types//////////////////////
+
+    /**
+     * The name of the normalizedString type.
+     */
+    public static final String NORMALIZEDSTRING_NAME = "normalizedString";
+
+    /**
+     * The name of the token type
+     */
+    public static final String TOKEN_NAME = "token";
+
+    /**
+     * The name of the language type.
+     */
+    public  static final String LANGUAGE_NAME = "language";
+
+    /**
+     * The Name of the IDREFS type
+     */
+     public static final String IDREFS_NAME = "IDREFS";
+
+
+    /**
+     * The name of the NMTOKEN type
+    **/
+    public static final String NMTOKEN_NAME = "NMTOKEN";
+
+   /**
+    * The of the NMTOKENS type
+    */
+    public static String NMTOKENS_NAME  = "NMTOKENS";
+
+   /**
+    * The name of the Name type
+    */
+    public static final String NAME_NAME = "Name";
+
+   /**
+    * The name of the NCName type
+    */
+    public static final String NCNAME_NAME = "NCName";
 
     /**
      * The name of the ID type
-    **/
+     **/
     public static final String ID_NAME = "ID";
 
     /**
@@ -110,31 +210,11 @@ public abstract class XSType {
     **/
     public static final String IDREF_NAME = "IDREF";
 
-    /**
-     * The Name of the IDREFS type
-     */
-     public static final String IDREFS_NAME = "IDREFS";
 
     /**
      * The name of the integer type
     **/
     public static final String INTEGER_NAME = "integer";
-
-
-    /**
-     * The name of the long type
-    **/
-    public static final String LONG_NAME = "long";
-
-    /**
-     * The name for the month type
-     */
-     public static final String MONTH_NAME = "month";
-
-    /**
-     * The name of the NCName type
-    **/
-    public static final String NCNAME_NAME = "NCName";
 
     /**
      * The name of the non-positive-integer type
@@ -151,74 +231,30 @@ public abstract class XSType {
     **/
     public static final String NEGATIVE_INTEGER_NAME  = "negativeInteger";
 
-
-    /**
-     * The name of the NMTOKEN type
-    **/
-    public static final String NMTOKEN_NAME        = "NMTOKEN";
-
    /**
-    * The of the NMTOKENS type
-    */
-    public static String NMTOKENS_NAME  = "NMTOKENS";
+    * The name of the long type
+   **/
+    public static final String LONG_NAME = "long";
 
-    /**
-     * The name of the positive-integer type
-    **/
-    public static final String POSITIVE_INTEGER_NAME  = "positiveInteger";
+  	/**
+	 * The name of the int type
+	 */
+	public static final String INT_NAME = "int";
 
-    /**
-     * the name of the QName type
-     */
-     public static final String QNAME_NAME = "QName";
-
-    /**
-     * the name of the recurring duration type
-     */
-     public static final String RECURRING_DURATION_NAME ="recurringDuration";
-
-    /**
-     * The name of the string type
-    **/
-    public static final String STRING_NAME  = "string";
-
-    /**
-     * The name of the timeInstant type
-    **/
-    public static final String TIME_INSTANT_NAME = "timeInstant";
-
-    /**
-     * the name of the timeDuration type
-     */
-    public static final String TIME_DURATION_NAME = "timeDuration";
-
-    /**
-     * the name of the time type
-     */
-     public static final String TIME_NAME = "time";
-     /**
-      * the name of the time period type
-      */
-     public static final String TIME_PERIOD_NAME    = "timePeriod";
-	/**
-     * The name of the URIReference type
-     */
-     public static final String URIRREFERENCE_NAME = "uriReference";
-
-    /**
-     * the name of the year type
-     */
-     public static final String YEAR_NAME = "year";
     /**
 	 * The name of the short type
 	 */
 	public static final String SHORT_NAME = "short";
 
-	/**
-	 * The name of the int type
-	 */
-	public static final String INT_NAME = "int";
+    /**
+     * The name of the byte type
+     */
+    public static final String BYTE_NAME = "byte";
 
+    /**
+     * The name of the positive-integer type
+    **/
+    public static final String POSITIVE_INTEGER_NAME  = "positiveInteger";
 
     public static final short NULL               = -1;
 
@@ -227,39 +263,50 @@ public abstract class XSType {
     public static final short CLASS              =  0;
 
     //--
-    public static final short BINARY               =  1;
-    public static final short BOOLEAN              =  2;
-    public static final short CENTURY              =  3;
-    public static final short CDATA                =  4;
-    public static final short COLLECTION           =  5;
-    public static final short DATE                 =  6;
-    public static final short DECIMAL              =  7;
-    public static final short DOUBLE               =  8;
-    public static final short FLOAT                =  9;
-    public static final short ID                   = 10;
-    public static final short IDREF                = 11;
-    public static final short IDREFS               = 12;
-    public static final short INT				   = 13;
-    public static final short INTEGER              = 14;
-    public static final short LONG                 = 15;
-    public static final short MONTH                = 16;
-    public static final short NCNAME               = 17;
-    public static final short NEGATIVE_INTEGER     = 18;
-    public static final short NMTOKEN              = 19;
-    public static final short NMTOKENS             = 20;
-    public static final short NON_NEGATIVE_INTEGER = 21;
-    public static final short NON_POSITIVE_INTEGER = 22;
-    public static final short POSITIVE_INTEGER     = 23;
-    public static final short QNAME                = 24;
-    public static final short RECURRING_DURATION   = 25;
-    public static final short SHORT				   = 26;
-    public static final short STRING               = 27;
-    public static final short TIME                 = 28;
-    public static final short TIME_DURATION        = 29;
-    public static final short TIME_INSTANT         = 30;
-    public static final short TIME_PERIOD          = 31;
-    public static final short URIREFERENCE         = 32;
-	public static final short YEAR                 = 33;
+    //Primitive types
+    public static final short STRING_TYPE                   =  1;
+    public static final short DURATION_TYPE                 =  2;
+    public static final short DATETIME_TYPE                 =  3;
+    public static final short TIME_TYPE                     =  4;
+    public static final short DATE_TYPE                     =  5;
+    public static final short GYEARMONTH_TYPE               =  6;
+    public static final short GYEAR_TYPE                    =  7;
+    public static final short GMONTHDAY_TYPE                =  8;
+    public static final short GDAY_TYPE                     =  9;
+    public static final short GMONTH_TYPE                   =  10;
+    public static final short BOOLEAN_TYPE                  =  11;
+    public static final short BASE64BINARY_TYPE             =  12;
+    public static final short HEXBINARY_TYPE                =  13;
+    public static final short FLOAT_TYPE                    =  14;
+    public static final short DOUBLE_TYPE                   =  15;
+    public static final short DECIMAL_TYPE                  =  16;
+    public static final short ANYURI_TYPE                   =  17;
+    public static final short QNAME_TYPE                    =  18;
+    public static final short NOTATION_TYPE                 =  19;
+    //Derived datatypes
+    public static final short NORMALIZEDSTRING_TYPE         = 20;
+    public static final short TOKEN_TYPE                    = 21;
+    public static final short LANGUAGE_TYPE                 = 22;
+    public static final short NAME_TYPE                     = 23;
+    public static final short NCNAME_TYPE                   = 24;
+    public static final short ID_TYPE                       = 25;
+    public static final short IDREF_TYPE                    = 26;
+    public static final short IDREFS_TYPE                   = 27;
+    public static final short ENTITY                        = 28;
+    public static final short ENTITIES                      = 29;
+    public static final short NMTOKEN_TYPE                  = 30;
+    public static final short NMTOKENS_TYPE                 = 31;
+    public static final short INTEGER_TYPE                  = 32;
+    public static final short NON_POSITIVE_INTEGER_TYPE     = 33;
+    public static final short NEGATIVE_INTEGER_TYPE         = 34;
+    public static final short LONG_TYPE                     = 35;
+    public static final short INT_TYPE                      = 36;
+    public static final short SHORT_TYPE                    = 37;
+    public static final short BYTE_TYPE                     = 38;
+    public static final short NON_NEGATIVE_INTEGER_TYPE     = 39;
+    public static final short POSITIVE_INTEGER_TYPE         = 44;
+    //collection type
+    public static final short COLLECTION                    = 45;
     private short   type       = NULL;
 
     /**
@@ -364,17 +411,17 @@ public abstract class XSType {
 
     public boolean isPrimitive() {
         switch (type) {
-            case BOOLEAN:
-            case DOUBLE:
-            case FLOAT:
-            case INTEGER:
-            case LONG:
-            case NON_NEGATIVE_INTEGER:
-            case NON_POSITIVE_INTEGER:
-            case NEGATIVE_INTEGER:
-            case POSITIVE_INTEGER:
-            case SHORT:
-            case INT:
+            case BOOLEAN_TYPE:
+            case DOUBLE_TYPE:
+            case FLOAT_TYPE:
+            case INTEGER_TYPE:
+            case LONG_TYPE:
+            case NON_NEGATIVE_INTEGER_TYPE:
+            case NON_POSITIVE_INTEGER_TYPE:
+            case NEGATIVE_INTEGER_TYPE:
+            case POSITIVE_INTEGER_TYPE:
+            case SHORT_TYPE:
+            case INT_TYPE:
                 return true;
             default:
                 return false;
@@ -389,14 +436,15 @@ public abstract class XSType {
      */
     public boolean isDateTime() {
         switch (type) {
-            case CENTURY:
-            case DATE:
-            case MONTH:
-            case RECURRING_DURATION:
-            case TIME:
-            case TIME_DURATION:
-            case TIME_PERIOD:
-            case YEAR:
+            case DATETIME_TYPE:
+            case DURATION_TYPE:
+            case DATE_TYPE:
+            case GDAY_TYPE:
+            case GMONTHDAY_TYPE:
+            case GMONTH_TYPE:
+            case GYEARMONTH_TYPE:
+            case GYEAR_TYPE:
+            case TIME_TYPE:
                 return true;
             default:
                 return false;
@@ -408,68 +456,76 @@ public abstract class XSType {
     **/
     public String getName() {
         switch (type) {
-            case BINARY:
-                return BINARY_NAME;
-            case BOOLEAN:
-                return BOOLEAN_NAME;
-            case CDATA:
-                return CDATA_NAME;
-            case CENTURY:
-                return CENTURY_NAME;
-            case DATE:
-                return DATE_NAME;
-            case DECIMAL:
-                return DECIMAL_NAME;
-            case DOUBLE:
-                return DOUBLE_NAME;
-            case FLOAT:
-                return FLOAT_NAME;
-            case ID:
-                return ID_NAME;
-            case IDREF:
-                return IDREF_NAME;
-            case IDREFS:
-                return IDREFS_NAME;
-            case INTEGER:
-                return INTEGER_NAME;
-            case LONG:
-                return LONG_NAME;
-            case MONTH :
-                return MONTH_NAME;
-            case NCNAME:
-                return NCNAME_NAME;
-            case NEGATIVE_INTEGER:
-                return NEGATIVE_INTEGER_NAME;
-            case NMTOKEN:
-                return NMTOKEN_NAME;
-            case NMTOKENS:
-                return NMTOKENS_NAME;
-            case NON_NEGATIVE_INTEGER:
-                return NON_NEGATIVE_INTEGER_NAME;
-            case NON_POSITIVE_INTEGER:
-                return NON_POSITIVE_INTEGER_NAME;
-            case POSITIVE_INTEGER:
-                return POSITIVE_INTEGER_NAME;
-            case QNAME:
-                return QNAME_NAME;
-            case RECURRING_DURATION:
-                return RECURRING_DURATION_NAME;
-            case STRING:
+            case STRING_TYPE:
                 return STRING_NAME;
-            case TIME:
+            case  DURATION_TYPE:
+                return DURATION_NAME;
+            case DATETIME_TYPE:
+                return DATETIME_NAME;
+            case TIME_TYPE:
                 return TIME_NAME;
-            case TIME_INSTANT:
-                return TIME_INSTANT_NAME;
-            case TIME_DURATION:
-                return TIME_DURATION_NAME;
-            case TIME_PERIOD:
-                return TIME_PERIOD_NAME;
-            case YEAR :
-                return YEAR_NAME;
-			case SHORT:
-				return SHORT_NAME;
-			case INT:
-				return INT_NAME;
+            case DATE_TYPE:
+                return DATE_NAME;
+            case GYEARMONTH_TYPE:
+                return GYEARMONTH_NAME;
+            case GDAY_TYPE:
+                return GDAY_NAME;
+            case GMONTH_TYPE:
+                return GMONTH_NAME;
+            case BOOLEAN_TYPE:
+                return BOOLEAN_NAME;
+            case BASE64BINARY_TYPE:
+                return BASE64BINARY_NAME;
+            case HEXBINARY_TYPE:
+                return HEXBINARY_NAME;
+            case FLOAT_TYPE:
+                return FLOAT_NAME;
+            case DOUBLE_TYPE:
+                return DOUBLE_NAME;
+            case DECIMAL_TYPE:
+                return DECIMAL_NAME;
+            case ANYURI_TYPE:
+                return ANYURI_NAME;
+            case QNAME_TYPE:
+                return QNAME_NAME;
+            case NORMALIZEDSTRING_TYPE:
+                return NORMALIZEDSTRING_NAME;
+            case TOKEN_TYPE:
+                return TOKEN_NAME;
+            case LANGUAGE_TYPE:
+                return LANGUAGE_NAME;
+            case NAME_TYPE:
+                return NAME_NAME;
+            case NCNAME_TYPE:
+                return NCNAME_NAME;
+            case ID_TYPE:
+                return ID_NAME;
+            case IDREF_TYPE:
+                return IDREF_NAME;
+            case IDREFS_TYPE:
+                return IDREFS_NAME;
+            case NMTOKENS_TYPE:
+                return NMTOKENS_NAME;
+            case NMTOKEN_TYPE:
+                return NMTOKEN_NAME;
+            case INTEGER_TYPE:
+                return INTEGER_NAME;
+            case NON_POSITIVE_INTEGER_TYPE:
+                return NON_POSITIVE_INTEGER_NAME;
+            case NEGATIVE_INTEGER_TYPE:
+                return NEGATIVE_INTEGER_NAME;
+            case LONG_TYPE:
+                return LONG_NAME;
+            case INT_TYPE:
+                return INTEGER_NAME;
+            case SHORT_TYPE:
+                return SHORT_NAME;
+            case BYTE_TYPE:
+                return BYTE_NAME;
+            case NON_NEGATIVE_INTEGER_TYPE:
+                return NON_NEGATIVE_INTEGER_NAME;
+            case POSITIVE_INTEGER_TYPE:
+                return POSITIVE_INTEGER_NAME;
             default:
                 return null;
         }

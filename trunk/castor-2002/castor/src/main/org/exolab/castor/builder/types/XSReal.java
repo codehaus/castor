@@ -72,7 +72,7 @@ public final class XSReal extends XSPatternBase {
 
 
     public XSReal() {
-        super(XSType.DOUBLE);
+        super(XSType.DOUBLE_TYPE);
     } //-- XSReal
 
 

@@ -53,12 +53,12 @@ import org.exolab.javasource.JClass;
 import java.util.Enumeration;
 
 /**
- * <p>The XSType representing a CDATA type.
- * <p>CDATA is simply a XSString with some specific validation
+ * <p>The XSType representing a normalizedString type.
+ * <p>normalizedString is simply a XSString with some specific validation
  * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
-public final class XSCData extends XSPatternBase {
+public final class XSNormalizedString extends XSPatternBase {
 
     /**
      * The JType represented by this XSType
@@ -84,8 +84,8 @@ public final class XSCData extends XSPatternBase {
     /**
      * Creates a new XSString
      */
-     public XSCData() {
-        super(XSType.CDATA);
+     public  XSNormalizedString() {
+        super(XSType.NORMALIZEDSTRING_TYPE);
     }
 
 

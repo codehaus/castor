@@ -48,7 +48,7 @@ package org.exolab.castor.builder.types;
 import org.exolab.javasource.*;
 
 /**
- * The XML Schema "positive-integer" type
+ * The XML Schema "negative-integer" type
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/

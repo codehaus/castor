@@ -38,50 +38,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
+ *
  * $Id$
- * Date         Author              Changes
- * 11/01/2000   Arnaud Blandin      Created
  */
 
-package org.exolab.castor.builder.types;
+package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.javasource.*;
+import org.exolab.castor.xml.schema.Schema;
 
 /**
- * The XML Schema Century type
- * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
- * @version $Revision$ $Date$
+ * Represents timeDuration
+ * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
+ * @version $Revision:
 **/
-public final class XSCentury extends XSTimePeriod {
+public class DurationType extends AtomicType
+{
+}
 
-    /**
-     * The JType represented by this XSType
-    **/
-    private static final JType jType
-        = new JClass("org.exolab.castor.types.Century");
 
-    private String value = null;
 
-    public XSCentury() {
-        super(XSType.CENTURY,"P100Y");
-    } //-- XSCentury
 
-    /**
-     * Returns the Java code necessary to create a new instance of the
-     * JType associated with this XSType
-     */
-    public String newInstanceCode() {
-         return "new "+getJType().getName()+"();";
-    } //-- newInstanceCode
-
-    /**
-     * Returns the JType that this XSType represents
-     * @return the JType that this XSType represents
-    **/
-    public JType getJType() {
-        return this.jType;
-    }
-
-} //-- XSCentury

@@ -50,51 +50,11 @@ import org.exolab.castor.xml.schema.Schema;
 
 /**
  * Represents the decimal type and those derived from it (integer, short...)
- * The value space is made of the values i / 10^n (I guess i x 10^n is a
- * typo error in the xmlscheme-2 document)
- * n is the scale, it is an interger >=0
- * The other facet is precision (maximum number of digits for i)
- * The facets must verify 0<=scale<=precision
- *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
 public class DecimalType extends AtomicType
 {
-    /** @return result can be null **/
-    public Long getPrecision()
-    {
-        Facet precisionFacet= getFacet(Facet.PRECISION);
-        if (precisionFacet == null) return null;
-
-        try
-        {
-            return new Long(precisionFacet.toLong());
-        }
-        catch (java.lang.Exception e)
-        {
-            return null;
-        }
-    }
-
-    /** @return result can be null **/
-    public Long getScale()
-    {
-        Facet scaleFacet= getFacet(Facet.SCALE);
-        if (scaleFacet == null) return null;
-
-        try
-        {
-            return new Long(scaleFacet.toLong());
-        }
-        catch (java.lang.Exception e)
-        {
-            return null;
-        }
-    }
-
-
-
 
 }
 

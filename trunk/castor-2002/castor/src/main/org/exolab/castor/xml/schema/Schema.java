@@ -64,12 +64,17 @@ public class Schema extends Annotated {
         = "http://www.w3.org/1999/XMLSchema";
     */
 
-    /**
-     * The default Schema namespace, currently
-     * supporting W3C XML Schema, October 2000 Candidate Release
-    **/
-    public static final String DEFAULT_SCHEMA_NS
+    /*
+      October 2000 Candidate Release Namespace
         = "http://www.w3.org/2000/10/XMLSchema";
+     */
+
+    /**
+     * The Namespace supported by the W3C XML Schema
+     * Recommendation.
+     */
+    public static final String DEFAULT_SCHEMA_NS
+        = "http://www.w3.org/2001/XMLSchema";
 
 
     private static final String NULL_ARGUMENT
