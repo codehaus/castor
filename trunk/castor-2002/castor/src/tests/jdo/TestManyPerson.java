@@ -46,18 +46,17 @@
 package jdo;
 
 import java.util.Collection;
-
+import org.exolab.castor.jdo.TimeStampable;
 
 
 
 /**
  * Test object mapping to test_table used to conduct all the tests.
  */
-public class TestManyPerson {
+public class TestManyPerson implements TimeStampable {
 
 
     private int    _id;
-
 
     private String _value;
 
@@ -67,6 +66,7 @@ public class TestManyPerson {
 
     private Collection _group;
 
+    private long _timeStamp;
 
     public TestManyPerson() {
     }
@@ -119,5 +119,13 @@ public class TestManyPerson {
         return _id + " / " + _value;
     }
 
+    public void jdoSetTimeStamp( long timeStamp )
+    {
+        _timeStamp = timeStamp;
+    }
 
+    public long jdoGetTimeStamp()
+    {
+        return _timeStamp;
+    }
 }
