@@ -81,6 +81,9 @@ public class SGTypes {
     //---------------/
     
     //-- java.lang
+    public static final JClass IllegalStateException
+        = new JClass("java.lang.IllegalStateException");
+        
     public static final JClass IndexOutOfBoundsException
         = new JClass("java.lang.IndexOutOfBoundsException");
         

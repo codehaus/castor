@@ -102,9 +102,9 @@ public class DescriptorSourceFactory {
         String variableName = "_"+className;
         
         
-        JClass classDesc = new DescriptorJClass(className+"Descriptor", 
-                                                jClass);
-                                                
+        DescriptorJClass classDesc 
+            = new DescriptorJClass(className+"Descriptor", jClass);
+                                            
         //-- get handle to default constuctor
         
         JConstructor cons = classDesc.getConstructor(0);
@@ -134,8 +134,9 @@ public class DescriptorSourceFactory {
             jsc.append("\";");
         }
         
-        jsc.add("XMLFieldDescriptorImpl desc = null;");
-        jsc.add("XMLFieldHandler handler = null;");
+        jsc.add("XMLFieldDescriptorImpl  desc           = null;");
+        jsc.add("XMLFieldHandler         handler        = null;");
+        jsc.add("FieldValidator          fieldValidator = null;");
         
         //jsc.add("Class[] emptyClassArgs = new Class[0];");
         //jsc.add("Class[] classArgs = new Class[1];");
@@ -384,14 +385,12 @@ public class DescriptorSourceFactory {
             jsc.add("");
             
             //-- Add Validation Code
-            //jsc.add("bvr = new BasicValidationRule(\"");
-            //jsc.append(member.getNodeName());
-            //jsc.append("\");");
-            //jsc.add("bvr.setAsAttributeRule();");
-            //validationCode(member, jsc);
-            //jsc.add("rules[");
-            //jsc.append(Integer.toString(i));
-            //jsc.append("] = bvr;");
+            jsc.add("//-- validation code for: ");
+            jsc.append(member.getName());
+            jsc.add("fieldValidator = new FieldValidator();");
+            validationCode(member, jsc);
+            jsc.add("desc.setValidator(fieldValidator);");
+            jsc.add("");
         }
         
         
@@ -590,12 +589,12 @@ public class DescriptorSourceFactory {
             jsc.add("");
             
             //-- Add Validation Code
-            //jsc.add("bvr = new BasicValidationRule(\"");
-            //jsc.append(member.getNodeName());
-            //jsc.append("\");");
-            //validationCode(member, jsc);
-            //jsc.add("gvr.addValidationRule(bvr);");
-            
+            jsc.add("//-- validation code for: ");
+            jsc.append(member.getName());
+            jsc.add("fieldValidator = new FieldValidator();");
+            validationCode(member, jsc);
+            jsc.add("desc.setValidator(fieldValidator);");
+            jsc.add("");
         }
         
         return classDesc;
@@ -622,19 +621,17 @@ public class DescriptorSourceFactory {
     private static void validationCode(FieldInfo member, JSourceCode jsc) {
         
         //-- a hack, I know, I will change later
-        if (member.getName().equals("_anyList")) return;
+        if (member.getName().equals("_anyObject")) return;
         
         XSType xsType = member.getSchemaType();
         
         //-- create local copy of field
-        JMember jMember = member.createMember();
-        
+        //JMember jMember = member.createMember();
         
         if (xsType.getType() != XSType.COLLECTION) {
             if (member.isRequired()) {
-                jsc.add("bvr.setMinOccurs(1);");
+                jsc.add("fieldValidator.setMinOccurs(1);");
             }
-            jsc.add("bvr.setMaxOccurs(1);");
         }
         
         switch (xsType.getType()) {
@@ -669,18 +666,18 @@ public class DescriptorSourceFactory {
                     jsc.append(");");
                 }
                 
-                jsc.add("bvr.setTypeValidator(iv);");
+                jsc.add("fieldValidator.setValidator(iv);");
                 jsc.unindent();
                 jsc.add("}");
                 break;
             case XSType.STRING:
-                jsc.add("bvr.setTypeValidator(new StringValidator());");
+                jsc.add("fieldValidator.setValidator(new StringValidator());");
                 break;
             case XSType.NCNAME:
-                jsc.add("bvr.setTypeValidator(new NameValidator());");
+                jsc.add("fieldValidator.setValidator(new NameValidator());");
                 break;
             case XSType.NMTOKEN:
-                jsc.add("bvr.setTypeValidator(new NameValidator(");
+                jsc.add("fieldValidator.setValidator(new NameValidator(");
                 jsc.append("NameValidator.NMTOKEN));");
                 break;
             case XSType.COLLECTION:
@@ -688,12 +685,11 @@ public class DescriptorSourceFactory {
                 CollectionInfo cInfo = (CollectionInfo)member;
                 FieldInfo content = cInfo.getContent();
                 
-                jsc.add("bvr.setMinOccurs(");
+                jsc.add("fieldValidator.setMinOccurs(");
                 jsc.append(Integer.toString(xsList.getMinimumSize()));
                 jsc.append(");");
-                
                 if (xsList.getMaximumSize() > 0) {
-                    jsc.add("bvr.setMaxOccurs(");
+                    jsc.add("fieldValidator.setMaxOccurs(");
                     jsc.append(Integer.toString(xsList.getMaximumSize()));
                     jsc.append(");");
                 }

@@ -185,8 +185,10 @@ public class TypeConversion {
                 //-- double
                 case BuiltInType.DOUBLE_TYPE:
                     return new XSReal();
-                //-- integer
+                //-- integer, negative-integer, positive-integer
                 case BuiltInType.INTEGER_TYPE:
+                case BuiltInType.NEGATIVE_INTEGER_TYPE:
+                case BuiltInType.POSITIVE_INTEGER_TYPE:
                     return toXSInteger(datatype);
                 case BuiltInType.LONG_TYPE:
                     return new XSLong();
@@ -232,7 +234,20 @@ public class TypeConversion {
      * @return the XSInteger representation of the given Datatype
     **/
     private static XSInteger toXSInteger(Datatype datatype) {
-        XSInteger xsInteger = new XSInteger();
+        
+        XSInteger xsInteger = null;
+        
+        switch ( ((BuiltInType)datatype).getType() ) {
+            case BuiltInType.NEGATIVE_INTEGER_TYPE:
+                xsInteger = new XSNegativeInteger();
+                break;
+            case BuiltInType.POSITIVE_INTEGER_TYPE:
+                xsInteger = new XSPositiveInteger();
+                break;
+            default:
+                xsInteger = new XSInteger();
+                break;
+        }
         
         //-- copy valid facets
         Enumeration enum = datatype.getFacets();
