@@ -13,6 +13,7 @@ public class TestPKsAddress {
     private String _city;
     private String _state;
     private String _zip;
+	private TestPKsPerson _person;
 
     public void setId( int id ) {
         _id = id;
@@ -44,5 +45,10 @@ public class TestPKsAddress {
     public String getZip() {
         return _zip;
     }
+	public void setPerson( TestPKsPerson person ) {
+		_person = person;
+	}
+	public TestPKsPerson getPerson() {
+		return _person;
+	}
 }
-
