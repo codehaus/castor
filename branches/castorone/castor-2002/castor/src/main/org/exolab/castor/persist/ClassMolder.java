@@ -751,6 +751,12 @@ public class ClassMolder {
         if ( !OID.isEquals( oid.getIdentities(), getIdentities( object ) ) ) 
             throw new PersistenceException("Identities changes is not allowed!");
 
+        fields = (Object[]) locker.getObject( tx );
+
+        if ( fields == null ) 
+            throw new PersistenceException("Object, "+oid+",  isn't loaded in the persistence storage!");
+
+
         newfields = new Object[_fhs.length];
 
         if ( getCallback() != null ) {
@@ -770,7 +776,7 @@ public class ClassMolder {
                         if ( o != null ) 
                             newfields[i] = _fhs[i].getFieldClassMolder().getIdentities( o );
                     }
-                    if ( !OID.isEquals( (Object[])ci.fields[i], (Object[])newfields[i] ) ) {
+                    if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
                         modified = true;
                         break;
                     }
@@ -780,12 +786,8 @@ public class ClassMolder {
                 getCallback().storing( object, modified );
             } catch ( Exception except ) {
                 throw new PersistenceException( except.getMessage(), except );
+            }
         }
-
-        if ( fields == null ) {
-            throw new PersistenceException("Object, "+oid+",  isn't loaded in the persistence storage!");
-        }
-
         
         ids = oid.getIdentities();
 
@@ -1127,8 +1129,9 @@ public class ClassMolder {
         // update oid and setStamp
     }
 
-    public void update( TransactionContext tx, OID oid, Object object, AccessMode accessMode )
+    public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
         throws PersistenceException, ObjectModifiedException {
+
         System.out.println("ClassMolder.update(): Oid: "+oid);
 
         ClassMolder fieldClassMolder;
@@ -1144,28 +1147,27 @@ public class ClassMolder {
         Object stamp;        
         Object[] temp;
         int fieldType;
+        long timestamp;
         Object o;
 
-        // assumption, only one transaction with the same oid will attemp load at
-        // any given time.
-        // if cache is not in hold state, rise exception
-        CacheItem ci = (CacheItem) _cache.get( oid );
-        if ( !ci.isHold )
-            throw new PersistenceException( "Illegal Cache State!" );
 
-        fields = ci.fields;
+        fields = (Object[]) locker.getObject( tx );
+
+        if ( fields == null ) 
+            throw new ObjectModifiedException("Object is cleared from cache.");
+
+        timestamp = locker.getTimeStamp();
 
         ids = oid.getIdentities();
 
         // If the object implements TimeStampable interface, verify
         // the object's timestamp against the cache
         if ( object instanceof TimeStampable ) {
-            if ( ci.stamp == 0 )
-                throw new IllegalStateException( Messages.format( "persist.internal",
-                                                "Cache stamp for the TimeStamped object is null " ) );
-            if ( ! checkObjectTimeStamp( object, ci ) )
+            TimeStampable ts = (TimeStampable) object;
+            if ( ts.jdoGetTimeStamp() != timestamp ) {
                 throw new ObjectModifiedException( Messages.format( "persist.objectModified", object.getClass(), 
                                                     OID.flatten( ids ) ) );
+            }
         }
 
         for ( int i=0; i<_fhs.length; i++ ) {
@@ -1210,7 +1212,7 @@ public class ClassMolder {
                     for ( int j=0; j<v.size(); j++ ) {
                         list.add( (fieldClassMolder.getIdentities( v.get(j) )) );
                     }
-                    if ( !OID.isEquals( (ArrayVector)ci.fields[i], list ) ) {
+                    if ( !OID.isEquals( (ArrayVector)fields[i], list ) ) {
                         if ( _fhs[i].isDependent() ) {
                             if ( orgFields != null && list != null ) {
                                 // make sure that all dependent objects are included in the transaction,
@@ -1590,7 +1592,7 @@ public class ClassMolder {
     }
 
     public CallbackInterceptor getCallback() {
-        return null;
+        return _callback;
     }
 
     /**
@@ -1722,49 +1724,6 @@ public class ClassMolder {
         }
         return v;
     }
-
-    // TimeStamp related methods from CacheEngine
-
-
-    /**
-     * Set object's timestamp of type "long" in the object (if TimeStampable)
-     * and in the correspondent CacheItem
-     */
-    private void setObjectTimeStamp( Object stamp, Object object, CacheItem ci ) {
-        long timeStamp = 0;
-
-        if ( ! (object instanceof TimeStampable) ) {
-            return;
-        }
-
-        if (stamp == null) {
-            timeStamp = System.currentTimeMillis();
-        } else if ( stamp instanceof Long ) {
-            timeStamp = ( (Long) stamp ).longValue();
-        } else if ( stamp instanceof Date ) {
-            timeStamp = ( (Date) stamp ).getTime();
-        } else if ( stamp instanceof Integer ) {
-            timeStamp = ( (Integer) stamp ).intValue();
-        } else if ( stamp instanceof BigDecimal ) {
-            timeStamp = ( (BigDecimal) stamp ).longValue();
-        }
-        ( (TimeStampable) object ).jdoSetTimeStamp( timeStamp );
-        ci.stamp = timeStamp;
-    }
-
-
-    /**
-     * Check equality of object's timestamp and the cache timestamp 
-     * if the object is TimeStampable, otherwise return true
-     */
-    private boolean checkObjectTimeStamp( Object object, CacheItem ci ) {
-        if ( ! (object instanceof TimeStampable) ) {
-            return true;
-        }
-        return ( ci.stamp == ( (TimeStampable) object ).jdoGetTimeStamp() );
-    }
-
-
 }
 
 
