@@ -468,10 +468,11 @@ public final class SQLEngine implements Persistence {
         try {
             // Must create record in the parent table first.
             // All other dependents are created afterwards.
-            if ( _extends != null )
+            if ( _extends != null ) {
                 // | quick and very dirty hack to try to make multiple class on the same table work
                 if ( !_extends._mapTo.equals( _mapTo ) )
                     identity = _extends.create( conn, fields, identity );
+            }
 
             // Generate key before INSERT
             else if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT )  
@@ -500,9 +501,9 @@ public final class SQLEngine implements Persistence {
                 } else {
                     if ( _ids.length != 1 )
                         throw new PersistenceException( "Complex field expected!" );
-
+                    
                     stmt.setObject( count++, idToSQL( 0, identity ) );
-                }
+                } 
             }
 
             for ( int i = 0 ; i < _fields.length ; ++i ) {
@@ -825,7 +826,6 @@ public final class SQLEngine implements Persistence {
             } else {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
-
                 stmt.setObject( count++, idToSQL( 0, identity ) );
             }
 
