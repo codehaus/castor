@@ -545,6 +545,7 @@ public class JDO
     /*
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
+     * See also, {@link JDO#setAutoStore(boolean)}
      */
     public void setAutoStore( boolean autoStore ) {
         _autoStore = autoStore;

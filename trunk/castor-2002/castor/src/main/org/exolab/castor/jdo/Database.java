@@ -455,7 +455,22 @@ public interface Database
 
     /**
      * True if autoStore is set on. 
-     * It method should be called before begin.
+     * <p>
+     * This method should be called before begin().
+     * <p>
+     * If autoStore is set, and db.create( theDataObject ) is called,
+     * Castor will create theDataObject, and create each object
+     * that does not exist in the transaction and reachable from
+     * theDataObject.
+     * <p>
+     * If db.update( theDataObject ), and theDataObject is
+     * loaded/queuied/created in a previous transaction, Castor
+     * will let theDataObject, and all reachable object from
+     * theDataObject, participate in the current transaction.
+     * <p>
+     * If autoStore is not set, Castor will only create/update/store
+     * dependent object, and related objects must be created/update 
+     * explicitly.
      */
     public void setAutoStore( boolean autoStore );
 
