@@ -532,7 +532,7 @@ public abstract class TransactionContext
     {
         OID         oid;
         ObjectEntry entry;
-        ClassDesc  clsDesc;
+        ClassDesc   clsDesc;
         
         if ( _status != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException();
@@ -590,6 +590,7 @@ public abstract class TransactionContext
         if ( entry.deleted )
             throw new PersistenceException( "persist.cannotDeleteTwice",
                                             obj.getClass(), entry.oid.getIdentity() );
+
         // If the object has been created in this transaction and had no
         // identity we don't need to remove it from persistent storage
         if ( entry.oid.getIdentity() == null ) {
@@ -755,7 +756,7 @@ public abstract class TransactionContext
                     // When storing the object it's OID might change
                     // if the primary identity has been changed
                     clsDesc = entry.engine.getClassDesc( entry.obj.getClass() );
-                    identity = clsDesc.getIdentity().getValue( entry.obj );
+                    identity = clsDesc.getIdentity( entry.obj );
                     if ( identity == null )
                         throw new TransactionAbortedException( "persist.noIdentity", 
                                                                clsDesc.getJavaClass(), null );
@@ -1052,7 +1053,7 @@ public abstract class TransactionContext
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null )
             return null;
-        return (ObjectEntry) engineOids.get( oid );
+       return (ObjectEntry) engineOids.get( oid );
     }
 
 

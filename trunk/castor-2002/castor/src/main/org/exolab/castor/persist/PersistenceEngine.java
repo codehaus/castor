@@ -49,7 +49,6 @@ package org.exolab.castor.persist;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
-import java.util.Enumeration;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.AccessMode;
@@ -98,6 +97,14 @@ public interface PersistenceEngine
      * @return The persistence implementation
      */
     public Persistence getPersistence( Class type );
+
+
+    /**
+     * Returns the log writer used to trace persistence operations.
+     *
+     * @return The log writer, or null
+     */
+    public PrintWriter getLogWriter();
 
 
     /**

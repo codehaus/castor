@@ -79,7 +79,7 @@ public class PersistenceEngineFactory
                                            PrintWriter logWriter )
         throws MappingException
     {
-        return new RelationEngine( null, mapResolver, factory, logWriter );
+        return new CacheEngine( mapResolver, factory, logWriter );
     }
 
 
