@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+
+Version 0.9.2 March 28, 2001 - also includes version 0.9.1
+----------------------------------------------------------
+
 XML:    Added fix for collections, reported by Ozgur Balsoy. This bug was introduced
         on March 8th, in the version 1.45 of DescriptorSourceFactory. (kvisco)
 
