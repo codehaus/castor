@@ -1,6 +1,10 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1500 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+	   Fixes a problem with dereferencing members of Complex that are set to null. 
+       (Werner - 20040122)
+       
 JDO:   Fixed bug 1498 using contribution from Stein M. Hugubakken [dulci@start.no]
        This patch improves performance by checking Log.isDebugEnabled() when using 
        Log.debug() statements.
