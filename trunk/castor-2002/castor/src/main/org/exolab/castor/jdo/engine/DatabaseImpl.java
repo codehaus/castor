@@ -316,6 +316,18 @@ public class DatabaseImpl
     }
 
 
+    public Object getIdentity( Object object )
+    {
+        TransactionContext tx;
+        
+        if ( _dbEngine == null )
+            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
+        if ( _ctx != null && _ctx.isOpen()  )
+            return _ctx.getIdentity( object );
+        return null;
+    }
+
+
     public void lock( Object object )
         throws LockNotGrantedException, ObjectNotPersistentException,
                TransactionNotInProgressException,  PersistenceException
