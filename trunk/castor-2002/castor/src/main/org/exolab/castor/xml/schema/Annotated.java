@@ -51,7 +51,8 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 /**
- * A class representing the XML Schema Annotation
+ * A base class used for XML Structures that support annotations.
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
