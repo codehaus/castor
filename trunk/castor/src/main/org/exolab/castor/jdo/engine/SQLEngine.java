@@ -610,7 +610,7 @@ public final class SQLEngine implements Persistence {
                 
                 // [WG]: TODO: Add below debug statement to show real values ???
                 // if (_log.isDebugEnabled()) {
-                // 	  _log.debug (Messages.format ("jdo.creating", _clsDesc.getJavaClass().getName(), cstmt));
+                //    _log.debug (Messages.format ("jdo.creating", _clsDesc.getJavaClass().getName(), cstmt));
                 // }
                 
                 cstmt.execute();
@@ -834,22 +834,20 @@ public final class SQLEngine implements Persistence {
                     if ( id.size() != _ids.length || _ids.length <= 1 )
                         throw new PersistenceException( "Size of complex field mismatched!");
                     
-	                for ( int i=0; i<_ids.length; i++ ){
-	                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-	                    if (_log.isDebugEnabled()) {
-	                    	_log.debug ( Messages.format("jdo.bindingIdentity", _ids[i].name, idToSQL( i, id.get(i) ) ) );
-	                    }
-	                }                    
+                    for ( int i=0; i<_ids.length; i++ ){
+                        stmt.setObject( count++, idToSQL( i, id.get(i) ) );
+                        if (_log.isDebugEnabled()) {
+                            _log.debug ( Messages.format("jdo.bindingIdentity", _ids[i].name, idToSQL( i, id.get(i) ) ) );
+                        }
+                    }                    
                 } else {
                     if ( _ids.length != 1 )
                         throw new PersistenceException( "Complex field expected!" );
                     
                     stmt.setObject( count++, idToSQL( 0, identity ) );
-	                if (_log.isDebugEnabled()) {
-	                	if (_log.isDebugEnabled()) {
-	                    	_log.debug ( Messages.format("jdo.bindingIdentity", _ids[0].name, idToSQL( 0, identity ) ) );
-	                    }
-	                }
+                    if (_log.isDebugEnabled()) {
+                        _log.debug ( Messages.format("jdo.bindingIdentity", _ids[0].name, idToSQL( 0, identity ) ) );
+                    }
                 }
                 
                 // bind the old fields of the row to be stored into the preparedStatement
@@ -872,8 +870,8 @@ public final class SQLEngine implements Persistence {
                                     SQLTypes.setObject( stmt, count++, toSQL( i, j, complex.get(j)), _fields[i].columns[j].sqlType );
                                     
                                     if (_log.isDebugEnabled()) {
-    	                            	_log.debug (Messages.format( "jdo.bindingField", _fields[i].columns[j].name, toSQL( i, j, complex.get(j) ) ) );
-    	                            }
+                                        _log.debug (Messages.format( "jdo.bindingField", _fields[i].columns[j].name, toSQL( i, j, complex.get(j) ) ) );
+                                    }
                                     
                                 }
                             } else {
@@ -882,9 +880,9 @@ public final class SQLEngine implements Persistence {
                                 
                                 SQLTypes.setObject( stmt, count++, toSQL( i, 0, original[i]), _fields[i].columns[0].sqlType );
                             
-	                            if (_log.isDebugEnabled()) {
-	                            	_log.debug (Messages.format( "jdo.bindingField", _fields[i].columns[0].name, toSQL( i, 0, original[i] ) ) );
-	                            }
+                                if (_log.isDebugEnabled()) {
+                                    _log.debug (Messages.format( "jdo.bindingField", _fields[i].columns[0].name, toSQL( i, 0, original[i] ) ) );
+                                }
                             }
                         }
                     }
@@ -915,24 +913,24 @@ public final class SQLEngine implements Persistence {
                         }
                         
                         ResultSet res = stmt.executeQuery();
-	                    if ( res.next() ) {                    	
-	                    	StringBuffer enlistFieldsNotMatching = new StringBuffer();
-	                    	
-	                    	Object currentField = null;
-	                    	int numberOfFieldsNotMatching = 0;
-	                    	for(int i = 0; i < fields.length; i++){
-	                    		currentField = toJava(i, 0, res.getObject(_fields[i].columns[0].name));
-	                    		
-	                    		if (_fields[i].tableName.compareTo(_mapTo) == 0 && !original[i].equals(currentField)) {
-	                    			if (numberOfFieldsNotMatching >= 1) {
-	                    				enlistFieldsNotMatching.append (", ");
-	                    			}
-	                    			enlistFieldsNotMatching.append ("(" + _clsDesc.getJavaClass().getName() + ")." + _fields[i].columns[0].name + ": ");
-	                    			enlistFieldsNotMatching.append ("[" + original[i] + "/" + currentField + "]"); 
-	                    			numberOfFieldsNotMatching++;
-	                    		}
-	                		}
-	                        throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), identity, enlistFieldsNotMatching.toString()) );
+                        if ( res.next() ) {                     
+                            StringBuffer enlistFieldsNotMatching = new StringBuffer();
+                            
+                            Object currentField = null;
+                            int numberOfFieldsNotMatching = 0;
+                            for(int i = 0; i < fields.length; i++){
+                                currentField = toJava(i, 0, res.getObject(_fields[i].columns[0].name));
+                                
+                                if (_fields[i].tableName.compareTo(_mapTo) == 0 && !original[i].equals(currentField)) {
+                                    if (numberOfFieldsNotMatching >= 1) {
+                                        enlistFieldsNotMatching.append (", ");
+                                    }
+                                    enlistFieldsNotMatching.append ("(" + _clsDesc.getJavaClass().getName() + ")." + _fields[i].columns[0].name + ": ");
+                                    enlistFieldsNotMatching.append ("[" + original[i] + "/" + currentField + "]"); 
+                                    numberOfFieldsNotMatching++;
+                                }
+                            }
+                            throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), identity, enlistFieldsNotMatching.toString()) );
                         }
                     }
                     throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), identity) );
@@ -941,7 +939,7 @@ public final class SQLEngine implements Persistence {
                 _log.fatal( Messages.format( "jdo.storeFatal", _type,  storeStatement ) );
                 throw new PersistenceException( Messages.format("persist.nested", except), except );
             } finally {
-            	try {
+                try {
                     // Close the insert/select statement
                     if ( stmt != null )
                         stmt.close();
@@ -1002,7 +1000,7 @@ public final class SQLEngine implements Persistence {
                     stmt.close();
                 }
             } catch ( Exception e ) {
-            	_log.warn ("Problem closing JDBC statement");
+                _log.warn ("Problem closing JDBC statement");
             }
         }
     }
@@ -1070,8 +1068,8 @@ public final class SQLEngine implements Persistence {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             
             if (_log.isDebugEnabled()) {
-            	String generatedSQL = ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad;
-            	_log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), generatedSQL ) );
+                String generatedSQL = ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad;
+                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), generatedSQL ) );
             }
             
             int count = 1;
@@ -1789,7 +1787,7 @@ public final class SQLEngine implements Persistence {
                         _stmt.close();
                     } 
                     catch ( SQLException e2 ) {
-                    	_log.warn("Problem closing JDBC statement", e2);
+                        _log.warn("Problem closing JDBC statement", e2);
                     }
                 }
                 _resultSetDone = true;
@@ -1879,7 +1877,7 @@ public final class SQLEngine implements Persistence {
                 try {
                     _stmt.close();
                 } catch ( SQLException except ) {
-                	_log.warn ("Problem closing JDBC statement", except);
+                    _log.warn ("Problem closing JDBC statement", except);
                 }
                 _stmt = null;
             }
