@@ -123,7 +123,7 @@
           public &lt;type> xxxYYY;
         </code>
 
-        <p>and expect an element/attribute name 'xxx-yyy'. The only handled
+        <p>and expect an element/attribute named 'xxx-yyy'. The only handled
           collections for &lt;type> are java.lang.Vector and array. (up to version
           0.8.10)</p>
 
