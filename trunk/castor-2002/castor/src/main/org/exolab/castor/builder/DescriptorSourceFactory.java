@@ -521,6 +521,59 @@ public class DescriptorSourceFactory {
 
         switch (xsType.getType()) {
 
+            case XSType.BYTE_TYPE:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("ByteValidator bv = new ByteValidator();");
+                XSByte xsByte = (XSByte)xsType;
+                if (xsByte.hasMinimum()) {
+                    Byte min = xsByte.getMinExclusive();
+                    if (min != null)
+                        jsc.add("bv.setMinExclusive(");
+                    else {
+                        min = xsByte.getMinInclusive();
+                        jsc.add("bv.setMinInclusive(");
+                    }
+                    jsc.append("(byte)");
+                    jsc.append(min.toString());
+                    jsc.append(");");
+                }
+                if (xsByte.hasMaximum()) {
+                    Byte max = xsByte.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("bv.setMaxExclusive(");
+                    else {
+                        max = xsByte.getMaxInclusive();
+                        jsc.add("bv.setMaxInclusive(");
+                    }
+                    jsc.append("(byte)");
+                    jsc.append(max.toString());
+                    jsc.append(");");
+                }
+
+                //-- fixed values
+                if (fixed != null) {
+                    //-- make sure we have a valid value...
+                    Byte.parseByte(fixed);
+
+                    jsc.add("bv.setFixedValue(");
+                    jsc.append("(byte)");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
+                //-- pattern facet
+                pattern = xsByte.getPattern();
+                if (pattern != null) {
+                    jsc.add("bv.setPattern(\"");
+                    jsc.append(escapePattern(pattern));
+                    jsc.append("\");");
+                }
+
+                jsc.add("fieldValidator.setValidator(bv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+
             case XSType.DECIMAL_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -628,7 +681,7 @@ public class DescriptorSourceFactory {
                 break;
             }
 
-              //-- double
+            //-- double
             case XSType.DOUBLE_TYPE:
             {
                 jsc.add("{ //-- local scope");
