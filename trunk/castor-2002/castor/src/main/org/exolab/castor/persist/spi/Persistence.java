@@ -100,11 +100,13 @@ public interface Persistence
      * of that object is known. Creates a new record in persistence
      * storage. Must detect an attempt to create an object with the
      * same identity and must retain a lock on the object after creation.
+     * If the identity is null, an identity might be created and returned
+     * by this method.
      *
      * @param conn An open connection
      * @param fields The fields to store
      * @param identity The object's identity
-     * @return The object's stamp, or null
+     * @return The object's identity
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured

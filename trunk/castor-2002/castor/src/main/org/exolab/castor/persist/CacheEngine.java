@@ -61,7 +61,6 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.engine.GenericFactory;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
@@ -216,10 +215,6 @@ public final class CacheEngine
                 // Create a new persistence engine for that type and add the type info
                 persist = _factory.getPersistence( handler.getDescriptor(), _logInterceptor );
                 if ( persist != null ) {
-                    boolean createReturnsIdentity;
-
-                    createReturnsIdentity = (_factory instanceof GenericFactory);
-
                     // At this point the extends typeInfo has been registered, so we know
                     // it exists. We need the extends in order to share cache between objects
                     // in the same heirarchy.
@@ -236,11 +231,11 @@ public final class CacheEngine
                                 _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
                         } else {
                             _typeInfo.put( handler.getJavaClass(),
-                                    new TypeInfo( handler, persist, typeInfo.cache, createReturnsIdentity ) );
+                                    new TypeInfo( handler, persist, typeInfo.cache ) );
                         }
                     } else {
                         _typeInfo.put( handler.getJavaClass(),
-                                new TypeInfo( handler, persist, new Cache(), createReturnsIdentity ) );
+                                new TypeInfo( handler, persist, new Cache() ) );
                     }
                 } else if ( _logInterceptor != null )
                     _logInterceptor.message( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
@@ -625,20 +620,13 @@ public final class CacheEngine
             typeInfo.handler.copyInto( object, fields );
 
 
-            // Create it in persistent store if the identity was known.
-            if ( identity != null ) {
-                if ( _logInterceptor != null )
-                    _logInterceptor.creating( typeInfo.javaClass, identity );
-                //  Create the object in persistent storage acquiring a lock on the object.
-                Object ret = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
-                if (typeInfo.createReturnsIdentity) {
-                    typeInfo.handler.setIdentity( object, ret );
-                    oid = new OID( typeInfo.handler, ret );
-                } else {
-                    oid.setStamp( ret );
-                }
-                oid.setDbLock( true );
-            }
+            if ( _logInterceptor != null )
+                _logInterceptor.creating( typeInfo.javaClass, identity );
+            //  Create the object in persistent storage acquiring a lock on the object.
+            identity = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
+            typeInfo.handler.setIdentity( object, identity );
+            oid = new OID( typeInfo.handler, identity );
+            oid.setDbLock( true );
 
             // Copy the contents of the object we just created into the
             // cache engine.
@@ -1290,18 +1278,12 @@ public final class CacheEngine
          */
         final Cache        cache;
 
-
-        final boolean      createReturnsIdentity;
-
-
-        TypeInfo( ClassHandler handler, Persistence persist, Cache cache,
-                  boolean createReturnsIdentity )
+        TypeInfo( ClassHandler handler, Persistence persist, Cache cache )
         {
             this.persist = persist;
             this.handler = handler;
             this.javaClass = handler.getJavaClass();
             this.cache = cache;
-            this.createReturnsIdentity = createReturnsIdentity;
         }
 
     }
