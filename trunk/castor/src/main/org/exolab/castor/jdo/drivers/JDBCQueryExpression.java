@@ -363,10 +363,10 @@ public class JDBCQueryExpression
     
     /**
 	 * Creates a SQL statement.
-     * In genral, for a RDBMS/JDBC driver with a full support of the SQL standard/JDBC 
+     * In general, for a RDBMS/JDBC driver with a full support of the SQL standard/JDBC 
 	 * specification, this will return a valid SQL statement. For some features,
-	 * a particular RDBMS might indidate that it doe snot support this feature by 
-	 * throwing a SyntaxNotSupportedException.
+	 * a particular RDBMS might indicate that it does not support this feature by 
+	 * throwing a {@linik SyntaxNotSupportedException}.
      * @throws SyntaxNotSupportedException If the RDBMS does not support a particular feature.
      */
     public String getStatement( boolean lock ) throws SyntaxNotSupportedException
