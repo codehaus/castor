@@ -285,6 +285,8 @@ public class CacheEngine
 	    } catch ( Exception except ) {
 		// This should never happen since we just created the lock
 	    }
+	    if ( exclusive )
+		oid.setExclusive( true );
 	    setLock( oid, lock );
 	    setOID( obj, oid );
 	    return oid;
@@ -375,6 +377,8 @@ public class CacheEngine
 	    } catch ( Exception except ) {
 		// This should never happen since we just created the lock
 	    }
+	    if ( exclusive )
+		oid.setExclusive( true );
 	    setLock( oid, lock );
 	    setOID( obj, oid );
 	    return oid;
@@ -453,6 +457,7 @@ public class CacheEngine
 	    } catch ( Exception except ) {
 		// This should never happen since we just created the lock
 	    }
+	    oid.setExclusive( true );
 	    setLock( oid, lock );
 	    setOID( locked, oid );
 	}
@@ -551,6 +556,8 @@ public class CacheEngine
 	// storing the object. Will wait until another transaction releases
 	// its lock on the object.
 	locked = lock.acquire( tx, true, timeout );
+	// Get the real OID with the exclusive and stamp info.
+	oid = getOID( locked );
 	
 	// If the object has a identity, it was retrieved/created before and
 	// need only be stored. If the object has no identity, the object must
@@ -561,13 +568,11 @@ public class CacheEngine
 	    // created during this transaction and must now be created in
 	    // persistent storage. A new OID is required to check for
 	    // duplicate identity.
-	    oid = new OID( typeInfo.objDesc, identity );
-	    if ( getLock( oid ) != null )
-		throw new DuplicateIdentityException( obj.getClass(), identity );
-	    oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), obj, identity ) );
-	    removeLock( removeOID( locked ) );
-	    setLock( oid, lock );
-	    setOID( locked, oid );
+	    try {
+		return create( tx, obj, identity );
+	    } catch ( ClassNotPersistenceCapableException except ) {
+		throw new PersistenceException( "persist.internal", except.toString() );
+	    }
 	} else if ( identity == oldIdentity || identity.equals( oldIdentity ) ) {
 	    // The object has an old identity, it existed before, one need
 	    // to store the new contents.
