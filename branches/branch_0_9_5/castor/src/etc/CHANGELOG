@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1633 XML Date Timezone Not unmarshalled correctly.
+       Patch from axia@sonusnet.com.
+       (kvisco - 20040527)
+
 JDO:   Fixed bug 1617 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
        Fixed an incorrectly coded equality check related to global transaction demarcation.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1617
