@@ -2349,14 +2349,16 @@ public class ClassMolder {
                 // relation have to be deleted.
                 // not really. cus, the other created relation, may already
                 // has reference to this object. so, how to deal with that?
-                ArrayList alist = (ArrayList) fields[i];
-                for ( int j=0; j<alist.size(); j++ ) {
-                    Object fid = alist.get(j);
-                    Object fetched = null;
-                    if ( fid != null ) {
-                        fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
-                        if ( fetched != null ) {
-                            fieldClassMolder.removeRelation( tx, fetched, this, object );
+                if ( fields[i] != null ) {
+                    ArrayList alist = (ArrayList) fields[i];
+                    for ( int j=0; j<alist.size(); j++ ) {
+                        Object fid = alist.get(j);
+                        Object fetched = null;
+                        if ( fid != null ) {
+                            fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
+                            if ( fetched != null ) {
+                                fieldClassMolder.removeRelation( tx, fetched, this, object );
+                            }
                         }
                     }
                 }
