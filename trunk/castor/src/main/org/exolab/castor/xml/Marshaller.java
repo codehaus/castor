@@ -1354,6 +1354,7 @@ public class Marshaller extends MarshalFramework {
         }
 
         ++depth;
+        //-- marshal elements
         for (int i = 0; i < descriptors.length; i++) {
 
             XMLFieldDescriptor elemDescriptor = descriptors[i];
@@ -1378,6 +1379,9 @@ public class Marshaller extends MarshalFramework {
                 try {
                     while ((idx = path.indexOf('/')) > 0) {
                         String elemName = path.substring(0, idx);
+                        if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
+                            elemName = nsPrefix + ':' + elemName;
+                        }
                         wrappers.push(elemName);
                         handler.startElement(elemName, _attributes);
                         path = path.substring(idx+1);
@@ -1394,8 +1398,12 @@ public class Marshaller extends MarshalFramework {
                             }
                         }
                     }
-                    wrappers.push(path);
-                    handler.startElement(path, _attributes);
+                    String elemName = path;
+                    if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
+                        elemName = nsPrefix + ':' + elemName;
+                    }
+                    wrappers.push(elemName);
+                    handler.startElement(elemName, _attributes);
                 }
                 catch(SAXException sx) {
                     throw new MarshalException(sx);
