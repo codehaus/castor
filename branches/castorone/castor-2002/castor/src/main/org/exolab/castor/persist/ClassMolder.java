@@ -90,7 +90,7 @@ import java.util.ArrayList;
 /**
  * ClassMolder is a binder for one type of data object and its 
  * {@link Persistence}. For example, when ClassMolder is asked to load 
- * an object, it acquires values from {@link Persistence} and binds it 
+ * an object, it acquires values from {@link Persistence} and binds it
  * into an target object. It also resolves relations via 
  * {@link TransactionContext} and bind related object into an target object. 
  * <p>
@@ -181,10 +181,15 @@ public class ClassMolder {
     private int _cachetype;
 
     /**
-     * The LRU parameter(or capcity) to be used for caching freed instance of the 
+     * The LRU parameter(or capcity) to be used for caching freed instance of the
      * base class.
      */
     private int _cacheparam;
+
+    /**
+     * Is a key kenerator used for the base class?
+     */
+    private boolean _isKeyGenUsed;
 
     /**
      * Constructor
@@ -195,7 +200,7 @@ public class ClassMolder {
      * @param classDescriptor   the classDescriptor for the base class
      * @param persist the Persistent for the base class
      */
-    ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist ) 
+    ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist )
             throws ClassNotFoundException, MappingException {
 
         ClassMapping clsMap = ((ClassDescriptorImpl) clsDesc).getMapping();
@@ -215,10 +220,10 @@ public class ClassMolder {
         ClassMapping dep = (ClassMapping) clsMap.getDepends();
         ClassMapping ext = (ClassMapping) clsMap.getExtends();
 
-        if ( dep != null && ext != null ) 
+        if ( dep != null && ext != null )
             throw new MappingException("A JDO cannot both extends and depends on other objects");
 
-        if ( dep != null ) {            
+        if ( dep != null ) {
             ds.pairDepends( this, dep.getName() );
         }
 
@@ -231,9 +236,10 @@ public class ClassMolder {
                 _cachetype = LRU.mapType( ((JDOClassDescriptor) clsDesc).getCacheType() );
                 _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheParam();
             }
+            _isKeyGenUsed = ( ( (JDOClassDescriptor) clsDesc ).getKeyGeneratorDescriptor() != null );
         }
-        
-        // construct <tt>FieldModler</tt>s for each of the identity fields of 
+
+        // construct <tt>FieldModler</tt>s for each of the identity fields of
         // the base class.
         FieldMapping[] fmId = getIdFields( clsMap );
         _ids = new FieldMolder[fmId.length];
@@ -290,7 +296,7 @@ public class ClassMolder {
                 String manyKey = fmFields[i].getSql().getManyKey();
                 String[] keys = breakApart( manyKey, ' ' );
                 if ( keys != null && keys.length != 0 ) {
-                    if ( keys.length != idSQL.length ) 
+                    if ( keys.length != idSQL.length )
                         throw new MappingException("The number of many-keys doesn't match referred object: "+clsDesc.getJavaClass().getName());
                     idSQL = keys;
                 }
@@ -299,14 +305,14 @@ public class ClassMolder {
                 String manyName = fmFields[i].getSql().getName();
                 String[] names = breakApart( manyName, ' ' );
                 if ( names != null && names.length != 0 ) {
-                    if ( names.length != relatedIdSQL.length ) 
+                    if ( names.length != relatedIdSQL.length )
                         throw new MappingException("The number of many-keys doesn't match referred object: "+relDesc.getJavaClass().getName());
                     relatedIdSQL = names;
                 }
 
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, idSQL, idType, relatedIdSQL, relatedIdType ); 
+                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, idSQL, idType, relatedIdSQL, relatedIdType );
             } else {
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i] ); 
+                _fhs[i] = new FieldMolder( ds, this, fmFields[i] );
             }
         }
 
@@ -315,11 +321,11 @@ public class ClassMolder {
     }
 
     /**
-     * Break a string into array of substring which serparated 
+     * Break a string into array of substring which serparated
      * by a delimitator
      */
     private String[] breakApart( String strings, char delimit ) {
-        if ( strings == null ) 
+        if ( strings == null )
             return new String[0];
         Vector v = new Vector();
         int start = 0;
@@ -2145,6 +2151,7 @@ public class ClassMolder {
     public int getCacheParam() {
         return _cacheparam;
     }
+
     /**
      * Return true if the base type of this ClassMolder is an dependent
      * class.
@@ -2155,7 +2162,7 @@ public class ClassMolder {
 
     /**
      * Set all persistence fields of object of the base type to null.
-     * 
+     *
      * @param object - target object
      */
     public void setFieldsNull( Object object ) {
@@ -2254,6 +2261,14 @@ public class ClassMolder {
         }
         return v;
     }
+
+    /**
+     * Return true if a key generator is used for the base type of this ClassMolder
+     */
+    public boolean isKeyGeneratorUsed() {
+        return _isKeyGenUsed;
+    }
+
 }
 
 
