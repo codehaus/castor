@@ -242,6 +242,10 @@ JDO:    Fixed a problem which occurs when two long-transactional objects
         are linked together in a many-many relationship. (yip) 20011205
         (bug reported by Toni Charlot [toni@fdplus.com]) 
 
+JDO:    Fixed accessor not found problem for collection. (yip) 20011211
+        (reported by Patric Bechtel [bechtel@ipcon.de] and
+         Matthew Baird [matthew.baird@motiva.com])
+
 JDO:    (doc) Added FAQs for OQL and data model issues.
 
 JDO:    (doc) Corrected the PostgreSQL configuration example.
