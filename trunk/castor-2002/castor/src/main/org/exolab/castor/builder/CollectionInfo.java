@@ -402,7 +402,7 @@ public class CollectionInfo extends FieldInfo {
         jsc.add("mArray[index] = ");
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
-            jsc.append(jType.getLocalName());
+            jsc.append(jType.getName());
             jsc.append(") ");
             jsc.append(variableName);
         }

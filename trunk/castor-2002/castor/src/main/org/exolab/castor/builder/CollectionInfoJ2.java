@@ -311,7 +311,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.add("mArray[index] = ");
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
-            jsc.append(jType.getLocalName());
+            jsc.append(jType.getName());
             jsc.append(") ");
             jsc.append(variableName);
         }
