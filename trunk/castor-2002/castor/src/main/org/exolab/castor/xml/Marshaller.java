@@ -260,7 +260,7 @@ public class Marshaller {
         if (_cdResolver == null) 
             _cdResolver = new ClassDescriptorResolverImpl();
             
-        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML, null ) );
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
     /**
