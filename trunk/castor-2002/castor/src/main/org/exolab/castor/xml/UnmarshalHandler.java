@@ -861,7 +861,9 @@ public final class UnmarshalHandler extends MarshalFramework
         //Test if we can accept the field in the parentState
         //in case the parentState fieldDesc is a container
         boolean canAccept = false;
-        while (parentState.fieldDesc.isContainer() && !canAccept) {
+        while ((parentState.fieldDesc != null) &&
+               (parentState.fieldDesc.isContainer() && !canAccept) )
+        {
             XMLClassDescriptor tempClassDesc = parentState.classDesc;
 
             //-- Find ClassDescriptor for Parent
@@ -1160,7 +1162,6 @@ public final class UnmarshalHandler extends MarshalFramework
                         state.object = handler.getValue(parentState.object);
                         create = (state.object == null);
                     }
-
                     if (create) {
                         state.object = handler.newInstance(parentState.object);
                     }
