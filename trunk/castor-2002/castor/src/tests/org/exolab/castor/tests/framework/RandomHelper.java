@@ -49,6 +49,9 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Date;
 import org.exolab.castor.types.*;
+
+import java.math.BigDecimal;
+
 /**
  * An helper class to assist in the generation of random instance of a given
  * object model.
@@ -170,6 +173,14 @@ public class RandomHelper {
     public static RecurringDuration getRandom(RecurringDuration recurring, Class c) {
         return new RecurringDuration(new TimeDuration(_rand.nextLong()),
                                      new TimeDuration(_rand.nextLong()));
+    }
+
+    /**
+     * Returns a random Castor recurringDuration
+     * @returns a random Castor recurringDuration
+     */
+    public static BigDecimal getRandom(BigDecimal bg, Class c) {
+        return new BigDecimal(_rand.nextDouble());
     }
 
     /**
