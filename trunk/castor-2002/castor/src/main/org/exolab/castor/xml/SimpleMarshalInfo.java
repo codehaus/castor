@@ -45,18 +45,28 @@
 
 package org.exolab.castor.xml;
 
-import java.util.Vector;
+import org.exolab.castor.util.List;
 import java.lang.reflect.Method;
 
 /**
- * A simple implementation of the MarshalInfo interface. This class
+ * A simple (1) implementation of the MarshalInfo interface. This class
  * is primarily used by the Marshalling Framework to create information
- * about Objects and Classes when no other MarshalInfo class exists.
+ * about objects and classes when no other MarshalInfo class exists.
  * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
+ * <BR />
+ * (1) OK, ok, so over time this class became not so simple,
+ *  but there is no reason to change it's name...right?! 
+ *   
 **/
 public class SimpleMarshalInfo implements MarshalInfo {
     
+    
+    /**
+     * A MarshalInfo in which this MarshalInfo inherits from
+    **/
+    private MarshalInfo ancestor = null;
+
     /**
      * The Class that this MarshalInfo describes
     **/
@@ -71,7 +81,7 @@ public class SimpleMarshalInfo implements MarshalInfo {
     /**
      * The set of attribute descriptors
     **/
-    private Vector attributeDescriptors = null;
+    private List attributeDescriptors = null;
     
     /**
      * The MarshalDescriptor for characters
@@ -82,12 +92,12 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * The ValidationRule to use when performing validation
      * of instances of the Class associated with this MarshalInfo
     **/
-    private Vector validationRules = null;
+    private List validationRules = null;
 
     /**
      * The set of element descriptors
     **/
-    private Vector elementDescriptors = null;
+    private List elementDescriptors = null;
 
     
     /**
@@ -103,12 +113,25 @@ public class SimpleMarshalInfo implements MarshalInfo {
     
     /**
      * Creates a MarshalInfo class used by the Marshalling Framework.
+     * @param type the Class type with which this MarshalInfo handles.
     **/
-    public SimpleMarshalInfo(Class _class) {
-        this._class = _class;
-        attributeDescriptors = new Vector(3); 
-        elementDescriptors = new Vector(5);
-        validationRules = new Vector(7);
+    public SimpleMarshalInfo(Class type) {
+        this(type, null);
+    } //-- SimpleMarshalInfo
+    
+
+    /**
+     * Creates a MarshalInfo class used by the Marshalling Framework.
+     * @param type the Class type with which this MarshalInfo handles.
+     * @param ancestor a MarshalInfo in which this MarshalInfo inherits from.
+     * This may be null, and is so by default.
+    **/
+    public SimpleMarshalInfo(Class type, MarshalInfo ancestor) {
+        this._class = type;
+        this.ancestor = ancestor;
+        attributeDescriptors = new List(3); 
+        elementDescriptors = new List(5);
+        validationRules = new List(7);
     } //-- SimpleMarshalInfo
     
     /**
@@ -121,9 +144,9 @@ public class SimpleMarshalInfo implements MarshalInfo {
     public void addMarshalDescriptor(MarshalDescriptor marshalDescriptor) {
         
         if (marshalDescriptor.getDescriptorType() == DescriptorType.attribute)
-            attributeDescriptors.addElement(marshalDescriptor);
+            attributeDescriptors.add(marshalDescriptor);
         else
-            elementDescriptors.addElement(marshalDescriptor);
+            elementDescriptors.add(marshalDescriptor);
             
     } //-- addMarshalDescriptor
 
@@ -134,7 +157,7 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * of attribute descriptors.
     **/
     public void addAttributeDescriptor(MarshalDescriptor marshalDescriptor) {
-        attributeDescriptors.addElement(marshalDescriptor);
+        attributeDescriptors.add(marshalDescriptor);
     } //-- addAttributeDescriptor
 
     /**
@@ -144,7 +167,7 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * of attribute descriptors.
     **/
     public void addElementDescriptor(MarshalDescriptor marshalDescriptor) {
-        elementDescriptors.addElement(marshalDescriptor);
+        elementDescriptors.add(marshalDescriptor);
     } //-- addAttributeDescriptor
         
     /**
@@ -154,7 +177,7 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * @param validationRule the ValidationRule to add
     **/
     public void addValidationRule(ValidationRule validationRule) {
-        validationRules.addElement(validationRule);
+        validationRules.add(validationRule);
     } //-- setValidatorRule
     
     /**
@@ -171,10 +194,25 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * should be marshalled as Attributes
     **/
     public MarshalDescriptor[] getAttributeDescriptors() {
+        
+        MarshalDescriptor[] mdArray  = null;
+        MarshalDescriptor[] tmpArray = null;
+        
+        //-- calculate size and offset
         int size = attributeDescriptors.size();
-        MarshalDescriptor[] mdArray = new MarshalDescriptor[size];
-        attributeDescriptors.copyInto(mdArray);
+        int offset = 0;
+        if (ancestor != null) {
+            tmpArray = ancestor.getAttributeDescriptors();
+            size += tmpArray.length;
+            offset = tmpArray.length;
+        }
+        mdArray = new MarshalDescriptor[size];
+        if (tmpArray != null)
+            System.arraycopy(tmpArray, 0, mdArray, 0, tmpArray.length);
+            
+        attributeDescriptors.toArray(mdArray, offset);
         return mdArray;
+        
     } //-- getAttributeDescriptors
     
     /**
@@ -183,17 +221,34 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * should be marshalled as Elements
     **/
     public MarshalDescriptor[]  getElementDescriptors() {
+        MarshalDescriptor[] mdArray  = null;
+        MarshalDescriptor[] tmpArray = null;
+        
+        //-- calculate size and offset
         int size = elementDescriptors.size();
-        MarshalDescriptor[] mdArray = new MarshalDescriptor[size];
-        elementDescriptors.copyInto(mdArray);
+        int offset = 0;
+        if (ancestor != null) {
+            tmpArray = ancestor.getElementDescriptors();
+            size += tmpArray.length;
+            offset = tmpArray.length;
+        }
+        mdArray = new MarshalDescriptor[size];
+        if (tmpArray != null)
+            System.arraycopy(tmpArray, 0, mdArray, 0, tmpArray.length);
+            
+        elementDescriptors.toArray(mdArray, offset);
         return mdArray;
-    }
+    } //-- getElementDescriptors
 
     /**
      * Returns the descriptor for dealing with Text content
      * @return the MarshalDescriptor for dealing with Text content
     **/
     public MarshalDescriptor getContentDescriptor() {
+        if (contentDescriptor == null) {
+            if (ancestor != null) 
+                return ancestor.getContentDescriptor();
+        }
         return contentDescriptor;
     } //-- getContentDescriptor
    
@@ -202,6 +257,10 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * @return the namespace prefix to use when marshalling as XML.
     **/
     public String getNameSpacePrefix() {
+        if (nsPrefix == null) {
+            if (ancestor != null) 
+                return ancestor.getNameSpacePrefix();
+        }
         return nsPrefix;
     } //-- getNameSpacePrefix
     
@@ -209,6 +268,10 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * @return the namespace URI used when marshalling and unmarshalling as XML.
     **/
     public String getNameSpaceURI() {
+        if (nsURI == null) {
+            if (ancestor != null)
+                return ancestor.getNameSpaceURI();
+        }
         return nsURI;
     } //-- getNameSpaceURI
    
@@ -219,11 +282,24 @@ public class SimpleMarshalInfo implements MarshalInfo {
      * of the class associated with this MarshalInfo
     **/
     public ValidationRule[] getValidationRules() {
-        int size = validationRules.size();
-        ValidationRule[] vrules = new ValidationRule[size];
-        validationRules.copyInto(vrules);
-        return vrules;
-    } //-- getValidationRule
+        ValidationRule[] vrArray  = null;
+        ValidationRule[] tmpArray = null;
+        
+        //-- calculate size and offset
+        int size = elementDescriptors.size();
+        int offset = 0;
+        if (ancestor != null) {
+            tmpArray = ancestor.getValidationRules();
+            size += tmpArray.length;
+            offset = tmpArray.length;
+        }
+        vrArray = new ValidationRule[size];
+        if (tmpArray != null)
+            System.arraycopy(tmpArray, 0, vrArray, 0, tmpArray.length);
+            
+        validationRules.toArray(vrArray, offset);
+        return vrArray;
+    } //-- getValidationRules
     
     /**
      * Sets the MarshalDescriptor for handling Text content

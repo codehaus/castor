@@ -57,11 +57,20 @@ import java.util.Vector;
 **/
 class SGStateInfo {
         
+        
+    /**
+     * The ClassInfoResolver (need I say more?)
+    **/
+    protected ClassInfoResolver resolver = null;
+    
     /** 
      * The package used when creating new classes.
     **/
     protected String      packageName = null;
         
+    /**
+     * A list of generated archetypes
+    **/
     protected Vector sourceGenerated = null;
     
     private Hashtable classTypes = null;
@@ -71,10 +80,10 @@ class SGStateInfo {
     **/
     protected SGStateInfo() {
         super();
-        packageName      = "";
-        sourceGenerated  = new Vector();
-        
         classTypes       = new Hashtable();
+        packageName      = "";
+        resolver         = new ClassInfoResolver();
+        sourceGenerated  = new Vector();
     } //-- SGStateInfo
     
     protected JClass getJClass(String name) {

@@ -253,6 +253,7 @@ public class SourceGenerator {
             ElementDecl eDecl = (ElementDecl) elems.nextElement();
             createClasses(eDecl, sInfo);
         }
+        
     } //-- createClasses
     
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
@@ -261,16 +262,13 @@ public class SourceGenerator {
         //-- create classes for sub-elements if necessary
         Archetype archetype = elementDecl.getArchetype();
             
-        ClassInfo classInfo = new ClassInfo(elementDecl, sInfo.packageName);
+        ClassInfo classInfo 
+            = new ClassInfo(elementDecl, sInfo.resolver, sInfo.packageName);
+            
         JClass jClass = null;
         
         if (archetype != null) {
-            boolean alreadyGenerated = sInfo.sourceGenerated.contains(archetype);
-            if (!alreadyGenerated) {
-                process(archetype, sInfo);
-                sInfo.sourceGenerated.addElement(archetype);
-            }
-            
+            processArchetype(archetype, sInfo);
             jClass = SourceFactory.createClassSource(classInfo);
             jClass.print(lineSeparator);
             jClass = MarshalInfoSourceFactory.createSource(classInfo);
@@ -295,6 +293,35 @@ public class SourceGenerator {
         
         
     }  //-- createClasses
+    
+    /**
+     * Processes the given Archetype and creates all necessary class
+     * to support it
+     * @param archetype the Archetype to process
+    **/
+    private void processArchetype(Archetype archetype, SGStateInfo sInfo) {
+        
+        if (archetype == null) return;
+        
+        boolean alreadyGenerated = sInfo.sourceGenerated.contains(archetype);
+        if (!alreadyGenerated) {
+            if (archetype.isTopLevel()) {
+                ClassInfo classInfo 
+                    = new ClassInfo(archetype, sInfo.resolver);
+                JClass jClass = SourceFactory.createClassSource(classInfo);
+                jClass.print(lineSeparator);
+                jClass = MarshalInfoSourceFactory.createSource(classInfo);
+                jClass.print(lineSeparator);
+            }
+            String source = null;
+            if ((source = archetype.getSource()) != null) {
+                Schema schema = archetype.getSchema();
+                processArchetype(schema.getArchetype(source), sInfo);
+            }
+            process(archetype, sInfo);
+            sInfo.sourceGenerated.addElement(archetype);
+        }
+    } //-- processArchetype
     
     private void process(ContentModelGroup cmGroup, SGStateInfo sInfo) {
         Enumeration enum = cmGroup.enumerate();

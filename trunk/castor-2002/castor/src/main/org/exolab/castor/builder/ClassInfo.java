@@ -48,7 +48,9 @@ package org.exolab.castor.builder;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.Resolver;
 import org.exolab.javasource.*;
+
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -81,11 +83,24 @@ public class ClassInfo  {
     private XSType dataType = null;
     
     /**
+     * A flag to signal derivation
+    **/
+    private boolean derived = false;
+    
+    /**
+     * The ClassInfo with which this ClassInfo derives from
+    **/
+    private ClassInfo sourceInfo = null;
+
+    private boolean _abstract = false;
+    
+    /**
      * Creates a new ClassInfo for the given XML Schema element declaration
      * @param element the XML Schema element declaration to create the 
      * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
     **/
-    public ClassInfo(ElementDecl element) 
+    public ClassInfo(ElementDecl element, ClassInfoResolver resolver)
     {
         this.elementName = element.getName();
         this.nsPrefix    = element.getSchemaAbbrev();
@@ -96,65 +111,142 @@ public class ClassInfo  {
         Archetype archetype = element.getArchetype();
         
         String dataTypeName = null;
-        
+        boolean derived = false;
         if (archetype != null) {
             
+            init(archetype, resolver);
+
             dataTypeName = archetype.getName();
-            
             if (dataTypeName == null) 
                 dataTypeName = className;
-                
-            atts     = new Vector(3);
-            elements = new Vector(5);
-            
-            //---------------------/
-            //- handle attributes -/
-            //---------------------/
-            //-- loop throug each attribute
-            Enumeration enum = archetype.getAttributeDecls();
-            while (enum.hasMoreElements()) {
-                processAttribute((AttributeDecl)enum.nextElement());
-            }
-            //------------------------/
-            //- handle content model -/
-            //------------------------/
-            //-- check contentType
-            ContentType contentType = archetype.getContent();
-            
-            //-- create text member
-            if ((contentType == ContentType.textOnly) ||
-                (contentType == ContentType.mixed) ||
-                (contentType == ContentType.any)) 
-            {
-                _allowTextContent = true;
-                
-                if (contentType == ContentType.any) {
-                    addMember(MemberFactory.createMemberForAny());
-                }
-                
-            }
-            process(archetype);
         }
         else {
             dataTypeName = element.getTypeRef();
         }
         dataType = TypeConversion.createXSType(dataTypeName);
-        //if (dataType.isPrimitive()) _allowTextContent = true;
-        
     } //-- ClassInfo
     
     /**
      * Creates a new ClassInfo for the given XML Schema element declaration
      * @param element the XML Schema element declaration to create the 
      * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
      * @param packageName the package to use when generating source
      * from this ClassInfo
     **/
-    public ClassInfo(ElementDecl element, String packageName) 
+    public ClassInfo
+        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
     {
-        this(element);
+        this(element, resolver);
         this.packageName = packageName;
     } //-- ClassInfo
+    
+    /**
+     * Creates a new ClassInfo for the given XML Schema type declaration.
+     * The type declaration must be a top-level declaration.
+     * @param type the XML Schema type declaration to create the 
+     * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+    **/
+    public ClassInfo(Archetype type, ClassInfoResolver resolver) 
+    {
+        if (type == null)
+            throw new IllegalArgumentException("Null Archetype");
+            
+        if (!type.isTopLevel())
+            throw new IllegalArgumentException("Archetype is not top-level.");
+            
+        this._abstract = true;
+        
+        String name = type.getName();
+        this.elementName = name;
+        
+        className = JavaXMLNaming.toJavaClassName(name);
+        init(type, resolver);
+        dataType = TypeConversion.createXSType(className);
+        
+    } //-- ClassInfo
+    
+    /**
+     * Initializes this ClassInfo using the given Archetype
+     * and makes the initial call to #process
+     * @param archetype the Archetype for this ClassInfo
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+    **/    
+    private void init(Archetype archetype, ClassInfoResolver resolver) {
+        
+        
+        atts     = new Vector(3);
+        elements = new Vector(5);
+        
+        Schema schema = archetype.getSchema();
+        
+        if (schema != null) {
+            this.nsURI = schema.getTargetNamespace();
+        }
+            
+        //- Handle derived types
+        if (archetype.getSource() != null) {
+            derived = true;
+            String sourceName = archetype.getSource();
+            Archetype source = schema.getArchetype(sourceName);
+            if (source != null) {
+                
+                ClassInfo classInfo = null;
+                
+                if (resolver != null) 
+                    classInfo = resolver.resolve(source);
+                    
+                if (classInfo == null)
+                    classInfo = new ClassInfo(source, resolver);
+                
+                if (resolver != null) 
+                    resolver.bindReference(source, classInfo);
+                    
+                sourceInfo = classInfo;
+                
+                //-- copy members from super class
+                addMembers(sourceInfo.getAttributeMembers());
+                addMembers(sourceInfo.getElementMembers());
+            }
+            else {
+                //-- will this ever be null, if we have a valid Schema?
+                //-- ignore for now...but add comment in case we
+                //-- ever see it.
+                System.out.print("ClassInfo#init: ");
+                System.out.print("A referenced archetype is null: ");
+                System.out.println(sourceName);
+            }
+        }
+        
+        //---------------------/
+        //- handle attributes -/
+        //---------------------/
+        //-- loop throug each attribute
+        Enumeration enum = archetype.getAttributeDecls();
+        while (enum.hasMoreElements()) {
+            processAttribute((AttributeDecl)enum.nextElement());
+        }
+        //------------------------/
+        //- handle content model -/
+        //------------------------/
+        //-- check contentType
+        ContentType contentType = archetype.getContent();
+            
+        //-- create text member
+        if ((contentType == ContentType.textOnly) ||
+            (contentType == ContentType.mixed) ||
+            (contentType == ContentType.any)) 
+        {
+            _allowTextContent = true;
+                
+            if (contentType == ContentType.any) {
+                addMember(MemberFactory.createMemberForAny());
+            }
+                
+        }
+        process(archetype);
+    } //-- init
     
     //------------------/
     //- Public Methods -/
@@ -165,7 +257,7 @@ public class ClassInfo  {
      * @param member the SGMember to add
     **/
     public void addMember(SGMember member) {
-        if (member.getFromType() == SGMember.ATTRIBUTE) {
+        if (member.getXMLNodeType() == SGMember.ATTRIBUTE) {
             if (atts == null) atts = new Vector(3);
             atts.addElement(member);
         }
@@ -176,12 +268,40 @@ public class ClassInfo  {
     } //-- addMember
     
     /**
+     * Adds the given set of SGMembers to this ClassInfo
+     * @param members an Array of SGMember objects
+    **/
+    public void addMembers(SGMember[] members) {
+        for (int i = 0; i < members.length; i++)
+            addMember(members[i]);
+    } //-- addMembers
+    
+    /**
      * @return true if Classes created with this ClassInfo allow
      * text content
     **/
     public boolean allowsTextContent() {
         return this._allowTextContent;
     } //-- allowsTextContent
+    
+    /**
+     * Returns true if the given member is a member of this ClassInfo
+     * @return true if the given member is a member of this ClassInfo
+    **/
+    public boolean contains(SGMember member) {
+        boolean val = false;
+        
+        if (atts != null) 
+            if (atts.contains(member)) return true;
+            
+        if (elements != null) 
+            if (elements.contains(member)) return true;
+            
+        if (sourceInfo != null) 
+            return sourceInfo.contains(member);
+            
+        return false;
+    } //-- contains
     
     /**
      * @return an array of attribute members
@@ -258,6 +378,48 @@ public class ClassInfo  {
     } //-- getPackageName
     
     /**
+     * Returns, if necessary, the ClassInfo in which this ClassInfo
+     * derives from
+     * @return the ClassInfo in which this ClassInfo derives from
+    **/
+    public ClassInfo getSuperClassInfo() {
+        return sourceInfo;
+    } //-- getSuperClassName
+    
+    /**
+     * Returns true if the class created by using this ClassInfo should 
+     * be declared as abstract, otherwise false
+     * @return true if the class created by using this ClassInfo should 
+     * be declared as abstract, otherwise false
+    **/
+    public boolean isAbstract() {
+        return this._abstract;
+    } //-- isAbstract
+    
+    /**
+     * Returns true if this Class created by this ClassInfo
+     * is "derived" from another class, otherwise false.
+     * @return true if this Class created by this ClassInfo
+     * is "derived" from another class, otherwise false.
+    **/
+    public boolean isDerived() {
+        return derived;
+    } //-- isDerived
+    
+    /**
+     * Returns true if the given member was derived from another ClassInfo,
+     * otherwise false if the member is local.
+     * @return true if the given member was derived from another ClassInfo,
+     * otherwise false will be returned
+    **/
+    public boolean isDerived(SGMember member) {
+        if ((member == null) || (sourceInfo == null)) 
+            return false;
+            
+        return sourceInfo.contains(member);
+    } //-- isDerived
+    
+    /**
      * Sets the class name for this SGClass
      * @param className the name to use for class name
      * @exception IllegalArgumentException when the given className is not
@@ -297,7 +459,8 @@ public class ClassInfo  {
                 
         if (typeRef.equals("integer")) {
             XSInteger xsInteger = new XSInteger();
-            member = new SGAttrMember(xsInteger, memberName);
+            member = new SGMember(xsInteger, memberName);
+            member.setXMLNodeType(SGMember.ATTRIBUTE);
             member.setCodeHelper(new IntegerCodeHelper(xsInteger));
             //-- handle integer related facets
             DataType dataType = attribute.getDataType();
@@ -328,7 +491,8 @@ public class ClassInfo  {
         }
         else {
             XSType xsType = TypeConversion.createXSType(typeRef);
-            member = new SGAttrMember(xsType, memberName);
+            member = new SGMember(xsType, memberName);
+            member.setXMLNodeType(SGMember.ATTRIBUTE);
         }
         member.setSchemaType(typeRef);
         member.setXMLName(attribute.getName());

@@ -55,7 +55,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SGList extends SGElementMember {
+public class SGList extends SGMember {
  
         
     private XSList xsList      = null;
@@ -72,7 +72,7 @@ public class SGList extends SGElementMember {
         this.contentType = contentType;
         this.contentName = "v" + JavaXMLNaming.toJavaClassName(elementName);
         this.elementName = elementName;
-        content = new SGElementMember(contentType, contentName);
+        content = new SGMember(contentType, contentName);
     } //-- SGList
     
     /**

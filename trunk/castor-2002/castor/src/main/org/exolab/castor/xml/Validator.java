@@ -176,11 +176,13 @@ public class Validator {
         }
         
         if (val != null) {
-            Class _class = val.getClass();
+            Class type = val.getClass();
             
             int size = 1;
-            if (_class.isArray()) {
-                size = Array.getLength(val);
+            boolean byteArray = false;
+            if (type.isArray()) {
+                byteArray = (type.getComponentType() == Byte.TYPE);
+                if (!byteArray) size = Array.getLength(val);
             }
             
             //-- check minimum
@@ -198,13 +200,16 @@ public class Validator {
             }
             
             //-- check type
-            if (_class.isPrimitive() || (_class == String.class)) {
+            if (type.isPrimitive() || (type == String.class)) {
                 TypeValidator typeValidator = vRule.getTypeValidator();
                 if (typeValidator != null) {
                     typeValidator.validate(val);
                 }
             }
-            else if (_class.isArray()) {
+            else if (byteArray) { 
+                //-- do nothing for now
+            }
+            else if (type.isArray()) {
                 size = Array.getLength(val);
                 for (int i = 0; i < size; i++) {
                     validate(Array.get(val, i));

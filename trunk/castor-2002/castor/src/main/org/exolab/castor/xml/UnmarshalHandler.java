@@ -45,6 +45,9 @@
 
 package org.exolab.castor.xml;
 
+//-- Castor imports
+import org.exolab.castor.util.MimeBase64Decoder;
+
 //-- xml related imports
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributeListImpl;
@@ -193,7 +196,7 @@ public class UnmarshalHandler implements DocumentHandler {
         throws org.xml.sax.SAXException
     {
         
-        //System.out.println("#endElement: " + name);
+        // System.out.println("#endElement: " + name);
         
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
@@ -212,27 +215,44 @@ public class UnmarshalHandler implements DocumentHandler {
             throw new SAXException(err);
         }        
         
-        //-- check for ignoring object
-        if ((state.object == null) && (!state.type.isPrimitive()))
-            return;
-        
         //-- clean up current Object
-        Class _class = state.type;
+        Class type = state.type;
         
-        if ((_class == String.class) || (_class.isPrimitive())) {
+        //-- check for special cases
+        boolean byteArray = false;
+        
+        if (type.isArray())
+            byteArray = (type.getComponentType() == Byte.TYPE);
+        
+        //-- If we don't have an instance object and the Class type
+        //-- is not a primitive or a byte[] we must simply return
+        if ((state.object == null) && 
+            (!state.type.isPrimitive()) &&
+            (!byteArray)) return;
+            
+            
+        if ((type == String.class) || type.isPrimitive() || byteArray) {
             
             String str = null;
             
             if (state.buffer != null) {
                 str = state.buffer.toString();
             }
-            if (_class == String.class)
+            else str = new String();
+            
+            if (type == String.class)
                 state.object = str;
+            //-- special handling for byte[]
+            else if (byteArray) {
+                //-- Base64 decoding
+                char[] chars = str.toCharArray();
+                MimeBase64Decoder decoder = new MimeBase64Decoder();
+                decoder.translate(chars, 0, chars.length);
+                state.object = decoder.getByteArray();
+            }
             else
-                state.object = MarshalHelper.toPrimitiveObject(_class,str);
+                state.object = MarshalHelper.toPrimitiveObject(type,str);
         }
-        
-        
         
         //-- Add to parent Object if necessary
         if (_stateInfo.empty()) return;
@@ -265,6 +285,7 @@ public class UnmarshalHandler implements DocumentHandler {
         if (descriptor.isIncremental()) return;
         
         Object val = state.object;
+        
         //-- get target object
         state = (UnmarshalState) _stateInfo.peek();
         try {
@@ -281,7 +302,13 @@ public class UnmarshalHandler implements DocumentHandler {
             err += " due to an InvocationTargetException: " + itx.getMessage();
             throw new SAXException(err);
         }
-
+        catch(Exception ex) {
+            String err = "unable to add \"" + name + "\" to ";
+            err += state.descriptor.getXMLName();
+            err += " due to the following exception: " + ex.getMessage();
+            throw new SAXException(err);
+        }
+        
     } //-- endElement
     
     public void ignorableWhitespace(char[] ch, int start, int length) 
@@ -310,9 +337,6 @@ public class UnmarshalHandler implements DocumentHandler {
     public void startElement(String name, AttributeList atts) 
         throws org.xml.sax.SAXException
     {
-        
-        
-        //System.out.println("#startElement: " + name);
         
         //-- handle namespaces
         
@@ -391,7 +415,7 @@ public class UnmarshalHandler implements DocumentHandler {
         if (parentState.object == null) return;
         
         Class _class = null;
-            
+        boolean byteArray = false;
             
         MarshalInfo mInfo = parentState.descriptor.getMarshalInfo();
         if (mInfo == null) {
@@ -460,17 +484,24 @@ public class UnmarshalHandler implements DocumentHandler {
                 
                 //-- instantiate class
                 try {
-                    if (!_class.isPrimitive())
+                    
+                    if (_class.isArray())
+                        byteArray = (_class.getComponentType() == Byte.TYPE);
+                    
+                    if ((!_class.isPrimitive()) && (!byteArray)) {
                         state.object = _class.newInstance();
+                    }
                 }
                 catch(java.lang.NoSuchMethodError nsme) {
                     String err = "no default constructor for class: "; 
-                    err += _class.getName();
+                    err += className(_class);
                     throw new SAXException(err);
                 }
-                catch(java.lang.IllegalAccessException iae) { /* :-) */ }
-                catch(java.lang.InstantiationException ie) { /* ;-) */};
-                
+                catch(java.lang.Exception ex) {
+                    String err = "unable to instantiate a new type of: ";
+                    err += className(_class);
+                    throw new SAXException(err);
+                }
             }
             //-- use creator method to create a new object
             else {
@@ -509,24 +540,31 @@ public class UnmarshalHandler implements DocumentHandler {
                     msg.append(ite.toString());
                     message(msg.toString());
                 }
-            }            
+            } //-- end if (creator)           
             
+            
+            //-- At this point we should have a new object, unless
+            //-- we are dealing with a primitive type, or a special
+            //-- case such as byte[]
             if (mInfo == null) {
                 mInfo = getMarshalInfo(_class);
             }
             state.mInfo = mInfo;
             
-            if ((state.object == null) && (!state.type.isPrimitive())) {
+            if ((state.object == null) && 
+                (!state.type.isPrimitive()) &&
+                (!byteArray))
+            {
                 StringBuffer err = new StringBuffer("unable to unmarshal: ");
                 err.append(name);
                 err.append("\n");
                 err.append("unable to instantiate: ");
-                err.append(_class.getName());
+                err.append(className(_class));
                 throw new SAXException(err.toString());
             }
             
             //-- assign object, if incremental
-            
+
             if (descriptor.isIncremental()) {
                 
                 if (debug) {
@@ -719,6 +757,7 @@ public class UnmarshalHandler implements DocumentHandler {
         throws SAXException
     {
         if (_class == null) return null;
+        if (_class.isArray()) return null;
         
         MarshalInfo mInfo = (MarshalInfo)_infoHash.get(_class);
         if (mInfo != null) return mInfo;
@@ -737,6 +776,17 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         return mInfo;
     } //-- getMarshalInfo
+    
+    /**
+     * Returns the name of a class, handles array types
+     * @return the name of a class, handles array types
+    **/
+    private String className(Class type) {
+        if (type.isArray()) {
+            return className(type.getComponentType()) + "[]";
+        }
+        return type.getName();
+    } //-- className
     
 } //-- Unmarshaller
 

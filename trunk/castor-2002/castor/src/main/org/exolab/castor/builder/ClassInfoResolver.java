@@ -45,63 +45,45 @@
 
 package org.exolab.castor.builder;
 
-import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaXMLNaming;
-import org.exolab.javasource.*;
 
-import java.util.Vector;
+import java.util.Hashtable;
 
 /**
+ * A class for "caching" ClassInfo's which later need to be
+ * resolved (or "fetched") by another ClassInfo
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SGIdRef extends SGMember {
- 
+public class ClassInfoResolver {
     
-    public SGIdRef(String name) {
-        super(new XSIdRef(), name);
-        setXMLNodeType(SGMember.ATTRIBUTE);
-    } //-- SGId
+    Hashtable _cache = null;
     
-    public JMethod[] createAccessMethods() {
-        
-        JMethod[] methods = new JMethod[2];
-        
-        String mname = getName().substring(1);
-        JType jType  = SGTypes.Object;
-        
-        //-- create get method
-        methods[0] = new JMethod(jType, "get"+mname);
-        JSourceCode jsc = methods[0].getSourceCode();
-        jsc.add("return this.");
-        jsc.append(getName());
-        jsc.append(".get();");
-        
-        //-- create set method
-        methods[1] = new JMethod(null, "set"+mname);
-        
-        methods[1].addParameter(new JParameter(getXSType().getJType(), getName()));
-        jsc = methods[1].getSourceCode();
-        jsc.add("this.");
-        jsc.append(getName());
-        jsc.append(" = ");
-        jsc.append(getName());
-        jsc.append(";");
-        
-        return methods;
-        
-    } //-- createAccessMethods
+    public ClassInfoResolver() {
+        _cache = new Hashtable();
+    } //-- ClassInfoResolver
+    
     
     /**
-     *
+     * Adds the given Reference to this ClassInfo resolver
+     * @param key the key to bind a reference to
+     * @param classInfo the ClassInfo which is being referenced
     **/
-    public void generateMarshalCode(JSourceCode jsc) {
-        jsc.add("atts.addAttribute(\"");
-        jsc.append(getXMLName());
-        jsc.append("\", null, this.");
-        jsc.append(getName());
-        jsc.append(".get().getReferenceId());");
-    } //-- generateMarshalCode
+    public void bindReference(Object key, ClassInfo classInfo) {
+        if (key == null) {
+            String err = "null passed as argument to ";
+            err += "ClassInfoResolver#bindReference";
+            throw new NullPointerException(err);
+        }
+        _cache.put(key, classInfo);
+    } //-- bindReference
     
-} //-- SGIdRef
-
+    /**
+     * Returns the ClassInfo which has been bound to the given key
+     * @param key the object to which the ClassInfo has been bound
+     * @return the ClassInfo which has been bound to the given key
+    **/
+    public ClassInfo resolve(Object key) {
+        return (ClassInfo) _cache.get(key);    
+    } //-- resolve
+    
+} //-- ClassInfoResolver
