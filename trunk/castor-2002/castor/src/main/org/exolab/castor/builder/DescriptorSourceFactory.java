@@ -362,9 +362,17 @@ public class DescriptorSourceFactory {
             jsc.add("} );");
             
             
+            //-- namespace
+            if (nsURI != null) {
+                jsc.add("desc.setNameSpaceURI(\"");
+                jsc.append(nsURI);
+                jsc.append("\");");
+            }
+            
             if (member.isRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
+            
             
             jsc.add("attributes[");
             jsc.append(Integer.toString(i));
@@ -551,6 +559,13 @@ public class DescriptorSourceFactory {
             }
             else jsc.add("desc.setHandler(handler);");
             
+            //-- namespace
+            if (nsURI != null) {
+                jsc.add("desc.setNameSpaceURI(\"");
+                jsc.append(nsURI);
+                jsc.append("\");");
+            }
+
             if (member.isRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
