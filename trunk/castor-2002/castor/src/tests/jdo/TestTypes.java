@@ -102,6 +102,8 @@ public class TestTypes
 
     private Clob _clob2;
 
+    private String _timestamp3;
+
 
     static final int       DefaultId = 3;
 
@@ -119,6 +121,7 @@ public class TestTypes
         _date2 = date;
         _time2 = date;
         _timestamp2 = date;
+        _timestamp3 = "2001-02-06 02:33:44.555";
     }
 
 
@@ -312,6 +315,18 @@ public class TestTypes
     public Clob getClob2()
     {
         return _clob2;
+    }
+
+
+    public void setTimestamp3( String timestamp3 )
+    {
+        _timestamp3 = timestamp3;
+    }
+
+
+    public String getTimestamp3()
+    {
+        return _timestamp3;
     }
 
 

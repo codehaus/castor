@@ -225,7 +225,8 @@ create table test_types (
   blob_val long byte      null,
   clob_val long           null,
   blob_val2 long byte     null,
-  clob_val2 long          null
+  clob_val2 long          null,
+  date_str  timestamp     null
 );
 
 create unique index test_types_pk

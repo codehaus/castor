@@ -451,6 +451,9 @@
     <field name="clob2" type="clob" >
       <sql name="clob_val2" type="clob" dirty="ignore" />
     </field>
+    <field name="timestamp3" type="string" >
+      <sql name="date_str" type="timestamp" />
+    </field>
   </class>
 
 
