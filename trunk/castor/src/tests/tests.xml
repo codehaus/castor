@@ -238,6 +238,8 @@
     <case class="jdo.Size" />
     <case class="jdo.Absolute" />
     <case class="jdo.TimeStampMismatched" />
+    <case class="jdo.ExpireManyToMany" />
+    <case class="jdo.ExpireLazyEmployee" />
   </category>
 
 <category name="mssql" class="jdo.JDOCategory">
