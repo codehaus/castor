@@ -90,7 +90,7 @@ public class Concurrent
             // Determine if test object exists, if not create it.
             // If it exists, set the name to some predefined value
             // that this test will later override.
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE Id = $1" );
+            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
