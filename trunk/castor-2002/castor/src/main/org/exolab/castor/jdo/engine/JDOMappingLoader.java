@@ -118,8 +118,6 @@ public class JDOMappingLoader
         throws MappingException
     {
         ClassDescriptor   clsDesc;
-        FieldDescriptor[] fields;
-        Vector            jdoFields;
         String            keyGenName;
         KeyGeneratorDescriptor keyGenDesc;
         
