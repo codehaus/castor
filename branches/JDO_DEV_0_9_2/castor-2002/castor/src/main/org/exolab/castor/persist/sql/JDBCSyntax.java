@@ -89,5 +89,16 @@ public interface JDBCSyntax
 
     public String Limit = " LIMIT "; //Alex
 
+    public String Insert = "INSERT INTO ";
+
+    public String Update = "UPDATE ";
+
+    public String Set = " SET ";
+
+    public String Delete = "DELETE FROM ";
+
+    public String Call = "{call ";
+
+    public String EndCall = "}";
 }
 

@@ -1187,7 +1187,7 @@ public final class SQLEngine implements Persistence {
         StringBuffer sb = new StringBuffer();
         sb.append( JDBCSyntax.Where );
         for ( int i=0; i<_ids.length; i++ ) {
-            if ( i > 0 ) sb.append( " AND " );
+            if ( i > 0 ) sb.append( JDBCSyntax.And );
             sb.append( _factory.quoteName( _ids[i].name ) );
             sb.append( QueryExpression.OpEquals );
             sb.append( JDBCSyntax.Parameter );
@@ -1196,7 +1196,7 @@ public final class SQLEngine implements Persistence {
 
         // Create statement to insert a new row into the table
         // using the specified primary key if one is required
-        sql = new StringBuffer( "INSERT INTO " );
+        sql = new StringBuffer( JDBCSyntax.Insert );
         sql.append( _factory.quoteName( tableName ) ).append( " (" );
         count = 0;
         for ( int i=0; i<_ids.length; i++ ) {
@@ -1244,21 +1244,21 @@ public final class SQLEngine implements Persistence {
                 return;
             }
             if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
-                _sqlCreate = "{call " + _sqlCreate + "}";
+                _sqlCreate = JDBCSyntax.Call + _sqlCreate + JDBCSyntax.EndCall;
         }
         if ( _logInterceptor != null )
             _logInterceptor.storeStatement( "SQL for creating " + _type + ": " + _sqlCreate );
 
 
-        sql = new StringBuffer( "DELETE FROM " ).append( _factory.quoteName( tableName ) );
+        sql = new StringBuffer( JDBCSyntax.Delete ).append( _factory.quoteName( tableName ) );
         sql.append( wherePK );
         _sqlRemove = sql.toString();
         if ( _logInterceptor != null )
             _logInterceptor.storeStatement( "SQL for deleting " + _type + ": " + _sqlRemove );
 
-        sql = new StringBuffer( "UPDATE " );
+        sql = new StringBuffer( JDBCSyntax.Update );
         sql.append( _factory.quoteName( _mapTo ) );
-        sql.append( " SET " );
+        sql.append( JDBCSyntax.Set );
         count = 0;
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].store ) {
