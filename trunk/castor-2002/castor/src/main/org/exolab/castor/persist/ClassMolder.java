@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -1022,10 +1023,17 @@ public class ClassMolder {
         if ( (o1 instanceof java.math.BigDecimal) && ((java.math.BigDecimal) o1).compareTo(o2) == 0) {
             return true;
         }
-        if ( (o1 instanceof java.sql.Timestamp) && (o2 instanceof java.sql.Timestamp)) {
+        if ((o1 instanceof java.sql.Timestamp) && (o2 instanceof java.sql.Timestamp)) {
             java.sql.Timestamp t1 = (java.sql.Timestamp) o1;
             java.sql.Timestamp t2 = (java.sql.Timestamp) o2;
             return (t1.getTime() == t2.getTime() && t1.getNanos() / 1000000 == t2.getNanos() / 1000000);
+        }
+
+        if((o1 instanceof byte[]) && (o2 instanceof byte[])) {
+            return Arrays.equals((byte[]) o1, (byte[]) o2);
+        }
+        if((o1 instanceof char[]) && (o2 instanceof char[])) {
+            return Arrays.equals((char[]) o1, (char[]) o2);
         }
         return false;
     }
