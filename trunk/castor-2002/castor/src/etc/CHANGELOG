@@ -1,6 +1,9 @@
 Version (CVS)
 -------------
 
+XML:    Bug fix for using addXxx methods.
+        (Fix submitted by Michael Thyen <mthyen@excite.com>)
+
 XML:    Bug fix in the handling of 'Map' collection. Now we use the abstract
         'Map' interface rather than 'HashMap'.
         (Fix submitted by Ron Smith <rsmith7209@yahoo.com>)
@@ -10,10 +13,11 @@ XML:    Added some logic to avoid unnecessary use of 'xsi:type' when
         class to instantiate from the mapping file information.
         (Sebastien Gignoux <gignoux@intalio.com>) 
 
-XML:    Solved a performance bug for unmarshalling of primitive type. We don't try anymore 
-        to generate a Class Descriptor for primitive type as we know that not only it 
-        fails but it is deadly slow (due to getMethods() call). Now, unmarhsalling speed 
-        is nearly only bounded by the speed of the parser.
+XML:    Solved a performance bug for unmarshalling of primitive type. We don't
+        try anymore to generate a Class Descriptor for primitive type as we know
+        that not only it fails but it is deadly slow (due to getMethods()
+        call). Now, unmarhsalling speed is nearly only bounded by the speed of
+        the parser.
         (Sebastien Gignoux <gignoux@intalio.com>) 
 
 JDO:    Added "trigger" mode for SEQUENCE key generator. 
