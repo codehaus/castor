@@ -15,12 +15,10 @@
       <p><b>$RELEASE_DATE$</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.</p>
 
       <p>
-         The presentation that Andrew Fawcet did for XML One London will be
+         The <a href="presentations.xml">presentation</a> that Andrew Fawcet did for XML One London will be
          available soon.
       </p>
 
-      <p><a href="ora-mar-2k/castor.htm">The presentation we did at the Java O'Reilly Conference
-         is available here.</a>.</p>
 
       <p><a href="origins.xml">About the origins of the name</a></p>
 
@@ -58,7 +56,7 @@
 
       <p>The Castor project has been developed out of need: the need to get stuff done
          and the need to write useful code. It has been designed and coded over many cups
-         of Latte and tall Americano, as proof that coffee beans do come in handy.</p>
+         of Latte and tall no-whip White Mocha, as proof that coffee beans do come in handy.</p>
 
       <p>For <a href="contributors.xml">a full list of contributors</a>.</p>
 
