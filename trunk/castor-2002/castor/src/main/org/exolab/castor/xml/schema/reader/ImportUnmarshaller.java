@@ -57,40 +57,56 @@ import java.util.Vector;
 public class ImportUnmarshaller extends SaxUnmarshaller
 {
     public ImportUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
+        (Schema schema, AttributeList atts, Resolver resolver, Locator locator)
 		throws SAXException
     {
         super();
         setResolver(resolver);
-			
+
 		//-- Get schemaLocation
 		String schemalocation = atts.getValue("schemaLocation");
 		if (schemalocation==null)
 			throw new SAXException("'schemaLocation' attribute missing on 'import'");
-		
-		//-- Get namespace 
+		//if the path is relative Xerces append the "user.Dir"
+        //we need to keep the base directory of the document
+        //if the doesn't exist we suppose 'include' is a relative path
+        // note: URI not supported (just system path)
+        if (!new java.io.File(schemalocation).exists()) {
+             String temp = locator.getSystemId();
+             if (temp != null) {
+                //remove 'file://'
+                temp = temp.substring(7);
+                if (java.io.File.separatorChar =='\\')
+                    temp = temp.substring(1);
+                temp = temp.substring(0,temp.lastIndexOf('/')+1);
+                schemalocation = temp + schemalocation;
+                temp = null;
+             }
+        }
+
+		//-- Get namespace
 		String namespace = atts.getValue("namespace");
 		if (namespace==null)
 			throw new SAXException("'namespace' attribute missing on 'import'");
-		
+
 		//-- Is this namespace one the schema knows about?
 		if (!schema.isKnownNamespace(namespace))
-			throw new SAXException("namespace '"+namespace+"' not declared in schema"); 
-		
+			throw new SAXException("namespace '"+namespace+"' not declared in schema");
+
 		//-- Schema object to hold import schema
 		boolean addSchema = false;
 		Schema importedSchema = schema.getImportedSchema(namespace);
 		if (importedSchema==null)
 		{
-			importedSchema = new Schema();				
+			importedSchema = new Schema();
 			addSchema = true;
 		}
-		
+
 		//-- Have we already imported this XML Schema file?
 		if (importedSchema.includeProcessed(schemalocation))
-			return;		
-		importedSchema.addInclude(schemalocation);		
-		
+			return;
+		importedSchema.addInclude(schemalocation);
+
 		//-- Parser Schema
 		Parser parser = null;
 		try {
@@ -107,20 +123,20 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			schemaUnmarshaller.setSchema(importedSchema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
-		}						
-		
+		}
+
 		try {
 		    parser.parse(new InputSource(schemalocation));
 		}
 		catch(java.io.IOException ioe) {
 		    throw new SAXException("Error reading import file '"+schemalocation+"': "+ ioe);
-		}	
-			
+		}
+
 		//-- Add schema to list of imported schemas (if not already present)
 		if (addSchema)
-			schema.addImportedSchema(importedSchema);	
-	}	
-	
+			schema.addImportedSchema(importedSchema);
+	}
+
 
     /**
      * Sets the name of the element that this UnknownUnmarshaller handles
@@ -129,7 +145,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
     public String elementName() {
         return SchemaNames.IMPORT;
     } //-- elementName
-	
+
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -137,5 +153,5 @@ public class ImportUnmarshaller extends SaxUnmarshaller
     public Object getObject() {
         return null;
     } //-- getObject
-	
+
 }
