@@ -49,7 +49,7 @@ package org.exolab.castor.jdo.drivers;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -109,7 +109,7 @@ public final class MaxKeyGenerator implements KeyGenerator
     {
         String sql;
         String pk;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs;
         QueryExpression query;
         Object identity = null;
@@ -136,8 +136,8 @@ public final class MaxKeyGenerator implements KeyGenerator
                 sql = query.getStatement( true );
             }
 
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery( sql );
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
 
             if ( rs.next() ) {
                 if ( _sqlType == Types.INTEGER )

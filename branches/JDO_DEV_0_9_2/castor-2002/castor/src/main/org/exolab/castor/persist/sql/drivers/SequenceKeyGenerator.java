@@ -47,9 +47,11 @@
 package org.exolab.castor.jdo.drivers;
 
 
+
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -76,10 +78,13 @@ public final class SequenceKeyGenerator implements KeyGenerator
     protected final PersistenceFactory _factory;
 
 
+    protected final String _factoryName;
+
+
     protected final String _seqName;
 
 
-    private final byte _style;
+    private byte _style;
 
 
     private final int _sqlType;
@@ -98,28 +103,33 @@ public final class SequenceKeyGenerator implements KeyGenerator
             Properties params, int sqlType )
             throws MappingException
     {
-        String fName = factory.getFactoryName();
-        boolean returning = "true".equals( params.getProperty("returning") );
+        boolean returning;
+
+        _factoryName = factory.getFactoryName();
+        returning = "true".equals( params.getProperty("returning") );
         _triggerPresent = "true".equals( params.getProperty("trigger","false") );
 
 
-        if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) && ! fName.equals( "interbase" ) && ! fName.equals( "sapdb" ) ) {
+        if ( ! _factoryName.equals( "oracle" ) && ! _factoryName.equals( "postgresql" ) &&
+                ! _factoryName.equals( "interbase" ) && ! _factoryName.equals( "sapdb" ) ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
-                                        getClass().getName(), fName ) );
+                                        getClass().getName(), _factoryName ) );
         }
-        if ( ( fName.equals( "postgresql" ) || fName.equals( "interbase" ) || fName.equals( "sapdb" ) )
-                && returning ) {
+        if ( ! _factoryName.equals( "oracle" ) && returning ) {
             throw new MappingException( Messages.format( "mapping.keyGenParamNotCompat",
-                                        "returning=\"true\"", getClass().getName(), fName ) );
+                                        "returning=\"true\"", getClass().getName(), _factoryName ) );
         }
         _factory = factory;
         _seqName = params.getProperty("sequence", "{0}_seq");
-        _style = ( fName.equals( "postgresql" ) || fName.equals("interbase") ? BEFORE_INSERT :
-                                   ( returning  ? DURING_INSERT : AFTER_INSERT) );
 
+        _style = ( _factoryName.equals( "postgresql" ) || _factoryName.equals("interbase")
+                ? BEFORE_INSERT : ( returning  ? DURING_INSERT : AFTER_INSERT) );
+        if (_triggerPresent && !returning) {
+            _style = AFTER_INSERT;
+        }
         if (_triggerPresent && _style==BEFORE_INSERT)
             throw new MappingException( Messages.format( "mapping.keyGenParamNotCompat",
-                                        "trigger=\"true\"", getClass().getName(), fName ) );
+                                        "trigger=\"true\"", getClass().getName(), _factoryName ) );
 
         _sqlType = sqlType;
         if (sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
@@ -146,26 +156,38 @@ public final class SequenceKeyGenerator implements KeyGenerator
             Properties props )
             throws PersistenceException
     {
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs;
         int value;
 
         try {
-            stmt = conn.createStatement();
-
             if (_factory.getFactoryName().equals("interbase")) {
                 //interbase only does before_insert, and does it its own way
-                rs = stmt.executeQuery("select gen_id(" +
+                stmt = conn.prepareStatement("select gen_id(" +
                         MessageFormat.format(_seqName, new String[] {tableName}) +
                         "," + _increment + ") from rdb$database");
+                rs = stmt.executeQuery();
             } else {
                 if ( _style == BEFORE_INSERT ) {
-                    rs = stmt.executeQuery( "SELECT nextval('" +
+                    stmt = conn.prepareStatement("SELECT nextval('" +
                             MessageFormat.format( _seqName, new String[] {tableName}) + "')" );
+                    rs = stmt.executeQuery();
+                } else if (_triggerPresent && _factoryName.equals( "postgresql" )) {
+                    Object insStmt = props.get("insertStatement");
+                    Class psqlStmtClass = Class.forName("org.postgresql.Statement");
+                    Method getInsertedOID = psqlStmtClass.getMethod("getInsertedOID", null);
+                    int insertedOID = ((Integer) getInsertedOID.invoke(insStmt, null)).intValue();
+                    stmt = conn.prepareStatement("SELECT " + _factory.quoteName( primKeyName ) +
+                            " FROM " + _factory.quoteName( tableName ) +
+                            " WHERE OID=?");
+                    stmt.setInt(1, insertedOID);
+                    rs = stmt.executeQuery();
+
                 } else {
-                    rs = stmt.executeQuery( "SELECT " + _factory.quoteName(
+                    stmt = conn.prepareStatement("SELECT " + _factory.quoteName(
                             MessageFormat.format( _seqName, new String[] {tableName} ) +
                             ".currval") + " FROM " + _factory.quoteName( tableName ) );
+                    rs = stmt.executeQuery();
                 }
             }
 
@@ -180,7 +202,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
             } else {
                 throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
             }
-        } catch ( SQLException ex ) {
+        } catch ( Exception ex ) {
             throw new PersistenceException( Messages.format(
                     "persist.keyGenSQL", ex.toString() ) );
         } finally {
