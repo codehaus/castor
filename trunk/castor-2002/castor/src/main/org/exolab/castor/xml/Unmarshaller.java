@@ -92,7 +92,10 @@ public class Unmarshaller {
     **/
     EntityResolver entityResolver = null;
 
-    private ClassLoader loader = null;
+    /**
+     * The class loader to use
+    **/
+    private ClassLoader _loader = null;
 
     /**
      * The print writer used for log information
@@ -137,7 +140,7 @@ public class Unmarshaller {
         this._class = c;
         this.debug = Configuration.debug();
         this.validate = Configuration.marshallingValidation();
-        this.loader = loader;
+        _loader = loader;
         _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)
 
@@ -153,7 +156,7 @@ public class Unmarshaller {
         this.debug = Configuration.debug();
         if (mapping != null) {
             setMapping(mapping);
-            this.loader = mapping.getClassLoader();
+            this._loader = mapping.getClassLoader();
         }
     } //-- Unmarshaller(Mapping)
 
@@ -162,7 +165,7 @@ public class Unmarshaller {
      * @param loader the ClassLoader to use
     **/
     public void setClassLoader(ClassLoader loader) {
-        this.loader = loader;
+        this._loader = loader;
     } //-- setClassLoader
 
 
@@ -216,7 +219,7 @@ public class Unmarshaller {
         throws MappingException
     {
         if (_cdResolver == null)
-            _cdResolver = new ClassDescriptorResolverImpl(loader);
+            _cdResolver = new ClassDescriptorResolverImpl(_loader);
 
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
@@ -236,7 +239,7 @@ public class Unmarshaller {
         if (cdr != null)
             _cdResolver = cdr;
         else
-            _cdResolver = new ClassDescriptorResolverImpl(loader);
+            _cdResolver = new ClassDescriptorResolverImpl(_loader);
 
     } //-- setResolver
 
@@ -435,6 +438,10 @@ public class Unmarshaller {
         
         if (_idResolver != null) 
             handler.setIDResolver(_idResolver);
+            
+        if (_loader != null)
+            handler.setClassLoader(_loader);
+            
         return handler;
     } //-- createHandler
     
