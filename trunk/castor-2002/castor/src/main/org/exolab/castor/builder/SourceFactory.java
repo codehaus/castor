@@ -1118,6 +1118,7 @@ public class SourceFactory  {
 
         //-- #enumerate method
         JMethod mEnumerate = new JMethod(SGTypes.Enumeration, "enumerate");
+        mEnumerate.getModifiers().setStatic(true);
         jClass.addMethod(mEnumerate);
         jdc = mEnumerate.getJDocComment();
         jdc.appendComment("Returns an enumeration of all possible instances of ");
