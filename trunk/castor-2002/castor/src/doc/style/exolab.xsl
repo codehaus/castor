@@ -5,12 +5,12 @@
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/XSL/Transform/1.0">
 
+  <!-- Color -->
   <xsl:variable name="color-alpha">#ffffff</xsl:variable>
   <xsl:variable name="color-beta" select="'#666699'"/>
   <xsl:variable name="color-gamma" select="'#424264'"/>
   <xsl:variable name="color-delta" select="'#54547f'"/>
   <xsl:variable name="color-epsilon" select="'#bfbffe'"/>
-
   <xsl:variable name="color-a" select="'#444466'"/>
   <xsl:variable name="color-b" select="'#4d4d73'"/>
   <xsl:variable name="color-c" select="'#565680'"/>
@@ -25,11 +25,21 @@
   <xsl:variable name="color-l" select="'#a2a2f2'"/>
   <xsl:variable name="color-m" select="'#ababff'"/>
 
+  <!-- Internal subset is broken, so resorting to this for a while -->
   <xsl:variable name="nbsp" select="'&#xA0;'"/>
-<!--
+
+
+  <!-- Include document for document transformation, widgets for some
+       simple HTML styles (e-mail, url, etc
+    -->
   <xsl:include href="document.xsl"/>
   <xsl:include href="widgets.xsl"/>
--->
+
+
+  <!-- Match the entire document and process it into a Web page.
+       The document properties and body are processed separately
+       in a uniform way. The background is provided by this style
+   -->
   <xsl:template match="/">
     <xsl:variable name="project" select="document(document/@project)/project"/>
 
@@ -80,7 +90,7 @@
                   <tr>
                     <td width="15" valign="top" align="right"><img src="images/bullets/square-small-white.gif" alt="*" height="12" width="12"/></td>
                     <td><span class="alpha">
-                      <font size="2"><a href="{@href}"><xsl:value-of select="@name"/></a></font>
+                      <font size="2"><a href="{substring-before(@href, '.xml')}.html"><xsl:value-of select="@name"/></a></font>
                     </span></td>
                   </tr>
                 </xsl:for-each>
@@ -151,9 +161,19 @@
     </html>
   </xsl:template>
 
+  <!-- Special handling for project-wide links which appear both at the
+       top and bottom of the page
+   -->
   <xsl:template match="project/links">
     <xsl:for-each select="link">
-      <a href="{@href}"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
+      <xsl:choose>
+        <xsl:when test="starts-with(@href, 'http:')">
+          <a href="{@href}"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
+        </xsl:when>
+        <xsl:otherwise>
+          <a href="{substring-before(@href, '.xml')}.html"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:template>
 
