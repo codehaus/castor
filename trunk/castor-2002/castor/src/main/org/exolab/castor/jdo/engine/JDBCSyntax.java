@@ -58,7 +58,7 @@ import java.util.Enumeration;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-interface JDBCSyntax
+public interface JDBCSyntax
 {
 
     public String TableColumnSeparator = ".";
@@ -76,6 +76,12 @@ interface JDBCSyntax
     public String From = " FROM ";
 
     public String Where = " WHERE ";
+
+    public String On = " ON ";
+
+    public String LeftJoin = " LEFT OUTER JOIN ";
+
+    public String InnerJoin = " INNER JOIN ";
 
 
 }
