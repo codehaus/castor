@@ -129,7 +129,7 @@ public class Parser implements TokenTypes {
             throws InvalidCharException, OQLSyntaxException {
     
     if (_curToken.getTokenType() != tokenType)
-      throw (new OQLSyntaxException("An incorrect token type was found"));
+      throw (new OQLSyntaxException("An incorrect token type was found near " + _curToken.getTokenValue() ));
 
     ParseTreeNode retNode = new ParseTreeNode(_curToken);
     _curToken = _nextToken;

@@ -368,6 +368,57 @@ public class Test
 
         db.commit();
 
+        //some new tests
+
+        db.begin();
+        
+        writer.println("\n\nStarting tests of new features in oql package\n\n");
+        
+        computer = new Computer();
+        computer.setId( 100 );
+        computer.setCpu( "recordBreaker CPU" );
+        computer.setName( "superstar PC" );
+        computer.setPrice( 19.99f );
+        computer.setGroup(group);
+
+        detail = new ProductDetail();
+        detail.setId(101);
+        detail.setName("neural interface");
+        computer.addDetail(detail);
+
+        db.create(computer);
+
+        computer = new Computer();
+        computer.setId( 102 );
+        computer.setCpu( "evenBetter CPU" );
+        computer.setName( "bestEver PC" );
+        computer.setPrice( 39.99f );
+        computer.setGroup(group);
+
+        detail = new ProductDetail();
+        detail.setId(103);
+        detail.setName("tty");
+        computer.addDetail(detail);
+
+        db.create(computer);
+        
+        newComputerOql = (OQLQueryImpl) db.getOQLQuery();
+        newComputerOql.newCreate( "Select c from myapp.Computer c where cpu like $1");
+        newComputerOql.newBind( "re%" );        
+        enum = newComputerOql.execute();
+        while ( enum.hasMoreElements() ) {
+          writer.println("Query result: " + enum.nextElement());
+        }
+
+        //now delete the stuff we made
+        newComputerOql = (OQLQueryImpl) db.getOQLQuery();
+        newComputerOql.newCreate( "Select c from myapp.Computer c");
+        enum = newComputerOql.execute();
+        while ( enum.hasMoreElements() ) {
+          db.remove((Computer) enum.nextElement());
+        }
+
+        db.commit();
 
         db.close();
     }
