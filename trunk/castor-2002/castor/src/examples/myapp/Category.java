@@ -50,9 +50,10 @@ public class Category
 
     public void addProduct( Product product )
     {
-        if ( ! _products.contains( product ) )
+        if ( ! _products.contains( product ) ) {
             _products.addElement( product );
-        product.addCategory( this );
+            product.addCategory( this );
+        }
     }
 
 

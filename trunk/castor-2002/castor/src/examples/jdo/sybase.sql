@@ -9,7 +9,7 @@ go
 
 
 create table prod_group (
-  id    char(20)      not null primary key,
+  id    numeric       not null primary key,
   name  varchar(200)  not null
 )
 go
@@ -20,7 +20,7 @@ create table prod (
   id        int           not null primary key,
   name      varchar(200)  not null,
   price     float         not null,
-  group_id  char(20)      not null references prod_group( id )
+  group_id  numeric       not null references prod_group( id )
 )
 go
 grant all on prod to test

@@ -39,7 +39,7 @@
     <!--  Product has reference to ProductGroup,
           many products may reference same group  -->
     <field name="group" type="myapp.ProductGroup">
-      <sql name="group_id" type="char" />
+      <sql name="group_id" />
       <xml name="group" node="element" />
     </field>
 

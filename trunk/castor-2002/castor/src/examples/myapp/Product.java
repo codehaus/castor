@@ -94,6 +94,21 @@ public class Product
     }
 
 
+    public Vector getCategories()
+    {
+        return _categories;
+    }
+
+
+    public void addCategory( Category category )
+    {
+        if ( _categories.contains( category ) ) {
+            _categories.addElement( category );
+            category.addProduct( this );
+        }
+    }
+
+
     public String toString()
     {
         return _id + " " + _name;

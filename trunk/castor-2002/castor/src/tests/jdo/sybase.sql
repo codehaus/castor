@@ -121,6 +121,9 @@ create table test_identity (
   attr varchar(200) not null,
 )
 go
+grant all on test_identity to test
+go
+
 drop table test_identity_ext
 go
 create table test_identity_ext (
@@ -129,6 +132,8 @@ create table test_identity_ext (
 )
 go
 create unique index test_ident_ext_pk on test_identity_ext ( id )
+go
+grant all on test_identity_ext to test
 go
 
 
@@ -139,4 +144,7 @@ create procedure sp_check_permissions @userName varchar(200),
                                       @groupName varchar(200) AS
     SELECT id, value1, value2 FROM test_table WHERE value1 = @userName
     SELECT id, value1, value2 FROM test_table WHERE value2 = @groupName
+go
+grant all on sp_check_permissions to test
+go
 
