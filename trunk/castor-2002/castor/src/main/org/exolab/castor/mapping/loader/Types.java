@@ -442,7 +442,8 @@ public class Types
                       java.io.InputStream.class,  true,     null ),
         new TypeInfo( "clob",      null,
                       java.sql.Clob.class,        true,     null ),
-
+        new TypeInfo( "serializable", null,
+                      java.io.Serializable.class, false,   null ), 
 
         /* Mapping for the java array of primitive type so they use the same
          * naming encoding as array of object.
@@ -1105,6 +1106,31 @@ public class Types
                 return result;
             }
             public String toString() { return "castor.types.Date->sql.Date"; }
+        } ),
+
+        // InputStream convertors
+        new TypeConvertorInfo( java.io.Serializable.class, java.io.InputStream.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new java.io.ByteArrayInputStream((byte[]) obj);
+            }
+            public String toString() { return "bytes->io.InputStream"; }
+        } ),
+        new TypeConvertorInfo( java.io.InputStream.class, java.io.Serializable.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    java.io.InputStream is = (java.io.InputStream) obj;
+                    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                    byte[] buffer = new byte[256];
+                    int len = 0;
+                    int b;
+                    while ( (len = is.read(buffer)) > 0 )
+                        bos.write( buffer, 0, len );
+                    return bos.toByteArray();
+                } catch ( java.io.IOException except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "io.InputStream->bytes"; }
         } )
 
     };
