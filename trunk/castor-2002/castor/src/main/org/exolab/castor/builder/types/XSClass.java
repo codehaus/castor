@@ -56,7 +56,6 @@ public class XSClass extends XSType {
     
     private JClass  jClass     = null;
     private String  name       = null;
-    private boolean enumerated = false;
     
     /**
      * Creates a new XSClass with the given JClass reference
@@ -89,27 +88,8 @@ public class XSClass extends XSType {
         return this.jClass;
     } //-- getJType
     
-    /**
-     * Return true if this XSClass represents an enumerated type,
-     * otherwise false
-     * @return true if this XSClass represents an enumerated type,
-     * otherwise false.
-    **/
-    public boolean isEnumerated() {
-        return enumerated;
-    } //-- isEnumerated
-    
     public String getName() {
         return this.name;
     } //-- getName
-    
-    /**
-     * Sets the enumerated flag for this XSClass
-     * @param enumerated a boolean indicating whether or not this XSClass 
-     * represents an enumerated type
-    **/
-    public void setAsEnumertated(boolean enumerated) {
-        this.enumerated = enumerated;
-    } //-- setAsEnumerated
     
 } //-- XSClass
