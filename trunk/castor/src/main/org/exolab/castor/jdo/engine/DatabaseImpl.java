@@ -194,10 +194,12 @@ public class DatabaseImpl
         _lockTimeout = lockTimeout;
 
         _transaction = transaction;
-        if (_transaction != null) {
-            _ctx = new TransactionContextImpl(this, true);
-        } else {
-            _ctx = new TransactionContextImpl(this, false);
+	
+		if (_transaction != null) {
+            _ctx = new TransactionContextImpl(this , true , transaction );
+        	//_ctx.setStatusActive();
+		} else {
+            _ctx = new TransactionContextImpl(this, false );
         }
         _ctx.setLockTimeout(_lockTimeout);
         _ctx.setAutoStore(_autoStore);
