@@ -10,6 +10,7 @@ public class TestLazyEmployee extends TestLazyPerson {
     private Date _startDate;
     private TestLazyPayRoll _payroll;
     private TestLazyContract _contract;
+    private Collection _projects;
 
     public Date getStartDate() {
         return _startDate;
@@ -28,5 +29,11 @@ public class TestLazyEmployee extends TestLazyPerson {
     }
     public void setContract( TestLazyContract contract ) {
         _contract = contract;
+    }
+    public void setProjects( Collection projects ) {
+        _projects = projects;
+    }
+    public Collection getProjects() {
+        return _projects;
     }
 }
