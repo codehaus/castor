@@ -172,8 +172,6 @@ public class XMLClassDescriptorImpl extends Validator
     
     private short              _compositor = ALL;
     
-    private static Validator   _internalValidator = null;
-    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -184,8 +182,6 @@ public class XMLClassDescriptorImpl extends Validator
     **/
     static {
         _naming = XMLNaming.getInstance();
-        if (_internalValidator == null)
-            _internalValidator = new Validator();
     } 
     
     /**
@@ -597,12 +593,10 @@ public class XMLClassDescriptorImpl extends Validator
     public void validate(Object object, ClassDescriptorResolver resolver) 
         throws ValidationException
     {
-        
         if (object == null) {
             throw new ValidationException("Cannot validate a null object.");
         }
-        
-        if (!_class.isAssignableFrom(object.getClass())) {
+        if (!getJavaClass().isAssignableFrom(object.getClass())) {
             String err = "The given object is not an instance of the class"+
                 " described by this ClassDecriptor.";
             throw new ValidationException(err);
@@ -611,6 +605,7 @@ public class XMLClassDescriptorImpl extends Validator
         switch (_compositor) {
             
             case CHOICE:
+            
                 boolean found = false;
                 String fieldName = null;
                 
@@ -621,12 +616,13 @@ public class XMLClassDescriptorImpl extends Validator
                     FieldHandler handler = desc.getHandler();
                     if (handler.getValue(object) != null) {
                         if (found) {
-                            String err = "The field '" + desc.getFieldName();
-                            err += "' cannot exist at the same time that field '";
-                            err += fieldName + "' also exists.";
+                            String err = "The element '" + desc.getXMLName();
+                            err += "' cannot exist at the same time that ";
+                            err += "element '" + fieldName + "' also exists.";
+                            throw new ValidationException(err);
                         }
                         found = true;
-                        fieldName = desc.getFieldName();
+                        fieldName = desc.getXMLName();
                         
                         FieldValidator fieldValidator = desc.getValidator();
                         if (fieldValidator != null)
