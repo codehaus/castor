@@ -989,6 +989,21 @@ public void setDetails( Collection details )
         used and what it supports. 
         </p>
     </section>
+    
+    <section title="Database-specific issues">
+    
+        <section title="HSQL and identity key generators">
+            <p>Due to a product limitation, AUTO_INCREMENT sequences in HSQL begin with 0 rather 1, 
+               as is the case with most other RDBMS. As a result of this, long transactions will 
+               not work for the object with the identity 0, and a ObjectModifiedException will be 
+               thrown.</p>
+               
+            <p>To avoid this issue, we recommend inserting a temp object into the database in 
+               question, and removing thereafter so that no object with identity 0 is stored.</p>
+	    </section>
+	    
+    </section>
+    
 
   </body>
 </document>
