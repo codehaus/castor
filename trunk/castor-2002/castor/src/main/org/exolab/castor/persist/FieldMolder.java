@@ -62,6 +62,7 @@ import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.jdo.DataObjectAccessException;
 
 
 /**
@@ -243,10 +244,10 @@ public class FieldMolder {
                 return null;
         } catch ( IllegalAccessException except ) {
             // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            throw new DataObjectAccessException( Messages.format( "mapping.schemaChangeNoAccess", toString() ), except );
         } catch ( InvocationTargetException except ) {
             // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+            throw new DataObjectAccessException( Messages.format( "mapping.schemaChangeInvocation",
                                                               toString(), except ) );
         }
     }
@@ -256,18 +257,18 @@ public class FieldMolder {
         ReflectService rf = getContextReflectService ( loader );
         try {
             if ( rf._addMethod == null )
-                throw new RuntimeException("No add method defined for this field");
+                throw new DataObjectAccessException("No add method defined for this field");
 
             if ( value == null )
                 throw new NullPointerException("Adding null value is not allowed");
 
             rf._addMethod.invoke( object, new Object[] { value } );
         } catch ( IllegalArgumentException e ) {
-            throw e;
+            throw new DataObjectAccessException("Argument ,"+value+", cannot be added!", e );
         } catch ( IllegalAccessException e ) {
-            throw new RuntimeException("Field access error");
+            throw new DataObjectAccessException("Field access error", e );
         } catch ( InvocationTargetException e ) {
-            throw new RuntimeException("Field invocation error");
+            throw new DataObjectAccessException("Field invocation error", e );
         }
     }
 
@@ -306,40 +307,30 @@ public class FieldMolder {
                         rf._setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                 }
             } else {
-                throw new RuntimeException("no method to set value for field: "+_fType+" in class: "+_eMold);
+                throw new DataObjectAccessException("no method to set value for field: "+_fType+" in class: "+_eMold);
             }
             // If the field has no set method, ignore it.
             // If this is a problem, identity it someplace else.
         } catch ( IllegalArgumentException except ) {
             // Graceful way of dealing with unwrapping exception
             if ( value == null )
-                throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
+                throw new DataObjectAccessException( Messages.format( "mapping.typeConversionNull", toString() ) );
             else
-                throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
+                throw new DataObjectAccessException( Messages.format( "mapping.typeConversion",
                                                             toString(), value.getClass().getName() ) );
         } catch ( IllegalAccessException except ) {
             // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            throw new DataObjectAccessException( Messages.format( "mapping.schemaChangeNoAccess", toString() ), except );
         } catch ( InvocationTargetException except ) {
             // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                              toString(), except.getMessage() ) );
+            throw new DataObjectAccessException( Messages.format( "mapping.schemaChangeInvocation",
+                                                              toString(), except.getMessage() ), except );
         }
-
     }
-
-    /*
-    public void addValue( Object target ) {
-    }
-
-    public void removeValue( Object target, Object identity ) {
-    }
-    */
 
     // ======================================================
     //  copy from FieldHanlder.java and modified
     // ======================================================
-
     protected Class getCollectionType( String coll, boolean lazy ) 
             throws MappingException {
         Class type;
@@ -462,7 +453,7 @@ public class FieldMolder {
             try {
                 javaClass = ds.resolve(eMold.getName());
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                throw new MappingException( "mapping.classNotFound", javaClass );
             }
             // ssa, multi classloader feature
             // set the default classloader to the hash table
@@ -482,11 +473,11 @@ public class FieldMolder {
                 fieldName = fieldMap.getName();
                 _defaultReflectService._field = findField( javaClass, fieldName, _defaultReflectService._fClass );
                 if ( _defaultReflectService._field == null )
-                    throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
+                    throw new MappingException( Messages.format("mapping.fieldNotAccessible", fieldName, javaClass.getName()) );
                 if ( _defaultReflectService._field.getModifiers() != Modifier.PUBLIC &&
                      _defaultReflectService._field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
-                    throw new MappingException( "mapping.fieldNotAccessible", _defaultReflectService._field.getName(),
-                                            _defaultReflectService._field.getDeclaringClass().getName() );
+                    throw new MappingException( Messages.format("mapping.fieldNotAccessible", _defaultReflectService._field.getName(),
+                                            _defaultReflectService._field.getDeclaringClass().getName()) );
             } else if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
 
                 // Container object, map field to fields of the container
