@@ -1298,13 +1298,12 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- simply return
             return;
         }
-        else {
-            //-- check for proper type and do type
-            //-- conversion
-            Class type = descriptor.getFieldType();
-            if (isPrimitive(type))
-                value = toPrimitiveObject(type, attValue);
-        }
+        //-- check for proper type and do type
+        //-- conversion
+        Class type = descriptor.getFieldType();
+        if (isPrimitive(type))
+            value = toPrimitiveObject(type, attValue);
+            
         FieldHandler handler = descriptor.getHandler();
 
         if (handler != null)
