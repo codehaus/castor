@@ -100,7 +100,7 @@ public class MozillaExporter
 	int         scope;
 
 	if ( getSearchDescriptor() == null )
-	    throw new IllegalStateException( Messages.message( "castor.dsml.searchDescriptorRequired" ) );
+	    throw new IllegalStateException( Messages.message( "dsml.searchDescriptorRequired" ) );
 
 	attrs = getSearchDescriptor().getReturnAttrs();
 	try {

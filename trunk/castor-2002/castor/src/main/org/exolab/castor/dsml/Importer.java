@@ -94,7 +94,7 @@ public abstract class Importer
 	throws TooManyListenersException
     {
 	if ( _listener != null )
-	    throw new TooManyListenersException( Messages.message( "castor.dsml.onlyOneListener" ) );
+	    throw new TooManyListenersException( Messages.message( "dsml.onlyOneListener" ) );
 	_listener = listener;
     }
 

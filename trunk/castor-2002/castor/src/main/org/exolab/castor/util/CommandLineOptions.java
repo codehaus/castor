@@ -111,7 +111,7 @@ public class CommandLineOptions {
 	                        }
 	                    }
 	                    else if (idx == flag.length()) {
-	                        errorWriter.println(Messages.format("castor.misc.invalidCLIOption",
+	                        errorWriter.println(Messages.format("misc.invalidCLIOption",
 								    "-" + flag));
 	                        printUsage(errorWriter);
 	                    }
@@ -167,7 +167,7 @@ public class CommandLineOptions {
 
     public void printUsage(PrintWriter pw) {
         pw.println();
-        pw.print(Messages.message( "castor.misc.CLIUsage" ));
+        pw.print(Messages.message( "misc.CLIUsage" ));
         for (int i = 0; i < flags.size(); i++) {
             String flag = (String) flags.elementAt(i);
             CmdLineOption opt = (CmdLineOption)optionInfo.get(flag);

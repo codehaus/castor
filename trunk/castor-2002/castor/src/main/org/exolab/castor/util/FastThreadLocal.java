@@ -48,7 +48,7 @@ package org.exolab.castor.util;
 
 
 /**
- * This is an efficient implementation of {@link java.lang.ThreadLocal}
+ * This is an efficient implementation of <tt>java.lang.ThreadLocal</tt>
  * which uses a background thread to remove stale thread entries,
  * doing away with the inefficiencies of <tt>WeakHashMap</tt>. This
  * implementation does not support <tt>ThreadLocal.initialValue()</tt>.
@@ -181,7 +181,7 @@ public class FastThreadLocal
 	// entries to stale (dead) threads.
 	Thread thread;
 
-	thread = new Thread( this, Messages.message( "castor.misc.threadLocalDaemonName" ) );
+	thread = new Thread( this, Messages.message( "misc.threadLocalDaemonName" ) );
 	thread.setPriority( Thread.MIN_PRIORITY );
 	thread.setDaemon( true );
 	thread.start();

@@ -94,12 +94,12 @@ public abstract class Consumer
 	} else if ( tagName.equals( XML.Namespace.Root ) ) {
 	    // Flag when entering (and leaving) the root element.
 	    if ( _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.elementNested",
+		throw new SAXException( Messages.format( "dsml.elementNested",
 							 XML.Namespace.Root ) );
 	    _insideRoot = true;
 	} else {
 	    if ( ! _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.expectingOpeningTag",
+		throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
 							 XML.Namespace.Root, tagName ) );
 	    if ( tagName.equals( XML.Schema.Element ) ||
 		 tagName.equals( XML.Entries.Element ) ) {
@@ -109,7 +109,7 @@ public abstract class Consumer
 		entry.startElement( tagName, attr );
 		_redirect = entry;
 	    } else {
-		throw new SAXException( Messages.format( "castor.dsml.openingTagNotRecognized",
+		throw new SAXException( Messages.format( "dsml.openingTagNotRecognized",
 							 tagName ) );
 	    }
 	}
@@ -126,10 +126,10 @@ public abstract class Consumer
 		if ( _insideRoot = true )
 		    _insideRoot = false;
 		else
-		    throw new SAXException( Messages.format( "castor.dsml.closingOutsideRoot",
+		    throw new SAXException( Messages.format( "dsml.closingOutsideRoot",
 							     tagName ) );
 	    } else {
-		throw new SAXException( Messages.format( "castor.dsml.expectingClosingTag",
+		throw new SAXException( Messages.format( "dsml.expectingClosingTag",
 							 XML.Namespace.Root, tagName ) );
 	    }
 	} else {
@@ -184,7 +184,7 @@ public abstract class Consumer
 	throws SAXException
     {
 	if ( _insideRoot )
-	    throw new SAXException( Messages.message( "castor.dsml.documentRootStillOpen" ) );
+	    throw new SAXException( Messages.message( "dsml.documentRootStillOpen" ) );
     }
 
 

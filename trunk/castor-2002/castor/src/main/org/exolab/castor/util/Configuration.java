@@ -253,7 +253,7 @@ public abstract class Configuration
 		cls = Class.forName( prop );
 		parser = (Parser) cls.newInstance();
 	    } catch ( Exception except ) {
-		throw new RuntimeException( Messages.format( "castor.conf.failedInstantiateParser",
+		throw new RuntimeException( Messages.format( "conf.failedInstantiateParser",
 							     prop, except ) );
 	    }
 	}
@@ -310,7 +310,7 @@ public abstract class Configuration
 
 	prop = getDefault().getProperty( Property.Serializer );
 	if ( prop == null )
-	    throw new RuntimeException( Messages.format( "castor.conf.missingProperty",
+	    throw new RuntimeException( Messages.format( "conf.missingProperty",
 							 Property.Serializer ) );
 	try {
   	    serializer = (Serializer) Class.forName( prop ).newInstance();
@@ -320,7 +320,7 @@ public abstract class Configuration
 	    }
 	    return serializer;
 	} catch ( Exception except ) {
-	    throw new RuntimeException( Messages.format( "castor.conf.failedInstantiateSerializer",
+	    throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
 							 prop, except ) );
 	}
     }
@@ -347,7 +347,7 @@ public abstract class Configuration
 	}
 	docHandler = serializer.asDocumentHandler();
 	if ( docHandler == null )
-	    throw new RuntimeException( Messages.format( "castor.conf.serializerNotSaxCapable",
+	    throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
 							 serializer.getClass().getName() ) );
 	return docHandler;
     }
@@ -370,7 +370,7 @@ public abstract class Configuration
 	serializer.setOutputCharStream( output );
 	docHandler = serializer.asDocumentHandler();
 	if ( docHandler == null )
-	    throw new RuntimeException( Messages.format( "castor.conf.serializerNotSaxCapable",
+	    throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
 							 serializer.getClass().getName() ) );
 	return docHandler;
     }
@@ -395,7 +395,7 @@ public abstract class Configuration
 	    _default.load( Configuration.class.getResourceAsStream( Property.ResourceName ) );
 	} catch ( Exception except ) {
 	    // This should never happen
-	    throw new RuntimeException( Messages.format( "castor.conf.notDefaultConfigurationFile",
+	    throw new RuntimeException( Messages.format( "conf.notDefaultConfigurationFile",
 							 Property.FileName ) );
 	}
 

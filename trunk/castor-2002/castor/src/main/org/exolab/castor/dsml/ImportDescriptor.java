@@ -198,12 +198,12 @@ public class ImportDescriptor
 	if ( tagName.equals( XML.Namespace.Root ) ) {
 	    // Flag when entering (and leaving) the root element.
 	    if ( _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.elementNested",
+		throw new SAXException( Messages.format( "dsml.elementNested",
 							 XML.Namespace.Root ) );
 	    _insideRoot = true;
 	} else {
 	    if ( ! _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.expectingOpeningTag",
+		throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
 							 XML.Namespace.Root, tagName ) );
 
 	    if ( tagName.equals( Names.Element.Policies ) ) {
@@ -211,7 +211,7 @@ public class ImportDescriptor
 	    } else if ( tagName.equals( Names.Element.Policy ) ) {
 		dn = attr.getValue( Names.Attribute.DN );
 		if ( dn == null )
-		    throw new SAXException( Messages.format( "castor.dsml.missingAttribute",
+		    throw new SAXException( Messages.format( "dsml.missingAttribute",
 							     Names.Element.Policy, Names.Attribute.DN ) );
 		policy = 0;
 		if ( "true".equals( attr.getValue( Names.Attribute.DeleteEmpty ) ) )
@@ -222,7 +222,7 @@ public class ImportDescriptor
 		    policy = policy | Policy.ReplaceAttr;
 		addPolicy( dn, policy );
 	    } else {
-		throw new SAXException( Messages.format( "castor.dsml.expectingOpeningTag",
+		throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
 							 Names.Element.Policies, tagName ) );
 	    }
 	}
@@ -236,18 +236,18 @@ public class ImportDescriptor
 	    if ( _insideRoot )
 		_insideRoot = false;
 	    else
-		throw new SAXException( Messages.format( "castor.dsml.closingOutsideRoot",
+		throw new SAXException( Messages.format( "dsml.closingOutsideRoot",
 							 tagName ) );
 	} else {
 	    if ( ! _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.closingOutsideRoot",
+		throw new SAXException( Messages.format( "dsml.closingOutsideRoot",
 							 tagName ) );
 	    if ( tagName.equals( Names.Element.Policies ) ) {
 		// Nothing to do here
 	    } else if (tagName.equals( Names.Element.Policy ) ) {
 		// Nothing to do here
 	    } else {
-		throw new SAXException( Messages.format( "castor.dsml.expectingClosingTag",
+		throw new SAXException( Messages.format( "dsml.expectingClosingTag",
 							 Names.Element.Policies, tagName ) );
 	    }
 	}

@@ -100,7 +100,7 @@ public class JNDIExporter
 	String[]          returnAttrs;
 
 	if ( getSearchDescriptor() == null )
-	    throw new IllegalStateException( Messages.message( "castor.dsml.searchDescriptorRequired" ) );
+	    throw new IllegalStateException( Messages.message( "dsml.searchDescriptorRequired" ) );
 
 	filter = getSearchDescriptor().getFilter();
 	if ( filter == null )
