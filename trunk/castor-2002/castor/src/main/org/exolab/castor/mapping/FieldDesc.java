@@ -47,6 +47,11 @@
 package org.exolab.castor.mapping;
 
 
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -177,6 +182,7 @@ public class FieldDesc
         throws MappingException
     {
         this( fieldName, fieldType, required );
+
         if ( fieldName == null )
             throw new IllegalArgumentException( "Argument 'fieldName' is null" );
         if ( getMethod == null && setMethod == null )
@@ -305,6 +311,19 @@ public class FieldDesc
 
 
     /**
+     * Return the declaring class of this field. The class to which
+     * this field belongs.
+     *
+     * @return The declaring class of the field
+     */
+    public Class getDeclaringClass()
+    {
+        return ( _field == null ? ( _getMethod == null ? _setMethod.getDeclaringClass() :
+                                    _getMethod.getDeclaringClass() ) : _field.getDeclaringClass() );
+    }
+
+
+    /**
      * Returns the value of the field in the object.
      *
      * @param obj The object
@@ -369,39 +388,58 @@ public class FieldDesc
     /**
      * Copy the field from the source object to the target object.
      * Immutable objects are shared between the objects, non-immutable
-     * objects are copied through serialization. <tt>source</tt> and
-     * <tt>target</tt> specify the object on which the field value is
-     * to be copied.
+     * objects are copied through cloning or serialization.
+     * <tt>source</tt> and <tt>target</tt> specify the object on which
+     * the field value is to be copied.
      *
      * @param source The source object
      * @param source The target object
      */
     public void copyInto( Object source, Object target )
     {
+        // Immutable objects are copied verbatim. Cloneable objects are
+        // cloned, all other fields must be serializable and are
+        // serialized.
         if ( _immutable )
             setValue( target, getValue( source ) );
-        else
-            // XXX Need to perform cloning or serialization here
-            setValue( target, getValue( source ) );
+        else {
+            try {
+                ByteArrayOutputStream ba;
+                ObjectOutputStream    os;
+                ObjectInputStream     is;
+                
+                ba = new ByteArrayOutputStream();
+                os = new ObjectOutputStream( ba );
+                os.writeObject( getValue( source ) );
+                os.flush();
+                is = new ObjectInputStream( new ByteArrayInputStream( ba.toByteArray() ) );
+                setValue( target, is.readObject() );
+            } catch ( IOException except ) {
+                throw new RuntimeException( Messages.format( "mapping.schemaNotSerializable",
+                                                             _fieldType.getName(), except.getMessage() ) );
+            } catch ( ClassNotFoundException except ) {
+                throw new RuntimeException( Messages.format( "mapping.schemaNotSerializable",
+                                                             _fieldType.getName(), except.getMessage() ) );
+            }
+        }
     }
 
 
     /**
-     * Determines if the field can be stored. Returns null if the field
-     * can be stored, or a message indicating the reason why the field
-     * cannot be stored. For example, if a required field is null.
-     * The message name can be used to look up the appropriate message
-     * text and should be formatted with an argument specifying the class name.
+     * Determines if the field can be stored. Returns successfully if
+     * the field can be stored. If a required field is null, throws
+     * an exception.
      *
      * @param obj The object
-     * @return Null if can store, otherwise a message indicate why
-     *  the field cannot be stored
+     * @throws IntegrityException Cannot store object due to
+     *  integrity violation
      */
-    public String canStore( Object obj )
+    public void canStore( Object obj )
+        throws IntegrityException
     {
         if ( getValue( obj ) == null && _required )
-            return "mapping.requiredField";
-        return null;
+            throw new IntegrityException( "mapping.requiredField",
+                                          obj.getClass().getName(), _fieldName );
     }
 
 
@@ -422,6 +460,15 @@ public class FieldDesc
             return ( getValue( cached ) == null );
         else
             return ( value.equals( getValue( cached ) ) );
+    }
+
+
+    /**
+     * Mutator method can only be used by {@link MappingHelper}.
+     */
+    final void setRequired( boolean required )
+    {
+        _required = required;
     }
     
     
