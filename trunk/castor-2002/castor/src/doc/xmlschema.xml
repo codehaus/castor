@@ -462,7 +462,9 @@
 	                     <li>'Name' is name of the top-level component (element, complexType or group).</li>
 	                     <li>'Compositor' is the compositor of the nested group.
 	                         For instance, if a 'choice' is nested inside a sequence, the value of Compositor will be
-	                         <tt>SequenceChoice</tt> ('Sequence'+'Choice').</li>
+	                         <tt>SequenceChoice</tt> ('Sequence'+'Choice').
+	                         Note: if the 'choice' is inside a Model Group and that Model Group <b>parent</b> is a Model Group Definition 
+	                         or a complexType then the value of'Compositor' will be only 'Choice'.</li>
 	                     <li>'Counter' is a number that prevents naming collision.</li>
 	                   </ul>  
 	             </li> 
