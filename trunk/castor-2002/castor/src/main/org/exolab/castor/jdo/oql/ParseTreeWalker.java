@@ -733,6 +733,7 @@ public class ParseTreeWalker implements TokenTypes
     if ( orderClause.getToken().getTokenType() != KEYWORD_ORDER )
       throw new QueryException( "checkOrderClause was called on a subtree which is not an order clause.");
 
+    ParseTreeNode prevChild = null;
     for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
 
@@ -749,13 +750,30 @@ public class ParseTreeWalker implements TokenTypes
           checkProjection( curChild, false, false );
           break;
       case IDENTIFIER:
-          checkField(curChild);
+          if ( curChild.children().hasMoreElements() ) {
+              if ( curChild.getChild(0).getToken().getTokenType() == LPAREN ) {
+                  // A function, skip to next element
+                  Enumeration arguments = curChild.getChild(0).children();
+                  while(arguments.hasMoreElements()) {
+                      ParseTreeNode nn = (ParseTreeNode)arguments.nextElement();
+                      checkWhereClause(nn);
+                  }
+              }
+          } else {
+                checkField(curChild);
+          }
+          break;
+      case LPAREN:
+          if ( ( prevChild == null ) || ( prevChild.getToken().getTokenType() != IDENTIFIER ) )
+              throw new QueryException("Illegal use of left parenthesis in ORDER BY clause.");
           break;
       default:
           throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
       }
+      prevChild = curChild;
     }
   }
+
 
   /**
    * Generates the QueryExpression which is an SQL representation or the OQL
