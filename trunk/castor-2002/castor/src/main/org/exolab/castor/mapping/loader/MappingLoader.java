@@ -812,7 +812,8 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
             if ( fieldType == null )
                 fieldType = Types.typeFromPrimitive( field.getType() );
-            else if ( Types.typeFromPrimitive( fieldType ) != Types.typeFromPrimitive( field.getType() ) )
+            else if ( fieldType != java.io.Serializable.class
+                    && Types.typeFromPrimitive( fieldType ) != Types.typeFromPrimitive( field.getType() ) )
                 throw new MappingException( "mapping.fieldTypeMismatch", field, fieldType.getName() );
             return field;
         } catch ( NoSuchFieldException except ) {
