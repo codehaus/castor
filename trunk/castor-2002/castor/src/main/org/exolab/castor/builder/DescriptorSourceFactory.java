@@ -220,9 +220,11 @@ public class DescriptorSourceFactory {
 
 
        //-- a hack, I know, I will change later (kv)
-       if (member.getName().equals("_anyList")) {
+       if (member.getName().equals("_anyObject"))
            any = true;
-           jsc.add("desc = (new XMLFieldDescriptorImpl(");
+
+
+           /*jsc.add("desc = (new XMLFieldDescriptorImpl(");
            jsc.append("Object.class, \"");
            jsc.append(member.getName());
            jsc.append("\", (String)null, NodeType.Element) { ");
@@ -233,7 +235,9 @@ public class DescriptorSourceFactory {
            jsc.unindent();
            jsc.add("});");
         }
-        else {
+        else {*/
+        //the previous section should not be used anymore
+
             if (xsType.getType() == XSType.COLLECTION)
                 //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
                 xsType = ((CollectionInfo)member).getContent().getSchemaType();
@@ -279,7 +283,7 @@ public class DescriptorSourceFactory {
                    break;
            } //switch
 
-        }//else
+        //}//else
 
         //-- handler access methods
 
@@ -451,13 +455,14 @@ public class DescriptorSourceFactory {
         if (member.isRequired()) {
             jsc.add("desc.setRequired(true);");
         }
-
+        //-- if any it can match all the names
+        if (any)
+           jsc.add("desc.setMatches(\"*\");");
         //-- mark as multi or single valued for elements
         if (isElement) {
             jsc.add("desc.setMultivalued("+member.isMultivalued());
             jsc.append(");");
         }
-
 
         jsc.add("addFieldDescriptor(desc);");
         jsc.add("");
