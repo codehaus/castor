@@ -270,7 +270,7 @@ public abstract class TransactionContext
      * an exception.
      *
      * @param engine The persistence engine
-     * @param obj The object to load
+     * @param object The object to load
      * @param identity The object's identity
      * @param accessMode The access mode (see {@link AccessMode})
      * @return True if the object contents has been modified to reflect
@@ -284,22 +284,24 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized boolean load( PersistenceEngine engine, Object obj,
+    public synchronized boolean load( PersistenceEngine engine, Object object,
                                       Object identity, AccessMode accessMode )
         throws TransactionNotInProgressException, ObjectNotFoundException,
                LockNotGrantedException, PersistenceException
     {
         ObjectEntry entry;
         OID         oid;
-        
-        if ( _status != Status.STATUS_ACTIVE )
+
+        /*        
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
 
         // Handle the case where object has already been loaded in
         // the context of this transaction. The case where object
         // has been loaded in another transaction is handled by the
         // locking mechanism.
-        entry = getObjectEntry( obj );
+        entry = getObjectEntry( object );
         if ( entry != null ) {
             // If the object has been loaded in this transaction from a
             // different engine this is an error. If the object has been
@@ -307,11 +309,11 @@ public abstract class TransactionContext
             // object has been created in this transaction, it cannot be
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
-                throw new PersistenceException( "persist.multipleLoad", obj.getClass(), identity );
+                throw new PersistenceException( "persist.multipleLoad", object.getClass(), identity );
             if ( entry.deleted )
-                throw new ObjectNotFoundException( obj.getClass(), identity );
-            if ( obj.getClass() != entry.obj.getClass() )
-                throw new PersistenceException( "persist.typeMismatch", obj.getClass(), entry.obj.getClass() );
+                throw new ObjectNotFoundException( object.getClass(), identity );
+            if ( object.getClass() != entry.javaClass )
+                throw new PersistenceException( "persist.typeMismatch", object.getClass(), entry.javaClass );
             if ( entry.created )
                 return false;
             if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
@@ -321,7 +323,7 @@ public abstract class TransactionContext
                 // synchronized with the database, but we cannot
                 // synchronize a live object.
                 throw new PersistenceException( "persist.lockConflict",
-                                                obj.getClass(), identity );
+                                                object.getClass(), identity );
             }
             return false;
         }
@@ -330,9 +332,9 @@ public abstract class TransactionContext
         // requested lock. This might report failure (object no longer exists),
         // hold until a suitable lock is granted (or fail to grant), or
         // report error with the persistence engine.
-        accessMode = engine.getClassHandler( obj.getClass() ).getAccessMode( accessMode );
+        accessMode = engine.getClassHandler( object.getClass() ).getAccessMode( accessMode );
         try {
-            oid = engine.load( this, obj.getClass(), identity,
+            oid = engine.load( this, object.getClass(), identity,
                                accessMode, _lockTimeout );
         } catch ( ObjectNotFoundException except ) {
             throw except;
@@ -347,18 +349,17 @@ public abstract class TransactionContext
         // If the mode is read-only we release the lock and forget about
         // it in the contents of this transaction. Otherwise we record
         // the object in this transaction. 
+        entry = addObjectEntry( object, oid, engine );
         try {
-            engine.copyObject( this, oid, obj );
-        } catch ( ObjectNotFoundException except ) {
+            engine.copyObject( this, oid, object );
+        } catch ( PersistenceException except ) {
+            removeObjectEntry( object );
             engine.forgetObject( this, oid );
             throw except;
         }
-        if ( entry == null ) {
-            if ( accessMode == AccessMode.ReadOnly ) {
-                engine.releaseLock( this, oid );
-            } else {
-                entry = addObjectEntry( obj, oid, engine );
-            }
+        if ( accessMode == AccessMode.ReadOnly ) {
+            removeObjectEntry( object );
+            engine.releaseLock( this, oid );
         }
         return true;
     }
@@ -408,10 +409,12 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
         OID         oid;
-        Object      obj;
-        
-        if ( _status != Status.STATUS_ACTIVE )
+        Object      object;
+
+        /*        
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
 
         oid = new OID( handler, identity );
         entry = getObjectEntry( engine, oid );
@@ -426,11 +429,11 @@ public abstract class TransactionContext
                                                 handler.getJavaClass(), identity );
             if ( entry.deleted )
                 throw new ObjectNotFoundException( handler.getJavaClass(), identity );
-            if ( handler.getJavaClass() != entry.obj.getClass() )
+            if ( ! handler.getJavaClass().isAssignableFrom( entry.javaClass ) )
                 throw new PersistenceException( "persist.typeMismatch",
-                                                handler.getJavaClass(), entry.obj.getClass() );
+                                                handler.getJavaClass(), entry.javaClass );
             if ( entry.created )
-                return entry.obj;
+                return entry.object;
             if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
                 // If we are in exclusive mode and object has not been
                 // loaded in exclusive mode before, then we have a
@@ -440,7 +443,7 @@ public abstract class TransactionContext
                 throw new PersistenceException( "persist.lockConflict",
                                                 handler.getJavaClass(), identity );
             }
-            return entry.obj;
+            return entry.object;
         }
 
         // Load (or reload) the object through the persistence engine with the
@@ -463,21 +466,20 @@ public abstract class TransactionContext
         // If the mode is read-only we release the lock and forget about
         // it in the contents of this transaction. Otherwise we record
         // the object in this transaction. 
-        obj = handler.newInstance();
+        object = handler.newInstance();
+        entry = addObjectEntry( object, oid, engine );
         try {
-            engine.copyObject( this, oid, obj );
-        } catch ( ObjectNotFoundException except ) {
+            engine.copyObject( this, oid, object );
+        } catch ( PersistenceException except ) {
+            removeObjectEntry( object );
             engine.forgetObject( this, oid );
             throw except;
         }
-        if ( entry == null ) {
-            if ( accessMode == AccessMode.ReadOnly ) {
-                engine.releaseLock( this, oid );
-            } else {
-                entry = addObjectEntry( obj, oid, engine );
-            }
+        if ( accessMode == AccessMode.ReadOnly ) {
+            removeObjectEntry( object );
+            engine.releaseLock( this, oid );
         }
-        return obj;
+        return object;
     }
 
 
@@ -503,8 +505,10 @@ public abstract class TransactionContext
         throws TransactionNotInProgressException, QueryException,
                PersistenceException
     {
-        if ( _status != Status.STATUS_ACTIVE )
+        /*
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
         // Need to execute query at this point. This will result in a
         // new result set from the query, or an exception.
         query.execute( getConnection( engine ), accessMode );
@@ -522,7 +526,7 @@ public abstract class TransactionContext
      * transaction.
      *
      * @param engine The persistence engine
-     * @param obj The object to persist
+     * @param object The object to persist
      * @param identity The object's identity (may be null)
      * @return The object's OID
      * @throws TransactionNotInProgressException Method called while
@@ -534,30 +538,32 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized OID create( PersistenceEngine engine, Object obj, Object identity )
+    public synchronized OID create( PersistenceEngine engine, Object object, Object identity )
         throws TransactionNotInProgressException, DuplicateIdentityException,
                ClassNotPersistenceCapableException, PersistenceException
     {
         OID          oid;
         ObjectEntry  entry;
         ClassHandler handler;
-        
-        if ( _status != Status.STATUS_ACTIVE )
+
+        /*        
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
         // Make sure the object has not beed persisted in this transaction.
-        if ( getObjectEntry( obj ) != null )
-            throw new PersistenceException( "persist.objectAlreadyPersistent", obj.getClass(), identity );
-        handler = engine.getClassHandler( obj.getClass() );
+        if ( getObjectEntry( object ) != null )
+            throw new PersistenceException( "persist.objectAlreadyPersistent", object.getClass(), identity );
+        handler = engine.getClassHandler( object.getClass() );
         if ( handler == null )
-            throw new ClassNotPersistenceCapableException( obj.getClass() );
+            throw new ClassNotPersistenceCapableException( object.getClass() );
         
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
         // add a new entry for this object and use this object as the view
         if ( identity != null && getObjectEntry( engine, new OID( handler, identity ) ) != null )
-            throw new DuplicateIdentityException( obj.getClass(), identity );
-        oid = engine.create( this, obj, identity );
-        entry = addObjectEntry( obj, oid, engine );
+            throw new DuplicateIdentityException( object.getClass(), identity );
+        oid = engine.create( this, object, identity );
+        entry = addObjectEntry( object, oid, engine );
         entry.created = true;
         return oid;
     }
@@ -571,7 +577,7 @@ public abstract class TransactionContext
      * transaction completes. A write lock is acquired in order to
      * assure the object can be deleted.
      *
-     * @param obj The object to delete from persistent storage
+     * @param object The object to delete from persistent storage
      * @throws TransactionNotInProgressException Method called while
      *   transaction is not in progress
      * @throws ObjectNotPersistentException The object has not been
@@ -581,29 +587,31 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized void delete( Object obj )
+    public synchronized void delete( Object object )
         throws TransactionNotInProgressException, ObjectNotPersistentException,
                LockNotGrantedException, PersistenceException
     {
         ObjectEntry entry;
-        
-        if ( _status != Status.STATUS_ACTIVE )
+
+        /*        
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
-        entry = getObjectEntry( obj );
+        entry = getObjectEntry( object );
         if ( entry == null )
-            throw new ObjectNotPersistentException( obj.getClass() );
+            throw new ObjectNotPersistentException( object.getClass() );
         // Cannot delete same object twice
         if ( entry.deleted )
             throw new PersistenceException( "persist.cannotDeleteTwice",
-                                            obj.getClass(), entry.oid.getIdentity() );
+                                            object.getClass(), entry.oid.getIdentity() );
 
         // If the object has been created in this transaction and had no
         // identity we don't need to remove it from persistent storage
         if ( entry.oid.getIdentity() == null ) {
             entry.engine.releaseLock( this, entry.oid );
-            removeObjectEntry( obj );
+            removeObjectEntry( object );
             return;
         }
         // Must acquire a write lock on the object in order to delete it,
@@ -619,7 +627,7 @@ public abstract class TransactionContext
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
-            removeObjectEntry( obj );
+            removeObjectEntry( object );
         }
     }
 
@@ -638,7 +646,7 @@ public abstract class TransactionContext
      * detected, an exception will be thrown but the current lock will
      * be retained. 
      *
-     * @param obj The object to lock
+     * @param object The object to lock
      * @param timeout Timeout waiting to acquire lock, specified in
      *  seconds, zero for no waiting, negative to use the default
      *  timeout for this transaction
@@ -651,26 +659,28 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized void writeLock( Object obj, int timeout )
+    public synchronized void writeLock( Object object, int timeout )
         throws TransactionNotInProgressException, ObjectNotPersistentException,
                LockNotGrantedException, PersistenceException
     {
         ObjectEntry entry;
-        
-        if ( _status != Status.STATUS_ACTIVE )
+
+        /*        
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
-        entry = getObjectEntry( obj );
+        entry = getObjectEntry( object );
         if ( entry == null || entry.deleted )
-            throw new ObjectNotPersistentException( obj.getClass() );
+            throw new ObjectNotPersistentException( object.getClass() );
         try {
             entry.engine.writeLock( this, entry.oid, timeout );
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
-            removeObjectEntry( obj );
-            throw new ObjectNotPersistentException( obj.getClass() );
+            removeObjectEntry( object );
+            throw new ObjectNotPersistentException( object.getClass() );
         } catch ( LockNotGrantedException except ) {
             // Can't get lock, but may still keep running
             throw except;
@@ -683,7 +693,7 @@ public abstract class TransactionContext
      * from this transaction and will not participate in transaction
      * commit/abort. Any changes done to the object are lost.
      *
-     * @param obj The object to release the lock
+     * @param object The object to release the lock
      * @throws  TransactionNotInProgressException Method called while
      *   transaction is not in progress
      * @throws ObjectNotPersistentException The object was not queried
@@ -691,22 +701,24 @@ public abstract class TransactionContext
      * @throws PersistenceException An error occured talking to the
      *   persistence engine
      */
-    public synchronized void release( Object obj )
+    public synchronized void release( Object object )
         throws TransactionNotInProgressException, ObjectNotPersistentException,
                PersistenceException
     {
         ObjectEntry entry;
-        
-        if ( _status != Status.STATUS_ACTIVE )
+
+        /*        
+        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
+        */
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
-        entry = getObjectEntry( obj );
+        entry = getObjectEntry( object );
         if ( entry == null || entry.deleted )
-            throw new ObjectNotPersistentException( obj.getClass() );
+            throw new ObjectNotPersistentException( object.getClass() );
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
-        removeObjectEntry( obj );
+        removeObjectEntry( object );
     }
 
 
@@ -732,13 +744,38 @@ public abstract class TransactionContext
     {
         Enumeration enum;
         ObjectEntry entry;
-        Object      obj;
+        Object      object;
         
+        if ( _status == Status.STATUS_MARKED_ROLLBACK )
+            throw new TransactionAbortedException( "persist.markedRollback" );
         if ( _status != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException();
-        if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
-            throw new TransactionAbortedException( "persist.markedRollback" );
+
+        /*
+        enum = _objects.elements();
+        while ( enum.hasMoreElements() ) {
+            entry = (ObjectEntry) enum.nextElement();
+            // If the object has been deleted, it is removed from the
+            // underlying database. This call will detect duplicate
+            // removal attempts. Otherwise the object is stored in
+            // the database.
+            if ( entry.deleted ) {
+                entry.engine.delete( this, entry.javaClass, entry.oid.getIdentity() );
+            } else {
+                Object       identity;
+                ClassHandler handler;
+                
+                // When storing the object it's OID might change
+                // if the primary identity has been changed
+                handler = entry.engine.getClassHandler( entry.javaClass );
+                identity = handler.getIdentity( entry.object );
+                if ( identity == null )
+                    throw new TransactionAbortedException( "persist.noIdentity", 
+                                                           handler.getJavaClass(), null );
+                entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+            }
         }
+        */
         
         // No objects in this transaction -- this is a read only transaction
         if ( _objects.size() == 0 ) {
@@ -756,19 +793,19 @@ public abstract class TransactionContext
                 // removal attempts. Otherwise the object is stored in
                 // the database.
                 if ( entry.deleted ) {
-                    entry.engine.delete( this, entry.obj.getClass(), entry.oid.getIdentity() );
+                    entry.engine.delete( this, entry.javaClass, entry.oid.getIdentity() );
                 } else {
                     Object       identity;
                     ClassHandler handler;
                     
                     // When storing the object it's OID might change
                     // if the primary identity has been changed
-                    handler = entry.engine.getClassHandler( entry.obj.getClass() );
-                    identity = handler.getIdentity( entry.obj );
+                    handler = entry.engine.getClassHandler( entry.javaClass );
+                    identity = handler.getIdentity( entry.object );
                     if ( identity == null )
                         throw new TransactionAbortedException( "persist.noIdentity", 
                                                                handler.getJavaClass(), null );
-                    entry.oid = entry.engine.store( this, entry.obj, identity, _lockTimeout );
+                    entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
                 }
             }
             _status = Status.STATUS_PREPARED;
@@ -826,7 +863,7 @@ public abstract class TransactionContext
                     // Object has been deleted inside transaction,
                     // engine must forget about it.
                     entry.engine.forgetObject( this, entry.oid );
-                    removeObjectEntry( entry.obj );
+                    removeObjectEntry( entry.object );
                 } else {
                     // Object has been created/accessed inside the
                     // transaction must retain the database lock
@@ -893,7 +930,7 @@ public abstract class TransactionContext
                 } else {
                     // Object has been created/accessed inside the
                     // transaction, release its lock.
-                    entry.engine.updateObject( this, entry.oid, entry.obj );
+                    entry.engine.updateObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
             }
@@ -949,7 +986,7 @@ public abstract class TransactionContext
                 } else {
                     // Object has been queried (possibly) deleted in this
                     // transaction, release the lock and revert to the old value.
-                    entry.engine.copyObject( this, entry.oid, entry.obj );
+                    entry.engine.copyObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
             } catch ( Exception except ) { }
@@ -965,12 +1002,12 @@ public abstract class TransactionContext
     /**
      * Returns true if the object is persistent in this transaction.
      *
-     * @param obj The object
+     * @param object The object
      * @return True if persistent in transaction
      */
-    public boolean isPersistent( Object obj )
+    public boolean isPersistent( Object object )
     {
-        return ( getObjectEntry( obj ) != null );
+        return ( getObjectEntry( object ) != null );
     }
 
 
@@ -1030,20 +1067,18 @@ public abstract class TransactionContext
      * (or deleted) in the context of this transaction. The object is
      * not persisted if it has not been recorded in this transaction.
      *
-     * @param obj The object to record
+     * @param object The object to record
      * @param oid The object's OID
      * @param engine The persistence engine used to create this object
      */
-    ObjectEntry addObjectEntry( Object obj, OID oid, PersistenceEngine engine )
+    ObjectEntry addObjectEntry( Object object, OID oid, PersistenceEngine engine )
     {
         ObjectEntry entry;
         Hashtable   engineOids;
         
-        entry = new ObjectEntry();
-        entry.engine = engine;
+        entry = new ObjectEntry( engine, object );
         entry.oid = oid;
-        entry.obj = obj;
-        _objects.put( obj, entry );
+        _objects.put( object, entry );
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null ) {
             engineOids = new Hashtable();
@@ -1071,12 +1106,12 @@ public abstract class TransactionContext
      * transaction. An entry will be returned even if the object has
      * been deleted in this transaction.
      *
-     * @param obj The object to locate
+     * @param object The object to locate
      * @return The object's entry or null if not persistent
      */
-    ObjectEntry getObjectEntry( Object obj )
+    ObjectEntry getObjectEntry( Object object )
     {
-        return (ObjectEntry) _objects.get( obj );
+        return (ObjectEntry) _objects.get( object );
     }
 
 
@@ -1084,14 +1119,14 @@ public abstract class TransactionContext
      * Removes the entry for an object and returns it. The object is
      * no longer part of the transaction.
      *
-     * @param obj The object to remove
+     * @param object The object to remove
      * @return The removed entry
      */
-    private ObjectEntry removeObjectEntry( Object obj )
+    ObjectEntry removeObjectEntry( Object object )
     {
         ObjectEntry entry;
         
-        entry = (ObjectEntry) _objects.remove( obj );
+        entry = (ObjectEntry) _objects.remove( object );
         if ( entry == null )
             return null;
         ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
@@ -1113,15 +1148,24 @@ public abstract class TransactionContext
     static class ObjectEntry
     {
         
-        PersistenceEngine  engine;
+        final PersistenceEngine  engine;
         
-        OID                oid;
+        final Object             object;
+
+        final Class              javaClass;
         
-        Object             obj;
+        OID                      oid;
         
-        boolean            deleted;
+        boolean                  deleted;
         
-        boolean            created;
+        boolean                  created;
+
+        ObjectEntry( PersistenceEngine  engine, Object object )
+        {
+            this.engine = engine;
+            this.object = object;
+            javaClass = object.getClass();
+        }
         
     }
 
