@@ -137,12 +137,14 @@ public class MarshalHelper {
         List      dateDescriptors = null;
         
         //-- make sure we have methods before creating
-        //-- the hashtables
+        //-- the hashtables and lists
         if (methods.length > 0) {
             descriptors     = new Hashtable();
             createMethods   = new Hashtable();
             dateDescriptors = new List(3);
         }
+        
+        int methodCount = 0;
         
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
@@ -155,6 +157,8 @@ public class MarshalHelper {
             //-- read methods
             if (methodName.startsWith(GET)) {
                 if (method.getParameterTypes().length != 0) continue;
+                                
+                ++methodCount;
                 
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
@@ -216,6 +220,9 @@ public class MarshalHelper {
                      methodName.startsWith(SET) ) {
                 
                 if (method.getParameterTypes().length != 1) continue;
+                
+                ++methodCount;
+                
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
                 String xmlName   = toXMLName(fieldName);
@@ -284,7 +291,7 @@ public class MarshalHelper {
                 String xmlName   = toXMLName(fieldName);
                 
                 Class type = method.getReturnType();
-                
+                                
                 if (!isDescriptable(type)) continue;
                 
                 XMLFieldDescriptorImpl fieldDesc 
@@ -305,7 +312,56 @@ public class MarshalHelper {
                     throw new MarshalException(mx);
                 }
             } //-- end create method
-        }
+            
+        } //-- end of method loop
+        
+        //-- If we didn't find any methods we can try
+        //-- direct field access
+        if (methodCount == 0) {           
+            Field[] fields = c.getFields();            
+            for (int i = 0; i < fields.length; i++) {                
+                Field field = fields[i];
+                
+                Class type = field.getType();       
+                boolean isCollection = false;
+                if (type.isArray()) {
+                    type = type.getComponentType();
+                    isCollection = true;
+                }                
+                if (!isDescriptable(type)) continue;
+                
+                String fieldName = field.getName();
+                String xmlName = toXMLName(fieldName);
+                
+                XMLFieldDescriptorImpl fieldDesc = 
+                        createFieldDescriptor(type, fieldName, xmlName);
+                        
+                if (isCollection) {
+                    fieldDesc.setNodeType(NodeType.Element);
+                    fieldDesc.setMultivalued(true);
+                }
+                descriptors.put(xmlName, fieldDesc);
+                classDesc.addFieldDescriptor(fieldDesc);
+                
+                TypeInfo typeInfo        = new TypeInfo(type);
+                FieldHandlerImpl handler = null;
+
+                try {
+                    handler = new FieldHandlerImpl(field, typeInfo);
+                }
+                catch (MappingException mx) {
+                    throw new MarshalException(mx);
+                }
+                
+                fieldDesc.setHandler(handler);
+                   
+                //-- check for instances of java.util.Date
+                if (java.util.Date.class.isAssignableFrom(type))
+                    dateDescriptors.add(fieldDesc);
+                
+            }            
+        } //-- end of direct field access
+        
         
         //-- A temporary fix for java.util.Date
         if (dateDescriptors != null) {
