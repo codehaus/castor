@@ -203,12 +203,20 @@ public class Schema extends Annotated {
     {
         if (attribute == null) return;
 
+        String name = attribute.getName();
+
         if (attribute.getSchema() != this) {
             String err = "invalid attempt to add an AttributeDecl which ";
             err += "belongs to a different Schema; " + name;
             throw new SchemaException(err);
         }
 
+        if ( (name == null) && (attribute.isReference()) ) {
+                String err = "Error attempting to add a top-level AttributeDecl that " +
+                "is a reference. Top-level attributes can only be attribute declarations: " +
+                attribute.getName(false);
+            throw new SchemaException(err);
+        }
         Object obj = attributes.get(name);
 
         if (obj == attribute) return;
@@ -320,7 +328,14 @@ public class Schema extends Annotated {
         throws SchemaException
     {
 
-        String name = elementDecl.getName();
+        String name = elementDecl.getName(true);
+
+        if ( (name == null) && (elementDecl.isReference()) ) {
+              String err = "Error attempting to add a top-level Element that " +
+              "is a reference. Top-level elements can only be element declarations: " +
+                elementDecl.getName(false);
+            throw new SchemaException(err);
+        }
 
         if (name == null) {
             String err = "an element declaration must contain a name.";
