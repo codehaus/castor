@@ -366,6 +366,19 @@ public abstract class SimpleType extends XMLType
         return Structure.SIMPLE_TYPE;
     } //-- getStructureType
 
+    /**
+     * Checks the validity of this SimpleType defintion.
+     *
+     * @throws ValidationException when this SimpleType definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- NOT YET IMPLEMENTED
+        
+    } //-- validate
+
     //-- protected Methods -/
 
     /**

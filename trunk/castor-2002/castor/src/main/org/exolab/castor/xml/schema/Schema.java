@@ -1251,14 +1251,48 @@ public class Schema extends Annotated {
 
     /**
      * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
+     *
+     * @throws ValidationException when this Schema definition
      * is invalid.
     **/
     public void validate()
         throws ValidationException
     {
-        //-- do nothing for now...eventually we need
-        //-- to cascade calls to all structure types
+        
+        //-- Note: This method needs to be completed.
+        
+        //-- top-level complexTypes
+        Enumeration enum = _complexTypes.elements();
+        while (enum.hasMoreElements()) {
+            ComplexType type = (ComplexType)enum.nextElement();
+            type.validate();
+        }        
+        //-- top-level simpleTypes
+        enum = _simpleTypes.elements();
+        while (enum.hasMoreElements()) {
+            SimpleType type = (SimpleType)enum.nextElement();
+            type.validate();
+        }        
+        
+        //-- top-level elements    
+        enum = _elements.elements();
+        while (enum.hasMoreElements()) {
+            ((ElementDecl)enum.nextElement()).validate();
+        }        
+        
+        //-- top-level attributes 
+        enum = _attributes.elements();
+        while (enum.hasMoreElements()) {
+            ((AttributeDecl)enum.nextElement()).validate();
+        }        
+        
+        //-- top-level groups
+        enum = _groups.elements();
+        while (enum.hasMoreElements()) {
+            ((Group)enum.nextElement()).validate();
+        }        
+        
+        //-- top-level attribute groups
 
     } //-- validate
 
