@@ -48,6 +48,8 @@ package org.exolab.castor.persist;
 
 
 import java.util.Hashtable;
+import java.util.Enumeration;
+import org.exolab.castor.jdo.LockNotGrantedException;
 
 
 /**
@@ -59,15 +61,8 @@ import java.util.Hashtable;
  * @version $Revision$ $Date$
  */
 final class Cache
+    extends Thread
 {
-
-
-    /**
-     * Mapping of OIDs to objects. The object is used as the key, and
-     * {@link OID} is the value.
-     */
-    private final Hashtable  _oids = new Hashtable();
-
 
     /**
      * Mapping of object locks to OIDs. The {@link OID} is used as the
@@ -76,39 +71,120 @@ final class Cache
     private final Hashtable _locks = new Hashtable();
 
 
-    ObjectLock getLock( OID oid )
+    private long  _counter;
+
+
+    private static TransactionContext _cacheTx = new CacheTransaction();
+
+
+    private static final long StampInUse   = 0;
+
+
+    Cache()
     {
-        return (ObjectLock) _locks.get( oid );
     }
 
 
-    void setLock( OID oid, ObjectLock lock )
+    synchronized ObjectLock getLock( OID oid )
     {
-        _locks.put( oid, lock );
+        CacheEntry entry;
+
+        entry = (CacheEntry) _locks.get( oid ); 
+        if ( entry == null )
+            return null;
+        entry.stamp = StampInUse;
+        return entry.lock;
     }
 
 
-    ObjectLock removeLock( OID oid )
+    synchronized ObjectLock releaseLock( OID oid )
     {
-        return (ObjectLock) _locks.remove( oid );
+        CacheEntry entry;
+
+        entry = (CacheEntry) _locks.get( oid ); 
+        if ( entry == null )
+            return null;
+        entry.stamp = System.currentTimeMillis();
+        return entry.lock;
     }
 
 
-    OID getOID( Object[] fields )
+    synchronized void addLock( OID oid, ObjectLock lock )
     {
-        return (OID) _oids.get( fields );
+        CacheEntry entry;
+
+        entry = new CacheEntry( oid, lock );
+        entry.stamp = StampInUse;
+        _locks.put( oid, entry );
     }
 
 
-    void setOID( Object[] fields, OID oid )
+    void removeLock( OID oid )
     {
-        _oids.put( fields, oid );
+        _locks.remove( oid );
     }
 
 
-    OID removeOID( Object[] fields )
+    public void run()
     {
-        return (OID) _oids.remove( fields );
+        Enumeration enum;
+        CacheEntry  entry;
+
+        while ( true ) {
+            enum = _locks.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (CacheEntry) enum.nextElement();
+                synchronized ( this ) {
+                    if ( entry.stamp != StampInUse ) {
+                        try {
+                            Object obj;
+                            
+                            obj = entry.lock.acquire( _cacheTx, true, 0 );
+                            _locks.remove( entry.oid );
+                            entry.lock.release( _cacheTx );
+                        } catch ( LockNotGrantedException except ) { }
+                    }
+                }
+            }
+        }
+    }
+
+
+    static class CacheEntry
+    {
+
+        final OID        oid;
+
+        final ObjectLock lock;
+        
+        long             stamp;
+
+        CacheEntry( OID oid, ObjectLock lock )
+        {
+            this.oid = oid;
+            this.lock = lock;
+        }
+
+    }
+
+
+    static class CacheTransaction
+        extends TransactionContext
+    {
+
+        public Object getConnection( PersistenceEngine engine )
+        {
+            return null;
+        }
+
+        protected void commitConnections( boolean keepOpen )
+        {
+        }
+
+        protected void rollbackConnections()
+        {
+        }
+
     }
 
 
