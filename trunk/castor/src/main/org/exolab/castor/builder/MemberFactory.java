@@ -228,11 +228,11 @@ public class MemberFactory {
             if (xmlType.isSimpleType()) {
                 SimpleType simpleType = (SimpleType)xmlType;
                 
+                SimpleType baseType = null;
                 String derivationMethod = simpleType.getDerivationMethod();
                 if (derivationMethod != null) {
                     if (SchemaNames.RESTRICTION.equals(derivationMethod)) {
-                        SimpleType base = (SimpleType)simpleType.getBaseType();
-                        if (base != null) simpleType = base;
+                        baseType = (SimpleType)simpleType.getBaseType();
                     }
                 }
 
@@ -241,15 +241,24 @@ public class MemberFactory {
                     //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
                     enumeration = true;
                     if (resolver != null) {
-                        classInfo = resolver.resolve(simpleType);
+                        classInfo = resolver.resolve(xmlType);
                     }
                     if (classInfo != null) {
                         xsType = classInfo.getSchemaType();
                     }
                 }
-                else if (simpleType instanceof ListType) {
-                    if (!simpleType.isBuiltInType())
-                        simpleTypeCollection = true;
+                else if ((simpleType instanceof ListType) || 
+                         (baseType instanceof ListType)) 
+                {
+                    if (baseType != null) {
+                    	if (!baseType.isBuiltInType())
+                    		simpleTypeCollection = true;
+                        
+                    }
+                    else {
+                    	if (!simpleType.isBuiltInType())
+                    		simpleTypeCollection = true;
+                    }
                 }
                 
                 if (xsType == null) {
