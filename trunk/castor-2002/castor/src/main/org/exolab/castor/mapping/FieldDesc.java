@@ -137,6 +137,12 @@ public abstract class FieldDesc
 
 
     /**
+     * The default value for primitive fields. Will be set if the field is null.
+     */
+    private Object   _default;
+
+
+    /**
      * Construct a new field descriptor for the specified field.
      * The field must be public, and may not be static or transient.
      * The field name and type are determined from the Java field.
@@ -170,6 +176,7 @@ public abstract class FieldDesc
 	_readable = readable;
 	_writeable = writeable;
 	_immutable = Types.isImmutable( _fieldType );
+	_default = Types.getDefault( _fieldType );
     }
 
 
@@ -267,6 +274,7 @@ public abstract class FieldDesc
 	_readable = readable;
 	_writeable = writeable;
 	_immutable = Types.isImmutable( _fieldType );
+	_default = Types.getDefault( _fieldType );
     }
 
 
@@ -286,6 +294,7 @@ public abstract class FieldDesc
 	_readable = desc._readable;
 	_writeable = desc._writeable;
 	_immutable = desc._immutable;
+	_default = desc._default;
     }
 
 
@@ -406,10 +415,11 @@ public abstract class FieldDesc
 		return _getMethod.invoke( obj, null );
 	} catch ( IllegalAccessException except ) {
 	    // This should never happen
-	    throw new RuntimeException( "Schema change: " + _fieldName + " is no longer accessible" );
+	    throw new IllegalStateException( "Schema change: " + _fieldName + " is no longer accessible" );
 	} catch ( InvocationTargetException except ) {
 	    // This should never happen
-	    throw new RuntimeException( "Java schema change: " + _fieldName + " invocation error" );
+	    throw new IllegalStateException( "Java schema change: " + _fieldName + " invocation error: " +
+					     except.toString() );
 	}
     }
     
@@ -423,6 +433,12 @@ public abstract class FieldDesc
     public void setValue( Object obj, Object value )
     {
 	try {
+	    if ( value == null && _required ) {
+		if ( _default != null )
+		    value = _default;
+		else
+		    throw new IllegalArgumentException( "Field " + toString() + " is required, null value used" );
+	    }
 	    if ( _setMethod == null )
 		_field.set( obj, value );
 	    else
@@ -430,21 +446,22 @@ public abstract class FieldDesc
 	} catch ( IllegalArgumentException except ) {
 	    // Graceful way of dealing with unwrapping exception
 	    if ( value == null ) {
-		throw new RuntimeException( "Type conversion error: could not set null to field " +
-					    toString() + " of type " + _fieldType.getName() +
-					    "; original error: " + except.getMessage() );
+		throw new IllegalArgumentException( "Type conversion error: could not set null to field " +
+						    toString() + " of type " + _fieldType.getName() +
+						    "; original error: " + except.getMessage() );
 	    } else {
-		throw new RuntimeException( "Type conversion error: failed to set value of type " +
-					    value.getClass().getName() + " in field " + toString() +
-					    " of type " + _fieldType.getName() + "; original error: " +
-					    except.getMessage() );
+		throw new IllegalArgumentException( "Type conversion error: failed to set value of type " +
+						    value.getClass().getName() + " in field " + toString() +
+						    " of type " + _fieldType.getName() + "; original error: " +
+						    except.getMessage() );
 	    }
 	} catch ( InvocationTargetException except ) {
 	    // This should never happen
-	    throw new RuntimeException( "Java schema change: " + _fieldName + " invocation error" );
+	    throw new IllegalStateException( "Java schema change: " + _fieldName + " invocation error: " +
+					     except.toString() );
 	} catch ( IllegalAccessException except ) {
 	    // This should never happen
-	    throw new RuntimeException( "Schema change: " + _fieldName + " is no longer accessible" );
+	    throw new IllegalStateException( "Schema change: " + _fieldName + " is no longer accessible" );
 	}
     }
 
