@@ -97,7 +97,7 @@ public class Test
         productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE id = $1" );
         productOql.bind( 4 );
         results = productOql.execute();
-        if ( results.hasMore() ) {
+        while ( results.hasMore() ) {
             product = (Product) results.next();
             writer.println( "Deleting existing product: " + product );
             db.remove(  product );
@@ -108,7 +108,7 @@ public class Test
         computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE id = $1" );
         computerOql.bind( 6 );
         results = computerOql.execute();
-        if ( results.hasMore() ) {
+        while ( results.hasMore() ) {
             computer = (Computer) results.next();
             writer.println( "Deleting existing computer: " + computer );
             db.remove( computer );
@@ -119,7 +119,7 @@ public class Test
         groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
         groupOql.bind( 3 );
         results = groupOql.execute();
-        if ( results.hasMore() ) {
+        while ( results.hasMore() ) {
             group = (ProductGroup) results.next();
             writer.println( "Deleting existing group: " + group );
             db.remove( group );

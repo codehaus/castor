@@ -33,7 +33,7 @@ Misc:    Fixed security bug when running as an Applet. (Reported by Remus Pereni
          <remus@nolimits.ro>).
 
 Misc:    Added support for Java 1.2 Collection by running the source generator with the
-         option -types 'j2'. Vectors are used with 'j1' and ODMG 3.0 DArray with 'odmg'.
+         option '-types j2'. Vectors are used with 'j1' and ODMG 3.0 DArray with 'odmg'.
 
 
 Version 0.8.6  May 24, 2000

@@ -93,7 +93,7 @@
       <sql name="str_time" type="char[HH:mm:ss.SSS]" />
     </field>
     <field name="timestamp2" type="java.util.Date" >
-      <sql name="num_date" type="numeric[YMDHmsS]" />
+      <sql name="num_date" type="numeric[YMDHmsS]" dirty="ignore" />
     </field>
   </class>
 

@@ -277,6 +277,9 @@ public class SourceGenerator {
         //-- source generator types name flag
         allOptions.addFlag("types", "types", "Sets the source generator types name (SGTypeFactory)");
         allOptions.setOptional("types", true);
+        //-- XXX maintained temporarily
+        allOptions.addFlag("type-factory", "");
+        allOptions.setOptional("type-factory", true);
         
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
@@ -294,6 +297,10 @@ public class SourceGenerator {
         String  lineSepStyle   = options.getProperty("line-separator");
         boolean force         = (options.getProperty("f") != null);
         String  typeFactory    = options.getProperty("types");
+
+        // -- XXX maintained temporarily
+        if (typeFactory == null)
+            typeFactory = options.getProperty("type-factory");
         
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
