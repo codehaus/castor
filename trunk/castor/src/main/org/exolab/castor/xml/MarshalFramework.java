@@ -51,7 +51,6 @@ import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
-import org.exolab.castor.mapping.ValidityException;
 
 import java.util.Vector;
 
@@ -60,7 +59,7 @@ import java.util.Vector;
  * A core class for common code shared throughout the
  * Marshalling Framework
  * 
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 abstract class MarshalFramework {
@@ -96,6 +95,10 @@ abstract class MarshalFramework {
      */
     public static final String LANG_ATTR = "lang";
     
+    /**
+     * The xsi:nil attribute, without the "xsi:" prefix.
+     */
+    public static final String NIL_ATTR = "nil";
     
     /**
      * The xml:space attribute name
