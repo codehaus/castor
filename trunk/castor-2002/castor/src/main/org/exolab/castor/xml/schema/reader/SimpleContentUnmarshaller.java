@@ -94,9 +94,10 @@ public class SimpleContentUnmarshaller extends SaxUnmarshaller {
         (ComplexType complexType, AttributeList atts, Resolver resolver)
         throws SAXException
     {
-        
+
         _complexType = complexType;
-        
+		setResolver(resolver);
+
     } //-- SimpleContentUnmarshaller
 
       //-----------/
@@ -135,49 +136,50 @@ public class SimpleContentUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         //-- extension
         if (SchemaNames.EXTENSION.equals(name)) {
-            
+
             if (foundExtension)
                 error("Only (1) 'extension' element may appear as a child "+
                     "of 'simpleContent' elements.");
-                    
+
             if (foundRestriction)
                 error("Both 'extension' and 'restriction' elements may not "+
                     "appear as children of the same simpleContent "+
                     "definition.");
-                
+
             foundExtension = true;
-            unmarshaller 
+            unmarshaller
                 = new ExtensionUnmarshaller(_complexType, atts, getResolver());
         }
         //-- restriction
         else if (SchemaNames.RESTRICTION.equals(name)) {
-            
+
             if (foundRestriction)
                 error("Only (1) 'restriction' element may appear as a child "+
                     "of 'simpleContent' elements.");
-                    
+
             if (foundExtension)
                 error("Both 'extension' and 'restriction' elements may not "+
                     "appear as children of the same simpleContent "+
                     "definition.");
-                
+
             foundRestriction = true;
-            
-            error( "restriction currently not supported.");
+
+            unmarshaller =
+			new SimpleContentRestrictionUnmarshaller(_complexType,atts,getResolver());
         }
         //-- annotation
         else if (name.equals(SchemaNames.ANNOTATION)) {
             if (foundAnnotation)
                 error("Only (1) 'annotation' element may appear as a child "+
                     "of 'simpleContent' elements.");
-                    
+
             if (foundRestriction || foundExtension)
                 error("An 'annotation' may only appear as the first child "+
                     "of a 'simpleContent' element.");
-            
+
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
