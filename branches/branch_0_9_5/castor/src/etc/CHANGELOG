@@ -1,6 +1,8 @@
 
-Version (CVS) 
--------------
+
+
+Version 0.9.5.4, November 08, 2004
+----------------------------------
 
 XML:   Added support for namespace to package mappings on the Unmarshaller
        and UnmarshalHandler. This basically fixes issues where Castor
@@ -13,6 +15,20 @@ XML:   Added support for namespace to package mappings on the Unmarshaller
 XML:   Fixed bug in SourceGenerator where class names for SimpleType
        instances with Enumeration facets were not getting resolved properly.
        (kvisco - 20041104)
+
+XML:   Fixed built-in java.util.Locale support
+       (kvisco - 20041104)
+
+XML:   Fixed bug 1771: Incorrect parsing of milliseconds in dateTime value.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1771
+       (kvisco - 20041025)
+
+XML:   Fixed bugs 1545 & 1394: NoClassDefFoundError when searching
+       for classes based on element names.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1545
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1394
+       (kvisco - 20041025)
+
 
 XML:   Fixed bug 1685, A StackOverflowError was occuring at certain times
        during container processing if the input XML was invalid.
