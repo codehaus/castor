@@ -295,7 +295,7 @@ design, which is important in larger projects. </p>
             If lazy loading is specified for a field of a class, Castor will set the field with a special collection which contains only the identities of the objects. Because of that, it requires the data object to have the method setDepartment( Collection department ) in the data object class which was not required in previous versions. </p>
      </section>
 
-     <section title="Mutliple columns primany keys">
+     <section title="Multiple columns primary keys">
         <p>
             The support of multiple column primary keys (also called compound primary keys) was another major enhancement added into Castor 0.9. Specifying multiple column primary keys is simple and straightforward, in the mapping file, 
             <pre><![CDATA[
