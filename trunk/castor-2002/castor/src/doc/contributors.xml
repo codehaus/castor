@@ -91,6 +91,14 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Kleppinger" given="Don"/>
+    <email>Don.Kleppinger@Den.Galileo.com</email>
+    <description>
+       Enhancement to Marshaller to support BigDecimal as a primitive type.
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Liebner" given="Stefan"/>
     <email>MailLiebner@gmx.ne</email>
     <description>Submitted code for generating mapping file from existing SQL database.</description>
