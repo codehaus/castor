@@ -30,7 +30,7 @@ public class SqlTable implements java.io.Serializable {
     /**
      * 
     **/
-    private java.lang.String vName;
+    private java.lang.String vTableName;
 
 
       //----------------/
@@ -48,16 +48,16 @@ public class SqlTable implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getName() {
-        return this.vName;
-    } //-- java.lang.String getName() 
+    public java.lang.String getTableName() {
+        return this.vTableName;
+    } //-- java.lang.String getTableName() 
 
     /**
-     * @param vName
+     * @param vTableName
     **/
-    public void setName(java.lang.String vName) {
-        this.vName = vName;
-    } //-- void setName(java.lang.String) 
+    public void setTableName(java.lang.String vTableName) {
+        this.vTableName = vTableName;
+    } //-- void setTableName(java.lang.String) 
 
     /**
     **/

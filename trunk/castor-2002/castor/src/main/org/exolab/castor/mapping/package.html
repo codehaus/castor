@@ -2,16 +2,16 @@
   <title>Class Mapping Descriptors</title>
 
   <body>
-    <p>This package provides a common base for the object mapping descriptors and tools to
+    <p>This package provides a common base for the class mapping descriptors and tools to
        generate mapping descriptors from a mapping file. The Java objects for the XML-based
-       mapping file are contained in the sub-package <tt>xml</tt>.</p>
+       mapping file are contained in the sub-package <tt>xml</tt> and the DTD and XML schema
+       in the sub-package <tt>schema</tt>.</p>
 
     <p><tt>ClassDesc</tt> is a mapping descriptor for a Java class,  consisting of any
        number of fields. <tt>FieldDesc</tt> is a mapping descriptor for a Java field within
        that class. <tt>ContainerFieldDesc</tt> describes a special type of field, one that
        contains additional fields that are mapped as part of the container class, not with a
-       separate class mapping. Each of the fields container in the contained class is described
-       with <tt>ContainedFieldDesc</tt>.</p>
+       separate class mapping.</p>
 
    <p><tt>Types</tt> provides generic type functionality, e.g. constructing new instances,
       getting the class from a type name, determining if a class is a simple object, immutable, etc.</p>

@@ -61,7 +61,7 @@ import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.Types;
 import org.exolab.castor.mapping.xml.Mapping;
-import org.exolab.castor.mapping.xml.ObjectMapping;
+import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.ContainerMapping;
 import org.exolab.castor.mapping.xml.LdapInfo;
@@ -80,20 +80,20 @@ public class DAXMappingHelper
         throws MappingException
     {
 	Enumeration   enum;
-	ObjectMapping objMap;
-	ClassDesc    clsDesc;
+	ClassMapping  clsMap;
+	ClassDesc     clsDesc;
 
-	enum = mapping.enumerateObjectMapping();
+	enum = mapping.enumerateClassMapping();
 	while ( enum.hasMoreElements() ) {
-	    objMap = (ObjectMapping) enum.nextElement();
-	    clsDesc = createDescriptor( loader, objMap );
+	    clsMap = (ClassMapping) enum.nextElement();
+	    clsDesc = createDescriptor( loader, clsMap );
 	    if ( clsDesc != null )
 		addDescriptor( clsDesc );
 	}
     }
 
 
-    protected ClassDesc createDescriptor( ClassLoader loader, ObjectMapping objMap )
+    protected ClassDesc createDescriptor( ClassLoader loader, ClassMapping objMap )
         throws MappingException
     {
 	ClassDesc clsDesc;

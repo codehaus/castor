@@ -47,12 +47,18 @@
 package org.exolab.castor.jdo.engine;
 
 
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.FieldDesc;
-import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.ContainerFieldDesc;
 
 
 /**
+ * JDO class descriptors. Extends {@link ClassDesc} to include the
+ * table name and other SQL-related information. All fields are of
+ * type {@link JDOFieldDesc}, identity field is not included in the
+ * returned field list, and contained fields are flattened out for
+ * efficiency (thus all fields are directly accessible).
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -62,40 +68,55 @@ public class JDOClassDesc
 {
 
 
+    /**
+     * True if any of the fields is marked for dirty checking.
+     */
     private boolean _dirtyCheck;
 
 
+    /**
+     * The name of the SQL table.
+     */
     private String  _tableName;
 
 
     /**
-     * Constructs a new descriptor for the specified object and target
-     * mapping. The object type and target name are mandatory. When
-     * describing inheritence, the descriptor of the parent object may
-     * be used and only the fields added in this object must be
-     * supplied here.
+     * Constructs a new JDO descriptor. The field list must consist only of
+     * JDO field, must not include the identity field, all contained fields
+     * must be represented as {@link JDOContainedFieldDesc}. Order of fields
+     * is not important. The identity field must be of type {@link JDOFieldDesc}
+     * or {@link ContainerFieldDesc}.
      * 
-     * @param objType The Java type of this object
-     * @param targetName The target name of this object
-     * @param fields The fields described for this object.
-     * @param extend The descriptor of the object which this object extends,
-     * or null if this is a top-level object
-     * @throws MappingException The extended descriptor does not match
-     *   a parent class of this object type
+     * @param javaClass The Java type of this class
+     * @param tableName The SQL table name
+     * @param fields The fields described for this class
+     * @param identity The field of the identity (key) of this class,
+     *   may be null
+     * @param extend The descriptor of the class which this class extends,
+     * or null if this is a top-level class
+     * @throws MappingException Invalid mapping information
      */
-    public JDOClassDesc( Class objType, String tableName, JDOFieldDesc[] fields,
-			  JDOClassDesc extend )
+    public JDOClassDesc( Class javaClass, String tableName, JDOFieldDesc[] fields,
+			 FieldDesc identity, JDOClassDesc extend )
 	throws MappingException
     {
-	super( objType, fields, null, extend );
+	super( javaClass, fields, identity, extend );
+	if ( tableName == null )
+	    throw new IllegalArgumentException( "Argument 'tableName' is null" );
+	_tableName = tableName;
+	if ( identity == null )
+	    throw new MappingException( "mapping.noIdentity", javaClass.getName() );
+	if ( ! ( identity instanceof JDOFieldDesc ) &&
+	     ! ( identity instanceof ContainerFieldDesc ) )
+	    throw new IllegalArgumentException( "Identity field must be of type JDOFieldDesc or ContainerFieldDesc" );
 	for ( int i = 0 ; i < fields.length ; ++i ) {
 	    if ( fields[ i ].isDirtyCheck() )
 		_dirtyCheck = true;
 	}
-	_tableName = tableName;
     }
 
 
+    /*
     public JDOClassDesc( Class objType, String tableName, JDOFieldDesc[] fields,
 			  PrimaryKeyDesc primKey, JDOFieldDesc keyField,
 			  JDOClassDesc extend, RelationDesc[] related )
@@ -116,7 +137,7 @@ public class JDOClassDesc
 			     FieldDesc parentRefField, String foreRef )
 	throws MappingException
     {
-	this( source.getObjectType(), source.getSQLName(),
+	this( source.getJavaClass(), source.getSQLName(),
 	      toContained( source.getJDOFields(), parentField, parentRefField ),
 	      source.getPrimaryKey(), new JDOContainedFieldDesc( source.getPrimaryKeyField(), parentField, parentRefField ),
 	      (JDOClassDesc) source.getExtends(), source.getRelated() );
@@ -140,6 +161,7 @@ public class JDOClassDesc
     }
 
 
+
     private static JDOFieldDesc[] toContained( JDOFieldDesc[] fields, FieldDesc parentField,
 					       FieldDesc parentRefField )
 	throws MappingException
@@ -150,8 +172,14 @@ public class JDOClassDesc
 	return fields;
 
     }
+    */
 
 
+    /**
+     * Returns true if at least one field requires dirty checking.
+     *
+     * @return True if at least one field requires dirty checking
+     */
     public boolean isDirtyCheck()
     {
 	return _dirtyCheck;
@@ -159,13 +187,19 @@ public class JDOClassDesc
 
 
     /**
-     * Returns the fields described for this object. An array of field
-     * descriptors is returned, allowing the set/get methods to be
-     * called on each field against this object. The returned array
-     * may be of size zero.
+     * Returns the table name to which this object maps.
      *
-     * @return The fields described for this object
+     * @return Table name
      */
+    public String getTableName()
+    {
+	return _tableName;
+    }
+
+
+
+
+    /*
     public JDOFieldDesc[] getJDOFields()
     {
 	FieldDesc[]    fields = getFields();
@@ -230,6 +264,7 @@ public class JDOClassDesc
             }
         }
     } 
+    */
 
 
 }

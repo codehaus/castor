@@ -262,7 +262,7 @@ public class OQLQueryImpl
 	    identity = results.nextIdentity();
 	    while ( identity != null ) {
 		try {
-		    obj = _dbEngine.getClassDesc( results.getResultType() ).createNew();
+		    obj = _dbEngine.getClassDesc( results.getResultType() ).newInstance();
 		    results.fetch( obj );
 		    set.addElement( obj );
 		} catch ( ObjectNotFoundException except ) {

@@ -42,7 +42,7 @@ public class Mapping implements java.io.Serializable {
     /**
      * 
     **/
-    private java.util.Vector vObjectList;
+    private java.util.Vector vClassList;
 
 
       //----------------/
@@ -52,7 +52,7 @@ public class Mapping implements java.io.Serializable {
     public Mapping() {
         super();
         vIncludeList = new Vector();
-        vObjectList = new Vector();
+        vClassList = new Vector();
     } //-- Mapping()
 
 
@@ -149,79 +149,79 @@ public class Mapping implements java.io.Serializable {
     } //-- void removeAllInclude() 
 
     /**
-     * @param vObjectMapping
+     * @param vClassMapping
     **/
-    public void addObjectMapping(ObjectMapping vObjectMapping) 
+    public void addClassMapping(ClassMapping vClassMapping) 
         throws java.lang.IndexOutOfBoundsException
     {
-        vObjectList.addElement(vObjectMapping);
-    } //-- void addObjectMapping(ObjectMapping) 
+        vClassList.addElement(vClassMapping);
+    } //-- void addClassMapping(ClassMapping) 
 
     /**
      * @param index
     **/
-    public ObjectMapping getObjectMapping(int index) 
+    public ClassMapping getClassMapping(int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vObjectList.size())) {
+        if ((index < 0) || (index > vClassList.size())) {
             throw new IndexOutOfBoundsException();
         }
         
-        return (ObjectMapping) vObjectList.elementAt(index);
-    } //-- ObjectMapping getObjectMapping(int) 
+        return (ClassMapping) vClassList.elementAt(index);
+    } //-- ClassMapping getClassMapping(int) 
 
     /**
     **/
-    public ObjectMapping[] getObjectMapping() {
-        int size = vObjectList.size();
-        ObjectMapping[] mArray = new ObjectMapping[size];
+    public ClassMapping[] getClassMapping() {
+        int size = vClassList.size();
+        ClassMapping[] mArray = new ClassMapping[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (ObjectMapping) vObjectList.elementAt(index);
+            mArray[index] = (ClassMapping) vClassList.elementAt(index);
         }
         return mArray;
-    } //-- ObjectMapping[] getObjectMapping() 
+    } //-- ClassMapping[] getClassMapping() 
 
     /**
-     * @param vObjectMapping
+     * @param vClassMapping
      * @param index
     **/
-    public void setObjectMapping(ObjectMapping vObjectMapping, int index) 
+    public void setClassMapping(ClassMapping vClassMapping, int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vObjectList.size())) {
+        if ((index < 0) || (index > vClassList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        vObjectList.setElementAt(vObjectMapping, index);
-    } //-- void setObject(ObjectMapping, int) 
+        vClassList.setElementAt(vClassMapping, index);
+    } //-- void setClassMapping(ClassMapping, int) 
 
     /**
     **/
-    public int getObjectMappingCount() {
-        return vObjectList.size();
-    } //-- int getObjectMappingCount() 
+    public int getClassMappingCount() {
+        return vClassList.size();
+    } //-- int getClassMappingCount() 
 
     /**
     **/
-    public java.util.Enumeration enumerateObjectMapping() {
-        return vObjectList.elements();
-    } //-- java.util.Enumeration enumerateObjectMapping() 
+    public java.util.Enumeration enumerateClassMapping() {
+        return vClassList.elements();
+    } //-- java.util.Enumeration enumerateClassMapping() 
 
     /**
      * @param index
     **/
-    public ObjectMapping removeObjectMapping(int index) {
-        Object obj = vObjectList.elementAt(index);
-        vObjectList.removeElementAt(index);
-        return (ObjectMapping) obj;
-    } //-- ObjectMapping removeObjectMapping(int) 
+    public ClassMapping removeClassMapping(int index) {
+        Object obj = vClassList.elementAt(index);
+        vClassList.removeElementAt(index);
+        return (ClassMapping) obj;
+    } //-- ClassMapping removeClassMapping(int) 
 
     /**
     **/
-    public void removeAllObjectMapping() {
-        vObjectList.removeAllElements();
-    } //-- void removeAllObjectMapping() 
+    public void removeAllClassMapping() {
+        vClassList.removeAllElements();
+    } //-- void removeAllClassMapping() 
 
     /**
     **/

@@ -442,7 +442,7 @@ public class MozillaEngine
 	if ( _dnFields != null ) {
 	    Object identity;
 
-	    identity = Types.createNew( _clsDesc.getIdentityField().getFieldType() );
+	    identity = Types.newInstance( _clsDesc.getIdentityField().getFieldType() );
 	    for ( int i = _dnFields.length ; i-- > 0 ; )
 		_dnFields[ i ].setValue( identity, rdns[ i ] );
 	    return identity;
@@ -518,7 +518,7 @@ public class MozillaEngine
 
 	public Class getResultType()
 	{
-	    return _clsDesc.getObjectType();
+	    return _clsDesc.getJavaClass();
 	}
 
 

@@ -63,7 +63,7 @@ import org.exolab.castor.mapping.MappingException;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public abstract class SQLTypes
+public final class SQLTypes
 {
 
 

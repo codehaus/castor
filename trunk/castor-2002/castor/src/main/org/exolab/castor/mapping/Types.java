@@ -151,16 +151,16 @@ public abstract class Types
      * checked exceptions, since object creation has been proven to work
      * when creating descriptor from mapping.
      */
-    public static Object createNew( Class type )
+    public static Object newInstance( Class type )
     {
 	try {
 	    return type.newInstance();
 	} catch ( IllegalAccessException except ) {
 	    // This should never happen unless  bytecode changed all of a sudden
-	    throw new RuntimeException( Messages.format( "castor.reflect.cannotConstruct", type ) );
+	    throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
 	} catch ( InstantiationException except ) {
 	    // This should never happen unless  bytecode changed all of a sudden
-	    throw new RuntimeException( Messages.format( "castor.reflect.cannotConstruct", type ) );
+	    throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
 	}
     }
 
@@ -236,7 +236,7 @@ public abstract class Types
     }
 
 
-    public static class TypeInfo
+    static class TypeInfo
     {
 
 	public final String  shortName;

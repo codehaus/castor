@@ -671,7 +671,7 @@ public abstract class TransactionContext
 		    identity = clsDesc.getIdentityField().getValue( entry.obj );
 		    if ( identity == null )
 			throw new TransactionAbortedException( "persist.noIdentity", 
-							       clsDesc.getObjectType(), null );
+							       clsDesc.getJavaClass(), null );
 		    entry.oid = entry.engine.store( this, entry.oid, entry.obj, identity, _lockTimeout );
 		}
 	    }
@@ -755,7 +755,7 @@ public abstract class TransactionContext
     /**
      * Commits all changes and closes the transaction releasing all
      * locks on all objects. All objects are now transient. Must be
-     * called after a call to {@link prepare} has returned successfully.
+     * called after a call to {@link #prepare} has returned successfully.
      *
      * @throws TransactionAbortedException The transaction has been
      *   aborted due to inconsistency, duplicate object identity, error

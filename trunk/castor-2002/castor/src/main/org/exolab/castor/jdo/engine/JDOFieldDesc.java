@@ -57,7 +57,8 @@ import org.exolab.castor.mapping.FieldDesc;
 
 
 /**
- *
+ * JDO field descriptor. Wraps {@link FieldDesc} and adds SQL-related
+ * information, type conversion, and set/get for JDBC.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -67,51 +68,65 @@ public class JDOFieldDesc
 {
 
 
+    /**
+     * True if the field requires dirty checking.
+     */
     private boolean        _dirtyCheck;
 
 
-    private TypeConvertor  _convertorTo;
+    /**
+     * Convertor from Java type to SQL type.
+     */
+    private TypeConvertor  _javaToSql;
 
 
-    private TypeConvertor  _convertorFrom;
+    /**
+     * Convertor from SQL type to Java type.
+     */
+    private TypeConvertor  _sqlToJava;
 
 
+    /**
+     * The SQL name of the field.
+     */
     private String         _sqlName;
 
 
-    public JDOFieldDesc( Field field, String sqlName, Class sqlType, boolean dirtyCheck )
+    /**
+     * Construct a new field descriptor for the specified field. This is
+     * a JDO field descriptor wrapping a field descriptor and adding JDO
+     * related properties and methods.
+     *
+     * @param fieldDesc The field descriptor
+     * @throws MappingException Invalid mapping information
+     */
+    public JDOFieldDesc( FieldDesc fieldDesc, String sqlName, Class sqlType, boolean dirtyCheck )
 	throws MappingException
     {
-	super( field, true, true, true );
-	if ( sqlType != null && getFieldType() != sqlType ) {
-	    _convertorTo = SQLTypes.getConvertor( getFieldType(), sqlType );
-	    _convertorFrom = SQLTypes.getConvertor( sqlType, getFieldType() );
-	}
+	super( fieldDesc );
+	if ( sqlName == null )
+	    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
 	_sqlName = sqlName;
+	if ( sqlType == null )
+	    throw new IllegalArgumentException( "Argument 'sqlType' is null" );
+	if ( getFieldType() != sqlType ) {
+	    _javaToSql = SQLTypes.getConvertor( getFieldType(), sqlType );
+	    _sqlToJava = SQLTypes.getConvertor( sqlType, getFieldType() );
+	}
+	_dirtyCheck = _dirtyCheck;
     }
 
 
-    public JDOFieldDesc( String fieldName, Class fieldType, Method getMethod, Method setMethod,
-			 String sqlName, Class sqlType, boolean dirtyCheck )
-	throws MappingException
+    /**
+     * Constructor used by derived classes.
+     */
+    protected JDOFieldDesc( JDOFieldDesc fieldDesc )
     {
-	super( fieldName, fieldType, getMethod, setMethod, true, true, true );
-	if ( sqlType != null && getFieldType() != sqlType ) {
-	    _convertorTo = SQLTypes.getConvertor( getFieldType(), sqlType );
-	    _convertorFrom = SQLTypes.getConvertor( sqlType, getFieldType() );
-	}
-	_dirtyCheck = dirtyCheck;
-	_sqlName = sqlName;
-    }
-
-
-    protected JDOFieldDesc( JDOFieldDesc desc )
-    {
-	super( desc );
-	_convertorTo = desc._convertorTo;
-	_convertorFrom = desc._convertorFrom;
-	_dirtyCheck = desc._dirtyCheck;
-	_sqlName = desc._sqlName;
+	super( fieldDesc );
+	_sqlName = fieldDesc._sqlName;
+	_dirtyCheck = fieldDesc._dirtyCheck;
+	_javaToSql = fieldDesc._javaToSql;
+	_sqlToJava = fieldDesc._sqlToJava;
     }
 
 
@@ -130,39 +145,45 @@ public class JDOFieldDesc
     public void getValue( Object obj, PreparedStatement stmt, int column )
 	throws SQLException
     {
-	if ( _convertorTo == null )
+	if ( _javaToSql == null )
 	    stmt.setObject( column, super.getValue( obj ) );
 	else
-	    stmt.setObject( column, _convertorTo.convert( super.getValue( obj ) ) );
+	    stmt.setObject( column, _javaToSql.convert( super.getValue( obj ) ) );
     }
     
 
     public void setValue( Object obj, ResultSet rs, int column )
 	throws SQLException
     {
-	if ( _convertorFrom == null )
+	if ( _sqlToJava == null )
 	    super.setValue( obj, rs.getObject( column ) );
 	else {
-	    super.setValue( obj, _convertorFrom.convert( rs.getObject( column ) ) );
+	    super.setValue( obj, _sqlToJava.convert( rs.getObject( column ) ) );
 	}
     }
 
 
     public Object getValue( Object obj )
     {
-	if ( _convertorTo == null )
+	if ( _javaToSql == null )
 	    return super.getValue( obj );
 	else
-	    return _convertorTo.convert( super.getValue( obj ) );
+	    return _javaToSql.convert( super.getValue( obj ) );
     }
 
 
     public void setValue( Object obj, Object value )
     {
-	if ( _convertorFrom == null )
+	if ( _sqlToJava == null )
 	    super.setValue( obj, value );
 	else
-	    super.setValue( obj, _convertorFrom.convert( value ) );
+	    super.setValue( obj, _sqlToJava.convert( value ) );
+    }
+
+
+    public String toString()
+    {
+	return toString() + " AS " + _sqlName;
     }
 
 

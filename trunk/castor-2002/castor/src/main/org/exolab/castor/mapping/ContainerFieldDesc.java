@@ -48,7 +48,17 @@ package org.exolab.castor.mapping;
 
 
 /**
- *
+ * Descriptor for a container field. A container field is a complex
+ * object consisting of multiple fields, that are treated as an integral
+ * part of the object to which the container field belongs. A container
+ * field is not used to describe a one to one relation. Generally the
+ * container field is used for multi-field identities and grouping.
+ * <p>
+ * Although a container field extends {@link FieldDesc} and is
+ * constructed from one, it is not handled directly. Rather, the
+ * fields in the container field (the contained fields) are stored in
+ * the class descriptor, and rely on the container field to access
+ * their containing object.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -74,6 +84,11 @@ public class ContainerFieldDesc
     }
 
 
+    /**
+     * Returns all the fields contained in the container field.
+     *
+     * @return An array of zero of more contained fields
+     */
     public FieldDesc[] getContainedFields()
     {
 	return (FieldDesc[]) _contained.clone();
@@ -88,7 +103,7 @@ public class ContainerFieldDesc
 	else {
 	    Object value;
 
-	    value = Types.createNew( getFieldType() );
+	    value = Types.newInstance( getFieldType() );
 	    setValue( target, value );
 	    for ( int i = 0 ; i < _contained.length ; ++i )
 		_contained[ i ].copyInto( source, value );
