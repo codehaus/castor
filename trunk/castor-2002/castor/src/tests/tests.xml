@@ -34,6 +34,7 @@
     <case class="jdo.KeyGenReturning" />
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
+    <case class="jdo.StoredProcedure" name="TC10" />
   </category>
 
   <category name="oleak" class="jdo.JDOCategory">

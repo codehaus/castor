@@ -184,15 +184,6 @@ public final class SQLEngine
     }
 
 
-    /**
-     * Used by ParseTreeWalker to quote names in WHERE clause
-     */
-    public String quoteName( String name )
-    {
-        return _factory.quoteName( name );
-    }
-
-
     public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException
     {
@@ -206,11 +197,31 @@ public final class SQLEngine
 
 
     public PersistenceQuery createCall( String spCall, Class[] types )
-        throws QueryException
     {
+        String[] fields;
+        int[]    sqlTypes;
+        int      count; 
+
         if ( _logInterceptor != null )
             _logInterceptor.queryStatement( spCall );
-        return new StoredProcedure( this, spCall, types );
+        // the first field is the identity
+        count = 1; 
+        for ( int i = 0; i < _fields.length; i++ ) 
+            if ( _fields[i].load )
+                ++count;
+        fields = new String[ count ];
+        sqlTypes = new int[ count ];
+        fields[ 0 ] = _clsDesc.getIdentity().getFieldName();
+        sqlTypes[ 0 ] = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
+        count = 1;
+        for ( int i = 0; i < _fields.length; i++ ) {
+            if ( ! _fields[i].load )
+                continue;
+            fields[ count ] = _fields[i].name;
+            sqlTypes[ count ] = _fields[i].sqlType;
+            ++count;
+        }
+        return ((BaseFactory) _factory).getCallQuery( spCall, types, _clsDesc.getJavaClass(), fields, sqlTypes );
     }
 
 
@@ -508,8 +519,7 @@ public final class SQLEngine
                     if ( value != null )
                         ( (Vector) fields[ i ] ).addElement( value );
                 } else {
-                    value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
-                    fields[ i ] =  rs.wasNull() ? null : value;
+                    fields[ i ] =  SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
                 }
                 ++count;
             }
@@ -523,7 +533,7 @@ public final class SQLEngine
                         Object value;
                         
                         value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
-                        if ( ! rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
+                        if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
                             ( (Vector) fields[ i ] ).addElement( value );
                     }
                     ++count;
@@ -950,10 +960,10 @@ public final class SQLEngine
                     value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
                     if ( _engine._fields[ i ].multi ) {
                         fields[ i ] = new Vector();
-                        if ( ! _rs.wasNull() )
+                        if ( value != null )
                             ( (Vector) fields[ i ] ).addElement( value );
                     } else
-                        fields[ i ] =  _rs.wasNull() ? null : value;
+                        fields[ i ] = value;
                     ++count;
                 }
 
@@ -968,7 +978,7 @@ public final class SQLEngine
                                 Object value;
 
                                 value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
-                                if ( ! _rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
+                                if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
                                     ( (Vector) fields[ i ] ).addElement( value );
                             }
                             ++count;
@@ -988,208 +998,5 @@ public final class SQLEngine
 
     }
 
-
-
-    /**
-     * PersistenceQuery implementation for use with stored procedures.
-     * It can deals with multiple ResultSets.
-     *
-     * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
-     * @version $Revision$ $Date$
-     */
-    static final class StoredProcedure implements PersistenceQuery
-    {
-
-
-        private CallableStatement _stmt;
-
-
-        private ResultSet         _rs;
-
-
-        private final SQLEngine _engine;
-
-
-        private final Class[]   _types;
-
-
-        private final Object[]  _values;
-
-
-        private final String    _sql;
-
-
-        private Object         _lastIdentity;
-
-
-        private int            _identSqlType;
-
-
-        StoredProcedure( SQLEngine engine, String sql, Class[] types )
-        {
-            _engine = engine;
-            _types = types;
-            _values = new Object[ _types.length ];
-            _sql = sql;
-            _identSqlType = ( (JDOFieldDescriptor) _engine._clsDesc.getIdentity() ).getSQLType();
-        }
-
-
-        public int getParameterCount()
-        {
-            return _types.length;
-        }
-
-
-        public Class getParameterType( int index )
-            throws ArrayIndexOutOfBoundsException
-        {
-            return _types[ index ];
-        }
-
-
-        public void setParameter( int index, Object value )
-            throws ArrayIndexOutOfBoundsException, IllegalArgumentException
-        {
-            _values[ index ] = value;
-        }
-
-
-        public Class getResultType()
-        {
-            return _engine.getDescriptor().getJavaClass();
-        }
-
-
-        public void execute( Object conn, AccessMode accessMode )
-            throws QueryException, PersistenceException
-        {
-            _lastIdentity = null;
-            try {
-                _stmt = ( (Connection) conn ).prepareCall( _sql );
-                for ( int i = 0 ; i < _values.length ; ++i ) {
-                    _stmt.setObject( i + 1, _values[ i ] );
-                    _values[ i ] = null;
-                }
-                _stmt.execute();
-                _rs = _stmt.getResultSet();
-            } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
-            }
-        }
-
-
-        private boolean nextRow() throws SQLException {
-            while ( true ) {
-                if ( _rs != null && _rs.next() ) {
-                    return true;
-                }
-                if ( !_stmt.getMoreResults() && _stmt.getUpdateCount() == -1 ) {
-                    _rs = null;
-                    return false;
-                }
-                _rs = _stmt.getResultSet();
-            }
-        }
-
-
-        public Object nextIdentity( Object identity )
-            throws PersistenceException
-        {
-            try {
-                if ( _lastIdentity == null ) {
-                    if ( !nextRow() )
-                        return null;
-                    _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
-                    return _lastIdentity;
-                }
-
-                while ( _lastIdentity.equals( identity ) ) {
-                    if ( ! nextRow() ) {
-                        _lastIdentity = null;
-                        return null;
-                    }
-                    _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
-                }
-                return _lastIdentity;
-            } catch ( SQLException except ) {
-                _lastIdentity = null;
-                throw new PersistenceExceptionImpl( except );
-            }
-        }
-
-
-        public void close()
-        {
-            if ( _rs != null ) {
-                try {
-                    _rs.close();
-                } catch ( SQLException except ) { }
-                _rs = null;
-            }
-            if ( _stmt != null ) {
-                try {
-                    _stmt.close();
-                } catch ( SQLException except ) { }
-                _stmt = null;
-            }
-        }
-
-
-        public Object fetch( Object[] fields, Object identity )
-            throws ObjectNotFoundException, PersistenceException
-        {
-            int    count;
-            Object stamp = null;
-
-            try {
-
-                // Load all the fields of the object including one-one relations
-                count = 2;
-                for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
-                    if ( ! _engine._fields[ i ].load ) 
-                        continue;
-                    if ( _engine._fields[ i ].multi ) {
-                        Object value;
-
-                        fields[ i ] = new Vector();
-                        value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
-                        if ( value != null )
-                            ( (Vector) fields[ i ] ).addElement( value );
-                    } else 
-                        fields[ i ] = _rs.getObject( count );
-                    ++count;
-                }
-
-                if ( nextRow() ) {
-                    _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
-                    while ( identity.equals( _lastIdentity ) ) {
-                        count = 2;
-                        for ( int i = 0; i < _engine._fields.length ; ++i  ) {
-                            if ( ! _engine._fields[ i ].load )
-                                continue;
-                            if ( _engine._fields[ i ].multi ) {
-                                Object value;
-
-                                value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
-                                if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
-                                    ( (Vector) fields[ i ] ).addElement( value );
-                            }
-                            ++count;
-                        }
-                        if ( nextRow() )
-                            _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
-                        else
-                            _lastIdentity = null;
-                    }
-                } else
-                    _lastIdentity = null;
-            } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
-            }
-            return stamp;
-        }
-
-    }
 
 }

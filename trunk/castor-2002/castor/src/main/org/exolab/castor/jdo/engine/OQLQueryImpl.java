@@ -315,7 +315,6 @@ public class OQLQueryImpl
         leftParen = oql.indexOf( "(" );
         rightParen = oql.indexOf( ")" );
         sql = new StringBuffer();
-        sql.append( "{call " );
         paramCnt = 0;
         _paramInfo = new Hashtable();
         if ( leftParen < 0 && rightParen < 0 ) {
@@ -356,10 +355,11 @@ public class OQLQueryImpl
             }
             for ( int i = 0; i < paramCnt; i++ ) {
                 sql.append( '?' );
-                sql.append( ( i == paramCnt - 1 ? ')' : ',' ) );
+                if ( i < paramCnt - 1 )
+                    sql.append( ',' );
             }
+            sql.append( ')' );
         }
-        sql.append( '}' );
         _spCall = sql.toString();
         _projectionType = ParseTreeWalker.PARENT_OBJECT;
         _bindTypes = new Class[ paramCnt ];
@@ -423,19 +423,17 @@ public class OQLQueryImpl
                     
                     //System.out.println("Executing object query");
                     
-                    try {
-                        engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-                        if ( _expr != null ) {
-                            query = engine.createQuery( _expr, _bindTypes );
-                        } else {
-                            query = engine.createCall( _spCall, _bindTypes );
-                        }
-                        if ( _bindValues != null ) {
-                            for ( int i = 0 ; i < _bindValues.length ; ++i )
-                                query.setParameter( i, _bindValues[ i ] );
-                        }
-                    } catch ( QueryException except ) {
-                        throw new QueryException( except.getMessage() );
+                    engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+                    if ( _expr != null ) {
+                        query = engine.createQuery( _expr, _bindTypes );
+                    } else {
+                        query = engine.createCall( _spCall, _bindTypes );
+                        if (query == null) 
+                            throw new QueryException( Messages.message( "query.callNotSupported" ) );
+                    }
+                    if ( _bindValues != null ) {
+                        for ( int i = 0 ; i < _bindValues.length ; ++i )
+                            query.setParameter( i, _bindValues[ i ] );
                     }
                     results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
                     _fieldNum = 0;
