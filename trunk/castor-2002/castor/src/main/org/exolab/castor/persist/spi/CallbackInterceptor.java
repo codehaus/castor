@@ -62,9 +62,6 @@ public interface CallbackInterceptor
     /**
      * Called to indicate that the object has been loaded from persistent
      * storage.
-     * <p>
-     * This method maps to <tt>ejbLoad</tt> and is also called on an object
-     * that is reverted to its original state during rollback.
      *
      * @param object The object
      * @throws Exception An exception occured, the object cannot be loaded
@@ -75,7 +72,7 @@ public interface CallbackInterceptor
 
     /**
      * Called to indicate that an object is to be stored in persistent
-     * stored. This method maps to <tt>ejbStore</tt>.
+     * stored.
      *
      * @param object The object
      * @throws Exception An exception occured, the object cannot be stored
@@ -85,14 +82,25 @@ public interface CallbackInterceptor
 
 
     /**
-     * Called to indicate that an object has been made transient.
+     * Called to indicate that an object has been deleted.
      * <p>
      * This method is made at commit time on objects deleted during the
      * transaction before setting their fields to null.
      *
      * @param object The object
      */
-    public void clearing( Object object );
+    public void removing( Object object );
+
+
+    /**
+     * Called to indicate that an object has been made transient.
+     * <p>
+     * This method is made at commit or rollback time on all objects
+     * that were presistent during the life time of the transaction.
+     *
+     * @param object The object
+     */
+    public void releasing( Object object );
 
 
 }

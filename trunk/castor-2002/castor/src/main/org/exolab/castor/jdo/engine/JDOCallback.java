@@ -75,9 +75,15 @@ public class JDOCallback
     }
 
 
-    public void clearing( Object object )
+    public void removing( Object object )
     {
-        ( (Persistent) object ).jdoClear();
+        ( (Persistent) object ).jdoRemove();
+    }
+
+
+    public void releasing( Object object )
+    {
+        ( (Persistent) object ).unsetDatabase();
     }
 
 
