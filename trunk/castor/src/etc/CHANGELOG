@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1221.
+       Added the ability to specify an OFFSET clause with LIMIT clauses. This 
+       patch provides support for postgreSQL, mySQL and HSQL only.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1221
+       (Werner - 20040812)
+
 JDO:   Added example to src/examples/MappingTool to demonstrate the use of the 
        MappingTool.
        (Werner - 20040811)
@@ -16,6 +22,7 @@ JDO:   Fixed bug 1700 using contribution from unknown [weitz@zimmerverpackungen.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1700
        (Werner - 20040805)
        
+>>>>>>> 1.95
 JDO:   Fixed bug 1690.
        Improved exception handling for the transactionmanager package.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1690
