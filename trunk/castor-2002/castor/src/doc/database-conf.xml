@@ -25,6 +25,7 @@
            <tr><td>sybase</td><td>Sybase 11</td></tr>
            <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
            <tr><td>db2</td><td>DB/2</td></tr>
+           <tr><td>informix</td><td>Informix</td></tr>
            <tr><td>postgresql</td><td>PostgreSQL 6.5 and 7</td></tr>
          </table></p>
 
