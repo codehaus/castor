@@ -81,8 +81,6 @@ public final class SQLEngine implements Persistence {
      */
     private static Log _log = LogFactory.getFactory().getInstance( SQLEngine.class );
 
-    static private Hashtable    _separateConnections = new Hashtable();
-
     /**
      * SQL statements for PK lookup
      */
@@ -110,39 +108,27 @@ public final class SQLEngine implements Persistence {
      */
     private String              _sqlLoad;
 
-
     private String              _sqlLoadLock;
-
 
     private FieldInfo[]         _fields;
 
-
     private ColumnInfo[]         _ids;
-
 
     private SQLEngine           _extends;
 
-
     private QueryExpression     _sqlFinder;
-
 
     private PersistenceFactory  _factory;
 
-
-    private String              _stampField;
-
+    private String              log;
 
     private String              _type;
 
-
     private String              _mapTo;
-
 
     private String              _extTable;
 
-
     private JDOClassDescriptor   _clsDesc;
-
 
     private KeyGenerator         _keyGen;
 
@@ -158,7 +144,6 @@ public final class SQLEngine implements Persistence {
         throws MappingException {
 
         _clsDesc = clsDesc;
-        _stampField = stampField;
         _factory = factory;
         _keyGen = null;
         _type = clsDesc.getJavaClass().getName();
@@ -345,27 +330,27 @@ public final class SQLEngine implements Persistence {
         _extends = engine;
     }
 
-    private synchronized Connection getSeparateConnection(Database database)
-        throws PersistenceException
-    {
-        Connection conn;
-        DatabaseRegistry dr;
-
-        dr=DatabaseRegistry.getDatabaseRegistry(database.getDatabaseName());
-
-        conn = (Connection) _separateConnections.get( dr );
-        if ( conn == null ) {
-            try {
-                conn = dr.createConnection();
-                conn.setAutoCommit( false );
-                _separateConnections.put( dr, conn );
-            } catch ( SQLException except ) {
-                throw new PersistenceException( Messages.message("persist.cannotCreateSeparateConn"), except );
-            }
-        } //else
-        return conn;
+    private Connection getSeparateConnection(Database database) throws PersistenceException {
+        try {
+            DatabaseRegistry databaseRegistry = DatabaseRegistry.getDatabaseRegistry(database.getDatabaseName());
+            Connection conn = databaseRegistry.createConnection();
+            conn.setAutoCommit(false);
+            return conn;
+        } catch (SQLException e) {
+            throw new PersistenceException(Messages.message("persist.cannotCreateSeparateConn"), e);
+        }
     }
 
+    private void closeSeparateConnection(Connection conn) {
+        try {
+            if (!conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            _log.error(e.getMessage(), e);
+        }
+    }
+    
     /**
      * Used by {@link org.exolab.castor.jdo.OQLQuery} to retrieve the class descriptor.
      */
@@ -459,38 +444,30 @@ public final class SQLEngine implements Persistence {
         return (QueryExpression) _sqlFinder.clone();
     }
 
-    private Object idToSQL( int index, Object object )
-            throws PersistenceException {
-
-        if ( object == null || _ids[index].convertFrom == null )
+    private Object idToSQL(int index, Object object) {
+        if (object == null || _ids[index].convertFrom == null)
             return object;
-        return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
+        return _ids[index].convertFrom.convert(object, _ids[index].convertParam);
     }
 
-    private Object toSQL( int field, int column, Object object )
-            throws PersistenceException {
-
+    private Object toSQL(int field, int column, Object object) {
         ColumnInfo col = _fields[field].columns[column];
-        if ( object == null || col.convertFrom == null )
+        if (object == null || col.convertFrom == null)
             return object;
-        return col.convertFrom.convert( object, col.convertParam );
+        return col.convertFrom.convert(object, col.convertParam);
     }
 
-    private Object idToJava( int index, Object object )
-            throws PersistenceException {
-
-        if ( object == null || _ids[index].convertTo == null )
+    private Object idToJava(int index, Object object) {
+        if (object == null || _ids[index].convertTo == null)
             return object;
-        return _ids[index].convertTo.convert( object, _ids[index].convertParam );
+        return _ids[index].convertTo.convert(object, _ids[index].convertParam);
     }
 
-    private Object toJava( int field, int column, Object object )
-            throws PersistenceException {
-
+    private Object toJava(int field, int column, Object object) {
         ColumnInfo col = _fields[field].columns[column];
-        if ( object == null || col.convertTo == null )
+        if (object == null || col.convertTo == null)
             return object;
-        return col.convertTo.convert( object, col.convertParam );
+        return col.convertTo.convert(object, col.convertParam);
     }
 
     /**
@@ -499,30 +476,41 @@ public final class SQLEngine implements Persistence {
      *
      * Result key will be in java type.
      */
-    private Object generateKey( Database database, Object conn, PreparedStatement stmt ) throws PersistenceException {
+    private Object generateKey(Database database, Object conn, PreparedStatement stmt) throws PersistenceException {
         Object identity;
         Connection connection;
         Properties prop = null;
 
-        if ( _keyGen.isInSameConnection() ) {
-            connection = (Connection) conn;
+        // TODO [SMH]: Change KeyGenerator.isInSameConnection to KeyGenerator.useSeparateConnection?
+        // TODO [SMH]: Move "if (_keyGen.isInSameConnection() == false)" out of SQLEngine and into key-generator?
+        if (_keyGen.isInSameConnection() == false) {
+            connection = getSeparateConnection(database);
         } else {
-            connection = getSeparateConnection( database );
+            connection = (Connection) conn;
         }
 
         if (stmt != null) {
             prop = new Properties();
             prop.put("insertStatement", stmt);
         }
-        synchronized (connection) {
-            identity = _keyGen.generateKey( connection, _clsDesc.getTableName(),
-                _ids[0].name, prop );
+
+        try {
+            synchronized (connection) {
+                identity = _keyGen.generateKey(connection, _clsDesc.getTableName(), _ids[0].name, prop);
+            }
+
+            // TODO [SMH]: Move "if (identity == null)" into keygenerator.
+            if (identity == null) {
+                throw new PersistenceException(
+                    Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()));
+            }
+
+            return idToJava(0, identity);
+        } finally {
+            if (_keyGen.isInSameConnection() == false) {
+                closeSeparateConnection(connection);
+            }
         }
-
-        if ( identity == null )
-            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
-
-        return idToJava( 0, identity );
     }
 
 
@@ -623,7 +611,7 @@ public final class SQLEngine implements Persistence {
                 // First skip all results "for maximum portability"
                 // as proposed in CallableStatement javadocs.
                 while ( cstmt.getMoreResults() || cstmt.getUpdateCount() != -1 ) {
-                	// do nothing
+                	// no code to execute
                 }
 
                 // Identity is returned in the last parameter
@@ -1448,9 +1436,6 @@ public final class SQLEngine implements Persistence {
         final boolean dirtyCheck;
 
         final String[] joinFields;
-        //!TY fix this. joinFields should be in FieldInfo, not ColumnInfo
-
-        //final boolean foreign;
 
         ColumnInfo[] columns;
 
@@ -1625,36 +1610,25 @@ public final class SQLEngine implements Persistence {
 
     static final class SQLQuery implements PersistenceQuery {
 
-
         private PreparedStatement _stmt;
-
 
         private ResultSet         _rs;
 
-
         private final SQLEngine _engine;
-
 
         private final Class[]   _types;
 
-
         private final Object[]  _values;
-
 
         private final String    _sql;
 
-
         private Object[]        _lastIdentity;
-
 
         private int[]           _identSqlType;
 
-
         private boolean         _resultSetDone;
 
-
         private Object[]        _fields;
-
 
         SQLQuery( SQLEngine engine, String sql, Class[] types )
         {
