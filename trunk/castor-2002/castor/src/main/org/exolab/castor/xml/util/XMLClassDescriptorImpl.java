@@ -123,7 +123,7 @@ public class XMLClassDescriptorImpl
      * The descriptor of the class which this class extends,
      * or null if this is a top-level class.
      */
-    private ClassDescriptor     _extends;
+    private XMLClassDescriptor     _extends;
 
 
     /**
@@ -152,13 +152,7 @@ public class XMLClassDescriptorImpl
             throw new IllegalArgumentException(NULL_CLASS_ERR);
             
         this._class = type;
-        
-        //-- create default XML name
-        String name = type.getName();
-        int idx = name.lastIndexOf('.');
-        if (idx >= 0) name = name.substring(idx+1);
-        this._xmlName = MarshalHelper.toXMLName(name);
-        
+        setXMLName(null);
     } //-- XMLClassDescriptorImpl
 
     /**
@@ -172,15 +166,7 @@ public class XMLClassDescriptorImpl
             throw new IllegalArgumentException(NULL_CLASS_ERR);
             
         this._class = type;
-        
-        if (xmlName == null) {
-            //-- create default XML name
-            String name = type.getName();
-            int idx = name.lastIndexOf('.');
-            if (idx >= 0) name = name.substring(idx+1);
-            this._xmlName = MarshalHelper.toXMLName(name);
-        }
-        else this._xmlName = xmlName;
+        setXMLName(xmlName);
     } //-- XMLClassDescriptorImpl
 
     /**
@@ -282,6 +268,60 @@ public class XMLClassDescriptorImpl
     } //-- getXMLName   
     
     /**
+     * Removes the given XMLFieldDescriptor from the list of descriptors. 
+     * @param descriptor the XMLFieldDescriptor to remove
+    **/
+    public void removeFieldDescriptor(XMLFieldDescriptor descriptor) {
+        
+        if (descriptor == null) return;
+        
+        NodeType nodeType = descriptor.getNodeType();
+        switch(nodeType.getType()) {
+            
+            case NodeType.ATTRIBUTE:
+                attributeDescriptors.remove(descriptor);
+                break;
+            case NodeType.TEXT:
+                if (contentDescriptor == descriptor)
+                    contentDescriptor = null;
+                break;
+            default:
+                elementDescriptors.remove(descriptor);
+                break;
+        }
+            
+    } //-- removeFieldDescriptor
+    
+    /**
+     * Sets the XMLClassDescriptor that this descriptor inherits from
+     * @param classDesc the XMLClassDescriptor that this descriptor
+     * extends
+    **/
+    public void setExtends(XMLClassDescriptor classDesc) {
+        
+        FieldDescriptor[] fields = null;
+        //-- remove reference to previous extended descriptor
+        if (_extends != null) {
+            sortDescriptors();
+            fields = _extends.getFields();
+            for (int i = 0; i < fields.length; i++) {
+                removeFieldDescriptor((XMLFieldDescriptor)fields[i]);
+            }
+        }
+        
+        this._extends = classDesc;
+        
+        //-- flatten out the hierarchy
+        if (_extends != null) {
+            fields = classDesc.getFields();
+            for (int i = 0; i < fields.length; i++) {
+                addFieldDescriptor((XMLFieldDescriptor)fields[i]);
+            }
+        }
+        
+    } //-- setExtends
+    
+    /**
      * Sets the Identity FieldDescriptor, if the FieldDescriptor is
      * not already a contained in this ClassDescriptor, it will be
      * added
@@ -321,7 +361,12 @@ public class XMLClassDescriptorImpl
      * XMLClassDescriptor
     **/
     public void setXMLName(String xmlName) {
-        this._xmlName = xmlName;
+        if (xmlName == null) {
+            if (_class != null) {
+                _xmlName = toXMLName(_class.getName());
+            }
+        }
+        else this._xmlName = xmlName;
     } //-- setXMLName
     
     /** 
@@ -460,6 +505,17 @@ public class XMLClassDescriptorImpl
         this._class = type;
     } //-- setJavaClass
 
+    protected void setExtendsWithoutFlatten(XMLClassDescriptor classDesc) {
+        this._extends = classDesc;
+    } //-- setExtendsWithoutFlatten
+    
+    private String toXMLName(String className) {
+        //-- create default XML name
+        String name = className;
+        int idx = name.lastIndexOf('.');
+        if (idx >= 0) name = name.substring(idx+1);
+        return MarshalHelper.toXMLName(name);
+    }
 } //-- XMLClassDescriptor
 
 

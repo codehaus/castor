@@ -92,6 +92,8 @@ public class XMLClassDescriptorAdapter
                 addFieldDescriptor((XMLFieldDescriptor)fields[i]);
             
             setXMLName(xmlClassDesc.getXMLName());
+            setExtendsWithoutFlatten((XMLClassDescriptor)
+                xmlClassDesc.getExtends());
             
         }
         else {
@@ -108,7 +110,16 @@ public class XMLClassDescriptorAdapter
                 }
             }
             
-            setXMLName(xmlName);
+            XMLClassDescriptor xmlClassDesc = null;
+            ClassDescriptor extendsDesc = classDesc.getExtends();
+            if (extendsDesc != null) {
+                if (extendsDesc instanceof XMLClassDescriptor)
+                    xmlClassDesc = (XMLClassDescriptor) extendsDesc;
+                else {
+                    xmlClassDesc = new XMLClassDescriptorAdapter(extendsDesc, null);
+                }
+            }
+            setExtends((XMLClassDescriptor)xmlClassDesc.getExtends());
         }
         
         if ( classDesc.getIdentity() != null ) {
@@ -117,6 +128,7 @@ public class XMLClassDescriptorAdapter
         }
 
         setJavaClass(classDesc.getJavaClass());
+        setXMLName(xmlName);
 
     } //-- XMLClassDescriptorAdapter
     
