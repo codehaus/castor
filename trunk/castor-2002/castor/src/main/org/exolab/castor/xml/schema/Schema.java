@@ -334,6 +334,20 @@ public class Schema extends Annotated {
     } //-- getElementDecls
 
     /**
+     * Returns the namespace of the XML Schema
+     * <BR />
+     * Note: This is not the same as targetNamespace. This is
+     * the namespace of "XML Schema" itself and not the namespace of the
+     * schema that is represented by this object model 
+     * (see #getTargetNamespace).
+     * @return the namespace of the XML Schema
+     *
+    **/
+    public String getSchemaNamespace() {
+        return this.schemaNS;
+    } //-- getSchemaNamespace
+    
+    /**
      * Returns the target namespace for this Schema, or null if no
      * namespace has been defined.
      * @return the target namespace for this Schema, or null if no
