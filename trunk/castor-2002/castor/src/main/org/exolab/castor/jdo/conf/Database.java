@@ -39,6 +39,11 @@ public class Database implements java.io.Serializable {
     /**
      * 
     **/
+    private String vEngine;
+
+    /**
+     * 
+    **/
     private Driver vDriver;
 
     /**
@@ -50,11 +55,6 @@ public class Database implements java.io.Serializable {
      * 
     **/
     private Jndi vJndi;
-
-    /**
-     * 
-    **/
-    private Engine vEngine;
 
     /**
      * 
@@ -115,6 +115,21 @@ public class Database implements java.io.Serializable {
 
     /**
      * 
+    **/
+    public String getEngine() {
+        return this.vEngine;
+    } //-- String getEngine() 
+
+    /**
+     * 
+     * @param vEngine 
+    **/
+    public void setEngine(String vEngine) {
+        this.vEngine = vEngine;
+    } //-- void setEngine(String) 
+
+    /**
+     * 
      * @param vDriver 
     **/
     public void setDriver(Driver vDriver) 
@@ -164,23 +179,6 @@ public class Database implements java.io.Serializable {
     {
         return vJndi;
     } //-- Jndi getJndi() 
-
-    /**
-     * 
-     * @param vEngine
-    **/
-    public void setEngine(Engine vEngine) 
-    {
-        this.vEngine = vEngine;
-    } //-- void setEngine(Engine) 
-
-    /**
-     * 
-    **/
-    public Engine getEngine() 
-    {
-        return vEngine;
-    } //-- Engine getEngine() 
 
     /**
      * 
