@@ -3,6 +3,15 @@ Adaptx (C) 1998-2004 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 
 The following are changes from different versions of Adaptx
 
+
+Version 0.9.11, April 20, 2004
+------------------------------
+
+-- Fixed issue with xsl:sort that was restricting the result of 
+   the expression specified by the select attribute to be a
+   node-set, instead of any valid XPath result.
+
+
 Version 0.9.10, February 02, 2004
 ---------------------------------
 
