@@ -97,7 +97,7 @@ public final class EntityInfo {
         this.superEntity   = superEntity;
         this.discriminator = discriminator;
         this.keyGen        = keyGen;
-    }
+    } // -- EntityInfo
 
     /**
      * Returns the offset of the first field in the entity
@@ -112,7 +112,7 @@ public final class EntityInfo {
             cur = cur.superEntity;
         }
         return offset;
-    }
+    } // -- getFieldOffset
 
     /**
      * Determines if the entity represented by this EntityInfo 
@@ -131,7 +131,7 @@ public final class EntityInfo {
             info = info.superEntity;
         }
         return true;
-    }
+    } // -- isSuper
 
     /**
      * Return the base entityInfo of this entity
@@ -143,7 +143,7 @@ public final class EntityInfo {
             cur = cur.superEntity;
         }
         return cur;
-    }
+    } // -- getBase
 
     /**
      * Return the maximium number of field possible
@@ -160,22 +160,31 @@ public final class EntityInfo {
                 max = subEntities[i].getMaxLength();
         }
         return max+fieldLen;
-    }
+    } // -- getMaxLength
 
+    /**
+     * Determines the specified EntityInfo is equals to this object.
+     */
     public boolean equals( Object object ) {
-        if ( !( object instanceof EntityInfo ) || object == null )
+        if ( object == null || !( object instanceof EntityInfo ) )
             return false;
 
         EntityInfo info = (EntityInfo) object;
 
         return entityClass.equals(info.entityClass);
-    }
+    } // -- equals
 
+    /**
+     * Returns the hashCode for this EntityInfo
+     */
     public int hashCode() {
         return entityClass == null ? 0 : entityClass.hashCode();
-    }
+    } // -- hashCode
 
+    /**
+     * Returns a string representing this EntityInfo
+     */
     public String toString() {
         return entityClass;
-    }
+    } // -- toString
 }

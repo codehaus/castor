@@ -144,9 +144,12 @@ public final class EntityFieldInfo {
      */
     public EntityFieldInfo relatedForeignKey;
 
+    /**
+     * Constructor
+     */
     public EntityFieldInfo() {
         // implements it....
-    }
+    } // -- EntityFieldInfo
 
     public int getFieldPos() {
         for ( int i = 0; i < entityClass.fieldInfo.length; i++ ) {
@@ -154,17 +157,21 @@ public final class EntityFieldInfo {
                 return i;
         }
         throw new IllegalStateException("FieldInfo, "+this+", is corrupted. It doesn't not contained in an entity it belongs");
-    }
+    } // -- getFieldPos
 
+    /**
+     * Determines the specified EntityFieldInfo representing the same
+     * Entity field as this EntityFieldInfo
+     */
     public boolean equals( Object object ) {
         EntityFieldInfo info;
 
-        if ( !( object instanceof EntityFieldInfo ) ) {
+        if ( object || null || !( object instanceof EntityFieldInfo ) )
             return false;
-        }
-        if (object == this) {
+
+        if (object == this)
             return true;
-        }
+
         info = (EntityFieldInfo) object;
         return  (entityClass.equals(info.entityClass) &&
                 ((fieldNames == null && info.fieldNames == null) ||
@@ -173,17 +180,22 @@ public final class EntityFieldInfo {
                     relatedEntityClass.equals(info.relatedEntityClass)) &&
                 ((relatedForeignKey == null && info.relatedForeignKey == null) ||
                     relatedForeignKey.equals(info.relatedForeignKey)));
-    }
+    } // -- equals
 
+    /**
+     * Returns the hashCode for this EntityFieldInfo
+     */
     public int hashCode() {
         return (entityClass == null ? 0: entityClass.hashCode()) +
                 (fieldNames == null ? 0 : fieldNames[0].hashCode()) +
                 (relatedEntityClass == null ? 0 : relatedEntityClass.hashCode());
-    }
+    } // -- hashCode
 
-
+    /**
+     * Returns a string representing this EntityFieldInfo
+     */
     public String toString() {
         return entityClass + "." + (fieldNames == null ? relatedEntityClass.toString()
                                                        : fieldNames[0].toString());
-    }
+    } // -- toString
 }
