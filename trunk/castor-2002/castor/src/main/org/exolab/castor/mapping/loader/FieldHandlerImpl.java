@@ -84,13 +84,13 @@ public final class FieldHandlerImpl
     /**
      * The method used to obtain the value of this field. May be null.
      */
-    private final Method  _getMethod;
+    private Method  _getMethod;
 
 
     /**
      * The method used to set the value of this field. May be null.
      */
-    private final Method  _setMethod;
+    private Method  _setMethod;
 
 
     /**
@@ -202,18 +202,9 @@ public final class FieldHandlerImpl
         if ( getMethod == null && setMethod == null )
             throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
-        if ( setMethod != null && ( ( setMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
-                                    ( setMethod.getModifiers() & Modifier.STATIC ) != 0 ) )
-            throw new MappingException( "mapping.accessorNotAccessible",
-                                        setMethod, setMethod.getDeclaringClass().getName() );
-        _setMethod = setMethod;
-
-        if ( getMethod != null && ( ( getMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
-                                    ( getMethod.getModifiers() & Modifier.STATIC ) != 0 ) )
-            throw new MappingException( "mapping.accessorNotAccessible",
-                                        getMethod, getMethod.getDeclaringClass().getName() );
-        _getMethod = getMethod;
-
+        if ( setMethod != null ) setWriteMethod(setMethod);
+        if ( getMethod != null ) setReadMethod(getMethod);
+        
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
         _immutable = typeInfo.isImmutable();
         _required = typeInfo.isRequired();
@@ -345,6 +336,7 @@ public final class FieldHandlerImpl
     }
 
 
+
     /**
      * Mutator method used by {@link MappingLoader}.
      */
@@ -361,6 +353,37 @@ public final class FieldHandlerImpl
         _createMethod = method;
     }
 
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    void setReadMethod( Method method )
+        throws MappingException
+    {
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 0 )
+            throw new MappingException( "mapping.readMethodHasParam",
+                                        method, method.getDeclaringClass().getName() );
+        _getMethod = method;
+    }
+
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    void setWriteMethod( Method method )
+        throws MappingException
+    {
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.writeMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _setMethod = method;
+    }
 
     public String toString()
     {
