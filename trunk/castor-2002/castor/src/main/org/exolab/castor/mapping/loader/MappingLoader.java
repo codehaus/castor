@@ -151,6 +151,12 @@ public abstract class MappingLoader
     }
 
 
+    public ClassLoader getClassLoader()
+    {
+        return _loader;
+    }
+
+
     /**
      * Returns the log writer. If not null, errors and other messages
      * should be directed to the log writer.

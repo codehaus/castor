@@ -90,4 +90,15 @@ public interface MappingResolver
     public Enumeration listJavaClasses();
 
 
+    /**
+     *
+     * Returns the class loader associated with this mapping resolver
+     * if one was specified. This is the class loader used to load all
+     * the classes mapped by this mapping resolver. May be null if no
+     * class loader was specified or in certain JVMs.
+     */
+    public ClassLoader getClassLoader();
+
+
+
 }
