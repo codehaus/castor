@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -54,13 +54,19 @@ public class ValidationException extends CastorException {
     
     /**
      * A nested exception
-    **/
+     */
     private Exception _exception  = null;
     
     /**
      * The location for this Exception
-    **/
+     */
     private Location  _location   = null;
+    
+    /**
+     * The next exception in the list, allows for reporting
+     * of several validation exceptions
+     */
+    private ValidationException _next = null;
     
     /**
      * Creates a new ValidationException with no message,
@@ -135,9 +141,25 @@ public class ValidationException extends CastorException {
         return _exception;
     } //-- getException
     
+    /**
+     * Returns the location of the exception
+     *
+     * @return the location of the exception
+     */
     public Location getLocation() {
         return _location;
     } //-- getLocation
+    
+    /**
+     * Returns the next ValidationException in the list, or null
+     * if no additional validation exceptions exist.
+     *
+     * @return the next ValidationException in the list, or null if
+     * there are no additional exceptions.
+     */
+    public ValidationException getNext() {
+        return _next;
+    } //-- getNext
     
     /**
      * Sets the location information for this ValidationException
@@ -149,18 +171,70 @@ public class ValidationException extends CastorException {
     } //-- setLocation
     
     /**
+     * Adds the given ValidationException as the last exception
+     * in the list. This is equivalent to calling #setNext if no
+     * additional ValidationException(s) exist.
+     *
+     * @param exception the ValidationException to set as the last
+     * exception in the list.
+     */
+    protected void setLast(ValidationException exception) {
+        if (_next != null) {
+            _next.setLast(exception);
+        }
+        _next = exception;
+    } //-- setLast
+    
+    /**
+     * Sets the given ValidationException as the next exception
+     * in the list. This method will overwrite any existing
+     * ValidationException that may already exist as the next
+     * exception.
+     *
+     * @param exception the ValidationException to set as the next
+     * exception in the list.
+     */
+    protected void setNext(ValidationException exception) {
+        _next = exception;
+    } //-- setNext
+
+    /**
      * Returns the String representation of this Exception
      * @return the String representation of this Exception
     **/
     public String toString() {
-        StringBuffer sb = new StringBuffer("ValidationException: ");
-        String message = getMessage();
-        if (message != null) sb.append(message);
-        if (_location != null) {
-            sb.append(";\n   - location of error: ");
-            sb.append(_location.toString());
+        StringBuffer sb = new StringBuffer();
+        if (getNext() != null) {
+            int count = 1;
+            ValidationException vx = this;
+            while (vx != null) {
+                if (count > 1) {
+                    sb.append('\n');
+                    sb.append('\n');
+                }
+                sb.append(count);
+                sb.append(". ValidationException: ");
+                String message = vx.getMessage();
+                if (message != null) sb.append(message);
+                Location location = getLocation();
+                if (location != null) {
+                    sb.append(";\n   - location of error: ");
+                    sb.append(location.toString());
+                }
+                vx = vx.getNext();
+                ++count;
+            }
+        }
+        else {
+            sb.append("ValidationException: ");
+            String message = getMessage();
+            if (message != null) sb.append(message);
+            if (_location != null) {
+                sb.append(";\n   - location of error: ");
+                sb.append(_location.toString());
+            }
         }
         return sb.toString();
     } //-- toString
-    
+
 } //-- ValidationException
