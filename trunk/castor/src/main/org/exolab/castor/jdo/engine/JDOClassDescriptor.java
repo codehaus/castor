@@ -125,11 +125,11 @@ public class JDOClassDescriptor
         }
         _idnames = new String[_identities.length];
         for (int i = 0; i < _idnames.length; i++) {
-        	  String[] sqlNames = ((JDOFieldDescriptor) _identities[i]).getSQLName();
-        	  if (sqlNames == null) {
-              throw new MappingException( "mapping.noSqlName", _identities[i].getFieldName(), getJavaClass().getName() );
-        	  }
-            _idnames[i] = sqlNames[0];
+        	String[] sqlNames = ((JDOFieldDescriptor) _identities[i]).getSQLName();
+        	if (sqlNames == null) {
+        		throw new MappingException( "mapping.noSqlName", _identities[i].getFieldName(), getJavaClass().getName() );
+        	}
+        	_idnames[i] = sqlNames[0];
         }
     }
 
