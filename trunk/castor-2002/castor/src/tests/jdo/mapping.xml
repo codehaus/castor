@@ -6,7 +6,6 @@
        Single object mapping, shared access, dirty checking on all fields -->
   <class name="jdo.TestObject" access="shared" identity="id">
     <description>Table used for concurrency and performance testing</description>
-    <cache-type type="time-limited" value="30"/>
     <map-to table="test_table" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
@@ -21,7 +20,6 @@
 
   <class name="jdo.TestObjectEx" access="shared" identity="id">
     <description>Table used for cache testing</description>
-    <cache-type type="count-limited" value="30"/>
     <map-to table="test_table_ex" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
@@ -115,11 +113,10 @@
       <sql name="id" type="numeric" />
     </field>
     <field name="date" type="java.util.Date">
-      <sql name="tdt" type="date" />
+      <sql name="tdt" type="timestamp" />
     </field>
-    <!-- Note: cannot do dirty checking on time field do to unknown conversion error -->
     <field name="time" type="java.util.Date">
-      <sql name="ttm" type="time" dirty="ignore" />
+      <sql name="ttm" type="timestamp" />
     </field>
     <field name="intValue" type="integer" required="false" >
       <sql name="int_val" type="integer" dirty="ignore" />
