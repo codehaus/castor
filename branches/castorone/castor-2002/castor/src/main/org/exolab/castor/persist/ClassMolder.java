@@ -534,14 +534,7 @@ public class ClassMolder implements CacheHolder {
                 }
                 break;
             case FieldMolder.ONE_TO_MANY:
-                if ( _fhs[i].isLazy() ) {
-                    // currently, many-to-many relation only allow one column pk
-                    ArrayVector list = (ArrayVector) fields[i];
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
-                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
-                    _fhs[i].setValue( object, relcol );
-                } else {
+                if ( !_fhs[i].isLazy() ) {
                     ArrayList col = new ArrayList();
                     //(ArrayList)_fhs[i].getCollectionType().newInstance();
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -557,19 +550,17 @@ public class ClassMolder implements CacheHolder {
                     } else {
                         _fhs[i].setValue( object, null );
                     }
-                }
-                break;
-            case FieldMolder.MANY_TO_MANY:
-                if ( _fhs[i].isLazy() ) {
-                    // currently, many-to-many relation only allow one column pk
+                } else {
                     ArrayVector list = (ArrayVector) fields[i];
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
                     RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
                     _fhs[i].setValue( object, relcol );
-                } else {
+				}
+                break;
+            case FieldMolder.MANY_TO_MANY:
+                if ( !_fhs[i].isLazy() ) {
                     ArrayList col = new ArrayList();
-                    //(ArrayList)_fhs[i].getCollectionType().newInstance();
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
 
@@ -580,6 +571,12 @@ public class ClassMolder implements CacheHolder {
                         }
                         _fhs[i].setValue( object, col );
                     }
+                } else {
+                    ArrayVector list = (ArrayVector) fields[i];
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
+                    _fhs[i].setValue( object, relcol );
                 }
                 break;
             default:
@@ -588,39 +585,12 @@ public class ClassMolder implements CacheHolder {
         }
 
         return oid;
-
-        // for each field
-        //   if field is a lazy collection
-        //     if the field is many-to-many
-        //       load with RelationCollectionClassMolder....
-        //     else
-        //       load
-        //    make an new object
-        //    call extended SQLEngine to load some fields first
-        //    load all field which this molder handle
-        //    update oid.setStamp
-        //    if object not found rise exception
-        //    call FieldMolder for each of the 1:N fields
-        //    return object
-        //  if lazy ....not yet implement, but leave space for the addition
-
-        //  fieldMolder
-        //    call FieldMolder for each of the 1:N fields
-        //      if the field is lazy
-        //        if the field is many-to-many
-        //          make a ManyToManyrelationCollection of SQLEngine, table, Transaction
-        //            (in relationCollection, leave space to take care the after
-        //             transaction call to a lazy collection)
-        //        if not many-to-many
-        //          make a RelationCollection of SQLEngine, table, Transaction
-        //      if the field is not lazy
-        //        if one-to-many
-        //          call typeMolder to molde the id
-
     }
 
     public ObjectBin fetch( TransactionContext tx, PersistenceQuery pq, OID oid, AccessMode accessMode )
             throws ObjectNotFoundException, PersistenceException {
+		// seem like we don't need fetch anymore, queryresult now call 
+		// transactionContext.load instead of calling classmolder itself
         // same as load, exception call pq.fetch, in place of load
         throw new RuntimeException("ObjectBin.fetch() is not implemented!");        
     }
@@ -932,7 +902,7 @@ public class ClassMolder implements CacheHolder {
 								}
 							}
                         } else {
-							// need to do anything for non-dependent object.
+							// need to do anything for non-dependent object?
 							// it seem not. should list all the case and make sure
                         }
                     }
@@ -960,40 +930,39 @@ public class ClassMolder implements CacheHolder {
                             }
                         }
 
-                        if ( orgFields != null && list != null ) {
-                            for ( int j=0; j<orgFields.size(); j++ ) {
-                                if ( !list.contains( orgFields.get(j) ) ) {
-                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
-                                    if ( reldel != null ) {
-										tx.delete( reldel );
-									} else {
-										// should i notify user that the object does not exist?
-										// user can't delete dependent object himself. So, must
-										// error.
-                                    }
-                                }
-                            }
-                            // add relation which added after it's created or loaded
-                            for ( int j=0; j<list.size(); j++ ) {
-                                if ( !orgFields.contains( list.get(j) ) ) {
-									if ( !tx.isPersistent( v.get(j) ) ) 
-										tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
-									else {
-										// should i notify user that the object does not exist?
-										// user can't create dependent object himself. So, must
-										// error.									
-									}
-                                }
-                            }
-                        }
-
+						if ( _fhs[i].isDependent() ) {
+	                        if ( orgFields != null && list != null ) {
+	                            for ( int j=0; j<orgFields.size(); j++ ) {
+	                                if ( !list.contains( orgFields.get(j) ) ) {
+	                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+	                                    if ( reldel != null ) {
+											tx.delete( reldel );
+										} else {
+											// should i notify user that the object does not exist?
+											// user can't delete dependent object himself. So, must
+											// error.
+	                                    }
+	                                }
+	                            }
+	                            // add relation which added after it's created or loaded
+	                            for ( int j=0; j<list.size(); j++ ) {
+	                                if ( !orgFields.contains( list.get(j) ) ) {
+										if ( !tx.isPersistent( v.get(j) ) ) 
+											tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
+										else {
+											// should i notify user that the object does not exist?
+											// user can't create dependent object himself. So, must
+											// error.									
+										}
+	                                }
+	                            }
+	                        }
+						}
                     }
                 } else {
-                    /*
-                    Lazy lazy = (Lazy) o;
-                    list = lazy.getIdentitiesList();
-                    if ( !OID.isEquals( list, (Vector)ci.fields[i] ) ) {
-                        System.out.println("Store.m-to-n(lazy) modified");
+                    RelationCollection lazy = (RelationCollection) o;
+                    ArrayList deleted = lazy.getDeleted();
+					if ( deleted != null ) {
                         if ( _fhs[i].isStored() ) {
                             if ( _fhs[i].isCheckDirty() ) {
                                 modified = true;
@@ -1002,9 +971,44 @@ public class ClassMolder implements CacheHolder {
                                 modified = true;
                             }
                         }
-                        // should do something for lazy collection
-                        throw new RuntimeException("One-to-many lazy loading is not implemented!");
-                    }*/
+
+						if ( _fhs[i].isDependent() ) {
+							itor = deleted.iterator();
+							while ( itor.hasNext() ) {
+								Object toBeDeleted = lazy.find( (Object[])itor.next() );
+								if ( toBeDeleted != null && tx.isPersistent( toBeDeleted ) ) {
+									tx.delete( toBeDeleted );
+								} else { 
+									// what to do if it happens?
+								}
+							}
+						}
+					}
+
+					ArrayList added = lazy.getAdded();
+					if ( added != null ) {
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+						if ( _fhs[i].isDependent() ) {
+							itor = added.iterator();
+							while ( itor.hasNext() ) {
+							    Object toBeAdded = lazy.find( (Object[])itor.next() );
+								if ( toBeAdded != null ) {
+									tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
+								} else {
+									// what to do if it happens?
+								}
+							}
+						}
+					}
+
                 }
                 break;
             case FieldMolder.MANY_TO_MANY:
@@ -1081,19 +1085,58 @@ public class ClassMolder implements CacheHolder {
                         }
                     }
                 } else {
-                    /*
-                    Lazy lazy = (Lazy) o;
-                    list = lazy.getIdentitiesList();
-                    if ( !OID.isEquals( list, (Vector)ci.fields[i] ) ) {
-                        System.out.println("Store.m-to-n(lazy) modified");
-                        if ( _fhs[i].isCheckDirty() ) {
-                            modified = true;
-                            lockrequired = true;
-                        } else {
-                            modified = true;
+                    RelationCollection lazy = (RelationCollection) o;
+                    ArrayList deleted = lazy.getDeleted();
+					if ( deleted != null ) {
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
                         }
-                        // should do something for lazy collection
-                    }*/
+
+						itor = deleted.iterator();
+						while ( itor.hasNext() ) {
+							Object[] deletedId = (Object[])itor.next();
+							Object toBeDeleted = lazy.find( deletedId );
+							if ( toBeDeleted != null && !tx.isPersistent(toBeDeleted) ) {
+								tx.writeLock( toBeDeleted, 0 );
+
+                                _fhs[i].getRelationLoader().deleteRelation( 
+                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                oid.getIdentities(), deletedId );
+							} else { 
+								// what to do if it happens?
+							}
+						}
+					}
+
+					ArrayList added = lazy.getAdded();
+					if ( added != null ) {
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+						itor = added.iterator();
+						while ( itor.hasNext() ) {
+							Object[] addedId = (Object[])itor.next();
+						    Object toBeAdded = lazy.find( addedId );
+							if ( toBeAdded != null ) {
+                                _fhs[i].getRelationLoader().createRelation( 
+                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                oid.getIdentities(), addedId );
+							} else {
+								// what to do if it happens?
+							}
+						}
+					}
                 }
                 break;
             default:
@@ -1135,7 +1178,7 @@ public class ClassMolder implements CacheHolder {
         Iterator itor;
         CacheItem ci;
         Object newid;
-        Vector fids;
+        ArrayList fids;
         Object key;
         Object[] fid;
         Object id;
@@ -1182,14 +1225,14 @@ public class ClassMolder implements CacheHolder {
                 if ( o != null ) {
                     if ( !( o instanceof Lazy) ) {
                         ArrayList list = (ArrayList) o;
-                        Vector fidlist = new Vector( list.size() );
+                        ArrayVector fidlist = new ArrayVector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
                             fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         ci.fields[i] = fidlist;
                     } else {
-                        Lazy lazy = (Lazy) o;
-                        fids = (Vector) lazy.getIdentitiesList();
+                        RelationCollection lazy = (RelationCollection) o;
+                        fids = (ArrayList)lazy.getIdentitiesList().clone();
                         ci.fields[i] = fids;
                     }
                 } else {
@@ -1202,14 +1245,14 @@ public class ClassMolder implements CacheHolder {
                 if ( o != null ) {
                     if ( !( o instanceof Lazy ) ) {
                         ArrayList list = (ArrayList) o;
-                        Vector fidlist = new Vector( list.size() );
+                        ArrayVector fidlist = new ArrayVector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
                             fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         ci.fields[i] = fidlist;
                     } else {
-                        Lazy lazy = (Lazy) o;
-                        fids = (Vector) lazy.getIdentitiesList();
+                        RelationCollection lazy = (RelationCollection) o;
+                        fids = (ArrayList)lazy.getIdentitiesList().clone();
                         ci.fields[i] = fids;
                     }
                 } else {
@@ -1252,7 +1295,7 @@ public class ClassMolder implements CacheHolder {
 					}
 
 					if ( extend._fhs[i].isMulti() ) {
-						Vector listOfIds = (Vector)persistFields[i];
+						ArrayVector listOfIds = (ArrayVector)persistFields[i];
 						for ( int j=0; i < listOfIds.size(); j++ ) {
 							extend._persistence.delete( tx.getConnection(extend._fhs[i].getFieldLockEngine()),
 							(Object[])listOfIds.get(j) );
@@ -1425,15 +1468,10 @@ public class ClassMolder implements CacheHolder {
                 break;
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
-                if ( ci.fields[i] == null ) {
+				Object o = ci.fields[i];
+                if ( o == null ) {
                     _fhs[i].setValue( object, null );
-                } else if ( _fhs[i].isLazy() ) {
-                    ArrayVector list = (ArrayVector) ci.fields[i];
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
-                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
-                    _fhs[i].setValue( object, relcol );
-                } else {
+                } else if ( !(o instanceof Lazy) ) {
                     ArrayList col = new ArrayList();
                     //(ArrayList)_fhs[i].getCollectionType().newInstance();
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -1444,7 +1482,14 @@ public class ClassMolder implements CacheHolder {
                         col.add( tx.load( fieldEngine, fieldClassMolder, (Object[])v.get(j), null ) );
                     }
                     _fhs[i].setValue( object, col );
-                }
+                } else {
+                    ArrayVector list = (ArrayVector) ci.fields[i];
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
+                    _fhs[i].setValue( object, relcol );
+
+				}
                 break;
             default:
             }

@@ -162,12 +162,10 @@ public class FieldMolder {
     public boolean isDependent() {
 		if ( _fMold == null )
 			return false;
-		System.out.println(_fType+"~~~~~~~~~~eMold: "+_eMold.getJavaClass().getName()+" field: "+_fType+" Path: "+_fMold.getJavaClass().getName()+" depend: "+_fMold.getDepends());	
 		ClassMolder extendPath = _eMold;
 		ClassMolder depends = _fMold.getDepends();
 		while ( extendPath != null ) {
 			if ( extendPath == depends ) {
-				System.out.println("~~~~~true~~~~~~eMold: "+_eMold.getJavaClass().getName()+" field: "+_fType+" Path: "+_fMold.getJavaClass().getName());	
 				return true;
 			} else 
 				extendPath = extendPath.getExtends();

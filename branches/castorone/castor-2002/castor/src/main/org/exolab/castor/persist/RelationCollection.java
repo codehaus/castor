@@ -7,10 +7,11 @@ package org.exolab.castor.persist;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Vector;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
+import java.lang.reflect.Array;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ArrayVector;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -34,15 +35,17 @@ public class RelationCollection implements Collection, Lazy {
     ArrayVector _ids;
 
     /* Vector of identity */
-    Vector _deleted;
+    ArrayVector _deleted;
 
-    /* Vector of identity */
-    Vector _added;
+    /* Vector of identity */ 
+    ArrayVector _added;
 
     /* Vector of object */
-    Hashtable _loaded;
+    Map _loaded;
 
     int _changecount;
+
+	int _size;
 
     public RelationCollection( TransactionContext tx, OID enclosing, LockEngine engine, 
             ClassMolder molder, AccessMode amode, ArrayVector ids ) {
@@ -52,39 +55,37 @@ public class RelationCollection implements Collection, Lazy {
         _engine = engine;
         _accessMode = amode;
         _ids = ids;
-        _deleted = new Vector();
-        _added = new Vector();
-        _loaded = new Hashtable();
+		_size = _ids.size();
+        _deleted = new ArrayVector();
+        _added = new ArrayVector();
+        _loaded = new ArrayKeysHashMap();
     }
 
 
     public boolean add(Object o) {
-        Object[] ids = _molder.getIdentities(o);
+        Object[] id = _molder.getIdentities(o);
         //boolean changed = false;
-        if ( _ids.contains( ids ) ) {
-            if ( _deleted.contains( ids ) ) {
-                _loaded.put( ids, o );
-                _deleted.remove( ids );
+        if ( _ids.contains( id ) ) {
+            if ( _deleted.contains( id ) ) {
+                _deleted.remove( id );
+                _loaded.put( id, o );
                 _changecount++;
+				_size++;
                 return true;
             } else {
-                _loaded.put( ids, o );
-                return false;
+                return (_loaded.put( id, o )!=o);
             }
         } else {
-            if ( _deleted.contains( ids ) ) {
-                _loaded.put( ids, o );
-                _deleted.remove( ids );
-                _added.add( ids );
+            if ( _deleted.contains( id ) ) 
+				throw new RuntimeException("Illegal Internal State.");
+
+            if ( _added.add( id ) ) {
+                _loaded.put( id, o );
                 _changecount++;
-                return true;
-            }
-            if ( _added.add( ids ) ) {
-                _loaded.put( ids, o );
-                _changecount++;
+				_size++;
                 return true;
             } else {
-                return false;
+                return (_loaded.put( id, o )!=o);
             }
         }
     }
@@ -111,25 +112,28 @@ public class RelationCollection implements Collection, Lazy {
         Object id;
 
         for ( int i=0; i<_ids.size(); i++ ) {
-            id = _ids.get(i);
-            _deleted.add( id );
-            _loaded.remove( id );
+			id = _ids.get(i);
+			if ( !_deleted.contains(id) ) {
+				_ids.remove(id);
+				_size--;
+			}
         }
-
-
         for ( int i=0; i<_added.size(); i++ ) {
-            id = _ids.get(i);
-            _loaded.remove( id );
+			id = _added.get(i);
+            _added.remove(id);
+			_size--;
         }
+		if ( _size != 0 )
+			throw new RuntimeException("Illegal Internal State!");
+
         _changecount++; // need more accurate count?? or it's fine
-        _added.clear();
     }
 
     public boolean contains(Object o) {
         Object[] ids = _molder.getIdentities(o);
         if ( _added.contains( ids ) )
             return true;
-        if ( _ids.contains( ids ) && ! _deleted.contains( ids ) )
+        if ( _ids.contains( ids ) && !_deleted.contains( ids ) )
             return true;
         return false;
     }
@@ -156,93 +160,96 @@ public class RelationCollection implements Collection, Lazy {
         private int cursor;
         private RelationCollection parent;
 
-        private IteratorImp( RelationCollection rc, int count ) {
-            changestamp = count;
+        private IteratorImp( RelationCollection rc ) {
             parent = rc;
+            changestamp = rc._changecount;
         }
         public boolean hasNext() {
             if ( changestamp != parent._changecount )
                 throw new ConcurrentModificationException("Concurrent Modification is not allowed!");
-            if ( cursor >= parent.size() )
+            if ( cursor >= parent._size )
                 return false;
             return true;
         }
         public Object next() {
             if ( changestamp != parent._changecount )
                 throw new ConcurrentModificationException("Concurrent Modification is not allowed!");
-            if ( cursor >= parent.size() )
+            if ( cursor >= parent._size )
                 throw new NoSuchElementException("Read after the end of iterator!");
             
-            Object[] ids;
+            Object[] id;
             Object o;
             if ( cursor < _added.size() ) {
-                ids = (Object[]) _added.elementAt( cursor++ );
-                return lazyLoad( ids );
+                id = (Object[]) _added.get( cursor++ );
+				o = _loaded.get( id );
+				if ( o != null )
+					return o;
+                return lazyLoad( id );
             } else {
-                ids = (Object[]) parent._ids.get(translate( cursor - _added.size() ) );
-                return lazyLoad( ids );
+				// skip to the first "not deleted" id
+				id = (Object[])_ids.get(cursor++);
+				while ( _deleted.contains(id) ) {
+				    id = (Object[])_ids.get(cursor++);
+				}
+				o = _loaded.get( id );
+				if ( o != null )
+					return o;
+                return lazyLoad( id );
             }
-        }
-        private int translate( int cur ) {
-            Object id;
-            int relatedCursor = cursor - _added.size();
-            int i = 0;
-            int idcur = 0;
-            while ( i <= relatedCursor ) {
-                id = parent._ids.get( idcur );
-                if ( !parent._deleted.contains( id ) )
-                    i++;
-                idcur++;
-            }
-            while ( parent._deleted.contains( parent._ids.get( idcur )) ) {
-                idcur++;
-            }
-            return idcur;
         }
         private Object lazyLoad( Object[] ids ) {
             Object o;
-            if ( _loaded.contains( ids ) )
-                return _loaded.get( ids );
-            else {
-                if ( ! _tx.isOpen() ) {
-                    return null;
-                } else {
-                    try {
-                        o = parent._tx.load( parent._engine, parent._molder, ids, AccessMode.ReadOnly );
-                        parent._loaded.put( ids, o );
-                        return o;
-                    } catch ( LockNotGrantedException e ) {
-                        throw new RuntimeException("Lock Not Granted for lazy loaded object\n"+e);
-                    } catch ( PersistenceException e ) {
-                        throw new RuntimeException("PersistenceException for lazy loaded object\n"+e);
-                    //} catch ( ObjectNotFoundException e ) {
-                      //  throw new RuntimeException("ObjectNotFound for lazy loaded object\n"+e);
-                    } finally {
-                        cursor--;
-                    }
-                }
-            }
+
+			if ( ! _tx.isOpen() ) 
+                throw new RuntimeException("Transaction is closed!");
+
+            try {
+                o = parent._tx.load( parent._engine, parent._molder, ids, AccessMode.ReadOnly );
+                parent._loaded.put( ids, o );
+                return o;
+            } catch ( LockNotGrantedException e ) {
+                throw new RuntimeException("Lock Not Granted for lazy loaded object\n"+e);
+            } catch ( PersistenceException e ) {
+                throw new RuntimeException("PersistenceException for lazy loaded object\n"+e);
+            } 
         }
+
         public void remove() {
-            if ( cursor == 0 )
-                throw new IllegalStateException("next() should be called before remove()");
+            if ( cursor <= 0 )
+                throw new IllegalStateException("Method next() must be called before remove!");
             if ( changestamp != parent._changecount )
                 throw new ConcurrentModificationException("Concurrent Modification is not allowed!");
 
             Object id;
-            int cur = cursor -1;
-            if ( cur < _added.size() ) {
-                id = parent._added.elementAt( cur );
-                parent.remove( id );
+            cursor--;
+            if ( cursor < _added.size() ) {
+                parent._added.remove( cursor );
+				parent._size--;
+				parent._changecount++;
+				changestamp = parent._changecount;
             } else {
-                id = parent._ids.get(translate( cursor-_added.size() ) );
-                parent.remove( id );
-            }
-        }
+				// backward to the first not deleted ids
+                id = _ids.get(cursor);
+				while ( _deleted.contains(id) ) {
+				    id = _ids.get(cursor--);
+				}
+	            if ( cursor < _added.size() ) {
+	                parent._added.remove( id );
+					parent._size--;
+					parent._changecount++;
+					changestamp = parent._changecount;
+				} else {
+					parent._deleted.add( id );
+					parent._size--;
+					parent._changecount++;
+					changestamp = parent._changecount;
+	            }
+	        }
+		}
     }
 
     public Iterator iterator() {
-        return new IteratorImp( this, _changecount ) ;
+        return new IteratorImp( this );
     }
 
     public boolean remove(Object o) {
@@ -254,15 +261,13 @@ public class RelationCollection implements Collection, Lazy {
 
         if ( _added.contains( id ) ) {
             _added.remove( id );
-            _loaded.remove( id );
             _changecount++;
+			_size--;
             return true;
-        }
-
-        if ( _ids.contains( o ) ) {
+        } else if ( _ids.contains( o ) ) {
             _deleted.add( id );
-            _loaded.remove( id );
             _changecount++;
+			_size--;
             return true;
         }
 
@@ -299,30 +304,61 @@ public class RelationCollection implements Collection, Lazy {
     }
 
     public int size() {
-        return _ids.size() - _deleted.size() + _added.size();
+        return _size;
     }
 
     public Object[] toArray() {
-        return null;
+        Object[] result = new Object[size()];
+		Iterator itor = iterator();
+
+		while ( itor.hasNext() ) {
+			result = (Object[])itor.next();
+		}
+		return result;
     }
 
     public Object[] toArray(Object[] a) {
-        return null;
+		if ( a == null )
+			throw new NullPointerException();
+
+        Object[] result;
+		int size = size();
+
+		if ( a.length < size )
+			result = a;
+		else 
+			result = (Object[])Array.newInstance( a.getClass().getComponentType(), size );
+		
+		Iterator itor = iterator();
+		int count = 0;
+		while ( itor.hasNext() ) {
+		    result[count++] = itor.next();
+		}
+
+		// patch the extra space with null
+		while ( count < result.length ) {
+			result[count++] = null;
+		}
+		return result;
     }
 
-    public Object[] getIdentity() {
-        return null;
+    public ArrayList getIdentitiesList() {
+		ArrayList result = new ArrayVector();
+        result.addAll(_ids);
+		result.addAll(_added);
+		result.removeAll(_deleted);
+		return result;
     }
 
-    public Object[] getIdentities() {
-        return null;
-    }
+	public Object find( Object[] ids ) {
+		return _loaded.get( ids );
+	}
 
-    public Vector getIdentitiesList() {
-        return null;
-    }
+	public ArrayList getDeleted() {
+		return (ArrayList)_deleted.clone();
+	}
 
-    public boolean isLoaded() {
-        return false;
-    }
+	public ArrayList getAdded() {
+		return (ArrayList)_added.clone();
+	}
 }
