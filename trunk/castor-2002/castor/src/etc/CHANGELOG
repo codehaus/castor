@@ -1,6 +1,11 @@
 Version 0.8.x  June xx, 2000
 ----------------------------
 
+XML:     Added suppor for the Unmarshaller to automatically determine the Class of the
+         root element, based on a given Mapping, or ClassDescriptorResolver
+
+XML:     Added support for the "has" method for primitives in the generated source
+
 XML:     Added support for specifying the destination output directory for the
          generated source code
 
