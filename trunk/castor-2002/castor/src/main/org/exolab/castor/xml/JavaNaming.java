@@ -56,29 +56,29 @@ import java.util.Hashtable;
  * @version $Revision$ $Date$
 **/
 public class JavaNaming {
-    
-    
+
+
     private static final Hashtable subst = keywordMap();
-    
-    private static final String[] keywords = { 
-        "abstract", 
-        "boolean",  
+
+    private static final String[] keywords = {
+        "abstract",
+        "boolean",
         "break",
         "byte",
-        "case",     
-        "catch",   
-        "char",   
-        "class", 
-        "const", 
+        "case",
+        "catch",
+        "char",
+        "class",
+        "const",
         "continue",
-        "default",  
-        "do",      
+        "default",
+        "do",
         "double",
-        "else",     
+        "else",
         "extends",
-        "false",    
-        "final",   
-        "finally", 
+        "false",
+        "final",
+        "finally",
         "float",
         "for",
         "goto",
@@ -112,14 +112,14 @@ public class JavaNaming {
         "volatile",
         "while"
     }; //-- keywords
-        
+
     /**
      * private constructor
     **/
     private JavaNaming() {
         super();
     } //-- JavaNaming
-    
+
     /**
      * Returns true if the given String is a Java keyword which
      * will cause a problem when used as a variable name
@@ -131,7 +131,7 @@ public class JavaNaming {
         }
         return false;
     } //-- isKeyword
-    
+
     /**
      * Returns true if the given String matches the
      * production of a valid Java identifier
@@ -141,42 +141,42 @@ public class JavaNaming {
      * production of a valid Java name, otherwise false
     **/
     public static boolean isValidJavaIdentifier(String string) {
-        
-        if ((string == null) || (string.length() == 0)) 
+
+        if ((string == null) || (string.length() == 0))
             return false;
-            
+
         for (int i = 0; i < string.length(); i++) {
             char ch = string.charAt(i);
-            
+
             //-- digit
             if (ch == '_') continue;
             if (ch == '$') continue;
-            
+
             if ((ch >= 'A') && (ch <= 'Z')) continue;
             if ((ch >= 'a') && (ch <= 'z')) continue;
             if ((ch >= '0') && (ch <= '9')) {
                 if (i == 0) return false;
                 continue;
             }
-            
+
             return false;
         }
         if (isKeyword(string)) return false;
         return true;
     } //-- isValidJavaIdentifier
-    
+
     public static String toJavaClassName(String name) {
-                
+
         if ((name == null) || (name.length() <= 0)) {
-           // handle error 
+           // handle error
            return name; //-- for now just return name
-        }        
+        }
 		// Remove namespace prefix (Andrew Fawcett, temporary until namespace changes go in)
         int colon = name.indexOf(':');
         if (colon != -1)
-            name = name.substring(colon + 1);		
+            name = name.substring(colon + 1);
         return toJavaName(name, true);
-        
+
     } //-- toJavaClassName
 
     public static String toJavaMemberName(String name) {
@@ -184,13 +184,13 @@ public class JavaNaming {
     } //-- toJavaMemberName
 
     public static String toJavaMemberName
-        (String name, boolean useKeywordSubstitutions) 
+        (String name, boolean useKeywordSubstitutions)
     {
-        
+
         if (name == null) return null;
-        
+
         String memberName = toJavaName(name, false);
-        
+
         if (isKeyword(memberName) && useKeywordSubstitutions) {
             String mappedName = (String) subst.get(memberName);
             if (mappedName != null) memberName = mappedName;
@@ -198,7 +198,7 @@ public class JavaNaming {
         }
         return memberName;
     } //-- toJavaMemberName
-    
+
     /**
      * Converts the given Package name to it's corresponding
      * Path. The path will be a relative path.
@@ -207,33 +207,34 @@ public class JavaNaming {
         if (packageName == null) return packageName;
         return packageName.replace('.',File.separatorChar);
     } //-- packageToPath
-    
+
     private static Hashtable keywordMap() {
         Hashtable ht = new Hashtable();
         ht.put("class", "type");
         return ht;
     } //-- keywordMap
-    
+
     /**
      * Converts the given xml name to a Java name.
      * @param name the name to convert to a Java Name
      * @param upperFirst a flag to indicate whether or not the
-     * the first character should be converted to uppercase. 
+     * the first character should be converted to uppercase.
     **/
     private static String toJavaName(String name, boolean upperFirst) {
-        
+
         int size = name.length();
         char[] ncChars = name.toCharArray();
         int next = 0;
-        
+
         boolean uppercase = upperFirst;
         boolean lowercase = (!uppercase);
-        
+
         for (int i = 0; i < size; i++) {
             char ch = ncChars[i];
-            
+
             switch(ch) {
-                case ' ':
+                case'.' :
+				case ' ':
                     ncChars[next++] = '_';
                     break;
                 case ':':
@@ -257,17 +258,17 @@ public class JavaNaming {
         }
         return new String(ncChars,0,next);
     } //-- toJavaName
-    
+
 
     /* for debuging *
     public static void main(String[] args) {
-        
+
         String[] names = new String[4];
         names[0] = "name";
         names[1] = "myName";
         names[2] = "my-name";
         names[3] = "my----name";
-        
+
         System.out.println("JavaXMLNaming Tests: ");
         System.out.println();
         for (int i = 0; i < names.length; i++) {
@@ -285,8 +286,8 @@ public class JavaNaming {
             System.out.print("\") ==> \"");
             System.out.print(toJavaMemberName(names[i]));
             System.out.println("\"");
-            
+
         }
     } //-- main /* */
-    
+
 } //-- JavaXMLNaming
