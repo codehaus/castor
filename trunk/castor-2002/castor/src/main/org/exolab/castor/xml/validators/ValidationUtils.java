@@ -225,6 +225,33 @@ public class ValidationUtils {
         }
         return false;
     } //-- isExtender
+    
+    /**
+     * Checks the characters of the given String to determine if they
+     * syntactically match the production of an QName as defined
+     * by the W3C XML Namespaces recommendation
+     * @param str the String to check
+     * @return true if the given String follows the Syntax of an QName
+    **/
+    public static boolean isQName(String str) {
+
+        if ((str == null) || (str.length() == 0)) return false;
+
+
+        char[] chars = str.toCharArray();
+
+        char ch = chars[0];
+
+        //-- make sure String starts with a letter or '_'
+        if ((!isLetter(ch)) && (ch != '_'))
+            return false;
+
+        for (int i = 1; i < chars.length; i++) {
+            if (chars[i] == ':') continue;
+            if (!isNCNameChar(chars[i])) return false;
+        }
+        return true;
+    } //-- isQName
 
     /**
      * Test
