@@ -201,7 +201,7 @@ public final class SQLEntityInfo
     }
 
     public boolean equals(Object obj) {
-        return info.equals(obj);
+        return (obj != null) && (obj instanceof SQLEntityInfo) && info.equals(((SQLEntityInfo) obj).info);
     }
 
     public int hashCode() {

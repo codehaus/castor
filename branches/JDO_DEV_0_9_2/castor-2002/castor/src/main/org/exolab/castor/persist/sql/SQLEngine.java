@@ -149,6 +149,18 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
     private SQLQueryExecutor    _sqlLoadLock;
 
 
+    /**
+     * Maps Relation.fieldInfo to SQLQueryExecutor
+     */
+    private HashMap             _sqlRelatedMap;
+
+
+    /**
+     * Maps Relation.fieldInfo to SQLQueryExecutor
+     */
+    private HashMap             _sqlRelatedLockMap;
+
+
     private SQLEntityInfo       _info;
 
 
@@ -297,7 +309,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
         if (_sqlCreate == null) {
             _sqlCreate = SQLQueryBuilder.getCreateExecutor(_factory, _connector, _log, _info);
         }
-        _sqlCreate.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+        _sqlCreate.execute(key, _lockEngine, (Connection) conn, entity, null, null);
     }
 
     private BitSet getDirtyCheckNulls(Entity original) {
@@ -375,7 +387,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
                 _sqlStoreDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
         }
-        executor.executeEntity(key, _lockEngine, (Connection) conn, entity, original);
+        executor.execute(key, _lockEngine, (Connection) conn, entity, original, null);
     }
 
 
@@ -416,7 +428,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
                 _sqlRemoveDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
         }
-        executor.executeEntity(key, _lockEngine, (Connection) conn, original, original);
+        executor.execute(key, _lockEngine, (Connection) conn, original, original, null);
     }
 
 
@@ -442,7 +454,7 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
         if (_sqlLock == null) {
             _sqlLock = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, true);
         }
-        _sqlLock.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+        _sqlLock.execute(key, _lockEngine, (Connection) conn, entity, null, null);
     }
 
 
@@ -469,14 +481,14 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
 
         if (accessMode == AccessMode.DbLocked) {
             if (_sqlLoadLock == null) {
-                _sqlLoadLock = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true);
+                _sqlLoadLock = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true, null);
             }
-            _sqlLoadLock.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+            _sqlLoadLock.execute(key, _lockEngine, (Connection) conn, entity, null, null);
         } else {
             if (_sqlLoad == null) {
-                _sqlLoad = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, false);
+                _sqlLoad = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, false, null);
             }
-            _sqlLoad.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+            _sqlLoad.execute(key, _lockEngine, (Connection) conn, entity, null, null);
         }
     }
 
@@ -495,6 +507,28 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
      */
     public void loadRelated( Key key, Object conn, Relation relation, AccessMode accessMode )
             throws PersistenceException {
+        SQLQueryExecutor executor;
+        SQLRelationInfo[] oneToManyPath;
+        HashMap map;
+
+        oneToManyPath = new SQLRelationInfo[] {SQLRelationInfo.getInstance(relation.fieldInfo)};
+        if (accessMode == AccessMode.DbLocked) {
+            if (_sqlRelatedLockMap == null) {
+                _sqlRelatedLockMap = new HashMap();
+            }
+            map = _sqlRelatedLockMap;
+        } else {
+            if (_sqlRelatedMap == null) {
+                _sqlRelatedMap = new HashMap();
+            }
+            map = _sqlRelatedMap;
+        }
+        executor = (SQLQueryExecutor) map.get(relation.fieldInfo);
+        if (executor == null) {
+            executor = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true, oneToManyPath);
+            map.put(relation.fieldInfo, executor);
+        }
+        executor.execute(key, _lockEngine, (Connection) conn, null, null, relation);
     }
 
 /* TODO: redesign
