@@ -193,7 +193,8 @@ public class DateDescriptor extends BaseDescriptor
                  if (temp.isUTC()) {
                     dateTarget.setUTC();
                     dateTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
-                }
+                    if (temp.isZoneNegative()) dateTarget.setZoneNegative(true);                
+                 }
             }
             catch (java.text.ParseException ex) {
                 String err = "DateDescriptor#setValue: wrong value\n"+ex.getMessage();
