@@ -54,12 +54,13 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.TimeStampable;
 
 
 /**
  * Test object mapping to test_persistent used for Persistent test.
  */
-public class TestPersistent implements Persistent
+public class TestPersistent implements Persistent, TimeStampable, java.io.Serializable
 {
 
 
@@ -93,7 +94,9 @@ public class TestPersistent implements Persistent
     private Vector         _origChildren;
 
 
-    private Database       _db;
+    private transient Database _db;
+
+    private long           _timeStamp;
 
 
     public TestPersistent()
@@ -245,21 +248,43 @@ public class TestPersistent implements Persistent
     public void jdoStore( boolean modified )
         throws Exception
     {
-        Object child;
+        TestPersistent child;
 
         if ( modified ) 
             _modificationTime = new Date();
 
         for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) {
-            child = enum.nextElement();
-            if ( ! _origChildren.contains(child) ) 
+            child = (TestPersistent) enum.nextElement();
+            if ( ! vectorContainsChild( _origChildren, child ) )
                 _db.create( child );
         }
         for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); ) {
-            child = enum.nextElement();
-            if ( ! _children.contains(child) ) 
+            child = (TestPersistent) enum.nextElement();
+            if ( ! vectorContainsChild( _children, child ) )
                 _db.remove( child );
         }
+    }
+
+    
+    public void jdoUpdate()
+        throws Exception
+    {
+        TestPersistent child;
+
+        for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); ) 
+            _db.update( enum.nextElement() );
+    }
+
+    
+    public static boolean vectorContainsChild(Vector v, TestPersistent child) {
+        TestPersistent ch;
+        
+        for ( Enumeration enum = v.elements(); enum.hasMoreElements(); ) {
+            ch = (TestPersistent) enum.nextElement();
+            if ( ch.getId() == child.getId() ) 
+                return true;
+        }
+        return false;
     }
 
 
@@ -280,16 +305,15 @@ public class TestPersistent implements Persistent
     }                   
          
     
-    public boolean equals( Object other )
+    public long jdoGetTimeStamp()
     {
-        if ( other == this )
-            return true;
-        if ( other != null && other instanceof TestPersistent ) {
-            if ( ( (TestPersistent) other )._id == _id &&
-                 ( (TestPersistent) other )._value.equals( _value ) )
-                return true;
-        }
-        return false;
+        return _timeStamp;
+    }
+
+
+    public void jdoSetTimeStamp( long timeStamp )
+    {
+        _timeStamp = timeStamp;
     }
 
 
