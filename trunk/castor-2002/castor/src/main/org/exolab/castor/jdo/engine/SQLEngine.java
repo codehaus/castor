@@ -591,12 +591,14 @@ public final class SQLEngine
             ++count;
         }
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
-            if ( jdoFields[ i ] != null ) {
+            if ( jdoFields[ i ] != null 
+		 // Don't try to insert many-many pseudo-fields
+		 && jdoFields[ i ].getManyTable() == null ) {
                 if ( count > 0 ) {
                     sql.append( ',' );
                 }
-                sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) );
-                ++count;
+		sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) );
+		++count;
             }
         }
         sql.append( ") VALUES (" );
@@ -638,7 +640,9 @@ public final class SQLEngine
         sql.append( _factory.quoteName( clsDesc.getTableName() ) ).append( " SET " );
         count = 0;
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
-            if ( jdoFields[ i ] != null ) {
+            if ( jdoFields[ i ] != null
+		 // Don't try to update many-many pseudo-fields
+		 && jdoFields[ i ].getManyTable() == null ) {
                 if ( count > 0 )
                     sql.append( ',' );
                 sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
@@ -649,7 +653,9 @@ public final class SQLEngine
         _sqlStore = sql.toString();
 
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
-            if ( jdoFields[ i ] != null ) {
+            if ( jdoFields[ i ] != null
+		 // Don't try to update many-many pseudo-fields
+		 && jdoFields[ i ].getManyTable() == null ) {
                 if ( jdoFields[ i ].isDirtyCheck() )
                     sql.append( " AND " ).append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
             }
