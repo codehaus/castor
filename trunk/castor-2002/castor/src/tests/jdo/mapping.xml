@@ -262,10 +262,10 @@
       <sql name="id" />
     </field>
     <field name="creationTime" type="java.util.Date" required="true">
-      <sql name="ctime" type="date" />
+      <sql name="ctime" type="timestamp" />
     </field>
     <field name="modificationTime" type="java.util.Date" required="false">
-      <sql name="mtime" type="date" dirty="ignore" />
+      <sql name="mtime" type="timestamp" dirty="ignore" />
     </field>
     <field name="value" type="string"  required="true">
       <sql name="value" type="varchar" />

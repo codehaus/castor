@@ -138,7 +138,7 @@ public class PersistenceFactoryRegistry
             while ( tokenizer.hasMoreTokens() ) {
                 prop = tokenizer.nextToken();
                 try {
-                    cls = PersistenceFactoryRegistry.class.getClassLoader().loadClass( prop );
+                    cls = Class.forName( prop );
                     factory = (PersistenceFactory) cls.newInstance();
                     _factories.put( factory.getFactoryName(), factory );
                 } catch ( Exception except ) {

@@ -145,7 +145,7 @@ public class Category
         CWTestCase     tc;
 
         try {
-            catClass = getClass().getClassLoader().loadClass( _className );
+            catClass = getClass().forName( _className );
             cnst = catClass.getConstructor( new Class[] { String.class, String.class, Object.class } );
             category = (CWTestCategory) cnst.newInstance( new Object[] { _name, _description, _object } );
             for ( int i = 0 ; i < _cases.size() ; ++i ) {

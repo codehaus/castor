@@ -138,7 +138,7 @@ public final class KeyGeneratorFactoryRegistry
             while ( tokenizer.hasMoreTokens() ) {
                 prop = tokenizer.nextToken();
                 try {
-                    cls = KeyGeneratorFactoryRegistry.class.getClassLoader().loadClass( prop );
+                    cls = Class.forName( prop );
                     factory = (KeyGeneratorFactory) cls.newInstance();
                     _factories.put( factory.getName(), factory );
                 } catch ( Exception except ) {

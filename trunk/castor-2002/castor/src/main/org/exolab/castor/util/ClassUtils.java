@@ -44,54 +44,37 @@
  */
 
 
-package harness;
+package org.exolab.castor.util;
 
 
-import java.util.Vector;
-import java.util.Enumeration;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWBaseApplication;
-import org.exolab.exceptions.CWClassConstructorException;
-
-
-public class Case
+/**
+ * The goal of this class is to hide differences between JDK 1.1 and JDK 1.2
+ * concerning class loading.
+ *
+ * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @version $Revision$ $Date$
+ */
+public final class ClassUtils
 {
+    
+    /**
+     * JDK version
+     */
+    private static final String JDK = System.getProperties().getProperty("java.version");
 
-
-    private String  _className;
-
-
-    public void setClassName( String className )
+    /**
+     * Hides Thread.currentThread().getContextClassLoader().loadClass()
+     * Intended for application classes (as opposed to Castor classes).
+     */
+    public static Class loadAppClass( String name ) 
+            throws ClassNotFoundException
     {
-        _className = className;
-    }
-
-
-    public String getClassName()
-    {
-        return _className;
-    }
-
-
-    public CWTestCase createTestCase( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        Class       catClass;
-        Constructor cnst;
-
-        try {
-            catClass = getClass().forName( _className );
-            cnst = catClass.getConstructor( new Class[] { CWTestCategory.class } );
-            return (CWTestCase) cnst.newInstance( new Object[] { category } );
-        } catch ( InvocationTargetException except ) {
-            throw new CWClassConstructorException( (Exception) except.getTargetException() );
-        } catch ( Exception except ) {
-            throw new CWClassConstructorException( except );
+        if ( JDK.startsWith( "1.1" ) ) {
+            return Class.forName( name );
+        } else {
+            return Thread.currentThread().getContextClassLoader().loadClass( name );
         }
     }
 
-
 }
+

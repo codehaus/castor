@@ -363,7 +363,8 @@ public class OQLQueryImpl
         _spCall = sql.toString();
         _projectionType = ParseTreeWalker.PARENT_OBJECT;
         _bindTypes = new Class[ paramCnt ];
-        java.util.Arrays.fill( _bindTypes, Object.class );
+        for ( int i = 0; i < paramCnt; i++ ) 
+            _bindTypes[ i ] = Object.class;
 
         objType = oql.substring( as + 4 ).trim();
         if ( objType.length() == 0 ) {

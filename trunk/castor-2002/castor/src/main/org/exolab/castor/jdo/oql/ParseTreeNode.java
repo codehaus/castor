@@ -152,7 +152,7 @@ public class ParseTreeNode implements TokenTypes {
    * @return the index child of this node.
    */
   public ParseTreeNode getChild(int index) {
-    return (ParseTreeNode) _children.get(index);
+    return (ParseTreeNode) _children.elementAt(index);
   }
 
   /**

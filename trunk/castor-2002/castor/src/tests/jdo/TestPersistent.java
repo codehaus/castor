@@ -237,7 +237,7 @@ public class TestPersistent implements Persistent
         qry.bind( _id );
         res = qry.execute();
         while ( res.hasMore() )
-            _children.add( res.next() );
+            _children.addElement( res.next() );
         _origChildren = (Vector) _children.clone();
     }
 
