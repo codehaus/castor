@@ -97,12 +97,12 @@ public class Schema extends Annotated {
 	 * A list of  XML Schema files included in this schema
 	 */
 	private Vector includedSchemas = null;
-	
+
 	/**
 	 * A list of namespaces declared in this schema
 	 */
 	private Hashtable namespaces = null;
-	
+
     private static SimpleTypesFactory simpleTypesFactory= new SimpleTypesFactory();
 
     /**
@@ -138,7 +138,7 @@ public class Schema extends Annotated {
      * @exception SchemaException if the Schema already exists
 	 */
 	public synchronized void addSchema(Schema schema)
-        throws SchemaException		
+        throws SchemaException
 	{
 		String targetNamespace = schema.getTargetNamespace();
 		if (importedSchemas.get(targetNamespace)!=null)
@@ -162,7 +162,7 @@ public class Schema extends Annotated {
 				return true;
 		return false;
 	}
-	
+
     /**
      * Adds the given Complextype definition to this Schema defintion
      * @param complextype the Complextype to add to this Schema
@@ -294,14 +294,14 @@ public class Schema extends Annotated {
      *  null if no ComplexType with the given name was found.
     **/
     public ComplexType getComplexType(String name) {
-		
-		//-- Null?	
+
+		//-- Null?
         if (name == null)  {
             String err = NULL_ARGUMENT + "getComplexType: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-		
+
         //-- Namespace prefix?
         String canonicalName = name;
 		String nsprefix = "";
@@ -318,18 +318,18 @@ public class Schema extends Annotated {
 			    throw new IllegalArgumentException(err);
 			}
 		}
-		
+
 		//-- Get GetComplexType object
-		if (ns.equals(targetNS))
+		if ((ns==null) || (ns.equals(targetNS)) )
 			return (ComplexType)complexTypes.get(canonicalName);
 		else {
 			Schema schema = getImportedSchema(ns);
 			if (schema!=null)
 				return schema.getComplexType(canonicalName);
 		}
-		
-		return null;	
-		
+
+		return null;
+
     } //-- getComplexType
 
     /**
@@ -347,7 +347,7 @@ public class Schema extends Annotated {
     public String getBuiltInTypeName(int builtInTypeCode) {
         return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
     }
-	
+
     /**
      * Returns the SimpleType associated with the given name,
      * or null if no such SimpleType exists.
@@ -355,14 +355,14 @@ public class Schema extends Annotated {
      * or null if no such SimpleType exists.
     **/
     public SimpleType getSimpleType(String name) {
-		
-		//-- Null?	
+
+		//-- Null?
         if (name == null)  {
             String err = NULL_ARGUMENT + "getSimpleType: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-		
+
         //-- Namespace prefix?
         String canonicalName = name;
 		String nsPrefix = "";
@@ -378,7 +378,7 @@ public class Schema extends Annotated {
 			    throw new IllegalArgumentException(err);
 			}
 		}
-		
+
 		//-- Get SimpleType object
 		SimpleType result = null;
 		if (ns == null) {
@@ -386,10 +386,10 @@ public class Schema extends Annotated {
 			result= simpleTypesFactory.getBuiltInType(name);
 			//-- otherwise check user-defined types
 			if (result == null)
-			    result = (SimpleType)simpleTypes.get(name);			    
+			    result = (SimpleType)simpleTypes.get(name);
 		}
 		else if (ns.equals(schemaNS))
-			result= simpleTypesFactory.getBuiltInType(canonicalName);			
+			result= simpleTypesFactory.getBuiltInType(canonicalName);
 		else if (ns.equals(targetNS))
 			result = (SimpleType)simpleTypes.get(canonicalName);
 		else {
@@ -438,15 +438,15 @@ public class Schema extends Annotated {
 	{
 		return (Schema) importedSchemas.get(ns);
 	} //-- getImportedSchema
-	
+
 	/**
 	 * Indicates that the given XML Schema file has been processed via an <xsd:include>
 	 */
 	public void addInclude(String include)
 	{
-		includedSchemas.addElement(include);		
+		includedSchemas.addElement(include);
 	} //-- addInclude
-	
+
 	/**
 	 * Returns True if the given XML Schema has already been included via <xsd:include>
 	 * @return True if the file specified has already been processed
@@ -455,7 +455,7 @@ public class Schema extends Annotated {
 	{
 		return includedSchemas.contains(includeFile);
 	} //-- includeProcessed
-	
+
     /**
      * Returns the namespace of the XML Schema
      * <BR />
@@ -557,8 +557,8 @@ public class Schema extends Annotated {
 	public void addNamespace(String prefix, String ns) {
 		namespaces.put(prefix, ns);
 	} //-- setNamespaces
-	
-	
+
+
     /** Gets the type factory, package private */
     static SimpleTypesFactory getTypeFactory() { return simpleTypesFactory; }
 
