@@ -314,8 +314,8 @@ public class MappingHelper
 	fieldDescs = new JDOFieldDesc[ fieldMaps.length ];
 	for ( i = 0 ; i < fieldMaps.length ; ++i ) {
 	    fieldDescs[ i ] = createFieldDesc( fieldMaps[ i ].getName(), fieldMaps[ i ].getType(),
-					 fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getAccessor(),
-					 loader, objType );
+					       fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getAccessor(),
+					       loader, objType );
 	    fieldDescs[ i ] = new JDOContainedFieldDesc( fieldDescs[ i ], parentDesc, null );
 	}
 	return fieldDescs;

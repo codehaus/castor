@@ -151,6 +151,8 @@ public class DatabaseSource
 	    if ( logWriter != null )
 		unm.setLogWriter( logWriter );
 	    loadMapping( (Databases) unm.unmarshal( source ) );
+	} catch ( MappingException except ) {
+	    throw except;
 	} catch ( Exception except ) {
 	    throw new MappingException( "Nested error: " + except.getMessage() );
 	}
