@@ -238,6 +238,18 @@ public class Group extends Particle
     } //-- addGroup
 
     /**
+     * Adds the given ModelGroup Definition to this ContentModelGroup
+     * @param group the ModelGroup to add
+     * @exception SchemaException when a group with the same name as the
+     * specified group already exists in the current scope
+    **/
+    public void addGroup(ModelGroup group)
+        throws SchemaException
+    {
+        _contentModel.addGroup(group);
+    } //-- addGroup
+
+    /**
      * Returns an enumeration of all the Particles of this
      * ContentModelGroup
      *

@@ -127,9 +127,38 @@ class ContentModelGroupImpl implements ContentModelGroup {
     } //-- addGroup
 
     /**
+     * Adds the given ModelGroup Definition to this ContentModelGroup
+     * @param group the ModelGroup to add
+     * @exception SchemaException when a modelgroup with the same name as the
+     * specified group already exists in the current scope
+    **/
+    public void addGroup(ModelGroup group)
+        throws SchemaException
+    {
+        if (group == null) return;
+
+        String name = group.getName();
+        if (name != null) {
+            String key = "group:"+name;
+            //-- check for naming collisions
+            if (_resolver.resolve(key) != null) {
+                String err = "An element declaration with the given name, ";
+                err += name + ", already exists in this scope.";
+                throw new SchemaException(err);
+            }
+
+            _resolver.addResolvable(key, group);
+        }
+
+        //-- add to content model
+        _contentModel.addElement(group);
+    } //-- addGroup
+
+
+    /**
      * Returns an enumeration of all the Particles contained
      * within this ContentModelGroup
-     * 
+     *
      * @return an enumeration of all the Particels contained
      * within this ContentModelGroup
     **/
@@ -145,7 +174,7 @@ class ContentModelGroupImpl implements ContentModelGroup {
     public Particle getParticle(int index) {
         return (Particle) _contentModel.elementAt(index);
     } //-- getParticle
-    
+
     /**
      * Returns the number of particles contained within
      * this ContentModelGroup

@@ -154,7 +154,7 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
         }
 
 		//-- @block
-        _complexType.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));		
+        _complexType.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));
 
     } //-- ComplexTypeUnmarshaller
 
@@ -285,8 +285,31 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 			unmarshaller
                 = new ComplexContentUnmarshaller(_complexType, atts, getResolver());
         }
-        //-- ModelGroup declarations (choice, all, sequence, group)
-        else if (SchemaNames.isGroupName(name)) {
+         //--<group>
+        else if ( name.equals(SchemaNames.GROUP) )
+        {
+            if (foundAttributes)
+                error("'" + name + "' must appear before any attribute "+
+                    "definitions when a child of 'complexType'.");
+            if (foundComplexContent)
+                error("'"+name+"' and 'complexContent' cannot both "+
+                    "appear as children of 'complexType'.");
+            if (foundSimpleContent)
+                error("'"+name+"' and 'simpleContent' cannot both "+
+                    "appear as children of 'complexType'.");
+            if (foundModelGroup)
+                error("'"+name+"' cannot appear as a child of 'complexType' "+
+                    "if another 'all', 'sequence', 'choice' or "+
+                    "'group' also exists.");
+
+            foundModelGroup = true;
+            allowAnnotation = false;
+            unmarshaller
+                = new ModelGroupUnmarshaller(_schema, atts, getResolver());
+        }
+        //-- ModelGroup declarations (choice, all, sequence)
+        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
+        {
 
             if (foundAttributes)
                 error("'" + name + "' must appear before any attribute "+
@@ -341,7 +364,6 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             --depth;
             return;
         }
-
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
@@ -365,8 +387,15 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
                 ((ElementUnmarshaller)unmarshaller).getElement();
             _complexType.addElementDecl(element);
         }
-        //-- group declarations (all, choice, group, sequence)
-        else if (SchemaNames.isGroupName(name)) {
+        //--group
+        else if (name.equals(SchemaNames.GROUP)) {
+            ModelGroup group = ((ModelGroupUnmarshaller)unmarshaller).getGroup();
+            _complexType.addGroup(group);
+        }
+
+        //-- group declarations (all, choice, sequence)
+        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
+        {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _complexType.addGroup(group);
         }

@@ -979,7 +979,6 @@ public class SourceFactory  {
                 }
                 //-- handle groups
                 case Structure.GROUP:
-
                     Group group = (Group) struct;
                     //-- if not nested, set compositor
                     if (contentModel instanceof ComplexType) {
@@ -993,6 +992,36 @@ public class SourceFactory  {
                     }
                     processContentModel(group, state);
                     break;
+                //--In case of a ModelGroup:
+                //-- 1- it contains another group (all, choice, sequence)
+                //-- 2- it is a reference to another group
+                //-- No validation on cross referencing since this validation
+                //-- will be done in the upcoming SOM
+                case Structure.MODELGROUP:
+                     ModelGroup modelgroup = (ModelGroup) struct;
+                     //--if it is a reference we resolve it
+                     if (modelgroup.hasReference()) {
+                        ModelGroup tmp = modelgroup.getReference();
+                        if (tmp == null) {
+                             String err = "Unable to find group referenced :\" ";
+                             err += modelgroup.getName();
+                             err +="\"";
+                            throw new IllegalStateException(err);
+                        }
+                        //get the contentModel and proccess it
+                        if (tmp.getContentModelGroup() != null)
+                           processContentModel(tmp.getContentModelGroup(), state);
+                        else {
+                             String err = "<group> should contains :\" ";
+                             err += " 'all' or 'sequence' or 'choice'";
+                             err +="\"";
+                             throw new IllegalStateException(err);
+                        }
+                     }
+
+                     //--if not we proceed the nested (all, choice, sequence)
+                     break;
+
                 default:
                     break;
             }

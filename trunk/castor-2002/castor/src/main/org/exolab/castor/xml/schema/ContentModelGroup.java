@@ -77,9 +77,18 @@ public interface ContentModelGroup {
         throws SchemaException;
 
     /**
+     * Adds the given ModelGroup Definition to this ContentModelGroup
+     * @param group the ModelGroup to add
+     * @exception SchemaException when a group with the same name as the
+     * specified group already exists in the current scope
+    **/
+    public void addGroup(ModelGroup group)
+        throws SchemaException;
+
+    /**
      * Returns an enumeration of all the Particles contained
      * within this ContentModelGroup
-     * 
+     *
      * @return an enumeration of all the Particels contained
      * within this ContentModelGroup
     **/
@@ -99,5 +108,5 @@ public interface ContentModelGroup {
      * @returns the CMParticle at the specified index
     **/
     public Particle getParticle(int index);
-    
+
 } //-- ContentModelGroup
