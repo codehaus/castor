@@ -153,6 +153,7 @@ public class MemberFactory {
                 
         SimpleType simpleType = attribute.getSimpleType();
         XSType   xsType = null;
+        ClassInfo cInfo = null;
         
         boolean enumeration = false;
         
@@ -162,7 +163,6 @@ public class MemberFactory {
                 enumeration = true;
             
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
-                ClassInfo cInfo = null;
                 if (resolver != null) {
                     cInfo = resolver.resolve(simpleType);
                 }
@@ -197,9 +197,9 @@ public class MemberFactory {
         fieldInfo.setNodeType(XMLInfo.ATTRIBUTE_TYPE);
         fieldInfo.setRequired(attribute.getRequired());
         
-        if (xsType.getType() == XSType.STRING) {
-            String def = attribute.getDefaultValue();
-            if ((def != null) && (def.length() > 0)) {
+        String def = attribute.getDefaultValue();
+        if (def != null && def.length() > 0) {
+            if (xsType.getType() == XSType.STRING) {
                 char ch = def.charAt(0);
                 switch (ch) {
                     case '\'':
@@ -211,8 +211,15 @@ public class MemberFactory {
                         break;
                 }
             }
+            else if (enumeration) {
+                JClass jClass = cInfo.getJClass();
+                String val = jClass.getName() + "." + def.toUpperCase();
+                fieldInfo.setDefaultValue(val);
+            }
+            else {
+                fieldInfo.setDefaultValue(def);
+            }
         }
-        else fieldInfo.setDefaultValue(attribute.getDefaultValue());
         
         if (attribute.hasFixedValue()) {
             fieldInfo.setFixedValue(attribute.getFixedValue());
