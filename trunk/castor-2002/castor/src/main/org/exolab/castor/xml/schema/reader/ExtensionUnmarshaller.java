@@ -77,13 +77,12 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
     **/
     private ComplexType _complexType = null;
     private Schema      _schema      = null;
-    
+
     private boolean foundAnnotation  = false;
     private boolean foundAttributes  = false;
     private boolean foundModelGroup  = false;
 
-    private boolean allowComplexContent = false;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -99,23 +98,31 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
         throws SAXException
     {
         super();
-        
+
         setResolver(resolver);
 
         _complexType = complexType;
         _schema      = complexType.getSchema();
-        
+
         _complexType.setDerivationMethod(SchemaNames.EXTENSION);
-        
+
         //-- base
         String base = atts.getValue(SchemaNames.BASE_ATTR);
         if ((base != null) && (base.length() > 0)) {
 
             XMLType baseType= _schema.getType(base);
-            if (baseType == null)
+		    if (baseType == null)
                 _complexType.setBase(base); //the base type has not been read
-            else
+		    else {
+				 //--we cannot extend a simpleType in <complexContent>
+				 if ( (baseType.isSimpleType()) &&
+					  (_complexType.isComplexContent()) ) {
+					String err = "In a 'complexContent', the base attribute "+
+                    "must be a complexType but "+ base+" is a simpleType.\n";
+                    error(err);
+				 }
                 _complexType.setBaseType(baseType);
+		    }
 
         }
 
@@ -143,10 +150,6 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
         return null;
     } //-- getObject
 
-    public void setAllowComplexContent(boolean allowComplexContent) {
-        this.allowComplexContent = allowComplexContent;
-    } //-- setAllowComplexContent
-    
     /**
      * @param name
      * @param atts
@@ -161,8 +164,8 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
-        
+
+
         //-- attribute declarations
         if (SchemaNames.ATTRIBUTE.equals(name)) {
             foundAttributes = true;
@@ -171,16 +174,16 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
         }
         //-- attribute group declarations
         else if (SchemaNames.ATTRIBUTE_GROUP.equals(name)) {
-            
+
             //-- make sure we have an attribute group
             //-- reference and not a definition
-            
+
             if (atts.getValue(SchemaNames.REF_ATTR) == null) {
                 String err = "A complexType may contain referring "+
                     "attribute groups, but not defining ones.";
                 error(err);
             }
-            
+
             foundAttributes = true;
             unmarshaller
                 = new AttributeGroupUnmarshaller(_schema, atts);
@@ -189,19 +192,19 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
             if (foundAttributes)
                 error("'"+name+"' must appear before attribute "+
                     "definitions in an 'extension' element.");
-                
+
             if (foundModelGroup)
                 error("'"+name+"' cannot appear as a child of 'extension' "+
                     "if another 'all', 'sequence', 'choice' or "+
                     "'group' already exists.");
-                    
-            if (!allowComplexContent)
+
+            if (_complexType.isSimpleContent())
                 error("'"+name+"' may not appear in a 'extension' of "+
                     "'simpleContent'.");
-                    
+
             foundModelGroup = true;
-            unmarshaller 
-                = new GroupUnmarshaller(_schema, name, atts, getResolver());            
+            unmarshaller
+                = new GroupUnmarshaller(_schema, name, atts, getResolver());
         }
         //-- element declarations
         else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
@@ -212,11 +215,11 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
             if (foundAttributes || foundModelGroup)
                 error("An annotation must appear as the first child of an " +
                     "'extension' element.");
-                    
+
             if (foundAnnotation)
                 error("Only one (1) annotation may appear as the child of "+
                     "an 'extension' element.");
-            
+
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }

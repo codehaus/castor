@@ -76,8 +76,7 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
      * The Attribute reference for the Attribute we are constructing
     **/
     private ComplexType _complexType = null;
-
-    private boolean allowAnnotation     = true;
+	private boolean allowAnnotation     = true;
     private boolean foundAnnotation     = false;
     private boolean foundAttributes     = false;
     private boolean foundSimpleContent  = false;
@@ -126,33 +125,6 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 			   _complexType.setContentType(ContentType.valueOf("elementOnly"));
 		}
 
-        //-- base and derivedBy
-        String base = atts.getValue(SchemaNames.BASE_ATTR);
-        if ((base != null) && (base.length() > 0)) {
-
-            String derivedBy = atts.getValue("derivedBy");
-            _complexType.setDerivationMethod(derivedBy);
-            if ((derivedBy == null) ||
-                (derivedBy.length() == 0) ||
-                (derivedBy.equals("extension")))
-            {
-                XMLType baseType= schema.getType(base);
-                if (baseType == null)
-                    _complexType.setBase(base); //the base type has not been read
-                else
-                    _complexType.setBaseType(baseType);
-            }
-            else if (derivedBy.equals("restrictions")) {
-                String err = "restrictions not yet supported for <type>.";
-                throw new SAXException(err);
-            }
-            else {
-                String err = "invalid value for derivedBy attribute of ";
-                err += "<type>: " + derivedBy;
-                throw new SAXException(err);
-            }
-
-        }
 
     } //-- ComplexTypeUnmarshaller
 
@@ -255,7 +227,7 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 
             foundSimpleContent = true;
             allowAnnotation = false;
-
+			_complexType.setSimpleContent(true);
             unmarshaller
                 = new SimpleContentUnmarshaller(_complexType, atts, getResolver());
         }
@@ -279,7 +251,8 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             foundComplexContent = true;
             allowAnnotation = false;
 
-            unmarshaller
+            _complexType.setComplexContent(true);
+			unmarshaller
                 = new ComplexContentUnmarshaller(_complexType, atts, getResolver());
         }
         //-- ModelGroup declarations (choice, all, sequence, group)
