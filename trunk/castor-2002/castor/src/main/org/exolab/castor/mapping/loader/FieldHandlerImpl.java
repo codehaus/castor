@@ -68,7 +68,7 @@ import org.exolab.castor.util.Messages;
  * obtained from {@link TypeInfo#getCollectionType} and the object to create
  * (with {@link #newInstance}) is the former field type.
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public final class FieldHandlerImpl

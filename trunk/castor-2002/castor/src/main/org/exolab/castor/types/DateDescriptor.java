@@ -55,7 +55,7 @@ import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
 /**
  * The Time Descriptor
- * @author <a href="kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see TimeDurationDescriptor
  */

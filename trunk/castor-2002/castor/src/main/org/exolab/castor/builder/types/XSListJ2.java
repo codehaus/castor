@@ -7,7 +7,7 @@ import org.exolab.javasource.*;
 
 /**
  * A list type for Java 2 collection that adapts the Castor preset list type.
- * @author <a href="mailto:arkin@exoffice.com">Assaf Arkin</a>
+ * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
 **/
 public class XSListJ2 extends XSList {

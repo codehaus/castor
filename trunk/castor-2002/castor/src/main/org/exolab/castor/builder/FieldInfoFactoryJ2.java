@@ -9,7 +9,7 @@ import org.exolab.castor.builder.types.*;
  * This class is used as a factory to create all the FieldInfo objects used by the 
  * source generator. You may override the FieldInfo classes and this factory for 
  * specific adaptions.
- * @author <a href="mailto:arkin@exoffice.com">Assaf Arkin</a>
+ * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
 **/
 public class FieldInfoFactoryJ2 extends FieldInfoFactory {
