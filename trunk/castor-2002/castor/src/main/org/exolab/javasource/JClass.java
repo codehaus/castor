@@ -446,7 +446,7 @@ public class JClass extends JType {
         if (className == null) return result;
         if (className.length() == 0) return result;
 
-        result = imports.remove(className);
+        result = imports.removeElement(className);
         return result;
     } //-- removeImport
 
