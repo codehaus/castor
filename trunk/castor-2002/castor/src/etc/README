@@ -22,10 +22,10 @@ Castor JDO  -- Java object to SQL relational database
 
 Castor DSML -- LDAP directory exchange through XML
 
-Future releases will include the following modules:
-
 Castor DAX  -- Java directory access (JNDI/LDAP)
 
+
+More information is available at http://castor.exolab.org
 
 
 

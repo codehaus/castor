@@ -32,14 +32,13 @@
     </section>
 
     <section title="News">
-      <p>
+      <p>Version 0.7.12 now <a href="download.xml">available for download</a>.
       <ul>
+        <li>Mar 15, 2000: Version 0.7.12, dirty checking, pluggable DB engine</li>
         <li>Mar 10, 2000: Version 0.7.11, supports one-many relations, XML-Servlet</li>
         <li>Mar 3, 2000: Version 0.7.10, addresses performance of the cache engine</li>
         <li>Feb 25, 2000: Version 0.7.9, new mapping file, one-one relation handling</li>
         <li>Feb 4, 2000: Version 0.7.7</li>
-        <li>Feb 2, 2000: Version 0.7.6, first DAX release</li>
-        <li>Jan 24, 2000: Version 0.7.5, full persistence engine</li>
         <li>Jan 7, 2000: Version 0.7, first to include JDO</li>
         <li>Dec 21, 1999: Version 0.6</li>
       </ul>

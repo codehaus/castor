@@ -1,5 +1,13 @@
-Version 0.7.12  March 12, 2000
+Version 0.7.12  March 15, 2000
 ------------------------------
+
+JDO:     Placed the ODMG API in the org.exolab.castor.jdo package,
+         to be included in the JavaDocs and to enable the introduction
+         of Castor (RDBMS) specific features.
+
+JDO:     Added preliminary support for many-many relations, improved
+         support for one-many relations, fixed bug in isModified with
+         relations.
 
 JDO:     Added support for pluggable SQL engines (PersistenceFactory),
          listed in the Castor properties file and referenced from the
@@ -17,12 +25,19 @@ JDO:     Implemented dirty checking on objects loaded with a shared lock.
 	 Dirty checking performed on fields within UPDATE statement requiring
 	 a single SQL operation to update/check dirtyness.
 
-JDO SPI: Added QueryExpression and KeyGenerator to the SPI. QueryExpression
+SPI:     Added QueryExpression and KeyGenerator to the SPI. QueryExpression
          is generated from PersistenceFactory. Added way to load factories
          from the Castor properties file.
 
-JDO:     No longer supports identity changes. Added supported for pluggable
-         key generators on a per table basis.
+Persist: No longer supports identity changes.
+
+Misc:    Documentation distribution includes API JavaDocs and JavaDocs for
+         all Java classes. Tarball/zip include just the API JavaDocs.
+         Web site has been revised accordingly and some links moved around.
+
+Misc:    Updated build.xml file now includes documentation in tarball and
+         zip, builds both API JavaDocs and all classes JavaDocs, and does
+         not include package.html files in JARs.
 
 
 Version 0.7.11  March 10, 2000

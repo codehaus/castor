@@ -47,8 +47,8 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.odmg.ODMGRuntimeException;
-import org.odmg.ClassNotPersistenceCapableException;
+import org.exolab.castor.jdo.ODMGRuntimeException;
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.persist.ClassHandler;
 
 

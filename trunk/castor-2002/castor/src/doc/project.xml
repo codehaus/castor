@@ -25,25 +25,24 @@
 
   <menu>
     <item name="Index" href="index.xml"/>
-    <item name="JavaDoc" href="javadoc/overview-summary.html"/>
-  </menu>
-  <menu name="Mapping">
-    <item name="JDO Configuration" href="database-conf.xml"/>
-    <item name="Types" href="types.xml"/>
-    <item name="Source generator" href="sourcegen.xml"/>
+    <item name="API" href="api/overview-summary.html"/>
+    <item name="DTDs" href="schema.xml"/>
   </menu>
   <menu name="Using">
+    <item name="JDO Config" href="database-conf.xml"/>
+    <item name="Types" href="types.xml"/>
+    <item name="Source generator" href="sourcegen.xml"/>
     <item name="Running The Examples" href="examples.xml"/>
+  </menu>
+  <menu name="Advanced">
+    <item name="Configuration, Libs, Building" href="conf-lib.xml"/>
     <item name="Transactions &amp; Locks" href="locking.xml"/>
+    <item name="Design: Persistence" href="design-persist.xml"/>
   </menu>
   <menu name="Misc">
-    <item name="DTD and Schema" href="schema.xml"/>
-    <item name="Configuration, JARs, Building" href="conf-lib.xml"/>
+    <item name="JavaDoc" href="javadoc/overview-summary.html"/>
     <item name="Status, Todo" href="status.xml"/>
     <item name="Changelog" href="changelog.xml"/>
-  </menu>
-  <menu name="Design">
-    <item name="Persistence" href="design-persist.xml"/>
   </menu>
 
   <notice>

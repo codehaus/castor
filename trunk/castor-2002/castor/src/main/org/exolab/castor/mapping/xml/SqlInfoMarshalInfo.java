@@ -65,7 +65,7 @@ public class SqlInfoMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         rules = new ValidationRule[6];
         //-- initialize attributes
         
-        attributes = new MarshalDescriptor[5];
+        attributes = new MarshalDescriptor[6];
         //-- vAccess
         desc = new SimpleMarshalDescriptor(java.lang.String.class, "vAccess", "access");
         desc.setDescriptorType(DescriptorType.attribute);
@@ -83,19 +83,36 @@ public class SqlInfoMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         bvr.setMaxOccurs(1);
         bvr.setTypeValidator(new StringValidator());
         rules[0] = bvr;
-        //-- vForKey
-        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vForKey", "for-key");
+        //-- vManyTable
+        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vManyTable", "many-table");
         desc.setDescriptorType(DescriptorType.attribute);
         try {
-            desc.setReadMethod(SqlInfo.class.getMethod("getForKey", emptyClassArgs));
+            desc.setReadMethod(SqlInfo.class.getMethod("getManyTable", emptyClassArgs));
             classArgs[0] = java.lang.String.class;
-            desc.setWriteMethod(SqlInfo.class.getMethod("setForKey", classArgs));
+            desc.setWriteMethod(SqlInfo.class.getMethod("setManyTable", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
         attributes[1] = desc;
         
-        bvr = new BasicValidationRule("for-key");
+        bvr = new BasicValidationRule("many-table");
+        bvr.setAsAttributeRule();
+        bvr.setMaxOccurs(1);
+        bvr.setTypeValidator(new NameValidator(NameValidator.NMTOKEN));
+        rules[1] = bvr;
+        //-- vManyKey
+        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vManyKey", "many-key");
+        desc.setDescriptorType(DescriptorType.attribute);
+        try {
+            desc.setReadMethod(SqlInfo.class.getMethod("getManyKey", emptyClassArgs));
+            classArgs[0] = java.lang.String.class;
+            desc.setWriteMethod(SqlInfo.class.getMethod("setManyKey", classArgs));
+        }
+        catch(java.lang.NoSuchMethodException nsme) {};
+        
+        attributes[2] = desc;
+        
+        bvr = new BasicValidationRule("many-key");
         bvr.setAsAttributeRule();
         bvr.setMaxOccurs(1);
         bvr.setTypeValidator(new NameValidator(NameValidator.NMTOKEN));
@@ -110,7 +127,7 @@ public class SqlInfoMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
-        attributes[2] = desc;
+        attributes[3] = desc;
         
         bvr = new BasicValidationRule("dirty");
         bvr.setAsAttributeRule();
@@ -127,7 +144,7 @@ public class SqlInfoMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
-        attributes[3] = desc;
+        attributes[4] = desc;
         
         bvr = new BasicValidationRule("type");
         bvr.setAsAttributeRule();
@@ -144,7 +161,7 @@ public class SqlInfoMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
-        attributes[4] = desc;
+        attributes[5] = desc;
         
         bvr = new BasicValidationRule("name");
         bvr.setAsAttributeRule();

@@ -49,7 +49,7 @@ package org.exolab.castor.jdo.engine;
 
 import java.io.PrintWriter;
 import java.io.PrintStream;
-import org.odmg.ODMGRuntimeException;
+import org.exolab.castor.jdo.ODMGRuntimeException;
 
 
 /**

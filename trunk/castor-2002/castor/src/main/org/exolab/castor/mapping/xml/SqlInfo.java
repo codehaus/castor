@@ -35,7 +35,12 @@ public class SqlInfo implements java.io.Serializable {
     /**
      * 
     **/
-    private java.lang.String vForKey;
+    private java.lang.String vManyTable;
+
+    /**
+     * 
+    **/
+    private java.lang.String vManyKey;
 
     /**
      * 
@@ -81,16 +86,29 @@ public class SqlInfo implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getForKey() {
-        return this.vForKey;
-    } //-- java.lang.String getForKey() 
+    public java.lang.String getManyTable() {
+        return this.vManyTable;
+    } //-- java.lang.String getManyTable() 
 
     /**
-     * @param vForKey
+     * @param vManyTable
     **/
-    public void setForKey(java.lang.String vForKey) {
-        this.vForKey = vForKey;
-    } //-- void setForKey(java.lang.String) 
+    public void setManyTable(java.lang.String vManyTable) {
+        this.vManyTable = vManyTable;
+    } //-- void setManyTable(java.lang.String) 
+
+    /**
+    **/
+    public java.lang.String getManyKey() {
+        return this.vManyKey;
+    } //-- java.lang.String getManyKey() 
+
+    /**
+     * @param vManyKey
+    **/
+    public void setManyKey(java.lang.String vManyKey) {
+        this.vManyKey = vManyKey;
+    } //-- void setManyKey(java.lang.String) 
 
     /**
     **/

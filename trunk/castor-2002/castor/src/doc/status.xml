@@ -36,9 +36,9 @@
           <li>Java to SQL mapping uses an XML document to specify the mapping
               textually, and provides an API to specify them programatically</li>
 
-          <li>Supports one-one and one-many relation types (release 0.8),
-              SQL/Java inheritance, object graph to single row mapping, and
-              multiple column primary keys and automatic type conversion</li>
+          <li>Supports one-one and one-many relation types, SQL/Java inheritance,
+              object graph to single row mapping, and multiple column primary
+              keys and automatic type conversion</li>
 
           <li>Provides an ODMG compliant API for OODMBS-like persistence,
               XML-based data source definition, name binding</li>
@@ -86,13 +86,8 @@
             queries with simple syntax and single object retrieval. A project
             to extend the OQL engine is underway.</li>
 
-        <li>This release supports one-one and one-many relations but not many-many
-            relations. Many-many relations will be introduced shortly.</li>
-
         <li>The DAX implementation is not complete. There are plans to replace
             the ODMG API with a similar, but J2EE-compatible API.</li>
-
-        <li>A unified mapping model will be introduced in 0.8.</li>
 
         <li>The EJB CMP implementation will be available for public review
             prior to release 0.9 and will include a CMP engine, integration
@@ -103,27 +98,9 @@
             but lacks support for JTA factories. Integration with transaction
             managers and Tomcat/OpenEJB will be introduced in release 0.9.</li>
 
-        <li>Dirty checking, key generation, database specific-locking,
-            store procedure support, etc need more work.</li>
+        <li>Key generation, engines for Oracle/Sybase, store procedure support,
+            BLOBs, XML content, read-only queries.</li>
       </ul>
-    </section>
-
-    <section title="TODO List">
-<pre>
-  JDO: Need to think up a better alternative to the ODMG API.
-
-  JDO: Implement key generation, support stored procedures.
-
-  JDO: Support for many-many relations.
-
-  JDO: More type convertors (serialize, BLOB, CLOB, XML)
-
-  DAX: Type convertors to/from String, support for Vectors.
-
-  DAX: Better query parser with support for parameters.
-
-  Persist: Implement AccessMode.ReadOnly and AccessMode.Singular
-</pre>
     </section>
 
   </body>

@@ -149,6 +149,15 @@ public class Logger
     }
 
 
+    /**
+     * Returns true if the configuration specifies debugging.
+     */
+    public static boolean debug()
+    {
+        return Configuration.debug();
+    }
+
+
     public void println()
     {
         super.println();

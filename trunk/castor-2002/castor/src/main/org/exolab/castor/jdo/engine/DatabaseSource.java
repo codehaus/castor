@@ -61,8 +61,6 @@ import javax.naming.NamingException;
 import javax.naming.NameNotFoundException;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
-import org.odmg.ODMGException;
-import org.odmg.DatabaseNotFoundException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
