@@ -133,7 +133,7 @@ public class BatchUpdateSQL {
                 continue;
 
             // Sybase style of ending token
-            if ( line.startsWith("go") && sb.length() > 0 ) {
+            if ( line.toLowerCase().startsWith("go") && sb.length() > 0 ) {
                 String s = sb.toString();
                 if ( skipgrants && (s.toLowerCase().startsWith("grant")) ) {
                     sb.setLength(0);
