@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.oql;
 
 import java.util.Vector;
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.mapping.loader.Types;
 
 /**
  * A class to store and check information about numbered query parameters.
@@ -91,7 +92,8 @@ public class ParamInfo {
 
     if ( ! userDefinedType.equals("") ) {
       try {
-        userClass = Class.forName(userDefinedType);
+        userClass = Types.typeFromName(ClassLoader.getSystemClassLoader(),
+                                       userDefinedType);
       } 
       catch (Exception e) {
         throw new QueryException( "The class " + userClass + " could not be found." );
