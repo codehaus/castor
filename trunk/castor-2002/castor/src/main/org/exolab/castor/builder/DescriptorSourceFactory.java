@@ -585,6 +585,21 @@ public class DescriptorSourceFactory {
         //-- create proper validator
 
         switch (xsType.getType()) {
+            case XSType.BOOLEAN_TYPE:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("BooleanValidator bv = new BooleanValidator();");
+                XSBoolean xsBoolean = (XSBoolean)xsType;
+                if (fixed != null) {
+                    Boolean.valueOf(fixed);
+                    jsc.add("bv.setFixed(");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
+                jsc.add("fieldValidator.setValidator(bv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
 
             case XSType.BYTE_TYPE:
                 jsc.add("{ //-- local scope");
@@ -621,7 +636,7 @@ public class DescriptorSourceFactory {
                     //-- make sure we have a valid value...
                     Byte.parseByte(fixed);
 
-                    jsc.add("bv.setFixedValue(");
+                    jsc.add("bv.setFixed(");
                     jsc.append("(byte)");
                     jsc.append(fixed);
                     jsc.append(");");
@@ -740,7 +755,7 @@ public class DescriptorSourceFactory {
                    //-- make sure we've got a good value
                    Float test = new Float(fixed);
 
-                    jsc.add("fv.setFixedValue( new Float(");
+                    jsc.add("fv.setFixed( new Float(");
                     jsc.append(fixed);
                     jsc.append("));");
                 }
@@ -793,7 +808,7 @@ public class DescriptorSourceFactory {
                     //-- make sure we have a valid value...
                     Double test = new Double(fixed);
 
-                    jsc.add("dv.setFixedValue(");
+                    jsc.add("dv.setFixed(");
                     jsc.append(fixed);
                     jsc.append(");");
                 }
@@ -960,7 +975,7 @@ public class DescriptorSourceFactory {
                     //-- make sure we have a valid value...
                     Long.parseLong(fixed);
 
-                    jsc.add("lv.setFixedValue(");
+                    jsc.add("lv.setFixed(");
                     jsc.append(fixed);
                     jsc.append(");");
                 }
@@ -1004,7 +1019,7 @@ public class DescriptorSourceFactory {
                 }
                 //-- fixed values
                 if (fixed != null) {
-                    jsc.add("sv.setFixedValue(");
+                    jsc.add("sv.setFixed(");
                     //fixed should be "the value"
                     jsc.append(fixed);
                     jsc.append(");");
@@ -1044,7 +1059,7 @@ public class DescriptorSourceFactory {
                 }
                 //-- fixed values
                 if (fixed != null) {
-                    jsc.add("nv.setFixedValue(\"");
+                    jsc.add("nv.setFixed(\"");
                     jsc.append(fixed);
                     jsc.append("\");");
                 }
