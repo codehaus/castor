@@ -874,6 +874,19 @@ Database db = jdo.getDatabase();
                 
     		</section>
 
+    		<section title="mySQL 4.1.x and upgrade issues">
+    		
+ 				<p>As with many other open source products, MySQL seems to be changing slightly from 
+ 				   version to version. There seems to be a problem with concurrency in MySQL 4.1.5
+				   that can be resolved by upgrading to 4.1.7 or higher.</p>
+				   
+				<p>With the 3.1.x releaseo of mySQL's Connector/J , the 'LIMIT $1' syntax of OQL does not 
+				   work. We hence advise you to stay with the Connector/J 3.0.16 release instead until 
+				   further notice.</p>
+			
+			</section>
+    		
+
     	</section>
 
     	<section title = "Oracle">
