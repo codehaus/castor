@@ -126,6 +126,28 @@ public class JDocComment {
     } //-- appendComment
     
     /**
+     * Returns the Parameter Descriptor associated with the
+     * given name
+     *
+     * @return the Parameter Descriptor associated with the
+     * given name
+    **/
+    public JDocDescriptor getParamDescriptor(String name) {
+        if (name == null) return null;
+        
+        for (int i = 0; i < _descriptors.size(); i++) {
+            JDocDescriptor jdd 
+                = (JDocDescriptor) _descriptors.elementAt(i);
+            if (jdd.getType() == JDocDescriptor.PARAM) {
+                if (name.equals(jdd.getName()))
+                    return jdd;
+            }
+        }
+        return null;
+        
+    } //-- getParamDescriptor
+    
+    /**
      * Returns an enumeration of the parameters of this JDocComment
      * @return an enumeration of the parameters of this JDocComment
     **/
