@@ -72,7 +72,7 @@ public abstract class BaseFactory
 
     public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException
-    {
+    { 
         if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
             return null;
         try {

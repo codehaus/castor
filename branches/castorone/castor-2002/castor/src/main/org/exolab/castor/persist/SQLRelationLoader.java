@@ -184,6 +184,7 @@ public class SQLRelationLoader {
             ResultSet rset;
 
             sStmt = "DELETE FROM " + tableName + " WHERE " + left + "=" + leftValue[0] +" AND " + right + "=" + rightValue[0];
+            System.out.println(sStmt);
             int i = stmt.executeUpdate( sStmt );
         } catch ( SQLException e ) {
             throw new PersistenceException( e.toString() );

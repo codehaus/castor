@@ -269,7 +269,7 @@ public class FieldMolder {
     protected Class getCollectionType( String coll, boolean lazy ) 
             throws MappingException {
         Class type;
-        System.out.println("coll: "+coll);
+        //System.out.println("coll: "+coll);
 
         for ( int i=0; i<info.length; i++ ) {
             if ( info[i].name.equals( coll ) ) 
@@ -423,7 +423,7 @@ public class FieldMolder {
                 if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                     Class sgClass = _colClass==null? _colClass : _fClass;
 
-                    System.out.println(javaClass+" "+fieldMap.getName()+" fieldMap.getCollection()..."+fieldMap.getCollection());
+                    //System.out.println(javaClass+" "+fieldMap.getName()+" fieldMap.getCollection()..."+fieldMap.getCollection());
                     String name = capitalize( fieldMap.getName() );
 
                     _getMethod = findAccessor( javaClass, "get" + name, sgClass, true );

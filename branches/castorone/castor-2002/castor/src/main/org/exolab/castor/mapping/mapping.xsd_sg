@@ -52,22 +52,6 @@
     </type>
   </element>
 
-  <element name="many-to-many">
-    <type content="elemOnly" order="seq">
-      <element name="description" type="string" minOccurs="0" maxOccurs="1" />
-      <element ref="map-to" minOccurs="0" maxOccurs="1" />
-      <element ref="type-mapping" minOccurs="2"/>
-      <attribute name="name" type="ID" minOccurs="1"/>
-    </type>
-  </element>
-
-  <element name="type-mapping">
-    <type content="empty">
-      <attribute name="type" type="IDREF" minOccurs="0" />
-      <attribute name="sql" type="ID" minOccurs="0" />
-    </type>
-  </element>
-
   <element name="cache-type-mapping">
     <type content="empty">
       <attribute name="type" type="string" minOccurs="0" default="count-limited">
@@ -105,7 +89,6 @@
       <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="many-to-many" type="IDREF" minOccurs="0"/>
       <attribute name="collection" type="string" minOccurs="0">
         <enumeration value="array"/>
         <enumeration value="vector"/>
@@ -125,6 +108,7 @@
       <attribute name="type" type="string" minOccurs="0"/>
       <attribute name="many-table" type="NMTOKEN" minOccurs="0"/>
       <attribute name="many-key" type="NMTOKEN" minOccurs="0"/> 
+      <attribute name="columns" type="NMTOKEN" minOccurs="0"/> 
       <attribute name="dirty" type="string" minOccurs="0" default="check">
         <enumeration value="check"/>
         <enumeration value="ignore"/>

@@ -407,8 +407,8 @@ public class ClassMolder implements CacheHolder {
             ci.isHold = false;
     }
 
-
-    // Methods of LockEngine, which called by LockEngine
+    //
+    // Methods of LockEngine, which called by TransactionContext
     //
     public OID load( TransactionContext tx, OID oid, Object object, AccessMode accessMode )
             throws ObjectNotFoundException, PersistenceException {       
@@ -422,6 +422,7 @@ public class ClassMolder implements CacheHolder {
         AccessMode am;
         Object value;
         Object stamp;        
+        Object[] temp;
         int fieldType;
 
         if ( oid.isIdsNull() ) 
@@ -463,13 +464,14 @@ public class ClassMolder implements CacheHolder {
             System.out.print("<"+i+":"+fields[i]+":"+(fields[i]==null?null:_fhs[i].getJavaClass())+">  ");
         }
         System.out.println("  Load(field)");
-
+    
         for ( int i = 0; i < _fhs.length; i++ ) {
             //System.out.println("!!!!!!!!!ClassMolder.load(): for: "+oid);
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
-                _fhs[i].setValue( object, fields[i] );
+                temp = (Object[]) fields[i];
+                _fhs[i].setValue( object, temp[0] );
                 break;
 
             case FieldMolder.PERSISTANCECAPABLE:
@@ -518,8 +520,7 @@ public class ClassMolder implements CacheHolder {
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
                             //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
-                            Object[] wrapped = { v.elementAt(j) };
-                            col.add( tx.load( oid.getLockEngine(), fieldClassMolder, wrapped, null ) );
+                            col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.elementAt(j), null ) );
                         }
                         _fhs[i].setValue( object, col );
                     } else {
@@ -533,8 +534,7 @@ public class ClassMolder implements CacheHolder {
                     Vector v = (Vector) fields[i];
                     Vector list = new Vector(v.size());
                     for ( int j=0; j<v.size(); j++ ) {
-                        Object[] wrapped = { v.elementAt(j) };
-                         list.add( wrapped );
+                        list.add( v.elementAt(j) );
                     }                    
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
@@ -550,10 +550,7 @@ public class ClassMolder implements CacheHolder {
                     if ( v != null ) {                        
                         for ( int j=0,l=v.size(); j<l; j++ ) {
                             //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
-                            Object[] wrapped = { v.elementAt(j) };
-                            col.add( tx.load( oid.getLockEngine(), fieldClassMolder, wrapped, null ) );
-                            // tricky part
-                            // also load the relation to transaction                            
+                            col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.elementAt(j), null ) );
                         }
                         _fhs[i].setValue( object, col );
                     }
@@ -620,6 +617,7 @@ public class ClassMolder implements CacheHolder {
         Object[] createdId;
         Object[] ids;
         Object[] newids;
+        Object[] temp;
         Object o;
 
         int fieldType;
@@ -645,7 +643,9 @@ public class ClassMolder implements CacheHolder {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
-                ci.fields[i] = _fhs[i].getValue( object );
+                temp = new Object[1];
+                temp[0] = _fhs[i].getValue( object );
+                ci.fields[i] = temp;
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -656,7 +656,7 @@ public class ClassMolder implements CacheHolder {
                     fid = fieldClassMolder.getIdentities( o );
                     // support only singular object
                     if ( fid != null ) {
-                        ci.fields[i] = fid[0];
+                        ci.fields[i] = fid;
                     }
                 }
                 break;
@@ -666,12 +666,7 @@ public class ClassMolder implements CacheHolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     fids = getIds( fieldClassMolder, o );
-                    Vector v = new Vector(fids.size());
-                    for ( int j=0; j<fids.size(); j++ ) {
-                        System.out.println( "One to many:"+((Object[])fids.elementAt(j))[0] );
-                        v.add( ((Object[])fids.elementAt(j))[0] );
-                    }
-                    ci.fields[i] = v;
+                    ci.fields[i] = fids;
                 }
                 break;
             case FieldMolder.MANY_TO_MANY:
@@ -679,13 +674,9 @@ public class ClassMolder implements CacheHolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
-                    fids = getIds( fieldClassMolder, o );                
-                    Vector v = new Vector( fids.size() );
-                    for ( int j=0; j<fids.size(); j++ ) {
-                        System.out.println( "many to many:"+((Object[])fids.elementAt(j))[0] );
-                        v.add( ((Object[])fids.elementAt(j))[0] );
-                    }
-                    ci.fields[i] = v;
+                    fids = getIds( fieldClassMolder, o );
+                    System.out.println("fids: "+ fids);
+                    ci.fields[i] = fids;
                 }
                 break;
             default:
@@ -849,9 +840,11 @@ public class ClassMolder implements CacheHolder {
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                newfields[i] = _fhs[i].getValue( object );
+                Object[] temp = new Object[1];
+                temp[0] = _fhs[i].getValue( object );
+                newfields[i] = temp;
 
-                if ( !OID.isEquals( ci.fields[i], newfields[i] ) ) {
+                if ( !OID.isEquals( (Object[])ci.fields[i], (Object[])newfields[i] ) ) {
                     System.out.println("Store.primitive modified");
                     if ( _fhs[i].isCheckDirty() ) {
                         modified = true;
@@ -868,7 +861,7 @@ public class ClassMolder implements CacheHolder {
                 if ( o != null ) 
                     newfields[i] = fieldClassMolder.getIdentities( o );
 
-                if ( !OID.isEquals( ci.fields[i], newfields[i] ) ) {
+                if ( !OID.isEquals( (Object[])ci.fields[i], (Object[])newfields[i] ) ) {
                     System.out.println("Store.persistencecapable modified");
                     if ( _fhs[i].isCheckDirty() ) {
                         modified = true;
@@ -988,20 +981,17 @@ public class ClassMolder implements CacheHolder {
                         if ( orgFields != null && list != null ) {
                             for ( int j=0; j<orgFields.size(); j++ ) {
                                 if ( !list.contains( orgFields.elementAt(j) ) ) {
-                                    Object[] wrappedOrg = { orgFields.elementAt(j) };
                                     _fhs[i].getRelationLoader().deleteRelation( 
                                     (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), wrappedOrg );
+                                    oid.getIdentities(), (Object[])orgFields.elementAt(j) );
                                 }
                             }
                             // add relation which added after it's created or loaded
                             for ( int j=0; j<list.size(); j++ ) {
                                 if ( !orgFields.contains( list.elementAt(j) ) ) {
-                                    Object[] wrappedNew = { list.elementAt(j) };
-    
                                     _fhs[i].getRelationLoader().createRelation( 
                                     (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), wrappedNew );
+                                    oid.getIdentities(), (Object[])orgFields.elementAt(j) );
                                 }
                             }
                         }
@@ -1032,15 +1022,24 @@ public class ClassMolder implements CacheHolder {
         if ( modified ) {
             System.out.println("object is modifed, now storing it");
             for ( int i=0; newfields!=null && i<newfields.length; i++ ) {
-                System.out.print("<"+i+":"+_fhs[i].getJavaClass()+">  ");
+                if ( newfields[i] instanceof Object[] ) {
+                    Object[] temp = (Object[])newfields[i];
+                    System.out.print("<"+i+":"+_fhs[i].getJavaClass()+">  ");
+                }
             }
             System.out.println();
             for ( int i=0; newfields!=null && i<newfields.length; i++ ) {
-                System.out.print("<"+i+":"+newfields[i]+">  ");
+                if ( newfields[i] instanceof Object[] ) {
+                    Object[] temp = (Object[])newfields[i];
+                    System.out.print("<"+i+":"+temp[0]+">  ");
+                }
             }
             System.out.println();
             for ( int i=0; ci.fields!=null && i<ci.fields.length; i++ ) {
-                System.out.print("<"+i+":"+ci.fields[i]+">  ");
+                if ( newfields[i] instanceof Object[] ) {
+                    Object[] temp = (Object[])ci.fields[i];
+                    System.out.print("<"+i+":"+temp[0]+">  ");
+                }
             }
             System.out.println();
             
@@ -1085,7 +1084,15 @@ public class ClassMolder implements CacheHolder {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
-                ci.fields[i] = _fhs[i].getValue( object );
+                // should give some attemp to reduce new object array
+                Object[] temp = new Object[1];
+                temp[0] = _fhs[i].getValue( object );
+                if ( temp[0] != null ) {
+                    ci.fields[i] = temp;
+                } else {
+                    ci.fields[i] = null;
+                }
+                System.out.println("update object: "+(temp==null?null:temp[0]));
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -1105,7 +1112,7 @@ public class ClassMolder implements CacheHolder {
                         ArrayList list = (ArrayList) o;
                         Vector fidlist = new Vector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
-                            fidlist.add( list.get(j) );
+                            fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         ci.fields[i] = fidlist;
                     } else {
@@ -1125,7 +1132,8 @@ public class ClassMolder implements CacheHolder {
                         ArrayList list = (ArrayList) o;
                         Vector fidlist = new Vector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
-                            fidlist.add( list.get(j) );
+                            System.out.println("Updating: "+list.get(j));
+                            fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         ci.fields[i] = fidlist;
                     } else {
@@ -1152,8 +1160,6 @@ public class ClassMolder implements CacheHolder {
             throws ObjectNotFoundException, PersistenceException {
         System.out.println("ClassMolder.delete() is called!");
         
-        _persistence.delete( tx.getConnection(oid.getLockEngine()), oid.getIdentities() );
-
         for ( int i=0; i < _fhs.length; i++ ) {
             int fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
@@ -1178,6 +1184,7 @@ public class ClassMolder implements CacheHolder {
                 throw new PersistenceException("Invalid field type!");
             }
         }
+        _persistence.delete( tx.getConnection(oid.getLockEngine()), oid.getIdentities() );
     }
 
     public void revertObject( TransactionContext tx, OID oid, Object object ) 

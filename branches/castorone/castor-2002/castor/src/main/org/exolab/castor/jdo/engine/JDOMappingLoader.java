@@ -221,10 +221,14 @@ public class JDOMappingLoader
         
         // Create a JDO field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
+
+        sqlName = fieldMap.getSql().getName();
+        /*
         if ( fieldMap.getSql().getName() == null )
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
         else
             sqlName = fieldMap.getSql().getName();
+        */
         /*
         if ( fieldMap.getSql().getType() == null  )
             sqlType = fieldDesc.getFieldType();

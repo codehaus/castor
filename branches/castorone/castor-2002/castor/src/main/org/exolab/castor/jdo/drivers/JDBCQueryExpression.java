@@ -138,8 +138,25 @@ public class JDBCQueryExpression
     }
 
 
+    public void addInnerJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn )
+    {
+        _tables.put( leftTable, leftTable );
+        _tables.put( rightTable, rightTable );
+        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, false ) );
+    }
+
+
     public void addOuterJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
+    {
+        _tables.put( leftTable, leftTable );
+        _tables.put( rightTable, rightTable );
+        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, true ) );
+    }
+
+    public void addOuterJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn )
     {
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
