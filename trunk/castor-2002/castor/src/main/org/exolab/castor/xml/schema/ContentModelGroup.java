@@ -95,6 +95,25 @@ public interface ContentModelGroup {
     public Enumeration enumerate();
 
     /**
+     * Returns the maximum number of occurances that this ContentModelGroup
+     * may appear
+     * @return the maximum number of occurances that this ContentModelGroup
+     * may appear.
+     * A non positive (n < 1) value indicates that the
+     * value is unspecified (ie. unbounded).
+    **/
+    public int getMaxOccurs();
+
+    /**
+     * Returns the minimum number of occurances that this ContentModelGroup
+     * must appear
+     * @return the minimum number of occurances that this ContentModelGroup
+     * must appear
+     * A negative (n < 0) value indicates that the value is unspecified.
+    **/
+    public int getMinOccurs();
+    
+    /**
      * Returns the number of particles contained within
      * this ContentModelGroup
      *
@@ -108,5 +127,7 @@ public interface ContentModelGroup {
      * @returns the CMParticle at the specified index
     **/
     public Particle getParticle(int index);
+
+
 
 } //-- ContentModelGroup
