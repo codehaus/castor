@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,7 +52,7 @@ import org.exolab.castor.builder.util.DescriptorJClass;
 
 /**
  * A factory for creating the source code of descriptor classes
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class DescriptorSourceFactory {
@@ -770,7 +770,7 @@ public class DescriptorSourceFactory {
                 pattern = xsInteger.getPattern();
                 if (pattern != null) {
                     jsc.add("iv.setPattern(\"");
-                    jsc.append(pattern);
+                    jsc.append(escapePattern(pattern));
                     jsc.append("\");");
                 }
 
@@ -819,7 +819,7 @@ public class DescriptorSourceFactory {
                 pattern = xsInt.getPattern();
                 if (pattern != null) {
                     jsc.add("iv.setPattern(\"");
-                    jsc.append(pattern);
+                    jsc.append(escapePattern(pattern));
                     jsc.append("\");");
                 }
 
@@ -870,7 +870,7 @@ public class DescriptorSourceFactory {
                 pattern = xsLong.getPattern();
                 if (pattern != null) {
                     jsc.add("lv.setPattern(\"");
-                    jsc.append(pattern);
+                    jsc.append(escapePattern(pattern));
                     jsc.append("\");");
                 }
 
@@ -904,7 +904,7 @@ public class DescriptorSourceFactory {
                 pattern = xsString.getPattern();
                 if (pattern != null) {
                     jsc.add("sv.setPattern(\"");
-                    jsc.append(pattern);
+                    jsc.append(escapePattern(pattern));
                     jsc.append("\");");
                 }
 
@@ -979,6 +979,30 @@ public class DescriptorSourceFactory {
                 break;
         }
     } //-- validationCode
-
-
-} //-- MarshalInfoSourceFactory
+    
+    /**
+     * Escapes special characters in the given String so that it can 
+     * be printed correctly.
+     *
+     * @param str the String to escape
+     * @return the escaped String, or null if the given String was null.
+    **/
+    private static String escapePattern(String str) {
+        if (str == null) return str;
+        
+        //-- make sure we have characters to escape
+        if (str.indexOf('\\') < 0) return str;
+        
+        StringBuffer sb = new StringBuffer();
+        char[] chars = str.toCharArray();
+        
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            if (ch == '\\') sb.append(ch);
+            sb.append(ch);
+        }
+        return sb.toString();
+        
+    } //-- escape
+    
+} //-- DescriptorSourceFactory
