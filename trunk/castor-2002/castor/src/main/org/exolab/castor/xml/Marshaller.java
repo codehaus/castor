@@ -461,6 +461,10 @@ public class Marshaller {
                 classDesc = getClassDescriptor(_class);
                 if (descriptor.getXMLName()==null)
                     name = classDesc.getXMLName();
+                    
+                //-- check to see if we to save the xsi:type
+                //-- for this class
+                saveType = (_class != descriptor.getFieldType());
             }
 
             if (classDesc == null) {
