@@ -10,8 +10,11 @@
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
-    <field name="name" type="string">
-      <sql name="name" type="varchar"/>
+    <field name="first" type="string">
+      <sql name="first" type="varchar"/>
+    </field>
+    <field name="second" type="string">
+      <sql name="second" type="varchar" dirty="ignore"/>
     </field>
   </class>
 

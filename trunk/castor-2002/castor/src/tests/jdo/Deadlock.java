@@ -1,3 +1,49 @@
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Exoffice Technologies.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+
 package jdo;
 
 
@@ -26,7 +72,7 @@ public class Deadlock
     private Database       _db;
 
 
-    public static final long  Wait = 2000;
+    public static final long  Wait = 1000;
 
 
     public Deadlock()
@@ -58,6 +104,35 @@ public class Deadlock
         boolean result = true;
 
         try {
+            stream.writeVerbose( "Running in access mode shared" );
+            if ( ! runOnce( stream, Database.Shared ) )
+                result = false;
+            stream.writeVerbose( "" );
+            stream.writeVerbose( "Running in access mode exclusive" );
+            if ( ! runOnce( stream, Database.Exclusive ) )
+                result = false;
+            stream.writeVerbose( "" );
+            stream.writeVerbose( "Running in access mode db-locked" );
+            if ( ! runOnce( stream, Database.DbLocked ) )
+                result = false;
+            stream.writeVerbose( "" );
+            _db.close();
+        } catch ( Exception except ) {
+            try {
+                stream.writeVerbose( "Error: " + except );
+            } catch ( IOException except2 ) { }
+            except.printStackTrace();
+            result = false;
+        }
+        return result;
+    }
+
+
+    public boolean runOnce( CWVerboseStream stream, short accessMode )
+    {
+        boolean result = true;
+
+        try {
             OQLQuery      oql;
             TestObject    object;
             Enumeration   enum;
@@ -72,7 +147,8 @@ public class Deadlock
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 stream.writeVerbose( "Retrieved object: " + object );
-                object.setName( TestObject.DefaultName );
+                object.setFirst( TestObject.DefaultFirst );
+                object.setSecond( TestObject.DefaultSecond );
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
@@ -83,13 +159,14 @@ public class Deadlock
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 stream.writeVerbose( "Retrieved object: " + object );
+                object.setFirst( TestObject.DefaultFirst );
+                object.setSecond( TestObject.DefaultSecond );
             } else {
                 object = new TestObject();
                 object.setId( TestObject.DefaultId + 1 );
                 stream.writeVerbose( "Creating new object: " + object );
                 _db.create( object );
             }
-            object.setName( TestObject.DefaultName );
             _db.commit();
 
             stream.writeVerbose( "Note: this test uses a 2 second delay between threads. CPU and database load might cause the test to not perform synchronously, resulting in erroneous results. Make sure that execution is not hampered by CPU/datebase load." );
@@ -103,10 +180,12 @@ public class Deadlock
             first = new FirstThread();
             first._db = JDOTests.getDatabase();
             first._stream = stream;
+            first._accessMode = accessMode;
             first.start();
             second = new SecondThread();
             second._db = JDOTests.getDatabase();
             second._stream = stream;
+            second._accessMode = accessMode;
             second.start();
 
             first.join();
@@ -138,6 +217,9 @@ public class Deadlock
         private boolean          _result = true;
 
 
+        private short            _accessMode;
+
+
         public void run()
         {
             TestObject   object;
@@ -150,8 +232,8 @@ public class Deadlock
                 // Load first object and change something about it (otherwise will not write)
                 _stream.writeVerbose( "First: Loading object " + TestObject.DefaultId );
                 object = (TestObject) _db.load( TestObject.class,
-                                               new Integer( TestObject.DefaultId ) );
-                object.setName( TestObject.DefaultName + ":1" );
+                                               new Integer( TestObject.DefaultId ), _accessMode );
+                object.setFirst( TestObject.DefaultFirst + ":1" );
                 _stream.writeVerbose( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
@@ -160,8 +242,8 @@ public class Deadlock
                 
                 _stream.writeVerbose( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
-                                               new Integer( TestObject.DefaultId + 1 ) );
-                object.setName( TestObject.DefaultName + ":1" );
+                                               new Integer( TestObject.DefaultId + 1 ), _accessMode );
+                object.setSecond( TestObject.DefaultSecond + ":1" );
                 _stream.writeVerbose( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
@@ -200,6 +282,9 @@ public class Deadlock
         private boolean          _result = true;
 
 
+        private short            _accessMode;
+
+
         public void run()
         {
             TestObject   object;
@@ -216,8 +301,8 @@ public class Deadlock
                 // Load first object and change something about it (otherwise will not write)
                 _stream.writeVerbose( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
-                                               new Integer( TestObject.DefaultId + 1 ) );
-                object.setName( TestObject.DefaultName + ":2" );
+                                               new Integer( TestObject.DefaultId + 1 ), _accessMode );
+                object.setSecond( TestObject.DefaultSecond + ":2" );
                 _stream.writeVerbose( "Second: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
@@ -225,9 +310,22 @@ public class Deadlock
                 start = System.currentTimeMillis();
                 
                 _stream.writeVerbose( "Second: Loading object " + TestObject.DefaultId );
-                object = (TestObject) _db.load( TestObject.class,
-                                               new Integer( TestObject.DefaultId ) );
-                object.setName( TestObject.DefaultName + ":2" );
+                try {
+                    object = (TestObject) _db.load( TestObject.class,
+                                                    new Integer( TestObject.DefaultId ), _accessMode );
+                } catch ( LockNotGrantedException except ) {
+                    if ( _accessMode == Database.Exclusive ||
+                         _accessMode == Database.DbLocked ) {
+                        _stream.writeVerbose( "OK: Deadlock detected" );
+                    } else {
+                        _result = false;
+                        _stream.writeVerbose( "Error: " + except );
+                    }
+                    _db.rollback();
+                    _db.close();
+                    return;
+                }
+                object.setFirst( TestObject.DefaultFirst + ":2" );
                 _stream.writeVerbose( "Second: Modified to " + object );
 
                 // Give the other thread a 2 second opportunity.
