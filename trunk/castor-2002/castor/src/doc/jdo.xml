@@ -43,7 +43,7 @@ Database db;
 
 <comment>// Define the JDO object</comment>
 jdo = new JDO();
-jdo.setDatabase( "mydb" );
+jdo.setDatabaseName( "mydb" );
 jdo.setConfiguration( "database.xml" );
 jdo.setClassLoader( getClass().getClassLoader() );
 
