@@ -1295,11 +1295,10 @@ public final class UnmarshalHandler extends MarshalFramework
         }
 
         if (attValue == null) {
-             //-- This code is not needed since
-             //-- when validation=true there is a check
-             //-- to required field
-             //-- The only thing to keep is the locator stuff (Arnaud)
-             /*if (descriptor.isRequired()) {
+             //-- Since many attributes represent primitive
+             //-- fields, we add an extra validation check here
+             //-- in case the class doesn't have a "has-method".
+             if (descriptor.isRequired()) {
                 String err = classDesc.getXMLName() + " is missing " +
                     "required attribute: " + attName;
                 if (_locator != null) {
@@ -1307,8 +1306,8 @@ public final class UnmarshalHandler extends MarshalFramework
                         " column: " + _locator.getColumnNumber();
                 }
                 throw new SAXException(err);
-            }*/
-             return;
+            }
+            return;
         }
 
         //-- if this is the identity then save id
