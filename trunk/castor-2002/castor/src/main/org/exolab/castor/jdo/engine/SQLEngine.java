@@ -469,7 +469,9 @@ public final class SQLEngine implements Persistence {
             // Must create record in the parent table first.
             // All other dependents are created afterwards.
             if ( _extends != null )
-                identity = _extends.create( conn, fields, identity );
+                // | quick and very dirty hack to try to make multiple class on the same table work
+                if ( !_extends._mapTo.equals( _mapTo ) )
+                    identity = _extends.create( conn, fields, identity );
 
             // Generate key before INSERT
             else if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT )  
@@ -679,7 +681,9 @@ public final class SQLEngine implements Persistence {
             // Must store record in parent table first.
             // All other dependents are stored independently.
             if ( _extends != null )
-                _extends.store( conn, fields, identity, original, stamp );
+                // | quick and very dirty hack to try to make multiple class on the same table work
+                if ( !_extends._mapTo.equals( _mapTo ) )
+                    _extends.store( conn, fields, identity, original, stamp );
 
             stmt = ( (Connection) conn ).prepareStatement( getStoreStatement( original ) );
 
@@ -1512,7 +1516,7 @@ public final class SQLEngine implements Persistence {
                     } catch ( SQLException e2 ) { }
                 }
                 _resultSetDone = true;
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except) + " while executing "+ _sql );
             }
         }
 
