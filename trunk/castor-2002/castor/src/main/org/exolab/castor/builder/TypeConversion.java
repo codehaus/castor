@@ -47,7 +47,6 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
 import org.exolab.javasource.*;
-import org.exolab.castor.util.OrderedMap;
 import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.castor.xml.schema.Facet;
@@ -55,78 +54,16 @@ import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.text.ParseException;
 
 
 /**
+ * A class used to convert XML Schema SimpleTypes into
+ * the appropriate XSType
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class TypeConversion {
-
-
-    private static OrderedMap sjNameMap = iCreateNameMap();
-
-    /**
-     * Returns the Java type name based on the given Schema
-     * type name
-    **/
-    public static String getJavaTypeName(String schemaTypeName) {
-        if (schemaTypeName == null) return null;
-        String mappedName = (String) sjNameMap.get(schemaTypeName);
-        if (mappedName != null) return mappedName;
-        else return schemaTypeName;
-    } //-- getJavaTypeName
-
-    /*
-    public static XSType createXSType(String schemaType) {
-
-        XSType xsType = null;
-
-        //-- string
-        if ("string".equals(schemaType)) {
-            xsType = new XSString();
-        }
-        //-- integer
-        else if ("integer".equals(schemaType)) {
-            xsType = new XSInteger();
-        }
-        else if ("binary".equals(schemaType)) {
-            xsType = new XSBinary();
-        }
-        else if ("boolean".equals(schemaType)) {
-            xsType = new XSBoolean();
-        }
-        //-- positive-integer
-        else if ("negative-integer".equals(schemaType)) {
-            xsType = new XSNegativeInteger();
-        }
-        //-- positive-integer
-        else if ("positive-integer".equals(schemaType)) {
-            xsType = new XSPositiveInteger();
-        }
-        //-- real
-        else if ("real".equals(schemaType)) {
-            xsType = new XSReal();
-        }
-        else if ("NCName".equals(schemaType)) {
-            xsType = new XSNCName();
-        }
-        //-- NMTOKEN
-        else if ("NMTOKEN".equals(schemaType)) {
-            xsType = new XSNMToken();
-        }
-        else if ("timeInstant".equals(schemaType)) {
-            xsType = new XSTimeInstant();
-        }
-        else {
-            xsType = new XSClass(new JClass(getJavaTypeName(schemaType)));
-        }
-        return xsType;
-    } //-- createXSType
-    */
 
 
     /**
@@ -315,67 +252,5 @@ public class TypeConversion {
         return xsType;
 
     } //-- convertType
-
-
-    /**
-     * Determines if the given type is a built in Schema simpletype
-    **/
-    public static boolean isBuiltInType(String type) {
-        return (sjNameMap.get(type) != null);
-    } //-- isBuiltInType
-
-    public static String getSchemaTypeName(String javaTypeName) {
-        return sjNameMap.getNameByObject(javaTypeName);
-    } //-- getSchemaTypeNam
-
-      //-------------------/
-     //- Private Methods -/
-    //-------------------/
-
-
-
-    /**
-     * Creates the naming table for type conversion
-    **/
-    private static OrderedMap iCreateNameMap() {
-
-        OrderedMap nameMap = new OrderedMap(24);
-
-        //-- #IDREF...temporary this will be changed, once
-        //-- I add in the Resolver code
-        nameMap.put("IDREF",        "java.lang.String");
-
-        // Choose the right collection
-        nameMap.put("IDREFS",       "java.lang.Vector");
-
-        //-- type mappings
-        nameMap.put("ID",                  "java.lang.String");
-        nameMap.put("NCName",              "java.lang.String");
-        nameMap.put("NMTOKEN",             "java.lang.String");
-        nameMap.put("uriReference",         "java.lang.String");
-        nameMap.put("binary",              "byte[]");
-        nameMap.put("boolean",             "boolean");
-        nameMap.put("century",                "org.exolab.castor.types.Century");
-        //nameMap.put("date",                "java.util.date");
-        nameMap.put("date",                "org.exolab.castor.types.Date");
-        nameMap.put("integer",             "int");
-        nameMap.put("month",                "org.exolab.castor.types.Month");
-        nameMap.put("negativeInteger",     "int");
-        nameMap.put("positiveInteger",     "int");
-        nameMap.put("real",                "double");
-        nameMap.put("recuuringDuration",    "org.exolab.castor.types.RecurringDuration");
-        nameMap.put("string",              "java.lang.String");
-        //nameMap.put("time",                "java.sql.Time");
-        nameMap.put("time",                "org.exolab.castor.types.Time");
-        nameMap.put("timeDuration",        "org.exolab.castor.types.TimeDuration");
-       // nameMap.put("timeDuration",        "long");
-        nameMap.put("timeInstant",         "java.util.Date");
-        nameMap.put("year",                "org.exolab.castor.types.Year");
-        nameMap.put("decimal",             "java.math.BigDecimal");
-        nameMap.put("short",               "short");
-        nameMap.put("int",		           "int");
-
-        return nameMap;
-    } //-- iCreateNameMap
 
 } //-- TypeConversion
