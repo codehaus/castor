@@ -213,6 +213,23 @@ public class Types
 
 
     /**
+     * Returns true if the Java type is represented as a primitive type. Wrapper
+     * like java.lang.Integer are considered as primitive.
+     *
+     * @param type The Java type
+     * @return True if a primitive type
+     */
+    public static boolean isPrimitiveType( Class type )
+    {
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( (_typeInfos[ i ].javaType == type) && (_typeInfos[ i ].primitive != null) )
+                return true;
+        }
+        return false;
+    }
+
+
+    /**
      * Constructs a new object from the given class. Does not generate any
      * checked exceptions, since object creation has been proven to work
      * when creating descriptor from mapping.

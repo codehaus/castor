@@ -47,6 +47,7 @@
 package org.exolab.castor.xml.util;
 
 import org.exolab.castor.xml.*;
+import org.exolab.castor.mapping.loader.Types;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -137,7 +138,10 @@ public class ClassDescriptorResolverImpl
         XMLClassDescriptor classDesc = (XMLClassDescriptor) _cache.get(type);
         
         if (classDesc != null) return classDesc;
-        
+
+        if (Types.isPrimitiveType(type))
+            return null;
+
         //-- check mapping loader first 
         //-- [proposed by George Stewart]
         if (mappingLoader != null) {            
