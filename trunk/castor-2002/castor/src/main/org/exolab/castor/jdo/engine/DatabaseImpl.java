@@ -162,29 +162,73 @@ public final class DatabaseImpl
     }
 
 
-    public synchronized void makePersistent( Object obj )
-        throws ClassNotPersistenceCapableException,
-               DuplicateIdentityException, PersistenceException
+    public void create( Object object )
+        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+               TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
         ClassHandler       handler;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( obj.getClass() );
+        handler = _dbEngine.getClassHandler( object.getClass() );
         if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( obj.getClass() );
-        tx.create( _dbEngine, obj, handler.getIdentity( obj ) );
+            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+        tx.create( _dbEngine, object, handler.getIdentity( object ) );
     }
 
 
-    public synchronized void deletePersistent( Object obj )
+    /**
+     * @deprecated
+     */
+    public synchronized void makePersistent( Object object )
+        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+               TransactionNotInProgressException, PersistenceException
+    {
+        create( object );
+    }
+
+
+    public void remove( Object object )
         throws ObjectNotPersistentException, LockNotGrantedException, 
-               PersistenceException
+               TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
         
         tx = getTransaction();
-        tx.delete( obj );
+        tx.delete( object );
+    }
+
+
+    /**
+     * @deprecated
+     */
+    public synchronized void deletePersistent( Object object )
+        throws ObjectNotPersistentException, LockNotGrantedException, 
+               PersistenceException
+    {
+        remove( object );
+    }
+
+
+    public boolean isPersistent( Object object )
+    {
+        TransactionContext tx;
+        
+        if ( _dbEngine == null )
+            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
+        if ( _ctx != null && _ctx.isOpen()  )
+            return _ctx.isPersistent( object );
+        return false;
+    }
+
+
+    public void lock( Object object )
+        throws LockNotGrantedException, ObjectNotPersistentException,
+               TransactionNotInProgressException,  PersistenceException
+    {
+        if ( _ctx == null || ! _ctx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        _ctx.writeLock( object, _lockTimeout );
     }
 
 
@@ -266,18 +310,6 @@ public final class DatabaseImpl
         } catch ( LockNotGrantedException except ) {
             throw new PersistenceExceptionImpl( except );
         }
-    }
-
-
-    public boolean isPersistent( Object object )
-    {
-        TransactionContext tx;
-        
-        if ( _dbEngine == null )
-            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
-        if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.isPersistent( object );
-        return false;
     }
 
 
@@ -390,13 +422,6 @@ public final class DatabaseImpl
     }
 
 
-    public void lock( Object obj )
-        throws LockNotGrantedException, PersistenceException
-    {
-        if ( _ctx == null || ! _ctx.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
-        _ctx.writeLock( obj, _lockTimeout );
-    }
 
 
 
