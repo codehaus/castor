@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+
+
+Version 0.9.3 July 3, 2001
+--------------------------
+
 XML:    Added fix to CollectionInfoJ2 for unbounded collections. (kvisco)
            - reported by Julien Viet
 
