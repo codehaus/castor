@@ -34,6 +34,9 @@ JDO:     Added support for stored procedures in OQLQuery. Now it is possible to
          relations the sequence is: identity, then all other fields in the same
          order as in mapping.xml). (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:     Support for ODMG 3.0 DArray collection in the XML source code generator.
+         (Contributed by Frank Thelen <frank.thelen@poet.de>)
+
 
 Version 0.8.4  May 5 2000
 --------------------------
