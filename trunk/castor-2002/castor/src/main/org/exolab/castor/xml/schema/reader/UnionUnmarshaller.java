@@ -198,7 +198,7 @@ public class UnionUnmarshaller extends SaxUnmarshaller {
         _unmarshaller.finish();
 
         if (SchemaNames.ANNOTATION.equals(name)) {
-            _union.addAnnotation((Annotation)_unmarshaller.getObject());
+            _union.setLocalAnnotation((Annotation)_unmarshaller.getObject());
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
             
