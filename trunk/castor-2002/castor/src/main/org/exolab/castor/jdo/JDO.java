@@ -73,6 +73,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
@@ -198,6 +199,11 @@ public class JDO
      */
     private EntityResolver _entityResolver;
 
+    
+    /**
+     * The transactions to databases map for database pooling
+     */
+    private TxDatabaseMap  _txDbPool;
 
     /**
      * Constructs a new JDO database factory. Must call {@link
@@ -467,6 +473,47 @@ public class JDO
 
 
     /**
+     * Enable/disable jdo Database pooling. This option only affects
+     * JDO if transactionManager is set and a transaction is associated
+     * with the thread that call getDatabase(). If jdo Database pooling
+     * is enabled, JDO will first search in the pool to see if there
+     * is already a Database for the current transaction. If found, it
+     * returns the database; if not, it create a new one, associates
+     * it will the transaction and return the newly created Database.
+     * <p>
+     * This method should be called before the invocation of getDatabase().
+     * <p>
+     * <b>Experimental</b> maybe removed in the future releases
+     *
+     * @param pool true to enable database pooling
+     */
+    public void setDatabasePooling( boolean pool ) {
+        if ( !pool ) {
+            if ( _txDbPool == null )
+                return;
+            else if ( _txDbPool.isEmpty() ) {
+                _txDbPool = null;
+                return;
+            } else
+                throw new IllegalStateException("JDO Pooling started. It can not be set to false");
+        } else {
+            if ( _txDbPool == null ) 
+                _txDbPool = new TxDatabaseMap();
+            return;
+        }
+    }
+
+    /**
+     * Indicates if jdo Database pooling is enable or not.
+     * <p>
+     * <b>Experimental</b> maybe removed in the further release
+     * @see #setDatabasePooling()
+     */ 
+    public boolean getDatabasePooling() {
+        return _txDbPool != null;
+    }
+
+    /**
      * Opens and returns a connection to the database. Throws an
      * {@link DatabaseNotFoundException} if the database named was not
      * set in the constructor or with a call to {@link #setDatabaseName},
@@ -505,9 +552,16 @@ public class JDO
                     tm = (TransactionManager) ctx.lookup( _tmName );
                 }
                 tx = tm.getTransaction();
+                if ( _txDbPool != null && _txDbPool.containsTx( tx ) )
+                    return _txDbPool.get( tx );
+
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
                     dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, 
                             _callback, tx, _classLoader );
+
+                    if ( _txDbPool != null )
+                        _txDbPool.put( tx, dbImpl );
+
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }

@@ -155,6 +155,11 @@ public class DatabaseImpl
     private ClassLoader                _classLoader;
 
 
+    /**
+     * The transaction to database map
+     */
+    private TxDatabaseMap              _txMap;
+
 
     public DatabaseImpl( String dbName, int lockTimeout, 
             LogInterceptor logInterceptor, CallbackInterceptor callback,
@@ -550,34 +555,45 @@ public class DatabaseImpl
 
     public void afterCompletion( int status )
     {
-        if ( _transaction == null || _ctx == null )
-            throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
-        if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
-            return;
-        if ( _ctx.getStatus() != Status.STATUS_PREPARED )
-            throw new IllegalStateException( "Unexpected state: afterCompletion called at status " + _ctx.getStatus() );
-        switch ( status ) {
-        case Status.STATUS_COMMITTED:
-            try {
-                _ctx.commit();
-            } catch ( TransactionAbortedException except ) {
-                if ( _logInterceptor != null )
-                    _logInterceptor.exception( except );
+        try {
+            if ( _transaction == null || _ctx == null )
+                throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
+            if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
+                return;
+            if ( _ctx.getStatus() != Status.STATUS_PREPARED )
+                throw new IllegalStateException( "Unexpected state: afterCompletion called at status " + _ctx.getStatus() );
+            switch ( status ) {
+            case Status.STATUS_COMMITTED:
+                try {
+                    _ctx.commit();
+                } catch ( TransactionAbortedException except ) {
+                    if ( _logInterceptor != null )
+                        _logInterceptor.exception( except );
+                    _ctx.rollback();
+                }
+                _ctx = null;
+                return;
+            case Status.STATUS_ROLLEDBACK:
                 _ctx.rollback();
+                _ctx = null;
+                return;
+            default:
+                _ctx.rollback();
+                _ctx = null;
+                throw new IllegalStateException( "Unexpected state: afterCompletion called with status " + status );
             }
-            _ctx = null;
-            return;
-        case Status.STATUS_ROLLEDBACK:
-            _ctx.rollback();
-            _ctx = null;
-            return;
-        default:
-            _ctx.rollback();
-            _ctx = null;
-            throw new IllegalStateException( "Unexpected state: afterCompletion called with status " + status );
+        } finally {
+            if ( _txMap != null && _transaction != null ) {
+                _txMap.remove( _transaction );
+                _txMap = null;
+            }
         }
     }
 
+    void setTxMap( TxDatabaseMap txMap ) 
+    {
+        _txMap = txMap;
+    }
 
     public boolean isActive()
     {
