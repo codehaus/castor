@@ -46,31 +46,11 @@
 package jdo;
 
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Collection;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.ResultSet;
-import java.lang.Math;
-import java.util.Vector;
-import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.LockNotGrantedException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import java.util.ArrayList;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -145,7 +125,7 @@ public class Size extends CastorTestCase
         QueryResults enum;
          OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
-        assert("size should be > 0",enum.size() > 0);
+        assertTrue ("size should be > 0",enum.size() > 0);
         _db.commit();
     }
 
@@ -163,8 +143,8 @@ public class Size extends CastorTestCase
         while (enum.hasMore())
         {
             enum.next();
-            assert("size should be > 0", enum.size() > 0);
-            assert("size should be ==25", enum.size() == 25);
+            assertTrue("size should be > 0", enum.size() > 0);
+            assertEquals("size should be ==25", enum.size(), 25);
         }
         _db.commit();
     }
@@ -186,29 +166,26 @@ public class Size extends CastorTestCase
             realSize ++;
         }
         _db.commit();
-        assert("realsize didn't equal expectedsize", realSize==expectedSize);
+        assertEquals("realsize didn't equal expectedsize", realSize, expectedSize);
     }
 
     /**
      * Should fail with a non scrollable resultset.
      */
-    public void testSizeD() throws PersistenceException 
+    public void testSizeD() 
     {
         try
         {
             _db.begin();
-            QueryResults enum;
             OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-            enum = oqlquery.execute(false);
-            // following should fail.
-            int expectedSize = enum.size();
+            QueryResults enum = oqlquery.execute(false);
             _db.commit();
             // This test fails when executed against PostgreSQL. 
-            assert("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).",false);
+            fail ("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).");
         }
         catch (Exception e)
         {
-            assert(true);
+            assertTrue(true);
         }
     
     }    

@@ -46,35 +46,19 @@
 package jdo; 
 
 
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.lang.Math;
-import java.util.Vector;
-import java.util.Random;
 import java.util.Date;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.persist.spi.Complex;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -123,7 +107,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void createDataObjects() 
-            throws PersistenceException, SQLException {
+            throws PersistenceException {
 
         _db.begin();
         // create person 1
@@ -215,7 +199,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testGeneral() 
-            throws PersistenceException, SQLException {
+            throws PersistenceException {
 
         stream.println("Running testGeneral...");
 
@@ -286,7 +270,9 @@ public class LazyLoading extends CastorTestCase {
             while ( itor.hasNext() ) {
                 cate = (TestLazyContractCategory) itor.next();
                 if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
+                	// no code 
                 } else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
+                	// no code
                 } else {
                     stream.println("Error: Category is incorrect");
                     _db.rollback();
@@ -369,7 +355,9 @@ public class LazyLoading extends CastorTestCase {
             while ( itor.hasNext() ) {
                 cate = (TestLazyContractCategory) itor.next();
                 if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
+                	// no code to execute
                 } else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
+                	// no code to execute 
                 } else {
                     stream.println("Error: Category is incorrect");
                     _db.rollback();
@@ -387,7 +375,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testCollection() 
-            throws PersistenceException, SQLException {
+            throws PersistenceException {
 
         stream.println("Running testCollection...");
 
@@ -474,7 +462,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testIterWithAdd()
-        throws PersistenceException, SQLException {
+        throws PersistenceException {
 
         stream.println("Running testIterWithAdd...");
 
@@ -503,7 +491,6 @@ public class LazyLoading extends CastorTestCase {
         _db.begin();
         loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
         addresses = loadPerson.getAddress();
-        int collSize = addresses.size();
         TestLazyAddress la = new TestLazyAddress();
         la.setId(999);
         la.setStreet("Rogue Street");
@@ -581,7 +568,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testIterWithDelete()
-        throws PersistenceException, SQLException {
+        throws PersistenceException {
 
         stream.println("Running testIterWithDelete...");
 
@@ -630,9 +617,6 @@ public class LazyLoading extends CastorTestCase {
             }
         }
 
-        // The expected number of items to iterate over
-        int collSize = addresses.size();
-
         _db.rollback();
 
         // Now start over, and add something to the collection.  Then try
@@ -668,7 +652,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testManyToMany()
-        throws PersistenceException, SQLException {
+        throws PersistenceException {
 
         stream.println("Running testManyToMany...");
 
@@ -707,7 +691,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testComplex()
-            throws PersistenceException, SQLException {
+            throws PersistenceException {
 
         stream.println("Running testComplex...");
 
@@ -840,7 +824,7 @@ public class LazyLoading extends CastorTestCase {
     }
 
     public void testLazyCollectionRollback()
-            throws PersistenceException, SQLException 
+            throws PersistenceException 
     {
 
         stream.println("Running testLazyCollectionRollback...");
@@ -867,10 +851,10 @@ public class LazyLoading extends CastorTestCase {
         projects = loadPerson.getProjects();
 
         // is the collection populated?
-        assert( "The projects collection is not valid!.", projects != null && projects.size() > 0 );
+        assertTrue( "The projects collection is not valid!.", projects != null && projects.size() > 0 );
 
         // is the collection instanceof Lazy? 
-        assert( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
+        assertTrue( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
             loadPerson.getProjects() instanceof org.exolab.castor.persist.Lazy );
 
         // OK, the collection of projects is there, let's test a rollback for bug #1046
@@ -878,7 +862,7 @@ public class LazyLoading extends CastorTestCase {
         _db.rollback();
 
         // test it again since the rollback - is the collection instanceof Lazy? 
-        assert( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
+        assertTrue( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
             loadPerson.getProjects() instanceof org.exolab.castor.persist.Lazy );
     }
 

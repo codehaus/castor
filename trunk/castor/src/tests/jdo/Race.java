@@ -47,12 +47,9 @@
 package jdo;
 
 
-import java.io.IOException;
 import java.util.Enumeration;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.ResultSet;
-import java.lang.Math;
 import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -62,12 +59,6 @@ import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -147,7 +138,6 @@ public class Race extends CastorTestCase {
     public void runOnce( int cachetype ) 
             throws PersistenceException, SQLException, Exception {
 
-        TestObjectEx    object;
         Enumeration     enum;
         OQLQuery        oql;
 
@@ -218,7 +208,7 @@ public class Race extends CastorTestCase {
         boolean isAllDone = false;
         int num;
         while ( !isAllDone ) {
-            Thread.currentThread().sleep( 1000 );
+            Thread.sleep( 1000 );
             num = 0;
             for ( int i=0; i<ts.length; i++ ) {
                 if ( ts[i].isDone() ) {
@@ -257,8 +247,8 @@ public class Race extends CastorTestCase {
             }
         }
         // report result
-        assert("Value in database does not match the expected value", num == jdos.length );
-        assert("Leak detected", !_leak );
+        assertTrue("Value in database does not match the expected value", num == jdos.length );
+        assertTrue("Leak detected", !_leak );
     }
     
     private class RaceThread extends Thread {
@@ -271,8 +261,7 @@ public class Race extends CastorTestCase {
         Random          ran;
         Exception       fatal;
 
-        RaceThread( Race theTest, Database db, TestRaceSyn[] tr, int cachetype, int n ) 
-                throws PersistenceException {
+        RaceThread( Race theTest, Database db, TestRaceSyn[] tr, int cachetype, int n ) {
             this.theTest    = theTest;
             this.db         = db;
             this.tr         = tr;
@@ -283,7 +272,6 @@ public class Race extends CastorTestCase {
 
         public void run() {
             try {
-                int num = 0;
                 stream.println("start testing");
                 out:
                 for ( int j=0; j<trial; j++ ) {
@@ -307,7 +295,7 @@ public class Race extends CastorTestCase {
                                         db.commit();
                                         isOk = true;
                                     } else {
-                                        theTest.stream.println("Error: "+" element not found!! missed in cache????\n");
+                                        CastorTestCase.stream.println("Error: "+" element not found!! missed in cache????\n");
                                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
                                         throw new NoSuchElementException("No element found (a).");
                                     }
@@ -327,27 +315,27 @@ public class Race extends CastorTestCase {
                                     }
                                 } else if ( (i % 4) == 2 ) {
                                     db.begin();
-                                    theTest.stream.println( "trying Database.load()" );
+                                    CastorTestCase.stream.println( "trying Database.load()" );
                                     TestRace tr = (TestRace) db.load( _classType, new Integer(i), Database.Shared );
                                     if ( tr != null ) {
                                         tr.incValue1();
                                         db.commit();
                                         isOk = true;
                                     } else {
-                                        theTest.stream.println("Error: "+" element not found!! missed in cache????\n");
+                                        CastorTestCase.stream.println("Error: "+" element not found!! missed in cache????\n");
                                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
                                         throw new NoSuchElementException("No element found (c).");                                        
                                     }
                                 } else if ( (i % 4 == 3 ) ) {
                                     db.begin();
-                                    theTest.stream.println( "trying Database.load()" );
+                                    CastorTestCase.stream.println( "trying Database.load()" );
                                     TestRace tr = (TestRace) db.load( _classType, new Integer(i), Database.Exclusive );
                                     if ( tr != null ) {
                                         tr.incValue1();
                                         db.commit();
                                         isOk = true;
                                     } else {
-                                        theTest.stream.println("Error: "+" element not found!! missed in cache????\n");
+                                        CastorTestCase.stream.println("Error: "+" element not found!! missed in cache????\n");
                                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
                                         throw new NoSuchElementException("No element found (c).");                                        
                                     }
@@ -357,44 +345,44 @@ public class Race extends CastorTestCase {
                             } catch ( TransactionAbortedException e ) {
                                 count++;
                                 // this exception should happen one in a while.
-                                theTest.stream.println( "Excepted exception: " + e );
+                                CastorTestCase.stream.println( "Excepted exception: " + e );
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 if ( count > 10 ) {
                                     break some;
                                 }
                             } catch ( LockNotGrantedException e ) {
                                 count++;
-                                theTest.stream.println( "Excepted exception: " + e);
+                                CastorTestCase.stream.println( "Excepted exception: " + e);
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 if ( count > 10 ) {
                                     break some;
                                 }
                             } catch ( QueryException e ) {
-                                theTest.stream.println( "Thread will be killed. Unexcepted exception: " );
+                                CastorTestCase.stream.println( "Thread will be killed. Unexcepted exception: " );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 _leak = true;
                                 break out;
                             } catch ( TransactionNotInProgressException e ) {
-                                theTest.stream.println( "Thread will be killed. Unexcepted exception: " );
+                                CastorTestCase.stream.println( "Thread will be killed. Unexcepted exception: " );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 _leak = true;
                                 break out;
                             } catch ( PersistenceException e ) {
-                                theTest.stream.println( "Thread will be killed. Unexcepted exception: " );
+                                CastorTestCase.stream.println( "Thread will be killed. Unexcepted exception: " );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 _leak = true;
                                 break out;
                             } catch ( NoSuchElementException e ) {
-                                theTest.stream.println( "Thread will be killed. Element not found: entry leakage in cache" );
+                                CastorTestCase.stream.println( "Thread will be killed. Element not found: entry leakage in cache" );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 _leak = true;
                                 break out;
                             } catch ( Exception e ) {
-                                theTest.stream.println( "Thread will be killed. Element not found: other exception: "+e );
+                                CastorTestCase.stream.println( "Thread will be killed. Element not found: other exception: "+e );
                                 e.printStackTrace();
                                 if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                                 _leak = true;
@@ -411,7 +399,7 @@ public class Race extends CastorTestCase {
                         // thread and won't discover problem.
                         //if ( ran.nextDouble() < 0.3 ) {
                             try {
-                                Thread.currentThread().sleep( (long) (100 * ran.nextDouble()) );
+                                Thread.sleep( (long) (100 * ran.nextDouble()) );
                             } catch ( InterruptedException e ) {
                                 System.out.println(e);
                                 break out;
