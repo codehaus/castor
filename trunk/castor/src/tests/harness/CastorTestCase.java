@@ -73,6 +73,7 @@ public class CastorTestCase extends TestCase {
         setDescription( description );
         setSuite( suite );
     }
+   
     private void clearCache() {
         try {
             if (suite instanceof JDOCategory) {
@@ -85,7 +86,7 @@ public class CastorTestCase extends TestCase {
     }
 
     /**
-	 * @param name2
+	 * @param name
 	 */
 	public CastorTestCase(String name) {
         super (name);
