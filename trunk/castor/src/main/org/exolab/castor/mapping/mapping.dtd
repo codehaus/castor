@@ -190,7 +190,7 @@
           support for it in the future.
  -->
 
-<!ELEMENT bind-xml EMPTY>
+<!ELEMENT bind-xml ( class? )>
 <!ATTLIST bind-xml
     name         NMTOKEN   #IMPLIED
     type         NMTOKEN   #IMPLIED
