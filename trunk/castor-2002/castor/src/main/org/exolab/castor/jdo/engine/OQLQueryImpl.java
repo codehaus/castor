@@ -267,8 +267,6 @@ public class OQLQueryImpl
         } catch ( LockNotGrantedException except ) {
             throw new PersistenceExceptionImpl( except.toString() );
         } catch ( PersistenceException except ) {
-            if ( Logger.debug() )
-                except.printStackTrace( Logger.getSystemLogger() );
             throw except;
         } finally {
             if ( results != null )
