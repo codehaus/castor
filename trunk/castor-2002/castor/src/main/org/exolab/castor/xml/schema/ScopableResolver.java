@@ -55,7 +55,7 @@ import java.util.Hashtable;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ScopableResolver implements Resolver , java.io.Serializable{
+public class ScopableResolver implements Resolver {
 
     private Hashtable ids;
 
