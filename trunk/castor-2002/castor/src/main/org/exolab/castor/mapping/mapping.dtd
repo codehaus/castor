@@ -122,7 +122,7 @@
     get-method NMTOKEN #IMPLIED
     set-method NMTOKEN #IMPLIED
     create-method NMTOKEN #IMPLIED
-    collection (array|vector|enumerate) #IMPLIED>
+    collection (array|vector|hashtable|collection|set|map) #IMPLIED>
 
 
 <!--

@@ -81,7 +81,10 @@
       <attribute name="collection" type="string" minOccurs="0">
         <enumeration value="array"/>
         <enumeration value="vector"/>
-        <enumeration value="enumerate"/>
+        <enumeration value="hashtable"/>
+        <enumeration value="collection"/>
+        <enumeration value="set"/>
+        <enumeration value="map"/>
       </attribute>
     </type>
   </element>
