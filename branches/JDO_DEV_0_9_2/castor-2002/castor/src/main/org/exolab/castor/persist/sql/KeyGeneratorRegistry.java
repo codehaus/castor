@@ -52,7 +52,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;

@@ -47,17 +47,29 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.sql.DriverManager;
+import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Properties;
+import java.util.Enumeration;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.Connector;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.LogInterceptor;
-
+import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.EntityInfo;
+import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.jdo.conf.*;
+import org.exolab.castor.jdo.PersistenceException;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.naming.NameNotFoundException;
 
 /**
  * {@link PersistenceFactory} for generic JDBC driver.
@@ -70,20 +82,81 @@ public abstract class BaseFactory
 {
 
 
-    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
+    public Persistence getPersistence( EntityInfo entity, LogInterceptor log )
         throws MappingException
     {
-        if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
-            return null;
+        
+        // 092: if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
+        //    return null;
+        
         try {
-            return new SQLEngine( (JDOClassDescriptor) clsDesc, logInterceptor, this, null);
+            return new SQLEngine( entity, log, this, null );
         } catch ( MappingException except ) {
-            if ( logInterceptor != null )
-                logInterceptor.exception( except );
+            if ( log != null )
+                log.exception( except );
             return null;
         }
     }
 
+    public Connector getConnector( Database database ) {
+
+        try {
+            if ( database.getDriver() != null ) {
+                // JDO configuration file specifies a driver, use the driver
+                // properties to create a new registry object.
+                Properties  props;
+                Enumeration params;
+                Param       param;
+
+                if ( database.getDriver().getClassName() != null ) {
+                    try {
+                        Class.forName( database.getDriver().getClassName() ).newInstance();
+                    } catch ( Exception except ) {
+                        throw new MappingException( except );
+                    }
+                }
+                if ( DriverManager.getDriver( database.getDriver().getUrl() ) == null )
+                    throw new MappingException( "jdo.missingDriver", database.getDriver().getUrl() );
+
+                props = new Properties();
+                params = database.getDriver().enumerateParam();
+                while ( params.hasMoreElements() ) {
+                    param = (Param) params.nextElement();
+                    props.put( param.getName(), param.getValue() );
+                }
+                return new SQLConnector( database.getName(), database.getDriver().getUrl(), props );
+            } else if ( database.getDataSource() != null ) {
+                // JDO configuration file specifies a DataSource object, use the
+                // DataSource which was configured from the JDO configuration file
+                // to create a new registry object.
+                DataSource ds;
+
+                ds = (DataSource) database.getDataSource().getParams();
+                if ( ds == null )
+                    throw new MappingException( "jdo.missingDataSource", database.getName() );
+                return new SQLConnector( database.getName(), ds );
+            } else if ( database.getJndi() != null ) {
+                // JDO configuration file specifies a DataSource lookup through JNDI,
+                // locate the DataSource object frome the JNDI namespace and use it.
+                Object    ds;
+
+                try {
+                    ds = new InitialContext().lookup( database.getJndi().getName() );
+                } catch ( NameNotFoundException except ) {
+                    throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
+                } catch ( NamingException except ) {
+                    throw new MappingException( except );
+                }
+                if ( ! ( ds instanceof DataSource ) )
+                    throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
+                return new SQLConnector( database.getName(), (DataSource) ds );
+            } else {
+                throw new MappingException( "jdo.missingDataSource", database.getName() );
+            }
+        } catch ( SQLException e ) {
+            throw new PersistenceException( "Exception occurs while obtaining SQL connection", e );
+        }
+    }
 
     /**
      * Needed to process OQL queries of "CALL" type (using stored procedure
@@ -119,6 +192,32 @@ public abstract class BaseFactory
     public boolean supportsSetNullInWhere()
     {
         return false;
+    }
+
+    private class SQLConnector implements Connector {
+        private String          _name;
+        private String          _url;
+        private Properties      _pros;
+        private LogInterceptor  _log;
+        private DataSource      _ds;
+
+        private SQLConnector( String name, String url, Properties pros ) {
+            _name  = name;
+            _url   = url;
+            _pros  = pros;
+        }
+
+        private SQLConnector( String name, DataSource ds ) {
+            _name  = name;
+            _ds    = ds;
+        }
+
+        public Object createConnection() {
+            if ( _ds != null )
+                return _ds.getConnection();
+            else
+                return DriverManager.getConnection( _url, _pros );
+        }
     }
 }
 
