@@ -34,12 +34,25 @@
     For concurrency and integrity reasons, two database definitions
     should never attempt to use overlapping mappings. It is recommended
     to use one database configuration per database server.
+
+    The engine attribute specifies the persistence engine for this database
+    server. Different  database servers vary in the SQL syntax and capabilites
+    they support, and this attribute names the service provider to use.
+
+    The following names are supported in Castor 1.0:
+
+    generic     Generic JDBC engine
+    oracle      Oracle 7 and Oracle 8
+    sybase      Sybase 11 and SQL Anywhere
+    sql-server  Microsoft SQL Server
+    postgresql  PostgreSQL 6.5 and 7
  -->
 
 <!ELEMENT database ( ( driver | data-source | jndi )?,
-                     engine?, mapping+ )>
+                     mapping+ )>
 <!ATTLIST database
-          name ID #REQUIRED>
+          name ID      #REQUIRED
+          engine CDATA "generic">
 
 
 <!--
@@ -144,19 +157,3 @@
           name CDATA #REQUIRED>
 
 
-<!--
-    Specifies the persistence engine for this database server. Different
-    database servers vary in the SQL syntax and capabilites they support.
-    This element names the service provider to use.
-
-    The following names are supported in Castor 1.0:
-
-    oracle      Oracle 7 and Oracle 8
-    sybase      Sybase 11 and SQL Anywhere
-    sql-server  Microsoft SQL Server
-    postgresql  PostgreSQL 6.5 and 7
- -->
-
-<!ELEMENT engine ANY>
-<!ATTLIST engine
-          name CDATA #REQUIRED>

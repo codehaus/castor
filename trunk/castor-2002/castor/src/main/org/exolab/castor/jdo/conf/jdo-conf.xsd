@@ -22,9 +22,9 @@
         <element ref="data-source" />
         <element ref="jndi" />
       </group>
-      <element ref="engine" minOccurs="1" />
       <element ref="mapping" minOccurs="1" />
       <attribute name="name" type="ID" minOccurs="1" />
+      <attribute name="engine" type="string" minOccurs="0" default="generic" />
     </type>
   </element>
 
@@ -62,12 +62,6 @@
   </element>
 
   <element name="jndi">
-    <type content="empty">
-      <attribute name="name" type="string" minOccurs="1" />
-    </type>
-  </element>
-
-  <element name="engine">
     <type content="empty">
       <attribute name="name" type="string" minOccurs="1" />
     </type>
