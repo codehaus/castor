@@ -11,14 +11,15 @@
     <name surname="Arkin" given="Assaf"/>
     <email>arkin@intalio.com</email>
     <company id="intalio"/>
-    <description>Responsible for all things wrong in JDO</description>
+    <description>Responsible for all things wrong in JDO.</description>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Visco" given="Keith"/>
     <email>kvisco@intalio.com</email>
     <company id="intalio"/>
-    <description>Responsible for all things wrong in Castor XML</description>
+    <description>Responsible for all things wrong in Castor XML,
+    as well as removing angle brackets.</description>
   </contributor>
 
   <contributor type="Committer">
@@ -33,7 +34,7 @@
     <name surname="Karpenstein" given="Nissim"/>
     <email>nissim@nksystems.com</email>
     <company id="nksystems"/>
-    <description>Develops the new OQL query parser.</description>
+    <description>Develops the OQL query parser.</description>
   </contributor>
 
   <contributor type="Committer">
@@ -244,7 +245,13 @@
   <contributor type="Contributor">
     <name surname="Rousse" given="Guillaume" />
 	<email>Guillaume.Rousse@univ-reunion.fr</email>
-	<description>Mapping extension</description>
+   <description>Mapping extension and other important feebback</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Vaughan" given="Steve"/>
+    <email>snmvaughan92@yahoo.com</email>
+    <description>Castor XML feedback</description>
   </contributor>
 
   <contributor type="Feedback">
