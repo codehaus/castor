@@ -29,6 +29,7 @@
            <tr><td>postgresql</td><td>PostgreSQL 6.5 and 7</td></tr>
            <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
            <tr><td>instantdb</td><td>InstantDB</td></tr>
+           <tr><td>interbase</td><td>Interbase</td></tr>
          </table></p>
       <p><small>Note: Castor do not work with JDBC-ODBC bridge from Sun,
                 therefore MS Access is not supported.
