@@ -126,6 +126,8 @@ public class OQLQueryImpl
 
     private int                _fieldNum;
 
+    private int                _projectionType;
+
 
     OQLQueryImpl( DatabaseImpl dbImpl )
     {
@@ -253,6 +255,7 @@ public class OQLQueryImpl
         _objClass = walker.getObjClass();
         _expr = walker.getQueryExpression();
         _paramInfo = walker.getParamInfo();
+        _projectionType = walker.getProjectionType();
 
 
         //port param info types back to the format of old bind types.
@@ -401,30 +404,50 @@ public class OQLQueryImpl
         org.exolab.castor.persist.QueryResults      results;
         PersistenceQuery  query;
         SQLEngine         engine;
+        QueryResults retVal = null;;
         
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         try {
-            try {
-                engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-                if ( _expr != null ) {
-                    query = engine.createQuery( _expr, _bindTypes );
-                } else {
-                    query = engine.createCall( _spCall, _bindTypes );
-                }
-                if ( _bindValues != null ) {
-                    for ( int i = 0 ; i < _bindValues.length ; ++i )
-                        query.setParameter( i, _bindValues[ i ] );
-                }
-            } catch ( QueryException except ) {
-                throw new QueryException( except.getMessage() );
+            switch (_projectionType) {
+                case ParseTreeWalker.PARENT_OBJECT:
+                case ParseTreeWalker.DEPENDANT_OBJECT:
+                case ParseTreeWalker.DEPENDANT_OBJECT_VALUE:
+                    
+                    //System.out.println("Executing object query");
+                    
+                    try {
+                        engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+                        if ( _expr != null ) {
+                            query = engine.createQuery( _expr, _bindTypes );
+                        } else {
+                            query = engine.createCall( _spCall, _bindTypes );
+                        }
+                        if ( _bindValues != null ) {
+                            for ( int i = 0 ; i < _bindValues.length ; ++i )
+                                query.setParameter( i, _bindValues[ i ] );
+                        }
+                    } catch ( QueryException except ) {
+                        throw new QueryException( except.getMessage() );
+                    }
+                    results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
+                    _fieldNum = 0;
+                    retVal = new OQLEnumeration( results );
+                    break;
+                case ParseTreeWalker.DEPENDANT_VALUE:
+                case ParseTreeWalker.AGGREGATE:
+                case ParseTreeWalker.FUNCTION:
+                
+                    //System.out.println("Executing simple query");
+
+                    SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
+                    retVal =  sqe.execute( _expr, _bindValues);
+                    
             }
-            results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
-            _fieldNum = 0;
-            return new OQLEnumeration( results );
         } catch ( PersistenceException except ) {
             throw except;
         }
+        return ( retVal );
     }
         
 
