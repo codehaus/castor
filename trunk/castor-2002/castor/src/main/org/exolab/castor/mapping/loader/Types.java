@@ -81,7 +81,7 @@ public class Types
      * be returned. If a Java class name is used, the class will be loaded and
      * returned through the supplied class loader.
      *
-     * @param loader The class loader to use
+     * @param loader The class loader to use, may be null
      * @param typeName The type name
      * @return The type class
      * @throws ClassNotFoundException The specified class could not be found
@@ -94,7 +94,10 @@ public class Types
                 return ( _typeInfos[ i ].primitive != null ? _typeInfos[ i ].primitive :
                          _typeInfos[ i ].javaType );
         }
-        return loader.loadClass( typeName );
+        if ( loader != null )
+            return loader.loadClass( typeName );
+        else
+            return Class.forName( typeName );
     }
 
 
