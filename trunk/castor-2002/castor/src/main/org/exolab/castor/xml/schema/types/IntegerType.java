@@ -45,12 +45,11 @@
 
 package org.exolab.castor.xml.schema.types;
 
-import org.exolab.castor.xml.schema.Simpletype;
 import org.exolab.castor.xml.schema.Schema;
 
 /**
- * An implementation of the XML Schema built-in integer simpletype.
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * An implementation of the XML Schema built-in integer SimpleType.
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
 public class IntegerType extends BuiltInType {
