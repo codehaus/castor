@@ -155,10 +155,15 @@ public class XSRecurringDuration extends XSType {
         _maxExclusive = max;
         //if no period and duration, we take the ones from the current
         //XSRecurringDuration
-        if (_maxExclusive.getDuration() == null)
-            _maxExclusive.setDuration(this.getDuration());
-        if (_maxExclusive.getPeriod() == null)
-            _maxExclusive.setPeriod(this.getPeriod());
+        try {
+            if (_maxExclusive.getDuration() == null)
+                _maxExclusive.setDuration(this.getDuration());
+            if (_maxExclusive.getPeriod() == null)
+                _maxExclusive.setPeriod(this.getPeriod());
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            String err = "XSRecurringDuration : "+e;
+            throw new IllegalArgumentException(err);
+        }
         _maxInclusive = null;
     } //-- setMaxExclusive
 
@@ -171,10 +176,16 @@ public class XSRecurringDuration extends XSType {
         _maxInclusive = max;
        //if no period and duration, we take the ones from the current
         //XSRecurringDuration
-        if (_maxExclusive.getDuration() == null)
-            _maxInclusive.setDuration(this.getDuration());
-        if (_maxExclusive.getPeriod() == null)
-            _maxInclusive.setPeriod(this.getPeriod());
+        try {
+            if (_maxExclusive.getDuration() == null)
+                _maxInclusive.setDuration(this.getDuration());
+            if (_maxExclusive.getPeriod() == null)
+                _maxInclusive.setPeriod(this.getPeriod());
+          } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            String err = "XSRecurringDuration : "+e;
+            throw new IllegalArgumentException(err);
+        }
+
         _maxExclusive = null;
     } //-- setMaxInclusive
 
@@ -188,10 +199,16 @@ public class XSRecurringDuration extends XSType {
         _minExclusive = min;
        //if no period and duration, we take the ones from the current
         //XSRecurringDuration
-        if (_minExclusive.getDuration() == null)
-            _minExclusive.setDuration(this.getDuration());
-        if (_minExclusive.getPeriod() == null)
-            _minExclusive.setPeriod(this.getPeriod());
+        try {
+            if (_minExclusive.getDuration() == null)
+                _minExclusive.setDuration(this.getDuration());
+            if (_minExclusive.getPeriod() == null)
+                _minExclusive.setPeriod(this.getPeriod());
+          } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            String err = "XSRecurringDuration : "+e;
+            throw new IllegalArgumentException(err);
+        }
+
         _minInclusive = null;
     } //-- setMinExclusive
 
@@ -204,10 +221,15 @@ public class XSRecurringDuration extends XSType {
         _minInclusive = min;
         //if no period and duration, we take the ones from the current
         //XSRecurringDuration
-        if (_minInclusive.getDuration() == null)
-            _minInclusive.setDuration(this.getDuration());
-        if (_minInclusive.getPeriod() == null)
-            _minInclusive.setPeriod(this.getPeriod());
+        try {
+            if (_minInclusive.getDuration() == null)
+                _minInclusive.setDuration(this.getDuration());
+            if (_minInclusive.getPeriod() == null)
+                _minInclusive.setPeriod(this.getPeriod());
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            String err = "XSRecurringDuration : "+e;
+            throw new IllegalArgumentException(err);
+        }
 
         _minExclusive = null;
     } //-- setMinInclusive
