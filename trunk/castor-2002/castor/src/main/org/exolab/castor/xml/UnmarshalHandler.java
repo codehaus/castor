@@ -95,6 +95,13 @@ public final class UnmarshalHandler extends MarshalFramework
 
 
     /**
+     * The built-in XML prefix used for xml:space, xml:lang
+     * and, as the XML 1.0 Namespaces document specifies, are
+     * reserved for use by XML and XML related specs.
+    **/
+    private static final String XML_PREFIX = "xml";
+    
+    /**
      * Attribute name for default namespace declaration
     **/
     private static final String   XMLNS             = "xmlns";
@@ -196,7 +203,14 @@ public final class UnmarshalHandler extends MarshalFramework
      private Namespaces _namespaces = null;
 
     private Hashtable _nsPackageMappings = null;
-
+    
+    /**
+     * A boolean that indicates attribute processing should
+     * be strict and an error should be flagged if any
+     * extra attributes exist.
+    **/
+    private boolean _strictAttributes = false;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -618,7 +632,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
     } //-- startDocument
 
-    public void startElement(String name, AttributeList atts)
+    public void startElement(String name, AttributeList attList)
         throws org.xml.sax.SAXException
     {
 
@@ -626,7 +640,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- we delegate the event handling
         if (_anyUnmarshaller != null) {
             _depth++;
-           _anyUnmarshaller.startElement(name,atts);
+           _anyUnmarshaller.startElement(name,attList);
            return;
         }
 
@@ -637,7 +651,10 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- XXX Note: This code will change when we update the XML event API
 
         _namespaces = _namespaces.createNamespaces();
-        processNamespaces(atts);
+        
+        //-- convert AttributeList to AttributeSet and process
+        //-- namespace declarations
+        AttributeSet atts = processAttributeList(attList);
 
         String prefix = "";
         int idx = name.indexOf(':');
@@ -1031,7 +1048,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     //1- creates a new SAX2ANY handler
                     _anyUnmarshaller = new SAX2ANY();
                     //2- delegates the element handling
-                    _anyUnmarshaller.startElement(name, atts);
+                    _anyUnmarshaller.startElement(name, attList);
                     //first element so depth can only be one at this point
                     _depth = 1;
                     state.object = _anyUnmarshaller.getStartingNode();
@@ -1181,26 +1198,13 @@ public final class UnmarshalHandler extends MarshalFramework
      * the instance type attribute, or null if no instance type
      * attribute exists in the given AttributeList.
      */
-    private String getInstanceType(AttributeList atts, String currentPackage) {
+    private String getInstanceType(AttributeSet atts, String currentPackage) {
 
-        String type = null;
-
+        if (atts == null) return null;
+        
         //-- find xsi:type attribute
-        String prefix = _namespaces.getNamespacePrefix(XSI_NAMESPACE);
-        if (prefix == null) return null;
-        prefix += ':';
-
-        for (int i = 0; i < atts.getLength(); i++) {
-            String attName = atts.getName(i);
-            if (attName.startsWith(prefix)) {
-                attName = attName.substring(prefix.length());
-                if (attName.equals(XSI_TYPE)) {
-                    type = atts.getValue(i);
-                    break;
-                }
-            }
-        }
-
+        String type = atts.getValue(XSI_TYPE, XSI_NAMESPACE);
+        
         if (type != null) {
             if (type.startsWith(JAVA_PREFIX)) {
                 return type.substring(JAVA_PREFIX.length());
@@ -1235,24 +1239,38 @@ public final class UnmarshalHandler extends MarshalFramework
     /**
      * Processes the given attribute list, and attempts to add each
      * Attribute to the current Object on the stack
+     *
+     * @param atts the AttributeSet to process
+     * @param classDesc the classDesc to use during processing
+     * @param element the element name used for error reporting
     **/
     private void processAttributes
-        (AttributeList atts, XMLClassDescriptor classDesc)
+        (AttributeSet atts, XMLClassDescriptor classDesc)
         throws org.xml.sax.SAXException
     {
 
-        if (atts == null) {
-
-            if ((classDesc != null)
-                && (classDesc.getAttributeDescriptors().length > 0)
-                && (debug))
-            {
-                UnmarshalState state = (UnmarshalState)_stateInfo.peek();
-                buf.setLength(0);
-                buf.append("warning: the AttributeList for '");
-                buf.append(state.elementName);
-                buf.append("' is null, but attribute descriptors exist.");
-                message(buf.toString());
+        //-- handle empty attributes
+        if ((atts == null) || (atts.getSize() == 0)) {
+            if (classDesc != null) {
+                XMLFieldDescriptor[] descriptors 
+                    = classDesc.getAttributeDescriptors();
+                for (int i = 0; i < descriptors.length; i++) {
+                    XMLFieldDescriptor descriptor = descriptors[i];
+                    if (descriptor == null) continue;
+                    //-- Since many attributes represent primitive
+                    //-- fields, we add an extra validation check here
+                    //-- in case the class doesn't have a "has-method".
+                    if (descriptor.isRequired() && (_validate || debug)) {
+                        String err = classDesc.getXMLName() + " is missing " +
+                            "required attribute: " + descriptor.getXMLName();
+                        if (_locator != null) {
+                            err += "\n  - line: " + _locator.getLineNumber() +
+                                " column: " + _locator.getColumnNumber();
+                        }
+                        if (_validate) throw new SAXException(err);
+                        if (debug) message(err);
+                    }
+                }
             }
             return;
         }
@@ -1272,7 +1290,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 return;
             }
         }
-
+        
         //-- First loop through Attribute Descriptors.
         //-- Then, if we have any attributes which
         //-- haven't been processed we can ask
@@ -1280,64 +1298,90 @@ public final class UnmarshalHandler extends MarshalFramework
 
         XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
 
-        List processedAtts = new List(atts.getLength());
+        boolean[] processedAtts = new boolean[atts.getSize()];
         for (int i = 0; i < descriptors.length; i++) {
 
             XMLFieldDescriptor descriptor = descriptors[i];
 
-            String attName = descriptor.getXMLName();
-            String attValue = atts.getValue(attName);
+            String name      = descriptor.getXMLName();
+            String namespace = descriptor.getNameSpaceURI();
+            
+            int index = atts.getIndex(name, namespace);
+            
 
-            if (attValue != null) {
-                processedAtts.add(attName);
+            if (index >= 0) {
+                processedAtts[index] = true;
             }
             //-- otherwise...for now just continue, this code needs to 
             //-- change when we upgrade to new event API
             else continue;
 
             try {
-                processAttribute(attName, attValue, descriptor, classDesc, object);
+                processAttribute(name, atts.getValue(index), descriptor, classDesc, object);
             }
             catch(java.lang.IllegalStateException ise) {
-                String err = "unable to add attribute \"" + attName + "\" to ";
-                err += state.fieldDesc.getXMLName();
-                err += "due to the following error: " + ise;
+                String err = "unable to add attribute \"" + name + "\" to '";
+                err += state.classDesc.getJavaClass().getName();
+                err += "' due to the following error: " + ise;
                 throw new SAXException(err);
             }
         }
-        //-- loop through remaining attributes if necessary
-        //-- this might be useful for prefixed attributes
-        int len = atts.getLength();
-        if (len != processedAtts.size()) {
-            for (int i = 0; i < len; i++) {
-                String attName = atts.getName(i);
-
-                //-- Begin Namespace Handling :
-                int idx = attName.indexOf(':');
-                if (idx >= 0) {
-                    attName = attName.substring(idx+1);
+        
+        //-- Handle any non processed attributes...
+        //-- This is useful for descriptors that might use
+        //-- wild-cards or other types of matching..as well
+        //-- as backward compatibility...attribute descriptors
+        //-- were erronously getting set with the default
+        //-- namespace by the source generator...this is 
+        //-- also true of the generated classes for the
+        //-- Mapping Framework...we need to clean this up
+        //-- at some point in the future.
+        for (int i = 0; i < processedAtts.length; i++) {
+            if (processedAtts[i]) continue;
+            
+            String name = atts.getName(i);
+            
+            if (name.startsWith(XML_PREFIX + ':')) {
+                //-- XML specification specific attribute
+                //-- It should be safe to ignore these...but
+                //-- if you think otherwise...let use know!
+                if (debug) {
+                    String msg = "ignoring attribute '" + name + 
+                        "' for class: " + 
+                            state.classDesc.getJavaClass().getName();
+                    message(msg);
                 }
-               //-- End Namespace Handling
+                continue;
+            }
+            
+            //-- This really should handle namespace...but it currently
+            //-- doesn't. Ignoring namespaces also helps with the 
+            //-- backward compatibility issue mentioned above.
+            XMLFieldDescriptor descriptor =
+                classDesc.getFieldDescriptor(name, NodeType.Attribute);
 
-               if (processedAtts.contains(attName)) continue;
-               XMLFieldDescriptor descriptor =
-                    classDesc.getFieldDescriptor(attName, NodeType.Attribute);
+            if (descriptor == null) {
+                if (_strictAttributes) {
+                    //-- handle error
+                    String error = "The attribute '" + name + 
+                        "' appears illegally on element '" +
+                        state.elementName + "'.";
+                    throw new SAXException(error);
+                }
+                continue;
+            }
 
-               if (descriptor == null) continue;
-
-               String attValue = atts.getValue(i);
-               try {
-                   processAttribute(attName, attValue, descriptor, classDesc, object);
-               }
-               catch(java.lang.IllegalStateException ise) {
-                   String err = "unable to add attribute \"" + attName + "\" to ";
-                   err += state.fieldDesc.getXMLName();
-                   err += "due to the following error: " + ise;
-                   throw new SAXException(err);
-               }
+            try {
+                processAttribute(name, atts.getValue(i), descriptor, classDesc, object);
+            }
+            catch(java.lang.IllegalStateException ise) {
+                String err = "unable to add attribute \"" + name + "\" to '";
+                err += state.classDesc.getJavaClass().getName();
+                err += "' due to the following error: " + ise;
+                throw new SAXException(err);
             }
         }
-
+        
     } //-- processAttributes
 
     /**
@@ -1446,14 +1490,22 @@ public final class UnmarshalHandler extends MarshalFramework
     } //-- processIDREF
 
     /**
-     * Processes the namespace declarations found in the given attribute list
+     * Processes the attributes and namespace declarations found
+     * in the given SAX AttributeList. The global AttributeSet
+     * is cleared and updated with the attributes. Namespace
+     * declarations are added to the set of namespaces in scope.
      *
-     * @param atts the AttributeList containing the namespace declarations
+     * @param atts the AttributeList to process.
     **/
-    private void processNamespaces(AttributeList atts) {
-        if (atts == null) return;
-
-        for (int i = 0; i < atts.getLength(); i++) {
+    private AttributeSet processAttributeList(AttributeList atts) {
+        
+        if (atts == null) return new AttributeSetImpl(0);
+        
+        
+        //-- process all namespaces first
+        int attCount = 0;
+        boolean[] validAtts = new boolean[atts.getLength()];
+        for (int i = 0; i < validAtts.length; i++) {
             String attName = atts.getName(i);
             if (attName.equals(XMLNS)) {
                 _namespaces.addNamespace("", atts.getValue(i));
@@ -1462,8 +1514,34 @@ public final class UnmarshalHandler extends MarshalFramework
                 String prefix = attName.substring(XMLNS_PREFIX_LENGTH);
                 _namespaces.addNamespace(prefix, atts.getValue(i));
             }
+            else {
+                validAtts[i] = true;
+                ++attCount;
+            }
         }
-
+        //-- process validAtts...if any exist
+        AttributeSetImpl attSet = null;
+        if (attCount > 0) {
+            attSet = new AttributeSetImpl(attCount);
+            for (int i = 0; i < validAtts.length; i++) {
+                if (!validAtts[i]) continue;
+                String namespace = null;
+                String attName = atts.getName(i);
+                int idx = attName.indexOf(':');
+                if (idx > 0) {
+                    String prefix = attName.substring(0, idx);
+                    if (!prefix.equals(XML_PREFIX)) {
+                        attName = attName.substring(idx+1);
+                        namespace = _namespaces.getNamespaceURI(prefix);
+                    }
+                }
+                attSet.setAttribute(attName, atts.getValue(i), namespace);
+            }
+        }
+        else attSet = new AttributeSetImpl(0);
+        
+        return attSet;
+        
     } //-- method: processNamespaces
 
     /**
