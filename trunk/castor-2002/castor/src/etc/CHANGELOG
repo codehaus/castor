@@ -1,6 +1,24 @@
 Version 0.8.6  May 19, 2000
 ---------------------------
 
+XML:     Added support in the Marshaller to specify whether or not to marshal
+         as an XML document, or just an XML fragment (default). Currently
+         the only difference is the XML declaration is printed when marshalling
+         as a document. I will add support for specifying the DOCTYPE. Of course
+         since a SAX 1.0 DocumentHandler doesn't allow this, DOCTYPE and
+         XML declarations will only be printed when a Writer is used.
+
+XML:     Added support in the unmarshaller for better inheritence checking.
+         If a FieldDescriptor is not found for an element, an attempt to
+         obtain ClassDescriptor will occur for the given element. If found,
+         another check will be performed to find a FieldDescriptor that
+         describes a field which is a superclass of type described by the
+         class descriptor. (see src/tests/xml/Inheritence.java)
+
+Mapping: Added a match attribute for the xml element, this is used for allowing
+         better inheritence support. Setting this match attribute will restrict,
+         or extend the xml names matched by a given XMLFieldDescriptor.
+
 JDO:     Fixed bug when related object is null and SQL_OTHER type is passed to JDBC
          driver; now properly passes type of identity field. (Reported by
          Eitan Suez <eitan@uptodata.com>).
