@@ -92,6 +92,12 @@ public class ClassDesc
     private FieldDesc      _identity;
 
 
+    /**
+     * Related identity field. Used for relations where the identity
+     * value is obtained from another object to which this identity
+     * field points. The related identity field is mapped against that
+     * other object.
+     */
     private FieldDesc      _relIdentity;
 
 
@@ -158,10 +164,12 @@ public class ClassDesc
     protected ClassDesc( ClassDesc clsDesc )
     {
         _javaClass = clsDesc._javaClass;
-        _fields = clsDesc._fields;
+        _fields = (FieldDesc[]) clsDesc._fields.clone();
         _extends = clsDesc._extends;
         _identity = clsDesc._identity;
         _accessMode = clsDesc._accessMode;
+        _relIdentity = clsDesc._relIdentity;
+        _relations = (RelationDesc[]) clsDesc._relations.clone();
     }
 
 
@@ -256,6 +264,16 @@ public class ClassDesc
     }
 
 
+    /**
+     * Returns the indentity value of this field. This method is used with
+     * regards to attached relation, where the actual identity value is
+     * obtained from the object to which this field relates and which this
+     * field's identity points to. This method will work for both regular
+     * descriptors and attached relations.
+     *
+     * @param obj The object
+     * @return The identity value
+     */
     public Object getIdentity( Object obj )
     {
         if ( _relIdentity == null )
