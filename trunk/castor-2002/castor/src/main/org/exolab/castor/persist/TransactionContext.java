@@ -111,18 +111,45 @@ public abstract class TransactionContext
      * access mechanism.
      */
 
+    /*
+     * An object is consider as Transitent if it is not partcipate in
+     * the current transaction.
+     */
     public static int OBJECT_STATE_TRANSIENT = 0;
 
+    /*
+     * This state is not yet used by castor
+     */
     public static int OBJECT_STATE_HOLLOW = 1;
 
+    /*
+     * An object is consider as READ_ONLY if and only if it is load
+     * thru this transactionContext as read only object
+     */
     public static int OBJECT_STATE_READ_ONLY = 2;
     
+    /*
+     * An object is consider as Persistent if the object is loaded
+     * thru this transactionContext
+     */
     public static int OBJECT_STATE_PERSISTENT = 3;
 
+    /*
+     * An object is consider as PERSISTENT_NEW if the object is
+     * created in this transactionContext
+     */
     public static int OBJECT_STATE_PERSISTENT_NEW = 4;
 
+    /*
+     * An object is consider as PERSISTENT_DELETED if the object is
+     * loaded thru this transactionContext and deleted
+     */
     public static int OBJECT_STATE_PERSISTENT_DELETED = 5;
 
+    /*
+     * An object is consider as PERSISTENT_NEW_DELETED if the object is
+     * created in this transactionContext and deleted
+     */
     public static int OBJECT_STATE_PERSISTENT_NEW_DELETED = 6;
 
     
@@ -200,6 +227,12 @@ public abstract class TransactionContext
     private Database     _db;
 
     /**
+     * True if user prefer all reachable object to be stored automatically.
+     * False if user want only dependent object to be stored.
+     */
+    private boolean _autoStore;
+
+    /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
      */
@@ -222,6 +255,13 @@ public abstract class TransactionContext
         _db = db;
     }
 
+    public void setAutoStore( boolean autoStore ) {
+        _autoStore = autoStore;
+    }
+
+    public boolean isAutoStore() {
+        return _autoStore;
+    }
 
     public PersistenceInfoGroup getScope() {
         return _db.getScope();
@@ -548,7 +588,7 @@ public abstract class TransactionContext
         ObjectEntry  entry;
 
         if ( object == null )
-            throw new PersistenceException("Object to be created is null!");
+            throw new NullPointerException();
 
         // Make sure the object has not beed persisted in this transaction.
         identity = molder.getIdentity( this, object );
@@ -558,9 +598,16 @@ public abstract class TransactionContext
             identity = null;
         }
         entry = getObjectEntry( object );
-        if ( entry != null && ! entry.deleted ) {
+        
+        // if autoStore is specified, we relieve user life a little bit here
+        // so that if an object create automatically and user create it
+        // again, it won't receive exception
+        if ( _autoStore && entry.object == object )
+            return entry.oid;
+
+        if ( entry != null && !entry.deleted )
             throw new PersistenceException( Messages.format("persist.objectAlreadyPersistent", object.getClass().getName(), entry.oid.getIdentity() ) );
-        }
+
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
         // add a new entry for this object and use this object as the view
@@ -661,11 +708,17 @@ public abstract class TransactionContext
         ObjectEntry  entry;
         AccessMode   accessMode = null;
 
+        if ( object == null )
+            throw new NullPointerException();
+
         identity = molder.getIdentity( this, object );
 
         // Make sure that nobody is looking at the object
         oid = new OID( engine, molder, depended, identity );
         entry = getObjectEntry( engine, oid );
+        if ( _autoStore && entry.object == object )
+            return entry.oid;
+
         if ( entry != null ) {
             if ( entry.deleted )
                 throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass(), identity ) );
@@ -1338,6 +1391,10 @@ public abstract class TransactionContext
     }
 
 
+    /**
+     * True if and only if the specified object is loaded or created
+     * in this transaction and is deleted.
+     */
     public boolean isDeleted( Object object ) {
 
         ObjectEntry entry;
