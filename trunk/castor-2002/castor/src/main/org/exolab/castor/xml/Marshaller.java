@@ -161,6 +161,12 @@ public class Marshaller {
 	private Node             _node         = null;
 
     /**
+     * A boolean to indicate whether or not we are
+     * marshalling as a complete document or not.
+    **/
+    private boolean _asDocument = true;
+    
+    /**
      * The depth of the sub tree, 0 denotes document level
     **/
     int depth = 0;
@@ -209,12 +215,14 @@ public class Marshaller {
             throw new RuntimeException("Unable to obtain serailizer");
 
         _serializer.setOutputCharStream( out );
+        
         _handler = _serializer.asDocumentHandler();
         if ( _handler == null ) {
             String err = Messages.format( this.SERIALIZER_NOT_SAX_CAPABLE,
                                           _serializer.getClass().getName() );
             throw new RuntimeException( err );
         }
+        
     } //-- Marshaller
 
 	/**
@@ -258,6 +266,8 @@ public class Marshaller {
     **/
     public void setMarshalAsDocument(boolean asDocument) {
 
+        _asDocument = asDocument;
+        
         if (_serializer != null) {
             OutputFormat format = Configuration.getOutputFormat();
             format.setOmitXMLDeclaration( ! asDocument );
@@ -448,8 +458,20 @@ public class Marshaller {
         throws MarshalException, ValidationException
     {
         validate(object);
-        marshal(object, null, _handler);
+        
+        if (_asDocument) {
+            try {
+                _handler.startDocument();
+                marshal(object, null, _handler);
+                _handler.endDocument();
+            }
+            catch (SAXException sx) {
+                throw new MarshalException(sx);
+            }
+        }
+        else marshal(object, null, _handler);
     } //-- marshal
+    
 
     /**
      * Marshals the given object, using the given descriptor
