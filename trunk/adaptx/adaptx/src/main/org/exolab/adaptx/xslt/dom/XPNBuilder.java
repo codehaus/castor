@@ -111,6 +111,18 @@ public class XPNBuilder implements ResultHandler {
         buffer = new StringBuffer();
     } //-- XPNBuilder
     
+    
+    /**
+     * Creates a new XPNBuilder
+    **/
+    public XPNBuilder(String documentURI) {
+        _root = new Root();
+        _root.setDocumentURI(documentURI);
+        nodeStack = new QuickStack();
+        nodeStack.push(_root);
+        buffer = new StringBuffer();
+    } //-- XPNBuilder
+    
     /**
      * Signals to receive CDATA characters
      * @param chars the character array containing the characters

@@ -153,7 +153,9 @@ public class XPNReader {
                 throw new NestedIOException(sx);
             }
         }
-		return builder.getRoot();
+        Root root = (Root) builder.getRoot();
+        root.setDocumentURI(_location.getAbsoluteURI());
+		return root;
 	    
 	} //-- read
 	

@@ -1388,7 +1388,7 @@ public class XSLTProcessor
 		        ErrorObserver.FATAL);
 		    return null;
 		}
-		XPNBuilder builder = new XPNBuilder();
+		XPNBuilder builder = new XPNBuilder(location.getAbsoluteURI());
 		
         try {
             InputSource source = new InputSource();
