@@ -388,7 +388,7 @@ public class RelationCollection implements Collection, Lazy {
         Object[] result;
 		int size = size();
 
-		if ( a.length < size )
+		if ( size < a.length )
 			result = a;
 		else 
 			result = (Object[])Array.newInstance( a.getClass().getComponentType(), size );
