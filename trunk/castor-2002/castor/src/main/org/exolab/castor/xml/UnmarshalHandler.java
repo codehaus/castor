@@ -1152,7 +1152,6 @@ public final class UnmarshalHandler extends MarshalFramework
             XMLFieldDescriptor descriptor = descriptors[i];
 
             String attName = descriptor.getXMLName();
-            System.out.println(attName);
             String attValue = atts.getValue(attName);
 
             if (attValue != null) processedAtts.add(attName);
