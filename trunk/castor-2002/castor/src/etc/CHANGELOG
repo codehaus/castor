@@ -1,3 +1,21 @@
+Version 0.8.9
+-------------
+
+XML:	Update of the XML Schema syntax to the April 7th draft
+	The following things in the April draft are supported :
+	  - datatype -> simpletype
+	  - type -> complextype
+	  - the "fixed" attribute in an attribute element now is
+	    part of the "use" attribute
+	  - the "default" attribute, which is used to specify the default
+	    value of an attribute, now is "value"
+	  - the "minoccurs" attribute of an attribute element has been removed,
+	    the attribute "use" has to be used instead. "use" can have the
+	    following values : default, optional, required, fixed and 
+	    prohibited
+	(Remy Maucherat <maucherat@intalio.com>)
+
+
 Version 0.8.8  June 20, 2000
 ----------------------------
 

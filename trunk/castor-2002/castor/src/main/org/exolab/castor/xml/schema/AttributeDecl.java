@@ -76,6 +76,10 @@ public class AttributeDecl extends Annotated {
      * The minimum occurance that this attribute must appear
     **/
     private int minOccurs = 0;
+    /**
+     * The maximum occurance that this attribute must appear
+    **/
+    private int maxOccurs = 1;
     
     String typeRef = null;
     
@@ -133,13 +137,13 @@ public class AttributeDecl extends Annotated {
      * Returns the data type associated with this AttributeDecl
      * @return the data type associated with this AttributeDecl
     **/
-    public Datatype getDatatype() {
-        return schema.getDatatype(typeRef);
-    } //-- getDataType
+    public Simpletype getSimpletype() {
+        return schema.getSimpletype(typeRef);
+    } //-- getSimpletype
 
-    public String getDatatypeRef() {
+    public String getSimpletypeRef() {
         return typeRef;
-    } //-- getDatatypeRef
+    } //-- getSimpletypeRef
     
     /**
      * Returns the default value, or null if none was defined
@@ -209,9 +213,9 @@ public class AttributeDecl extends Annotated {
         return ((value != null) && (useFlag == FIXED));
     } //-- hasFixedValue
     
-    public void setDatatypeRef(String name) {
+    public void setSimpletypeRef(String name) {
         this.typeRef = name;
-    } //-- setDataTypeRef
+    } //-- setSimpletypeRef
     
     
     /**
@@ -224,10 +228,19 @@ public class AttributeDecl extends Annotated {
         if (value != null) this.useFlag = DEFAULT;
     } //-- setDefault
     
-    public void setFixedValue(String value) {
-        this.value = value;
-        if (value != null) this.useFlag = FIXED;
-    } //-- setFixed
+    public void setUseValue(String value) {
+        if (value != null) {
+            if (value.equals("fixed")) {
+                this.useFlag = FIXED;
+            }
+            if (value.equals("required")) {
+                this.minOccurs = 1;
+            }
+            if (value.equals("prohibited")) {
+                this.maxOccurs = 0;
+            }
+        }
+    } //-- setUse
     
     /**
      * Sets the minimum occurance that attributes defined by this

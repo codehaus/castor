@@ -69,9 +69,9 @@ public class Info extends Structure {
     private Vector objects = null;
     
     /**
-     * The source attribute
+     * The base attribute
     **/
-    private String source = null;
+    private String base = null;
     
     /**
      * Creates a new Info
@@ -106,12 +106,12 @@ public class Info extends Structure {
     } //-- getObjects
     
     /**
-     * Returns the source property of this Info
-     * @return the source property of this Info
+     * Returns the base property of this Info
+     * @return the base property of this Info
     **/
-    public String getSource() {
-        return source;
-    } //-- getSource
+    public String getBase() {
+        return base;
+    } //-- getBase
     
     /**
      * Removes the given Object from this Info
@@ -130,12 +130,12 @@ public class Info extends Structure {
     } //-- setContent
     
     /**
-     * Sets the source property for this Info
-     * @param source the value of the source property
+     * Sets the base property for this Info
+     * @param base the value of the base property
     **/
-    public void setSource(String source) {
-        this.source = source;
-    } //-- setSource
+    public void setBase(String base) {
+        this.base = base;
+    } //-- setBase
     
     //-------------------------------/
     //- Implementation of Structure -/

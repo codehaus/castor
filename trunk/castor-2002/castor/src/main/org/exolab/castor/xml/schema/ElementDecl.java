@@ -104,9 +104,9 @@ public class ElementDecl extends ContentModelType {
     private String schemaAbbrev = null;
     
     /**
-     * The Archetype of this ElementDecl
+     * The Complextype of this ElementDecl
     **/
-    private Archetype archetype = null;
+    private Complextype complextype = null;
     
     
     private Schema schema = null;
@@ -142,8 +142,8 @@ public class ElementDecl extends ContentModelType {
     /**
      *
     **/
-    public void setArchetype(Archetype archetype) {
-        this.archetype = archetype;
+    public void setComplextype(Complextype complextype) {
+        this.complextype = complextype;
     } //-- addAttribute
     
     /**
@@ -174,49 +174,49 @@ public class ElementDecl extends ContentModelType {
     } //-- getName
     
     /**
-     * Returns the Archetype of this ElementDecl. If the element content
-     * did not define an archetype, is a simple type (defined by a 
-     * 'datatype'declaration) or is a built-in type the this method will 
+     * Returns the Complextype of this ElementDecl. If the element content
+     * did not define an complextype, is a simple type (defined by a 
+     * 'simpletype'declaration) or is a built-in type the this method will 
      * return null.
-     * @return the archetype of this ElementDecl
+     * @return the complextype of this ElementDecl
     **/
-    public Archetype getArchetype() {
+    public Complextype getComplextype() {
         
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null)
-                return element.getArchetype();
+                return element.getComplextype();
             return null;
         }
         
-        if (archetype == null) {
-            //-- check datatype first since it has higher
+        if (complextype == null) {
+            //-- check simpletype first since it has higher
             //-- precedence
             if (typeRef != null) {
-                if (schema.getDatatype(typeRef) != null) return null;
-                archetype = schema.getArchetype(typeRef);
+                if (schema.getSimpletype(typeRef) != null) return null;
+                complextype = schema.getComplextype(typeRef);
             }
         }
-        return archetype;
+        return complextype;
     } //-- getAttributes
 
     /**
-     * Returns the Datatype of this ElementDecl. If the element content
-     * is defined by an archetype a built-in type the this method
+     * Returns the Simpletype of this ElementDecl. If the element content
+     * is defined by an complextype a built-in type the this method
      * will return null;
-     * @return the archetype of this ElementDecl
+     * @return the complextype of this ElementDecl
     **/
-    public Datatype getDatatype() {
-        if (archetype != null) return null;
+    public Simpletype getSimpletype() {
+        if (complextype != null) return null;
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null)             
-                return element.getDatatype();
+                return element.getSimpletype();
             else 
                 return null;
         }
-        return schema.getDatatype(typeRef);
-    } //-- getDatatype
+        return schema.getSimpletype(typeRef);
+    } //-- getSimpletype
 
     /**
      * Returns the ElementDecl that this element definition references.
@@ -332,8 +332,8 @@ public class ElementDecl extends ContentModelType {
     
     
     /**
-     * Sets the type reference for this element (either archetype or
-     * datatype)
+     * Sets the type reference for this element (either complextype or
+     * simpletype)
     **/
     public void setTypeRef(String typeRef) {
         this.typeRef = typeRef;

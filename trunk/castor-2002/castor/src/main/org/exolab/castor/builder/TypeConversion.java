@@ -51,7 +51,7 @@ import org.exolab.castor.util.OrderedMap;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.JavaXMLNaming;
-import org.exolab.castor.xml.schema.Datatype;
+import org.exolab.castor.xml.schema.Simpletype;
 import org.exolab.castor.xml.schema.types.*;
 
 import java.util.Enumeration;
@@ -131,20 +131,20 @@ public class TypeConversion {
     
     
     /**
-     * Converts the given Datatype to the appropriate XSType.
-     * @return the XSType which represets the given Datatype
+     * Converts the given Simpletype to the appropriate XSType.
+     * @return the XSType which represets the given Simpletype
     **/
-    public static XSType convertType(Datatype datatype) {
+    public static XSType convertType(Simpletype simpletype) {
         
-        if (datatype == null) return null;
+        if (simpletype == null) return null;
         
         XSType xsType = null;
         
         
         //-- enumerated types
-        if (datatype.hasFacet("enumeration")) {
+        if (simpletype.hasFacet("enumeration")) {
             String className 
-                = JavaXMLNaming.toJavaClassName(datatype.getName());
+                = JavaXMLNaming.toJavaClassName(simpletype.getName());
                 
             XSClass xsClass = new XSClass(new JClass(className));
             xsClass.setAsEnumertated(true);
@@ -152,13 +152,13 @@ public class TypeConversion {
         }
         
         //-- determine base type
-        Datatype base = datatype;
+        Simpletype base = simpletype;
         while ((base != null) && (!(base instanceof BuiltInType))) {
-            base = base.getSource();
+            base = base.getBase();
         }
         if (base == null) {
             String className 
-                = JavaXMLNaming.toJavaClassName(datatype.getName());
+                = JavaXMLNaming.toJavaClassName(simpletype.getName());
             xsType = new XSClass(new JClass(className));
         }
         else {
@@ -189,35 +189,35 @@ public class TypeConversion {
                 case BuiltInType.INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSInteger();
-                    readIntegerFacets(datatype, xsInteger);
+                    readIntegerFacets(simpletype, xsInteger);
                     return xsInteger;
                 }
                 //-- negative-integer 
                 case BuiltInType.NEGATIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSNegativeInteger();
-                    readIntegerFacets(datatype, xsInteger);
+                    readIntegerFacets(simpletype, xsInteger);
                     return xsInteger;
                 }
                 //-- positive-integer
                 case BuiltInType.POSITIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSPositiveInteger();
-                    readIntegerFacets(datatype, xsInteger);
+                    readIntegerFacets(simpletype, xsInteger);
                     return xsInteger;
                 }
                 case BuiltInType.LONG_TYPE:
                     return new XSLong();
                 //-- string
                 case BuiltInType.STRING_TYPE:
-                    return toXSString(datatype);
+                    return toXSString(simpletype);
                 //-- timeInstant
                 case BuiltInType.TIME_INSTANT_TYPE:
                     return new XSTimeInstant();
                 default:
                     //-- error
                     String className 
-                        = JavaXMLNaming.toJavaClassName(datatype.getName());
+                        = JavaXMLNaming.toJavaClassName(simpletype.getName());
                     xsType = new XSClass(new JClass(className));
                     break;
                 
@@ -229,7 +229,7 @@ public class TypeConversion {
     
         
     /**
-     * Determines if the given type is a built in Schema datatype
+     * Determines if the given type is a built in Schema simpletype
     **/
     public static boolean isBuiltInType(String type) {
         return (sjNameMap.get(type) != null);
@@ -244,16 +244,16 @@ public class TypeConversion {
     //-------------------/
     
     /**
-     * Converts the given datatype to an XSInteger
-     * @param datatype the Datatype to convert
-     * @return the XSInteger representation of the given Datatype
+     * Converts the given simpletype to an XSInteger
+     * @param simpletype the Simpletype to convert
+     * @return the XSInteger representation of the given Simpletype
     **/
     private static void readIntegerFacets
-        (Datatype datatype, XSInteger xsInteger) 
+        (Simpletype simpletype, XSInteger xsInteger) 
     {
         
         //-- copy valid facets
-        Enumeration enum = datatype.getFacets();
+        Enumeration enum = simpletype.getFacets();
         while (enum.hasMoreElements()) {
             
             Facet facet = (Facet)enum.nextElement();
@@ -277,14 +277,14 @@ public class TypeConversion {
     } //-- toXSInteger
     
     /**
-     * Converts the given datatype to an XSString
-     * @param datatype the Datatype to convert
-     * @return the XSString representation of the given Datatype
+     * Converts the given simpletype to an XSString
+     * @param simpletype the Simpletype to convert
+     * @return the XSString representation of the given Simpletype
     **/
-    private static XSString toXSString(Datatype datatype) {
+    private static XSString toXSString(Simpletype simpletype) {
         XSString xsString = new XSString();
         //-- copy valid facets
-        Enumeration enum = datatype.getFacets();
+        Enumeration enum = simpletype.getFacets();
         while (enum.hasMoreElements()) {
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();

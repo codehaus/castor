@@ -144,21 +144,21 @@ public class SourceFactory  {
             jClass.getJDocComment().setComment(comment);
             
         
-        Archetype archetype = element.getArchetype();
+        Complextype complextype = element.getComplextype();
         
         boolean derived = false;
         
-        if (archetype != null) {
-            processArchetype(archetype, state);
+        if (complextype != null) {
+            processComplextype(complextype, state);
         }
         else {
-            Datatype datatype = element.getDatatype();
-            if (datatype != null) {
-                classInfo.setSchemaType(TypeConversion.convertType(datatype));
+            Simpletype simpletype = element.getSimpletype();
+            if (simpletype != null) {
+                classInfo.setSchemaType(TypeConversion.convertType(simpletype));
                 
                 //-- handle our special case for enumerated types
-                if (datatype.hasFacet(Facet.ENUMERATION)) {
-                    createSourceCode(datatype, state, state.packageName);
+                if (simpletype.hasFacet(Facet.ENUMERATION)) {
+                    createSourceCode(simpletype, state, state.packageName);
                 }
             }
             else
@@ -195,13 +195,13 @@ public class SourceFactory  {
      * belong
     **/
     public JClass createSourceCode
-        (Archetype type, ClassInfoResolver resolver, String packageName) 
+        (Complextype type, ClassInfoResolver resolver, String packageName) 
     {
         if (type == null)
-            throw new IllegalArgumentException("null archetype");
+            throw new IllegalArgumentException("null complextype");
             
         if (!type.isTopLevel())
-            throw new IllegalArgumentException("Archetype is not top-level.");
+            throw new IllegalArgumentException("Complextype is not top-level.");
         
         String className = JavaXMLNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
@@ -231,7 +231,7 @@ public class SourceFactory  {
             jClass.getJDocComment().setComment(comment);
             
         
-        processArchetype(type, state);
+        processComplextype(type, state);
         
         //-- add imports required by the marshal methods
         jClass.addImport("java.io.Writer");
@@ -254,26 +254,26 @@ public class SourceFactory  {
     } //-- ClassInfo
     
     /**
-     * Creates the Java source code to support the given Datatype
-     * @param datatype the Datatype to create the Java source for
-     * @return the JClass representation of the given Datatype
+     * Creates the Java source code to support the given Simpletype
+     * @param simpletype the Simpletype to create the Java source for
+     * @return the JClass representation of the given Simpletype
     **/
     public JClass createSourceCode
-        (Datatype datatype, ClassInfoResolver resolver, String packageName) 
+        (Simpletype simpletype, ClassInfoResolver resolver, String packageName) 
     {
         
-        if (datatype instanceof BuiltInType) {
+        if (simpletype instanceof BuiltInType) {
             String err = "You cannot construct a ClassInfo for a " +
-                "built-in datatype.";
+                "built-in simpletype.";
             throw new IllegalArgumentException(err);
         }
         
         boolean enumeration = false;
         
         //-- class name information
-        String className = JavaXMLNaming.toJavaClassName(datatype.getName());
+        String className = JavaXMLNaming.toJavaClassName(simpletype.getName());
         
-        if (datatype.hasFacet(Facet.ENUMERATION)) {
+        if (simpletype.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
             //-- XXXX Fix packageName...this is a hack I know,
             //-- XXXX we should change this
@@ -294,29 +294,29 @@ public class SourceFactory  {
         initialize(jClass);
         
         //-- XML information
-        Schema  schema = datatype.getSchema();        
+        Schema  schema = simpletype.getSchema();        
         classInfo.setNamespaceURI(schema.getTargetNamespace());
-        classInfo.setNodeName(datatype.getName());
+        classInfo.setNodeName(simpletype.getName());
         
         
         //-- process annotation
-        String comment  = processAnnotations(datatype);
+        String comment  = processAnnotations(simpletype);
         if (comment != null) 
             jClass.getJDocComment().setComment(comment);
             
-        XSClass xsClass = new XSClass(jClass, datatype.getName());
+        XSClass xsClass = new XSClass(jClass, simpletype.getName());
         
         classInfo.setSchemaType(xsClass);
         
         //-- handle enumerated types
         if (enumeration) {
             xsClass.setAsEnumertated(true);
-            processEnumeration(datatype, state);
+            processEnumeration(simpletype, state);
         }
         
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
-            resolver.bindReference(datatype, classInfo);
+            resolver.bindReference(simpletype, classInfo);
         }
         
         return jClass;
@@ -491,40 +491,40 @@ public class SourceFactory  {
     } //-- resolveClassName
     
     /**
-     * @param archetype the Archetype for this ClassInfo
+     * @param complextype the Complextype for this ClassInfo
      * @param resolver the ClassInfoResolver for resolving "derived" types.
     **/    
-    private void processArchetype
-        (Archetype archetype, FactoryState state) 
+    private void processComplextype
+        (Complextype complextype, FactoryState state) 
     {
         
-        String typeName = archetype.getName();
+        String typeName = complextype.getName();
         
         ClassInfo classInfo = state.classInfo;
         classInfo.setSchemaType(new XSClass(state.jClass, typeName));
         
-        Schema schema = archetype.getSchema();
+        Schema schema = complextype.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
         
         
         
         //- Handle derived types
-        if (archetype.getSource() != null) {
+        if (complextype.getBase() != null) {
         
-            String sourceName = archetype.getSource();
-            Archetype source = schema.getArchetype(sourceName);
-            if (source != null) {
+            String baseName = complextype.getBase();
+            Complextype base = schema.getComplextype(baseName);
+            if (base != null) {
                 
                 String className = null;
                 
-                ClassInfo cInfo = state.resolve(source);
+                ClassInfo cInfo = state.resolve(base);
                 if (cInfo == null) {
                     
                     String packageName = state.jClass.getPackageName();
-                    JClass jClass = createSourceCode(source, 
+                    JClass jClass = createSourceCode(base, 
                                                      state,
                                                      packageName);
-                    cInfo = state.resolve(source);
+                    cInfo = state.resolve(base);
                     className = jClass.getName();
                 }
                 else className = cInfo.getJClass().getName();
@@ -542,8 +542,8 @@ public class SourceFactory  {
                 //-- ignore for now...but add comment in case we
                 //-- ever see it.
                 System.out.print("ClassInfo#init: ");
-                System.out.print("A referenced archetype is null: ");
-                System.out.println(sourceName);
+                System.out.print("A referenced complextype is null: ");
+                System.out.println(baseName);
             }
         }
         
@@ -551,12 +551,12 @@ public class SourceFactory  {
         //- handle attributes -/
         //---------------------/
         //-- loop throug each attribute
-        Enumeration enum = archetype.getAttributeDecls();
+        Enumeration enum = complextype.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
             
-            //-- if we have a new datatype...generate ClassInfo
-            Datatype dtype = attr.getDatatype();
+            //-- if we have a new simpletype...generate ClassInfo
+            Simpletype dtype = attr.getSimpletype();
             if (dtype != null) {
                 if ( ! (dtype instanceof BuiltInType) )
                 createSourceCode(dtype, state, state.packageName);
@@ -570,7 +570,7 @@ public class SourceFactory  {
         //- handle content model -/
         //------------------------/
         //-- check contentType
-        ContentType contentType = archetype.getContent();
+        ContentType contentType = complextype.getContent();
             
         //-- create text member
         if ((contentType == ContentType.textOnly) ||
@@ -587,8 +587,8 @@ public class SourceFactory  {
             }
                 
         }
-        processContentModel(archetype, state);
-    } //-- processArchetype
+        processContentModel(complextype, state);
+    } //-- processComplextype
 
 
     private void handleField(FieldInfo fieldInfo, FactoryState state) {
@@ -684,13 +684,13 @@ public class SourceFactory  {
     
     /**
      * Creates all the necessary enumeration code from the given 
-     * datatype
+     * simpletype
     **/
     private void processEnumeration
-        (Datatype datatype, FactoryState state) 
+        (Simpletype simpletype, FactoryState state) 
     {
         
-        Enumeration enum = datatype.getFacets("enumeration");
+        Enumeration enum = simpletype.getFacets("enumeration");
         
         
         

@@ -76,13 +76,13 @@ public class Schema extends Structure {
     /**
      * A list of defined architypes
     **/
-    private Hashtable archetypes = null;
+    private Hashtable complextypes = null;
     
     
     /**
-     * A list of defined datatypes
+     * A list of defined simpletypes
     **/
-    private Hashtable datatypes = null;
+    private Hashtable simpletypes = null;
 
     /**
      * A list of defined elements
@@ -102,8 +102,8 @@ public class Schema extends Structure {
     **/
     public Schema(String schemaNS) {
         super();
-        archetypes = new Hashtable();
-        datatypes  = new Hashtable();
+        complextypes = new Hashtable();
+        simpletypes  = new Hashtable();
         elements   = new Hashtable();
         this.schemaNS = schemaNS;
         init();
@@ -115,90 +115,90 @@ public class Schema extends Structure {
        
         try {
             //-- ID
-            addDatatype(new IDType(this));
+            addSimpletype(new IDType(this));
             //-- IDREF
-            addDatatype(new IDREFType(this));
+            addSimpletype(new IDREFType(this));
             //-- NCName
-            addDatatype(new NCNameType(this));
+            addSimpletype(new NCNameType(this));
             //-- NMTOKEN
-            addDatatype(new NMTokenType(this));
+            addSimpletype(new NMTokenType(this));
             
             //-- binary
-            addDatatype(new BinaryType(this));
+            addSimpletype(new BinaryType(this));
             //-- boooean
-            addDatatype(new BooleanType(this));
+            addSimpletype(new BooleanType(this));
             //-- double
-            addDatatype(new DoubleType(this));
+            addSimpletype(new DoubleType(this));
             //-- integer
-            addDatatype(new IntegerType(this));
+            addSimpletype(new IntegerType(this));
             //-- long
-            addDatatype(new LongType(this));
+            addSimpletype(new LongType(this));
             //-- negative-integer
-            addDatatype(new NegativeIntegerType(this));
+            addSimpletype(new NegativeIntegerType(this));
             //-- positive-integer
-            addDatatype(new PositiveIntegerType(this));
+            addSimpletype(new PositiveIntegerType(this));
             //-- string
-            addDatatype(new StringType(this));
+            addSimpletype(new StringType(this));
             //-- timeInstant
-            addDatatype(new TimeInstantType(this));
+            addSimpletype(new TimeInstantType(this));
         }
         catch (SchemaException sx) {
             //-- will never be thrown here since we
-            //-- are not adding invalid datatypes
+            //-- are not adding invalid simpletypes
         }
     } //-- init
     
     /**
-     * Adds the given Archetype definition to this Schema defintion
-     * @param archetype the Archetype to add to this Schema
-     * @exception SchemaException if the Archetype does not have
-     * a name or if another Archetype already exists with the same name
+     * Adds the given Complextype definition to this Schema defintion
+     * @param complextype the Complextype to add to this Schema
+     * @exception SchemaException if the Complextype does not have
+     * a name or if another Complextype already exists with the same name
     **/
-    public synchronized void addArchetype(Archetype archetype) 
+    public synchronized void addComplextype(Complextype complextype) 
         throws SchemaException 
     {
         
-        String name = archetype.getName();
+        String name = complextype.getName();
         
         if (name == null) {
-            String err = "a global archetype must contain a name.";
+            String err = "a global complextype must contain a name.";
             throw new SchemaException(err);
         }
-        if (archetype.getSchema() != this) {
-            String err = "invalid attempt to add an archetype which ";
+        if (complextype.getSchema() != this) {
+            String err = "invalid attempt to add an complextype which ";
             err += "belongs to a different Schema; type name: " + name;
         }
-        if (archetypes.get(name) != null) {
-            String err = "an archetype already exists with the given name: ";
+        if (complextypes.get(name) != null) {
+            String err = "an complextype already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        archetypes.put(name, archetype);
+        complextypes.put(name, complextype);
         
-    } //-- addArchetype
+    } //-- addComplextype
 
     /**
-     * Adds the given Datatype definition to this Schema defintion
-     * @param datatype the Datatype to add to this Schema
-     * @exception SchemaException if the Archetype does not have
-     * a name or if another Archetype already exists with the same name
+     * Adds the given Simpletype definition to this Schema defintion
+     * @param simpletype the Simpletype to add to this Schema
+     * @exception SchemaException if the Complextype does not have
+     * a name or if another Complextype already exists with the same name
     **/
-    public synchronized void addDatatype(Datatype datatype) 
+    public synchronized void addSimpletype(Simpletype simpletype) 
         throws SchemaException 
     {
         
-        String name = datatype.getName();
+        String name = simpletype.getName();
         
-        if (datatype.getSchema() != this) {
-            String err = "invalid attempt to add a datatype which ";
+        if (simpletype.getSchema() != this) {
+            String err = "invalid attempt to add a simpletype which ";
             err += "belongs to a different Schema; type name: " + name;
         }
-        if (datatypes.get(name) != null) {
-            String err = "a datatype already exists with the given name: ";
+        if (simpletypes.get(name) != null) {
+            String err = "a simpletype already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        datatypes.put(name, datatype);
+        simpletypes.put(name, simpletype);
         
-    } //-- addDatatype
+    } //-- addSimpletype
 
     /**
      * Adds the given Element declaration to this Schema defintion
@@ -228,81 +228,91 @@ public class Schema extends Structure {
     
     
     /**
-     * Creates a new Archetype using this Schema as the owning Schema
-     * document. A call to #addArchetype must still be made in order
-     * to add the archetype to this Schema.
-     * @return the new Archetype
+     * Creates a new Complextype using this Schema as the owning Schema
+     * document. A call to #addComplextype must still be made in order
+     * to add the complextype to this Schema.
+     * @return the new Complextype
     **/
-    public Archetype createArchetype() {
-        return new Archetype(this);
-    } //-- createArchetype
+    public Complextype createComplextype() {
+        return new Complextype(this);
+    } //-- createComplextype
     
     /**
-     * Creates a new Archetype using this Schema as the owning Schema
-     * document. A call to #addArchetype must still be made in order
-     * to add the archetype to this Schema.
-     * @param name the name of the Archetype 
-     * @return the new Archetype
+     * Creates a new Complextype using this Schema as the owning Schema
+     * document. A call to #addComplextype must still be made in order
+     * to add the complextype to this Schema.
+     * @param name the name of the Complextype 
+     * @return the new Complextype
     **/
-    public Archetype createArchetype(String name) {
-        return new Archetype(this, name);
-    } //-- createArchetype
+    public Complextype createComplextype(String name) {
+        return new Complextype(this, name);
+    } //-- createComplextype
     
     /**
-     * Creates a new Datatype using this Schema as the owning Schema
-     * document. A call to #addDatatype must till be made in order
-     * to add the Datatype to this Schema.
-     * @param name the name of the Datatype
-     * @return the new Datatype.
+     * Creates a new Simpletype using this Schema as the owning Schema
+     * document. A call to #addSimpletype must till be made in order
+     * to add the Simpletype to this Schema.
+     * @param name the name of the Simpletype
+     * @return the new Simpletype.
     **/
-    public Datatype createDatatype(String name) {
-        return new Datatype(this, name);
-    } //-- createDatatype(String)
+    public Simpletype createSimpletype(String name) {
+        return new Simpletype(this, name);
+    } //-- createSimpletype(String)
     
     /**
-     * Returns the Archetype of associated with the given name
-     * @return the Archetypel of associated with the given name, or
-     *  null if no Archetype with the given name was found.
+     * Returns the Complextype of associated with the given name
+     * @return the Complextypel of associated with the given name, or
+     *  null if no Complextype with the given name was found.
     **/
-    public Archetype getArchetype(String name) {
+    public Complextype getComplextype(String name) {
         if (name == null)  {
-            String err = NULL_ARGUMENT + "getArchetype: ";
+            String err = NULL_ARGUMENT + "getComplextype: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-        return (Archetype)archetypes.get(name);
-    } //-- getArchetype
+        // [Remm] Strip namespace prefix
+        String canonicalName = name;
+        int colon = name.indexOf(':');
+        if (colon != -1)
+            canonicalName = name.substring(colon + 1);
+        return (Complextype)complextypes.get(canonicalName);
+    } //-- getComplextype
     
     /**
-     * Returns an Enumeration of all top-level Archetype declarations
-     * @return an Enumeration of all top-level Archetype declarations
+     * Returns an Enumeration of all top-level Complextype declarations
+     * @return an Enumeration of all top-level Complextype declarations
     **/
-    public Enumeration getArchetypes() {
-        return archetypes.elements();
-    } //-- getArchetypes
+    public Enumeration getComplextypes() {
+        return complextypes.elements();
+    } //-- getComplextypes
     
     /**
-     * Returns the Datatype associated with the given name,
-     * or null if no such Datatype exists.
-     * @return the Datatype associated with the given name,
-     * or null if no such Datatype exists.
+     * Returns the Simpletype associated with the given name,
+     * or null if no such Simpletype exists.
+     * @return the Simpletype associated with the given name,
+     * or null if no such Simpletype exists.
     **/
-    public Datatype getDatatype(String name) {
+    public Simpletype getSimpletype(String name) {
         if (name == null)  {
-            String err = NULL_ARGUMENT + "getDatatype: ";
+            String err = NULL_ARGUMENT + "getSimpletype: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-        return (Datatype)datatypes.get(name);
-    } //-- getDatatype
+        // [Remm] Strip namespace prefix
+        String canonicalName = name;
+        int colon = name.indexOf(':');
+        if (colon != -1)
+            canonicalName = name.substring(colon + 1);
+        return (Simpletype)simpletypes.get(canonicalName);
+    } //-- getSimpletype
     
     /**
-     * Returns an Enumeration of all Datatype declarations
-     * @return an Enumeration of all Datatype declarations
+     * Returns an Enumeration of all Simpletype declarations
+     * @return an Enumeration of all Simpletype declarations
     **/
-    public Enumeration getDatatypes() {
-        return datatypes.elements();
-    } //-- getDatatypes
+    public Enumeration getSimpletypes() {
+        return simpletypes.elements();
+    } //-- getSimpletypes
     
     /**
      * Returns the ElementDecl of associated with the given name
@@ -332,21 +342,21 @@ public class Schema extends Structure {
     } //-- getTargetNamespace
     
     /**
-     * Removes the given top level Archetype from this Schema
-     * @param archetype the Archetype to remove
-     * @return true if the archetype has been removed, or
-     * false if the archetype wasn't top level or
+     * Removes the given top level Complextype from this Schema
+     * @param complextype the Complextype to remove
+     * @return true if the complextype has been removed, or
+     * false if the complextype wasn't top level or
      * didn't exist in this Schema
     **/
-    public boolean removeArchetype(Archetype archetype) {
-        if (archetype.isTopLevel()) {
-            if (archetypes.contains(archetype)) {
-                archetypes.remove(archetype);
+    public boolean removeComplextype(Complextype complextype) {
+        if (complextype.isTopLevel()) {
+            if (complextypes.contains(complextype)) {
+                complextypes.remove(complextype);
                 return true;
             }
         }
         return false;
-    } //-- removeArchetype
+    } //-- removeComplextype
     
     /**
      * Sets the name of this Schema definition
