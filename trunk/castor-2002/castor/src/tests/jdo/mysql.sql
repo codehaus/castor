@@ -257,3 +257,19 @@ create table test_identity_ext (
 );
 
 create unique index test_ident_ext_pk on test_identity_ext ( id );
+
+create table test_col (
+  id       integer         not null,
+  dum    integer    null
+);
+
+create unique index test_col_pk on test_col( id );
+
+create table test_item (
+  iid       integer         not null,
+  id      integer         not null
+);
+
+create unique index test_item_pk on test_item( iid );
+
+
