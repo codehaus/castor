@@ -221,6 +221,7 @@ public class MemberFactory {
             memberName = "_"+memberName;
 
         XMLType xmlType = component.getXMLType();
+        
         ClassInfo classInfo = resolver.resolve(component);
 
         XSType   xsType = null;
@@ -271,6 +272,20 @@ public class MemberFactory {
                     }
                 }
             }//--complexType
+        }
+        else {
+            
+            //-- patch for bug 1471 (No XMLType specified)
+            //-- treat unspecified type as anyType
+            switch (component.getAnnotated().getStructureType()) {
+                case Structure.ATTRIBUTE:
+                case Structure.ELEMENT:
+                    xsType = new XSClass(SGTypes.Object);
+                    break;
+                default:
+                    // probably a model-group
+                    break;
+            }
         }
 
         //--is the XSType found?
