@@ -1,6 +1,16 @@
 
 Version (CVS) 
 -------------
+XML:   Fix attribute processing when marshalling an AnyNode.
+       Namespace handling was not enabled
+       (Arnaud - 20031016)       
+
+XML:   Enhance SAX2ANY to be compliant with the use of XML Reader.
+       (Arnaud - 20031016)       
+
+XML:   Improvements to the CTF (better error reporting)
+       (Arnaud - 20031015)
+   
 XML:   Added the Source Generator command-line option 
        '-generateImportedSchemas' that lets you specify 
        the automatic generation of Java for imported XML Schemas.
