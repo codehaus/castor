@@ -44,26 +44,24 @@
 
 package jdo;
 
+import harness.CastorTestCase;
+import harness.TestHarness;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import java.sql.*;
-
-import org.xml.sax.ContentHandler;
-
-import org.exolab.castor.jdo.JDO;
+import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.util.Logger;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.persist.spi.Complex;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
-import harness.TestHarness;
-import harness.CastorTestCase;
 
 /**
  * Expire Cache test. Tests the ability to clear objects from the cache.  This
@@ -386,31 +384,23 @@ public class ExpireLazyEmployee extends CastorTestCase {
     private void expire(boolean byType) {
         log("expiring cache...");
 
-        Class[] typeArray = null;
-        Object[] identityArray = null;
-
-        if ( byType ) {
-            typeArray = new Class[5];
-            typeArray[0] = TestLazyContract.class;
-            typeArray[1] = TestLazyContractCategory.class;
-            typeArray[2] = TestLazyPayRoll.class;
-            typeArray[3] = TestLazyAddress.class;
-            typeArray[4] = TestLazyEmployee.class;
-        }
-        else {
-            typeArray = new Class[1];
-            identityArray = new Object[1];
-
-            typeArray[0] = TestLazyEmployee.class;
-            identityArray[0] = new Complex("First", "Person");
-        }
-
         try {
-            this._category.getDatabase( verbose ).expireCache(typeArray, identityArray);
-        }
-        catch (Exception e) {
-            log("expireCache: exception encountered clearing cache: "+e.getMessage());
-//            e.printStackTrace();
+            CacheManager cacheManager = ((DatabaseImpl) _db).getCacheManager();
+            if (byType) {
+                Class[] typeArray = new Class[5];
+                typeArray[0] = TestLazyContract.class;
+                typeArray[1] = TestLazyContractCategory.class;
+                typeArray[2] = TestLazyPayRoll.class;
+                typeArray[3] = TestLazyAddress.class;
+                typeArray[4] = TestLazyEmployee.class;
+                cacheManager.expireCache(typeArray);
+            } else {
+                Object[] identityArray = new Object[1];
+                identityArray[0] = new Complex("First", "Person");
+                cacheManager.expireCache(TestLazyEmployee.class, identityArray);
+            }
+        } catch (Exception e) {
+            log("expireCache: exception encountered clearing cache: " + e.getMessage());
         }
     }
 

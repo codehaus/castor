@@ -44,25 +44,21 @@
 
 package jdo;
 
+import harness.CastorTestCase;
+import harness.TestHarness;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import java.sql.*;
-
-import org.xml.sax.ContentHandler;
-
-import org.exolab.castor.jdo.JDO;
+import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.util.Logger;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
-import harness.TestHarness;
-import harness.CastorTestCase;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.engine.DatabaseImpl;
 
 /**
  * Expire Cache test. Tests the ability to clear objects from the cache.  This
@@ -71,8 +67,6 @@ import harness.CastorTestCase;
  */
 public class ExpireManyToMany extends CastorTestCase {
     
-    private static int PERSONS_PER_GROUP           = 4;
-
     private static final boolean BY_TYPE_OR_CLASS   = true;
     private static final boolean BY_OBJECT_IDENTITY = false;
 
@@ -80,7 +74,6 @@ public class ExpireManyToMany extends CastorTestCase {
     private static final String JDO_UPDATED_VALUE   = "Updated Using JDO";
     private static final String JDBC_UPDATED_VALUE  = "Updated Using JDBC";
 
-    private ArrayList           _txnList = new ArrayList();
     private Database            _db;
     private JDOCategory         _category;
     private Connection          _conn;
@@ -423,37 +416,24 @@ public class ExpireManyToMany extends CastorTestCase {
     private void expire(boolean byType) {
         log("expiring cache...");
 
-        Class[] typeArray = null;
         Object[] identityArray = null;
-
-        if ( byType ) {
-            typeArray = new Class[2];
-            typeArray[0] = TestManyGroup.class;
-            typeArray[1] = TestManyPerson.class;
-        }
-        else {
-            typeArray = new Class[4];
-            identityArray = new Object[4];
-
-            typeArray[0] = TestManyGroup.class;
-            identityArray[0] = new Integer(groupAId);
-
-            typeArray[0] = TestManyGroup.class;
-            identityArray[1] = new Integer(groupBId);
-
-            typeArray[0] = TestManyGroup.class;
-            identityArray[2] = new Integer(groupCId);
-
-            typeArray[0] = TestManyGroup.class;
-            identityArray[3] = new Integer(groupDId);
-        }
-
         try {
-            this._category.getDatabase( verbose ).expireCache(typeArray, identityArray);
-        }
-        catch (Exception e) {
-            log("expireCache: exception encountered clearing cache: "+e.getMessage());
-//            e.printStackTrace();
+            CacheManager cacheManager = ((DatabaseImpl) _db).getCacheManager();
+            if (byType) {
+                Class[] typeArray = new Class[2];
+                typeArray[0] = TestManyGroup.class;
+                typeArray[1] = TestManyPerson.class;
+                cacheManager.expireCache(typeArray);
+            } else {
+                identityArray = new Object[4];
+                identityArray[0] = new Integer(groupAId);
+                identityArray[1] = new Integer(groupBId);
+                identityArray[2] = new Integer(groupCId);
+                identityArray[3] = new Integer(groupDId);
+                cacheManager.expireCache(TestManyGroup.class, identityArray);
+            }
+        } catch (Exception e) {
+            log("expireCache: exception encountered clearing cache: " + e.getMessage());
         }
     }
 
@@ -550,8 +530,6 @@ public class ExpireManyToMany extends CastorTestCase {
      */
     private void deleteTestDataSet() {
         log("deleting test data set...");
-        OQLQuery oql;
-        OQLQuery oqlp;
         QueryResults enum;
         TestManyGroup group = null;
         TestManyPerson person = null;
