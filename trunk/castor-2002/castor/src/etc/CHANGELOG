@@ -1,6 +1,9 @@
 Version 0.8.9
 -------------
 
+JDO:    Now IdentityKeyGenerator works with Hypersonic SQL identities
+        (idea by Mark Delanoy <mdelanoy@niku.com>)
+
 JDO:    Fixed bugs (contributed by Bill Reynolds <bill@leastsquares.com>)
         - same OID for parent class instance and subclass instance
           with the same identities causes cache corruption
@@ -30,6 +33,8 @@ JDO:    Changed HIGH/LOW key generator implementation: now holds lock
         that don't support "SELECT FOR UPDATE" (like Hypersonic SQL and
         InstantDB) it was possible to get the same key values in two concurrent
         transactions (Reported by George Stewart <georgestewartiv@yahoo.com>)
+        Now works in a separate connection, and commits changes to the sequence
+        table immediately.
 
 JDO:    Temporary fix to ClassLoader problem in EJB environment: application
         classes are loaded using context classloader of the current thread.
