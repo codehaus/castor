@@ -1,6 +1,8 @@
 Version 0.8.9
 -------------
 
+JDO:    MySQL driver (contributed by Leonardo Souza Mario Bueno <leonardo@itera.com.br>).
+
 JDO:    Annoying type conversion problems solved:
         - integer SQL type for Oracle now can be used for dependent objects
           identities - before this caused type conversion error;
