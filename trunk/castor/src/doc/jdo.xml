@@ -201,6 +201,10 @@ while ( results.hasMore() ) {
   prod.markDown( 0.25 );
   prod.setOnSale( true );
 }
+<comment>// Explicitly close the QueryResults</comment>
+results.close();
+<comment>// Explicitly close the OQLQuery</comment>
+oql.close();
 <comment>// Explicitly commit transaction</comment>
 db.commit();
 db.close();
