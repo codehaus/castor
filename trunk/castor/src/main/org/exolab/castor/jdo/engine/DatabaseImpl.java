@@ -127,7 +127,7 @@ public class DatabaseImpl
     private Transaction                _transaction;
 
 
-    /*
+    /**
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
      */
@@ -144,7 +144,11 @@ public class DatabaseImpl
      * The transaction to database map
      */
     private TxDatabaseMap              _txMap;
-
+    
+    /**
+	 * {@link CacheManager} instance.
+	 */
+    private CacheManager cacheManager;
 
     public DatabaseImpl( String dbName, int lockTimeout, CallbackInterceptor callback,
                          InstanceFactory instanceFactory, Transaction transaction, 
@@ -170,13 +174,15 @@ public class DatabaseImpl
         _lockTimeout = lockTimeout;
 
         _transaction = transaction;
-        if ( _transaction != null ) {
-            _ctx = new TransactionContextImpl( this, true );
-            _ctx.setLockTimeout( _lockTimeout );
-            _ctx.setAutoStore( _autoStore );
-            _ctx.setCallback( _callback );
-            _ctx.setInstanceFactory( _instanceFactory );
+        if (_transaction != null) {
+            _ctx = new TransactionContextImpl(this, true);
+        } else {
+            _ctx = new TransactionContextImpl(this, false);
         }
+        _ctx.setLockTimeout(_lockTimeout);
+        _ctx.setAutoStore(_autoStore);
+        _ctx.setCallback(_callback);
+        _ctx.setInstanceFactory(_instanceFactory);
         _classLoader = classLoader;
     }
 
@@ -189,7 +195,7 @@ public class DatabaseImpl
         return _scope;
     }
 
-    /*
+    /**
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
      */
@@ -197,7 +203,7 @@ public class DatabaseImpl
         _autoStore = autoStore;
     }
 
-    /*
+    /**
      * Return if the current transaction is set to autoStore, it there is
      * transaction active. If there is no active transaction, return if
      * the next transaction will be set to autoStore.
@@ -345,6 +351,18 @@ public class DatabaseImpl
 
         tx.create( info.engine, info.molder, object, null );
     }
+    
+    /**
+     * Get's the CacheManager-instance.
+     * Call getCacheManager for every Database-instances.
+     * 
+     * @return the CacheManager-instance.
+     */
+    public CacheManager getCacheManager() {
+        if(cacheManager == null)
+            cacheManager = new CacheManager(this, _ctx, getLockEngine());
+        return cacheManager;
+    }
 
     public void update( Object object )
         throws ClassNotPersistenceCapableException, ObjectModifiedException,
@@ -430,7 +448,8 @@ public class DatabaseImpl
     }
 
 
-	/* Overrides Object.finalize().
+	/**
+     * Overrides Object.finalize().
 	 * 
 	 * Outputs a warning message to teh logs if the current DatabaseImpl 
 	 * instance still has valid scope. In this condition - a condition that 
@@ -474,7 +493,8 @@ public class DatabaseImpl
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
 
-        _ctx = new TransactionContextImpl( this, false );
+        //_ctx = new TransactionContextImpl( this, false );
+        ((TransactionContextImpl) _ctx).setStatusActive();
         _ctx.setLockTimeout( _lockTimeout );
         _ctx.setAutoStore( _autoStore );
         _ctx.setCallback( _callback );
@@ -505,7 +525,6 @@ public class DatabaseImpl
                 _ctx.close();
             } catch (Exception ex) {
             }
-           _ctx = null;
         }
     }
 
@@ -522,12 +541,12 @@ public class DatabaseImpl
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         _ctx.rollback();
-        _ctx = null;
     }
 
 
     public void beforeCompletion()
     {
+        // XXX [SMH]: Find another test for txNotInProgress
         if ( _transaction == null || _ctx == null || ! _ctx.isOpen() )
             throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK ) {
@@ -555,6 +574,7 @@ public class DatabaseImpl
     public void afterCompletion( int status )
     {
         try {
+            // XXX [SMH]: Find another test for txNotInProgress
             if ( _transaction == null || _ctx == null )
                 throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
             if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
@@ -569,15 +589,12 @@ public class DatabaseImpl
                     _log.fatal( Messages.format( "jdo.fatalException", except ) );
                     _ctx.rollback();
                 }
-                _ctx = null;
                 return;
             case Status.STATUS_ROLLEDBACK:
                 _ctx.rollback();
-                _ctx = null;
                 return;
             default:
                 _ctx.rollback();
-                _ctx = null;
                 throw new IllegalStateException( "Unexpected state: afterCompletion called with status " + status );
             }
         } finally {
@@ -614,52 +631,6 @@ public class DatabaseImpl
             throws org.exolab.castor.jdo.PersistenceException
     {
         return _ctx.getConnection( _scope.getLockEngine() );
-    }
-
-    /**
-     * Expire objects from the cache.  Objects expired from the cache will be
-     * read from persistent storage, as opposed to being read from the
-     * performance cache, during subsequent load/query operations.
-     *
-     * Objects may be expired from the cache individually, using explicit
-     * type/identity pairs in the argument list, or whole classes of objects
-     * may be expired by specifying a class type without a corresponding 
-     * entry in the identity array.
-     *
-     * Objects contained within a "master" object, for example objects
-     * maintained in a one-to-many relationship, will automatically be expired
-     * from the cache without the need to explicitly identify them.  This does
-     * not apply when expiring objects by type.  Each type, both container and
-     * contained objects need to be specified.
-     * 
-     * @param type An array of class types.
-     * @param identity An array of object identifiers.
-     */
-    public void expireCache( Class[] type, Object[] identity )
-        throws PersistenceException 
-    {
-        for ( int i = 0; i < type.length; i++ ) {
-
-            LockEngine engine = getLockEngine();
-            
-            if ( identity != null ) {
-                if (identity.length >= i+1 ) {
-                    // the object with this type/identity should be
-                    // cleared from the cache
-                    ClassMolder molder = engine.getClassMolder(type[i]);
-                    begin();
-                    TransactionContext tx = getTransaction();
-                    tx.expireCache(engine, molder, identity[i]);
-                    commit();
-                } else {
-                    // all objects of this type should be cleared from the cache
-                    engine.expireCache(type[i]);
-                }
-            } else {
-                // all objects of this type should be cleared from the cache
-                engine.expireCache(type[i]);
-            }
-        }
     }
 
 }                                
