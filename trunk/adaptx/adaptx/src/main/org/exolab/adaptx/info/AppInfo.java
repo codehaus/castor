@@ -1,11 +1,11 @@
 /*
- * (C) Copyright Keith Visco 2002  All rights reserved.
+ * (C) Copyright Keith Visco 2002-2003.  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -24,9 +24,9 @@ package org.exolab.adaptx.info;
 /**
  * A class to hold Adaptx application information
  *
- * @author <a href="kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class AppInfo {
     
     /**
@@ -41,12 +41,12 @@ public class AppInfo {
      * website actually works
     **/
     public static final String VENDOR_URL 
-        = "http://www.clc-marketing.com/xslp";
+        = "http://www.kvisco.com/xslp";
         
     /**
      * The current Version Number
     **/
-    public static final String VERSION = "0.9.4.3+";
+    public static final String VERSION = "0.9.7";
     
     
 } //-- AppInfo
