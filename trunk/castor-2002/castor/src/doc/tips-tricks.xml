@@ -89,9 +89,14 @@ org.exolab.castor.indent=true
 
     </section>
 
-    <section title="XML: XSLT">
-
-    </section>
+    <section title="XML:Marshall validation">
+    	<p>It is possible to disable the validation in the marshalling framework by
+    	   simply modifying the Castor properties file or create a new properties file in the classpath 
+    	   (named <tt>castor.properties</tt>) with the following content:
+         <pre>
+org.exolab.castor.marshalling.validation=true
+         </pre></p>
+    </section> 
     
     <section title="JDO: Views of Same Object">
 
