@@ -179,14 +179,14 @@ public final class FieldHandlerImpl
      * Convertor to apply when setting the value of the field. Converts from
      * the value to the field type. Null if no convertor is required.
      */
-    private final TypeConvertor  _convertTo;
+    private TypeConvertor  _convertTo = null;
 
 
     /**
      * Convertor to apply when reading the value of the field. Converts from
      * the field type to the return value. Null if no convertor is required.
      */
-    private final TypeConvertor  _convertFrom;
+    private TypeConvertor  _convertFrom = null;
 
 
     /**
@@ -381,8 +381,9 @@ public final class FieldHandlerImpl
                                                               toString(), except ) );
         }
 
-        // If a collection, return an enumeration of it's values.
-        if ( _colHandler != null ) {
+        //-- If a collection, return an enumeration of it's values.
+        //-- Only use collection handler, if there is no convertor
+        if (( _colHandler != null ) && (_convertFrom == null)) {
             if ( value == null )
                 return new CollectionHandlers.EmptyEnumerator();
             else
@@ -642,7 +643,25 @@ public final class FieldHandlerImpl
         _required = required;
     }
 
-
+    /**
+     * Sets the TypeConvertor used during calls to getValue
+     *
+     * @param convertor the TypeConvertor to use during calls
+     * to getValue
+    **/
+    public void setConvertFrom(TypeConvertor convertor) {
+        _convertFrom = convertor;
+    } //-- setConvertFrom
+    
+    /**
+     * Sets the TypeConvertor used during calls to setValue
+     *
+     * @param convertor the TypeConvertor to use during calls
+     * to setValue
+    **/
+    public void setConvertTo(TypeConvertor convertor) {
+        _convertTo = convertor;
+    } //-- setConvertTo
 
     /**
      * Mutator method used by {@link MappingLoader} and
