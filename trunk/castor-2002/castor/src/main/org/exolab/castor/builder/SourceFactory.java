@@ -175,8 +175,7 @@ public class SourceFactory  {
         String elementName = element.getName();
 		String className = JavaNaming.toJavaClassName(elementName);
         XMLType type = element.getType();
-
-        //dirty code for handling
+       //dirty code for handling
         //nested groups inside anonymous complexTypes.
         if ((type instanceof ComplexType) && (type.getName() == null)) {
             int max = ((ComplexType)type).getMaxOccurs();
@@ -228,13 +227,12 @@ public class SourceFactory  {
         // ComplexType
         else if (type.isComplexType()) {
             ComplexType complexType = (ComplexType)type;
-
             //-- If anonymous complex type, we need to process
             //-- the complex type
             if ( ! complexType.isTopLevel() ) {
-	       //process the complexType only if it has not been proceed
+	           //process the complexType only if it has not been proceed
                if (!state.processed(complexType))
-     		  processComplexType( complexType, state);
+     		      processComplexType( complexType, state);
                if (createGroupItem) {
                    sgState.bindReference(jClass, classInfo);
                    classes[1] = jClass;
@@ -247,9 +245,9 @@ public class SourceFactory  {
                    fInfo.setContainer(true);
                    className = className.substring(0,className.length()-4);
                    state     = new FactoryState(className, sgState);
-		   classInfo = state.classInfo;
+		           classInfo = state.classInfo;
                    jClass    = state.jClass;
-		   initialize(jClass);
+		           initialize(jClass);
                    classInfo.addFieldInfo(fInfo);
                    fInfo.createJavaField(jClass);
                    fInfo.createAccessMethods(jClass);
@@ -271,7 +269,11 @@ public class SourceFactory  {
             else {
                 String typeName = complexType.getName();
                 String superClass = JavaNaming.toJavaClassName(typeName);
-                superClass = resolveClassName(superClass, sgState.packageName);
+                //at this point the package name can change
+                //if we are using a type imported from another schema
+                String packageName = SourceGenerator.getJavaPackage(type.getSchema().getTargetNamespace());
+                superClass = resolveClassName(superClass, packageName);
+                packageName = null;
                 jClass.setSuperClass(superClass);
                 derived = true;
             }
@@ -349,7 +351,6 @@ public class SourceFactory  {
 
         String className = JavaNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, sgState.packageName);
-
 
         boolean createGroupItem = false;
 
@@ -1351,8 +1352,7 @@ public class SourceFactory  {
                             }
 		                }
                         boolean processed = state.processed(tmpDecl);
-
-						//-- make sure we process the element first
+                        //-- make sure we process the element first
 						//-- so that it's available to the MemberFactory
 						if ((state.resolve(struct) == null) && (!processed))
 						    createSourceCode((ElementDecl)struct,

@@ -618,8 +618,12 @@ public class Schema extends Annotated {
             return (ComplexType)complexTypes.get(canonicalName);
         else {
             Schema schema = getImportedSchema(ns);
-            if (schema!=null)
+            if (schema!=null) {
+                String warning = "Warning : do not forget to generate the source ";
+                warning += "for the schema with this targetNamespace: "+schema.getTargetNamespace();
+                System.out.println(warning);
                 return schema.getComplexType(canonicalName);
+            }
         }
 
         return null;

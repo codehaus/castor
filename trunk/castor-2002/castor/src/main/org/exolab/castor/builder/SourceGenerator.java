@@ -92,7 +92,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.9.2";
+    static final String version = "0.9.3";
 
     /**
      * The application URI
@@ -722,10 +722,12 @@ public class SourceGenerator {
         //-- ComplexType
         else if (xmlType.isComplexType()) {
 
-			JClass[] classes = sourceFactory.createSourceCode(elementDecl,
+		JClass[] classes = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo);
 
-            processComplexType((ComplexType)xmlType, sInfo);
+            //only create classes for types that are not imported
+            if (xmlType.getSchema() == elementDecl.getSchema())
+                 processComplexType((ComplexType)xmlType, sInfo);            
 
             for (int i = 0; i < classes.length; i++)
                  processJClass(classes[i], sInfo);
