@@ -1685,13 +1685,28 @@ public abstract class TransactionContext
                 entry.molder.getCallback().releasing( entry.object, true );
             }
         }
+        // Call txcommited() before objects are removed to allow
+        // TxSynchronizable to iterate through the objects.
+        txcommitted();
+
         // Forget about all the objects in this transaction,
         // and mark it as completed.
         _objects.removeAllElements();
         _engineOids.clear();
         _readOnlyObjects.clear();
-        txcommitted();
+        
         _status = Status.STATUS_COMMITTED;
+    }
+
+
+    /**
+     * Expose an enumeration of the commited object entries to allow
+     * TxSynchronizable to iterate through the objects.
+     *
+     * @return Enumeration of commited object entries.
+     */
+    public Enumeration getObjectEntries(){
+        return _objects.elements();
     }
 
 
@@ -2245,7 +2260,7 @@ public abstract class TransactionContext
      * created in this transaction, or modified. Objects identified as
      * read only are not update when the transaction commits.
      */
-    static final class ObjectEntry
+    public static final class ObjectEntry
     {
 
         /**
@@ -2310,6 +2325,64 @@ public abstract class TransactionContext
          * objects.
          */
         ObjectEntry              nextDeleted;
+
+        /**
+         * Allow TxSynchronizable to access deleted flag.
+         * 
+         * @return True if the object has been deleted in this transaction.
+         */
+        public boolean isDeleted() {
+            return deleted;
+        }
+
+        /**
+         * Allow TxSynchronizable to access created flag.
+         * 
+         * @return True if the object has been created in this transaction.
+         */
+        public boolean isCreated() {
+            return created;
+        }
+
+        /**
+         * Allow TxSynchronizable to access flag showing if the object has
+         * been modified and the cache has been updated.
+         * 
+         * @return True if the object has been modified and the cache has
+         *         been updated at commit time.
+         */
+        public boolean isUpdateCacheNeeded() {
+            return updateCacheNeeded;
+        }
+
+        /**
+         * Allow TxSynchronizable to access flag showing if the object has
+         * been modified and the persistence storage has been updated.
+         * 
+         * @return True if the object has been modified and the persistence
+         *         storage has been updated.
+         */
+        public boolean isUpdatePersistNeeded() {
+            return updatePersistNeeded;
+        }
+
+        /**
+         * Allow TxSynchronizable to access OID of the object.
+         * 
+         * @return The OID of the object.
+         */
+        public OID getOid() {
+            return oid;
+        }
+
+        /**
+         * Allow TxSynchronizable to access the object.
+         * 
+         * @return The object.
+         */
+        public Object getObject() {
+            return object;
+        }
 
         ObjectEntry( LockEngine engine, ClassMolder molder, OID oid, Object object ) {
             this.engine = engine;
