@@ -192,14 +192,13 @@ public class Unmarshaller {
      * Sets the Mapping to use during unmarshalling.
      * @param mapping the Mapping to use during unmarshalling.
      * @see setResolver
-     * <BR />     
-     * <B>Note:</B> This method will nullify any ClassDescriptorResolver
-     * currently being used by this Unmarshaller
     **/
     public void setMapping( Mapping mapping )
         throws MappingException
     {
-        _cdResolver = new ClassDescriptorResolverImpl(loader);
+        if (_cdResolver == null)
+            _cdResolver = new ClassDescriptorResolverImpl(loader);
+        
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML, null ) );
     } //-- setMapping
     
