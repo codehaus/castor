@@ -1,13 +1,8 @@
 /*
  * This class was automatically generated with
- * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
  * $Id$
- *
- * NOTE: 
- *   THOMAS, THIS FILE WAS MODIFIED BY HAND.
- *   Changes include:
- *     - XML name change, "class" instead of "class-mapping"
  */
 
 package org.exolab.castor.mapping.xml;
@@ -54,7 +49,7 @@ public class MappingRootDescriptor extends org.exolab.castor.xml.util.XMLClassDe
     public MappingRootDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/";
-        xmlName = "mapping-root";
+        xmlName = "mapping";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
@@ -125,7 +120,7 @@ public class MappingRootDescriptor extends org.exolab.castor.xml.util.XMLClassDe
                 return new Include();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(true);
         addFieldDescriptor(desc);
@@ -159,6 +154,8 @@ public class MappingRootDescriptor extends org.exolab.castor.xml.util.XMLClassDe
                 return new ClassMapping();
             }
         } );
+
+        //desc.setHandler( new CollectionFieldHandler(handler));
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(true);
@@ -193,7 +190,7 @@ public class MappingRootDescriptor extends org.exolab.castor.xml.util.XMLClassDe
                 return new KeyGeneratorDef();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(true);
         addFieldDescriptor(desc);

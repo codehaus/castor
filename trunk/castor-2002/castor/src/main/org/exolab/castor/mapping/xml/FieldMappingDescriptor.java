@@ -1,15 +1,8 @@
 /*
  * This class was automatically generated with
- * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
  * $Id$
- * 
- * NOTE: 
- *   THOMAS, THIS FILE WAS MODIFIED BY HAND.
- *   Changes include:
- *     - XML name change, "field" instead of "field-mapping"
- *     - Backward compatibility for "xml" element.
- *     
  */
 
 package org.exolab.castor.mapping.xml;
@@ -494,7 +487,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- _bindXml
         desc = new XMLFieldDescriptorImpl(BindXml.class, "_bindXml", "bind-xml", NodeType.Element);
-        //-- BACKWARD COMPATABILITY
+        //BACKWARD COMPATIBILITY
         desc.setMatches("bind-xml xml");
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object )

@@ -1,13 +1,8 @@
 /*
  * This class was automatically generated with
- * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
  * $Id$
- *
- * NOTE: 
- *   THOMAS, THIS FILE WAS MODIFIED BY HAND.
- *   Changes include:
- *     - XML name change, "class" instead of "class-mapping"
  */
 
 package org.exolab.castor.mapping.xml;
@@ -110,7 +105,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setExtends(value);
+                    target.setExtends( (java.lang.Object) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -162,7 +157,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         desc.setValidator(fieldValidator);
 
         //-- _identity
-        desc = new XMLFieldDescriptorImpl(java.util.Vector.class, "_identity", "identity", NodeType.Attribute);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_identity", "identity", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object )
                 throws IllegalStateException
@@ -175,17 +170,17 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setIdentity( (String[]) value);
+                    target.addIdentity( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new java.util.Vector();
+                return new java.lang.String();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
 
@@ -228,8 +223,8 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         desc.setValidator(fieldValidator);
 
         //-- _keyGenerator
-        desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_keyGenerator", "key-generator", NodeType.Attribute);
-        desc.setReference(true);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_keyGenerator", "key-generator", NodeType.Attribute);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object )
                 throws IllegalStateException
@@ -242,14 +237,14 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setKeyGenerator( (java.lang.Object) value);
+                    target.setKeyGenerator( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new java.lang.Object();
+                return null;
             }
         } );
         desc.setHandler(handler);
@@ -258,6 +253,11 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _keyGenerator
         fieldValidator = new FieldValidator();
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
 
         //-- _autoComplete
@@ -430,6 +430,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
                 return new FieldMapping();
             }
         } );
+        //desc.setHandler( new CollectionFieldHandler(handler));
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(true);
@@ -464,7 +465,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
                 return new Container();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(true);
         addFieldDescriptor(desc);

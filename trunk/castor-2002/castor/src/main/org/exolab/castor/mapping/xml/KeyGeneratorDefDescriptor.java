@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -154,7 +154,7 @@ public class KeyGeneratorDefDescriptor extends org.exolab.castor.xml.util.XMLCla
                 return new Param();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(true);
         addFieldDescriptor(desc);
