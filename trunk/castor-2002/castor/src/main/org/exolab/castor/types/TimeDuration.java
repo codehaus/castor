@@ -52,12 +52,11 @@ package org.exolab.castor.types;
 import java.text.ParseException;
 
 /**
- * Represents the timeDuration XML Schema type.
- * This representation does not support the decimal fraction
+ * <p>Represents the timeDuration XML Schema type.
+ * <p>This representation does not support the decimal fraction
  * for the lowest order item.
  * Besides setting TimeDuration to '0' is not possible thus there is
  * no distinction between '0' and 'P0Y'
- * TODO support the corresponding facets
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  **/
@@ -531,6 +530,8 @@ public class TimeDuration  {
      */
     public boolean equals(TimeDuration timeD) {
         boolean result = false;
+        if (timeD == null)
+            return result;
         result = (_year == timeD.getYear());
         result = result && (_month == timeD.getMonth());
         result = result && (_day == timeD.getDay());

@@ -61,12 +61,11 @@ import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.types.RecurringDurationBase;
 
 /**
- * Represents recurringDuration utterly
+ * <p> Represents recurringDuration utterly
  * a recurringDuration must contain all the fields :
- * (+|-)CCYY-MM-DDThh:mm:ss.sss(Z|(+|-)hh:mm)
- * The validation of the date fields is done in the set methods and follows
- * <a href="http://www.iso.ch/markete/8601.pdf>the ISO8601 Date and Time Format</a>
- * TODO : write a constructor RecurringDuration(java.util.Date date)
+ * <p> (+|-)CCYY-MM-DDThh:mm:ss.sss(Z|(+|-)hh:mm)
+ * <p> The validation of the date fields is done in the set methods and follows
+ * <a href="http://www.iso.ch/markete/8601.pdf">the ISO8601 Date and Time Format</a>
  *
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
@@ -251,10 +250,6 @@ public class RecurringDuration extends RecurringDurationBase{
      * set all the fields by reading the values in an array
      * @param values an array of shorts with the values
      * the array is supposed to be of length 6 and ordered like that:
-     * century
-     * year
-     * month
-     * day
      *<ul>
      *      <li>century</li>
      *      <li>year</li>
@@ -351,8 +346,8 @@ public class RecurringDuration extends RecurringDurationBase{
     }//toDate()
 
     /**
-     * convert this recurringDuration to a string
-     * The format is defined by W3C XML Schema draft and ISO8601
+     * <p>Convert this recurringDuration to a string
+     * <p>The format is defined by W3C XML Schema draft and ISO8601
      * i.e (+|-)CCYY-MM-DDThh:mm:ss.sss(Z|(+|-)hh:mm)
      * @return a string representing this recurringDuration
      */
@@ -576,15 +571,17 @@ public class RecurringDuration extends RecurringDurationBase{
     /**
      * <p> Returns true if the present instance of Recurring Duration is equal to
      * the parameter.
-     * The equals relation is the following :
-     * rd1 equals rd2 iff each field of rd1 is equal to the corresponding field of rd2
+     * <p>The equals relation is the following :
+     * <p> <tt>rd1 equals rd2 </tt> iff each field of rd1 is equal to the corresponding field of rd2
      * @param reccD the recurring duration to compare with the present instance
      * @return true if the present instance is equal to the parameter false if not
      */
      public boolean equals(RecurringDuration reccD) throws ValidationException
      {
         boolean result = false;
-         if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
+        if (reccD == null)
+            return false;
+        if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
              !(this.getDuration().equals(reccD.getDuration())) )
         {
                 String err = " Recurring Duration which have different values "
@@ -612,7 +609,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * <p>Returns true if the present instance of RecurringDuration is greater than
      * the parameter
      * <p>Note : the order relation follows the W3C XML Schema draft i.e
-     * rd1 < rd2 iff rd2-rd1>0
+     * <tt>rd1 < rd2 </tt>iff rd2-rd1>0
      * @param reccD the recurring duration to compare with the present instance
      * @return true if the present instance is the greatest, false if not
      */
