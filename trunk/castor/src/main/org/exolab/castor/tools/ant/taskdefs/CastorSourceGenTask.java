@@ -57,6 +57,7 @@ import org.exolab.castor.xml.schema.reader.SchemaUnmarshaller;
 import org.exolab.castor.xml.schema.reader.Sax2ComponentReader;
 import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.xml.XMLException;
+
 import org.exolab.castor.util.LocalConfiguration;
 
 import org.xml.sax.InputSource;
