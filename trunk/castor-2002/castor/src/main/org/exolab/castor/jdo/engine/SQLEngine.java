@@ -592,13 +592,13 @@ public final class SQLEngine
         }
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null 
-		 // Don't try to insert many-many pseudo-fields
-		 && jdoFields[ i ].getManyTable() == null ) {
+         // Don't try to insert many-many pseudo-fields
+         && jdoFields[ i ].getManyTable() == null ) {
                 if ( count > 0 ) {
                     sql.append( ',' );
                 }
-		sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) );
-		++count;
+        sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) );
+        ++count;
             }
         }
         sql.append( ") VALUES (" );
@@ -641,8 +641,8 @@ public final class SQLEngine
         count = 0;
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null
-		 // Don't try to update many-many pseudo-fields
-		 && jdoFields[ i ].getManyTable() == null ) {
+         // Don't try to update many-many pseudo-fields
+         && jdoFields[ i ].getManyTable() == null ) {
                 if ( count > 0 )
                     sql.append( ',' );
                 sql.append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
@@ -654,8 +654,8 @@ public final class SQLEngine
 
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null
-		 // Don't try to update many-many pseudo-fields
-		 && jdoFields[ i ].getManyTable() == null ) {
+         // Don't try to update many-many pseudo-fields
+         && jdoFields[ i ].getManyTable() == null ) {
                 if ( jdoFields[ i ].isDirtyCheck() )
                     sql.append( " AND " ).append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
             }
@@ -798,7 +798,7 @@ public final class SQLEngine
             this.name = fieldDesc.getFieldName();
             this.store = store;
             this.multi = fieldDesc.isMultivalued();
-            this.load = this.store || this.multi;
+            this.load = (fieldDesc instanceof JDOFieldDescriptor) || this.multi;
             if ( store && fieldDesc instanceof JDOFieldDescriptor ) {
                 this.dirtyCheck = ( (JDOFieldDescriptor) fieldDesc ).isDirtyCheck();
                 this.sqlType = ( (JDOFieldDescriptor) fieldDesc ).getSQLType();
