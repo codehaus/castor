@@ -84,7 +84,6 @@ public final class PostgreSQLFactory
     {
         Boolean isDuplicateKey = Boolean.FALSE;
 
-        // Fixed 
         if ( ex.getMessage().indexOf( "duplicate key" ) > 0 )
             isDuplicateKey = Boolean.TRUE;
 
