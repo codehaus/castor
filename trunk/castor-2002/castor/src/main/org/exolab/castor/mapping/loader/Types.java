@@ -131,7 +131,7 @@ public class Types
     {
         for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
             if ( _typeConvertors[ i ].fromType.isAssignableFrom( fromType ) &&
-                 _typeConvertors[ i ].toType.isAssignableFrom( toType ) )
+                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) )
                 return _typeConvertors[ i ].convertor;
         }
         throw new MappingException( "mapping.noConvertor", fromType.getName(), toType.getName() );

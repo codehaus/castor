@@ -55,6 +55,8 @@ import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Properties;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -168,9 +170,29 @@ public class HighLowKeyGenerator implements KeyGenerator
                 rs = stmt.executeQuery();
 
                 if ( rs.next() ) {
-                    last = rs.getBigDecimal( 1 );
+                    Object value;
+                    Class valClass;
+                    TypeConvertor back = null;
+
+                    value = rs.getObject( 1 );
+                    valClass = value.getClass();
+                    if ( !valClass.equals(BigDecimal.class) ) {
+                        try {
+                            value = Types.getConvertor(valClass, BigDecimal.class ).convert( value );
+                            back = Types.getConvertor( BigDecimal.class, valClass );
+                        } catch ( Exception except ) {
+                            throw new PersistenceException(
+                                    Messages.format( "mapping.keyGenWrongType",
+                                    getClass().getName(), value.getClass() ), except );
+                        }
+                    }
+                    last = (BigDecimal) value;
                     max = last.add( _grabSize );
-                    rs.updateBigDecimal( 1, max );
+                    if ( back != null ) {
+                        rs.updateObject( 1, back.convert( max ) );
+                    } else {
+                        rs.updateBigDecimal( 1, max );
+                    }
                     rs.updateRow();
                     last = last.add( ONE );
                 } else {
@@ -178,7 +200,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                                                 " (" + _seqKey + "," + _seqValue +
                                                 ") VALUES (?, ?)");
                     stmt.setString( 1, tableName );
-                    stmt.setBigDecimal( 2, _grabSize );
+                    stmt.setInt( 2, _grabSize.intValue() );
                     stmt.executeUpdate();
                     last = ONE;
                     max = _grabSize;

@@ -53,6 +53,8 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -121,7 +123,18 @@ public final class MaxKeyGenerator implements KeyGenerator
             rs = stmt.executeQuery( sql );
 
             if ( rs.next() ) {
-                identity = rs.getBigDecimal( 1 ).add( ONE );
+                identity = rs.getObject( 1 );
+                if ( !(identity instanceof BigDecimal) ) {
+                    try {
+                        identity = Types.getConvertor( identity.getClass(),
+                                BigDecimal.class ).convert( identity );
+                    } catch ( Exception except ) {
+                        throw new PersistenceException(
+                                Messages.format( "mapping.keyGenWrongType",
+                                getClass().getName(), identity.getClass() ) );
+                    }
+                }
+                identity = ( (BigDecimal) identity ).add( ONE );
             } else {
                 identity = ONE;
             }
@@ -156,5 +169,6 @@ public final class MaxKeyGenerator implements KeyGenerator
     public boolean isInSameConnection() {
         return true;
     }
+
 }
 
