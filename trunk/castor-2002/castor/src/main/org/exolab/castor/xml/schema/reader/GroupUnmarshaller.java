@@ -101,6 +101,10 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     private String _element = SchemaNames.GROUP;
 
     private boolean foundAll        = false;
+    private boolean foundElement    = false;
+    private boolean foundGroup      = false;
+    private boolean foundModelGroup = false;
+    private boolean foundAnnotation = false;
 
       //----------------/
      //- Constructors -/
@@ -143,7 +147,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
 
 
         _element = element;
-        
+
         //-- set name
         attValue = atts.getValue(SchemaNames.NAME_ATTR);
         if (attValue != null) {
@@ -157,9 +161,9 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
          * equals the minOccurs value.
          */
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
-        
+
         if (attValue != null) {
-            if (MAX_OCCURS_WILDCARD.equals(attValue)) 
+            if (MAX_OCCURS_WILDCARD.equals(attValue))
                 _group.setMaxOccurs(-1);
             else
                 _group.setMaxOccurs(toInt(attValue));
@@ -223,13 +227,28 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-        if (SchemaNames.ELEMENT.equals(name)) {
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            if (foundElement || foundGroup ||foundModelGroup)
+                error("An annotation may only appear as the first child "+
+                    "of an element definition.");
+
+
+            if (foundAnnotation)
+                error("Only one (1) 'annotation' is allowed as a child of "+
+                    "element definitions.");
+
+            foundAnnotation = true;
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+        else if (SchemaNames.ELEMENT.equals(name)) {
+            foundElement = true;
             unmarshaller
                 = new ElementUnmarshaller(_schema, atts, getResolver());
         }
         //--group
         else if (name.equals(SchemaNames.GROUP))
         {
+            foundModelGroup = true;
             unmarshaller
                 = new ModelGroupUnmarshaller(_schema, atts, getResolver());
         }
@@ -237,6 +256,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         //--all, sequence, choice
         else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
         {
+            foundGroup = true;
             if (SchemaNames.ALL.equals(name))
                foundAll = true;
             unmarshaller
