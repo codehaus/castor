@@ -164,7 +164,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         String currval;
         String table;
 
-        seqName = MessageFormat.format( _seqName, new String[] {tableName});
+        seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
         table = _factory.quoteName(tableName);
         try {
             if (_factory.getFactoryName().equals("interbase")) {
@@ -267,7 +267,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         if ( tableName.startsWith("\"") ) {
             tableName = tableName.substring( 1, tableName.length() - 1 );
         }
-        seqName = MessageFormat.format( _seqName, new String[] {tableName});
+        seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
         nextval = _factory.quoteName(seqName + ".nextval");
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );
