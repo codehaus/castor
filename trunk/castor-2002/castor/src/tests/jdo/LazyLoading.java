@@ -117,9 +117,11 @@ public class LazyLoading extends CastorTestCase {
         stmt.executeUpdate("DELETE FROM test_pks_contract");
         stmt.executeUpdate("DELETE FROM test_pks_category");
         _conn.commit();
+
+        createDataObjects();
     }
 
-    public void runTest() 
+    public void createDataObjects() 
             throws PersistenceException, SQLException {
 
         _db.begin();
@@ -189,7 +191,21 @@ public class LazyLoading extends CastorTestCase {
         con.setCategory( category );
         person.setContract( con );
         _db.create( person );
-        _db.commit();           
+        _db.commit();
+    }
+
+    public void runTest() 
+            throws PersistenceException, SQLException {
+
+        // the following test are designed to be run in sequence. 
+        testGeneral();
+
+        testCollection();
+
+    }
+
+    public void testGeneral() 
+            throws PersistenceException, SQLException {
 
         _db.begin();
         Complex fullname = new Complex( "First", "Person" );
@@ -247,7 +263,6 @@ public class LazyLoading extends CastorTestCase {
                 stream.println("Error: Contract is not what expected!");
                 stream.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
                 stream.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());                   
-                stream.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());                   
                 _db.rollback();
                 fail("contract is incorrect");
             }
@@ -331,7 +346,6 @@ public class LazyLoading extends CastorTestCase {
                 stream.println("Error: Contract is not what expected!");
                 stream.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
                 stream.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());                   
-                stream.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());                   
                 _db.rollback();
                 fail("contract is incorrect");
             }
@@ -360,6 +374,91 @@ public class LazyLoading extends CastorTestCase {
         _db.commit();
     }
 
+    public void testCollection() 
+            throws PersistenceException, SQLException {
+        // test against bug 801
+
+        Complex fullname = new Complex( "First", "Person" );
+
+        // test java.util.Collection.clear() for lazy loading
+        _db.begin();
+        TestLazyPerson loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
+        
+        Collection addresses = loadPerson.getAddress();
+        addresses.clear();
+        _db.commit();
+
+        _db.begin();
+        loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
+        addresses = loadPerson.getAddress();
+
+        if ( !addresses.isEmpty() ) {
+            stream.println("Error: Collection.clear() is not working!");
+            fail("Error: Collection.clear() is not working!");
+        }
+
+        // modify the collection to test java.util.Collection.addAll() 
+        // for lazy loading
+        Collection c = new ArrayList();
+
+        TestLazyAddress address = new TestLazyAddress();
+        address.setId(101);
+        address.setStreet("Mattrew Street");
+        address.setCity("Rome City");
+        address.setState("RM");
+        address.setZip("10000");
+        address.setPerson( loadPerson );
+        c.add( address );
+
+        address = new TestLazyAddress();
+        address.setId(102);
+        address.setStreet("Luke Street");
+        address.setCity("Rome City");
+        address.setState("RM");
+        address.setZip("10000");
+        address.setPerson( loadPerson );
+        c.add( address );
+
+        address = new TestLazyAddress();
+        address.setId(103);
+        address.setStreet("John Street");
+        address.setCity("Rome City");
+        address.setState("RM");
+        address.setZip("10000");
+        address.setPerson( loadPerson );
+        c.add( address );
+
+        addresses.addAll( c );
+        _db.commit();
+
+        // check if add all work
+        _db.begin();
+        loadPerson = (TestLazyEmployee) _db.load( TestLazyEmployee.class, fullname );
+        addresses = loadPerson.getAddress();
+        Iterator itor = addresses.iterator();
+
+        boolean hasAddr1, hasAddr2, hasAddr3;
+        hasAddr1 = hasAddr2 = hasAddr3 = false;
+        while ( itor.hasNext() ) {
+            address = (TestLazyAddress) itor.next();
+            if ( address.getId() == 101 )
+                hasAddr1 = true;
+            else if ( address.getId() == 102 )
+                hasAddr2 = true;
+            else if ( address.getId() == 103 )
+                hasAddr3 = true;
+            else {
+                stream.println("Error: Address with unexpected id is found! "+address);
+                fail("Erorr: Address with unexpected id is found! "+address);
+            }
+        }
+        if ( !hasAddr1 || !hasAddr2 || !hasAddr3 ) {
+            stream.println("Error: Collection.addAll( Collection ) fail");
+            fail("Error: Collection.addAll( Collection ) fail");
+        }
+
+        _db.commit();
+    }
 
     public void tearDown()
             throws PersistenceException, SQLException  {
