@@ -47,17 +47,13 @@ package org.exolab.castor.jdo;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.util.Hashtable;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.Name;
-import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import javax.naming.NoInitialContextException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
@@ -70,10 +66,15 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
-import org.exolab.castor.jdo.engine.OQLQueryImpl;
+import org.exolab.castor.jdo.engine.JDOConfLoader;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactoryRegistry;
+import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
@@ -151,7 +152,7 @@ public class JDO
      * specified, the first attempt to load a database of this type
      * will use the specified configuration file.
      */
-    private String          _dbConf;
+    private String          _jdoConf;
 
 
     /**
@@ -194,12 +195,11 @@ public class JDO
      */
     private String         _description = "Castor JDO";
 
-
     /**
-     * The look up name for a transaction manager.
+     * The transaction manager factory to be used to obtain a
+     * <code>javax.jta.TransactionManager</code> instance.
      */
-    private String         _tmName = "java:comp/TransactionManager";
-
+    private TransactionManagerFactory _transactionManagerFactory = null;
 
     /**
      * The transaction manager
@@ -478,7 +478,7 @@ public class JDO
      */
     public void setConfiguration( String url )
     {
-        _dbConf = url;
+        _jdoConf = url;
     }
 
 
@@ -491,35 +491,8 @@ public class JDO
      */
     public String getConfiguration()
     {
-        return _dbConf;
+        return _jdoConf;
     }
-
-
-    /**
-     * Sets the JNDI name of the transaction manager. If set, JDO will look
-     * up this name through JNDI and if available register itself
-     * for synchronization and take part in a distributed transaction.
-     * <p>
-     * The standard name for this property is <tt>transactionManager</tt>.
-     *
-     * @param tmName The JNDI name of the transaction manager
-     */
-    public void setTransactionManager( String tmName )
-    {
-        _tmName = tmName;
-    }
-
-
-    /**
-     * Returns the JNDI name of the transaction manager.
-     *
-     * @returns The JNDI name of the transaction manager
-     */
-    public String getTransactionManager()
-    {
-        return _tmName;
-    }
-
 
     /**
      * Enable/disable jdo Database pooling. This option only affects
@@ -597,32 +570,104 @@ public class JDO
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
         if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
-            if ( _dbConf == null )
+            if ( _jdoConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), _entityResolver, _classLoader );
+                DatabaseRegistry.loadDatabase( new InputSource( _jdoConf ), _entityResolver, _classLoader );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( except );
             }
         }
+        
+        // load transaction manager factory registry configuration
+        try {
+            TransactionManagerFactoryRegistry.load (new InputSource (_jdoConf), _entityResolver);
+        }
+        catch (TransactionManagerAcquireException e) {
+            throw new PersistenceException (Messages.message ("jdo.transaction.problemToInitializeTransactionManagerFactory"), e); 
+        }
 
-        if ( _tmName != null ) {
-            InitialContext     ctx;
+        if (_transactionManagerFactory == null) {
+            
+            String transactionMode = null;
+            try {
+                TransactionDemarcation demarcation =
+                    JDOConfLoader.getTransactionDemarcation(new InputSource (_jdoConf), _entityResolver);
+                     
+                String demarcationMode =demarcation.getMode();
+
+                org.exolab.castor.jdo.conf.TransactionManager transactionManager = demarcation.getTransactionManager();
+                                
+                if (transactionManager != null) 
+                    transactionMode = transactionManager.getName();
+                else {
+                    
+                    if (demarcationMode.equals(LocalTransactionManagerFactory.NAME))
+                        transactionMode= LocalTransactionManagerFactory.NAME;
+                    else
+                        throw new PersistenceException (Messages.message ("jdo.transaction.missingTransactionManagerConfiguration"));
+                }
+                    
+            }
+            catch (MappingException e) {
+                throw new PersistenceException ("jdo.transaction.noValidTransactionMode", e);
+            }
+                 
+            /*
+             * Try to obtain the specified<code>TransactionManagerFactory</code> instance from the
+             * registry.
+             * 
+             * If the returned TransactionManagerFactory instance is null,
+             * return an exception to indicate that we cannot live without a
+             * valid TransactionManagerFactory instance and that the user should
+             * change her configuration.
+             */
+             _transactionManagerFactory = 
+                TransactionManagerFactoryRegistry.getTransactionManagerFactory (transactionMode);
+        
+            if (_transactionManagerFactory == null) {
+                throw new DatabaseNotFoundException( Messages.format( "jdo.transaction.missingTransactionManagerFactory", transactionMode));
+            }
+
+            /*
+             *  Try to obtain a <code>javax.jta.TransactionManager>/code> from the factory.
+             */
+            try {
+                tm = _transactionManagerFactory.getTransactionManager();
+            } catch (TransactionManagerAcquireException e) {
+                throw new DatabaseNotFoundException( Messages.format( "jdo.transaction.unableToAcquireTransactionManager", 
+                    _transactionManagerFactory.getName(),
+                    e ) );
+            }
+        }
+        
+        /* At this point, we MUST have a valid instance of TransactionManagerFactory, and 
+         * dependent on its type (LOCAL or not), we MIGHT have a
+         * valid<code>javax. jta.TransactionManager</code> instance.
+         * 
+         * Scenario 1: If the user uses Castor in standalone mode (outside of an
+         * J2EE container), we have a TransactionManagerFactory instance only,
+         * but no TransactionManager instance.
+         * 
+         * Scenario 2: If the user uses Castor in J2EE mode (inside of an J2EE
+         * container), and wants the container to control transaction
+         * demarcation, we have both a TransactionManagerFactory and a
+         * TransactionManager instance.
+         */
+         
+        if ( (_transactionManagerFactory.getName().equals (LocalTransactionManagerFactory.NAME ) ) && 
+             ( tm != null) ) {
             Transaction        tx;
             DatabaseImpl       dbImpl;
 
             try {
-                if(tm == null) {
-                    ctx = new InitialContext();
-                    tm = (TransactionManager) ctx.lookup( _tmName );
-                }
                 tx = tm.getTransaction();
                 if ( _txDbPool != null && _txDbPool.containsTx( tx ) )
                     return _txDbPool.get( tx );
 
                 if ( tx != null && tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _callback, 
-                            _instanceFactory, tx, _classLoader, _autoStore );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, 
+                            _callback, _instanceFactory, tx, _classLoader, _autoStore );
 
                     if ( _txDbPool != null )
                         _txDbPool.put( tx, dbImpl );
@@ -630,17 +675,15 @@ public class JDO
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
-             } catch ( NoInitialContextException except ) {
-                // No initial context. Just ignore.
-             } catch ( NameNotFoundException except ) {
-                // No TransactionManager object. Just ignore.
-            } catch ( Exception except ) {
+             } catch ( Exception except ) {
                 // NamingException, SystemException, RollbackException
-                    _log.warn( Messages.format( "jdo.warnException", except ) );
+                if ( _logInterceptor != null )
+                    _logInterceptor.exception( except );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _callback, 
-                _instanceFactory, null, _classLoader, _autoStore );
+        
+        return new DatabaseImpl( _dbName, _lockTimeout, 
+                _callback, _instanceFactory, null, _classLoader, _autoStore );
     }
 
 
@@ -711,10 +754,8 @@ public class JDO
             ref.add( new StringRefAddr( "description", _description ) );
         if ( _dbName != null )
             ref.add( new StringRefAddr( "databaseName", _dbName ) );
-        if ( _dbConf != null )
-            ref.add( new StringRefAddr( "configuration", _dbConf ) );
-        if ( _tmName != null )
-            ref.add( new StringRefAddr( "transactionManager", _tmName ) );
+        if ( _jdoConf != null )
+            ref.add( new StringRefAddr( "configuration", _jdoConf ) );
         ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
     return ref;
     }
@@ -747,13 +788,10 @@ public class JDO
             ds._dbName = (String) addr.getContent();
         addr = ref.get( "configuration" );
         if ( addr != null )
-            ds._dbConf = (String) addr.getContent();
+            ds._jdoConf = (String) addr.getContent();
         addr = ref.get( "lockTimeout" );
         if ( addr != null )
                     ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
-        addr = ref.get( "transactionManager" );
-        if ( addr != null )
-                    ds._tmName = (String) addr.getContent();
         return ds;
 
         } else
