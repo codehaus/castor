@@ -52,8 +52,8 @@
      be included to obtain more information about the author. For
      example:
 
-       <author email="arkin@exoffice.com"
-               ldap="ldap.exoffice.com/uid=arkin,o=people,dc=exoffice,dc=com">
+       <author email="arkin@intalio.com"
+               ldap="ldap.intalio.com/uid=arkin,o=people,dc=intalio,dc=com">
          Assaf Arkin</author>
 
  -->

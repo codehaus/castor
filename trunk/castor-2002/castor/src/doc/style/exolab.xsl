@@ -1,242 +1,444 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Content Stylesheet                             -->
-<!-- Ismael Ghalimi ghalimi@exoffice.com            -->
-<!-- Copyright (c) Exoffice Technologies, Inc. 1999 -->
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsl:stylesheet version="1.0">
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output method="html" indent="yes"/>
 
-
-  <!-- Include document for document transformation, widgets for some
-       simple HTML styles (e-mail, url, etc
-    -->
-  <xsl:include href="document.xsl"/>
-  <xsl:include href="widgets.xsl"/>
+  <xsl:include href="topNav.xsl"/>
+  <xsl:include href="leftNav.xsl"/>
+  <xsl:include href="keywords.xsl"/>
+  <xsl:include href="searchForm.xsl"/>
 
 
-  <xsl:output method="html" indent="no"/>
-
-
-  <!-- Color -->
-  <xsl:variable name="color-alpha">#ffffff</xsl:variable>
-  <xsl:variable name="color-beta" select="'#666699'"/>
-  <xsl:variable name="color-gamma" select="'#424264'"/>
-  <xsl:variable name="color-delta" select="'#54547f'"/>
-  <xsl:variable name="color-epsilon" select="'#bfbffe'"/>
-  <xsl:variable name="color-a" select="'#444466'"/>
-  <xsl:variable name="color-b" select="'#4d4d73'"/>
-  <xsl:variable name="color-c" select="'#565680'"/>
-  <xsl:variable name="color-d" select="'#5e5e8c'"/>
-  <xsl:variable name="color-e" select="'#676799'"/>
-  <xsl:variable name="color-f" select="'#6f6fa6'"/>
-  <xsl:variable name="color-g" select="'#7878b3'"/>
-  <xsl:variable name="color-h" select="'#8080bf'"/>
-  <xsl:variable name="color-i" select="'#8989cc'"/>
-  <xsl:variable name="color-j" select="'#9292d9'"/>
-  <xsl:variable name="color-k" select="'#9a9ae6'"/>
-  <xsl:variable name="color-l" select="'#a2a2f2'"/>
-  <xsl:variable name="color-m" select="'#ababff'"/>
-
-  <!-- Internal subset is broken, so resorting to this for a while -->
-  <xsl:variable name="nbsp" select="'&#xA0;'"/>
-
-
-  <!-- Match the entire document and process it into a Web page.
-       The document properties and body are processed separately
-       in a uniform way. The background is provided by this style
-   -->
+  <!-- Template for document -->
+  
   <xsl:template match="/">
-    <xsl:variable name="project" select="document('../project.xml')/project"/>
+  <xsl:variable name="project" select="document('../project.xml')/project"/>
+  <html>
 
-    <html><head>
-      <meta name="author" content="{document/properties/author/.}"/>
-      <link rel="stylesheet" type="text/css" href="style/default.css"/>
-      <xsl:choose>
-        <xsl:when test="/document/properties/title"><title><xsl:value-of select="/document/body/title"/></title></xsl:when>
-        <xsl:when test="/document/body/title"><title><xsl:value-of select="/document/body/title"/></title></xsl:when>
-        <xsl:otherwise><title><xsl:value-of select="$project/title"/></title></xsl:otherwise>
-      </xsl:choose>
-    </head>
+  <head>
+    <xsl:apply-templates select="keywords"/>
+    <xsl:choose>
+      <xsl:when test="/document/properties/title"><title><xsl:value-of select="/document/body/title"/></title></xsl:when>
+      <xsl:when test="/document/body/title"><title><xsl:value-of select="/document/body/title"/></title></xsl:when>
+      <xsl:otherwise><title><xsl:value-of select="$project/title"/></title></xsl:otherwise>
+    </xsl:choose>
+    <link rel="stylesheet" href="default.css"/>
+  </head>
 
-    <body bgcolor="{$color-e}" link="#bfbffe" vlink="#bfbffe" alink="#bfbffe" leftmargin="0" topmargin="0">
-      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <body bgcolor="#ffffff" link="#6763a9" vlink="#6763a9" 
+        topmargin="0" bottommargin="0" leftmargin="0" marginheight="0" marginwidth="0">
 
-        <tr>
-          <td bgcolor="{$color-alpha}" colspan="3">
+  <a name="top"/>
+    
+    <table border="0" cellpadding="0" cellspacing="0" width="712" height="400">
 
-            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                  <td bgcolor="{$color-beta}" align="left" width="254" rowspan="2">
-                    <a href="http://www.exolab.org/">
-                      <img src="style/images/exolab.gif" height="117" width="254" border="0"/>
-                    </a>
-                  </td>
-                  <td bgcolor="{$color-beta}" align="left" height="11" width="3600">
-                    <xsl:apply-templates select="$project/links"/>
-                  </td>
-                </tr>
-                <tr>
-                  <td bgcolor="{$color-alpha}" width="*" align="left" valign="top">
-                    <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/>
-                    <a href="{$project/@href}"><img src="{$project/@image}" border="0" vspace="8" hspace="16"/></a>
-                  </td>
-                </tr>
+      <tr><td width="20" valign="top" align="left" bgcolor="#7270c2"><img
+        src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
+        <td width="95" valign="top" align="left" bgcolor="#7270c2"><img
+          src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
+        <td width="7" valign="top" align="left"><img src="images/dotTrans.gif" border="0" 
+          width="1" height="1"/></td>
+        <td width="70" valign="top" align="left"><img 
+          src="images/dotTrans.gif" width="70" height="6" border="0"/></td>
+        <td width="400" valign="top" align="left"><img 
+          src="images/top_2.gif"  width="400" height="6" border="0"/></td>
+        <td width="120" valign="top" align="left"><xsl:element
+          name="img"><xsl:attribute name="src">images/line_purple.gif</xsl:attribute>
+        <xsl:attribute name="width">120</xsl:attribute>  
+        <xsl:attribute name="height">6</xsl:attribute>  
+        <xsl:attribute name="border">0</xsl:attribute>  
+      </xsl:element></td></tr>
 
-            </table>
+      <tr>
+        <td width="20" bgcolor="#7270c2" valign="top" align="left"><img
+          src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
+        <td width="95" bgcolor="#7270c2" valign="top" align="left"><img
+          src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
+        <td width="7" bgcolor="#ffffff" valign="top" align="left"></td>
+        <td width="70" valign="top" align="left"><img 
+          src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
+        <td width="400" valign="middle" align="left">
+        
+        <xsl:apply-templates select="$project/topNav"/>
 
-          </td>
-        </tr>
+        <br/>
+        <img src="images/dotTrans.gif" width="1" height="2" border="0"/></td>
+        <td width="120" height="20" valign="top" align="left">&#160;</td>
+      </tr>
+      <tr>
+        <td width="20" bgcolor="#7270c2" valign="top" align="left"><img 
+          src="images/dotTrans.gif" width="20" height="3" border="0"/></td>
+        <td width="95" bgcolor="#7270c2" valign="top" align="left"><img 
+          src="images/line_sm.gif" width="105" height="3" border="0"/></td>
+        <td width="7" bgcolor="#a9a5de" valign="top" align="left"><img 
+          src="images/line_sm.gif" width="7" height="3" border="0"/></td>
+        <td width="70" valign="top" align="left"><img 
+          src="images/line_light.gif" width="70" height="3" border="0"/></td>
+        <td width="400" valign="top" align="left"><img 
+          src="images/line_light.gif" width="400" height="3" border="0"/></td>
+        <td width="120" valign="top" align="left"><img 
+          src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
+      </tr>
 
-        <tr>
-          <td bgcolor="{$color-beta}" width="120" rowspan="2" valign="top">
-            <xsl:if test="document/properties">
-              <xsl:attribute name="rowspan">4</xsl:attribute>
-            </xsl:if>
-            <table>
-              <xsl:for-each select="$project/menu">
-                <tr>
-                  <td align="left" colspan="2">
-                    <font color="{$color-alpha}"><small><xsl:value-of select="@name"/></small></font>
-                  </td>
-                </tr>
-                <xsl:for-each select="item">
-                  <tr>
-                    <td width="15" valign="top" align="right">
-                      <img src="style/images/bullets/square-small-white.gif" alt="*" height="12" width="12"/>
-                    </td>
-                    <td><span class="alpha">
-                      <xsl:variable name="href">
-                        <xsl:call-template name="link-convertor">
-                          <xsl:with-param name="href" select="@href"/>
-                        </xsl:call-template>
-                      </xsl:variable>
-                      <font size="2"><a href="{$href}"><xsl:value-of select="@name"/></a></font>
-                    </span></td>
-                  </tr>
-                </xsl:for-each>
-              </xsl:for-each>
-            </table>
-          </td>
-          <td bgcolor="{$color-alpha}" width="11" valign="top">
-              <img src="style/images/corners/nw-small.gif" height="11" width="11" valign="top"/>
-          </td>
-          <td bgcolor="{$color-alpha}" height="45" width="3600">
-            &#xA0;&#xA0;<img src="style/images/bullets/dots.gif" height="11" width="41" valign="top"/>&#xA0;&#xA0;
-            <font size="4" color="{$color-c}"><b>
+      <tr>
+        <td bgcolor="#7270c2" valign="top" align="left"><img 
+          src="images/dotTrans.gif" width="20" height="10" border="0"/></td>
+
+        <td width="95" bgcolor="#7270c2" valign="top" align="left">
+        <img src="images/dotTrans.gif" width="1" height="2" border="0"/><br/>
+        <xsl:apply-templates select="$project/navSections"/>
+        </td>
+
+        <td width="7" bgcolor="#a9a5de" valign="top" align="left">&#160;</td>
+        <td width="70" valign="top" align="left">&#160;</td>
+        <td rowspan="4" width="400" valign="top">
+          <table cols="1" rows="2" border="0" cellpadding="0" cellspacing="0" width="400">
+            <tr>
+              <td valign="top" align="left"><br/>
+              <xsl:apply-templates select="logo"/>
+              </td>
+            </tr>
+          </table>
+          <p/><p/>
+          <br/>
+
+          <xsl:if test="/document/properties/title">
+            <span class="header"><xsl:value-of select="/document/properties/title"/></span>
+          </xsl:if>
+
+          <xsl:apply-templates select="document/body/header"/>
+
+          <!-- build the page navigation first, section by section -->
+          <xsl:for-each select=".//section">
+          <span class="bodyGrey">
+            <xsl:if test="@title">
+              <xsl:variable name="level" select="count(ancestor::*)"/>
               <xsl:choose>
-                <xsl:when test="/document/body/title"><xsl:value-of select="/document/body/title"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="$project/title"/></xsl:otherwise>
+                <xsl:when test='$level=2'>
+                  <a href="#{@title}"><xsl:value-of select="@title"/></a><br/>
+                </xsl:when>
+                <xsl:when test='$level=3'>
+                  <a href="#{@title}"><xsl:value-of select="@title"/></a><br/> 
+                </xsl:when>
+                <xsl:otherwise>
+                  &#xA0;&#xA0;&#xA0;<a href="#{@title}"><xsl:value-of select="@title"/></a><br/> 
+                </xsl:otherwise>
               </xsl:choose>
-            </b></font>
-           </td>
-        </tr>
+            </xsl:if>
+          </span>
+        </xsl:for-each>
 
-      <xsl:if test="document/properties">
-        <tr>
-          <td bgcolor="{$color-alpha}" width="11"><xsl:value-of select="$nbsp"/></td>
-          <td bgcolor="{$color-alpha}" valign="top">
-             <xsl:apply-templates select="document/properties"/>
-          </td>
-        </tr>
+        <br/>
 
-        <tr>
-          <td bgcolor="{$color-beta}" width="11"><xsl:value-of select="$nbsp"/></td>
-          <td bgcolor="{$color-beta}" valign="top"><xsl:value-of select="$nbsp"/></td>
-        </tr>
-      </xsl:if>
+        <!-- now show the sections themselves -->
+        <xsl:apply-templates select="document/body/section"/>
+      </td>
+      <td width="120" height="5" valign="top" 
+        align="left"><a href="http://www.exolab.org"><img 
+        src="images/logo_exolab.gif" hspace="0" vspace="10" width="77" height="20" border="0"/></a></td>
+      </tr>
 
-        <tr>
-          <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
-          <td bgcolor="{$color-alpha}" valign="top">
-             <xsl:apply-templates select="document/body"/>
-             <br/>
-          </td>
-        </tr>
+      <!-- line row -->
+      
+      <tr height="5">
+        <td width="20" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
+        <td width="95" height="5" bgcolor="#7270c2" valign="top">
+        <img src="images/dotTrans.gif" width="1" height="15" border="0"/><br/>
+        <img src="images/line_sm.gif" width="105" height="3" border="0"/>
+        
+        
+        </td>
+        <td width="7" height="5" bgcolor="#a9a5de" valign="top" align="left">&#160;</td>
+        <td width="70" height="5" valign="top" align="left">&#160;</td>
+        <td width="120" height="5" valign="top" align="left">&#160;</td>
+      </tr>
+    
+      <!-- content row -->
+    
+      <tr>
+        <td width="20" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
+        <td width="95" bgcolor="#7270c2" valign="top" 
+          align="left"><xsl:apply-templates select="searchForm"/></td>
+        <td width="7" bgcolor="#a9a5de" valign="top" align="left"> 
+          <img src="images/dotTrans.gif" width="1" height="25" border="0"/>
+        </td>
+        <td width="70" valign="top" align="left"> 
+          <img src="images/dotTrans.gif" width="1" height="25" border="0"/>
+        </td>
+        <td width="120" valign="top" align="left">&#160;</td>
+      </tr>
+    
+      <!-- final row -->
+    
+      <tr height="5">
+        <td width="20" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom" 
+          align="left"><img src="images/stripes1.gif" width="20" height="125" border="0"/></td>
+        <td width="95" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom" 
+          align="left"><img src="images/stripe105.gif" width="105" height="125" border="0"/></td>
+        <td width="7" rowspan="2" height="100%" bgcolor="#a9a5de" valign="top" 
+          align="left">&#160;</td>
+        <td width="70" height="100%" valign="top" align="left">&#160;</td>
+        <td width="120" height="100%" valign="top" align="left">&#160;</td>
+      </tr>
+    
+      <!-- extra  row -->
+    
+      <tr height="5">
+        <!--td width="20" height="25" valign="top" align="left">&#160;</td>
+        <td width="95" height="25" valign="top" align="left">&#160;</td>
+        <td width="7" height="25" valign="top" align="left">&#160;</td-->
+        <td width="70" height="25" valign="top" align="left">&#160;</td>
+        <td width="400" height="25" valign="bottom" align="left">
+          <br/><br/>
+          <img src="images/line_light.gif"  border="0" width="400" height="3"  /><br/>
+          <p/>
+          <span class="bodyGrey">
+            <xsl:for-each select="$project/notice">
+              <small><xsl:copy-of select="."/><br/>&#xA0;<br/></small>
+            </xsl:for-each>
+          </span>
+          <p/>
+          &#160;
+        </td>
+        <td width="120" height="25" valign="top" align="left">&#160;</td>
+      </tr>
 
-        <tr>
-          <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" height="11" width="11" valign="top">
-            <img src="style/images/corners/sw-small.gif" height="11" width="11" valign="top"/>
-          </td>
-          <td bgcolor="{$color-alpha}" valign="top">
-            <img src="style/images/blank.gif" height="11" width="11"/>
-          </td>
-        </tr>
-        <tr>
-          <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11">
-            <img src="style/images/blank.gif" height="11" width="11"/>
-          </td>
-          <td bgcolor="{$color-beta}" valign="top"></td>
-        </tr>
+    </table>
 
-        <xsl:if test="$project/notice">
-          <tr>
-            <td bgcolor="{$color-beta}" width="120"></td>
-            <td bgcolor="{$color-beta}" width="11" valign="top"><img src="style/images/corners/nw-small.gif" height="11" width="11"/></td>
-            <td bgcolor="{$color-alpha}" valign="top"><img src="style/images/blank.gif" height="11" width="11"/></td>
-          </tr>
-          <tr>
-            <td bgcolor="{$color-beta}" width="120"></td>
-            <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
-            <td bgcolor="{$color-alpha}">
-              <xsl:for-each select="$project/notice">
-                <small><xsl:copy-of select="."/><br/>&#xA0;<br/></small>
-              </xsl:for-each>
-            </td>
-          </tr>
-          <tr>
-            <td bgcolor="{$color-beta}" width="120"></td>
-            <td bgcolor="{$color-beta}" width="11" valign="top"><img src="style/images/corners/sw-small.gif" height="11" width="11" valign="top"/></td>
-            <td bgcolor="{$color-alpha}" valign="top"><img src="style/images/blank.gif" height="11" width="11"/></td>
-          </tr>
-        </xsl:if>
+  </body>
 
-        <tr>
-          <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11" valign="top"></td>
-          <td bgcolor="{$color-beta}" valign="top">
-            <xsl:apply-templates select="$project/links"/>
-          </td>
-        </tr>
-
-      </table>
-
-    </body>
-    </html>
+  </html>
   </xsl:template>
 
-  <!-- Special handling for project-wide links which appear both at the
-       top and bottom of the page
-   -->
-  <xsl:template match="project/links">
-    <xsl:for-each select="link">
-      <xsl:variable name="href">
-        <xsl:call-template name="link-convertor">
-          <xsl:with-param name="href" select="@href"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <a href="{$href}"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
-    </xsl:for-each>
+
+  <!-- Templates for sections and headers -->
+
+  <xsl:template match="document//section">
+    <xsl:variable name="level" select="count(ancestor::*)"/>
+    <xsl:choose>
+      <xsl:when test='$level=2'>
+        <a name="{@title}"><h2><xsl:value-of select="@title"/></h2></a>
+      </xsl:when>
+      <xsl:when test='$level=3'>
+        <a name="{@title}"><h3><xsl:value-of select="@title"/></h3></a>
+      </xsl:when>
+      <xsl:when test='$level=4'>
+        <a name="{@title}"><h4><xsl:value-of select="@title"/></h4></a>
+      </xsl:when>
+      <xsl:when test='$level>=5'>
+        <h5><xsl:copy-of select="@title"/></h5>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:apply-templates/>
   </xsl:template>
 
-  <!-- UL is processed into a table using graphical bullets -->
+  <xsl:template match="header">
+    <xsl:apply-templates select="*"/>  
+  </xsl:template>
+
+
+  <!-- Templates for HTML correction -->
+
+  <xsl:template match="*|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="*|@*|text()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="small">
+    <span class="bodyGrey">
+      <xsl:copy-of select="*|text()"/>  
+    </span>
+  </xsl:template>
+
+  <xsl:template match="p">
+    <p>
+      <span class="bodyGrey">
+        <xsl:apply-templates select="*|@*|text()"/>
+      </span>
+    </p>
+  </xsl:template>
+      
+  <xsl:template match="td">
+    <td>
+      <span class="bodyGrey">
+      <xsl:apply-templates select="*|@*|text()"/>
+      </span>
+    </td>
+  </xsl:template>
+
   <xsl:template match="ul">
     <table border="0" cellpadding="2" cellspacing="2">
       <tr><td colspan="2" height="5"></td></tr>
-      <xsl:apply-templates/>
+      <span class="bodyGrey"><xsl:apply-templates/></span>
     </table>
   </xsl:template>
 
   <xsl:template match="ul/li">
     <tr>
       <td align="left" valign="top" width="15">
-        <img src="style/images/bullets/blue.gif" height="22" width="15" alt="*"/>
+        &#149;
      </td>
-      <td align="left" valign="top"><xsl:apply-templates/></td>
+      <td align="left" valign="top"><span class="bodyGrey"><xsl:apply-templates/></span></td>
     </tr>
   </xsl:template>
 
+  <xsl:template match="pre">
+    <span class="bodyGrey">
+      <pre><xsl:apply-templates/></pre>
+    </span>
+  </xsl:template>
+
+
+  <!-- Templates for links -->
+      
+  <xsl:template match="a">
+    <a>
+      <xsl:if test="@href">
+        <xsl:variable name="href">
+          <xsl:call-template name="link-convertor">
+            <xsl:with-param name="href" select="@href"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="href">
+          <xsl:value-of select="$href"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:for-each select="@*[name(.)!='href']">
+        <xsl:copy select="."/>
+      </xsl:for-each>
+      <xsl:apply-templates/>
+    </a>
+  </xsl:template>
+
+  <xsl:template name="link-convertor">
+    <xsl:param name="href" select="empty"/>
+    <xsl:choose>
+      <xsl:when test="starts-with($href,'http:')">
+        <xsl:value-of select="$href"/>
+      </xsl:when>
+      <xsl:when test="not(contains($href,'.xml'))">
+        <xsl:value-of select="$href"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="substring-before($href, '.xml')"/>.html
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="javadoc">
+    <xsl:choose>
+      <xsl:when test="@type='package'">
+        <a href="javadoc/{translate(.,'.','/')}/package-summary.html"><xsl:copy-of select="."/></a>
+      </xsl:when>
+      <xsl:otherwise>
+        <a href="javadoc/{translate(.,'.','/')}.html"><xsl:copy-of select="."/></a>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="api">
+    <xsl:choose>
+      <xsl:when test="@package">
+        <a href="api/{translate(@package,'.','/')}/package-summary.html"><xsl:copy-of select="."/></a>
+      </xsl:when>
+      <xsl:when test="@class">
+        <a href="api/{translate(@class,'.','/')}.html#{.}"><xsl:value-of select="."/></a>
+      </xsl:when>
+      <xsl:otherwise>
+        <a href="api/{translate(.,'.','/')}.html"><xsl:copy-of select="."/></a>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="url">
+    <a href="{.}"><xsl:copy-of select="."/></a>
+  </xsl:template>
+
+  <xsl:template match="email">
+    <a href="mailto:{.}"><xsl:copy-of select="."/></a>
+  </xsl:template>
+
+
+  <!-- Templates for special content -->
+
+  <xsl:template match="body-note">
+    <hr size="1" noshadow=""/><span class="bodyGrey"><xsl:apply-templates/><hr size="1" noshadow=""/></span>
+  </xsl:template>
+
+  <xsl:template match="code">
+    <span class="bodyGrey">
+      <pre><span class="bodyBlack"><xsl:apply-templates/></span></pre>
+      <pre><xsl:apply-templates/></pre>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="code/comment">
+    <span class="bodyGrey">
+      <font color="red"><xsl:apply-templates/></font>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="mailing-lists">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="mailing-list">
+    <div>
+      [
+      <a href="mailto:{@manager}@{@server}?subject=subscribe {@name}">Subscribe</a> |
+      <a href="mailto:{@manager}@{@server}?subject=unsubscribe {@name}">Unsubscribe</a> |
+      <a href="mailto:{@name}@{@server}">Post Message</a> |
+      <a href="{@archive}">Archive</a>
+      ]
+    </div>
+  </xsl:template>
+
+  <xsl:template match="mailing-list/title">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="mailing-list/description">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="contributors">
+    <xsl:for-each select="type">
+      <xsl:variable name="type" select="@name"/>
+      <xsl:variable name="color-epsilon" select="'#ffffff'"/>
+      <p><span class="bodyGrey"><b><xsl:value-of select="@name"/></b></span></p>
+      <p><span class="bodyGrey"><xsl:value-of select="."/></span></p>
+      <table cellpadding="4" cellspacing="2" width="90%">
+        <tr>
+          <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
+            <b>Name</b></span>
+          </td>
+          <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
+            <b>Contribution</b></span>
+          </td>
+          <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
+            <b>Company</b></span>
+          </td>
+        </tr>
+        <xsl:for-each select="../contributor[@type=$type]">
+          <tr>
+            <td><span class="bodyGrey">
+              <a href="mailto:{email}"><xsl:value-of select="name@given"/>&#xA0;<xsl:value-of select="name@surname"/></a></span>
+            </td>
+            <td><span class="bodyGrey">
+               <xsl:value-of select="description"/></span>
+            </td>
+            <td><span class="bodyGrey">
+               <xsl:variable name="company-id" select="company/@id"/>
+               <xsl:variable name="company" select="../company[@id=$company-id]"/>
+               <a href="http://{$company/url}"><xsl:value-of select="$company/name"/></a>
+               &#xA0;</span>
+            </td>
+          </tr>
+        </xsl:for-each>
+      </table>
+    </xsl:for-each>
+  </xsl:template>
 
 </xsl:stylesheet>
-
 
