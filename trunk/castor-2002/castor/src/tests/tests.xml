@@ -2,51 +2,34 @@
 
   <jtf:category name="sybase" class-name="jdo.JDOCategory">
     <jtf:description>JDO tests for Sybase 11</jtf:description>
-
-    <jdo:jdo database-name="sybase" configuration="sybase.xml"/>
-
-    <jtf:case name="TC01" class-name="jdo.Concurrent">
-      <jtf:description>Test dirty checking</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC02" class-name="jdo.Deadlock">
-      <jtf:description>Test deadlock detection</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC03" class-name="jdo.DuplicateKey">
-      <jtf:description>Test duplicate key</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC04" class-name="jdo.ReadOnly">
-      <jtf:description>Read only test</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC05" class-name="jdo.TypeHandling">
-      <jtf:description>Test type handling</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC06" class-name="jdo.Join">
-      <jtf:description>Test inner and outer joins</jtf:description>
-    </jtf:case>
-
+    <jdo:jdo database-name="sybase" configuration="sybase.xml" />
+    <jtf:case name="TC01" class-name="jdo.Concurrent" />
+    <jtf:case name="TC02" class-name="jdo.Deadlock" />
+    <jtf:case name="TC03" class-name="jdo.DuplicateKey" />
+    <jtf:case name="TC04" class-name="jdo.ReadOnly" />
+    <jtf:case name="TC05" class-name="jdo.TypeHandling"/>
+    <jtf:case name="TC06" class-name="jdo.Join" />
   </jtf:category>
 
   <jtf:category name="postgres" class-name="jdo.JDOCategory">
     <jtf:description>JDO tests for PostgreSQL 6.5/7</jtf:description>
+    <jdo:jdo database-name="postgres" configuration="postgres.xml" />
+    <jtf:case name="TC01" class-name="jdo.Concurrent" />
+    <jtf:case name="TC02" class-name="jdo.Deadlock" />
+    <jtf:case name="TC03" class-name="jdo.DuplicateKey" />
+    <jtf:case name="TC04" class-name="jdo.ReadOnly" />
+    <jtf:case name="TC05" class-name="jdo.TypeHandling" />
+  </jtf:category>
 
-    <jdo:jdo database-name="postgres" configuration="postgres.xml"/>
-
-    <jtf:case name="TC01" class-name="jdo.Concurrent">
-      <jtf:description>Test dirty checking</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC02" class-name="jdo.Deadlock">
-      <jtf:description>Test deadlock detection</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC03" class-name="jdo.DuplicateKey">
-      <jtf:description>Test duplicate key</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC04" class-name="jdo.ReadOnly">
-      <jtf:description>Read only test</jtf:description>
-    </jtf:case>
-    <jtf:case name="TC05" class-name="jdo.TypeHandling">
-      <jtf:description>Test type handling</jtf:description>
-    </jtf:case>
-
+  <jtf:category name="cloudscape" class-name="jdo.JDOCategory">
+    <jtf:description>JDO tests for Cloudscape 3</jtf:description>
+    <jdo:jdo database-name="cloudscape" configuration="cloudscape.xml" />
+    <jtf:case name="TC01" class-name="jdo.Concurrent" />
+    <jtf:case name="TC02" class-name="jdo.Deadlock" />
+    <jtf:case name="TC03" class-name="jdo.DuplicateKey" />
+    <jtf:case name="TC04" class-name="jdo.ReadOnly" />
+    <jtf:case name="TC05" class-name="jdo.TypeHandling" />
+    <jtf:case name="TC06" class-name="jdo.Join" />
   </jtf:category>
 
 </jtf:harness>
