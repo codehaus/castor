@@ -413,7 +413,6 @@ public class XMLMappingLoader
             
             //-- has location path?
             if (xml.getLocation() != null) {
-                System.out.println("location: " + xml.getLocation());
                 xmlDesc.setLocationPath(xml.getLocation());
             }
             //is the value type needs specific handling
