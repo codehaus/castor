@@ -275,6 +275,15 @@ SELECT p FROM myapp.Product p]]>
         <tt>Computer</tt>s, etc.
         </p>
         <p>
+        Another item that will need to be added is a mapping for interfaces
+        and abstract classes. The &lt;class> element could certainly be used
+        for this possibly by introducing another attribute to the &lt;class> 
+        element. I'm thinking about an attribute named 'abstract' that 
+        is simply a boolean whose default is false so that it won't affect 
+        concrete classes. Then it serves as a marker for interfaces and 
+        abstract classes only. 
+        </p>
+        <p>
         Not sure if this will really work. It will need experimentation to 
         determine.
         </p>
