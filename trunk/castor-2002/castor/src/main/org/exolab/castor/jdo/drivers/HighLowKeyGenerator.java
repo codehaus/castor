@@ -81,6 +81,8 @@ public class HighLowKeyGenerator implements KeyGenerator
 
     private final static String GRAB_SIZE = "grab-size";
 
+    private final PersistenceFactory _factory;
+    
     private final int _sqlType;
 
     // Sequence table name 
@@ -107,11 +109,12 @@ public class HighLowKeyGenerator implements KeyGenerator
     /**
      * Initialize the HIGH/LOW key generator.
      */
-    public HighLowKeyGenerator( Properties params, int sqlType )
+    public HighLowKeyGenerator( PersistenceFactory factory,  Properties params, int sqlType )
             throws MappingException
     {
         String factorStr;
 
+        _factory = factory;
         _sqlType = sqlType;
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL) 
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
@@ -169,29 +172,34 @@ public class HighLowKeyGenerator implements KeyGenerator
             else
                 last = ((BigDecimal) last).add( ONE );
         } else {
+            QueryExpression query;
             String sql;
+            String sql2;
             String pk;
             PreparedStatement stmt = null;
+            PreparedStatement stmt2 = null;
             ResultSet rs;
 
             try {
-                sql = JDBCSyntax.Select + _seqValue + JDBCSyntax.From + _seqTable +
+                // Create SQL sentence of the form
+                // "SELECT seq_val FROM seq_table WHERE seq_key='table'"
+                // with database-dependent keyword for lock
+                query = _factory.getQueryExpression();
+                query.addColumn( _seqTable, _seqValue );
+                query.addCondition( _seqTable, _seqKey, QueryExpression.OpEquals, 
+                                    JDBCSyntax.Parameter);
+
+                // SELECT and put lock on the last record
+                sql = query.getStatement( true );
+                sql2 = "UPDATE "+  _seqTable +
+                    " SET " + _seqValue + "=" + JDBCSyntax.Parameter +
                     JDBCSyntax.Where + _seqKey + QueryExpression.OpEquals +
                     JDBCSyntax.Parameter;
 
-                stmt = null;
-                try {
-                    if ( conn.getMetaData().supportsResultSetConcurrency(
-                            ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE) ) {
-                        stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
-                                                           ResultSet.CONCUR_UPDATABLE );
-                    }
-                } catch ( Throwable ex ) {
-                }
-                if ( stmt == null ) {
-                    stmt = conn.prepareStatement( sql );
-                }
+                stmt = conn.prepareStatement( sql );
                 stmt.setString(1, tableName);
+                stmt2 = conn.prepareStatement( sql2 );
+                stmt2.setString(2, tableName);
 
                 rs = stmt.executeQuery();
 
@@ -204,7 +212,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                         last = new Integer( value + 1 );
                         maxVal = value + _grabSizeI;
                         max = new Integer( maxVal );
-                        rs.updateInt( 1, maxVal );
+                        stmt2.setInt(1, maxVal);
                     } else {
                         BigDecimal value;
                         BigDecimal maxVal;
@@ -213,9 +221,9 @@ public class HighLowKeyGenerator implements KeyGenerator
                         last = value.add( ONE );
                         maxVal = value.add( _grabSizeD );
                         max = maxVal;
-                        rs.updateBigDecimal( 1, maxVal );
+                        stmt2.setBigDecimal(1, maxVal);
                     }
-                    rs.updateRow();
+                    stmt2.executeUpdate();
                 } else {
                     stmt = conn.prepareStatement("INSERT INTO " + _seqTable +
                                                 " (" + _seqKey + "," + _seqValue +
@@ -241,11 +249,17 @@ public class HighLowKeyGenerator implements KeyGenerator
                     } catch ( SQLException ex ) {
                     }
                 }
+                if ( stmt2 != null ) {
+                    try {
+                        stmt2.close();
+                    } catch ( SQLException ex ) {
+                    }
+                }
             }
         }
 
         if ( _sqlType == Types.INTEGER ) 
-            inRange = ( ( (Integer) last ).compareTo( (Integer) max ) < 0 );
+            inRange = ( ( (Integer) last ).intValue() < ( (Integer) max ).intValue() );
         else
             inRange = ( ( (BigDecimal) last ).compareTo( (BigDecimal) max ) < 0 );
 
