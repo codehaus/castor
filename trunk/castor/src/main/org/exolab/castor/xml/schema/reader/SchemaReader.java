@@ -48,6 +48,8 @@ package org.exolab.castor.xml.schema.reader;
 import java.io.Reader;
 import java.io.IOException;
 
+import org.exolab.castor.net.URIException;
+import org.exolab.castor.net.URILocation;
 import org.exolab.castor.net.URIResolver;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
@@ -205,12 +207,27 @@ public class SchemaReader {
         SchemaUnmarshaller schemaUnmarshaller = null;
 
         try {
-            SchemaUnmarshallerState state = new SchemaUnmarshallerState();
-            state.setConfiguration(_config);
-            
+            SchemaUnmarshallerState state = new SchemaUnmarshallerState();            
+            state.setConfiguration(_config);            
             schemaUnmarshaller = new SchemaUnmarshaller(state);
             if (_uriResolver != null)
                 schemaUnmarshaller.setURIResolver(_uriResolver);
+            
+            //-- make sure we mark the URI as processed for cyclic
+            //-- imports/includes
+            String uri = _source.getSystemId();
+            if (uri != null) {
+                URIResolver resolver = schemaUnmarshaller.getURIResolver();
+                try {
+                    URILocation location = resolver.resolve(uri, null);
+                    if (location != null) uri = location.toString();
+                }
+                catch(URIException except) {
+                    throw new NestedIOException(except);
+                }
+                state.markAsProcessed(uri, schemaUnmarshaller.getSchema());
+            }
+            
             Sax2ComponentReader handler
                 = new Sax2ComponentReader(schemaUnmarshaller);
             _parser.setDocumentHandler(handler);
