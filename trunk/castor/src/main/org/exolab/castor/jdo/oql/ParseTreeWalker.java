@@ -129,8 +129,8 @@ public class ParseTreeWalker implements TokenTypes
     if ( ! _parseTree.isRoot() )
       throw (new QueryException( "ParseTreeWalker must be created with the root node of the parse tree."));
 
-    //System.out.println(ParseTest.treeToString(_parseTree, ParseTest.NODE_TYPES));
-    //System.out.println(ParseTest.treeToString(_parseTree, ParseTest.NODE_VALUES));
+    //_log.debug (ParseTest.treeToString(_parseTree, ParseTest.NODE_TYPES));
+    //_log.debug (ParseTest.treeToString(_parseTree, ParseTest.NODE_VALUES));
 
 
     checkErrors();
@@ -863,9 +863,11 @@ public class ParseTreeWalker implements TokenTypes
   /**
    * Generates the QueryExpression which is an SQL representation or the OQL
    * parse tree.
-   *
+   * @throws SyntaxNotSupportedException If a specific OQL feature is not supported by a RDBMS.
    */
-  private void createQueryExpression() {
+  private void createQueryExpression() 
+  	throws SyntaxNotSupportedException 
+  {
 
     //We use the SQLEngine buildfinder for any queries which require
     //us to load the entire object from the database.  Otherwise
@@ -1107,8 +1109,11 @@ public class ParseTreeWalker implements TokenTypes
    * Adds a SQL version of an OQL limit clause.
    *
    * @param limitClause the parse tree node with the limit clause
+   * @throws SyntaxNotSupportedException If the LIMIT clause is not supported by a RDBMS.
    */
-  private void addLimitClause(ParseTreeNode limitClause) {
+  private void addLimitClause(ParseTreeNode limitClause) 
+  	throws SyntaxNotSupportedException 
+  {
     String sqlExpr = getSQLExpr(limitClause/*.getChild(0)*/);
 
     //Map numbered parameters
@@ -1140,8 +1145,11 @@ public class ParseTreeWalker implements TokenTypes
   /**
    * Adds a SQL version of an OQL offset clause.
    * @param offsetClause The parse tree node with the offset clause
+   * @throws SyntaxNotSupportedException If the LIMIT clause is not supported by a RDBMS.
    */
-  private void addOffsetClause(ParseTreeNode offsetClause) {
+private void addOffsetClause(ParseTreeNode offsetClause)
+  	throws SyntaxNotSupportedException
+  {
     String sqlExpr = getSQLExpr(offsetClause/*.getChild(0)*/);
 
     //Map numbered parameters
