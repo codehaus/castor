@@ -262,7 +262,7 @@ public class JDOMappingLoader
             sType = new int[0];
                 /*new Class[1];
             try {
-                sqlType[0] = Types.typeFromName( this.getClass().getClassLoader(), fieldMap.getType() );
+                sqlType[0] = Types.typeFromName( getClassLoader(), fieldMap.getType() );
             } catch ( ClassNotFoundException e ) {
                 throw new MappingException( "SQLType not found, nor field type of, "+fieldMap.getType()+" convertable to sql type!" );
             }*/
