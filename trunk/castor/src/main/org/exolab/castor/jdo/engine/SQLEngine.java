@@ -551,7 +551,7 @@ public final class SQLEngine implements Persistence {
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
              
             if(_log.isDebugEnabled()){
-                _log.debug( Messages.format( "jdo.create", _sqlCreate ) );
+                _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), _sqlCreate) );
             }
             
             // Must remember that SQL column index is base one
@@ -607,6 +607,12 @@ public final class SQLEngine implements Persistence {
 
                 sqlType = _ids[0].sqlType;
                 cstmt.registerOutParameter( count, sqlType );
+                
+                // [WG]: TODO: Add below debug statement to show real values ???
+                // if (_log.isDebugEnabled()) {
+                // 	  _log.debug (Messages.format ("jdo.creating", _clsDesc.getJavaClass().getName(), cstmt));
+                // }
+                
                 cstmt.execute();
 
                 // First skip all results "for maximum portability"
