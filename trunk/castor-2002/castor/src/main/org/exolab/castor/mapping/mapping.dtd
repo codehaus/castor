@@ -64,7 +64,7 @@
 
  -->
 <!ELEMENT class ( description?, sql-table?, xml-schema?, ldap-entry?,
-                   identity?, ( field | container )+ )>
+                  identity?, ( field | container )+ )>
 <!ATTLIST class
     class-name ID #REQUIRED
     extends    IDREF #IMPLIED
@@ -141,7 +141,7 @@
     attribute.
 
  -->
-<!ELEMENT field ( decription?, sql-info?, xml-info?, ldap-info? )>
+<!ELEMENT field ( description?, sql-info?, xml-info?, ldap-info? )>
 <!ATTLIST field
     name NMTOKEN #REQUIRED
     type NMTOKEN #IMPLIED
