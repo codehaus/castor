@@ -502,6 +502,14 @@ public interface Database
      */
     public Object getIdentity( Object object );
 
+    
+    /** 
+     * Returns the current ClassLoader if one has been set for this Database instance.
+     * @return ClassLoader the current ClassLoader instance, <code>null</code> if no 
+     * ClassLoader's instance has been explicitely set.
+     */
+    public ClassLoader getClassLoader ();
+    
 
     /**
      * @deprecated See {@link #create}
