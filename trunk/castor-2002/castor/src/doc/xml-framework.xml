@@ -5,12 +5,20 @@
 
     <header>
       <p>Reference: <api package="org.exolab.castor.xml">The XML Framework API</api></p>
+      <p>Note: This documentation is not yet finished</p>
+      <p align="center"><date>2000-03-27</date></p>
     </header>
 
     <section title="Introduction">
       <p>
+        Castor XML is an XML databinding framework. Unlike the two main XML APIs,
+        DOM (Document Object Model) and SAX (Simple API for XML) which deal with the
+        structure of an XML document, Castor enables one to deal with the data defined
+        in an XML document through an object model which represents that data.
+      </p>
+      <p>
          Castor XML can marshal almost any "bean-like" Java Object to and from XML.
-         The marshalling framework uses a set of ClassDescriptors and FieldDescriptors
+         In most cases the marshalling framework uses a set of ClassDescriptors and FieldDescriptors
          to describe how an Object should be marshalled and unmarshalled from XML.
       </p>
       <p>
@@ -23,12 +31,13 @@
 
     <section title="The Marshalling Framework">
       <p>
-         The marshalling Framwork consists of two main classes,
+         The marshalling framework, as it's name implies, is resposible for doing
+         the conversion between Java and XML. The framework consists of two main classes,
          <api>org.exolab.castor.xml.Marshaller</api> and
          <api>org.exolab.castor.xml.Unmarshaller</api>.
       </p>
      <p>
-         Lets walk through a very simple example. Assume we have a simple person
+         Lets walk through a very simple example. Assume we have a simple Person
         class as follows:
 <code>
 <comment>

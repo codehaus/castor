@@ -25,7 +25,10 @@
 
       <p>Castor's source code generator creates a set of Java classes
          which represent an object model for an XML Schema
-         (W3C XML Schema, 19991217 Working Draft).
+         (W3C XML Schema, 19991217 Working Draft), as well as the
+         necessary Class Descriptors used by the
+         <a href="xml-framework.xml">marshalling framework</a>
+         to obtain information about the generated classes.
          <note>
             Currently the generated source files will need to be compiled. We
             will be adding an Ant taskdef eventually to handle this automatically.
