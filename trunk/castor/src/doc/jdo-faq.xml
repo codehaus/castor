@@ -511,7 +511,7 @@ SELECT o FROM Order o, LineItem i WHERE o.id = i.id AND i.price > 100
             <p>
             It is simply equivalent to the following OQL
             <code><![CDATA[
-SELECT o FROM Order o, WHERE o.lineItem.price > 100
+SELECT o FROM Order o WHERE o.lineItem.price > 100
             ]]></code>
             </p>
         </section>
