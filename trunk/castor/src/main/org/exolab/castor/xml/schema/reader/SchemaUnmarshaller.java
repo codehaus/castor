@@ -234,7 +234,9 @@ public class SchemaUnmarshaller extends ComponentReader {
         _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
 
         //set the default locator of this schema
-        _schema.setSchemaLocation(getDocumentLocator().getSystemId());
+        if (!_include) {
+            _schema.setSchemaLocation(getDocumentLocator().getSystemId());
+        }
 
         //-- attributeFormDefault
         String form = atts.getValue(SchemaNames.ATTR_FORM_DEFAULT_ATTR);
@@ -414,6 +416,10 @@ public class SchemaUnmarshaller extends ComponentReader {
     {
 
         if (skipAll) return;
+        
+        //-- DEBUG
+        //System.out.println("#startElement: " + name + " {" + namespace + "}");
+        //-- /DEBUG
 
 
         //-- process namespaces...unless we are inside an 
@@ -458,7 +464,12 @@ public class SchemaUnmarshaller extends ComponentReader {
         
         //-- Do delagation if necessary
         if (unmarshaller != null) {
-            unmarshaller.startElement(name, namespace, atts, nsDecls);
+            try {
+                unmarshaller.startElement(name, namespace, atts, nsDecls);
+            }
+            catch(RuntimeException rtx) {
+                error(rtx);
+            }
             ++depth;
             return;
         }
@@ -539,6 +550,10 @@ public class SchemaUnmarshaller extends ComponentReader {
         throws XMLException
     {
         if (skipAll) return;
+
+        //-- DEBUG
+        //System.out.println("#endElement: " + name + " {" + namespace + "}");
+        //-- /DEBUG
 
         //-- backward compatibility
         if (namespace == null) namespace =  defaultNS;
