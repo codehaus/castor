@@ -233,6 +233,12 @@ public class SourceGenerator {
          */
         public static final String Wrapper = "org.exolab.castor.builder.primitivetowrapper";
 
+        /**
+         * Property specifying if we want to have a 'public static final String'
+         * generated for each attribute and element name used within a class descriptor
+         */
+        public static final String ClassDescFieldNames = "org.exolab.castor.builder.classdescfieldnames";
+
 
         /**
          * The name of the configuration file.
@@ -270,6 +276,12 @@ public class SourceGenerator {
      * generated class
      */
      private static boolean _equalsMethod = false;
+
+    /**
+     * Set to true if we generate a 'public static final String' 
+     * for each element and attribute in a class descriptor
+     */
+     private static boolean _classDescFieldNames = false;
 
      /**
       * Set to true if you want to use Object instead of
@@ -1037,7 +1049,32 @@ public class SourceGenerator {
      public static void setEqualsMethod(boolean equals) {
          _equalsMethod = equals;
      }
+	 
+	/**
+     * Returns true if we generate a 'public static final String' for the
+     * name of each attribute and element described by the class descriptor
+     *
+     * Enabling this property is controlled via
+     * the org.exolab.castor.builder.classdescfieldnames item
+     * in the castorbuilder.properties file. The value is
+     * either 'true' or 'false'.
+     *
+     * @return true if bound properties are enabled.
+    **/
+    public static boolean classDescFieldNames() {
+        return _classDescFieldNames;
+    } //-- classDescFieldNames
 
+    /**
+     * Sets the 'classDescFieldNames' property
+     * @param boolean the value we want to ues
+     */
+     public static void setClassDescFieldNames(boolean classDescFieldNames) {
+         //ensure the other properties are loaded
+         getDefault();
+         _classDescFieldNames = classDescFieldNames;
+     } //-- setClassDescFieldNames
+	 
      /**
       * Returns true if primitive types have to be used
       * as Objects (eg. replacing float by java.lang.Float).
@@ -1148,6 +1185,10 @@ public class SourceGenerator {
         //-- Primitive to Wrapper
         prop = _default.getProperty(Property.Wrapper, "");
         _wrapper = _wrapper || prop.equalsIgnoreCase("true");
+		
+		//-- Generate public field names in class descriptors?
+		prop = _default.getProperty( Property.ClassDescFieldNames, "");
+		_classDescFieldNames = prop.equalsIgnoreCase("true");
 
         initBindingType();
 

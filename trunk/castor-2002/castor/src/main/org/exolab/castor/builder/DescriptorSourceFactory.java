@@ -156,7 +156,7 @@ public class DescriptorSourceFactory {
 
         //-- handle  content
         if (classInfo.allowContent())
-           createDescriptor(classInfo.getTextField(), localClassName, null, jsc);
+           createDescriptor(classDesc, classInfo.getTextField(), localClassName, null, jsc);
 
 
         FieldInfo[] atts = classInfo.getAttributeFields();
@@ -172,7 +172,7 @@ public class DescriptorSourceFactory {
             FieldInfo member = atts[i];
             //-- skip transient members
             if (member.isTransient()) continue;
-            createDescriptor(member, localClassName, nsURI, jsc);
+            createDescriptor(classDesc, member, localClassName, nsURI, jsc);
        }
 
 
@@ -188,7 +188,7 @@ public class DescriptorSourceFactory {
             FieldInfo member = elements[i];
             //-- skip transient members
             if (member.isTransient()) continue;
-            createDescriptor(member, localClassName, nsURI, jsc);
+            createDescriptor(classDesc, member, localClassName, nsURI, jsc);
         }
 
         return classDesc;
@@ -202,7 +202,7 @@ public class DescriptorSourceFactory {
      * Create a specific descriptor for a given member (whether an attribute or
      * an element) represented by a given Class name
      */
-    private static void createDescriptor(FieldInfo member, String localClassName,
+    private static void createDescriptor(DescriptorJClass classDesc, FieldInfo member, String localClassName,
                                   String nsURI, JSourceCode jsc)
     {
 
@@ -239,17 +239,38 @@ public class DescriptorSourceFactory {
             if (xsType.getType() == XSType.COLLECTION)
                 //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
                 xsType = ((CollectionInfo)member).getContent().getSchemaType();
-
+			
+			//-- Resolve how the node name parameter to the XMLFieldDescriptorImpl constructor is supplied
+            String nodeName = member.getNodeName();	   
+			String nodeNameParam = null;
+			if ((nodeName!=null) && (!isText))
+			{
+				//-- By default the node name parameter is a literal string
+				nodeNameParam = "\""+nodeName+"\"";
+				if (SourceGenerator.classDescFieldNames())
+				{
+					//-- The node name parameter is a reference to a public static final
+					nodeNameParam = member.getNodeName().toUpperCase();
+					//-- Expose node name as public static final (reused by XMLFieldDescriptorImpl)
+					JModifiers publicStaticFinal = new JModifiers();
+					publicStaticFinal.makePublic();
+					publicStaticFinal.setStatic(true);
+					publicStaticFinal.setFinal(true);		
+					JField jField = new JField(SGTypes.String, nodeNameParam);
+					jField.setModifiers(publicStaticFinal);
+					jField.setInitString("\""+nodeName+"\"");
+					classDesc.addMember(jField);
+				}
+			}
+			
+			//-- Generate code to new XMLFieldDescriptorImpl instance
             jsc.add("desc = new XMLFieldDescriptorImpl(");
             jsc.append(classType(xsType.getJType()));
             jsc.append(", \"");
             jsc.append(member.getName());
             jsc.append("\", ");
-            String nodeName = member.getNodeName();
-            if ( (nodeName != null) && (!isText)) {
-                jsc.append("\"");
-                jsc.append(member.getNodeName());
-                jsc.append("\"");
+            if (nodeNameParam!=null) {
+                jsc.append(nodeNameParam);
             } else if (isText) {
                 jsc.append("\"PCDATA\"");
             } else {
