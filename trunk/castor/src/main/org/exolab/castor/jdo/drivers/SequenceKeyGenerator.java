@@ -59,6 +59,8 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
@@ -74,7 +76,12 @@ import org.exolab.castor.util.Messages;
 public final class SequenceKeyGenerator implements KeyGenerator
 {
 
-
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (SequenceKeyGenerator.class);
+    
     protected final PersistenceFactory _factory;
 
 
@@ -213,6 +220,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
                 try {
                     stmt.close();
                 } catch ( SQLException ex ) {
+                    _log.warn ("Problem closing JDBC Statement", ex);
                 }
             }
         }
