@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1655 using contribution from Dave Eccleston[deccles@mitre.org]
+       Improved debug statements during create operations, showing the actual SQL generated 
+       with values bound.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1655
+       (Werner - 200409017)
+
 JDO:   Fixed bug 1713 using contribution from Gregory Block [gblock@ctoforaday.com]
        Fixed problem in FieldMolder when dealing with addXXX() methods on fields of
        type collection.
