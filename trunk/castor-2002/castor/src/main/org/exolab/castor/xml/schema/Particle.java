@@ -61,13 +61,14 @@ public abstract class Particle extends Annotated {
     /**
      * The maximum occurance
     **/
-    private int _maxOccurs = 1; //aberry: was -1 (unbounded) but its not consistent with the spec.
+    private int _maxOccurs = 1; 
 
     /**
      * The minimum occurance
     **/
     private int _minOccurs  = 1;
 
+    
     /**
      * Default Constructor, uses a default minimum occurance
      * of 1, and a default unbounded maximum occurance
