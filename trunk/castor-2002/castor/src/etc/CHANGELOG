@@ -3,6 +3,8 @@ Version 0.8.7  June 1, 2000
 
 JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>)
 
+XML:     Identity field will now use XML name provided in mapping file.
+
 
 Version 0.8.6  May 24, 2000
 ---------------------------

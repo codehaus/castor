@@ -1,15 +1,15 @@
 <categories>
-  <category category-id="1">
+  <category id="1">
     <short>First</short>
     <description>Category no. 1</description>
   </category>
   <category id="2">
-    <short>First</short>
-    <description>Category no. 1</description>
+    <short>Second</short>
+    <description>Category no. 2</description>
   </category>
   <category id="3">
-    <short>First</short>
-    <description>Category no. 1</description>
+    <short>Third</short>
+    <description>Category no. 3</description>
   </category>
 </categories>
 

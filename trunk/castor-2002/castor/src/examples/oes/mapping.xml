@@ -13,7 +13,7 @@
     <map-to table="oes_category" xml="category" />
     <field name="categoryId" type="integer" >
       <sql name="categ_id" type="smallint" />
-      <xml name="id" node="attribute" />
+      <xml name="id" node="element" />
     </field>
     <field name="shortName" type="string" >
       <sql name="short" type="char" dirty="ignore" />
