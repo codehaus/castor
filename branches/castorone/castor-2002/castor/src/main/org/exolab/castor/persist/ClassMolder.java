@@ -134,6 +134,12 @@ public class ClassMolder implements CacheHolder {
 
     Hashtable _cache = new Hashtable();
 
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append( _name );
+		return sb.toString();
+	}
+
     ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist ) 
             throws ClassNotFoundException, MappingException {
         ClassMapping clsMap = ((ClassDescriptorImpl) clsDesc).getMapping();
@@ -156,7 +162,7 @@ public class ClassMolder implements CacheHolder {
         if ( dep != null && ext != null ) 
             throw new MappingException("A JDO cannot both extends and depends on other objects");
 
-        if ( dep != null ) {
+        if ( dep != null ) {			
             ds.pairDepends( this, dep.getName() );
         }
 
@@ -258,10 +264,11 @@ public class ClassMolder implements CacheHolder {
         while ( base.getExtends() != null ) {
             base = (ClassMapping) base.getExtends();
         }
-        fmDepended = null;
+        fmDepended = null; 
+        /*
         if ( base.getDepends() != null ) {
             fmDepended = getIdFields( (ClassMapping) base.getDepends() );
-        }
+        }*/
 
         identities = breakApart( base.getIdentity(), ' ' );
        
@@ -366,11 +373,7 @@ public class ClassMolder implements CacheHolder {
             desc = (ClassDescriptor) loader.getDescriptor((Class)enum.nextElement());
             persist = factory.getPersistence( desc, logInterceptor );
             mold = new ClassMolder( ds, loader, lock, desc, persist );
-
-            if ( ! mold.isDependent() ) {
-                //System.out.println("Molder added: "+mold.getName() + " " + mold);
-                result.add( mold );
-            }
+            result.add( mold );
         }
         ds.close();
         return result;
@@ -460,9 +463,9 @@ public class ClassMolder implements CacheHolder {
         }
 
         for ( int i=0; i<_fhs.length; i++ ) {
-            System.out.print("<"+i+":"+fields[i]+":"+(fields[i]==null?null:_fhs[i].getJavaClass())+">  ");
+            System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
         }
-        System.out.println("  Load(field)");
+        System.out.println("  is loaded!");
     
         for ( int i = 0; i < _fhs.length; i++ ) {
             //System.out.println("!!!!!!!!!ClassMolder.load(): for: "+oid);
@@ -539,7 +542,6 @@ public class ClassMolder implements CacheHolder {
                     ArrayVector v = (ArrayVector)fields[i];
                     if ( v != null ) {                        
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            System.out.println("ClassMolder: "+oid.getLockEngine()+" Object: "+((Object[])v.get(j))[0]);
                             col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
                         }
                         _fhs[i].setValue( object, col );
@@ -549,9 +551,7 @@ public class ClassMolder implements CacheHolder {
             default:
                 throw new PersistenceException("Unexpect field type!");
             }
-            //System.out.println("ClassMolder.load(): end of loop");
         }
-        //System.out.println( "~~~~~~~Loaded ci: hold? "+ci.isHold+" field: "+ci.fields);
 
         return oid;
 
@@ -626,7 +626,7 @@ public class ClassMolder implements CacheHolder {
         ids = oid.getIdentities();
 
         if ( !OID.isEquals( ids, getIdentities(object) ) )
-            throw new PersistenceException("Object identity change is not allowed!");
+            throw new PersistenceException("Object identity change is not allowed! original id: "+OID.flatten(ids)+" changed id: "+OID.flatten(getIdentities(object)));
 
         // copy the object to cache should make a new field now,
         for ( int i=0; i<_fhs.length; i++ ) {
@@ -643,7 +643,6 @@ public class ClassMolder implements CacheHolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     // need multi-pk
-                    System.out.println("Before exception: "+o+" class: "+o.getClass());
                     fid = fieldClassMolder.getIdentities( o );
                     // support only singular object
                     if ( fid != null ) {
@@ -679,13 +678,9 @@ public class ClassMolder implements CacheHolder {
                 ci.fields, ids );
 
         for ( int i=0; i<_fhs.length; i++ ) {
-            System.out.print("<"+i+":"+_fhs[i].getJavaClass()+">  ");
+            System.out.print("<"+i+":"+(ci.fields[i] instanceof Object[]?OID.flatten((Object[])ci.fields[i]):ci.fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
         }
-        System.out.println(" create(type)");
-        for ( int i=0; i<_fhs.length; i++ ) {
-            System.out.print("<"+i+":"+ci.fields[i]+">  ");
-        }
-        System.out.println(" create(field)");
+        System.out.println(" will be created");
 
         if ( createdId == null ) 
             throw new PersistenceException("Identity can't be created!");
@@ -717,9 +712,14 @@ public class ClassMolder implements CacheHolder {
                     if ( _fhs[i].isDependent() ) {
                         if ( !tx.isPersistent( o ) ) 
                             tx.create( fieldEngine, fieldClassMolder, o, oid );
+						else 
+							// fail-fast principle: if the object depend on another object,
+							// throw exception
+							if ( !tx.isDepended( oid, o ) )
+								throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
                     } else {
-                        if ( !tx.isPersistent( o ) ) 
-                            tx.create( fieldEngine, fieldClassMolder, o, null );
+                        //if ( !tx.isPersistent( o ) ) 
+                        //    tx.create( fieldEngine, fieldClassMolder, o, null );
                     }
                 }
                 break;
@@ -735,9 +735,14 @@ public class ClassMolder implements CacheHolder {
                         if ( _fhs[i].isDependent() ) {
                             if ( !tx.isPersistent( oo ) )
                                 tx.create( fieldEngine, fieldClassMolder, oo, oid );
+							else 
+								// fail-fast principle: if the object depend on another object,
+								// throw exception
+								if ( !tx.isDepended( oid, oo ) )
+									throw new PersistenceException("Dependent object may not change its master");
                         } else {
-                            if ( !tx.isPersistent( oo ) ) 
-                                tx.create( fieldEngine, fieldClassMolder, oo, null );
+                            //if ( !tx.isPersistent( oo ) ) 
+                            //    tx.create( fieldEngine, fieldClassMolder, oo, null );
                         }
                     }
                 }
@@ -776,6 +781,7 @@ public class ClassMolder implements CacheHolder {
         // update oid and setStamp
 
         System.out.println("ClassMolder.create() done: returning, oid=" +oid+" id="+OID.flatten( oid.getIdentities() ));
+
         return oid;
     }
 
@@ -835,7 +841,6 @@ public class ClassMolder implements CacheHolder {
                 newfields[i] = temp;
 
                 if ( !OID.isEquals( (Object[])ci.fields[i], (Object[])newfields[i] ) ) {
-                    System.out.println("Store.primitive modified");
                     if ( _fhs[i].isCheckDirty() ) {
                         modified = true;
                         lockrequired = true;
@@ -852,7 +857,6 @@ public class ClassMolder implements CacheHolder {
                     newfields[i] = fieldClassMolder.getIdentities( o );
 
                 if ( !OID.isEquals( (Object[])ci.fields[i], (Object[])newfields[i] ) ) {
-                    System.out.println("Store.persistencecapable modified");
                     if ( _fhs[i].isStored() ) {
                         if ( _fhs[i].isCheckDirty() ) {
                             modified = true;
@@ -868,9 +872,9 @@ public class ClassMolder implements CacheHolder {
                                 // should be created if transaction have no record of the object
                                 tx.create( fieldEngine, fieldClassMolder, o, oid );
                         } else {
-                            if ( !tx.isPersistent( o ) ) 
+                            //if ( !tx.isPersistent( o ) ) 
                                 // should be created if transaction have no record of the object
-                                tx.create( fieldEngine, fieldClassMolder, o, null );
+                            //    tx.create( fieldEngine, fieldClassMolder, o, null );
                         }
                     }
                 }
@@ -887,7 +891,6 @@ public class ClassMolder implements CacheHolder {
                         list.add( (fieldClassMolder.getIdentities( v.get(j) ))[0] );
                     }
                     if ( !OID.isEquals( (ArrayVector)ci.fields[i], list ) ) {
-                        System.out.println("Store.one-to-many modified");
                         if ( _fhs[i].isStored() ) {
                             if ( _fhs[i].isCheckDirty() ) {
                                 modified = true;
@@ -908,9 +911,9 @@ public class ClassMolder implements CacheHolder {
                                     // should be created if transaction have no record of the object
                                     tx.create( fieldEngine, fieldClassMolder, newobj, oid );
                             } else {
-                                if ( !tx.isPersistent( newobj ) ) 
+                                //if ( !tx.isPersistent( newobj ) ) 
                                     // should be created if transaction have no record of the object
-                                    tx.create( fieldEngine, fieldClassMolder, newobj, null );
+                                //   tx.create( fieldEngine, fieldClassMolder, newobj, null );
                             }
                         }
                     }
@@ -934,7 +937,7 @@ public class ClassMolder implements CacheHolder {
                 }
                 break;
             case FieldMolder.MANY_TO_MANY:
-                System.out.println("ClassMolder.store():MANY_TO_MANY");
+
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
@@ -944,7 +947,6 @@ public class ClassMolder implements CacheHolder {
                     list = getIds( fieldClassMolder, o );
                     ArrayVector orgFields = (ArrayVector)ci.fields[i];
                     if ( !OID.isEquals( orgFields, list ) ) {
-                        System.out.println("Store.m-to-n modified");
 
                         itor = getIterator( o );
                         while ( o != null && itor.hasNext() ) {
@@ -953,8 +955,9 @@ public class ClassMolder implements CacheHolder {
 
                             if ( !tx.isPersistent( newobj ) ) {
                                 // should be created if transaction have no record of the object
-                                tx.create( fieldEngine, fieldClassMolder, newobj, oid );
-
+								if ( _fhs[i].isDependent() ) {
+	                                tx.create( fieldEngine, fieldClassMolder, newobj, oid );
+								}
                                 // create the relation in relation table too
                                 _fhs[i].getRelationLoader().createRelation( 
                                 (Connection)tx.getConnection(oid.getLockEngine()), 
@@ -1032,26 +1035,14 @@ public class ClassMolder implements CacheHolder {
         if ( modified ) {
             System.out.println("object is modifed, now storing it");
             for ( int i=0; newfields!=null && i<newfields.length; i++ ) {
-                if ( newfields[i] instanceof Object[] ) {
-                    Object[] temp = (Object[])newfields[i];
-                    System.out.print("<"+i+":"+_fhs[i].getJavaClass()+">  ");
-                }
+                System.out.print("<"+i+":"+(newfields[i] instanceof Object[]?OID.flatten((Object[])newfields[i]):newfields[i])+" of "+_fhs[i].getJavaClass()+">  ");
             }
-            System.out.println();
-            for ( int i=0; newfields!=null && i<newfields.length; i++ ) {
-                if ( newfields[i] instanceof Object[] ) {
-                    Object[] temp = (Object[])newfields[i];
-                    System.out.print("<"+i+":"+temp[0]+">  ");
-                }
-            }
-            System.out.println();
+            System.out.println("     new field in object");
+
             for ( int i=0; ci.fields!=null && i<ci.fields.length; i++ ) {
-                if ( newfields[i] instanceof Object[] ) {
-                    Object[] temp = (Object[])ci.fields[i];
-                    System.out.print("<"+i+":"+temp[0]+">  ");
-                }
+                    System.out.print("<"+i+":"+(ci.fields[i] instanceof Object[]?OID.flatten((Object[])ci.fields[i]):ci.fields[i])+">  ");
             }
-            System.out.println();
+            System.out.println("       in cache");
             
             Object stamp = _persistence.store( tx.getConnection(oid.getLockEngine()),
                 newfields, oid.getIdentities(), ci.fields, oid.getStamp() );
@@ -1102,7 +1093,6 @@ public class ClassMolder implements CacheHolder {
                 } else {
                     ci.fields[i] = null;
                 }
-                System.out.println("update object: "+(temp==null?null:temp[0]));
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -1142,7 +1132,6 @@ public class ClassMolder implements CacheHolder {
                         ArrayList list = (ArrayList) o;
                         Vector fidlist = new Vector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
-                            System.out.println("Updating: "+list.get(j));
                             fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         ci.fields[i] = fidlist;
@@ -1161,30 +1150,73 @@ public class ClassMolder implements CacheHolder {
         }
     }
 
-    public void markDelete( TransactionContext tx, OID oid, Object object )
-            throws ObjectNotFoundException, PersistenceException {
-        System.out.println("ClassMolder.markDelete() is called!");
+    public void delete( TransactionContext tx, OID oid ) 
+            throws PersistenceException {
+        
+        _persistence.delete( (Connection)tx.getConnection(oid.getLockEngine()), oid.getIdentities() );
     }
 
-    public void delete( TransactionContext tx, OID oid ) 
+    public void markDelete( TransactionContext tx, OID oid, Object object )
             throws ObjectNotFoundException, PersistenceException {
-        System.out.println("ClassMolder.delete() is called!");
-        
+        System.out.println("ClassMolder.markDelete() is called for "+oid+" object: "+ object );
+
+        ClassMolder fieldClassMolder;
+        LockEngine fieldEngine;
+        CacheItem ci;
+
+        ci = (CacheItem) _cache.get( oid );
+        if ( !ci.isHold )
+            throw new PersistenceException( "Illegal Cache State!" );
+
         for ( int i=0; i < _fhs.length; i++ ) {
             int fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
                 if ( _fhs[i].isDependent() ) {
+                    Object[] fid = (Object[]) ci.fields[i];
+                    Object fetched = null;
+                    if ( fid != null ) {
+                        fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
+                        if ( fetched != null ) 
+                            tx.delete( fetched );
+                    }
+
+                    Object fobject = _fhs[i].getValue( object );
+                    if ( fobject != null && tx.isPersistent( fobject ) ) {
+                        tx.delete( fobject );
+                    }
                 }
                 break;
             case FieldMolder.ONE_TO_MANY:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
                 if ( _fhs[i].isDependent() ) {
+                    ArrayList alist = (ArrayList) ci.fields[i];
+                    for ( int j=0; j<alist.size(); j++ ) {
+                        Object[] fid = (Object[]) alist.get(j);
+						Object fetched = null;
+                        if ( fid != null ) {    
+                            fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
+                            if ( fetched != null ) 
+                                tx.delete( fetched );
+                        }
+                    }
+
+                    ArrayList blist = (ArrayList) _fhs[i].getValue( object );
+                    for ( int j=0; j<blist.size(); j++ ) {
+                        Object fobject = blist.get(j);
+                        if ( fobject != null && tx.isPersistent( fobject ) ) {
+                            tx.delete( fobject );
+                        }
+                    }
                 }
                 break;
             case FieldMolder.MANY_TO_MANY:
-                // create the relation in relation table too
+                // delete the relation in relation table too
                 _fhs[i].getRelationLoader().deleteRelation( 
                 (Connection)tx.getConnection(oid.getLockEngine()), 
                 oid.getIdentities() );
@@ -1194,7 +1226,6 @@ public class ClassMolder implements CacheHolder {
                 throw new PersistenceException("Invalid field type!");
             }
         }
-        _persistence.delete( tx.getConnection(oid.getLockEngine()), oid.getIdentities() );
     }
 
     public void revertObject( TransactionContext tx, OID oid, Object object ) 
@@ -1379,6 +1410,7 @@ public class ClassMolder implements CacheHolder {
      * Mutator method
      */
     void setDepends( ClassMolder dep ) {
+		System.out.println("++++++++++++++++++++++ setDepends "+dep);
         _depends = dep;
     }
     private Iterator getIterator( Object o ) {
@@ -1400,7 +1432,6 @@ public class ClassMolder implements CacheHolder {
         Iterator i;
         Collection c;
         Enumeration e;
-        System.out.println("Object class: "+o.getClass());
         if ( o instanceof Collection ) {
             c = (Collection) o ;
             i = c.iterator();

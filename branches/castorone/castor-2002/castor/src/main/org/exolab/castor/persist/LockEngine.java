@@ -106,11 +106,11 @@ import org.exolab.castor.util.Messages;
 //      (it requires knowing how to implement ClassMolder
 //  - DONE -- LockEngine need revert, update and forget etc
 //
-//  - add logic, so if the related many-to-many isn't
+//  - NOTNEEDED -- add logic, so if the related many-to-many isn't
 //      lazy, it class helper is lazy (1 hr)
-//  - the prime time, implmenets many-to-many, dependent, 
-//      lazy in ClassMolder (8 hr) (7 hr)
-//  - implement multi-column pk (2 hr)
+//  - DONE? -- the prime time, implmenets many-to-many, dependent, 
+//      lazy in ClassMolder (8 hr) (7 hr) 
+//  - DONE -- implement multi-column pk (2 hr) (it was 2 days, instead of 2 hours, terrible estimation!!)
 
 /**
  * Implements the object cache engine sitting between a persistence engine
@@ -213,7 +213,8 @@ public final class LockEngine {
     public ClassMolder getClassMolder( Class cls ) {
         TypeInfo info = (TypeInfo)_typeInfo.get( cls );
         if ( info != null ) {
-            return info.molder;
+            if ( !info.molder.isDependent() ) 
+                return info.molder;
         }
         return null;
     }
@@ -504,7 +505,7 @@ public final class LockEngine {
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void delete( TransactionContext tx, OID oid )
+    public void delete( TransactionContext tx, OID oid, Object object )
             throws PersistenceException {
         ObjectLock lock;
         TypeInfo   typeInfo;
@@ -517,6 +518,8 @@ public final class LockEngine {
 
             if ( _logInterceptor != null )
                 _logInterceptor.removing( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
+
+            typeInfo.molder.markDelete( tx, oid, object );
 
             typeInfo.molder.delete( tx, oid );
 
@@ -542,7 +545,7 @@ public final class LockEngine {
         try {
             oid = typeInfo.locks.acquire( oid, tx, true, 0, false, null );
 
-            oid.getMolder().markDelete( tx, oid, null );
+            oid.getMolder().markDelete( tx, oid, object );
         } catch ( LockNotGrantedException except ) {
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to delete object for which no lock was acquired" ) );

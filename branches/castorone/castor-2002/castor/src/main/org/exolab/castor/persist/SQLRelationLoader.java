@@ -125,13 +125,11 @@ public class SQLRelationLoader {
                 */
                 String sStmt = "SELECT "+left + ", " + right + " FROM " + tableName 
                         + " WHERE " + left + "=" + leftValue + " AND " + right + "=" + rightValues.elementAt(i);
-                //System.out.println( sStmt );
                 rset = stmt.executeQuery(  "select group_id, person_id FROM test_group_person WHERE group_id=1 AND person_id=0" );
                 if ( ! rset.next() ) {
                     sStmt = "INSERT INTO " + tableName + 
                         "( " + left + ", " + right + " ) VALUES ( " +
                         leftValue + ", " + rightValues.elementAt(i) + " )" ;
-                    //System.out.println( sStmt );
                     i = stmt.executeUpdate( sStmt );
                 }
             }
@@ -153,7 +151,6 @@ public class SQLRelationLoader {
                 sStmt = "INSERT INTO " + tableName + 
                     "( " + left + ", " + right + " ) VALUES ( " +
                     leftValue[0] + ", " + rightValue[0] + " )" ;
-                //System.out.println( sStmt );
                 int i = stmt.executeUpdate( sStmt );
             }
         } catch ( SQLException e ) {

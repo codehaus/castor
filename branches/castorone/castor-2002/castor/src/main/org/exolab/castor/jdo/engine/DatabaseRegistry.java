@@ -371,11 +371,6 @@ public class DatabaseRegistry
         DatabaseRegistry dbs;
 
         dbs = (DatabaseRegistry) _databases.get( new Key( name, loader ) );
-        Enumeration enum = _databases.keys();
-        while ( enum.hasMoreElements() ) {
-            Object key = enum.nextElement();
-            System.out.println("Key: "+key+" value: "+_databases.get( key ) );
-        }
         return dbs;
     }
 

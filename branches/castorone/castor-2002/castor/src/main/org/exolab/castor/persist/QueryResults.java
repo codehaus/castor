@@ -218,10 +218,7 @@ public final class QueryResults
         handler = _engine.getClassMolder( _query.getResultType() );
 
         object = _tx.load( _engine, handler, _lastIdentities, _accessMode );
-        if ( object == null )
-            System.out.println("queryresult.fetch().Object is null");
-        else 
-            System.out.println("queryresult.fetch().Object: "+object);
+
         return object;
 
         /*

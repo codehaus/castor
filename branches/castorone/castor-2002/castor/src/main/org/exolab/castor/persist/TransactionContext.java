@@ -299,7 +299,8 @@ public abstract class TransactionContext
             if ( entry.engine != engine )
                 throw new PersistenceExceptionImpl( "persist.multipleLoad", molder.getJavaClass(), OID.flatten( identities ) );
             if ( entry.deleted )
-                throw new ObjectNotFoundExceptionImpl( molder.getJavaClass(), OID.flatten( identities ) );
+                //throw new ObjectNotFoundExceptionImpl( molder.getJavaClass(), OID.flatten( identities ) );
+				return null;
             if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceExceptionImpl( "persist.typeMismatch", molder.getJavaClass(), OID.flatten( identities ) );
             if ( entry.created )
@@ -360,7 +361,6 @@ public abstract class TransactionContext
         ObjectEntry entry;
         Object      object;
         OID         oid;
-        //System.out.println("+++++++Tx.load called!");
 
         if ( identities == null ) 
             throw new PersistenceException("Identities can't be null!");
@@ -385,11 +385,6 @@ public abstract class TransactionContext
             removeObjectEntry( object );
             entry = addObjectEntry( oid, object );
 
-            System.out.println(getObjectEntry(oid.getLockEngine(), oid).oid);
-            Enumeration enum = _objects.keys();
-            while ( enum.hasMoreElements() ) {
-                System.out.println("......"+((ObjectEntry)_objects.get(enum.nextElement())).oid);
-            }
         } catch ( ObjectNotFoundException except ) {
             throw except;
         } catch ( LockNotGrantedException except ) {
@@ -419,10 +414,8 @@ public abstract class TransactionContext
         }
 
         if ( accessMode == AccessMode.ReadOnly ) {
-            System.out.println("/////////////////read-only///////////////////////");
             removeObjectEntry( entry.object );
         }
-        //System.out.println("++++++Tx.load returned!");
         return object;
     }
 
@@ -476,7 +469,7 @@ public abstract class TransactionContext
     public synchronized OID create( LockEngine engine, ClassMolder molder, Object object, OID depended )
             throws DuplicateIdentityException, PersistenceException {
         OID          oid;
-        Object[]       identities;
+        Object[]     identities;
         ObjectEntry  entry;
 
         if ( object == null )
@@ -488,18 +481,18 @@ public abstract class TransactionContext
         if ( entry != null && ! entry.deleted ) {
             throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), OID.flatten( identities ) );
         }
-
+		/*
         if ( depended != null ) {
             Object[] dependedIds  = depended.getIdentities();
             Object[] tempIds = identities;
             identities = new Object[dependedIds.length+tempIds.length];
             System.arraycopy( tempIds, 0, identities, 0, tempIds.length );
-            System.arraycopy( dependedIds, 0, identities, 0, dependedIds.length );
-        }
+            System.arraycopy( dependedIds, 0, identities, tempIds.length, dependedIds.length );
+        }*/
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
         // add a new entry for this object and use this object as the view
-        oid = new OID( engine, molder, identities );
+        oid = new OID( engine, molder, depended, identities );
         entry = getObjectEntry( engine, oid );
         if ( !OID.isIdsNull( identities ) && entry != null ) {
             if ( ! entry.deleted || entry.object != object ) 
@@ -879,8 +872,7 @@ public abstract class TransactionContext
                     
                         // When storing the object it's OID might change
                         // if the primary identity has been changed
-                        molder = entry.engine.getClassMolder( entry.object.getClass() );
-                        identities = molder.getIdentities( entry.object );
+                        identities = entry.molder.getIdentities( entry.object );
                         oid = entry.engine.store( this, entry.oid, entry.object, _lockTimeout );
                         if ( oid != null ) {
                             entry.oid = oid;
@@ -896,12 +888,9 @@ public abstract class TransactionContext
 
             // Process all deleted objects last in FIFO order.
             while ( _deletedList != null ) {
-                ClassMolder molder;
-
                 entry = _deletedList;
                 _deletedList = _deletedList.nextDeleted;
-                molder = entry.engine.getClassMolder( entry.object.getClass() );
-                entry.engine.delete( this, entry.oid );
+                entry.engine.delete( this, entry.oid, entry.object );
             }
 
             _status = Status.STATUS_PREPARED;
@@ -957,16 +946,14 @@ public abstract class TransactionContext
         // regards to the persistence engine.
         enum = _objects.elements();
         while ( enum.hasMoreElements() ) {
-            ClassMolder molder;
 
             entry = (ObjectEntry) enum.nextElement();
-            molder = entry.engine.getClassMolder( entry.object.getClass() );
             if ( entry.deleted ) {
 
                 // Object has been deleted inside transaction,
                 // engine must forget about it.
                 entry.engine.forgetObject( this, entry.oid );
-                entry.engine.getClassMolder( entry.object.getClass() ).setFieldsNull( entry.object );
+                entry.molder.setFieldsNull( entry.object );
             } else {
                 // Object has been created/accessed inside the
                 // transaction, release its lock.
@@ -975,8 +962,8 @@ public abstract class TransactionContext
                 }
                 entry.engine.releaseLock( this, entry.oid );
             }
-            if ( molder.getCallback() != null )
-                molder.getCallback().releasing( entry.object, true );
+            if ( entry.molder.getCallback() != null )
+                entry.molder.getCallback().releasing( entry.object, true );
         }
         // Forget about all the objects in this transaction,
         // and mark it as completed.
@@ -1012,10 +999,8 @@ public abstract class TransactionContext
         // database engine
         enum = _objects.elements();
         while ( enum.hasMoreElements() ) {
-            ClassMolder molder;
                 
             entry = (ObjectEntry) enum.nextElement();
-            molder = entry.engine.getClassMolder( entry.object.getClass() );
             try {
                 if ( entry.created ) {
                     // Object has been created in this transaction,
@@ -1029,8 +1014,8 @@ public abstract class TransactionContext
                         entry.engine.revertObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
-                if ( molder.getCallback() != null )
-                    molder.getCallback().releasing( entry.object, false );
+                if ( entry.molder.getCallback() != null )
+                    entry.molder.getCallback().releasing( entry.object, false );
             } catch ( Exception except ) { }
         }
 
@@ -1062,6 +1047,20 @@ public abstract class TransactionContext
     }
 
 
+
+	public boolean isDepended( OID master, Object dependent ) {
+		ObjectEntry entry;
+		OID depends;
+
+		entry = getObjectEntry( dependent );
+		if ( entry == null )
+			return false;
+		depends = entry.oid.getDepends();
+		if ( depends == null )
+			return false;
+		
+		return depends.equals( master );
+	}
     /**
      * Returns the object's identity. If the identity was determined when
      * the object was created, or if the object was retrieved, that identity
@@ -1081,7 +1080,7 @@ public abstract class TransactionContext
         if ( entry != null )
             return entry.oid.getIdentities();
         return null;
-    }
+    } 
 
 
     /**
@@ -1147,11 +1146,9 @@ public abstract class TransactionContext
         entry = getObjectEntry( engine, new OID( engine, engine.getClassMolder( type ), identities ) );
         if ( entry != null && ! entry.deleted ) {
             try {
-                ClassMolder molder;
-                
-                molder = entry.engine.getClassMolder( entry.object.getClass() );
-                if ( molder != null && molder.getCallback() != null )
-                    molder.getCallback().removing( entry.object );
+
+                if ( entry.molder != null && entry.molder.getCallback() != null )
+                    entry.molder.getCallback().removing( entry.object );
             } catch ( Exception except ) {
                 throw new PersistenceExceptionImpl( except );
             }
@@ -1192,6 +1189,10 @@ public abstract class TransactionContext
      */
     ObjectEntry addObjectEntry( OID oid, Object object )
     {
+        if ( oid == null )
+            throw new IllegalArgumentException("oid cannot be null");
+        if ( object == null )
+            throw new IllegalArgumentException("object cannot be null");
         ObjectEntry entry;
         Hashtable   engineOids;
         LockEngine engine = oid.getLockEngine();
