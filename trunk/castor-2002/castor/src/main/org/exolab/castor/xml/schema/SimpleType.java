@@ -205,8 +205,19 @@ public abstract class SimpleType extends XMLType
 
 
     /**
-     *  Gets the code for this simple type (define in SimpleTypesFactory)
-     */
+     * Returns true if this SimpleType is a built in type
+     * @return true if this SimpleType is a built in type
+    **/
+    public boolean isBuiltInType() {
+        return SimpleTypesFactory.isBuiltInType( typeCode );
+    } //-- isBuiltInType
+    
+    /**
+     * Gets the code for this simple type 
+     * (as defined in SimpleTypesFactory)
+     *
+     * @return the type code for this simple type
+    **/
     public int getTypeCode() { return typeCode; }
 
 
