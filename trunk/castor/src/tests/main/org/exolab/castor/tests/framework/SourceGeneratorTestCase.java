@@ -225,8 +225,11 @@ public class SourceGeneratorTestCase extends XMLTestCase {
             try {
                 compileDirectory(_outputRootFile);
             } catch (BuildException e) {
-                if (_printStack)
+                if (_printStack) {
                     e.printStackTrace(System.out); 
+                }
+                fail("Build Failed: " + e.getMessage());
+                
             }
             // 3. Nest the class loader to look into the tmp dir
             //don't forget to add the previous path
