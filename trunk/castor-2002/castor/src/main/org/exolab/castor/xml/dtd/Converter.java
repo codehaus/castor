@@ -566,22 +566,21 @@ public class Converter {
 
        if (dtdAttribute.isREQUIRED()) {
 
-          schemaAttribute.setMinOccurs(1);
+          schemaAttribute.setUse(AttributeDecl.USE_REQUIRED);
 
        } else if (dtdAttribute.isIMPLIED()) {
 
-          schemaAttribute.setMinOccurs(0);
+          schemaAttribute.setUse(AttributeDecl.USE_OPTIONAL);
 
        } else if (dtdAttribute.isFIXED()) {
 
-          schemaAttribute.setDefaultValue(dtdAttribute.getDefaultValue());
-          schemaAttribute.setUseValue("fixed");
-          schemaAttribute.setMinOccurs(0);
+          schemaAttribute.setValue(dtdAttribute.getDefaultValue());
+          schemaAttribute.setUse(AttributeDecl.USE_FIXED);
 
        } else { //-- DTD attribute is of "DEFAULT" type
 
-          schemaAttribute.setDefaultValue(dtdAttribute.getDefaultValue());
-          schemaAttribute.setMinOccurs(0);
+          schemaAttribute.setValue(dtdAttribute.getDefaultValue());
+          schemaAttribute.setUse(AttributeDecl.USE_DEFAULT);
 
        }
 
