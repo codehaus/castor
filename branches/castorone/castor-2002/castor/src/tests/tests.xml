@@ -83,6 +83,76 @@
     <!-- <case class="jdo.ListTypes" /> -->
   </category>
 
+  <category name="mysql" class="jdo.JDOCategory">
+    <description>JDO tests for MySQL</description>
+    <jdo database-name="mysql" configuration="mysql.xml" />
+    <!-- A -->
+    <case class="jdo.DuplicateKey" />
+    <case class="jdo.Concurrent" />
+    <!-- <case class="jdo.DatabaseLockOracle" /> -->
+    <case class="jdo.ReadOnly" />
+    <case class="jdo.Deadlock" />
+    <case class="jdo.Race" />
+    <case class="jdo.CacheLeakage" />
+
+    <!-- B -->
+    <case class="jdo.TypeHandling" />
+    <!-- <case class="jdo.Join" /> -->
+    <case class="jdo.MultiPKs" />
+    <case class="jdo.ManyToMany" />
+    <case class="jdo.Dependent" />
+    <case class="jdo.DependentUpdate" />
+    <case class="jdo.LazyLoading" />
+    <case class="jdo.NestedFields" />
+    <!-- -->
+    <!-- -->
+    <!-- <case class="jdo.Complex" /> -->
+
+    <!-- C -->
+    <case class="jdo.KeyGenGeneric" />
+    <!-- -->
+    <case class="jdo.Persistent" />
+
+    <!-- D -->
+    <!-- <case class="jdo.ListTypes" /> -->
+  </category>
+
+  <category name="sapdb" class="jdo.JDOCategory">
+    <description>JDO tests for SAP DB</description>
+    <jdo database-name="sapdb" configuration="sapdb.xml" />
+    <!-- A -->
+    <case class="jdo.DuplicateKey" />
+    <case class="jdo.Concurrent" />
+    <!-- <case class="jdo.DatabaseLockOracle" /> -->
+    <case class="jdo.ReadOnly" />
+    <case class="jdo.Deadlock" />
+    <case class="jdo.Race" />
+    <case class="jdo.CacheLeakage" />
+
+    <!-- B -->
+    <case class="jdo.TypeHandling" />
+    <!-- <case class="jdo.Join" /> -->
+    <case class="jdo.MultiPKs" />
+    <case class="jdo.ManyToMany" />
+    <case class="jdo.Dependent" />
+    <case class="jdo.DependentUpdate" />
+    <case class="jdo.LazyLoading" />
+    <case class="jdo.NestedFields" />
+    <!-- -->
+    <!-- -->
+    <!-- <case class="jdo.Complex" /> -->
+
+    <!-- C -->
+    <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenSequence" />
+    <!--case class="jdo.KeyGenIdentity" /-->
+    <!-- -->
+    <case class="jdo.Persistent" />
+
+    <!-- D -->
+    <!-- <case class="jdo.ListTypes" /> -->
+  </category>
+
   <category name="xml" class="xml.XMLCategory">
     <description>Tests for XML marshalling framework</description>
     <case class="xml.TypeHandling" />

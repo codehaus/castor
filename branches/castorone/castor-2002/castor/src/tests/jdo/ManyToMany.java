@@ -170,7 +170,7 @@ public class ManyToMany extends CWTestCase {
             _db.begin();
             System.out.println("--------------Creating new group with people!--------------");
             person1 = new TestManyPerson();
-            person1.setValue("I am person 1");
+            person1.setValue1("I am person 1");
             ArrayList gPerson1 = new ArrayList();
             person1.setGroup( gPerson1 );
             person1.setId( 100 );
@@ -179,7 +179,7 @@ public class ManyToMany extends CWTestCase {
 
 
             person2 = new TestManyPerson();
-            person2.setValue("I am person 2");
+            person2.setValue1("I am person 2");
             ArrayList gPerson2 = new ArrayList();
             person2.setGroup( gPerson2 );
             person2.setId( 200 );
@@ -188,7 +188,7 @@ public class ManyToMany extends CWTestCase {
 
             group = new TestManyGroup();
             group.setId( 1 );
-            group.setValue("Group A");
+            group.setValue1("Group A");
             ArrayList al = new ArrayList();
             al.add( person1 );
             al.add( person2 );
@@ -243,15 +243,15 @@ public class ManyToMany extends CWTestCase {
                     
                     if (person1.getId() == 100 && person2.getId() == 200) {
                         // check if the value is valid for person1 and chnage value of person1
-                        if ( person1.getValue() == null || !person1.getValue().equals("I am person 1") ) {
+                        if ( person1.getValue1() == null || !person1.getValue1().equals("I am person 1") ) {
                             result = false;
                             throw new Exception("Error: unexpected person value");
                         } else {
-                            person1.setValue("New person 1 value");
+                            person1.setValue1("New person 1 value");
                         }
 
                         // check if the value is valid for person1 and remove person2
-                        if ( person2.getValue() == null || !person2.getValue().equals("I am person 2") ) {
+                        if ( person2.getValue1() == null || !person2.getValue1().equals("I am person 2") ) {
                             result = false;
                             throw new Exception("Error: unexpected person value");
                         }
@@ -300,7 +300,7 @@ public class ManyToMany extends CWTestCase {
 
                     if ( person1.getId() == 100 ) {
                         // check if the value is valid for person1 and chnage value of person1
-                        if ( person1.getValue() == null || !person1.getValue().equals("New person 1 value") ) {
+                        if ( person1.getValue1() == null || !person1.getValue1().equals("New person 1 value") ) {
                             result = false;
                             throw new Exception("Error: unexpected person value");
                         } 

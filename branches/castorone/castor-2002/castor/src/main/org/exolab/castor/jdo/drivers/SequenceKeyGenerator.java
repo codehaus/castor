@@ -84,6 +84,9 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
     private final int _sqlType;
 
+    
+    private int _increment;
+
 
     /**
      * Initialize the SEQUENCE key generator.
@@ -95,22 +98,28 @@ public final class SequenceKeyGenerator implements KeyGenerator
         String fName = factory.getFactoryName();
         boolean returning = "true".equals( params.getProperty("returning") );
 
-        if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) ) {
+        if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) && ! fName.equals( "interbase" ) && ! fName.equals( "sapdb" ) ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
-        if ( fName.equals( "postgresql" ) && returning ) {
+        if ( ( fName.equals( "postgresql" ) || fName.equals( "interbase" ) || fName.equals( "sapdb" ) )
+                && returning ) {
             throw new MappingException( Messages.format( "mapping.keyGenParamNotCompat",
                                         "returning=\"true\"", getClass().getName(), fName ) );
         }
         _factory = factory;
         _seqName = params.getProperty("sequence", "{0}_seq");
-        _style = ( fName.equals( "postgresql" ) ? BEFORE_INSERT :
+        _style = ( fName.equals( "postgresql" ) || fName.equals("interbase") ? BEFORE_INSERT :
                                    ( returning  ? DURING_INSERT : AFTER_INSERT) );
         _sqlType = sqlType;
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL) 
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
+        try {
+            _increment = Integer.parseInt(params.getProperty("increment","1"));
+        } catch (NumberFormatException nfe) {
+            _increment = 1;
+        }
     }
 
 
@@ -134,13 +143,20 @@ public final class SequenceKeyGenerator implements KeyGenerator
         try {
             stmt = conn.createStatement();
 
-            if ( _style == BEFORE_INSERT ) {
-                rs = stmt.executeQuery( "SELECT nextval('" +
-                        MessageFormat.format( _seqName, new String[] {tableName}) + "')" );
+            if (_factory.getFactoryName().equals("interbase")) {
+                //interbase only does before_insert, and does it its own way
+                rs = stmt.executeQuery("select gen_id(" +
+                        MessageFormat.format(_seqName, new String[] {tableName}) +
+                        "," + _increment + ") from rdb$database");
             } else {
-                rs = stmt.executeQuery( "SELECT " + _factory.quoteName(
-                        MessageFormat.format( _seqName, new String[] {tableName} ) +
-                        ".currval") + " FROM " + _factory.quoteName( tableName ) );
+                if ( _style == BEFORE_INSERT ) {
+                    rs = stmt.executeQuery( "SELECT nextval('" +
+                            MessageFormat.format( _seqName, new String[] {tableName}) + "')" );
+                } else {
+                    rs = stmt.executeQuery( "SELECT " + _factory.quoteName(
+                            MessageFormat.format( _seqName, new String[] {tableName} ) +
+                            ".currval") + " FROM " + _factory.quoteName( tableName ) );
+                }
             }
 
             if ( rs.next() ) {

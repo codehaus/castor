@@ -423,7 +423,7 @@ public class OQLQueryImpl
                     try {
                         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
                         if ( _expr != null ) {
-                            query = engine.createQuery( _expr, _bindTypes );
+                            query = engine.createQuery( _expr, _bindTypes, accessMode );
                         } else {
                             query = engine.createCall( _spCall, _bindTypes );
                         }

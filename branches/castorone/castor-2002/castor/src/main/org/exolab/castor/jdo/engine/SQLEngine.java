@@ -349,12 +349,14 @@ public final class SQLEngine implements Persistence {
     }
 
 
-    public PersistenceQuery createQuery( QueryExpression query, Class[] types )
+    public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
         throws QueryException
     {
         String sql;
 
-        sql = query.getStatement( _clsDesc.getAccessMode() == AccessMode.DbLocked);
+        if ( accessMode == null )
+            accessMode = _clsDesc.getAccessMode();
+        sql = query.getStatement( accessMode == AccessMode.DbLocked);
         if ( _logInterceptor != null )
             _logInterceptor.queryStatement( sql );
         return new SQLQuery( this, sql, types );
@@ -693,7 +695,7 @@ public final class SQLEngine implements Persistence {
                 }
             }
 
-            if ( stmt.executeUpdate() == 0 ) {
+            if ( stmt.executeUpdate() <= 0 ) { // SAP DB returns -1 here
                 // If no update was performed, the object has been previously
                 // removed from persistent storage or has been modified if
                 // dirty checking. Determine which is which.

@@ -115,6 +115,7 @@ public class LazyLoading extends CWTestCase {
         try {
             _db = _category.getDatabase( stream.verbose() );
             _conn = _category.getJDBCConnection();
+            _conn.setAutoCommit( false );
 
             // delete everything directly
             stream.writeVerbose( "Delete everything" );
