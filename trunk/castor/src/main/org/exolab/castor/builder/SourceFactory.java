@@ -603,7 +603,7 @@ public class SourceFactory {
             createEqualsMethod(jClass);
         //implements CastorTestable?
         if (_testable)
-            SourceFactory.createTestableMethods(jClass);
+            createTestableMethods(jClass, state);
 
 		//-- This boolean is set to create bound properties
         //-- even if the user has set the SUPER CLASS property
@@ -1087,7 +1087,9 @@ public class SourceFactory {
      * @param jclass the JCLass which will implement the CastorTestable Interface
      * @see org.exolab.castor.tests.framework.CastorTestable
      */
-     public static void createTestableMethods(JClass jclass) {
+     public static void createTestableMethods
+         (JClass jclass, FactoryState state) 
+     {
          if (jclass == null)
             throw new IllegalArgumentException("JClass must not be null");
 
@@ -1103,11 +1105,19 @@ public class SourceFactory {
         jclass.addMethod(jMethod);
         JSourceCode jsc = jMethod.getSourceCode();
         JField[] fields = jclass.getFields();
+        
         for (int i = 0; i <fields.length; i++) {
 
             JField temp = fields[i];
             JType type = temp.getType();
             String name = temp.getName();
+            
+            if (state.fieldInfoForChoice != null) {
+                if (name.equals(state.fieldInfoForChoice.getName())) {
+                    continue;
+                }
+            }
+            
             if (name.startsWith("_"))
                 name = JavaNaming.toJavaClassName(name.substring(1));
             else
@@ -1481,12 +1491,8 @@ public class SourceFactory {
         {
             state.fieldInfoForChoice 
                 = memberFactory.createFieldInfoForChoiceValue();
-            state.fieldInfoForChoice.setTransient(false);
-            handleField(state.fieldInfoForChoice, state);
-            //-- set transient to true so that the 
-            //-- descriptor source generator won't create
-            //-- a field descriptor
-            state.fieldInfoForChoice.setTransient(true);
+            state.fieldInfoForChoice.createJavaField(state.jClass);
+            state.fieldInfoForChoice.createAccessMethods(state.jClass);
         }
         
         FieldInfo fieldInfo = null;
@@ -2040,17 +2046,19 @@ public class SourceFactory {
             }
         }
 
-        if (state.fieldInfoForChoice != null) {
-            if (fieldInfo != state.fieldInfoForChoice) {
-                fieldInfo.setReference(state.fieldInfoForChoice.getName());
-            }
-        }
         
         state.classInfo.addFieldInfo(fieldInfo);
         present = present && !fieldInfo.isMultivalued();
         //create the relevant Java fields only if the field
         //info is not yet in the base classInfo or if it is not a collection
         if (!present) {
+            
+            if (state.fieldInfoForChoice != null) {
+                if (fieldInfo != state.fieldInfoForChoice) {
+                    fieldInfo.setReference(state.fieldInfoForChoice.getName());
+                }
+            }
+            
             fieldInfo.createJavaField(state.jClass);
             //-- do not create access methods for transient fields
             if (!fieldInfo.isTransient()) {
