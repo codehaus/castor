@@ -58,19 +58,12 @@ import java.util.Enumeration;
  */
 public class ParseTest implements TokenTypes {
 
-  public static int NODE_TYPES = 1;
-  public static int NODE_VALUES = 2;
+  public static final int NODE_TYPES = 1;
+  public static final int NODE_VALUES = 2;
 
   private static Hashtable tokenTypes = new Hashtable();
-
-  /**
-   * Main function.  Takes OQL query string as command line parameter
-   * and prints Parse Tree version of that query to stdout.
-   *
-   * @param args Pass an OQL query string on the command line.
-   */
-  public static void main (String args[]) {
-    
+  
+  static {
     tokenTypes.put(new Integer(END_OF_QUERY), "END_OF_QUERY");
     tokenTypes.put(new Integer(KEYWORD_SELECT), "KEYWORD_SELECT");
     tokenTypes.put(new Integer(IDENTIFIER), "IDENTIFIER");
@@ -109,7 +102,16 @@ public class ParseTest implements TokenTypes {
     tokenTypes.put(new Integer(DATE_LITERAL), "DATE_LITERAL");
     tokenTypes.put(new Integer(TIME_LITERAL), "TIME_LITERAL");
     tokenTypes.put(new Integer(TIMESTAMP_LITERAL), "TIMESTAMP_LITERAL");
+  }
 
+  /**
+   * Main function.  Takes OQL query string as command line parameter
+   * and prints Parse Tree version of that query to stdout.
+   *
+   * @param args Pass an OQL query string on the command line.
+   */
+  public static void main (String args[]) {
+    
 		try {
       Lexer lexer = new Lexer(args[0]);
       Parser parser = new Parser(lexer);
