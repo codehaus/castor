@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
@@ -51,26 +56,49 @@ import org.exolab.castor.xml.ClassDescriptorEnumeration;
 import org.exolab.castor.xml.ClassDescriptorResolver;
 import org.exolab.castor.xml.Introspector;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ResolverException;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLMappingLoader;
 
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.mapping.loader.MappingLoader;
 
-import java.util.Hashtable;
+import java.net.URL;
 import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
 
 /**
  * The default implementation of the ClassDescriptorResolver interface
  *
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class ClassDescriptorResolverImpl
     implements ClassDescriptorResolver 
 {
  
-    private static final String DESCRIPTOR_PREFIX = "Descriptor";
+    private static final String PKG_MAPPING_FILE   = ".castor.xml";
+    private static final String PKG_CDR_LIST_FILE  = ".castor.cdr";
+    private static final String DESCRIPTOR_PREFIX  = "Descriptor";
     private static final String INTERNAL_CONTAINER_NAME = "-error-if-this-is-used-";
 
+    /**
+     * A "null" Mapping file reference, used to mark that
+     * the resolver has already attempted file.io to load
+     * a package mapping
+     */
+    private static final Mapping NULL_MAPPING = new Mapping();
+    
+    /**
+     * A "null" Properties file reference, used to mark that
+     * the resolver has already attempted file.io to load
+     * a package cdr list file
+     */
+    private static final Properties NULL_CDR_FILE = new Properties();
+    
     /**
      * internal cache for class descriptors
      * with the class as the key
@@ -91,16 +119,10 @@ public class ClassDescriptorResolverImpl
      */
     private Hashtable _classNotFoundList = null;
     
-    /**
-     * A flag indicating an error has occured
-    **/
-    private boolean   _error      = false;
+    private Hashtable _packageMappings   = null;
     
+    private Hashtable _packageCDList     = null;
     
-    /**
-     * Error message
-    **/
-    private String    _errMessage = null;
     
     /**
      * The introspector to use, if necessary, to 
@@ -114,25 +136,32 @@ public class ClassDescriptorResolverImpl
     private ClassLoader _loader  = null;
     
     /**
+     * A flag to indicate whether or not to use
+     * the default package mappings, true by
+     * default
+     */
+    private boolean _loadPackageMappings = true;
+    
+    /**
      * MappingLoader instance for finding user-defined
      * mappings from a mapping-file
      */
     private XMLMappingLoader _mappingLoader = null;
     
-   
-    
     /** 
      * A flag to indicate the use of introspection
      */
     private boolean _useIntrospection = true;
-    
+        
     
     /**
      * Creates a new ClassDescriptorResolverImpl
      */
     public ClassDescriptorResolverImpl() {
-        _cacheViaClass = new Hashtable();
-        _cacheViaName  = new Hashtable();
+        _cacheViaClass   = new Hashtable();
+        _cacheViaName    = new Hashtable();
+        _packageMappings = new Hashtable();
+        _packageCDList   = new Hashtable();
     } //-- ClassDescriptorResolverImpl
 
 
@@ -183,16 +212,6 @@ public class ClassDescriptorResolverImpl
     } //-- associate
     
     /**
-     * Returns the last error message generated
-     * If no error String exists, null will be returned
-     * @return the last error message generated.
-     * If no error String exists, null will be returned
-    **/
-    public String getErrorMessage() {
-        return _errMessage;
-    } //-- getErrorMessage
-    
-    /**
      * Returns the Introspector being used by this ClassDescriptorResolver.
      * This allows for configuration of the Introspector.
      *
@@ -209,30 +228,20 @@ public class ClassDescriptorResolverImpl
     } //-- getXMLMappingLoader
     
     /**
-     * Returns true if an error was generated on the last call
-     * to one of the resolve methods
-     * @return true if an error was generated on the last call
-     * to one of the resolve methods
-    **/
-    public boolean error() {
-        return _error;
-    } //-- error
-    
-    /**
      * Returns the XMLClassDescriptor for the given class
      * @param type the Class to find the XMLClassDescriptor for
      * @return the XMLClassDescriptor for the given class
     **/
-    public XMLClassDescriptor resolve(Class type) {
+    public XMLClassDescriptor resolve(Class type) 
+        throws ResolverException
+    {
         
-        clearError();
-
         if (type == null) return null;
         
         XMLClassDescriptor classDesc = (XMLClassDescriptor) _cacheViaClass.get(type);
         
         if (classDesc != null) return classDesc;
-
+        
         //-- check mapping loader first 
         //-- [proposed by George Stewart]
         if (_mappingLoader != null) {            
@@ -242,7 +251,28 @@ public class ClassDescriptorResolverImpl
                return classDesc;
             }
         }
-       
+
+        String pkgName = getPackageName(type.getName());
+        
+        //-- check package mapping
+        Mapping mapping = loadPackageMapping(pkgName, type.getClassLoader());
+        if (mapping != null) {
+            try {
+                MappingLoader mapLoader = (MappingLoader)mapping.getResolver(Mapping.XML);
+                classDesc = (XMLClassDescriptor) mapLoader.getDescriptor(type);
+            }
+            catch(MappingException mx) {};
+            if (classDesc != null) {
+                associate(type, classDesc);
+                return classDesc;
+            }
+        }
+        
+        //-- load package list
+        if (loadPackageList(pkgName, type.getClassLoader())) {
+            classDesc = (XMLClassDescriptor) _cacheViaClass.get(type);
+            if (classDesc != null) return classDesc;
+        }
          
         String className = type.getName() + DESCRIPTOR_PREFIX;
         try {
@@ -260,8 +290,7 @@ public class ClassDescriptorResolverImpl
         catch(Exception ex) {
             String err = "instantiation error for class: " + className;
             err += "; " + ex.toString();
-            setError(err);
-            return null;
+            throw new ResolverException(err, ex);
         }
         
         //-- create classDesc automatically if necessary
@@ -273,9 +302,7 @@ public class ClassDescriptorResolverImpl
                 }
             }
             catch (MarshalException mx) {
-                String err = mx.toString();
-                setError(err);
-                return null;
+                throw new ResolverException(mx);
             }
         }
         return classDesc;
@@ -286,7 +313,9 @@ public class ClassDescriptorResolverImpl
      * @param className the class name to find the XMLClassDescriptor for
      * @return the XMLClassDescriptor for the given class name
     **/
-    public XMLClassDescriptor resolve(String className) {
+    public XMLClassDescriptor resolve(String className) 
+        throws ResolverException
+    {
         return resolve(className, null);
     } //-- resolve(String)
     
@@ -296,14 +325,15 @@ public class ClassDescriptorResolverImpl
      * @param loader the ClassLoader to use
      * @return the XMLClassDescriptor for the given class name
     **/
-    public XMLClassDescriptor resolve(String className, ClassLoader loader) {
+    public XMLClassDescriptor resolve(String className, ClassLoader loader) 
+        throws ResolverException
+    {
         
         XMLClassDescriptor classDesc = null;
         
         if ((className == null) || (className.length() == 0)) {
-            clearError(); //-- clear previous error flag
-            setError("Cannot resolve a null or zero-length class name.");
-            return null;
+            String error = "Cannot resolve a null or zero-length class name.";
+            throw new IllegalArgumentException(error);
         }
             
         //-- first check mapping loader
@@ -311,6 +341,23 @@ public class ClassDescriptorResolverImpl
             classDesc = (XMLClassDescriptor)_mappingLoader.getDescriptor(className);
             if (classDesc != null)
                 return classDesc;
+        }
+        
+        //-- check package mapping
+        String pkgName = getPackageName(className);
+        Mapping mapping = loadPackageMapping(pkgName, loader);
+        if (mapping != null) {
+            try {
+                MappingLoader mapLoader = (MappingLoader)mapping.getResolver(Mapping.XML);
+                classDesc = (XMLClassDescriptor) mapLoader.getDescriptor(className);
+            }
+            catch(MappingException mx) {};
+            if (classDesc != null) {
+                if (classDesc.getJavaClass() != null) {
+                    associate(classDesc.getJavaClass(), classDesc);
+                }
+                return classDesc;
+            }
         }
         
         //-- try and load class to check cache,
@@ -329,7 +376,6 @@ public class ClassDescriptorResolverImpl
         if (_class != null) {
             classDesc = resolve(_class);
         }
-        else clearError(); //-- clear error flag
         
         //-- try to load ClassDescriptor with no class being
         //-- present...does this make sense?
@@ -372,11 +418,9 @@ public class ClassDescriptorResolverImpl
         (String xmlName, String namespaceURI, ClassLoader loader) 
     {
         if ((xmlName == null) || (xmlName.length() == 0)) {
-            clearError(); //-- clear previous error flag
-            setError("Cannot resolve a null or zero-length xml name.");
-            return null;
+            String error = "Cannot resolve a null or zero-length xml name.";
+            throw new IllegalArgumentException(error);
         }
-        
         
         XMLClassDescriptor classDesc = null;
         Enumeration enumeration             = null;
@@ -426,6 +470,34 @@ public class ClassDescriptorResolverImpl
             classDesc = null;
         }
         
+        //-- next look in package mappings
+        Enumeration mappings = _packageMappings.elements();
+        while (mappings.hasMoreElements()) {
+            Mapping mapping = (Mapping)mappings.nextElement();
+            try {
+                MappingResolver resolver = mapping.getResolver(Mapping.XML);
+                enumeration = resolver.listDescriptors();
+                while (enumeration.hasMoreElements()) {
+                    classDesc = (XMLClassDescriptor)enumeration.nextElement();
+                    if (xmlName.equals(classDesc.getXMLName())) {
+                        if (namespaceEquals(namespaceURI, classDesc.getNameSpaceURI())) {
+                            _cacheViaName.put(nameKey, classDesc);
+                            return classDesc;
+                        }
+                        if (possibleMatch == null) 
+                            possibleMatch = classDesc;
+                        else if (possibleMatch != classDesc) {
+                            //-- too many possible matches, return null.
+                            possibleMatch = null;
+                        }
+                    }
+                }
+            }
+            catch(MappingException mx) {};
+            classDesc = null;
+        }
+        
+        
         if (classDesc == null) 
             classDesc = possibleMatch;
             
@@ -445,9 +517,8 @@ public class ClassDescriptorResolverImpl
         (String xmlName, String namespaceURI, ClassLoader loader)
     {
         if ((xmlName == null) || (xmlName.length() == 0)) {
-            clearError(); //-- clear previous error flag
-            setError("Cannot resolve a null or zero-length xml name.");
-            return null;
+            String error = "Cannot resolve a null or zero-length xml name.";
+            throw new IllegalArgumentException(error);
         }
         
         XCDEnumerator xcdEnumerator  = new XCDEnumerator();
@@ -474,6 +545,23 @@ public class ClassDescriptorResolverImpl
             }
         }
         
+        //-- next look in package mappings
+        Enumeration mappings = _packageMappings.elements();
+        while (mappings.hasMoreElements()) {
+            Mapping mapping = (Mapping)mappings.nextElement();
+            try {
+                MappingResolver resolver = mapping.getResolver(Mapping.XML);
+                enumeration = resolver.listDescriptors();
+                while (enumeration.hasMoreElements()) {
+                    classDesc = (XMLClassDescriptor)enumeration.nextElement();
+                    if (xmlName.equals(classDesc.getXMLName())) {
+                        xcdEnumerator.add(classDesc);
+                    }
+                }
+            }
+            catch(MappingException mx) {};
+        }
+        
         return xcdEnumerator;
         
     } //-- resolveByXMLName
@@ -497,6 +585,17 @@ public class ClassDescriptorResolverImpl
     public void setIntrospection(boolean enable) {
         _useIntrospection = enable;
     } //-- setIntrospection
+    
+    /**
+     * Sets whether or not to look for and load package specific
+     * mapping files (".castor.xml" files).
+     * 
+     * @param loadPackageMappings a boolean that enables or
+     * disables the loading of package specific mapping files
+     */
+    public void setLoadPackageMappings(boolean loadPackageMappings) {
+        _loadPackageMappings = loadPackageMappings;
+    } //-- setLoadPackageMappings
     
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
         _mappingLoader = mappingLoader;
@@ -543,23 +642,6 @@ public class ClassDescriptorResolverImpl
         }
     } //-- loadClass
     
-    /**
-     * Clears the error flag
-    **/
-    private void clearError() {
-        _error = false;
-    } //-- clearError
-    
-    /**
-     * Sets the current error message to the given String
-     * @param message the error message
-    **/
-    private void setError(String message) {
-        _error = true;
-        _errMessage = message;
-    } //-- setError
-    
-    
     /** 
      * Compares the two strings for equality. A Null and empty
      * strings are considered equal.
@@ -577,7 +659,150 @@ public class ClassDescriptorResolverImpl
         
         return ns1.equals(ns2);
     } //-- namespaceEquals
+    
+    /**
+     * Loads a package mapping file
+     * 
+     * @param packageName
+     * @param loader
+     * @return true if the package list was loaded during this call
+     * @throws ResolverException
+     */
+    private synchronized boolean loadPackageList
+        (String packageName, ClassLoader loader) 
+        throws ResolverException
+    {
+        if (packageName == null) packageName = "";
+        
+        Properties list = (Properties) _packageCDList.get(packageName);
+        if (list != null) {
+            return false;
+        }
+        
+        String filename;
+        
+        if (packageName.length() == 0) {
+            filename = PKG_CDR_LIST_FILE;
+        }
+        else {
+            filename = packageName.replace('.', '/');
+            filename = filename + "/" + PKG_CDR_LIST_FILE;
+        }
+        
+        if (loader == null) loader = _loader;
+        if (loader == null) loader = getClass().getClassLoader();
+        URL url = loader.getResource(filename);
+        if (url != null) {
+            try {
+                list = new Properties();
+                list.load(url.openStream());
+                _packageCDList.put(packageName, list);
+                
+                Enumeration classes = list.keys();
+                XMLClassDescriptor xcd = null;
+                while (classes.hasMoreElements()) {
+                    String className1 = (String)classes.nextElement();
+                    String className2 = list.getProperty(className1);
+                    try {
+                        Class type = loadClass(className1, loader);
+                        Class desc = loadClass(className2, loader);
+                        xcd = (XMLClassDescriptor) desc.newInstance();
+                        associate(type, xcd);
+                    }
+                    catch(ClassNotFoundException cnfx) {
+                        //-- TODO: report error, but
+                        //-- continue
+                    }
+                    catch(InstantiationException ix) {
+                        //-- TODO: report error, but
+                        //-- continue
+                    }
+                    catch(IllegalAccessException iax) {
+                        //-- TODO: report error, but
+                        //-- continue
+                        
+                    }
+                    
+                }
+                return true;
+            }
+            catch(java.io.IOException iox) {
+                throw new ResolverException(iox);
+            }
+        }
+        else {
+            _packageCDList.put(packageName, NULL_CDR_FILE);
+        }
+        return false;
+        
+    } //-- loadPackageList
+    
 
+    /**
+     * Loads a package mapping file
+     * 
+     * @param packageName
+     * @param loader
+     * @return
+     * @throws ResolverException
+     */
+    private synchronized Mapping loadPackageMapping
+        (String packageName, ClassLoader loader) 
+        throws ResolverException
+    {
+        if (!_loadPackageMappings) return null;
+        if (packageName == null) packageName = "";
+        
+        Mapping mapping = (Mapping)_packageMappings.get(packageName);
+        if (mapping != null) {
+            if (mapping == NULL_MAPPING) {
+                return null;
+            }
+            return mapping;
+        }
+        
+        String filename;
+        
+        if (packageName.length() == 0) {
+            filename = PKG_MAPPING_FILE;
+        }
+        else {
+            filename = packageName.replace('.', '/');
+            filename = filename + "/" + PKG_MAPPING_FILE;
+        }
+        
+        if (loader == null) loader = _loader;
+        if (loader == null) loader = getClass().getClassLoader();
+        URL url = loader.getResource(filename);
+        if (url != null) {
+            try {
+                mapping = new Mapping(loader);
+                mapping.loadMapping(url);
+                _packageMappings.put(packageName, mapping);
+            }
+            catch(java.io.IOException iox) {
+                throw new ResolverException(iox);
+            }
+            catch(MappingException mx) {
+                throw new ResolverException(mx);
+            }
+        }
+        else {
+            _packageMappings.put(packageName, NULL_MAPPING);
+        }
+        
+        return mapping;
+    } //-- loadPackageMapping
+    
+    private String getPackageName(String className) {
+        if (className == null) return null;
+        int idx = className.lastIndexOf('.');
+        if (idx >= 0) {
+            return className.substring(0, idx);
+        }
+        return null;
+    }
+    
     /**
      * A locally used implementation of ClassDescriptorEnumeration
      */
@@ -598,6 +823,7 @@ public class ClassDescriptorResolverImpl
         * Adds the given XMLClassDescriptor to this XCDEnumerator
         **/
         protected void add(XMLClassDescriptor classDesc) {
+            
             Entry entry = new Entry();
             entry.classDesc = classDesc;
             if (_current == null) {
