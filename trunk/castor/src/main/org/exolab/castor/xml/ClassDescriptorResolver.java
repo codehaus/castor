@@ -40,6 +40,11 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ * 
  * $Id$
  */
 
@@ -53,58 +58,48 @@ package org.exolab.castor.xml;
  * <B>Note:</B>
  * This interface is used by the marshalling Framework for
  * resolving XMLClassDescriptors for non-primitive types.
- * There is no guarantees that this class will be called for
+ * There are no guarantees that this class will be called for
  * java native classes.
  * 
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public interface ClassDescriptorResolver {
     
-    
-    /**
-     * Returns the last error message generated
-     * If no error String exists, null will be returned
-     * @return the last error message generated.
-     * If no error String exists, null will be returned
-    **/
-    public String getErrorMessage();
-    
-    /**
-     * Returns true if an error was generated on the last call
-     * to one of the resolve methods
-     * @return true if an error was generated on the last call
-     * to one of the resolve methods
-    **/
-    public boolean error();
     
     /** 
      * <BR />
      * <B>Note:</B> This method will be removed soon (kv).
-    **/
+     */
     public XMLMappingLoader getMappingLoader();
     
     /**
      * Returns the XMLClassDescriptor for the given class
+     * 
      * @param type the Class to find the XMLClassDescriptor for
      * @return the XMLClassDescriptor for the given class
-    **/
-    public XMLClassDescriptor resolve(Class type);
+     */
+    public XMLClassDescriptor resolve(Class type)
+        throws ResolverException;
     
     /**
      * Returns the XMLClassDescriptor for the given class name
+     * 
      * @param className the class name to find the XMLClassDescriptor for
      * @return the XMLClassDescriptor for the given class name
-    **/
-    public XMLClassDescriptor resolve(String className);
+     */
+    public XMLClassDescriptor resolve(String className)
+        throws ResolverException;
     
     /**
      * Returns the XMLClassDescriptor for the given class name
+     * 
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
      * @return the XMLClassDescriptor for the given class name
-    **/
-    public XMLClassDescriptor resolve(String className, ClassLoader loader);
+     */
+    public XMLClassDescriptor resolve(String className, ClassLoader loader)
+        throws ResolverException;
     
     /**
      * Returns the first XMLClassDescriptor that matches the given
@@ -114,9 +109,10 @@ public interface ClassDescriptorResolver {
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
      * @return the XMLClassDescriptor for the given XML name
-    **/
+     */
     public XMLClassDescriptor resolveByXMLName
-        (String xmlName, String namespaceURI, ClassLoader loader);
+        (String xmlName, String namespaceURI, ClassLoader loader)
+        throws ResolverException;
 
     /**
      * Returns an enumeration of XMLClassDescriptor objects that
@@ -125,16 +121,17 @@ public interface ClassDescriptorResolver {
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
      * @return an enumeration of XMLClassDescriptor objects.
-    **/
+     */
     public ClassDescriptorEnumeration resolveAllByXMLName
-        (String xmlName, String namespaceURI, ClassLoader loader);
+        (String xmlName, String namespaceURI, ClassLoader loader)
+        throws ResolverException;
     
     /**
      * Sets the mapping loader for this ClassDescriptorResolver
      *
      * <BR />
      * <B>Note:</B> This method will be removed soon (kv).
-    **/
+     */
     public void setMappingLoader(XMLMappingLoader xmlMappingLoader);
     
 } //-- ClassDescriptorResolver
