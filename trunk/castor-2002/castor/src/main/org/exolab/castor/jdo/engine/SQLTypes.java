@@ -74,9 +74,12 @@ public final class SQLTypes
 
 
     /**
-     * Separator between type name and parameter, e.g. "char.01"
+     * Separators between type name and parameter, e.g. "char[01]"
      */
-    private static final char ParamSeparator = '.';
+    private static final char LeftParamSeparator = '[';
+
+
+    private static final char RightParamSeparator = ']';
 
 
     /**
@@ -91,7 +94,7 @@ public final class SQLTypes
     {
         int sep;
 
-        sep = sqlTypeName.indexOf( ParamSeparator );
+        sep = sqlTypeName.indexOf( LeftParamSeparator );
         if ( sep >= 0 ) 
             sqlTypeName = sqlTypeName.substring( 0, sep );
         
@@ -108,16 +111,21 @@ public final class SQLTypes
      * of the form "SQL_type.domain".
      * If the type is not parameterized, returns null.
      *
-     * @param sqlTypeName SQL type name (e.g. char.01)
+     * @param sqlTypeName SQL type name (e.g. char[01])
      * @return Parameter (e.g. "01") or null
      */
     public static String paramFromName( String sqlTypeName )
     {
-        int sep;
+        int left;
+        int right;
 
-        sep = sqlTypeName.indexOf( ParamSeparator );
-        if ( sep >= 0 )
-            return sqlTypeName.substring( sep + 1 );
+        left = sqlTypeName.indexOf( LeftParamSeparator );
+        right = sqlTypeName.indexOf( RightParamSeparator );
+        if ( right < 0 ) 
+            right = sqlTypeName.length();
+
+        if ( left >= 0 )
+            return sqlTypeName.substring( left + 1, right );
         else
             return null;
     }

@@ -123,9 +123,9 @@ public class SequenceKeyGenerator implements KeyGenerator
                 rs = stmt.executeQuery( "SELECT nextval('" +
                         MessageFormat.format( _seqName, new String[] {tableName}) + "')" );
             } else {
-                rs = stmt.executeQuery( "SELECT " +
-                        MessageFormat.format( _seqName, new String[] {tableName}) +
-                        ".currval FROM " + tableName );
+                rs = stmt.executeQuery( "SELECT " + _factory.quoteName(
+                        MessageFormat.format( _seqName, new String[] {tableName} ) +
+                        ".currval") + " FROM " + _factory.quoteName( tableName ) );
             }
 
             if ( rs.next() ) {
