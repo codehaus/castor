@@ -68,7 +68,7 @@
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
     <case class="jdo.SerializableObject" />
-    <!-- <case class="jdo.OqlExtends" /> -->
+    <case class="jdo.OqlExtends" />
     <case class="jdo.ManyToManyKeyGen" />
 
     <!-- C -->
@@ -92,7 +92,6 @@
     <!-- A -->
     <case class="jdo.DuplicateKey" />
     <case class="jdo.Concurrent" />
-    <!-- <case class="jdo.DatabaseLockOracle" /> -->
     <case class="jdo.ReadOnly" />
     <case class="jdo.Deadlock" />
     <case class="jdo.Race" />
