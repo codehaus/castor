@@ -791,7 +791,7 @@ public final class UnmarshalHandler extends MarshalFramework
         if (descriptor == null) {
              Vector inheritanceList = searchInheritance(name, namespace, classDesc, _cdResolver);
              if (inheritanceList.size() != 0) {
-                 InheritanceMatch match = (InheritanceMatch)inheritanceList.get(0);
+                 InheritanceMatch match = (InheritanceMatch)inheritanceList.elementAt(0);
                  descriptor  = match._parentFieldDesc;
                  cdInherited = match._inheritedClassDesc;
              }
@@ -1592,7 +1592,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     // It is possible that the superclass is of type object if we use any node.
                     if (superclass.isAssignableFrom(subclass) && (superclass != Object.class)) {
                         descriptor = descriptors[i];
-                        inheritanceList.add(new InheritanceMatch(descriptor, cdInherited));
+                        inheritanceList.addElement(new InheritanceMatch(descriptor, cdInherited));
                     }
                 }
             }
