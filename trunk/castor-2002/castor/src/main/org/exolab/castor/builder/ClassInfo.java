@@ -191,12 +191,14 @@ public class ClassInfo extends XMLInfo {
      * @return a fieldInfo that corresponds to an attribute with the given node name.
      */
     public FieldInfo getAttributeField(String nodeName) {
-        for (int i = 0; i < _atts.size(); i++) {
-            FieldInfo temp = (FieldInfo)_atts.get(i);
-            if (temp.getNodeName().equals(nodeName))
-                 return temp;
+        if (_atts != null) {
+            for (int i = 0; i < _atts.size(); i++) {
+                FieldInfo temp = (FieldInfo)_atts.get(i);
+                if (temp.getNodeName().equals(nodeName))
+                     return temp;
+            }
         }
-        return null;
+            return null;
     }
 
     /**
@@ -232,11 +234,12 @@ public class ClassInfo extends XMLInfo {
      * @return a fieldInfo that corresponds to an element with the given node name.
      */
     public FieldInfo getElementField(String nodeName) {
-
-        for (int i = 0; i < _elements.size(); i++) {
-            FieldInfo temp = (FieldInfo)_elements.get(i);
-            if (temp.getNodeName().equals(nodeName))
-                 return temp;
+        if (_elements != null) {
+            for (int i = 0; i < _elements.size(); i++) {
+                FieldInfo temp = (FieldInfo)_elements.get(i);
+                if (temp.getNodeName().equals(nodeName))
+                     return temp;
+            }
         }
         return null;
     }
