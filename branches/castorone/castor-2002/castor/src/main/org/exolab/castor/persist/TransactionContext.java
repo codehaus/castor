@@ -293,6 +293,7 @@ public abstract class TransactionContext
     public synchronized Object fetch( LockEngine engine, ClassMolder molder, 
             Object[] identities, AccessMode accessMode ) 
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
+
         ObjectEntry entry = null;
         OID         oid;
         //System.out.println("Tx.fetch() class: "+molder.getJavaClass().getName()+" : "+OID.flatten( identities ));
@@ -313,9 +314,11 @@ public abstract class TransactionContext
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
                 throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getJavaClass(), OID.flatten( identities )) );
-            if ( entry.deleted )
-                //throw new ObjectNotFoundException( molder.getJavaClass(), OID.flatten( identities ) );
-                return null;
+            if ( entry.deleted ) {
+                //throw new ObjectNotFoundException( molder.getJavaClass() + OID.flatten( identities ) );
+                System.out.println(".....................................fetch a deleted object");
+                //return null;
+            }
             if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getJavaClass(), OID.flatten( identities )) );
             if ( entry.created )
@@ -373,8 +376,9 @@ public abstract class TransactionContext
     public synchronized Object load( LockEngine engine, ClassMolder molder, 
             Object[] identities, AccessMode accessMode )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
-        ObjectEntry entry;
-        Object      object;
+
+        ObjectEntry entry = null;
+        Object      object = null;
         OID         oid;
 
         if ( identities == null ) 
@@ -382,21 +386,47 @@ public abstract class TransactionContext
         if ( OID.isIdsNull( identities ) )
             throw new PersistenceException("Identities can't be null!");
 
-        object = fetch( engine, molder, identities, accessMode );
-        if ( object != null ) return object;
-
         oid = new OID( engine, molder, identities );
+
+        if ( accessMode == AccessMode.ReadOnly )
+            entry = getReadOnlyObjectEntry( oid );
+        if ( entry == null )
+            entry = getObjectEntry( engine, oid );
+        if ( entry != null ) {
+            // If the object has been loaded in this transaction from a
+            // different engine this is an error. If the object has been
+            // deleted in this transaction, it cannot be re-loaded. If the
+            // object has been created in this transaction, it cannot be
+            // re-loaded but no error is reported.
+            if ( entry.engine != engine )
+                throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getJavaClass(), OID.flatten( identities )) );
+            if ( entry.deleted ) 
+                throw new ObjectNotFoundException( "Object is deleted" + molder.getJavaClass() + OID.flatten( identities ) );
+            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
+                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getJavaClass(), OID.flatten( identities )) );
+            if ( entry.created )
+                return entry.object;
+            if ( ( accessMode == AccessMode.Exclusive ||
+                   accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
+                throw new PersistenceException( Messages.format("persist.lockConflict", molder.getJavaClass(), OID.flatten( identities )) );
+            }
+            return entry.object;
+        }
+
         // Load (or reload) the object through the persistence engine with the
         // requested lock. This might report failure (object no longer exists),
         // hold until a suitable lock is granted (or fail to grant), or
         // report error with the persistence engine.
         accessMode = molder.getAccessMode( accessMode );
         try {
+            System.out.println("new instance");
             object = molder.newInstance(); 
             entry = addObjectEntry( oid, object );
             oid = engine.load( this, oid, object, accessMode, _lockTimeout );
             // add entry again using new oid
-            removeObjectEntry( object );
+            entry = removeObjectEntry( object );
+            if ( entry == null )
+                throw new IllegalStateException("to be removed after debug");
             entry = addObjectEntry( oid, object );
 
         } catch ( ObjectNotFoundException except ) {
@@ -523,6 +553,7 @@ public abstract class TransactionContext
                 // If the object was already deleted in this transaction, 
                 // just undelete it.
                 // Remove the entry from a FIFO linked list of deleted entries.
+                System.out.println("*********** undelete object");
                 if ( _deletedList != null ) {
                     ObjectEntry deleted;
                     
@@ -797,6 +828,23 @@ public abstract class TransactionContext
         }
     }
 
+    public synchronized void markModified( Object object, boolean updatePersist, boolean updateCache ) {
+        
+        ObjectEntry entry;
+
+        entry = getObjectEntry( object );
+
+        if ( entry != null ) {
+            //System.out.println("!!!!!!!!!!!!markModified "+object+(updatePersist?"":" not")+" updatePersist "+(updateCache?"":" not")+" updateCache");
+            if ( updatePersist )
+                entry.updatePersistNeeded = true;
+            if ( updateCache )
+                entry.updateCacheNeeded = true;
+        } else {
+            // report or ignore?
+        }
+    }
+
 
     /**
      * Acquire a write lock on the object. Read locks are implicitly
@@ -938,20 +986,31 @@ public abstract class TransactionContext
                     
                         // When storing the object it's OID might change
                         // if the primary identity has been changed
+
+                        /* what is the following line for?
                         identities = entry.molder.getIdentities( entry.object );
-                        oid = entry.engine.store( this, entry.oid, entry.object, _lockTimeout );
+                        */
+                        oid = entry.engine.preStore( this, entry.oid, entry.object, _lockTimeout );
                         if ( oid != null ) {
                             entry.oid = oid;
-                            entry.modified = true;
+                            entry.updateCacheNeeded = true;
+                            //entry. = true;
                         }
                     }
                     done.addElement( entry );
                 }
             }
-            // | LockEngine should return oid, not just change the oid.....
 
             _status = Status.STATUS_PREPARING;
 
+            // Process all modified objects
+            enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (ObjectEntry) enum.nextElement();
+                if ( !entry.deleted && (entry.updatePersistNeeded) ) {
+                    entry.engine.store( this, entry.oid, entry.object );
+                }
+            }
             // Process all deleted objects last in FIFO order.
             while ( _deletedList != null ) {
                 entry = _deletedList;
@@ -1025,8 +1084,12 @@ public abstract class TransactionContext
             } else {
                 // Object has been created/accessed inside the
                 // transaction, release its lock.
-                if ( entry.modified ) {
+                
+                if ( entry.updateCacheNeeded ) {
+                    System.out.println("updateCache");
                     entry.engine.updateCache( this, entry.oid, entry.object );
+                } else {
+                    System.out.println("---Object "+entry.oid+" is not modified!");
                 }
                 entry.engine.releaseLock( this, entry.oid );
             }
@@ -1079,7 +1142,7 @@ public abstract class TransactionContext
                 } else {
                     // Object has been queried (possibly) deleted in this
                     // transaction and release the lock.
-                    if ( entry.modified )
+                    if ( entry.updateCacheNeeded || entry.updatePersistNeeded )
                         entry.engine.revertObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
@@ -1271,9 +1334,16 @@ public abstract class TransactionContext
         LockEngine engine = oid.getLockEngine();
         ClassMolder molder = oid.getMolder();
 
+        removeObjectEntry( object );
+
         entry = new ObjectEntry( engine, molder, oid, object );
         entry.oid = oid;
         _objects.addElement( entry );
+        //System.out.println("addEntry oid: "+oid);
+        for ( int i=0; i < _objects.size(); i++ ) {
+            //System.out.print("["+((ObjectEntry)_objects.get(i)).oid+" "+((ObjectEntry)_objects.get(i)).oid.getMolder()+" "+((ObjectEntry)_objects.get(i)).oid.getLockEngine()+"]  ");
+        }
+        System.out.println();
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null ) {
             engineOids = new Hashtable();
@@ -1443,7 +1513,19 @@ public abstract class TransactionContext
          * True if the object has been modified in the transaction,
          * stored during the preparation stage and is write locked.
          */
-        boolean                  modified;
+        // boolean                  modified;
+
+        /**
+         * True if the object has been modified and the cache should
+         * be updated at commit time
+         */
+        boolean                  updateCacheNeeded;
+
+        /**
+         * True if the object has been modified and the persistence
+         * storage should be updated
+         */
+        boolean                  updatePersistNeeded;
 
         /**
          * Link to the next deleted object in a FIFO list of deleted
