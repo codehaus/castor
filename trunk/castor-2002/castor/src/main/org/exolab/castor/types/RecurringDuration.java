@@ -38,11 +38,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author          Changes
- * 12/05/2000   Arnaud Blandin  Added the support for OperationNotSupportedException
+ * 12/05/2000   Arnaud Blandin  Added the support for NotSupportedOperationException
  * 11/08/2000   Arnaud Blandin  Added new constructor and setValues method
  * 11/07/2000   Arnaud Blandin  Added isEqual() and isGreater() methods
  * 11/02/2000   Arnaud Blandin  Changed the constructor
