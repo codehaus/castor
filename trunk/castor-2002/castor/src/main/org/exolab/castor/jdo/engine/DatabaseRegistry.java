@@ -244,6 +244,8 @@ public class DatabaseRegistry
             // configuration file, relative to the configuration file.
             // Fail if cannot load the mapping for whatever reason.
             mapping = new Mapping( loader );
+            if ( logInterceptor != null )
+                  mapping.setLogWriter( logInterceptor.getPrintWriter() );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
             if ( source.getSystemId() != null )
