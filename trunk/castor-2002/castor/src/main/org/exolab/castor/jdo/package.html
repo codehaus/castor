@@ -32,10 +32,10 @@
        groups and marks them down with a 25% discount and on-sale status.</p>
 
        <pre>
-  JDO         jdo;
-  Database    db;
-  Query       oql;
-  Enumeration enum;
+  JDO          jdo;
+  Database     db;
+  Query        oql;
+  QueryResults results;
 
   <font color="red">// Define a new database source</font>
   jdo = new JDO( "mydb" );
@@ -48,10 +48,10 @@
   <font color="red">// Select all the products in a given group</font>
   oql = db.getQuery( "SELECT p FROM Product p WHERE group=$" );
   oql.bind( groupId );
-  enum = oql.execute();
-  while ( enum.hasMore() ) {
+  results = oql.execute();
+  while ( results.hasMore() ) {
     <font color="red">// A 25% mark down for each product and mark as sale</font>
-    prod = (Product) enum.next();
+    prod = (Product) results.next();
     prod.markDown( 0.25 );
     prod.setOnSale( true );
   }

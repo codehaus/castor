@@ -63,16 +63,16 @@ package org.exolab.castor.jdo;
  * <p>
  * For example:
  * <pre>
- * Query       oql;
- * Enumeration enum;
+ * Query        oql;
+ * QueryResults results;
  *
  * <font color="red">// Construct a new query and bind the id value</font>
  * oql = db.getQuery( "SELECT ... WHERE id=$" );
  * oql.bind( 5 );
- * enum = oql.execute();
+ * results = oql.execute();
  * <font color="red">// Iterate over all the results and print them</font>
- * while ( enum.hasMore() ) {
- *   System.out.println( enum.next(); );
+ * while ( results.hasMore() ) {
+ *   System.out.println( results.next(); );
  * }
  * </pre>
  *
