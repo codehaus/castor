@@ -45,6 +45,9 @@
 
 package org.exolab.castor.core.exceptions;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+
 /**
  * The base exception for Castor (or at least Castor XML)
  * 
@@ -57,11 +60,6 @@ public class CastorException extends Exception {
      * The cause for this exception
      */
     private Throwable cause;
-
-    /**
-     * The message for this Exception
-     */
-    private String message;
 
     /**
      * Creates a new CastorException with no message, or nested Exception
@@ -77,7 +75,6 @@ public class CastorException extends Exception {
      */
     public CastorException(String message) {
         super(message);
-        this.message = message;
     }
 
     /**
@@ -85,7 +82,6 @@ public class CastorException extends Exception {
      * @param cause
      */
     public CastorException(String message, Throwable cause) {
-        this.message = message;
         this.cause = cause;
     }
 
@@ -94,39 +90,123 @@ public class CastorException extends Exception {
      */
     public CastorException(Throwable cause) {
         this.cause = cause;
-        message = cause.getMessage();
     }
 
+    /**
+     * Match the JDK 1.4 Throwable version of initCause() on JDK<1.4 systems.
+     * @param cause The throwable you wish to attach to this exception as the 'cause' of the exception.
+     * @return This exception.  (Throwable also returns this, not the cause.)
+     */
+    public synchronized Throwable initCause(Throwable cause) {
+        this.cause = cause;
+        return this;
+    }
+
+    
+    /**
+     * Match the JDK 1.4 Throwable version of getCause() on JDK<1.4 systems.
+     * @return The throwable cause of this exception.
+     */
     public Throwable getCause() {
         return cause;
     }
+    
+    /**
+     * Match some internal API and some surrounding API to provide this method.
+     * @return the exception, which in turn caused this Exception to
+     * be thrown, or null if nested exception exists.
+     * @deprecated Please move to getCause().
+    **/
+    public Throwable getException() {
+        return cause;
+    } //-- getException
+
+
+    /** Retrieve the cause of a specific exception.  This is a nice, safe, easy thing to call internally
+     * to ensure we never call getCause on something that shouldn't have it.  More hand-holding than anything
+     * else, really, but it makes it easy to read.
+     * @param e The exception you wish to extract a cause from.
+     * @return The throwable attached to that exception as a cause.
+     */
+    private static Throwable getNestedException(Throwable e) {
+        // Deal with the myriad ways of getting a nested exception.
+        if (e instanceof CastorException) return ((CastorException) e).getCause();
+        else return null;
+    }
 
     /**
-     * Returns the detail message for this Exception
-     * 
-     * @return the detail message for this Exception
+     * Return the detailed message from this exception.  Chain message information from child exceptions into it, so that
+     * the message shows the chain of message information available.
      */
     public String getMessage() {
-        //-- simply return message, or if null,
-        //-- to prevent null pointer exceptions while printing
-        //-- error message, return ""
-        if (message == null)
-            return "";
-        else
-            return message;
-    }
+        // Get this exception's message.
+        String msg = super.getMessage();
 
-    public synchronized Throwable initCause(Throwable cause) {
-        return this.cause = cause;
+        Throwable parent = this;
+        Throwable child = getNestedException(parent);
+
+        if (child!=null) {
+            // Get the child's message.
+            String msg2 = child.getMessage();
+
+            // If we found a message for the child exception, 
+            // we append it.
+            if (msg2 != null) {
+                if (msg != null) {
+                    msg += ": " + msg2;
+                } else {
+                    msg = msg2;
+                }
+            }
+        }
+
+        // Return the completed message.
+        return msg;
     }
 
     /**
-     * Sets the message for this Exception
-     * 
-     * @param message the message for this Exception
+     * Print a stack trace to stderr.
      */
-    public void setMessage(String message) {
-        this.message = message;
+    public void printStackTrace() {
+        // Print the stack trace for this exception.
+        super.printStackTrace();
+
+        Throwable child = getNestedException(this);
+
+        if (child != null) {
+            System.err.print("Caused by: ");
+            child.printStackTrace();
+        }
     }
 
+    /**
+     * Print a stack trace to the specified PrintStream.
+     * @param s The PrintStream to print a stack trace to.
+     */
+    public void printStackTrace(PrintStream s) {
+        // Print the stack trace for this exception.
+        super.printStackTrace(s);
+
+        Throwable child = getNestedException(this);
+
+        if (child != null) {
+            System.err.print("Caused by: ");
+            child.printStackTrace(s);
+        }
+    }
+
+    /**
+     * Print a stack trace to the specified PrintWriter.
+     * @param w The PrintWriter to print a stack trace to.
+     */
+    public void printStackTrace(PrintWriter w) {
+        // Print the stack trace for this exception.
+        super.printStackTrace(w);
+
+        Throwable child = getNestedException(this);
+        if (child != null) {
+            System.err.print("Caused by: ");
+            child.printStackTrace(w);
+        }
+    }
 }
