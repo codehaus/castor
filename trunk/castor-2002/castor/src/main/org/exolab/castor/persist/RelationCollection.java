@@ -162,7 +162,7 @@ public class RelationCollection implements Collection, Lazy {
         boolean changed = false;
         Iterator a = c.iterator();
         while ( a.hasNext() ) {
-            if ( add( a ) ) {
+            if ( add( a.next() ) ) {
                 changed = true;
             }
         }
@@ -175,6 +175,7 @@ public class RelationCollection implements Collection, Lazy {
         Object o;
         Object id;
 
+        ArrayList newIds = new ArrayList();
         for ( int i=0; i<_ids.size(); i++ ) {
             id = _ids.get(i);
             if ( !_deleted.contains(id) ) {
@@ -182,6 +183,7 @@ public class RelationCollection implements Collection, Lazy {
                 _size--;
             }
         }
+        _ids = newIds;
         for ( int i=0; i<_added.size(); i++ ) {
             id = _added.get(i);
             _added.remove(id);
