@@ -142,7 +142,8 @@ public class SourceFactory  {
         String comment  = processAnnotations(element);
         if (comment != null) 
             jClass.getJDocComment().setComment(comment);
-            
+        
+        
         
         XMLType type = element.getType();
         
@@ -155,7 +156,20 @@ public class SourceFactory  {
         }
         // ComplexType
         else if (type.isComplexType()) {
-            processComplexType( (ComplexType)type, state);
+
+            ComplexType complexType = (ComplexType)type;
+
+            if (element.getTypeReference() == null) {
+                processComplexType( (ComplexType)type, state);
+            }
+            else {
+
+                String typeName = complexType.getName();
+                String superClass = JavaXMLNaming.toJavaClassName(typeName);
+                
+                superClass = resolveClassName(superClass, packageName);
+                jClass.setSuperClass(superClass);
+            }
         }
         // SimpleType
         else {
