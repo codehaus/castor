@@ -96,6 +96,10 @@
         <display>XML Schema Support</display>
       </navLink>
       <navLink>
+        <url>xml-mapping.xml</url>
+        <display>XML Mapping</display>
+      </navLink>
+      <navLink>
         <url>examples.xml</url>
         <display>Running The Examples</display>
       </navLink>
