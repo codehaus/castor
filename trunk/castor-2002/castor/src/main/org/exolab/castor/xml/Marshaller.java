@@ -1291,13 +1291,21 @@ public class Marshaller extends MarshalFramework {
             return value;
         if (!(fieldDesc instanceof XMLFieldDescriptorImpl))
            return value;
+           
         String result = (String)value;
-        int idx = result.indexOf('}');
-        if (idx <= 0) {
-            String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
-            throw new IllegalArgumentException(err);
+        
+        String nsURI = null;
+        int idx = -1;
+        if ((result.length() > 0) && (result.charAt(0) == '{')) {
+            idx = result.indexOf('}');
+            if (idx <= 0) {
+                String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
+                throw new IllegalArgumentException(err);
+            }
+            nsURI = result.substring(1, idx);
         }
-        String nsURI = result.substring(1, idx);
+        else return value;
+        
         String prefix = ((XMLFieldDescriptorImpl)fieldDesc).getQNamePrefix();
         //no prefix provided, check if one has been previously defined
         if (prefix == null)
