@@ -231,7 +231,8 @@ public class DescriptorSourceFactory {
            jsc.add("}");
            jsc.unindent();
            jsc.add("});");
-        } else {
+        } 
+        else {
             if (xsType.getType() == XSType.COLLECTION)
                 //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
                 xsType = ((CollectionInfo)member).getContent().getSchemaType();
@@ -380,68 +381,82 @@ public class DescriptorSourceFactory {
                 xsType.isPrimitive() ||
                 xsType.getJType().isArray() ||
                 (xsType.getType() == XSType.STRING))
-         {
-             jsc.append("null;");
-         } else {
-                jsc.append(xsType.newInstanceCode());
-         }
-         jsc.unindent();
-         jsc.add("}");
-         //--end of new Instance method
-         jsc.unindent();
-         jsc.add("} );");
-         //--end of XMLFieldDescriptor
+        {
+            jsc.append("null;");
+        } 
+        else {
+            jsc.append(xsType.newInstanceCode());
+        }
+        jsc.unindent();
+        jsc.add("}");
+        //--end of new Instance method
+        jsc.unindent();
+        jsc.add("} );");
+        //--end of XMLFieldDescriptor
 
-         if (isEnumerated) {
+        if (isEnumerated) {
             jsc.add("desc.setHandler( new EnumFieldHandler(");
             jsc.append(classType(xsType.getJType()));
             jsc.append(", handler));");
             jsc.add("desc.setImmutable(true);");
-         } else if (xsType.getType() == XSType.TIME_INSTANT) {
+        } 
+        else if (xsType.getType() == XSType.TIME_INSTANT) {
             jsc.add("desc.setHandler( new DateFieldHandler(");
             jsc.append("handler));");
             jsc.add("desc.setImmutable(true);");
-         } else if (xsType.getType() == XSType.DECIMAL) {
-             jsc.add("desc.setHandler( new DecimalFieldHandler(");
-             jsc.append("handler));");
-             jsc.add("desc.setImmutable(true);");
-         }
-          //--We need to handle NMTOKENS with the CollectionFieldHandler
-          else if (member.getSchemaType().getType() == XSType.COLLECTION) {
-              jsc.add("desc.setHandler( new CollectionFieldHandler(");
-              jsc.append("handler));");
-          }
-          //IDREFS?
+        } 
+        else if (xsType.getType() == XSType.DECIMAL) {
+            jsc.add("desc.setHandler( new DecimalFieldHandler(");
+            jsc.append("handler));");
+            jsc.add("desc.setImmutable(true);");
+        }
+        //-- We need to handle NMTOKENS and IDREFS with the 
+        //-- CollectionFieldHandler
+        else if (member.getSchemaType().getType() == XSType.COLLECTION) {
+            
+            switch (xsType.getType()) {
+                case XSType.NMTOKEN:
+                case XSType.NMTOKENS:
+                case XSType.IDREF:
+                case XSType.IDREFS:
+                    jsc.add("desc.setHandler( new CollectionFieldHandler(");
+                    jsc.append("handler));");
+                    break;
+                default:
+                    jsc.add("desc.setHandler(handler);");
+                    break;
+            }
+        }
+        else jsc.add("desc.setHandler(handler);");
+        
+        //-- namespace
+        if (nsURI != null) {
+            jsc.add("desc.setNameSpaceURI(\"");
+            jsc.append(nsURI);
+            jsc.append("\");");
+        }
 
-          else jsc.add("desc.setHandler(handler);");
-          //-- namespace
-          if (nsURI != null) {
-             jsc.add("desc.setNameSpaceURI(\"");
-             jsc.append(nsURI);
-             jsc.append("\");");
-          }
+        if (member.isRequired()) {
+            jsc.add("desc.setRequired(true);");
+        }
 
-          if (member.isRequired()) {
-              jsc.add("desc.setRequired(true);");
-          }
-
-          //-- mark as multi or single valued for elements
-          if (isElement) {
-             jsc.add("desc.setMultivalued("+member.isMultivalued());
-             jsc.append(");");
-          }
+        //-- mark as multi or single valued for elements
+        if (isElement) {
+            jsc.add("desc.setMultivalued("+member.isMultivalued());
+            jsc.append(");");
+        }
 
 
-          jsc.add("addFieldDescriptor(desc);");
-          jsc.add("");
+        jsc.add("addFieldDescriptor(desc);");
+        jsc.add("");
 
-          //-- Add Validation Code
-          jsc.add("//-- validation code for: ");
-          jsc.append(member.getName());
-          jsc.add("fieldValidator = new FieldValidator();");
-          validationCode(member, jsc);
-          jsc.add("desc.setValidator(fieldValidator);");
-          jsc.add("");
+        //-- Add Validation Code
+        jsc.add("//-- validation code for: ");
+        jsc.append(member.getName());
+        jsc.add("fieldValidator = new FieldValidator();");
+        validationCode(member, jsc);
+        jsc.add("desc.setValidator(fieldValidator);");
+        jsc.add("");
 
     }//--CreateDescriptor
 
