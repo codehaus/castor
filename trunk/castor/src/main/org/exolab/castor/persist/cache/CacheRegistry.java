@@ -88,6 +88,11 @@ public final class CacheRegistry {
     private static final String DEFAULT_CACHE_TYPE = "count-limited";
     
     /**
+     * Default cache capacity (when not specified).
+     */
+    private static final int DEFAULT_CAPACITY = 30;
+    
+    /**
      * Association between {@link Cache} implementation name and cache implementation.
      */
     private static Hashtable  _cacheFactories;
@@ -103,7 +108,7 @@ public final class CacheRegistry {
      * @throws CacheAcquireException A cache of the type specified can not be acquired.
      * @throws InvalidCacheTypeException An invalid cache type has been specified.
      */
-    public static Cache getCache (String cacheType, int capacity) 
+    public static Cache getCache (String cacheType, int capacity, String className) 
     throws CacheAcquireException, InvalidCacheTypeException
     {
         load();
@@ -112,9 +117,15 @@ public final class CacheRegistry {
         
         // still assume that a user does not have to specify a cache type 
         // in the mapping file. for such a case, we still set the default 
-        // value to be "count-limited". 
+        // value to be "count-limited" and the default capacity to 0. 
         if (cacheType == null || cacheType == "") {
         	cacheType = DEFAULT_CACHE_TYPE;
+        	capacity = DEFAULT_CAPACITY;
+        }
+        
+        // if no capacity is specified, set it to default capacity.
+        if (capacity == 0) {
+            capacity = DEFAULT_CAPACITY;
         }
         
         CacheFactory cacheFactory = (CacheFactory) _cacheFactories.get (cacheType);
@@ -123,6 +134,12 @@ public final class CacheRegistry {
             cache = cacheFactory.getCache();
             cache.setCacheType (cacheType);
             cache.setCapacity (capacity);
+            cache.setClassName (className);
+        }
+        
+        if (_log.isDebugEnabled()) {
+            _log.debug ("Successfully instantiated '" + cache.getCacheType() + 
+                        "' cache instance [" + cache.getCapacity() + "/" + cache.getClassName() + "]");
         }
         
         return cache;
