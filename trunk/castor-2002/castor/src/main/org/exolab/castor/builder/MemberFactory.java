@@ -244,8 +244,8 @@ public class MemberFactory {
     {
 
         //-- check whether this should be a Vector or not
-        int maxOccurs = element.getMaximumOccurance();
-        int minOccurs = element.getMinimumOccurance();
+        int maxOccurs = element.getMaxOccurs();
+        int minOccurs = element.getMinOccurs();
 
         ElementDecl eDecl = element;
 

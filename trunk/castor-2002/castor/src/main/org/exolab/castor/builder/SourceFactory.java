@@ -670,8 +670,10 @@ public class SourceFactory  {
 
             Structure struct = (Structure)enum.nextElement();
             switch(struct.getStructureType()) {
+                
+                //-- handle element declarations
                 case Structure.ELEMENT:
-
+                {
                     ElementDecl eDecl = (ElementDecl)struct;
                     
 					//-- Output source for element definition?
@@ -709,6 +711,8 @@ public class SourceFactory  {
                                                          state);
                     handleField(fieldInfo, state);
                     break;
+                }
+                //-- handle groups
                 case Structure.GROUP:
                     processContentModel((Group)struct, state);
                     break;

@@ -59,10 +59,32 @@ import java.util.Vector;
 public class ClassInfo extends XMLInfo {
     
     
+    /** 
+     * The compositor value that indicates that all fields are
+     * required, but order is not important.
+     * <I>default</I>
+    **/ 
+    public static final int ALL    = 0;
+    
+    /**
+     * The compositor value that indicates that only one 
+     * field may be present
+    **/
+    public static final int CHOICE = 1;
+    
+    /** 
+     * The compositor value that indicates that all fields are
+     * required and order is important
+    **/ 
+    public static final int SEQUENCE = 2;
+    
     private Vector atts     = null;
     private Vector elements = null;
     
     private FieldInfo textField = null;
+    
+    
+    private int _compositor = ALL;
     
     /**
      * A reference to the JClass that this ClassInfo describes
@@ -203,5 +225,46 @@ public class ClassInfo extends XMLInfo {
     public FieldInfo getTextField() {
         return textField;
     } //-- getTextField
+    
+
+    /**
+     * Returns true if the compositor of this ClassInfo is a choice
+     * @return true if the compositor of this ClassInfo is a choice
+    **/
+    public boolean isChoice() {
+        return (_compositor == CHOICE);
+    } //-- isChoice
+
+    /**
+     * Returns true if the compositor of this ClassInfo is a sequence
+     * @return true if the compositor of this ClassInfo is a sequence
+    **/
+    public boolean isSequence() {
+        return (_compositor == SEQUENCE);
+    } //-- isSequence
+    
+    /**
+     * Sets the compositor for the fields of this class to
+     * be "all".
+    **/
+    public void setAsAll() {
+        this._compositor = ALL;
+    } //-- setAsAll
+    
+    /**
+     * Sets the compositor for the fields of this class to
+     * be a choice
+    **/
+    public void setAsChoice() {
+        this._compositor = CHOICE;
+    } //-- setAsChoice
+    
+    /**
+     * Sets the compositor for the fields of this class to
+     * be a sequence
+    **/
+    public void setAsSequence() {
+        this._compositor = SEQUENCE;
+    } //-- setAsSequence
     
 } //-- ClassInfo
