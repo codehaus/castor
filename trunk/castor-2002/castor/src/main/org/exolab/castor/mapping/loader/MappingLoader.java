@@ -248,6 +248,8 @@ public abstract class MappingLoader
     }
 
 
+private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
+
     /**
      * Loads the mapping from the specified input source. This method
      * loads the mapping objects from the specified input source.
@@ -263,6 +265,17 @@ public abstract class MappingLoader
         Unmarshaller unm;
         
         unm = new Unmarshaller( Mapping.class );
+
+        if ( _cdr == null ) {
+            org.exolab.castor.xml.XMLMappingLoader xml;
+
+            _cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
+            xml = new org.exolab.castor.xml.XMLMappingLoader( _loader );
+            xml.loadMapping( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) );
+            _cdr.setMappingLoader( xml );
+        }
+        unm.setResolver( _cdr );
+
         try {
             unm.setEntityResolver( _resolver );
             if ( _logWriter != null )
@@ -551,6 +564,7 @@ public abstract class MappingLoader
         Class        fieldType = null;
         Class        colType = null;
         FieldHandler handler;
+        String       fieldName;
 
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. If the field is declared as a collection, grab
@@ -581,24 +595,29 @@ public abstract class MappingLoader
                     fieldType = getMethod.getReturnType();
             }
             if ( fieldMap.getSetMethod() != null ) {
-                setMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
-                                          ( colType == null ? fieldType : colType ), true );
+                setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
+                                          ( colType == null ? fieldType : colType ), false );
                 if ( fieldType == null )
                     fieldType = setMethod.getParameterTypes()[ 0 ];
             }
             typeInfo = getTypeInfo( fieldType, colType, fieldMap );
-            handler = new FieldHandlerImpl( fieldMap.getName(), getMethod, setMethod, typeInfo );
+
+            fieldName = fieldMap.getName();
+            if ( fieldName == null )
+                fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
+            handler = new FieldHandlerImpl( fieldName, getMethod, setMethod, typeInfo );
         } else {
             // No accessor, map field directly.
             Field field;
             
-            field = findField( javaClass, fieldMap.getName(), ( colType == null ? fieldType : colType ) );
+            fieldName = fieldMap.getName();
+            field = findField( javaClass, fieldName, ( colType == null ? fieldType : colType ) );
             if ( fieldType == null )
                 fieldType = field.getType();
             typeInfo = getTypeInfo( fieldType, colType, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
         }
-        return new FieldDescriptorImpl( fieldMap.getName(), typeInfo, handler, false );
+        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
     }
 
 
@@ -704,8 +723,9 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.accessorNotAccessible",
                                             methodName, javaClass.getName() );
             return method;
-        } catch ( NoSuchMethodException except ) {
-        } catch ( SecurityException except ) {
+        } catch ( MappingException except ) {
+            throw except;
+        } catch ( Exception except ) {
         }
         // No such/access to method
         throw new MappingException( "mapping.accessorNotAccessible",
