@@ -51,6 +51,7 @@ import org.exolab.castor.util.ObjectFactory;
 import org.exolab.castor.util.DefaultObjectFactory;
 import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.List;
+import org.exolab.castor.xml.descriptors.PrimitivesClassDescriptor;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ClassDescriptor;
@@ -1285,12 +1286,23 @@ public final class UnmarshalHandler extends MarshalFramework
 
             _topState.fieldDesc = fieldDesc;
             //-- look for XMLClassDescriptor if null
+            //-- always check resolver first
             if (classDesc == null)
                 classDesc = getClassDescriptor(_topClass);
+                
+            //-- check for top-level primitives 
+            if (classDesc == null) {
+                if (isPrimitive(_topClass)) {
+                    classDesc = new PrimitivesClassDescriptor(_topClass);
+                    fieldDesc.setIncremental(false);
+                    _topState.primitiveOrImmutable = true;
+                }
+            }
+            
             fieldDesc.setClassDescriptor(classDesc);
             if (classDesc == null) {
                 //-- report error
-			    if ((!_topClass.isPrimitive()) &&
+			    if ((!isPrimitive(_topClass)) &&
                     (!Serializable.class.isAssignableFrom( _topClass )))
                     throw new SAXException(MarshalException.NON_SERIALIZABLE_ERR);
                 else {
@@ -1302,7 +1314,7 @@ public final class UnmarshalHandler extends MarshalFramework
             _topState.classDesc = classDesc;
             _topState.type = _topClass;
 
-            if (_topObject == null) {
+            if  ((_topObject == null) && (!_topState.primitiveOrImmutable)) {
                 // Retrieving the xsi:type attribute, if present
                 String topPackage = getJavaPackage(_topClass);
                 String instanceClassname = getInstanceType(atts, topPackage);
@@ -1350,16 +1362,20 @@ public final class UnmarshalHandler extends MarshalFramework
             else {
                 _topState.object = _topObject;
             }
-            //--The top object has just been initialized
-            //--notify the listener
-            if ( _unmarshalListener != null )
-                _unmarshalListener.initialized(_topState.object);
+            
             _stateInfo.push(_topState);
-            processAttributes(atts, classDesc);
-             if ( _unmarshalListener != null )
-                _unmarshalListener.attributesProcessed(_topState.object);
-
-            processNamespaces(classDesc);
+            
+            if (!_topState.primitiveOrImmutable) {
+                //--The top object has just been initialized
+                //--notify the listener
+                if ( _unmarshalListener != null )
+                    _unmarshalListener.initialized(_topState.object);
+                    
+                processAttributes(atts, classDesc);
+                if ( _unmarshalListener != null )
+                    _unmarshalListener.attributesProcessed(_topState.object);
+                processNamespaces(classDesc);
+            }
             return;
         } //--rootElement
 
