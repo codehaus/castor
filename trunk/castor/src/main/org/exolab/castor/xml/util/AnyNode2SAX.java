@@ -47,11 +47,12 @@
 
 package org.exolab.castor.xml.util;
 
+import java.util.HashSet;
+
 import org.xml.sax.DocumentHandler;
 
 import org.exolab.castor.xml.EventProducer;
 import org.exolab.castor.types.AnyNode;
-import org.exolab.castor.util.Stack;
 import org.exolab.castor.xml.Namespaces;
 
 import org.xml.sax.helpers.AttributeListImpl;
@@ -77,7 +78,7 @@ public class AnyNode2SAX implements EventProducer {
    /**
     * The stack to store the elements
     */
-    private Stack _elements;
+    private HashSet _elements;
 
     /**
      * The namespace context
@@ -91,8 +92,8 @@ public class AnyNode2SAX implements EventProducer {
 
 
     public AnyNode2SAX() {
-        _elements = new Stack();
-    }
+		_elements = new HashSet();
+	}
 
 
     /**
@@ -152,12 +153,12 @@ public class AnyNode2SAX implements EventProducer {
             throw new IllegalArgumentException();
         }
 
-        //-- add object to stack so we don't potentially get into
-        //-- an endlessloop
-        if (_elements.search(node) >= 0) return;
-        else _elements.push(node);
+		//-- so we don't potentially get into
+		//-- an endlessloop
+		if (!_elements.add(node)) return;
 
-        if (node.getNodeType() == AnyNode.ELEMENT) {
+        if (node.getNodeType() == AnyNode.ELEMENT) 
+		{
             //the first sibling node of the current one
             AnyNode siblingNode = node.getNextSibling();
 
