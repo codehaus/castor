@@ -2,12 +2,16 @@
 Version (CVS)
 -------------
 
+XML:    Removed a dependency to xerces jar in Configuration.java (Patch submitted by
+        Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM> and committed by
+        Sebastien Gignoux <gignoux@intalio.com>)
+
 XML: 	Fix a bug in the validation framework. (Arnaud)
 
 XML:	Supports the <any> element in the Source Generator.(Arnaud)
 
 XML:	Support the wildcards <any> and <anyAttribute> in the Schema Object Model.
-	(Arnaud)
+        (Arnaud)
 
 XML:    Added object container support. Handle element and attributes, as well
         as container in container. Object container are object that exist in the
@@ -15,6 +19,7 @@ XML:    Added object container support. Handle element and attributes, as well
         will be no element associated to this object, but its child will appear
         in its parent element.
         (Sebastien Gignoux <gignoux@intalio.com>)
+
 
 Version 0.9.2 March 28, 2001 - also includes version 0.9.1
 ----------------------------------------------------------
