@@ -153,14 +153,17 @@ public class SourceFactory  {
         }
         else {
             Datatype datatype = element.getDatatype();
-            if (datatype != null)
+            if (datatype != null) {
                 classInfo.setSchemaType(TypeConversion.convertType(datatype));
+                
+                //-- handle our special case for enumerated types
+                if (datatype.hasFacet(Facet.ENUMERATION)) {
+                    createSourceCode(datatype, state, state.packageName);
+                }
+            }
             else
                 classInfo.setSchemaType(new XSClass(state.jClass));
-                
-            if (!(datatype instanceof BuiltInType)) {
-                createSourceCode(datatype, state, state.packageName);
-            }
+            
         }
         
         //-- add imports required by the marshal methods

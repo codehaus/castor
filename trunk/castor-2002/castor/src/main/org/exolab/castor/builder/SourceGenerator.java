@@ -492,14 +492,13 @@ public class SourceGenerator {
         if (datatype == null) return;
 
         String packageName = sInfo.packageName;
-        //-- modify package name so we don't have
-        //-- name collisions, since XML Schema uses
-        //-- separate namespaces for elements and datatypes
-        if (packageName == null) packageName = "types";
-        else packageName += ".types";
 
-        if (! (datatype instanceof BuiltInType) ) {
-
+        //-- Right now the only time we actually
+        //-- generate source for a datatype is
+        //-- when it's an enumeration
+        //if (! (datatype instanceof BuiltInType) ) {
+        if (datatype.hasFacet(Facet.ENUMERATION)) {    
+            
             ClassInfo classInfo = sInfo.resolve(datatype);
 
             if (classInfo == null) {
