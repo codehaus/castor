@@ -2,10 +2,7 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
-    <section title="Version 0.8.8  June 2, 2000"><pre>
-JDO:	 Cache control at JDO configuration and mapping file specification - 
-	 no-cache option, cache count limit, cache time limit, LRU removal 
-	 deamon (Thomas Yip &lt;yip@intalio.com&gt;)
+    <section title="Version 0.8.8  June 13, 2000"><pre>
 
 JDO:     Fixes multiple request of same object with DBLocked
 	 (Oleg Nitz and Markus Fritz)
@@ -16,6 +13,10 @@ JDO:	 Hypersonic SQL driver
 JDO:	 Changes to Persistent interface enable developer to use database 
 	 operations inside jdoStore, jdoCreate, jdoRemove.
 	 (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:	 Cache control at JDO configuration and mapping file specification - 
+	 no-cache option, cache count limit, cache time limit, LRU removal 
+	 deamon (Thomas Yip &lt;yip@intalio.com&gt;)
 
 JDO:	 Bug fix: for created objects fetch() returned oid instead of object 
 	 (contributed by Chris Stevenson &lt;chris@ssabsa.sa.gov.au&gt;)
