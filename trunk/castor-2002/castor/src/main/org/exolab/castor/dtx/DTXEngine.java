@@ -66,7 +66,13 @@ import org.exolab.castor.xml.schema.reader.*;
  * An OQL query engine for hitting JDO data sources and generating SAX
  * events. It skips the intermediate Java class step used by
  * e.g. Castor JDO.
+ * 
+ * The engine uses the SQL and XML descriptions in an XML Schema file
+ * and a Castor JDO mapping file to determine how to map results of
+ * the query into SAX events.
  *
+ * @author <a href="0@exoffice.com">Evan Prodromou</a> 
+ * @version $Revision$ $Date$
  */
 
 public class DTXEngine {
@@ -81,8 +87,20 @@ public class DTXEngine {
     protected Connection _conn = null;
     protected PersistenceFactory _factory = null;
 
+    /**
+     * Default constructor.
+     */
+
     public DTXEngine() {
     }
+
+    /**
+     * Construct a DTXEngine for the given JDO mapping file and
+     * XML schema.
+     * 
+     * @param databaseURL URL string for JDO mapping file.
+     * @param schemaURL URL string for XML Schema file.
+     */
 
     public DTXEngine(String databaseURL, String schemaURL) 
 	throws DTXException
@@ -90,6 +108,11 @@ public class DTXEngine {
 	setDatabase(databaseURL);
 	setSchema(schemaURL);
     }
+
+    /**
+     * Sets the XML Schema to use. Parses and prepares the Schema.
+     * 
+     * @param schemaURL URL string for XML Schema file.  */
 
     public void setSchema(String schemaURL) {
 	_schemaURL = schemaURL;
@@ -124,6 +147,12 @@ public class DTXEngine {
         
         _schema = schemaUnmarshaller.getSchema();
     }
+
+    /**
+     * Sets the database options from a JDO database mapping file.
+     * 
+     * @param databaseURL URL string for JDO database mapping file.
+     */
 
     public void setDatabase(String databaseURL) throws DTXException {
 	_databaseURL = databaseURL;
@@ -183,13 +212,39 @@ public class DTXEngine {
  	}
     }
 
+    /**
+     * Sets the log writer for this DTX engine. Individual
+     * queries will use this writer by default, but it can be
+     * overwritten on a per-query basis.
+     * 
+     * @param logWriter A PrintWriter to use for logging.
+     */
+
     public void setLogWriter(PrintWriter logWriter) {
 	_logWriter = logWriter;
     }
 
+    /**
+     * Sets the default SAX document handler for this DTX
+     * engine. Individual queries will use this handler by default,
+     * but it can be overwritten on a per-query basis.
+     * 
+     * @param handler A DocumentHandler to receive query results as
+     * SAX events.
+     */
+
     public void setDocumentHandler(DocumentHandler handler) {
 	_handler = handler;
     }
+
+    /**
+     * Prepare a new DTXQuery object, given an OQL string. The syntax
+     * is currently limited only to SELECT statements that return a
+     * single object type (although multiple results will appear as
+     * multiple documents to the DocumentHandler).
+     * 
+     * @param oql OQL string for the query. 
+     */
 
     public DTXQuery prepareQuery(String oql) throws DTXException {
 
@@ -204,17 +259,29 @@ public class DTXEngine {
 
     /* Package scope -- for DTXQuery */
 
+    /* Returns the Database mapping information. */
+
     Database getDatabase() {
 	return _database;
     }
+
+    /* Returns the parsed XML Schema. */
 
     Schema getSchema() {
 	return _schema;
     }
 
+    /* The Castor persistence factory for this engine, derived from
+       the Database mapping. This is used to create new
+       QueryExpression (an abstraction of a SQL query). */
+
     PersistenceFactory getFactory() {
 	return _factory;
     }
+
+    /* Get a (single) connection from this engine. Yes, this needs
+       serious re-work. It should be re-written to work with the JDO
+       and/or Tyrex pooling mechanism. */
 
     Connection getConnection() throws DTXException {
 	if (_conn == null) {
@@ -222,6 +289,7 @@ public class DTXEngine {
 	    org.exolab.castor.jdo.conf.Driver driver = _database.getDriver();
 
 	    if (datasource != null) {
+		// FIXME: lame
 		throw new DTXException("dtx.DataSourceUnimplemented");
 	    } else if (driver != null) {
 		try {
@@ -244,6 +312,8 @@ public class DTXEngine {
 	}
 	return _conn;
     }
+
+    /* Return a class mapping based on the class name. */
 
     ClassMapping getClassMapping(String className) {
 	return (ClassMapping) _classMappings.get(className);
