@@ -84,8 +84,11 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
     private final int _sqlType;
 
-    
+
     private int _increment;
+
+
+    private boolean _triggerPresent;
 
 
     /**
@@ -97,6 +100,8 @@ public final class SequenceKeyGenerator implements KeyGenerator
     {
         String fName = factory.getFactoryName();
         boolean returning = "true".equals( params.getProperty("returning") );
+        _triggerPresent = "true".equals( params.getProperty("trigger","false") );
+
 
         if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) && ! fName.equals( "interbase" ) && ! fName.equals( "sapdb" ) ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
@@ -111,8 +116,13 @@ public final class SequenceKeyGenerator implements KeyGenerator
         _seqName = params.getProperty("sequence", "{0}_seq");
         _style = ( fName.equals( "postgresql" ) || fName.equals("interbase") ? BEFORE_INSERT :
                                    ( returning  ? DURING_INSERT : AFTER_INSERT) );
+
+        if (_triggerPresent && _style==BEFORE_INSERT)
+            throw new MappingException( Messages.format( "mapping.keyGenParamNotCompat",
+                                        "trigger=\"true\"", getClass().getName(), fName ) );
+
         _sqlType = sqlType;
-        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL) 
+        if (sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
         try {
@@ -183,7 +193,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
 
     /**
-     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ?
      */
     public byte getStyle() {
         return _style;
@@ -237,20 +247,22 @@ public final class SequenceKeyGenerator implements KeyGenerator
                                                          insert ) );
         }
         sb = new StringBuffer( insert );
-        if ( lp2 < 0 ) {
-            // Only one pk field in the table, the INSERT statement would be
-            // INSERT INTO table VALUES ()
-            lp2 = lp1;
-            lp1 = insert.indexOf( " VALUES " );
-            // don't change the order of lines below,
-            // otherwise index becomes invalid
-            sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ));
-            sb.insert( lp1 + 1, "(" + _factory.quoteName( primKeyName ) + ") " );
-        } else {
-            // don't change the order of lines below,
-            // otherwise index becomes invalid
-            sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
-            sb.insert( lp1 + 1, _factory.quoteName( primKeyName ) + "," );
+        if (!_triggerPresent) { // if no onInsert triggers in the DB, we have to supply the Key values manually
+           if ( lp2 < 0 ) {
+                // Only one pk field in the table, the INSERT statement would be
+                // INSERT INTO table VALUES ()
+                lp2 = lp1;
+                lp1 = insert.indexOf( " VALUES " );
+                // don't change the order of lines below,
+                // otherwise index becomes invalid
+                sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ));
+                sb.insert( lp1 + 1, "(" + _factory.quoteName( primKeyName ) + ") " );
+            } else {
+                // don't change the order of lines below,
+                // otherwise index becomes invalid
+                sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
+                sb.insert( lp1 + 1, _factory.quoteName( primKeyName ) + "," );
+            }
         }
         if ( _style == DURING_INSERT ) {
             // append 'RETURNING primKeyName INTO ?'
