@@ -77,9 +77,8 @@ public interface LogInterceptor
      * @param objClass The type of the object
      * @param identity The object identity
      */
-    public void loading( Class objClass, Object identity );
-
-
+    public void loading( Object objClass, Object identity );
+    
     /**
      * Called to indicate that an object of the given type and identity
      * is about to be created in persistent storage.
@@ -92,7 +91,7 @@ public interface LogInterceptor
      * @param objClass The type of the object
      * @param identity The object identity
      */
-    public void creating( Class objClass, Object identity );
+    public void creating( Object objClass, Object identity );
 
 
     /**
@@ -107,7 +106,7 @@ public interface LogInterceptor
      * @param objClass The type of the object
      * @param identity The object identity
      */
-    public void removing( Class objClass, Object identity );
+    public void removing( Object objClass, Object identity );
 
 
     /**
@@ -122,7 +121,7 @@ public interface LogInterceptor
      * @param objClass The type of the object
      * @param identity The object identity
      */
-    public void storing( Class objClass, Object identity );
+    public void storing( Object objClass, Object identity );
 
 
     /**
