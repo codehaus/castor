@@ -60,8 +60,8 @@ public abstract class Facet extends Annotated {
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
-    public static final String MAX_LENGTH       = "maxlength";
-    public static final String MIN_LENGTH       = "minlength";
+    public static final String MAX_LENGTH       = "maxLength";
+    public static final String MIN_LENGTH       = "minLength";
     
     /**
      * The character value of this Facet

@@ -59,10 +59,10 @@ public class SchemaNames {
     //-- element definitions
     public static final String ANNOTATION       = "annotation";
     public static final String APPINFO          = "appinfo";
-    public static final String COMPLEXTYPE      = "complextype";
+    public static final String COMPLEXTYPE      = "complexType";
     public static final String ATTRIBUTE        = "attribute";
     public static final String SIMPLETYPE_REF   = "simpletypeRef";
-    public static final String SIMPLETYPE       = "simpletype";
+    public static final String SIMPLETYPE       = "simpleType";
     public static final String ELEMENT          = "element";
     public static final String ENUMERATION      = "enumeration";
     public static final String GROUP            = "group";
