@@ -96,7 +96,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.9.3";
+    static final String version = "0.9.3.9+";
 
     /**
      * The application URI
@@ -721,6 +721,15 @@ public class SourceGenerator {
         while (structures.hasMoreElements())
             createClasses((ModelGroup)structures.nextElement(), sInfo);
 
+        //-- clean up any remaining JClasses which need printing
+        Enumeration keys = sInfo.keys();
+        while (keys.hasMoreElements()) {
+            ClassInfo cInfo = sInfo.resolve(keys.nextElement());
+            JClass jClass = cInfo.getJClass();
+            if (!sInfo.processed(jClass)) {
+                processJClass(jClass, sInfo);
+            }
+        }
 
     } //-- createClasses
 
@@ -758,7 +767,7 @@ public class SourceGenerator {
                  processComplexType((ComplexType)xmlType, sInfo);
 
             for (int i = 0; i < classes.length; i++)
-                 processJClass(classes[i], sInfo);
+                processJClass(classes[i], sInfo);
 
         }
         //-- SimpleType
