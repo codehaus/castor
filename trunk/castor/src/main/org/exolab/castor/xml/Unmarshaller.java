@@ -221,6 +221,9 @@ public class Unmarshaller {
         initConfig();
         this._class = c;
         _loader = loader;
+        if ((loader == null) && (c != null)) {
+            _loader = c.getClassLoader();
+        }
         _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)
 
