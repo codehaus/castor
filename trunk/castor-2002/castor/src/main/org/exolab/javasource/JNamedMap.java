@@ -42,42 +42,50 @@
  *
  * $Id$
  */
-
-
 package org.exolab.javasource;
-
 
 import java.util.Vector;
 
 /**
- * A simple String to Object mapping which preserves order
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * A simple String to Object mapping which preserves order.
+ *
+ * <BR/>
+ * <B>Note:</B>
+ * This class is not synchronized. So be careful. :-)
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
 **/
 public class JNamedMap {
-    
+
     private Vector names = null;
     private Vector objects = null;
-    
+
     /**
      * Creates a new JNamedMap
     **/
     public JNamedMap() {
-        names = new Vector();
+
+        names   = new Vector();
         objects = new Vector();
+
     } //-- JNamedMap
 
     /**
-     * Creates a new JNamedMap with the given size
+     * Creates a new JNamedMap with the given size.
+     *
      * @param size the initial size for this NamedMap
     **/
     public JNamedMap(int size) {
-        names = new Vector(size);
+
+        names   = new Vector(size);
         objects = new Vector(size);
+
     } //-- JNamedMap
-    
+
     
     /**
-     * Returns the Object associated with the given name
+     * Returns the Object associated with the given name.
+     *
      * @param name the name to search for
      * @return the Object associated with the given name
     **/
@@ -86,9 +94,10 @@ public class JNamedMap {
         if (i >= 0) return objects.elementAt(i);
         return null;
     } //-- get
-    
+
     /**
-     * Returns the Object at the given index
+     * Returns the Object at the given index.
+     *
      * @param index the index of the Object to return
      * @return the Object at the given index
     **/
@@ -100,6 +109,7 @@ public class JNamedMap {
     
     /**
      * Returns the name associated with the given Object
+     *
      * @param obj the Object to search for
      * @return the name of the given Object
     **/
@@ -108,26 +118,29 @@ public class JNamedMap {
         if (i >= 0) return (String)names.elementAt(i);
         return null;
     } //-- getNameByObject
-    
+
     /**
      * Return a Vector of names
+     *
      * @return a Vector of names
     **/
     public Vector getNames() {
         return (Vector)names.clone();
     } //-- getNames
-    
+
     /**
-     * @return a Vector of Objects
+     * Return a Vector of Objects
+     *
      * @return a Vector of Objects
     **/
     public Vector getObjects() {
         return (Vector)objects.clone();
     } //-- getObjects
-    
+
     /**
      * Returns the index of the Object which has been 
      * mapped (associated) with the given name
+     *
      * @return the index of the Object which has been mapped (associated)
      * to the given name
     **/
@@ -140,14 +153,17 @@ public class JNamedMap {
         return -1;
         
     } //-- indexOf
-    
+
     /**
      * Maps (associates) an Object with a name
+     *
      * @param name the name to associate with the given Object
      * @param obj the Object to be mapped
     **/
     public void put(String name, Object obj) {
+
         int idx = indexOf(name);
+        
         if (idx >= 0) objects.setElementAt(obj, idx);
         else {
             //-- we may need some synchronization here
@@ -156,15 +172,50 @@ public class JNamedMap {
             objects.addElement(obj);
         }
     } //-- put
-    
+
+    /**
+     * Removes and returns the Object located at the given index
+     *
+     * @param name the name of the Object to remove
+     * @return the object removed from the map.
+    **/
+    public Object remove(int index) 
+        throws IndexOutOfBoundsException
+    {
+        Object obj = objects.elementAt(index);
+        objects.removeElementAt(index);
+        names.removeElementAt(index);
+        return obj;
+    } //-- remove
+
+    /**
+     * Removes and returns the Object associated with the given name
+     *
+     * @param name the name of the Object to remove
+     * @return the object removed from the map.
+    **/
+    public Object remove(String name) {
+
+        Object obj = null;
+        
+        int idx = indexOf(name);
+        if (idx >= 0) {
+            obj = objects.elementAt(idx);
+            objects.removeElementAt(idx);
+            names.removeElementAt(idx);
+        }
+        return obj;
+    } //-- remove
+
     /**
      * Returns the number of Object associations currently in
      * this named map
+     *
      * @return the number of Object associations currently in
      * this named map
     **/
     public int size() {
         return names.size();
     } //-- size
-    
+
 } //-- JNamedMap
