@@ -132,7 +132,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         //-- use
         String use = atts.getValue(SchemaNames.USE_ATTR);
         if (use != null) {
-            if (_attribute.isDefault() && (use != AttributeDecl.USE_OPTIONAL) )
+            if (_attribute.isDefault() && (!use.equals(AttributeDecl.USE_OPTIONAL)) )
                 throw new IllegalArgumentException("When 'default' is present, the 'use' attribute must have the value 'optional'.");
            _attribute.setUse(use);
         }
