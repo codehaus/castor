@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML: Added code from Matt Small [msmall@clickability.com] that improves the
+     SchemaWriter support (Arnaud)
+
 XML: Fixed bug in the generated descriptors to correctly generate validation code when
      collections are used.
      (Reported by Dr. Louis Coetzee [lcoetzee@subversion.icomtek.csir.co.za]) (Arnaud)
