@@ -275,6 +275,11 @@ public class Marshaller extends MarshalFramework {
     private Serializer       _serializer   = null;
 
     /**
+     * A flag to allow suppressing namespaces
+     */
+    private boolean _suppressNamespaces = false;
+    
+    /**
      * A flag to allow suppressing the xsi:type attribute
      */
     private boolean _suppressXSIType = false;
@@ -463,15 +468,44 @@ public class Marshaller extends MarshalFramework {
         }
     } //-- setDoctype
 
+    
     /**
      * Sets whether or not to marshal as a document which includes
      * the XML declaration, and if necessary the DOCTYPE declaration.
      * By default the Marshaller will marshal as a well formed
-     * XML fragment (no XML declaration or DOCTYPE).
+     * XML document including the XML Declaration.
+     * 
+     * If the given boolean is true, the Marshaller will marshal 
+     * as a well formed XML fragment (no XML declaration or DOCTYPE).
+     * 
+     * This method is basically the same as calling 
+     * #setMarshalAsDocument(false);
+     * 
+     * @param supressXMLDeclaration a boolean that when true
+     * includes that generated XML should not contain 
+     * the XML declaration.
+     * @see #setMarshalAsDocument
+     */
+    public void setSupressXMLDeclaration(boolean supressXMLDeclaration) {
+        setMarshalAsDocument(!supressXMLDeclaration);
+    } //-- setSupressXMLDeclaration
+    
+    /**
+     * Sets whether or not to marshal as a document which includes
+     * the XML declaration, and if necessary the DOCTYPE declaration.
+     * By default the Marshaller will marshal as a well formed
+     * XML document including the XML Declaration.
+     * 
+     * If the given boolean is false, the Marshaller will marshal 
+     * as a well formed XML fragment (no XML declaration or DOCTYPE).
      *
+     * This method is basically the same as calling 
+     * #setSupressXMLDeclaration(true);
+     * 
      * @param asDocument a boolean, when true, indicating to marshal
      * as a complete XML document.
-    **/
+     * @see #setSupressXMLDeclaration
+     */
     public void setMarshalAsDocument(boolean asDocument) {
 
         _asDocument = asDocument;
@@ -1117,44 +1151,54 @@ public class Marshaller extends MarshalFramework {
         //------------------------/
         
         //-- Set a new namespace scoping
+        //-- Note: We still need to declare a new scope even if
+        //-- we are suppressing most namespaces. Certain elements
+        //-- like xsi:type and xsi:nil will require a namespace 
+        //-- declaration and cannot be suppressed.
         if (!atRoot) {
             _namespaces = _namespaces.createNamespaces();
         }
         
-        //-- Must be done before any attributes are processed
-        //-- since attributes can be namespaced as well.
-
-        String nsPrefix = descriptor.getNameSpacePrefix();
-        if (nsPrefix == null) nsPrefix = classDesc.getNameSpacePrefix();
-
-        String nsURI = descriptor.getNameSpaceURI();
-        if (nsURI == null) nsURI = classDesc.getNameSpaceURI();
-
-        if ((nsURI == null) && (nsPrefix != null)) {
-            nsURI = _namespaces.getNamespaceURI(nsPrefix);
+        String nsPrefix = "";
+        String nsURI = "";
+        
+        if (!_suppressNamespaces) {
+        
+            //-- Must be done before any attributes are processed
+            //-- since attributes can be namespaced as well.
+    
+            nsPrefix = descriptor.getNameSpacePrefix();
+            if (nsPrefix == null) nsPrefix = classDesc.getNameSpacePrefix();
+    
+            nsURI = descriptor.getNameSpaceURI();
+            if (nsURI == null) nsURI = classDesc.getNameSpaceURI();
+    
+            if ((nsURI == null) && (nsPrefix != null)) {
+                nsURI = _namespaces.getNamespaceURI(nsPrefix);
+            }
+            else if ((nsPrefix == null) && (nsURI != null)) {
+                nsPrefix = (String) _namespaces.getNamespacePrefix(nsURI);
+            }
+            //-- declare namespace at this element scope?
+            if (nsURI != null) {
+                String defaultNamespace = _namespaces.getNamespaceURI("");
+    		    if ((nsPrefix == null) && (!nsURI.equals(defaultNamespace)))
+    		    {
+    		        if ((defaultNamespace == null) && atRoot) {
+    		            nsPrefix = "";
+    		        }
+    		        else nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
+    		    }
+    			declareNamespace(nsPrefix, nsURI);
+    		}
+    		else {
+                nsURI = "";
+    		    //-- redeclare default namespace as empty
+    		    String defaultNamespace = _namespaces.getNamespaceURI("");
+    		    if ((defaultNamespace != null) && (!"".equals(defaultNamespace)))
+    		        _namespaces.addNamespace("", "");
+    		}
         }
-        else if ((nsPrefix == null) && (nsURI != null)) {
-            nsPrefix = (String) _namespaces.getNamespacePrefix(nsURI);
-        }
-        //-- declare namespace at this element scope?
-        if (nsURI != null) {
-            String defaultNamespace = _namespaces.getNamespaceURI("");
-		    if ((nsPrefix == null) && (!nsURI.equals(defaultNamespace)))
-		    {
-		        if ((defaultNamespace == null) && atRoot) {
-		            nsPrefix = "";
-		        }
-		        else nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
-		    }
-			declareNamespace(nsPrefix, nsURI);
-		}
-		else {
-            nsURI = "";
-		    //-- redeclare default namespace as empty
-		    String defaultNamespace = _namespaces.getNamespaceURI("");
-		    if ((defaultNamespace != null) && (!"".equals(defaultNamespace)))
-		        _namespaces.addNamespace("", "");
-		}
         
         
 
@@ -1173,15 +1217,18 @@ public class Marshaller extends MarshalFramework {
             for (int i = 0; i < _topLevelAtts.getSize(); i++) {
                 String localName = _topLevelAtts.getName(i);
                 String qName = localName;
-                String ns = _topLevelAtts.getNamespace(i);
-                String prefix = null;
-                if ((ns != null) && (ns.length() > 0)) {
-                    prefix = _namespaces.getNonDefaultNamespacePrefix(ns);
+                String ns = "";
+                if (!_suppressNamespaces) {
+                    ns = _topLevelAtts.getNamespace(i);
+                    String prefix = null;
+                    if ((ns != null) && (ns.length() > 0)) {
+                        prefix = _namespaces.getNonDefaultNamespacePrefix(ns);
+                    }
+                    if ((prefix != null) && (prefix.length() > 0)) {
+                        qName = prefix + ':' + qName;
+                    }
+                    if (ns == null) ns = "";
                 }
-                if ((prefix != null) && (prefix.length() > 0)) {
-                    qName = prefix + ':' + qName;
-                }
-                if (ns == null) ns = "";
                 atts.addAttribute(ns, localName, qName, CDATA,
                     _topLevelAtts.getValue(i));
             }
@@ -1867,6 +1914,20 @@ public class Marshaller extends MarshalFramework {
                 schemaLocation, XSI_NAMESPACE);
         }
     } //-- setSchemaLocation
+    
+    /**
+     * Sets whether or not namespaces are output. By default
+     * the Marshaller will output namespace declarations and
+     * prefix elements and attributes with their respective
+     * namespace prefix. This method can be used to prevent
+     * the usage of namespaces.
+     * 
+     * @param suppressNamespaces a boolean that when true
+     * will prevent namespaces from being output.
+     */
+    public void setSuppressNamespaces(boolean suppressNamespaces) {
+        _suppressNamespaces = suppressNamespaces;
+    } //-- setSuppressNamespaces
 
     /**
      * Sets whether or not the xsi:type attribute should appear
@@ -1944,14 +2005,16 @@ public class Marshaller extends MarshalFramework {
         //-- process Namespace nodes from Object Model,
         //-- if necessary.
         if (attDescriptor.getNodeType() == NodeType.Namespace) {
-            Object map = attDescriptor.getHandler().getValue(object);
-            MapHandler mapHandler = MapHandlers.getHandler(map);
-            if (mapHandler != null) {
-                Enumeration keys = mapHandler.keys(map);
-                while (keys.hasMoreElements()) {
-                    Object key = keys.nextElement();
-                    Object val = mapHandler.get(map, key);
-                    declareNamespace(key.toString(), val.toString());
+            if (!_suppressNamespaces) {
+                Object map = attDescriptor.getHandler().getValue(object);
+                MapHandler mapHandler = MapHandlers.getHandler(map);
+                if (mapHandler != null) {
+                    Enumeration keys = mapHandler.keys(map);
+                    while (keys.hasMoreElements()) {
+                        Object key = keys.nextElement();
+                        Object val = mapHandler.get(map, key);
+                        declareNamespace(key.toString(), val.toString());
+                    }
                 }
             }
             return;
@@ -1961,20 +2024,23 @@ public class Marshaller extends MarshalFramework {
         String qName     = localName;
 
         //-- handle attribute namespaces
-        String namespace = attDescriptor.getNameSpaceURI();
-        if ((namespace != null) && (namespace.length() > 0)) {
-            String prefix = attDescriptor.getNameSpacePrefix();
-            if ((prefix == null) || (prefix.length() == 0))
-                prefix = _namespaces.getNonDefaultNamespacePrefix(namespace);
-
-            if ((prefix == null) || (prefix.length() == 0)) {
-                //-- automatically create namespace prefix?
-                prefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
+        String namespace = "";
+        if (!_suppressNamespaces) {
+            namespace = attDescriptor.getNameSpaceURI();
+            if ((namespace != null) && (namespace.length() > 0)) {
+                String prefix = attDescriptor.getNameSpacePrefix();
+                if ((prefix == null) || (prefix.length() == 0))
+                    prefix = _namespaces.getNonDefaultNamespacePrefix(namespace);
+    
+                if ((prefix == null) || (prefix.length() == 0)) {
+                    //-- automatically create namespace prefix?
+                    prefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
+                }
+                declareNamespace(prefix, namespace);
+                qName = prefix + ':' + qName;
             }
-            declareNamespace(prefix, namespace);
-            qName = prefix + ':' + qName;
+            else namespace = "";
         }
-        else namespace = "";
 
         Object value = null;
 
