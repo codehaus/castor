@@ -230,58 +230,71 @@ public class SQLRelationLoader {
 
     public void createRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
-        
-		try {
-			int count = 1;
-			ResultSet rset;
-            PreparedStatement stmt = conn.prepareStatement( select );
+
+        ResultSet rset = null;
+        PreparedStatement selectStatement = null;
+        PreparedStatement insertStatement = null;
+
+        try {
+            int count = 1;
+            selectStatement = conn.prepareStatement( select );
             if ( leftType.length > 1 ) {
                 Complex left = (Complex) leftValue;
                 for ( int i=0; i < left.size(); i++ ) {
-                    stmt.setObject( count, idToSQL( i, left.get(i)), leftType[i] );
+                    selectStatement.setObject( count, idToSQL( i, left.get(i)), leftType[i] );
                     count++;
                 }
             } else {
-                stmt.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
-				count++;
-			}
+                selectStatement.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
+                count++;
+            }
             if ( rightType.length > 1 ) {
                 Complex right = (Complex) rightValue;
                 for ( int i=0; i < right.size(); i++ ) {
-                    stmt.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
-				count++;
-			}
+                    selectStatement.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
+                    count++;
+                }
             } else {
-                stmt.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
+                selectStatement.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
             }
-			count = 1;
-            rset = stmt.executeQuery();
+                        count = 1;
+            rset = selectStatement.executeQuery();
+
+            insertStatement = conn.prepareStatement( insert );
             if ( ! rset.next() ) {
-				stmt = conn.prepareStatement( insert );
                 if ( leftType.length > 1 ) {
                     Complex left = (Complex) leftValue;
                     for ( int i=0; i < left.size(); i++ ) {
-                        stmt.setObject( count, idToSQL( i, left.get(i)), leftType[i] );
+                        insertStatement.setObject( count, idToSQL( i, left.get(i)), leftType[i] );
                         count++;
                     }
                 } else {
-                    stmt.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
-					count++;
-				}
+                    insertStatement.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
+                                        count++;
+                                }
                 if ( rightType.length > 1 ) {
                     Complex right = (Complex) rightValue;
                     for ( int i=0; i < right.size(); i++ ) {
-                        stmt.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
-					count++;
-				}
+                        insertStatement.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
+                                        count++;
+                    }
                 } else {
-                    stmt.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
+                    insertStatement.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
                 }
-				int r = stmt.executeUpdate();
+                int r = insertStatement.executeUpdate();
             } 
         } catch ( SQLException e ) {
-			e.printStackTrace();
+            e.printStackTrace();
             throw new PersistenceException( e.toString() );
+        } finally {
+            try {
+                if ( rset != null )
+                    rset.close();
+                if ( selectStatement != null )
+                    selectStatement.close();
+                if ( insertStatement != null )
+                    insertStatement.close();
+            } catch (SQLException ex) { }
         }
     }
     public void deleteRelation( Connection conn, Object leftValue )
@@ -339,4 +352,3 @@ public class SQLRelationLoader {
     }
 
 }
-
