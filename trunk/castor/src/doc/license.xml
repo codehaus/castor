@@ -3,6 +3,10 @@
   <body>
     <title>The Exolab License</title>
     <header>
+    </header>
+
+    <section title="">
+
     <p>The code of this project is released under a BSD-like license [<a href="license.txt">license.txt</a>]:</p>
     <pre>
   Copyright 1999-2004 (C) Intalio Inc., and others. All Rights Reserved.
@@ -44,6 +48,6 @@
   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
   DAMAGE.
     </pre>
-    </header>
+  </section>
   </body>
 </document>
