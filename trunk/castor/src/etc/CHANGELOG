@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1507 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Fixed problem using the HighLowKeyGenerator with the same-connection
+       attribute set to 'true'.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1507
+       (Werner - 20040915)
+
 JDO:   Fixed bug 1635 using contribution from Stein M. Hugubakken [dulci@start.no]
        Provided a ptach to initialize array(s) with the correct size, rather than
        hardcoding the value '10'.
