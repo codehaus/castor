@@ -144,6 +144,9 @@
         <p>
         This layer should also be made pluggable allowing one or more query 
         engines to plugged in simultaneously (e.g. OQL, XQuery, EJBQL, etc.).
+        The <tt>tests.jdo.OqlTests</tt> class needs to be completed before
+        this work can take place. This will provide a baseline before the
+        removal of the current OQL engine. 
         </p>
         </section>
 
