@@ -47,7 +47,11 @@
 package org.exolab.castor.persist.spi;
 
 
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.AccessMode;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.persist.EntityInfo;
+//import org.exolab.castor.persist.Lockable;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectDeletedException;
@@ -56,6 +60,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.persist.TransactionContext;
 
+import java.util.List;
 
 /**
  * The persistence engine implements this interface in order to allow
@@ -90,8 +95,7 @@ import org.exolab.castor.persist.TransactionContext;
  * @see TransactionContext
  * @see PersistenceQuery
  */
-public interface Persistence
-{
+public interface Persistence {
 
 
     /**
@@ -111,7 +115,7 @@ public interface Persistence
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object create( Object conn, Object[] fields, Object identity )
+    public Object create( TransactionContext tx, Object conn, Entity entity )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -133,10 +137,20 @@ public interface Persistence
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, Object[] fields, Object identity,
-                        AccessMode accessMode )
+    public Object load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
+
+    /**
+     * Loads all the identities of entity in which the specified field match
+     * the supplied value. Conceptually, the specified field is a foreign key
+     * field; the supplied values is the value the foreign key.
+     *
+     * @param conn An open connection
+     *
+     */
+    public Object loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
+        throws PersistenceException;
 
     /**
      * Stores the object in persistent storage, given the object fields
@@ -168,8 +182,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( Object conn, Object[] fields, Object identity,
-                         Object[] original, Object stamp )
+    public Object store( TransactionContext tx, Object conn, Entity entity, Entity orginal )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
 
@@ -184,7 +197,7 @@ public interface Persistence
      * @param identity The object's identity
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Object conn, Object identity )
+    public void delete( TransactionContext tx, Object conn, Entity entity )
         throws PersistenceException;
     
 
@@ -203,7 +216,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( Object conn, Object identity )
+    public void writeLock( TransactionContext tx, Object conn, Entity entity )
         throws ObjectDeletedException, PersistenceException;
     
 
@@ -222,17 +235,10 @@ public interface Persistence
      */
     public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
         throws QueryException;
-
-
     
-	public Persistence.FieldInfo[] getInfo();
 
-    public interface FieldInfo {
-		public boolean isComplex();
+    public PersistenceQuery createCall( String call, Class[] types )
+        throws QueryException;
 
-		public boolean isPersisted();
-
-		public String getFieldName();
-    }
 }
 

@@ -72,9 +72,9 @@ import javax.transaction.Status;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.persist.DatabaseRegistry;
 import org.exolab.castor.persist.OutputLogInterceptor;
-import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
 

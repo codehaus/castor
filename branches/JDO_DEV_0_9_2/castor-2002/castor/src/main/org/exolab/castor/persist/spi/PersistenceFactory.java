@@ -50,7 +50,11 @@ package org.exolab.castor.persist.spi;
 import java.io.PrintWriter;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
-
+import org.exolab.castor.persist.EntityInfo;
+import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.conf.Database;
 
 /**
  * Factory for producing new persistence implementations. Used for
@@ -91,9 +95,11 @@ public interface PersistenceFactory
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
+    public Persistence getPersistence( EntityInfo entity, LogInterceptor logInterceptor )
         throws MappingException;
 
+
+    public Connector getConnector( Database conf );
 
     /**
      * Returns a new empty query expression suitable for the underlying
