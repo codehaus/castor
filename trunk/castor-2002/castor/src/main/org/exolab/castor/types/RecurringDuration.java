@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author          Changes
+ * 05/13/2001   Arnaud Blandin  Added the support for omitted components (section 4.5 of ISO8601)
  * 12/05/2000   Arnaud Blandin  Added the support for NotSupportedOperationException
  * 11/08/2000   Arnaud Blandin  Added new constructor and setValues method
  * 11/07/2000   Arnaud Blandin  Added isEqual() and isGreater() methods
@@ -65,6 +66,7 @@ import java.text.SimpleDateFormat;
  * <p> (+|-)CCYY-MM-DDThh:mm:ss.sss(Z|(+|-)hh:mm)
  * <p> The validation of the date fields is done in the set methods and follows
  * <a href="http://www.iso.ch/markete/8601.pdf">the ISO8601 Date and Time Format</a>
+ * <p>It is possible to omit higher components by using '-'.
  *
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
@@ -79,10 +81,13 @@ public class RecurringDuration extends RecurringDurationBase{
 
 
     //Private variables
+    //-1 means that the field has been omitted (cf section 4.5 of ISO 8601)
     private short _century = 0;
     private short _year = 0;
     private short _month = 0;
     private short _day = 0;
+
+    private static final short OMITED = Short.parseShort("-1");
 
     public RecurringDuration() {
     }
@@ -138,7 +143,7 @@ public class RecurringDuration extends RecurringDurationBase{
      */
     public void setCentury(short century) {
         String err ="";
-        if (century < 0) {
+        if (century < -1) {
             err = "century : "+century+" must not be a negative value.";
             throw new IllegalArgumentException(err);
         }
@@ -154,12 +159,15 @@ public class RecurringDuration extends RecurringDurationBase{
         throws OperationNotSupportedException
     {
         String err ="";
-        if (year < 0) {
+        if (year < -1) {
             err = "year : "+year+" must not be a negative value.";
             throw new IllegalArgumentException(err);
         }
-
-        if ( (year ==0) && (_century==0)) {
+        else if ( (year == -1) && (_century != -1) ) {
+            err = "year can not be omitted if century is not omitted.";
+            throw new IllegalArgumentException(err);
+        }
+        else if ( (year ==0) && (_century==0)) {
             err = "0000 is not an allowed year";
             throw new IllegalArgumentException(err);
         }
@@ -176,13 +184,20 @@ public class RecurringDuration extends RecurringDurationBase{
         throws OperationNotSupportedException
     {
         String err ="";
-        if (month < 1) {
-            err = "month : "+month+" is not a correct value.";
-            err+= "\n 1<month<12";
+        if (month == -1) {
+            if (_century != -1) {
+                 err = "month cannot be omitted if the previous component is not omitted.\n"+
+                       "only higher level components can be omitted.";
+                 throw new IllegalArgumentException(err);
+            }
+        }
+        else if (month < 1) {
+            err = "month : "+month+" is not a correct value."
+                  +"\n 1<month<12";
             throw new IllegalArgumentException(err);
         }
 
-         if (month > 12) {
+        else if (month > 12) {
             err = "month : "+month+" is not a correct value.";
             err+= "\n 1<month<12";
             throw new IllegalArgumentException(err);
@@ -200,7 +215,14 @@ public class RecurringDuration extends RecurringDurationBase{
         throws OperationNotSupportedException
     {
         String err = "";
-        if (day < 1) {
+        if  (day == -1) {
+            if (_month != -1) {
+                 err = "day cannot be omitted if the previous component is not omitted.\n"+
+                       "only higher level components can be omitted.";
+                 throw new IllegalArgumentException(err);
+            }
+        }
+        else if (day < 1) {
             err = "day : "+day+" is not a correct value.";
             err+= "\n 1<day";
             throw new IllegalArgumentException(err);
@@ -368,40 +390,59 @@ public class RecurringDuration extends RecurringDurationBase{
         StringBuffer result = new StringBuffer();
         StringBuffer timeZone = null;
 
-        if (this.getCentury()/10 == 0)
+        if (this.getCentury() == -1)
+            result.append('-');
+        else {
+            if (this.getCentury()/10 == 0)
             result.append(0);
-        result.append(this.getCentury());
+            result.append(this.getCentury());
 
-        if ((this.getYear()/10) == 0)
-            result.append(0);
-        result.append(this.getYear());
-
+             if ((this.getYear()/10) == 0)
+                result.append(0);
+             result.append(this.getYear());
+        }
         result.append('-');
-        if ((this.getMonth() / 10) == 0 )
-           result.append(0);
-        result.append(this.getMonth());
-
+        if (this.getMonth() == -1)
+            result.append('-');
+        else {
+            if ((this.getMonth() / 10) == 0 )
+               result.append(0);
+            result.append(this.getMonth());
+        }
         result.append('-');
-        if ((this.getDay()/10) == 0 )
-            result.append(0);
-        result.append(this.getDay());
-
+        if (this.getDay() == -1)
+             result.append('-');
+        else {
+            if ((this.getDay()/10) == 0 )
+                result.append(0);
+            result.append(this.getDay());
+        }
         // nowhere it is said in the specs that Time can be omitted
         // choose to always keep it
         result.append("T");
-         if ((this.getHour()/10) == 0)
-            result.append(0);
-        result.append(this.getHour());
-
+        if (this.getHour() == -1)
+            result.append('-');
+        else {
+            if ((this.getHour()/10) == 0)
+                result.append(0);
+            result.append(this.getHour());
+        }
         result.append(':');
-        if ((this.getMinute() / 10) == 0 )
-           result.append(0);
-        result.append(this.getMinute());
-
+        if (this.getMinute() == -1)
+            result.append('-');
+        else {
+            if ((this.getMinute() / 10) == 0 )
+               result.append(0);
+            result.append(this.getMinute());
+        }
         result.append(':');
-        if ((this.getSeconds()/10) == 0 )
-            result.append(0);
-        result.append(this.getSeconds());
+        if (this.getSeconds() == -1)
+            result.append('-');
+        else {
+            if ((this.getSeconds()/10) == 0 )
+                result.append(0);
+            result.append(this.getSeconds());
+        }
         result.append('.');
         result.append(this.getMilli());
 
@@ -444,6 +485,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * @throws ParseException a parse exception is thrown if the string to parse
      *                        does not follow the rigth format (see the description
      *                        of this class)
+     * @todo optimize this method (too much strings)
      */
     public static RecurringDuration parseRecurringDuration(String str) throws ParseException {
 
@@ -453,10 +495,11 @@ public class RecurringDuration extends RecurringDurationBase{
         if ( str.endsWith("Z"))
             str = str.substring(0,str.indexOf("Z"));
 
-        //isNegative ? is there a time zone ?
-        if ( str.startsWith("-") )
+        //isNegative ?
+        if ( str.startsWith("-") && !str.startsWith("--"))
             result.setNegative();
 
+        //Is there a time Zone?
         String zoneStr = str.substring(str.length()-6,str.length());
         boolean timeZone = (  ((zoneStr.lastIndexOf("-") !=-1)  ||
                                (zoneStr.lastIndexOf("+") !=-1 )) &&
@@ -487,82 +530,133 @@ public class RecurringDuration extends RecurringDurationBase{
         // proceed date
         StringTokenizer token = new StringTokenizer(date,"-");
 
-        if (token.countTokens() != 3)
+        if (token.countTokens() > 3)
             throw new ParseException(str+": Bad date format",0);
 
         try {
             //CCYY
-            String temp = token.nextToken();
-            if (temp.length() != 4)
-                throw new ParseException(str+":Bad year format",1);
-            if (DEBUG) {
-                System.out.println("Processing century: "+temp.substring(0,2));
+            boolean process = false;
+            String temp;
+            if (token.countTokens() == 3) {
+                temp = token.nextToken();
+                if (temp.length() != 4)
+                    throw new ParseException(str+":Bad year format",1);
+                if (DEBUG) {
+                    System.out.println("Processing century: "+temp.substring(0,2));
+                }
+                result.setCentury(Short.parseShort( temp.substring(0,2) ));
+                if (DEBUG) {
+                    System.out.println("Processing year: "+temp.substring(2,4));
+                }
+                result.setYear(Short.parseShort( temp.substring(2,4) ));
+                process = true;
             }
-            result.setCentury(Short.parseShort( temp.substring(0,2) ));
-            if (DEBUG) {
-            System.out.println("Processing year: "+temp.substring(2,4));
-        }
-        result.setYear(Short.parseShort( temp.substring(2,4) ));
-
-        //MM
-        temp=token.nextToken();
-        if (temp.length() != 2)
-            throw new ParseException(str+": Bad month format",5);
-        if (DEBUG) {
-            System.out.println("Processing month: "+temp);
-        }
-        result.setMonth(Short.parseShort(temp));
-
-        //DD
-        temp=token.nextToken();
-        if (temp.length() != 2)
-                throw new ParseException(str+":Bad day format",8);
-            if (DEBUG) {
-                System.out.println("Processing day: "+temp);
+            if (!process)
+               result.setCentury(OMITED);
+            if (token.countTokens() == 2) {
+               //MM
+               temp=token.nextToken();
+                if (temp.length() != 2)
+                    throw new ParseException(str+": Bad month format",5);
+                if (DEBUG) {
+                    System.out.println("Processing month: "+temp);
+                }
+                result.setMonth(Short.parseShort(temp));
+                process = true;
             }
-            result.setDay(Short.parseShort(temp));
+
+            if ((!process)) {
+               result.setMonth(OMITED);
+            }
+            if (token.countTokens() == 1) {
+                //DD
+                temp=token.nextToken();
+                if (temp.length() != 2)
+                    throw new ParseException(str+":Bad day format",8);
+                if (DEBUG) {
+                    System.out.println("Processing day: "+temp);
+                }
+                result.setDay(Short.parseShort(temp));
+                process = true;
+            }
+
+           if (!process) {
+               result.setDay(OMITED);
+            }
+
 
             //proceed Time
             token = new StringTokenizer(time,":");
-
-            if ((token.countTokens() < 3) && (token.countTokens() > 5) )
+            process = false;
+            if (token.countTokens() > 5)
                 throw new ParseException(str+": Bad time format",11);
 
-            //hh
-            temp = token.nextToken();
-            temp = temp.substring(temp.indexOf("T")+1);
-            if (temp.length() != 2)
-                throw new ParseException(str+": Bad hour format",11);
-            if (DEBUG) {
-                System.out.println("Processing hour: "+temp);
-            }
-            result.setHour(Short.parseShort( temp ));
-
-            //mm
-            temp=token.nextToken();
-            if (temp.length() != 2)
-                throw new ParseException(str+": Bad minute format",14);
-            if (DEBUG) {
-                System.out.println("Processing minute: "+temp);
-            }
-            result.setMinute( Short.parseShort(temp));
-
-            //ss
-            temp=token.nextToken();
-            String milsecond = "0";
-            if (temp.indexOf(".") != -1) {
-                milsecond = temp.substring(temp.indexOf(".")+1);
-                temp = temp.substring(0,temp.indexOf("."));
+            if (token.countTokens() == 3) {
+                //hh
+                temp = token.nextToken();
+                temp = temp.substring(temp.indexOf("T")+1);
+                 if (temp.length() != 2)
+                    throw new ParseException(str+": Bad hour format",11);
+                  if (DEBUG) {
+                    System.out.println("Processing hour: "+temp);
+                  }
+                  result.setHour(Short.parseShort( temp ));
+                  process = true;
             }
 
-            if (temp.length() != 2)
-                throw new ParseException(str+": Bad second format",17);
-            if (DEBUG) {
-                System.out.println("Processing seconds: "+temp);
+            if (!process) {
+                if (result.getDay() == OMITED )
+                   result.setHour(OMITED);
+                else throw new IllegalArgumentException("hour cannot be omitted");
             }
-            result.setSecond(Short.parseShort(temp.substring(0,2)),
-                            Short.parseShort(milsecond));
+            if (token.countTokens() == 2) {
+               //mm
+               temp=token.nextToken();
 
+                if (temp.length() != 2)
+                    throw new ParseException(str+": Bad minute format",14);
+
+                if (DEBUG) {
+                    System.out.println("Processing minute: "+temp);
+                }
+                result.setMinute( Short.parseShort(temp));
+                process = true;
+            }
+            if (!process){
+                if (result.getDay() == OMITED ) {
+                    result.setHour(OMITED);
+                    result.setMinute(OMITED);
+                 }
+                 else throw new IllegalArgumentException("hour cannot be omitted");
+            }
+            if (token.countTokens() == 1) {
+                //ss
+                temp=token.nextToken();
+                String milsecond = "0";
+                if (temp.indexOf(".") != -1) {
+                    milsecond = temp.substring(temp.indexOf(".")+1);
+                    temp = temp.substring(0,temp.indexOf("."));
+                }
+
+                if (temp.length() != 2)
+                    throw new ParseException(str+": Bad second format",17);
+                if (DEBUG) {
+                    System.out.println("Processing seconds: "+temp);
+                }
+                result.setSecond(Short.parseShort(temp.substring(0,2)),
+                                 Short.parseShort(milsecond));
+
+                process = true;
+            }
+
+            if (!process) {
+                if (result.getDay() == OMITED ) {
+                    result.setHour(OMITED);
+                    result.setMinute(OMITED);
+                    result.setSecond(OMITED,OMITED);
+                }
+                else throw new IllegalArgumentException("hour cannot be omitted");
+            }
 
             // proceed TimeZone if any
             if (timeZone) {

@@ -85,14 +85,17 @@ public abstract class RecurringDurationBase
 
     /**
      * the hour field of this recurringDuration
+     * -1 means that the field has been omitted (cf section 4.5 of ISO 8601)
      */
     private short _hour = 0;
     /**
      * the minute field of this recurringDuration
+     * -1 means that the field has been omitted (cf section 4.5 of ISO 8601)
      */
     private short _minute = 0;
     /**
      * the second field of this recurringDuration
+     * -1 means that the field has been omitted (cf section 4.5 of ISO 8601)
      */
     private short _second = 0;
     /**
@@ -277,7 +280,11 @@ public abstract class RecurringDurationBase
         throws OperationNotSupportedException
     {
          String err = "";
-         if (minute > 59) {
+         if ( (minute == -1) && (_hour != -1)) {
+             err = "minute cannot be omitted if the previous field is not omitted.";
+             throw new IllegalArgumentException(err);
+         }
+         else if (minute > 59) {
             err = "the minute field ("+minute+")must be lower than 59";
             throw new IllegalArgumentException(err);
         }
@@ -295,7 +302,12 @@ public abstract class RecurringDurationBase
         throws OperationNotSupportedException
      {
          String err = "";
-         if (second > 60) {
+         if ( (second == -1) && (_minute != -1)) {
+             err = "second cannot be omitted if the previous field is not omitted.";
+             throw new IllegalArgumentException(err);
+         }
+
+         else if (second > 60) {
             err = "the second field ("+second+")must be lower than 60";
             throw new IllegalArgumentException(err);
         }
