@@ -27,10 +27,28 @@
 	        <description>New and on-going development</description>
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
-            <summary>
-              Short description says all ...
-            </summary>
+            <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="1820">
+					<description>
+						Add template for submitting a bug report.
+					</description>
+					<contributor>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</reporter>
+					<type>Enh</type>
+					<module>All</module>
+					<date>20050406</date>
+				</bug>
 				<bug id="1214">
 					<description>
 						Fixed problem in field molder when dealing with 'set'
