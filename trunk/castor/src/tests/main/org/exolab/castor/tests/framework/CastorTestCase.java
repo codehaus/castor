@@ -88,6 +88,12 @@ public class CastorTestCase extends TestCase {
     private final static String TEST_DESCRIPTOR_JAR = "META-INF/TestDescriptor.xml";
 
     /**
+     * A flag indicating whether or not the output root directory has
+     * been compiled.
+     */
+    private boolean _compiled = false;
+    
+    /**
      * The file that contains the tests. This can either be a directory or
      * a jar file.
      */
@@ -118,6 +124,7 @@ public class CastorTestCase extends TestCase {
      */
     private final static String FILE_SEPARATOR = System.getProperty("file.separator");
 
+    
     /**
      * True if we expect a lot of info on what happen.
      */
@@ -244,6 +251,7 @@ public class CastorTestCase extends TestCase {
         SchemaTest schemaTest = _testDescriptor.getTestDescriptorChoice().getSchemaTest();
 
         if (mar != null) {
+            
             // Set up marshalling tests
             for (int i=0; i<mar.getUnitTestCaseCount(); ++i) {
                 UnitTestCase tc = mar.getUnitTestCase(i);
@@ -294,15 +302,7 @@ public class CastorTestCase extends TestCase {
         return suite;
     }
 
-   /**
-    * Sets the ClassLoader to use for loading the resources
-    * for this test case.
-    *
-    * @param loader the class loader to use
-    */
-    public void setClassLoader(ClassLoader loader) {
-        _loader = loader;
-    }
+    
     public ClassLoader getClassLoader() {
         return _loader;
     }
@@ -314,6 +314,38 @@ public class CastorTestCase extends TestCase {
     public short getType() {
         return _type;
     }
+    
+    /**
+     * Returns a boolean that when true indicates the output directory has 
+     * been compiled. This is useful for preventing the compilation of a directory 
+     * multiple times when more than one test case exists in a given directory.
+     * 
+     * @return true when the output root directory has already been compiled.
+     */
+    public boolean isDirectoryCompiled() {
+        return _compiled;
+    } //-- isDirectoryCompiled
+    
+    
+   /**
+    * Sets the ClassLoader to use for loading the resources
+    * for this test case.
+    *
+    * @param loader the class loader to use
+    */
+    public void setClassLoader(ClassLoader loader) {
+        _loader = loader;
+    }
+    
+    /**
+     * Sets a flag to indicate the output directory has been compiled.
+     * This prevents compiling a directory multiple times, uncessarily when
+     * more than one test case exists in a given directory.
+     */
+    public void setDirectoryCompiled(boolean compiled) {
+        _compiled = compiled;
+    } //-- setDirectoryCompiled
+    
     /**
      * print the message if in verbose mode.
      */
