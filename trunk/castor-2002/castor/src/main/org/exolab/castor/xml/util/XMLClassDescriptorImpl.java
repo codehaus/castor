@@ -644,7 +644,6 @@ public class XMLClassDescriptorImpl extends Validator
 
                 boolean found = false;
                 XMLFieldDescriptor fieldDesc = null;
-
                 //-- handle elements, affected by choice
                 for (int i = 0; i < elementDescriptors.size(); i++) {
                     XMLFieldDescriptor desc =
@@ -675,28 +674,28 @@ public class XMLClassDescriptorImpl extends Validator
                         if (fieldValidator != null)
                             fieldValidator.validate(object, resolver);
                     }
+                }//for
 
-                    //if there is nothing, we check if at least one field is required
-                    //and print the grammar that the choice must match.
-                    if (!found) {
-                        StringBuffer buffer = new StringBuffer(40);
-                        boolean error = false;
-                        for (i = 0; i < elementDescriptors.size(); i++) {
-                            desc = (XMLFieldDescriptor) elementDescriptors.get(i);
-                            FieldValidator fieldValidator = desc.getValidator();
-                            if (fieldValidator.getMinOccurs() > 0) {
-                                error = true;
-                                buffer.append('(');
-                                buffer.append(desc.getXMLName());
-                                buffer.append(") ");
-                            }
+                //if there is nothing, we check if at least one field is required
+                //and print the grammar that the choice must match.
+                if (!found) {
+                    StringBuffer buffer = new StringBuffer(40);
+                    boolean error = false;
+                    for (int i = 0; i < elementDescriptors.size(); i++) {
+                        XMLFieldDescriptor  desc = (XMLFieldDescriptor) elementDescriptors.get(i);
+                        FieldValidator fieldValidator = desc.getValidator();
+                        if (fieldValidator.getMinOccurs() > 0) {
+                            error = true;
+                            buffer.append('(');
+                            buffer.append(desc.getXMLName());
+                            buffer.append(") ");
                         }
-                        if (error) {
-                             String err = "In the choice contained in <"+ this.getXMLName()
-                                          +">, at least one of these elements must appear:\n"
-                                          + buffer.toString();
-                             throw new ValidationException(err);
-                        }
+                    }
+                    if (error) {
+                        String err = "In the choice contained in <"+ this.getXMLName()
+                                     +">, at least one of these elements must appear:\n"
+                                     + buffer.toString();
+                        throw new ValidationException(err);
                     }
 
                 }
