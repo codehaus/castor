@@ -18,37 +18,43 @@
          as one that was read in the first transaction.
          The example code for writing the object in the second Castor
          transaction follows:
-         <pre>
-            // a customer go to a webpage to review her personal information.
-            // The servlet then call this server side function: getCustomerInfo
-            public CustomerInfo getCustomerInfo( Integer customNum ) {
-                 // in most case, users simply review information and
-                 // make no change. Even if they make changes, it often 
-                 // takes time for them to decide. We don't want to 
-                 // lock the database row, so commit right after we load.
-                 db.begin();
-                 CustomerInfo info = (CustomerInfo) 
-                    db.load( CustomerInfo.class, customNum );
+         <code>
+    <comment>
+    // a customer go to a webpage to review her personal information.
+    // The servlet then call this server side function: getCustomerInfo</comment>
+    public CustomerInfo getCustomerInfo( Integer customNum ) {
+         <comment>
+             // in most case, users simply review information and
+             // make no change. Even if they make changes, it often 
+             // takes time for them to decide. We don't want to 
+             // lock the database row, so commit right after we load.</comment>
+         db.begin();
+         CustomerInfo info = (CustomerInfo) 
+            db.load( CustomerInfo.class, customNum );
 
+         <comment>
                  // we also want to keep track of customers patterns
-                 // well...I don't want to, but my boss asks me to do so.
-                 info.setLastVisit( today );
-                 db.commit();
-                 return info;
-            }
+                 // well...it helps us provide better service.</comment>
+         info.setLastVisit( today );
+         db.commit();
+         return info;
+    }
 
-            // Three days passed, the indecisive customer finally agrees to 
-            // marry Joe. She changes her last name in the webpage and 
-            // clicked the "Submit" button on the webpage.
+    <comment>
+        // Three days passed, the indecisive customer finally agrees to 
+        // marry Joe. She changes her last name in the webpage and 
+        // clicked the "Submit" button on the webpage.
+    </comment>
 
-            // The servlet then call updateCustomerInfo to update the
-            // last name for the indecisive customer.
-            public void updateCustomerInfo( CustomerInfo info ) {
-                db.begin();
-                db.update(info);
-                db.commit();
-            }
-         </pre>
+    <comment>
+        // The servlet then calls updateCustomerInfo to update the
+        // last name for the indecisive customer.</comment>
+    public void updateCustomerInfo( CustomerInfo info ) {
+        db.begin();
+        db.update(info);
+        db.commit();
+    }
+         </code>
          Note, that it is natural to read the object in the first
          transaction in the read-only mode.
       </p>
