@@ -191,8 +191,10 @@ public class SourceGeneratorTestCase extends XMLTestCase {
             File bindingFile = new File(_outputRootFile, bindingName);
 
             if ( !bindingFile.exists()) {
-                assertNotNull("Unable to find the binding file:", bindingName);
+                fail("Unable to find the specified binding file: " + bindingName);
             }
+            
+            verbose("using binding file: " + bindingFile.getAbsolutePath());
             InputSource source = new InputSource(new FileReader(bindingFile));
             source.setSystemId(bindingFile.getAbsolutePath());
             sourceGen.setBinding(source);
