@@ -1,3 +1,23 @@
+/**
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+
 package xml.xml2java;
 
 import java.io.*;
@@ -6,6 +26,14 @@ import org.exolab.castor.xml.Unmarshaller;
 import junit.framework.*;
 import junit.extensions.*;
 
+/**
+ *  Here we try to test the behavior of Castor when the unmarshaller 
+ *  has to deal with min/max Occurs attributes. For each situation 
+ *  there is a corresponding schema.
+ *
+ * @author <a href="mailto:victoor@intalio.com">Alexandre Victoor</a>
+ * @version $Revision$ $Date$
+ */
 
  public class OccursTest extends TestCase {
    
@@ -19,7 +47,9 @@ import junit.extensions.*;
     }
     
     
-    // test minOccurs when the tag is not present in the XML file
+    /**
+    *   test minOccurs when the tag is not present in the XML file
+    */
     public void testMinOccurs()
     {
     try
@@ -46,7 +76,9 @@ import junit.extensions.*;
      
     }
 
-    // test minOccurs when the tag is present but not enough times
+    /**
+    *   test minOccurs when the tag is present but not enough times
+    */
     public void testMinOccurs2()
     {
     try
@@ -86,7 +118,9 @@ import junit.extensions.*;
         }
     }
  */
-    // test where no exception should be raised
+    /**
+     *   test where no exception should be raised
+     */
     public void testMinOccurs4()
     {
     try
@@ -99,7 +133,9 @@ import junit.extensions.*;
         }
     }   
 
-    // test where no exception should be raised involving the unbound value for the maxoccur attribute
+    /**
+    *    test where no exception should be raised involving the unbound value for the maxoccur attribute
+    */
     public void testMinOccurs5()
     {
     try
@@ -113,7 +149,9 @@ import junit.extensions.*;
     }   
 
 
-    // test where there are too much tags
+    /**
+    *    test where there are too much tags
+    */
     public void testMaxOccurs()
     {
     try
@@ -139,7 +177,9 @@ import junit.extensions.*;
     fail("Should have raised an exception");
     }
 
-    // test where no exception should be raised
+    /**
+    *    test where no exception should be raised
+    */
     public void testMaxOccurs2()
     {
     try
@@ -153,7 +193,9 @@ import junit.extensions.*;
     }
 
 
-    // test where no exception should be raised using both minOccurs and maxOccurs
+    /** 
+    *   test where no exception should be raised using both minOccurs and maxOccurs
+    */
     public void testMinMaxOccurs()
     {
     try
@@ -166,7 +208,9 @@ import junit.extensions.*;
         }
     }
     
-    // maxOccurs attribute not respected
+    /**
+    *    maxOccurs attribute not respected
+    */
     public void testMinMaxOccurs2()
     {
     try
@@ -191,7 +235,9 @@ import junit.extensions.*;
     }
     
     
-    // minOccurs attribute not respected
+    /**
+    *    minOccurs attribute not respected
+    */
     public void testMinMaxOccurs3()
     {
     try
