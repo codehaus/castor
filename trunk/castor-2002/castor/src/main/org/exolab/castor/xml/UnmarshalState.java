@@ -65,6 +65,11 @@ class UnmarshalState {
     Object object = null;
     
     /**
+     * The current container in the object that we are unmarshalling to
+    **/
+    Object container = null;
+
+    /**
      * The class of the object, mainly used for primitives
     **/
     Class type = null;
@@ -73,6 +78,11 @@ class UnmarshalState {
      * The field descriptor for the Object
     **/
     XMLFieldDescriptor fieldDesc = null;
+        
+    /**
+     * The field descriptor for the container object
+    **/
+    XMLFieldDescriptor ContainerFieldDesc = null;
     
     /**
      * The class descriptor for the Object, in case 

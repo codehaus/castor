@@ -151,6 +151,11 @@ public class XMLFieldDescriptorImpl
     private boolean _transient = false;
     
     /**
+     * True if the field is a container field
+     */
+    private boolean _container = false;
+
+    /**
      * The XML name of the field.
      */
     private String _xmlName    = null;
@@ -439,6 +444,21 @@ public class XMLFieldDescriptorImpl
     } //-- isTransient
 
     /**
+     * Returns true if the field described by this descriptor is a container
+     * field.
+     */
+    public boolean isContainer() {
+        return _container;
+    }
+
+    /**
+     * Set if the field is a container field or not.
+     */
+    public void setContainer(boolean b) {
+        _container = b;
+    }
+
+    /**
      * Returns true if this descriptor can be used to handle elements
      * or attributes with the given XML name. By default this method
      * simply compares the given XML name with the internal XML name.
@@ -448,7 +468,7 @@ public class XMLFieldDescriptorImpl
      * or attributes with the given XML name.
     **/
     public boolean matches(String xmlName) {
-        
+
         if (xmlName != null) {
             
             if (isWild) return true;
@@ -458,8 +478,12 @@ public class XMLFieldDescriptorImpl
                         return true;
                 }
             }
-            else return xmlName.equals(this._xmlName);
-            
+            else if (_container) {
+                if (_classDescriptor.getFieldDescriptor(xmlName, NodeType.Element) != null ||
+                   _classDescriptor.getFieldDescriptor(xmlName, NodeType.Attribute) != null )
+                    return true;
+            } else
+                return xmlName.equals(this._xmlName);
         }
         
         return false;

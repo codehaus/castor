@@ -220,8 +220,7 @@ public class XMLClassDescriptorImpl extends Validator
     } //-- XMLClassDescriptor
     
     //------------------/
-    //- Public Methods -/
-    //------------------/
+    //- Public Methods -/    //------------------/
     
     /**
      * Adds the given XMLFieldDescriptor to the list of descriptors. The
@@ -288,11 +287,13 @@ public class XMLClassDescriptorImpl extends Validator
     } // getElementDescriptors
 
     /**
-     * Returns the XML field descriptor matching the given
-     * xml name and nodeType. If NodeType is null, then
-     * either an AttributeDescriptor, or ElementDescriptor
-     * may be returned. Null is returned if no matching
+     * Returns the XML field descriptor matching the given xml name and
+     * nodeType. If NodeType is null, then either an AttributeDescriptor, or
+     * ElementDescriptor may be returned. Null is returned if no matching
      * descriptor is available.
+     *
+     * If an field is matched in one of the container field, it will return the
+     * container field that contain the field named 'name'
      *
      * @param name the xml name to match against
      * @param nodeType, the NodeType to match against, or null if
@@ -304,9 +305,8 @@ public class XMLClassDescriptorImpl extends Validator
     public XMLFieldDescriptor getFieldDescriptor
         (String name, NodeType nodeType) 
     {
-        
         boolean wild = ((nodeType == null) || _introspected);
-        
+
         if (wild || (nodeType == NodeType.Element)) {
             XMLFieldDescriptor desc = null;
             for (int i = 0; i < elementDescriptors.size(); i++) {
@@ -320,11 +320,26 @@ public class XMLClassDescriptorImpl extends Validator
             XMLFieldDescriptor desc = null;
             for (int i = 0; i < attributeDescriptors.size(); i++) {
                 desc = (XMLFieldDescriptor)attributeDescriptors.get(i);
-                if (desc == null) continue;
-                if (desc.matches(name)) return desc;
+                if (desc == null) 
+                    continue;
+                if (desc.matches(name))
+                    return desc;
             }
         }
         
+        // To handle container object, we need to check if an attribute of a
+        // container field match this attribute
+        if (nodeType == NodeType.Attribute) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < elementDescriptors.size(); i++) {
+                desc = (XMLFieldDescriptor)elementDescriptors.get(i);
+                if (desc.isContainer()) {
+                    if (desc.matches(name))
+                        return desc;
+                }
+            }
+        }
+
         return null;
         
     } //-- getFieldDescriptor

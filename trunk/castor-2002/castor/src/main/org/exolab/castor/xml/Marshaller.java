@@ -71,7 +71,7 @@ import java.lang.reflect.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-
+import java.util.LinkedList;
 
 /**
  * A Marshaller to allowing serializing Java Object's to XML
@@ -504,6 +504,11 @@ public class Marshaller extends MarshalFramework {
         }
 
 
+        boolean containerField = false;
+
+        if (descriptor != null && descriptor.isContainer())
+            containerField = true;
+
         //-- add object to stack so we don't potentially get into
         //-- an endlessloop
         if (_parents.search(object) >= 0) return;
@@ -717,6 +722,66 @@ public class Marshaller extends MarshalFramework {
             atts.addAttribute(xmlName, null, value.toString());
         }
 
+
+        //-- Look for attributes in container fields (we have to handle container in container too)
+
+        // List of container field descriptor that need to be visited in search of attributes
+        LinkedList descriptorList = new LinkedList();
+
+        XMLFieldDescriptor[] elemDescriptors = classDesc.getElementDescriptors();
+
+        for (int i = 0; i < elemDescriptors.length; i++) {
+            if (elemDescriptors[i] == null) continue;
+            if (!elemDescriptors[i].isContainer()) continue;
+            descriptorList.addLast(new Object[] {elemDescriptors[i], object});
+        }
+
+        while (!descriptorList.isEmpty()) {
+
+            Object[] current = (Object[])descriptorList.removeFirst();
+
+            XMLFieldDescriptor elemDescriptor  = (XMLFieldDescriptor)current[0];
+            Object             containerObject =  current[1];
+
+            XMLClassDescriptor containerClassDesc = (XMLClassDescriptor)((XMLFieldDescriptorImpl)elemDescriptor).getClassDescriptor();
+
+            containerObject = elemDescriptor.getHandler().getValue(containerObject);
+            
+            if (containerObject == null) continue;
+
+            // Look for container field to visit later
+            XMLFieldDescriptor[] containerElemDescriptors = containerClassDesc.getElementDescriptors();
+            for (int i = 0; i < containerElemDescriptors.length; i++) {
+                if (containerElemDescriptors[i] == null) continue;
+                if (containerElemDescriptors[i].isContainer()) 
+                    descriptorList.addLast(new Object[] {containerElemDescriptors[i], containerObject});
+            }
+
+            // Look for attributes
+            XMLFieldDescriptor[] containerAttrDescriptors = containerClassDesc.getAttributeDescriptors();
+            for (int i = 0; i < containerAttrDescriptors.length; i++) {
+                
+                if (containerAttrDescriptors[i] == null) continue;
+
+                XMLFieldDescriptor attContainerDescriptor = containerAttrDescriptors[i];
+                
+                String xmlName = attContainerDescriptor.getXMLName();
+                Object value = null;
+                
+                try {
+                    value = attContainerDescriptor.getHandler().getValue(containerObject);
+                }
+                catch(IllegalStateException ise) {
+                    continue;
+                }
+                
+                if (value == null) continue;
+                
+                atts.addAttribute(xmlName, null, value.toString());
+                
+            }
+        }//-- End of container attributes
+
         //-- xsi:type
         if (saveType) {
             saveType = declareNamespace(XSI_PREFIX, XSI_NAMESPACE, atts);
@@ -773,7 +838,8 @@ public class Marshaller extends MarshalFramework {
         else qName = name;
 
         try {
-            handler.startElement(qName, atts);
+            if (!containerField)
+                handler.startElement(qName, atts);
         }
         catch (org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
@@ -884,7 +950,8 @@ public class Marshaller extends MarshalFramework {
 
         //-- finish element
         try {
-            handler.endElement(qName);
+            if (!containerField)
+                handler.endElement(qName);
         }
         catch(org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);

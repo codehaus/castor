@@ -63,6 +63,15 @@ public class FieldMapping implements java.io.Serializable {
     **/
     private boolean _has_lazy;
 
+
+    private boolean _container = false;
+
+    /**
+     * keeps track of state for field: _container
+    **/
+    private boolean _has_container;
+
+
     private java.lang.String _getMethod;
 
     private java.lang.String _setMethod;
@@ -106,6 +115,13 @@ public class FieldMapping implements java.io.Serializable {
     {
         this._has_lazy= false;
     } //-- void deleteLazy() 
+
+    /**
+    **/
+    public void deleteContainer()
+    {
+        this._has_container= false;
+    } //-- void deleteContainer() 
 
     /**
     **/
@@ -172,6 +188,13 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
+    public boolean getContainer()
+    {
+        return this._container;
+    } //-- boolean getContainer() 
+
+    /**
+    **/
     public Ldap getLdap()
     {
         return this._ldap;
@@ -232,6 +255,13 @@ public class FieldMapping implements java.io.Serializable {
     {
         return this._has_lazy;
     } //-- boolean hasLazy() 
+
+    /**
+    **/
+    public boolean hasContainer()
+    {
+        return this._has_container;
+    } //-- boolean hasContainer() 
 
     /**
     **/
@@ -346,6 +376,16 @@ public class FieldMapping implements java.io.Serializable {
         this._lazy = _lazy;
         this._has_lazy = true;
     } //-- void setLazy(boolean) 
+
+    /**
+     * 
+     * @param _container
+    **/
+    public void setContainer(boolean _container)
+    {
+        this._container = _container;
+        this._has_container = true;
+    } //-- void setContainer(boolean) 
 
     /**
      * 
