@@ -69,9 +69,8 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			throw new SAXException("'schemaLocation' attribute missing on 'import'");
 		//if the path is relative Xerces append the "user.Dir"
         //we need to keep the base directory of the document
-        //if the doesn't exist we suppose 'include' is a relative path
         // note: URI not supported (just system path)
-        if (!new java.io.File(schemalocation).exists()) {
+        if (!new java.io.File(schemalocation).isAbsolute()) {
              String temp = locator.getSystemId();
              if (temp != null) {
                 //remove 'file://'
