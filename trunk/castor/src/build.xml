@@ -41,6 +41,7 @@
             org.exolab.castor.xml,
             org.exolab.castor.dsml,
             org.exolab.castor.mapping,
+            org.exolab.castor.util,
             org.exolab.castor.builder"
         />
         <!--    org.exolab.castor.dax, -->
