@@ -130,7 +130,7 @@ public class Unmarshaller {
         super();
         this._class = c;
         this.debug = Configuration.debug();
-        this.validate = Configuration.validation();
+        this.validate = Configuration.marshallingValidation();
         this.loader = loader;
         _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)

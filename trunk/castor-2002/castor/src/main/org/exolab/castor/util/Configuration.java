@@ -119,7 +119,7 @@ public abstract class Configuration
          * org.exolab.castor.SAXParser.validation
          * </pre>
          */
-        public static final String Validation = "org.exolab.castor.parser.validation";
+        public static final String ParserValidation = "org.exolab.castor.parser.validation";
 
         /**
          * Property specifying whether to support Namespaces by default.
@@ -135,7 +135,7 @@ public abstract class Configuration
          * org.exolab.castor.marshalling.validation
          * </pre>
          */
-         public static final String Marshalling_validation = "org.exolab.castor.marshalling.validation";
+         public static final String MarshallingValidation = "org.exolab.castor.marshalling.validation";
 
         /**
          * Property specifying whether XML documents should be indented by default.
@@ -213,26 +213,26 @@ public abstract class Configuration
     /**
      * True if the default configuration specified validation in the marshalling Framework
      */
-     private static boolean  _validation;
+     private static boolean  _MarshallingValidation;
 
     /**
      * Returns true if the default configuration specified debugging.
      */
     public static boolean debug()
     {
-        getDefault().getProperty(Property.Debug);
+        getDefault();
         return _debug;
     }
 
     /**
-     * Returns true if the default configuration specified validation.
+     * Returns true if the default configuration specified validation in
+     * the marshalling framework.
      */
-    public static boolean validation()
+    public static boolean marshallingValidation()
     {
-        getDefault().getProperty(Property.Validation);
-        return _validation;
+        getDefault();
+        return _MarshallingValidation;
     }
-
     /**
      * Returns the default configuration file. Changes to the returned
      * properties set will affect all Castor functions relying on the
@@ -315,7 +315,7 @@ public abstract class Configuration
             StringTokenizer token;
             boolean         flag;
 
-            prop = getDefault().getProperty( Property.Validation, "false" );
+            prop = getDefault().getProperty( Property.ParserValidation, "false" );
             flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
             try {
                 ( (XMLReader) parser ).setFeature( Features.Validation, flag );
@@ -488,9 +488,9 @@ public abstract class Configuration
         prop = _default.getProperty( Property.Debug, "" );
         if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
             _debug = true;
-        prop = _default.getProperty( Property.Marshalling_validation, "" );
+        prop = _default.getProperty( Property.MarshallingValidation, "" );
         if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
-            _validation = true;
+            _MarshallingValidation = true;
         prop = null;
     }
 
