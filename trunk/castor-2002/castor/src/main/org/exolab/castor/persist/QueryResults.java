@@ -278,6 +278,12 @@ public final class QueryResults
                             object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
                         }
                     }
+                    // [oleg] complicated scenarios of object reloading may
+                    // replace the instance of dependent object.
+                    // Looks bad, but works. Need to do this better in castorone...
+                    entry = _tx.getObjectEntry( _engine, oid );
+                    if ( entry != null ) 
+                        object = entry.object;
                 } catch ( Exception except ) {
                     _tx.release( object );
                     _engine.forgetObject( _tx, oid );
