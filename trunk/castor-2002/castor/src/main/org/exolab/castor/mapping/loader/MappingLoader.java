@@ -384,8 +384,6 @@ public abstract class MappingLoader
             }
 
             // separates fields into identity fields and regular fields
-
-
             for ( int i=0; i < fields.length ; i++ ) {
                 //System.out.println("MappingLoader.createClassDesc.for:id: " + i );
                 idfield = false;
@@ -432,6 +430,8 @@ public abstract class MappingLoader
                     }
                 } else {
                     // we leave things in the old way for the XML side
+                    if ( idList.size() == 0 )
+                        idList.add( extend.getIdentity() );
                     identities = new FieldDescriptor[idList.size()];
                     idList.toArray(identities);
                 }
