@@ -148,12 +148,16 @@ public class MemberFactory {
         boolean enumeration = false;
         
         if (datatype != null) {
+            
             xsType = TypeConversion.convertType(datatype);
+            
+            if (datatype.hasFacet(Facet.ENUMERATION)) 
+                enumeration = true;
+            
             //-- This is NOT clean...we need a different approach
             //-- here...
             //-- modify package name if necessary
-            if (datatype.hasFacet(Facet.ENUMERATION)) {
-                enumeration = true;
+            if (enumeration || (datatype.getSource() != null)) {
                 JClass jClass = (JClass) xsType.getJType();
                 String packageName = jClass.getPackageName();
                 if ((packageName != null) && (packageName.length() > 0))
