@@ -88,6 +88,29 @@ class SimpleTypeDefinition {
     } //-- addFacet
     
     /**
+     * Copies the name, facets and annotations of this SimpleTypeDefinition
+     * into the given SimpleType.
+     *
+     * @param simpleType the SimpleType to copy into.
+    **/
+    void copyInto(SimpleType simpleType) {
+        
+        //-- set name
+        simpleType.setName(_name);
+        
+        //-- set Schema
+        simpleType.setSchema(_schema);
+        
+        //-- copy Facets
+        Enumeration enum = _facets.enumerate();
+        while (enum.hasMoreElements())
+            simpleType.addFacet((Facet)enum.nextElement());
+            
+        if (_annotation != null)
+            simpleType.addAnnotation(_annotation);
+    } //-- copyInto
+    
+    /**
      * Creates the SimpleType instance which represents this 
      * SimpleTypeDefinition
      *
