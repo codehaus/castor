@@ -510,7 +510,11 @@ public abstract class Configuration
         indent = ( prop.equalsIgnoreCase( TRUE_VALUE ) ||
                    prop.equalsIgnoreCase( ON_VALUE ) );
 
-        return new OutputFormat( Method.XML, null, indent );
+        OutputFormat format = new OutputFormat( Method.XML, null, indent );
+        
+        format.setPreserveSpace(true); 
+
+        return format;
     } //-- getOutputFormat
 
 

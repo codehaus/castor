@@ -1,6 +1,9 @@
 Version (CVS)
 -------------
 
+XML:    Changed the default behavior of the Xerces Serializer to preserve space
+        by default.
+        (Sebastien Gignoux <gignoux@intalio.com>)
 
 JDO:    Bug fix when castor closed Connection during db.close() (before the end of
         transaction) and the got new Connection during beforeCompletion(),
