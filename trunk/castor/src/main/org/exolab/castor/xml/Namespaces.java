@@ -59,6 +59,17 @@ import java.util.Vector;
 public final class Namespaces {
 
     /**
+     * The reserved XML Namespace Prefix 
+     */
+    public static final String XML_NAMESPACE_PREFIX = "xml";
+    
+    /**
+     * The reserved XML 1.0 Namespace URI 
+     */
+    public static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
+    
+    
+    /**
      * The first namespace in this set of Namespaces
     **/
     private Namespace _first = null;
@@ -103,7 +114,7 @@ public final class Namespaces {
      * @param prefix the namespace prefix
      * @param uri the namespace URI to be associated with the given prefix
     **/
-    public void addNamespace(String prefix, String uri) {
+    public synchronized void addNamespace(String prefix, String uri) {
 
         if (uri == null) {
             throw new IllegalArgumentException("Namespace URI must not be null");
@@ -112,6 +123,19 @@ public final class Namespaces {
         //-- adjust prefix to prevent null value
         if (prefix == null) prefix = "";
 
+        //-- Make sure prefix is not equal to "xml"
+        if (XML_NAMESPACE_PREFIX.equalsIgnoreCase(prefix)) {
+            String err = "The prefix 'xml' is reserved (XML 1.0 Specification) " +
+                "and cannot be declared.";
+            throw new IllegalArgumentException(err);
+        }
+        //-- make sure URI is not equal to the XML 1.0 namespace
+        else if (XML_NAMESPACE.equals(uri)) {
+            String err = "The namespace '" + XML_NAMESPACE;
+            err += "' is reserved (XML 1.0 Specification) and cannot be declared.";
+            throw new IllegalArgumentException(err);
+        }
+        
         if (_first == null) {
             _first = new Namespace(prefix, uri);
             _last  = _first;
@@ -175,6 +199,12 @@ public final class Namespaces {
         if (_parent != null) {
             return _parent.getNamespaceURI(prefix);
         }
+        
+        //-- handle built-in namespace URIs
+        if (XML_NAMESPACE_PREFIX.equals(prefix)) {
+            return XML_NAMESPACE;
+        }
+        
         return null;
 
     } //-- method: getNamespaceURI
@@ -204,6 +234,12 @@ public final class Namespaces {
         if (_parent != null) {
             return _parent.getNamespacePrefix(nsURI);
         }
+        
+        //-- handle built-in namespace prefixes
+        if (XML_NAMESPACE.equals(nsURI)) {
+            return XML_NAMESPACE_PREFIX;
+        }
+        
         return null;
 
     } //-- method: getNamespacePrefix
@@ -289,6 +325,45 @@ public final class Namespaces {
     public Namespaces getParent() {
         return _parent;
     } //-- method: getParent
+
+    /**
+     * Removes the namespace declaration for the given prefix.
+     * This is a local action only, the namespace declaration
+     * will not be removed from any parent Namespaces object.
+     *
+     * @param prefix the namespace prefix to remove the binding of
+     * @return true if the namespace declaration was removed, 
+     * otherwise false.
+     */
+    public synchronized boolean removeNamespace(String prefix) {
+        if (prefix == null) return false;
+        
+        Namespace ns = _first;
+        Namespace previous = null;
+        
+        while (ns != null) {
+            if (ns.prefix.equals(prefix)) {
+                if (ns == _first) {
+                    _first = _first.next;
+                    if (_last == ns) {
+                        _last = null;
+                    }
+                }
+                else {
+                    previous.next = ns.next;
+                    if (_last == ns) {
+                        _last = previous;
+                    }
+                }
+                return true;
+            }
+            previous = ns;
+            ns = ns.next;
+        }
+
+        return false;
+        
+    } //-- method: removeNamespace
 
     /**
      * Sets the parent Namespaces for this Namespaces instance.
