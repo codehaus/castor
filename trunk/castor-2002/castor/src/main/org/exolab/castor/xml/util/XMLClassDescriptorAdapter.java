@@ -127,7 +127,7 @@ public class XMLClassDescriptorAdapter
     private void process(ClassDescriptor classDesc) 
         throws org.exolab.castor.mapping.MappingException
     {
-        
+            
         if (classDesc instanceof XMLClassDescriptor) {
             //-- hopefully this won't happen, but we can't prevent it.
             process((XMLClassDescriptor)classDesc);
@@ -174,13 +174,14 @@ public class XMLClassDescriptorAdapter
         //-- handle Identity if it wasn't already handled
         if ( identity != null ) {
             String  xmlFieldName;
-            if ( identity instanceof XMLFieldDescriptor )
-                xmlFieldName = ((XMLFieldDescriptor)identity).getXMLName();
+            if ( identity instanceof XMLFieldDescriptor ) {
+                setIdentity((XMLFieldDescriptor)identity);
+            }
             else {
                 XMLNaming naming = XMLNaming.getInstance();
                 xmlFieldName = naming.toXMLName(identity.getFieldName());
+                setIdentity(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
             }
-            setIdentity(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
         }
         //-- handle inheritence
         XMLClassDescriptor xmlClassDesc = null;
