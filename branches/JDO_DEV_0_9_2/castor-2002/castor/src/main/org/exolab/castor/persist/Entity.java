@@ -220,4 +220,44 @@ public final class Entity implements Cloneable {
             target.values = null;
         }
     }
+
+    public Object getFieldValue(EntityFieldInfo fieldInfo) {
+        int level = 0;
+        String entityClass;
+        EntityInfo curInfo;
+        boolean found;
+
+        entityClass = fieldInfo.entityClass.entityClass;
+        found = false;
+        for (int i = 0; i < entityClasses.length; i++) {
+            if (entityClasses[i].equals(entityClass)) {
+                level = i;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new IllegalStateException("Entity " + entityClass + " for the field " + fieldInfo + " not found in " + this);
+        }
+        curInfo = info;
+        for (int i = 1; i < level; i++) {
+            found = false;
+            for (int j = 0; j < curInfo.subEntities.length; j++) {
+                if (curInfo.subEntities[j].entityClass.equals(entityClasses[i])) {
+                    curInfo = curInfo.subEntities[j];
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                throw new IllegalStateException("Sub-entity " + entityClasses[i] + " not found in " + curInfo);
+            }
+        }
+        for (int i = 0; i < curInfo.fieldInfo.length; i++) {
+            if (curInfo.fieldInfo[i].equals(fieldInfo)) {
+                return values[level][i];
+            }
+        }
+        throw new IllegalStateException("Field " + fieldInfo + " not found in " + curInfo);
+    }
 }
