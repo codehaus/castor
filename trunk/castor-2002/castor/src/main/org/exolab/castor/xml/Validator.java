@@ -93,7 +93,7 @@ public class Validator implements ClassValidator {
     {
         
         if (object == null) {
-            throw new ValidationException("cannot validate a null Object.");
+            throw new ValidationException("Cannot validate a null Object.");
         } 
         
         if (resolver == null) {
