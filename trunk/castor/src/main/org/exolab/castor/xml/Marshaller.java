@@ -885,11 +885,11 @@ public class Marshaller extends MarshalFramework {
         if (_parents.search(object) >= 0) return;
         _parents.push(object);
 
-        boolean nil = (object instanceof NilObject);
+        final boolean isNil = (object instanceof NilObject);
         
         Class _class = null;
         
-        if (!nil) {
+        if (!isNil) {
             _class = object.getClass();
         }
         else {
@@ -1084,7 +1084,7 @@ public class Marshaller extends MarshalFramework {
                 saveType = false;
             else if (descriptor.getHandler() instanceof EnumFieldHandler)
                 saveType = false;
-            else if (nil) 
+            else if (isNil) 
                 saveType = false;
         }
         
@@ -1262,12 +1262,12 @@ public class Marshaller extends MarshalFramework {
         int nestedAttCount = 0;
         XMLFieldDescriptor[] nestedAtts = null;
         XMLFieldDescriptor[] descriptors = null;
-        if (!descriptor.isReference()) {
+        if ((!descriptor.isReference()) && (!isNil)) {
             descriptors = classDesc.getAttributeDescriptors();
         }
         else {
             // references don't have attributes
-            descriptors = new XMLFieldDescriptor[0];
+            descriptors = NO_FIELD_DESCRIPTORS;
         }
         
         for (int i = 0; i < descriptors.length; i++) {
@@ -1287,7 +1287,7 @@ public class Marshaller extends MarshalFramework {
 
         //-- Look for attributes in container fields,
         //-- (also handle container in container)
-        processContainerAttributes(object, classDesc, atts);
+        if (!isNil) processContainerAttributes(object, classDesc, atts);
 
         //-- xml:space
         String attValue = descriptor.getProperty(XMLFieldDescriptor.PROPERTY_XML_SPACE);
@@ -1353,7 +1353,7 @@ public class Marshaller extends MarshalFramework {
             atts.addAttribute(XSI_NAMESPACE, TYPE_ATTR, XSI_TYPE, CDATA, typeName);
         }
         
-        if (nil) {
+        if (isNil) {
             //-- declare XSI namespace, if necessary
             declareNamespace(XSI_PREFIX, XSI_NAMESPACE);
             //-- add xsi:nil="true"
@@ -1395,7 +1395,7 @@ public class Marshaller extends MarshalFramework {
                 
                 
                 //-- isNillable?
-                if ((!nil) && descriptor.isNillable()) {
+                if ((!isNil) && descriptor.isNillable()) {
                     XMLFieldDescriptor desc = classDesc.getContentDescriptor();
                 	descriptors = classDesc.getElementDescriptors();
                     int descCount = descriptors.length;
@@ -1453,7 +1453,6 @@ public class Marshaller extends MarshalFramework {
                 
                 
                 handler.startElement(nsURI, name, qName, atts);
-                if (nil) return;
             } 
         }
         catch (org.xml.sax.SAXException sx) {
@@ -1465,36 +1464,51 @@ public class Marshaller extends MarshalFramework {
         //-- handle text content
         //----------------------
         
-        XMLFieldDescriptor cdesc = null;
-        if (!descriptor.isReference()) {
-            cdesc = classDesc.getContentDescriptor();
-        }
-        if (cdesc != null) {
-            Object obj = null;
-            try {
-                obj = cdesc.getHandler().getValue(object);
+        if (!isNil) {
+            XMLFieldDescriptor cdesc = null;
+            if (!descriptor.isReference()) {
+                cdesc = classDesc.getContentDescriptor();
             }
-            catch(IllegalStateException ise) {};
-            
-            if (obj != null) {
-                char[] chars = null;
-                //-- handle base64 content
-                Class objType = obj.getClass();
-                if (objType.isArray() &&
-                   (objType.getComponentType() == Byte.TYPE))
-                {
-                    MimeBase64Encoder encoder = new MimeBase64Encoder();
-                    encoder.translate((byte[])obj);
-                    chars = encoder.getCharArray();
+            if (cdesc != null) {
+                Object obj = null;
+                try {
+                    obj = cdesc.getHandler().getValue(object);
                 }
-                //-- all other types
-                else {
-                    String str = obj.toString();
-                    if ((str != null) && (str.length() > 0)) {
-                        chars = str.toCharArray();
+                catch(IllegalStateException ise) {};
+                
+                if (obj != null) {
+                    char[] chars = null;
+                    //-- handle base64 content
+                    Class objType = obj.getClass();
+                    if (objType.isArray() &&
+                       (objType.getComponentType() == Byte.TYPE))
+                    {
+                        MimeBase64Encoder encoder = new MimeBase64Encoder();
+                        encoder.translate((byte[])obj);
+                        chars = encoder.getCharArray();
+                    }
+                    //-- all other types
+                    else {
+                        String str = obj.toString();
+                        if ((str != null) && (str.length() > 0)) {
+                            chars = str.toCharArray();
+                        }
+                    }
+                    if ((chars != null) && (chars.length > 0)) {
+                        try {
+                            handler.characters(chars, 0, chars.length);
+                        }
+                        catch(org.xml.sax.SAXException sx) {
+                            throw new MarshalException(sx);
+                        }
                     }
                 }
-                if ((chars != null) && (chars.length > 0)) {
+            }
+            //-- element references
+            else if (descriptor.isReference()) {
+                Object id = getObjectID(object);
+                if (id != null) {
+                    char[] chars = id.toString().toCharArray();
                     try {
                         handler.characters(chars, 0, chars.length);
                     }
@@ -1503,12 +1517,12 @@ public class Marshaller extends MarshalFramework {
                     }
                 }
             }
-        }
-        //-- element references
-        else if (descriptor.isReference()) {
-            Object id = getObjectID(object);
-            if (id != null) {
-                char[] chars = id.toString().toCharArray();
+            // special case for byte[]
+            else if (byteArray) {
+                //-- Base64Encoding
+                MimeBase64Encoder encoder = new MimeBase64Encoder();
+                encoder.translate((byte[])object);
+                char[] chars = encoder.getCharArray();
                 try {
                     handler.characters(chars, 0, chars.length);
                 }
@@ -1516,29 +1530,16 @@ public class Marshaller extends MarshalFramework {
                     throw new MarshalException(sx);
                 }
             }
-        }
-        // special case for byte[]
-        else if (byteArray) {
-            //-- Base64Encoding
-            MimeBase64Encoder encoder = new MimeBase64Encoder();
-            encoder.translate((byte[])object);
-            char[] chars = encoder.getCharArray();
-            try {
-                handler.characters(chars, 0, chars.length);
-            }
-            catch(org.xml.sax.SAXException sx) {
-                throw new MarshalException(sx);
-            }
-        }
-        /* special case for Strings and primitives */
-        else if (isPrimitive(_class)) {
-
-            char[] chars = object.toString().toCharArray();
-            try {
-                handler.characters(chars,0,chars.length);
-            }
-            catch(org.xml.sax.SAXException sx) {
-                throw new MarshalException(sx);
+            /* special case for Strings and primitives */
+            else if (isPrimitive(_class)) {
+    
+                char[] chars = object.toString().toCharArray();
+                try {
+                    handler.characters(chars,0,chars.length);
+                }
+                catch(org.xml.sax.SAXException sx) {
+                    throw new MarshalException(sx);
+                }
             }
         }
 
@@ -1546,10 +1547,11 @@ public class Marshaller extends MarshalFramework {
         //-- handle daughter elements
         //---------------------------
         
-        nil = false;
-        descriptors = classDesc.getElementDescriptors();
-        if (descriptor.isReference()) {
-            descriptors = new XMLFieldDescriptor[0];
+        if (isNil || descriptor.isReference()) {
+        	descriptors = NO_FIELD_DESCRIPTORS;
+        }
+        else {
+            descriptors = classDesc.getElementDescriptors();
         }
 
         ++depth;
@@ -1560,6 +1562,7 @@ public class Marshaller extends MarshalFramework {
 
             XMLFieldDescriptor elemDescriptor = descriptors[i];
             Object obj = null;
+            boolean nil = false;
             
             //-- used previously cached value?
             if ((i == firstNonNullIdx) && (firstNonNullValue != null)) {
