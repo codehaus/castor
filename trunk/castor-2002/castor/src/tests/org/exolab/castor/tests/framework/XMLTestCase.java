@@ -54,7 +54,6 @@ import org.exolab.castor.tests.framework.ObjectModelInstanceBuilder;
 import org.exolab.castor.tests.framework.CastorTestable;
 import org.exolab.castor.tests.framework.testDescriptor.MarshallingTest;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
-import org.exolab.castor.tests.framework.testDescriptor.RootObject;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.Marshaller;
