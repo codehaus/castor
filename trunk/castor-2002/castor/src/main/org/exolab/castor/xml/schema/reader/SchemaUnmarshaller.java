@@ -62,10 +62,11 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
 
     public static final String XSD_NAMESPACE
-        = "http://www.w3.org/2000/10/XMLSchema";
+        = "http://www.w3.org/2001/XMLSchema";
 
 
     public static final String[] UNSUPPORTED_NAMESPACES = {
+        "http://www.w3.org/2000/10/XMLSchema",
         "http://www.w3.org/1999/XMLSchema"
     };
 
@@ -215,7 +216,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             if (attValue.equals(UNSUPPORTED_NAMESPACES[i]))
                 error("The following namespace \"" + attValue +
                     "\" is no longer supported. Please update to " +
-                    " XML Schema Candidate Release (October)");
+                    " W3C XML Schema Recommendation.");
         }
 		_schema.addNamespace(prefix, attValue);
 
