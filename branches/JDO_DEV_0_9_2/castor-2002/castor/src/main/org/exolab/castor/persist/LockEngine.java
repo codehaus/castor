@@ -55,9 +55,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.io.Writer;
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.Persistent;
-import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -88,7 +85,7 @@ import org.exolab.castor.util.Messages;
  * operations will be let running concurrently for the same object. 
  * <p>
  * For example, it ensures that exactly one transaction may read (load) exclusively
- * on one object; transaction can not deleted an object while the other is 
+ * on one entity; transaction can not deleted an entity while the other is 
  * reading it, etc...
  * <p>
  * It also provides caching for a persistence storage. Different {@link LRU} mechanisms
@@ -310,7 +307,17 @@ public final class LockEngine {
     //         Referential integrity stuff
     // ==========================================
     /**
-     * Updates the relationship list
+     * Updates the corresponding Relations of the specified Entity.<p>
+     *
+     * The Entity, and Relation of an Entity to another, is maintained
+     * (cache and lock) separately. When the state of an Entity changed
+     * the corresponding Relation, if any, should be updated too. For
+     * example, when the foreign key field in a Entity is set to null,
+     * the corresponds Relation should be removed.<p>
+     *
+     * @param key The key which holds the locks
+     * @param entity The specified entity
+     * @throws LockNotGrantedException ??
      */
     private void updateRelationLists( Key key, Entity entity ) 
             throws LockNotGrantedException {
@@ -349,7 +356,7 @@ public final class LockEngine {
      * concurrent updates. In non-exclusive mode the object is either
      * loaded or obtained from the cache with a read lock. 
      *
-     * @param key The key used to lock object(s).
+     * @param key The key used to lock entity to be loaded.
      * @param entity The entity instance to be loaded into
      * @param accessMode The desired access mode
      * @param timeout The timeout waiting to acquire a lock on the
@@ -360,8 +367,6 @@ public final class LockEngine {
      *  attempting to acquire lock on object
      * @throws PersistenceException An error reported by the
      *  persistence engine
-     * @throws ClassNotPersistenceCapableException The class is not
-     *  persistent capable
      */
     public void load( Key key, Entity entity, AccessMode accessMode, int timeout )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
@@ -421,11 +426,8 @@ public final class LockEngine {
     }
 
     /**
-     * Creates a new object in the persistence storage. The object must not 
+     * Creates a new entity in the persistence storage. The entity must not 
      * be persistent and must have a unique identity within this engine.
-     * If the identity is specified the object is created in persistent 
-     * storage immediately with the identity. If the identity is not 
-     * specified, the object is created only when the transaction commits.
      *
      * @param key The transaction context
      * @param entity The entity to be created
@@ -433,8 +435,6 @@ public final class LockEngine {
      *  already exists in persistent storage
      * @throws PersistenceException An error reported by the
      *  persistence engine
-     * @throws ClassNotPersistenceCapableException The class is not
-     *  persistent capable
      */
     public void create( Key key, Entity entity )
             throws DuplicateIdentityException, PersistenceException,
@@ -498,21 +498,20 @@ public final class LockEngine {
     }
 
     /**
-     * Called at transaction commit time to delete the object. Object
+     * Called at transaction commit time to delete the entity. Entity
      * deletion occurs in three distinct steps:
      * <ul>
-     * <li>A write lock is obtained on the object to assure it can be
-     *     deleted and the object is marked for deletion in the
+     * <li>A write lock is obtained on the entity to assure it can be
+     *     deleted and the entity is marked for deletion in the
      *     transaction context
-     * <li>As part of transaction preparation the object is deleted
+     * <li>As part of transaction preparation the entity is deleted
      *     from persistent storage using this method
-     * <li>The object is removed from the cache when the transaction
-     *     completes with a call to {@link #forgetObject}
+     * <li>The entity is removed from the cache when the transaction
+     *     completes
      * </ul>
      *
      * @param key The transaction context
-     * @param oid The object's identity
-     * @param object The object type
+     * @param entity The entity
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
@@ -966,17 +965,6 @@ public final class LockEngine {
             throw new IllegalStateException( except.toString() );
         }
     } */
-
-    /**
-     * Returns an association between Xid and transactions contexts.
-     * The association is shared between all transactions open against
-     * this cache engine through the XAResource interface.
-     */
-     /*
-    public HashMap getXATransactions()
-    {
-        return _xaTx;
-    }*/
 
     /**
      * Helper methods to get a specified typeInfo from the maps
