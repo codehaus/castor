@@ -184,6 +184,38 @@ public class DatabaseImpl
     }
 
 
+    public Object load( Class type, Object identity, short accessMode )
+        throws TransactionNotInProgressException, ObjectNotFoundException,
+               LockNotGrantedException, PersistenceException
+    {
+        TransactionContext tx;
+        ClassHandler       handler;
+        AccessMode         mode;
+
+        switch ( accessMode ) {
+        case ReadOnly:
+            mode = AccessMode.ReadOnly;
+            break;
+        case Shared:
+            mode = AccessMode.Shared;
+            break;
+        case Exclusive:
+            mode = AccessMode.Exclusive;
+            break;
+        case Locked:
+            mode = AccessMode.Locked;
+            break;
+        default:
+            throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
+        }
+        tx = getTransaction();
+        handler = _dbEngine.getClassHandler( type );
+        if ( handler == null )
+            throw new ClassNotPersistenceCapableExceptionImpl( type );
+        return tx.fetch( _dbEngine, handler, identity, mode );
+    }
+
+
     public void create( Object object )
         throws ClassNotPersistenceCapableException, DuplicateIdentityException,
                TransactionNotInProgressException, PersistenceException

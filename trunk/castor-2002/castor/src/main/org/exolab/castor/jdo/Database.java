@@ -86,8 +86,8 @@ package org.exolab.castor.jdo;
  * while ( enum.hasMoreElements() ) {
  *   <font color="red">// A 25% mark down for each product and mark as sale</font>
  *   prod = (Product) enum.nextElement();
- *   prod.price = prod.price * 0.75;
- *   prod.onSale = true;
+ *   prod.markDown( 0.25 );
+ *   prod.setOnSale( true );
  * }
  * <font color="red">// Commit all changes, close the database</font>
  * db.commit();
@@ -101,6 +101,34 @@ package org.exolab.castor.jdo;
  */
 public interface Database
 {
+
+
+    /**
+     * Read only access. Objects can be read but are not made persistent
+     * and changes to objects are not reflected in the database.
+     */
+    public static final short ReadOnly = 0;
+
+
+    /**
+     * Shared access. Objects can be read by multiple concurrent
+     * transactions. Equivalent to optimistic locking.
+     */
+    public static final short Shared = 1;
+
+
+    /**
+     * Exclusive access. Objects can be access by a single transaction
+     * at any given time. Equivalent to pessimistic locking.
+     */
+    public static final short Exclusive = 2;
+
+
+    /**
+     * Locked access. Objects can be access by a single transaction
+     * at any given time, and a lock is acquired in the database.
+     */
+    public static final short Locked = 3;
 
 
     /**
@@ -142,6 +170,30 @@ public interface Database
      *  persistence engine
      */
     public Object load( Class type, Object identity )
+        throws ObjectNotFoundException, LockNotGrantedException,
+               TransactionNotInProgressException, PersistenceException;
+
+
+    /**
+     * Load an object of the specified type and given identity.
+     * Once loaded the object is persistent. Calling this method with
+     * the same identity in the same transaction will return the same
+     * object. This method is equivalent to a query that returns a
+     * single object.
+     *
+     * @param type The object's type
+     * @param identity The object's identity
+     * @param accessMode The access mode
+     * @throws ObjectNotFoundException No object of the given type and
+     *  identity was found in persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire a lock on the object
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public Object load( Class type, Object identity, short accessMode )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
