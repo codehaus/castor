@@ -42,7 +42,8 @@
  *
  * $Id$
  * Date         Author          Changes
- * 10/31/00     Arnaud Blandin  support for min/max, scale&precision facets
+ * 06/01/2001   Arnaud Blandin  Upgrade to XML Schema Recommendation
+ * 10/31/200    Arnaud Blandin  support for min/max, scale&precision facets
  */
 
 package org.exolab.castor.builder.types;
@@ -65,12 +66,13 @@ public  class XSDecimal extends XSType
     /**
      * Facets for Decimal type
      */
-    Integer _scale = null;
-    Integer _precision = null;
     java.math.BigDecimal _maxInclusive = null;
     java.math.BigDecimal _maxExclusive = null;
     java.math.BigDecimal _minInclusive = null;
     java.math.BigDecimal _minExclusive = null;
+    private int  _totalDigits = -1;
+    private int _fractionDigits = -1;
+
 
 
     /**
@@ -96,24 +98,6 @@ public  class XSDecimal extends XSType
     public String createFromJavaObjectCode(String variableName) {
         return "(java.math.BigDecimal)"+variableName;
     } //-- fromJavaObject
-
-    /**
-     * Returns the precision value of this XSDecimal
-     * @return the precision value of this XSDecimal.
-    **/
-
-    public Integer getPrecision() {
-        return _precision;
-    }
-
-
-    /**
-     * Returns the scale value of this XSDecimal
-     * @return the scale value of this XSDecimal.
-    **/
-    public Integer getScale() {
-        return _scale;
-    }
 
     /**
      * Returns the maximum exclusive value that this XSInteger can hold.
@@ -156,6 +140,21 @@ public  class XSDecimal extends XSType
     public java.math.BigDecimal  getMinInclusive() {
         return _minInclusive;
     } //-- getMinInclusive
+      /**
+     * Returns the totalDigits facet value of this XSInteger.
+     * @return the totalDigits facet value of this XSInteger.
+     */
+    public int getTotalDigits() {
+        return _totalDigits;
+    }
+
+    /**
+     * Returns the fractionDigits facet value of this XSInteger.
+     * @return the fractionDigits facet value of this XSInteger.
+     */
+    public int getFractionDigits() {
+        return _fractionDigits;
+    }
 
     public boolean hasMaximum() {
         return ((_maxInclusive != null) || (_maxExclusive != null));
@@ -209,31 +208,26 @@ public  class XSDecimal extends XSType
         _minExclusive = null;
     } //-- setMinInclusive
 
+    /**
+     * Sets the totalDigits facet for this XSInteger.
+     * @param totalDig the value of totalDigits (must be >0)
+     */
+     public void setTotalDigits(int totalDig) {
+          if (totalDig <= 0)
+              throw new IllegalArgumentException(this.getName()+": the totalDigits facet must be positive");
+          else _totalDigits = totalDig;
+     }
 
-    public void setPrecision(int p) throws ValidationException {
-        String err = "";
-        if ( p<0 || p==0 ) {
-            err = "decimal precision must be a positiveInteger";
-            throw new ValidationException(err);
-        }
+    /**
+     * Sets the fractionDigits facet for this XSInteger.
+     * @param fractionDig the value of fractionDigits (must be >=0)
+     */
+     public void setFractionDigits(int fractionDig) {
+          if (fractionDig < 0)
+              throw new IllegalArgumentException(this.getName()+": the fractionDigits facet must be positive");
+          else _fractionDigits = fractionDig;
+     }
 
-        _precision = new Integer(p);
-    }
-
-    public void setScale(int s) throws ValidationException {
-        String err = "";
-        if (s<0) {
-            err = "decimal scale must be a nonNegativeInteger";
-            throw new ValidationException(err);
-        }
-
-        if ( (_precision!=null) && (s > _precision.intValue()) ) {
-            err = "decimal scale must be lower than precision";
-            throw new ValidationException(err);
-        }
-
-        _scale = new Integer(s);
-    }
 
     public void setFacets(SimpleType simpleType) {
      Enumeration enum = getFacets(simpleType);
@@ -254,6 +248,12 @@ public  class XSDecimal extends XSType
                 //-- minInclusive
                 else if (Facet.MIN_INCLUSIVE.equals(name))
                     setMinInclusive(new java.math.BigDecimal(facet.getValue()));
+                //--totalDigits
+                else if (Facet.TOTALDIGITS.equals(name))
+                    setTotalDigits(facet.toInt());
+                //--fractionDigits
+                else if (Facet.FRACTIONDIGITS.equals(name))
+                   setFractionDigits(facet.toInt());
             }
 
     } //-- setFacets
@@ -271,10 +271,7 @@ public  class XSDecimal extends XSType
 	 */
 	public String newInstanceCode()
 	{
-        String result = "new java.math.BigDecimal(0)";
-        //can't create a BigDecimal that follows the precision facet
-        result = (_scale!=null) ? result+".setScale("+_scale.intValue()+");"
-                                  : result+";";
+        String result = "new java.math.BigDecimal(0);";
         return result;
 	}
 }

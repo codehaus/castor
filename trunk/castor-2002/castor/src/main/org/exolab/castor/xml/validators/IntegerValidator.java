@@ -50,52 +50,54 @@ import org.exolab.castor.xml.*;
 
 /**
  * The Integer Validation class. This class handles validation
- * for the integer type as well as all integer derived types 
+ * for the integer type as well as all integer derived types
  * such as positive-integer and negative-integer
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class IntegerValidator extends PatternValidator
-    implements TypeValidator    
-{    
-    
+    implements TypeValidator
+{
+
     private boolean useMin   = false;
     private boolean useMax   = false;
     private boolean useFixed = false;
-    
+
     private int min = 0;
     private int max = 0;
-    
+    private int  _totalDigits = -1;
+
+
     private int fixed = 0;
-    
+
     /**
      * Creates a new IntegerValidator with no restrictions
     **/
     public IntegerValidator() {
         super();
     } //-- IntegerValidator
-    
+
     /**
      * Clears the fixed value for this IntegerValidator
     **/
     public void clearFixed() {
         useFixed = false;
     } //-- clearFixed
-    
+
     /**
      * Clears the maximum value for this IntegerValidator
     **/
     public void clearMax() {
         useMax = false;
     } //-- clearMax
-    
+
     /**
      * Clears the minimum value for this IntegerValidator
     **/
     public void clearMin() {
         useMin = false;
     } //-- clearMin
-    
+
     /**
      * Sets the fixed value that integers validated with this
      * validated must be equal to
@@ -103,14 +105,14 @@ public class IntegerValidator extends PatternValidator
      * this validator must be equal to.
      * <BR />
      * NOTE: Using Fixed values takes preceedence over using max and mins,
-     * and is really the same as setting both max-inclusive and 
-     * min-inclusive to the same value 
+     * and is really the same as setting both max-inclusive and
+     * min-inclusive to the same value
     **/
     public void setFixed(int fixedValue) {
         useFixed = true;
         this.fixed = fixedValue;
     } //-- setFixed
-    
+
     /**
      * Sets the minimum value that integers validated with this
      * validator must be greater than
@@ -121,7 +123,7 @@ public class IntegerValidator extends PatternValidator
         useMin = true;
         min = minValue+1;
     } //-- setMinExclusive
-    
+
     /**
      * Sets the minimum value that integers validated with this
      * validator are allowed to be
@@ -143,7 +145,7 @@ public class IntegerValidator extends PatternValidator
         useMax = true;
         max = maxValue-1;
     } //-- setMaxExclusive
-    
+
     /**
      * Sets the maximum value that integers validated with this
      * validator are allowed to be
@@ -154,20 +156,30 @@ public class IntegerValidator extends PatternValidator
         useMax = true;
         max = maxValue;
     } //-- setMaxInclusive
-    
-    public void validate(int i) 
-        throws ValidationException 
+
+      /**
+     * Sets the totalDigits facet for this Integer type.
+     * @param totalDig the value of totalDigits (must be >0)
+     */
+     public void setTotalDigits(int totalDig) {
+          if (totalDig <= 0)
+              throw new IllegalArgumentException("IntegerValidator: the totalDigits facet must be positive");
+          else _totalDigits = totalDig;
+     }
+
+    public void validate(int i)
+        throws ValidationException
     {
-        
+
         if (useFixed) {
             if (i != fixed) {
-                String err = i + " is not equal to the fixed value of " 
+                String err = i + " is not equal to the fixed value of "
                     + fixed;
                 throw new ValidationException(err);
             }
             return;
         }
-        
+
         if (useMin) {
             if (i < min) {
                 String err = i + " is less than the minimum allowable ";
@@ -182,24 +194,31 @@ public class IntegerValidator extends PatternValidator
                 throw new ValidationException(err);
             }
         }
-        
+
+        if (_totalDigits != -1) {
+            if ( (i % 10) != _totalDigits ) {
+                String err = i + " doesn't have the correct number of digits: "+_totalDigits;
+                throw new ValidationException(err);
+            }
+        }
+
         if (hasPattern())
             super.validate(Integer.toString(i));
-        
+
     } //-- validate
-    
+
     /**
      * Validates the given Object
      * @param object the Object to validate
     **/
     public void validate(Object object)
-        throws ValidationException 
+        throws ValidationException
     {
         if (object == null) {
             String err = "IntegerValidator cannot validate a null object.";
             throw new ValidationException(err);
         }
-        
+
         int value = 0;
         try {
             value = ((Integer)object).intValue();
@@ -211,5 +230,5 @@ public class IntegerValidator extends PatternValidator
         }
         validate(value);
     } //-- validate
-    
+
 } //-- IntegerValidator

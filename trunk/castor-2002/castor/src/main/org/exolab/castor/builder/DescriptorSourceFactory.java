@@ -516,7 +516,8 @@ public class DescriptorSourceFactory {
 
         String fixed = member.getFixedValue();
         String pattern = null;
-
+        int fractionDigits = -1;
+        int totalDigits = -1;
         //-- create proper validator
 
         switch (xsType.getType()) {
@@ -602,16 +603,21 @@ public class DescriptorSourceFactory {
                     jsc.append(");");
                 }
 
-                if (xsDecimal.getScale() != null) {
-                    jsc.add("dv.setScale(");
-                    jsc.append(xsDecimal.getScale().toString());
-                    jsc.append(");");
+                 //-- totalDigits
+                 totalDigits = xsDecimal.getTotalDigits();
+
+                if (totalDigits != -1) {
+                   jsc.add("dv.setTotalDigits(");
+                   jsc.append(Integer.toString(totalDigits));
+                   jsc.append(");");
                 }
 
-                if (xsDecimal.getPrecision() != null) {
-                    jsc.add("dv.setPrecision(");
-                    jsc.append(xsDecimal.getPrecision().toString());
-                    jsc.append(");");
+                 //-- fractionDigits
+                fractionDigits = xsDecimal.getFractionDigits();
+                if (fractionDigits != -1) {
+                   jsc.add("dv.setFractionDigits(");
+                   jsc.append(Integer.toString(fractionDigits));
+                   jsc.append(");");
                 }
 
                 jsc.add("fieldValidator.setValidator(dv);");
@@ -781,6 +787,14 @@ public class DescriptorSourceFactory {
                     jsc.add("iv.setPattern(\"");
                     jsc.append(escapePattern(pattern));
                     jsc.append("\");");
+                }
+                //-- totalDigits
+                totalDigits = xsInteger.getTotalDigits();
+
+                if (totalDigits != -1) {
+                   jsc.add("iv.setTotalDigits(");
+                   jsc.append(Integer.toString(totalDigits));
+                   jsc.append(");");
                 }
 
                 jsc.add("fieldValidator.setValidator(iv);");
