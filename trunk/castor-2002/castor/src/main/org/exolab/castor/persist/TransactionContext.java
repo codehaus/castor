@@ -764,7 +764,6 @@ public abstract class TransactionContext
             throw new NullPointerException();
 
         identity = molder.getActualIdentity( this, object );
-
         // Make sure that nobody is looking at the object
         oid = new OID( engine, molder, depended, identity );
         entry = getObjectEntry( engine, oid );
@@ -774,7 +773,7 @@ public abstract class TransactionContext
         if ( entry != null ) {
             if ( entry.deleted )
                 throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass(), identity ) );
-            else
+            else 
                 throw new DuplicateIdentityException( "update object which is already in the transaction" );
 
             // to prevent circular references
@@ -1387,6 +1386,17 @@ public abstract class TransactionContext
         return ( ( entry != null ) && ( ! entry.deleted ) );
     }
 
+    /**
+     * Returns true if the object is previously queried/loaded/update/create
+     * in this transaction
+     */
+    public boolean isRecorded( Object object )
+    {
+        ObjectEntry entry;
+
+        entry = getObjectEntry( object );
+        return entry != null;
+    }
     public boolean isDepended( OID master, Object dependent ) {
         ObjectEntry entry;
         OID depends;
@@ -1488,7 +1498,16 @@ public abstract class TransactionContext
     
         return false;
     }
-            
+    
+    public boolean isDeletedByOID( OID oid ) {
+        ObjectEntry entry;
+
+        entry = getObjectEntry( oid.getLockEngine(), oid );
+        if ( entry != null )
+            return entry.deleted;
+
+        return false;
+    }
 
     public int getObjectState( Object object ) {
 
