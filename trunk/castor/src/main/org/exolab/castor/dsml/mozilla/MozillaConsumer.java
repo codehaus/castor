@@ -48,16 +48,9 @@ package org.exolab.castor.dsml.mozilla;
 
 
 import java.util.Enumeration;
-import java.util.Vector;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.AttributeList;
-import netscape.ldap.LDAPEntry;
-import netscape.ldap.LDAPAttribute;
-import netscape.ldap.LDAPAttributeSet;
-import netscape.ldap.LDAPException;
-import netscape.ldap.LDAPSearchResults;
-import netscape.ldap.LDAPConnection;
 import org.exolab.castor.dsml.Consumer;
 
 

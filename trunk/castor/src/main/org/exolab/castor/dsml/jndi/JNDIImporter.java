@@ -57,12 +57,10 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchResult;
-import org.exolab.castor.dsml.XML;
 import org.exolab.castor.dsml.Consumer;
 import org.exolab.castor.dsml.ImportEventListener;
 import org.exolab.castor.dsml.Importer;
 import org.exolab.castor.dsml.ImportDescriptor;
-import org.exolab.castor.dsml.SearchDescriptor;
 import org.exolab.castor.dsml.ImportExportException;
 
 

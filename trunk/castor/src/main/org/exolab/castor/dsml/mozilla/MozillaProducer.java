@@ -58,8 +58,6 @@ import netscape.ldap.LDAPSchema;
 import netscape.ldap.LDAPAttributeSchema;
 import netscape.ldap.LDAPObjectClassSchema;
 import netscape.ldap.LDAPSearchResults;
-import netscape.ldap.LDAPv2;
-import netscape.ldap.LDAPSearchConstraints;
 import org.exolab.castor.dsml.Producer;
 import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.dsml.XML;

@@ -47,7 +47,6 @@
 package org.exolab.castor.dsml.jndi;
 
 
-import java.util.Enumeration;
 import javax.naming.NamingException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
@@ -57,7 +56,6 @@ import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.exolab.castor.dsml.Consumer;
 import org.exolab.castor.dsml.Exporter;
-import org.exolab.castor.dsml.ImportDescriptor;
 import org.exolab.castor.dsml.SearchDescriptor;
 import org.exolab.castor.dsml.ImportExportException;
 import org.exolab.castor.util.Messages;

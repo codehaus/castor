@@ -52,7 +52,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Enumeration;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.Parser;
