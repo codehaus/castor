@@ -70,7 +70,7 @@ public class MemberFactory {
     private FieldInfoFactory infoFactory = null;
 
 
-    /** 
+    /**
      * Creates a new MemberFactory with default type factory.
     **/
     public MemberFactory() {
@@ -182,10 +182,6 @@ public class MemberFactory {
         switch (xsType.getType()) {
             case XSType.INTEGER_TYPE:
                 fieldInfo = infoFactory.createFieldInfo(xsType, memberName);
-                fieldInfo.setCodeHelper(
-                    new IntegerCodeHelper((XSInteger)xsType)
-                );
-
                 break;
             case XSType.ID_TYPE:
                 fieldInfo = infoFactory.createIdentity(memberName);
@@ -474,7 +470,7 @@ public class MemberFactory {
     {
 
         String groupName = group.getName();
-        
+
         if (groupName == null) {
             groupName = sgState.getGroupNaming().createClassName(group);
             if (groupName == null) {
@@ -487,8 +483,7 @@ public class MemberFactory {
         //-- check whether this should be a Vector or not
         int maxOccurs = group.getMaxOccurs();
         int minOccurs = group.getMinOccurs();
-
-		//-- determine type
+       //-- determine type
 
         JSourceCode jsc     = null;
         FieldInfo fieldInfo = null;
@@ -544,7 +539,7 @@ public class MemberFactory {
         return fieldInfo;
     } //-- createFieldInfo(Group)
 
-    
+
 	/**
 	 * Returns the actual element type (handles 'ref' attribute and anonymous complextypes)
 	 * @param e The element the type is need from
