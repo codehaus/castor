@@ -82,7 +82,7 @@ import org.exolab.castor.util.Messages;
  * on one object; transaction can not deleted an object while the other is 
  * reading it, etc...
  * <p>
- * It also provides caching for a persistence storage. Different {@link LRU} mechanisms
+ * It also provides caching for a persistence storage. Different {@link Cache} mechanisms
  * can be specified. 
  * <p>
  * User should not create more than one instance of LockEngine for each persistent 
@@ -141,7 +141,7 @@ public final class LockEngine {
     
     /**
      * Used by the constructor when creating handlers to temporarily
-     * hold the persistence factory for use by {@link #addClassMolder}.
+     * hold the persistence factory for use by {@link #getClassMolder}.
      */
     private PersistenceFactory _factory;
 
