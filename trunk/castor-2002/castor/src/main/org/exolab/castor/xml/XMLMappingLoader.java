@@ -266,7 +266,7 @@ public class XMLMappingLoader
         if (xml != null) {
             //-- xml name
             xmlName = xml.getName();
-
+            
             //-- node type
             if ( xml.getNode() != null )
                 nodeType = NodeType.getNodeType( xml.getNode().toString() );
@@ -281,6 +281,19 @@ public class XMLMappingLoader
             AutoNamingType autoName = xml.getAutoNaming();
             if (autoName != null) {
                 deriveNameByClass = (autoName == AutoNamingType.DERIVEBYCLASS);
+            }
+        }
+        
+        //-- handle QName for xmlName
+        String namespace = null;
+        if ((xmlName != null) && (xmlName.length() > 0)){
+            if (xmlName.charAt(0) == '{') {
+                int idx = xmlName.indexOf('}');
+                if (idx < 0) {
+                    throw new MappingException("Invalid QName: " + xmlName);
+                }
+                namespace = xmlName.substring(1, idx);
+                xmlName = xmlName.substring(idx+1);
             }
         }
 
@@ -308,6 +321,11 @@ public class XMLMappingLoader
         //-- and automatically creates the name.
         if (deriveNameByClass) {
             xmlDesc.setXMLName(null);
+        }
+        
+        //-- namespace
+        if (namespace != null) {
+            xmlDesc.setNameSpaceURI(namespace);
         }
         
         //-- matches
@@ -358,7 +376,7 @@ public class XMLMappingLoader
         return (type.getSuperclass() == Number.class);
 
     } //-- isPrimitive
-
+    
 }
 
 
