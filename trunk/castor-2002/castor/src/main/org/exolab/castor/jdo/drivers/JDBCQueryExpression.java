@@ -347,6 +347,8 @@ public class JDBCQueryExpression
         boolean      first;
         Hashtable    tables;
         Vector       done = new Vector();
+        String       tableName;
+        String       tableAlias;
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
@@ -379,7 +381,7 @@ public class JDBCQueryExpression
                 sql.append( "{oj " );
             sql.append(  _factory.quoteName( join.leftTable ) );
             sql.append( JDBCSyntax.LeftJoin );
-            String tableName = (String) tables.get( join.rightTable );
+            tableName = (String) tables.get( join.rightTable );
             if( join.rightTable.equals( tableName ) ) {
                 sql.append( _factory.quoteName( tableName ) );
             } else {
@@ -405,6 +407,7 @@ public class JDBCQueryExpression
                 if ( ! join.leftTable.equals( join2.leftTable ) )
                     continue;
                 sql.append( JDBCSyntax.LeftJoin );
+                tableName = (String) tables.get( join2.rightTable );
                 if( join2.rightTable.equals( tableName ) ) {
                     sql.append( _factory.quoteName( tableName ) );
                 } else {
@@ -432,8 +435,8 @@ public class JDBCQueryExpression
                 first = false;
             else
                 sql.append( JDBCSyntax.TableSeparator );
-            String tableAlias = (String) enum.nextElement();
-            String tableName = (String) tables.get( tableAlias );
+            tableAlias = (String) enum.nextElement();
+            tableName = (String) tables.get( tableAlias );
             if( tableAlias.equals( tableName ) ) {
                 sql.append( _factory.quoteName( tableName ) );
             } else {
