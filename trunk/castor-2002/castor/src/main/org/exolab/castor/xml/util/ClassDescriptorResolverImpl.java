@@ -70,8 +70,22 @@ public class ClassDescriptorResolverImpl
     
     private XMLMappingLoader mappingLoader = null;
     
+    private ClassLoader _loader  = null;
+    
+    /**
+     * Creates a new ClassDescriptorResolverImpl
+    **/
     public ClassDescriptorResolverImpl() {
         _cache = new Hashtable();
+    } //-- ClassDescriptorResolverImpl
+
+    /**
+     * Creates a new ClassDescriptorResolverImpl with the given ClassLoader
+     * @param loader the ClassLoader to use when loading ClassDescriptors
+    **/
+    public ClassDescriptorResolverImpl(ClassLoader loader) {
+        _cache  = new Hashtable();
+        _loader = loader;
     } //-- ClassDescriptorResolverImpl
     
     /**
@@ -124,13 +138,7 @@ public class ClassDescriptorResolverImpl
         String className = type.getName() + "Descriptor";
         try {
             ClassLoader loader = type.getClassLoader();
-            
-            Class dClass = null;            
-            if ( loader != null )
-	            dClass = loader.loadClass(className);
-	        else
-	            dClass = Class.forName(className);
-	            
+            Class dClass = loadClass(className, loader);            
             classDesc = (XMLClassDescriptor) dClass.newInstance();
             _cache.put(type, classDesc);
         }
@@ -196,10 +204,7 @@ public class ClassDescriptorResolverImpl
         //-- try and load class to check cache,
         Class _class = null;
         try {
-	        if ( loader != null )
-		        _class = loader.loadClass(className);
-	        else
-		        _class = Class.forName(className);
+            _class = loadClass(className, loader);
         }
         catch(ClassNotFoundException cnfe) { 
             //-- do nothing for now
@@ -215,19 +220,13 @@ public class ClassDescriptorResolverImpl
         if ((classDesc == null) && (_class == null)) {
             String dClassName = className+"Descriptor";
             try {
-	            Class dClass = null;
-	            if ( loader != null )
-		            dClass = loader.loadClass(dClassName);
-	            else
-		            dClass = Class.forName(dClassName);
-    		        
+	            Class dClass = loadClass(dClassName, loader);
                 classDesc = (XMLClassDescriptor) dClass.newInstance();
             }
             catch(InstantiationException ie)   { /* :-) */ }
             catch(ClassNotFoundException cnfe) { /* ;-) */ }
             catch(IllegalAccessException iae)  { /* :-Þ */ }
         }
-        
         return classDesc;
     } //-- resolve(String, ClassLoader)
     
@@ -261,6 +260,14 @@ public class ClassDescriptorResolverImpl
         return classDesc;
     } //-- resolveByXMLName
     
+    /**
+     * Sets the ClassLoader to use when loading class descriptors
+     * @param loader the ClassLoader to use
+    **/
+    public void setClassLoader(ClassLoader loader) {
+        this._loader = loader;
+    } //-- setClassLoader
+    
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
         this.mappingLoader = mappingLoader;
     } //-- setMappingLoader
@@ -269,6 +276,27 @@ public class ClassDescriptorResolverImpl
     //-------------------/
     //- Private Methods -/
     //-------------------/
+    
+    /**
+     * Loads and returns the class with the given class name using the 
+     * given loader.
+     * @param className the name of the class to load
+     * @param loader the ClassLoader to use, this may be null.
+    **/
+    private Class loadClass(String className, ClassLoader loader) 
+        throws ClassNotFoundException
+    {
+        Class c = null;
+        
+        //-- use passed in loader
+	    if ( loader != null )
+		    return loader.loadClass(className);
+		//-- use internal loader
+		else if (_loader != null)
+		    return loader.loadClass(className);
+		//-- no loader available use Class.forName
+		return Class.forName(className);
+    } //-- loadClass
     
     /**
      * Clears the error flag
