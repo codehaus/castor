@@ -57,7 +57,7 @@ package org.exolab.castor.jdo;
  * (bound) before executing the query. Execution of the query will
  * result in an enumeration of all the objects found by the query.
  * The query can be re-executed by binding new parameters and calling
- * the {@link #execute} method a second time. A query can be
+ * the {@link #execute()} method a second time. A query can be
  * re-execute while objects are still retrieved from a previous
  * execution.
  * <p>
@@ -67,7 +67,7 @@ package org.exolab.castor.jdo;
  * QueryResults results;
  *
  * <font color="red">// Construct a new query and bind the id value</font>
- * oql = db.getQuery( "SELECT ... WHERE id=$" );
+ * oql = db.getQuery( "SELECT ... WHERE id=$1" );
  * oql.bind( 5 );
  * results = oql.execute();
  * <font color="red">// Iterate over all the results and print them</font>
