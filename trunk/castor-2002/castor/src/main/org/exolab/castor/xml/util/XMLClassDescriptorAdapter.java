@@ -64,7 +64,9 @@ public class XMLClassDescriptorAdapter
     extends XMLClassDescriptorImpl
 {
     
+    
     private XMLClassDescriptor delegate = null;
+    
     
     /**
      * Creates a new XMLClassDescriptorAdapter using the
@@ -104,7 +106,8 @@ public class XMLClassDescriptorAdapter
                     addFieldDescriptor( (XMLFieldDescriptorImpl) fieldDesc );
                 else {
                     String name = fieldDesc.getFieldName();
-                    String xmlFieldName = MarshalHelper.toXMLName(name);
+                    XMLNaming naming = XMLNaming.getInstance();
+                    String xmlFieldName = naming.toXMLName(name);
                     addFieldDescriptor(new XMLFieldDescriptorImpl(fieldDesc,xmlFieldName, 
                         ( fieldDesc.getClassDescriptor() == null ? NodeType.Element : NodeType.Attribute )));
                 }
@@ -129,8 +132,10 @@ public class XMLClassDescriptorAdapter
             identity = classDesc.getIdentity();
             if ( identity instanceof XMLFieldDescriptor )
                 xmlFieldName = ((XMLFieldDescriptor)identity).getXMLName();
-            else
-                xmlFieldName = MarshalHelper.toXMLName(identity.getFieldName());
+            else {
+                XMLNaming naming = XMLNaming.getInstance();
+                xmlFieldName = naming.toXMLName(identity.getFieldName());
+            }
             addFieldDescriptor(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
         }
 

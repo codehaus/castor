@@ -79,12 +79,25 @@ public class XMLMappingLoader
     extends MappingLoader
 {
 
-
+    
+    /**
+     * naming conventions
+    **/
+    private static XMLNaming _naming = null;
+    
+    static {
+        _naming = XMLNaming.getInstance();
+    }
+    
+    /**
+     * Creates a new XMLMappingLoader
+    **/
     public XMLMappingLoader( ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
         super( loader, logWriter );
-    }
+        
+    } //-- XMLMappingLoader
 
 
     protected void resolveRelations( ClassDescriptor clsDesc )
@@ -125,7 +138,7 @@ public class XMLMappingLoader
         // generated only for supported fields, see createFieldDesc later on.
         clsDesc = super.createDescriptor( clsMap );
         if ( clsMap.getMapTo() == null || clsMap.getMapTo().getXml() == null )
-            xmlName = MarshalHelper.toXMLName( clsDesc.getJavaClass().getName() );
+            xmlName = _naming.toXMLName( clsDesc.getJavaClass().getName() );
         else
             xmlName = clsMap.getMapTo().getXml();
             
