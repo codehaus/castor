@@ -130,6 +130,10 @@ public class OQLQueryImpl
     private int                _projectionType;
     private Vector             _pathInfo;
 
+    private PersistenceQuery   _query;
+
+    private QueryResults       _results;
+
 
     OQLQueryImpl( DatabaseImpl dbImpl )
     {
@@ -284,9 +288,9 @@ public class OQLQueryImpl
             {
                 int paramIndex = ( (Integer) f.nextElement() ).intValue();
                 _bindTypes[ paramIndex - 1 ] = f.getClass();
-            }        
+            }
         }
-         
+
     }
 
     public void createCall( String oql ) throws QueryException {
@@ -378,7 +382,7 @@ public class OQLQueryImpl
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
 
-   
+
     public QueryResults execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
@@ -408,60 +412,81 @@ public class OQLQueryImpl
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         org.exolab.castor.persist.QueryResults      results;
-        PersistenceQuery  query;
         SQLEngine         engine;
-        QueryResults retVal = null;;
-        
+
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
+        if (_results != null) {
+            _results.close();
+        }
         try {
             switch (_projectionType) {
                 case ParseTreeWalker.PARENT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT_VALUE:
-                    
+
                     try {
                         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
                         if ( _expr != null ) {
-                            query = engine.createQuery( _expr, _bindTypes, accessMode );
+                            _query = engine.createQuery( _expr, _bindTypes, accessMode );
                         } else {
-                            query = engine.createCall( _spCall, _bindTypes );
+                            _query = engine.createCall( _spCall, _bindTypes );
                         }
                         if ( _bindValues != null ) {
                             for ( int i = 0 ; i < _bindValues.length ; ++i )
-                                query.setParameter( i, _bindValues[ i ] );
+                                _query.setParameter( i, _bindValues[ i ] );
                         }
                     } catch ( QueryException except ) {
                         throw new QueryException( except.getMessage() );
                     }
-                    results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
+                    results = _dbImpl.getTransaction().query( _dbEngine, _query, accessMode );
                     _fieldNum = 0;
 
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
-                      retVal = new OQLEnumeration( results );
+                      _results = new OQLEnumeration( results );
                     else
-                      retVal = new OQLEnumeration( results, _pathInfo, _clsDesc);
+                      _results = new OQLEnumeration( results, _pathInfo, _clsDesc);
                     break;
                 case ParseTreeWalker.DEPENDANT_VALUE:
                 case ParseTreeWalker.AGGREGATE:
                 case ParseTreeWalker.FUNCTION:
-                
+
                     SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
-                    retVal =  sqe.execute( _expr, _bindValues);
-                    
+                    _results =  sqe.execute( _expr, _bindValues);
+
             }
         } catch ( PersistenceException except ) {
             throw except;
         }
-        return ( retVal );
+        return _results;
     }
-        
+
+
+    public void close()
+    {
+        if ( _query != null ) {
+            _query.close();
+            _query = null;
+        }
+        if ( _results != null ) {
+            _results.close();
+            _results = null;
+        }
+    }
+
+
+    protected void finalize()
+        throws Throwable
+    {
+        close();
+    }
+
 
     static class OQLEnumeration
         implements QueryResults, Enumeration
     {
 
-        
+
         private Object                 _lastObject;
 
         private Vector                 _pathInfo;
@@ -480,7 +505,7 @@ public class OQLQueryImpl
             _classDescriptor = clsDesc;
         }
         
-        
+
         OQLEnumeration( org.exolab.castor.persist.QueryResults results )
         {
             _results = results;
@@ -610,7 +635,7 @@ public class OQLQueryImpl
                     _results.close();
                     _results = null;
                 }
-            } catch ( PersistenceException except ) { 
+            } catch ( PersistenceException except ) {
                 _results.close();
                 _results = null;
                 if ( ! skipError )
@@ -631,10 +656,7 @@ public class OQLQueryImpl
         protected void finalize()
             throws Throwable
         {
-            if ( _results != null ) {
-                _results.close();
-                _results = null;
-            }
+            close();
         }
 
 

@@ -136,6 +136,7 @@ public class NestedFields
                 }
             }
             db.commit();
+            oql.close();
 
             stream.writeVerbose( "Testing nested fields in OQLQuery..." );
             db.begin();
@@ -148,6 +149,7 @@ public class NestedFields
                 stream.writeVerbose( "Error" );
                 result = false;
             }
+            oql.close();
             db.commit();
 
             db.close();
