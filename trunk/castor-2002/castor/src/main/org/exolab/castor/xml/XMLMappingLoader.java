@@ -202,6 +202,11 @@ public class XMLMappingLoader
                 nodeType = NodeType.Element;
         }
         
+        if ((xmlName == null) && (match == null)) {
+            xmlName = _naming.toXMLName( fieldDesc.getFieldName() );
+            match = xmlName + ' ' + fieldDesc.getFieldName();
+        }
+        
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
         
         //-- matches
