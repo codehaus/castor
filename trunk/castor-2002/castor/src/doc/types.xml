@@ -136,8 +136,7 @@
       <pre><![CDATA[
   <field name="prodId" type"integer">
     <sql name="prod_id" type="numeric"/>
-  </field>]]>
-      </pre>
+  </field>]]></pre>
 
     </section>
 
@@ -149,8 +148,7 @@
       <pre><![CDATA[
   <field name="active" type="boolean">
     <sql name="acc_active" type="char[01]"/>
-  </field>]]>
-      </pre>
+  </field>]]></pre>
          where "0" is the character value for <b>false</b> and "1" is
          the character value for <b>true</b></p>
       <p>In the above example the first of four parameterized type convertors
@@ -166,8 +164,7 @@
       <pre><![CDATA[
   <field name="dateOfBirth" type="date">
     <sql name="pers_dob" type="char[MMM d, yyyy]"/>
-  </field>]]>
-      </pre>
+  </field>]]></pre>
       <p>If the parameter is not specified, the conversion is performed
          using toString() method of the Date class.</p>
       <p>The third and the fourth convertors are "date->integer" and
@@ -202,8 +199,7 @@
       <pre><![CDATA[
   <field name="text" type="string">
     <sql name="text" type="clob" dirty="ignore" />
-  </field>]]>
-      </pre>
+  </field>]]></pre>
          In this example CLOB field will be read as String. This may cause OutOfMemoryError, if the text
          is really large, but in many cases mapping CLOB to String is acceptable.
          The advantage of this way is that we obtain Serializable value that can be passed via RMI.
@@ -214,16 +210,14 @@
   </field>
   <field name="resume" type="chars">
     <sql name="resume" type="clob" dirty="ignore" />
-  </field>]]>
-      </pre>
+  </field>]]></pre>
          </p>
       <p>Now assume that this way is not acceptable.
-         The natual mapping for BLOB value is java.io.InputStream, and it is supported by Castor:
+         The natual mapping for BLOB type is java.io.InputStream, and it is supported by Castor:
       <pre><![CDATA[
   <field name="cdImage" type="stream">
     <sql name="cd_image" type="blob" dirty="ignore" />
-  </field>]]>
-      </pre>
+  </field>]]></pre>
          The natual mapping for CLOB type is java.io.Reader, but it is not supported by Castor, because
          java.io.Reader doesn't provide information about the length of the stream, which is necessary
          for JDBC driver (at least for Oracle driver) to write the value to the database.
@@ -231,16 +225,29 @@
       <pre><![CDATA[
   <field name="novel" type="clob">
     <sql name="novel" type="clob" dirty="ignore" />
-  </field>]]>
-      </pre>
+  </field>]]></pre>
          When you read data from the database, you can use getCharacterStream() method to obtain
          java.io.Reader from java.sql.Clob.
          When you write data to the database, you can either use the helper class
          org.exolab.castor.util.ClobImpl to construct java.sql.Clob from java.io.Reader and the length:
          <pre>
-  object.setClob(new ClobImpl(new FileReader(file), file.length());
-         </pre>
+  object.setClob(new ClobImpl(new FileReader(file), file.length());</pre>
          or implement java.sql.Clob() interface yourself.</p>
+      <p>But we aware of the followng restriction: if you map BLOB to java.io.InputStream or
+         CLOB to java.sql.Clob, you should set turn caching off for the Java class containing
+         those values, e.g.:
+      <pre><![CDATA[
+  <class ...>
+    <cache-type type="none"/>
+      ...
+      <field name="novel" type="clob">
+        <sql name="novel" type="clob" dirty="ignore" />
+      </field>
+  </class>]]></pre>
+         Blob and Clob values cannot be cached, because they are alive only while ResultSet that
+         produced them is open.
+         In particular this means that you cannot use dirty checking for long transactions with such
+         classes.</p>
     </section>
   </body>
 </document>
