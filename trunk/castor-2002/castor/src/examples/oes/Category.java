@@ -108,7 +108,12 @@ public class Category
     }
 
 
-    public void jdoStore()
+    public void jdoCreate()
+    {
+    }
+
+
+    public void jdoStore(boolean modified)
     {
     }
 
