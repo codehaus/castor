@@ -134,6 +134,17 @@ JDO:    Fixed a StackOverflowException. The Exception was caused by an infinite
         loop in getPrority().
         (Submitted by Mark Lamb [Mark.Lamb@spirent.com])
 
+JDO:    Fixed a problem causing unexpected ObjectModifiedException being thrown
+        when an object in one side of 1:1 relationship is being added via a long 
+        transaction. (yip)
+        (Reported by Sharma, Naveen [Naveen.Sharma@lmco.com])
+
+JDO:    Fixed the default value not being used for primitives bug. (yip)
+
+JDO:    Fixed the 1:1 dependent object not being created when the it is newly
+        link, or replaced to the master object in both long and short 
+        transaction. (yip)
+
 JDO:    (doc) Added FAQs for OQL and data model issues.
 
 JDO:    (doc) Corrected the PostgreSQL configuration example.
@@ -160,6 +171,9 @@ JDO:    (test) Added test cases for more TypeConvertor. (yip)
 JDO:    (test) Added a test for 1:1 dependent relationship. (yip)
 
 JDO:    (test) Added a soak test for Castor JDO. (todo: adds build.xml entry) (yip)
+
+JDO:    (test) Added a test case for depedent objects with 
+        key-generator used in long transaction. (yip)
 
 XML & JDO:  (doc) Fixed most of the javadoc warnings. (yip)
 
