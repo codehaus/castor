@@ -144,10 +144,10 @@
 
                  <li><b>Write the tests.</b><br/>
                  
-                     The easiest way to write a test for your situation is to copy one of the 
+                     <p>The easiest way to write a test for your situation is to copy one of the 
                      existing tests in the src/tests/jdo directory and change it to suit your 
                      needs. Each test implements a certain set of methods. The list of methods 
-                     is as follows:</br/>
+                     is as follows:</p>
 
                      <ol type="A">
                         <li>The constructor - This is used to identify the test by giving it a name and a number.</li>
@@ -157,10 +157,10 @@
                         <li>testXXX() - Any number of test methods can be written. Each test method's name begins with the word test followed by a descriptive name using an initial capital letter.</li>
                      </ol><br /><br />
                 
-                     Simply change setUp(), runTest() and tearDown() to suit your needs. Then 
+                     <p>Simply change setUp(), runTest() and tearDown() to suit your needs. Then 
                      proceed to write any number of testXXX() methods necessary to test your 
                      situation. Just place the name of each testXXX() method (in the proper 
-                     order) in the runTest() method.</li>
+                     order) in the runTest() method.</p></li>
 
                  <li><b>Create the test descriptor.</b><br/>
                  
