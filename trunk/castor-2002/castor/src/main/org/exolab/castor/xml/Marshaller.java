@@ -114,6 +114,13 @@ public class Marshaller extends MarshalFramework {
     **/
     private static final String CDATA = "CDATA";
     
+    
+    /**
+     * A static flag used to enable debugging when using
+     * the static marshal methods.
+    **/
+    public static boolean enableDebug = false;
+    
     /**
      * A flag indicating whether or not to generate
      * debug information
@@ -166,7 +173,6 @@ public class Marshaller extends MarshalFramework {
     **/
     private ClassDescriptorResolver _cdResolver = null;
 
-    private Hashtable        _cdCache      = null;
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
     private XMLNaming        _naming       = null;
@@ -256,12 +262,12 @@ public class Marshaller extends MarshalFramework {
      * the Constructors
     **/
     private void initialize() {
+        _debug           = enableDebug;
         _nsPrefixKeyHash = new Hashtable(3);
         _nsURIKeyHash    = new Hashtable(3);
         _nsScope         = new List(3);
         _packages        = new List(3);
         _cdResolver      = new ClassDescriptorResolverImpl();
-        _cdCache         = new Hashtable(3);
         _parents         = new Stack();
         _validate        = Configuration.marshallingValidation();
         _naming          = XMLNaming.getInstance();
@@ -411,10 +417,10 @@ public class Marshaller extends MarshalFramework {
 	 * to marshall a field value that extended the defined field type.
 	 * Default is True.
 	 */
-	public void setMarshalExtendedType(boolean marshallExtendedType)
+	public void setMarshalExtendedType(boolean marshalExtendedType)
 	{
-		_marshalExtendedType = marshallExtendedType;
-	} //-- setMarshallExtendedType
+		_marshalExtendedType = marshalExtendedType;
+	} //-- setMarshalExtendedType
 
 	/**
 	 * If True the marshaller will use the 'xsi:type' attribute
@@ -439,8 +445,14 @@ public class Marshaller extends MarshalFramework {
     public static void marshal(Object object, Writer out)
         throws MarshalException, ValidationException
     {
+        if (object == null) 
+            throw new MarshalException("object must not be null");
+            
+        if (enableDebug) {
+            System.out.print("- Marshaller called using ");
+            System.out.println("*static* marshal(Object, Writer)");
+        }
         Marshaller marshaller;
-
         try {
             marshaller = new Marshaller(out);
             marshaller.marshal(object);
@@ -460,6 +472,13 @@ public class Marshaller extends MarshalFramework {
     public static void marshal(Object object, DocumentHandler handler)
         throws MarshalException, ValidationException
     {
+        if (object == null) 
+            throw new MarshalException("object must not be null");
+            
+        if (enableDebug) {
+            System.out.print("- Marshaller called using ");
+            System.out.println("*static* marshal(Object, DocumentHandler)");
+        }
         Marshaller marshaller;
         marshaller = new Marshaller(handler);
         marshaller.marshal(object);
@@ -476,8 +495,14 @@ public class Marshaller extends MarshalFramework {
     public static void marshal(Object object, Node node)
         throws MarshalException, ValidationException
     {
+        if (object == null) 
+            throw new MarshalException("object must not be null");
+            
+        if (enableDebug) {
+            System.out.print("- Marshaller called using ");
+            System.out.println("*static* marshal(Object, Node)");
+        }        
         Marshaller marshaller;
-
         marshaller = new Marshaller(node);
         marshaller.marshal(object);
     } //-- marshal
@@ -492,6 +517,12 @@ public class Marshaller extends MarshalFramework {
     public void marshal(Object object)
         throws MarshalException, ValidationException
     {
+        if (object == null) 
+            throw new MarshalException("object must not be null");
+            
+        if (_debug) {
+            System.out.println("Marshalling " + object.getClass().getName());
+        }
         if (object instanceof AnyNode) {
            try{
               AnyNode2SAX.fireEvents((AnyNode)object, _handler);
@@ -541,7 +572,7 @@ public class Marshaller extends MarshalFramework {
     {
         if (object == null) {
             String err = "Marshaller#marshal: null parameter: 'object'";
-            throw new IllegalArgumentException(err);
+            throw new MarshalException(err);
         }
 
         if (object instanceof AnyNode) {
