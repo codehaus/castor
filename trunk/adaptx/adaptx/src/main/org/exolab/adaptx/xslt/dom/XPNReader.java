@@ -27,6 +27,10 @@ import org.exolab.adaptx.net.URILocation;
 import org.exolab.adaptx.net.impl.URILocationImpl;
 import org.exolab.adaptx.xslt.util.Configuration;
 import org.exolab.adaptx.util.NestedIOException;
+import org.exolab.adaptx.xml.DOMURILocation;
+import org.exolab.adaptx.xml.SAXURILocation;
+import org.exolab.adaptx.xslt.util.SAXInput;
+
 
 import org.xml.sax.*;
 
@@ -118,15 +122,38 @@ public class XPNReader {
 	        _usable = false;
 	    }
 	    
-		XPNBuilder builder = new XPNBuilder();
-		builder.setSaveLocation(_saveLocation);
+	    XMLReader reader = null;
+	    InputSource source = null;
+	    if (_location instanceof SAXURILocation) {
+	        SAXURILocation saxLocation = (SAXURILocation)_location;
+	        reader = saxLocation.getXMLReader();
+	        source = saxLocation.getInputSource();
+	    }
+	    
+		XPathNode node = null;
+		
 		
         try {
-            InputSource source = new InputSource();
-            source.setSystemId(_location.getAbsoluteURI());
-            source.setCharacterStream(_location.getReader());
-            _parser.setDocumentHandler(builder);
-            _parser.parse(source);
+            //-- create InputSource if necessary
+            if (source == null) {
+                source = new InputSource();
+                source.setSystemId(_location.getAbsoluteURI());
+                source.setCharacterStream(_location.getReader());
+            }
+            
+            if (reader != null) {
+                SAXInput saxInput = new SAXInput(_saveLocation);
+                reader.setContentHandler(saxInput);
+                reader.parse(source);
+                node = saxInput.getRoot();
+            }
+            else {
+		        XPNBuilder builder = new XPNBuilder();
+		        builder.setSaveLocation(_saveLocation);
+                _parser.setDocumentHandler(builder);
+                _parser.parse(source);
+                node = builder.getRoot();
+            }
         }
         catch(SAXException sx) {
                     
@@ -153,7 +180,7 @@ public class XPNReader {
                 throw new NestedIOException(sx);
             }
         }
-        Root root = (Root) builder.getRoot();
+        Root root = (Root) node;
         root.setDocumentURI(_location.getAbsoluteURI());
 		return root;
 	    
