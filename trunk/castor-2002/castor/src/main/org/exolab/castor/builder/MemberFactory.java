@@ -106,7 +106,7 @@ public class MemberFactory {
         String memberName = "obj";
         String vName = "_anyObject";
         String xmlName = null;
-        CollectionInfo cInfo = infoFactory.createCollection(xsType, vName, "object");
+        CollectionInfo cInfo = infoFactory.createCollection(xsType, vName, "_anyObject");
         XSList xsList = cInfo.getXSList();
         xsList.setMinimumSize(0);
         cInfo.setRequired(false);
@@ -403,7 +403,7 @@ public class MemberFactory {
     public FieldInfo createFieldInfo
         (Group group, ClassInfoResolver resolver)
     {
-        
+
         if (group.getName() == null)
             throw new IllegalArgumentException("Only named groups are currently by the MemberFactory");
 
@@ -419,14 +419,14 @@ public class MemberFactory {
 
         JClass groupClass = null;
 		String className = null;
-        
+
         ClassInfo classInfo = resolver.resolve(group);
         if (classInfo != null) {
             groupClass = classInfo.getJClass();
             xsType = classInfo.getSchemaType();
         }
-        
-		
+
+
 		if (groupClass == null) {
 		    // Java class name is group name or.
 		    className = JavaNaming.toJavaClassName(group.getName());
