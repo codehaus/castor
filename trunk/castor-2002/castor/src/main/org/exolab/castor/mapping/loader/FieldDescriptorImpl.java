@@ -83,25 +83,25 @@ public class FieldDescriptorImpl
      * The name of this field in the object. The field must have a
      * name, even if it set through accessor methods.
      */
-    private final String        _fieldName;
+    private String        _fieldName;
 
 
     /**
      * The field type.
      */
-    private final Class         _fieldType;
+    private Class         _fieldType;
 
 
     /**
      * True if the field is transient and should not be saved/stored.
      */
-    private final boolean       _transient;
+    private boolean       _transient;
 
 
     /**
      * True if the field type is immutable.
      */
-    private final boolean       _immutable;
+    private boolean       _immutable;
 
 
     /**
@@ -113,7 +113,7 @@ public class FieldDescriptorImpl
     /**
      * True if the field is multi valued (a collection).
      */
-    private final boolean       _multi;
+    private boolean       _multi;
 
 
     /**
@@ -181,9 +181,24 @@ public class FieldDescriptorImpl
      */
     protected FieldDescriptorImpl( FieldDescriptorImpl fieldDesc )
     {
-        this((FieldDescriptor) fieldDesc);
+        //-- it is the same code as the previous constructor
+        //-- but due to 1.1 compilation compatibility, we can't use super()
+        this._contClsDesc = fieldDesc.getContainingClassDescriptor();
+        this._handler = fieldDesc.getHandler();
+        this._fieldName = fieldDesc.getFieldName();
+        this._fieldType = fieldDesc.getFieldType();
+        this._transient = fieldDesc.isTransient();
+        this._immutable = fieldDesc.isImmutable();
+        this._required = fieldDesc.isRequired();
+        this._clsDesc = fieldDesc.getClassDescriptor();
+        this._multi = fieldDesc.isMultivalued();
+        //--
+
+
+
         this._convertor = fieldDesc.getConvertor();
         this._convertorParam = fieldDesc.getConvertorParam();
+
     }
 
     public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
