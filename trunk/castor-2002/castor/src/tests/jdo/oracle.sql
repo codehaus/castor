@@ -420,3 +420,10 @@ create table list_types (
   o_bfile BFILE        null
 );
 
+
+drop table test_oqlext;
+create table test_oqlext (
+  ident   integer         not null,
+  ext     integer         not null
+);
+create unique index test_oqlext_pk on test_oqlext( ident );

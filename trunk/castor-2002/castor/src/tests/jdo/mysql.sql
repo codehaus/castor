@@ -289,3 +289,10 @@ create table test_item (
 create unique index test_item_pk on test_item( iid );
 
 
+create table test_oqlext (
+  ident   integer         not null,
+  ext     integer         not null
+);
+
+create unique index test_oqlext_pk on test_oqlext( ident );
+
