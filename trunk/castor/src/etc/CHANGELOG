@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
+       Added test for IdentityKeyGenerator to SAP DB test suite.
+       (Werner - 20040428)
+
 JDO:   Fixed bug 1092 using contribution from Rhett Sutphin [rhett-sutphin@uiowa.edu].
 	   Fixed default namespace declaration, changed some small syntax issues.
        (Werner - 20040427)
