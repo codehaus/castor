@@ -50,7 +50,6 @@ import org.exolab.castor.xml.handlers.ContainerFieldHandler;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.handlers.DefaultFieldHandlerFactory;
 import org.exolab.castor.xml.util.ContainerElement;
-import org.exolab.castor.xml.util.DefaultNaming;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.CollectionHandler;
@@ -66,9 +65,7 @@ import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.List;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -461,7 +458,7 @@ public final class Introspector {
                     methodSet = new MethodSet(fieldName);
                     methodSets.put(fieldName, methodSet);
                 }
-                methodSet.add = method;
+                methodSet.addMethods.add(method);
             }
             //-- write method (singleton or collection)
             else if (methodName.startsWith(SET)) {
@@ -478,7 +475,7 @@ public final class Introspector {
                     methodSet = new MethodSet(fieldName);
                     methodSets.put(fieldName, methodSet);
                 }
-                methodSet.set = method;
+                methodSet.setMethods.add(method);
             }
             else if (methodName.startsWith(CREATE)) {
                 if (method.getParameterTypes().length != 0) continue;
@@ -504,30 +501,32 @@ public final class Introspector {
         Enumeration enumeration = methodSets.elements();
         
         while (enumeration.hasMoreElements()) {
-            
+
             MethodSet methodSet = (MethodSet) enumeration.nextElement();
-            
+
             //-- create XMLFieldDescriptor
             String xmlName = _naming.toXMLName(methodSet.fieldName);
-                
+
             boolean isCollection = false;
-            
+
             //-- calculate class type
             //-- 1st check for add-method, then set or get method
             Class type = null;
-            if (methodSet.add != null) {
-                type = methodSet.add.getParameterTypes()[0];
+            if (!methodSet.addMethods.isEmpty()) {
+                type = ((Method)methodSet.addMethods.get(0)).	//TODO choose the best of the method types
+                			getParameterTypes()[0];
                 isCollection = true;
             }
-                        
+
             //-- if there was no add method, use get/set methods
             //-- to calculate type.
             if (type == null) {
                 if (methodSet.get != null) {
                     type = methodSet.get.getReturnType();
                 }
-                else if (methodSet.set != null) {
-                    type = methodSet.set.getParameterTypes()[0];
+                else if (!methodSet.setMethods.isEmpty()) {
+                    type = ((Method)methodSet.setMethods.get(0)).	//TODO choose the best of the method types
+                    			getParameterTypes()[0];
                 }
                 else {
                     //-- if we make it here, the only method found
@@ -535,7 +534,7 @@ public final class Introspector {
                     continue;
                 }
             }
-            
+
             //-- Handle Collections
             isCollection = (isCollection || isCollection(type));
             
@@ -544,8 +543,7 @@ public final class Introspector {
             
             //-- If the type is a collection and there is no add method, 
             //-- then we obtain a CollectionHandler
-            if (isCollection && (methodSet.add == null)) {
-                
+            if (isCollection && (methodSet.addMethods.isEmpty())) {
                 try {
                     colHandler = CollectionHandlers.getHandler(type);
                 }
@@ -569,7 +567,7 @@ public final class Introspector {
             
             //-- Create FieldHandler first, before the XMLFieldDescriptor
             //-- in case we need to use a custom handler
-                                                
+
             FieldHandler handler = null;
             boolean customHandler = false;
             try {
@@ -577,15 +575,15 @@ public final class Introspector {
                                                 null,
                                                 null,
                                                 methodSet.get,
-                                                methodSet.set, 
+                                                methodSet.setMethods, 
                                                 typeInfo);
                 //-- clean up
-                if (methodSet.add != null) 
-                    ((FieldHandlerImpl)handler).setAddMethod(methodSet.add);
-                                                
+                if (!methodSet.addMethods.isEmpty()) 
+                    ((FieldHandlerImpl)handler).setAddMethods(methodSet.addMethods);
+
                 if (methodSet.create != null) 
                     ((FieldHandlerImpl)handler).setCreateMethod(methodSet.create);
-                 
+
                 //-- handle Hashtable/Map 
                 if (isCollection && _saveMapKeys && isMapCollection(type)) {
                     ((FieldHandlerImpl)handler).setConvertFrom(new IdentityConvertor());
@@ -1317,23 +1315,23 @@ public final class Introspector {
         /**
          * A reference to the add method.
         **/
-        Method add    = null;
-        
+        Vector addMethods = new Vector();
+
         /**
          * A reference to the create method.
         **/
         Method create = null;
-        
+
         /**
          * A reference to the get method.
         **/
         Method get    = null;
-        
+
         /**
          * A reference to the set method.
         **/
-        Method set    = null;
-        
+        Vector setMethods = new Vector();
+
         /**
          * The fieldName for the field accessed by the methods in
          * this method set.

@@ -31,6 +31,25 @@
               Short description says all ...
             </summary>
 			<bugs>
+				<bug id="1691">
+					<description>
+						Extend FieldHandlerImpl to be able to handle multiple overloaded set methods.
+						This now makes possible to specify the pooling parameter "cache-scheme"
+						for Oracle connects.
+					</description>
+					<contributor>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</submitter>
+					<reporter></reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050320</date>
+				</bug>
 				<bug id="1889">
 					<description>
 						Fixed bug with cryptic message at 1:m relation
