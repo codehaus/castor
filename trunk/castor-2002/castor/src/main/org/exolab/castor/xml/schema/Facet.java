@@ -68,7 +68,7 @@ public class Facet extends Annotated {
     public static final String MIN_LENGTH       = "minLength";
     public static final String PERIOD           = "period";
     public static final String SCALE            = "scale";
-
+    public static final String WHITESPACE       = "whiteSpace";
 
     /**
      * The name of this Facet

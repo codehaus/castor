@@ -209,6 +209,7 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
         if (Facet.MIN_LENGTH.equals(name))    return true;
         if (Facet.PERIOD.equals(name))        return true;
         if (Facet.SCALE.equals(name))         return true;
+        if (Facet.WHITESPACE.equals(name))    return true;
 
         return false;
     } //-- isFacet
