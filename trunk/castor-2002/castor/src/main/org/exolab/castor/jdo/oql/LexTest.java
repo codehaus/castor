@@ -104,6 +104,7 @@ public class LexTest implements TokenTypes {
     tokenTypes.put(new Integer(DATE_LITERAL), "DATE_LITERAL");
     tokenTypes.put(new Integer(TIME_LITERAL), "TIME_LITERAL");
     tokenTypes.put(new Integer(TIMESTAMP_LITERAL), "TIMESTAMP_LITERAL");
+    tokenTypes.put(new Integer(KEYWORD_BETWEEN), "KEYWORD_BETWEEN");
 
     Lexer lexer = new Lexer(args[0]);
     while (lexer.hasMoreTokens()) {

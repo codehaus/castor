@@ -558,7 +558,7 @@ public class ParseTreeWalker implements TokenTypes
         systemType = "java.lang.Boolean";
         break;
       case EQUAL: case NOT_EQUAL: case GT:
-      case GTE: case LT: case LTE:
+      case GTE: case LT: case LTE: case KEYWORD_BETWEEN:
         systemType = getTypeForComparison(paramTree.getParent());
     }
     
@@ -765,7 +765,7 @@ public class ParseTreeWalker implements TokenTypes
       int endPos = sqlExpr.indexOf(" ", pos);
       Integer paramNumber = null;
       if ( endPos != -1 )
-        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos - 1));
+        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
       else
         paramNumber = new Integer(sqlExpr.substring(pos + 1));
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
