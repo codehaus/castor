@@ -6,16 +6,6 @@
     <header>
 
       <p>
-         <b>Note:</b> <font color="red">Due to the hard-drive crash we had two weeks ago
-         (Februrary 27, 2003) we had to rebuild the Exolab server. While we have been
-          able to restore most of our infrastructure, we did lose the subscriber list
-          for the 'castor-announce' mailing list. If you were a subscriber to that list
-          you'll have to re-subscribe. We apologize for the inconvenience.
-          </font>
-          <p />
-          The Castor Team - 12 Mar 2003.
-      </p>
-      <p>
          Castor is an open source data binding framework for Java[tm].
          It's basically the shortest path between Java objects, XML documents and SQL tables.
          Castor provides Java to XML binding, Java to SQL persistence, and then
@@ -101,8 +91,8 @@
       <p>For <a href="contributors.xml">a full list of contributors</a>.</p>
 
       <p>The Castor Project was started and originally developed by
-         <a href="mailto:kvisco@intalio.com">Keith Visco</a>, Chief XML Architect,
-         Intalio Inc. and <a href="mailto:arkin@intalio.com">Assaf Arkin</a>.
+         <a href="mailto:kvisco@intalio.com">Keith Visco</a> and
+         <a href="mailto:arkin@intalio.com">Assaf Arkin</a> of Intalio, Inc.
          Contributors are welcome to join this project. Please join us on the
          <a href="lists.xml">mailing list</a>.</p>
        <p>
