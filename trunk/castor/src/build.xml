@@ -31,6 +31,7 @@
         <property name="doc" value="${source}/doc"/>
         <property name="schema" value="${source}/schema"/>
         <property name="gen.src" value="gen-src"/>
+        <property name="project.eclipse" value="${source}/tools/ide/eclipse" />
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
         <property name="main.opt.debug" value="true"/>
@@ -81,22 +82,27 @@
 
         The following targets are available:
 
-            targets  Lists the build targets
-            clean    Cleans the build and distribution directories
-            all      Cleans and builds all the packages and examples
-            release  Cleans and builds all the release packages
-                      (JAR, source, doc, tarball) in the dist directory
-            main     Builds the main packages (including debugging info)
-            examples Builds the example packages (including debugging info)
-            tests    Builds the test packages (including debugging info)
-            jar      Builds the binary JAR in the dist directory
-            CTFjar   Builds the JAR of the Castor Testing Framework in the dist directory
-            doc      Builds the documentation
-            api      Builds the API JavaDocs
-            javadoc  Builds the full JavaDocs
-            source   Builds the source tarball in the dist directory
-            tarball  Builds the binary distribution in the dist directory
-            cvs      Update the sources from the CVS
+            targets          Lists the build targets
+            clean            Cleans the build and distribution directories
+            all              Cleans and builds all the packages and examples
+            release          Cleans and builds all the release packages
+                             (JAR, source, doc, tarball) in the dist directory
+            main             Builds the main packages (including debugging info)
+            examples         Builds the example packages (including debugging info)
+            tests            Builds the test packages (including debugging info)
+            jar              Builds the binary JAR in the dist directory
+            CTFjar           Builds the JAR of the Castor Testing Framework in the dist directory
+            doc              Builds the documentation
+            api              Builds the API JavaDocs
+            javadoc          Builds the full JavaDocs
+            source           Builds the source tarball in the dist directory
+            tarball          Builds the binary distribution in the dist directory
+            cvs              Update the sources from the CVS
+
+            generate.jdo.conf   Use the Source Generator to create the classes for the jdo-conf.xsd
+            gen.pvd          Use the Source Generator to create the classes for the pvd.xsd
+            
+            prepare-eclipse  Put Eclipse project files into place.
         -----------------------------------------------------------
         </echo>
     </target>
@@ -482,5 +488,12 @@
             <arg value="j2"/>
         </java>
     </target>
+    
+	<target name="prepare-eclipse" depends="prepare"
+            description="Copy Eclipse project files to the root directory">
+        <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
+        <copy file="${project.eclipse}/project.template" tofile="${basedir}/.project" overwrite="true"/>
+    </target>
+    
 
 </project>
