@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2002-2003 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 2002-2004 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -48,7 +48,6 @@ package org.exolab.castor.builder.binding;
 import org.exolab.castor.builder.BindingComponent;
 import org.exolab.castor.builder.BuilderConfiguration;
 import org.exolab.castor.builder.GroupNaming;
-import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.castor.builder.TypeConversion;
 import org.exolab.castor.builder.types.XSClass;
 import org.exolab.castor.builder.types.XSType;
@@ -1079,6 +1078,22 @@ public class XMLBindingComponent implements BindingComponent {
         }
         return false;
     }
+    
+    /**
+     * Returns true if the wrapped XML Schema component is nillable.
+     *
+     * @return true if the wrapped XML Schema component is nillable.
+     */
+    public boolean isNillable() {
+        switch (_annotated.getStructureType()) {
+            case Structure.ELEMENT:
+                return ((ElementDecl)_annotated).isNillable();
+            default:
+                break;
+        }
+        return false;
+    } //-- isNillable
+    
 
     ////////METHODS RELATED TO A MEMBER BINDING
     /**
