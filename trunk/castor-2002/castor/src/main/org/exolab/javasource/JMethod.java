@@ -91,9 +91,9 @@ public class JMethod {
     private Vector exceptions = null;
 
     /**
-     * A comment for use with Java doc
+     * The JavaDoc comment for this method
     **/
-    private String comment    = null;
+    private JDocComment jdc = null;
     
     /**
      * Creates a new method with the given name and returnType.
@@ -101,6 +101,7 @@ public class JMethod {
     **/
     public JMethod(JType returnType, String name) {
         
+        this.jdc          = new JDocComment();
         this.returnType   = returnType;
         this.name         = name;
         this.modifiers    = new JModifiers();
@@ -142,17 +143,23 @@ public class JMethod {
     {
         
         if (parameter == null) return;
+        
+        String pName = parameter.getName();
         //-- check current params
-        if (params.get(parameter.getName()) != null) {
+        if (params.get(pName) != null) {
             StringBuffer err = new StringBuffer();
             err.append("A parameter already exists for this method, ");
             err.append(name);
             err.append(", with the name: ");
-            err.append(parameter.getName());
+            err.append(pName);
             throw new IllegalArgumentException(err.toString());
         }
         
-        params.put(parameter.getName(), parameter);
+        
+        params.put(pName, parameter);
+        
+        //-- create comment
+        jdc.addDescriptor(JDocDescriptor.createParamDesc(pName, null));
         
         //-- be considerate and add the class name to the
         //-- declaring class's list of imports
@@ -165,13 +172,12 @@ public class JMethod {
     } //-- addParameter
     
     /**
-     * Returns the comment describing this member. 
-     * @return the comment describing this member, or
-     * null if no comment has been set.
+     * Returns the JDocComment describing this member. 
+     * @return the JDocComment describing this member.
     **/
-    public String getComment() {
-        return this.comment;
-    } //-- getComment
+    public JDocComment getJDocComment() {
+        return this.jdc;
+    } //-- getJDocComment
     
     /**
      * Returns the class in which this JMember has been declared
@@ -222,9 +228,10 @@ public class JMethod {
      * will be printed when this member is printed with the
      * Class Printer
      * @param comment the comment for this member
+     * @see #getJDocComment
     **/
     public void setComment(String comment) {
-        this.comment = comment;
+        jdc.setComment(comment);
     } //-- setComment
     
     /**
@@ -263,24 +270,7 @@ public class JMethod {
         //- Java Doc -/
         //------------/
         
-        jsw.writeln("/**");
-        jsw.write(" * ");
-        if (comment != null) {
-            jsw.write(comment);
-        }
-        jsw.writeln();
-        
-        //-- print parameter comments
-        for (int i = 0; i < params.size(); i++) {
-            jsw.write(" * @param ");
-            JParameter jParam = (JParameter) params.get(i);
-            jsw.write(jParam.getName());
-            jsw.write(" ");
-            //-- print parameter comment
-            // sb.append(jParam.getComment());
-            jsw.writeln();
-        }
-        jsw.writeln("**/");
+        jdc.print(jsw);
         
         //-----------------/
         //- Method Source -/

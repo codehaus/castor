@@ -64,16 +64,11 @@ public class JClass extends JType {
         = "Add code header here";
 
     /**
-     * The author for JavaDoc
-    **/
-    private String author = null;
-
-    /**
      * The version for JavaDoc
      * I needed to separate this line to prevent CVS from
      * expanding it! ;-)
     **/
-    private String version = "$"+"Revision$ $"+"Date$";
+    private static final String version = "$"+"Revision$ $"+"Date$";
 
     /**
      * The code header to be displayed at the top of the source file
@@ -102,6 +97,8 @@ public class JClass extends JType {
     **/
     private Vector interfaces    = null;
     
+    
+    private JDocComment jdc      = null;
     /**
      * The list of methods of this JClass
     **/
@@ -144,10 +141,15 @@ public class JClass extends JType {
         this.packageName = getPackageFromClassName(name);
         imports       = new Vector();
         interfaces    = new Vector();
+        jdc           = new JDocComment();
         constructors  = new Vector();
         members       = new JNamedMap();
         methods       = new Vector();
         modifiers     = new JModifiers();
+        
+        //-- initialize default Java doc
+        jdc.addDescriptor(JDocDescriptor.createVersionDesc(version));
+        
     } //-- JClass
 
     
@@ -294,6 +296,13 @@ public class JClass extends JType {
         return jcArray;
     } //-- getConstructors
     
+    /**
+     * Returns the Java Doc comment for this JClass
+     * @return the JDocComment for this JClass
+    **/
+    public JDocComment getJDocComment() {
+        return jdc;
+    } //-- getJDocComment
     
     /**
      * Returns the member with the given name, or null if no member
@@ -440,20 +449,7 @@ public class JClass extends JType {
         //- Java Doc -/
         //------------/
         
-        jsw.writeln("/**");
-        //-- comment
-        //jsw.write(" * ");
-        
-        //-- author
-        jsw.write(" * @author ");
-        if (author != null) jsw.write(author);
-        jsw.writeln();
-        //-- version
-        jsw.write(" * @version ");
-        if (version != null) jsw.write(version);
-        jsw.writeln();
-        
-        jsw.writeln("**/");
+        jdc.print(jsw);
         
         //-- print class information
         //-- we need to add some JavaDoc API adding comments
