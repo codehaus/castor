@@ -1,6 +1,12 @@
 
 Version (CVS) 
 -------------
+XML:   Implemented a feature to cache included XML Schemas. This allow
+       the user to share the same XML schema instance accross the Schema Object Model.
+       (Arnaud - 20040920)
+
+XML:   Implemented the support for Redefine in the Schema Object Model.
+       (Arnaud - 20040920)
 
 JDO:   Fixed bug 1655 using contribution from Dave Eccleston[deccles@mitre.org]
        Improved debug statements during create operations, showing the actual SQL generated 
