@@ -556,7 +556,7 @@ public class ParseTreeWalker implements TokenTypes
       //fields
       case IDENTIFIER: case DOT:
         JDOFieldDescriptor field = (JDOFieldDescriptor) _fieldInfo.get(exprTree);
-        return _clsDesc.getTableName() + "." + field.getSQLName();
+        return _engine.quoteName( _clsDesc.getTableName() + "." + field.getSQLName() );
 
       //parameters
       case DOLLAR:

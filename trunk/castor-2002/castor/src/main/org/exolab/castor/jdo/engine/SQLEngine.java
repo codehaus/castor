@@ -182,6 +182,15 @@ public final class SQLEngine
     }
 
 
+    /**
+     * Used by ParseTreeWalker to quote names in WHERE clause
+     */
+    public String quoteName( String name )
+    {
+        return _factory.quoteName( name );
+    }
+
+
     public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException
     {
