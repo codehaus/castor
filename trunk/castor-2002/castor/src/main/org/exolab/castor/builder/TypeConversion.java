@@ -118,6 +118,9 @@ public class TypeConversion {
                 //-- NMTOKEN
                 case SimpleTypesFactory.NMTOKEN_TYPE:
                     return new XSNMToken();
+                //-- NMTOKENS
+                case SimpleTypesFactory.NMTOKENS_TYPE:
+                    return new XSList(new XSNMToken());
                 //-- binary
                 case SimpleTypesFactory.BINARY_TYPE:
                     return new XSBinary();
