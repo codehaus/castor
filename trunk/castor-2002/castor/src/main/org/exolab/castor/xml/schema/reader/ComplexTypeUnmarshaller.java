@@ -51,13 +51,12 @@ import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
 /**
- * A class for Unmarshalling element definitions
+ * A class for Unmarshalling ComplexTypes
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class ElementUnmarshaller extends SaxUnmarshaller {
+public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 
-    private static final String MAX_OCCURS_WILDCARD = "*";
 
       //--------------------/
      //- Member Variables -/
@@ -74,12 +73,13 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     private int depth = 0;
     
     /**
-     * The element reference for the element definition we are "unmarshalling".
+     * The Attribute reference for the Attribute we are constructing
     **/
-    private ElementDecl _element = null;
+    private ComplexType _complexType = null;
     
+    private boolean allowRefines = true;
     
-    private CharacterUnmarshaller charUnmarshaller = null;
+    private boolean allowContentModel = true;
     
     private Schema _schema = null;
     
@@ -88,59 +88,58 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     //----------------/
 
     /**
-     * Creates a new ElementUnmarshaller
-     * @param schema the Schema to which the Element belongs
+     * Creates a new ComplexTypeUnmarshaller
+     * @param schema the Schema to which the ComplexType belongs
      * @param atts the AttributeList
      * @param resolver the resolver being used for reference resolving
     **/
-    public ElementUnmarshaller
+    public ComplexTypeUnmarshaller
         (Schema schema, AttributeList atts, Resolver resolver) 
+        throws SAXException
     {
         super();
         setResolver(resolver);
-        
         this._schema = schema;
         
-        _element = new ElementDecl(schema);
+        _complexType = schema.createComplexType();
         
+        _complexType.useResolver(resolver);
+        
+        //-- handle attributes
         String attValue = null;
-        
-        //-- @ref
-        attValue = atts.getValue("ref");
-        if (attValue != null) {
-            _element.setReference(attValue);
-        }
             
-            
-        //-- @name
-        _element.setName(atts.getValue("name"));
-            
-        //-- @type
-        attValue = atts.getValue("type");
-        if (attValue != null) _element.setTypeRef(atts.getValue("type"));
-                
-        //-- @minOccurs
-        attValue = atts.getValue(SchemaNames.MIN_OCCURS_ATTR);
-        if (attValue != null) {
-            int minOccurs = toInt(attValue);
-            _element.setMinimumOccurance(minOccurs);
+        _complexType.setName(atts.getValue(SchemaNames.NAME_ATTR));
+        
+        //-- read contentType
+        String content = atts.getValue(SchemaNames.CONTENT_ATTR);
+        if (content != null) {
+            _complexType.setContent(ContentType.valueOf(content));
         }
-        //-- @maxOccurs
-        attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
-        if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = null;
         
-        if (attValue != null) {
-            int maxOccurs = toInt(attValue);
-            _element.setMaximumOccurance(maxOccurs);
+        //-- base and derivedBy
+        String base = atts.getValue(SchemaNames.BASE_ATTR);
+        if ((base != null) && (base.length() > 0)) {
+            
+            String derivedBy = atts.getValue("derivedBy");
+            if ((derivedBy == null) || 
+                (derivedBy.length() == 0) ||
+                (derivedBy.equals("extension"))) 
+            {
+                _complexType.setBase(base);
+            }
+            else if (derivedBy.equals("restrictions")) {
+                String err = "restrictions not yet supported for <type>.";
+                throw new SAXException(err);
+            }
+            else {
+                String err = "invalid value for derivedBy attribute of ";
+                err += "<type>: " + derivedBy;
+                throw new SAXException(err);
+            }
+        
         }
-        //-- @schemaAbbrev
-        _element.setSchemaAbbrev(atts.getValue("schemaAbbrev"));
         
-        //-- @schemaName
-        _element.setSchemaName(atts.getValue("schemaName"));
-        
-        charUnmarshaller = new CharacterUnmarshaller();
-    } //-- ElementUnmarshaller
+    } //-- ComplexTypeUnmarshaller
 
       //-----------/
      //- Methods -/
@@ -153,24 +152,24 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
      * handles
     **/
     public String elementName() {
-        return SchemaNames.ELEMENT;
+        return SchemaNames.COMPLEX_TYPE;
     } //-- elementName
 
     /**
      * 
     **/
-    public ElementDecl getElement() {
-        return _element;
-    } //-- getElement
-
+    public ComplexType getComplexType() {
+        return _complexType;
+    } //-- getComplexType
+    
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
     **/
     public Object getObject() {
-        return _element;
+        return getComplexType();
     } //-- getObject
-    
+
     /**
      * @param name 
      * @param atts 
@@ -179,7 +178,6 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     public void startElement(String name, AttributeList atts) 
         throws org.xml.sax.SAXException
     {
-        
         //-- Do delagation if necessary
         if (unmarshaller != null) {
             unmarshaller.startElement(name, atts);
@@ -189,22 +187,39 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         
         //-- Use JVM internal String
         name = name.intern();
-        
-        if (SchemaNames.ANNOTATION.equals(name)) {
+                
+        if (name == SchemaNames.ATTRIBUTE) {
+            allowRefines = false;
+            allowContentModel = false;
+            unmarshaller 
+                = new AttributeUnmarshaller(_schema, atts, getResolver());
+        }
+        else if (name == SchemaNames.ELEMENT) {
+            allowRefines = false;
+            if (allowContentModel)
+                unmarshaller 
+                    = new ElementUnmarshaller(_schema, atts, getResolver());
+            else 
+                outOfOrder(name);
+        }
+        else if (name == SchemaNames.GROUP) {
+            allowRefines = false;
+            if (allowContentModel)
+                unmarshaller 
+                    = new GroupUnmarshaller(_schema, atts, getResolver());
+            else
+                outOfOrder(name);
+        }
+        else if (name.equals("restrictions")) {
+            String err = "<restrictions> element not yet supported.";
+            throw new SAXException(err);
+        }
+        else if (name.equals(SchemaNames.ANNOTATION)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
-        else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
-            unmarshaller 
-                = new ComplexTypeUnmarshaller(_schema, atts, getResolver());
-        }
-        else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            throw new SAXException("<simpletype> not yet supported for <element>.");
-        }
         else illegalElement(name);
-        
-        unmarshaller.setResolver(getResolver());
+    
         unmarshaller.setDocumentLocator(getDocumentLocator());
-        
     } //-- startElement
 
     /**
@@ -222,38 +237,36 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
-        //-- check for name mismatches
-        if ((unmarshaller != null) && (charUnmarshaller != unmarshaller)) {
-            if (!name.equals(unmarshaller.elementName())) {
-                String err = "missing end element for ";
-                err += unmarshaller.elementName();
-                throw new SAXException(err);
-            }
-        }
+        //-- Use JVM internal String
+        name = name.intern();
         
-        //-- call finish for any necessary cleanup
+        //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
         
-        if (SchemaNames.ANNOTATION.equals(name)) {
-            Annotation ann = (Annotation)unmarshaller.getObject();
-            _element.addAnnotation(ann);
-        }
-        else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
-            
-            ComplexType complexType = _element.getComplexType();
-            
-            if (complexType != null) 
-                redefinedElement(name);
-            
-            complexType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
-            _element.setComplexType(complexType);
-            
+        if (name == SchemaNames.ATTRIBUTE) {
+            AttributeDecl attrDecl =
+                ((AttributeUnmarshaller)unmarshaller).getAttribute();
+                
+            _complexType.addAttributeDecl(attrDecl);
         } 
-        
+        else if (name == SchemaNames.ELEMENT) {
+            
+            ElementDecl element = 
+                ((ElementUnmarshaller)unmarshaller).getElement();
+            _complexType.addElementDecl(element);
+        }
+        else if (name == SchemaNames.GROUP) {
+            Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
+            _complexType.addGroup(group);
+        }
+        else if (name == SchemaNames.ANNOTATION) {
+            Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
+            _complexType.addAnnotation(ann);
+        } 
+    
         unmarshaller = null;
-    
     } //-- endElement
-    
+
     public void characters(char[] ch, int start, int length) 
         throws SAXException
     {
@@ -263,4 +276,4 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         }
     } //-- characters
 
-} //-- ElementUnmarshaller
+} //-- ComplexTypeUnmarshaller

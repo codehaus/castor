@@ -402,14 +402,14 @@ public class SourceGenerator {
             createClasses((ElementDecl)structures.nextElement(), sInfo);
 
         //-- handle all top-level complextypes
-        structures = schema.getComplextypes();
+        structures = schema.getComplexTypes();
         while (structures.hasMoreElements())
-            processComplextype((Complextype)structures.nextElement(), sInfo);
+            processComplexType((ComplexType)structures.nextElement(), sInfo);
 
         //-- handle all top-level simpletypes
-        structures = schema.getSimpletypes();
+        structures = schema.getSimpleTypes();
         while (structures.hasMoreElements())
-            processSimpletype((Simpletype)structures.nextElement(), sInfo);
+            processSimpleType((SimpleType)structures.nextElement(), sInfo);
 
 
     } //-- createClasses
@@ -418,49 +418,49 @@ public class SourceGenerator {
 
 
         //-- create classes for sub-elements if necessary
-        Complextype complextype = elementDecl.getComplextype();
+        ComplexType complexType = elementDecl.getComplexType();
 
-        if (complextype != null) {
+        if (complexType != null) {
             JClass jClass = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
-            processComplextype(complextype, sInfo);
+            processComplexType(complexType, sInfo);
 
             processJClass(jClass, sInfo);
         }
         else {
-            Simpletype simpletype = elementDecl.getSimpletype();
-            if (simpletype == null) {
+            SimpleType simpleType = elementDecl.getSimpleType();
+            if (simpleType == null) {
                 String typeRef = elementDecl.getTypeRef();
-                System.out.print("'type' or 'simpletype' with name '" + typeRef);
+                System.out.print("'type' or 'simpleType' with name '" + typeRef);
                 System.out.print("' not found for element: ");
                 System.out.println(elementDecl.getName());
                 return;
             }
-            processSimpletype(simpletype, sInfo);
+            processSimpleType(simpleType, sInfo);
         }
 
     }  //-- createClasses
 
     /**
-     * Processes the given Complextype and creates all necessary class
+     * Processes the given ComplexType and creates all necessary class
      * to support it
-     * @param complextype the Complextype to process
+     * @param complexType the ComplexType to process
     **/
-    private void processComplextype(Complextype complextype, SGStateInfo sInfo) {
+    private void processComplexType(ComplexType complexType, SGStateInfo sInfo) {
 
-        if (complextype == null) return;
+        if (complexType == null) return;
 
 
-        ClassInfo classInfo = sInfo.resolve(complextype);
+        ClassInfo classInfo = sInfo.resolve(complexType);
 
         if (classInfo == null) {
 
             //-- handle top-leve complextypes
-            if (complextype.isTopLevel()) {
+            if (complexType.isTopLevel()) {
 
                 JClass jClass
-                    = sourceFactory.createSourceCode(complextype,
+                    = sourceFactory.createSourceCode(complexType,
                                                      sInfo,
                                                      sInfo.packageName);
                 processJClass(jClass, sInfo);
@@ -468,43 +468,43 @@ public class SourceGenerator {
             }
 
             //-- process base complextype if necessary
-            String base = complextype.getBase();
+            String base = complexType.getBase();
             if (base != null) {
-                Schema schema = complextype.getSchema();
-                processComplextype(schema.getComplextype(base), sInfo);
+                Schema schema = complexType.getSchema();
+                processComplexType(schema.getComplexType(base), sInfo);
             }
 
-            process(complextype, sInfo);
+            process(complexType, sInfo);
 
         }
         else {
             JClass jClass = classInfo.getJClass();
             if (!sInfo.processed(jClass)) {
-                process(complextype, sInfo);
+                process(complexType, sInfo);
                 processJClass(jClass, sInfo);
             }
         }
-    } //-- processComplextype
+    } //-- processComplexType
 
 
-    private void processSimpletype(Simpletype simpletype, SGStateInfo sInfo) {
+    private void processSimpleType(SimpleType simpleType, SGStateInfo sInfo) {
 
-        if (simpletype == null) return;
+        if (simpleType == null) return;
 
         String packageName = sInfo.packageName;
 
         //-- Right now the only time we actually
         //-- generate source for a simpletype is
         //-- when it's an enumeration
-        //if (! (simpletype instanceof BuiltInType) ) {
-        if (simpletype.hasFacet(Facet.ENUMERATION)) {    
+        //if (! (simpleType instanceof BuiltInType) ) {
+        if (simpleType.hasFacet(Facet.ENUMERATION)) {    
             
-            ClassInfo classInfo = sInfo.resolve(simpletype);
+            ClassInfo classInfo = sInfo.resolve(simpleType);
 
             if (classInfo == null) {
 
                 JClass jClass
-                    = sourceFactory.createSourceCode(simpletype,
+                    = sourceFactory.createSourceCode(simpleType,
                                                      sInfo,
                                                      packageName);
 
@@ -517,7 +517,7 @@ public class SourceGenerator {
                 }
             }
         }
-    } //-- processSimpletype
+    } //-- processSimpleType
 
     private void process(ContentModelGroup cmGroup, SGStateInfo sInfo) {
 

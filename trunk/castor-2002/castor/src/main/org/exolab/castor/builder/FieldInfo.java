@@ -123,6 +123,8 @@ public class FieldInfo extends XMLInfo {
         
         XSType type = getSchemaType();
         
+        JType jType = type.getJType();
+        
         JMember jMember = new JMember(type.getJType(), name);
         
         if (_static || _final) {
@@ -135,6 +137,8 @@ public class FieldInfo extends XMLInfo {
         if (_default != null) {
             jMember.setInitString(_default);
         }
+        
+        
         //-- set Javadoc comment
         if (_comment != null) jMember.setComment(_comment);
         
@@ -149,6 +153,19 @@ public class FieldInfo extends XMLInfo {
             jMember.setComment("keeps track of state for field: " + name);
             jClass.addMember(jMember);
         }
+        
+        //-- save default value for primitives
+        if (type.isPrimitive()) {
+            jMember = new JMember(jType, "_DEFAULT" + name.toUpperCase());
+            JModifiers modifiers = jMember.getModifiers();
+            modifiers.setFinal(true);
+            modifiers.setStatic(true);
+            
+            if (_default != null)
+                jMember.setInitString(_default);
+           
+        }
+        
         
     } //-- createJavaField
     
