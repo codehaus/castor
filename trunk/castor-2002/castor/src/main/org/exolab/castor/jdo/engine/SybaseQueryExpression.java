@@ -47,32 +47,21 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.exolab.castor.persist.spi.QueryExpression;
-
-
 /**
- * PersistenceFactory for Sybase Adaptive Servers.
+ * QueryExpression for Sybase Adaptive Servers.
  *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public final class SybaseFactory
-    extends GenericFactory
+public final class SybaseQueryExpression extends JDBCQueryExpression
 {
-
-
-    public String getFactoryName()
-    {
-        return "sybase";
+    protected String getStatementLock( boolean lock ) {
+        return "";
     }
 
-    public QueryExpression getQueryExpression()
-    {
-        return new SybaseQueryExpression();
+    protected String getTableLock( boolean lock ) {
+        return (lock ? " HOLDLOCK" : "");
     }
-
-
 }
 
 

@@ -115,7 +115,7 @@ public class JDBCQueryExpression
     }
 
 
-    protected String getTableList()
+    protected String getTableList( boolean lock )
     {
         Enumeration  enum;
         StringBuffer sql;
@@ -124,6 +124,7 @@ public class JDBCQueryExpression
         enum = _tables.elements();
         while ( enum.hasMoreElements() ) {
             sql.append( (String) enum.nextElement() );
+            sql.append( getTableLock( lock ) );
             if ( enum.hasMoreElements() )
                 sql.append( JDBCSyntax.TableSeparator );
         }
@@ -163,6 +164,13 @@ public class JDBCQueryExpression
         return sql.toString();
     }
 
+    protected String getStatementLock( boolean lock ) {
+        return (lock ? " FOR UPDATE" : "");
+    }
+
+    protected String getTableLock( boolean lock ) {
+        return "";
+    }
 
     public String getStatement( boolean lock )
     {
@@ -173,7 +181,7 @@ public class JDBCQueryExpression
         sql.append( JDBCSyntax.Select );
         sql.append( getColumnList() );
         sql.append( JDBCSyntax.From );
-        sql.append( getTableList() );
+        sql.append( getTableList( lock ) );
 
         first = true;
         if ( _conds.size() > 0 ) {
@@ -193,8 +201,8 @@ public class JDBCQueryExpression
             sql.append( ( (Join) _joins.elementAt( i ) ).toString() );
         }
 
-        if ( lock )
-            sql.append( " FOR UPDATE" );
+        sql.append( getStatementLock( lock ) );
+
         return sql.toString();
     }
 
