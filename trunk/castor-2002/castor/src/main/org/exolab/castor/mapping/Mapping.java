@@ -436,7 +436,7 @@ public class Mapping
             unm.setEntityResolver( _resolver );
             if ( _logWriter != null )
                 unm.setLogWriter( _logWriter );
-            unm.setMapping( new Mapping( Mapping.class.getClassLoader() ) );
+            unm.setClassLoader( Mapping.class.getClassLoader() );
             loaded = (MappingRoot) unm.unmarshal( source );
             // gather "class" tags
             enum = loaded.enumerateClassMapping();
