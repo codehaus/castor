@@ -77,8 +77,11 @@
     <field name="time" type="java.util.Date">
       <sql name="ttm" type="time" dirty="ignore" />
     </field>
-    <field name="intValue" type="integer">
+    <field name="intValue" type="integer" required="false" >
       <sql name="int_val" type="integer" />
+    </field>
+    <field name="charValue" type="char" required="false" >
+      <sql name="char_val" type="char" />
     </field>
   </class>
 
