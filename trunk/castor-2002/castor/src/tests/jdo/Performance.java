@@ -63,10 +63,6 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
 
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
@@ -101,31 +97,30 @@ public class Performance extends CastorTestCase {
     static final String    JDOValue = "jdo value";
 
 
-    public Performance( TestHarness category )
-            throws CWClassConstructorException {
+    public Performance( TestHarness category ) {
         super( category, "TC63", "Test on database's outter join and alternatives" );
         _category = (JDOCategory) category;
     }
 
 
-    public boolean run( CWVerboseStream stream ) {
+    public boolean runOld() {
         boolean result = true;
 
         try {
-            _db = _category.getDatabase( stream.verbose() );
+            _db = _category.getDatabase( verbose );
             _conn = _category.getJDBCConnection(); 
             createData();
             System.out.println();
             System.out.println("pretest");
-            runOnce( stream );
+            runOnce();
             System.out.println();
             System.out.println("real test");
-            runOnce( stream );
+            runOnce();
             // clear up
             _db.close();
             _conn.close();
         } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
+            stream.println( "Error: " + except );
             except.printStackTrace();
             result = false;
         }
@@ -179,7 +174,7 @@ public class Performance extends CastorTestCase {
         System.out.println("Time taken to create table: "+(endTime-startTime));
         _conn.commit();
     }
-    public void runOnce( CWVerboseStream stream ) throws Exception {
+    public void runOnce() throws Exception {
             // generate random data
             // add data into table
             PreparedStatement stat, stat1, stat2, stat3, stat4, stat5, stat6;

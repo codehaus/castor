@@ -54,7 +54,6 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.exceptions.CWClassConstructorException;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
