@@ -50,14 +50,12 @@ package org.exolab.castor.mapping.loader;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.IntegrityException;
 
 
 /**
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see ClassDesc
  */
 public class DelegateFieldDescriptor
     implements FieldDescriptor
@@ -117,9 +115,9 @@ public class DelegateFieldDescriptor
     }
 
 
-    public ClassDescriptor getTypeDescriptor()
+    public ClassDescriptor getClassDescriptor()
     {
-        return _desc.getTypeDescriptor();
+        return _desc.getClassDescriptor();
     }
 
 
