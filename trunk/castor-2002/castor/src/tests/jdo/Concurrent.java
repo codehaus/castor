@@ -1,3 +1,49 @@
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Exoffice Technologies.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+
 package jdo;
 
 
@@ -15,6 +61,9 @@ import org.exolab.exceptions.CWClassConstructorException;
 
 
 /**
+ * Concurrent access test. Tests a JDO modification and concurrent
+ * JDBC modification to determine if JDO can detect the modification
+ * with dirty checking.
  */
 public class Concurrent
     extends CWTestCase
@@ -27,10 +76,10 @@ public class Concurrent
     private Connection     _conn;
 
 
-    static final String    JDBCName = "jdbc value";
+    static final String    JDBCValue = "jdbc value";
 
 
-    static final String    JDOName = "jdo value";
+    static final String    JDOValue = "jdo value";
 
 
     public Concurrent()
@@ -43,23 +92,6 @@ public class Concurrent
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }
-
-        /*        
-	if ( driverClass == null )
-	    driverClass = "postgresql.Driver";
-	_logger.println( "Using JDBC driver " + driverClass );
-        try {
-            Class.forName( driverClass );
-        } catch ( ClassNotFoundException except ) {
-            throw new RuntimeException( except.toString() );
-        }
-
-	if ( jdbcUri == null )
-	    _jdbcUri = "jdbc:postgresql:test?user=test&password=test";
-	else
-	    _jdbcUri = jdbcUri;
-	_logger.println( "Using JDBC URI " + _jdbcUri );
-        */
     }
 
 
@@ -80,6 +112,36 @@ public class Concurrent
         boolean result = true;
 
         try {
+            stream.writeVerbose( "Running in access mode shared" );
+            if ( ! runOnce( stream, Database.Shared ) )
+                result = false;
+            stream.writeVerbose( "" );
+            stream.writeVerbose( "Running in access mode exclusive" );
+            if ( ! runOnce( stream, Database.Exclusive ) )
+                result = false;
+            stream.writeVerbose( "" );
+            stream.writeVerbose( "Running in access mode db-locked" );
+            if ( ! runOnce( stream, Database.DbLocked ) )
+                result = false;
+            stream.writeVerbose( "" );
+            _db.close();
+            _conn.close();
+        } catch ( Exception except ) {
+            try {
+                stream.writeVerbose( "Error: " + except );
+            } catch ( IOException except2 ) { }
+            except.printStackTrace();
+            result = false;
+        }
+        return result;
+    }
+
+
+    private boolean runOnce( CWVerboseStream stream, short accessMode )
+    {
+        boolean result = true;
+
+        try {
             OQLQuery      oql;
             TestObject    object;
             Enumeration   enum;
@@ -96,7 +158,8 @@ public class Concurrent
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 stream.writeVerbose( "Retrieved object: " + object );
-                object.setName( TestObject.DefaultName );
+                object.setFirst( TestObject.DefaultFirst );
+                object.setSecond( TestObject.DefaultSecond );
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
@@ -108,25 +171,58 @@ public class Concurrent
             // Open a new transaction in order to conduct test
             _db.begin();
             oql.bind( new Integer( TestObject.DefaultId ) );
-            object = (TestObject) oql.execute().nextElement();
-            object.setName( JDOName );
+            object = (TestObject) oql.execute(  accessMode ).nextElement();
+            object.setFirst( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
-            _conn.createStatement().execute( "UPDATE test_table SET name='" + JDBCName + "' WHERE id=" + TestObject.DefaultId );
+            _conn.createStatement().execute( "UPDATE test_table SET first='" + JDBCValue +
+                                             "' WHERE id=" + TestObject.DefaultId );
             stream.writeVerbose( "Updated test object from JDBC" );
-            _conn.close();
         
             // Commit JDO transaction, this should report object modified
             // exception
-            stream.writeVerbose( "Committing JDO update" );
+            stream.writeVerbose( "Committing JDO update: dirty checking field modified" );
+            if ( accessMode != Database.DbLocked ) {
+                try {
+                    _db.commit();
+                    stream.writeVerbose( "Error: ObjectModifiedException not thrown" );
+                    result = false;
+                } catch ( ObjectModifiedException except ) {
+                    stream.writeVerbose( "OK: ObjectModifiedException thrown" );
+                }
+            } else {
+                try {
+                    _db.commit();
+                    stream.writeVerbose( "OK: ObjectModifiedException not thrown" );
+                } catch ( ObjectModifiedException except ) {
+                    result = false;
+                    stream.writeVerbose( "Error: ObjectModifiedException thrown" );
+                }
+            }
+
+            // Open a new transaction in order to conduct test
+            _db.begin();
+            oql.bind( new Integer( TestObject.DefaultId ) );
+            object = (TestObject) oql.execute(  accessMode ).nextElement();
+            object.setSecond( JDOValue );
+            
+            // Perform direct JDBC access and override the value of that table
+            _conn.setAutoCommit( true );
+            _conn.createStatement().execute( "UPDATE test_table SET second='" + JDBCValue +
+                                             "' WHERE id=" + TestObject.DefaultId );
+            _conn.commit();
+            stream.writeVerbose( "Updated test object from JDBC" );
+        
+            // Commit JDO transaction, this should report object modified
+            // exception
+            stream.writeVerbose( "Committing JDO update: no dirty checking field not modified" );
             try {
                 _db.commit();
-                stream.writeVerbose( "Error: ObjectModifiedException not thrown" );
-                result = false;
+                stream.writeVerbose( "OK: ObjectModifiedException not thrown" );
             } catch ( ObjectModifiedException except ) {
-                stream.writeVerbose( "OK: ObjectModifiedException thrown" );
+                result = false;
+                stream.writeVerbose( "Error: ObjectModifiedException thrown" );
             }
-            _db.close();
         } catch ( Exception except ) {
             try {
                 stream.writeVerbose( "Error: " + except );

@@ -1,3 +1,15 @@
+Version 0.8.2   April 7, 2000
+-----------------------------
+
+JDO:     Fixed some minor glitches in support for exclusive and db-locked
+         access, documented the available access modes.
+
+JDO:     Fixed synchronization support, eliminated checkpoint method altogether.
+
+Misc:    Documented the locking options in Castor and concurrency support.
+         Added the three locking mode to all the test cases.
+
+
 Version 0.8.1   April 5, 2000
 -----------------------------
 
