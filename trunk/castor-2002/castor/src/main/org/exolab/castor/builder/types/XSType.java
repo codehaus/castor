@@ -143,9 +143,14 @@ public abstract class XSType {
     public static final String NMTOKEN_NAME        = "NMTOKEN";
 
     /**
-     * The name of the posative-interger type
+     * The name of the positive-integer type
     **/
     public static final String POSITIVE_INTEGER_NAME  = "positive-integer";
+
+    /**
+     * the name of the QName type
+     */
+     public static final String QNAME_NAME = "QName";
 
     /**
      * the name of the recurring duration type
@@ -228,8 +233,9 @@ public abstract class XSType {
     public static final short MONTH              = 24;
     public static final short YEAR               = 25;
     public static final short RECURRING_DURATION = 26;
-    public static final short TIME_PERIOD        = 27;
-    public static final short FLOAT             = 28;
+    public static final short QNAME              = 27;
+    public static final short TIME_PERIOD        = 28;
+    public static final short FLOAT              = 29;
     private short   type       = NULL;
 
     /**
@@ -389,6 +395,8 @@ public abstract class XSType {
                 return NMTOKEN_NAME;
             case POSITIVE_INTEGER:
                 return POSITIVE_INTEGER_NAME;
+            case QNAME:
+                return QNAME_NAME;
             case RECURRING_DURATION:
                 return RECURRING_DURATION_NAME;
             case STRING:
