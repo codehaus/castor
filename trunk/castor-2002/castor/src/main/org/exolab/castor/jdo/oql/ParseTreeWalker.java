@@ -365,8 +365,18 @@ public class ParseTreeWalker implements TokenTypes
 
     _queryExpr = _engine.getFinder();
 
-    if ( _parseTree.getChildCount() > 2 ) 
-      _queryExpr.addWhereClause( getWhereClause( _parseTree.getChild(2) ) );    
+    //check for DISTINCT
+    if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
+      _queryExpr.setDistinct(true);
+      
+    //process where clause
+    for ( Enumeration e = _parseTree.children(); e.hasMoreElements(); ) {
+      ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
+      if ( curChild.getToken().getTokenType() == KEYWORD_WHERE ) {
+        _queryExpr.addWhereClause( getWhereClause( _parseTree.getChild(2) ) );    
+        break;
+      }
+    }
   }
   
   /**
@@ -431,7 +441,6 @@ public class ParseTreeWalker implements TokenTypes
           return getSQLExpr( exprTree.getChild(0) ) + " " 
                + exprTree.getToken().getTokenValue() + " "
                + getSQLExpr( exprTree.getChild(1) );
-
                  
       //binary operators
       case KEYWORD_AND: case KEYWORD_OR: 
@@ -441,6 +450,19 @@ public class ParseTreeWalker implements TokenTypes
         return getSQLExpr( exprTree.getChild(0) ) + " " 
                + exprTree.getToken().getTokenValue() + " "
                + getSQLExpr( exprTree.getChild(1) );
+
+      //tertiary BETWEEN operator
+      case KEYWORD_BETWEEN:
+        return getSQLExpr( exprTree.getChild(0) ) + " " 
+               + exprTree.getToken().getTokenValue() + " "
+               + getSQLExpr( exprTree.getChild(1) ) + " AND "
+               + getSQLExpr( exprTree.getChild(2) );
+
+      //built in functions
+      case KEYWORD_IS_DEFINED:
+        return getSQLExpr( exprTree.getChild(0) ) + " IS NOT NULL ";
+      case KEYWORD_IS_UNDEFINED:
+        return getSQLExpr( exprTree.getChild(0) ) + " IS NULL ";
 
       //fields
       case IDENTIFIER: case DOT:
@@ -482,6 +504,10 @@ public class ParseTreeWalker implements TokenTypes
         return exprTree.getToken().getTokenValue().substring(5);
       case TIMESTAMP_LITERAL:
         return exprTree.getToken().getTokenValue().substring(10);
+
+      case KEYWORD_NIL:
+      case KEYWORD_UNDEFINED:
+        return " NULL ";
     }
 
     return "";
