@@ -53,6 +53,8 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
@@ -110,6 +112,12 @@ public abstract class TransactionContext
      * access mechanism.
      */
 
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (TransactionContext.class);
+    
     /*
      * An object is consider as Transitent if it is not partcipate in
      * the current transaction.
@@ -904,6 +912,7 @@ public abstract class TransactionContext
                         }
                     }
                 } catch ( Exception except ) {
+                    // _log.error ("Problem", except);
                     if ( _callback != null ) {
                         _callback.releasing( enumEntry.object, false );
                     } else if ( molder.getCallback() != null ) {
