@@ -92,11 +92,30 @@
     <description>Enhancements to OQL.</description>
   </contributor>
 
+  <!-- *********** -->
+  <!-- CONTRIBUTOR -->
+  <!-- *********** -->
+
+  <contributor type="Contributor">
+    <name surname="Bate" given="Steve" />
+    <email>mail@technoetic.com</email>
+    <description>Fixes to JDO</description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Beloff" given="Rostislav"/>
     <email>ros@domainforfree.com</email>
     <description>
        Patch to prevent instropection of static methods.
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Deichmann" given="Bernd"/>
+    <email>bernd.deichmann@poet.de</email>
+    <company id="poet"/>
+    <description>
+       Updates for ODMG 3.0 collection support.
     </description>
   </contributor>
 
@@ -220,7 +239,71 @@
     <email>Guillaume.Rousse@univ-reunion.fr</email>
    <description>Mapping extension and other important feebback</description>
   </contributor>
-                                                           '
+
+  <contributor type="Contributor">
+    <name surname="Maria" given="Damon" />
+    <email>damon@mahu-ika.com</email>
+   <description>Bug reports and bug fixes for readonly locking mode in Castor JDO</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Ballanger" given="Andrew" />
+    <email>AWBALLAN@smumn.edu</email>
+   <description>An improvement for generated SQL statement syntax</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Ballanger" given="Andrew" />
+    <email>AWBALLAN@smumn.edu</email>
+   <description>An improvement for generated SQL statement syntax</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Snowsill" given="David" />
+    <email>david.snowsill@calibreft.com.au</email>
+   <description>JDO bugfixes</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Sibilev" given="Kesha"/>
+    <email>ksibilev@powernetinc.com</email>
+    <description>Patches to JDO</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Purnhagen" given="Ralf" />
+    <email>purnhar@gmx.net</email>
+    <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Bechtel" given="Patric" />
+    <email>bechtel@ipcon.de</email>
+    <description>A patch to JDO: the same-connection="false" mode of HIGH/LOW key generator didn't work</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Moallemi" given="Ciamac" />
+    <email>ciamac@neogenesis.com</email>
+    <description>A patch to OQL parser: retrieving fields from a superclass</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Rhodes" given="Phillip" />
+    <email>rhodespc@telerama.com</email>
+    <description>Fixed JDO bug: non-null columns sometimes were returned as null</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Tsichevski" given="Vladimir"/>
+    <email>wowa@jet.msk.su</email>
+    <description>Some patches for Castor XML + Castor JDO</description>
+  </contributor>
+
+  <!-- ******** -->
+  <!-- FEEDBACK -->
+  <!-- ******** -->
+
   <contributor type="Feedback">
     <name surname="Balsoy" given="Ozgur"/>
     <email>ozgur@csit.fsu.edu</email>
@@ -304,59 +387,6 @@
     <description>Improve the documentation of Castor JDO. Also, bug reports and feedback.</description>
   </contributor>
 
-  <contributor type="Contributor">
-    <name surname="Maria" given="Damon" />
-    <email>damon@mahu-ika.com</email>
-   <description>Bug reports and bug fixes for readonly locking mode in Castor JDO</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Ballanger" given="Andrew" />
-    <email>AWBALLAN@smumn.edu</email>
-   <description>An improvement for generated SQL statement syntax</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Ballanger" given="Andrew" />
-    <email>AWBALLAN@smumn.edu</email>
-   <description>An improvement for generated SQL statement syntax</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Snowsill" given="David" />
-    <email>david.snowsill@calibreft.com.au</email>
-   <description>JDO bugfixes</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Sibilev" given="Kesha"/>
-    <email>ksibilev@powernetinc.com</email>
-    <description>Patches to JDO</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Purnhagen" given="Ralf" />
-    <email>purnhar@gmx.net</email>
-    <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Bechtel" given="Patric" />
-    <email>bechtel@ipcon.de</email>
-    <description>A patch to JDO: the same-connection="false" mode of HIGH/LOW key generator didn't work</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Moallemi" given="Ciamac" />
-    <email>ciamac@neogenesis.com</email>
-    <description>A patch to OQL parser: retrieving fields from a superclass</description>
-  </contributor>
-
-  <contributor type="Contributor">
-    <name surname="Rhodes" given="Phillip" />
-    <email>rhodespc@telerama.com</email>
-    <description>Fixed JDO bug: non-null columns sometimes were returned as null</description>
-  </contributor>
 
   <contributor type="Feedback">
     <name surname="Wolpert" given="Ned"/>
@@ -364,11 +394,6 @@
     <description>Proposed "trigger" mode of SEQUENCE key generator for PostgreSQL</description>
   </contributor>
 
-  <contributor type="Contributor">
-    <name surname="Bate" given="Steve" />
-    <email>mail@technoetic.com</email>
-    <description>Fixes to JDO</description>
-  </contributor>
 
   <contributor type="Contributor">
     <name surname="Tinker" given="David" />
