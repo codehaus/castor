@@ -113,7 +113,7 @@ public final class SQLEngine implements Persistence {
     private final static boolean FIELD_TYPE = false;
 
 
-	static private Hashtable    _separateConnections = new Hashtable();
+    static private Hashtable    _separateConnections = new Hashtable();
 
 
     private String              _pkLookup;
@@ -229,7 +229,7 @@ public final class SQLEngine implements Persistence {
         JDOClassDescriptor base = clsDesc;
 
         // make sure there is no forbidded cases
-		/*
+        /*
         while ( base.getDepends() != null ) {
             if ( base.getExtends() != null )
                 throw new MappingException("Class should not both depends on and extended other classes");
@@ -333,9 +333,9 @@ public final class SQLEngine implements Persistence {
         }
     }
 
-	public Persistence.FieldInfo[] getInfo() {
-		return _fields;
-	}
+    public Persistence.FieldInfo[] getInfo() {
+        return _fields;
+    }
 
     /**
      * Mutator method for setting extends SQLEngine
@@ -351,21 +351,21 @@ public final class SQLEngine implements Persistence {
         Connection conn;
         DatabaseRegistry dr;
 
-		dr=DatabaseRegistry.getDatabaseRegistry(_clsDesc.getJavaClass());
+        dr=DatabaseRegistry.getDatabaseRegistry(_clsDesc.getJavaClass());
 
         conn = (Connection) _separateConnections.get( dr );
         if ( conn == null ) {
             try {
-            	//System.out.println("creating new Connection for keygenerator...");
+                //System.out.println("creating new Connection for keygenerator...");
                 conn = dr.createConnection();
                 conn.setAutoCommit( false );
                 _separateConnections.put( dr, conn );
             } catch ( SQLException except ) {
-            	//except.printStackTrace();
+                //except.printStackTrace();
                 throw new PersistenceException( Messages.message("persist.cannotCreateSeparateConn"), except );
             }
         } //else
-        //	System.out.println("reusing already established connection for keygenerator...");
+        //  System.out.println("reusing already established connection for keygenerator...");
         return conn;
     }
 
@@ -406,7 +406,7 @@ public final class SQLEngine implements Persistence {
         FieldDescriptor[] fields;
         String[] jdoFields0;
         String[] jdoFields;
-	  String sql;
+        String sql;
         int[] sqlTypes0;
         int[] sqlTypes;
         int count;
@@ -435,12 +435,12 @@ public final class SQLEngine implements Persistence {
         System.arraycopy( jdoFields0, 0, jdoFields, 0, count );
         System.arraycopy( sqlTypes0, 0, sqlTypes, 0, count );
         // changes for the SQL Direct interface begins here
-	  if(spCall.startsWith("SQL")){
-		sql =spCall.substring(4);
-	  	return new SQLQuery( this, sql, types );
-	  } else{
-        	return ((BaseFactory) _factory).getCallQuery( spCall, types,_clsDesc.getJavaClass(), jdoFields, sqlTypes );
-	  }
+        if(spCall.startsWith("SQL")){
+            sql =spCall.substring(4);
+            return new SQLQuery( this, sql, types );
+        } else{
+            return ((BaseFactory) _factory).getCallQuery( spCall, types,_clsDesc.getJavaClass(), jdoFields, sqlTypes );
+        }
 
        
     }
@@ -454,13 +454,13 @@ public final class SQLEngine implements Persistence {
         return (QueryExpression) _sqlFinder.clone();
     }
 
-	private Object idToSQL( int index, Object object )
-			throws PersistenceException {
+    private Object idToSQL( int index, Object object )
+            throws PersistenceException {
 
         if ( object == null || _ids[index].convertFrom == null )
-			return object;
-		return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
-	}
+            return object;
+        return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
+    }
 
     private Object toSQL( int field, int column, Object object )
             throws PersistenceException {
@@ -471,13 +471,13 @@ public final class SQLEngine implements Persistence {
         return col.convertFrom.convert( object, col.convertParam );
     }
 
-	private Object idToJava( int index, Object object )
-			throws PersistenceException {
+    private Object idToJava( int index, Object object )
+            throws PersistenceException {
 
-		if ( object == null || _ids[index].convertTo == null )
-			return object;
-		return _ids[index].convertTo.convert( object, _ids[index].convertParam );
-	}
+        if ( object == null || _ids[index].convertTo == null )
+            return object;
+        return _ids[index].convertTo.convert( object, _ids[index].convertParam );
+    }
 
     private Object toJava( int field, int column, Object object )
             throws PersistenceException {
@@ -500,10 +500,10 @@ public final class SQLEngine implements Persistence {
         Properties prop = null;
 
         if ( _keyGen.isInSameConnection() ) {
-        	//System.out.println("using same connection as transaction. Dangerous!");
+            //System.out.println("using same connection as transaction. Dangerous!");
             connection = (Connection) conn;
         } else {
-        	//System.out.println("using separate connection for key generation.");
+            //System.out.println("using separate connection for key generation.");
             connection = getSeparateConnection();
         }
 
@@ -511,8 +511,8 @@ public final class SQLEngine implements Persistence {
             prop = new Properties();
             prop.put("insertStatement", stmt);
         }
-		synchronized (connection) {
-			identity = _keyGen.generateKey( connection, _clsDesc.getTableName(),
+        synchronized (connection) {
+            identity = _keyGen.generateKey( connection, _clsDesc.getTableName(),
                 _ids[0].name, prop );
         }
 
@@ -1460,15 +1460,15 @@ public final class SQLEngine implements Persistence {
                         fh.getConvertFrom(), fh.getConvertParam() );
             }
         }
-		public boolean isComplex() {
-			return true;
-		}
-		public boolean isPersisted() {
-			return store;
-		}
-		public String getFieldName() {
-			return jdoName;
-		}
+        public boolean isComplex() {
+            return true;
+        }
+        public boolean isPersisted() {
+            return store;
+        }
+        public String getFieldName() {
+            return jdoName;
+        }
         public String toString() {
             return tableName + "." + jdoName;
         }
