@@ -1,66 +1,70 @@
-<!DOCTYPE databases PUBLIC "-//EXOLAB/Castor Java/SQL Mapping DTD Version 1.0//EN"
-                           "http://castor.exolab.org/jdo-mapping.dtd">
-<databases>
-<database db-name="test-schema">
+<!--DOCTYPE databases PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                           "http://castor.exolab.org/mapping.dtd"-->
 <mapping>
 
   <!--  Mapping for ProductGroup  -->
-  <object type="myapp.ProductGroup"
-          table="prod_group">
+  <class class-name="myapp.ProductGroup">
+    <sql-table table-name="prod_group"/>
     <description>Product group</description>
-    <field name="id" sql-name="id" />
-    <field name="name" sql-name="name" />
-    <primary-key type="java.lang.Integer">
-      <field-ref name="id"/>
-    </primary-key>
-  </object>
+    <identity field-ref="id"/>
+    <field name="id">
+      <sql-info name="id" />
+    </field>
+    <field name="name">
+      <sql-info name="name" />
+    </field>
+  </class>
+
 
   <!--  Mapping for Product  -->
-  <object type="myapp.Product"
-          table="prod">
+  <class class-name="myapp.Product">
+    <sql-table table-name="prod"/>
     <description>Product definition</description>
-    <field name="id" sql-name="id"/>
-    <field name="name" sql-name="name" />
-    <field name="price" type="float" sql-name="price" sql-type="double"/>
-    <primary-key type="java.lang.Integer">
-      <field-ref name="id"/>
-    </primary-key>
+    <identity field-ref="id"/>
+    <field name="id">
+      <sql-info name="id"/>
+    </field>
+    <field name="name">
+      <sql-info name="name"/>
+    </field>
+    <field name="price" type="float">
+      <sql-info name="price" type="double"/>
+    </field>
 
     <!--  Product has reference to ProductGroup,
           many products may reference same group  -->
-    <relation name="group" type="many-one">
-      <object-ref type="myapp.ProductGroup"/>
-      <foreign-key>
-        <sql-column sql-name="group_id"/>
-      </foreign-key>
-    </relation>
+    <field name="group" type="myapp.ProductGroup">
+      <sql-info name="group_id" />
+    </field>
 
     <!-- Product has reference to ProductInventory
          one inventory per product  -->
-    <relation name="inventory" type="one-one">
-      <object type="myapp.ProductInventory"
-              table="prod_inv">
-        <description>Inventory for product</description>
-        <field name="quantity" sql-name="quant" />
-        <field name="product" type="myapp.Product" sql-name="prod_id"/>
-        <primary-key type="myapp.Product">
-	  <field-ref name="product" />
-        </primary-key>
-      </object>
-      <foreign-key>
-        <sql-column sql-name="id" />
-      </foreign-key>
-    </relation>
+    <field name="inventory" type="myapp.ProductInventory"/>
 
-  </object>
+  </class>
+
+
+  <class class-name="myapp.ProductInventory">
+    <sql-table table-name="prod_inv" fore-key="id"/>
+    <description>Inventory for product</description>
+    <identity field-ref="product" />
+    <field name="quantity">
+      <sql-info name="quant" />
+    </field>
+    <field name="product" type="myapp.Product" >
+      <sql-info name="prod_id"/>
+    </field>
+  </class>
+
 
   <!--  Mapping for Computer, extending Product  -->
-  <object type="myapp.Computer" extends="myapp.Product"
-          table="computer">
+  <class class-name="myapp.Computer" extends="myapp.Product">
+    <sql-table table-name="computer"/>
     <description>Computer definition, extends generic product</description>
-    <field name="cpu" sql-name="cpu"/>
-  </object>
+    <field name="cpu">
+      <sql-info name="cpu"/>
+    </field>
+  </class>
 
 </mapping>
-</database>
-</databases>
+
