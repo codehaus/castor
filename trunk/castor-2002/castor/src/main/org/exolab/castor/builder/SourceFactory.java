@@ -431,7 +431,7 @@ public class SourceFactory  {
     public JClass createSourceCode
         (Group group, SGStateInfo sgInfo, String packageName)
     {
-        
+
         String groupName = group.getName();
         if (groupName == null) {
             groupName = "Group" + sgInfo.getNextGroupNumber();
@@ -492,8 +492,8 @@ public class SourceFactory  {
         return jClass;
 
     } //-- createSourceCode(Group)
-    
-    
+
+
     /**
      * Creates Source Code from the given ClassDescriptor
      * NOT YET IMPLEMENTED
@@ -830,12 +830,10 @@ public class SourceFactory  {
 			//-- Set super class
             state.jClass.setSuperClass(className);
         }
-		//--if the base a simpleType, we need to add a 'value' member
+		//--if the base a simpleType,we create a field info to handle the content
 		if ( (base != null) && (base.isSimpleType()) ) {
-		   ElementDecl element = new ElementDecl(complexType.getSchema());
-		   element.setName("value");
-		   element.setType((SimpleType)base);
-		   FieldInfo fieldInfo = memberFactory.createFieldInfo(element, state);
+		   FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(
+                               TypeConversion.convertType((SimpleType)base));
 		   handleField(fieldInfo,state);
         }
 
@@ -870,7 +868,7 @@ public class SourceFactory  {
             (contentType == ContentType.any))
         {
 
-            FieldInfo fieldInfo = memberFactory.createFieldInfoForText();
+            FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
             handleField(fieldInfo, state);
 
             if (contentType == ContentType.any) {
@@ -977,7 +975,7 @@ public class SourceFactory  {
                 }
                 //-- handle groups
                 case Structure.GROUP:
-                
+
                     Group group = (Group) struct;
                     //-- if not nested, set compositor
                     if (contentModel instanceof ComplexType) {
@@ -1124,7 +1122,7 @@ public class SourceFactory  {
         jdc.appendComment("Returns an enumeration of all possible instances of ");
         jdc.appendComment(className);
         mEnumerate.getSourceCode().add("return _memberTable.elements();");
-        
+
         //-- #toString method
         JMethod mToString = new JMethod(SGTypes.String, "toString");
         jClass.addMethod(mToString);
