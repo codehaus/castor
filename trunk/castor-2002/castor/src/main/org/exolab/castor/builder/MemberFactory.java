@@ -402,7 +402,7 @@ public class MemberFactory {
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
-        if (maxOccurs > 1) {
+        if ((maxOccurs < 0) || (maxOccurs > 1)) {
             String vName = fieldName+"List";
             CollectionInfo cInfo
                 = infoFactory.createCollection(xsType, vName, eDecl.getName(false));
@@ -477,6 +477,7 @@ public class MemberFactory {
                  //XXX with String as parameter exists
                  value = "new "+xsType.getJType().toString()+"(\""+value+"\")";
             }
+
             if (eDecl.getFixedValue() != null) {
                 fieldInfo.setFixedValue(value);
             }
@@ -552,7 +553,7 @@ public class MemberFactory {
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
-        if (maxOccurs > 1) {
+        if ((maxOccurs < 0) || (maxOccurs > 1)) {
             String vName = fieldName+"List";
             CollectionInfo cInfo
                 = infoFactory.createCollection(xsType, vName, groupName);
