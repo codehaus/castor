@@ -71,6 +71,11 @@
     <description>XML enhancements.</description>
   </contributor>
 
+  <contributor type="Committer">
+    <name surname="Sahuc" given="Sebastien"/>
+    <email>ssahuc@intalio.com</email>
+    <description>Testing for Oracle and Castor XML.</description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Beloff" given="Rostislav"/>
@@ -129,12 +134,6 @@
     <name surname="Mauch" given="Thorsten"/>
     <email>mauch@imkenberg.de</email>
     <description>OQL Query tool, bug fixing for OQL.</description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Sahuc" given="Sebastien"/>
-    <email>ssahuc@citeweb.net</email>
-    <description>Testing for Oracle and Castor XML.</description>
   </contributor>
 
   <contributor type="Feedback">
