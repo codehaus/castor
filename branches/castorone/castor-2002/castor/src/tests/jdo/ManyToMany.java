@@ -198,6 +198,8 @@ public class ManyToMany extends CWTestCase {
             gPerson2.add( group );
 
             _db.create( group );
+            _db.create( person1 );
+            _db.create( person2 );
 
             System.out.println("object created: " + group);
             Collection ppl = group.getPeople();
