@@ -219,6 +219,12 @@
     <description>Patch to upgrade Mapping.xsd to latest XML Schema draft</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Wolpert" given="Edward"/>
+    <email>wolpert@methodsystems.com</email>
+    <description>Testing for PostgreSQL.</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
