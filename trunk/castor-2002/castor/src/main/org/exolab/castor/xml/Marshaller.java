@@ -55,6 +55,7 @@ import org.exolab.castor.mapping.MapHandler;
 import org.exolab.castor.mapping.handlers.MapHandlers;
 
 import org.exolab.castor.types.AnyNode;
+import org.exolab.castor.xml.descriptors.RootArrayDescriptor;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.handlers.EnumFieldHandler;
@@ -675,6 +676,7 @@ public class Marshaller extends MarshalFramework {
         if (_debug) {
             System.out.println("Marshalling " + object.getClass().getName());
         }
+                
         if (object instanceof AnyNode) {
            try{
               AnyNode2SAX.fireEvents((AnyNode)object, _handler);
@@ -830,15 +832,24 @@ public class Marshaller extends MarshalFramework {
 				_class = descriptor.getFieldType();
 				classDesc = getClassDescriptor(_class);
             }
+            
+            //-- If we are marshalling an array as the top
+            //-- level object, use the special ArrayDescriptor
+            if (atRoot && (classDesc == null) && _class.isArray()) {
+                classDesc = new RootArrayDescriptor(_class);
+                containerField = (!_asDocument);
+            }
 
 			if (atRoot && _rootElement!=null)
 				name = _rootElement;
 			else if (descriptor.getXMLName()==null)
-                  name = classDesc.getXMLName();
+			      if (classDesc != null) {
+                    name = classDesc.getXMLName();
+                  }
             }
 
+            
             if (classDesc == null) {
-
                 //-- make sure we are allowed to marshal Object
                 if ((_class == Void.class) ||
                     (_class == Object.class) ||
@@ -1546,7 +1557,7 @@ public class Marshaller extends MarshalFramework {
             validator.validate(object, _cdResolver);
         }
     }
-
+    
 } //-- Marshaller
 
 
