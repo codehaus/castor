@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,6 +51,8 @@ import java.io.PrintWriter;
 import java.util.Vector;
 
 /**
+ * A class for holding in-memory Java source code.
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -88,7 +90,7 @@ public class JSourceCode {
     **/
     public JSourceCode(String sourceCode) {
         this();
-        this.source.addElement(sourceCode);
+        this.source.addElement(new JCodeStatement(sourceCode, currentIndent));
     } //-- JSourceCode
     
     /**
@@ -114,6 +116,24 @@ public class JSourceCode {
         source.addElement(jcs);
     } //-- add
     
+    /**
+     * Adds the given statement to this JSourceCode. The statement
+     * will be added on a new line and added with increased indent.
+     * This is a convenience method for the sequence
+     * <code>
+     * indent();
+     * add(statement);
+     * unindent();
+     * </code>
+     * @param statement the statement to add
+    **/
+    public void addIndented(String statement) {
+        indent();
+        JCodeStatement jcs = new JCodeStatement(statement, currentIndent);
+        source.addElement(jcs);
+        unindent();
+    } //-- add
+
     /**
      * Appends the given String to the last line in this
      * JSourceCode
@@ -141,7 +161,7 @@ public class JSourceCode {
     **/
     public void copyInto(JSourceCode jsc) {
         for (int i = 0; i < source.size(); i++) {
-            addCodeStatement((JCodeStatement)source.elementAt(i));
+             jsc.addCodeStatement((JCodeStatement)source.elementAt(i));
         }
     } //-- copyInto
     
@@ -166,7 +186,7 @@ public class JSourceCode {
     **/
     public void print(JSourceWriter jsw) {
         for (int i = 0; i < source.size(); i++) 
-            jsw.writeln(source.elementAt(i));
+            jsw.writeln(source.elementAt(i).toString());
     } //-- print
     
     /**
@@ -196,8 +216,8 @@ public class JSourceCode {
      * @param jcs the JCodeStatement to add
     **/
     private void addCodeStatement(JCodeStatement jcs) {
-        short indent = (short)(jcs.getIndent()+ currentIndent);
-        source.addElement(new JCodeStatement(jcs.getStatement(), indentSize));
+        short indent = (short)(jcs.getIndent()+ currentIndent - jcs.DEFAULT_INDENTSIZE);
+        source.addElement(new JCodeStatement(jcs.getStatement(), indent));
     } //-- addCodeStatement(JCodeStatement)
    
 } //-- JSourceCode
@@ -209,7 +229,8 @@ public class JSourceCode {
 class JCodeStatement {
     
     private StringBuffer value = null;
-    private short indentSize = 4;
+       static public short DEFAULT_INDENTSIZE = 4;
+    private short indentSize = DEFAULT_INDENTSIZE;
     
     JCodeStatement() {
         super();
