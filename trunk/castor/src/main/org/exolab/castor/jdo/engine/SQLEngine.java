@@ -439,7 +439,7 @@ public final class SQLEngine implements Persistence {
         if(spCall.startsWith("SQL")){
             sql =spCall.substring(4);
             return new SQLQuery( this, sql, types );
-        } else{
+        } else {
             return ((BaseFactory) _factory).getCallQuery( spCall, types,_clsDesc.getJavaClass(), jdoFields, sqlTypes );
         }
 
@@ -834,14 +834,22 @@ public final class SQLEngine implements Persistence {
                     if ( id.size() != _ids.length || _ids.length <= 1 )
                         throw new PersistenceException( "Size of complex field mismatched!");
                     
-                    for ( int i=0; i<_ids.length; i++ )
-                        stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-                    
+	                for ( int i=0; i<_ids.length; i++ ){
+	                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
+	                    if (_log.isDebugEnabled()) {
+	                    	_log.debug ( Messages.format("jdo.bindingIdentity", _ids[i].name, idToSQL( i, id.get(i) ) ) );
+	                    }
+	                }                    
                 } else {
                     if ( _ids.length != 1 )
                         throw new PersistenceException( "Complex field expected!" );
                     
                     stmt.setObject( count++, idToSQL( 0, identity ) );
+	                if (_log.isDebugEnabled()) {
+	                	if (_log.isDebugEnabled()) {
+	                    	_log.debug ( Messages.format("jdo.bindingIdentity", _ids[0].name, idToSQL( 0, identity ) ) );
+	                    }
+	                }
                 }
                 
                 // bind the old fields of the row to be stored into the preparedStatement
@@ -862,12 +870,21 @@ public final class SQLEngine implements Persistence {
                                 
                                 for ( int j=0; j<_fields[i].columns.length; j++ ) {
                                     SQLTypes.setObject( stmt, count++, toSQL( i, j, complex.get(j)), _fields[i].columns[j].sqlType );
+                                    
+                                    if (_log.isDebugEnabled()) {
+    	                            	_log.debug (Messages.format( "jdo.bindingField", _fields[i].columns[j].name, toSQL( i, j, complex.get(j) ) ) );
+    	                            }
+                                    
                                 }
                             } else {
                                 if ( _fields[i].columns.length != 1 )
                                     throw new PersistenceException( "Complex field expected! ");
                                 
                                 SQLTypes.setObject( stmt, count++, toSQL( i, 0, original[i]), _fields[i].columns[0].sqlType );
+                            
+	                            if (_log.isDebugEnabled()) {
+	                            	_log.debug (Messages.format( "jdo.bindingField", _fields[i].columns[0].name, toSQL( i, 0, original[i] ) ) );
+	                            }
                             }
                         }
                     }
@@ -898,21 +915,33 @@ public final class SQLEngine implements Persistence {
                         }
                         
                         ResultSet res = stmt.executeQuery();
-                        if ( res.next() ) {
-                            
-                            stmt.close();
-                            throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
+	                    if ( res.next() ) {                    	
+	                    	StringBuffer enlistFieldsNotMatching = new StringBuffer();
+	                    	
+	                    	Object currentField = null;
+	                    	int numberOfFieldsNotMatching = 0;
+	                    	for(int i = 0; i < fields.length; i++){
+	                    		currentField = toJava(i, 0, res.getObject(_fields[i].columns[0].name));
+	                    		
+	                    		if (_fields[i].tableName.compareTo(_mapTo) == 0 && !original[i].equals(currentField)) {
+	                    			if (numberOfFieldsNotMatching >= 1) {
+	                    				enlistFieldsNotMatching.append (", ");
+	                    			}
+	                    			enlistFieldsNotMatching.append ("(" + _clsDesc.getJavaClass().getName() + ")." + _fields[i].columns[0].name + ": ");
+	                    			enlistFieldsNotMatching.append ("[" + original[i] + "/" + currentField + "]"); 
+	                    			numberOfFieldsNotMatching++;
+	                    		}
+	                		}
+	                        throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), identity, enlistFieldsNotMatching.toString()) );
                         }
-                        stmt.close();
                     }
-                    
                     throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), identity) );
-                }
-                stmt.close();
+                }                
             } catch ( SQLException except ) {
                 _log.fatal( Messages.format( "jdo.storeFatal", _type,  storeStatement ) );
-                
-                try {
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
+            } finally {
+            	try {
                     // Close the insert/select statement
                     if ( stmt != null )
                         stmt.close();
@@ -920,7 +949,6 @@ public final class SQLEngine implements Persistence {
                 catch ( SQLException except2 ) {
                     _log.warn ("Problem closing JDBC statement", except2);
                 }
-                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
         }
 
