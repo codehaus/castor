@@ -30,6 +30,8 @@ import org.exolab.adaptx.xslt.util.*;
 import org.exolab.adaptx.xml.parser.DOMParser;
 import org.exolab.adaptx.xml.XMLUtil;
 import org.exolab.adaptx.xml.DOM2SAX;
+import org.exolab.adaptx.xml.DOMURILocation;
+import org.exolab.adaptx.xml.SAXURILocation;
 import org.exolab.adaptx.util.ErrorObserverAdapter;
 import org.exolab.adaptx.util.ErrorObserver;
 
@@ -296,6 +298,19 @@ public class XSLTReader extends ErrorObserverAdapter {
 	public XSLTStylesheet read(URILocation location) 
 	    throws XSLException, java.io.IOException 
 	{
+	    //-- check for special location implementations
+	    if (location instanceof DOMURILocation) {
+	        DOMURILocation domLocation = (DOMURILocation)location;
+	        return read(domLocation.getNode(), location.getAbsoluteURI());
+	    }
+	    else if (location instanceof SAXURILocation) {
+	        SAXURILocation saxLocation = (SAXURILocation)location;
+	        XMLReader reader = saxLocation.getXMLReader();
+	        if (reader != null) {
+	            return read(saxLocation.getInputSource(), location, reader);
+	        }
+	    }
+	    
         //-- Try SAX first
         Parser parser = Configuration.getSAXParser();
         if (parser != null) {
@@ -379,5 +394,51 @@ public class XSLTReader extends ErrorObserverAdapter {
         
         return stylesheet;
     } //-- read
+    
+    private XSLTStylesheet read
+        (InputSource source, URILocation location, XMLReader reader) 
+        throws XSLException, java.io.IOException
+    {
+        StylesheetHandler handler = new StylesheetHandler(this);
+        XSLTStylesheet stylesheet = handler.getStylesheet();
+        stylesheet.setURILocation(location);
+        reader.setContentHandler(handler);
+        if (_entityResolver != null)
+            reader.setEntityResolver(_entityResolver);
+        try {
+            reader.parse(source);
+        }
+        catch(SAXException sx) {
+                    
+            SAXParseException sxp = null;
+            Exception nested = sx.getException();
+                    
+            if (sx instanceof SAXParseException)
+                sxp = (SAXParseException)sx;
+            else if ((nested != null) && 
+                        (nested instanceof SAXParseException)) 
+                sxp = (SAXParseException)nested;
+                    
+            if (sxp != null) {
+                StringBuffer err = new StringBuffer(sxp.toString());
+                err.append("\n - ");
+                err.append(sxp.getSystemId());
+                err.append("; line: ");
+                err.append(sxp.getLineNumber());
+                err.append(", column: ");
+                err.append(sxp.getColumnNumber());
+                        
+                receiveError(err.toString());
+                throw new XSLException(err.toString());
+            }
+            else {
+                receiveError(sx.toString());
+                throw new XSLException(sx.toString());
+            }
+        }
+        
+        return stylesheet;
+    } //-- read
+    
     
 } //-- XSLReader
