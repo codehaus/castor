@@ -89,7 +89,7 @@ import org.exolab.castor.jdo.conf.TransactionManager;
  * jdoDbConf = JdoConfFactory.createJdoDbConf(db_name, "oracle", JdoConfFactory.createJdoDSConf(ds));
  * </code>
  *
- * @author Martin Fuchs <martin-fuchs@gmx.net>
+ * @author Martin Fuchs <a href="mailto:martin-fuchs AT gmx DOT net">Martin Fuchs</a>
  */
 public class JdoConfFactory
 {
