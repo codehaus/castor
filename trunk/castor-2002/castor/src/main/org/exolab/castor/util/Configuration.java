@@ -55,6 +55,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.util.Hashtable;
 import java.net.URL;
 import org.xml.sax.SAXException;
 import org.xml.sax.DocumentHandler;
@@ -147,20 +148,6 @@ public abstract class Configuration
         public static final String ParserFeatures = "org.exolab.castor.sax.features";
 
         public static final String ParserFeatureSeparator = ",";
-
-		/**
-         * Property specifying how element's and type's are mapped into a Java
-         * class hierarchy by the Source Generator. 
-         * The value must contain one of the following.
-         * 'element' outputs a Java class hierarchy based on element 
-         * names used in the XML Schema. This is the default.
-         * 'type' outputs a Java class hierarchy based on the type 
-         * information defined in the XML Schema.
-         * <pre>
-         * org.exolab.castor.javaclassmapping
-         * </pre>
-         */
-        public static final String JavaClassMapping = "org.exolab.castor.javaclassmapping";
         
         /**
          * Property specifying whether to run in debug mode.
@@ -192,8 +179,6 @@ public abstract class Configuration
     // Some static string definitions
     private static final String TRUE_VALUE  = "true";
     private static final String ON_VALUE    = "on";
-	private static final String ELEMENT_VALUE = "element";
-	private static final String TYPE_VALUE = "type";
 
 	/**
      * The default properties loaded from the configuration file.
@@ -205,7 +190,7 @@ public abstract class Configuration
      * True if the default configuration specified debugging.
      */
     private static boolean    _debug;
-
+	
     /**
      * Returns true if the default configuration specified debugging.
      */
@@ -423,26 +408,6 @@ public abstract class Configuration
                                                          serializer.getClass().getName() ) );
         return docHandler;
     }
-
-	/**
-	 * Tests the org.exolab.castor.javaclassmapping property for the 'element' value.
-	 * @return True if the Source Generator is mapping schema elements to Java classes.
-	 */	
-	public static boolean mappingSchemaElement2Java()
-	{
-		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
-		return prop.toLowerCase().equals(ELEMENT_VALUE);
-	}
-
-	/**
-	 * Tests the org.exolab.castor.javaclassmapping property for the 'type' value.
-	 * @return True if the Source Generator is mapping schema types to Java classes.
-	 */	
-	public static boolean mappingSchemaType2Java()
-	{
-		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
-		return prop.toLowerCase().equals(TYPE_VALUE);
-	}
 	
     /**
      * Called by {@link #getDefault} to load the configuration the
@@ -453,28 +418,44 @@ public abstract class Configuration
      */
     protected static void load()
     {
+		_default = loadProperties( Property.ResourceName, Property.FileName);
+		
+        String     prop;
+        prop = _default.getProperty( Property.Debug, "" );
+        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
+            _debug = true;
+    }
+
+    /**
+     * Load the configuration will not complain about inability to load
+     * configuration file from one of the default directories, but if
+     * it cannot find the JAR's configuration file, will throw a
+     * run time exception.
+     */
+	public static Properties loadProperties(String resourceName, String fileName)
+	{
         File        file;
         InputStream is;
 
         // Get detault configuration from the Castor JAR.
         // Complain if not found.
-        _default = new Properties();
+        Properties properties = new Properties();
         try {
-            _default.load( Configuration.class.getResourceAsStream( Property.ResourceName ) );
+            properties.load( Configuration.class.getResourceAsStream( resourceName ) );
         } catch ( Exception except ) {
             // This should never happen
             throw new RuntimeException( Messages.format( "conf.noDefaultConfigurationFile",
-                                                         Property.FileName ) );
+                                                         fileName ) );
         }
 
         // Get overriding configuration from the Java
         // library directory, ignore if not found.
         try {
             file = new File( System.getProperty( "java.home" ), "lib" );
-            file = new File( file, Property.FileName );
+            file = new File( file, fileName );
             if ( file.exists() ) {
-                _default = new Properties( _default );
-                _default.load( new FileInputStream( file ) );
+                properties = new Properties( properties );
+                properties.load( new FileInputStream( file ) );
             }
         } catch ( IOException except ) {
             // Do nothing
@@ -483,22 +464,18 @@ public abstract class Configuration
         // Get overriding configuration from the classpath,
         // ignore if not found.
         try {
-            is = Configuration.class.getResourceAsStream( "/" + Property.FileName );
+            is = Configuration.class.getResourceAsStream( "/" + fileName );
             if ( is != null ) {
-                _default = new Properties( _default );
-                _default.load( is );
+                properties = new Properties( properties );
+                properties.load( is );
             }
         } catch ( Exception except ) {
             // Do nothing
-        }
-
-        String     prop;
-
-        prop = _default.getProperty( Property.Debug, "" );
-        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
-            _debug = true;
-    }
-
+        }	
+		
+		return properties;
+	}
+	
     /**
      * Gets the url of the mapping file used to load the xml schema built-in type definitions.
      */
