@@ -572,8 +572,6 @@ public final class CacheEngine
                     typeInfo.cache.removeLock( oid );
                     lock.delete( tx );
                 }
-                if ( _logInterceptor != null )
-                    _logInterceptor.creating( typeInfo.javaClass, identity );
             }
 
             // Store/create/delete all the dependent objects first.
@@ -617,6 +615,8 @@ public final class CacheEngine
 
             // Create it in persistent store if the identity was known.
             if ( identity != null ) {
+                if ( _logInterceptor != null )
+                    _logInterceptor.creating( typeInfo.javaClass, identity );
                 //  Create the object in persistent storage acquiring a lock on the object.
                 oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), fields, identity ) );
                 oid.setDbLock( true );
@@ -681,7 +681,7 @@ public final class CacheEngine
         }
         
         if ( _logInterceptor != null )
-            _logInterceptor.deleting( typeInfo.javaClass, oid.getIdentity() );
+            _logInterceptor.removing( typeInfo.javaClass, oid.getIdentity() );
         typeInfo.persist.delete( tx.getConnection( this ), oid.getIdentity() );
 
         // Store/create/delete all the dependent objects first. Must perform that
@@ -701,13 +701,117 @@ public final class CacheEngine
                     related = (Vector) fields[ i ];
                     for ( int j = 0 ; j < related.size() ; ++j ) {
                         relIdentity = related.elementAt( j );
-                        if ( relIdentity != null ) {
+                        if ( relIdentity != null )
                             tx.markDelete( this, relations[ i ].getRelatedClass(), relIdentity );
-                        }
                     }
                 }
             }
         }
+    }
+
+
+    /**
+     * Updates an existing object to this engine. The object must not be
+     * persistent and must not have the identity of a persistent object.
+     * The object's OID is returned. The OID is guaranteed to be unique
+     * for this engine even if no identity was specified.
+     *
+     * @param tx The transaction context
+     * @param object The object to update
+     * @param identity The identity of the object, or null
+     * @return The object's OID
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws ClassNotPersistenceCapableException The class is not
+     *  persistent capable
+     */
+    public OID update( TransactionContext tx, Object object, Object identity )
+        throws DuplicateIdentityException, PersistenceException,
+               ClassNotPersistenceCapableException
+    {
+        OID        oid;
+        ObjectLock lock;
+        Object[]   fields;
+        TypeInfo   typeInfo;
+
+        typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
+        if ( typeInfo == null )
+            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+
+        // Must prevent concurrent attempt to create the same object
+        // Best way to do that is through the type
+        synchronized ( typeInfo ) {
+            // XXX If identity is null need to fine a way to determine it
+            if ( identity == null )
+                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+
+            oid = new OID( typeInfo.handler, identity );
+
+            // If the object has a known identity at creation time, perform
+            // duplicate identity check.
+            lock = typeInfo.cache.getLock( oid );
+            if ( lock != null ) {
+                try {
+                    fields = (Object[]) lock.acquire( tx, true, 0 );
+                } catch ( LockNotGrantedException except ) {
+                    // Someone else is using the object, definite duplicate key
+                    throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
+                }
+                // Dump the memory image of the object, it might have been deleted
+                // from persistent storage
+                typeInfo.cache.removeLock( oid );
+                lock.delete( tx );
+            }
+
+            // Store/create/delete all the dependent objects first.
+            RelationHandler[] relations;
+
+            relations = typeInfo.handler.getRelations();
+            for ( int i = 0 ; i < relations.length ; ++i ) {
+                if ( relations[ i ] != null ) {
+                    Object related;
+
+                    if ( ! relations[ i ].isMulti() ) {
+                        related = relations[ i ].getRelated( object );
+                        if ( related != null && ! tx.isPersistent( related ) )
+                            tx.create( this, related, relations[ i ].getIdentity( related ) );
+                    } else {
+                        Enumeration enum;
+
+                        enum = (Enumeration) relations[ i ].getRelated( object );
+                        if ( enum != null ) {
+                            while ( enum.hasMoreElements() ) {
+                                related = enum.nextElement();
+                                if ( related != null && ! tx.isPersistent( related ) )
+                                    tx.create( this, related, relations[ i ].getIdentity( related ) );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check integrity of object before creating it, assuring no fields
+            // are null, and then place it in the cache. This copy will be deleted
+            // if the transaction ends up rolling back.
+            try {
+                typeInfo.handler.checkValidity( object );
+            } catch ( ValidityException except ) {
+                throw new PersistenceExceptionImpl( except );
+            }
+            fields = typeInfo.handler.newFieldSet();
+            typeInfo.handler.copyInto( object, fields );
+
+            // Copy the contents of the object we just created into the
+            // cache engine.
+            lock = new ObjectLock( fields, oid );
+            try {
+                lock.acquire( tx, true, 0 );
+            } catch ( Exception except ) {
+                // This should never happen since we just created the lock
+            }
+            typeInfo.cache.addLock( oid, lock );
+        }
+        return oid;
     }
 
 
@@ -873,7 +977,7 @@ public final class CacheEngine
             // Object has been modified, must write it. Acquire a write lock and
             // block is some other transaction has a read lock on the object.
             // First one to call this method gets to commit.
-            original = (Object[]) lock.acquire( tx, modified == ClassHandler.LockRequired, timeout );
+            original = (Object[]) lock.acquire( tx, ( modified == ClassHandler.LockRequired ), timeout );
 
             // The object has an old identity, it existed before, one need
             // to store the new contents.
@@ -900,6 +1004,7 @@ public final class CacheEngine
                     throw except;
                 }
             }
+
         }
         return oid;
     }
