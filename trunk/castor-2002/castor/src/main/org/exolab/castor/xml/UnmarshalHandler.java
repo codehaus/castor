@@ -1681,6 +1681,8 @@ public final class UnmarshalHandler extends MarshalFramework
     private void processNamespaces(XMLClassDescriptor classDesc) {
         
         
+        if (classDesc == null) return;
+        
         //-- process namespace nodes
         XMLFieldDescriptor nsDescriptor =
             classDesc.getFieldDescriptor(null, NodeType.Namespace);
