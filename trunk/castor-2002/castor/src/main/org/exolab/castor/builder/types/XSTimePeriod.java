@@ -48,6 +48,7 @@ import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
+import org.exolab.castor.types.OperationNotSupportedException;
 
 import java.text.ParseException;
 import java.util.Enumeration;
@@ -81,7 +82,7 @@ public class XSTimePeriod extends XSRecurringDuration {
 
 
     public void setPeriod (TimeDuration period) {
-        throw new UnsupportedOperationException("in a time period type, the period facet must not be changed");
+        throw new OperationNotSupportedException("in a time period type, the period facet must not be changed");
     }
 
 
