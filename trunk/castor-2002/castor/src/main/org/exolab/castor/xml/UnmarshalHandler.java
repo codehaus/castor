@@ -130,6 +130,8 @@ public class UnmarshalHandler implements DocumentHandler {
     
     private Hashtable _resolveTable = null;
     
+    private ClassLoader _loader = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -162,6 +164,21 @@ public class UnmarshalHandler implements DocumentHandler {
     } //-- getObject
     
     
+    /**
+     * Sets the ClassLoader to use when loading classes
+     *
+     * @param loader the ClassLoader to use
+    **/
+    public void setClassLoader(ClassLoader loader) {
+        _loader = loader;
+    } //-- setClassLoader
+    
+    /**
+     * Sets the ClassDescriptorResolver to use for loading and
+     * resolving ClassDescriptors
+     * 
+     * @param cdResolver the ClassDescriptorResolver to use
+    **/
     public void setResolver(ClassDescriptorResolver cdResolver) {
         this._cdResolver = cdResolver;
     } //-- setResolver
@@ -354,8 +371,8 @@ public class UnmarshalHandler implements DocumentHandler {
         if (!descriptor.isMultivalued()) {
             if (state.isUsed(descriptor)) {
                 
-                String err = descriptor.getXMLName();
-                err += " occurs more than once.";
+                String err = "element \"" + name;
+                err += "\" occurs more than once.";
                 ValidationException vx = 
                     new ValidationException(err);
                 throw new SAXException(vx);
@@ -450,7 +467,8 @@ public class UnmarshalHandler implements DocumentHandler {
                         name + "' could not be found.";
                     throw new SAXException(err);
                 }
-                else _cdResolver = new ClassDescriptorResolverImpl();
+                else 
+                    _cdResolver = new ClassDescriptorResolverImpl(_loader);
             }
             
             _topState = new UnmarshalState();
@@ -707,23 +725,29 @@ public class UnmarshalHandler implements DocumentHandler {
                     _class = descriptor.getFieldType();
                 
                 // Retrieving the xsi:type attribute, if present
-                String instanceClassname = getInstanceType(atts);
-                if (instanceClassname != null) {
+                String instanceType = getInstanceType(atts);
+                if (instanceType != null) {
                     Class instanceClass = null;
-                    Object instance = null;
                     try {
-                        instanceClass = _cdResolver.resolve(instanceClassname)
-                            .getJavaClass();
+                        
+                        XMLClassDescriptor instanceDesc 
+                            = _cdResolver.resolve(instanceType);
+                        
+                        if (instanceDesc != null)
+                            instanceClass = instanceDesc.getJavaClass();
+                        else
+                            instanceClass = loadClass(instanceType, null);
+                            
                         if (!_class.isAssignableFrom(instanceClass)) {
                             String err = instanceClass 
                                 + " is not a subclass of " + _class;
                             throw new SAXException(err);
                         }
                         _class = instanceClass;
-                    } catch(Exception ex) {
-                        String msg = "unable to instantiate " + 
-                            instanceClassname + "; ";
-                        throw new SAXException(msg + ex);
+                    } 
+                    catch(Exception ex) {
+                        String msg = "unable to instantiate " + instanceType;
+                        throw new SAXException(msg + "; " + ex);
                     }
                     
                 }
@@ -1138,6 +1162,9 @@ public class UnmarshalHandler implements DocumentHandler {
         
         if (type.isPrimitive()) return true;
         
+        //-- we treat strings as primitives
+        if (type == String.class) return true;
+        
         if ((type == Boolean.class)   ||
             (type == Byte.class)      ||
             (type == Character.class) ||
@@ -1151,6 +1178,27 @@ public class UnmarshalHandler implements DocumentHandler {
        return false;
        
     } //-- isPrimitive
+    
+    /**
+     * Loads and returns the class with the given class name using the 
+     * given loader.
+     * @param className the name of the class to load
+     * @param loader the ClassLoader to use, this may be null.
+    **/
+    private Class loadClass(String className, ClassLoader loader) 
+        throws ClassNotFoundException
+    {
+        Class c = null;
+        
+        //-- use passed in loader
+	    if ( loader != null )
+		    return loader.loadClass(className);
+		//-- use internal loader
+		else if (_loader != null)
+		    return _loader.loadClass(className);
+		//-- no loader available use Class.forName
+		return Class.forName(className);
+    } //-- loadClass
     
     /**
      * Resolves the current set of waiting references for the given Id

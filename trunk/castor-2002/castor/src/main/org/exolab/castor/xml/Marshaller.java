@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999, 2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -73,7 +73,7 @@ import java.util.Vector;
 
 /**
  * A Marshaller to allowing serializing Java Object's to XML
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class Marshaller {
@@ -83,7 +83,23 @@ public class Marshaller {
     **/
     private static final String SERIALIZER_NOT_SAX_CAPABLE
         = "conf.serializerNotSaxCapable";
-            
+          
+    
+    /**
+     * The namespace declaration String
+    **/
+    private static final String XMLNS  = "xmlns";
+    
+    /**
+     * Namespace declaration for xml schema instance
+    **/
+    private static final String XSI_PREFIX = "xsi";
+    
+    /**
+     * The xsi:type attribute
+    **/
+    private static final String XSI_TYPE = "xsi:type";
+    
     /**
      * A flag indicating whether or not to generate 
      * debug information
@@ -298,16 +314,51 @@ public class Marshaller {
         validate(object);        
         marshal(object, null, _handler);        
     } //-- marshal
+
+    /**
+     * Marshals the given object, using the given descriptor 
+     * and document handler.
+     *
+     * <BR/>
+     * <B>Note:</B>
+     * <I>
+     *   It is an error if this method is called with an 
+     *   AttributeDescriptor.
+     * </I>
+     * @param descriptor the XMLFieldDescriptor for the given object
+     * @param handler the DocumentHandler to marshal to
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
+     * during marshaling
+    **
+    private void marshal
+        (Object object, 
+         XMLFieldDescriptor descriptor, 
+         DocumentHandler handler, boolean foo) 
+        throws MarshalException, ValidationException
+    {
+    } //-- marshal
     
     /**
-     * It is an error if this method is called with an AttributeDescriptor.
+     * Marshals the given object, using the given descriptor 
+     * and document handler.
+     *
+     * <BR/>
+     * <B>Note:</B>
+     * <I>
+     *   It is an error if this method is called with an 
+     *   AttributeDescriptor.
+     * </I>
+     * @param descriptor the XMLFieldDescriptor for the given object
      * @param handler the DocumentHandler to marshal to
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
      * during marshaling
     **/
     private void marshal
-        (Object object, XMLFieldDescriptor descriptor, DocumentHandler handler) 
+        (Object object, 
+         XMLFieldDescriptor descriptor, 
+         DocumentHandler handler) 
         throws MarshalException, ValidationException
     {
         if (object == null) {
@@ -327,8 +378,9 @@ public class Marshaller {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
         
-        if (descriptor == null)
+        if (descriptor == null) {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
+        }
       
         //-- calculate Object's name
         String name = descriptor.getXMLName();
@@ -346,6 +398,7 @@ public class Marshaller {
             
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
+        boolean saveType = false; /* flag for xsi:type */
         
         if (_class == descriptor.getFieldType())
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
@@ -359,6 +412,11 @@ public class Marshaller {
             if (isPrimitive(_class) || (_class == String.class) || byteArray) 
             {
                 classDesc = getPrimitiveClassDescriptor(_class, name);
+                
+                //-- check to see if we need to save the xsi:type
+                //-- for this class
+                saveType = (descriptor.getFieldType() == Object.class);
+                    
             }
             else {
                 //-- save package information for use when searching
@@ -458,13 +516,18 @@ public class Marshaller {
             atts.addAttribute(xmlName, null, value.toString());
         }
         
+        //-- xsi:type
+        if (saveType) {
+            saveType = declareNamespace(XSI_PREFIX, 
+                MarshalHelper.XSI_NAMESPACE, atts);
+            atts.addAttribute(XSI_TYPE, null, "java:"+_class.getName());
+        }
+        
         //------------------/
         //- Create element -/
         //------------------/
         
         //-- namespace management
-        boolean addedNamespace = false;
-        
         String nsPrefix = descriptor.getNameSpacePrefix();
         if (nsPrefix == null) nsPrefix = classDesc.getNameSpacePrefix();
             
@@ -478,24 +541,27 @@ public class Marshaller {
             nsPrefix = (String) _nsURIKeyHash.get(nsURI);
         }
         
-        if (nsURI != null) {
-            if (!_nsScope.contains(nsURI)) {
-                String attName = "xmlns";
-                if (nsPrefix != null) {
-                    if (nsPrefix.length() > 0) 
-                        attName += ":" + nsPrefix;
-                }
-                addedNamespace = true;
-                _nsScope.add(nsURI);
-                atts.addAttribute(attName, null, nsURI);
+        boolean declaredNS = false;
+        if (nsURI != null)
+            declaredNS = declareNamespace(nsPrefix, nsURI, atts);
+        
+        
+        String qName = null;
+        if (nsPrefix != null) {
+            int len = nsPrefix.length();
+            if (len > 0) {
+                StringBuffer sb = new StringBuffer(len+name.length()+1);
+                sb.append(nsPrefix);
+                sb.append(':');
+                sb.append(name);
+                qName = sb.toString();
             }
+            else qName = name;
         }
+        else qName = name;
         
         try {
-            if ((nsPrefix != null) && (nsPrefix.length() > 0))
-                handler.startElement(nsPrefix+":"+name, atts);
-            else 
-                handler.startElement(name, atts);
+            handler.startElement(qName, atts);
         }
         catch (org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
@@ -590,21 +656,19 @@ public class Marshaller {
             }
             //-- handle vectors
             else if (obj instanceof java.util.Vector) {
-                Vector v = (Vector) obj;
-                int length = v.size();
-                for (int j = 0; j < length; j++) {
-                    marshal(v.elementAt(j), elemDescriptor, handler);
-                }
+                marshal(obj, elemDescriptor, handler);
+                //Vector v = (Vector) obj;
+                //int length = v.size();
+                //for (int j = 0; j < length; j++) {
+                //    marshal(v.elementAt(j), elemDescriptor, handler);
+                //}
             }
             else marshal(obj, elemDescriptor, handler);
         }
         
         //-- finish element
         try {
-            if ((nsPrefix != null) && (nsPrefix.length() > 0))
-                handler.endElement(nsPrefix+":"+name);
-            else 
-                handler.endElement(name);
+            handler.endElement(qName);
         }
         catch(org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
@@ -612,10 +676,52 @@ public class Marshaller {
         
         --depth;
         _parents.pop();
-        if (addedNamespace) _nsScope.remove(nsURI);
+        if (declaredNS) _nsScope.remove(nsURI);
+        if (saveType) _nsScope.remove(MarshalHelper.XSI_NAMESPACE);
         
     } //-- void marshal(DocumentHandler) 
       
+    
+    /**
+     * Declares the given namespace, if not already in scope
+     * 
+     * @param nsPrefix the namespace prefix
+     * @param nsURI the namespace URI to declare
+     * @param atts the AttributeListImpl to create the namespace
+     * declaration
+     * @return true if the namespace was not in scope and was 
+     *  sucessfully declared, other false
+    **/
+    private boolean declareNamespace
+        (String nsPrefix, String nsURI, AttributeListImpl atts) 
+    {
+        
+        boolean declared = false;
+        
+        if (nsURI != null) {
+            
+            if (!_nsScope.contains(nsURI)) {
+                String attName = XMLNS;
+                
+                if (nsPrefix != null) {
+                    int len = nsPrefix.length();
+                    if (len > 0) { 
+                        StringBuffer buf = new StringBuffer(6+len);
+                        buf.append(XMLNS);
+                        buf.append(':');
+                        buf.append(nsPrefix);
+                        attName = buf.toString();
+                    }
+                }
+                
+                _nsScope.add(nsURI);
+                atts.addAttribute(attName, null, nsURI);
+                declared = true;
+            }
+        }
+        return declared;
+    } //-- declareNamespace
+    
     /**
      * Gets a class descriptor for a primitive type. Will search for a
      * specialized descriptor, but will return a plain string descriptor if
