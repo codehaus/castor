@@ -68,6 +68,14 @@ public class XSLOutput extends XSLObject implements OutputFormat {
         return getAttribute(Names.DOCTYPE_SYSTEM_ATTR);
     } //-- getDoctypeSystemId
     
+    /*
+     *  (non-Javadoc)
+     * @see org.exolab.adaptx.xslt.OutputFormat#getEncoding()
+     */
+    public String getEncoding() {
+        return getAttribute(Names.ENCODING_ATTR);
+    } //-- getEncoding
+    
     /**
      * Returns whether or not indenting the result is allowed
      * @return true if whitespace may be added to the output result
@@ -142,7 +150,8 @@ public class XSLOutput extends XSLObject implements OutputFormat {
         catch (XSLException xsle) {
             //-- do nothing
         }
-    } //-- setDoctypePublicId
+    } //-- setDoctypePublicId    
+    
     
     /**
      * Sets the System ID that should be used in the Doctype
@@ -156,6 +165,20 @@ public class XSLOutput extends XSLObject implements OutputFormat {
             //-- do nothing
         }
     } //-- setDoctypeSystemId
+    
+    /*
+     *  (non-Javadoc)
+     * @see org.exolab.adaptx.xslt.OutputFormat#setEncoding(java.lang.String)
+     */
+    public void setEncoding(String encoding) {
+        try {
+            setAttribute(Names.ENCODING_ATTR, encoding);
+        }
+        catch (XSLException xsle) {
+            //-- do nothing
+        }
+    } //-- setEncoding
+    
     
     /**
      * Returns whether or not indenting the result is allowed
