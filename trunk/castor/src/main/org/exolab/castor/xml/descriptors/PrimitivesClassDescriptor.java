@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2003-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -46,17 +46,12 @@
 package org.exolab.castor.xml.descriptors;
 
 
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.xml.validators.*;
-import org.exolab.castor.xml.*;
 
 /**
  * The default primitives class descriptor, this is only
  * used when unmarshalling a primitive as the "root" object
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class PrimitivesClassDescriptor
