@@ -99,8 +99,8 @@
     <field name="id" type="integer">
       <sql name="id" type="numeric" />
     </field>
-    <field name="value" type="string"  required="true">
-      <sql name="value" type="varchar" />
+    <field name="value1" type="string"  required="true">
+      <sql name="value1" type="varchar" />
     </field>
     <field name="group" type="jdo.TestGroup" required="false">
       <sql name="group_id" />
@@ -116,8 +116,8 @@
     <field name="id" type="integer">
       <sql name="detail_id" type="numeric" />
     </field>
-    <field name="value" type="string" required="true">
-      <sql name="value" type="varchar" />
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar" />
     </field>
     <field name="master" type="jdo.TestMaster" required="true">
       <sql name="master_id" />
@@ -133,8 +133,8 @@
     <field name="id" type="integer">
       <sql name="detail2_id" type="numeric" />
     </field>
-    <field name="value" type="string" required="true">
-      <sql name="value" type="varchar" />
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar" />
     </field>
     <field name="detail" type="jdo.TestDetail" required="true">
       <sql name="detail_id" />
@@ -148,8 +148,8 @@
     <field name="id" type="integer">
       <sql name="id" type="numeric" />
     </field>
-    <field name="value" type="string"  required="true">
-      <sql name="value" type="varchar" />
+    <field name="value1" type="string"  required="true">
+      <sql name="value1" type="varchar" />
     </field>
   </class>
 
@@ -345,8 +345,8 @@
     <field name="modificationTime" type="java.util.Date" required="false">
       <sql name="mtime" type="timestamp" dirty="ignore" />
     </field>
-    <field name="value" type="string"  required="true">
-      <sql name="value" type="varchar" />
+    <field name="value1" type="string"  required="true">
+      <sql name="value1" type="varchar" />
     </field>
     <field name="parentId" type="integer" required="false">
       <sql name="parent_id" dirty="ignore" />

@@ -46,7 +46,7 @@ drop table test_master
 go
 create table test_master (
   id       numeric(10,0)    not null,
-  value    varchar(200)   not null,
+  value1    varchar(200)   not null,
   group_id numeric(10,0)  null
 )
 go
@@ -62,7 +62,7 @@ go
 create table test_detail (
   detail_id  numeric(10,0)  not null,
   master_id  numeric(10,0)  not null,
-  value      varchar(200 )  not null
+  value1      varchar(200 )  not null
 )
 go
 create unique index test_detail_pk on test_detail ( detail_id )
@@ -76,7 +76,7 @@ drop table test_group
 go
 create table test_group (
   id     numeric(10,0)  not null,
-  value  varchar(200)   not null
+  value1  varchar(200)   not null
 )
 go
 create unique index test_group_pk on test_group ( id )
@@ -217,7 +217,7 @@ create table test_detail2
 (
   detail2_id  numeric(10,0)  not null,
   detail_id  numeric(10,0)  not null,
-  value      varchar(200 )  not null
+  value1      varchar(200 )  not null
 )
 go
 create unique index test_detail2_pk on test_detail2 ( detail2_id )
@@ -234,7 +234,7 @@ create table test_persistent (
   id       integer         not null,
   ctime    datetime        not null,
   mtime    datetime        null,
-  value    varchar(200)    not null,
+  value1    varchar(200)    not null,
   parent_id integer        null,
   group_id numeric(10,0)   not null
 )
