@@ -95,7 +95,34 @@ public abstract class XMLType extends Annotated
      * Sets the name of this type
      * @param name of the type
     **/
-    public void setName(String name) { this.name= name; }
+    public synchronized void setName(String name) { 
+        this.name= name; 
+        
+        //-- Patch to handle name changes....we should
+        //-- change this in the future to something
+        //-- less heavy.
+        if (schema != null) {
+            try {
+                if (isComplexType()) {
+                    if (schema.removeComplexType( (ComplexType) this)) {
+                        schema.addComplexType( (ComplexType) this);
+                    }
+                }
+                else {
+                    if (schema.removeSimpleType( (SimpleType) this)) {
+                        schema.addSimpleType( (SimpleType) this);
+                    }
+                }
+            }
+            catch (SchemaException ex) {
+                //-- If this is ever thrown then we've
+                //-- had some nasty synchronization error! :-(
+                throw new IllegalStateException(ex.toString());
+            }
+        }
+        //-- end name-change patch
+        
+    } //-- setName
 
 
     /**
