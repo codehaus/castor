@@ -57,26 +57,26 @@ public class TestObject
     private int    _id;
 
 
-    private String _first;
+    private String _value1;
 
 
-    private String _second;
+    private String _value2;
 
 
     static final int       DefaultId = 3;
 
 
-    static final String    DefaultFirst = "first";
+    static final String    DefaultValue1 = "one";
 
 
-    static final String    DefaultSecond = "second";
+    static final String    DefaultValue2 = "two";
 
 
     public TestObject()
     {
         _id = DefaultId;
-        _first = DefaultFirst;
-        _second = DefaultSecond;
+        _value1 = DefaultValue1;
+        _value2 = DefaultValue2;
     }
 
 
@@ -92,33 +92,33 @@ public class TestObject
     }
 
 
-    public void setFirst( String first )
+    public void setValue1( String value1 )
     {
-        _first = first;
+        _value1 = value1;
     }
 
 
-    public String getFirst()
+    public String getValue1()
     {
-        return _first;
+        return _value1;
     }
 
 
-    public void setSecond( String second )
+    public void setValue2( String value2 )
     {
-        _second = second;
+        _value2 = value2;
     }
 
 
-    public String getSecond()
+    public String getValue2()
     {
-        return _second;
+        return _value2;
     }
 
 
     public String toString()
     {
-        return _id + " / " + _first + " / " + _second;
+        return _id + " / " + _value1 + " / " + _value2;
     }
 
 

@@ -85,7 +85,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
         attributes[0] = desc;
         
         //-- _name
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_className", "class-name", NodeType.Attribute);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_className", "class", NodeType.Attribute);
         desc.setImmutable(true);
         desc.setHandler( new XMLFieldHandler() {
             public Object getValue( Object object ) 

@@ -86,10 +86,10 @@ public class Concurrent
     static final String    JDOValue = "jdo value";
 
 
-    public Concurrent( String name, String description, CWTestCategory category )
+    public Concurrent( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC01", "Concurrent access" );
         _category = (JDOCategory) category;
     }
 
@@ -159,8 +159,8 @@ public class Concurrent
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 stream.writeVerbose( "Retrieved object: " + object );
-                object.setFirst( TestObject.DefaultFirst );
-                object.setSecond( TestObject.DefaultSecond );
+                object.setValue1( TestObject.DefaultValue1 );
+                object.setValue2( TestObject.DefaultValue2 );
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
@@ -173,11 +173,11 @@ public class Concurrent
             _db.begin();
             oql.bind( new Integer( TestObject.DefaultId ) );
             object = (TestObject) oql.execute(  accessMode ).nextElement();
-            object.setFirst( JDOValue );
+            object.setValue1( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
             _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_table SET first='" + JDBCValue +
+            _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
                                              "' WHERE id=" + TestObject.DefaultId );
             _conn.commit();
             stream.writeVerbose( "Updated test object from JDBC" );
@@ -207,11 +207,11 @@ public class Concurrent
             _db.begin();
             oql.bind( new Integer( TestObject.DefaultId ) );
             object = (TestObject) oql.execute(  accessMode ).nextElement();
-            object.setSecond( JDOValue );
+            object.setValue2( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
             _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_table SET second='" + JDBCValue +
+            _conn.createStatement().execute( "UPDATE test_table SET value2='" + JDBCValue +
                                              "' WHERE id=" + TestObject.DefaultId );
             _conn.commit();
             stream.writeVerbose( "Updated test object from JDBC" );

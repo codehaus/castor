@@ -73,10 +73,10 @@ public class ReadOnly
     static final String    NewValue = "new value";
 
 
-    public ReadOnly( String name, String description, CWTestCategory category )
+    public ReadOnly( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC04", "Read only tests" );
         _category = (JDOCategory) category;
     }
 
@@ -115,8 +115,8 @@ public class ReadOnly
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
-                object.setFirst( TestObject.DefaultFirst );
-                object.setSecond( TestObject.DefaultSecond );
+                object.setValue1( TestObject.DefaultValue1 );
+                object.setValue2( TestObject.DefaultValue2 );
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
@@ -129,7 +129,7 @@ public class ReadOnly
             enum = oql.execute( Database.ReadOnly );
             object = (TestObject) enum.nextElement();
             stream.writeVerbose( "Retrieved object: " + object );
-            object.setFirst( NewValue );
+            object.setValue1( NewValue );
             stream.writeVerbose( "Modified object: " + object );
             db.commit();
             
@@ -138,7 +138,7 @@ public class ReadOnly
             enum = oql.execute( Database.ReadOnly );
             object = (TestObject) enum.nextElement();
             stream.writeVerbose( "Retrieved object: " + object );
-            if ( object.getFirst().equals( NewValue ) ) {
+            if ( object.getValue1().equals( NewValue ) ) {
                 result = false;
                 stream.writeVerbose( "Error: modified object was stored" );
             } else
