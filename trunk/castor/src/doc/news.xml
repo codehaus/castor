@@ -8,18 +8,21 @@
       <p><b>News:</b>
         <br />
         <b>$RELEASE_DATE$</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.
+
+        <p><b>Next scheduled release (tentative):</b> February, 16th 2004.</p>
+
         <ul>
-            <li><b>08 Jan 2004</b> - Please welcome Patrick van Kaan as the 
+            <li><b>08 Jan 2004</b> - Please welcome Patrick van Kaan as the
                 latest addition to team Castor! Patrick has been using
                 Castor JDO for a while now and is the developer behind the
-                <a href="http://castor-taglib.sourceforge.net/">Castor-Taglib</a> 
-                project. 
+                <a href="http://castor-taglib.sourceforge.net/">Castor-Taglib</a>
+                project.
             </li>
 
-            <li><b>10 Nov 2003</b> - Please welcome Werner Guttman as the 
+            <li><b>10 Nov 2003</b> - Please welcome Werner Guttman as the
                 newest committer to the Castor team! Werner's contributions
                 moving forward with the Castor JDO refactoring are key, as is
-                his experience with J2EE and IBM WebSphere. 
+                his experience with J2EE and IBM WebSphere.
             </li>
 
             <li><b>06 Jun 2003</b> - Can't find it here? Check out the
@@ -56,5 +59,7 @@
         </ul>
       </p>
     </section>
+
+
   </body>
 </document>
