@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1718. Milliseconds are represented as 'long' in a Duration.
+       (Arnaud - 20041111)
+
+XML:   Fixed bug 1144 that was reopened.
+       (Arnaud - 20041111)
+
 XML:   Added support for namespace to package mappings on the Unmarshaller
        and UnmarshalHandler. This basically fixes issues where Castor
        can't find the right package to look for classes during 
