@@ -643,9 +643,9 @@ public class Marshaller {
                 else {
                     int length = Array.getLength(obj);
                     for (int j = 0; j < length; j++) {
-                        Object arrayItem = Array.get(obj, j);
-                        if (arrayItem != null)
-                            marshal(arrayItem, elemDescriptor, handler);
+                        Object item = Array.get(obj, j);
+                        if (item != null)
+                            marshal(item, elemDescriptor, handler);
                     }
                 }
             }
@@ -653,7 +653,9 @@ public class Marshaller {
             else if (obj instanceof java.util.Enumeration) {
                 Enumeration enum = (Enumeration)obj;
                 while (enum.hasMoreElements()) {
-                    marshal(enum.nextElement(), elemDescriptor, handler);
+                    Object item = enum.nextElement();
+                    if (item != null) 
+                        marshal(item, elemDescriptor, handler);
                 }
             }
             //-- handle vectors
