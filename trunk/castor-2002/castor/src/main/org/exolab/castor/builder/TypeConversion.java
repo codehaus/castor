@@ -188,6 +188,13 @@ public class TypeConversion {
                     xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
+                //-- QName
+                case SimpleTypesFactory.QNAME_TYPE:
+                {
+                    XSQName xsQName = new XSQName();
+                    xsQName.setFacets(simpleType);
+                    return xsQName;
+                }
                 //recurringDuration
                 case SimpleTypesFactory.RECURRING_DURATION_TYPE:
                 {
