@@ -152,6 +152,13 @@
   <!-- Last names begin with A-D -->
 
   <contributor type="Contributor">
+    <name surname="Ackley" given="Keith"/>
+    <email>keith.ackley@eds.com</email>
+    <company id="eds"/>
+    <description>Added support for marshalling the DOCTYPE to the marshaller.</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Arriaga" given="Santiago"/>
     <email>santiago@catnet.com.mx</email>
     <description>Added Informix and Hypersonic SQL to the list of supported databases.</description>
@@ -847,6 +854,11 @@
 
 
   <!-- Company Names (E-H) -->
+
+  <company id="eds">
+    <name>EDS (Electronic Data Systems)</name>
+    <url>www.eds.com</url>
+  </company>
 
   <!-- Company Names (I-L) -->
 
