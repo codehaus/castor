@@ -87,12 +87,13 @@ public final class EntityInfo {
     public final KeyGeneratorDescriptor keyGen;
 
     public EntityInfo( String entityClass, EntityFieldInfo[] idInfo,
-                       EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities,
+                       EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, EntityInfo superEntity,
                        Object discriminator, KeyGeneratorDescriptor keyGen ) {
         this.entityClass   = entityClass;
         this.fieldInfo     = fieldInfo;
         this.idInfo        = idInfo;
         this.subEntities   = subEntities;
+        this.superEntity   = superEntity;
         this.discriminator = discriminator;
         this.keyGen        = keyGen;
     }
