@@ -24,7 +24,7 @@
         <property name="archive" value="${project}-${version}"/>
         <property name="exampleexcludes" value="SourceGenerator/*,dax/*"/>
         <property name="excludes" value="**/package.html"/>
-        <property name="testexcludes" value="**/package.html,**/xml2java/**,**/MasterTestSuite/**"/>
+        <property name="testexcludes" value="**/package.html,**/MasterTestSuite/**"/>
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
