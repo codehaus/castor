@@ -58,12 +58,16 @@ public class ObjectModifiedException
     extends TransactionAbortedException
 {
 
-    
     public ObjectModifiedException( String message )
     {
         super( message );
     }
 
+    public ObjectModifiedException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
 
+    
 }
 

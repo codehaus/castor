@@ -65,6 +65,11 @@ public class FatalPersistenceException
         super( message );
     }
 
+    public FatalPersistenceException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
+
 
 }
 

@@ -57,13 +57,13 @@ package org.exolab.castor.jdo;
 public class QueryException
     extends PersistenceException
 {
-
-
     public QueryException( String message )
     {
         super( message );
     }
-
+    public QueryException( String message, Throwable t) {
+    		super(message, t);
+    }
 
 }
 

@@ -58,11 +58,15 @@ public class ObjectNotPersistentException
     extends PersistenceException
 {
 
-
     public ObjectNotPersistentException( String message )
     {
         super( message );
     }
 
+    public ObjectNotPersistentException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
 
+    
 }

@@ -58,11 +58,14 @@ public class TransactionNotInProgressException
     extends PersistenceException
 {
 
-
     public TransactionNotInProgressException( String message )
     {
         super( message );
     }
 
+    public TransactionNotInProgressException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
 
 }

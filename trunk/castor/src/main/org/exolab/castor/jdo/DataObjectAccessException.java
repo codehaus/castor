@@ -47,10 +47,6 @@
 package org.exolab.castor.jdo;
 
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
-
 /**
  * An exception encapsulating another exception which occurs during
  * operation to data object.
@@ -61,50 +57,13 @@ import java.io.PrintWriter;
 public class DataObjectAccessException
         extends RuntimeException {
 
-
-    private Exception  _except;
-
-    
-    public DataObjectAccessException( String message, Exception except ) {
-        super( message );
-        _except = except;
+    public DataObjectAccessException( String message, Throwable except ) {
+        super( message, except );
     }
-
 
     public DataObjectAccessException( String message ) {
         super( message );
     }
-    
-    
-    
-    public Exception getException() {
-        return _except;
-    }
-    
-    
-    public void printStackTrace() {
-        if ( _except == null )
-            super.printStackTrace();
-        else
-            _except.printStackTrace();
-    }
-    
-    
-    public void printStackTrace( PrintStream print ) {
-        if ( _except == null )
-            super.printStackTrace( print );
-        else
-            _except.printStackTrace( print );
-    }
-    
-    
-    public void printStackTrace( PrintWriter print ) {
-        if ( _except == null )
-            super.printStackTrace( print );
-        else
-            _except.printStackTrace( print );
-    }
-    
 
 }
 

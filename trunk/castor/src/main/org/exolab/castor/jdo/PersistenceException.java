@@ -63,58 +63,15 @@ import org.exolab.castor.core.exceptions.CastorException;
 public class PersistenceException
     extends CastorException
 {
-
-
-    private Exception  _except;
-
-    
-    public PersistenceException( String message, Exception except )
+    public PersistenceException( String message, Throwable except )
     {
-        super( message );
-        _except = except;
+        super( message, except );
     }
-
 
     public PersistenceException( String message )
     {
         super( message );
     }
-    
-    
-    
-    public Exception getException()
-    {
-        return _except;
-    }
-    
-    
-    public void printStackTrace()
-    {
-        if ( _except == null )
-            super.printStackTrace();
-        else
-            _except.printStackTrace();
-    }
-    
-    
-    public void printStackTrace( PrintStream print )
-    {
-        if ( _except == null )
-            super.printStackTrace( print );
-        else
-            _except.printStackTrace( print );
-    }
-    
-    
-    public void printStackTrace( PrintWriter print )
-    {
-        if ( _except == null )
-            super.printStackTrace( print );
-        else
-            _except.printStackTrace( print );
-    }
-    
-
 }
 
 

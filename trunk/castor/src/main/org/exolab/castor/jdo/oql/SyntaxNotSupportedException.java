@@ -7,9 +7,6 @@ package org.exolab.castor.jdo.oql;
  * @version $Revision$ $Date$
  */
 public class SyntaxNotSupportedException extends OQLSyntaxException {
-
-    private Exception  _exception;
-
 	/**
 	 * @param message A description of the error encountered.
 	 */
@@ -21,15 +18,7 @@ public class SyntaxNotSupportedException extends OQLSyntaxException {
 	 * @param message A description of the error encountered.
 	 * @param exception The root cause of this exception.
 	 */
-	public SyntaxNotSupportedException(String message, Exception exception) {
+	public SyntaxNotSupportedException(String message, Throwable exception) {
 		super(message, exception);
-		_exception = exception;
-	}
-
-	/**
-	 * @return Returns the root exception.	 
-	 */
-	public Exception getException() {
-		return _exception;
 	}
 }

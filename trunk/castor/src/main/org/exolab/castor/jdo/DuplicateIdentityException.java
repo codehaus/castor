@@ -58,11 +58,15 @@ package org.exolab.castor.jdo;
 public class DuplicateIdentityException
     extends PersistenceException
 {
-
     
     public DuplicateIdentityException( String message )
     {
         super( message );
+    }
+
+    public DuplicateIdentityException( String message, Throwable exception )
+    {
+        super( message, exception );
     }
 
 

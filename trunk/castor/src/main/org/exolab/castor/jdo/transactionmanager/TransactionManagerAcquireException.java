@@ -46,11 +46,6 @@
 
 package org.exolab.castor.jdo.transactionmanager;
 
-
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
-
 /**
  * An exception encapsulating an exception that occurs during the operation 
  * to acquire a <tt>javax.transaction.TransactionManager</tt>.
@@ -63,53 +58,14 @@ public class TransactionManagerAcquireException
     extends Exception 
 {
 
-
-    private Exception  _except;
-
-    
-    public TransactionManagerAcquireException( String message, Exception except ) 
+	public TransactionManagerAcquireException( String message, Throwable except ) 
     {
-        super( message );
-        _except = except;
+        super( message, except );
     }
-
 
     public TransactionManagerAcquireException( String message ) 
     {
         super( message );
     }
     
-    
-    
-    public Exception getException() 
-    {
-        return _except;
-    }
-    
-    
-    public void printStackTrace() 
-    {
-        if ( _except == null )
-            super.printStackTrace();
-        else
-            _except.printStackTrace();
-    }
-    
-    
-    public void printStackTrace( PrintStream print ) 
-    {
-        if ( _except == null )
-            super.printStackTrace( print );
-        else
-            _except.printStackTrace( print );
-    }
-    
-    
-    public void printStackTrace( PrintWriter print ) 
-    {
-        if ( _except == null )
-            super.printStackTrace( print );
-        else
-            _except.printStackTrace( print );
-    }
 }

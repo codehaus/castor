@@ -58,10 +58,14 @@ public class ObjectNotFoundException
     extends PersistenceException
 {
 
-
     public ObjectNotFoundException( String message )
     {
         super( message );
+    }
+
+    public ObjectNotFoundException( String message, Throwable exception )
+    {
+        super( message, exception );
     }
 
 

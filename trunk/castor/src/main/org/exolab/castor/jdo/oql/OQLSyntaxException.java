@@ -58,22 +58,11 @@ import org.exolab.castor.jdo.QueryException;
  * @version $Revision$ $Date$
  */
 public class OQLSyntaxException extends QueryException {
-
-    private Exception  _except;
-
 	public OQLSyntaxException( String message ) {
 		super( message );
 	}
-	
-    
-    public OQLSyntaxException( String message, Exception except ) 
+    public OQLSyntaxException( String message, Throwable except ) 
     {
-        super( message );
-        _except = except;
-    }
-    
-    public Exception getException() 
-    {
-        return _except;
+        super( message, except );
     }
 }

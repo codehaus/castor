@@ -11,16 +11,15 @@ public class ObjectDeletedException
     extends ObjectNotPersistentException
 {
     
-
-    /**
-     * Construct an instance of the exception.
-     *
-     * @param message A string providing a description of the exception.
-     */
     public ObjectDeletedException( String message )
     {
         super( message );
     }
 
+    public ObjectDeletedException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
 
+    
 } 

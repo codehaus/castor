@@ -58,18 +58,15 @@ public class TransactionAbortedException
     extends PersistenceException
 {
 
-
-    public TransactionAbortedException( String message, Exception except )
-    {
-        super( message, except );
-    }
-
-
     public TransactionAbortedException( String message )
     {
         super( message );
     }
 
+    public TransactionAbortedException( String message, Throwable except )
+    {
+        super( message, except );
+    }
 
 }
 
