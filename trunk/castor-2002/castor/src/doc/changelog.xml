@@ -42,6 +42,18 @@ XML:     Support for ODMG 3.0 DArray collection in the XML source code generator
          interoperability with OODBMS using the ODMG 3.0.
          (Contributed by Frank Thelen &lt;frank.thelen@poet.de&gt;)
 
+XML:     Added some namespace support to the XML Schema reader. It currently doesn't
+         properly handle namespace scoping as you go down the tree, so if you are
+         changing your namespace declarations for some reason on sub-elements it
+         probably won't work properly and you'll need to wait until Monday when I
+         finish it up.
+
+XML:     Fixed problem when using attributes that are of enumerated datatypes,
+         the types subpackage was not getting imported (reported by markd@lutris.com)
+
+XML:     Fixed problem when using enumerated datatypes with enumeration values
+         that contained Java keywords (reported by markd@lutris.com)
+
 Misc:    Support for Java 1.2 collections: Collection, Set, Map. Requires Java 1.2
          to compile, but using reflection can be made to work on Java 1.1.
     </pre></section>

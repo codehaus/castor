@@ -12,59 +12,58 @@
     Note: This schema is under evolution and subject to change.
 
  -->
-
 <xsd:schema xmlns:xsd="http://www.w3.org/1999/XMLSchema"
   targetNamespace="http://castor.exolab.org/JDO"
   version="0.8">
 
-  <element name="database">
-    <type content="elemOnly" order="seq">
-      <element ref="driver" minOccurs="0" maxOccurs="1" />
-      <element ref="data-source" minOccurs="0" maxOccurs="1" />
-      <element ref="jndi" minOccurs="0" maxOccurs="1" />
-      <element ref="mapping" minOccurs="1" />
-      <attribute name="name" type="ID" minOccurs="1" />
-      <attribute name="engine" type="string" minOccurs="0" default="generic" />
-    </type>
-  </element>
+  <xsd:element name="database">
+    <xsd:type content="elemOnly" order="seq">
+      <xsd:element ref="driver" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="data-source" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="jndi" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="mapping" minOccurs="1" />
+      <xsd:attribute name="name" type="ID" minOccurs="1" />
+      <xsd:attribute name="engine" type="string" minOccurs="0" default="generic" />
+    </xsd:type>
+  </xsd:element>
 
-  <element name="mapping">
-    <type content="empty">
-      <attribute name="href" type="string" minOccurs="1" />
-    </type>
-  </element>
+  <xsd:element name="mapping">
+    <xsd:type content="empty">
+      <xsd:attribute name="href" type="string" minOccurs="1" />
+    </xsd:type>
+  </xsd:element>
 
-  <element name="driver">
-    <type content="elemOnly" order="seq">
-      <element ref="param" minOccurs="0" />
-      <attribute name="url" type="string" minOccurs="1" />
-      <attribute name="class-name" type="string" minOccurs="0" />
-    </type>
-  </element>
+  <xsd:element name="driver">
+    <xsd:type content="elemOnly" order="seq">
+      <xsd:element ref="param" minOccurs="0" />
+      <xsd:attribute name="url" type="string" minOccurs="1" />
+      <xsd:attribute name="class-name" type="string" minOccurs="0" />
+    </xsd:type>
+  </xsd:element>
 
-  <element name="param">
-    <type content="empty">
-      <attribute name="name" type="string" minOccurs="1" />
-      <attribute name="value" type="string" minOccurs="1" />
-    </type>
-  </element>
+  <xsd:element name="param">
+    <xsd:type content="empty">
+      <xsd:attribute name="name" type="string" minOccurs="1" />
+      <xsd:attribute name="value" type="string" minOccurs="1" />
+    </xsd:type>
+  </xsd:element>
 
-  <element name="data-source">
-    <type content="elemOnly" order="seq">
-      <element ref="params" minOccurs="1" maxOccurs="1" />
-      <attribute name="class-name" type="string" minOccurs="1" />
-    </type>
-  </element>
+  <xsd:element name="data-source">
+    <xsd:type content="elemOnly" order="seq">
+      <xsd:element ref="params" minOccurs="1" maxOccurs="1" />
+      <xsd:attribute name="class-name" type="string" minOccurs="1" />
+    </xsd:type>
+  </xsd:element>
 
-  <element name="params">
-    <type content="any">
-    </type>
-  </element>
+  <xsd:element name="params">
+    <xsd:type content="any">
+    </xsd:type>
+  </xsd:element>
 
-  <element name="jndi">
-    <type content="empty">
-      <attribute name="name" type="string" minOccurs="1" />
-    </type>
-  </element>
+  <xsd:element name="jndi">
+    <xsd:type content="empty">
+      <xsd:attribute name="name" type="string" minOccurs="1" />
+    </xsd:type>
+  </xsd:element>
 
-</schema>
+</xsd:schema>
