@@ -16,36 +16,6 @@
     <case class="jdo.Race" name="TC12" />
     <case class="jdo.Dependent" name="TC15" />
   </category>
-<!--
-  <category name="postgres" class="jdo.JDOCategory">
-    <description>JDO tests for PostgreSQL 6.5/7</description>
-    <jdo database-name="postgres" configuration="postgres.xml" />
-    <case class="jdo.Concurrent" />
-    <case class="jdo.Deadlock" />
-    <case class="jdo.DuplicateKey" />
-    <case class="jdo.ReadOnly" />
-    <case class="jdo.TypeHandling" />
-    <case class="jdo.KeyGenGeneric" />
-    <case class="jdo.KeyGenSequence" />
-    <case class="jdo.CacheLeakage" />
-    <case class="jdo.Race" />
-  </category>
--->
-  <category name="access" class="jdo.JDOCategory">
-    <description>JDO tests for MS Access</description>
-    <jdo database-name="test" configuration="access.xml" />
-    <case class="jdo.Concurrent" />
-    <!--
-    <case class="jdo.Deadlock" /> -->
-    <case class="jdo.DuplicateKey" />
-    <case class="jdo.ReadOnly" />
-    <!-- need numeric(X,0) 
-    <case class="jdo.TypeHandling" /> -->
-    <case class="jdo.KeyGenGeneric" />
-    <case class="jdo.CacheLeakage" />
-    <case class="jdo.Race" />
-  </category>
-
   <category name="oracle" class="jdo.JDOCategory">
     <description>JDO tests for Oracle8i</description>
     <jdo database-name="oracle" configuration="oracle.xml" />

@@ -29,9 +29,10 @@ go
 -- test_race
 drop table test_race
 go
-create table test_race (
+create table test_race
+(
   id      int          not null,
-  value1  int          not null
+  value1  int	       not null
 )
 go
 create unique index test_race_pk on test_race ( id )
@@ -67,21 +68,6 @@ go
 create unique index test_detail_pk on test_detail ( detail_id )
 go
 grant all on test_detail to test
-go
-
-
--- test_detail2
-drop table test_detail2
-go
-create table test_detail2 (
-  detail2_id  numeric(10,0)  not null,
-  detail_id  numeric(10,0)  not null,
-  value      varchar(200 )  not null
-)
-go
-create unique index test_detail2_pk on test_detail2 ( detail2_id )
-go
-grant all on test_detail2 to test
 go
 
 
@@ -195,6 +181,20 @@ create procedure sp_check_permissions @userName varchar(200),
 go
 grant all on sp_check_permissions to test
 go
-sp_procxmode sp_check_permissions,"anymode"
+
+
+-- test_detail2
+drop table test_detail2
+go
+create table test_detail2
+(
+  detail2_id  numeric(10,0)  not null,
+  detail_id  numeric(10,0)  not null,
+  value      varchar(200 )  not null
+)
+go
+create unique index test_detail2_pk on test_detail2 ( detail2_id )
+go
+grant all on test_detail2 to test
 go
 
