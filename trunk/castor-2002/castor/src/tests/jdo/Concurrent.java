@@ -1,34 +1,30 @@
 package jdo;
 
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.Enumeration;
-import org.exolab.castor.jdo.DataObjects;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import org.exolab.jtf.CWVerboseStream;
+import org.exolab.jtf.CWTestCase;
+import org.exolab.exceptions.CWClassConstructorException;
 
 
 /**
  */
 public class Concurrent
+    extends CWTestCase
 {
-
-
-    private DataObjects    _jdo;
 
 
     private Database       _db;
 
 
-    private PrintWriter    _logger;
-
-
-    private String         _jdbcUri;
+    private Connection     _conn;
 
 
     static final String    JDBCName = "jdbc value";
@@ -37,15 +33,18 @@ public class Concurrent
     static final String    JDOName = "jdo value";
 
 
-    public Concurrent( DataObjects jdo, PrintWriter logger,
-		       String driverClass, String jdbcUri )
-	throws PersistenceException
+    public Concurrent()
+        throws CWClassConstructorException
     {
-        _jdo = jdo;
-        _logger = logger;
-        _db = _jdo.getDatabase();
-        _logger.println( "Opened JDO database " + _db );
-        
+        super( "TC01", "Test dirty checking" );
+        try {
+            _db = JDOTests.getDatabase();
+            _conn = JDOTests.getJDBCConnection(); 
+        } catch ( Exception except ) {
+            throw new CWClassConstructorException( except.toString() );
+        }
+
+        /*        
 	if ( driverClass == null )
 	    driverClass = "postgresql.Driver";
 	_logger.println( "Using JDBC driver " + driverClass );
@@ -60,65 +59,85 @@ public class Concurrent
 	else
 	    _jdbcUri = jdbcUri;
 	_logger.println( "Using JDBC URI " + _jdbcUri );
+        */
     }
 
 
-    public void run()
-        throws PersistenceException, SQLException
+    public void preExecute()
     {
-	OQLQuery      oql;
-        TestObject    object;
-	Connection    conn;
-        Enumeration   enum;
+        super.preExecute();
+    }
 
-        // Open transaction in order to perform JDO operations
-        _db.begin();
-        
-        // Determine if test object exists, if not create it.
-        // If it exists, set the name to some predefined value
-        // that this test will later override.
-        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-        oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
-            object.name = TestObject.DefaultName;
-            _logger.println( "Updating object: " + object );
-        } else {
-            object = new TestObject();
-            object.id = TestObject.DefaultId;
-            object.name = TestObject.DefaultName;
-            _logger.println( "Creating new object: " + object );
-            _db.create( object );
-        }
-        _db.commit();
-        
-        
-        // Open a new transaction in order to conduct test
-        _db.begin();
-        oql.bind( new Integer( TestObject.DefaultId ) );
-        object = (TestObject) oql.execute().nextElement();
-        object.name = JDOName;
-        
-        // Perform direct JDBC access and override the value of that table
-        conn = DriverManager.getConnection( _jdbcUri );
-        conn.createStatement().execute( "UPDATE test_table SET name='" + JDBCName + "' WHERE id=" + TestObject.DefaultId );
-        _logger.println( "Updated test object from JDBC" );
-        conn.close();
-        
-        // Commit JDO transaction, this should report object modified
-        // exception
-        _logger.println( "Committing JDO update" );
+
+    public void postExecute()
+    {
+        super.postExecute();
+    }
+
+
+    public boolean run( CWVerboseStream stream )
+    {
+        boolean result = true;
+
         try {
+            OQLQuery      oql;
+            TestObject    object;
+            Connection    conn;
+            Enumeration   enum;
+
+            // Open transaction in order to perform JDO operations
+            _db.begin();
+        
+            // Determine if test object exists, if not create it.
+            // If it exists, set the name to some predefined value
+            // that this test will later override.
+            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE Id = $1" );
+            oql.bind( TestObject.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                object = (TestObject) enum.nextElement();
+                stream.writeVerbose( "Retrieved object: " + object );
+                object.setName( TestObject.DefaultName );
+            } else {
+                object = new TestObject();
+                stream.writeVerbose( "Creating new object: " + object );
+                _db.create( object );
+            }
             _db.commit();
-            _logger.println( "Error: ObjectModifiedException not thrown" );
-        } catch ( ObjectModifiedException except ) {
-            _logger.println( "OK: ObjectModifiedException thrown" );
+            
+            
+            // Open a new transaction in order to conduct test
+            _db.begin();
+            oql.bind( new Integer( TestObject.DefaultId ) );
+            object = (TestObject) oql.execute().nextElement();
+            object.setName( JDOName );
+            
+            // Perform direct JDBC access and override the value of that table
+            _conn.createStatement().execute( "UPDATE test_table SET name='" + JDBCName + "' WHERE id=" + TestObject.DefaultId );
+            stream.writeVerbose( "Updated test object from JDBC" );
+            _conn.close();
+        
+            // Commit JDO transaction, this should report object modified
+            // exception
+            stream.writeVerbose( "Committing JDO update" );
+            try {
+                _db.commit();
+                stream.writeVerbose( "Error: ObjectModifiedException not thrown" );
+                result = false;
+            } catch ( ObjectModifiedException except ) {
+                stream.writeVerbose( "OK: ObjectModifiedException thrown" );
+            }
+            _db.close();
         } catch ( Exception except ) {
-            _logger.println( "Error: " + except );
+            try {
+                stream.writeVerbose( "Error: " + except );
+            } catch ( IOException except2 ) { }
+            except.printStackTrace();
+            result = false;
         }
-        _db.close();
+        return result;
     }
 
 
 }
+
