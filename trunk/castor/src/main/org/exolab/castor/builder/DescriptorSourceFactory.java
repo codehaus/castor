@@ -40,6 +40,8 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Portions of this file are copyright 2005 (C) Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
@@ -53,7 +55,7 @@ import org.exolab.castor.builder.types.*;
 /**
  * A factory for creating the source code of descriptor classes
  * 
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class DescriptorSourceFactory {
@@ -65,6 +67,12 @@ public class DescriptorSourceFactory {
 	private static JClass _FieldDescriptorClass =
 		new JClass("org.exolab.castor.mapping.FieldDescriptor");
 
+    /**
+     * GeneralizedFieldHandler
+     */
+    private static final JClass GENERALIZED_FIELD_HANDLER_CLASS =
+        new JClass("org.exolab.castor.mapping.GeneralizedFieldHandler");
+    
 	//-- org.exolab.castor.xml
 	private static JClass fdImplClass =
 		new JClass("org.exolab.castor.xml.util.XMLFieldDescriptorImpl");
@@ -169,7 +177,7 @@ public class DescriptorSourceFactory {
 
 		//-- declare temp variables
 		jsc.add("org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;");
-		jsc.add("org.exolab.castor.xml.XMLFieldHandler              handler        = null;");
+		jsc.add("org.exolab.castor.mapping.FieldHandler             handler        = null;");
 		jsc.add("org.exolab.castor.xml.FieldValidator               fieldValidator = null;");
 
 		//-- handle  content
@@ -345,9 +353,32 @@ public class DescriptorSourceFactory {
 		//-- handler access methods
 		if (member.getXMLFieldHandler() != null) {
 			String handler = member.getXMLFieldHandler();
-			jsc.add("desc.setHandler(new " + handler + "());");
-		} else
-		    createXMLFieldHandler(member, xsType, localClassName, jsc);
+			jsc.add("handler = new " + handler + "();");
+            jsc.add("//-- test for generalized field handler");
+            jsc.add("if (handler instanceof ");
+            jsc.append(GENERALIZED_FIELD_HANDLER_CLASS.getName());
+            jsc.append(")");
+            jsc.add("{");
+            jsc.indent();
+            jsc.add("//-- save reference to user-specified handler");
+            jsc.add(GENERALIZED_FIELD_HANDLER_CLASS.getName());
+            jsc.append(" gfh = (");
+            jsc.append(GENERALIZED_FIELD_HANDLER_CLASS.getName());
+            jsc.append(")handler;");
+            createXMLFieldHandler(member, xsType, localClassName, jsc, true);
+            jsc.add("gfh.setFieldHandler(handler);");
+            jsc.add("handler = gfh;");
+            jsc.unindent();
+            jsc.add("}");
+            
+		} 
+        else {
+		    createXMLFieldHandler(member, xsType, localClassName, jsc, false);
+            addSpecialHandlerLogic(member, xsType, jsc);
+        }
+        
+        jsc.add("desc.setHandler(handler);");
+        
 
 		//-- container
 		if (member.isContainer()) {
@@ -412,7 +443,11 @@ public class DescriptorSourceFactory {
      * Creates the XMLFieldHandler for the given FieldInfo
      */
 	private void createXMLFieldHandler
-	    (FieldInfo member, XSType xsType, String localClassName, JSourceCode jsc) 
+	    (FieldInfo member, 
+         XSType xsType, 
+         String localClassName, 
+         JSourceCode jsc,
+         boolean forGeneralizedHandler)
 	{
 
 		boolean any = false;
@@ -428,7 +463,7 @@ public class DescriptorSourceFactory {
 	    if (xsType.getType() == XSType.CLASS)
 			isEnumerated = ((XSClass) xsType).isEnumerated();
 
-		jsc.add("handler = (new org.exolab.castor.xml.XMLFieldHandler() {");
+		jsc.add("handler = new org.exolab.castor.xml.XMLFieldHandler() {");
 		jsc.indent();
 
 		//-- read method
@@ -548,6 +583,7 @@ public class DescriptorSourceFactory {
         if (member.getDeclaringClassInfo() != null)
 		    isAbstract = member.getDeclaringClassInfo().isAbstract();
         if (any
+            || forGeneralizedHandler
 			|| isEnumerated
 			|| xsType.isPrimitive()
 			|| xsType.getJType().isArray()
@@ -561,52 +597,66 @@ public class DescriptorSourceFactory {
 		jsc.add("}");
 		//--end of new Instance method
 		jsc.unindent();
-		jsc.add("} );");
-		//--end of XMLFieldDescriptor
-
-		if (isEnumerated) {
-			jsc.add("desc.setHandler( new org.exolab.castor.xml.handlers.EnumFieldHandler(");
-			jsc.append(classType(xsType.getJType()));
-			jsc.append(", handler));");
-			jsc.add("desc.setImmutable(true);");
-		} else if (xsType.getType() == XSType.DATETIME_TYPE) {
-			jsc.add("desc.setHandler( new org.exolab.castor.xml.handlers.DateFieldHandler(");
-			jsc.append("handler));");
-			jsc.add("desc.setImmutable(true);");
-		} else if (xsType.getType() == XSType.DECIMAL_TYPE) {
-			jsc.add("desc.setHandler(handler);");
-			jsc.add("desc.setImmutable(true);");
-		}
-		//-- Handle special Collection Types such as NMTOKENS and IDREFS
-		else if (member.getSchemaType().getType() == XSType.COLLECTION) {
-			switch (xsType.getType()) {
-				case XSType.NMTOKEN_TYPE:
-				case XSType.NMTOKENS_TYPE:
-					//-- use CollectionFieldHandler
-					jsc.add("desc.setHandler( new org.exolab.castor.xml.handlers.CollectionFieldHandler(");
-					jsc.append(
-						"handler, new org.exolab.castor.xml.validators.NameValidator(org.exolab.castor.xml.validators.NameValidator.NMTOKEN)));");
-					break;
-				case XSType.QNAME_TYPE:
-					//-- use CollectionFieldHandler
-					jsc.add("desc.setHandler( new org.exolab.castor.xml.handlers.CollectionFieldHandler(");
-					jsc.append(
-						"handler, null));");
-					break;
-				case XSType.IDREF_TYPE :
-				case XSType.IDREFS_TYPE :
-					//-- uses special code in UnmarshalHandler
-					//-- see UnmarshalHandler#processIDREF
-					jsc.add("desc.setMultivalued(" + member.isMultivalued());
-					jsc.append(");");
-					/* do not break here */
-				default :
-					jsc.add("desc.setHandler(handler);");
-					break;
-			}
-		} else
-			jsc.add("desc.setHandler(handler);");
+		jsc.add("};");
+		//--end of XMLFieldHandler
 	}
+    
+    /**
+     * Adds additional logic or wrappers around the core handler
+     * for special types such as dates, enumerated types, 
+     * collections, etc.
+     * 
+     * @param member
+     * @param xsType
+     * @param jsc
+     */
+    private void addSpecialHandlerLogic
+       (FieldInfo member, 
+        XSType xsType, 
+        JSourceCode jsc)
+    {
+        if (xsType.isEnumerated()) {
+            jsc.add("handler = new org.exolab.castor.xml.handlers.EnumFieldHandler(");
+            jsc.append(classType(xsType.getJType()));
+            jsc.append(", handler);");
+            jsc.add("desc.setImmutable(true);");
+        } else if (xsType.getType() == XSType.DATETIME_TYPE) {
+            jsc.add("handler = new org.exolab.castor.xml.handlers.DateFieldHandler(");
+            jsc.append("handler);");
+            jsc.add("desc.setImmutable(true);");
+        } else if (xsType.getType() == XSType.DECIMAL_TYPE) {
+            jsc.add("desc.setImmutable(true);");
+        }
+        //-- Handle special Collection Types such as NMTOKENS and IDREFS
+        else if (member.getSchemaType().getType() == XSType.COLLECTION) {
+            switch (xsType.getType()) {
+                case XSType.NMTOKEN_TYPE:
+                case XSType.NMTOKENS_TYPE:
+                    //-- use CollectionFieldHandler
+                    jsc.add("handler = new org.exolab.castor.xml.handlers.CollectionFieldHandler(");
+                    jsc.append("handler, new org.exolab.castor.xml.validators.NameValidator(");
+                    jsc.append("org.exolab.castor.xml.validators.NameValidator.NMTOKEN));");
+                    break;
+                case XSType.QNAME_TYPE:
+                    //-- use CollectionFieldHandler
+                    jsc.add("handler = new org.exolab.castor.xml.handlers.CollectionFieldHandler(");
+                    jsc.append("handler, null);");
+                    break;
+                case XSType.IDREF_TYPE :
+                case XSType.IDREFS_TYPE :
+                    //-- uses special code in UnmarshalHandler
+                    //-- see UnmarshalHandler#processIDREF
+                    jsc.add("desc.setMultivalued(");
+                    jsc.append("" + member.isMultivalued());
+                    jsc.append(");");
+                    break;
+                default :
+                    break;
+            }
+        }
+        
+    } //-- addSpecialHandlerLogic
+    
 
 	/**
 	 * Creates the validation code for a given member.
