@@ -299,8 +299,10 @@ public class XMLMappingLoader
 
         //is the value type needs specific handling
         //such as QName support?
-        xmlDesc.setSchemaType(xml.getType());
-        xmlDesc.setQNamePrefix(xml.getQNamePrefix());
+        if (xml != null) {
+            xmlDesc.setSchemaType(xml.getType());
+            xmlDesc.setQNamePrefix(xml.getQNamePrefix());
+        }
 
         return xmlDesc;
     }
