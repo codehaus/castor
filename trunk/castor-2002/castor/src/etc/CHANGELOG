@@ -1,5 +1,9 @@
 Version (CVS)
 -------------
+
+JDO:    For HIGH/LOW key generator the paramater "global" has been added, it gives possibility
+        to generate globally unique keys (Oleg Nitz).
+
 JDO:    SAP DB driver, improved support for MySQL (Oleg Nitz)
 
 JDO:    Added possibility to close OQL queries in order to release resources (Oleg Nitz)
