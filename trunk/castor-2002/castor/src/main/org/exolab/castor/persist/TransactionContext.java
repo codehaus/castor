@@ -514,7 +514,7 @@ public abstract class TransactionContext
         // prevents object form being deleted while someone else is
         // looking at it.
         try {
-            entry.engine.writeLock( this, entry.oid, _lockTimeout );
+            entry.engine.softLock( this, entry.oid, _lockTimeout );
             // Mark object as deleted. This will prevent it from being viewed
             // in this transaction and will handle it properly at commit time.
             // The write lock will prevent it from being viewed in another
@@ -755,7 +755,7 @@ public abstract class TransactionContext
                     // just updated)
                     if ( entry.modified ) {
                         entry.engine.updateObject( this, entry.oid, entry.object );
-                        entry.engine.writeLock( this, entry.oid, 0 );
+                        entry.engine.softLock( this, entry.oid, 0 );
                     }
                     entry.created = false;
                 }
@@ -968,7 +968,7 @@ public abstract class TransactionContext
             entry.deleted = true;
             entry.prepared = false;
             try {
-                entry.engine.writeLock( this, entry.oid, _lockTimeout );
+                entry.engine.softLock( this, entry.oid, _lockTimeout );
             } catch ( ObjectDeletedException except ) {
                 // Object has been deleted outside this transaction,
                 // forget about it
