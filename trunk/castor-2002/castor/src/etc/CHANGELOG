@@ -23,6 +23,10 @@ XML:    Solved a performance bug for unmarshalling of primitive type. We don't
         the parser.
         (Sebastien Gignoux <gignoux@intalio.com>) 
 
+XML & JDO:
+	Regenerated data objects in the org.exolab.castor.mapping.xml package,
+	using an updated version of schema (Nov 2000).
+
 JDO:    Added "trigger" mode for SEQUENCE key generator. 
         (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
 
@@ -40,6 +44,45 @@ JDO:    Added support for BIGINT sql type in key generators (oleg).
  
 JDO:    Bug fix in the handling of classloader in the mapping loader (reported 
         by brian rogers <brian@freya.bianca.com>).
+
+JDO:    Added "serializable" as a supported field type. Require BLOB support in the 
+	database. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged JDO branch, "castorone", into the main branch.
+
+JDO:    Merged: Store cycle during transaction "prepare" state is split into
+	preStore and store cycles. With the new addition cycle, dependent object 
+	using key-generator is stored properly. It also avoid unnecessary update
+	SQL statements execution. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Added markModification in TransactionContext. It enable a 
+	more flexible way to mark an object dirty. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: RemoveRelated is added in LockEngine. It automatically removes the 
+	reference of the deleted object in other related object. It protect 
+	cache consistency and avoid some ObjectNotFoundException due to
+	users' errors. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Added Multiple Primary Keys support. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Added Many-to-Many relationship support. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Added Lazy loading for "collection" support. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Improved dependent object support. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Improved the in-memory locking architecture and stablity. (Thomas Yip <yip@intalio.com>) 
+
+JDO:    Merged: Cleaned up excessive ExceptionImpl classes. (Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Support of Object[] as a collection type is temporarily removed. 
+	(Thomas Yip <yip@intalio.com>)
+
+JDO:    Merged: Support of custom ClassDescriptor for JDO side is no longer supported. 
+	(Thomas Yip <yip@intalio.com>)
+
+DAX:    Merged: Tempoarily removed DAX. To be reworked and merged into JDO 
+	(as new type of data-store).  (Thomas Yip <yip@intalio.com>)
 
 DSML:   Add a more detailed policies :
         * NewAttrOnly, which implies that new attributes are created according 
