@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug 1820 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Add template for submitting a bug report.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1820
+       (Ralf - 20050406)
+
 JDO:   Fixed bug 1214 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem in field molder when dealing with 'set'
 	   methods with more than one signature.

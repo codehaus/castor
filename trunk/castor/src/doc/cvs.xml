@@ -10,6 +10,7 @@
       </p>
       <p>
          Before submitting bugs, please read the
+         <a href="how-to-submit-a-bug.xml">Submitting a bug report</a>,
          <a href="http://bugzilla.mozilla.org/page.cgi?id=etiquette.html">Bugzilla Etiguette</a> and
          <a href="http://bugzilla.mozilla.org/bugwritinghelp.html">Bug Writing Guidelines</a> from Mozilla.org.
       </p>
