@@ -38,7 +38,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
+ *
  *
  * $Id$
  */
@@ -73,8 +74,11 @@ import java.net.URL;
 
 /**
  * A Java Source generation tool which uses XML Schema definitions
- * to create an Object model
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * to create an Object model.
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a> - Main author.
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a> - Contributions.
+ * @author <a href="mailto:nsgreen@thazar.com">Nathan Green</a> - Contributions.
  * @version $Revision$ $Date$
 **/
 public class SourceGenerator {
@@ -920,6 +924,7 @@ public class SourceGenerator {
     /**
      * Processes the given JClass by creating the
      * corresponding MarshalInfo and print the Java classes
+     *
      * @param classInfo the classInfo to process
     **/
     private void processJClass(JClass jClass, SGStateInfo state) {
@@ -931,8 +936,17 @@ public class SourceGenerator {
             String filename = jClass.getFilename(destDir);
             File file = new File(filename);
             if (file.exists()) {
-                String message = filename + " already exists. overwrite?";
-                allowPrinting = dialog.confirm(message);
+                String message = filename + " already exists. overwrite";
+                char ch = dialog.confirm(message, "yna",
+                    "y = yes, n = no, a = all");
+                if (ch == 'a') {
+                    state.setPromptForOverwrite(false);
+                    allowPrinting = true;
+                } 
+                else if (ch == 'y')
+                    allowPrinting = true;
+                else
+                    allowPrinting = false;
             }
         }
         //-- print class
@@ -961,8 +975,17 @@ public class SourceGenerator {
                 String filename = desc.getFilename(destDir);
                 File file = new File(filename);
                 if (file.exists()) {
-                    String message = filename + " already exists. overwrite?";
-                    allowPrinting = dialog.confirm(message);
+                    String message = filename + " already exists. overwrite";
+                    char ch = dialog.confirm(message, "yna",
+                        "y = yes, n = no, a = all");
+                    if (ch == 'a') {
+                        state.setPromptForOverwrite(false);
+                        allowPrinting = true;
+                    } 
+                    else if (ch == 'y')
+                        allowPrinting = true;
+                    else
+                        allowPrinting = false;
                 }
             }
 
@@ -1220,10 +1243,12 @@ public class SourceGenerator {
            throw new IllegalArgumentException("The parameter must represent an absolute path.");
         if (File.separatorChar != '/')
             result = result.replace(File.separatorChar, '/');
+            
         if (result.startsWith("/"))
             /*Unix platform*/
             result = "file://" + result;
-        else result = "file://" + "/" + result;   /*DOS platform*/
+        else 
+            result = "file:///" + result;   /*DOS platform*/
 
         return result;
     }
