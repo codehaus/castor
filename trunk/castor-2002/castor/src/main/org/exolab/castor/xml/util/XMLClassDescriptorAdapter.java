@@ -119,7 +119,7 @@ public class XMLClassDescriptorAdapter
                     xmlClassDesc = new XMLClassDescriptorAdapter(extendsDesc, null);
                 }
             }
-            setExtends((XMLClassDescriptor)xmlClassDesc.getExtends());
+            setExtends(xmlClassDesc);
         }
         
         if ( classDesc.getIdentity() != null ) {
