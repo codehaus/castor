@@ -829,8 +829,14 @@ public class Schema extends Annotated {
                 }
             }
         }
-        else if (ns.equals(_schemaNamespace))
+        else if (ns.equals(_schemaNamespace)) {
             result= simpleTypesFactory.getBuiltInType(canonicalName);
+            if (result == null)  {
+                 String err = "getSimpleType: the simple type '"+canonicalName+
+                                "' is not a built-in type as defined in XML Schema specification.";
+                    throw new IllegalArgumentException(err);
+                }
+        }
         else if (ns.equals(_targetNamespace)) {
             result = (SimpleType)_simpleTypes.get(canonicalName);
             if (result != null) {
@@ -864,7 +870,7 @@ public class Schema extends Annotated {
      * @return an Enumeration of all SimpleType declarations
     **/
     public Enumeration getSimpleTypes() {
-        
+
         //-- clean up "deferred types" if necessary
         Enumeration enum = _simpleTypes.elements();
         while(enum.hasMoreElements()) {
