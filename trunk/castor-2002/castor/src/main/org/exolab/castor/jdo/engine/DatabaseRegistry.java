@@ -65,7 +65,6 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.conf.Mapping;
-import org.exolab.castor.jdo.conf.DTDResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.ClassHandler;
@@ -74,6 +73,7 @@ import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.util.DTDResolver;
 
 
 /**
@@ -84,6 +84,12 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  */
 public class DatabaseRegistry
 {
+
+
+    /**
+     * The name of the generic SQL engine, if no SQL engine specified.
+     */
+    public static final String  GenericEngine = "generic";
 
 
     /**
@@ -255,7 +261,29 @@ public class DatabaseRegistry
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
 
+
+        org.exolab.castor.xml.util.ClassDescriptorResolverImpl cdr;
+
+        try {
+            org.exolab.castor.xml.XMLMappingLoader xml;
+
+            unm = new Unmarshaller( org.exolab.castor.mapping.xml.Mapping.class );
+            cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
+            xml = new org.exolab.castor.xml.XMLMappingLoader( loader );
+            xml.loadMapping( new InputSource( unm.getClass().getResourceAsStream( "/org/exolab/castor/jdo/conf/mapping.xml" ) ) );
+            cdr.setMappingLoader( xml );
+        } catch ( MappingException except ) {
+            except.printStackTrace();
+            throw except;
+        } catch ( Exception except ) {
+            throw new MappingException( except );
+        }
+
+
         unm = new Unmarshaller( Database.class );
+        //
+        unm.setResolver( cdr );
+        //
         try {
             // Load the JDO database configuration file from the specified
             // input source. If the database was already configured, ignore
@@ -272,11 +300,12 @@ public class DatabaseRegistry
 
             // Complain if no database engine was specified, otherwise get
             // a persistence factory for that database engine.
-            if ( database.getEngine() == null || database.getEngine().getName() == null )
-                throw new MappingException( "jdo.missingEngine", database.getName() );
-            factory = PersistenceFactoryRegistry.getPersistenceFactory( database.getEngine().getName() );
+            if ( database.getEngine() == null  )
+                factory = PersistenceFactoryRegistry.getPersistenceFactory( GenericEngine );
+            else
+                factory = PersistenceFactoryRegistry.getPersistenceFactory( database.getEngine() );
             if ( factory == null )
-                throw new MappingException( "jdo.noSuchEngine", database.getEngine().getName() );
+                throw new MappingException( "jdo.noSuchEngine", database.getEngine() );
 
             // Load the mapping file from the URL specified in the database
             // configuration file, relative to the configuration file.
