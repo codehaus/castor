@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document project="../project.xml">
-  <body title="CVS Access">
+<document url="http://castor.exolab.org/cvs.xml">
+  <body>
+    <title>CVS Access</title>
     <p>The source code, documentation and libraries are available for anonymous access
        from the ExoLab CVS server.</p>
 

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document id="EXOLAB-2000-01-24-AA01-DR" project="../project.xml">
+<document url="http://castor.exolab.org/locking.xml">
   <properties>
     <title>Transaction And Locking Modes</title>
     <abstract>Describes the Castor transaction and locking modes, the semantics of optimistic and pessimistic locking, and the operations performed by Castor to assure transactional ACID-ity</abstract>
-    <authors>
-      <author email="arkin@exoffice.com">
-        <firstname>Assaf</firstname>
-        <lastname>Arkin</lastname>
-      </author>
-    </authors>
+    <author email="arkin@exoffice.com">Assaf Arkin</author>
     <status>Preliminary Draft</status>
   </properties>
   <body>
     <section title="Transaction And Locking">
+
+      <p>Castor implements an internal locking mechanism with read/write locks, timeouts and
+         deadlock detection. The locking mechanism guarantees transactional integrity and
+         concurrency outside of the database server, allowing Castor to properly manage locks
+         in optimistic locking mode, when not using the database server as a persistence engine
+         (e.g. LDAP, shared object space), and to better report concurrency errors.</p>
 
 
       <section title="Optimistic Locking">
@@ -41,6 +41,87 @@
 
       </section>
 
+      <section title="The ObjectLock">
+
+        <p>Most Java applications rely on the Java <tt>synchronized</tt> mechanism to implement
+           locks. Castor takes a different approach to locking, managed through an <tt>ObjectLock</tt>.
+           In the persistence world locks fall into two types: read locks, and write locks.</p>
+
+        <p>Any number of transaction can acquire a read lock on an object, however only one
+           transaction can acquire a write lock at any given instance. Read and write locks are
+           mutually exclusive, no transaction can have a write lock while other transactions have
+           a read lock on the object, and vice versa.</p>
+
+        <p>Read locks are generally granted for a long period of time (e.g. while an object is
+           being modified), while write locks are granted for a short period of time (when the
+           object is being saved).</p>
+
+        <p>If a transaction requires a lock on an object and cannot acquire it directly, the
+           transaction will block until the opposing lock is released or a timeout has passed.
+           For example, if transaction T1 has a write lock on object O1 and is in the process
+           of committing, and transaction T2 wants to acquire a write (or read) lock on object
+           O1, transaction T2 will block until T1 has completed and released the lock.</p>
+
+        <p>This form of locking assures that only one concurrent update is allowed on an object,
+           even if multiple transactions are working with the very same object. It also assures
+           that a transaction's view of an object will be consistent with the object's copy in
+           persistent storage.</p>
+
+        <p>An <tt>ObjectLock</tt> identifies a unique object in the persistence engine that can
+           be accessed concurrently by multiple transactions. Any number of transactions may
+           acquire a read lock, only one transaction may acquire a write lock, a read lock and
+           write lock are mutually exclusive and will not be granted at the same time.
+           A transaction can always upgrade from a read lock to a write lock if no other
+           transaction holds a read lock.</p>
+
+        <p>When a transaction requestes a lock which cannot be acquired, the transaction is
+           put on the waiting list and is blocked until the lock is released, or the
+           transaction has timedout. A transaction can only wait to acquire one lock at any
+           given time, but multiple transactions may wait to acquire the same lock.</p>
+
+      </section>
+
+      <section title="Deadlock Detection">
+
+        <p>A locking mechanism always results in the possibility of a deadlock. The Castor
+           locking mechanism includes a deadlock detection mechanism that properly reports
+           deadlock scenarios.</p>
+
+        <p>Consider the following scenario. Transaction T1 has acquired a write lock on object
+           O1. Transaction T2 has acquired a write lock on object O2. T1 now attempts to acquire
+           a lock on object O2 in order to complete. T1 will block until T2 has released its
+           lock on O2. Now T2 attempts to acquire a lock on object O1 in order to complete.
+           T2 will block until T1 has releases its lock, which will never happen for as long as
+           T1 is waiting for T2 to release its lock.</p>
+
+        <p>A deadlock situation as described above has three possible outcomes. If we used a
+           simple synchronization mechanism like Java's <tt>synchronized</tt>, both transactions
+           would block forever and the application will never complete. If we rely on the
+           <tt>ObjectLock</tt> timeout mechanism, one of the transactions will give up at some
+           point (say, after 30 seconds) and allow the other one to complete. Even if we don't
+           mind the delay, the outcome will not be deterministic (we cannot say which
+           transaction will complete first).</p>
+
+        <p>A deadlock detection mechanism identifies the last attempt to acquire a lock as
+           leading to a deadlock, immediately notifies the application with the proper error
+           message, and allows the application to proceed, either recovering from the
+           situation or rolling back the transaction. There is no timeout and the outcome
+           is deterministic.</p>
+
+        <p>Here's a brief explanation of how the deadlock detection mechanism works. When a
+           transaction T2 attempts to acquire a lock on object O1, locked by transaction T1,
+           it will be placed on the waiting list for that <tt>ObjectLock</tt>. Prior to
+           placing it on the waiting list, the possibility of a deadlock will be determined.</p>
+
+        <p>All blocking transactions are identified from the lock, of those the set of blocked
+           transactions is investigated to determine whether they are blocked (directly or
+           indirectly) throw a lock belonging to T2.</p>
+
+        <p>In this example all transations holding a lock on O1 are considerd as blocking T2.
+           Of these, T1 is a blocked transaction (waiting on T2). T2 is known to be locked
+           directly by T2, and so a deadlock is identifier.</p>
+
+      </section>
 
     </section>
   </body>

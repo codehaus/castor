@@ -1,25 +1,62 @@
 <?xml version="1.0"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document id="ELPD-2000-01-07-KV01-PR" project="../project.xml">
-  <body title="Castor">
-    <p>Castor is a versatile B2B connector (marketing pitch) which integrates Java[tm] objects,
-       XML documents, SQL relational databases and LDAP directories in a unified model that allows
-       information to be exchanged, persisted and manipulated in a variety of ways. The Castor moto
-       is simplifying the exchange and persistence of information.</p>
+<document url="http://castor.exolab.org/design-persist.xml">
+  <body>
+    <title>Castor</title>
 
-    <p>The current release of Castor includes the following packages:</p>
+    <header>
+      <p>Castor is the shortest path between Java[tm] objects, XML documents, SQL tables and LDAP
+         directories. It provides Java to XML binding, Java to SQL/LDAP persistence, and then
+         some more.</p>
 
-    <ul>
-      <li>Castor XML: Java[tm] object to XML document mapping</li>
-      <li>Castor JDO: Java[tm] object to SQL relational database mapping</li>
-      <li>Castor DSML: LDAP directory exchange through XML</li>
-    </ul>
+    </header>
 
-    <h2>About the Castor Project</h2>
-    <p>Most of the code released through the Castor Project has been developed by Keith Visco,
-       Chief XML Architect, Exoffice Technologies, Inc. &lt;<email>visco@exoffice.com</email>&gt;
-       and Assaf Arkin, CTO &lt;<email>arkin@exoffice.com</email>&gt;. Contributors are welcome
-       to join this project and should contact join@castor.exolab.org.</p>
+    <section title="Features">
+
+      <p>Short feature list (we haven't got all day):
+        <ul>
+          <li>Castor XML: Java object to XML document</li>
+          <li>Castor JDO: Java object persistence on top of RDBMS</li>
+          <li>Castor DAX: Java object persistence on top of LDAP</li>
+          <li>Castor DSML: LDAP directory exchange through XML</li>
+          <li>XML-based mapping file specify the mapping between one model and another</li>
+          <li>Support for schema-less Java to XML binding</li>
+          <li>Persistence engine supports ransactions, rollbacks, deadlocks</li>
+          <li>ODMG API support with OQL queries</li>
+          <li>EJB container managed persistence provider for OpenEJB</li>
+        </ul>
+      </p>
+
+    </section>
+
+    <section title="News">
+
+      <ul>
+        <li>Jan 24, 2000: Version 0.7.5, full persistence engine</li>
+        <li>Jan 7, 2000: Version 0.7, first to include JDO</li>
+        <li>Dec 21, 1999: Version 0.6</li>
+      </ul>
+
+    </section>
+
+    <section title="About the Castor Project">
+
+      <p>The Castor project has been developed out of need: the need to get stuff done
+         and the need to write useful code. It has been designed and coded over many cups
+         of Latte and tall Americano, as proof that coffe beans do come in handy.</p>
+
+      <p>Contributors:
+        <ul>
+          <li>Oleg Nitz <email>on@ibis.odessa.ua</email></li>
+          <li>Stefan Liebner <email>MailLiebner@gmx.ne</email></li>
+          <li>Venkatakrishnan Sundaranatha <email>ssvk@msn.com</email></li>
+        </ul>
+      </p>
+
+      <p>Most of the code released through the Castor Project has been developed by Keith Visco,
+         Chief XML Architect, Exoffice Technologies, Inc. &lt;<email>visco@exoffice.com</email>&gt;
+         and Assaf Arkin, CTO &lt;<email>arkin@exoffice.com</email>&gt;. Contributors are welcome
+         to join this project and should contact join@castor.exolab.org.</p>
+    </section>
 
   </body>
 </document>

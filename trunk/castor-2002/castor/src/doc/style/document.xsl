@@ -14,27 +14,29 @@
   <!-- Process the document properties -->
   <xsl:template match="document/properties">
     <table border="0" cellpadding="4" cellspacing="2">
-      <tr>
-        <td valign="top"><b>Author:</b></td>
-        <td valign="top">
-          <xsl:for-each select="authors/author">
-              <xsl:value-of select="firstname"/>&#xA0;
-              <xsl:if test="initials">
-                <xsl:value-of select="initials"/>&#xA0;
-              </xsl:if>
-              <xsl:value-of select="lastname"/>&#xA0;&#xA0;
+      <xsl:for-each select="author">
+        <tr>
+          <td valign="top"><b>Author:</b></td>
+          <td valign="top">
+            <xsl:value-of select="."/>&#xA0;
+            <xsl:if test="@email">
               <a href="mailto:{@email}"><xsl:value-of select="@email"/></a><br/>
-          </xsl:for-each>
-        </td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Abstract:</b></td>
-        <td valign="top"><xsl:value-of select="abstract"/><br/>&#xA0;&#xA0;</td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Status:</b></td>
-        <td valign="top"><xsl:value-of select="status"/></td>
-      </tr>
+            </xsl:if>
+          </td>
+        </tr>
+      </xsl:for-each>
+      <xsl:if test="abstract">
+        <tr>
+          <td valign="top"><b>Abstract:</b></td>
+          <td valign="top"><xsl:value-of select="abstract"/></td>
+        </tr>
+      </xsl:if>
+      <xsl:if test="status">
+        <tr>
+          <td valign="top"><b>Status:</b></td>
+          <td valign="top"><xsl:value-of select="status"/></td>
+        </tr>
+      </xsl:if>
     </table><br/>
   </xsl:template>
 
@@ -45,15 +47,19 @@
       <br/>
       <h1><xsl:value-of select="/document/properties/title"/></h1>
     </xsl:if>
-    <xsl:if test="@title">
+    <xsl:if test="title">
       <br/>
-      <h1><xsl:value-of select="@title"/></h1>
+      <h1><xsl:value-of select="title"/></h1>
     </xsl:if>
 
-    <small>
-    <xsl:for-each select="//section">
+    <xsl:if test="header">
+      <xsl:apply-templates select="header"/>
+    </xsl:if>
+
+    <xsl:for-each select=".//section">
+      <small>
       <xsl:if test="@title">
-        <xsl:variable name="level" select="count(ancestor::*)"/>
+        <xsl:variable name="level" select="count(from-ancestors(*))"/>
         <xsl:choose>
           <xsl:when test='$level=2'>
             <a href="#{@title}"><xsl:value-of select="@title"/></a><br/>
@@ -63,17 +69,22 @@
           </xsl:when>
         </xsl:choose>
       </xsl:if>
+      </small>
     </xsl:for-each>
-    </small>
     <br/>
 
-    <xsl:apply-templates/>
+    <xsl:apply-templates select="section"/>
+
+    <xsl:if test="footer">
+      <br/>
+      <xsl:apply-templates select="footer"/>
+    </xsl:if>
   </xsl:template>
 
 
   <!-- Process a section in the document. Nested sections are supported -->
   <xsl:template match="document//section">
-    <xsl:variable name="level" select="count(ancestor::*)"/>
+    <xsl:variable name="level" select="count(from-ancestors(*))"/>
     <xsl:choose>
       <xsl:when test='$level=2'>
         <a name="{@title}"><h2>

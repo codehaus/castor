@@ -98,7 +98,7 @@ public final class TransactionImpl
     }
 
 
-    static TransactionContext getCurrentContext()
+    public static TransactionContext getCurrentContext()
     {
 	TransactionImpl tx;
 

@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document id="EXOLAB-2000-01-19-AA01-DR" project="../project.xml">
+<document url="http://castor.exolab.org/types.xml">
   <properties>
     <title>Castor Type Support</title>
     <abstract>Defines the type mechanism in Castor, how types are specified in the mapping file and how Java to SQL type conversion is used</abstract>
-    <authors>
-      <author email="arkin@exoffice.com">
-        <firstname>Assaf</firstname>
-        <lastname>Arkin</lastname>
-      </author>
-    </authors>
+    <author email="arkin@exoffice.com">Assaf Arkin</author>
     <status>Preliminary Draft</status>
   </properties>
   <body>

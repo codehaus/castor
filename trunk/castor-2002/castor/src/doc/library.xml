@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document id="ELPD-2000-01-07-KV01-PR" project="../project.xml">
-  <body title="Library">
+<document url="http://castor.exolab.org/library.xml">
+  <body>
+    <title>Library</title>
+    <header>
     <ul>
       <li><a href="http://www.w3.org/XML/">Extensible Markup Language (XML) at the W3C</a></li>
       <li><a href="http://www.w3.org/TR/xmlschema-1/">XML Schema Part 1: Structures at the W3C</a></li>
@@ -9,6 +10,6 @@
       <li><a href="http://java.sun.com/aboutJava/communityprocess/jsr/jsr_031_xmld.html">JSR-000031
         XML Data Binding Specification at java.sun.com</a></li>
     </ul>
-
+    </header>
   </body>
 </document>

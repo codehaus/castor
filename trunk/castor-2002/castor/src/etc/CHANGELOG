@@ -1,3 +1,40 @@
+Version 0.7.5  January 28, 2000
+-------------------------------
+
+JDO:  Dirty check mechanism has been disabled since 0.7.4, although
+      the new API enables any number of approaches. Two dirty check
+      mechanisms will be added in 0.7.6.
+
+JDO:  SQLEngine now employs two schemes for detecting duplicate primary
+      keys. For some databases it will use a separate SELECT statement,
+      for those that properly return an SQL error it will use the X/Open
+      error code (contributed by Oleg Nitz).
+
+JDO:  Duplicate keys are now only detected inside a transaction, unless
+      a similar object is locked by another transaction, fixing a
+      potential problem in duplicate key reporting when object is
+      removed from persistence storage directly.
+
+Persist: Fixed deadlock detection algorithm. Previous algorithm would
+      allow the second transaction to commit but rollback the first
+      one. New algorithm allows first transaction to complete, but
+      detects deadlock in second one and terminates it.
+
+CMP:  No CMP engine yet, but the design architecture has been reviewed
+      by RMH and supports the proper CMP semantics. Still need to
+      determine how to deal with out-of-transaction methods. New
+      architecture allows Castor to be used as CMP or BMP implementation.
+
+Docs: Finally there. Added an Ant taskdef (style) and a task (doc) to
+      produce documenation in build/doc and the doc JAR. Sources are
+      XML, output is HTML, magic is XSLT.
+
+Docs: Added document describing persistence architecture and started
+      working on document describing transaction and locking semantics.
+      Would like to thank Chris Raber of GemStone for validating some
+      of the design choices.
+
+
 Version 0.7.4  January 23, 2000
 -------------------------------
 
