@@ -145,7 +145,7 @@ public class TypeConversion {
         if (simpleType.hasFacet("enumeration")) {
             String className = JavaXMLNaming.toJavaClassName(simpleType.getName());
 			className = SourceGeneratorConfiguration.getQualifiedClassName(
-							simpleType.getSchema().getTargetNamespace(), 
+							simpleType.getSchema().getTargetNamespace(),
 							"types."+className);
             XSClass xsClass = new XSClass(new JClass(className));
             xsClass.setAsEnumertated(true);
@@ -171,6 +171,12 @@ public class TypeConversion {
                 //-- IDREF
                 case SimpleTypesFactory.IDREF_TYPE:
                     return new XSIdRef();
+                //-- IDREFS
+                case SimpleTypesFactory.IDREFS_TYPE:
+                    return new XSList(new XSIdRef());
+                //--URIREFERENCE
+                case SimpleTypesFactory.URIREFERENCE_TYPE:
+                    return new XSUriReference();
                 //-- NCName
                 case SimpleTypesFactory.NCNAME_TYPE:
                     return new XSNCName();
@@ -223,7 +229,7 @@ public class TypeConversion {
 					XSShort xsShort = new XSShort();
 					readShortFacets(simpleType, xsShort);
                     return xsShort;
-                //-- short
+                //-- int
 				case SimpleTypesFactory.INT_TYPE:
 					XSInt xsInt = new XSInt();
 					readIntFacets(simpleType, xsInt);
@@ -357,7 +363,7 @@ public class TypeConversion {
     } //-- toXSShort
 
 	/**
-	 * Returns a list of Facets from the simpleType 
+	 * Returns a list of Facets from the simpleType
 	 *	(duplicate facets due to extension are filtered out)
      * @param simpletype the Simpletype we want the facets for
      * @return Unique list of facets from the simple type
@@ -367,14 +373,14 @@ public class TypeConversion {
 		Hashtable hashTable = new Hashtable();
         Enumeration enum = simpleType.getFacets();
 		while (enum.hasMoreElements()) {
-			
+
             Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();			
+            String name = facet.getName();
 			hashTable.put(name, facet);
 		}
 		return hashTable.elements();
 	}
-	
+
     /**
      * Converts the given simpletype to an XSString
      * @param simpletype the Simpletype to convert
@@ -407,10 +413,14 @@ public class TypeConversion {
         //-- I add in the Resolver code
         nameMap.put("IDREF",        "java.lang.String");
 
+        // Choose the right collection
+        nameMap.put("IDREFS",       "java.lang.Vector");
+
         //-- type mappings
         nameMap.put("ID",                  "java.lang.String");
         nameMap.put("NCName",              "java.lang.String");
         nameMap.put("NMTOKEN",             "java.lang.String");
+        nameMap.put("uriReference",         "java.lang.String");
         nameMap.put("binary",              "byte[]");
         nameMap.put("boolean",             "boolean");
         nameMap.put("integer",             "int");
