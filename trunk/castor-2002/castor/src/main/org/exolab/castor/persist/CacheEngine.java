@@ -66,6 +66,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
@@ -205,7 +206,7 @@ public final class CacheEngine
             Persistence         persist;
 
             clsDesc = _mapResolver.getDescriptor( javaClass );
-            if ( clsDesc != null ) {
+            if ( clsDesc != null && clsDesc != MappingLoader.NoDescriptor ) {
                 // Place the handler in the hashtable first, since normalize() might
                 // reference it (extends, relation, etc) and we don't want an infinite loop
                 handler = new ClassHandler( clsDesc );
