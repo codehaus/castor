@@ -68,9 +68,8 @@ import org.apache.xml.serialize.XMLSerializer;
 import org.apache.xml.serialize.SerializerFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
-import org.apache.xalan.xslt.XSLTProcessor;
-import org.apache.xalan.xslt.XSLTProcessorFactory;
-import org.apache.xalan.xslt.XSLTInputSource;
+import com.kvisco.xsl.*;
+import com.kvisco.xsl.util.*;
 
 
 /**
@@ -95,13 +94,15 @@ public abstract class XMLServlet
      */
     private ServletContext  _ctx;
 
-
+    private static XSLProcessor    _xslp;
+    
     /**
      * Servlets that implement this method should call it.
      */
     public void init( ServletConfig config )
     {
         _ctx = config.getServletContext();
+        _xslp = new XSLProcessor();
     }
 
 
@@ -144,7 +145,7 @@ public abstract class XMLServlet
         private DocumentHandler   _docHandler;
 
 
-        private XSLTInputSource   _stylesheet;
+        private XSLStylesheet   _stylesheet;
 
 
         private OutputFormat      _format;
@@ -155,6 +156,8 @@ public abstract class XMLServlet
         
         private final ServletContext      _ctx;
 
+        private final XSLReader           _xslReader;
+        
 
         XMLServletResponseImpl( ServletContext ctx, HttpServletResponse response )
         {
@@ -168,6 +171,8 @@ public abstract class XMLServlet
             param = _ctx.getInitParameter( "xsl:output-method" );
             if ( param != null )
                 setOutputFormat( new OutputFormat( param, null, "true".equals( _ctx.getInitParameter( "xsl:output-indent" ) ) ) );
+                
+            _xslReader = new XSLReader();
         }
 
 
@@ -176,48 +181,71 @@ public abstract class XMLServlet
         {
             if ( _docHandler != null )
                 return _docHandler;
-            if ( _format == null ) {
-                XMLSerializer ser;
                 
+            Formatter _formatter = null;
+            
+            if ( _format == null ) {
+                
+                XMLSerializer ser;
                 _format = new OutputFormat( Method.XML, _response.getCharacterEncoding(), false );
                 ser = new XMLSerializer( _format );
                 ser.setOutputCharStream( getWriter() );
-                _docHandler = ser.asDocumentHandler();
+                _formatter = new FormatterAdapter(ser.asDocumentHandler());
             } else {
                 Serializer ser;
                 
                 _format.setEncoding( _response.getCharacterEncoding() );
                 ser = SerializerFactory.getSerializerFactory( _format.getMethod() ).makeSerializer( _format );
                 ser.setOutputCharStream( getWriter() );
-                _docHandler = ser.asDocumentHandler();
+                _formatter = new FormatterAdapter(ser.asDocumentHandler());
             }
             _response.setContentType( "text/" + _format.getMethod() );
 
             if ( _stylesheet != null ) {
-                XSLTProcessor xslt;
-
-                xslt = XSLTProcessorFactory.getProcessor();
-                xslt.processStylesheet( _stylesheet );
-                xslt.setDocumentHandler( _docHandler );
-                _docHandler = xslt;
+                SAXInput saxInput = new SAXInput();
+                saxInput.setProcessor(_xslp);
+                saxInput.setOutputHandler(_formatter);
+                saxInput.setStylesheet(_stylesheet);
+                _docHandler = saxInput;
             }
+            else _docHandler = _formatter;
+            
             return _docHandler;
         }
 
 
         public void setStylesheet( String path )
         {
+            
+            //-- why?
             if ( _docHandler != null )
                 throw new IllegalStateException( "Cannot set stylesheet after obtaining document handler" );
-            _stylesheet = new XSLTInputSource( _ctx.getResourceAsStream( path ) );
+            
+            try {
+                _stylesheet = _xslReader.read(path);
+            }
+            catch(XSLException xslx) {
+                throw new IllegalArgumentException(xslx.toString());
+            }
+            //_stylesheet = new XSLTInputSource( _ctx.getResourceAsStream( path ) );
+            
         }
  
 
         public void setStylesheet( InputSource source )
         {
+            //-- why?
             if ( _docHandler != null )
                 throw new IllegalStateException( "Cannot set stylesheet after obtaining document handler" );
-            _stylesheet = new XSLTInputSource( source );
+                
+            String uri = source.getSystemId();
+            try {
+                _stylesheet = _xslReader.read(source.getCharacterStream(), uri);
+            }
+            catch(XSLException xslx) {
+                throw new IllegalArgumentException(xslx.toString());
+            }
+            //_stylesheet = new XSLTInputSource( source );
         }
 
 

@@ -1,10 +1,15 @@
 Version 0.8.2   April 7, 2000
 -----------------------------
 
+JDO:     Added experimental update() method to Database interface.
+
 JDO:     Fixed some minor glitches in support for exclusive and db-locked
          access, documented the available access modes.
 
-JDO:     Fixed synchronization support, eliminated checkpoint method altogether.
+JDO:     Fixed synchronization support, disabled checkpoint method.
+
+JDO:     Fixed circular exception problem in ObjectLock.release.
+         (Contributed by Jason Weistein <jasonw@reticular.com>)
 
 Misc:    Documented the locking options in Castor and concurrency support.
          Added the three locking mode to all the test cases.
@@ -37,7 +42,7 @@ JDO:     Added Locked mode to provide locking at the database level, as
 JDO:     Improved concurrency for shared mode by eliminating write locks when
          modified field is not marked as dirty.
 
-JDO:     Added isOpen method to database. Deprecated checkpoint.
+JDO:     Added isClosed method to database. Deprecated checkpoint.
 
 JDO:     Added preliminary support for controlling cache size and removing
          objects from cache.

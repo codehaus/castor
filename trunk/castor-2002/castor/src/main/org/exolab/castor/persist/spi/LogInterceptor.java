@@ -104,7 +104,7 @@ public interface LogInterceptor
      * @param objClass The type of the object
      * @param identity The object identity
      */
-    public void deleting( Class objClass, Object identity );
+    public void removing( Class objClass, Object identity );
 
 
     /**

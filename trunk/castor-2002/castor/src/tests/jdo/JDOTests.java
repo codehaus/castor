@@ -97,7 +97,6 @@ public class JDOTests
         jdo.setConfiguration( JDOTests.class.getResource( DatabaseFile ).toString() );
         jdo.setDatabaseName( "test" );
         jdo.setLogWriter( Logger.getSystemLogger() );
-        jdo.setLockTimeout( 30 );
         return jdo.getDatabase();
     }
 

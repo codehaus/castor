@@ -103,8 +103,6 @@
 
         <li>Add type convertors to bind parameters and load() method</li>
 
-        <li>Update method - allow one object to be replaced with another, or an object to be introduced</li>
-
         <li>KeyGenerator - use one from SQLEngine, way to specify the key generator from the mapping file,
             way to pass a key generator parameter on database creation</li>
 

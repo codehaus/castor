@@ -175,8 +175,10 @@ public class Concurrent
             object.setFirst( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
+            _conn.setAutoCommit( false );
             _conn.createStatement().execute( "UPDATE test_table SET first='" + JDBCValue +
                                              "' WHERE id=" + TestObject.DefaultId );
+            _conn.commit();
             stream.writeVerbose( "Updated test object from JDBC" );
         
             // Commit JDO transaction, this should report object modified
@@ -207,7 +209,7 @@ public class Concurrent
             object.setSecond( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
-            _conn.setAutoCommit( true );
+            _conn.setAutoCommit( false );
             _conn.createStatement().execute( "UPDATE test_table SET second='" + JDBCValue +
                                              "' WHERE id=" + TestObject.DefaultId );
             _conn.commit();

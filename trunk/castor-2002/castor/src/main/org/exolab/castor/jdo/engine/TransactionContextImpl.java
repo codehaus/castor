@@ -144,7 +144,7 @@ final class TransactionContextImpl
     {
         Connection  conn;
         Enumeration enum;
-        
+
         if ( ! _globalTx ) {
             // Go through all the connections opened in this transaction,
             // rollback and close them one by one. Ignore errors.
@@ -175,9 +175,8 @@ final class TransactionContextImpl
                 // transaction association in the engine inflates the
                 // code size in other places.
                 conn = DatabaseRegistry.createConnection( engine );
-                if ( ! _globalTx ) {
+                if ( ! _globalTx )
                     conn.setAutoCommit( false );
-                }
                 _conns.put( engine, conn );
             } catch ( SQLException except ) {
                 throw new PersistenceExceptionImpl( except );
