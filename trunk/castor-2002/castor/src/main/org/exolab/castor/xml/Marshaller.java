@@ -741,13 +741,13 @@ public class Marshaller extends MarshalFramework {
                             catch(IllegalStateException ise) {
                                 err = ise.toString();
                             }
-                        }
+                        }//fieldHandler != null
                         else {
                             err = "FieldHandler for Identity descriptor is null.";
                         }
-                    }
+                    }//fieldDesc != null
                     else err = "No identity descriptor available";
-                }
+                }//cd!=null
                 else  {
                     err = "Unable to resolve ClassDescriptor for: " +
                         value.getClass().getName();
@@ -757,7 +757,7 @@ public class Marshaller extends MarshalFramework {
                     String errMsg = "Unable to save reference to: " +
                         cd.getXMLName() + " from element: " +
                         classDesc.getXMLName() +
-                        " due to the following error: ";
+                        " due to the following error: "+ err;
                     throw new MarshalException(errMsg);
                 }
             }
