@@ -88,7 +88,7 @@ public class Complex {
             _all = new Object[_size];
             System.arraycopy( o, 0, _all, 0, _size );
             _hashCode = 0;
-            for ( int i=1; i < _size; i++ ) {
+            for ( int i=0; i < _size; i++ ) {
                 _hashCode += (_all[i]==null?0:_all[i].hashCode());
             }
         } else
@@ -129,7 +129,7 @@ public class Complex {
             _all = new Object[_size];
             System.arraycopy( o, 0, _all, 0, _size );
             _hashCode = 0;
-            for ( int i=1; i < _size; i++ ) {
+            for ( int i=0; i < _size; i++ ) {
                 _hashCode += (_all[i]==null?0:_all[i].hashCode());
             }
         }
@@ -162,7 +162,7 @@ public class Complex {
             _all = new Object[_size];
             System.arraycopy( complex, 0, _all, 0, _size );
             _hashCode = 0;
-            for ( int i=1; i < _size; i++ ) {
+            for ( int i=0; i < _size; i++ ) {
                 _hashCode += (_all[i]==null?0:_all[i].hashCode());
             }
         }
@@ -208,7 +208,7 @@ public class Complex {
     }
     public Object get( int i ) {
 
-        if ( i >= _size && i < 0 )
+        if ( i >= _size || i < 0 )
             throw new ArrayIndexOutOfBoundsException();
         if ( _size <= 2 )
             if ( i == 0 )
