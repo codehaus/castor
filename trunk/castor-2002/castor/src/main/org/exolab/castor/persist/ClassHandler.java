@@ -66,6 +66,7 @@ import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -124,6 +125,13 @@ public final class ClassHandler
      * The field handler for obtaining the identity through a relation.
      */
     private FieldHandler      _relIdentity;
+
+
+    /**
+     * The call back interceptor for this class.
+     */
+    private CallbackInterceptor  _callback;
+
 
 
     /**
@@ -213,6 +221,15 @@ public final class ClassHandler
     public Class getJavaClass()
     {
         return _clsDesc.getJavaClass();
+    }
+
+
+    /**
+     * Returns the callback interceptor for this class.
+     */
+    public CallbackInterceptor getCallback()
+    {
+        return _callback;
     }
 
 
@@ -577,6 +594,19 @@ public final class ClassHandler
         // Object cannot be saved if one of the required fields is null
         for ( int i = 0 ; i < _fields.length ; ++i )
             _fields[ i ].handler.checkValidity( object );
+    }
+
+
+    /**
+     * Sets all the fields of the object to null. This method is called
+     * on objects that have been deleted during the transaction.
+     *
+     * @param object The object to reset
+     */
+    void setFieldsNull( Object object )
+    {
+        for ( int i = 0 ; i < _fields.length ; ++i )
+            _fields[ i ].handler.setValue( object, null );
     }
 
 

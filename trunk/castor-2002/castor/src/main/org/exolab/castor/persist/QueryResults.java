@@ -244,20 +244,27 @@ public final class QueryResults
                     }
                 }
             } else {
+
                 // First time we see the object in this transaction,
                 // must create a new record for this object. We only
                 // record the object in the transaction if in read-write
                 // or exclusive mode.
                 oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-
-                object = _engine.getClassHandler( oid.getJavaClass() ).newInstance();
+                handler = _engine.getClassHandler( oid.getJavaClass() );
+                object = handler.newInstance();
                 entry = _tx.addObjectEntry( object, oid, _engine );
                 try {
                     _engine.copyObject( _tx, oid, object );
+                    if ( handler.getCallback() != null )
+                        handler.getCallback().loaded( object );
                 } catch ( PersistenceException except ) {
                     _tx.removeObjectEntry( object );
                     _engine.forgetObject( _tx, oid );
                     throw except;
+                } catch ( Exception except ) {
+                    _tx.removeObjectEntry( object );
+                    _engine.forgetObject( _tx, oid );
+                    throw new PersistenceExceptionImpl( except );
                 }                    
                 if ( _accessMode == AccessMode.ReadOnly ) {
                     _tx.removeObjectEntry( object );
