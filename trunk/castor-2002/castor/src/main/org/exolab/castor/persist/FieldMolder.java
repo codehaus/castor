@@ -61,6 +61,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.xml.FieldMapping;
+import org.exolab.castor.mapping.xml.types.DirtyType;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.jdo.DataObjectAccessException;
 
@@ -440,7 +441,7 @@ public class FieldMolder {
 
             if ( fieldMap.getSql() == null
                     || fieldMap.getSql().getDirty() == null
-                    || ! fieldMap.getSql().getDirty().equals("ignore") ) {
+                    || ! fieldMap.getSql().getDirty().equals(DirtyType.IGNORE) ) {
                 _check = true;
             }
 
