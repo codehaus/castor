@@ -45,7 +45,7 @@
 
 package org.exolab.castor.xml;
 
-import org.exolab.castor.xml.descriptors.*;
+import org.exolab.castor.xml.descriptors.CoreDescriptors;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.DefaultNaming;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
@@ -63,6 +63,7 @@ import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * A Helper class for the Marshaller and Unmarshaller,
@@ -75,6 +76,7 @@ import java.util.Hashtable;
 public final class Introspector {
     
           
+          
     private static final String ADD     = "add";
     private static final String GET     = "get";
     private static final String SET     = "set";
@@ -83,14 +85,14 @@ public final class Introspector {
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
 
-    private static final DateClassDescriptor _DateClassDescriptor 
-        = new DateClassDescriptor();
+    private static final String LIST = "java.util.List";
     
-    private static final StringClassDescriptor _StringClassDescriptor 
-        = new StringClassDescriptor();
+    /**
+     * The set of available collections to use
+     * during introspection. JDK dependant.
+    **/
+    private static final Class[] _collections = loadCollections();
 
-    private static final VectorClassDescriptor _VectorClassDescriptor 
-        = new VectorClassDescriptor();
     
     /**
      * The default naming conventions
@@ -101,6 +103,7 @@ public final class Introspector {
      * The naming conventions to use
     **/
     private XMLNaming _naming = null;
+    
     
     
     /**
@@ -162,21 +165,6 @@ public final class Introspector {
         //-- handle arrays
         if (c.isArray()) return null;
         
-        //-- handle Strings
-        if (c == String.class)
-            return _StringClassDescriptor;
-        
-        //-- handle Vectors...we need to make this
-        //-- plug&play for JDK 1.2
-        if (c == java.util.Vector.class) {
-            return new VectorClassDescriptor();
-        }
-        
-        //-- handle Dates
-        if (c == java.util.Date.class) {
-            return _DateClassDescriptor;
-        }
-        
         //-- handle base objects
         if ((c == Void.class) || 
             (c == Class.class)||
@@ -184,6 +172,12 @@ public final class Introspector {
             throw new MarshalException (
                 MarshalException.BASE_CLASS_OR_VOID_ERR );
         }
+        
+        //-- handle core descriptors
+        XMLClassDescriptor coreDesc = CoreDescriptors.getDescriptor(c);
+        if (coreDesc != null) 
+            return coreDesc;
+        
         
         //--------------------------/
         //- handle complex objects -/
@@ -407,9 +401,8 @@ public final class Introspector {
                 //-- Built-in support for JDK 1.1 Collections
                 //-- we need to a pluggable interface for 
                 //-- JDK 1.2+
-                if (type == java.util.Vector.class) {
-                    isCollection = true;
-                    //contentType = java.lang.Object.class;
+                if (!isCollection) {
+                    isCollection = isCollection(type);
                 }
                 
                 String fieldName = field.getName();
@@ -596,6 +589,30 @@ public final class Introspector {
     } //-- createFieldDescriptor
 
     /**
+     * Returns true if the given Class is an instance of a
+     * collection class.
+     * 
+     * @see loadCollections
+    **/
+    public static boolean isCollection(Class clazz) {
+        for (int i = 0; i < _collections.length; i++) {
+            //-- check to see if clazz is either the
+            //-- same as or a subclass of one of the
+            //-- available collections. For performance
+            //-- reasons we first check if class is 
+            //-- directly equal to one of the collections
+            //-- instead of just calling isAssignableFrom.
+            if ((clazz == _collections[i]) ||
+                (_collections[i].isAssignableFrom(clazz)))
+            {
+                return true;
+            }
+        }
+        return false;
+    } //-- isCollection
+    
+    
+    /**
      * Returns true if we are allowed to create a descriptor
      * for a given class type
      * @param type the Class type to test
@@ -646,6 +663,44 @@ public final class Introspector {
         return (type.getSuperclass() == Number.class);
        
     } //-- isPrimitive
+    
+    /**
+     * Returns an array of collections available during
+     * introspection. Allows JDK 1.2+ support without
+     * breaking JDK 1.1 support.
+     *
+     * @return a list of available collections
+    **/
+    private static Class[] loadCollections() {
+        Vector collections = new Vector();
+        
+        //-- JDK 1.1
+        collections.addElement(Vector.class);
+        collections.addElement(Enumeration.class);
+        
+        //-- JDK 1.2+
+        ClassLoader loader = Vector.class.getClassLoader();
+        
+        Class clazz = null;
+        try {
+            if (loader != null) {
+                clazz = loader.loadClass(LIST);
+            }
+            else clazz = Class.forName(LIST);
+        }
+        catch(ClassNotFoundException cnfx) {
+            //-- just ignore...either JDK 1.1
+            //-- or some nasty ClassLoader 
+            //-- issue has occurred.
+        } 
+        if (clazz != null) collections.addElement(clazz);
+        
+        Class[] classes = new Class[collections.size()];
+        collections.copyInto(classes);
+        
+        return classes;
+    } //-- loadCollections
+    
     
     /**
      * A simple struct for holding a set of accessor methods
