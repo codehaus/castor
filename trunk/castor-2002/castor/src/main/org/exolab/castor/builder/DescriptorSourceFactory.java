@@ -302,6 +302,12 @@ public class DescriptorSourceFactory {
             jsc.unindent();
             jsc.add("{");
             jsc.indent();
+            //-- check for null primitives
+            if (xsType.isPrimitive()) {
+                jsc.add("// ignore null values for primitives");
+                jsc.add("if (value == null) return;");
+                jsc.add("");
+            }
             jsc.add("try {");
             jsc.indent();
             jsc.add(localClassName);
@@ -499,6 +505,12 @@ public class DescriptorSourceFactory {
             jsc.unindent();
             jsc.add("{");
             jsc.indent();
+            //-- check for null primitives
+            if (xsType.isPrimitive()) {
+                jsc.add("// ignore null values for primitives");
+                jsc.add("if (value == null) return;");
+                jsc.add("");
+            }
             jsc.add("try {");
             jsc.indent();
             jsc.add(localClassName);
