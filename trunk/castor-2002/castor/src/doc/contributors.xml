@@ -86,6 +86,12 @@
     <description>Testing for Oracle and Castor XML.</description>
   </contributor>
 
+  <contributor type="Committer">
+    <name surname="Thielen" given="Thorsten"/>
+    <email>thorsten@ipcon.de</email>
+    <description>Enhancements to OQL.</description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Beloff" given="Rostislav"/>
     <email>ros@domainforfree.com</email>
@@ -211,7 +217,7 @@
 
   <contributor type="Contributor">
     <name surname="Rousse" given="Guillaume" />
-	<email>Guillaume.Rousse@univ-reunion.fr</email>
+    <email>Guillaume.Rousse@univ-reunion.fr</email>
    <description>Mapping extension and other important feebback</description>
   </contributor>
                                                            '
@@ -300,25 +306,25 @@
 
   <contributor type="Contributor">
     <name surname="Maria" given="Damon" />
-	<email>damon@mahu-ika.com</email>
+    <email>damon@mahu-ika.com</email>
    <description>Bug reports and bug fixes for readonly locking mode in Castor JDO</description>
   </contributor>
 
   <contributor type="Contributor">
     <name surname="Ballanger" given="Andrew" />
-	<email>AWBALLAN@smumn.edu</email>
+    <email>AWBALLAN@smumn.edu</email>
    <description>An improvement for generated SQL statement syntax</description>
   </contributor>
 
   <contributor type="Contributor">
     <name surname="Ballanger" given="Andrew" />
-	<email>AWBALLAN@smumn.edu</email>
+    <email>AWBALLAN@smumn.edu</email>
    <description>An improvement for generated SQL statement syntax</description>
   </contributor>
 
   <contributor type="Contributor">
     <name surname="Snowsill" given="David" />
-	<email>david.snowsill@calibreft.com.au</email>
+    <email>david.snowsill@calibreft.com.au</email>
    <description>JDO bugfixes</description>
   </contributor>
 
@@ -359,9 +365,15 @@
   </contributor>
 
   <contributor type="Contributor">
-    <name surname="Thielen" given="Thorsten" />
-    <email>thorsten@ipcon.de</email>
-    <description>Several improvements to OQL parser</description>
+    <name surname="Bate" given="Steve" />
+    <email>mail@technoetic.com</email>
+    <description>Fixes to JDO</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Tinker" given="David" />
+    <email>david@hemtech.co.za</email>
+    <description>Add support of Identity Key generator for Informix</description>
   </contributor>
 
   <!--
