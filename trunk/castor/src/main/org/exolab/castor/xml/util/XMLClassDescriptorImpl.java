@@ -49,11 +49,13 @@ package org.exolab.castor.xml.util;
 import java.lang.reflect.Array;
 import java.util.Collection;
 
-import org.exolab.castor.mapping.MappingException;
+
+import org.exolab.castor.mapping.AbstractFieldHandler;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.*;
 
 
@@ -1036,13 +1038,35 @@ public class XMLClassDescriptorImpl extends Validator
         //4-- Check if the value is set or not
         else {
             FieldHandler handler = fieldDesc.getHandler();
-            hasValue = (handler.getValue(object) != null);
+            
+            boolean checkPrimitiveValue = true;
+            if (handler instanceof AbstractFieldHandler) {
+                hasValue = ((AbstractFieldHandler)handler).hasValue( object );
+                //-- poor man's check for a generated handler, since
+                //-- all generated handlers extend XMLFieldHandler, however
+                //-- this doesn't guarantee that that handler is indeed
+                //-- a generated handler, it does however mean that
+                //-- the handler definately didn't come from the
+                //-- MappingLoader. 
+                //checkPrimitiveValue = (!(handler instanceof XMLFieldHandler));
+            }
+            else {
+                hasValue = (handler.getValue(object) != null);
+            }
             
             //-- patch for primitives, we should check
             //-- for the has-method somehow...but this
-            //-- is good enough for now.
-            if (hasValue && isPrimitive(fieldDesc.getFieldType())) {
-                hasValue = false;
+            //-- is good enough for now. This may break
+            //-- some non-Castor-generated code with
+            //-- primitive values that have been set
+            //-- with the same as the defaults
+            if (hasValue && 
+                checkPrimitiveValue && 
+                fieldDesc.getFieldType().isPrimitive());
+            {
+                if (isDefaultPrimitiveValue(handler.getValue( object ))) {
+                    hasValue = false;
+                }
             }
             //-- end patch
             result = !hasValue;
@@ -1081,6 +1105,7 @@ public class XMLClassDescriptorImpl extends Validator
     //- Protected Methods -/
     //---------------------/
 
+
     /**
      * Returns true if the given class should be treated as a primitive
      * type. This method will return true for all Java primitive
@@ -1103,6 +1128,37 @@ public class XMLClassDescriptorImpl extends Validator
 
         return (type.getSuperclass() == Number.class);
     } //-- isPrimitive
+    
+    /**
+     * Checks to see if the given Object is a java primitive
+     * (does not check for primitive wrappers) and has a 
+     * value that is equal to the default value for that 
+     * primitive. This method will return true if the value
+     * is a java primitive with a default value.
+     * 
+     * @return true if the value is a java primitive with
+     * a default value
+     */
+    static boolean isDefaultPrimitiveValue(Object value) {
+        if (value == null) return false;
+        
+        Class type = value.getClass();
+        if (type.isPrimitive()) {
+            try {
+                return (value.equals(type.newInstance()));
+            }
+            catch(java.lang.IllegalAccessException iax) {
+                //-- Just return false, we should be
+                //-- able to instantiate primitive types
+            }
+            catch(java.lang.InstantiationException ix) {
+                //-- Just return false, we should be
+                //-- able to instantiate primitive types
+            }
+        }
+        return false;        
+    } //-- isDefaultPrimitiveValue
+    
     
     /**
      * Sets the Class type being described by this descriptor.
