@@ -42,34 +42,28 @@
  *
  * $Id$
  */
-
 package org.exolab.javasource;
-
-
-import java.util.Vector;
-
 /**
  * Represents a parameter to a JMethod. 
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ *
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JParameter extends JAnnotatedElementHelper {
-    
     /**
      * The type associated with this JParameter
-    **/
+     */
     private JType type = null;
-    
     /**
      * The name of this JParameter
-    **/
+     */
     private String name = null;
-
     /**
      * Creates a new JParameter with the given type, and name
+     * 
      * @param type the type to associate with this JParameter
      * @param the name of the JParameter
-    **/
+     */
     public JParameter(JType type, String name) 
         throws IllegalArgumentException
     {
@@ -77,35 +71,37 @@ public class JParameter extends JAnnotatedElementHelper {
         setType(type);
         setName(name);
     } //-- JParameter
-    
     /**
      * Returns the name of the parameter
+     *
      * @return the name of the parameter
-    **/
+     */
     public String getName() {
         return this.name;
     } //-- getName
     
     /**
      * Returns the parameter type
+     * 
      * @return the parameter type
-    **/
+     */
     public JType getType() {
         return this.type;
     } //-- getType
-    
     /**
      * Sets the name of this parameter
+     * 
      * @param name the new name of the parameter
-    **/
+     */
     public void setName(String name) {
         this.name = name;
     } //-- setName
     
     /**
      * Sets the type of this parameter
+     * 
      * @param type the new type of this parameter
-    **/
+     */
     public void setType(JType type) 
         throws IllegalArgumentException
     {
@@ -115,18 +111,17 @@ public class JParameter extends JAnnotatedElementHelper {
         }
         this.type = type;
     } //-- setType
-
     /**
      * Returns the String representation of this JParameter. The
      * String returns will consist of the String representation
      * of the parameter type, followed by the name of the parameter
+     * 
      * @return the String representation of this JParameter
-    **/
+     */
     public String toString() {
         StringBuffer sb = new StringBuffer(this.type.toString());
         sb.append(' ');
         sb.append(this.name);
         return sb.toString();
     } //-- toString
-    
 } //-- JParamater

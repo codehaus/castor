@@ -46,16 +46,13 @@
 
 package org.exolab.javasource;
 
-import java.util.Enumeration;
-import java.util.Vector;
-
-import java.io.*;
 
 /**
  * A class that represents a Java comment.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JComment {
 
         

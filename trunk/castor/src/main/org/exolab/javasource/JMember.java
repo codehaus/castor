@@ -45,16 +45,16 @@
 
 package org.exolab.javasource;
 
-import java.util.Vector;
 
 /**
  * An interface which represents a Member of a JClass,
  * modelled closely after the Java Reflection API.
  * This class is part of a package used to represent
  * source code.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 interface JMember {
 
     /**

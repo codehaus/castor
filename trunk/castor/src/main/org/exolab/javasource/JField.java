@@ -45,16 +45,15 @@
 
 package org.exolab.javasource;
 
-import java.util.Vector;
-
 /**
  * A class which holds information about a field.
  * Modelled closely after the Java Reflection API.
  * This class is part of package which is used to 
  * create source code in memory.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JField extends JAnnotatedElementHelper implements JMember {
 
     /**
