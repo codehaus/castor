@@ -79,9 +79,7 @@ import java.util.ArrayList;
 
 
 /**
- * Concurrent access test. Tests a JDO modification and concurrent
- * JDBC modification to determine if JDO can detect the modification
- * with dirty checking.
+ * Multiple Columns Primary Keys tests.
  */
 public class MultiPKs extends CWTestCase {
 
