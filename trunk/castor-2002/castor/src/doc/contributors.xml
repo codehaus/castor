@@ -68,7 +68,7 @@
   <contributor type="Committer">
     <name surname="Maucherat" given="Remy"/>
     <email>remm@apache.org</email>
-    <company id="apache"/>
+    <company id="sun"/>
     <description>XML enhancements, lots of testing.</description>
   </contributor>
 
@@ -297,6 +297,11 @@
   <company id="nksystems">
     <name>NK Systems</name>
     <url>www.nksystems.com</url>
+  </company>
+
+  <company id="sun">
+    <name>Sun Microsystems</name>
+    <url>www.sun.com</url>
   </company>
 
   <!-- description of contributor types -->
