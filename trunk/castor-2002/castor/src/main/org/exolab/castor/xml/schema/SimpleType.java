@@ -147,6 +147,14 @@ public abstract class SimpleType extends XMLType
     } //-- getFacets
 
 
+    /**
+     * Returns the facets of this type (without the parent's facets)
+     */
+    public Enumeration getLocalFacets()    {
+        if (facets == null) return null;
+        return facets.enumerate();
+    }
+
 
     /**
      * Returns the built in type this type is derived from.
