@@ -72,6 +72,19 @@
 	</p>
 	
 	<p>
+		<b>Note:</b>It should also be noted that "database pooling" must be enabled
+		for the JDO instance when using the WAS v4 and v5 transaction managers, or
+		the JDO "database" instance will fall outside the current transaction/thread,
+		resulting in the error message "No transaction in progress for the current
+		thread". For example:
+	</p>
+	
+	<pre>
+       JDO myJdo = new JDO();
+       myJdo.setDatabasePooling( true );
+	</pre>
+	
+	<p>
 		<b>Note:</b>At the moment, only  the JNDI transaction manager factory
 		supports such an attribute. In this context, the <em>jndiEnc</em> attribute 
 		can be used to specify what JNDI ENC to use to lookup the transaction 

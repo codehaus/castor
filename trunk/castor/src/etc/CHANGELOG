@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug 1916 using contribution from Tim Telcik [ttelcik@hbf.com.au]
+       Fixed typo in transaction manager class for WAS v4 and add note that
+       database pooling should be enabled for WAS v4 and v5.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1916
+       (Ralf - 20050330)
+
 JDO:   Fixed bug 1917 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        Fixed misleading error messages referencing to "javax.jta.TransactionManager"
        instead of "javax.transaction.TransactionManager".

@@ -89,7 +89,7 @@ public class WebSphereTransactionManagerFactory
 
         try 
         {
-            webSphereTxMgr = Class.forName( "com.ibm.ejcs.jts.jta.JTSXA" );
+            webSphereTxMgr = Class.forName( "com.ibm.ejs.jts.jta.JTSXA" );
             method = webSphereTxMgr.getMethod( "getTransactionManager", null );
             _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, null );
         }
