@@ -426,9 +426,19 @@ public class SchemaWriter {
             ELEM_DERIVATION = schemaPrefix +
                 complexType.getDerivationMethod();
 
+            String baseTypeName = baseType.getName();
+
+            //-- add "xsd" prefix if necessary
+            if (complexType.isSimpleContent()) {
+                SimpleType simpleType = (SimpleType)baseType;
+                if ((baseTypeName.indexOf(':') < 0) && 
+                     simpleType.isBuiltInType()) 
+                {
+                    baseTypeName = schemaPrefix + baseTypeName;
+                }
+            }
             _atts.clear();
-            _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA,
-                baseType.getName());
+            _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, baseTypeName);
             _handler.startElement(ELEM_DERIVATION, _atts);
         }
 
