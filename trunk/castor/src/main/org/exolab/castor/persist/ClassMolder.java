@@ -1099,7 +1099,9 @@ public class ClassMolder
         if ( o1.equals( o2 ) )
             return true;
         // [oleg] is some special cases equals doesn't work properly
-        if ( (o1 instanceof java.math.BigDecimal) && ((java.math.BigDecimal) o1).compareTo(o2) == 0) {
+        if ( (o1 instanceof java.math.BigDecimal) && 
+        	 ((java.math.BigDecimal) o1).compareTo((java.math.BigDecimal) o2) == 0) 
+        {
             return true;
         }
         if ((o1 instanceof java.sql.Timestamp) && (o2 instanceof java.sql.Timestamp)) {
