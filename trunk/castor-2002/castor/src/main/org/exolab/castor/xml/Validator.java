@@ -107,7 +107,8 @@ public class Validator {
         
         if (rules != null) {
             for (int i = 0; i < rules.length; i++)
-                validate(object, rules[i], mInfo);
+		if ( rules[ i ] != null )
+		    validate(object, rules[i], mInfo);
         }
         
     } //-- validate
