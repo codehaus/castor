@@ -11,8 +11,8 @@
          for database server.</p>
 
       <p>The key generator for the given class is set in the mapping
-         specification file (<tt>mapping.xml</tt>), in the 
-         <tt>key-generator</tt> attribute of the <tt>class</tt> element, 
+         specification file (<tt>mapping.xml</tt>), in the
+         <tt>key-generator</tt> attribute of the <tt>class</tt> element,
          for example:
          <code><![CDATA[
   <class name="myapp.ProductGroup"
@@ -89,7 +89,7 @@ DB</td></tr>
          is possible.
          The generated value in this case is 1.</p>
       <p>This algorithm has no parameters.
-         Primary key must have type <tt>int</tt> or <tt>numeric</tt>.</p>
+         Primary key must have type <tt>integer</tt>, <tt>bigint</tt> or <tt>numeric</tt>.</p>
     </section>
 
     <section title="HIGH/LOW key generator">
@@ -97,8 +97,8 @@ DB</td></tr>
          algorithm. It is needed a special auxiliary table ("sequence table")
          which has the unique column which contains table names (of the type
          <tt>char</tt> or <tt>varchar</tt>) and the column which is used to
-         reserve values of the primary keys (of the type <tt>int</tt> or
-         <tt>numeric</tt>).
+         reserve values of the primary keys (of the type <tt>integer</tt>,
+         <tt>bigint</tt> or <tt>numeric</tt>).
          The key generator seeks for the given table name, reads the last
          reserved value and increases it by some number N, which is called 
          "grab size". Then the lock on the auxiliary table is released,
@@ -144,7 +144,7 @@ table, values:
          </table></p>
       <p>If the parameter "global" is set to "true", the sequence table contains only one row with
          "&lt;GLOBAL&gt;" instead of the table name. This row serves for all tables.</p>
-      <p>Note, that the class HighLowKeyGenerator is not final, so you can 
+      <p>Note, that the class HighLowKeyGenerator is not final, so you can
          extend it in order to implement other variants of HIGH/LOW
          algorithm (for example, HIGH/MID/LOW or char key values).</p>
     </section>
@@ -160,10 +160,10 @@ table, values:
     </section>
 
     <section title="IDENTITY key generator">
-      <p>IDENTITY key generator can be used only with autoincrement primary 
+      <p>IDENTITY key generator can be used only with autoincrement primary
          key columns (identities) with Sybase ASE/ASA, MS SQL Server and
          Hypersonic SQL.
-         After the insert the key generator selects system variable 
+         After the insert the key generator selects system variable
          <tt>@@identity</tt> which contains the last identity value for 
          the current database connection.
          In the case of Hypersonic SQL the system function <tt>IDENTITY()</tt>
