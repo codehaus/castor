@@ -674,6 +674,12 @@ public class Types
             }
             public String toString() { return "Date->String"; }
         } ),
+        new TypeConvertorInfo( java.lang.Character.class, java.lang.String.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return new String( obj.toString() );
+            }
+            public String toString() { return "Character->String"; }
+        } ),
         new TypeConvertorInfo( char[].class, java.lang.String.class, new TypeConvertor() {
             public Object convert( Object obj ) {
                 return new String( (char[]) obj );
@@ -697,6 +703,12 @@ public class Types
             public String toString() { return "Boolean->String"; }
         } ),
         // Convertors to character/byte array
+        new TypeConvertorInfo( java.lang.String.class, java.lang.Character.class, new TypeConvertor() {
+            public Object convert( Object obj ) {
+                return ( new Character( ( (String ) obj ).charAt( 0 ) ) );
+            }
+            public String toString() { return "String->Character"; }
+        } ),
         new TypeConvertorInfo( java.lang.String.class, char[].class, new TypeConvertor() {
             public Object convert( Object obj ) {
                 return ( (String ) obj ).toCharArray();
