@@ -4,19 +4,20 @@
     <title>Download</title>
     <header>
       <ul>For FTP access use <url>ftp://ftp.exolab.org/pub</url>.
-        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.10.jar</url><br/>
-             The Castor JAR</li>
-        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.10-xml.jar</url><br/>
-             The Castor XML module alone</li>
-        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.10.tgz</url><br/>
-            <url>http://www.exolab.org/ftp/jars/castor-0.7.10.zip</url><br/>
-            The Castor JAR, dependent JARs, XML schemas, command line tools
-            and examples</li>
-        <li><url>http://www.exolab.org/ftp/doc/castor-0.7.10-doc.jar</url><br/>
-            Documentation and JavaDocs</li>
-        <li><url>http://www.exolab.org/ftp/src/castor-0.7.10-src.tgz</url><br/>
-            <url>http://www.exolab.org/ftp/src/castor-0.7.10-src.zip</url><br/>
-            Full CVS snapshot: all sources, docs, libraries</li>
+        <li>The Castor JAR<br/>
+            <url>http://www.exolab.org/ftp/jars/castor-$VERSION$.jar</url></li>
+        <li>The Castor XML module alone<br/>
+            <url>http://www.exolab.org/ftp/jars/castor-$VERSION$-xml.jar</url></li>
+        <li>The Castor JAR, dependent JARs, XML schemas, command line tools
+            and examples<br/>
+            <url>http://www.exolab.org/ftp/jars/castor-$VERSION$.tgz</url><br/>
+            <url>http://www.exolab.org/ftp/jars/castor-$VERSION$.zip</url></li>
+        <li>Documentation and JavaDocs<br/>
+            <url>http://www.exolab.org/ftp/doc/castor-$VERSION$-doc.tgz</url><br/>
+            <url>http://www.exolab.org/ftp/doc/castor-$VERSION$-doc.zip</url></li>
+        <li>Full CVS snapshot: all sources, docs, libraries<br/>
+            <url>http://www.exolab.org/ftp/src/castor-$VERSION$-src.tgz</url><br/>
+            <url>http://www.exolab.org/ftp/src/castor-$VERSION$-src.zip</url></li>
       </ul>
 
       <p><small>The tarball includes all the JARs required by Castor. To fully install Castor,
