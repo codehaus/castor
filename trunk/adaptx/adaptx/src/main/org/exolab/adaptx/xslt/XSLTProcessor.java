@@ -1,11 +1,11 @@
 /*
- * (C) Copyright Keith Visco 1998-2001  All rights reserved.
+ * (C) Copyright Keith Visco 1998-2003  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -60,14 +60,10 @@ import java.util.Properties;
 /**
  * This class represents an XSLT Processor that implements
  * the W3C XSLT 1.0 Recommendation.
- * <BR />
- * <B>This application is a work in progress.</B>
- * <BR />
- * see the XSLT WD 1.0 (http://www.w3.org/TR/1999/WD-xslt-19990421.html)
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class XSLTProcessor 
     extends ErrorObserverAdapter
     implements MessageObserver
@@ -203,6 +199,14 @@ public class XSLTProcessor
     **/
     private URIResolver _uriResolver = null;
     
+    /**
+     * The output properties for the transformation 
+     * This will over-ride the XSLOutput from the
+     * Stylesheet.
+     */
+    private XSLOutput _output = null;
+    
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -270,6 +274,18 @@ public class XSLTProcessor
         return appName + " " + appVersion;
     }
 
+    /**
+     * Returns the XSLOutput object containing the
+     * output properties. This is used for over-riding
+     * any output properties which may appear in the
+     * XSLT stylesheet.
+     *
+     * @return the XSLOutput object, or null if not set.
+     */
+    public XSLOutput getOutputProperties() {
+        return _output;
+    } //-- getOutputProperties
+    
     /**
      * Returns the value of the top-level parameter 
      * associated with the given name.
@@ -670,15 +686,16 @@ public class XSLTProcessor
     } //-- process
 
     /**
-     * Processes the specified xml InputStream, using the specified xsl 
-     * InputStream. 
+     * Processes the specified xml URILocation, using the specified xslt 
+     * stylesheet URILocation, and the desired ResultHandler.
      *
-     * @param xmlInput the InputStream of the XML to process
-     * @param xslInput the InputStream of the XSL to use for processing.
-     * This stylesheet will supercede any embedded stylesheets in the
-     * xsl document. Set to null, to allow xml:stylesheet PI to be processed.
+     * @param xmlLocation the URILocation for the input XML source
+     * @param xslLocation the URILocation for the stylesheet to use. 
+     * If present this stylesheet will supercede any embedded stylesheets 
+     * in the xml document. Set to null, to allow the xml:stylesheet PI to 
+     * be processed.
      *
-     * @return the resulting XPathNode
+     * @return the resulting DOM Document
     **/    
 	public Document process(URILocation xmlLocation, URILocation xslLocation) {
 	    
@@ -702,15 +719,16 @@ public class XSLTProcessor
 	
 
     /**
-     * Processes the specified xml InputStream, using the specified xsl 
-     * InputStream, and the desired ResultHandler.
+     * Processes the specified xml URILocation, using the specified xslt 
+     * stylesheet URILocation, and the desired ResultHandler.
      *
-     * @param xmlInput the InputStream of the XML to process
-     * @param xslInput the InputStream of the XSL to use for processing.
-     * This stylesheet will supercede any embedded stylesheets in the
-     * xsl document. Set to null, to allow xml:stylesheet PI to be processed.
+     * @param xmlLocation the URILocation for the input XML source
+     * @param xslLocation the URILocation for the stylesheet to use. 
+     * If present this stylesheet will supercede any embedded stylesheets 
+     * in the xml document. Set to null, to allow the xml:stylesheet PI to 
+     * be processed.
      * @param handler the ResultHandler to use for processing the stylesheet
-    **/    
+     */    
 	public void process
 	    (URILocation xmlLocation, URILocation xslLocation, ResultHandler handler) 
 	{
@@ -727,6 +745,39 @@ public class XSLTProcessor
 		parsePIs(source,piHandler);
 	    XSLTStylesheet xsl = readXSLStylesheet(xslLocation,piHandler);	    
 		process(source, xsl, handler);
+    } //-- process
+
+    /**
+     * Processes the specified xml URILocation, using the specified xslt 
+     * stylesheet, and the desired ResultHandler.
+     *
+     * @param xmlLocation the URILocation for the input XML source
+     * @param stylesheet the XSLTStylesheet to use (may be null). 
+     * If present this stylesheet will supercede any embedded stylesheets 
+     * in the xml document. Set to null, to allow the xml:stylesheet PI to 
+     * be processed.
+     * @param handler the ResultHandler to use for processing the stylesheet
+     */    
+	public void process
+	    (URILocation xmlLocation, XSLTStylesheet stylesheet, ResultHandler handler) 
+	{
+		                    
+        if (handler == null)
+            throw new IllegalArgumentException(NULL_HANDLER_ERR);
+            
+	    if (xmlLocation == null)
+	        throw new IllegalArgumentException(NULL_XML_LOCATION_ERR);
+	        
+		XPathNode source = readXMLDocument(xmlLocation);
+		
+        if (stylesheet == null) {
+            // look for stylesheet PI
+		    XSLPIHandler piHandler = new XSLPIHandler();
+		    piHandler.setDocumentBase(xmlLocation.getBaseURI());
+		    parsePIs(source,piHandler);
+		    stylesheet = readXSLStylesheet(null, piHandler);
+        }
+		process(source, stylesheet, handler);
     } //-- process
     
     
@@ -890,7 +941,7 @@ public class XSLTProcessor
         ResultHandler handler = null;
         
         if (stylesheet != null)
-            handler = new DefaultHandler(out,stylesheet.getOutput());
+            handler = new DefaultHandler(out, getOutputProperties(stylesheet));
         else
             handler = new DefaultHandler(out);
             
@@ -912,7 +963,7 @@ public class XSLTProcessor
         ResultHandler handler = null;
         
         if (stylesheet != null)
-            handler = new DefaultHandler(out,stylesheet.getOutput());
+            handler = new DefaultHandler(out, getOutputProperties(stylesheet));
         else
             handler = new DefaultHandler(out);
             
@@ -946,7 +997,7 @@ public class XSLTProcessor
 		    stylesheet = readXSLStylesheet(null, piHandler);
         }
            
-        handler.setOutputFormat(stylesheet.getOutput());
+        handler.setOutputFormat(getOutputProperties(stylesheet));
             
         //-- Set indentation from Properties file
         //-- (suggested by Aaron Metzger)
@@ -1065,6 +1116,18 @@ public class XSLTProcessor
     public void setDOMParser(DOMParser domParser) {
         Configuration.setDOMParser(domParser);
     } //-- setDOMParser
+    
+    /**
+     * Sets the XSLOutput object containing the
+     * output properties. This is used for over-riding
+     * any output properties which may appear in the
+     * XSLT stylesheet.
+     *
+     * @param output the XSLOutput object to set.
+     */
+    public void setOutputProperties(XSLOutput output) {
+        _output = output;
+    } //-- setOutputProperties
     
     /**
      * Sets the property value associated with the given String.
@@ -1186,6 +1249,27 @@ public class XSLTProcessor
 	    return options;
 	} //-- getOptions
 
+    /**
+     * Returns the XSLOutput properties object to use when
+     * processing the given stylesheet. A null object may
+     * be returned.
+     *
+     * @return the XSLOutput object to use during processing
+     * the given stylesheet
+     */
+    private XSLOutput getOutputProperties(XSLTStylesheet stylesheet) {
+        
+        if ((stylesheet == null) || (stylesheet.getOutput() == null))
+            return _output;
+            
+        if (_output == null) return stylesheet.getOutput();
+        
+        XSLOutput output = stylesheet.getOutput().copy();
+        output.merge(_output);
+        
+        return output;
+    } //-- getOutputProperties
+    
     /**
      * Retrieves Processing Instructions from the given document
      * and hands them off to the given XSLPIHandler
