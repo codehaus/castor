@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML: Fixed bug which prevented IDREFS from working properly (kvisco) 20010807
+      - Applied patches sent in from Steve Vaughan
+
 XML: Added code to Source Code Generator to create 'add(index, object)' method for list fields.
 	(andrew.fawcett@coda.com, Andrew Fawcett)
 
