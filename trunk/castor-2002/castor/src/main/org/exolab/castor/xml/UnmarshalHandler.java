@@ -118,6 +118,12 @@ public final class UnmarshalHandler extends MarshalFramework
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
     private Class            _topClass     = null;
+    
+    /**
+     * The top-level instance object, this may be set by the user
+     * by calling #setRootObject();
+    **/
+    private Object           _topObject    = null;
 
     /**
      * A StringBuffer used to created Debug/Log messages
@@ -245,6 +251,15 @@ public final class UnmarshalHandler extends MarshalFramework
         this._cdResolver = cdResolver;
     } //-- setResolver
 
+    /**
+     * Sets the root (top-level) object to use for unmarshalling into.
+     *
+     * @param root the instance to unmarshal into.
+    **/
+    public void setRootObject(Object root) {
+        _topObject = root;
+    } //-- setRootObject
+    
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
      * System.out will be used to display debug information
@@ -639,15 +654,20 @@ public final class UnmarshalHandler extends MarshalFramework
         if (_stateInfo.empty()) {
             //-- Initialize since this is the first element
 
+            if (_topClass == null) {
+                if (_topObject != null) {
+                    _topClass = _topObject.getClass();
+                }
+            }
             if (_cdResolver == null) {
-
                 if (_topClass == null) {
                     String err = "The class for the root element '" +
                         name + "' could not be found.";
                     throw new SAXException(err);
                 }
-                else
+                else {
                     _cdResolver = new ClassDescriptorResolverImpl(_loader);
+                }
             }
 
             _topState = new UnmarshalState();
@@ -696,58 +716,66 @@ public final class UnmarshalHandler extends MarshalFramework
             _topState.classDesc = classDesc;
             _topState.type = _topClass;
 
-            // Retrieving the xsi:type attribute, if present
-            String topPackage = getJavaPackage(_topClass);
-            String instanceClassname = getInstanceType(atts, topPackage);
-            if (instanceClassname != null) {
-                Class instanceClass = null;
-                Object instance = null;
-                try {
+            if (_topObject == null) {
+                // Retrieving the xsi:type attribute, if present
+                String topPackage = getJavaPackage(_topClass);
+                String instanceClassname = getInstanceType(atts, topPackage);
+                if (instanceClassname != null) {
+                    Class instanceClass = null;
+                    Object instance = null;
+                    try {
 
-                    XMLClassDescriptor xcd =
-                        getClassDescriptor(instanceClassname);
+                        XMLClassDescriptor xcd =
+                            getClassDescriptor(instanceClassname);
 
-                    if (xcd != null)
-                        instanceClass = xcd.getJavaClass();
+                        if (xcd != null)
+                            instanceClass = xcd.getJavaClass();
 
-                    if (instanceClass == null) {
-                        throw new SAXException("Class not found: " +
-                            instanceClassname);
+                        if (instanceClass == null) {
+                            throw new SAXException("Class not found: " +
+                                instanceClassname);
+                        }
+
+                        if (!_topClass.isAssignableFrom(instanceClass)) {
+                            String err = instanceClass + " is not a subclass of "
+                                + _topClass;
+                            throw new SAXException(err);
+                        }
+
+                    } 
+                    catch(Exception ex) {
+                        String msg = "unable to instantiate " +
+                            instanceClassname + "; ";
+                        throw new SAXException(msg + ex);
                     }
 
-                    if (!_topClass.isAssignableFrom(instanceClass)) {
-                        String err = instanceClass + " is not a subclass of "
-                            + _topClass;
-                        throw new SAXException(err);
+                    //-- try to create instance of the given Class
+                    try {
+                        _topState.object = instanceClass.newInstance();
+                    }
+                    catch(Exception ex) {
+                        String msg = "unable to instantiate " +
+                            instanceClass.getName() + "; ";
+                        throw new SAXException(msg + ex);
                     }
 
-                } catch(Exception ex) {
-                    String msg = "unable to instantiate " +
-                        instanceClassname + "; ";
-                    throw new SAXException(msg + ex);
+                } 
+                //-- no xsi type information present
+                else {
+                    //-- try to create instance of the given Class
+                    try {
+                        _topState.object = _topClass.newInstance();
+                    }
+                    catch(Exception ex) {
+                        String msg = "unable to instantiate " +
+                            _topClass.getName() + "; ";
+                        throw new SAXException(msg + ex);
+                    }
                 }
-
-                //-- try to create instance of the given Class
-                try {
-                    _topState.object = instanceClass.newInstance();
-                }
-                catch(Exception ex) {
-                    String msg = "unable to instantiate " +
-                        instanceClass.getName() + "; ";
-                    throw new SAXException(msg + ex);
-                }
-
-            } else {
-
-                //-- try to create instance of the given Class
-                try {
-                    _topState.object = _topClass.newInstance();
-                }
-                catch(Exception ex) {
-                    String msg = "unable to instantiate " +
-                        _topClass.getName() + "; ";
-                    throw new SAXException(msg + ex);
-                }
+            }
+            //-- otherwise use _topObject
+            else {
+                _topState.object = _topObject;
             }
             _stateInfo.push(_topState);
             processAttributes(atts, classDesc);
