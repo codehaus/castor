@@ -684,7 +684,7 @@ public class ParseTreeWalker implements TokenTypes
       int tokenType = curChild.getToken().getTokenType();
       switch ( tokenType ) {
         case KEYWORD_WHERE:
-          _queryExpr.addWhereClause( getWhereClause( curChild ) );    
+          addWhereClause(curChild);    
           break;
         case KEYWORD_ORDER:
           _queryExpr.addOrderClause( getOrderClause( curChild ) );
@@ -754,7 +754,7 @@ public class ParseTreeWalker implements TokenTypes
    * @param whereClause the parse tree node with the where clause
    * @return The SQL translation of the where clause.
    */
-  private String getWhereClause(ParseTreeNode whereClause) {
+  private void addWhereClause(ParseTreeNode whereClause) {
     String sqlExpr = getSQLExpr(whereClause.getChild(0));
 
     //Map numbered parameters
@@ -770,19 +770,52 @@ public class ParseTreeWalker implements TokenTypes
         paramNumber = new Integer(sqlExpr.substring(pos + 1));
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
       paramInfo.mapToSQLParam( SQLParamIndex++ );
-      sb.append(sqlExpr.substring(0, pos + 1)).append(" ");
+      addCondition( sqlExpr.substring(0, pos + 1) );
       if (endPos != -1 )
         sqlExpr = sqlExpr.substring(endPos);
       else
         sqlExpr = "";
       pos = sqlExpr.indexOf("?");
     }
-    sb.append(sqlExpr);
-    
-    
-    return sb.toString();
+
+    addCondition(sqlExpr);
   }
 
+  /**
+   * This method adds a condition to the query expression. It internally
+   *   uses a StringTokenizer to subdivide the condition in parts and then
+   *   calls the addCondition method of JDBCQuery expression.
+   * @param str a string which is part of the condition part in an oql query
+   *   The current implementation implies that this string is empty or
+   *   ends with a '?' character.
+   */
+  private void addCondition(String str)
+  {
+    if( str.trim().equals("") )
+      return;
+
+    String table = null;
+    String column = null;
+
+    java.util.StringTokenizer tokenizer = new
+      java.util.StringTokenizer(str, ".=!<> ?", true);
+
+    do
+      { table = tokenizer.nextToken(); }
+    while( table.equals(" ") || table.equalsIgnoreCase("and") );
+
+    tokenizer.nextToken();
+    column = tokenizer.nextToken();
+    StringBuffer operator = new StringBuffer(5);
+    String token = tokenizer.nextToken();
+    while(tokenizer.hasMoreElements() && token.equals("?") == false)
+    {
+      operator.append(token);
+      token = tokenizer.nextToken();
+    }
+
+    _queryExpr.addCondition( table, column, operator.toString(), token );
+  }
 
   /**
    * Returns a SQL version of an OQL expr.
@@ -895,7 +928,7 @@ public class ParseTreeWalker implements TokenTypes
           if ( clsDesc == null )
             clsDesc = _clsDesc;
                   
-          return _engine.quoteName( clsDesc.getTableName() + "." + field.getSQLName() );
+          return clsDesc.getTableName() + "." + field.getSQLName();
         }
 
       //parameters

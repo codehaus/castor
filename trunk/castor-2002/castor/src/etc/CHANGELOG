@@ -17,16 +17,20 @@ JDO:     Fixed bug: NULL value in database was read as 0 for Java wrappers
          (Oleg Nitz <on@ibis.odessa.ua>)
 
 JDO:     Changes to org.exolab.castor.jdo.Persistent interface:
-         - now it can be used to perform addition database operations during
+         - now it can be used to perform additional database operations during
            loading/storing/creating/deleting objects, e.g. to implement some
            types of relations that are not supported by Castor yet,
            see TestPersistent.java and Persistent.java in src/test/jdo.
-         - now jdoStore has the parameter "boolean modified" that is convenient
-           for setting fields like "modification time".
+         - now jdoStore has the boolean parameter "modified", which is
+           convenient for setting fields like "modification time".
          (Oleg Nitz <on@ibis.odessa.ua>)
 
 JDO:     Changed the inner SELECT syntax in MaxKeyGenerator to make it work
-         with hsql. (Contributed by Santiago Arriaga <santiago@catnet.com.mx>)
+         with Hypersonic SQL.
+         (Contributed by Santiago Arriaga <santiago@catnet.com.mx>)
+
+JDO:     Hypersonic SQL driver.
+         (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>)
 
 Version 0.8.7  June 2, 2000
 ---------------------------
