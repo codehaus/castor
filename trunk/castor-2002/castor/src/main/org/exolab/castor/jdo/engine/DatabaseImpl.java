@@ -72,7 +72,7 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDesc;
-import org.exolab.castor.persist.TransactionContext.AccessMode;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.util.Messages;
@@ -272,7 +272,7 @@ public final class DatabaseImpl
                 tx.load( _dbEngine, obj, primKey, AccessMode.Exclusive );
                 break;
             case OPEN_READ_WRITE:
-                tx.load( _dbEngine, obj, primKey, AccessMode.ReadWrite );
+                tx.load( _dbEngine, obj, primKey, AccessMode.Shared );
                 break;
             }
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {

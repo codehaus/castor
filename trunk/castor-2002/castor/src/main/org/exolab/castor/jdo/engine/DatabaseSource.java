@@ -133,8 +133,9 @@ public class DatabaseSource
 
 
 
-
     private static MappingResolver _defaultMapping;
+
+
     public static String  DefaultMapping = "mapping.xml";
 
 
@@ -146,18 +147,19 @@ public class DatabaseSource
      * @param sqlFactory Factory for SQL engines
      * @param jdbcURL The JDBC URL
      * @param jdbcProps The JDBC properties
+     * @param logWriter For tracing messages
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
      */
     DatabaseSource( String dbName, MappingResolver mapResolver, SQLEngineFactory sqlFactory,
-                    String jdbcUrl, Properties jdbcProps )
+                    String jdbcUrl, Properties jdbcProps, PrintWriter logWriter )
         throws MappingException
     {
         _dbName = dbName;
         _mapResolver = mapResolver;
         _jdbcUrl = jdbcUrl;
         _jdbcProps = jdbcProps;
-        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, sqlFactory, null );
+        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, sqlFactory, logWriter );
         _byEngine.put( _engine, this );
     }
 
@@ -169,17 +171,18 @@ public class DatabaseSource
      * @param mapResolver The mapping resolver
      * @param sqlFactory Factory for SQL engines
      * @param dataSource The data source
+     * @param logWriter For tracing messages
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
      */
     DatabaseSource( String dbName, MappingResolver mapResolver, SQLEngineFactory sqlFactory,
-                    DataSource dataSource )
+                    DataSource dataSource, PrintWriter logWriter )
         throws MappingException
     {
         _dbName = dbName;
         _mapResolver = mapResolver;
         _dataSource = dataSource;
-        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, sqlFactory, null );
+        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, sqlFactory, logWriter );
         _byEngine.put( _engine, this );
     }
 
@@ -197,7 +200,7 @@ public class DatabaseSource
     }
 
 
-    static DatabaseSource registerDatabase( String dbName )
+    static DatabaseSource registerDatabase( String dbName, PrintWriter logWriter )
         throws MappingException
     {
         DatabaseSource dbs;
@@ -207,7 +210,7 @@ public class DatabaseSource
 
             try {
                 mapping = new JDOMappingHelper( null );
-                mapping.loadMapping( DefaultMapping );
+                mapping.loadMapping( new InputSource( DatabaseSource.class.getClassLoader().getResourceAsStream( DefaultMapping ) ) );
                 _defaultMapping = mapping;
             } catch ( IOException except ) {
                 throw new MappingException( except );
@@ -216,7 +219,7 @@ public class DatabaseSource
         
         if ( dbName.startsWith( "jdbc:" ) ) {
             dbs = new DatabaseSource( dbName, _defaultMapping, new SQLEngineFactory(),
-                                      dbName, null );
+                                      dbName, null, logWriter );
         } else if ( dbName.startsWith( "java:" ) ) {
             Object obj;
 
@@ -229,7 +232,7 @@ public class DatabaseSource
             }
             if ( obj instanceof DataSource ) {
                 dbs = new DatabaseSource( dbName, _defaultMapping, new SQLEngineFactory(),
-                                          (DataSource) obj );
+                                          (DataSource) obj, logWriter );
             } else {
                 throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
             }
@@ -240,7 +243,7 @@ public class DatabaseSource
 
 
     public static void loadDatabase( InputSource source, EntityResolver resolver,
-                                     PrintWriter logWriter )
+                                     PrintWriter logWriter, ClassLoader loader )
         throws MappingException
     {
         Unmarshaller     unm;
@@ -259,7 +262,7 @@ public class DatabaseSource
                 unm.setLogWriter( logWriter );
             database = (Database) unm.unmarshal( source );
 
-            mapping = new JDOMappingHelper( null );
+            mapping = new JDOMappingHelper( loader );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
             if ( logWriter != null )
@@ -294,7 +297,7 @@ public class DatabaseSource
                     props.put( param.getName(), param.getValue() );
                 }
                 dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(),
-                                          database.getDriver().getUrl(), props );
+                                          database.getDriver().getUrl(), props, logWriter );
             } else if ( database.getDataSource() != null ) {
                 DataSource ds;
           
@@ -302,7 +305,8 @@ public class DatabaseSource
                 if ( ds == null )
                     throw new MappingException( "No data source specified for database " +
                                                 database.getDbName() );
-                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(), ds );
+                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(),
+                                          ds, logWriter );
             } else if ( database.getDataSourceRef() != null ) {
                 Object    ds;
           
@@ -317,7 +321,8 @@ public class DatabaseSource
                 if ( ! ( ds instanceof DataSource ) )
                     throw new MappingException( "The JNDI name " + database.getDbName() +
                                                 " does not map to a DataSource" );
-                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(), (DataSource) ds );
+                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(),
+                                          (DataSource) ds, logWriter );
             } else {
                 throw new MappingException( "Bad" );
             }
@@ -375,7 +380,7 @@ public class DatabaseSource
         
         dbs = (DatabaseSource) _databases.get( dbName );
         if ( dbs == null )
-            dbs = registerDatabase( dbName );
+            dbs = registerDatabase( dbName, null );
         return dbs;
     }
     

@@ -73,6 +73,12 @@ public class JDOMappingHelper
 {
 
 
+    static class Names
+    {
+        public static final String DirtyCheck = "check";
+    }
+
+
     public JDOMappingHelper( ClassLoader loader )
         throws MappingException
     {
@@ -80,25 +86,37 @@ public class JDOMappingHelper
     }
 
 
-    protected void loadMapping( Mapping mapping )
+    protected void resolveRelations( ClassDesc clsDesc )
         throws MappingException
     {
-        Enumeration   enum;
-        ClassMapping  clsMap;
-        ClassDesc     clsDesc;
-        
-        enum = mapping.enumerateClassMapping();
-        while ( enum.hasMoreElements() ) {
-            clsMap = (ClassMapping) enum.nextElement();
-            clsDesc = createDescriptor( clsMap );
-            if ( clsDesc != null ) {
-                addDescriptor( clsDesc );
-            } else {
-                if ( getLogWriter() != null ) {
-                    getLogWriter().println( "Ignored mapping for class " + clsMap.getClassName() + " - no SQL information available" );
+        super.resolveRelations( clsDesc );
+
+        // At this point the descriptor may contain only JDO fields,
+        // and all container fields must be flattened.
+        FieldDesc[] fields;
+        Vector      allFields;
+
+        allFields = new Vector();
+        fields = clsDesc.getFields();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof ContainerFieldDesc ) {
+                FieldDesc[] cFields;
+                
+                cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
+                for ( int j = 0 ; j < cFields.length ; ++j ) {
+                    if ( cFields[ j ] instanceof JDOFieldDesc )
+                        allFields.add( cFields[ j ] );
                 }
+            } else if ( fields[ i ] instanceof JDOFieldDesc ) {
+                allFields.add( fields[ i ] );
             }
         }
+        
+        JDOFieldDesc[] jdoFields;
+
+        jdoFields = new JDOFieldDesc[ allFields.size() ];
+        allFields.copyInto( jdoFields );
+        ( (JDOClassDesc) clsDesc ).setJDOFields( jdoFields );
     }
 
 
@@ -107,13 +125,12 @@ public class JDOMappingHelper
     {
         ClassDesc   clsDesc;
         FieldDesc[] fields;
-        FieldDesc   identity;
         Vector      jdoFields;
-        Vector      jdoRels;
         
-        // If no SQL information for class, ignore it.
+        // If no SQL information for class, ignore it. JDO only
+        // supports JDO class descriptors.
         if ( clsMap.getSqlTable() == null )
-            return null;
+            return ClassDesc.NoDescriptor;
 
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
@@ -121,65 +138,23 @@ public class JDOMappingHelper
         // found for the parent.
         clsDesc = super.createDescriptor( clsMap );
 
-        // JDO descriptor must include an identity field.
-        identity = clsDesc.getIdentity();
-        if ( identity == null )
+        // JDO descriptor must include an identity field, the identity field
+        // is either a field, or a container field containing only JDO fields.
+        // If the identity field is not a JDO field, it will be cleaned later
+        // on (we need the descriptor for relations mapping).
+        if ( clsDesc.getIdentity() == null )
             throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
-
-        // Accumulate all the fields, flatten them, remove the identity
-        // field, and use that to create the descriptor.
-        jdoFields = new Vector();
-        jdoRels = new Vector();
-        fields = clsDesc.getFields();
-        for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( ! fields[ i ].getFieldName().equals( identity.getFieldName() ) ) {
-                if ( fields[ i ] instanceof ContainerFieldDesc ) {
-                    FieldDesc[] cFields;
-                    
-                    cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
-                    for ( int j = 0 ; j < cFields.length ; ++j )
-                        jdoFields.add( cFields[ j ] );
-                } else if ( fields[ i ] instanceof JDOFieldDesc ) {
-                    Class type;
-
-                    type = fields[ i ].getFieldType();
-                    if ( Types.isSimpleType( type ) ) {
-                        // Simple type. Map field directly.
-                        jdoFields.add( fields[ i ] );
-                    } else {
-                        // Complex type. This might be a relation.
-                        JDOClassDesc rel;
-
-                        rel = (JDOClassDesc) getDescriptor( fields[ i ].getFieldType() );
-                        if ( rel == null ) {
-                            // XXX Need some handling here. Serializable, conversion, error?
-                        } else {
-                            rel = new JDORelationDesc( rel, Relation.ManyToOne, fields[ i ], null,
-                                                       ( (JDOFieldDesc) fields[ i ] ) );
-                            jdoRels.add( rel );
-                        }
-                    }
-                } else {
-                    JDOClassDesc rel;
-                    
-                    rel = (JDOClassDesc) getDescriptor( fields[ i ].getFieldType() );
-                    if ( rel != null ) {
-                        // ???
-                        rel = new JDORelationDesc( rel, Relation.OneToOne, fields[ i ], null, null );
-                        jdoRels.add( rel );
-                    }
-                }
-            }
+        if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
+            FieldDesc[] idFields;
+            
+            idFields = ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
+            for ( int i = 0 ; i < idFields.length ; ++i )
+                if ( ! ( idFields[ i ] instanceof JDOFieldDesc ) )
+                    throw new MappingException( "The identity field " + idFields[ i ] +
+                                                " does not have SQL information to map it" );
         }
         
-        JDOFieldDesc[] array;
-        array = new JDOFieldDesc[ jdoFields.size() ];
-        jdoFields.copyInto( array );
-        JDORelationDesc[] related;
-        related = new JDORelationDesc[ jdoRels.size() ];
-        jdoRels.copyInto( related );
-        return new JDOClassDesc( clsDesc.getJavaClass(), clsMap.getSqlTable().getTableName(),
-                                 array, identity, related, (JDOClassDesc) clsDesc.getExtends() );
+        return new JDOClassDesc( clsDesc, clsMap.getSqlTable().getTableName() );
     }
 
 
@@ -204,7 +179,8 @@ public class JDOMappingHelper
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
         else
             sqlName = fieldMap.getSqlInfo().getName();
-        return new JDOFieldDesc( fieldDesc, sqlName, sqlType, "check".equals( fieldMap.getSqlInfo().getDirty() ) );
+        return new JDOFieldDesc( fieldDesc, sqlName, sqlType,
+                                 Names.DirtyCheck.equals( fieldMap.getSqlInfo().getDirty() ) );
     }
 
 

@@ -60,7 +60,6 @@ import org.odmg.QueryParameterTypeInvalidException;
 import org.odmg.QueryInvalidException;
 import org.odmg.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -69,7 +68,9 @@ import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.LockNotGrantedException;
 import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.RelationContext;
 import org.exolab.castor.mapping.ContainerFieldDesc;
+import org.exolab.castor.mapping.AccessMode;
 
 
 /**
@@ -176,7 +177,8 @@ public class OQLQueryImpl
         array = new Class[ types.size() ];
         types.copyInto( array );
         try {
-            _query = engine.createQuery( sql.toString(), array );
+            _query = engine.createQuery( new RelationContext( TransactionImpl.getCurrentContext(), _dbEngine ),
+                                         sql.toString(), array );
         } catch ( QueryException except ) {
             throw new QueryInvalidException( except.getMessage() );
         }
@@ -256,7 +258,7 @@ public class OQLQueryImpl
             tx = TransactionImpl.getCurrentContext();
             if ( tx == null || ! tx.isOpen() )
                 throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
-            results = tx.query( _dbEngine, _query, AccessMode.ReadWrite );
+            results = tx.query( _dbEngine, _query, AccessMode.Shared );
             _fieldNum = 0;
             
             set = new Vector();
