@@ -17,7 +17,7 @@ drop table test_group_person
 go
 create table test_group_person (
   gid int         not null,
-  pid int        not null 
+  pid int        not null
 )
 go
 create index test_group_person_p_pk on test_group_person ( pid )
@@ -48,7 +48,6 @@ create table test_many_person (
    sthelse varchar(100) null
 )
 go
-
 create unique index test_many_person_pk on test_many_person ( pid )
 go
 grant all on test_many_person to test
@@ -63,7 +62,6 @@ create table test_pks_person (
   bday  datetime
 )
 go
-
 create unique index test_pks_person_pk on test_pks_person( fname, lname )
 go
 grant all on test_pks_person to test
@@ -95,6 +93,8 @@ go
 create unique index test_pks_payroll_fk on test_pks_payroll( fname, lname )
 go
 create unique index test_pks_payroll_pk on test_pks_payroll( id )
+go
+grant all on test_pks_payroll to test
 go
 
 drop table test_pks_address
@@ -139,6 +139,8 @@ create table test_pks_category_contract (
   cate_id int          not null
 )
 go
+grant all on test_pks_category_contract to test
+go
 
 drop table test_pks_category
 go
@@ -149,6 +151,8 @@ create table test_pks_category (
 go
 create unique index test_pks_category_pk on test_pks_category( id )
 go
+grant all on test_pks_category to test
+go
 
 -- base class
 drop table test_rel_person
@@ -157,10 +161,9 @@ create table test_rel_person (
   pid    int             not null,
   fname varchar(100)    not null,
   lname varchar(100)    not null,
-  bday  datetime 
+  bday  datetime
 )
 go
-
 create unique index test_rel_person_pk on test_rel_person( pid )
 go
 grant all on test_rel_person to test
@@ -198,7 +201,6 @@ go
 grant all on test_rel_address to test
 go
 
-
 -- depend class of employee
 drop table test_rel_payroll
 go
@@ -212,6 +214,8 @@ go
 create unique index test_rel_payroll_fk on test_rel_payroll( pid )
 go
 create unique index test_rel_payroll_pk on test_rel_payroll( id )
+go
+grant all on test_rel_payroll to test
 go
 -- end for test_relations
 
@@ -228,7 +232,6 @@ create unique index test_table_extends_pk on test_table_extends ( id )
 go
 grant all on test_table_extends to test
 go
-
 
 -- test_table_ex
 drop table test_table_ex
@@ -258,7 +261,6 @@ go
 grant all on test_race to test
 go
 
-
 -- test_master
 drop table test_master
 go
@@ -273,7 +275,6 @@ go
 grant all on test_master to test
 go
 
-
 -- test_detail
 drop table test_detail
 go
@@ -287,7 +288,6 @@ create unique index test_detail_pk on test_detail ( detail_id )
 go
 grant all on test_detail to test
 go
-
 
 -- test_detail2
 drop table test_detail2
@@ -304,7 +304,6 @@ go
 grant all on test_detail2 to test
 go
 
-
 -- test_group
 drop table test_group
 go
@@ -317,7 +316,6 @@ create unique index test_group_pk on test_group ( id )
 go
 grant all on test_group to test
 go
-
 
 -- test_types
 drop table test_types
@@ -345,7 +343,6 @@ go
 grant all on test_types to test
 go
 
-
 -- test_keygen
 drop table test_keygen
 go
@@ -358,7 +355,6 @@ create unique index test_keygen_pk on test_keygen ( id )
 go
 grant all on test_keygen to test
 go
-
 
 -- test_keygen_ext
 drop table test_keygen_ext
@@ -373,7 +369,6 @@ go
 grant all on test_keygen_ext to test
 go
 
-
 drop table test_uuid
 go
 create table test_uuid (
@@ -382,6 +377,8 @@ create table test_uuid (
 )
 go
 create unique index test_uuid_pk on test_uuid ( id )
+go
+grant all on test_uuid to test
 go
 
 drop table test_uuid_ext
@@ -393,7 +390,8 @@ create table test_uuid_ext (
 go
 create unique index test_uuid_ext_pk on test_uuid_ext ( id )
 go
-
+grant all on test_uuid_ext to test
+go
 
 -- test_seqtable
 drop table test_seqtable
@@ -431,7 +429,6 @@ go
 grant all on test_identity_ext to test
 go
 
-
 -- The test stored procedure on TransactSQL
 drop procedure proc_check_permissions
 go
@@ -443,18 +440,18 @@ go
 sp_procxmode proc_check_permissions, "anymode"
 go
 
-
 -- test_serial
 drop table test_serial
 go
 create table test_serial (
   id      integer        not null,
-  dep     blob           null
+  dep     image           null
 )
 go
 create unique index test_serial_pk on test_serial( id )
 go
-
+grant all on test_serial to test
+go
 
 -- test_persistent
 drop table test_persistent
@@ -482,8 +479,8 @@ create table test_related (
 go
 create unique index test_related_pk on test_related ( id )
 go
-
-
+grant all on test_related to test
+go
 
 -- test_col
 drop table test_col
@@ -495,8 +492,10 @@ create table test_col (
 go
 create unique index test_col_pk on test_col( id )
 go
+grant all on test_col to test
+go
 
-drop table test_item 
+drop table test_item
 go
 create table test_item (
   iid       integer         not null,
@@ -504,6 +503,8 @@ create table test_item (
 )
 go
 create unique index test_item_pk on test_item( iid )
+go
+grant all on test_item to test
 go
 
 -- list_types
@@ -523,6 +524,8 @@ create table list_types (
   o_int   INT null,
 )
 go
+grant all on list_types to test
+go
 
 drop table test_oqlext
 go
@@ -532,4 +535,6 @@ create table test_oqlext (
 )
 go
 create unique index test_oqlext_pk on test_oqlext( ident )
+go
+grant all on test_oqlext to test
 go
