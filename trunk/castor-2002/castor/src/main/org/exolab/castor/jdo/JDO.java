@@ -148,12 +148,6 @@ public class JDO
 
 
     /**
-     * The class loader.
-     */
-    private ClassLoader     _classLoader;
-
-
-    /**
      * The lock timeout for this database. Zero for immediate
      * timeout, an infinite value for no timeout. The timeout is
      * specified in seconds.
@@ -177,6 +171,12 @@ public class JDO
      * The look up name for a transaction manager.
      */
     private String         _tmName = "java:comp/TransactionManager";
+
+
+    /**
+     * The application class loader.
+     */
+    private ClassLoader    _classLoader;
 
 
     /**
@@ -239,6 +239,30 @@ public class JDO
     public LogInterceptor getLogInterceptor()
     {
         return _logInterceptor;
+    }
+
+
+    /**
+     * Sets the application class loader.
+     * This method should be used with application servers that use multiple
+     * class loaders. The default value is "null". It means that
+     * application classes are loaded through <code>Class.forName(className)</code>.
+     * Examples:
+     * <p><code>jdo.setClassLoader(getClass().getClassLoader());</code>
+     * <p><code>jdo.setClassLoader(Thread.currentThread().getContextClassLoader());</code>
+     */
+    public void setClassLoader( ClassLoader classLoader)
+    {
+        _classLoader = classLoader;
+    }
+
+
+    /**
+     * Returns the application classloader.
+     */
+    public ClassLoader getClassLoader()
+    {
+        return _classLoader;
     }
 
 
@@ -382,28 +406,6 @@ public class JDO
 
 
     /**
-     * Sets the application class loader.
-     *
-     * @param classLoader The application class loader
-     */
-    public void setClassLoader( ClassLoader classLoader )
-    {
-        _classLoader = classLoader;
-    }
-
-
-    /**
-     * Returns the application class loader.
-     *
-     * @returns The application class loader
-     */
-    public ClassLoader getClassLoader()
-    {
-        return _classLoader;
-    }
-
-
-    /**
      * Opens and returns a connection to the database. Throws an
      * {@link DatabaseNotFoundException} if the database named was not
      * set in the constructor or with a call to {@link #setDatabaseName},
@@ -421,7 +423,7 @@ public class JDO
 
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
-        if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
+        if ( DatabaseRegistry.getDatabaseRegistry( _dbName, _classLoader ) == null ) {
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
@@ -442,7 +444,7 @@ public class JDO
                 tm = (TransactionManager) ctx.lookup( _tmName );
                 tx = tm.getTransaction();
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx, _classLoader );
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
@@ -456,7 +458,7 @@ public class JDO
                     _logInterceptor.exception( except );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, null );
+        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, null, _classLoader );
     }
 
 

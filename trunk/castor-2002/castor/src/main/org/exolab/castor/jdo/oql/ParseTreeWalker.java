@@ -57,7 +57,6 @@ import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
-import org.exolab.castor.util.ClassUtils;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
@@ -80,6 +79,7 @@ public class ParseTreeWalker implements TokenTypes
   private String _fromClassName;
   private String _fromClassAlias;
 
+  private ClassLoader _classLoader;
   private Class _objClass;
   private QueryExpression _queryExpr;
   
@@ -107,11 +107,12 @@ public class ParseTreeWalker implements TokenTypes
    * @param parseTree The parse tree to walk
    * @throws QueryException Thrown by checkErrors.
    */
-  public ParseTreeWalker(PersistenceEngine dbEngine, ParseTreeNode parseTree) 
+  public ParseTreeWalker(PersistenceEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader ) 
       throws QueryException 
   {
     _dbEngine = dbEngine;
     _parseTree = parseTree;
+    _classLoader = classLoader;
 
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
@@ -279,7 +280,10 @@ public class ParseTreeWalker implements TokenTypes
     }
     
     try {
-      _objClass = ClassUtils.loadAppClass( _fromClassName );
+      if ( _classLoader == null )  
+        _objClass = Class.forName( _fromClassName );
+      else
+        _objClass = _classLoader.loadClass( _fromClassName );
     } 
     catch ( ClassNotFoundException except ) {
       throw new QueryException( "Could not find class " + _fromClassName );
@@ -389,17 +393,17 @@ public class ParseTreeWalker implements TokenTypes
             if ( curField == null )
               throw new QueryException( "An unknown field was requested in the select part of the query: " + curName );
             curClassDesc = (JDOClassDescriptor) curField.getClassDescriptor();
-	    if ( curClassDesc == null && e.hasMoreElements() )
-		throw new QueryException( "An non-reference field was requested in the select part of the query: " + curName );
+        if ( curClassDesc == null && e.hasMoreElements() )
+        throw new QueryException( "An non-reference field was requested in the select part of the query: " + curName );
             count++;
           }
 
           _pathInfo.put( projection, projectionInfo );
           _fieldInfo.put( projection, curField );
 
-	  // simple projection == Field => remember it
-	  if ( projectionInfo.size() == 2 )
-	      checkField( curNode );
+      // simple projection == Field => remember it
+      if ( projectionInfo.size() == 2 )
+          checkField( curNode );
           
           Class theClass = curField.getFieldType();
           // is it actually a Java primitive, or String, 
@@ -468,7 +472,7 @@ public class ParseTreeWalker implements TokenTypes
     int tokenType = whereClause.getToken().getTokenType();
     switch (tokenType) {
       case DOT:
-	checkProjection( whereClause, false, false );
+    checkProjection( whereClause, false, false );
         break;
       case IDENTIFIER:
         checkField(whereClause);
@@ -655,8 +659,8 @@ public class ParseTreeWalker implements TokenTypes
           checkField(curChild.getChild(0));
           break;
         case DOT:
-	  checkProjection( curChild, false, false );
-	  break;
+      checkProjection( curChild, false, false );
+      break;
         case IDENTIFIER:
           checkField(curChild);
           break;
@@ -734,7 +738,7 @@ public class ParseTreeWalker implements TokenTypes
    */
   private void addJoinsForPathExpression( Vector path ) {
       if ( path == null )
-	  throw new IllegalStateException( "path = null !" );
+      throw new IllegalStateException( "path = null !" );
 
     JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
     String identityColumn = identity.getSQLName();
@@ -905,40 +909,40 @@ public class ParseTreeWalker implements TokenTypes
         }
         else {
 
-	    //a field
-	    if ( tokenType == DOT ) {
-		Vector path = (Vector) _pathInfo.get(exprTree);
-		if ( path == null ) {
-		    System.err.println( "exprTree="+exprTree.toStringEx()+
-					"\npathInfo = {" );
-		    Enumeration enum = _pathInfo.keys();
-		    ParseTreeNode n;
-		    while ( enum.hasMoreElements() ) {
-			n = (ParseTreeNode)enum.nextElement();
-			System.err.println( "\t"+n.toStringEx() );
-		    }
-		    // Exception follows in addJoinsForPathExpression()
-		}
-		addJoinsForPathExpression( path );
-	    }
+        //a field
+        if ( tokenType == DOT ) {
+        Vector path = (Vector) _pathInfo.get(exprTree);
+        if ( path == null ) {
+            System.err.println( "exprTree="+exprTree.toStringEx()+
+                    "\npathInfo = {" );
+            Enumeration enum = _pathInfo.keys();
+            ParseTreeNode n;
+            while ( enum.hasMoreElements() ) {
+            n = (ParseTreeNode)enum.nextElement();
+            System.err.println( "\t"+n.toStringEx() );
+            }
+            // Exception follows in addJoinsForPathExpression()
+        }
+        addJoinsForPathExpression( path );
+        }
             
           JDOFieldDescriptor field = 
                   (JDOFieldDescriptor) _fieldInfo.get(exprTree);
-	  if ( field == null ) {
-	      throw new IllegalStateException( "fieldInfo for "+exprTree.toStringEx()+
-					       " not found" );
-	  }
+      if ( field == null ) {
+          throw new IllegalStateException( "fieldInfo for "+exprTree.toStringEx()+
+                           " not found" );
+      }
           JDOClassDescriptor clsDesc = 
-	      // (JDOClassDescriptor) field.getClassDescriptor();
-	      (JDOClassDescriptor) field.getContainingClassDescriptor();
-	  
+          // (JDOClassDescriptor) field.getClassDescriptor();
+          (JDOClassDescriptor) field.getContainingClassDescriptor();
+      
           if ( clsDesc == null ) {
-	      throw new IllegalStateException( "ContainingClass of "+
-					       field.toString()+" is null !" );
-	  }
+          throw new IllegalStateException( "ContainingClass of "+
+                           field.toString()+" is null !" );
+      }
                   
           return _queryExpr.encodeColumn( clsDesc.getTableName(), 
-					  field.getSQLName() );
+                      field.getSQLName() );
         }
 
       //parameters
