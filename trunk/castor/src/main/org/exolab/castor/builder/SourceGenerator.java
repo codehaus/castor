@@ -1212,7 +1212,7 @@ public class SourceGenerator
         //-- check for class name conflicts
         JClass conflict = state.getProcessed(jClass.getName());
         
-        if (conflict != null) {
+        if ((conflict != null) && (!state.getSuppressNonFatalWarnings())) {
             ClassInfo temp = state.resolve(conflict);
             
             //-- if the ClassInfo are equal, we can just return
