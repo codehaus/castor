@@ -42,11 +42,12 @@
  *
  * Contributors:
  * --------------
- * Gary Shea (shea@gtsdesign.com)   - Original Author
- * Keith Visco (kvisco@intalio.com) - Changed JCompElement references to
- *                                    JStructure, some additional tweaking 
- *                                    to get it working with the current 
- *                                    Javasource package.
+ * Gary Shea (shea AT gtsdesign DOT com)   
+ *    - Original Author
+ * 
+ * Keith Visco 
+ *   - Changed JCompElement references to JStructure, some additional
+ *     tweaking to get it working with the current Javasource package.
  *
  * $Id$
  */
@@ -55,8 +56,6 @@ package org.exolab.javasource;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.Writer;
-import java.io.PrintWriter;
 
 import java.util.Vector;
 import java.util.Enumeration;
@@ -70,9 +69,10 @@ import java.util.Iterator;
  * a useful utility when creating in memory source code.
  * This package was modelled after the Java Reflection API
  * as much as possible to reduce the learning curve.
- * @author <a href="mailto:shea@gtsdesign.com">Gary Shea</a>
+ * 
+ * @author <a href="mailto:shea AT gtsdesign DOT com">Gary Shea</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JCompUnit {
 
     /**

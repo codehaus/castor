@@ -45,17 +45,14 @@
 
 package org.exolab.javasource;
 
-
-import java.io.PrintWriter;
-
 import java.util.Vector;
 
 /**
  * A class for holding in-memory Java source code.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JSourceCode {
     
     
@@ -216,7 +213,7 @@ public class JSourceCode {
      * @param jcs the JCodeStatement to add
     **/
     private void addCodeStatement(JCodeStatement jcs) {
-        short indent = (short)(jcs.getIndent()+ currentIndent - jcs.DEFAULT_INDENTSIZE);
+        short indent = (short)(jcs.getIndent()+ currentIndent - JCodeStatement.DEFAULT_INDENTSIZE);
         source.addElement(new JCodeStatement(jcs.getStatement(), indent));
     } //-- addCodeStatement(JCodeStatement)
    

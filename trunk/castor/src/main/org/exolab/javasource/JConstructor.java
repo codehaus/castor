@@ -45,15 +45,12 @@
 
 package org.exolab.javasource;
 
-
-import java.util.Vector;
-import java.io.PrintWriter;
-
 /**
  * A class for handling source code for a constructor of a JClass
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JConstructor extends JAnnotatedElementHelper {
 
     

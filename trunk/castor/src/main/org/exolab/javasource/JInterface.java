@@ -45,11 +45,6 @@
 
 package org.exolab.javasource;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.io.PrintWriter;
-
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -59,10 +54,10 @@ import java.util.Vector;
  * The code in this package was modelled after the Java Reflection API
  * as much as possible to reduce the learning curve.
  *
- * @author <a href="mailto:skopp@riege.de">Martin Skopp</a> 
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:skopp AT riege DOT de">Martin Skopp</a> 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public final class JInterface extends JStructure {
 
 

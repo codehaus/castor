@@ -43,15 +43,15 @@
  * $Id$
  */
 
-
 package org.exolab.javasource;
 
-import java.util.Vector;
 
 /**
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * Represents a primitive or class type
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JType {
 
     public static final JType Boolean  = new JType("boolean");
@@ -133,14 +133,14 @@ public class JType {
      * @return true if this JType represents a primitive, otherwise false
     **/
     public boolean isPrimitive() {
-        return ((this == this.Boolean) ||
-                (this == this.Byte)    ||
-                (this == this.Char)    ||
-                (this == this.Double)  ||
-                (this == this.Float)   ||
-                (this == this.Int)     ||
-                (this == this.Long)    ||
-                (this == this.Short));
+        return ((this == JType.Boolean) ||
+                (this == JType.Byte)    ||
+                (this == JType.Char)    ||
+                (this == JType.Double)  ||
+                (this == JType.Float)   ||
+                (this == JType.Int)     ||
+                (this == JType.Long)    ||
+                (this == JType.Short));
     } //-- isPrimitive
     
     /**
