@@ -131,7 +131,7 @@ public interface LogInterceptor
      * The SQL engine uses this method to report all the select,
      * update, insert statements it creates upon initialization.
      *
-     * @param message The storage statement
+     * @param statement The storage statement
      */
     public void storeStatement( String statement );
 
@@ -143,7 +143,7 @@ public interface LogInterceptor
      * The SQL engine uses this method to report select statements
      * when running new queries.
      *
-     * @param message The query statement
+     * @param statement The query statement
      */
     public void queryStatement( String statement );
 
@@ -163,7 +163,7 @@ public interface LogInterceptor
      * application. Only the interceptor will be notified of this
      * exception.
      *
-     * @param exception The exception
+     * @param except The exception
      */
     public void exception( Exception except );
 
