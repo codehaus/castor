@@ -288,9 +288,8 @@ public class TypeConversion {
                     //-- since we don't actually support this type, yet,
                     //-- we'll simply treat it as a string, but warn the
                     //-- user.
-                    String warning = "Warning: The W3C datatype '"+simpleType.getName();
-                    warning += "' is not currently supported by Castor Source Generator.";
-                    warning += " It will be treated as a java.lang.String.";
+                    String warning = "Warning: Currently, the W3C datatype '"+simpleType.getName();
+                    warning += "' is supported only as a String by Castor Source Generator.";
                     System.out.println(warning);
                     return new XSString();
                 }
@@ -409,6 +408,16 @@ public class TypeConversion {
                     if (!simpleType.isBuiltInType())
                         xsTime.setFacets(simpleType);
                     return xsTime;
+                }
+                case SimpleTypesFactory.TOKEN_TYPE:
+                {
+                    //-- since we don't actually support this type, yet,
+                    //-- we'll simply treat it as a string, but warn the
+                    //-- user.
+                    String warning = "Warning: Currently, the W3C datatype '"+simpleType.getName();
+                    warning += "' is supported only as a String by Castor Source Generator.";
+                    System.out.println(warning);
+                    return new XSString();
                 }
                 default:
                     //-- error
