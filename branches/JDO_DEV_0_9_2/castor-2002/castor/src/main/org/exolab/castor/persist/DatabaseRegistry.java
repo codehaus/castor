@@ -69,13 +69,14 @@ import org.exolab.castor.mapping.MappingException;
 //import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
-//import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.persist.resolvers.Resolver;
 import org.exolab.castor.util.DTDResolver;
+
 
 
 /**
