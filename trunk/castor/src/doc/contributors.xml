@@ -91,7 +91,7 @@
      <project>JDO</project>
      <company id="syscon"/>
      <description>
-        JDO bug fixes and enhancements for type convertion; addition of test 
+        JDO bug fixes and enhancements for type convertion; addition of test
         cases and documentation.
      </description>
     <status>active</status>
@@ -107,7 +107,7 @@
     <status>active</status>
 	<company id="ctoforaday"/>
     <description>
-       Bugfixes/enhancements, stress testing, performance testing, tester of 
+       Bugfixes/enhancements, stress testing, performance testing, tester of
        unusual 'runtime' environments, (Hashbelt) cache implementations et alias.
     </description>
     <since>
@@ -616,6 +616,12 @@
     <name surname="Pelchat" given="Stéphane"/>
     <email>stephane@ofoto.com</email>
     <description>Patches to enum and date field handlers to support "nillable" fields.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Picasso" given="Brent"/>
+    <email>brentpicasso@yahoo.com</email>
+    <description>Some patches for Castor XML</description>
   </contributor>
 
   <contributor type="Contributor">
@@ -1167,7 +1173,7 @@
     <name>Mentopolis</name>
     <url>www.mentopolis.de/index.htm</url>
   </company>
-  
+
   <company id="nksystems">
     <name>NK Systems</name>
     <url>www.nksystems.com</url>
