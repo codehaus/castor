@@ -53,7 +53,7 @@ package org.exolab.castor.persist;
  * based on their identity as well as assure no duplicate identities.
  * The object type and it's identity object define the OID's identity.
  * In addition the OID is used to hold the object's stamp and
- * exclusive access fields which are used to optimize dirty checking
+ * db-lock access fields which are used to optimize dirty checking
  * within a transaction.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
@@ -83,9 +83,9 @@ final class OID
 
 
     /**
-     * True if the object is loaded with exclusive access.
+     * True if the object is loaded with db-lock access.
      */
-    private boolean      _exclusive;
+    private boolean      _dbLock;
 
 
     /**
@@ -143,33 +143,33 @@ final class OID
 
     /**
      * Specifies whether the object represented by this OID has
-     * exclusive access. Exclusive access overrides the need to
-     * perform dirty checking on the object. This status is set when
-     * the object is loaded with exclusive access, created or deleted.
+     * a database lock. Database locks overrides the need to perform
+     * dirty checking on the object. This status is set when the
+     * object is loaded with db-lock access, created or deleted.
      * It is reset when the object is unlocked.
      *
-     * @param exclusive True the object represented by this OID has
-     *  exclusive access
+     * @param dbLock True the object represented by this OID has
+     *  a database lock
      */
-    void setExclusive( boolean exclusive )
+    void setDbLock( boolean dbLock )
     {
-        _exclusive = exclusive;
+        _dbLock = dbLock;
     }
 
 
     /**
      * Returns true if the object represented by this OID has
-     * exclusive access. Exclusive access overrides the need to
-     * perform dirty checking on the object. This status is set when
-     * the object is loaded with exclusive access, created or deleted.
+     * a database lock. Database locks overrides the need to perform
+     * dirty checking on the object. This status is set when the
+     * object is loaded with db-lock access, created or deleted.
      * It is reset when the object is unlocked.
      *
      * @return True the object represented by this OID is loaded
-     *  with exclusive access
+     *  with a datbase lock
      */
-    boolean isExclusive()
+    boolean isDbLock()
     {
-        return _exclusive;
+        return _dbLock;
     }
 
 

@@ -357,8 +357,8 @@ public final class ClassHandler
         clsMode = _clsDesc.getAccessMode();
         if ( clsMode == AccessMode.ReadOnly || txMode == AccessMode.ReadOnly )
             return AccessMode.ReadOnly;
-        if ( clsMode == AccessMode.Locked || txMode == AccessMode.Locked )
-            return AccessMode.Locked;
+        if ( clsMode == AccessMode.DbLocked || txMode == AccessMode.DbLocked )
+            return AccessMode.DbLocked;
         if ( clsMode == AccessMode.Exclusive || txMode == AccessMode.Exclusive )
             return AccessMode.Exclusive;
         return txMode;
