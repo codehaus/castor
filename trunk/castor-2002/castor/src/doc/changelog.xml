@@ -2,7 +2,15 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
-    <section title="Version 0.8  March 24, 2000"><pre>
+    <section title="Version 0.8  March 27, 2000"><pre>
+XML:     support for IDREF/ID has been added back in
+
+XML:     fixed circular reference bug
+           -  This was an indirect bug caused by a bug
+              in org.exolab.castor.util.Stack
+
+XML:     fixed bug in method naming when type is "ID"
+
 XML:     Updated the Source code generator to work with new Framework
          - Note I currently removed validation support, this will be
            back ASAP

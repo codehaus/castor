@@ -4,21 +4,25 @@ package myapp;
 import java.io.Serializable;
 
 
-public class ProductGroup
+public class ProductDetail
     implements Serializable
 {
 
 
-    public int        id;
+    public int       id;
 
 
-    public String     name;
+    public Product   product;
+
+
+    public String    name;
 
 
     public int getId() { return id; }
 
     public String getName() { return name; }
 
+    public Product getProduct() { return product; }
+
 
 }
-
