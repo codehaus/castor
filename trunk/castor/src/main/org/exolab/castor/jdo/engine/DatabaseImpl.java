@@ -47,6 +47,10 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.*;
@@ -55,9 +59,9 @@ import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.InstanceFactory;
+import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
-import javax.transaction.NotSupportedException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
@@ -75,6 +79,14 @@ import javax.transaction.Transaction;
 public class DatabaseImpl
     implements Database, Synchronization
 {
+
+    /**
+     * Property listing all the available {@link TxSynchronizable}
+     * implementations (<tt>org.exolab.castor.persit.TxSynchronizable</tt>).
+     */
+    private static final String TxSynchronizableProperty = 
+        "org.exolab.castor.persist.TxSynchronizable";
+
 
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
@@ -95,6 +107,13 @@ public class DatabaseImpl
      * {@link javax.transaction.xa.XAResource}.
      */
     protected TransactionContext       _ctx;
+
+
+    /**
+     * List of TxSynchronizeable implementations that should all be
+     * informed about changes after commit of transactions. 
+     */
+    private ArrayList                  _synchronizables;
 
 
     /**
@@ -185,6 +204,8 @@ public class DatabaseImpl
         _ctx.setCallback(_callback);
         _ctx.setInstanceFactory(_instanceFactory);
         _classLoader = classLoader;
+        
+        loadSynchronizables();
     }
 
     LockEngine getLockEngine()
@@ -212,8 +233,8 @@ public class DatabaseImpl
     public boolean isAutoStore() {
         if ( _ctx != null )
             return _ctx.isAutoStore();
-        else
-            return _autoStore;
+
+        return _autoStore;
     }
 
     /**
@@ -500,6 +521,8 @@ public class DatabaseImpl
         _ctx.setAutoStore( _autoStore );
         _ctx.setCallback( _callback );
         _ctx.setInstanceFactory( _instanceFactory );
+
+        registerSynchronizables();
     }
 
 
@@ -527,6 +550,8 @@ public class DatabaseImpl
             } catch (Exception ex) {
             }
         }
+
+        unregisterSynchronizables();
     }
 
 
@@ -542,6 +567,8 @@ public class DatabaseImpl
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         _ctx.rollback();
+
+        unregisterSynchronizables();
     }
 
 
@@ -621,8 +648,6 @@ public class DatabaseImpl
         return super.toString()+":"+_dbName;
     }
 
-
-
     /**
      * Get the underlying JDBC Connection.
      * Only for internal / advanced use !
@@ -634,6 +659,64 @@ public class DatabaseImpl
         return _ctx.getConnection( _scope.getLockEngine() );
     }
 
+    /**
+     * Load the {@link TxSynchronizable} implementations from the 
+     * properties file, if not loaded before.
+     */
+    private void loadSynchronizables()
+    {
+    	if ( _synchronizables == null ) {
+    		_synchronizables = new ArrayList();
+    		
+    		String syncName = LocalConfiguration.getInstance().getProperty( TxSynchronizableProperty, "" );
+    		StringTokenizer tokenizer = new StringTokenizer( syncName, ", " );
+    		while ( tokenizer.hasMoreTokens() ) {
+    			syncName = tokenizer.nextToken();
+    			try {
+                	Class cls = null;
+                	if (_classLoader != null) {
+                		cls = _classLoader.loadClass( syncName );
+                	} else {
+                		cls = Class.forName( syncName );
+                	}
+    				TxSynchronizable sync = (TxSynchronizable)cls.newInstance();
+    				if ( sync != null ) _synchronizables.add(sync);
+    			} catch ( Exception except ) {
+    				_log.warn(Messages.format( "jdo.missingTxSynchronizable", syncName ));
+    			}
+    		}
+    		
+    		if (_synchronizables.size() == 0) _synchronizables = null;
+    	}
+    }
+    
+    /**
+     * Register the {@link TxSynchronizable} implementations at the
+     * TransactionContect at end of begin().
+     */
+    private void registerSynchronizables()
+    {
+    	if ( _synchronizables != null && _synchronizables.size() > 0) {
+    		Iterator iter = _synchronizables.iterator();
+    		while ( iter.hasNext() ) {
+    			_ctx.addTxSynchronizable((TxSynchronizable)iter.next());
+    		}
+    	}
+    }
+    
+    /**
+     * Unregister the {@link TxSynchronizable} implementations at the
+     * TransactionContect after commit() or rollback().
+     */
+    private void unregisterSynchronizables()
+    {
+    	if ( _synchronizables != null  && _synchronizables.size() > 0) {
+    		Iterator iter = _synchronizables.iterator();
+    		while ( iter.hasNext() ) {
+    			_ctx.removeTxSynchronizable((TxSynchronizable)iter.next());
+    		}
+    	}
+    }
     /**
      * Expire objects from the cache.  Objects expired from the cache will be
      * read from persistent storage, as opposed to being read from the
@@ -660,5 +743,6 @@ public class DatabaseImpl
     {
     	throw new PersistenceException ("Please use the new CacheManager to manage Castor performance caches.");
     }
-
-}                                
+    
+}  
+                                
