@@ -55,6 +55,7 @@ import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.simpletypes.ListType;
 import org.exolab.castor.xml.util.AnyNode2SAX;
+import org.exolab.castor.xml.Namespaces;
 
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
@@ -1045,11 +1046,12 @@ public class SchemaWriter {
 
 
         //-- namespace declarations
-        Enumeration keys = schema.getNamespaces().keys();
+        Namespaces namespaces = schema.getNamespaces();
+        Enumeration keys = namespaces.getLocalNamespacePrefixes();
         while (keys.hasMoreElements()) {
             String nsPrefix = (String)keys.nextElement();
             if (!nsPrefix.equals(schemaPrefix)) {
-                String ns = (String)schema.getNamespaces().get(nsPrefix);
+                String ns = namespaces.getNamespaceURI(nsPrefix);
                 if (nsPrefix.length() > 0) {
                     _atts.addAttribute(XMLNS_PREFIX + nsPrefix, CDATA, ns);
                 }
@@ -1448,15 +1450,7 @@ public class SchemaWriter {
      * @param namespace the namespace for which a prefix will be returned
     **/
     private String getNSPrefix(Schema schema, String namespace){
-        Hashtable namespaces = schema.getNamespaces();
-        for (Enumeration e = namespaces.keys(); e.hasMoreElements();) {
-            String prefix = (String)e.nextElement();
-            String ns = (String)namespaces.get(prefix);
-            if (ns != null && ns.equals(namespace)){
-                return (prefix);
-            }
-        }
-        return null;
+        return schema.getNamespaces().getNamespacePrefix(namespace);
     } //-- getNSPrefix
 
 
