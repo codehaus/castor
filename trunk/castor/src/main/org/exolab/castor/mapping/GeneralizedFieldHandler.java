@@ -38,13 +38,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2005 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
  
 package org.exolab.castor.mapping;
 
+import org.exolab.castor.mapping.loader.CollectionHandlers;
+import java.util.Enumeration;
 
 /**
  * An extended version of the FieldHandler interface which is
@@ -52,7 +54,7 @@ package org.exolab.castor.mapping;
  * can be used for more than one field or class, but have
  * similar conversion algorithms.
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see FieldDescriptor
  * @see FieldHandler
@@ -72,6 +74,12 @@ public abstract class GeneralizedFieldHandler
      * The actual FieldHandler to delegate to
      */
     private FieldHandler _handler = null;
+    
+    /**
+     * The flag controlling automatic collection iteration
+     * during convertUponGet
+     */
+    private boolean _autoCollectionIteration = true;
     
     
     /** 
@@ -131,6 +139,21 @@ public abstract class GeneralizedFieldHandler
         _handler = handler;
     } //-- setFieldHandler
 
+    /**
+     * Sets whether or not this GeneralizedFieldHandler should automatically
+     * iterate over the collection returned by the target object and pass 
+     * only the items (one by one) to the convertUponGet method. 
+     * 
+     * As of Castor 0.9.6 this is true by default. 
+     * 
+     * @param autoCollectionIteration a boolean that when true indicates
+     * that this GeneralizedFieldHandler should automatically iterate over
+     * a collection and pass only collection items to the convertUponGet
+     * method.
+     */
+    public void setCollectionIteration(boolean autoCollectionIteration) {
+        _autoCollectionIteration = autoCollectionIteration;
+    } //-- setCollectionIteration
 
     //-----------------------------------------------/
     //- Methods inherited from AbstractFieldHandler -/
@@ -151,7 +174,27 @@ public abstract class GeneralizedFieldHandler
         if (_handler == null) {
             throw new IllegalStateException(NULL_HANDLER_ERR);
         }
-        return convertUponGet(_handler.getValue(object));
+        
+        Object value = _handler.getValue(object);
+        if ((_autoCollectionIteration) && (value != null)) {
+            
+            if (value instanceof java.util.Enumeration) {
+            	return new GFHConverterEnumeration(this, (Enumeration)value);
+            }
+            //-- other collection type?
+            if (CollectionHandlers.hasHandler(value.getClass())) {
+                CollectionHandler colHandler = null;
+                try {
+                    colHandler = CollectionHandlers.getHandler(value.getClass());
+                }
+                catch(MappingException mx) {
+                	throw new IllegalStateException(mx.getMessage());
+                }
+                return new GFHConverterEnumeration(this, colHandler.elements(value));
+            }
+        }
+        
+        return convertUponGet(value);
     } //-- getValue
     
 
@@ -232,6 +275,28 @@ public abstract class GeneralizedFieldHandler
         }
         _handler.setValue(object, convertUponSet(value));
     }
+    
+    static class GFHConverterEnumeration implements Enumeration {
+        
+        Enumeration _enumeration = null;
+        GeneralizedFieldHandler _handler = null;
+        
+        GFHConverterEnumeration(GeneralizedFieldHandler handler, Enumeration enumeration) {
+            _enumeration = enumeration;
+            _handler = handler;
+        }
+        
+        public boolean hasMoreElements() {
+            return _enumeration.hasMoreElements();
+        }
+        
+        public Object nextElement() {
+            Object value = _enumeration.nextElement();
+            return _handler.convertUponGet(value);
+        }
+        
+        
+    }
 
-} //-- AbstractFieldHandler
+} //-- GeneralizedFieldHandler
 
