@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1368 using contribution from Tim O'Brien [tobrien@discursive.com].
+	   Small (mostly syntactical) changes to src/doc/jdo-faq.xml. Added a reference
+	   to XPath as well.
+       (Werner - 20040428)
+
 JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
        Added test for IdentityKeyGenerator to SAP DB test suite.
        (Werner - 20040428)
