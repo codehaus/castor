@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -56,19 +56,18 @@ import org.exolab.castor.xml.util.*;
 //-- misc xml related imports
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.DocumentHandler;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.AttributeListImpl;
-import org.xml.sax.helpers.XMLReaderAdapter;
 
 //-- Java imports
-import java.io.IOException;
 import java.io.Reader;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * An unmarshaller to allowing unmarshalling of XML documents to
@@ -76,7 +75,7 @@ import java.io.PrintWriter;
  * the proper access methods (setters/getters) in order for instances
  * of the Class to be properly unmarshalled.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class Unmarshaller {
@@ -181,6 +180,11 @@ public class Unmarshaller {
      */
     private boolean _wsPreserve = false;
     
+    /**
+     * A list of namespace To Package Mappings
+     */
+    private HashMap _namespaceToPackage = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -269,7 +273,43 @@ public class Unmarshaller {
         _debug    = _config.debug();
         _validate = _config.marshallingValidation();
         _ignoreExtraElements = (!_config.strictElements());
+        
+        //-- process namespace to package mappings
+        String mappings = _config.getProperty(Configuration.Property.NamespacePackages, null);
+        if (mappings != null) {
+            StringTokenizer tokens = new StringTokenizer(mappings, ",");
+            while(tokens.hasMoreTokens()) {
+                String token = tokens.nextToken();
+                int sepIdx = token.indexOf('=');
+                if (sepIdx < 0) continue;
+                String ns = token.substring(0,sepIdx).trim();
+                String javaPackage = token.substring(sepIdx+1).trim();
+                addNamespaceToPackageMapping(ns, javaPackage);
+            }
+        }
+        
+        
     } //-- initConfig
+    
+    /**
+     * Adds a mapping from the given namespace URI to the given
+     * package name
+     * 
+     * @param nsURI the namespace URI to map from
+     * @param packageName the package name to map to
+     */
+    public void addNamespaceToPackageMapping(String nsURI, String packageName) {
+        
+        
+        if (_namespaceToPackage == null) {
+        	_namespaceToPackage = new HashMap();
+        }
+        if (nsURI == null) nsURI = "";
+        if (packageName == null) packageName = "";
+        _namespaceToPackage.put(nsURI, packageName);
+        
+    } //-- addNamespaceToPackageMapping
+    
 
     /**
      * Creates and initalizes an UnmarshalHandler
@@ -293,6 +333,15 @@ public class Unmarshaller {
         handler.setConfiguration(_config);
         handler.setWhitespacePreserve(_wsPreserve);
 
+        //-- copy namespaceToPackageMappings
+        if (_namespaceToPackage != null) {
+        	Iterator keys = _namespaceToPackage.keySet().iterator();
+            while (keys.hasNext()) {
+                String nsURI = (String)keys.next();
+                String pkgName = (String) _namespaceToPackage.get(nsURI);
+            	handler.addNamespaceToPackageMapping(nsURI, pkgName);
+            }
+        }
 
         if (_instanceObj != null) {
             handler.setRootObject(_instanceObj);
