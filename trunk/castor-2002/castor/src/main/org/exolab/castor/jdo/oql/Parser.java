@@ -583,9 +583,18 @@ public class Parser implements TokenTypes {
     
     if ( (curTokenType == IDENTIFIER) && 
          ( (nextTokenType == DOT) || (nextTokenType == ARROW) ) ) {
+      
       retNode = new ParseTreeNode(new Token(DOT, "."));
-      retNode.addChild(match(IDENTIFIER));
-      match(nextTokenType);
+      while ( (curTokenType == IDENTIFIER) && 
+              ( (nextTokenType == DOT) || (nextTokenType == ARROW) ) ) {
+        retNode.addChild(match(IDENTIFIER));
+        match(nextTokenType);  //the dot or arrow
+        curTokenType = _curToken.getTokenType();
+        if (_nextToken != null)
+          nextTokenType = _nextToken.getTokenType();
+        else
+          nextTokenType = 0;
+      }
       retNode.addChild(match(IDENTIFIER));
     }
     
