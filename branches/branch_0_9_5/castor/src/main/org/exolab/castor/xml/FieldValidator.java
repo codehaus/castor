@@ -52,13 +52,13 @@ import java.util.Enumeration;
 import java.lang.reflect.Array;
 
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
 
 /**
  * Handles field validation
+ * 
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class FieldValidator extends Validator {
     
     
@@ -190,7 +190,18 @@ public class FieldValidator extends Validator {
         //-- don't validate "transient" fields...
         if (_descriptor.isTransient()) return;
                
+        //-- prevent endless loop!
+        //-- have we seen this object yet?
+        if (context != null) {
+            if (context.isValidated(object))
+                return;
+            //-- mark object as processed
+            context.addValidated(object);
+        }
         
+        
+        
+            
         FieldHandler handler = _descriptor.getHandler();
         
         if (handler == null) return;
@@ -310,6 +321,10 @@ public class FieldValidator extends Validator {
             }
             err += "are required for class: " + object.getClass().getName() + ".";
             throw new ValidationException(err);
+        }
+        
+        if (context != null) {
+        	context.removeValidated(object);
         }
         
     } //-- validate
