@@ -39,7 +39,7 @@
     <section title="News">
       <p>Version 0.8 is now <a href="download.xml">available for download</a>.
       <ul>
-        <li>Mar 17, 2000: Version 0.8, unified mapping model, pluggable DB engine, dirty checking</li>
+        <li>Mar 24, 2000: Version 0.8, unified mapping model, pluggable DB engine, dirty checking</li>
         <li>Mar 10, 2000: Version 0.7.11, supports one-many relations, XML-Servlet</li>
         <li>Mar 3, 2000: Version 0.7.10, addresses performance of the cache engine</li>
         <li>Feb 25, 2000: Version 0.7.9, new mapping file, one-one relation handling</li>
