@@ -48,7 +48,7 @@ package org.exolab.castor.dax.engine;
 
 
 import java.util.Hashtable;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.MappingException;
 
@@ -58,8 +58,8 @@ import org.exolab.castor.mapping.MappingException;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class DAXObjectDesc
-    extends ObjectDesc
+public class DAXClassDesc
+    extends ClassDesc
 {
 
 
@@ -69,10 +69,10 @@ public class DAXObjectDesc
     private String     _ldapClass;
 
 
-    public DAXObjectDesc( ObjectDesc objDesc, FieldDesc attributeSet, String ldapClass )
+    public DAXClassDesc( ClassDesc clsDesc, FieldDesc attributeSet, String ldapClass )
 	throws MappingException
     {
-	super( objDesc );
+	super( clsDesc );
 	if ( attributeSet != null ) {
 	    if ( attributeSet.getFieldType() != Hashtable.class )
 		throw new MappingException( "Not attribute set" );
