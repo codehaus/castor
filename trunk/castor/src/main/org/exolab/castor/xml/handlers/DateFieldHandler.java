@@ -582,7 +582,7 @@ public class DateFieldHandler extends XMLFieldHandler {
         
         //-- TimeZone
         value = cal.get(Calendar.ZONE_OFFSET);
-        if (value == 0) {
+        if ((value == 0) && (cal.get(Calendar.DST_OFFSET) == 0)) {
             buffer.append('Z'); // UTC
         }
         else {
