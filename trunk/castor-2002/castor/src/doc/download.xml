@@ -3,7 +3,8 @@
   <body>
     <title>Download</title>
     <header>
-      <ul>For FTP access use <url>ftp://ftp.exolab.org/pub/</url>.
+      <p>For FTP access use <url>ftp://ftp.exolab.org/pub/</url></p>
+      <ul><b>Lastest Released Version: Castor $VERSION$</b>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
             <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.jar</url>
             <br/>&#xA0;</li>
@@ -23,8 +24,15 @@
             <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-src.zip</url>
             <br/>&#xA0;</li>
       </ul>
-
       <p>Notes:</p>
+
+      <p>
+         For Latest CVS version use our CVS server
+         (<a href="cvs.xml">CVS Information</a>) or
+         for those of you behind a firewall with the CVS port non-accessible, feel free to
+         use the daily-snapshot here:
+        <url>ftp://ftp.exolab.org/pub/castor/castor_daily_snapshot.tgz</url>
+      </p>
 
       <p><small>The tarball and zips includes all the JARs required by Castor, the
          docs and API JavaDocs. To fully install Castor, simply extract all the JARs
