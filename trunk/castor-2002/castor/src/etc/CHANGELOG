@@ -85,6 +85,10 @@ JDO:    Added support for aliases in generated SQL queries.
         Before in some cases OQL queries were incorrectly translated into SQL.
         (Thorsten Thielen <thorsten@ipcon.de>)
 
+JDO:    Shortened the name for aliases in generated SQL queries to
+        support database that allows limited columns name length.
+        (Thorsten Thielen <thorsten@ipcon.de>)
+
 JDO:    Added support for SQL functions in OQL queries.
         (Thorsten Thielen <thorsten@ipcon.de>)
 
@@ -104,6 +108,19 @@ JDO:    Added SQL Direct Interface. Syntax:
 JDO:    Added the overdued <sql many-key="??"/> and <sql many-table="??"/>
         attributes into the mapping.dtd file.
         (reported by Vladimir Tsichevski <wowa@jet.msk.su>)
+
+JDO:    Fixed a AOBException in RelationCollection used by lazy loaoding.
+        (submitted by Steve Bate <mail@technoetic.com>)
+
+JDO:    Fixed a "too many open cursor" errors caused by JDBC statement not
+        released. (Submitted by Steve Bate [mail@technoetic.com])
+
+JDO:    Fixed an IllegalArgumentException being thrown the second time a value
+        or function query was bound. 
+        (Submitted by Steve Bate [mail@technoetic.com])
+
+JDO:    Added IdentityKeyGenerator support for Informix.
+        (Submitted by David Tinker [david@hemtech.co.za])
 
 JDO:    Fixed: Loading with "db-locked" mode is now always load from the
         Database. (yip)
@@ -134,6 +151,21 @@ JDO:    As part of the rewritten mentioned above, update is now behavior like
 
 JDO:    Added a final static variable TimeStampable NO_TIMESTAMP. (yip)
 
+JDO:    Added database to transaction association pooling. 
+        This option only affects JDO if transactionManager is set and 
+        a transaction is associated with the thread that call 
+        getDatabase(). If jdo Database pooling is enabled, JDO will 
+        first search in the pool to see if there is already a Database 
+        for the current transaction. If found, it returns the database; 
+        if not, it create a new one, associates it will the transaction 
+        and return the newly created Database. (yip)
+
+JDO:    (misc) Added a BatchUpdateSQL utility to helps executing a batch
+        of sql create statements in the jdo test directory. (yip)
+
+JDO:    (misc) Ported test cases and test harness framework from JTF to JUnit (yip)
+
+JDO:    (misc) Javadoc to test cases (yip)
 
 Version 0.9.2 March 28, 2001 - also includes version 0.9.1
 ----------------------------------------------------------
