@@ -157,7 +157,7 @@ public class MemberFactory {
             //-- This is NOT clean...we need a different approach
             //-- here...
             //-- modify package name if necessary
-            if (enumeration || (datatype.getSource() != null)) {
+            if (enumeration) {
                 JClass jClass = (JClass) xsType.getJType();
                 String packageName = jClass.getPackageName();
                 if ((packageName != null) && (packageName.length() > 0))
@@ -252,7 +252,8 @@ public class MemberFactory {
             //-- This is NOT clean...we need a different approach
             //-- here...
             //-- modify package name if necessary
-            if (datatype.getSource() != null) {
+            if (datatype.hasFacet(Facet.ENUMERATION)) {
+                
                 JClass jClass = (JClass) xsType.getJType();
                 String packageName = jClass.getPackageName();
                 if ((packageName != null) && (packageName.length() > 0))
