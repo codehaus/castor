@@ -69,11 +69,25 @@
       <p>When sending patches, diff files with context (3 lines before, 3 lines
          after) work best:
 <pre><![CDATA[
-  cvs diff -c <file>
-or
-  diff -c <file>
-]]></pre>
-      </p>
+  cvs diff -u <file>]]></pre>
+againsts the up-to-date cvs version, or
+<pre><![CDATA[
+  diff -u <file>
+]]></pre></p>
+
+      <p>It is very important for sending test cases along with the patch of a 
+         new feature and a bug fix.</p>
+
+      <p>A test case, showing a feature being added, a bug being fixed, 
+         proves that the patch plays along nicely with other code, ensures 
+         the committer understands what the patch does and also encourages 
+         promptly reviewing and checking in.</p>
+
+      <p>Committer commits a patch only if s/he fully understands the patch.</p>
+
+      <p>Also, a test case is the easiest way to ensure your contribution will 
+         not be broken by another patch later. It becomes even more important 
+         if your project depends on a feature that you're contributing.</p>
 
     </section>
 
