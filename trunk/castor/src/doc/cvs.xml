@@ -62,6 +62,12 @@
          thinking about you! Just download the latest daily snapshot of the CVS at:
          <url>ftp://ftp.exolab.org/pub/castor/castor_daily_snapshot.tgz</url>
       </p>
+
+      <p>
+        Another option for accessing CVS from behind a firewall is to use 
+        <a href="http://cvsgrab.sf.net/">CVSGrab</a>. It's designed as a
+        solution for exactly this situation. 
+      </p>
     </section>
 
     <section title="Guidelines For Code Contribution">
