@@ -61,6 +61,9 @@
     implements RegExpEvaluator
 {
     
+    private static final String BOL = "^";
+    private static final String EOL = "$";
+    
     /**
      * The Regular expression
     **/
@@ -80,9 +83,11 @@
      * @param rexpr the regular expression
     **/
     public void setExpression(String rexpr) {
+        
         if (rexpr != null) {
             try {
-                _regexp = new RE(rexpr);
+                //-- patch and compile expression
+                _regexp = new RE(BOL + rexpr + EOL);
             }
             catch(RESyntaxException ex) {
                 String err = "RegExp Syntax error: ";
