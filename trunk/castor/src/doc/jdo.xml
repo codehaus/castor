@@ -27,24 +27,60 @@
 		<p>In the example code I refer to the database file as <tt>database.xml</tt>, but any name can be used.
 		   See <a href="database-conf.xml">Castor JDO Database Configuration</a> for more information.</p>
 
-        <p><api>org.exolab.castor.jdo.JDO</api> defines the database name and properties and is used
-           to open a database connection. The database configuration is loaded on demand by setting
-           the configuration file URL with <tt>setConfiguration</tt>. Creating multiple JDO objects
-           with the same configuration will only load the database configuration once.</p>
-
+        <p><api>org.exolab.castor.jdo.JDO2</api> defines the database name and properties and is used
+           to open a database connection. An instance of this class is contructed with a two-step 
+           approach:</p> 
+ 
+        <ul>
+          <li>load the JDO configuration file through one of the static loadConfiguration() 
+              methods, e.g. <api class="org.exolab.castor.jdo.JDO2">loadConfiguration(String)</api></li>
+          <li>create an instance of the JDO engine using the factory method 
+              <api class="org.exolab.castor.jdo.JDO2">createInstance(String)</api> where you supply one 
+              of the database names defined in the configuration file loaded in step 1).</li>
+        </ul>
+        
+        <p>Creating multiple JDO2 objects with the same configuration will only load the database 
+           configuration once.</p>
+         
         <p>The <api>org.exolab.castor.jdo.Database</api> object represents an open connection to the
            database. By definition the database object is not thread safe and should not be used from
            concurrent threads. There is little overhead involved in opening multiple <tt>Database</tt>
            objects, and a JDBC connection is acquired only per open transaction.</p>
 
          <p>The following code snippet opens a database, performs a transaction, and closes the database,
-            as it will typically appear in client applications:
+            as it will typically appear in client applications (for brevity, we have ommitted any required 
+            exception handling):</p>
+       
+         <code> 
+JDO2 jdo;
+Database db;
+ 
+<comment>// load the JDO configuration file</comment>
+JDO2.loadConfiguration ("jdo-config.xml");
+ 
+<comment>// Construct a new JDO for the database 'mydb'</comment>
+jdo = JDO2.createInstance ("mydb");
+<comment>// Obtain a new database</comment>
+Database db = jdo.getDatabase();
+    
+<comment>// Begin a transaction</comment>
+db.begin();
+<comment>// Do something</comment>
+. . .
+<comment>// Commit the transaction and close the database</comment>
+db.commit();
+db.close();
+         </code> 
+
+        <p>The old way of obtaining a JDO instance has been deprecated with release 0.9.6, 
+           but still is supported:</p> 
+             
             <code>
-JDO      jdo;
+DataObjects jdo;
 Database db;
 
-<comment>// Define the JDO object</comment>
-jdo = new JDO();
+<comment>// Instantiate a JDO object</comment>
+jdo = new JDOOld();
 jdo.setDatabaseName( "mydb" );
 jdo.setConfiguration( "database.xml" );
 jdo.setClassLoader( getClass().getClassLoader() );
@@ -58,7 +94,7 @@ db.begin();
 <comment>// Commit the transaction, close database</comment>
 db.commit();
 db.close();
-           </code></p>
+           </code>
 
 		<p>For an example showing how to set up a database configuration on the fly without
 		the need of a preconfigured XML configuration file) see
@@ -81,7 +117,7 @@ db.close();
            resources.</p>
 
         <p>The following code snippet uses JNDI to lookup a database, and uses <tt>UserTransaction</tt>
-           to manage the transaction:
+           to manage the transaction:</p>
            <code>
 InitialContext  ctx;
 UserTransaction ut;
@@ -99,14 +135,14 @@ ut.begin();
 <comment>// Commit the transaction, close database</comment>
 ut.commit();
 db.close();
-           </code></p>
+           </code>
 
         <p>When the transaction is managed by the container, a common case with EJB beans and
            in particular entity beans, there is no need to being/commit the transaction explicitly.
            Instead the application server takes care of enlisting the database in the ongoing
            transaction and commiting/rollingback at the proper time.</p>
 
-        <p>The following code snippet relies on the container to manage the transaction:
+        <p>The following code snippet relies on the container to manage the transaction</p>
            <code>
 InitialContext  ctx;
 UserTransaction ut;
@@ -120,7 +156,7 @@ db = (Database) ctx.lookup( "java:comp/env/jdo/mydb" );
 . . .
 <comment>// Close the database</comment>
 db.close();
-           </code></p>
+           </code>
 
       </section>
 
@@ -180,7 +216,8 @@ db.close();
            required to load related objects, Castor will automatically perform the join.</p>
 
         <p>The following code snippet uses an OQL query to load all the objects in a given group.
-           Note that product and group are related objects, the JDBC query involves a join:
+           Note that product and group are related objects, the JDBC query involves a join:</p>
+           
            <code>
 OQLQuery     oql;
 QueryResults results;
@@ -193,11 +230,11 @@ results = oql.execute();
 while ( results.hasMore() ) {
   System.out.println( results.next() );
 }
-           </code></p>
+           </code>
 
         <p>The following code snippet uses the previous query to obtain products, mark down
            their price by 25%, and store them back to the database (in this case using
-           a client application transaction):
+           a client application transaction):</p>
             <code>
 while ( results.hasMore() ) {
   Product prod;
@@ -213,7 +250,7 @@ oql.close();
 <comment>// Explicitly commit transaction</comment>
 db.commit();
 db.close();
-           </code></p>
+           </code>
 
         <p>As illustrated above, a query is executed in three steps. First a query object is
            created from the database using an OQL statement. If there are any parameters, the
@@ -226,11 +263,13 @@ db.close();
            a query can be used while the query is being executed a second time.</p>
 
         <p>The is also a special form of query that gives a possibility to call stored
-           procedures:
+           procedures:</p>
+           
            <code>
 oql = db.getOQLQuery( "CALL sp_something($) AS myapp.Product" );
            </code>
-           Here sp_something is a stored procedure returning one or more
+           
+        <p>Here sp_something is a stored procedure returning one or more
            ResultSets with the same sequence of fields as Castor-generated
            SELECT for the OQL query "SELECT p FROM myapp.Product p"
            (for objects without relations the sequence is: identity, then all
@@ -248,7 +287,8 @@ oql = db.getOQLQuery( "CALL sp_something($) AS myapp.Product" );
            same identity already exists in the database.</p>
 
         <p>The following code snippet creates a new product with a group that was previously
-           queried:
+           queried:</p>
+           
            <code>
 Product prod;
 
@@ -260,7 +300,7 @@ prod.setPrice( 55.0 );
 prod.setGroup( furnitures );
 <comment>// Make is persistent</comment>
 db.create( prod );
-           </code></p>
+           </code>
 
         <p>The method <api class="org.exolab.castor.jdo.Database">remove(java.lang.Object)</api>
            has the reverse affect, deleting a persistent object. Once removed the object is no

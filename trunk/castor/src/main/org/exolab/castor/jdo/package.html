@@ -7,7 +7,7 @@
       <dt><b>Author: </b></dt><dd><a href="mailto:arkin@exoffice.com">Assaf Arkin</a></dd>
     </dl>
 
-    <p>The class {@link org.exolab.castor.jdo.JDO} provides the Castor JDO engine used for
+    <p>The class {@link org.exolab.castor.jdo.JDO2} provides the Castor JDO engine used for
        obtaining database connection. A JDO object is constructed with the name of a database
        and other properties, and <tt>getDatabase}</tt> is used to obtain a new database connection.</p>
 
@@ -32,14 +32,14 @@
        groups and marks them down with a 25% discount and on-sale status.</p>
 
        <pre>
-  JDO          jdo;
+  JDO2          jdo;
   Database     db;
   Query        oql;
   QueryResults results;
 
   <font color="red">// Define a new database source</font>
-  jdo = new JDO( "mydb" );
-  jdo.setConfiguration( "database.xml" );
+  JDO2.loadConfiguration ("jdo-conf.xml");
+  JDO2 jdo = JDO2.createInstance ( "mydb" );
 
   <font color="red">// Open a new database, begin a transaction</font>
   db = jdo.getDatabase();
