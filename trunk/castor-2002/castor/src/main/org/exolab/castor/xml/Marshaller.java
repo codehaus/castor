@@ -809,8 +809,21 @@ public class Marshaller extends MarshalFramework {
 
             XMLFieldDescriptor attDescriptor = descriptors[i];
             String xmlName = attDescriptor.getXMLName();
+            
             //-- handle attribute namespaces
-            //-- [need to add this support]
+            String namespace = attDescriptor.getNameSpaceURI();
+            if ((namespace != null) && (namespace.length() > 0)) {
+                String prefix = attDescriptor.getNameSpacePrefix();
+                if ((prefix == null) || (prefix.length() == 0))
+                    prefix = _namespaces.getNamespacePrefix(namespace);
+
+                if ((prefix == null) || (prefix.length() == 0)) {
+                    //-- automatically create namespace prefix?
+                    prefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
+                }
+                declareNamespace(prefix, namespace, atts);
+                xmlName = prefix + ':' + xmlName;                
+            }
 
             Object value = null;
 
