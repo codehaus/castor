@@ -426,6 +426,12 @@ public final class SQLEngine implements Persistence {
          }             
 		 return result;
     }
+	private Object idToSQL( int index, Object object ) 
+			throws PersistenceException {
+		if ( object == null || _ids[index].convertFrom == null )
+			return object;
+		return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
+	}
 
     private Object toSQL( int field, int column, Object object ) 
             throws PersistenceException {
@@ -522,6 +528,12 @@ public final class SQLEngine implements Persistence {
         }
 
     }
+	private Object idToJava( int index, Object object ) 
+			throws PersistenceException {
+		if ( object == null || _ids[index].convertTo == null )
+			return object;
+		return _ids[index].convertTo.convert( object, _ids[index].convertParam );
+	}
 
     private Object toJava( int field, int column, Object object ) 
             throws PersistenceException {
@@ -672,7 +684,7 @@ public final class SQLEngine implements Persistence {
         PreparedStatement stmt;
         int               count;
         //Object[]          convertedFields;
-        Object[]          sqlIdentities;
+        Object[]          resultIds = null;
         Object            tempId;
 
         //convertedFields = toSql( fields );
@@ -687,9 +699,14 @@ public final class SQLEngine implements Persistence {
             if ( _keyGen == null && identities == null )
                 throw new PersistenceExceptionImpl( "persist.noIdentity" );
 
+			if ( identities != null ) {
+				resultIds = new Object[identities.length];
+				System.arraycopy( identities, 0, resultIds, 0, identities.length );
+			}
+
             // Generate key before INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-                identities[0] = generateKey( conn );   // genKey return identity in JDO type
+                resultIds[0] = generateKey( conn );   // genKey return identity in JDO type
             }
 
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
@@ -701,10 +718,9 @@ public final class SQLEngine implements Persistence {
             // Must remember that SQL column index is base one
             count = 1;
             if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-                sqlIdentities = idToSql( identities );
                 for ( int i=0; i<_ids.length; i++ ) {
-                    System.out.print("[id"+count+":"+sqlIdentities[i]+"    "+_ids[i].name+" ]  ");
-                    stmt.setObject( count, sqlIdentities[i] );
+                    System.out.print("[id"+count+":"+resultIds[i]+"    "+_ids[i].name+" ]  ");
+                    stmt.setObject( count, idToSQL( i, resultIds[i] ) );
                     ++count;
                 }
             }
@@ -748,11 +764,7 @@ public final class SQLEngine implements Persistence {
                 else
                     tempId = cstmt.getObject( count );
 
-                if ( _ids[0].convertTo != null && tempId != null ) {
-                    identities[0] = _ids[0].convertTo.convert( tempId, _ids[0].convertParam );
-                } else {
-                    identities[0] = tempId;
-                }
+				resultIds[0] = idToJava( 0, tempId );
             } else
                 stmt.executeUpdate();
 
@@ -761,14 +773,10 @@ public final class SQLEngine implements Persistence {
             // Generate key after INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT ) {
                 tempId = generateKey( conn );
-                if ( _ids[0].convertTo != null && tempId != null ) {
-                    identities[0] = _ids[0].convertTo.convert( tempId, _ids[0].convertParam );
-                } else {
-                    identities[0] = tempId;
-                }
+                resultIds[0] = tempId;
             }
 
-            return identities;
+            return resultIds;
 
         } catch ( SQLException except ) {
             // [oleg] Check for duplicate key based on X/Open error code

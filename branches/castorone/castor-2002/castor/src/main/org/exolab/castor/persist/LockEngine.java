@@ -442,7 +442,6 @@ public final class LockEngine {
                                 throw new PersistenceException("LockEngine.create(): oid.getIdentity() is null after create!");
                             }
                         }
-
                     } else {
                         // | hum what if the object is deleted beforehand??
                     }
@@ -474,6 +473,8 @@ public final class LockEngine {
                     }
 
                     if ( !newoid.equals( oid ) ) {
+						typeInfo.locks.acquire( newoid, tx, true, 0, null );
+						
                         typeInfo.locks.destory( oid, tx );
                         oid = newoid;
                     }
@@ -652,6 +653,7 @@ public final class LockEngine {
 
         try {
             oid = new OID( this, typeInfo.molder, oid.getIdentities() );
+			System.out.println("Oid: "+oid);
             typeInfo.locks.acquire( oid, tx, false, 0, false, null );
             typeInfo.molder.store( tx, oid, object );
             return oid;
@@ -930,7 +932,7 @@ public final class LockEngine {
                         entry = new CacheEntry( new ObjectLock( oid ) );
                         locks.put( oid, entry );
                     } else 
-                        throw new IllegalStateException("Lock doesn't exist!");
+                        throw new IllegalStateException("Lock, "+oid+", doesn't exist!");
                 }
                 entry.count++;
             }
@@ -962,7 +964,7 @@ public final class LockEngine {
             synchronized( locks ) {
                 entry = (CacheEntry) locks.get( oid );
                 if ( entry == null || !entry.lock.hasLock( tx, false ) ) {
-                    throw new IllegalStateException("Lock doesn't exist or no lock!");
+                    throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
                 } 
                 entry.count++;
             }
