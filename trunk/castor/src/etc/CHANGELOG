@@ -3,7 +3,8 @@ Version (CVS)
 -------------
 
 JDO:   Fixed bug 1689 using contribution from Nick Stuart [nick@newtsplace.com]
-       Added code to support is<FieldName>() methods in addition to standard getter.
+       Added code to support is<FieldName>() methods for boolean properties in 
+       addition to standard getter.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1689
        (Werner - 20040923)
 
