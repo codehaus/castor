@@ -54,7 +54,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ElementDecl extends ContentModelType {
+public class ElementDecl extends Particle {
 
 
     /**
@@ -69,18 +69,6 @@ public class ElementDecl extends ContentModelType {
      * abstract
     **/
     private boolean isAbstract = false;
-
-    /**
-     * The maximum number of occurances of that elements of this type
-     * may appear as children of it's context
-    **/
-    private int maxOccurs = -1;
-
-    /**
-     * The minimum number of occurances of this element that must
-     * exist in it's parent context
-    **/
-    private int minOccurs = 1;
 
     /**
      * The element name
@@ -137,7 +125,7 @@ public class ElementDecl extends ContentModelType {
      * @param name the name of the Element being declared
     **/
     public ElementDecl(Schema schema, String name) {
-        super();
+        super(1,1);
         if (schema == null) {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
@@ -146,27 +134,6 @@ public class ElementDecl extends ContentModelType {
         this.name = name;
     } //-- ElementDecl
 
-
-    /**
-     * Returns the maximum number of occurances that this element
-     * must appear within it's parent context
-     * @return the maximum number of occurances that this element
-     * must appear within it's parent context
-    **/
-    public int getMaximumOccurance() {
-        return maxOccurs;
-    } //-- getMaximumOccurance
-
-    /**
-     * Returns the minimum number of occurances that this element
-     * must appear within it's parent context
-     * @return the minimum number of occurances that this element
-     * must appear within it's parent context
-    **/
-    public int getMinimumOccurance() {
-        return minOccurs;
-    } //-- getMinimumOccurance
-    
     /**
      * Returns the name of this Element declaration. The name of the 
      * referenced element is returned if the 'ref' attribute was used.
@@ -268,26 +235,6 @@ public class ElementDecl extends ContentModelType {
     public void setAbstract(boolean isAbstract) {
         this.isAbstract = isAbstract;
     } //-- isAbstract
-
-    /**
-     * Sets the maximum number of occurances that this element must
-     * appear within it's parent context
-     * @param maxOccurs the maximum number of occurances that this
-     * element may appear within it's parent context
-    **/
-    public void setMaximumOccurance(int maxOccurs) {
-        this.maxOccurs = maxOccurs;
-    } //-- setMaximumOccurance
-
-    /**
-     * Sets the minimum number of occurances that this element must
-     * appear within it's parent context
-     * @param minOccurs the number of occurances that this element must
-     * appeae within it's parent context
-    **/
-    public void setMinimumOccurance(int minOccurs) {
-        this.minOccurs = minOccurs;
-    } //-- setMinimumOccurance
 
     /**
      * Sets the name of the element that this Element definition defines

@@ -243,11 +243,35 @@ public class ComplexType extends XMLType
         _contentModel.addGroup(group);
     } //-- addGroup
 
+    /**
+     * Returns an enumeration of all the Particles of this
+     * ContentModelGroup
+     *
+     * @return an enumeration of the Particles contained
+     * within this ContentModelGroup
+    **/
     public Enumeration enumerate() {
         return _contentModel.enumerate();
     } //-- enumerate
 
-    public int getChildrenCount() { return _contentModel.getChildrenCount(); }
+    /**
+     * Returns the Particle at the specified index
+     * @param index the index of the particle to return
+     * @returns the CMParticle at the specified index
+    **/
+    public Particle getParticle(int index) {
+        return _contentModel.getParticle(index);
+    } //-- getParticle
+    
+    /**
+     * Returns the number of particles contained within
+     * this ContentModelGroup
+     *
+     * @return the number of particles
+    **/
+    public int getParticleCount() {
+        return _contentModel.getParticleCount();
+    } //-- getParticleCount
 
     //-------------------------------/
     //- Implementation of Structure -/

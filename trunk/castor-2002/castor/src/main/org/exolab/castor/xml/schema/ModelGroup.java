@@ -56,7 +56,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ModelGroup extends ContentModelType {
+public class ModelGroup extends Particle {
 
     
     /**
