@@ -325,7 +325,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
             throw new Exception("Incorrect object state: group is not set in " + this);
         }
         try {
-            grp = db.load( TestGroup.class, new BigDecimal( _group.getId() ) );
+            grp = db.load( TestGroup.class, new Integer( _group.getId() ) );
         } catch ( Exception ex ) {
         }
         if ( grp == null ) {

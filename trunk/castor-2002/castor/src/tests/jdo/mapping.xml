@@ -191,7 +191,7 @@
       <sql name="tdt" type="timestamp" />
     </field>
     <field name="time" type="java.util.Date">
-      <sql name="ttm" type="timestamp" dirty="ignore" />
+      <sql name="ttm" type="timestamp"/>
     </field>
     <field name="intValue" type="integer" required="false" >
       <sql name="int_val" type="integer" dirty="ignore" />
