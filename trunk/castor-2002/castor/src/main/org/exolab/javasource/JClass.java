@@ -54,7 +54,9 @@ import java.util.Vector;
 
 /**
  * A representation of the Java Source code for a Java Class. This is
- * a useful utility when creating in memory source code
+ * a useful utility when creating in memory source code.
+ * This package was modelled after the Java Reflection API
+ * as much as possible to reduce the learning curve.
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -66,7 +68,7 @@ public class JClass extends JType {
      * expanding it here! ;-)
     **/
     private static final String DEFAULT_HEADER
-        = "$"+"Id";
+        = "$"+"Id$";
 
     /**
      * The version for JavaDoc
@@ -85,9 +87,9 @@ public class JClass extends JType {
     private String superClass = null;
 
     /**
-     * The list of member variables of this JClass
+     * The list of member variables (fields) of this JClass
     **/
-    private JNamedMap members    = null;
+    private JNamedMap fields    = null;
 
     /**
      * The list of constructors for this JClass
@@ -120,8 +122,8 @@ public class JClass extends JType {
     private Vector packageClasses = null;
 
     /**
-     * Creates a new Class with the given name
-     * @param name the name of the Class to create
+     * Creates a new JClass with the given name
+     * @param name the name of the JClass to create
      * @exception IllegalArgumentException when the given name
      * is not a valid Class name
     **/
@@ -134,7 +136,7 @@ public class JClass extends JType {
         interfaces       = new Vector();
         jdc              = new JDocComment();
         constructors     = new Vector();
-        members          = new JNamedMap();
+        fields           = new JNamedMap();
         methods          = new Vector();
         modifiers        = new JModifiers();
         packageClasses   = new Vector();
@@ -200,27 +202,62 @@ public class JClass extends JType {
         }
     }
 
-    public void addMember(JMember jMember)
+    /**
+     * Adds the given JField to this JClass
+     *
+     * @param jField, the JField to add
+     * @exception IllegalArgumentException when the given
+     * JField has a name of an existing JField
+    **/
+    public void addField(JField jField)
         throws IllegalArgumentException
     {
-        if (jMember == null) {
+        if (jField == null) {
             throw new IllegalArgumentException("Class members cannot be null");
         }
-        if (members.get(jMember.getName()) != null) {
-            String err = "duplicate name found: " + jMember.getName();
+        
+        String name = jField.getName();
+        
+        if (fields.get(name) != null) {
+            String err = "duplicate name found: " + name;
             throw new IllegalArgumentException(err);
         }
-        members.put(jMember.getName(), jMember);
+        fields.put(name, jField);
 
         // if member is of a type not imported by this class
         // then add import
-        JType type = jMember.getType();
+        JType type = jField.getType();
         while (type.isArray()) type = type.getComponentType();
         if ( !type.isPrimitive() )
             addImport( ((JClass)type).getName());
 
+    } //-- addField
+
+    /**
+     * Adds the given JMember to this JClass
+     *
+     * @param jMember, the JMember to add
+     * @exception IllegalArgumentException when the given
+     * JMember has the same name of an existing JField
+     * or JMethod respectively.
+    **/
+    public void addMember(JMember jMember)
+        throws IllegalArgumentException
+    {
+        if (jMember instanceof JField)
+            addField((JField)jMember);
+        else
+            addMethod((JMethod)jMember);
+
     } //-- addMember
 
+    /**
+     * Adds the given JMethod to this JClass
+     *
+     * @param jMethod, the JMethod to add
+     * @exception IllegalArgumentException when the given
+     * JMethod has the same name of an existing JMethod.
+    **/
     public void addMethod(JMethod jMethod)
         throws IllegalArgumentException
     {
@@ -284,6 +321,13 @@ public class JClass extends JType {
         }
     } //-- addMethod
 
+    /**
+     * Adds the given array of JMethods to this JClass
+     *
+     * @param jMethods, the JMethod[] to add
+     * @exception IllegalArgumentException when any of the given
+     * JMethods has the same name of an existing JMethod.
+    **/
     public void addMethods(JMethod[] jMethods)
         throws IllegalArgumentException
     {
@@ -369,19 +413,27 @@ public class JClass extends JType {
      * @return the member with the given name, or null if no member
      * was found with the given name
     **/
-    public JMember getMember(String name) {
-        return (JMember)members.get(name);
-    } //-- getMember
+    public JField getField(String name) {
+        return (JField)fields.get(name);
+    } //-- getField
 
-    public JMember[] getMembers() {
-        int size = members.size();
-        JMember[] marray = new JMember[size];
+    /**
+     * Returns an array of all the JFields of this JClass
+     * @return an array of all the JFields of this JClass
+    **/
+    public JField[] getFields() {
+        int size = fields.size();
+        JField[] farray = new JField[size];
         for (int i = 0; i < size; i++) {
-            marray[i] = (JMember)members.get(i);
+            farray[i] = (JField)fields.get(i);
         }
-        return marray;
-    } //-- getMembers
+        return farray;
+    } //-- getFields
 
+    /**
+     * Returns an array of all the JMethods of this JClass
+     * @return an array of all the JMethods of this JClass
+    **/
     public JMethod[] getMethods() {
         int size = methods.size();
         JMethod[] marray = new JMethod[size];
@@ -582,27 +634,27 @@ public class JClass extends JType {
 
         //-- declare members
 
-        if (members.size() > 0) {
+        if (fields.size() > 0) {
             jsw.writeln();
-            jsw.writeln("  //--------------------/");
-            jsw.writeln(" //- Member Variables -/");
-            jsw.writeln("//--------------------/");
+            jsw.writeln("  //--------------------------/");
+            jsw.writeln(" //- Class/Member Variables -/");
+            jsw.writeln("//--------------------------/");
             jsw.writeln();
         }
 
-        for (int i = 0; i < members.size(); i++) {
+        for (int i = 0; i < fields.size(); i++) {
 
-            JMember jMember = (JMember)members.get(i);
+            JField jField = (JField)fields.get(i);
 
             //-- print Java comment
-            JDocComment comment = jMember.getComment();
+            JDocComment comment = jField.getComment();
             if (comment != null) comment.print(jsw);
 
             // -- print member
-            jsw.write(jMember.getModifiers().toString());
+            jsw.write(jField.getModifiers().toString());
             jsw.write(' ');
 
-            JType type = jMember.getType();
+            JType type = jField.getType();
             String typeName = type.toString();
             //-- for esthetics use short name in some cases
             if (typeName.equals(toString())) {
@@ -610,9 +662,9 @@ public class JClass extends JType {
             }
             jsw.write(typeName);
             jsw.write(' ');
-            jsw.write(jMember.getName());
+            jsw.write(jField.getName());
 
-            String init = jMember.getInitString();
+            String init = jField.getInitString();
             if (init != null) {
                 jsw.write(" = ");
                 jsw.write(init);

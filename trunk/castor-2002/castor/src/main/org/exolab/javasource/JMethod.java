@@ -49,10 +49,15 @@ package org.exolab.javasource;
 import java.util.Vector;
 
 /**
+ * A class which holds information about the methods of
+ * a JClass.
+ * Modelled closely after the Java Reflection API.
+ * This class is part of package which is used to 
+ * create source code.
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class JMethod {
+public class JMethod implements JMember {
 
     /**
      * The set of modifiers for this JMethod
