@@ -255,7 +255,7 @@ public final class XSLong extends XSPatternBase {
 				setMinInclusive(facet.toLong());
 			//-- pattern
 			else if (Facet.PATTERN.equals(name))
-				addPattern(facet.getValue());
+				setPattern(facet.getValue());
 		} //setFacets
 
 	} //-- readLongFacets
@@ -343,21 +343,13 @@ public final class XSLong extends XSPatternBase {
 			jsc.append(fixedValue);
 			jsc.append(");");
 		}
-        //-- pattern facet
-        String[] patterns = getPatterns();
-        if (patterns != null) {
-            int i = 0;
-            while (i<patterns.length) {
-                 String pattern = patterns[i];
-                 if (pattern != null) {
-                       jsc.add("typeValidator.addPattern(\"");
-                       jsc.append(escapePattern(pattern));
-                       jsc.append("\");");
-                 }     
-                 i++;
-             }
-         }
-
+		//-- pattern facet
+		String pattern = getPattern();
+		if (pattern != null) {
+			jsc.add("typeValidator .setPattern(\"");
+			jsc.append(escapePattern(pattern));
+			jsc.append("\");");
+		}
 		jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 		
 	}
