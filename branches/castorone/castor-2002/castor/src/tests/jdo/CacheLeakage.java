@@ -86,6 +86,8 @@ public class CacheLeakage extends CWTestCase {
 
     private final static int SLEEP_BASE_TIME = 100;
 
+    private final static int NUM_OF_READ_THREADS = 1;
+
     private JDOCategory    _category;
 
     Database _db;
@@ -184,10 +186,14 @@ public class CacheLeakage extends CWTestCase {
 
             CreateDeleteThread cdThread = new CreateDeleteThread( stream, _category, _cacheType, NUM_OF_CREATE_DELETE );
 
-            ReadThread rThread =  new ReadThread( stream, cdThread, _category, NUM_OF_READ );
+            ReadThread[] rThread =  new ReadThread[NUM_OF_READ_THREADS];
+            for ( int i=0; i < NUM_OF_READ_THREADS; i++ ) {
+                rThread[i] = new ReadThread( stream, cdThread, _category, NUM_OF_READ );
+                rThread[i].start();
+            }
 
             cdThread.start();
-            //rThread.start();
+            
 
             while ( !cdThread.isDone() /*&& !rThread.isDone()*/ ) {
                 Thread.currentThread().sleep( 500 );
@@ -233,8 +239,8 @@ public class CacheLeakage extends CWTestCase {
                             trials++;
                             try {
                                 tr = (TestRace) db.load( _classType, id, Database.Shared );
-                                                    // may throw ObjectNotFoundException
-                                                    // LockNotGrantedException
+                                // may throw ObjectNotFoundException
+                                // LockNotGrantedException
                                 db.commit();
                                 succeed = true;
                             } catch ( LockNotGrantedException e ) {
