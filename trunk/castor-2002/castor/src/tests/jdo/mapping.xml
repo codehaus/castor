@@ -109,5 +109,44 @@
     </field>
   </class>
 
+
+  <class name="jdo.TestSequenceObject" identity="id" key-generator="SEQUENCE">
+    <description>Table used for SEQUENCE key generator testing</description>
+    <map-to table="test_keygen" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestSequenceExtends" extends="jdo.TestSequenceObject">
+    <description>Table used for SEQUENCE key generator testing</description>
+    <map-to table="test_keygen_ext" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestIdentityObject" identity="id" key-generator="IDENTITY">
+    <description>Table used for IDENTITY key generator testing</description>
+    <map-to table="test_identity" />
+    <field name="id" type="integer">
+      <sql name="id" type="numeric" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestIdentityExtends" extends="jdo.TestIdentityObject">
+    <description>Table used for IDENTITY key generator testing</description>
+    <map-to table="test_identity_ext" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
+
 </mapping>
 

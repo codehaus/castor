@@ -10,6 +10,7 @@
     <jtf:case class="jdo.TypeHandling"/>
     <jtf:case class="jdo.Join" />
     <jtf:case class="jdo.KeyGenGeneric" />
+    <jtf:case class="jdo.KeyGenIdentity" />
   </jtf:category>
 
   <jtf:category name="postgres" class="jdo.JDOCategory">
@@ -21,6 +22,7 @@
     <jtf:case class="jdo.ReadOnly" />
     <jtf:case class="jdo.TypeHandling" />
     <jtf:case class="jdo.KeyGenGeneric" />
+    <jtf:case class="jdo.KeyGenSequence" />
   </jtf:category>
 
   <jtf:category name="xml" class="xml.XMLCategory">
