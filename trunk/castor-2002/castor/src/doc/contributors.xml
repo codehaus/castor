@@ -387,6 +387,14 @@
     <description>Improve the documentation of Castor JDO. Also, bug reports and feedback.</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Viet" given="Julien"/>
+    <email>julien.viet@int-evry.fr</email>
+    <description>
+          Reported bug in CollectionInfoJ2 with respect to unbounded collections
+    </description>
+  </contributor>
+
 
   <contributor type="Feedback">
     <name surname="Wolpert" given="Ned"/>
