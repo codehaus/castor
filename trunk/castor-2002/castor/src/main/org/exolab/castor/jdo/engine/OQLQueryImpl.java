@@ -152,35 +152,32 @@ public class OQLQueryImpl
                                                 " fields in this query" );
         try {
             ParamInfo info = (ParamInfo) _paramInfo.get(new Integer( _fieldNum + 1 ));
-            
+
             //do type checking and conversion
             Class paramClass = info.getTheClass();
             Class valueClass = value.getClass();
-            Class numberClass = java.lang.Number.class;
-            
+
             if ( value != null && ! paramClass.isAssignableFrom( valueClass ) )
                 if ( info.isUserDefined() )
                     //If the user specified a type they must pass that exact type.
-                    
-                    throw new IllegalArgumentException( "Query paramter " + 
-                                                        ( _fieldNum + 1 ) + 
-                                                        " is not of the expected type " + 
-                                                        paramClass + 
-                                                        " it is an instance of the class " 
+
+                    throw new IllegalArgumentException( "Query paramter " +
+                                                        ( _fieldNum + 1 ) +
+                                                        " is not of the expected type " +
+                                                        paramClass +
+                                                        " it is an instance of the class "
                                                         + valueClass );
-                else if ( numberClass.isAssignableFrom( paramClass ) ) {
-                    //if the user did not specify a type, we'll get a converter for numeric types.
-                    
+                else {
                     try {
                         TypeConvertor tc = Types.getConvertor( valueClass, paramClass );
                         value = tc.convert( value, null );
                     }
                     catch ( MappingException e ) {
-                        throw new IllegalArgumentException( "Query parameter " 
+                        throw new IllegalArgumentException( "Query parameter "
                                                             + ( _fieldNum + 1 )
                                                             + " cannot be converted from "
                                                             + valueClass + " to "
-                                                            + paramClass 
+                                                            + paramClass
                                                             + ", because no convertor can be found." );
                     }
                 }
@@ -193,7 +190,7 @@ public class OQLQueryImpl
                 int fieldNum = ( (Integer) e.nextElement() ).intValue();
                 _bindValues[ fieldNum - 1 ] = value;
             }
-            
+
         } catch ( IllegalArgumentException except ) {
             throw except;
         }
