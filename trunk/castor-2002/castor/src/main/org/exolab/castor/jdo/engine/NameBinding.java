@@ -78,25 +78,25 @@ public class NameBinding
 
     public NameBinding( String name, Object obj, JDOClassDesc clsDesc )
     {
-	Object     primKey;
-
-	this.name = name;
-	type = obj.getClass().getName();
-	if ( clsDesc.getIdentity() instanceof ContainerFieldDesc )
-	    throw new ClassNotPersistenceCapableException();
-	primKey = clsDesc.getIdentity().getValue( obj );
-	// XXX Need to serialize the primary key to support non-string keys
-	objectId = primKey.toString();
+        Object     primKey;
+        
+        this.name = name;
+        type = obj.getClass().getName();
+        if ( clsDesc.getIdentity() instanceof ContainerFieldDesc )
+            throw new ClassNotPersistenceCapableException();
+        primKey = clsDesc.getIdentity().getValue( obj );
+        // XXX Need to serialize the primary key to support non-string keys
+        objectId = primKey.toString();
     }
 
 
     public Class getType()
     {
-	try {
-	    return getClass().getClassLoader().loadClass( type );
-	} catch ( Exception except ) {
-	    throw new ODMGRuntimeException( "Nested exception: " + except.toString() );
-	}
+        try {
+            return getClass().getClassLoader().loadClass( type );
+        } catch ( Exception except ) {
+            throw new ODMGRuntimeException( "Nested exception: " + except.toString() );
+        }
     }
 
 

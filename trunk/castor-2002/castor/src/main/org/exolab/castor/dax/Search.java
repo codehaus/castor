@@ -73,7 +73,7 @@ public interface Search
      * @param value The query parameter's value
      */
     public void setParameter( String value )
-	throws IndexOutOfBoundsException;
+        throws IndexOutOfBoundsException;
 
 
     /**
@@ -93,7 +93,7 @@ public interface Search
      * @throws DirectoryException Directory access failed
      */
     public Enumeration execute()
-	throws InvalidSearchException, DirectoryException;
+        throws InvalidSearchException, DirectoryException;
 
 
 }

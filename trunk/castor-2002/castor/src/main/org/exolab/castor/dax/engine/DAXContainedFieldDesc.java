@@ -94,100 +94,100 @@ public class DAXContainedFieldDesc
      * @throws MappingException This should never happen
      */
     public DAXContainedFieldDesc( DAXFieldDesc fieldDesc, FieldDesc containerField )
-	throws MappingException
+        throws MappingException
     {
-	this( fieldDesc, containerField, null );
+        this( fieldDesc, containerField, null );
     }
 
 
     public DAXContainedFieldDesc( DAXFieldDesc fieldDesc, FieldDesc containerField,
-				  FieldDesc parentRefField )
-	throws MappingException
+                                  FieldDesc parentRefField )
+        throws MappingException
     {
-	super( fieldDesc, fieldDesc.getLdapName() );
-	if ( containerField == null )
-	    throw new IllegalArgumentException( "Argument 'containerField' is null" );
-	if ( ! Types.isConstructable( containerField.getFieldType() ) )
-	    throw new MappingException( "The field type " + containerField.getFieldType().getName() +
-					" is not a consturctable class" );
-	_containerField = containerField;
-	_parentRefField = parentRefField;
+        super( fieldDesc, fieldDesc.getLdapName() );
+        if ( containerField == null )
+            throw new IllegalArgumentException( "Argument 'containerField' is null" );
+        if ( ! Types.isConstructable( containerField.getFieldType() ) )
+            throw new MappingException( "The field type " + containerField.getFieldType().getName() +
+                                        " is not a consturctable class" );
+        _containerField = containerField;
+        _parentRefField = parentRefField;
     }
-
-
+    
+    
     FieldDesc getContainerField()
     {
-	return _containerField;
+        return _containerField;
     }
-
-
+    
+    
     public Object getValue( Object obj )
     {
-	// This is always called with an instance of the parent
-	// object, so we have to obtain the contained object
-	// first before retrieving the field from it.
-	obj = _containerField.getValue( obj );
-	if ( obj == null )
-	    return null;
-	return super.getValue( obj );
+        // This is always called with an instance of the parent
+        // object, so we have to obtain the contained object
+        // first before retrieving the field from it.
+        obj = _containerField.getValue( obj );
+        if ( obj == null )
+            return null;
+        return super.getValue( obj );
     }
 
 
     public LDAPAttribute getAttribute( Object obj )
     {
-	// This is always called with an instance of the parent
-	// object, so we have to obtain the contained object
-	// first before retrieving the field from it.
-	obj = _containerField.getValue( obj );
-	if ( obj == null )
-	    return null;
-	return super.getAttribute( obj );
+        // This is always called with an instance of the parent
+        // object, so we have to obtain the contained object
+        // first before retrieving the field from it.
+        obj = _containerField.getValue( obj );
+        if ( obj == null )
+            return null;
+        return super.getAttribute( obj );
     }
 
 
     public void setValue( Object obj, Object value )
     {
-	Object self;
-
-	// This is always called with an instance of the parent
-	// object, so we have to obtain the contained object
-	// first before retrieving the field from it.
-	self = _containerField.getValue( obj );
-	if ( self == null ) {
-	    // If the contained object does not exist, it is
-	    // created at this point.
-	    self = Types.newInstance( _containerField.getFieldType() );
-	    if ( _parentRefField != null )
-		_parentRefField.setValue( self, obj );
-	    _containerField.setValue( obj, self );
-	}
-	super.setValue( self, value );
+        Object self;
+        
+        // This is always called with an instance of the parent
+        // object, so we have to obtain the contained object
+        // first before retrieving the field from it.
+        self = _containerField.getValue( obj );
+        if ( self == null ) {
+            // If the contained object does not exist, it is
+            // created at this point.
+            self = Types.newInstance( _containerField.getFieldType() );
+            if ( _parentRefField != null )
+                _parentRefField.setValue( self, obj );
+            _containerField.setValue( obj, self );
+        }
+        super.setValue( self, value );
     }
 
 
     public void setValue( Object obj, LDAPEntry entry )
     {
-	Object self;
-
-	// This is always called with an instance of the parent
-	// object, so we have to obtain the contained object
-	// first before retrieving the field from it.
-	self = _containerField.getValue( obj );
-	if ( self == null ) {
-	    // If the contained object does not exist, it is
-	    // created at this point.
-	    self = Types.newInstance( _containerField.getFieldType() );
-	    if ( _parentRefField != null )
-		_parentRefField.setValue( self, obj );
-	    _containerField.setValue( obj, self );
-	}
-	super.setValue( self, entry );
+        Object self;
+        
+        // This is always called with an instance of the parent
+        // object, so we have to obtain the contained object
+        // first before retrieving the field from it.
+        self = _containerField.getValue( obj );
+        if ( self == null ) {
+            // If the contained object does not exist, it is
+            // created at this point.
+            self = Types.newInstance( _containerField.getFieldType() );
+            if ( _parentRefField != null )
+                _parentRefField.setValue( self, obj );
+            _containerField.setValue( obj, self );
+        }
+        super.setValue( self, entry );
     }
-
-
+    
+    
     public String toString()
     {
-	return super.toString() + " on " + _containerField.getFieldName();
+        return super.toString() + " on " + _containerField.getFieldName();
     }
 
 

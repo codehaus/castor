@@ -84,7 +84,7 @@ public interface Directory
      * @see Search
      */
     public Search createSearch( String expr )
-	throws InvalidSearchException, DirectoryException;
+        throws InvalidSearchException, DirectoryException;
 
 
     /**
@@ -98,7 +98,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public Object read( Object rdn )
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -116,7 +116,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void create( Object obj )
- 	throws DuplicateRDNException, DirectoryException;
+        throws DuplicateRDNException, DirectoryException;
 
 
     /**
@@ -131,7 +131,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void delete( Object obj )
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -156,7 +156,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void begin()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -180,7 +180,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void commit()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -198,7 +198,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void rollback()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -219,7 +219,7 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void close()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
 }

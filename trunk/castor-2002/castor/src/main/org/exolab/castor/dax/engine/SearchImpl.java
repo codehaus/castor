@@ -87,116 +87,116 @@ class SearchImpl
 
     SearchImpl( DirectoryImpl dir, PersistenceQuery query )
     {
-	_dir = dir;
-	_query = query;
-	_paramIndex = 0;
+        _dir = dir;
+        _query = query;
+        _paramIndex = 0;
     }
     
     
     public void setParameter( String value )
-	throws IndexOutOfBoundsException
+        throws IndexOutOfBoundsException
     {
-	if ( _paramIndex == _query.getParameterCount() )
-	    throw new IndexOutOfBoundsException( "Query only specifies " + _query.getParameterCount() +
-						 " parameters" );
-	_query.setParameter( _paramIndex, value );
-	++_paramIndex;
+        if ( _paramIndex == _query.getParameterCount() )
+            throw new IndexOutOfBoundsException( "Query only specifies " + _query.getParameterCount() +
+                                                 " parameters" );
+        _query.setParameter( _paramIndex, value );
+        ++_paramIndex;
     }
     
     
     public int getParameterCount()
     {
-	return _query.getParameterCount();
+        return _query.getParameterCount();
     }
     
     
     public Enumeration execute()
-	throws InvalidSearchException, DirectoryException
+        throws InvalidSearchException, DirectoryException
     {
-	TransactionContext tx;
-	PersistenceEngine  dirEngine;
-
-	dirEngine = _dir.getPersistenceEngine();
-	tx = _dir.getTransactionContext();
-	try {
-	    if ( tx == null ) {
-		tx = _dir.newTransactionContext();
-		_paramIndex = 0;
-		return new SearchResults( dirEngine, tx.query( dirEngine, _query, AccessMode.ReadOnly ) );
-	    } else {
-		if ( ! tx.isOpen() )
-		    throw new DirectoryException( "Transaction closed" );
-		_paramIndex = 0;
-		return new SearchResults( dirEngine, tx.query( dirEngine, _query, AccessMode.ReadWrite ) );
-	    }
-	} catch ( QueryException except ) {
-	    throw new InvalidSearchException( except.getMessage() );
-	} catch ( PersistenceException except ) {
-	    throw new DirectoryException( except );
-	}
+        TransactionContext tx;
+        PersistenceEngine  dirEngine;
+        
+        dirEngine = _dir.getPersistenceEngine();
+        tx = _dir.getTransactionContext();
+        try {
+            if ( tx == null ) {
+                tx = _dir.newTransactionContext();
+                _paramIndex = 0;
+                return new SearchResults( dirEngine, tx.query( dirEngine, _query, AccessMode.ReadOnly ) );
+            } else {
+                if ( ! tx.isOpen() )
+                    throw new DirectoryException( "Transaction closed" );
+                _paramIndex = 0;
+                return new SearchResults( dirEngine, tx.query( dirEngine, _query, AccessMode.ReadWrite ) );
+            }
+        } catch ( QueryException except ) {
+            throw new InvalidSearchException( except.getMessage() );
+        } catch ( PersistenceException except ) {
+            throw new DirectoryException( except );
+        }
     }
     
     
     static class SearchResults
-	implements Enumeration
+        implements Enumeration
     {
+        
+        
+        private QueryResults      _results;
+        
+        
+        private Object            _lastIdentity;
+        
+        
+        private PersistenceEngine _dirEngine;
+        
+        
+        SearchResults( PersistenceEngine dirEngine, QueryResults results )
+            throws DirectoryException
+        {
+            _results = results;
+            _dirEngine = dirEngine;
+            try {
+                _lastIdentity = _results.nextIdentity();
+            } catch ( TransactionNotInProgressException except ) {
+                throw new DirectoryException( except.getMessage() );
+            } catch ( PersistenceException except ) {
+                throw new DirectoryException( except );
+            }
+        }
 	
 	
-	private QueryResults      _results;
-	
-	
-	private Object            _lastIdentity;
+        public boolean hasMoreElements()
+        {
+            if ( ! _results.getTransaction().isOpen() )
+                return false;
+            return ( _lastIdentity != null );
+        }
+        
 
-
-	private PersistenceEngine _dirEngine;
-
-
-	SearchResults( PersistenceEngine dirEngine, QueryResults results )
-	    throws DirectoryException
-	{
-	    _results = results;
-	    _dirEngine = dirEngine;
-	    try {
-		_lastIdentity = _results.nextIdentity();
-	    } catch ( TransactionNotInProgressException except ) {
-		throw new DirectoryException( except.getMessage() );
-	    } catch ( PersistenceException except ) {
-		throw new DirectoryException( except );
-	    }
-	}
-	
-	
-	public boolean hasMoreElements()
-	{
-	    if ( ! _results.getTransaction().isOpen() )
-		return false;
-	    return ( _lastIdentity != null );
-	}
-
-
-	public Object nextElement()
-	{
-	    Object obj;
-
-	    if ( _lastIdentity == null )
-		throw new NoSuchElementException( "No more elements in query result" );
-	    obj = _dirEngine.getClassDesc( _results.getResultType() ).newInstance();
-	    try {
-		_results.fetch( obj );
-		_lastIdentity = _results.nextIdentity();
-	    } catch ( ObjectNotFoundException except ) {
-		return nextElement();
-	    } catch ( LockNotGrantedException except ) {
-		return nextElement();
-	    } catch ( TransactionNotInProgressException except ) {
-		throw new IllegalStateException( except.getMessage() );
-	    } catch ( PersistenceException except ) {
-		throw new NoSuchElementException( except.getMessage() );
-	    }
-	    return obj;
-	}
-
-
+        public Object nextElement()
+        {
+            Object obj;
+            
+            if ( _lastIdentity == null )
+                throw new NoSuchElementException( "No more elements in query result" );
+            obj = _dirEngine.getClassDesc( _results.getResultType() ).newInstance();
+            try {
+                _results.fetch( obj );
+                _lastIdentity = _results.nextIdentity();
+            } catch ( ObjectNotFoundException except ) {
+                return nextElement();
+            } catch ( LockNotGrantedException except ) {
+                return nextElement();
+            } catch ( TransactionNotInProgressException except ) {
+                throw new IllegalStateException( except.getMessage() );
+            } catch ( PersistenceException except ) {
+                throw new NoSuchElementException( except.getMessage() );
+            }
+            return obj;
+        }
+        
+        
     }
 
 

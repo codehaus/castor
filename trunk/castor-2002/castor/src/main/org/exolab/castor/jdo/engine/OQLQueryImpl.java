@@ -96,195 +96,195 @@ public class OQLQueryImpl
 
 
     public void bind( Object obj )
-	throws QueryParameterCountInvalidException,
-	       QueryParameterTypeInvalidException
+        throws QueryParameterCountInvalidException,
+               QueryParameterTypeInvalidException
     {
-	if ( _query == null ) {
-	    throw new ODMGRuntimeException( "Must create query before using it" );
-	}
-	if ( _fieldNum == _query.getParameterCount() )
-	    throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
-							   " fields in this query" );
-	try {
-	    _query.setParameter( _fieldNum, obj );
-	} catch ( IndexOutOfBoundsException except ) {
-	    throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
-							   " fields in this query" );
-	} catch ( IllegalArgumentException except ) {
-	    throw new QueryParameterTypeInvalidException( except.getMessage() );
-	}
-	++_fieldNum;
+        if ( _query == null ) {
+            throw new ODMGRuntimeException( "Must create query before using it" );
+        }
+        if ( _fieldNum == _query.getParameterCount() )
+            throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
+                                                           " fields in this query" );
+        try {
+            _query.setParameter( _fieldNum, obj );
+        } catch ( IndexOutOfBoundsException except ) {
+            throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
+                                                           " fields in this query" );
+        } catch ( IllegalArgumentException except ) {
+            throw new QueryParameterTypeInvalidException( except.getMessage() );
+        }
+        ++_fieldNum;
     }
 
 
     public void create( String oql )
-	throws QueryInvalidException
+        throws QueryInvalidException
     {
-	StringTokenizer token;
-	String          objType;
-	String          objName;
-	StringBuffer    sql;
-	JDOClassDesc   clsDesc;
-	SQLEngine       engine;
-	Vector          types;
-	Class[]         array;
-
-	_fieldNum = 0;
-	types = new Vector();
-	sql = new StringBuffer();
-	token = new StringTokenizer( oql );
-	if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "SELECT" ) )
-	    throw new QueryInvalidException( "Query must start with SELECT" );
-	if ( ! token.hasMoreTokens() )
-	    throw new QueryInvalidException( "Missing object name" );
-	objName = token.nextToken();
-	if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "FROM" ) )
-	    throw new QueryInvalidException( "Object must be followed by FROM" );
-	if ( ! token.hasMoreTokens() )
-	    throw new QueryInvalidException( "Missing object type" );
-	objType = token.nextToken();
-	if ( ! token.hasMoreTokens() )
-	    throw new QueryInvalidException( "Missing object name" );
-	if ( ! objName.equals( token.nextToken() ) )
-	    throw new QueryInvalidException( "Object name not same in SELECT and FROM" );
-
-	try {
-	    _objClass = Class.forName( objType );
-	} catch ( ClassNotFoundException except ) {
-	    throw new QueryInvalidException( "Could not find class " + objType );
-	}
-	_dbEngine = DatabaseSource.getPersistenceEngine( _objClass ); 
-	if ( _dbEngine == null )
-	    throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
-	engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-	clsDesc = engine.getClassDesc();
-
-	if ( token.hasMoreTokens() ) {
-	    if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
-		throw new QueryInvalidException( "Missing WHERE clause" );
-	    parseField( clsDesc, token, sql, types );
-	    while ( token.hasMoreTokens() ) {
-		if ( ! token.nextToken().equals( "AND" ) )
-		    throw new QueryInvalidException( "Only AND supported in WHERE clause" );
-		parseField( clsDesc, token, sql, types );
-	    }
-	} else {
-	    sql.append( "1 = 1" );
-	}
-
-	sql.insert( 0, engine._sqlFinder ).append( engine._sqlFinderJoin );
-	array = new Class[ types.size() ];
-	types.copyInto( array );
-	try {
-	    _query = engine.createQuery( sql.toString(), array );
-	} catch ( QueryException except ) {
-	    throw new QueryInvalidException( except.getMessage() );
-	}
+        StringTokenizer token;
+        String          objType;
+        String          objName;
+        StringBuffer    sql;
+        JDOClassDesc   clsDesc;
+        SQLEngine       engine;
+        Vector          types;
+        Class[]         array;
+        
+        _fieldNum = 0;
+        types = new Vector();
+        sql = new StringBuffer();
+        token = new StringTokenizer( oql );
+        if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "SELECT" ) )
+            throw new QueryInvalidException( "Query must start with SELECT" );
+        if ( ! token.hasMoreTokens() )
+            throw new QueryInvalidException( "Missing object name" );
+        objName = token.nextToken();
+        if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "FROM" ) )
+            throw new QueryInvalidException( "Object must be followed by FROM" );
+        if ( ! token.hasMoreTokens() )
+            throw new QueryInvalidException( "Missing object type" );
+        objType = token.nextToken();
+        if ( ! token.hasMoreTokens() )
+            throw new QueryInvalidException( "Missing object name" );
+        if ( ! objName.equals( token.nextToken() ) )
+            throw new QueryInvalidException( "Object name not same in SELECT and FROM" );
+        
+        try {
+            _objClass = Class.forName( objType );
+        } catch ( ClassNotFoundException except ) {
+            throw new QueryInvalidException( "Could not find class " + objType );
+        }
+        _dbEngine = DatabaseSource.getPersistenceEngine( _objClass ); 
+        if ( _dbEngine == null )
+            throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
+        engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+        clsDesc = engine.getClassDesc();
+        
+        if ( token.hasMoreTokens() ) {
+            if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
+                throw new QueryInvalidException( "Missing WHERE clause" );
+            parseField( clsDesc, token, sql, types );
+            while ( token.hasMoreTokens() ) {
+                if ( ! token.nextToken().equals( "AND" ) )
+                    throw new QueryInvalidException( "Only AND supported in WHERE clause" );
+                parseField( clsDesc, token, sql, types );
+            }
+        } else {
+            sql.append( "1 = 1" );
+        }
+        
+        sql.insert( 0, engine._sqlFinder ).append( engine._sqlFinderJoin );
+        array = new Class[ types.size() ];
+        types.copyInto( array );
+        try {
+            _query = engine.createQuery( sql.toString(), array );
+        } catch ( QueryException except ) {
+            throw new QueryInvalidException( except.getMessage() );
+        }
     }
-
-
+    
+    
     private void parseField( JDOClassDesc clsDesc, StringTokenizer token,
-			     StringBuffer sqlWhere, Vector types )
-	throws QueryInvalidException
+                             StringBuffer sqlWhere, Vector types )
+        throws QueryInvalidException
     {
-	String         name;
-	String         op;
-	String         value;
-	JDOFieldDesc[] fields;
-	JDOFieldDesc   field;
-
-	if ( ! token.hasMoreTokens() )
-	    throw new QueryInvalidException( "Missing field name" );
-	name = token.nextToken();
-	if ( ! token.hasMoreTokens() )
-	    throw new QueryInvalidException( "Missing operator" );
-	op = token.nextToken();
-	if ( ! token.hasMoreTokens() )
-	    throw new QueryInvalidException( "Missing field value" );
-
-	value = token.nextToken();
-	if ( name.indexOf( "." ) > 0 )
-	    name = name.substring( name.indexOf( "." ) + 1 );
-	fields = (JDOFieldDesc[]) clsDesc.getFields();
-	field = null;
-	for ( int i = 0 ; i < fields.length ; ++i ) {
-	    if ( fields[ i ].getFieldName().equals( name ) ) {
-		sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
-		field = fields[ i ];
-		break;
-	    }
-	}
-
-	if ( field == null ) {
-	    if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
-		fields = (JDOFieldDesc[]) ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
-		for ( int i = 0 ; i < fields.length ; ++i ) {
-		    if ( fields[ i ].getFieldName().equals( name ) ) {
-			sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
-			field = fields[ i ];
-			break;
-		    }
-		}
-	    } else if ( clsDesc.getIdentity().getFieldName().equals( name ) ) {
-		sqlWhere.append( clsDesc.getTableName() + "." + ( (JDOFieldDesc) clsDesc.getIdentity() ).getSQLName() );
-		field = (JDOFieldDesc) clsDesc.getIdentity();
-	    }
-	}
-
-	if ( field == null )
-	    throw new QueryInvalidException( "The field " + name + " was not found" );
-	sqlWhere.append( op );
-	if ( value.startsWith( "$" ) ) {
-	    sqlWhere.append( "?" );
-	    types.addElement( field.getFieldType() );
-	} else {
-	    sqlWhere.append( value );
-	}
+        String         name;
+        String         op;
+        String         value;
+        JDOFieldDesc[] fields;
+        JDOFieldDesc   field;
+        
+        if ( ! token.hasMoreTokens() )
+            throw new QueryInvalidException( "Missing field name" );
+        name = token.nextToken();
+        if ( ! token.hasMoreTokens() )
+            throw new QueryInvalidException( "Missing operator" );
+        op = token.nextToken();
+        if ( ! token.hasMoreTokens() )
+            throw new QueryInvalidException( "Missing field value" );
+        
+        value = token.nextToken();
+        if ( name.indexOf( "." ) > 0 )
+            name = name.substring( name.indexOf( "." ) + 1 );
+        fields = (JDOFieldDesc[]) clsDesc.getFields();
+        field = null;
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ].getFieldName().equals( name ) ) {
+                sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
+                field = fields[ i ];
+                break;
+            }
+        }
+        
+        if ( field == null ) {
+            if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
+                fields = (JDOFieldDesc[]) ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
+                for ( int i = 0 ; i < fields.length ; ++i ) {
+                    if ( fields[ i ].getFieldName().equals( name ) ) {
+                        sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
+                        field = fields[ i ];
+                        break;
+                    }
+                }
+            } else if ( clsDesc.getIdentity().getFieldName().equals( name ) ) {
+                sqlWhere.append( clsDesc.getTableName() + "." + ( (JDOFieldDesc) clsDesc.getIdentity() ).getSQLName() );
+                field = (JDOFieldDesc) clsDesc.getIdentity();
+            }
+        }
+        
+        if ( field == null )
+            throw new QueryInvalidException( "The field " + name + " was not found" );
+        sqlWhere.append( op );
+        if ( value.startsWith( "$" ) ) {
+            sqlWhere.append( "?" );
+            types.addElement( field.getFieldType() );
+        } else {
+            sqlWhere.append( value );
+        }
     }
-
-
+    
+    
     public Object execute()
-	throws QueryInvalidException
+        throws QueryInvalidException
     {
-	TransactionContext tx;
-	QueryResults       results;
-	Object             obj;
-	Object             identity;
-	Vector             set;
-
-	try {
-	    tx = TransactionImpl.getCurrentContext();
-	    if ( tx == null || ! tx.isOpen() )
-		throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
-	    results = tx.query( _dbEngine, _query, AccessMode.ReadWrite );
-	    _fieldNum = 0;
-
-	    set = new Vector();
-	    identity = results.nextIdentity();
-	    while ( identity != null ) {
-		try {
-		    obj = _dbEngine.getClassDesc( results.getResultType() ).newInstance();
-		    results.fetch( obj );
-		    set.addElement( obj );
-		} catch ( ObjectNotFoundException except ) {
-		}
-		identity = results.nextIdentity();
-	    }
-	    if ( set.size() == 0 )
-		return null;
-	    if ( set.size() == 1 )
-		return set.elementAt( 0 );
-	    return set.elements();
-	} catch ( QueryException except ) {
-	    throw new QueryInvalidException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( LockNotGrantedException except ) {
-	    throw new ODMGRuntimeException( except.toString() );
-	} catch ( PersistenceException except ) {
-	    throw new ODMGRuntimeException( except.toString() );
-	}
+        TransactionContext tx;
+        QueryResults       results;
+        Object             obj;
+        Object             identity;
+        Vector             set;
+        
+        try {
+            tx = TransactionImpl.getCurrentContext();
+            if ( tx == null || ! tx.isOpen() )
+                throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
+            results = tx.query( _dbEngine, _query, AccessMode.ReadWrite );
+            _fieldNum = 0;
+            
+            set = new Vector();
+            identity = results.nextIdentity();
+            while ( identity != null ) {
+                try {
+                    obj = _dbEngine.getClassDesc( results.getResultType() ).newInstance();
+                    results.fetch( obj );
+                    set.addElement( obj );
+                } catch ( ObjectNotFoundException except ) {
+                }
+                identity = results.nextIdentity();
+            }
+            if ( set.size() == 0 )
+                return null;
+            if ( set.size() == 1 )
+                return set.elementAt( 0 );
+            return set.elements();
+        } catch ( QueryException except ) {
+            throw new QueryInvalidException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( LockNotGrantedException except ) {
+            throw new ODMGRuntimeException( except.toString() );
+        } catch ( PersistenceException except ) {
+            throw new ODMGRuntimeException( except.toString() );
+        }
     }
-
+    
 
 }

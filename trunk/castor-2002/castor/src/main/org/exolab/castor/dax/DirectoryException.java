@@ -74,7 +74,7 @@ public class DirectoryException
      */
     public DirectoryException( String message )
     {
-	super( message );
+        super( message );
     }
 
 
@@ -85,8 +85,8 @@ public class DirectoryException
      */
     public DirectoryException( Exception except )
     {
-	super( except.toString() );
-	_except = except;
+        super( except.toString() );
+        _except = except;
     }
 
 
@@ -101,34 +101,34 @@ public class DirectoryException
      */
     public Exception getSPIException()
     {
-	return _except;
+        return _except;
     }
 
 
     public void printStackTrace()
     {
-	if ( _except == null )
-	    super.printStackTrace();
-	else
-	    _except.printStackTrace();
+        if ( _except == null )
+            super.printStackTrace();
+        else
+            _except.printStackTrace();
     }
 
 
     public void printStackTrace( PrintStream printer )
     {
-	if ( _except == null )
-	    super.printStackTrace( printer );
-	else
-	    _except.printStackTrace( printer );
+        if ( _except == null )
+            super.printStackTrace( printer );
+        else
+            _except.printStackTrace( printer );
     }
 
 
     public void printStackTrace( PrintWriter printer )
     {
-	if ( _except == null )
-	    super.printStackTrace( printer );
-	else
-	    _except.printStackTrace( printer );
+        if ( _except == null )
+            super.printStackTrace( printer );
+        else
+            _except.printStackTrace( printer );
     }
 
 

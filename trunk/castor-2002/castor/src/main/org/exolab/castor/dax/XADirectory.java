@@ -74,7 +74,7 @@ public interface XADirectory
      * @throws DirectoryException Directory access failed
      */
     public XAResource getXAResource()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -86,7 +86,7 @@ public interface XADirectory
      * @throws DirectoryException Directory access failed
      */
     public Directory getDirectory()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -94,8 +94,8 @@ public interface XADirectory
      * connection are no longer useable.
      */
     public void close()
-	throws DirectoryException;
-
+        throws DirectoryException;
+    
 
     /**
      * Adds an event listener.

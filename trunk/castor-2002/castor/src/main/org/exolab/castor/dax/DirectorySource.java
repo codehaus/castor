@@ -70,7 +70,7 @@ public interface DirectorySource
      * @throws DirectoryException Directory access failed
      */
     public Directory getDirectory()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -82,7 +82,7 @@ public interface DirectorySource
      * @throws DirectoryException Directory access failed
      */
     public Directory getDirectory( String userDN, String password )
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**

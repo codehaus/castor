@@ -135,277 +135,275 @@ public final class DatabaseImpl
 
     public DatabaseImpl( PersistenceEngine dbEngine )
     {
-	if ( dbEngine == null )
-	    throw new IllegalArgumentException( "Argument 'dbEngine' is null" );
-	_dbEngine = dbEngine;
-	_mode = OPEN_READ_WRITE;
+        if ( dbEngine == null )
+            throw new IllegalArgumentException( "Argument 'dbEngine' is null" );
+        _dbEngine = dbEngine;
+        _mode = OPEN_READ_WRITE;
     }
 
 
     public void setLogWriter( PrintWriter logWriter )
     {
-	_logWriter = logWriter;
+        _logWriter = logWriter;
     }
 
 
     public PrintWriter getLogWriter()
     {
-	return _logWriter;
+        return _logWriter;
     }
 
 
     public synchronized void open( String dbName, int mode )
-	throws ODMGException
+        throws ODMGException
     {
-	// Check that we are opening this database in a valid mode.
-	if ( _mode != NOT_OPEN )
-	    throw new DatabaseOpenException( Messages.message( "castor.jdo.odmg.dbAlreadyOpen" ) );
-	switch ( mode ) {
-	case OPEN_READ_ONLY:
-	case OPEN_READ_WRITE:
-	case OPEN_EXCLUSIVE:
-	    break;
-	default:
-	    throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.dbIllegalOpenMode" ) );
-	}
-	_mode = mode;
-
-	// Locate a suitable datasource and database engine
-	// and report if not mapping registered any of the two.
-	// A new ODMG engine is created each time with different
-	// locking mode.
-	DatabaseSource dbs;
-
-	try {
-	    dbs = DatabaseSource.getDatabaseSource( dbName );
-	} catch ( MappingException except ) {
-	    throw new DatabaseNotFoundException( except.getMessage() );
-	}
-	if ( dbs == null )
-	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoMapping", dbName ) );
-	if ( ! dbs.canConnect() )
-	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoDataSource", dbName ) );
-	_dbEngine = DatabaseSource.getPersistenceEngine( dbs );
+        // Check that we are opening this database in a valid mode.
+        if ( _mode != NOT_OPEN )
+            throw new DatabaseOpenException( Messages.message( "castor.jdo.odmg.dbAlreadyOpen" ) );
+        switch ( mode ) {
+        case OPEN_READ_ONLY:
+        case OPEN_READ_WRITE:
+        case OPEN_EXCLUSIVE:
+            break;
+        default:
+            throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.dbIllegalOpenMode" ) );
+        }
+        _mode = mode;
+        
+        // Locate a suitable datasource and database engine
+        // and report if not mapping registered any of the two.
+        // A new ODMG engine is created each time with different
+        // locking mode.
+        DatabaseSource dbs;
+        
+        try {
+            dbs = DatabaseSource.getDatabaseSource( dbName );
+        } catch ( MappingException except ) {
+            throw new DatabaseNotFoundException( except.getMessage() );
+        }
+        if ( dbs == null )
+            throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoMapping", dbName ) );
+        _dbEngine = DatabaseSource.getPersistenceEngine( dbs );
     }
-
-
+    
+    
     public synchronized void close()
-	throws ODMGException
+        throws ODMGException
     {
-	Enumeration        enum;
-	TransactionContext tx;
-
-	// Never close database while inside a transaction.
-	enum = _txOpen.elements();
-	while ( enum.hasMoreElements() ) {
-	    tx = (TransactionContext) enum.nextElement();
-	    if ( tx.isOpen() )
-		throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.dbTxInProgress" ) );
-	}
-	_dbEngine = null;
-	_mode = NOT_OPEN;
+        Enumeration        enum;
+        TransactionContext tx;
+        
+        // Never close database while inside a transaction.
+        enum = _txOpen.elements();
+        while ( enum.hasMoreElements() ) {
+            tx = (TransactionContext) enum.nextElement();
+            if ( tx.isOpen() )
+                throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.dbTxInProgress" ) );
+        }
+        _dbEngine = null;
+        _mode = NOT_OPEN;
     }
 
 
     public synchronized void makePersistent( Object obj )
     {
-	TransactionContext tx;
-	ClassDesc         clsDesc;
-
-	if ( _mode == Database.OPEN_READ_ONLY )
-	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
-	tx = getTransaction();
-	clsDesc = _dbEngine.getClassDesc( obj.getClass() );
-	if ( clsDesc == null || clsDesc.getIdentity() == null )
-	    throw new ClassNotPersistenceCapableException( obj.getClass().getName() );
-	try {
-	    tx.create( _dbEngine, obj, clsDesc.getIdentity().getValue( obj ) );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
-	    throw new ClassNotPersistenceCapableException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.DuplicateIdentityException except ) {
-	    throw new ODMGRuntimeException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
+        TransactionContext tx;
+        ClassDesc         clsDesc;
+        
+        if ( _mode == Database.OPEN_READ_ONLY )
+            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+        tx = getTransaction();
+        clsDesc = _dbEngine.getClassDesc( obj.getClass() );
+        if ( clsDesc == null || clsDesc.getIdentity() == null )
+            throw new ClassNotPersistenceCapableException( obj.getClass().getName() );
+        try {
+            tx.create( _dbEngine, obj, clsDesc.getIdentity().getValue( obj ) );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
+            throw new ClassNotPersistenceCapableException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.DuplicateIdentityException except ) {
+            throw new ODMGRuntimeException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
     }
 
 
     public synchronized void deletePersistent( Object obj )
     {
-	TransactionContext tx;
-
-	if ( _mode == Database.OPEN_READ_ONLY )
-	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
-	tx = getTransaction();
-	try {
-	    tx.delete( obj );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
-	    throw new ObjectNotPersistentException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
-	    throw new LockNotGrantedException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
+        TransactionContext tx;
+        
+        if ( _mode == Database.OPEN_READ_ONLY )
+            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+        tx = getTransaction();
+        try {
+            tx.delete( obj );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
+            throw new ObjectNotPersistentException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+            throw new LockNotGrantedException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
     }
 
 
     public synchronized Object lookup( Class type, Object primKey )
-	throws ODMGException
+        throws ODMGException
     {
-	TransactionContext tx;
-	ClassDesc         clsDesc;
-	Object             obj;
-
-	tx = getTransaction();
-	clsDesc = _dbEngine.getClassDesc( type );
-	if ( clsDesc == null )
-	    throw new ClassNotPersistenceCapableException();
-	obj = clsDesc.newInstance();
-	try {
-	    switch ( _mode ) {
-	    case OPEN_READ_ONLY:
-		tx.load( _dbEngine, obj, primKey, AccessMode.ReadOnly );
-		break;
-	    case OPEN_EXCLUSIVE:
-		tx.load( _dbEngine, obj, primKey, AccessMode.Exclusive );
-		break;
-	    case OPEN_READ_WRITE:
-		tx.load( _dbEngine, obj, primKey, AccessMode.ReadWrite );
-		break;
-	    }
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
-	    throw new LockNotGrantedException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
-	    return null;
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
-	return obj;
+        TransactionContext tx;
+        ClassDesc         clsDesc;
+        Object             obj;
+        
+        tx = getTransaction();
+        clsDesc = _dbEngine.getClassDesc( type );
+        if ( clsDesc == null )
+            throw new ClassNotPersistenceCapableException();
+        obj = clsDesc.newInstance();
+        try {
+            switch ( _mode ) {
+            case OPEN_READ_ONLY:
+                tx.load( _dbEngine, obj, primKey, AccessMode.ReadOnly );
+                break;
+            case OPEN_EXCLUSIVE:
+                tx.load( _dbEngine, obj, primKey, AccessMode.Exclusive );
+                break;
+            case OPEN_READ_WRITE:
+                tx.load( _dbEngine, obj, primKey, AccessMode.ReadWrite );
+                break;
+            }
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+            throw new LockNotGrantedException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
+            return null;
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
+        return obj;
     }
-
+    
 
     public synchronized void bind( Object obj, String name )
-	throws ObjectNameNotUniqueException
+        throws ObjectNameNotUniqueException
     {
-	TransactionContext tx;
-	NameBinding        binding;
-	ClassDesc         clsDesc;
-
-	if ( _mode == Database.OPEN_READ_ONLY )
-	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
-	tx = getTransaction();
-	makePersistent( obj );
-	clsDesc = _dbEngine.getClassDesc( obj.getClass() );
-	binding = new NameBinding( name, obj, (JDOClassDesc) clsDesc );
-	try {
-	    tx.create( _dbEngine, binding, name );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.DuplicateIdentityException except ) {
-	    throw new ObjectNameNotUniqueException( name );
-	} catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
-	    throw new NotImplementedException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
+        TransactionContext tx;
+        NameBinding        binding;
+        ClassDesc         clsDesc;
+        
+        if ( _mode == Database.OPEN_READ_ONLY )
+            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+        tx = getTransaction();
+        makePersistent( obj );
+        clsDesc = _dbEngine.getClassDesc( obj.getClass() );
+        binding = new NameBinding( name, obj, (JDOClassDesc) clsDesc );
+        try {
+            tx.create( _dbEngine, binding, name );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.DuplicateIdentityException except ) {
+            throw new ObjectNameNotUniqueException( name );
+        } catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
+            throw new NotImplementedException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
     }
 
 
     public synchronized void unbind( String name )
-	throws ObjectNameNotFoundException
+        throws ObjectNameNotFoundException
     {
-	TransactionContext tx;
-	NameBinding binding;
-
-	if ( _mode == Database.OPEN_READ_ONLY )
-	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
-	tx = getTransaction();
-	try {
-	    binding = new NameBinding();
-	    tx.load( _dbEngine, binding, name, AccessMode.Exclusive );
-	    tx.delete( binding );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
-	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
-	} catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
-	    throw new ObjectNameNotFoundException( name );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
+        TransactionContext tx;
+        NameBinding binding;
+        
+        if ( _mode == Database.OPEN_READ_ONLY )
+            throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
+        tx = getTransaction();
+        try {
+            binding = new NameBinding();
+            tx.load( _dbEngine, binding, name, AccessMode.Exclusive );
+            tx.delete( binding );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
+        } catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
+        } catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
+            throw new ObjectNameNotFoundException( name );
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
     }
 
 
     public synchronized Object lookup( String name )
-	throws ObjectNameNotFoundException
+        throws ObjectNameNotFoundException
     {
-	TransactionContext tx;
-	NameBinding        binding;
-	Object             obj;
-	ClassDesc         clsDesc;
-
-	tx = getTransaction();
-	try {
-	    binding = new NameBinding();
-	    tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
-	    clsDesc = _dbEngine.getClassDesc( binding.getType() );
-	    if ( clsDesc == null )
-		throw new ClassNotPersistenceCapableException( clsDesc.getJavaClass().getName() );
-	    obj = clsDesc.newInstance();
-	    tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
-	    return obj;
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
-	} catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
-	    throw new ObjectNameNotFoundException( name );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
+        TransactionContext tx;
+        NameBinding        binding;
+        Object             obj;
+        ClassDesc         clsDesc;
+        
+        tx = getTransaction();
+        try {
+            binding = new NameBinding();
+            tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
+            clsDesc = _dbEngine.getClassDesc( binding.getType() );
+            if ( clsDesc == null )
+                throw new ClassNotPersistenceCapableException( clsDesc.getJavaClass().getName() );
+            obj = clsDesc.newInstance();
+            tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
+            return obj;
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except );
+        } catch ( org.exolab.castor.persist.ObjectNotFoundException except ) {
+            throw new ObjectNameNotFoundException( name );
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
     }
-
-
+    
+    
     protected void finalize()
-	throws Throwable
+        throws Throwable
     {
-	if ( _mode != NOT_OPEN )
-	    close();
+        if ( _mode != NOT_OPEN )
+            close();
     }
 
 
     protected TransactionContext getTransaction()
     {
-	TransactionContext tx;
-
-	if ( _dbEngine == null )
-	    throw new DatabaseClosedException( Messages.message( "castor.jdo.odmg.dbClosed" ) );
-	if ( _ctx != null )
-	    return _ctx;
-
-	// Get the current transaction, complain if none found:
-	// Cannot persist outside of a transaction.
-	tx = TransactionImpl.getCurrentContext();
-	if ( tx == null || ! tx.isOpen() )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
-	// Must register transaction with this database.
-	if ( ! _txOpen.contains( tx ) )
-	    _txOpen.addElement( tx );
-	return tx;
+        TransactionContext tx;
+        
+        if ( _dbEngine == null )
+            throw new DatabaseClosedException( Messages.message( "castor.jdo.odmg.dbClosed" ) );
+        if ( _ctx != null )
+            return _ctx;
+        
+        // Get the current transaction, complain if none found:
+        // Cannot persist outside of a transaction.
+        tx = TransactionImpl.getCurrentContext();
+        if ( tx == null || ! tx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
+        // Must register transaction with this database.
+        if ( ! _txOpen.contains( tx ) )
+            _txOpen.addElement( tx );
+        return tx;
     }
 
 
     public XAResource getXAResource()
     {
-	return this;
+        return this;
     }
 
 
@@ -414,241 +412,241 @@ public final class DatabaseImpl
 
     private Hashtable _resManager = new Hashtable();
 
-
+    
     public synchronized void start( Xid xid, int flags )
         throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _resManager ) {
-	    switch ( flags ) {
-	    case TMNOFLAGS:
-		_ctx = (TransactionContext) _resManager.get( xid );
-		if ( _ctx == null ) {
-		    _ctx = new TransactionContextImpl( xid );
-		    _resManager.put( xid, _ctx );
-		}
-		break;
-	    case TMJOIN:
-	    case TMRESUME:
-		_ctx = (TransactionContext) _resManager.get( xid );
-		if ( _ctx == null )
-		    throw new XAException( XAException.XAER_NOTA );
-		if ( ! _ctx.isOpen() )
-		    throw new XAException( XAException.XAER_NOTA );
-		break;
-	    default:
-		// No other flags supported in start().
-		throw new XAException( XAException.XAER_INVAL );
-	    }
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _resManager ) {
+            switch ( flags ) {
+            case TMNOFLAGS:
+                _ctx = (TransactionContext) _resManager.get( xid );
+                if ( _ctx == null ) {
+                    _ctx = new TransactionContextImpl( xid );
+                    _resManager.put( xid, _ctx );
+                }
+                break;
+            case TMJOIN:
+            case TMRESUME:
+                _ctx = (TransactionContext) _resManager.get( xid );
+                if ( _ctx == null )
+                    throw new XAException( XAException.XAER_NOTA );
+                if ( ! _ctx.isOpen() )
+                    throw new XAException( XAException.XAER_NOTA );
+                break;
+            default:
+                // No other flags supported in start().
+                throw new XAException( XAException.XAER_INVAL );
+            }
+        }
     }
 
 
     public synchronized void end( Xid xid, int flags )
         throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _resManager ) {
-	    if ( _ctx == null )
-		throw new XAException( XAException.XAER_INVAL );
-	    switch ( flags ) {
-	    case TMSUCCESS:
-		break;
-	    case TMFAIL:
-		try {
-		    _ctx.rollback();
-		} catch ( Exception except ) { }
-		break;
-	    case TMSUSPEND:
-		break;
-	    default:
-		throw new XAException( XAException.XAER_INVAL );
-	    }
-	    _ctx = null;
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _resManager ) {
+            if ( _ctx == null )
+                throw new XAException( XAException.XAER_INVAL );
+            switch ( flags ) {
+            case TMSUCCESS:
+                break;
+            case TMFAIL:
+                try {
+                    _ctx.rollback();
+                } catch ( Exception except ) { }
+                break;
+            case TMSUSPEND:
+                break;
+            default:
+                throw new XAException( XAException.XAER_INVAL );
+            }
+            _ctx = null;
+        }
     }
 
 
     public synchronized void forget( Xid xid )
-	throws XAException
+        throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _resManager ) {
-	    TransactionContext ctx;
-
-	    ctx = (TransactionContext) _resManager.remove( xid );
-	    if ( ctx == null )
-		throw new XAException( XAException.XAER_NOTA );
-
-	    // Forget is never called on an open transaction, but one
-	    // can never tell.
-	    if ( ctx.isOpen() ) {
-		try {
-		    ctx.rollback();
-		} catch ( Exception except ) { }
-		throw new XAException( XAException.XAER_PROTO );
-	    }
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _resManager ) {
+            TransactionContext ctx;
+            
+            ctx = (TransactionContext) _resManager.remove( xid );
+            if ( ctx == null )
+                throw new XAException( XAException.XAER_NOTA );
+            
+            // Forget is never called on an open transaction, but one
+            // can never tell.
+            if ( ctx.isOpen() ) {
+                try {
+                    ctx.rollback();
+                } catch ( Exception except ) { }
+                throw new XAException( XAException.XAER_PROTO );
+            }
+        }
     }
 
 
     public synchronized int prepare( Xid xid )
-	throws XAException
+        throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _resManager ) {
-	    TransactionContext ctx;
-
-	    ctx = (TransactionContext) _resManager.get( xid );
-	    if ( ctx == null )
-		throw new XAException( XAException.XAER_NOTA );
-
-	    switch ( ctx.getStatus() ) {
-	    case Status.STATUS_PREPARED:
-	    case Status.STATUS_ACTIVE:
-		// Can only prepare an active transaction. And error
-		// is reported as vote to rollback the transaction.
-		try {
-		    if ( ctx.prepare() ) {
-			return XA_OK;
-		    } else {
-			return XA_RDONLY;
-		    }
-		} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-		    throw new XAException( XAException.XAER_PROTO );
-		} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
-		    throw new XAException( XAException.XA_RBROLLBACK );
-		}
-	    case Status.STATUS_MARKED_ROLLBACK:
-		// Report transaction marked for rollback.
-		throw new XAException( XAException.XA_RBROLLBACK );
-	    default:
-		throw new XAException( XAException.XAER_PROTO );
-	    }
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _resManager ) {
+            TransactionContext ctx;
+            
+            ctx = (TransactionContext) _resManager.get( xid );
+            if ( ctx == null )
+                throw new XAException( XAException.XAER_NOTA );
+            
+            switch ( ctx.getStatus() ) {
+            case Status.STATUS_PREPARED:
+            case Status.STATUS_ACTIVE:
+                // Can only prepare an active transaction. And error
+                // is reported as vote to rollback the transaction.
+                try {
+                    if ( ctx.prepare() ) {
+                        return XA_OK;
+                    } else {
+                        return XA_RDONLY;
+                    }
+                } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+                    throw new XAException( XAException.XAER_PROTO );
+                } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+                    throw new XAException( XAException.XA_RBROLLBACK );
+                }
+            case Status.STATUS_MARKED_ROLLBACK:
+                // Report transaction marked for rollback.
+                throw new XAException( XAException.XA_RBROLLBACK );
+            default:
+                throw new XAException( XAException.XAER_PROTO );
+            }
+        }
     }
 
 
     public Xid[] recover( int flags )
         throws XAException
     {
-	return null;
+        return null;
     }
 
-
+    
     public synchronized void commit( Xid xid, boolean onePhase )
         throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _resManager ) {
-	    TransactionContext ctx;
-
-	    ctx = (TransactionContext) _resManager.get( xid );
-	    if ( ctx == null )
-		throw new XAException( XAException.XAER_NOTA );
-	    switch ( ctx.getStatus() ) {
-	    case Status.STATUS_COMMITTED:
-		// Allowed to make multiple commit attempts.
-		return;
-	    case Status.STATUS_ROLLEDBACK:
-		// This should not happen unless someone interfered
-		// by calling rollback directly or failing a commit,
-		// but is still a valid heuristic condition on our behalf.
-		throw new XAException( XAException.XA_HEURRB );
-	    case Status.STATUS_PREPARED:
-		// Commit can only occur after a prepare, so must be
-		// in prepared state first. Any ODMG error is reported
-		// as a heuristic decision to rollback.
-		try {
-		    ctx.commit();
-		} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-		    throw new XAException( XAException.XAER_PROTO );
-		} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
-		    throw new XAException( XAException.XA_HEURRB );
-		}
-	    default:
-		throw new XAException( XAException.XAER_PROTO );
-	    }
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _resManager ) {
+            TransactionContext ctx;
+            
+            ctx = (TransactionContext) _resManager.get( xid );
+            if ( ctx == null )
+                throw new XAException( XAException.XAER_NOTA );
+            switch ( ctx.getStatus() ) {
+            case Status.STATUS_COMMITTED:
+                // Allowed to make multiple commit attempts.
+                return;
+            case Status.STATUS_ROLLEDBACK:
+                // This should not happen unless someone interfered
+                // by calling rollback directly or failing a commit,
+                // but is still a valid heuristic condition on our behalf.
+                throw new XAException( XAException.XA_HEURRB );
+            case Status.STATUS_PREPARED:
+                // Commit can only occur after a prepare, so must be
+                // in prepared state first. Any ODMG error is reported
+                // as a heuristic decision to rollback.
+                try {
+                    ctx.commit();
+                } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+                    throw new XAException( XAException.XAER_PROTO );
+                } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+                    throw new XAException( XAException.XA_HEURRB );
+                }
+            default:
+                throw new XAException( XAException.XAER_PROTO );
+            }
+        }
     }
-
+    
 
     public synchronized void rollback( Xid xid )
         throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _resManager ) {
-	    TransactionContext ctx;
-
-	    ctx = (TransactionContext) _resManager.get( xid );
-	    if ( ctx == null )
-		throw new XAException( XAException.XAER_NOTA );
-	    switch ( ctx.getStatus() ) {
-	    case Status.STATUS_COMMITTED:
-		// This should not happen unless someone interfered
-		// by calling commit directly, but is still a valid
-		// heuristic condition on our behalf.
-		throw new XAException( XAException.XA_HEURCOM );
-	    case Status.STATUS_ROLLEDBACK:
-		// Allowed to make multiple rollback attempts.
-		return;
-	    case Status.STATUS_ACTIVE:
-	    case Status.STATUS_MARKED_ROLLBACK:
-		// Rollback never fails with an application exception.
-		try {
-		    ctx.rollback();
-		} catch ( Exception except ) {
-		    throw new XAException( XAException.XAER_RMFAIL );
-		}
-		return;
-	    default:
-		throw new XAException( XAException.XAER_PROTO );
-	    }
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _resManager ) {
+            TransactionContext ctx;
+            
+            ctx = (TransactionContext) _resManager.get( xid );
+            if ( ctx == null )
+                throw new XAException( XAException.XAER_NOTA );
+            switch ( ctx.getStatus() ) {
+            case Status.STATUS_COMMITTED:
+                // This should not happen unless someone interfered
+                // by calling commit directly, but is still a valid
+                // heuristic condition on our behalf.
+                throw new XAException( XAException.XA_HEURCOM );
+            case Status.STATUS_ROLLEDBACK:
+                // Allowed to make multiple rollback attempts.
+                return;
+            case Status.STATUS_ACTIVE:
+            case Status.STATUS_MARKED_ROLLBACK:
+                // Rollback never fails with an application exception.
+                try {
+                    ctx.rollback();
+                } catch ( Exception except ) {
+                    throw new XAException( XAException.XAER_RMFAIL );
+                }
+                return;
+            default:
+                throw new XAException( XAException.XAER_PROTO );
+            }
+        }
     }
 
 
     public synchronized boolean isSameRM( XAResource xaRes )
-	throws XAException
+        throws XAException
     {
-	// Two resource managers are equal if they produce equivalent
-	// connection (i.e. same database, same user). If the two are
-	// equivalent they would share a transaction by joining.
-	if ( xaRes == null || ! ( xaRes instanceof DatabaseImpl ) )
-	    return false;
-	if ( _resManager.equals( ( (DatabaseImpl) xaRes )._resManager ) )
-	    return true;
-	return false;
+        // Two resource managers are equal if they produce equivalent
+        // connection (i.e. same database, same user). If the two are
+        // equivalent they would share a transaction by joining.
+        if ( xaRes == null || ! ( xaRes instanceof DatabaseImpl ) )
+            return false;
+        if ( _resManager.equals( ( (DatabaseImpl) xaRes )._resManager ) )
+            return true;
+        return false;
     }
 
 
     public boolean setTransactionTimeout( int timeout )
     {
-	return false;
+        return false;
     }
 
 
     public int getTransactionTimeout()
     {
-	return 0;
+        return 0;
     }
 
 

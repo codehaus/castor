@@ -73,96 +73,96 @@ public class DAXFieldDesc
 
 
     public DAXFieldDesc( FieldDesc fieldDesc, String ldapName )
-	throws MappingException
+        throws MappingException
     {
-	super( fieldDesc );
-	_ldapName = ldapName;
+        super( fieldDesc );
+        _ldapName = ldapName;
     }
 
 
     public String getLdapName()
     {
-	return _ldapName;
+        return _ldapName;
     }
 
 
     public void setValue( Object obj, LDAPEntry entry )
     {
-	LDAPAttribute attr;
-
-	attr = entry.getAttribute( _ldapName );
-	if ( attr == null )
-	    super.setValue( obj, null );
-	else  if ( getFieldType() == byte[].class ) {
-	    byte[][] values;
-	    int      count;
-	    byte[]   bytes;
-
-	    // Pretty much takes an array of bytes and stuffs it
-	    // into a single array of bytes
-	    values = attr.getByteValueArray();
-	    if ( values.length == 0 )
-		super.setValue( obj, null );
-	    else if ( values.length == 1 )
-		super.setValue( obj, values[ 0 ] );
-	    else {
-		count = 0;
-		for ( int i = 0 ; i < values.length ; ++i )
-		    count += values[ i ].length;
-		bytes = new byte[ count ];
-		count = 0;
-		for ( int i = 0 ; i < values.length ; ++i ) {
-		    for ( int j = 0 ; j < values.length ; ++j )
-			bytes[ count + j ] = values[ i ][ j ];
-		    count += values[ i ].length;
-		}
-		super.setValue( obj, values );
-	    }
-	} else if ( getFieldType() == String[].class ) {
-	    super.setValue( obj, attr.getStringValueArray() );
-	} else {
-	    // Type conversion comes here
-	    String[]  values;
-
-	    values = attr.getStringValueArray();
-	    if ( values.length == 0 )
-		super.setValue( obj, null );
-	    else if ( values.length == 1 )
-		super.setValue( obj, values[ 0 ] );
-	    else
-		// Need to assemble all strings together
-		super.setValue( obj, values[ 0 ] );
-	}
+        LDAPAttribute attr;
+        
+        attr = entry.getAttribute( _ldapName );
+        if ( attr == null )
+            super.setValue( obj, null );
+        else  if ( getFieldType() == byte[].class ) {
+            byte[][] values;
+            int      count;
+            byte[]   bytes;
+            
+            // Pretty much takes an array of bytes and stuffs it
+            // into a single array of bytes
+            values = attr.getByteValueArray();
+            if ( values.length == 0 )
+                super.setValue( obj, null );
+            else if ( values.length == 1 )
+                super.setValue( obj, values[ 0 ] );
+            else {
+                count = 0;
+                for ( int i = 0 ; i < values.length ; ++i )
+                    count += values[ i ].length;
+                bytes = new byte[ count ];
+                count = 0;
+                for ( int i = 0 ; i < values.length ; ++i ) {
+                    for ( int j = 0 ; j < values.length ; ++j )
+                        bytes[ count + j ] = values[ i ][ j ];
+                    count += values[ i ].length;
+                }
+                super.setValue( obj, values );
+            }
+        } else if ( getFieldType() == String[].class ) {
+            super.setValue( obj, attr.getStringValueArray() );
+        } else {
+            // Type conversion comes here
+            String[]  values;
+            
+            values = attr.getStringValueArray();
+            if ( values.length == 0 )
+                super.setValue( obj, null );
+            else if ( values.length == 1 )
+                super.setValue( obj, values[ 0 ] );
+            else
+                // Need to assemble all strings together
+                super.setValue( obj, values[ 0 ] );
+        }
     }
-
-
+    
+    
     public LDAPAttribute getAttribute( Object obj )
     {
-	Object  value;
-
-	value = super.getValue( obj );
-	if ( value == null ) {
-	    return null;
-	} else if ( value instanceof byte[] ) {
-	    return new LDAPAttribute( _ldapName, (byte[]) value );
-	} else if ( value instanceof String[] ) {
-	    return  new LDAPAttribute( _ldapName, (String[]) value );
-	} else if ( value instanceof String ) {
-	    return new LDAPAttribute( _ldapName, (String) value );
-	} else if ( value instanceof char[] ) {
-	    return new LDAPAttribute( _ldapName, new String( (char[]) value ) );
-	} else if ( Types.isSimpleType( value.getClass() ) ) {
-	    // Simple objects are stored as String
-	    return new LDAPAttribute( _ldapName, value.toString() );
-	} else {
-	    // Complex objects are serialized
-	    try {
-		return new LDAPAttribute( _ldapName, Serializer.serialize( value ) );
-	    } catch ( IOException except ) {
-		throw new IllegalArgumentException( "Cannot serialize field value of type " +
-						    value.getClass().getName() );
-	    }
-	}
+        Object  value;
+        
+        value = super.getValue( obj );
+        if ( value == null ) {
+            return null;
+        } else if ( value instanceof byte[] ) {
+            return new LDAPAttribute( _ldapName, (byte[]) value );
+        } else if ( value instanceof String[] ) {
+            return  new LDAPAttribute( _ldapName, (String[]) value );
+        } else if ( value instanceof String ) {
+            return new LDAPAttribute( _ldapName, (String) value );
+        } else if ( value instanceof char[] ) {
+            return new LDAPAttribute( _ldapName, new String( (char[]) value ) );
+        } else if ( Types.isSimpleType( value.getClass() ) ) {
+            // Simple objects are stored as String
+            return new LDAPAttribute( _ldapName, value.toString() );
+        } else {
+            // Complex objects are serialized
+            try {
+                return new LDAPAttribute( _ldapName, Serializer.serialize( value ) );
+            } catch ( IOException except ) {
+                throw new IllegalArgumentException( "Cannot serialize field value of type " +
+                                                    value.getClass().getName() );
+            }
+        }
     }
 
 

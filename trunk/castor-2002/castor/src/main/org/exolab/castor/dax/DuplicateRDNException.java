@@ -60,7 +60,7 @@ public class DuplicateRDNException
 
     public DuplicateRDNException( String message )
     {
-	super( message );
+        super( message );
     }
 
 
