@@ -63,7 +63,6 @@ import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.ContainerMapping;
 import org.exolab.castor.mapping.xml.LdapInfo;
 
 

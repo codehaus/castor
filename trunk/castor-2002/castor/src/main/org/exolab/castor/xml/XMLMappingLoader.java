@@ -129,10 +129,10 @@ public class XMLMappingLoader
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
         clsDesc = super.createDescriptor( clsMap );
-        if ( clsMap.getXmlSchema() == null || clsMap.getXmlSchema().getXmlName() == null )
+        if ( clsMap.getXmlSchema() == null || clsMap.getXmlSchema().getName() == null )
             xmlName = clsDesc.getJavaClass().getName();
         else
-            xmlName = clsMap.getXmlSchema().getXmlName();
+            xmlName = clsMap.getXmlSchema().getName();
             
         return new XMLClassDescriptorAdapter( clsDesc, xmlName );
     }

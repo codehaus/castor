@@ -261,30 +261,7 @@ public class DatabaseRegistry
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
 
-
-        /*
-        org.exolab.castor.xml.util.ClassDescriptorResolverImpl cdr;
-
-        try {
-            org.exolab.castor.xml.XMLMappingLoader xml;
-
-            unm = new Unmarshaller( org.exolab.castor.mapping.xml.Mapping.class );
-            cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
-            xml = new org.exolab.castor.xml.XMLMappingLoader( loader );
-            xml.loadMapping( new InputSource( unm.getClass().getResourceAsStream( "/org/exolab/castor/jdo/conf/mapping.xml" ) ) );
-            cdr.setMappingLoader( xml );
-        } catch ( MappingException except ) {
-            except.printStackTrace();
-            throw except;
-        } catch ( Exception except ) {
-            throw new MappingException( except );
-        }
-        */
-
-
         unm = new Unmarshaller( Database.class );
-        // unm.setResolver( cdr );
-
         try {
             // Load the JDO database configuration file from the specified
             // input source. If the database was already configured, ignore
