@@ -98,7 +98,7 @@ public class Date extends TimePeriod {
      * CCYY-MM-YY
      */
     public Date(java.util.Date dateRef) {
-        new Date();
+        this();
         GregorianCalendar tempCalendar = new GregorianCalendar();
         tempCalendar.setTime(dateRef);
         try {
