@@ -295,7 +295,7 @@ public abstract class TransactionContext
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
         ObjectEntry entry = null;
         OID         oid;
-        System.out.println("Tx.fetch() class: "+molder.getJavaClass().getName()+" : "+OID.flatten( identities ));
+        //System.out.println("Tx.fetch() class: "+molder.getJavaClass().getName()+" : "+OID.flatten( identities ));
 
         if ( identities == null ) 
             throw new PersistenceException("Identities can't be null!");
@@ -403,6 +403,7 @@ public abstract class TransactionContext
             removeObjectEntry( object );
             throw except;
         } catch ( LockNotGrantedException except ) {
+            // | it is an important one......
             removeObjectEntry( object );
             throw except;
         } catch ( ClassNotPersistenceCapableException except ) {
@@ -562,6 +563,7 @@ public abstract class TransactionContext
             }
             return oid;
         } catch ( Exception except ) {
+            except.printStackTrace();
             if ( molder.getCallback() != null )
                 molder.getCallback().releasing( object, false );
             removeObjectEntry( object );
@@ -598,7 +600,7 @@ public abstract class TransactionContext
      *  report that the object was modified in the database during the long 
      *  transaction.
      */
-    public synchronized OID update( LockEngine engine, ClassMolder molder, Object object)
+    public synchronized OID update( LockEngine engine, ClassMolder molder, Object object, OID depended )
         throws DuplicateIdentityException, ObjectModifiedException,
                ClassNotPersistenceCapableException, PersistenceException
     {
@@ -610,7 +612,7 @@ public abstract class TransactionContext
         identities = molder.getIdentities( object );
 
         // Make sure that nobody is looking at the object
-        oid = new OID( engine, molder, identities );
+        oid = new OID( engine, molder, depended, identities );
         entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
             if ( entry.deleted )
@@ -623,18 +625,30 @@ public abstract class TransactionContext
             //update() call must be replaced. Thus, we must allow this.
             //I don't see other way.
             release( entry.object );
+            //[Yip] Hum, i don't understand why
             //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
 
         // to prevent circular references
-        addObjectEntry( oid, object );
         accessMode = molder.getAccessMode( accessMode );
-        oid = engine.update( this, oid.getJavaClass(), object, accessMode, _lockTimeout );
 
         // If the object isn't found in the cache, then attempt to create it.
-        if ( oid == null ) {
+        try {
+            oid = engine.update( this, oid, object, accessMode, _lockTimeout );
+
+            if ( oid == null ) {
+                oid = create( engine, molder, object, depended );
+            }
+
+            // rehash the object with new oid
             removeObjectEntry( object );
-            return create( engine, molder, object, null );
+            addObjectEntry( oid, object );
+        } catch ( ObjectModifiedException e ) {
+            removeObjectEntry( object );
+            throw e;
+        } catch ( DuplicateIdentityException e ) {
+            removeObjectEntry( object );
+            throw new ObjectModifiedException("Object modified and can not be updated!");
         }
 
         try {
@@ -644,6 +658,7 @@ public abstract class TransactionContext
             }
         } catch ( Exception except ) {
             release( object );
+            removeObjectEntry( object );
             if ( except instanceof PersistenceException )
                 throw (PersistenceException) except;
             throw new PersistenceException( except.getMessage(), except );
@@ -939,6 +954,7 @@ public abstract class TransactionContext
             _status = Status.STATUS_PREPARED;
             return true;
         } catch ( Exception except ) {
+            except.printStackTrace();
             _status = Status.STATUS_MARKED_ROLLBACK;
             if ( except instanceof TransactionAbortedException )
                 throw (TransactionAbortedException) except;
@@ -1063,6 +1079,7 @@ public abstract class TransactionContext
                     entry.molder.getCallback().releasing( entry.object, false );
             } catch ( Exception except ) { 
                 // maybe we should remove it, when castor become stable
+                except.printStackTrace();
             }
         }
 
