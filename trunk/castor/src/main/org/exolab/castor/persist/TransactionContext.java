@@ -56,6 +56,7 @@ import javax.transaction.xa.Xid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -434,6 +435,14 @@ public abstract class TransactionContext
     public abstract Object getConnection( LockEngine engine )
         throws PersistenceException;
 
+
+	/**
+	 * Returns meta-data related to the RDBMS used.
+	 * @param engine LockEngine instance used.
+	 * @return A DbMetaInfo instance describing var. features of the underlying RDBMS.
+	 */
+    public abstract DbMetaInfo getConnectionInfo(LockEngine engine)
+    	throws PersistenceException;
 
     /**
      * The derived class must implement this method and commit all the
