@@ -545,7 +545,7 @@ public class UnmarshalHandler implements DocumentHandler {
             //-- descriptor
             classDesc = null;
             if (cdInherited != null) classDesc = cdInherited;
-            else if (!descriptor.getXMLName().equals(name))
+            else if (!name.equals(descriptor.getXMLName()))
                 classDesc = _cdResolver.resolveByXMLName(name, null);
             
             if (classDesc == null)
