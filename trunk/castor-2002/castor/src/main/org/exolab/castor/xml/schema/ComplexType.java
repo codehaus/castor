@@ -66,9 +66,18 @@ public class ComplexType extends XMLType
 
     private String type = null;
 
+	/**
+	 * a flag set to true if this complexType is a complexContent
+	 */
+	 private boolean _complexContent = false;
 
     /**
-     * The base type
+	 * a flag set to true if this complexType is a simpleContent
+	 */
+	 private boolean _simpleContent = false;
+
+	/**
+     * The base type used in <restriction> or <extension>
     **/
     private String base = null;
 
@@ -203,7 +212,39 @@ public class ComplexType extends XMLType
         return (getSchema().getComplexType(getName()) == this);
     } //-- isTopLevel
 
-    /**
+	/**
+	 * Returns true if this complexType is a 'complexContent'
+	 * @eturns true if this complexType is a 'complexContent'
+	 */
+	public boolean isComplexContent() {
+	       return _complexContent;
+	}
+
+	/**
+	 * Returns true if this complexType is a 'simpleContent'
+	 * @eturns true if this complexType is a 'simpleContent'
+	 */
+	public boolean isSimpleContent() {
+	       return _simpleContent;
+	}
+
+	/**
+	 * Sets whether or not this complexType is a 'complexContent'
+	 * @param complexContent true if this complexType is a 'complexContent'
+	 */
+	public void setComplexContent(boolean complexContent) {
+	       this._complexContent = complexContent;
+	}
+
+	/**
+	 * Sets whether or not this complexType is a 'simpleContent'
+	 * @param complexContent true if this complexType is a 'simpleContent'
+	 */
+	public void setSimpleContent(boolean simpleContent) {
+	       this._simpleContent = simpleContent;
+	}
+
+	/**
      * Sets the content type of this archetype
      * @param contentType the ContentType for this archetype
     **/
