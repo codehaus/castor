@@ -103,12 +103,14 @@ public class SGList extends SGMember {
     
     public JMethod[] createAccessMethods() {
         
-        JMethod[] methods = new JMethod[6];
+        Vector methods = new Vector(10);
+        
+        JMethod method = null;
+        
         JParameter contentParam 
             = new JParameter(contentType.getJType(), contentName);
+            
         JSourceCode jsc = null;
-        
-        int mc = 0;
         
           //---------------------/
          //- Create add method -/
@@ -116,11 +118,14 @@ public class SGList extends SGMember {
         
         String cName = JavaXMLNaming.toJavaClassName(elementName);
         
-        methods[mc] = new JMethod(null, "add"+cName);
-        methods[mc].addException(SGTypes.IndexOutOfBoundsException);
-        methods[mc].addParameter(contentParam);
+        method = new JMethod(null, "add"+cName);
+        methods.addElement(method);
+        
+        method.addException(SGTypes.IndexOutOfBoundsException);
+        method.addParameter(contentParam);
                     
-        jsc = methods[mc].getSourceCode();
+        jsc = method.getSourceCode();
+        
         int maxSize = xsList.getMaximumSize();
         if (maxSize > 0) {
             jsc.add("if (!(");
@@ -143,14 +148,14 @@ public class SGList extends SGMember {
          //- Create get method -/
         //---------------------/
         
-        ++mc;
         
         JType jType = contentType.getJType();
-        methods[mc] = new JMethod(jType, "get"+cName);
-        methods[mc].addException(SGTypes.IndexOutOfBoundsException);
-        methods[mc].addParameter(new JParameter(JType.Int, "index"));
+        method = new JMethod(jType, "get"+cName);
+        methods.addElement(method);
+        method.addException(SGTypes.IndexOutOfBoundsException);
+        method.addParameter(new JParameter(JType.Int, "index"));
                     
-        jsc = methods[mc].getSourceCode();
+        jsc = method.getSourceCode();
                     
         jsc.add("//-- check bounds for index");
         jsc.add("if ((index < 0) || (index > ");
@@ -181,11 +186,10 @@ public class SGList extends SGMember {
          //- Create get[] method -/
         //-----------------------/
 
-        ++mc;
-        
         jType = jType.createArray();
-        methods[mc] = new JMethod(jType, "get"+cName);
-        jsc = methods[mc].getSourceCode();
+        method = new JMethod(jType, "get"+cName);
+        methods.addElement(method);
+        jsc = method.getSourceCode();
                     
         jsc.add("int size = ");
         jsc.append(getName());
@@ -216,14 +220,13 @@ public class SGList extends SGMember {
          //- Create set method -/
         //---------------------/
         
-        ++mc;
-        
-        methods[mc] = new JMethod(null, "set"+cName);
-        methods[mc].addException(SGTypes.IndexOutOfBoundsException);
-        methods[mc].addParameter(contentParam);
-        methods[mc].addParameter(new JParameter(JType.Int, "index"));
+        method = new JMethod(null, "set"+cName);
+        methods.addElement(method);
+        method.addException(SGTypes.IndexOutOfBoundsException);
+        method.addParameter(contentParam);
+        method.addParameter(new JParameter(JType.Int, "index"));
                     
-        jsc = methods[mc].getSourceCode();
+        jsc = method.getSourceCode();
         
         jsc.add("//-- check bounds for index");
         jsc.add("if ((index < 0) || (index > ");
@@ -255,9 +258,9 @@ public class SGList extends SGMember {
          //- Create getCount method -/
         //--------------------------/
         
-        ++mc;
-        methods[mc] = new JMethod(JType.Int, "get"+cName+"Count");
-        jsc = methods[mc].getSourceCode();
+        method = new JMethod(JType.Int, "get"+cName+"Count");
+        methods.addElement(method);
+        jsc = method.getSourceCode();
         jsc.add("return ");
         jsc.append(getName());
         jsc.append(".size();");
@@ -267,14 +270,71 @@ public class SGList extends SGMember {
          //- Create Enumerate Method -/
         //---------------------------/
         
-        ++mc;
-        methods[mc] = new JMethod(SGTypes.Enumeration, "enumerate"+cName);
-        jsc = methods[mc].getSourceCode();
+        method = new JMethod(SGTypes.Enumeration, "enumerate"+cName);
+        methods.addElement(method);
+        jsc = method.getSourceCode();
         jsc.add("return ");
         jsc.append(getName());
         jsc.append(".elements();");
         
-        return methods;
+        
+          //--------------------------------/
+         //- Create remove(Object) Method -/
+        //--------------------------------/
+        
+        //-- commented out until I fix primitives
+        //method = new JMethod(JType.Boolean, "remove"+cName);
+        //methods.addElement(method);
+        //method.addParameter(contentParam);
+        //jsc = method.getSourceCode();
+        //jsc.add("return ");
+        //jsc.append(getName());
+        //jsc.append(".removeElement(");
+        //jsc.append(contentName);
+        //jsc.append(");");
+        
+
+          //--------------------------------/
+         //- Create remove(int i) Method -/
+        //--------------------------------/
+        
+        jType = contentType.getJType();
+        method = new JMethod(jType, "remove"+cName);
+        methods.addElement(method);
+        method.addParameter(new JParameter(JType.Int, "index"));
+        jsc = method.getSourceCode();
+        jsc.add("Object obj = ");
+        jsc.append(getName());
+        jsc.append(".elementAt(index);");
+        jsc.add(getName());
+        jsc.append(".removeElementAt(index);");
+        jsc.add("return ");
+        if (contentType.getType() == XSType.CLASS) {
+            jsc.append("(");
+            jsc.append(jType.getName());
+            jsc.append(") obj;");
+        }
+        else {
+            jsc.append(contentType.createFromJavaObjectCode("obj"));
+            jsc.append(";");
+        }
+        
+          //-----------------------------/
+         //- Create removeAll() Method -/
+        //-----------------------------/
+        
+        method = new JMethod(null, "removeAll"+cName);
+        methods.addElement(method);
+        jsc = method.getSourceCode();
+        jsc.add(getName());
+        jsc.append(".removeAllElements();");
+        
+        /* Return JMethod[] */
+        
+        JMethod[] jmArray = new JMethod[methods.size()];
+        methods.copyInto(jmArray);
+        
+        return jmArray;
         
     } //-- createAccessMethods
     
