@@ -336,7 +336,8 @@ create table test_types (
   blob_val image          null,
   clob_val text           null,
   blob_val2 image         null,
-  clob_val2 text          null
+  clob_val2 text          null,
+  date_str  datetime      null
 )
 go
 create unique index test_types_pk on test_types (id)

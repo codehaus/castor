@@ -266,7 +266,8 @@ create table test_types (
   blob_val blob           null,
   clob_val clob           null,
   blob_val2 blob          null,
-  clob_val2 clob          null
+  clob_val2 clob          null,
+  date_str  date          null
 );
 create unique index test_types_pk
   on test_types ( id );
