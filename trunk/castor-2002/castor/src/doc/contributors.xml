@@ -243,6 +243,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Nielsen" given="Glenn"/>
+    <email>glenn@voyager.apg.more.net</email>
+    <description>Some patches for Castor XML</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Rousse" given="Guillaume" />
     <email>Guillaume.Rousse@univ-reunion.fr</email>
    <description>Mapping extension and other important feebback</description>
@@ -307,7 +313,7 @@
     <email>msmall@clickability.com</email>
     <description>Some patches for Castor XML Schema Writer</description>
   </contributor>
- 
+
   <contributor type="Contributor">
     <name surname="Low" given="Heng Sin"/>
     <email>lowhs@comline.com.my</email>
