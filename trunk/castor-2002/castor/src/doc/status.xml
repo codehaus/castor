@@ -7,26 +7,24 @@
 
       <section title="Castor XML">
         <ul>
+          <li>Automatic XML data binding for class definitions which adhere
+              to the Java Beans design pattern.</li>
+
           <li>Java to XML mapping automates transformation of Java objects from
               and into XML documents and provides Java object validation</li>
 
-          <li>Java to XML mapping uses an XML document to specify the mapping
-              textually, Bean-like descriptors to specify them programatically,
-              and introspection to create default mappings</li>
-
-          <li>Code generator can produce Java objects, validation and the proper
-              mapping based on an XML schema</li>
-
-          <li>Supports XML schema data types including integer, real (float/double),
-              NMTOKEN, NCName, timeInstant, ID/IDREF, boolean and binary (base 64 encoded).
-              For an updated list see <a href="sourcegen.xml">Source Generator</a>
+          <li>An XML based mapping file to specify XML bindings.
           </li>
 
-          <li>Supports arbitrary object marshalling when object type is known at
-              run-time and XML schema is determined dynamically based on the
-              object type</li>
+          <li>Source Code generator can produce Java class definitions,
+              XML binding information and validation code based on
+              a given XML schema.
+          </li>
 
-          <li>Supports for creation of objects based on class name attribute</li>
+          <li>Supports W3C XML Schema October 24, 2000 Candidate Recommendation.
+              For more information refer to the
+              <a href="sourcegen.xml">Source Code Generator</a>
+          </li>
         </ul>
       </section>
 
@@ -119,8 +117,9 @@
        <section title="XML">
           <section title="Source Code Generator">
             <ul>
-               <li>Finish support for XML Schema (Grouping, remaining datatypes, etc)</li>
-               <li>Remove excessive methods in source code generator</li>
+               <li>Upgrade W3C XML Schema support to the March 16, 2001 Proposed
+                   Recommendation.</li>
+               <li>Support for element and object Containers (also called Wrappers)</li>
                <li>Create "customization" input file</li>
                <li>Extensibility API</li>
             </ul>
