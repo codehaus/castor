@@ -461,10 +461,10 @@ public class SourceGenerator {
         
         ClassInfo classInfo = state.resolve(jClass);
         if (classInfo != null) {
-            JClass mInfo 
-                = MarshalInfoSourceFactory.createSource(classInfo);
-            mInfo.setHeader(header);
-            mInfo.print(lineSeparator);
+            JClass desc 
+                = DescriptorSourceFactory.createSource(classInfo);
+            desc.setHeader(header);
+            desc.print(lineSeparator);
         }
         
         state.markAsProcessed(jClass);
