@@ -77,8 +77,6 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
     **/
     private Archetype _archetype = null;
     
-    private CharacterUnmarshaller charUnmarshaller = null;
-    
     private boolean allowRefines = true;
     
     private boolean allowContentModel = true;
@@ -141,7 +139,6 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
         
         }
         
-        charUnmarshaller = new CharacterUnmarshaller();
     } //-- ArchetypeUnmarshaller
 
       //-----------/
@@ -164,6 +161,14 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
     public Archetype getArchetype() {
         return _archetype;
     } //-- getArchetype
+    
+    /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getArchetype();
+    } //-- getObject
 
     /**
      * @param name 
@@ -209,12 +214,7 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
             String err = "<restrictions> element not yet supported.";
             throw new SAXException(err);
         }
-        else {
-            StringBuffer err = new StringBuffer("illegal element <");
-            err.append(name);
-            err.append("> found in <archetype>.");
-            throw new SAXException(err.toString());
-        }
+        else illegalElement(name);
     
     } //-- startElement
 
@@ -231,15 +231,6 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
             unmarshaller.endElement(name);
             --depth;
             return;
-        }
-        
-        //-- check for name mismatches
-        if ((unmarshaller != null) && (charUnmarshaller != unmarshaller)) {
-            if (!name.equals(unmarshaller.elementName())) {
-                String err = "missing end element for ";
-                err += unmarshaller.elementName();
-                throw new SAXException(err);
-            }
         }
         
         //-- Use JVM internal String

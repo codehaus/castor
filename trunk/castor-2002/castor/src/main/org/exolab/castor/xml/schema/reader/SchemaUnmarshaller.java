@@ -103,6 +103,14 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     }
     
     /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getSchema();
+    } //-- getObject
+    
+    /**
      * Returns the name of the element that this SaxUnmarshaller
      * handles
      * @return the name of the element that this SaxUnmarshaller
@@ -218,9 +226,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         else if (name == SchemaNames.ELEMENT) {
             ElementDecl element = null;
             element = ((ElementUnmarshaller)unmarshaller).getElement();
-            element.useResolver(_resolver);
             _schema.addElementDecl(element);
-            _resolver.addResolvable(element.getReferenceId(), element);
         }
         unmarshaller = null;
     } //-- endElement
