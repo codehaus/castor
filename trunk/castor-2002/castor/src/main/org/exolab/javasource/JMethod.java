@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -59,31 +59,18 @@ import java.util.Vector;
 **/
 public class JMethod implements JMember {
 
-    /**
-     * The set of modifiers for this JMethod
-    **/
-    private JModifiers modifiers = null;
     
     /**
-     * The return type of this Method
+     * The set of classes that contain this JMethod.
     **/
-    private JType returnType    = null;
+    private Vector _classes = null;
     
     /**
-     * The name of this method
+     * The JavaDoc comment for this JMethod. This
+     * will overwrite the JavaDoc for the 
+     * JMethodSignature.
     **/
-    private String name          = null;
-
-
-    /**
-     * List of parameters of this JMethod in declared order
-    **/
-    private JNamedMap params       = null;
-    
-    /**
-     * The Class in this JMember has been declared
-    **/
-    private JClass declaringClass = null;
+    private JDocComment jdc = null;
     
     /**
      * The source code for this method
@@ -91,87 +78,71 @@ public class JMethod implements JMember {
     private JSourceCode source = null;
     
     /**
-     * The exceptions that this method throws
+     * The signature for this method.
     **/
-    private Vector exceptions = null;
+    private JMethodSignature _signature = null;
+    
 
     /**
-     * The JavaDoc comment for this method
+     * Creates a new JMethod with the given name and "void" return type.
+     *
+     * @param name, the method name. Must not be null.
     **/
-    private JDocComment jdc = null;
+    public JMethod(String name) {
+        this(null, name);
+    } //-- JMethod
     
     /**
-     * Creates a new method with the given name and returnType.
-     * For "void" return types, simply pass in null as the returnType
+     * Creates a new JMethod with the given name and returnType.
+     * For "void" return types, simply pass in null as the returnType.
+     *
+     * @param name, the method name. Must not be null.
+     * @param returnType the return type of the method. May be null.
     **/
     public JMethod(JType returnType, String name) {
         
+        if ((name == null) || (name.length() == 0)) {
+            String err = "The method name must not be null or zero-length";
+            throw new IllegalArgumentException(err);
+        }
+        
+        _classes   = new Vector(1);
         this.jdc          = new JDocComment();
-        this.returnType   = returnType;
-        this.name         = name;
-        this.modifiers    = new JModifiers();
-        this.params       = new JNamedMap(3);
         this.source       = new JSourceCode();
-        this.exceptions   = new Vector(1); 
+        _signature = new JMethodSignature(name, returnType);
         
     } //-- JMethod
 
     
     /**
-     * Adds the given Exception to this Method's throws clause
+     * Adds the given Exception to this Method's throws clause.
+     *
      * @param exp the JClass representing the Exception
     **/
     public void addException(JClass exp) {
-        
-        if (exp == null) return;
-        
-        //-- make sure exception is not already added
-        String expClassName = exp.getName();
-        for (int i = 0; i < exceptions.size(); i++) {
-            JClass jClass = (JClass) exceptions.elementAt(i);
-            if (expClassName.equals(jClass.getName())) return;
-        }
-        //-- add exception
-        exceptions.addElement(exp);
+        _signature.addException(exp);
     } //-- addException
 
 
     /**
-     * Adds the given parameter to this Methods list of parameters
+     * Adds the given parameter to this JMethod's list of parameters.
+     *
      * @param parameter the parameter to add to the this Methods
      * list of parameters.
-     * @exception IllegalArgumentException when a parameter already
+     * @throws IllegalArgumentException when a parameter already
      * exists for this Method with the same name as the new parameter
     **/
     public void addParameter(JParameter parameter) 
         throws IllegalArgumentException
     {
-        
-        if (parameter == null) return;
-        
-        String pName = parameter.getName();
-        //-- check current params
-        if (params.get(pName) != null) {
-            StringBuffer err = new StringBuffer();
-            err.append("A parameter already exists for this method, ");
-            err.append(name);
-            err.append(", with the name: ");
-            err.append(pName);
-            throw new IllegalArgumentException(err.toString());
-        }
-        
-        
-        params.put(pName, parameter);
-        
-        //-- create comment
-        jdc.addDescriptor(JDocDescriptor.createParamDesc(pName, null));
+        _signature.addParameter(parameter);
         
         //-- be considerate and add the class name to the
-        //-- declaring class's list of imports
-        if (declaringClass != null) {
-            if (!parameter.getType().isPrimitive()) {
-                JClass jc = (JClass)parameter.getType();
-                declaringClass.addImport(jc.getName());
+        //-- each declaring class' list of imports
+        if (!parameter.getType().isPrimitive()) {
+            JClass type = (JClass)parameter.getType();
+            for (int i = 0; i < _classes.size(); i++) {
+                ((JClass)_classes.elementAt(i)).addImport(type.getName());
             }
         }
     } //-- addParameter
@@ -187,46 +158,48 @@ public class JMethod implements JMember {
     /**
      * Returns the class in which this JMember has been declared
      * @return the class in which this JMember has been declared
-    **/
+    **
     public JClass getDeclaringClass() {
-        return this.declaringClass;
+        return _declaringClass;
     } //-- getDeclaringClass
+    */
     
     /**
-     * Returns the exceptions that this JMember throws
-     * @return the exceptions that this JMember throws
+     * Returns the exceptions that this JMember throws.
+     *
+     * @return the exceptions that this JMember throws.
     **/
     public JClass[] getExceptions() {
-        
-        JClass[] jclasses = new JClass[exceptions.size()];
-        exceptions.copyInto(jclasses);
-        return jclasses;
+        return _signature.getExceptions();
     } //-- getExceptions
 
 
     /**
-     * Returns the modifiers for this JMember
-     * @return the modifiers for this JMember     
+     * Returns the modifiers for this JMember.
+     *
+     * @return the modifiers for this JMember.
     **/
     public JModifiers getModifiers() {
-        return this.modifiers;
+        return _signature.getModifiers();
     } //-- getModifiers
 
     /**
-     * Returns the name of this JMember
-     * @return the name of this JMember
+     * Returns the name of this JMember.
+     *
+     * @return the name of this JMember.
     **/
     public String getName() {
-        return this.name;
+        return _signature.getName();
     } //-- getName
 
     /**
-     * Returns the JParameter at the given index
-     * @param index the index of the JParameter to return
-     * @return the JParameter at the given index
+     * Returns the JParameter at the given index.
+     *
+     * @param index the index of the JParameter to return.
+     * @return the JParameter at the given index.
     **/
     public JParameter getParameter(int index) {
-        return (JParameter)params.get(index);
+        return _signature.getParameter(index);
     } //-- getParameter
     
     /**
@@ -234,20 +207,36 @@ public class JMethod implements JMember {
      * <BR>
      * <B>Note:</B> the array is a copy, the params in the array
      * are the actual references.
+     *
      * @return the set of JParameters for this JMethod
     **/
-    public synchronized JParameter[] getParameters() {
-        JParameter[] pArray = new JParameter[params.size()];
-        for (int i = 0; i < pArray.length; i++) {
-            pArray[i] = (JParameter)params.get(i);
-        }
-        return pArray;
+    public JParameter[] getParameters() {
+        return _signature.getParameters();
     } //-- getParameters
     
+    /** 
+     * Returns the JType that represents the return type of the method.
+     *
+     * @return the JType that represents the return type of the method.
+    **/
     public JType getReturnType() {
-        return returnType;
+        return _signature.getReturnType();
     } //-- getReturnType
 
+    /**
+     * Returns the JMethodSignature for this JMethod.
+     *
+     * @return the JMethodSignature for this JMethod.
+    **/
+    public JMethodSignature getSignature() {
+        return _signature;
+    } //-- getSignature
+    
+    /** 
+     * Returns the JSourceCode for the method body.
+     *
+     * @return the JSourceCode for the method body.
+    **/
     public JSourceCode getSourceCode() {
         return this.source;
     } //-- getSourceCode
@@ -255,7 +244,8 @@ public class JMethod implements JMember {
     /**
      * Sets the comment describing this member. The comment 
      * will be printed when this member is printed with the
-     * Class Printer
+     * Class Printer.
+     *
      * @param comment the comment for this member
      * @see #getJDocComment
     **/
@@ -264,35 +254,44 @@ public class JMethod implements JMember {
     } //-- setComment
     
     /**
-     * Sets the name of this JMember
-     * @param name the name of this JMember
-     * @exception IllegalArgumentException when the
-     * name is not a valid Java member name, or if a member
-     * with the given name already exists in the declaring class
+     * Sets the JModifiers for this JMethod. This
+     * JMethod will use only a copy of the JModifiers.
+     * <B>Note:</B> The JModifiers will be set in the
+     * containing JMethodSignature. If the JMethodSignature
+     * is used by other methods, keep in mind that it will be 
+     * changed.
+     *
+     * @param modifiers the JModifiers to set.
     **/
-    public void setName(String name) throws 
-        IllegalArgumentException
-    {
-        this.name = name;
-    } //-- setName
-    
     public void setModifiers(JModifiers modifiers) {
-        this.modifiers = modifiers.copy();
-        this.modifiers.setFinal(false);
+        _signature.setModifiers(modifiers);
     } //-- setModifiers
 
-    protected void setDeclaringClass(JClass declaringClass) {
-        this.declaringClass = declaringClass;
-    } //-- setDeclaringClass
-
+    /**
+     * Sets the given string as the source code (method body) 
+     * for this JMethod.
+     *
+     * @param source the String that represents the method body.
+    **/
     public void setSourceCode(String source) {
         this.source = new JSourceCode(source);
     } //-- setSource
 
+    /**
+     * Sets the given JSourceCode as the source code (method body) 
+     * for this JMethod.
+     *
+     * @param source the JSourceCode that represents the method body.
+    **/
     public void setSourceCode(JSourceCode source) {
         this.source = source;
     } //-- setSource;
     
+    /**
+     * Prints this JMethod to the given JSourceWriter.
+     *
+     * @param jsw the JSourceWriter to print to.
+    **/
     public void print(JSourceWriter jsw) {
         
         //------------/
@@ -301,39 +300,13 @@ public class JMethod implements JMember {
         
         jdc.print(jsw);
         
-        //-----------------/
-        //- Method Source -/
-        //-----------------/
+        //--------------------/
+        //- Method Signature -/
+        //--------------------/
         
-        jsw.write(modifiers.toString());
-        if (modifiers.toString().length() > 0) {
-            jsw.write(' ');
-        }
-        if (returnType != null) {
-            jsw.write(returnType);
-        }
-        else jsw.write("void");
-        jsw.write(' ');
-        jsw.write(name);
-        jsw.write('(');
+        _signature.print(jsw, false);
         
-        //-- print parameters
-        for (int i = 0; i < params.size(); i++) {
-            if (i > 0) jsw.write(", ");
-            jsw.write(params.get(i));
-        }
-        jsw.write(")");
-        
-        if (exceptions.size() > 0) {
-            jsw.writeln();
-            jsw.write("    throws ");
-            for (int i = 0; i < exceptions.size(); i++) {
-                if (i > 0) jsw.write(", ");
-                JClass jClass = (JClass) exceptions.elementAt(i);
-                jsw.write(jClass.getName());
-            }
-        }
-        if (modifiers.isAbstract()) {
+        if (_signature.getModifiers().isAbstract()) {
             jsw.writeln(";");
         }
         else {
@@ -353,45 +326,37 @@ public class JMethod implements JMember {
      * is simply the method prototype
     **/
     public String toString() {
-        
-        StringBuffer sb = new StringBuffer();
-        if (returnType != null) {
-            sb.append(returnType);
-        }
-        else sb.append("void");
-        sb.append(' ');
-        sb.append(name);
-        sb.append('(');
-        
-        //-- print parameters
-        for (int i = 0; i < params.size(); i++) {
-            JParameter jParam = (JParameter)params.get(i);
-            if (i > 0) sb.append(", ");
-            sb.append(jParam.getType().getName());
-        }
-        sb.append(") ");
-
-        return sb.toString();
+        return _signature.toString();
     } //-- toString
+    
+    //---------------------/
+    //- PROTECTED METHODS -/
+    //---------------------/
+    
+    /**
+     * Adds the given JClass to the set of classes that
+     * contain this method.
+     *
+     * @param jClass the JClass to add as one of
+     * the JClasses that contain this method.
+    **/
+    protected void addDeclaringClass(JClass jClass) {
+        _classes.addElement(jClass);
+    } //-- addDeclaringClass
+
+    /**
+     * Removes the given JClass from the set of classes that
+     * contain this method.
+     *
+     * @param jClass the JClass to add as one of
+     * the JClasses that contain this method.
+    **/
+    protected void removeDeclaringClass(JClass jClass) {
+        _classes.removeElement(jClass);
+    } //-- removeDeclaringClass
 
     protected String[] getParameterClassNames() {
-        
-        
-        Vector names = new Vector(params.size());
-        
-        for (int i = 0; i < params.size(); i++) {
-            
-            JType  jType  = ((JParameter)params.get(i)).getType();
-            while (jType.isArray()) jType = jType.getComponentType();
-            if (!jType.isPrimitive()) {
-                JClass jclass = (JClass)jType;
-                names.addElement( jclass.getName() );
-            }
-        }
-        
-        String[] names_array = new String[names.size()];
-        names.copyInto(names_array);
-        return names_array;
+        return _signature.getParameterClassNames();
     } //-- getParameterClassNames
     
 } //-- JMember
