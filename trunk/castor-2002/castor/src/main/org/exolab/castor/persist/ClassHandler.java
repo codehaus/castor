@@ -381,8 +381,7 @@ public final class ClassHandler
 
                 if ( fields[ i ] == null )
                     _fields[ i ].relation.setRelated( target, null );
-                else if ( _fields[ i ].colHandler != null ) {
-                    Object collection = null;
+                else if ( _fields[ i ].multi ) {
                     Vector vector;
 
                     vector = (Vector) fields[ i ];
@@ -393,9 +392,8 @@ public final class ClassHandler
                         if ( object == null )
                             throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
                                                                    vector.elementAt( j ) );
-                        collection = _fields[ i ].colHandler.addValue( collection, object, vector.elementAt( j ) );
+                         _fields[ i ].relation.setRelated( target, object );
                     }
-                    _fields[ i ].relation.setRelated( target, collection );
                 } else {
                     Object relTarget;
 
@@ -424,12 +422,12 @@ public final class ClassHandler
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].relation == null )
                 fields[ i ] = copyValue( _fields[ i ], _fields[ i ].handler.getValue( source ) );
-            else if ( _fields[ i ].colHandler != null ) {
+            else if ( _fields[ i ].multi ) {
                 Vector     vector;
                 Enumeration enum;
 
                 vector = new Vector();
-                enum = _fields[ i ].colHandler.getValues( _fields[ i ].relation.getRelated( source ) );
+                enum = (Enumeration) _fields[ i ].relation.getRelated( source );
                 while ( enum.hasMoreElements() ) {
                     vector.addElement( copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
                                                   _fields[ i ].relation.getIdentity( enum.nextElement() ) ) );
@@ -500,7 +498,7 @@ public final class ClassHandler
      */
     private boolean isModified( FieldInfo field, Object object, Object original )
     {
-        if ( field.colHandler == null ) {
+        if ( ! field.multi ) {
             Object value;
 
 	    // Modified if field has value but original is null,
@@ -516,31 +514,27 @@ public final class ClassHandler
             else
                 return ! value.equals( original );
         } else {
-            Object collection;
-
-	    // Modified if collection is null or zero size, and original
-	    // is not null or has some elements, or if collection has
-	    // some elements but original is null or does not have the
-	    // same number of elements.
-            collection = field.handler.getValue( object );
-            if ( collection == null || field.colHandler.getSize( collection ) == 0 )
-                return ( original != null && ( (Vector) original ).size() >= 0 );
-            if ( original == null || ( (Vector) original ).size() != field.colHandler.getSize( collection ) )
-                return true;
-
-	    // Collection and original both have the same number of
-	    // elements, modified if collection has an identity that
-	    // does not exist in the original.
-	    Enumeration enum;
+            // The field will always return an enumeration, the original
+            // might be null. If the original is null and there are elements
+            // in the collection, then the field has been modified. If not,
+            // look at all the element in the collection, if any of these does
+            // not appear in the vector (based on identity), the field is
+            // modified. As the enumeration is traversed the elements are
+            // counted to determine whether the vector might have additional
+            // elements.
+            Enumeration enum;
+            int         count;
 	    Object      relIdentity;
 
-	    enum = field.colHandler.getValues( collection );
-	    while ( enum.hasMoreElements() ) {
-		relIdentity = field.relation.getIdentity( enum.nextElement() );
-		if ( ! ( (Vector) original ).contains( relIdentity ) )
-		    return true;
+            enum = (Enumeration) field.handler.getValue( object );
+            if ( enum.hasMoreElements() && original == null )
+                return true;
+            for ( count = 0 ;  enum.hasMoreElements() ; ++count ) {
+ 		relIdentity = field.relation.getIdentity( enum.nextElement() );
+                if ( ! ( (Vector) original ).contains( relIdentity ) )
+                    return true;
 	    }
-            return false;
+            return ( count != ( (Vector) original ).size() );
         }
     }
 
@@ -598,10 +592,10 @@ public final class ClassHandler
 	 */
         final RelationHandler   relation;
 
-	/**
-	 * The collection handler if the field is a collection.
-	 */
-        final CollectionHandler colHandler;
+        /**
+         * True if the field is multi valued (collection).
+         */
+        final boolean           multi;
 
         FieldInfo( FieldDescriptor fieldDesc, RelationHandler relation )
         {
@@ -609,7 +603,7 @@ public final class ClassHandler
 	    this.handler = fieldDesc.getHandler();
             this.immutable = fieldDesc.isImmutable();
             this.relation = relation;
-            this.colHandler = fieldDesc.getCollectionHandler();
+            this.multi = fieldDesc.isMulti();
         }
 
     }

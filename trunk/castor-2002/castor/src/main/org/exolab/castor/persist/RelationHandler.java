@@ -72,9 +72,9 @@ public final class RelationHandler
 
 
     /**
-     * A collection handler if this is a many relation.
+     * True if the relation is multi valued (a collection).
      */
-    private final CollectionHandler _colHandler;
+    private final boolean           _multi;
 
 
     /**
@@ -95,9 +95,9 @@ public final class RelationHandler
     RelationHandler( FieldDescriptor fieldDesc, ClassHandler relHandler, boolean attached )
     {
 	_handler = fieldDesc.getHandler();
-        _colHandler = fieldDesc.getCollectionHandler();
         _relHandler = relHandler;
         _attached = attached;
+        _multi = fieldDesc.isMulti();
     }
 
 
@@ -112,9 +112,9 @@ public final class RelationHandler
      *
      * @return True if a many relation
      */
-    public boolean isMany()
+    public boolean isMulti()
     {
-        return ( _colHandler != null );
+        return _multi;
     }
 
 
@@ -152,23 +152,6 @@ public final class RelationHandler
     public void setRelated( Object object, Object related )
     {
         _handler.setValue( object, related );
-    }
-
-
-    /**
-     * Returns the collection of related objects.
-     *
-     * @param object The object
-     * @return The related objects
-     */
-    public Enumeration getCollection( Object object )
-    {
-        Object collection;
-
-        collection = _handler.getValue( object );
-        if ( collection == null )
-            return null;
-        return _colHandler.getValues( collection );
     }
 
 
