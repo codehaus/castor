@@ -84,7 +84,7 @@ public final class XSNMToken extends XSType {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSNMToken.jType;
     }
 
   	/**

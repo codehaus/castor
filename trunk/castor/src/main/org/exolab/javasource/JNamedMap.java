@@ -176,7 +176,7 @@ public class JNamedMap {
     /**
      * Removes and returns the Object located at the given index
      *
-     * @param name the name of the Object to remove
+     * @param index the index of the Object to remove
      * @return the object removed from the map.
     **/
     public Object remove(int index) 

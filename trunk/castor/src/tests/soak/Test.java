@@ -1,16 +1,10 @@
 package soak;
 
 
-import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Date;
 import java.util.Calendar;
 import java.math.BigDecimal;
-import java.io.PrintWriter;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.InputStream;
-import java.io.BufferedReader;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -51,7 +45,7 @@ public abstract class Test extends Thread {
         int ch = 0;
         while ( testA.isAlive() && testB.isAlive() ) {
             if ( r.available() > 0 )
-                Thread.currentThread().sleep(100);
+                Thread.sleep(100);
             else if ((ch=r.read()) == -1 || ch == (int)'q')
                 break;
         }

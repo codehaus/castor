@@ -45,8 +45,6 @@
 
 package org.exolab.castor.builder.types;
 
-import org.exolab.javasource.*;
-
 /**
  * A base class for types which support the pattern facet
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>

@@ -48,6 +48,7 @@ package org.exolab.castor.types;
 
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 
 /**
@@ -228,7 +229,7 @@ public class Year extends TimePeriod {
             offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
-            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+            timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);
         }
         df.setTimeZone(timeZone);
         date = df.parse(this.toString());

@@ -54,8 +54,10 @@ package org.exolab.castor.types;
 
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.SimpleTimeZone;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 /**
  * Describe an XML schema Date.
  * <p>The format is defined by W3C XML Schema Recommendation and ISO8601
@@ -118,13 +120,13 @@ public class Date extends DateTimeBase{
     public Date(java.util.Date dateRef) {
         GregorianCalendar tempCalendar = new GregorianCalendar();
         tempCalendar.setTime(dateRef);
-        setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
-        setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
+        setCentury((short) (tempCalendar.get(Calendar.YEAR)/100));
+        setYear((short) (tempCalendar.get(Calendar.YEAR)%100));
 
         //we need to add 1 to the Month value returned by GregorianCalendar
         //because 0<MONTH<11 (i.e January is 0)
-        setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
-        setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
+        setMonth((short) (tempCalendar.get(Calendar.MONTH)+1));
+        setDay((short) (tempCalendar.get(Calendar.DAY_OF_MONTH)));
     } //Date(java.util.Date)
 
     /**
@@ -194,7 +196,7 @@ public class Date extends DateTimeBase{
             offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
-            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+            timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);
             df.setTimeZone(timeZone);
         }
 

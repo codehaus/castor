@@ -86,7 +86,7 @@ public class XSGMonth extends XSType {
     } //-- newInstanceCode
 
     public JType getJType() {
-        return this.jType;
+        return XSGMonth.jType;
     }
 
     /**
@@ -154,7 +154,7 @@ public class XSGMonth extends XSType {
 
     /**
      * Sets the minimum exclusive value that this XSGMonth can hold.
-     * @param max the minimum exclusive value this XSGMonth can be
+     * @param min the minimum exclusive value this XSGMonth can be
      * @see #setMinInclusive
     **/
     public void setMinExclusive(GMonth min) {
@@ -164,7 +164,7 @@ public class XSGMonth extends XSType {
 
     /**
      * Sets the minimum inclusive value that this XSGMonth can hold.
-     * @param max the minimum inclusive value this XSGMonth can be
+     * @param min the minimum inclusive value this XSGMonth can be
      * @see #setMinExclusive
     **/
     public void setMinInclusive(GMonth min) {
@@ -184,8 +184,7 @@ public class XSGMonth extends XSType {
     /**
      * Reads and sets the facets for XSXSGMonth
      * override the readFacet method of XSType
-     * @param simpletype the Simpletype containing the facets
-     * @param xsType the XSType to set the facets of
+     * @param simpleType the Simpletype containing the facets
      * @see org.exolab.castor.builder.types.XSType#getFacets
      */
 

@@ -29,7 +29,7 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * Base 64 text to byte decoded. To produce the binary  array from
- * base 64 encoding call {@link #translate} for each sequence of
+ * base 64 encoding call {@link #translate(String)} for each sequence of
  * characters and {@link #getByteArray} to mark closure of the
  * character stream and retrieve the binary contents.
  *
@@ -37,7 +37,6 @@ import java.io.ByteArrayOutputStream;
  */
 public final class MimeBase64Decoder
 {
-
 
     private ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -205,6 +204,5 @@ public final class MimeBase64Decoder
         eof();
         return out.toByteArray();
     }
-
 
 }

@@ -116,7 +116,7 @@ public class JAnnotationType extends JStructure
 	/**
 	 * Adds the given JAnnotationTypeElement to this JAnnotationType
 	 *
-	 * @param jMethod, the JMethod to add
+	 * @param jElement, the element to add
 	 * @exception IllegalArgumentException when the given
 	 * JAnnotationTypeElement has the same name of an existing JAnnotationTypeElement.
 	**/	

@@ -48,11 +48,10 @@ package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
 
-import org.exolab.castor.builder.SourceGenerator;
-
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
+
 /**
  * The XML Schema Integer type
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -119,8 +118,8 @@ public final class XSInt extends XSPatternBase {
      * Returns the minimum exclusive value that this XSInt can hold.
      * @return the minimum exclusive value that this XSInt can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see #getMinInclusive
-     * @see #setMaxInclusive
+     * @see #getMinInclusive()
+     * @see #setMaxInclusive(int)
     **/
     public Integer getMinExclusive() {
         return minExclusive;
@@ -153,7 +152,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSInt can hold.
      * @param max the maximum exclusive value this XSInt can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(Integer)
     **/
     public void setMaxExclusive(int max) {
         maxExclusive = new Integer(max);
@@ -163,7 +162,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSInt can hold.
      * @param max the maximum exclusive value this XSInt can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(int)
     **/
     public void setMaxExclusive(Integer max) {
         maxExclusive = max;
@@ -173,7 +172,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSInt can hold.
      * @param max the maximum inclusive value this XSInt can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(Integer)
     **/
     public void setMaxInclusive(int max) {
         maxInclusive = new Integer(max);
@@ -183,7 +182,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSInt can hold.
      * @param max the maximum inclusive value this XSInt can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(int)
     **/
     public void setMaxInclusive(Integer max) {
         maxInclusive = max;
@@ -193,8 +192,8 @@ public final class XSInt extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSInt can hold.
-     * @param max the minimum exclusive value this XSInt can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSInt can be
+     * @see #setMinInclusive(Integer)
     **/
     public void setMinExclusive(int min) {
         minExclusive = new Integer(min);
@@ -203,8 +202,8 @@ public final class XSInt extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSInt can hold.
-     * @param max the minimum exclusive value this XSInt can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSInt can be
+     * @see #setMinInclusive(int)
     **/
     public void setMinExclusive(Integer min) {
         minExclusive = min;
@@ -213,8 +212,8 @@ public final class XSInt extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSInt can hold.
-     * @param max the minimum inclusive value this XSInt can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSInt can be
+     * @see #setMinExclusive(Integer)
     **/
     public void setMinInclusive(int min) {
         minInclusive = new Integer(min);
@@ -223,8 +222,8 @@ public final class XSInt extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSInt can hold.
-     * @param max the minimum inclusive value this XSInt can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSInt can be
+     * @see #setMinExclusive(int)
     **/
     public void setMinInclusive(Integer min) {
         minInclusive = min;
@@ -235,8 +234,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Reads and sets the facets for XSTimeDuration
      * override the readFacet method of XSType
-     * @param simpletype the Simpletype containing the facets
-     * @param xsType the XSType to set the facets of
+     * @param simpleType the Simpletype containing the facets
      * @see org.exolab.castor.builder.types.XSType#getFacets
      */
     public void setFacets(SimpleType simpleType){

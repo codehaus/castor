@@ -260,9 +260,6 @@ public class JClass extends JStructure {
      * Adds the given JMethod to this JClass
      *
      * @param jMethod, the JMethod to add
-     * @param importReturnType true if we add the importReturnType to
-     * the class import lists. It could be useful to set it to false when 
-     * all types are fully qualified.
      * @exception IllegalArgumentException when the given
      * JMethod has the same name of an existing JMethod.
     **/

@@ -48,14 +48,11 @@ package org.exolab.castor.tests.framework;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;

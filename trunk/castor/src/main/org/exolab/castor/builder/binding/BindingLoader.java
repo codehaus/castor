@@ -56,8 +56,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 
 //--java imports
-import java.io.Reader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.net.URL;
@@ -112,7 +110,7 @@ public class BindingLoader {
      * binding document into a binding object and load all the included
      * bindings along the way into a single collection.
      *
-     * @param reader The binding document to load.
+     * @param source The binding document to load.
      * @throws BindingException thrown when an error occured during the unmarshalling.
      */
     public void loadBinding(InputSource source) throws BindingException

@@ -116,7 +116,6 @@ public class TimeDuration
      * value of the long by calling setValue
      * @see #setValue
      * @param l the long value of the Time Duration
-     * @return A time duration which represents the long
      */
     public TimeDuration(long l) {
 
@@ -362,7 +361,7 @@ public class TimeDuration
     /**
      * <p>Parse the given string and return a time duration
      * which represents this string
-     * @param String str the string to parse
+     * @param str the string to parse
      * @return a TimeDuration instance which represent the string
      * @throws ParseException thrown when the string is not valid
      */

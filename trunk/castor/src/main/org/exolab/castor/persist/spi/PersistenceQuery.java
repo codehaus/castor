@@ -64,7 +64,7 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
  * assist in assuring that through the mechanisms available to it.
  * <p>
  * A query may be created once and used multiple times by calling the
- * {@link #execute} method. Query parameters are set each time prior
+ * {@link #execute(Object, AccessMode)} method. Query parameters are set each time prior
  * to executing the query.
  * <p>
  * See {@link Persistence} for information about locks, loading
@@ -119,7 +119,7 @@ public interface PersistenceQuery
      * After a successful return the query results will be returned
      * by calling {@link #nextIdentity} and {@link #fetch}. The
      * query parameters will be reset. A new query may be issued by
-     * providing new query parameters and calling {@link #execute}.
+     * providing new query parameters and calling {@link #execute(Object, AccessMode)}.
      *
      * @param conn An open connection
      * @param accessMode The access mode (null equals shared)
@@ -195,7 +195,7 @@ public interface PersistenceQuery
     /**
      * moves the result of the query to the absolute position in the
      * resultset
-     * @param int The row to move to
+     * @param row The row to move to
      * @throws PersistenceException A persistence error occured
      */
     public boolean absolute(int row)

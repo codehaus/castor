@@ -47,32 +47,16 @@
 package jdo;
 
 import java.math.BigDecimal;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.StringReader;
-import java.util.Date;
 import java.util.Enumeration;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.engine.ClobImpl;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 

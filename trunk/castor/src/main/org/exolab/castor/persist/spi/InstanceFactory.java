@@ -48,9 +48,6 @@
 package org.exolab.castor.persist.spi;
 
 
-import org.exolab.castor.jdo.Database;
-
-
 /**
  * A callback interceptor delegates instance creation to the handler.
  *
@@ -63,8 +60,8 @@ public interface InstanceFactory {
      * Called to indicate that an object needs to be instatiated.
      *
      * @return an instance of the object needs to be instatiated
-     * @param The name of the class of the object to be created
-     * @param The class loader to use when creating the object
+     * @param className The name of the class of the object to be created
+     * @param loader The class loader to use when creating the object
      */
     public Object newInstance( String className, ClassLoader loader );
 

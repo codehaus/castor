@@ -35,7 +35,6 @@
 package org.exolab.castor.builder.types;
 
 
-import org.exolab.castor.builder.types.*;
 import org.exolab.javasource.*;
 
 
@@ -71,7 +70,7 @@ public class XSListJ2 extends XSList {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSListJ2.jType;
     }
 
     public int getMinimumSize() {

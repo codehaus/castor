@@ -139,7 +139,7 @@ public class JAnnotationTypeElement
 	/**
 	 * Sets the initialization string for this JAnnotationTypeElement;
 	 * Allows some flexibility in declaring default values.
-	 * @param init the initialization string for this member.
+	 * @param defaultString the default string for this member.
 	**/	
 	public void setDefaultString(String defaultString)
 	{

@@ -46,13 +46,11 @@
 
 package org.exolab.castor.types;
 
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
+
 /**
  * The Century Descriptor
  * @author <a href="kvisco@intalio.com">Keith Visco</a>

@@ -56,7 +56,6 @@ import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Mapping;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.conf.TransactionDemarcation;
-import org.exolab.castor.jdo.conf.TransactionManager;
 
 
 /**
@@ -300,7 +299,6 @@ public class JdoConfFactory
 		TransactionDemarcation trans = new TransactionDemarcation();
 
 		trans.setMode("local");
-		trans.setTransactionManager(new TransactionManager());
 
 		return trans;
 	}

@@ -62,7 +62,7 @@ public class JParameter extends JAnnotatedElementHelper {
      * Creates a new JParameter with the given type, and name
      * 
      * @param type the type to associate with this JParameter
-     * @param the name of the JParameter
+     * @param name name of the JParameter
      */
     public JParameter(JType type, String name) 
         throws IllegalArgumentException

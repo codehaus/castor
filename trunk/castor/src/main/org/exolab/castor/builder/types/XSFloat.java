@@ -47,8 +47,6 @@
 
 package org.exolab.castor.builder.types;
 
-import org.exolab.castor.builder.SourceGenerator;
-
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
 
@@ -121,8 +119,8 @@ public final class XSFloat extends XSPatternBase {
      * Returns the minimum exclusive value that this XSFloat can hold.
      * @return the minimum exclusive value that this XSFloat can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see #getMinInclusive
-     * @see #setMaxInclusive
+     * @see #getMinInclusive()
+     * @see #setMaxInclusive(float)
     **/
     public Float getMinExclusive() {
         return minExclusive;
@@ -151,7 +149,7 @@ public final class XSFloat extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSFloat can hold.
      * @param max the maximum exclusive value this XSFloat can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(Float)
     **/
     public void setMaxExclusive(float max) {
         maxExclusive = new Float(max);
@@ -160,7 +158,7 @@ public final class XSFloat extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSFloat can hold.
      * @param max the maximum exclusive value this XSFloat can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(float)
     **/
     public void setMaxExclusive(Float max) {
         maxExclusive = max;
@@ -169,7 +167,7 @@ public final class XSFloat extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSFloat can hold.
      * @param max the maximum inclusive value this XSFloat can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(Float)
     **/
     public void setMaxInclusive(float max) {
         maxInclusive = new Float(max);
@@ -178,7 +176,7 @@ public final class XSFloat extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSFloat can hold.
      * @param max the maximum inclusive value this XSFloat can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(float)
     **/
     public void setMaxInclusive(Float max) {
         maxInclusive = max;
@@ -187,8 +185,8 @@ public final class XSFloat extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSFloat can hold.
-     * @param max the minimum exclusive value this XSFloat can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSFloat can be
+     * @see #setMinInclusive(Float)
     **/
     public void setMinExclusive(float min) {
         minExclusive = new Float(min);
@@ -196,8 +194,8 @@ public final class XSFloat extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSFloat can hold.
-     * @param max the minimum exclusive value this XSFloat can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSFloat can be
+     * @see #setMinInclusive(float)
     **/
     public void setMinExclusive(Float min) {
         minExclusive = min;
@@ -205,8 +203,8 @@ public final class XSFloat extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSFloat can hold.
-     * @param max the minimum inclusive value this XSFloat can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSFloat can be
+     * @see #setMinExclusive(Float)
     **/
     public void setMinInclusive(float min) {
         minInclusive = new Float(min);
@@ -214,8 +212,8 @@ public final class XSFloat extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSFloat can hold.
-     * @param max the minimum inclusive value this XSFloat can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSFloat can be
+     * @see #setMinExclusive(float)
     **/
     public void setMinInclusive(Float min) {
         minInclusive = min;

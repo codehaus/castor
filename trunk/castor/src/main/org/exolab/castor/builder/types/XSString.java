@@ -106,7 +106,7 @@ public final class XSString extends XSPatternBase {
 	 * @return the JType that this XSType represents
 	**/
 	public JType getJType() {
-		return this.jType;
+		return XSString.jType;
 	} //-- getJType
 
 	/**
@@ -214,7 +214,7 @@ public final class XSString extends XSPatternBase {
 	 *  <li>collapse</li>
 	 * </ul>
 	 * any other value will generate a Warning and set the whiteSpace to preserved
-	 * @param whiteSpace the whiteSpace value
+	 * @param value the whiteSpace value
 	 */
 	public void setWhiteSpace(String value) {
 		if (value.equals("preserve"))

@@ -127,7 +127,6 @@ public class Duration
      * value of the long by calling setValue.
      * @see #setValue
      * @param l the long value of the Duration
-     * @return A duration which represents the long
      */
     public Duration(long l) {
 
@@ -410,7 +409,7 @@ public class Duration
     /**
      * <p>Parse the given string and return a time duration
      * which represents this string.
-     * @param String str the string to parse
+     * @param str the string to parse
      * @return a TimeDuration instance which represent the string
      * @throws ParseException thrown when the string is not valid
      */
@@ -699,7 +698,7 @@ public class Duration
     /**
      * Returns true if the instance of TimeDuration has the same fields
      * of the parameter
-     * @param timeD the time duration to compare
+     * @param duration the time duration to compare
      * @return true if equal, false if not
      */
     public boolean equal(Duration duration) {
@@ -724,7 +723,7 @@ public class Duration
      * the following total order relation is used :
      * <tt>givent t1,t2 timeDuration types
      * t1>t2 iff t1.toLong()>t2.toLong()</tt>
-     * @param timeD the time duration to compare with the present instance
+     * @param duration the time duration to compare with the present instance
      * @return true if the present instance is the greatest, false if not
      */
      public boolean isGreater(Duration duration) {

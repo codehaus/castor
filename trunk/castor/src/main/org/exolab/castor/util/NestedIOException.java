@@ -45,7 +45,6 @@
 
 package org.exolab.castor.util;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 

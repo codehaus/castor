@@ -345,7 +345,7 @@ public abstract class XSType {
 	/**
 	 * Returns a list of Facets from the simpleType
 	 *	(duplicate facets due to extension are filtered out)
-     * @param simpletype the Simpletype we want the facets for
+     * @param simpleType the Simpletype we want the facets for
      * @return Unique list of facets from the simple type
 	 */
 	protected static Enumeration getFacets(SimpleType simpleType)

@@ -59,7 +59,6 @@ import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingRuntimeException;
-import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.util.Messages;
 
 
@@ -70,7 +69,7 @@ import org.exolab.castor.util.Messages;
  * Note: the field Java type is obtained from {@link TypeInfo#getFieldType()},
  * but if the field is a collection, the actual field/accessor type is
  * obtained from {@link TypeInfo#getCollectionHandler} and the object to create
- * (with {@link #newInstance}) is the former field type.
+ * (with {@link #newInstance(Object)}) is the former field type.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -210,7 +209,7 @@ public final class FieldHandlerImpl
      * be public, and may not be static or transient. The field name is
      * determined from the Java field, the type from the type information.
      *
-     * @param field The field being described
+     * @param handler
      * @param typeInfo Type information
      * @throws MappingException If the field is not public, is static or
      *    transient

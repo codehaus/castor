@@ -2,6 +2,15 @@
 Version (CVS) 
 -------------
 
+Misc:  Eclipse reported a lot of warnings for the whole Castor source
+       code. This change eliminates most of them without changing any
+       functionality. It spares the XML packages to avoid CVS conflicts.
+       This will be handled a bit later by Keith. Other still pending
+       warnings are "real" warnings - they need to be investigated
+       further and might result in additional larger code changes.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1896
+       (Martin - 20050305)
+
 JDO:   Updated documentation to explain that no auto-mapping of
        java.util.Date takes place; users must decide whether to
        map a particular date field to java.sql.Date, java.sql.Time,

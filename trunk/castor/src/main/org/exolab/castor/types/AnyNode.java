@@ -49,17 +49,12 @@
 
 package org.exolab.castor.types;
 
-import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Stack;
 import org.exolab.castor.xml.util.AnyNode2SAX;
 
 import org.apache.xml.serialize.Serializer;
-import org.apache.xml.serialize.OutputFormat;
 
-import java.util.Enumeration;
-import java.util.Vector;
-import java.io.PrintStream;
 import java.io.StringWriter;
 
 /**
@@ -190,11 +185,11 @@ public final class AnyNode implements java.io.Serializable {
      * type, localName, prefix, uri and value.
      * This constructor is not user-friendly and launched
      * RunTime exception is you try to instantiate non-valid node.
-     * @param short type the node type.
-     * @param String localName the name of the node.
-     * @param String prefix the prefix if any of the namespace.
-     * @param String uri the namespace uri of this node.
-     * @param String value the value of this node.
+     * @param type the node type.
+     * @param localName the name of the node.
+     * @param prefix the prefix if any of the namespace.
+     * @param uri the namespace uri of this node.
+     * @param value the value of this node.
      */
     public AnyNode(short type, String localName,
                    String prefix,String uri,

@@ -3,8 +3,6 @@ package org.exolab.castor.xml.dtd.parser;
 
 import org.exolab.castor.xml.dtd.*;
 
-import java.io.*;
-
 /**
  * Main XML DTD parser. Parses DTD documents with <b>parameter entity
  * references</b> already substituted by corresponding <b>replacement text</b>.

@@ -57,6 +57,7 @@ import org.exolab.castor.xml.ValidationException;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -97,8 +98,6 @@ public class RecurringDuration extends RecurringDurationBase{
      * duration and period set up
      * @param duration the TimeDuration representing the duration facet
      * @param period the TimeDuration reprensenting the period facet
-     * @return a recurringDuration with the facets
-     *          duration and period set up
      */
     public RecurringDuration(TimeDuration duration, TimeDuration period) {
         super(duration,period);
@@ -109,8 +108,6 @@ public class RecurringDuration extends RecurringDurationBase{
      * duration and period set up
      * @param duration the String representing the duration facet
      * @param period the String reprensenting the period facet
-     * @return a recurringDuration with the facets
-     *          duration and period set up
      */
     public RecurringDuration(String duration, String period) {
         super(duration, period);
@@ -123,8 +120,6 @@ public class RecurringDuration extends RecurringDurationBase{
      * @param duration the String representing the duration facet
      * @param period the String reprensenting the period facet
      * @param values an array of shorts which contains the values of the fields
-     * @return a recurringDuration with the facets
-     *          duration and period set up
      * @see #setValues
      */
      public RecurringDuration(String duration, String period, short[] values)
@@ -153,7 +148,7 @@ public class RecurringDuration extends RecurringDurationBase{
     /**
      * set the Year field
      * Note: 0000 is not allowed
-     * @param the year to set up
+     * @param year year to set up
      */
     public void setYear(short year)
         throws OperationNotSupportedException
@@ -366,7 +361,7 @@ public class RecurringDuration extends RecurringDurationBase{
             offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
-            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+            timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);
         }
         df.setTimeZone(timeZone);
         date = df.parse(this.toPrivateString());

@@ -51,7 +51,8 @@ package org.exolab.castor.types;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
-import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 /**
  * Describe an XML schema gYearMonth type.
  * <p>The format is defined by W3C XML Schema Recommendation and ISO8601
@@ -181,7 +182,7 @@ public class GYearMonth extends Date {
             offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
-            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+            timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);
             df.setTimeZone(timeZone);
         }
 

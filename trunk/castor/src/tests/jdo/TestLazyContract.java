@@ -3,9 +3,6 @@
 package jdo;
 
 import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Date;
-
 
 
 public class TestLazyContract {

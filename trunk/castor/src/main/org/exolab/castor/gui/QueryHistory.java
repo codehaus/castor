@@ -46,11 +46,8 @@
 
 package org.exolab.castor.gui;
 
-
-
 import java.util.Vector;
-import java.io.FileWriter;
-import org.exolab.castor.xml.*;
+
 
 public class QueryHistory implements java.io.Serializable {
     private  Vector querys = new Vector();

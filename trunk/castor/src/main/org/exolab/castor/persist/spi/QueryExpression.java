@@ -224,10 +224,7 @@ public interface QueryExpression
 
     /**
      * Adds an limit clause. 
-     * @param limitClause The LIMIT clause to add (without the word 
-     *    LIMIT).
-     * @param paramIndexFrom first bind variable index
-     * @param paramIndexTo last bind variable index
+     * @param limitClause The LIMIT clause to add (without the word LIMIT).
      * @throws SyntaxNotSupportedException If the LIMIT clause is not supported by the RDBMS.
      */
     public void addLimitClause( String limitClause )
@@ -235,10 +232,7 @@ public interface QueryExpression
 
     /**
      * Adds an offset clause. 
-     * @param offsetClause The OFFSET clause to add (without the word 
-     *    OFFSET).
-     * @param paramIndexFrom first bind variable index
-     * @param paramIndexTo last bind variable index
+     * @param offsetClause The OFFSET clause to add (without the word OFFSET).
      * @throws SyntaxNotSupportedException If the OFFSET clause is not supported by the RDBMS.
      */
     public void addOffsetClause( String offsetClause )

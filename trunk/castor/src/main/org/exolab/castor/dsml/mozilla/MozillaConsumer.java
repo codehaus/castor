@@ -49,8 +49,6 @@ package org.exolab.castor.dsml.mozilla;
 
 import java.util.Enumeration;
 import org.xml.sax.DocumentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.AttributeList;
 import org.exolab.castor.dsml.Consumer;
 
 

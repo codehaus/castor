@@ -48,11 +48,10 @@ package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
 
-import org.exolab.castor.builder.SourceGenerator;
-
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
+
 /**
  * The XML Schema Byte type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
@@ -119,8 +118,8 @@ public final class XSByte extends XSPatternBase {
      * Returns the minimum exclusive value that this XSByte can hold.
      * @return the minimum exclusive value that this XSByte can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see #getMinInclusive
-     * @see #setMaxInclusive
+     * @see #getMinInclusive()
+     * @see #setMaxInclusive(byte)
     **/
     public Byte getMinExclusive() {
         return minExclusive;
@@ -148,7 +147,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSByte can hold.
      * @param max the maximum exclusive value this XSByte can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(Byte)
     **/
     public void setMaxExclusive(byte max) {
         maxExclusive = new Byte(max);
@@ -158,7 +157,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSByte can hold.
      * @param max the maximum exclusive value this XSByte can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(byte)
     **/
     public void setMaxExclusive(Byte max) {
         maxExclusive = max;
@@ -168,7 +167,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSByte can hold.
      * @param max the maximum inclusive value this XSByte can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(Byte)
     **/
     public void setMaxInclusive(byte max) {
         maxInclusive = new Byte(max);
@@ -178,7 +177,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSByte can hold.
      * @param max the maximum inclusive value this XSByte can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(byte)
     **/
     public void setMaxInclusive(Byte max) {
         maxInclusive = max;
@@ -188,8 +187,8 @@ public final class XSByte extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSByte can hold.
-     * @param max the minimum exclusive value this XSByte can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSByte can be
+     * @see #setMinInclusive(Byte)
     **/
     public void setMinExclusive(byte min) {
         minExclusive = new Byte(min);
@@ -198,8 +197,8 @@ public final class XSByte extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSByte can hold.
-     * @param max the minimum exclusive value this XSByte can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSByte can be
+     * @see #setMinInclusive(byte)
     **/
     public void setMinExclusive(Byte min) {
         minExclusive = min;
@@ -208,8 +207,8 @@ public final class XSByte extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSByte can hold.
-     * @param max the minimum inclusive value this XSByte can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSByte can be
+     * @see #setMinExclusive(Byte)
     **/
     public void setMinInclusive(byte min) {
         minInclusive = new Byte(min);
@@ -218,8 +217,8 @@ public final class XSByte extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSByte can hold.
-     * @param max the minimum inclusive value this XSByte can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSByte can be
+     * @see #setMinExclusive(byte)
     **/
     public void setMinInclusive(Byte min) {
         minInclusive = min;
@@ -230,8 +229,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Reads and sets the facets for XSByte
      * override the readFacet method of XSType
-     * @param simpletype the Simpletype containing the facets
-     * @param xsType the XSType to set the facets of
+     * @param simpleType the Simpletype containing the facets
      * @see org.exolab.castor.builder.types.XSType#getFacets
      */
     public void setFacets(SimpleType simpleType){

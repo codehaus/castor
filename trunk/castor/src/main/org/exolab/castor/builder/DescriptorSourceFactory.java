@@ -116,7 +116,7 @@ public class DescriptorSourceFactory {
 	/**
 	 * Creates the Source code of a MarshalInfo for a given XML Schema
 	 * element declaration
-	 * @param element the XML Schema element declaration
+	 * @param classInfo the XML Schema element declaration
 	 * @return the JClass representing the MarshalInfo source code
 	 */
 	public JClass createSource(ClassInfo classInfo) {

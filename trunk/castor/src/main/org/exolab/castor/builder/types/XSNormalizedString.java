@@ -105,7 +105,7 @@ public final class XSNormalizedString extends XSPatternBase {
 	 * @return the JType that this XSType represents
 	**/
 	public JType getJType() {
-		return this.jType;
+		return XSNormalizedString.jType;
 	} //-- getJType
 
 	/**

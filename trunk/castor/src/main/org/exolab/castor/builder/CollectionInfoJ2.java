@@ -51,7 +51,6 @@
 package org.exolab.castor.builder;
 
 
-import org.exolab.castor.builder.*;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
@@ -65,7 +64,7 @@ import org.exolab.javasource.*;
 public class CollectionInfoJ2 extends CollectionInfo {
 
     /**
-     * @param contextType the content type of the collection, ie. the type
+     * @param contentType the content type of the collection, ie. the type
      * of objects that the collection will contain
      * @param name the name of the Collection
      * @param elementName the element name for each element in collection

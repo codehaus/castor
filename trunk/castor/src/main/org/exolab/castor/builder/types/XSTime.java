@@ -86,7 +86,7 @@ public final class XSTime extends XSType {
 	 * @return the JType that this XSType represents
 	**/
 	public JType getJType() {
-		return this.jType;
+		return XSTime.jType;
 	}
 	/**
 	* Returns the maximum exclusive value that this XSTime can hold.
@@ -151,7 +151,7 @@ public final class XSTime extends XSType {
 
 	/**
 	 * Sets the minimum exclusive value that this XSTime can hold.
-	 * @param max the minimum exclusive value this XSTime can be
+	 * @param min the minimum exclusive value this XSTime can be
 	 * @see #setMinInclusive
 	**/
 	public void setMinExclusive(Time min) {
@@ -161,7 +161,7 @@ public final class XSTime extends XSType {
 
 	/**
 	 * Sets the minimum inclusive value that this XSTime can hold.
-	 * @param max the minimum inclusive value this XSTime can be
+	 * @param min the minimum inclusive value this XSTime can be
 	 * @see #setMinExclusive
 	**/
 	public void setMinInclusive(Time min) {
@@ -180,8 +180,7 @@ public final class XSTime extends XSType {
 	/**
 	 * Reads and sets the facets for XSTime
 	 * override the readFacet method of XSType
-	 * @param simpletype the Simpletype containing the facets
-	 * @param xsType the XSType to set the facets of
+	 * @param simpleType the Simpletype containing the facets
 	 * @see org.exolab.castor.builder.types.XSType#getFacets
 	 */
 

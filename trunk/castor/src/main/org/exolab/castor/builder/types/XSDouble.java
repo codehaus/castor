@@ -47,8 +47,6 @@ package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
-import org.exolab.castor.builder.SourceGenerator;
-
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -120,7 +118,7 @@ public final class XSDouble extends XSPatternBase {
      * @return the minimum exclusive value that this XSReal can hold. If
      * no minimum exclusive value has been set, Null will be returned
      * @see #getMinInclusive
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(Double)
     **/
     public Double getMinExclusive() {
         return minExclusive;
@@ -153,7 +151,7 @@ public final class XSDouble extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSReal can hold.
      * @param max the maximum exclusive value this XSReal can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(Double)
     **/
     public void setMaxExclusive(double max) {
         maxExclusive = new Double(max);
@@ -162,7 +160,7 @@ public final class XSDouble extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSReal can hold.
      * @param max the maximum exclusive value this XSReal can be
-     * @see #setMaxInclusive
+     * @see #setMaxInclusive(double)
     **/
     public void setMaxExclusive(Double max) {
         maxExclusive = max;
@@ -171,7 +169,7 @@ public final class XSDouble extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSReal can hold.
      * @param max the maximum inclusive value this XSReal can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(Double)
     **/
     public void setMaxInclusive(double max) {
         maxInclusive = new Double(max);
@@ -180,7 +178,7 @@ public final class XSDouble extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSReal can hold.
      * @param max the maximum inclusive value this XSReal can be
-     * @see #setMaxExclusive
+     * @see #setMaxExclusive(double)
     **/
     public void setMaxInclusive(Double max) {
         maxInclusive = max;
@@ -189,8 +187,8 @@ public final class XSDouble extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSReal can hold.
-     * @param max the minimum exclusive value this XSReal can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSReal can be
+     * @see #setMinInclusive(Double)
     **/
     public void setMinExclusive(double min) {
         minExclusive = new Double(min);
@@ -198,8 +196,8 @@ public final class XSDouble extends XSPatternBase {
 
     /**
      * Sets the minimum exclusive value that this XSReal can hold.
-     * @param max the minimum exclusive value this XSReal can be
-     * @see #setMinInclusive
+     * @param min the minimum exclusive value this XSReal can be
+     * @see #setMinInclusive(double)
     **/
     public void setMinExclusive(Double min) {
         minExclusive = min;
@@ -207,8 +205,8 @@ public final class XSDouble extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSReal can hold.
-     * @param max the minimum inclusive value this XSReal can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSReal can be
+     * @see #setMinExclusive(Double)
     **/
     public void setMinInclusive(double min) {
         minInclusive = new Double(min);
@@ -216,8 +214,8 @@ public final class XSDouble extends XSPatternBase {
 
     /**
      * Sets the minimum inclusive value that this XSReal can hold.
-     * @param max the minimum inclusive value this XSReal can be
-     * @see #setMinExclusive
+     * @param min the minimum inclusive value this XSReal can be
+     * @see #setMinExclusive(double)
     **/
     public void setMinInclusive(Double min) {
         minInclusive = min;

@@ -45,15 +45,10 @@
 
 package org.exolab.castor.types;
 
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLFieldHandler;
-import org.exolab.castor.xml.TypeValidator;
 
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.ValidityException;

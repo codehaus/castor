@@ -48,7 +48,6 @@ package org.exolab.castor.builder.util;
 import org.exolab.javasource.*;
 
 import org.exolab.castor.builder.BuilderConfiguration;
-import org.exolab.castor.builder.types.*;
 import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.castor.builder.SGTypes;
 

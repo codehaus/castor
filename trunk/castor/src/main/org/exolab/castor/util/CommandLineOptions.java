@@ -250,7 +250,7 @@ class CmdLineOption {
     
     /**
      * Creates a new CmdLineOption
-     * @param the flag associated with this command line option
+     * @param flag The flag associated with this command line option
     **/
     CmdLineOption(String flag) {
         super();

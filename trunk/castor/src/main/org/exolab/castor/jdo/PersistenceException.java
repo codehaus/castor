@@ -46,9 +46,6 @@
 package org.exolab.castor.jdo;
 
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import org.exolab.castor.core.exceptions.CastorException;
 
 
@@ -73,5 +70,3 @@ public class PersistenceException
         super( message );
     }
 }
-
-

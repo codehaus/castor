@@ -49,8 +49,6 @@ package org.exolab.castor.mapping.handlers;
 
 import org.exolab.castor.mapping.MapHandler;
 
-import java.util.Hashtable;
-
 /**
  * A Map handler for adding and retreiving key-value pairs from
  * A map. A map handler is instantiated only once, must be thread

@@ -1,19 +1,13 @@
 package myapp;
 
-
 import java.util.Vector;
-import java.util.Enumeration;
 
 
 public class Category
 {
-
-
     private int      _id;
 
-
     private Vector   _products = new Vector();
-
 
     private String   _name;
 
@@ -65,6 +59,4 @@ public class Category
         return "<id: " + _id + " name: " + _name + ">";
     }
 
-
 }
-

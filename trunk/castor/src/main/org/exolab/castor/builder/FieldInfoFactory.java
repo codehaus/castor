@@ -46,7 +46,6 @@
 package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaNaming;
 
 
 /**
@@ -169,7 +168,7 @@ public class FieldInfoFactory {
      * @param extraMethods a boolean that when true indicates that
      * extra collection accessor methods should be created. False
      * by default.
-     * @see setReferenceMethodSuffix
+     * @see org.exolab.castor.builder.FieldInfoFactory#setReferenceMethodSuffix
      */
     public void setCreateExtraMethods(boolean extraMethods) {
         _extraMethods = extraMethods;
@@ -182,7 +181,7 @@ public class FieldInfoFactory {
      * @param suffix the method suffix to use when creating
      * the extra collection methods. If null or emtpty the default
      * value, as specified in CollectionInfo will be used.
-     * @see setCreateExtraMethods
+     * @see org.exolab.castor.builder.FieldInfoFactory#setCreateExtraMethods
      */
     public void setReferenceMethodSuffix(String suffix) {
         _referenceSuffix = suffix;

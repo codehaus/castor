@@ -49,15 +49,12 @@ package harness;
 
 import java.util.Vector;
 import java.util.Enumeration;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Constructor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.jdo.engine.SQLEngine;
 
 import junit.framework.TestSuite;
-import junit.framework.TestCase;
 
 public class Category
 {
@@ -156,7 +153,7 @@ public class Category
         String sub = (branch==null||branch.equals(""))?null
             :branch.substring( branch.indexOf(".")==-1?branch.length():branch.indexOf(".")+1 );
 
-        catClass = getClass().forName( _className );
+        catClass = Class.forName( _className );
         cnst = catClass.getConstructor( new Class[] { TestHarness.class, String.class, String.class, Object.class } );
         category = (TestHarness) cnst.newInstance( new Object[] { harness, _name, _description, _object } );
         for ( int i = 0 ; i < _cases.size() ; ++i ) {

@@ -87,7 +87,7 @@ public final class XSDate extends XSType {
 	 * @return the JType that this XSType represents
 	**/
 	public JType getJType() {
-		return this.jType;
+		return XSDate.jType;
 	}
 
 	/**
@@ -153,7 +153,7 @@ public final class XSDate extends XSType {
 
 	/**
 	 * Sets the minimum exclusive value that this XSDate can hold.
-	 * @param max the minimum exclusive value this XSDate can be
+	 * @param min the minimum exclusive value this XSDate can be
 	 * @see #setMinInclusive
 	**/
 	public void setMinExclusive(Date min) {
@@ -163,7 +163,7 @@ public final class XSDate extends XSType {
 
 	/**
 	 * Sets the minimum inclusive value that this XSInt can hold.
-	 * @param max the minimum inclusive value this XSInt can be
+	 * @param min the minimum inclusive value this XSInt can be
 	 * @see #setMinExclusive
 	**/
 	public void setMinInclusive(Date min) {
@@ -182,8 +182,7 @@ public final class XSDate extends XSType {
 	/**
 	 * Reads and sets the facets for XSDate
 	 * override the readFacet method of XSType
-	 * @param simpletype the Simpletype containing the facets
-	 * @param xsType the XSType to set the facets of
+	 * @param simpleType the Simpletype containing the facets
 	 * @see org.exolab.castor.builder.types.XSType#getFacets
 	 */
 

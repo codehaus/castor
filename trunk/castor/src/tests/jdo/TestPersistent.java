@@ -47,7 +47,6 @@
 package jdo;
 
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;

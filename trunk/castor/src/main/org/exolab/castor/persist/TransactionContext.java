@@ -401,7 +401,7 @@ public abstract class TransactionContext
      * The factory is used to obatain a new instance of data object
      * when it is needed during loading.
      *
-     * @param instanceFactory The instanceFactory to be used, null if disable
+     * @param factory The instanceFactory to be used, null if disable
      */
     public void setInstanceFactory( InstanceFactory factory ) {
         _instanceFactory = factory;
@@ -789,7 +789,6 @@ public abstract class TransactionContext
      * <p>
      * @param engine The persistence engine
      * @param object The object to persist
-     * @return The object's OID
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
      * @throws PersistenceException An error reported by the
@@ -889,7 +888,6 @@ public abstract class TransactionContext
      * @param molder The molder of the creating class
      * @param object The object to persist
      * @param depended The master object's OID if exist
-     * @return The object's OID
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
      * @throws PersistenceException An error reported by the
@@ -2088,7 +2086,6 @@ public abstract class TransactionContext
      *
      * @param object The object to record
      * @param oid The object's OID
-     * @param engine The persistence engine used to create this object
      */
     ObjectEntry addObjectEntry( OID oid, Object object )
     {

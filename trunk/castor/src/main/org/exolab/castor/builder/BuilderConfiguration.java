@@ -52,14 +52,9 @@ import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.JavaNaming;
 
 //--Java IO imports
-import java.io.Reader;
-import java.io.PrintWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.OutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.IOException;
 
 //--Java util imports
 import java.util.Enumeration;
@@ -264,7 +259,7 @@ public class BuilderConfiguration {
      * of {@link #getDefault}.
      *
      * @param name The property name
-     * @param default The property's default value
+     * @param defValue The property's default value
      * @return The property's value
      */
     public String getProperty( String name, String defValue ) {
@@ -303,7 +298,7 @@ public class BuilderConfiguration {
     /**
      * Sets the 'equalsmethod' property
      *
-     * @param boolean the value we want to use
+     * @param equals: the value we want to use
      */
      public void setEqualsMethod(boolean equals) {
         String value = (equals) ? TRUE : FALSE;
@@ -343,7 +338,7 @@ public class BuilderConfiguration {
     
     /**
      * Sets the 'classDescFieldNames' property
-     * @param boolean the value we want to ues
+     * @param classDescFieldNames the value we want to ues
      */
      public void setClassDescFieldNames(boolean classDescFieldNames) {
         String value = (classDescFieldNames) ? TRUE : FALSE;
@@ -361,7 +356,7 @@ public class BuilderConfiguration {
     /**
      * Sets the 'primitivetowrapper' property
      *
-     * @param boolean the value we want to use.
+     * @param wrapper the value we want to use.
      */
     public void setPrimitiveWrapper(boolean wrapper) {
         String value = (wrapper) ? TRUE : FALSE; 
@@ -383,7 +378,7 @@ public class BuilderConfiguration {
      /**
       * Sets the 'enumTypeAccessInterface' property
       *
-      * @param boolean the value we want to use
+      * @param flag the value we want to use
       */
       public void setUseEnumeratedTypeInterface(boolean flag) {
          String value = (flag) ? TRUE : FALSE;

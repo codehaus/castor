@@ -48,7 +48,6 @@ package org.exolab.castor.builder;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.builder.types.XSType;
 import org.exolab.javasource.*;
-import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.JavaNaming;
@@ -60,7 +59,6 @@ import org.exolab.castor.xml.schema.SimpleTypesFactory;
 import org.exolab.castor.xml.schema.Structure;
 import org.exolab.castor.xml.schema.Union;
 
-import java.text.ParseException;
 import java.util.Enumeration;
 
 /**
@@ -447,7 +445,7 @@ public class TypeConversion {
     /**
      * Returns the XSType that corresponds to the given javaType
      * @param javaType
-     * @return
+     * @return XSType that corresponds to the given javaType
      */
     public static XSType convertType(String javaType) {
         if (javaType == null)

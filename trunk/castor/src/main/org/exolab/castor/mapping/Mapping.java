@@ -132,7 +132,7 @@ public class Mapping
 
     /**
      * Use this object to obtain the mapping resolver for JDO from
-     * {@link #getResolver}.
+     * {@link #getResolver(EngineMapping)}.
      */
     public static final EngineMapping JDO =
         new EngineMapping( "jdo", "org.exolab.castor.jdo.engine.JDOMappingLoader" );
@@ -140,7 +140,7 @@ public class Mapping
 
     /**
      * Use this object to obtain the mapping resolver for DAX from
-     * {@link #getResolver}.
+     * {@link #getResolver(EngineMapping)}.
      */
     public static final EngineMapping DAX =
         new EngineMapping( "dax", "org.exolab.castor.dax.engine.DAXMappingLoader" );
@@ -148,7 +148,7 @@ public class Mapping
 
     /**
      * Use this object to obtain the mapping resolver for XML from
-     * {@link #getResolver}.
+     * {@link #getResolver(EngineMapping)}.
      */
     public static final EngineMapping XML =
         new EngineMapping( "xml", "org.exolab.castor.xml.XMLMappingLoader" );

@@ -51,7 +51,6 @@ import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MapItem;
 

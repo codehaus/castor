@@ -52,7 +52,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
-import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.Parser;
 import org.xml.sax.InputSource;

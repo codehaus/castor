@@ -11,10 +11,8 @@ package org.exolab.castor.tests.framework.testDescriptor;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.xml.TypeValidator;
-import org.exolab.castor.xml.XMLFieldDescriptor;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.validators.BooleanValidator;
+import org.exolab.castor.xml.validators.StringValidator;
 
 /**
  * Class FailureTypeDescriptor.

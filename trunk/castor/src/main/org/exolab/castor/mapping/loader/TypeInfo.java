@@ -132,7 +132,7 @@ public class TypeInfo
      * @param required True if the field is required
      * @param defaultValue The default value of the field, null to
      *  use the known Java defaults
-     * @param colType The collection type for this field, or null if
+     * @param colHandler The collection handler for this field, or null if
      *  field is singular
      */
     public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,

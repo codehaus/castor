@@ -53,7 +53,6 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.util.Messages;
 
 
 /**
@@ -110,7 +109,7 @@ public class ClassDescriptorImpl
      *
      * @param javaClass The Java type of this class
      * @param fields The fields described for this class
-     * @param identity The field of the identity (key) of this class,
+     * @param identities The array of the identities (key) of this class,
      *   may be null
      * @param extend The descriptor of the class which this class extends,
      * @param accessMode The access mode for this class (null is shared)
@@ -133,7 +132,7 @@ public class ClassDescriptorImpl
      *
      * @param javaClass The Java type of this class
      * @param fields The fields described for this class
-     * @param identity The field of the identity (key) of this class,
+     * @param identities The field of the identities (key) of this class,
      *   may be null
      * @param extend The descriptor of the class which this class extends,
      * @param accessMode The access mode for this class (null is shared)

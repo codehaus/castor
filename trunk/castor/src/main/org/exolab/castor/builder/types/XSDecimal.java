@@ -48,7 +48,6 @@
 
 package org.exolab.castor.builder.types;
 
-import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.javasource.*;
@@ -189,7 +188,7 @@ public  class XSDecimal extends XSType
 
     /**
      * Sets the minimum exclusive value that this XSDecimal can hold.
-     * @param max the minimum exclusive value this XSDecimal can be
+     * @param min the minimum exclusive value this XSDecimal can be
      * @see #setMinInclusive
     **/
     public void setMinExclusive(java.math.BigDecimal min) {
@@ -200,7 +199,7 @@ public  class XSDecimal extends XSType
 
     /**
      * Sets the minimum inclusive value that this XSDecimalcan hold.
-     * @param max the minimum inclusive value this XSDecimal can be
+     * @param min the minimum inclusive value this XSDecimal can be
      * @see #setMinExclusive
     **/
     public void setMinInclusive(java.math.BigDecimal  min) {
@@ -262,7 +261,7 @@ public  class XSDecimal extends XSType
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSDecimal.jType;
     }
 
 	/**

@@ -85,7 +85,7 @@ public interface TransactionManagerFactory
     
 	/**
 	 * Setsthe full set of parameters on this factory instance.
-	 * @param The full set of parameters. 
+	 * @param params The full set of parameters. 
 	 */
 	void setParams(Properties params);
     

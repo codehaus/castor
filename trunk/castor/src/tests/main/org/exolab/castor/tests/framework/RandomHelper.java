@@ -47,7 +47,6 @@ package org.exolab.castor.tests.framework;
 import java.util.Random;
 import java.util.Vector;
 import java.util.ArrayList;
-import java.util.Date;
 import org.exolab.castor.types.*;
 
 import java.math.BigDecimal;
