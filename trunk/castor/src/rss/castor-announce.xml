@@ -20,7 +20,7 @@
 
 		<item>
 			<title>A new home</title>
-			<pubDate>Mon, 14 Feb 2005 23:35:32 GMT</pubDate>
+			<pubDate>Mon, 14 Feb 2005 22:21:20 GMT</pubDate>
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html#item20</link>
 			<description>After over five years of Exolab (http://www.exolab.org)sponsoring Castor, 
@@ -37,7 +37,7 @@
 		</item>
 		<item>
 			<title>Castor JDO - new committers</title>
-			<pubDate>Mon, 14 Feb 2005 23:35:32 GMT</pubDate>
+			<pubDate>Mon, 14 Feb 2005 21:21:21 GMT</pubDate>
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html#item19</link>
 			<guid isPermaLink="true">http://groups.yahoo.com/group/rss-dev/message/7047</guid>
@@ -49,20 +49,22 @@
 		</item>
 		<item>
 			<title>Final 0.9.6 release available</title>
-			<pubDate>Mon, 14 Feb 2005 23:35:32 GMT</pubDate>
+			<pubDate>Wed, 09 Feb 2005 22:22:22 GMT</pubDate>
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html#item18</link>
 			<description>
-				The final release of Castor 0.9.6 has been made available at http://dist.codehaus.org/castor/0.9.6
+				The final release of Castor 0.9.6 has been made available at 
+				http://dist.codehaus.org/castor/0.9.6.
 			</description>
 		</item>
 		<item>
 			<title>0.9.6 release candidate 3 available</title>
-			<pubDate>Mon, 14 Feb 2005 23:35:32 GMT</pubDate>
+			<pubDate>Mon, 11 Jan 2005 23:25:00 GMT</pubDate>
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html</link>
 			<description>
-				The third release candidate of Castor 0.9.6 has been made available at http://dist.codehaus.org/castor/0.9.6/
+				The third release candidate of Castor 0.9.6 has been made available at 
+				http://dist.codehaus.org/castor/0.9.6/
 			</description>
 		</item>
 		<item>
@@ -71,16 +73,18 @@
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html</link>
 			<description>
-				The second release candidate of Castor 0.9.6 has been made available at http://dist.codehaus.org/castor/0.9.6/
+				The second release candidate of Castor 0.9.6 has been made available at 
+				http://dist.codehaus.org/castor/0.9.6/
 			</description>
 		</item>
 		<item>
 			<title>0.9.6 release candidate 1 available</title>
-			<pubDate>Mon, 14 Feb 2005 23:35:32 GMT</pubDate>
+			<pubDate>Mon, 28 Oct 2004 23:35:32 GMT</pubDate>
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html</link>
 			<description>
-				The first release candidate of Castor 0.9.6 has been made available at http://dist.codehaus.org/castor/0.9.6/
+				The first release candidate of Castor 0.9.6 has been made available at 
+				http://dist.codehaus.org/castor/0.9.6/
 			</description>
 		</item>
 	</channel>
