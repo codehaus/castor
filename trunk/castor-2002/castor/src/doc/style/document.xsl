@@ -47,11 +47,6 @@
       <br/>
       <h1><xsl:value-of select="/document/properties/title"/></h1>
     </xsl:if>
-    <xsl:if test="title">
-      <br/>
-      <h1><xsl:value-of select="title"/></h1>
-    </xsl:if>
-
     <xsl:if test="header">
       <xsl:apply-templates select="header"/>
     </xsl:if>

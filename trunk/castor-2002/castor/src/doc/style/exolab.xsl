@@ -78,7 +78,7 @@
                 <tr>
                   <td bgcolor="{$color-alpha}" width="*" align="left" valign="top">
                     <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/>
-                    <a href="{$project/@href}"><img src="{$project/@image}" border="0"/></a>
+                    <a href="{$project/@href}"><img src="{$project/@image}" border="0" vspace="16" hspace="16"/></a>
                   </td>
                 </tr>
 
@@ -122,8 +122,13 @@
           </td>
           <td bgcolor="{$color-alpha}" height="45" width="3600">
             &#xA0;&#xA0;<img src="style/images/bullets/dots.gif" height="11" width="41" valign="top"/>&#xA0;&#xA0;
-            <font size="4" color="{$color-c}"><b><xsl:value-of select="$project/title"/></b></font>    
-          </td>
+            <font size="4" color="{$color-c}"><b>
+              <xsl:choose>
+                <xsl:when test="/document/body/title"><xsl:value-of select="/document/body/title"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$project/title"/></xsl:otherwise>
+              </xsl:choose>
+            </b></font>
+           </td>
         </tr>
 
       <xsl:if test="document/properties">
@@ -142,7 +147,7 @@
 
         <tr>
           <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
-          <td bgcolor="{$color-alpha}">
+          <td bgcolor="{$color-alpha}" valign="top">
              <xsl:apply-templates select="document/body"/>
              <br/>
           </td>
