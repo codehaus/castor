@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
@@ -34,9 +36,9 @@ public class JdoConf implements java.io.Serializable {
     //--------------------------/
 
     /**
-     * Field _database
+     * Field _databaseList
      */
-    private org.exolab.castor.jdo.conf.Database _database;
+    private java.util.ArrayList _databaseList;
 
     /**
      * Field _transactionDemarcation
@@ -50,6 +52,7 @@ public class JdoConf implements java.io.Serializable {
 
     public JdoConf() {
         super();
+        _databaseList = new ArrayList();
     } //-- org.exolab.castor.jdo.conf.JdoConf()
 
 
@@ -58,14 +61,80 @@ public class JdoConf implements java.io.Serializable {
     //-----------/
 
     /**
-     * Returns the value of field 'database'.
+     * Method addDatabase
      * 
-     * @return the value of field 'database'.
+     * @param vDatabase
      */
-    public org.exolab.castor.jdo.conf.Database getDatabase()
+    public void addDatabase(org.exolab.castor.jdo.conf.Database vDatabase)
+        throws java.lang.IndexOutOfBoundsException
     {
-        return this._database;
-    } //-- org.exolab.castor.jdo.conf.Database getDatabase() 
+        _databaseList.add(vDatabase);
+    } //-- void addDatabase(org.exolab.castor.jdo.conf.Database) 
+
+    /**
+     * Method addDatabase
+     * 
+     * @param index
+     * @param vDatabase
+     */
+    public void addDatabase(int index, org.exolab.castor.jdo.conf.Database vDatabase)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _databaseList.add(index, vDatabase);
+    } //-- void addDatabase(int, org.exolab.castor.jdo.conf.Database) 
+
+    /**
+     * Method clearDatabase
+     */
+    public void clearDatabase()
+    {
+        _databaseList.clear();
+    } //-- void clearDatabase() 
+
+    /**
+     * Method enumerateDatabase
+     */
+    public java.util.Enumeration enumerateDatabase()
+    {
+        return new org.exolab.castor.util.IteratorEnumeration(_databaseList.iterator());
+    } //-- java.util.Enumeration enumerateDatabase() 
+
+    /**
+     * Method getDatabase
+     * 
+     * @param index
+     */
+    public org.exolab.castor.jdo.conf.Database getDatabase(int index)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _databaseList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        return (org.exolab.castor.jdo.conf.Database) _databaseList.get(index);
+    } //-- org.exolab.castor.jdo.conf.Database getDatabase(int) 
+
+    /**
+     * Method getDatabase
+     */
+    public org.exolab.castor.jdo.conf.Database[] getDatabase()
+    {
+        int size = _databaseList.size();
+        org.exolab.castor.jdo.conf.Database[] mArray = new org.exolab.castor.jdo.conf.Database[size];
+        for (int index = 0; index < size; index++) {
+            mArray[index] = (org.exolab.castor.jdo.conf.Database) _databaseList.get(index);
+        }
+        return mArray;
+    } //-- org.exolab.castor.jdo.conf.Database[] getDatabase() 
+
+    /**
+     * Method getDatabaseCount
+     */
+    public int getDatabaseCount()
+    {
+        return _databaseList.size();
+    } //-- int getDatabaseCount() 
 
     /**
      * Returns the value of field 'transactionDemarcation'.
@@ -116,13 +185,44 @@ public class JdoConf implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Sets the value of field 'database'.
+     * Method removeDatabase
      * 
-     * @param database the value of field 'database'.
+     * @param vDatabase
      */
-    public void setDatabase(org.exolab.castor.jdo.conf.Database database)
+    public boolean removeDatabase(org.exolab.castor.jdo.conf.Database vDatabase)
     {
-        this._database = database;
+        boolean removed = _databaseList.remove(vDatabase);
+        return removed;
+    } //-- boolean removeDatabase(org.exolab.castor.jdo.conf.Database) 
+
+    /**
+     * Method setDatabase
+     * 
+     * @param index
+     * @param vDatabase
+     */
+    public void setDatabase(int index, org.exolab.castor.jdo.conf.Database vDatabase)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _databaseList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        _databaseList.set(index, vDatabase);
+    } //-- void setDatabase(int, org.exolab.castor.jdo.conf.Database) 
+
+    /**
+     * Method setDatabase
+     * 
+     * @param databaseArray
+     */
+    public void setDatabase(org.exolab.castor.jdo.conf.Database[] databaseArray)
+    {
+        //-- copy array
+        _databaseList.clear();
+        for (int i = 0; i < databaseArray.length; i++) {
+            _databaseList.add(databaseArray[i]);
+        }
     } //-- void setDatabase(org.exolab.castor.jdo.conf.Database) 
 
     /**

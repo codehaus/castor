@@ -67,8 +67,8 @@ public class JdoConfDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         
         //-- initialize element descriptors
         
-        //-- _database
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.Database.class, "_database", "database", org.exolab.castor.xml.NodeType.Element);
+        //-- _databaseList
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.Database.class, "_databaseList", "database", org.exolab.castor.xml.NodeType.Element);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
@@ -81,7 +81,7 @@ public class JdoConfDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             {
                 try {
                     JdoConf target = (JdoConf) object;
-                    target.setDatabase( (org.exolab.castor.jdo.conf.Database) value);
+                    target.addDatabase( (org.exolab.castor.jdo.conf.Database) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -93,10 +93,10 @@ public class JdoConfDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         } );
         desc.setHandler(handler);
         desc.setRequired(true);
-        desc.setMultivalued(false);
+        desc.setMultivalued(true);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _database
+        //-- validation code for: _databaseList
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
         fieldValidator.setMinOccurs(1);
         { //-- local scope
