@@ -93,7 +93,7 @@ public class ManyToManyKeyGen extends CWTestCase {
     public ManyToManyKeyGen( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC29", "ManyToManyKeyGen" );
+        super( "TC31", "ManyToManyKeyGen" );
         _category = (JDOCategory) category;
     }
 
@@ -134,18 +134,22 @@ public class ManyToManyKeyGen extends CWTestCase {
             _db.begin();
 
             // select an group and delete it, if it exist!
-            OQLQuery oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object" );
+            OQLQuery oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object WHERE object.id < $1" );
+            oqlclean.bind( Integer.MAX_VALUE );
             enum = oqlclean.execute();
             while ( enum.hasMore() ) {
                 groupA = (TestManyGroupKeyGen) enum.next();
                 stream.writeVerbose( "Retrieved object: " + groupA );
                 _db.remove( groupA );
                 stream.writeVerbose( "Deleted object: " + groupA );
-            } 
+            }
+            _db.commit();
 
-            oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object" );
+            _db.begin();
+            oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object WHERE object.id < $1" );
+            oqlclean.bind( Integer.MAX_VALUE );
             enum = oqlclean.execute();
-            if ( enum.hasMore() ) {
+            while ( enum.hasMore() ) {
                 person1 = (TestManyPersonKeyGen) enum.next();
                 stream.writeVerbose( "Retrieved object: " + person1 );
                 _db.remove( person1 );
@@ -165,7 +169,6 @@ public class ManyToManyKeyGen extends CWTestCase {
             person1.setGroup( gPerson1 );
             person1.setSthelse("Something else");
             person1.setHelloworld("Hello World!");
-
 
             person2 = new TestManyPersonKeyGen();
             person2.setValue1("I am person 2");
@@ -199,7 +202,7 @@ public class ManyToManyKeyGen extends CWTestCase {
             groupB.setValue1("Group B");
 
             gPerson1.add( groupA );
-            gPerson2.add( groupB );
+            gPerson2.add( groupA );
 
             _db.create( groupA );
             _db.create( person1 );
@@ -379,19 +382,10 @@ public class ManyToManyKeyGen extends CWTestCase {
             stream.writeVerbose("Update object to a new transaction");
             _db.setAutoStore( true );
             _db.begin();
-            stream.writeVerbose("------------------");
             _db.update( groupA );
-            System.out.println( "person3Id: "+person3Id );
-            System.out.println( "person3: "+person3 );
-            _db.update( person3 );
-            _db.remove( person3 );
-            //_db.create( person4 );
-            stream.writeVerbose("------------------");
-            stream.writeVerbose("------------------");
             _db.commit();
 
             person4Id = person4.getId();
-
             // load again to see if the changes done are effective
             stream.writeVerbose("Load the objects again to see if changes done are effective");
             _db.begin();
@@ -460,8 +454,13 @@ public class ManyToManyKeyGen extends CWTestCase {
             }
             _db.commit();
         } catch ( Exception e ) {
-            result = false;
             e.printStackTrace();
+            if ( _db.isActive() )
+                try {
+                    _db.rollback();
+                } catch ( Exception ee ) {
+                }
+            result = false;
         }
 
         return result;
