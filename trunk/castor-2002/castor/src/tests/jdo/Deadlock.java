@@ -355,7 +355,7 @@ public class Deadlock
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
                     _lock.notify();
-                    _lock.wait();
+                    _lock.wait( 2000 );
                 }
                 // Give the other thread a 2 second opportunity.
                 // sleep( start + Wait - System.currentTimeMillis() );
@@ -382,7 +382,7 @@ public class Deadlock
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
                     _lock.notify();
-                    _lock.wait();
+                    _lock.wait( 2000 );
                 }
                 // Give the other thread a 2 second opportunity.
                 //sleep( start + Wait - System.currentTimeMillis() );

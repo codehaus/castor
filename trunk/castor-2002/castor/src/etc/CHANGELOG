@@ -14,7 +14,11 @@ JDO:     Fixed the way in which null fields are handled, so has/delete methods a
 
 Mapping: Date type no longer defaults to new date() when field is null, field is no
          longer set to default when null. (Reported by Lincoln Spiteri
-         <Lincoln.Spiteri@mobisle.com>).
+         <Lincoln.Spiteri@mobisle.com>)
+
+Mapping: Fixed mapping loader to complain if get/set methods are not found. Both are
+         required to be present, unless a collection field is used which only requires
+         a get method. (Reported by Lincoln Spiteri <Lincoln.Spiteri@mobisle.com>)
 
 
 Version 0.8.5  May 12, 2000

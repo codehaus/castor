@@ -457,7 +457,7 @@ public abstract class MappingLoader
         if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
 
             if ( fieldMap.getName() == null )
-                throw new MappingException( "" );
+                throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
             getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
                                       ( colType == null ? fieldType : colType ), true );
             if ( getMethod == null )
