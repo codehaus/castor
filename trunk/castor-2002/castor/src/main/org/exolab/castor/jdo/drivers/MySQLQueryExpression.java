@@ -73,8 +73,19 @@ public final class MySQLQueryExpression
 
     public String getStatement( boolean lock )
     {
+        StringBuffer sql;
+
+        sql = getStandardStatement( lock, false );
+
+        if ( _limit != null )
+            sql.append( JDBCSyntax.Limit ).append( _limit );
+
         // Do not use FOR UPDATE to lock query.
-        return getStandardStatement( lock, false ).toString();
+        // return getStandardStatement( lock, false ).toString();
+        if ( lock )
+            sql.append( " FOR UPDATE" );
+
+        return sql.toString();
     }
 }
 
