@@ -15,7 +15,7 @@ import org.exolab.castor.xml.MarshalDescriptor;
 import org.exolab.castor.xml.SimpleMarshalDescriptor;
 
 /**
- * @author 
+ * @author <a href="http://castor.exolab.org">Castor-XML</a>
  * @version $Revision$ $Date$
 **/
 public class DataSourceRefMarshalInfo implements org.exolab.castor.xml.MarshalInfo {

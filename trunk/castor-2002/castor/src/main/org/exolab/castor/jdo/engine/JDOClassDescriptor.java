@@ -52,12 +52,11 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.IntegrityException;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 
 
 /**
- * JDO class descriptors. Extends {@link ClassDesc} to include the
+ * JDO class descriptors. Extends {@link ClassDescriptor} to include the
  * table name and other SQL-related information. All fields are of
  * type {@link JDOFieldDescriptor}, identity field is not included in the
  * returned field list, and contained fields are flattened out for

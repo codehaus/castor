@@ -17,6 +17,7 @@ import org.exolab.castor.xml.SimpleMarshalDescriptor;
 import org.exolab.castor.xml.ValidationRule;
 
 /**
+ * @author <a href="http://castor.exolab.org">Castor-XML</a>
  * @version $Revision$ $Date$
 **/
 public class MappingMarshalInfo implements org.exolab.castor.xml.MarshalInfo {

@@ -20,7 +20,7 @@ import org.xml.sax.SAXException;
 //import javax.sql.DataSource;
 
 /**
- * @author 
+ * @author <a href="http://castor.exolab.org">Castor-XML</a>
  * @version $Revision$ $Date$
 **/
 public class DataSource implements java.io.Serializable {

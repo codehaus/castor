@@ -55,9 +55,9 @@ import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 
 
 /**
- * DAX class descriptors. Extends {@link ClassDesc} to include the
+ * DAX class descriptors. Extends {@link ClassDescriptor} to include the
  * object class and other LDAP-related information. All fields are of
- * type {@link DAXFieldDesc}, identity field is part of the returned
+ * type {@link DAXFieldDescriptor}, identity field is part of the returned
  * field list, and contained fields are flattened out for efficiency
  * (thus all fields are directly accessible).
  *
