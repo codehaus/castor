@@ -457,7 +457,13 @@ public class SchemaWriter {
         //-- default
         String defaultValue = element.getDefaultValue();
         if (defaultValue != null) {
-            _atts.addAttribute("default", null, defaultValue);
+            _atts.addAttribute("default", CDATA, defaultValue);
+        }
+        
+        //-- @form
+        Form form = element.getForm();
+        if (form != null) {
+            _atts.addAttribute(SchemaNames.FORM, CDATA, form.toString());
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
@@ -669,6 +675,20 @@ public class SchemaWriter {
         String value = schema.getTargetNamespace();
         if (value != null)
             _atts.addAttribute(SchemaNames.TARGET_NS_ATTR, CDATA, value);
+
+        //-- attributeFormDefault
+        Form form = schema.getAttributeFormDefault();
+        if (form != null) {
+            _atts.addAttribute(SchemaNames.ATTR_FORM_DEFAULT_ATTR, CDATA,
+                form.toString());
+        }
+        //-- elementFormDefault
+        form = schema.getElementFormDefault();
+        if (form != null) {
+            _atts.addAttribute(SchemaNames.ELEM_FORM_DEFAULT_ATTR, CDATA,
+                form.toString());
+        }
+
 
         //-- modify schemaPrefix to include ':'
         if (schemaPrefix.length() > 0) {
