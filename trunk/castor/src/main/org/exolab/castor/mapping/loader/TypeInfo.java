@@ -216,7 +216,7 @@ public class TypeInfo
             }
         }
 
-        _fieldType = Types.typeFromPrimitive( fieldType );
+        _fieldType = fieldType;
         _convertorTo = convertorTo;
         _convertorFrom = convertorFrom;
         _convertorParam = convertorParam;
@@ -238,7 +238,6 @@ public class TypeInfo
     {
         return _fieldType;
     }
-
 
     /**
      * Returns the convertor to the field type from an external type.
