@@ -19,8 +19,11 @@
     <title>Using the Source Code Generator</title>
     <header>
       <p>Reference: <api package="org.exolab.castor.builder">The Source Builder API</api></p>
+      <p>For a more detailled version of the Source Generator documentation, download the 
+      <a href="./SourceGeneratorUser.pdf">
+      	Source Generator User Document(PDF).</a></p>
     </header>
-
+	
     <section title="Introduction">
 
       <p>Castor's source code generator creates a set of Java classes
