@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1606 using contribution from Emir Causevic [emirc@gawab.com]
+       Fixed problem with incorrectly quoting non-function names for SAP DB.
+       (Werner - 20040427)
+       
 JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
        Added support for SAB DB to IdentityKeyGenerator.
        (Werner - 20040427)
