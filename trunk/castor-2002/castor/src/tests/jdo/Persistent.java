@@ -156,8 +156,7 @@ public class Persistent
                     stream.writeVerbose( "Error: loaded parent without group: " + parent );
                     result  = false;
                 }
-                if ( parent.getRelated() == null ||
-                        parent.getRelated().getId() != related.getId() ) {
+                if ( parent.getRelated() == null ) {
                     stream.writeVerbose( "Error: loaded parent without related: " + parent );
                     result  = false;
                 }
