@@ -339,21 +339,20 @@ public class UnmarshalHandler implements DocumentHandler {
         try {
             descriptor.setValue(state.object, val);
         }
-        catch(java.lang.IllegalAccessException iae) {
-            String err = "unable to add \"" + name + "\" to ";
-            err += state.descriptor.getXMLName();
-            throw new SAXException(err);
-        }
         catch(java.lang.reflect.InvocationTargetException itx) {
-            String err = "unable to add \"" + name + "\" to ";
+            
+            Throwable toss = itx.getTargetException();
+            if (toss == null) toss = itx;
+            
+            String err = "unable to add '" + name + "' to <";
             err += state.descriptor.getXMLName();
-            err += " due to an InvocationTargetException: " + itx.getMessage();
+            err += "> due to the following exception: " + toss;
             throw new SAXException(err);
         }
         catch(Exception ex) {
-            String err = "unable to add \"" + name + "\" to ";
+            String err = "unable to add '" + name + "' to <";
             err += state.descriptor.getXMLName();
-            err += " due to the following exception: " + ex.getMessage();
+            err += "> due to the following exception: " + ex;
             throw new SAXException(err);
         }
         
@@ -395,6 +394,8 @@ public class UnmarshalHandler implements DocumentHandler {
     {
         
         //-- handle namespaces
+        
+        //System.out.println("debug - UnmarshalHandler#startElement: " + name);
         
         String namespace = null;
         
@@ -540,6 +541,7 @@ public class UnmarshalHandler implements DocumentHandler {
                         _class = mInfo.getClassType();
                     }
                 }
+                
                 state.type = _class;
                 
                 //-- instantiate class
@@ -650,13 +652,15 @@ public class UnmarshalHandler implements DocumentHandler {
             }
         }
         else {
+            System.out.println("descriptor is null");
+            
             String msg = "unable to find MarshalDescriptor for: ";
             message(msg+name);
         }
         
         if (state.object != null)
             processAttributes(atts, mInfo);
-        else if (!state.type.isPrimitive()){
+        else if ((state.type != null) && (!state.type.isPrimitive())) {
             StringBuffer msg = new StringBuffer("current object for '");
             msg.append(name);
             msg.append("\' is null, ignoring attributes.");
@@ -802,6 +806,7 @@ public class UnmarshalHandler implements DocumentHandler {
     private void message(String msg) {
         if (_logWriter != null) {
             _logWriter.println(msg);
+            _logWriter.flush();
         }
     } //-- message
     
