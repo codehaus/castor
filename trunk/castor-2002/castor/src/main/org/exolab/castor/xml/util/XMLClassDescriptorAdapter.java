@@ -98,10 +98,14 @@ public class XMLClassDescriptorAdapter
             FieldDescriptor[] fields = classDesc.getFields();
             for (int i = 0; i < fields.length; i++) {
                 FieldDescriptor fieldDesc = fields[i];
-                String name = fieldDesc.getFieldName();
-                String xmlFieldName = MarshalHelper.toXMLName(name);
-                addFieldDescriptor(new XMLFieldDescriptorImpl(fieldDesc,
-                     xmlFieldName, null));
+                if ( fieldDesc instanceof XMLFieldDescriptorImpl )
+                    addFieldDescriptor( (XMLFieldDescriptorImpl) fieldDesc );
+                else {
+                    String name = fieldDesc.getFieldName();
+                    String xmlFieldName = MarshalHelper.toXMLName(name);
+                    addFieldDescriptor(new XMLFieldDescriptorImpl(fieldDesc,xmlFieldName, 
+                        ( fieldDesc.getClassDescriptor() == null ? NodeType.Element : NodeType.Attribute )));
+                }
             }
             
             setXMLName(xmlName);
