@@ -45,9 +45,12 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.types.Time;
 import org.exolab.javasource.*;
 
+import java.util.Enumeration;
+import java.text.ParseException;
 /**
  * The XML Schema time type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
@@ -61,9 +64,14 @@ public final class XSTime extends XSType{
     private static final JType jType
         = new JClass ("org.exolab.castor.types.Time");
 
-   public XSTime() {
-        super(XSType.TIME_TYPE);
-   } //-- XSTime
+    private Time _maxInclusive;
+    private Time _maxExclusive;
+    private Time _minInclusive;
+    private Time _minExclusive;
+
+    public XSTime() {
+         super(XSType.TIME_TYPE);
+    } //-- XSTime
 
     /**
      * Returns the Java code necessary to create a new instance of the
@@ -80,10 +88,142 @@ public final class XSTime extends XSType{
     public JType getJType() {
         return this.jType;
     }
+       /**
+     * Returns the maximum exclusive value that this XSTime can hold.
+     * @return the maximum exclusive value that this XSTime can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public Time getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
     /**
-     * Reads and sets the facets for XSType
-     * @param simpleType the SimpleType containing the facets
+     * Returns the maximum inclusive value that this XSTime can hold.
+     * @return the maximum inclusive value that this XSTime can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public Time getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSTime can hold.
+     * @return the minimum exclusive value that this XSTime can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public Time getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSTime can hold.
+     * @return the minimum inclusive value that this can XSTime hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public Time getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSTime can hold.
+     * @param max the maximum exclusive value this XSTime can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(Time max) {
+        _maxExclusive = max;
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSTime can hold.
+     * @param max the maximum inclusive value this XSTime can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(Time max) {
+        _maxInclusive = max;
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSTime can hold.
+     * @param max the minimum exclusive value this XSTime can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(Time min) {
+        _minExclusive = min;
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSTime can hold.
+     * @param max the minimum inclusive value this XSTime can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(Time min) {
+        _minInclusive = min;
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
+    }
+
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
+    /**
+     * Reads and sets the facets for XSTime
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
      */
-     public void setFacets(SimpleType simpleType){}
+
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(Time.parseTime(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(Time.parseTime(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(Time.parseTime(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(Time.parseTime(facet.getValue()));
+                //-- pattern
+                else if (Facet.PATTERN.equals(name)) {
+                    //do nothing for the moment
+                    System.out.println("Warning: The facet 'pattern' is not currently supported for XSTime.");
+                }
+            } catch (ParseException e) {
+                //not possible to set the facet properly
+                //This can't happen since a ParseException would have been set
+                //during the unmarshalling of the facets
+                e.printStackTrace();
+                return;
+            }
+        }//while
+
+    }//setFacets
 
 } //-- XSTime

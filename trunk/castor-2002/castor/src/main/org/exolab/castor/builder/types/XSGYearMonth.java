@@ -45,10 +45,13 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.types.GYearMonth;
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
 
+import java.util.Enumeration;
+import java.text.ParseException;
 /**
  * The XML Schema gYearMonth type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
@@ -63,6 +66,10 @@ public class XSGYearMonth extends XSType {
     private static final JType jType
         = new JClass ("org.exolab.castor.types.GYearMonth");
 
+    private GYearMonth _maxInclusive;
+    private GYearMonth _maxExclusive;
+    private GYearMonth _minInclusive;
+    private GYearMonth _minExclusive;
 
     public XSGYearMonth() {
        super(XSType.GYEARMONTH_TYPE);
@@ -80,6 +87,141 @@ public class XSGYearMonth extends XSType {
         return this.jType;
     }
 
-    public void setFacets(SimpleType simpleType){
+    /**
+     * Returns the maximum exclusive value that this XSGYearMonth can hold.
+     * @return the maximum exclusive value that this XSGYearMonth can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public GYearMonth getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
+    /**
+     * Returns the maximum inclusive value that this XSGYearMonth can hold.
+     * @return the maximum inclusive value that this XSGYearMonth can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public GYearMonth getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSGYearMonth can hold.
+     * @return the minimum exclusive value that this XSGYearMonth can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public GYearMonth getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSGYearMonth can hold.
+     * @return the minimum inclusive value that this can XSGYearMonth hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public GYearMonth getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSGYearMonth can hold.
+     * @param max the maximum exclusive value this XSGYearMonth can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(GYearMonth max) {
+        _maxExclusive = max;
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSGYearMonth can hold.
+     * @param max the maximum inclusive value this XSGYearMonth can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(GYearMonth max) {
+        _maxInclusive = max;
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSGYearMonth can hold.
+     * @param max the minimum exclusive value this XSGYearMonth can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(GYearMonth min) {
+        _minExclusive = min;
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSGYearMonth can hold.
+     * @param max the minimum inclusive value this XSGYearMonth can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(GYearMonth min) {
+        _minInclusive = min;
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
     }
+
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
+    /**
+     * Reads and sets the facets for XSGYearMonth
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
+     */
+
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(GYearMonth.parseGYearMonth(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(GYearMonth.parseGYearMonth(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(GYearMonth.parseGYearMonth(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(GYearMonth.parseGYearMonth(facet.getValue()));
+                //-- pattern
+                else if (Facet.PATTERN.equals(name)) {
+                    //do nothing for the moment
+                    System.out.println("Warning: The facet 'pattern' is not currently supported for XSGYearMonth.");
+                }
+            } catch (ParseException e) {
+                //not possible to set the facet properly
+                //This can't happen since a ParseException would have been set
+                //during the unmarshalling of the facets
+                e.printStackTrace();
+                return;
+            }
+        }//while
+
+    }//setFacets
 }

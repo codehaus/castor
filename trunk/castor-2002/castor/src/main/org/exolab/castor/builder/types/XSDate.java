@@ -45,7 +45,12 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.types.Date;
 import org.exolab.javasource.*;
+
+import java.text.ParseException;
+import java.util.Enumeration;
 
 /**
  * The XML Schema Date type
@@ -59,6 +64,12 @@ public final class XSDate extends XSType{
     **/
     private static final JType jType
         = new JClass("org.exolab.castor.types.Date");
+
+    private Date _maxInclusive;
+    private Date _maxExclusive;
+    private Date _minInclusive;
+    private Date _minExclusive;
+
 
     public XSDate() {
         super(XSType.DATE_TYPE);
@@ -82,10 +93,141 @@ public final class XSDate extends XSType{
     }
 
     /**
-     * Reads and sets the facets for XSType
-     * @param simpleType the SimpleType containing the facets
+     * Returns the maximum exclusive value that this XSDate can hold.
+     * @return the maximum exclusive value that this XSDate can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public Date getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
+    /**
+     * Returns the maximum inclusive value that this XSDate can hold.
+     * @return the maximum inclusive value that this XSDate can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public Date getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSDate can hold.
+     * @return the minimum exclusive value that this XSDate can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public Date getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSDate can hold.
+     * @return the minimum inclusive value that this can XSDate hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public Date getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSDate can hold.
+     * @param max the maximum exclusive value this XSDate can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(Date max) {
+        _maxExclusive = max;
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSDate can hold.
+     * @param max the maximum inclusive value this XSDate can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(Date max) {
+        _maxInclusive = max;
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSDate can hold.
+     * @param max the minimum exclusive value this XSDate can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(Date min) {
+        _minExclusive = min;
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSInt can hold.
+     * @param max the minimum inclusive value this XSInt can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(Date min) {
+        _minInclusive = min;
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
+    }
+
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
+    /**
+     * Reads and sets the facets for XSDate
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
      */
-     public void setFacets(SimpleType simpleType){}
+
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(Date.parseDate(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(Date.parseDate(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(Date.parseDate(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(Date.parseDate(facet.getValue()));
+                //-- pattern
+                else if (Facet.PATTERN.equals(name)) {
+                    //do nothing for the moment
+                    System.out.println("Warning: The facet 'pattern' is not currently supported for Date.");
+                }
+            } catch (ParseException e) {
+                //not possible to set the facet properly
+                //This can't happen since a ParseException would have been set
+                //during the unmarshalling of the facets
+                e.printStackTrace();
+                return;
+            }
+        }//while
+    }//setFacets
 
 
 } //-- XSDate
