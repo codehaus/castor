@@ -29,6 +29,7 @@
            <tr><td>postgresql</td><td>PostgreSQL 6.5 and 7</td></tr>
            <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
          </table></p>
+      <p><small>Note: MySQL and MS Access does not work with Castor.</small></p>
 
       <p>The means to acquire a database connection is specified in one of three
          ways: as a JDBC 2.0 driver URL, as a JDBC 2.0 DataSource, or as a DataSource
