@@ -552,6 +552,13 @@ public class Duration
     } //parse
 
     /**
+     * Overrides the java.lang.Object#hashcode method.
+     */
+     public int hashCode() {
+         return _year^_month^_day^_hour^_minute^_second;
+     }
+
+    /**
      * Override the java.lang.equals method
      * @see equal
      */
@@ -560,6 +567,7 @@ public class Duration
                return equal( (Duration) object);
         else return false;
     }
+
     /**
      * Returns true if the instance of TimeDuration has the same fields
      * of the parameter
