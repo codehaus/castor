@@ -915,16 +915,23 @@ public class Parser implements TokenTypes {
    * @throws OQLSyntaxException passed through from match(), or if an
    *    unknown token is encountered here.
    */
-  private ParseTreeNode limitClause()
-            throws InvalidCharException, OQLSyntaxException {
-
+  private ParseTreeNode limitClause() throws InvalidCharException, OQLSyntaxException {
     ParseTreeNode retNode = match(KEYWORD_LIMIT);
 
-    retNode.addChild(queryParam());
-      if ( _curToken.getTokenType() == COMMA )
-    {
-      retNode.addChild( match( COMMA ) );
-      retNode.addChild( queryParam() );
+    int tokenType = _curToken.getTokenType();
+    switch (tokenType) {
+    case DOLLAR:
+        retNode.addChild(queryParam());
+        if ( _curToken.getTokenType() == COMMA ) {
+          retNode.addChild( match( COMMA ) );
+          retNode.addChild( queryParam() );
+        }
+        break;
+    case LONG_LITERAL:
+        retNode.addChild(match(tokenType));
+        break;
+    default:
+        throw (new OQLSyntaxException("An inapropriate token ("+String.valueOf( tokenType )+") was encountered in an expression."));
     }
 
     return retNode;

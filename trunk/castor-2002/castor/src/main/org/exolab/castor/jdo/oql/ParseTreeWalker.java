@@ -685,25 +685,25 @@ public class ParseTreeWalker implements TokenTypes
     for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
 
-	  int tokenType = curChild.getToken().getTokenType();
-	  switch (tokenType) {
-	  case KEYWORD_ASC:
-	  case KEYWORD_DESC:
-		  // iterate on child
-		  curChild = curChild.getChild(0);
-		  tokenType = curChild.getToken().getTokenType();
-	  }
-	  switch (tokenType) {
-	  case DOT:
-		  checkProjection( curChild, false, false );
-		  break;
-	  case IDENTIFIER:
-		  checkField(curChild);
-		  break;
-	  default:
-		  throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
-	  }
-	}
+      int tokenType = curChild.getToken().getTokenType();
+      switch (tokenType) {
+      case KEYWORD_ASC:
+      case KEYWORD_DESC:
+          // iterate on child
+          curChild = curChild.getChild(0);
+          tokenType = curChild.getToken().getTokenType();
+      }
+      switch (tokenType) {
+      case DOT:
+          checkProjection( curChild, false, false );
+          break;
+      case IDENTIFIER:
+          checkField(curChild);
+          break;
+      default:
+          throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
+      }
+    }
   }
 
   /**
@@ -875,7 +875,7 @@ public class ParseTreeWalker implements TokenTypes
       sb.append( sqlExpr.substring( startPos ) );
 
     _queryExpr.addLimitClause( sb.toString() );
-     System.out.println(sb.toString());
+    // System.out.println(sb.toString());
     _SQLParamIndex = SQLParamIndex;
   }
 
@@ -1104,10 +1104,16 @@ public class ParseTreeWalker implements TokenTypes
           sb.append( "?" + exprTree.getChild(exprTree.getChildCount() - 1)
                                 .getToken().getTokenValue());
           break;
-              case COMMA:
-                sb.append(" , ");
-                break;
-          }
+        case COMMA:
+          sb.append(" , ");
+          break;
+        case BOOLEAN_LITERAL:
+        case LONG_LITERAL:
+        case DOUBLE_LITERAL:
+        case CHAR_LITERAL:
+          return exprTree.getToken().getTokenValue();
+
+        }
       }
       return sb.toString();
   }
