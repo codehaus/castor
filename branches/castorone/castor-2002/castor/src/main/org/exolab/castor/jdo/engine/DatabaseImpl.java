@@ -346,18 +346,16 @@ public class DatabaseImpl
         remove( object );
     }
 
-    /*
     public boolean isPersistent( Object object )
     {
         TransactionContext tx;
         
-        if ( _dbEngine == null )
+        if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
             return _ctx.isPersistent( object );
         return false;
     }
-    */
 
     public Object[] getIdentities( Object object )
     {
