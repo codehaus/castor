@@ -19,7 +19,7 @@
     same collection.
 
  -->
-<!ELEMENT mapping ( description?, include*, class+, key-generator* )>
+<!ELEMENT mapping ( description?, include*, class*, key-generator* )>
 
 
 <!--
@@ -79,7 +79,7 @@
 <!ELEMENT cache-type EMPTY>
 <!ATTLIST cache-type
     type           ( none | count-limited | time-limited | unlimited ) "count-limited"
-    capacity	   NMTOKEN  #IMPLIED>
+    capacity       NMTOKEN  #IMPLIED>
 
 <!--
     Specifies the mapping between a Java class and an SQL table.
@@ -133,7 +133,7 @@
     type           NMTOKEN  #IMPLIED
     required       ( true | false )  "false"
     direct         ( true | false )  "false"
-    lazy	   ( true | false )  "false"
+    lazy       ( true | false )  "false"
     get-method     NMTOKEN  #IMPLIED
     set-method     NMTOKEN  #IMPLIED
     create-method  NMTOKEN  #IMPLIED
@@ -154,8 +154,8 @@
  -->
 <!ELEMENT sql EMPTY>
 <!ATTLIST sql
-    name	    NMTOKEN  #IMPLIED
-    type	    CDATA    #IMPLIED
+    name        NMTOKEN  #IMPLIED
+    type        CDATA    #IMPLIED
     dirty  ( check | ignore )  "check"> 
 
 
