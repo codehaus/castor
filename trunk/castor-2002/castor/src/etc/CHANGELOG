@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+XML:    Improved Javadoc support - method names now use the Schema annotations for
+        their respective fields. (kvisco - 20020117)
+
+XML:    Added support for marshalling xsi:type using only Schema name, instead
+        of Java classname. (kvisco - 20020115)
+
 XML:    Added support in the Schema Object Model for 'union'. Union is not
         yet integrated with the source generator. (kvisco - 20011217) 
        
