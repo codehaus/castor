@@ -695,13 +695,15 @@ public class Types
         // Convertors to big decimal
         new TypeConvertorInfo( java.lang.Double.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return new BigDecimal( ( (Double) obj ).doubleValue() ).setScale( 16, BigDecimal.ROUND_DOWN );
+                // Don't remove "toString" below! Otherwise the result is incorrect.
+                return new BigDecimal( ( (Double) obj ).toString() );
             }
             public String toString() { return "Double->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return new BigDecimal( ( (Float) obj ).floatValue() ).setScale( 16, BigDecimal.ROUND_DOWN );
+                // Don't remove "toString" below! Otherwise the result is incorrect.
+                return new BigDecimal( ( (Float) obj ).toString() );
             }
             public String toString() { return "Float->BigDecimal"; }
         } ),
