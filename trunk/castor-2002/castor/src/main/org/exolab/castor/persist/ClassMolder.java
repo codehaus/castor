@@ -578,7 +578,6 @@ public class ClassMolder {
                     // same action to be taken for lazy and non lazy collection
                     boolean changed = false;
                     Object related = _fhs[i].getValue( object, tx.getClassLoader() );
-                    ArrayList alist = (ArrayList) related;
                     Iterator itor = getIterator( related );
                     while ( itor.hasNext() ) {
                         Object o = itor.next();
