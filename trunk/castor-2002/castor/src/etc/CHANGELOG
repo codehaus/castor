@@ -1,6 +1,10 @@
 
 Version (CVS)
 -------------
+
+XML:	Removed unintentional filtering of 'xmlns' attributes. 
+	(Andrew Fawcett  20020318)
+
 XML:	Refactored the entire container support. A lot of changes have been made during the
         Unmarshalling process and a method (canAccept) has been added to the XMLClassDescriptor 
         interface. These changes fix bug 884 (and potentially many others) (Arnaud - 20020306)
