@@ -73,8 +73,8 @@ public class MarshalHelper {
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
     
-    //private static final StringClassDescriptor stringClassDescriptor =
-      //  new StringClassDescriptor();
+    private static final StringClassDescriptor stringClassDescriptor =
+        new StringClassDescriptor();
 
     
     /**
@@ -108,9 +108,8 @@ public class MarshalHelper {
         if (c.isArray()) return null;
         
         //-- handle Strings
-        if (c == String.class) return null;
-        //    return stringClassDescriptor;
-        //}
+        if (c == String.class)
+            return stringClassDescriptor;
         
         //-- handle base objects
         if ((c == Void.class) || 
