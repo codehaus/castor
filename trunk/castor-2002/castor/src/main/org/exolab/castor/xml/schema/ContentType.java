@@ -50,7 +50,7 @@ package org.exolab.castor.xml.schema;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ContentType {
+public class ContentType implements java.io.Serializable {
 
 
     public static final short ELEMENT_ONLY = 0;

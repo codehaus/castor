@@ -1,9 +1,9 @@
 /*
  * (C) Copyright Keith Visco 1998, 1999, 2000. All rights reserved.
  *
- * The contents of this file are released under an Open Source 
- * Definition (OSD) compliant license; you may not use this file 
- * execpt in compliance with the license. Please see license.txt, 
+ * The contents of this file are released under an Open Source
+ * Definition (OSD) compliant license; you may not use this file
+ * execpt in compliance with the license. Please see license.txt,
  * distributed with this file. You may also obtain a copy of the
  * license at http://www.clc-marketing.com/xslp/license.txt
  *
@@ -23,7 +23,7 @@ package org.exolab.castor.util;
 
 /**
  * This is my implementation of the JDK 1.2 List interface.
- * I wrote this because I want people using 1.1.x to be able 
+ * I wrote this because I want people using 1.1.x to be able
  * to use my apps, but I don't want to use a "synchronized" Vector.
  * I also wanted to get a start in moving my source to JDK 1.2<BR>
  * I use the implementation of the hashCode method that is listed
@@ -36,33 +36,33 @@ package org.exolab.castor.util;
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see java.util.List
- * @see java.util.Collection 
+ * @see java.util.Collection
 **/
-public class List implements Cloneable {
-    
+public class List implements Cloneable , java.io.Serializable {
+
     private int DEFAULT_SIZE = 17;
-    
+
     private Object[] elements;
-    
+
     private int initialSize = DEFAULT_SIZE;
-    
+
     /**
      * The next available location in the elements array
     **/
     private int elementCount = 0;
-    
+
     /**
      * Creates a new BasicSet with the default Size
     **/
     public List() {
         elements = new Object[DEFAULT_SIZE];
     } //-- List
-    
+
     public List(int size) {
         initialSize = size;
         elements = new Object[size];
     } //-- List
-    
+
     /**
      * Adds the specified Object to the list
      * @param obj the Object to add to the list
@@ -80,15 +80,15 @@ public class List implements Cloneable {
      * @return true if the Object is added to the list
      * @exception IndexOutOfBoundsException
     **/
-    public boolean add(int index, Object obj) 
-        throws IndexOutOfBoundsException 
+    public boolean add(int index, Object obj)
+        throws IndexOutOfBoundsException
     {
-        if ((index < 0) || (index > elementCount)) 
+        if ((index < 0) || (index > elementCount))
             throw new IndexOutOfBoundsException();
-            
+
         // make sure we have room to add the object
         if (elementCount == elements.length) increaseSize();
-        
+
         if (index == elementCount) {
             elements[elementCount++] = obj;
         }
@@ -99,7 +99,7 @@ public class List implements Cloneable {
         }
         return true;
     } //-- add
-    
+
     /**
      * Removes all elements from the list
     **/
@@ -109,7 +109,7 @@ public class List implements Cloneable {
         }
         elementCount = 0;
     } //-- clear
-    
+
     public Object clone() {
         Object obj = null;
         try {
@@ -120,7 +120,7 @@ public class List implements Cloneable {
         }
         return obj;
     } //-- clone
-    
+
     /**
      * Returns true if the specified element is contained in the list.
      * if the specfied element is null, then if the list contains a null
@@ -134,7 +134,7 @@ public class List implements Cloneable {
 
     /**
      * Compares the specified object with this list for equality.
-     * Returns true if and only if the specified Object is a list 
+     * Returns true if and only if the specified Object is a list
      * and all of its associated elements are equal to the elements
      * of this list
     **/
@@ -151,11 +151,11 @@ public class List implements Cloneable {
         }
         return true;
     } //-- equals
-    
+
     /**
      * Returns the element at the specified position in this list.
      * @param index the position of the element to return
-     * @exception IndexOutOfBoundsException 
+     * @exception IndexOutOfBoundsException
     **/
     public Object get(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || index >= elementCount) {
@@ -163,11 +163,11 @@ public class List implements Cloneable {
         }
         return elements[index];
     } //-- get
-    
+
     /**
      * As defined by the JDK 1.2 API spec:<BR>
      * Returns the hash code value for this list.
-     * The hash code of a list is defined to be the result of the following 
+     * The hash code of a list is defined to be the result of the following
      * calculation: <BR>
      * <code>
      * hashCode = 1;
@@ -187,9 +187,9 @@ public class List implements Cloneable {
        }
        return hashCode;
     } //-- hashCode
-    
+
     /**
-     * Returns the index of the first occurrence of the specified element, 
+     * Returns the index of the first occurrence of the specified element,
      * or -1 if the element is not contained in the List
      * @param obj the Object to get the index for
     **/
@@ -216,7 +216,7 @@ public class List implements Cloneable {
     } //-- isEmpty
 
     /**
-     * Returns the index of the last occurrence of the specified element, 
+     * Returns the index of the last occurrence of the specified element,
      * or -1 if the element is not contained in the List
      * @param obj the Object to get the last index for
     **/
@@ -240,7 +240,7 @@ public class List implements Cloneable {
      * @return the Object that was removed from the list
     **/
     public Object remove(int index) {
-        
+
         if ((index < 0) || (index > elementCount)) return null;
         Object obj = elements[index];
         shiftDown(index+1);
@@ -255,15 +255,15 @@ public class List implements Cloneable {
     **/
     public boolean remove(Object obj) {
         int index = indexOf(obj);
-        
+
         if (index > -1) {
             remove(index);
-        } 
+        }
         else return false;
-        
+
         return true;
     } //-- remove
-    
+
     /**
      * Reduces the capacity of the internal buffer to the current size
      * freeing up unused memory.
@@ -273,21 +273,21 @@ public class List implements Cloneable {
         elements = new Object[elementCount];
         System.arraycopy(pointer, 0, elements, 0, elementCount);
         pointer = null;
-        
+
     } //-- trimBuffer
-    
+
     /**
-     * Replaces the element at the specified position in this list 
+     * Replaces the element at the specified position in this list
      * with the specified element.
      * @param index the position in the list to place the element at
      * @param element the element to add to the list
      * @exception IndexOutOfBoundsException
     **/
 
-    public Object set(int index, Object element) 
-        throws IndexOutOfBoundsException 
+    public Object set(int index, Object element)
+        throws IndexOutOfBoundsException
     {
-        if ((index < 0) || (index > elementCount)) 
+        if ((index < 0) || (index > elementCount))
             throw new IndexOutOfBoundsException();
         Object oldElement = null;
         if (index == elementCount) add(element);
@@ -298,7 +298,7 @@ public class List implements Cloneable {
         return oldElement;
     } //-- set
 
-     
+
     /**
      * Returns the number of elements in the List
      * @return the number of elements in the List
@@ -323,12 +323,12 @@ public class List implements Cloneable {
             throw new IndexOutOfBoundsException();
         List list = new List(toIndex-fromIndex);
         for (int i = fromIndex; i < toIndex; i++)
-            list.add(elements[i]);            
+            list.add(elements[i]);
         return list;
     } //-- sublist
-    
+
     /**
-     * Returns an array containing all of the elements in this list 
+     * Returns an array containing all of the elements in this list
      * in proper sequence.
      * @return the array of elements of this List
     **/
@@ -339,7 +339,7 @@ public class List implements Cloneable {
     } //-- toArray
 
     /**
-     * Returns an array containing all of the elements in this list 
+     * Returns an array containing all of the elements in this list
      * in proper sequence.
      * @return the array of elements of this List
     **/
@@ -348,14 +348,14 @@ public class List implements Cloneable {
     } //-- toArray
 
     /**
-     * Returns an array containing all of the elements in this list 
+     * Returns an array containing all of the elements in this list
      * in proper sequence.
      * @return the array of elements of this List
     **/
     public Object[] toArray(Object[] dst, int offset) {
-        
+
         Object[] objArray = null;
-        
+
         if (dst.length >= elementCount) objArray = dst;
         else {
             Class dstType = dst.getClass();
@@ -369,7 +369,7 @@ public class List implements Cloneable {
       //-------------------/
      //- Private Methods -/
     //-------------------/
-    
+
     /**
      * Basically the same as a vector,
      * increase the list by a factor of its initial size
@@ -381,17 +381,17 @@ public class List implements Cloneable {
         System.arraycopy(pointer, 0, elements, 0, pointer.length);
         pointer = null;
     } //-- increaseSize
-    
+
     /**
      * Shifts all elements at the specified index to down by 1
     **/
     private void shiftDown(int index) {
         if ((index <= 0) || (index >= elementCount)) return;
-        System.arraycopy(elements, index, elements, index - 1, elementCount - index);        
+        System.arraycopy(elements, index, elements, index - 1, elementCount - index);
         // clean up for gc
         elements[elementCount-1] = null;
     } //-- shiftDown
-    
+
     /**
      * Shifts all elements at the specified index up by 1
     **/
@@ -400,7 +400,7 @@ public class List implements Cloneable {
         if (elementCount == elements.length) increaseSize();
         System.arraycopy(elements, index, elements, index + 1, elementCount - index);
     } //-- shiftUp
-    
-    
-    
+
+
+
 } //-- List

@@ -54,7 +54,7 @@ import org.exolab.castor.xml.ValidationException;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class Structure {
+public abstract class Structure implements java.io.Serializable {
 
     public static final short ANNOTATION        = 0;
     public static final short APPINFO           = 1;
