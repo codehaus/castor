@@ -924,9 +924,6 @@ public class Marshaller extends MarshalFramework {
                         
                         saveType = true;
                         
-                        String nsURI = descriptor.getNameSpaceURI();
-                        
-                        
                         boolean containsDesc = false;
                         
                         //-- if we're not at the root, check to see if we can resolve name.
@@ -934,7 +931,15 @@ public class Marshaller extends MarshalFramework {
                         //-- due to the validation step, so in most cases, if we are not
                         //-- using a mapping we need the xsi:type at the root
                         if (!atRoot) {
-                        	containsDesc = (_cdResolver.resolveByXMLName(name, nsURI, null) != null);
+                            String nsURI = descriptor.getNameSpaceURI();
+                            XMLClassDescriptor tmpDesc = null;
+                        	tmpDesc = _cdResolver.resolveByXMLName(name, nsURI, null);
+                            if (tmpDesc != null) {
+                            	Class tmpType = tmpDesc.getJavaClass();
+                                if (tmpType != null) {
+                                	containsDesc = (!tmpType.isInterface());
+                                }
+                            }
                         }
                         
                         if (!containsDesc) {
@@ -942,9 +947,11 @@ public class Marshaller extends MarshalFramework {
                             //-- resolver directly because it will try to
                             //-- load a compiled descriptor, or introspect
                             //-- one
-                            XMLMappingLoader ml = _cdResolver.getMappingLoader();
-                            if (ml != null) {
-                                containsDesc = (ml.getDescriptor(_class) != null);
+                            if (atRoot) {
+                            	XMLMappingLoader ml = _cdResolver.getMappingLoader();
+                            	if (ml != null) {
+                            		containsDesc = (ml.getDescriptor(_class) != null);
+                            	}
                             }
                             
                             //-- The following logic needs to be expanded to use
