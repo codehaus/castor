@@ -154,7 +154,10 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         _hasDump =   rootType.getDump();
         _hasRandom = rootType.getRandom();
         
-        // Compile class files (if necessary)
+        //-- Compile class files (if necessary)
+        //-- NOTE: This really slows things down, so we should
+        //-- optimize the compilation and only do it, if needed
+        //-- better yet, it should be moved to build.xml
         verbose("-->Compiling any necessary source files");
         try {
             compileDirectory(_outputRootFile);
@@ -164,8 +167,8 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         }
         
         //-- Add outputRoot to classpath
-        ClassLoader loader = _test.getClass().getClassLoader();
-        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);        
+        ClassLoader loader = _test.getClassLoader();
+        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);     
 
         if (_rootClassName == null)
             throw new Exception("No Root Object found in test descriptor");
