@@ -88,6 +88,9 @@
             <xsl:if test="document/properties">
               <xsl:attribute name="rowspan">4</xsl:attribute>
             </xsl:if>
+            <span class="alpha">
+              <font color="{$color-alpha}"><a href="print/{}">Print</a></font>
+            </span>
             <table>
               <xsl:for-each select="$project/menu">
                 <tr>
@@ -161,10 +164,10 @@
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
           <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
-          <td bgcolor="{$color-alpha}"><br/>
+          <td bgcolor="{$color-alpha}">
             <xsl:for-each select="$project/notice">
               <small><xsl:copy-of select="."/></small><br/>
-            </xsl:for-each><br/>
+            </xsl:for-each>
           </td>
         </tr>
 

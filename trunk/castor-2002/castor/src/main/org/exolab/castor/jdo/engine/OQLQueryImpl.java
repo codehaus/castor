@@ -68,6 +68,7 @@ import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.Query;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.LockNotGrantedException;
 
 
 /**
@@ -266,6 +267,8 @@ public class OQLQueryImpl
 	    throw new QueryException( except.getMessage() );
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
 	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( LockNotGrantedException except ) {
+	    throw new QueryException( except.toString() );
 	} catch ( PersistenceException except ) {
 	    throw new QueryException( except.toString() );
 	}

@@ -104,8 +104,10 @@ public final class OID
 	_identity = identity;
 	// OID must be unique across the engine: always use the parent
 	// most class of an object, getting it from the descriptor
+	/*
 	while ( objDesc.getExtends() != null )
 	    objDesc = (ObjectDesc) objDesc.getExtends();
+	*/
 	_type = objDesc.getObjectType();
 	_hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }

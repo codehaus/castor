@@ -1,14 +1,18 @@
 Version 0.7.5  January 28, 2000
 -------------------------------
 
-JDO:  Dirty check mechanism has been disabled since 0.7.4, although
-      the new API enables any number of approaches. Two dirty check
-      mechanisms will be added in 0.7.6.
+JDO:  Finalized the transaction and locking semantics and started working
+      on a document describing it. I would like to thank Chris Raber of
+      GemStone for validating some of the design choices.
 
 JDO:  SQLEngine now employs two schemes for detecting duplicate primary
       keys. For some databases it will use a separate SELECT statement,
       for those that properly return an SQL error it will use the X/Open
       error code (contributed by Oleg Nitz).
+
+JDO:  Dirty check mechanism has been disabled since 0.7.4, although
+      the new API enables any number of approaches. The dirty check
+      mechanisms will be re-introduced in 0.7.6.
 
 JDO:  Duplicate keys are now only detected inside a transaction, unless
       a similar object is locked by another transaction, fixing a
@@ -31,8 +35,10 @@ Docs: Finally there. Added an Ant taskdef (style) and a task (doc) to
 
 Docs: Added document describing persistence architecture and started
       working on document describing transaction and locking semantics.
-      Would like to thank Chris Raber of GemStone for validating some
-      of the design choices.
+
+Misc: The examples have been broken to two packages: examples will contain
+      brief and illustrative code showing how to develop with Castor,
+      while tests will contain unit tests.
 
 
 Version 0.7.4  January 23, 2000
