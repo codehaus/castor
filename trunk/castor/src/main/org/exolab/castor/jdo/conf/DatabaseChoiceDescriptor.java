@@ -17,11 +17,11 @@ import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.validators.*;
 
 /**
- * Class DatabaseDescriptor.
+ * Class DatabaseChoiceDescriptor.
  * 
  * @version $Revision$ $Date$
  */
-public class DatabaseDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class DatabaseChoiceDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
 
       //--------------------------/
@@ -53,162 +53,125 @@ public class DatabaseDescriptor extends org.exolab.castor.xml.util.XMLClassDescr
      //- Constructors -/
     //----------------/
 
-    public DatabaseDescriptor() {
+    public DatabaseChoiceDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/JDO";
-        xmlName = "database";
         
         //-- set grouping compositor
-        setCompositorAsSequence();
+        setCompositorAsChoice();
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
         org.exolab.castor.xml.XMLFieldHandler              handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
         
-        //-- _name
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", org.exolab.castor.xml.NodeType.Attribute);
-        this.identity = desc;
+        //-- initialize element descriptors
+        
+        //-- _driver
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.Driver.class, "_driver", "driver", org.exolab.castor.xml.NodeType.Element);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                Database target = (Database) object;
-                return target.getName();
+                DatabaseChoice target = (DatabaseChoice) object;
+                return target.getDriver();
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    Database target = (Database) object;
-                    target.setName( (java.lang.String) value);
+                    DatabaseChoice target = (DatabaseChoice) object;
+                    target.setDriver( (org.exolab.castor.jdo.conf.Driver) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new java.lang.String();
+                return new org.exolab.castor.jdo.conf.Driver();
             }
         } );
         desc.setHandler(handler);
         desc.setRequired(true);
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _name
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-        }
-        desc.setValidator(fieldValidator);
-        //-- _engine
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_engine", "engine", org.exolab.castor.xml.NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                Database target = (Database) object;
-                return target.getEngine();
-            }
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Database target = (Database) object;
-                    target.setEngine( (java.lang.String) value);
-                }
-                catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public java.lang.Object newInstance( java.lang.Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _engine
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        { //-- local scope
-            StringValidator typeValidator = new StringValidator();
-            typeValidator.setWhiteSpace("preserve");
-            fieldValidator.setValidator(typeValidator);
-        }
-        desc.setValidator(fieldValidator);
-        //-- initialize element descriptors
-        
-        //-- _databaseChoice
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.DatabaseChoice.class, "_databaseChoice", "-error-if-this-is-used-", org.exolab.castor.xml.NodeType.Element);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                Database target = (Database) object;
-                return target.getDatabaseChoice();
-            }
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Database target = (Database) object;
-                    target.setDatabaseChoice( (org.exolab.castor.jdo.conf.DatabaseChoice) value);
-                }
-                catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.jdo.conf.DatabaseChoice();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setContainer(true);
-        desc.setClassDescriptor(new org.exolab.castor.jdo.conf.DatabaseChoiceDescriptor());
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _databaseChoice
+        //-- validation code for: _driver
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(1);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
-        //-- _mappingList
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.Mapping.class, "_mappingList", "mapping", org.exolab.castor.xml.NodeType.Element);
+        //-- _dataSource
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.DataSource.class, "_dataSource", "data-source", org.exolab.castor.xml.NodeType.Element);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                Database target = (Database) object;
-                return target.getMapping();
+                DatabaseChoice target = (DatabaseChoice) object;
+                return target.getDataSource();
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    Database target = (Database) object;
-                    target.addMapping( (org.exolab.castor.jdo.conf.Mapping) value);
+                    DatabaseChoice target = (DatabaseChoice) object;
+                    target.setDataSource( (org.exolab.castor.jdo.conf.DataSource) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.jdo.conf.Mapping();
+                return new org.exolab.castor.jdo.conf.DataSource();
             }
         } );
         desc.setHandler(handler);
         desc.setRequired(true);
-        desc.setMultivalued(true);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _mappingList
+        //-- validation code for: _dataSource
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
         fieldValidator.setMinOccurs(1);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
-    } //-- org.exolab.castor.jdo.conf.DatabaseDescriptor()
+        //-- _jndi
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.jdo.conf.Jndi.class, "_jndi", "jndi", org.exolab.castor.xml.NodeType.Element);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                DatabaseChoice target = (DatabaseChoice) object;
+                return target.getJndi();
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    DatabaseChoice target = (DatabaseChoice) object;
+                    target.setJndi( (org.exolab.castor.jdo.conf.Jndi) value);
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new org.exolab.castor.jdo.conf.Jndi();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _jndi
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
+    } //-- org.exolab.castor.jdo.conf.DatabaseChoiceDescriptor()
 
 
       //-----------/
@@ -244,7 +207,7 @@ public class DatabaseDescriptor extends org.exolab.castor.xml.util.XMLClassDescr
      */
     public java.lang.Class getJavaClass()
     {
-        return org.exolab.castor.jdo.conf.Database.class;
+        return org.exolab.castor.jdo.conf.DatabaseChoice.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**
