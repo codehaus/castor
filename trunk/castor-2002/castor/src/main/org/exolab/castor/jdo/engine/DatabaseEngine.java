@@ -104,7 +104,7 @@ public final class DatabaseEngine
 
     /**
      * Mapping of object locks to OIDs. The {@link OID} is used as the
-     * key, and {@link ObjectLock} is the value.
+     * key, and {@link ObjectLock} is the value. There is one lock per OID.
      */
     private Hashtable _locks = new Hashtable();
 
@@ -242,7 +242,6 @@ public final class DatabaseEngine
 
 
     /**
-    /**
      * Loads an object and return's its OID. The object is loaded from the
      * database based on its type and primary key and its OID is returned.
      * Normally a read lock is obtained on the object. In exclusive mode
@@ -260,7 +259,8 @@ public final class DatabaseEngine
      * @throws ObjectDeletedException The object has been deleted from
      *   persistent storage
      */
-    OID load( Class type, Object primKey, TransactionContext tx, boolean exclusive )
+    OID load( Class type, Object primKey, TransactionContext tx,
+	      boolean exclusive, int timeout )
 	throws ODMGException, LockNotGrantedException, ObjectDeletedException
     {
 	Object     obj;
@@ -271,7 +271,7 @@ public final class DatabaseEngine
 	typeInfo = (TypeInfo) _typeInfo.get( type );
 	// Must prevent concurrent attempt to retrieve the same object
 	// Best way to do that is through the type
-	synchronized ( type ) {
+	synchronized ( typeInfo ) {
 	    // Create an OID to represent the object and see if we
 	    // have a lock (i.e. object is cached).
 	    oid = new OID( this, typeInfo.objDesc, primKey );
@@ -299,7 +299,7 @@ public final class DatabaseEngine
 
 		lock = new ObjectLock( obj );
 		try {
-		    lock.acquire( tx, exclusive, 0 );
+		    lock.acquire( tx, exclusive, timeout );
 		} catch ( Exception except ) {
 		    // This should never happen
 		}
@@ -308,12 +308,8 @@ public final class DatabaseEngine
 	    } else {
 		// Object has been loaded before, must acquire lock
 		// on it (write in exclusive mode)
-		try {
-		    tx.setWaitOnLock( lock );
-		    obj = lock.acquire( tx, exclusive, _lockTimeout );
-		} finally {
-		    tx.setWaitOnLock( null );
-		}
+		obj = lock.acquire( tx, exclusive, _lockTimeout );
+
 		// In exclusive mode must synchronize with the databse,
 		// if an error occurs the object is immediately deleted
 		// from memory
@@ -451,12 +447,8 @@ public final class DatabaseEngine
 	    synchronized ( tx ) {
 		// Must acquire write lock on the object in order to delete
 		// it. Will complain if timeout/deadlock occurs.
-		try {
-		    tx.setWaitOnLock( lock );
-		    lock.acquire( tx, true, _lockTimeout );
-		} finally {
-		    tx.setWaitOnLock( null );
-		}
+		lock.acquire( tx, true, _lockTimeout );
+
 		// Attempt to obtain a lock on the database. If this attempt
 		// fails, release the lock and report the exception.
 		try {
@@ -518,10 +510,10 @@ public final class DatabaseEngine
      *   attempting to obtain write lock on object
      * @throws ObjectDeletedException The object has been deleted
      */
-    OID store( OID oid, TransactionContext tx )
+    OID store( OID oid, Object obj, TransactionContext tx )
 	throws ODMGException, LockNotGrantedException, ObjectDeletedException
     {
-	Object     obj;
+	Object     locked;
 	ObjectLock lock;
 	Object     newPrimKey;
 	Object     oldPrimKey;
@@ -530,13 +522,8 @@ public final class DatabaseEngine
 	synchronized ( tx ) {
 	    lock = getLock( oid );
 	    // Must acquire a write lock on the object in order to proceed
-	    try {
-		tx.setWaitOnLock( lock );
-		obj = lock.acquire( tx, true, _lockTimeout );
-	    } finally {
-		tx.setWaitOnLock( null );
-	    }
-	    typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
+	    locked = lock.acquire( tx, true, _lockTimeout );
+	    typeInfo = (TypeInfo) _typeInfo.get( locked.getClass() );
 	    if ( typeInfo.interceptor != null )
 		typeInfo.interceptor.storing( obj );
 
@@ -554,8 +541,9 @@ public final class DatabaseEngine
 		removeOID( obj );
 		removeLock( oid );
 		typeInfo.engine.create( tx.getConnection( this ), obj, newPrimKey );
+		typeInfo.objDesc.copyInto( obj, locked );
 		setLock( oid, lock );
-		setOID( obj, oid );
+		setOID( locked, oid );
 	    } else if ( newPrimKey == oldPrimKey ||
 			typeInfo.objDesc.getPrimaryKey().equals( oldPrimKey, newPrimKey ) ) {
 		typeInfo.engine.store( tx.getConnection( this ), obj, oldPrimKey );
@@ -567,14 +555,16 @@ public final class DatabaseEngine
 		typeInfo.engine.store( tx.getConnection( this ), obj, newPrimKey );
 		oid = new OID( this, typeInfo.objDesc, newPrimKey );
 		setLock( oid, lock );
-		setOID( obj, oid );
+		setOID( locked, oid );
 	    }
+	    
 	}
 	return oid;
     }
 
 
-    OID query( Class type, String sql, Object[] values, TransactionContext tx, boolean exclusive )
+    OID query( Class type, String sql, Object[] values, TransactionContext tx,
+	       boolean exclusive, int timeout )
 	throws ODMGException, LockNotGrantedException, ObjectDeletedException
     {
 	Object     obj;
@@ -586,7 +576,7 @@ public final class DatabaseEngine
 	typeInfo = (TypeInfo) _typeInfo.get( type );
 	// Must prevent concurrent attempt to retrieve the same object
 	// Best way to do that is through the type
-	synchronized ( type ) {
+	synchronized ( typeInfo ) {
 	    obj = typeInfo.engine.query( tx.getConnection( this ), sql, values );
 	    if ( obj == null )
 		return null;
@@ -604,7 +594,7 @@ public final class DatabaseEngine
 
 		lock = new ObjectLock( obj );
 		try {
-		    lock.acquire( tx, exclusive, 0 );
+		    lock.acquire( tx, exclusive, timeout );
 		} catch ( Exception except ) {
 		    // This should never happen
 		}
@@ -613,12 +603,8 @@ public final class DatabaseEngine
 	    } else {
 		// Object has been loaded before, must acquire lock
 		// on it (write in exclusive mode)
-		try {
-		    tx.setWaitOnLock( lock );
-		    obj = lock.acquire( tx, exclusive, _lockTimeout );
-		} finally {
-		    tx.setWaitOnLock( null );
-		}
+		obj = lock.acquire( tx, exclusive, _lockTimeout );
+
 		// In exclusive mode must synchronize with the databse,
 		// if an error occurs the object is immediately deleted
 		// from memory
@@ -717,6 +703,44 @@ public final class DatabaseEngine
 	    // This should never happen
 	    throw new ODMGRuntimeException( except.getMessage() );
 	}
+    }
+
+
+    void update( TransactionContext tx, OID oid, Object source )
+    {
+	ObjectLock lock;
+	TypeInfo   typeInfo;
+	Object     locked;
+
+	typeInfo = (TypeInfo) _typeInfo.get( source.getClass() );
+	// Must prevent concurrent attempt to retrieve the same object
+	// Best way to do that is through the type
+	synchronized ( typeInfo ) {
+	    lock = getLock( oid );
+	    locked = lock.acquire( tx, true, 0 );
+	    typeInfo.objDesc.copyInto( source, locked );
+	}
+    }
+
+
+    Object copyInto( TransactionContext tx, OID oid, Object target )
+    {
+	ObjectLock lock;
+	Object     source;
+	ObjectDesc objDesc;
+
+	// Get the source object based on the OID. We already have some
+	// sort of lock on the object, so acquire does not require a timeout.
+	lock = getLock( oid );
+	source = lock.acquire( tx, false, 0 );
+	objDesc = ( (TypeInfo) _typeInfo.get( source.getClass() ) ).objDesc;
+	// If no target object exists, create a new one
+	if ( target == null ) {
+	    target = objDesc.createNew( false );
+	}
+	// Copy all the fields from the source to the target
+	objDesc.copyInto( source, target );
+	return target;
     }
 
 

@@ -52,6 +52,7 @@ import java.util.StringTokenizer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.odmg.OQLQuery;
+import org.odmg.Database;
 import org.odmg.ODMGRuntimeException;
 import org.odmg.ODMGException;
 import org.odmg.QueryParameterCountInvalidException;
@@ -232,9 +233,9 @@ public class OQLQueryImpl
 
 	try {
 	    tx = TransactionImpl.getCurrentContext();
-	    if ( tx == null || tx.getStatus() != TransactionContext.Status.Open )
+	    if ( tx == null || ! tx.isOpen() )
 		throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
-	    obj = tx.query( _dbEngine, _objClass, _sql, _values, false );
+	    obj = tx.query( _dbEngine, _objClass, _sql, _values, Database.OPEN_READ_WRITE, 0 );
 	    _fieldNum = 0;
 	    return obj;
 	} catch ( ODMGException except ) {
