@@ -557,10 +557,6 @@ public final class CacheEngine
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
-            // XXX If identity is null need to fine a way to determine it
-            if ( identity == null )
-                throw new PersistenceExceptionImpl( "persist.noIdentity" );
-
             oid = new OID( typeInfo.handler, identity );
 
             if ( identity != null ) {
