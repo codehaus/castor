@@ -720,10 +720,11 @@ public final class LockEngine {
             throw e;
         }
 
-        if ( modified )
+        if ( modified ) {
             return oid;
-        else
-            return null;
+        }
+
+        return null;
     }
 
     public void store( TransactionContext tx, OID oid, Object object ) 
@@ -1128,10 +1129,11 @@ public final class LockEngine {
                     }
                 }
             }
-            if ( entry == null )
+            if ( entry == null ) {
                 return false;
-            else
-                return true;
+            }
+
+            return true;
         }
    
         /**
@@ -1177,8 +1179,8 @@ public final class LockEngine {
         }
 
         /**
-         * Acquire the object lock for transaction. After this method is call,
-         * user must call {@link ObjectLock.confirm} exactly once.
+         * Acquire the object lock for transaction. After this method is called,
+         * user must call {@link ObjectLock.confirm()} exactly once.
          *
          * @param oid  the OID of the lock
          * @param tx   the transactionContext of the transaction to
@@ -1437,6 +1439,29 @@ public final class LockEngine {
                 }
             }
         }
-        
+
+		/**
+		 * Indicates whether an object with the specified identifier is curretly cached. 
+		 * @param oid Object identifier.
+		 * @return True if the object is cached. 
+		 */
+		public boolean isCached(Object oid) {
+            return cache.contains (oid);
+		}
+
     }
+
+
+	/**
+	 * Provides information about whether an object of Class cls with identity iod
+	 * is currently cached.
+	 * @param cls Class type.
+	 * @param oid Object identity
+	 * @return True if the specified object is in the cache.  
+	 */
+	public boolean isCached(Class cls, Object oid) {
+        TypeInfo typeInfo = (TypeInfo) _typeInfo.get(cls.getName());
+        return typeInfo.isCached (oid);
+	}
+
 }
