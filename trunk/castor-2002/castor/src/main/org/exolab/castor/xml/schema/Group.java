@@ -99,7 +99,7 @@ public class Group extends Particle
      * The parent for this Group (either another Group or a ComplexType)
     **/
     private Structure _parent = null;
-    
+
     /**
      * Creates a new Group, with no name
     **/
@@ -132,16 +132,6 @@ public class Group extends Particle
         _wildcard.addElement(wildcard);
      }
 
-
-    /**
-     * Returns the Model Group Collection type for this Group
-     *
-     * This should be removed?
-     * @return the Collection type for this Model Group
-    **
-    public Collection getCollection() {
-        return this.collection;
-    } //-- getCollection
 
     /**
      * Returns the ContentModelGroup for this group
@@ -199,7 +189,7 @@ public class Group extends Particle
     public Structure getParent() {
         return _parent;
     } //-- getParent
-    
+
     /**
      * Returns an enumeration of the different <any> wildcards held
      * by this group.
@@ -292,10 +282,10 @@ public class Group extends Particle
         throws SchemaException
     {
         _contentModel.addGroup(group);
-        
+
         //-- set reference to parent
         group.setParent(this);
-        
+
     } //-- addGroup
 
     /**
@@ -308,7 +298,7 @@ public class Group extends Particle
         throws SchemaException
     {
         _contentModel.addGroup(group);
-        
+
         //-- set reference to parent
         group.setParent(this);
     } //-- addGroup
@@ -412,5 +402,5 @@ public class Group extends Particle
         }
         _parent = parent;
     } //-- setParent
-        
+
 } //-- Group
