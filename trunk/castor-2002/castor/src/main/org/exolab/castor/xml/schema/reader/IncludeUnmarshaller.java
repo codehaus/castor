@@ -80,15 +80,20 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
         if (state.processed(include))
             return;
 		state.markAsProcessed(include, schema);
-		
-        // note: URI not supported (just system path), so remove any file:///
-		String absolute = include;
-		if (include.startsWith("file:///"))
-			absolute = include.substring(8);
-		
+
+        // note: URI not supported (just system path), so remove any file://
+        String absolute = include;
+		if (include.startsWith("file://")){
+            absolute = include.substring(7);
+            if (java.io.File.separatorChar =='\\')
+                include = include.substring(1);
+        }
+
+
         // if the path is relative Xerces append the "user.Dir"
         // we need to keep the base directory of the document
         if (!new java.io.File(absolute).isAbsolute()) {
+
              String temp = locator.getSystemId();
              if (include.startsWith("./"))
                 include = include.substring(2);
@@ -110,7 +115,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 
 		Parser parser = null;
 		try {
-		parser = Configuration.getParser();
+		    parser = Configuration.getParser();
 		}
 		catch(RuntimeException rte) {}
 		if (parser == null) {

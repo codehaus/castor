@@ -75,15 +75,20 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 		String schemaLocation = atts.getValue("schemaLocation");
 		if (schemaLocation==null)
 			throw new SAXException("'schemaLocation' attribute missing on 'import'");
-		
-		// note: URI not supported (just system path), so remove any file:///
+
+
+		// note: URI not supported (just system path), so remove any file://
 		String absolute = schemaLocation;
-		if (schemaLocation.startsWith("file:///"))
-			absolute = schemaLocation.substring(8);
-		
+		if (schemaLocation.startsWith("file://")){
+            absolute = schemaLocation.substring(7);
+            if (java.io.File.separatorChar =='\\')
+                absolute = absolute.substring(1);
+        }
+
 		// if the path is relative Xerces append the "user.Dir"
         // we need to keep the base directory of the document
         if (!new java.io.File(absolute).isAbsolute()) {
+
              String temp = locator.getSystemId();
              if (temp != null) {
                if (schemaLocation.startsWith("./"))
@@ -110,7 +115,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			throw new SAXException("namespace '"+namespace+"' not declared in schema");
         if (namespace.equals(schema.getTargetNamespace()) )
             throw new SAXException("the 'namespace' attribute in the <import> element cannot be the same of the targetNamespace of the global schema");
-		
+
         //-- Schema object to hold import schema
 		boolean addSchema = false;
 		Schema importedSchema = schema.getImportedSchema(namespace);
@@ -125,13 +130,13 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			importedSchema = new Schema();
 			addSchema = true;
 		}
-		
+
         state.markAsProcessed(schemaLocation, importedSchema);
 
         //-- Parser Schema
 		Parser parser = null;
 		try {
-		parser = Configuration.getParser();
+		    parser = Configuration.getParser();
 		}
 		catch(RuntimeException rte) {}
 		if (parser == null) {
