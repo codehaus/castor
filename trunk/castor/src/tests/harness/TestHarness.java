@@ -47,12 +47,10 @@
 package harness;
 
 
-import java.util.Vector;
 import java.util.Enumeration;
 import java.io.PrintStream;
 
 import junit.framework.TestSuite;
-import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 public class TestHarness extends TestSuite {
