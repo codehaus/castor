@@ -150,6 +150,16 @@ public abstract class Configuration
         public static final String ParserFeatureSeparator = ",";
         
         /**
+         * Property specifying the regular expression validator
+         * to use. This specified class must implement
+         * org.exolab.castor.xml.validators.RegExpValidator
+         * <pre>
+         * org.exolab.castor.regexp
+         * </pre>
+         */
+        public static final String RegExp = "org.exolab.castor.regexp";
+        
+        /**
          * Property specifying whether to run in debug mode.
          * <pre>
          * org.exolab.castor.debug
@@ -313,7 +323,38 @@ public abstract class Configuration
         return parser;
     }
 
-
+    
+    /**
+     * Returns a new instance of the specified Regular Expression 
+     * Evaluator, or null if no validator was specified
+     * 
+     * @return the regular expression evaluator,
+     *
+    **/
+    public static RegExpEvaluator getRegExpEvaluator() {
+        
+        String prop = getDefault().getProperty( Property.RegExp );
+        
+        RegExpEvaluator regex = null;
+        
+        if ( prop == null ) {
+            return null;
+        } 
+        else {
+            try {
+                Class cls;
+                cls = Class.forName( prop );
+                regex = (RegExpEvaluator) cls.newInstance();
+            } 
+            catch ( Exception except ) {
+                throw new RuntimeException( Messages.format( "conf.failedInstantiateRegExp",
+                                                             prop, except ) );
+            }
+        }
+        
+        return regex;
+    } //-- getRegExpEvaluator
+    
     /**
      * Returns a default serializer for producing an XML document.
      * The caller can specify an alternative output format, may reuse
