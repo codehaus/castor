@@ -1107,11 +1107,7 @@ public final class SQLTypes
         new TypeConvertorInfo( org.exolab.castor.types.Date.class, java.util.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 Object result = null;
-                try {
-                    result = ((org.exolab.castor.types.Date)obj).toDate();
-                } catch (java.text.ParseException e) {
-                    //we can never reach that point
-                }
+                result = ((org.exolab.castor.types.Date)obj).toDate();
                 return result;
             }
             public String toString() { return "castor.types.Date->util.Date"; }
@@ -1127,11 +1123,7 @@ public final class SQLTypes
         new TypeConvertorInfo( org.exolab.castor.types.Date.class, java.sql.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 Object result = null;
-                try {
-                    result = new java.sql.Date( ((org.exolab.castor.types.Date)obj).toDate().getTime() );
-                } catch (java.text.ParseException e) {
-                    //we can never reach that point
-                }
+                result = new java.sql.Date( ((org.exolab.castor.types.Date)obj).toDate().getTime() );
                 return result;
             }
             public String toString() { return "castor.types.Date->sql.Date"; }
