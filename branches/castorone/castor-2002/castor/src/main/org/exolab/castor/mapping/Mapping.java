@@ -224,6 +224,28 @@ public class Mapping
     public MappingResolver getResolver( EngineMapping engine )
         throws MappingException
     {
+        return getResolver( engine, null );
+    }
+
+    /**
+     * Returns a mapping resolver for the suitable engine. The engine's
+     * specific mapping loader is created and used to create engine
+     * specific descriptors, returning a suitable mapping resolver.
+     * The mapping resolver is cached in memory and returned in
+     * subsequent method calls.
+     *
+     * @param engine The mapping engine
+     * @param param Arbitrary parameter that is to be passed to resolver.loadMapping()
+     * @return A mapping resolver
+     * @throws MappingException A mapping error occured preventing
+     *  descriptors from being generated from the loaded mapping
+     * @see #JDO
+     * @see #XML
+     * @see #DAX
+     */
+    public MappingResolver getResolver( EngineMapping engine, Object param )
+        throws MappingException
+    {
         MappingResolver resolver;
 
         if ( _mapping == null )
@@ -235,12 +257,8 @@ public class Mapping
             Constructor   loaderConst;
 
             try {
-                // Find the constructor and use it to create a loader
-                ClassLoader loader = getClass().getClassLoader();
-                //-- make sure we check for null loader for people
-                //-- using JDK 1.1
-                if (loader != null)
-                    loaderClass = loader.loadClass( engine.getLoaderClass() );
+                if (_loader != null)
+                    loaderClass = _loader.loadClass(engine.getLoaderClass() );
                 else
                     loaderClass = Class.forName(engine.getLoaderClass());
                     
@@ -250,7 +268,7 @@ public class Mapping
                 // method is called a second time
                 resolver = loaderImpl;
                 _resolvers.put( engine, resolver );
-                loaderImpl.loadMapping( _mapping );
+                loaderImpl.loadMapping( _mapping, param );
             } catch ( Exception except ) {
                 throw new MappingException( except );
             }
