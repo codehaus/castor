@@ -172,8 +172,8 @@ public class Dependent extends CastorTestCase {
             }
             detail = master.findDetail( 5 );
             if ( detail.getDetails2() != null && detail.getDetails2().size() != 0 ) {
-                stream.println( "Error: loaded detail 5 with details2: " + qres.next() );
-                fail("loaded detail 5 with details2: " + qres.next());
+                stream.println( "Error: loaded detail 5 with details2: " + detail );
+                fail("loaded detail 5 with details2: " + detail);
             }
             detail = master.findDetail( 6 );
             if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
