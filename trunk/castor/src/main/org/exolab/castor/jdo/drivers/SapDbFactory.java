@@ -48,6 +48,8 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.sql.SQLException;
+import java.util.StringTokenizer;
+
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
@@ -56,6 +58,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
  * PersistenceFactory for SAP DB.
  *
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @author <a href="ferret@frii.com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public final class SapDbFactory
@@ -75,9 +78,73 @@ public final class SapDbFactory
     }
 
 
+    /** 
+     * Quotes words in SQL statements. This method must recieve a non null, 
+     * non empty string. 
+     *
+     * @param name The SQL string that needs quotes added
+     */
     public String quoteName( String name )
     {
-        return doubleQuoteName( name );
+        StringBuffer buffer = new StringBuffer();
+        StringTokenizer tokens = new StringTokenizer(name, ".");
+        String token = null;
+        boolean addQuote = true;
+
+
+        buffer.append('\"');
+        buffer.append(tokens.nextToken());
+
+        while(tokens.hasMoreTokens()) {
+            token = tokens.nextToken();
+
+            if ( isAFunction( token ) )
+            {
+                addQuote = false;
+                buffer.append("\".");
+            }
+            else
+            {
+                buffer.append("\".\"");
+            }
+
+            buffer.append( token );
+        }
+
+        if ( addQuote )
+            buffer.append('\"');
+
+        return buffer.toString();
+    }
+
+    /**
+     * Tests a text string against a known list of functions to determine
+     * if it is a function. 
+     *
+     * @param text The text to be checked
+     * @see #quoteName
+     */
+    public boolean isAFunction( String text )
+    {
+        boolean isAFunction = false;
+
+        // Add all supported functions in SAP DB here
+        String[] knownFunctions = new String[] 
+        {
+            "nextval"
+        };
+
+        for ( int i = 0; i < knownFunctions.length; ++i )
+        {
+            String function = ( String ) knownFunctions[i];
+
+            if ( text.equals( function ) )
+            {
+                return true;
+            }
+        }
+
+        return isAFunction;
     }
 }
 
