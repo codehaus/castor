@@ -117,7 +117,7 @@ public interface FieldDescriptor
      *
      * @return The class descriptor of the field type, or null
      */
-    public ClassDescriptor getTypeDescriptor();
+    public ClassDescriptor getClassDescriptor();
 
 
 }

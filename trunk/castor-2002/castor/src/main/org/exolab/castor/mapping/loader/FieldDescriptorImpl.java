@@ -59,7 +59,7 @@ import org.exolab.castor.mapping.MappingException;
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see ClassDesc
+ * @see ClassDescriptorImpl
  */
 public class FieldDescriptorImpl
     implements FieldDescriptor
@@ -107,7 +107,7 @@ public class FieldDescriptorImpl
      * The type class descriptor, if this field is of a type
      * known by a descriptor.
      */
-    private ClassDescriptor  _typeDesc;
+    private ClassDescriptor  _clsDesc;
 
 
     /**
@@ -142,6 +142,7 @@ public class FieldDescriptorImpl
         this._transient = fieldDesc._transient;
         this._immutable = fieldDesc._immutable;
         this._required = fieldDesc._required;
+        this._clsDesc = fieldDesc._clsDesc;
     }
 
 
@@ -181,9 +182,9 @@ public class FieldDescriptorImpl
     }
 
 
-    public ClassDescriptor getTypeDescriptor()
+    public ClassDescriptor getClassDescriptor()
     {
-        return _typeDesc;
+        return _clsDesc;
     }
 
 
@@ -199,9 +200,9 @@ public class FieldDescriptorImpl
     /**
      * Mutator method used by {@link MappingLoader}.
      */
-    void setTypeDescriptor( ClassDescriptor typeDesc )
+    void setClassDescriptor( ClassDescriptor clsDesc )
     {
-        _typeDesc = typeDesc;
+        _clsDesc = clsDesc;
     }
 
 
