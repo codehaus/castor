@@ -76,6 +76,9 @@ public class JDBCQueryExpression
     protected Vector    _joins = new Vector();
 
 
+    protected String    _where;
+
+
     public void addColumn( String tableName, String columnName )
     {
         _tables.put( tableName, tableName );
@@ -116,6 +119,12 @@ public class JDBCQueryExpression
     }
 
 
+    public void addWhereClause( String where )
+    {
+        _where = where;
+    }
+
+
     protected String getColumnList()
     {
         StringBuffer sql;
@@ -133,17 +142,29 @@ public class JDBCQueryExpression
     }
 
 
-    protected String getConditionList()
+    protected boolean addWhereClause( StringBuffer sql, boolean first )
     {
-        StringBuffer sql;
-
-        sql = new StringBuffer();
-        for ( int i = 0 ; i < _conds.size() ; ++i ) {
-            if ( i > 0 )
+        if ( _conds.size() > 0 ) {
+            if ( first ) {
+                sql.append( JDBCSyntax.Where );
+                first = false;
+            } else
                 sql.append( JDBCSyntax.And );
-            sql.append( (String) _conds.elementAt( i ) );
+            for ( int i = 0 ; i < _conds.size() ; ++i ) {
+                if ( i > 0 )
+                    sql.append( JDBCSyntax.And );
+                sql.append( (String) _conds.elementAt( i ) );
+            }
         }
-        return sql.toString();
+        if ( _where != null ) {
+            if ( first ) {
+                sql.append( JDBCSyntax.Where );
+                first = false;
+            } else
+                sql.append( JDBCSyntax.And );
+            sql.append( _where );
+        }
+        return first;
     }
 
 
@@ -213,14 +234,7 @@ public class JDBCQueryExpression
                 }
             }
         }
-        if ( _conds.size() > 0 ) {
-            if ( first ) {
-                sql.append( JDBCSyntax.Where );
-                first = false;
-            } else
-                sql.append( JDBCSyntax.And );
-            sql.append( getConditionList() );
-        }
+        first = addWhereClause( sql, first );
         // There is no standard way to lock selected tables.
         return sql.toString();
     }
