@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,13 +52,13 @@ import java.util.Enumeration;
 import java.lang.reflect.Array;
 
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
 
 /**
  * Handles field validation
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class FieldValidator extends Validator {
     
     
@@ -199,7 +199,7 @@ public class FieldValidator extends Validator {
         Object value = handler.getValue(object);
         
         if (value == null) {
-            if (!_descriptor.isRequired()) return;
+            if (!_descriptor.isRequired() || _descriptor.isNillable()) return;            
             String err = "The field '" + _descriptor.getFieldName() + "' ";
             if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
                 err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
