@@ -183,17 +183,42 @@ public class ODMG
     }
 
 
-    public void loadDatabase( String url )
+    /**
+     * Load database configuration from the specified URL. <tt>url</tt>
+     * must point to a JDO configuration file describing the database
+     * name, connection factory and mappings. <tt>loader</tt> is
+     * optional, if null the default class loader is used.
+     * 
+     * @param url The JDO configuration file
+     * @param loader The class loader to use, null for the default
+     * @throw MappingException The mapping file is invalid, or any
+     *  error occured trying to load the JDO configuration/mapping
+     */
+    public void loadDatabase( String url, ClassLoader loader )
         throws MappingException
     {
-        DatabaseSource.loadDatabase( new InputSource( url ), null, _logWriter );
+        DatabaseSource.loadDatabase( new InputSource( url ), null, _logWriter, loader );
     }
     
     
-    public void loadDatabase( InputSource source, EntityResolver resolver )
+    /**
+     * Load database configuration from the specified input source.
+     * <tt>source</tt> must point to a JDO configuration file describing
+     * the database* name, connection factory and mappings.
+     * <tt>resolver</tt> can be used to resolve cached entities, e.g.
+     * for external mapping documents. <tt>loader</tt> is optional, if
+     * null the default class loader is used.
+     * 
+     * @param source The JDO configuration file
+     * @param resolve An optional entity resolver
+     * @param loader The class loader to use, null for the default
+     * @throw MappingException The mapping file is invalid, or any
+     *  error occured trying to load the JDO configuration/mapping
+     */
+    public void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
         throws MappingException
     {
-        DatabaseSource.loadDatabase( source, resolver, _logWriter );
+        DatabaseSource.loadDatabase( source, resolver, _logWriter, loader );
     }
 
 

@@ -51,6 +51,8 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
+import org.exolab.castor.mapping.RelationDesc;
+import org.exolab.castor.mapping.AccessMode;
 
 
 /**
@@ -81,46 +83,42 @@ public class JDOClassDesc
 
 
     /**
-     * All the related tables/classes.
-     */
-    private JDORelationDesc[]  _related;
-
-
-    /**
      * Constructs a new JDO descriptor. The field list must consist only of
      * JDO field, must not include the identity field, all contained fields
      * must be represented as {@link JDOContainedFieldDesc}. Order of fields
      * is not important. The identity field must be of type {@link JDOFieldDesc}
      * or {@link ContainerFieldDesc}.
      * 
-     * @param javaClass The Java type of this class
+     * @param clsDesc The class descriptor
      * @param tableName The SQL table name
-     * @param fields The fields described for this class
-     * @param identity The field of the identity (key) of this class,
-     *   may be null
-     * @param extend The descriptor of the class which this class extends,
-     * or null if this is a top-level class
-     * @param related Describes all relations
+     * @param fields Field descriptors
      * @throws MappingException Invalid mapping information
      */
-    public JDOClassDesc( Class javaClass, String tableName, JDOFieldDesc[] fields,
-                         FieldDesc identity, JDORelationDesc[] related, JDOClassDesc extend )
+    public JDOClassDesc( ClassDesc clsDesc, String tableName )
         throws MappingException
     {
-        super( javaClass, fields, identity, extend );
+        super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getRelations(),
+               clsDesc.getIdentity(), clsDesc.getExtends(), clsDesc.getAccessMode() );
+
         if ( tableName == null )
             throw new IllegalArgumentException( "Argument 'tableName' is null" );
         _tableName = tableName;
-        if ( identity == null )
-            throw new MappingException( "mapping.noIdentity", javaClass.getName() );
-        if ( ! ( identity instanceof JDOFieldDesc ) &&
-             ! ( identity instanceof ContainerFieldDesc ) )
+        if ( getIdentity() == null )
+            throw new MappingException( "mapping.noIdentity", getJavaClass().getName() );
+        if ( ! ( getIdentity() instanceof JDOFieldDesc ) &&
+             ! ( getIdentity() instanceof ContainerFieldDesc ) )
             throw new IllegalArgumentException( "Identity field must be of type JDOFieldDesc or ContainerFieldDesc" );
+        if ( getExtends() != null && ! ( getExtends() instanceof JDOClassDesc ) )
+            throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
+
+        FieldDesc[] fields;
+
+        fields = getFields();
         for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ].isDirtyCheck() )
+            if ( fields[ i ] instanceof JDOFieldDesc && 
+                 ( (JDOFieldDesc) fields[ i ] ).isDirtyCheck() )
                 _dirtyCheck = true;
         }
-        _related = related;
     }
 
 
@@ -130,70 +128,10 @@ public class JDOClassDesc
     protected JDOClassDesc( JDOClassDesc clsDesc )
         throws MappingException
     {
-        super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getIdentity(), clsDesc.getExtends() );
+        super( clsDesc );
         _tableName = clsDesc._tableName;
         _dirtyCheck = clsDesc._dirtyCheck;
-        _related = clsDesc._related;
     }
-
-
-    /*
-    public JDOClassDesc( Class objType, String tableName, JDOFieldDesc[] fields,
-			  PrimaryKeyDesc primKey, JDOFieldDesc keyField,
-			  JDOClassDesc extend, RelationDesc[] related )
-	throws MappingException
-    {
-	super( objType, fields, keyField, extend );
-	for ( int i = 0 ; i < fields.length ; ++i ) {
-	    if ( fields[ i ].isDirtyCheck() )
-		_dirtyCheck = true;
-	}
-	_primKey = primKey;
-	_related = ( related == null ? new RelationDesc[ 0 ] : related );
-	_tableName = tableName;
-    }
-
-
-    protected JDOClassDesc( JDOClassDesc source, FieldDesc parentField,
-			     FieldDesc parentRefField, String foreRef )
-	throws MappingException
-    {
-	this( source.getJavaClass(), source.getSQLName(),
-	      toContained( source.getJDOFields(), parentField, parentRefField ),
-	      source.getPrimaryKey(), new JDOContainedFieldDesc( source.getPrimaryKeyField(), parentField, parentRefField ),
-	      (JDOClassDesc) source.getExtends(), source.getRelated() );
-	
-	JDOFieldDesc[] descs;
-	descs = source.getPrimaryKey().getJDOFields();
-	if ( descs != null ) {
-             for ( int i = 0 ; i < descs.length ; ++i )
-                descs[ i ] = new JDOContainedFieldDesc( descs[ i ], parentField, parentRefField );
-            _primKey = new PrimaryKeyDesc( source.getPrimaryKey().getPrimaryKeyType(), descs );
-        } else {
-            _primKey = source.getPrimaryKey();
-        }
-	for ( int i = 0 ; i < _fields.length ; ++i ) {
-	    if ( ( (JDOFieldDesc) _fields[ i ] ).isDirtyCheck() )
-		_dirtyCheck = true;
-	}
-	_related = source.getRelated();
-	_tableName = source._tableName;
-	//_foreRef = foreRef;
-    }
-
-
-
-    private static JDOFieldDesc[] toContained( JDOFieldDesc[] fields, FieldDesc parentField,
-					       FieldDesc parentRefField )
-	throws MappingException
-    {
-	for ( int i = 0 ; i < fields.length ; ++i ) {
-	    fields[ i ] = new JDOContainedFieldDesc( fields[ i ], parentField, parentRefField );
-	}
-	return fields;
-
-    }
-    */
 
 
     /**
@@ -219,38 +157,17 @@ public class JDOClassDesc
 
 
     /**
-     * Returns the relations (tables/classes).
-     *
-     * @return Relations, may be null
+     * Mutator method can only be used by {@link JDOMappingHelper}.
      */
-    public JDORelationDesc[] getRelations()
+    final void setJDOFields( JDOFieldDesc[] fields )
     {
-        return _related;
-    }
-
-
-    /*
-    public void copyInto( Object source, Object target )
-    {
-	super.copyInto( source, target );
-        for ( int i = 0 ; i < _related.length ; ++i ) {
-            if ( _related[ i ].getParentField().getValue( source ) == null ) {
-                Object relTarget;
- 
-                relTarget = _related[ i ].getParentField().getValue( target );
-                if ( relTarget != null ) {
-                    _related[ i ].getPrimaryKeyField().setValue( relTarget, null );
-                }
-                _related[ i ].getParentField().setValue( target, null );
-            } else {
-                _related[ i ].copyInto( source, target );
-                if ( _related[ i ].getRelationType() == Relation.OneToOne ) {
-                    _related[ i ].getPrimaryKeyField().setValue( target, target );
-                }
-            }
+        setFields( fields );
+        _dirtyCheck = false;
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ].isDirtyCheck() )
+                _dirtyCheck = true;
         }
-    } 
-    */
+    }
 
 
     public String toString()
