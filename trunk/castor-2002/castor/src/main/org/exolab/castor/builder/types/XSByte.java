@@ -48,6 +48,8 @@ package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
 
+import org.exolab.castor.builder.SourceGenerator;
+
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -67,10 +69,16 @@ public final class XSByte extends XSPatternBase {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Byte;
+    private static JType jType = JType.Byte;
 
-    public XSByte() {
+    public XSByte(){
+         this(SourceGenerator.usePrimitiveWrapper());
+    }
+
+    public XSByte(boolean asWrapper) {
         super(XSType.BYTE_TYPE);
+        if (asWrapper)
+             this.jType = new JClass("java.lang.Byte");
     } //-- XSByte
 
 
@@ -258,10 +266,14 @@ public final class XSByte extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Byte(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+        if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+            StringBuffer sb = new StringBuffer("new Byte(");
+            sb.append(variableName);
+            sb.append(")");
+            return sb.toString();
+        }
     } //-- toJavaObject
 
     /**

@@ -47,6 +47,7 @@ package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -66,10 +67,16 @@ public final class XSLong extends XSPatternBase {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Long;
+    private static JType jType = JType.Long;
 
     public XSLong() {
+        this(SourceGenerator.usePrimitiveWrapper());
+    }
+
+    public XSLong(boolean asWrapper) {
         super(XSType.LONG_TYPE);
+        if (asWrapper)
+            this.jType = new JClass("java.lang.Long");
     } //-- XSLong
 
 
@@ -261,10 +268,14 @@ public final class XSLong extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Long(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+        if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+            StringBuffer sb = new StringBuffer("new Long(");
+            sb.append(variableName);
+            sb.append(")");
+            return sb.toString();
+        }
     } //-- toJavaObject
 
     /**
@@ -276,10 +287,10 @@ public final class XSLong extends XSPatternBase {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Long)");
-        sb.append(variableName);
-        sb.append(").longValue()");
-        return sb.toString();
+       StringBuffer sb = new StringBuffer("((Long)");
+       sb.append(variableName);
+       sb.append(").longValue()");
+       return sb.toString();
     } //-- fromJavaObject
 
 } //-- XSLong

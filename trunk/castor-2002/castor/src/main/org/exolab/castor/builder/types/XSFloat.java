@@ -47,6 +47,8 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.builder.SourceGenerator;
+
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
 
@@ -70,11 +72,16 @@ public final class XSFloat extends XSPatternBase {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Float;
-
+    private static JType jType = JType.Float;
 
     public XSFloat() {
+        this(SourceGenerator.usePrimitiveWrapper());
+    }
+
+    public XSFloat(boolean asWrapper) {
         super(XSType.FLOAT_TYPE);
+        if (asWrapper)
+            this.jType = new JClass("java.lang.Float");
     } //-- XSReal
 
 
@@ -250,10 +257,14 @@ public final class XSFloat extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Float(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+        if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+             StringBuffer sb = new StringBuffer("new Float(");
+             sb.append(variableName);
+             sb.append(")");
+             return sb.toString();
+        }
     } //-- toJavaObject
 
     /**

@@ -46,6 +46,8 @@
 package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.builder.SourceGenerator;
+
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -67,12 +69,17 @@ public class XSInteger extends XSPatternBase {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Int;
+    private static JType jType = JType.Int;
 
     //private Integer value = null;
 
     public XSInteger() {
+        this(SourceGenerator.usePrimitiveWrapper());
+    }
+    public XSInteger(boolean asWrapper) {
         super(XSType.INTEGER_TYPE);
+        if (asWrapper)
+            this.jType = new JClass("java.lang.Integer");
     } //-- XSInteger
 
 
@@ -283,10 +290,14 @@ public class XSInteger extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Integer(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+        if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+            StringBuffer sb = new StringBuffer("new Integer(");
+            sb.append(variableName);
+            sb.append(")");
+            return sb.toString();
+        }
     } //-- toJavaObject
 
     /**
