@@ -626,16 +626,18 @@ public class FieldMolder {
                     _defaultReflectService._getSequence = (Method[]) getSeq.toArray( new Method[ 0 ] );
                     _defaultReflectService._setSequence = (Method[]) setSeq.toArray( new Method[ 0 ] );
                 }
-                Class methodClass = _colClass!=null? _colClass: null;
+                Class methodClass = _colClass != null? _colClass: declaredClass;
                 _defaultReflectService._getMethod = null;
                 
                 // if field is of type boolean, check whether is<Field>() is defined.
                 if(fieldMap.getType().compareTo("boolean") == 0) {
-                	_defaultReflectService._getMethod = findAccessor( javaClass, METHOD_IS_PREFIX + capitalize( name ), methodClass, true );
+                	_defaultReflectService._getMethod = 
+                		findAccessor( javaClass, METHOD_IS_PREFIX + capitalize( name ), methodClass, true );
                 }
                 
                 if( _defaultReflectService._getMethod == null ) {
-                	_defaultReflectService._getMethod = findAccessor( javaClass, METHOD_GET_PREFIX + capitalize( name ), methodClass, true );
+                	_defaultReflectService._getMethod = 
+                		findAccessor( javaClass, METHOD_GET_PREFIX + capitalize( name ), methodClass, true );
                 }
 
                 if ( _defaultReflectService._getMethod == null ){
@@ -856,7 +858,7 @@ public class FieldMolder {
                                         Class fieldType, boolean getMethod )
         throws MappingException
     {
-        Method   method;
+        Method   method = null;
         Method[] methods;
         int      i;
 
@@ -882,9 +884,18 @@ public class FieldMolder {
                     try {
                         method = javaClass.getMethod( methodName, new Class[] { fieldType } );
                     } catch ( Exception except ) {
-                        method = javaClass.getMethod( methodName, new Class[] { Types.typeFromPrimitive( fieldType ) } );
+                    	try {
+                    	    method = javaClass.getMethod( methodName, new Class[] { Types.typeFromPrimitive( fieldType ) } );
+                    	} catch ( Exception except2 ) {
+                    		// Ignore and try if clause
+                    	}
                     }
-                } else {
+                }
+                
+                // If all else fails (e.g. if the field type is an interface)
+                // scan the method list and pick the first one that matches
+                // the name and number of parameters
+                if (method == null) {
                     methods = javaClass.getMethods();
                     method = null;
                     for ( i = 0 ; i < methods.length ; ++i ) {
@@ -898,6 +909,9 @@ public class FieldMolder {
                         return null;
                 }
             }
+            
+
+            
             // Make sure method is public and not abstract/static.
             if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
                  ( method.getModifiers() & Modifier.STATIC ) != 0 )
