@@ -62,7 +62,6 @@ import org.odmg.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
-import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
@@ -70,6 +69,8 @@ import org.exolab.castor.persist.LockNotGrantedException;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
@@ -128,7 +129,7 @@ public class OQLQueryImpl
         SQLEngine          engine;
         Vector             types;
         Class[]            array;
-        QueryExpr          expr;
+        QueryExpression    expr;
         
         _fieldNum = 0;
         types = new Vector();
@@ -175,7 +176,7 @@ public class OQLQueryImpl
         array = new Class[ types.size() ];
         types.copyInto( array );
         try {
-            _query = engine.createQuery( expr.getQuery( false ), array );
+            _query = engine.createQuery( expr, array );
         } catch ( QueryException except ) {
             throw new QueryInvalidException( except.getMessage() );
         }
@@ -183,7 +184,7 @@ public class OQLQueryImpl
     
     
     private void parseField( JDOClassDescriptor clsDesc, StringTokenizer token,
-                             QueryExpr expr, Vector types )
+                             QueryExpression expr, Vector types )
         throws QueryInvalidException
     {
         String               name;
@@ -224,10 +225,10 @@ public class OQLQueryImpl
         if ( field == null )
             throw new QueryInvalidException( "The field " + name + " was not found" );
         if ( value.startsWith( "$" ) ) {
-            expr.addParameter( clsDesc, field, op );
+            expr.addParameter( clsDesc.getTableName(), field.getSQLName(), op );
             types.addElement( field.getFieldType() );
         } else {
-            expr.addCondition( clsDesc, field, op, value );
+            expr.addCondition( clsDesc.getTableName(), field.getSQLName(), op, value );
         }
     }
     
