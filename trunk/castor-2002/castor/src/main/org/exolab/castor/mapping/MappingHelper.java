@@ -85,6 +85,12 @@ public abstract class MappingHelper
 
 
     /**
+     * The suffix for the name of a compiled class.
+     */
+    private static final String CompiledSuffix = "ClassDesc";
+
+
+    /**
      * All class descriptors added so far, keyed by Java class.
      */
     private Hashtable  _clsDescs = new Hashtable();
@@ -429,13 +435,20 @@ public abstract class MappingHelper
         ContainerMapping contMaps[];
         Vector           relations;
         
+        // See if we have a compiled descriptor.
+        ClassDesc clsDesc;
+
+        clsDesc = loadClassDescriptor( clsMap.getClassName(), null, ClassDesc.class );
+        if ( clsDesc != null )
+            return clsDesc;
+
         // Obtain the Java class.
         try {
             javaClass = _loader.loadClass( clsMap.getClassName() );
         } catch ( ClassNotFoundException except ) {
             throw new MappingException( "mapping.classNotFound", clsMap.getClassName() );
         }
-        
+
         // If this class extends another class, need to obtain the extended
         // class and make sure this class indeed extends it.
         if ( clsMap.getExtends() != null ) {
@@ -756,6 +769,39 @@ public abstract class MappingHelper
         // No such/access to method
         throw new MappingException( "mapping.accessorNotAccessible",
                                     methodName, javaClass.getName() );
+    }
+
+
+    /**
+     * Loads a class descriptor from a compiled class. Based
+     * on the class name, the name of the descriptor class
+     * is created by adding the typePrefix (null for the stock
+     * descriptor) and "ClassDesc". If the descriptor is found
+     * and of the right type, it is returned. If no descriptor
+     * is found, null is returned.
+     *
+     * @param clsName The class for which the descriptor is loaded
+     * @param compiledType The type prefix for the compiled class
+     *  descriptor name (XML, JDO, etc), may be null
+     * @param clsDescType The type of the class descriptor
+     * @return An instance of the class descriptor or null if not found
+     */
+    protected ClassDesc loadClassDescriptor( String clsName, String compiledType,
+                                             Class clsDescType )
+    {
+        if ( compiledType != null )
+            clsName = clsName + compiledType;
+        clsName = clsName + CompiledSuffix;
+        try {
+            Object obj;
+
+            obj = _loader.loadClass( clsName ).newInstance();
+            if ( clsDescType.isAssignableFrom( obj.getClass() ) )
+                return (ClassDesc) obj;
+            return null;
+        } catch ( Exception except ) {
+            return null;
+        }
     }
 
 
