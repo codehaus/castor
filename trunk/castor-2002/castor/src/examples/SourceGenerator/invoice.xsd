@@ -39,6 +39,7 @@
    			<element name="Id" type="ID" minOccurs="1" maxOccurs="1"/>
    		    <element name="Quantity" type="integer" minOccurs="1" maxOccurs="1"/>
         	<element name="Price" type="PriceType" minOccurs="1" maxOccurs="1"/>
+        	<attributeGroup ref="ItemAttributes"/>
     	</complexType>
    	</element>
    	
@@ -110,4 +111,10 @@
     	<minInclusive value="1"/>
    		<maxInclusive value="100"/>
    </simpleType>
+
+   <!-- The attributes for an Item -->
+   <attributeGroup name="ItemAttributes">
+   		<attribute name="InStock" type="boolean" use="default" value="false"/>
+   		<attribute name="Category" type="string" use="required"/>
+    </attributeGroup>
 </schema>

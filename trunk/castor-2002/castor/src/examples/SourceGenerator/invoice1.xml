@@ -12,8 +12,8 @@
       <phone>650-345-2777</phone>
    </ship-to>
 
-   <item>
-   		<Id>CAS 0.8.9 TOR</Id>
+   <item InStock="true" Category="Open Source Project">
+   		<Id>CAS 0.8.10 TOR</Id>
    		<Quantity>1</Quantity>
    		<Price>5</Price>
    	</item>
