@@ -488,6 +488,9 @@ public final class UnmarshalHandler extends MarshalFramework
            _anyUnmarshaller.characters(ch, start, length);
         else {
              
+             /* Commented out 2003-09-11 kvisco, this code is breaking
+                some of the test cases
+                
              //-- we look for the proper state since we could be unmarshalling containers
              //-- that don't hold text value
              Object[] states = _stateInfo.toArray();
@@ -500,7 +503,8 @@ public final class UnmarshalHandler extends MarshalFramework
              	counter = counter - 1;
              	state = (UnmarshalState)states[counter-1]; 	
              }
-             
+             */
+             UnmarshalState state = (UnmarshalState)_stateInfo.peek();
              if (state.buffer == null) state.buffer = new StringBuffer();
              state.buffer.append(ch, start, length);
         }
