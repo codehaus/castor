@@ -234,6 +234,7 @@ public final class Cache
     
     synchronized void removeLock( OID oid )
     {
+        /*
         CacheEntry entry = (CacheEntry) _locks.get( oid ); 
         
         if ( entry == null )
@@ -245,6 +246,9 @@ public final class Cache
                 _locks.remove( oid );
             }
         }
+        */
+        _locks.remove( oid );
+        _cache.remove( oid );
     }
     
     
