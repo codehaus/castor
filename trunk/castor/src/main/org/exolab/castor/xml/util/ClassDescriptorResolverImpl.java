@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -46,9 +46,14 @@
 
 package org.exolab.castor.xml.util;
 
-import org.exolab.castor.xml.*;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.util.Configuration;
+
+import org.exolab.castor.xml.ClassDescriptorEnumeration;
+import org.exolab.castor.xml.ClassDescriptorResolver;
+import org.exolab.castor.xml.Introspector;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.xml.XMLMappingLoader;
+
 
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -56,7 +61,7 @@ import java.util.Enumeration;
 /**
  * The default implementation of the ClassDescriptorResolver interface
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class ClassDescriptorResolverImpl
@@ -64,7 +69,8 @@ public class ClassDescriptorResolverImpl
 {
  
     private static final String DESCRIPTOR_PREFIX = "Descriptor";
-    
+    private static final String INTERNAL_CONTAINER_NAME = "-error-if-this-is-used-";
+
     /**
      * internal cache for class descriptors
      * with the class as the key
@@ -120,6 +126,7 @@ public class ClassDescriptorResolverImpl
      */
     private boolean _useIntrospection = true;
     
+    
     /**
      * Creates a new ClassDescriptorResolverImpl
      */
@@ -163,12 +170,14 @@ public class ClassDescriptorResolverImpl
             _cacheViaClass.put(type, classDesc);
             String xmlName = classDesc.getXMLName();
             if ((xmlName != null) && (xmlName.length() > 0)) {
-                String nameKey = xmlName;
-                String ns = classDesc.getNameSpaceURI();             
-                if ((ns != null) && (ns.length() > 0)) {
-                    nameKey = ns + ':' + xmlName;
+                if (!INTERNAL_CONTAINER_NAME.equals(xmlName)) {
+                    String nameKey = xmlName;
+                    String ns = classDesc.getNameSpaceURI();             
+                    if ((ns != null) && (ns.length() > 0)) {
+                        nameKey = ns + ':' + xmlName;
+                    }
+                    _cacheViaName.put(nameKey, classDesc);
                 }
-                _cacheViaName.put(nameKey, classDesc);
             }
         }
     } //-- associate
@@ -469,6 +478,7 @@ public class ClassDescriptorResolverImpl
         
     } //-- resolveByXMLName
     
+    
     /**
      * Sets the ClassLoader to use when loading class descriptors
      * @param loader the ClassLoader to use
@@ -516,14 +526,21 @@ public class ClassDescriptorResolverImpl
                 throw (ClassNotFoundException)exception;
         }
         
-        //-- use passed in loader
-	    if ( loader != null )
-		    return loader.loadClass(className);
-		//-- use internal loader
-		else if (_loader != null)
-		    return _loader.loadClass(className);
-		//-- no loader available use Class.forName
-		return Class.forName(className);
+        try {
+            //-- use passed in loader
+    	    if ( loader != null )
+    		    return loader.loadClass(className);
+    		//-- use internal loader
+    		else if (_loader != null)
+    		    return _loader.loadClass(className);
+    		//-- no loader available use Class.forName
+    		return Class.forName(className);
+        }
+        catch(NoClassDefFoundError ncdfe) {
+            //-- This can happen if we try to load a class with invalid case,
+            //-- for example foo instead Foo.
+            throw new ClassNotFoundException(ncdfe.getMessage());
+        }
     } //-- loadClass
     
     /**
