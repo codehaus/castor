@@ -4,9 +4,9 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Properties;
 
-import org.exolab.castor.util.Logger;
-
 import junit.framework.TestCase;
+
+import org.exolab.castor.util.Logger;
 
 /*
  * JUnit test case for unit testing TransactionManagerFactoryRegistry.

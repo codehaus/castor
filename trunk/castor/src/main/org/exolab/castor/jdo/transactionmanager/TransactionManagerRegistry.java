@@ -48,11 +48,6 @@ package org.exolab.castor.jdo.transactionmanager;
 
 
 import java.util.Hashtable;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Logger;
-import org.exolab.castor.util.Messages;
 
 
 /**
