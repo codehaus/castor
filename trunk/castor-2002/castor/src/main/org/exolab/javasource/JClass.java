@@ -53,7 +53,7 @@ import java.io.PrintWriter;
 import java.util.Vector;
 
 /**
- * A representation of the Java Source code for a Java Class. This is 
+ * A representation of the Java Source code for a Java Class. This is
  * a useful utility when creating in memory source code
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
@@ -83,7 +83,7 @@ public class JClass extends JType {
     private Vector imports = null;
 
     private String superClass = null;
-    
+
     /**
      * The list of member variables of this JClass
     **/
@@ -98,8 +98,8 @@ public class JClass extends JType {
      * The set of interfaces implemented by this JClass
     **/
     private Vector interfaces    = null;
-    
-    
+
+
     private JDocComment jdc      = null;
     /**
      * The list of methods of this JClass
@@ -111,21 +111,21 @@ public class JClass extends JType {
      * change the resulting qualifiers
     **/
     private JModifiers modifiers = null;
-    
+
     /**
      * The package to which this JClass belongs
     **/
     private String packageName   = null;
 
     private Vector packageClasses = null;
-    
+
     /**
      * Creates a new Class with the given name
      * @param name the name of the Class to create
      * @exception IllegalArgumentException when the given name
      * is not a valid Class name
     **/
-    public JClass(String name) 
+    public JClass(String name)
         throws IllegalArgumentException
     {
         super(name);
@@ -140,21 +140,21 @@ public class JClass extends JType {
         packageClasses   = new Vector();
         //-- initialize default Java doc
         jdc.addDescriptor(JDocDescriptor.createVersionDesc(version));
-        
+
     } //-- JClass
 
-    
+
     public void addImport(String className) {
         if (className == null) return;
         if (className.length() == 0) return;
 
         //-- getPackageName
         String pkgName = getPackageFromClassName(className);
-        
+
         if (pkgName != null) {
             if (pkgName.equals(this.packageName)) return;
             if (pkgName.equals("java.lang")) return;
-                
+
             //-- for readabilty keep import list sorted, and make sure
             //-- we do not include more than one of the same import
             for (int i = 0; i < imports.size(); i++) {
@@ -168,29 +168,29 @@ public class JClass extends JType {
             imports.addElement(className);
         }
     } //-- addImport
-    
+
     public void addInterface(String interfaceName) {
-        
+
         if (!interfaces.contains(interfaceName))
             interfaces.addElement(interfaceName);
-            
+
     } //-- addInterface
-    
+
     /**
      * Adds the given Constructor to this classes list of constructors.
-     * The constructor must have been created with this JClass' 
+     * The constructor must have been created with this JClass'
      * createConstructor.
      * @exception IllegalArgumentException
     **/
-    public void addConstructor(JConstructor constructor) 
+    public void addConstructor(JConstructor constructor)
         throws IllegalArgumentException
     {
         if (constructor == null)
             throw new IllegalArgumentException("Constructors cannot be null");
         if (constructor.getDeclaringClass() == this) {
-            
+
             /** check signatures (add later) **/
-            
+
             constructors.addElement(constructor);
         }
         else {
@@ -199,9 +199,9 @@ public class JClass extends JType {
             throw new IllegalArgumentException(err);
         }
     }
-    
+
     public void addMember(JMember jMember)
-        throws IllegalArgumentException 
+        throws IllegalArgumentException
     {
         if (jMember == null) {
             throw new IllegalArgumentException("Class members cannot be null");
@@ -211,7 +211,7 @@ public class JClass extends JType {
             throw new IllegalArgumentException(err);
         }
         members.put(jMember.getName(), jMember);
-        
+
         // if member is of a type not imported by this class
         // then add import
         JType type = jMember.getType();
@@ -219,24 +219,24 @@ public class JClass extends JType {
         if (!type.isPrimitive()) {
             addImport( ((JClass)type).getName());
         }
-        
+
     } //-- addMember
-    
+
     public void addMethod(JMethod jMethod)
-        throws IllegalArgumentException 
+        throws IllegalArgumentException
     {
         if (jMethod == null) {
             throw new IllegalArgumentException("Class methods cannot be null");
         }
-        
+
         //-- check method name and signatures *add later*
-        
+
         //-- keep method list sorted for esthetics when printing
         //-- START SORT :-)
         boolean added = false;
         short modifierVal = 0;
         JModifiers modifiers = jMethod.getModifiers();
-        
+
         for (int i = 0; i < methods.size(); i++) {
             JMethod tmp = (JMethod) methods.elementAt(i);
             //-- first compare modifiers
@@ -256,35 +256,35 @@ public class JClass extends JType {
         }
         //-- END SORT
         if (!added) methods.addElement(jMethod);
-        
+
         //-- check parameter packages to make sure we have them
         //-- in our import list
-        
+
         String[] pkgNames = jMethod.getParameterClassNames();
         for (int i = 0; i < pkgNames.length; i++) {
             addImport(pkgNames[i]);
         }
-        //-- check return type to make sure it's included in the 
+        //-- check return type to make sure it's included in the
         //-- import list
         JType jType = jMethod.getReturnType();
         if (jType != null) {
-            while (jType.isArray()) 
+            while (jType.isArray())
                 jType = jType.getComponentType();
-            
+
             if (!jType.isPrimitive())
                 addImport( ((JClass)jType).getName());
         }
-        //-- check exceptions 
+        //-- check exceptions
         JClass[] exceptions = jMethod.getExceptions();
         for (int i = 0; i < exceptions.length; i++) {
             addImport(exceptions[i].getName());
         }
     } //-- addMethod
-    
-    public void addMethods(JMethod[] jMethods) 
+
+    public void addMethods(JMethod[] jMethods)
         throws IllegalArgumentException
     {
-        for (int i = 0; i < jMethods.length; i++) 
+        for (int i = 0; i < jMethods.length; i++)
             addMethod(jMethods[i]);
     } //-- addMethods
 
@@ -296,26 +296,26 @@ public class JClass extends JType {
         if (jClass != null) packageClasses.addElement(jClass);
     } //-- addPackageClass
     */
-    
+
     public JConstructor createConstructor() {
         return new JConstructor(this);
     } //-- createConstructor
-    
+
     public JConstructor getConstructor(int index) {
         return (JConstructor)constructors.elementAt(index);
     } //-- getConstructor
-    
+
     public JConstructor[] getConstructors() {
-        
+
         int size = constructors.size();
         JConstructor[] jcArray = new JConstructor[size];
-        
+
         for (int i = 0; i < constructors.size(); i++) {
             jcArray[i] = (JConstructor)constructors.elementAt(i);
         }
         return jcArray;
     } //-- getConstructors
-    
+
     /**
      * Returns the name of the file that this JClass would be
      * printed as, given a call to #print.
@@ -325,9 +325,9 @@ public class JClass extends JType {
      * printed as, given a call to #print.
     **/
     public String getFilename(String destDir) {
-        
+
         String filename = getLocalName() + ".java";
-        
+
         if ((packageName != null) && (packageName.length() > 0)) {
             String path = packageName.replace('.',File.separatorChar);
             File pathFile;
@@ -338,12 +338,12 @@ public class JClass extends JType {
             if (!pathFile.exists()) {
                 pathFile.mkdirs();
             }
-            filename = path+File.separator+filename;
+            filename = pathFile.toString()+File.separator+filename;
         }
-        
+
         return filename;
     } //-- getFilename
-    
+
     /**
      * Returns the Java Doc comment for this JClass
      * @return the JDocComment for this JClass
@@ -351,7 +351,7 @@ public class JClass extends JType {
     public JDocComment getJDocComment() {
         return jdc;
     } //-- getJDocComment
-    
+
     /**
      * Returns the member with the given name, or null if no member
      * was found with the given name
@@ -362,7 +362,7 @@ public class JClass extends JType {
     public JMember getMember(String name) {
         return (JMember)members.get(name);
     } //-- getMember
-    
+
     public JMember[] getMembers() {
         int size = members.size();
         JMember[] marray = new JMember[size];
@@ -371,17 +371,17 @@ public class JClass extends JType {
         }
         return marray;
     } //-- getMembers
-    
+
     public JMethod[] getMethods() {
         int size = methods.size();
         JMethod[] marray = new JMethod[size];
-        
+
         for (int i = 0; i < methods.size(); i++) {
             marray[i] = (JMethod)methods.elementAt(i);
         }
         return marray;
     } //-- getMethods
-    
+
     public JMethod getMethod(String name, int startIndex) {
         for (int i = startIndex; i < methods.size(); i++) {
             JMethod jMethod = (JMethod)methods.elementAt(i);
@@ -389,11 +389,11 @@ public class JClass extends JType {
         }
         return null;
     }
-    
+
     public JMethod getMethod(int index) {
         return (JMethod)methods.elementAt(index);
-    } 
-    
+    }
+
     /**
      * Returns the JModifiers which allows the qualifiers to be changed
      * @return the JModifiers for this JClass
@@ -401,16 +401,16 @@ public class JClass extends JType {
     public JModifiers getModifiers() {
         return modifiers;
     } //-- getModifiers
-    
+
     /**
      * Returns the name of the package that this JClass is a member of
      * @return the name of the package that this JClass is a member of,
      * or null if there is no current package name defined
-    **/ 
+    **/
     public String getPackageName() {
         return this.packageName;
     } //-- getPackageName
-    
+
     public static boolean isValidClassName(String name) {
         //** add class name validation */
         return true;
@@ -419,7 +419,7 @@ public class JClass extends JType {
     public void print() {
         print(null,null);
     } //-- printSrouce
-    
+
     /**
      * Prints the source code for this JClass
      * @param lineSeparator the line separator to use at the end of each line.
@@ -429,10 +429,10 @@ public class JClass extends JType {
     public void print(String destDir, String lineSeparator) {
 
         String name = getLocalName();
-        
+
         //-- open output file
         String filename = getFilename(destDir);
-        
+
         File file = new File(filename);
         JSourceWriter jsw = null;
         try {
@@ -442,15 +442,15 @@ public class JClass extends JType {
             System.out.println("unable to create class file: " + filename);
             return;
         }
-        
+
         if (lineSeparator == null) {
             lineSeparator = System.getProperty("line.separator");
         }
         jsw.setLineSeparator(lineSeparator);
-        
+
         StringBuffer buffer = new StringBuffer();
-        
-        
+
+
         //-- write class header
         if (header != null) header.print(jsw);
         else {
@@ -460,10 +460,10 @@ public class JClass extends JType {
         }
         jsw.writeln();
         jsw.flush();
-        
+
         //-- print package name
         if ((packageName != null) && (packageName.length() > 0)) {
-            
+
             buffer.setLength(0);
             buffer.append("package ");
             buffer.append(packageName);
@@ -471,7 +471,7 @@ public class JClass extends JType {
             jsw.writeln(buffer.toString());
             jsw.writeln();
         }
-        
+
         //-- print imports
         jsw.writeln("  //---------------------------------/");
         jsw.writeln(" //- Imported classes and packages -/");
@@ -483,29 +483,29 @@ public class JClass extends JType {
             jsw.writeln(';');
         }
         jsw.writeln();
-        
+
         //------------/
         //- Java Doc -/
         //------------/
-        
+
         jdc.print(jsw);
-        
+
         //-- print class information
         //-- we need to add some JavaDoc API adding comments
-        
+
         buffer.setLength(0);
-        
+
         if (modifiers.isPrivate()) {
             buffer.append("private ");
         }
         else if (modifiers.isPublic()) {
             buffer.append("public ");
         }
-        
+
         if (modifiers.isAbstract()) {
             buffer.append("abstract ");
         }
-        
+
         buffer.append("class ");
         buffer.append(getLocalName());
         buffer.append(' ');
@@ -533,16 +533,16 @@ public class JClass extends JType {
             }
             else buffer.append(' ');
         }
-        
+
         buffer.append('{');
         jsw.writeln(buffer.toString());
         buffer.setLength(0);
         jsw.writeln();
-        
+
         jsw.indent();
-        
+
         //-- declare members
-        
+
         if (members.size() > 0) {
             jsw.writeln();
             jsw.writeln("  //--------------------/");
@@ -550,19 +550,19 @@ public class JClass extends JType {
             jsw.writeln("//--------------------/");
             jsw.writeln();
         }
-        
+
         for (int i = 0; i < members.size(); i++) {
 
             JMember jMember = (JMember)members.get(i);
-            
+
             //-- print Java comment
             JDocComment comment = jMember.getComment();
             if (comment != null) comment.print(jsw);
-            
+
             // -- print member
             jsw.write(jMember.getModifiers().toString());
             jsw.write(' ');
-            
+
             JType type = jMember.getType();
             String typeName = type.toString();
             //-- for esthetics use short name in some cases
@@ -572,17 +572,17 @@ public class JClass extends JType {
             jsw.write(typeName);
             jsw.write(' ');
             jsw.write(jMember.getName());
-            
+
             String init = jMember.getInitString();
             if (init != null) {
                 jsw.write(" = ");
                 jsw.write(init);
             }
-            
+
             jsw.writeln(';');
             jsw.writeln();
         }
-        
+
         //-- print constructors
         if (constructors.size() > 0) {
             jsw.writeln();
@@ -596,7 +596,7 @@ public class JClass extends JType {
             jConstructor.print(jsw);
             jsw.writeln();
         }
-        
+
         //-- print methods
         if (methods.size() > 0) {
             jsw.writeln();
@@ -611,13 +611,13 @@ public class JClass extends JType {
             jMethod.print(jsw);
             jsw.writeln();
         }
-        
+
         jsw.unindent();
         jsw.writeln('}');
         jsw.flush();
         jsw.close();
     } //-- printSource
-    
+
     /**
      * Sets the header comment for this JClass
      * @param comment the comment to display at the top of the source file
@@ -626,7 +626,7 @@ public class JClass extends JType {
     public void setHeader(JComment comment) {
         this.header = comment;
     } //-- setHeader
-    
+
     /**
      * Allows changing the package name of this JClass
      * @param packageName the package name to use
@@ -635,7 +635,7 @@ public class JClass extends JType {
         this.packageName = packageName;
         changePackage(packageName);
     } //-- setPackageName
-    
+
     /**
      * Sets the super Class that this class extends
      * @param superClass the super Class that this Class extends
@@ -643,18 +643,18 @@ public class JClass extends JType {
     public void setSuperClass(String superClass) {
         this.superClass = superClass;
     } //-- setSuperClass
-    
+
     //-------------------/
     //- Private Methods -/
     //-------------------/
-    
+
     /**
-     * 
+     *
     **/
     private void printlnWithPrefix(String prefix, String source, JSourceWriter jsw) {
         jsw.write(prefix);
         if (source == null) return;
-        
+
         char[] chars = source.toCharArray();
         int lastIdx = 0;
         for (int i = 0; i < chars.length; i++) {
@@ -673,10 +673,10 @@ public class JClass extends JType {
             jsw.write(chars, lastIdx, chars.length-lastIdx);
         }
         jsw.writeln();
-        
+
     } //-- printWithPrefix
-    
-    
+
+
     private static String getPackageFromClassName(String className) {
         int idx = -1;
         if ((idx = className.lastIndexOf('.')) > 0) {
@@ -684,21 +684,21 @@ public class JClass extends JType {
         }
         return null;
     } //-- getPackageFromClassName
-    
+
     /**
      * Test drive method...to be removed or commented out
     **
     public static void main(String[] args) {
         JClass testClass = new JClass("Test");
-        
+
         testClass.addImport("java.util.Vector");
         testClass.addMember(new JMember(JType.Int, "x"));
         JClass jcString = new JClass("String");
-        
+
         JMember jMember = new JMember(jcString, "myString");
         jMember.getModifiers().makePrivate();
         testClass.addMember(jMember);
-        
+
         //-- create constructor
         JConstructor cons = testClass.createConstructor();
         testClass.addConstructor(cons);
