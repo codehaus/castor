@@ -161,13 +161,23 @@
   </field>]]></pre>
          where "0" is the character value for <b>false</b> and "1" is
          the character value for <b>true</b></p>
-      <p>In the above example the first of four parameterized type convertors
+      <p>In the above example the first of six parameterized type convertors
          is used, "boolean->char" convertor.
          The parameter must have length 2, the first character is the value
          for <b>false</b>, the second character is the value for <b>true</b>.
          The default value is "FT".
          The actual SQL type should be char(1).</p>
-      <p>The second convertor is "date->char".
+      <p>The second and third convertors are "boolean->integer" and
+         "boolean->numeric". Its parameter must be <b>+</b> for +1 or <b>-</b>
+         for -1 representing true. False is always converted to 0.
+         
+         For example:</p>
+      <pre><![CDATA[
+  <field name="flagWithMinusOneForTrue" type="boolean">
+    <sql name="flag" type="integer[-]"/>
+  </field>]]></pre>
+      <p>If the parameter is not specified, true is converted to +1.</p>
+      <p>The forth convertor is "date->char".
          Its parameter must be a correct pattern for SimpleDateFormat.
 
          For example:</p>
@@ -177,7 +187,7 @@
   </field>]]></pre>
       <p>If the parameter is not specified, the conversion is performed
          using toString() method of the Date class.</p>
-      <p>The third and the fourth convertors are "date->integer" and
+      <p>The fifth and the sixth convertors are "date->integer" and
          "date->numeric".
          Their parameters are also patterns having syntax based on the
          SimpleDateFormat syntax, but repeated characters are eliminated.
