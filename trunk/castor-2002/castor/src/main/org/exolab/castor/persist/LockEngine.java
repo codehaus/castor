@@ -642,7 +642,6 @@ public final class LockEngine {
             else
                 succeed = true;
 
-            
             return creating;
 
             /*
