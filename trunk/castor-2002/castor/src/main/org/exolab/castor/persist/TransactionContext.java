@@ -1147,6 +1147,14 @@ public abstract class TransactionContext
         // rollback and close them one by one.
         rollbackConnections();
 
+        // un-delete object first
+        enum = _objects.elements();
+        while ( enum.hasMoreElements() ) {
+            entry = (ObjectEntry) enum.nextElement();
+            if ( entry.deleted )
+                entry.deleted = false;
+        }
+
         // Clean the transaction locks with regards to the
         // database engine
         enum = _objects.elements();
@@ -1162,8 +1170,8 @@ public abstract class TransactionContext
                 } else {
                     // Object has been queried (possibly) deleted in this
                     // transaction and release the lock.
-                    if ( entry.updateCacheNeeded || entry.updatePersistNeeded )
-                        entry.engine.revertObject( this, entry.oid, entry.object );
+                    //if ( entry.updateCacheNeeded || entry.updatePersistNeeded )
+                    entry.engine.revertObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
                 if ( entry.molder.getCallback() != null )
