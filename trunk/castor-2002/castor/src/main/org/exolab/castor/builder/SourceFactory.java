@@ -466,6 +466,10 @@ public class SourceFactory  {
 			    createUnmarshalMethods(jClass);
 			}
 		}
+		
+        //create equals() method?
+        if (SourceGenerator.equalsMethod())
+            createEqualsMethod(jClass);
 
 		//-- create Bound Properties code
 		if (state.hasBoundProperties())
@@ -960,6 +964,14 @@ public class SourceFactory  {
         jsc.indent();
         jsc.add("return true;");
         jsc.unindent();
+		if (jclass.getSuperClass()!=null)
+		{
+			jsc.add("");
+			jsc.add("if (super.equals(obj)==false)");
+			jsc.indent();
+			jsc.add("return false;");
+			jsc.unindent();
+		}		
         jsc.add("");
         jsc.add("if (obj instanceof ");
         jsc.append(jclass.getName(true));
