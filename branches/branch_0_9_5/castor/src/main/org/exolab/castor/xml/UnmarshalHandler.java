@@ -2193,6 +2193,9 @@ public final class UnmarshalHandler extends MarshalFramework
         {
             return;
         }
+        else if (XMLNS.equals(prefix)) {
+            return;
+        }
         //-- end Xerces 2.x bug
         
         //-- Forward the call to SAX2ANY 
