@@ -61,7 +61,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.mapping.Mapping;
@@ -71,8 +70,6 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.DTDResolver;
-import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
@@ -225,7 +222,6 @@ public class DatabaseRegistry
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
         throws MappingException
     {
-        Unmarshaller       unm;
         Mapping            mapping;
         Enumeration        mappings;
         Database           database;
