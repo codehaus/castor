@@ -2,6 +2,16 @@
 Version (CVS)
 -------------
 
+XML: Fixed bug with 'equals' implementation not being generated for classes representing <xsd:complexType>'s
+	(andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML: Fixed bug in 'equals' implementation, not calling super.equals(...) when approprite
+	(andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML: Fixed problem in Schema unmarshalling (when using both xsd:include and xsd:import), 
+            allowing a given schema to be  parsed a second time, resulting in duplicate type errors.
+	(andrew.fawcett@coda.com, Andrew Fawcett)
+
 XML: Added an option (default is off) to expose the names of each attribute and element described in the class descriptor.
             Use org.exolab.castor.builder.classdescfieldnames=true in castorbuilder.properties to enable
 	(andrew.fawcett@coda.com, Andrew Fawcett)
