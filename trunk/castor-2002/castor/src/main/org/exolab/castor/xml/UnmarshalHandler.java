@@ -499,24 +499,23 @@ public class UnmarshalHandler implements DocumentHandler {
             }
         }
 
-        // Keith's fault for the below nasty code.
-        if ( descriptor == null ) {
-            org.exolab.castor.mapping.ClassDescriptor resolved;
 
-            resolved = _cdResolver.resolveByXMLName(name, null);
-            if ( resolved != null ) {
-                for(int i = 0; i< descriptors.length ; ++i ) {
+        /*
+          If descriptor is null, we need to handle possible inheritence.
+          This can be a slow process...for speed use the match attribute
+          of the xml element in the mapping file
+        */
+        XMLClassDescriptor cdInherited = null;
+        if (descriptor == null) {
+            cdInherited = _cdResolver.resolveByXMLName(name, null);
+            if (cdInherited != null) {
+                Class subclass = cdInherited.getJavaClass();
+                for (int i = 0; i < descriptors.length; i++) {
                     if (descriptors[i] == null) continue;
-                    if (descriptors[i].getFieldType().isAssignableFrom( resolved.getJavaClass() )) {
-                        try {
-                            descriptor = new XMLFieldDescriptorImpl( resolved.getJavaClass(), descriptors[i].getFieldName(),
-                                                                     name, NodeType.Element );
-                            ( (XMLFieldDescriptorImpl) descriptor ).setClassDescriptor( (XMLClassDescriptor) resolved );
-                            ( (XMLFieldDescriptorImpl) descriptor ).setHandler( descriptors[ i ].getHandler() );
-                            break;
-                        } catch ( Exception except ) {
-                            throw new SAXException( except.toString() );
-                        }
+                    Class superclass = descriptors[i].getFieldType();
+                    if (superclass.isAssignableFrom(subclass)) {
+                        descriptor = descriptors[i];
+                        break;
                     }
                 }
             }
@@ -541,7 +540,16 @@ public class UnmarshalHandler implements DocumentHandler {
             */
             
             //-- Find class to instantiate
-            classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
+            //-- check xml names to see if we should look for a more specific
+            //-- ClassDescriptor, otherwise just use the one found in the
+            //-- descriptor
+            classDesc = null;
+            if (cdInherited != null) classDesc = cdInherited;
+            else if (!descriptor.getXMLName().equals(name))
+                classDesc = _cdResolver.resolveByXMLName(name, null);
+            
+            if (classDesc == null)
+                classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
             
             FieldHandler handler = descriptor.getHandler();
             
@@ -599,7 +607,18 @@ public class UnmarshalHandler implements DocumentHandler {
             */
             try {
                     
-                _class = descriptor.getFieldType();
+                //-- Get Class type...first use ClassDescriptor,
+                //-- since it could be more specific than 
+                //-- the FieldDescriptor
+                boolean useHandler = true;
+                if (classDesc != null) {
+                    _class = classDesc.getJavaClass();
+                    //-- XXXX this is a hack I know...but we
+                    //-- XXXX can't use the handler in this case
+                    useHandler = false;
+                }
+                else
+                    _class = descriptor.getFieldType();
 
                 //-- Handle support for "Any" type
                 if (_class == Object.class) {
@@ -645,7 +664,10 @@ public class UnmarshalHandler implements DocumentHandler {
                     state.primitiveOrImmutable = true;
                 }
                 else {
-                    state.object = handler.newInstance(parentState.object);
+                    //-- XXXX should remove this test once we can
+                    //-- XXXX come up with a better solution
+                    if (useHandler) 
+                        state.object = handler.newInstance(parentState.object);
                     //-- reassign class in case there is a conflict
                     //-- between descriptor#getFieldType and
                     //-- handler#newInstance...I should hope not, but
