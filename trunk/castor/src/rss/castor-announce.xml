@@ -19,6 +19,19 @@
 -->	
 
 		<item>
+			<title>RSS feed available</title>
+			<link>http://castor.codehaus.org/news.html#item21</link>
+			<description>
+				We are happy to provide an RSS feed for announcements related to Castor at 
+				http://castor.codehaus.org/rss/castor-announcement.xml. This service 
+				basically mirrors the information provided at our news page at 
+				http://castor.codehaus.org/news.html.
+			</description>
+			<author>Werner Guttmann</author>
+			<guid isPermaLink="false">{2a847937-1b5f-90c4-5be1-347a3b84d29}</guid>
+			<pubDate>Thu, 10 Mar 2005 13:35:00 GMT</pubDate>
+		</item>
+		<item>
 			<title>A new home</title>
 			<pubDate>Mon, 14 Feb 2005 22:21:20 GMT</pubDate>
 			<author>Werner Guttmann</author>
@@ -69,7 +82,7 @@
 		</item>
 		<item>
 			<title>0.9.6 release candidate 2 available</title>
-			<pubDate>Mon, 14 Feb 2005 23:35:32 GMT</pubDate>
+			<pubDate>Mon, 14 Jan 2005 23:35:32 GMT</pubDate>
 			<author>Werner Guttmann</author>
 			<link>http://castor.codehaus.org/news.html</link>
 			<description>
