@@ -2,6 +2,15 @@
 Version (CVS) 
 -------------
 
+XML:   Added some additional support for nillable fields. There is still
+       some more work needed in this area, but this gets us closer.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1723
+       (kvisco - 20041210)
+
+XML:   Added initial support to suppress namespaces during Marshalling. This
+       has been a long asked for feature, so I figured it was about time I
+       finally got around to doing this.
+       (kvisco - 20041210)
 
 JDO:   Fixed bug 1317 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Fixed problem in properly dealing with postgreSQL quotations, preventing
