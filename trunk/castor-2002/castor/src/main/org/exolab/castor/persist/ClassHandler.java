@@ -394,7 +394,8 @@ public final class ClassHandler
                     for ( int j = 0 ; j < vector.size() ; ++j ) {
                         Object object;
 
-                        object = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), vector.elementAt( j ) );
+                        object = _fields[ i ].handler.newInstance( target);
+                        ctx.fetch( _fields[ i ].relation.getRelatedHandler(), object, vector.elementAt( j ) );
                         if ( object == null )
                             throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
                                                                    vector.elementAt( j ) );
@@ -403,7 +404,8 @@ public final class ClassHandler
                 } else {
                     Object relTarget;
 
-                    relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
+                    relTarget = _fields[ i ].handler.newInstance( target );
+                    ctx.fetch( _fields[ i ].relation.getRelatedHandler(), relTarget, fields[ i ] );
                     if ( relTarget == null )
                         throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
                                                                fields[ i ] );
