@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,9 +52,10 @@ import org.exolab.castor.builder.types.*;
 
 /**
  * A factory for creating the source code of descriptor classes
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class DescriptorSourceFactory {
 
 	//-- org.exolab.castor.mapping
@@ -384,6 +385,12 @@ public class DescriptorSourceFactory {
 		if (member.isRequired()) {
 			jsc.add("desc.setRequired(true);");
 		}
+        
+        //-- nillable
+        if (member.isNillable()) {
+           jsc.add("desc.setNillable(true);");
+        }
+        
 		//-- if any it can match all the names
 		if (any)
 			jsc.add("desc.setMatches(\"*\");");
@@ -511,7 +518,7 @@ public class DescriptorSourceFactory {
 			//handle by DateFieldHandler
 			if ( (isAttribute | isContent)
 				&& xsType.isDateTime()
-				&& xsType.getType() != xsType.DATETIME_TYPE) {
+				&& xsType.getType() != XSType.DATETIME_TYPE) {
 				jsc.append(".parse");
 				jsc.append(JavaNaming.toJavaClassName(xsType.getName()));
 				jsc.append("((String) value))");
