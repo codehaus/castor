@@ -594,7 +594,6 @@ public abstract class TransactionContext
             }
             return oid;
         } catch ( Exception except ) {
-except.printStackTrace();            
             if ( molder.getCallback() != null )
                 molder.getCallback().releasing( object, false );
             removeObjectEntry( object );
@@ -765,6 +764,12 @@ except.printStackTrace();
                 while ( deleted.nextDeleted != null )
                     deleted = deleted.nextDeleted;
                 deleted.nextDeleted = entry;
+            }
+            try {
+                if ( entry.molder.getCallback() != null )
+                    entry.molder.getCallback().removed( entry.object );
+            } catch ( Exception except ) {
+                throw new PersistenceException( Messages.format("persist.nested",except) );
             }
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
@@ -1321,11 +1326,17 @@ except.printStackTrace();
                    _deletedList = entry;
                 else {
                     ObjectEntry deleted;
-                    
+
                     deleted = _deletedList;
                     while ( deleted.nextDeleted != null )
                         deleted = deleted.nextDeleted;
                     deleted.nextDeleted = entry;
+                }
+                try {
+                    if ( entry.molder.getCallback() != null )
+                        entry.molder.getCallback().removed( entry.object );
+                } catch ( Exception except ) {
+                    throw new PersistenceException( Messages.format("persist.nested",except) );
                 }
             } catch ( ObjectDeletedException except ) {
                 // Object has been deleted outside this transaction,
