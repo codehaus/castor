@@ -425,7 +425,11 @@ public final class SQLEngine
             // All other dependents are stored independently.
             if ( _extends != null )
                 _extends.store( conn, fields, identity, original, stamp );
-            
+
+            // In some cases update never happends
+            if ( _sqlStore == null )
+                return null;
+
             stmt = ( (Connection) conn ).prepareStatement( original == null ? _sqlStore : _sqlStoreDirty );
             count = 1;
             for ( int i = 0 ; i < _fields.length ; ++i )
@@ -451,7 +455,7 @@ public final class SQLEngine
                 }
             }
             
-            if ( stmt.executeUpdate() == 0 ) {
+            if ( stmt.executeUpdate() <= 0 ) { // SAP DB returns -1
                 // If no update was performed, the object has been previously
                 // removed from persistent storage or has been modified if
                 // dirty checking. Determine which is which.
@@ -607,9 +611,10 @@ public final class SQLEngine
         String               wherePK;
         String               primKeyName;
 
+        primKeyName = ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName();
         query = _factory.getQueryExpression();
-        query.addParameter( clsDesc.getTableName(), ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName(),
-                            QueryExpression.OpEquals );
+        query.addColumn( clsDesc.getTableName(), primKeyName );
+        query.addParameter( clsDesc.getTableName(), primKeyName, QueryExpression.OpEquals );
         _pkLookup = query.getStatement( true );
         wherePK = JDBCSyntax.Where + _factory.quoteName( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() ) +
             QueryExpression.OpEquals + JDBCSyntax.Parameter;
@@ -626,7 +631,6 @@ public final class SQLEngine
         sql = new StringBuffer( "INSERT INTO " );
         sql.append( _factory.quoteName( clsDesc.getTableName() ) ).append( " (" );
         count = 0;
-        primKeyName = ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName();
         if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
             sql.append( _factory.quoteName( primKeyName ) );
             ++count;
@@ -697,21 +701,24 @@ public final class SQLEngine
                 ++count;
             }
         }
-        sql.append( wherePK );
-        _sqlStore = sql.toString();
+        // The table may contain only identity column, in this case UPDATE is never needed
+        if ( count > 0 ) {
+            sql.append( wherePK );
+            _sqlStore = sql.toString();
 
-        for ( int i = 0 ; i < jdoFields.length ; ++i ) {
-            if ( jdoFields[ i ] != null
-         // Don't try to update many-many pseudo-fields
-         && jdoFields[ i ].getManyTable() == null ) {
-                if ( jdoFields[ i ].isDirtyCheck() )
-                    sql.append( " AND " ).append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
+            for ( int i = 0 ; i < jdoFields.length ; ++i ) {
+                if ( jdoFields[ i ] != null
+             // Don't try to update many-many pseudo-fields
+             && jdoFields[ i ].getManyTable() == null ) {
+                    if ( jdoFields[ i ].isDirtyCheck() )
+                        sql.append( " AND " ).append( _factory.quoteName( jdoFields[ i ].getSQLName() ) ).append( "=?" );
+                }
             }
+            _sqlStoreDirty = sql.toString();
+            if ( logInterceptor != null )
+                logInterceptor.storeStatement( "SQL for updating " + clsDesc.getJavaClass().getName() +
+                                               ": " + _sqlStoreDirty );
         }
-        _sqlStoreDirty = sql.toString();
-        if ( logInterceptor != null )
-            logInterceptor.storeStatement( "SQL for updating " + clsDesc.getJavaClass().getName() +
-                                           ": " + _sqlStoreDirty );
     }
 
 
@@ -853,7 +860,10 @@ public final class SQLEngine
                 this.sqlType = ( (JDOFieldDescriptor) fieldDesc ).getSQLType();
             } else {
                 this.dirtyCheck = false;
-                this.sqlType = java.sql.Types.OTHER;
+                if ( this.multi )
+                    this.sqlType = ( (JDOFieldDescriptor) fieldDesc.getClassDescriptor().getIdentity() ).getSQLType();
+                else
+                    this.sqlType = java.sql.Types.OTHER;
             }
         }
 
