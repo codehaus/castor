@@ -56,7 +56,7 @@ import java.util.HashMap;
  */
 public final class TxDatabaseMap {
 
-    private HashMap _txDbMap;
+    private HashMap _txDbMap = new HashMap();
 
     public TxDatabaseMap() {
     }
