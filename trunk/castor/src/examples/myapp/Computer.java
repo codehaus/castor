@@ -36,5 +36,9 @@ public class Computer
         return _timeStamp;
     }
 
+    public String toString()
+    {
+        return "<id: " + getId() + " name: " + getName() + " price: " + getPrice() + " cpu: " + _cpu + ">";
+    }
 
 }

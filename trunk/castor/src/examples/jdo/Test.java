@@ -94,7 +94,7 @@ public class Test
         _jdo = new JDO();
         // _jdo.setLogWriter( writer );
         String jdoConf =  getClass().getResource( JdoConfFile ).toString();
-        _log.debug( "############## loading jdo descriptor: " + jdoConf );
+        _log.debug( "loading jdo descriptor: " + jdoConf );
         _jdo.setConfiguration( getClass().getResource( JdoConfFile ).toString() );
         _jdo.setDatabaseName( "test" );
     }
@@ -357,7 +357,6 @@ public class Test
         db.begin();
         _log.info( "Begin transaction: update extends relation in long transaction " );
 
-
         computerOql.bind( 44 );
         results = computerOql.execute();
 
@@ -383,6 +382,35 @@ public class Test
         db.update( computer );
 
         _log.info( "End transaction: update extends relation in long transaction" );
+        db.commit();
+
+        db.begin();
+        _log.info( "Begin transaction: simple load and update within the same transaction" );
+
+        computerOql.bind( 44 );
+        results = computerOql.execute();
+
+        if ( results.hasMore() )
+        {
+            computer = ( Computer ) results.next();
+            computer.setCpu( "Opteron" );
+        }
+
+        _log.info( "End transaction: simple load and update within the same transaction" );
+        db.commit();
+
+        db.begin();
+        _log.info( "Begin transaction: simple load to test the previous change" );
+
+        computerOql.bind( 44 );
+        results = computerOql.execute();
+
+        if ( results.hasMore() )
+        {
+            _log.info( "Loaded computer:" + ( Computer ) results.next() );
+        }
+
+        _log.info( "End transaction: simple load to test the previous change" );
         db.commit();
 
         Marshaller     marshaller;
