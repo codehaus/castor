@@ -93,7 +93,7 @@ public class CollectionInfoODMG30 extends CollectionInfo {
 
         jsc.add(compType.toString());
         jsc.append("[] mArray = new ");
-        jsc.append(compType.getLocalName());
+        jsc.append(compType.toString());
         jsc.append("[size]");
         //-- if component is an array, we must add [] after setting
         //-- size
