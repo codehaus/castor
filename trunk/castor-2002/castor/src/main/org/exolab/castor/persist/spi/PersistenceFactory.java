@@ -49,7 +49,7 @@ package org.exolab.castor.persist.spi;
 
 import java.io.PrintWriter;
 import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.mapping.ClassDesc;
+import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.mapping.MappingException;
 
 
@@ -75,14 +75,14 @@ public interface PersistenceFactory
      * engine. Return null if no persistence support is available for
      * the specified object type.
      *
-     * @param clsDesc The object descriptor
+     * @param handler The class handler
      * @param logWriter Writer to use for logging errors and tracing
      *  messages (may be null)
      * @return A suiteable persistence implementation, or null
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
+    public Persistence getPersistence( ClassHandler handler, PrintWriter logWriter )
         throws MappingException;
 
 

@@ -55,7 +55,7 @@ import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.RelationContext;
+import org.exolab.castor.persist.FetchContext;
 
 
 /**
@@ -130,7 +130,7 @@ public interface Persistence
      * locked in persistence storage to prevent concurrent updates.
      *
      * @param conn An open connection
-     * @param rtx Context for loading/storing related objects
+     * @param ctx Context for fetching related objects
      * @param obj The object to load into
      * @param identity object's identity
      * @param accessMode The access mode (null equals shared)
@@ -139,7 +139,7 @@ public interface Persistence
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, RelationContext rtx, Object obj, Object identity,
+    public Object load( Object conn, FetchContext ctx, Object obj, Object identity,
                         AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
@@ -187,11 +187,10 @@ public interface Persistence
      * transaction has completed.
      *
      * @param conn An open connection
-     * @param obj The object to delete, may be null
      * @param identity The object's identity
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Object conn, Object obj, Object identity )
+    public void delete( Object conn, Object identity )
         throws PersistenceException;
     
 
@@ -245,13 +244,13 @@ public interface Persistence
      * null may be used and type checking will defer to query
      * execution.
      *
-     * @param rtx Context for loading/storing related objects
+     * @param ctx Context for loading related objects
      * @param query The query statement
      * @param type List of all parameter types, or null
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
-    public PersistenceQuery createQuery( RelationContext rtx, String query, Class[] types )
+    public PersistenceQuery createQuery( FetchContext ctx, String query, Class[] types )
         throws QueryException;
 
 
