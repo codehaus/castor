@@ -214,8 +214,12 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
             String err = "<restrictions> element not yet supported.";
             throw new SAXException(err);
         }
+        else if (name.equals(SchemaNames.ANNOTATION)) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
         else illegalElement(name);
     
+        unmarshaller.setDocumentLocator(getDocumentLocator());
     } //-- startElement
 
     /**
@@ -255,6 +259,10 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _archetype.addGroup(group);
         }
+        else if (name == SchemaNames.ANNOTATION) {
+            Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
+            _archetype.addAnnotation(ann);
+        } 
     
         unmarshaller = null;
     } //-- endElement

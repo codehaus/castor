@@ -203,6 +203,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         else illegalElement(name);
         
         unmarshaller.setResolver(getResolver());
+        unmarshaller.setDocumentLocator(getDocumentLocator());
         
     } //-- startElement
 
