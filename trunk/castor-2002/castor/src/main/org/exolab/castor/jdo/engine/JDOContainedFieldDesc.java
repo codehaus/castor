@@ -56,6 +56,11 @@ import org.exolab.castor.mapping.Types;
 
 
 /**
+ * A contained field descriptor. A contained field is a field in
+ * object X, where object X is contained in object Y. When object Y
+ * is persisted, the contained field is persisted through object Y
+ * directly, by being listed as a field of object Y. Contained fields
+ * are used to flatten out one-one relations.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -73,27 +78,31 @@ public class JDOContainedFieldDesc
 
 
     /**
-     * A field in this object that references the parent object.
-     * Must be set when creating a new object of this type.
+     * Constructs a new contained field for the specified field.
+     *
+     * @param fieldDesc The field descriptor
+     * @param parentField The field in the parent object
+     * @throws MappingException The container object is not constructable
      */
-    protected FieldDesc   _parentRefField;
-
-
-    public JDOContainedFieldDesc( JDOFieldDesc fieldDesc, FieldDesc parentField,
-                                  FieldDesc parentRefField )
+    public JDOContainedFieldDesc( JDOFieldDesc fieldDesc, FieldDesc parentField )
         throws MappingException
     {
         super( fieldDesc );
         if ( parentField == null )
             throw new IllegalArgumentException( "Argument 'parentField' is null" );
         if ( ! Types.isConstructable( parentField.getFieldType() ) )
-            throw new MappingException( "The field type " + parentField.getFieldType().getName() +
-                                        " is not a consturctable class" );
+            throw new MappingException( "mapping.classNotConstructable",
+                                        parentField.getFieldType().getName() );
         _parentField = parentField;
-        _parentRefField = parentRefField;
     }
 
 
+    /**
+     * Returns the field in the parent object which holds the
+     * container object for this field.
+     *
+     * @return The parent field
+     */
     FieldDesc getParentField()
     {
         return _parentField;
@@ -131,8 +140,6 @@ public class JDOContainedFieldDesc
             // If the contained object does not exist, it is
             // created at this point.
             self = Types.newInstance( _parentField.getFieldType() );
-            if ( _parentRefField != null )
-                _parentRefField.setValue( self, obj );
             _parentField.setValue( obj, self );
         }
         super.setValue( self, value );
