@@ -122,6 +122,7 @@
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
+    <case class="jdo.TypeConversion" id="TC20b"/>
     <case class="jdo.MultiPKs" />
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
@@ -167,6 +168,7 @@
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
+    <!-- <case class="jdo.TypeConversion" id="TC20b"/> -->
     <!-- <case class="jdo.Join" /> -->
     <case class="jdo.MultiPKs" />
     <case class="jdo.ManyToMany" />
