@@ -63,9 +63,9 @@ public class TestHarness extends TestSuite {
 
     private String name;
 
-    protected static PrintStream stream;
+    public static PrintStream stream;
 
-    protected static boolean verbose;
+    public static boolean verbose;
 
     public TestHarness( TestHarness suite, String name, String description ) {
         super( name );

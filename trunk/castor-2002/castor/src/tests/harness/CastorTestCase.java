@@ -63,9 +63,9 @@ public class CastorTestCase extends TestCase {
 
     private String name;
 
-    protected static PrintStream stream;
+    public static PrintStream stream;
 
-    protected static boolean verbose;
+    public static boolean verbose;
 
     public CastorTestCase( TestHarness suite, String name, String description ) {
         super( name );
