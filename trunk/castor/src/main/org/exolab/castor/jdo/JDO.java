@@ -201,7 +201,7 @@ public class JDO
     /**
      * The transaction manager
      */
-    private TransactionManager tm = null;
+    private TransactionManager _transactionManager = null;
 
 
     /**
@@ -255,6 +255,7 @@ public class JDO
      * The log writer is a character output stream to which all
      * logging and tracing messages will be printed.
      *
+     * @param logWriter A PrintWriter instance.
      * @deprecated There is no need for this method due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      */
@@ -492,7 +493,7 @@ public class JDO
 
     /**
      * Enable/disable jdo Database pooling. This option only affects
-     * JDO if transactionManager is set and a transaction is associated
+     * JDO if _transactionManager is set and a transaction is associated
      * with the thread that call {@link #getDatabase}. If jdo Database pooling
      * is enabled, JDO will first search in the pool to see if there
      * is already a Database for the current transaction. If found, it
@@ -627,7 +628,7 @@ public class JDO
              *  Try to obtain a <code>javax.jta.TransactionManager>/code> from the factory.
              */
             try {
-                tm = _transactionManagerFactory.getTransactionManager();
+                _transactionManager = _transactionManagerFactory.getTransactionManager();
             } catch (TransactionManagerAcquireException e) {
                 throw new DatabaseNotFoundException( Messages.format( "jdo.transaction.unableToAcquireTransactionManager", 
                     _transactionManagerFactory.getName(),
@@ -637,7 +638,7 @@ public class JDO
         
         /* At this point, we MUST have a valid instance of TransactionManagerFactory, and 
          * dependent on its type (LOCAL or not), we MIGHT have a
-         * valid<code>javax. jta.TransactionManager</code> instance.
+         * valid<code>javax.jta.TransactionManager</code> instance.
          * 
          * Scenario 1: If the user uses Castor in standalone mode (outside of an
          * J2EE container), we have a TransactionManagerFactory instance only,
@@ -645,33 +646,34 @@ public class JDO
          * 
          * Scenario 2: If the user uses Castor in J2EE mode (inside of an J2EE
          * container), and wants the container to control transaction
-         * demarcation, we have both a TransactionManagerFactory and a
-         * TransactionManager instance.
+         * demarcation, we have both a TransactionManagerFactory (different from 
+         * LOCAL) and a TransactionManager instance.
          */
          
-        if ( (_transactionManagerFactory.getName().equals (LocalTransactionManagerFactory.NAME ) ) && 
-             ( tm != null) ) {
-            Transaction        tx;
+        if ((!_transactionManagerFactory.getName().equals (LocalTransactionManagerFactory.NAME )) && 
+            (_transactionManager != null)) {
+            Transaction        transaction;
             DatabaseImpl       dbImpl;
 
             try {
-                tx = tm.getTransaction();
-                if ( _txDbPool != null && _txDbPool.containsTx( tx ) )
-                    return _txDbPool.get( tx );
-
-                if ( tx != null && tx.getStatus() == Status.STATUS_ACTIVE ) {
+                transaction = _transactionManager.getTransaction();
+                if ( _txDbPool != null && _txDbPool.containsTx (transaction))
+                    return _txDbPool.get (transaction);
+                
+                if (transaction != null && transaction.getStatus() == Status.STATUS_ACTIVE) {
                     dbImpl = new DatabaseImpl( _dbName, _lockTimeout, 
-                            _callback, _instanceFactory, tx, _classLoader, _autoStore );
-
-                    if ( _txDbPool != null )
-                        _txDbPool.put( tx, dbImpl );
-
-                    tx.registerSynchronization( dbImpl );
+                            _callback, _instanceFactory, transaction, _classLoader, _autoStore);
+                    
+                    if (_txDbPool != null)
+                        _txDbPool.put( transaction, dbImpl );
+                    
+                    transaction.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
-             } catch ( Exception except ) {
+            } 
+            catch (Exception except) {
                 // NamingException, SystemException, RollbackException
-                if ( _logInterceptor != null )
+                if (_logInterceptor != null)
                     _logInterceptor.exception( except );
             }
         }
