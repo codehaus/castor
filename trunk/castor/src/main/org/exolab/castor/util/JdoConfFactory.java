@@ -118,7 +118,7 @@ public class JdoConfFactory
 	{
 		Database dbConf = createJdoDbConf(db_name, engine);
 
-		dbConf.setDataSource(dsConf);
+		dbConf.getDatabaseChoice().setDataSource(dsConf);
 
 		return dbConf;
 	}
@@ -133,7 +133,7 @@ public class JdoConfFactory
 	{
 		Database dbConf = createJdoDbConf(db_name, engine);
 
-		dbConf.setDriver(driverConf);
+		dbConf.getDatabaseChoice().setDriver(driverConf);
 
 		return dbConf;
 	}
