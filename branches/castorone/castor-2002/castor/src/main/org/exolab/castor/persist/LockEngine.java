@@ -40,6 +40,7 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id: LockEngine.java,
  */
 
 
@@ -62,7 +63,6 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.engine.CacheType;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
@@ -79,13 +79,31 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.persist.ObjectBin;
 import org.exolab.castor.util.Messages;
 
 
 /**
- * Implements the object cache engine sitting between a persistence engine
- * and persistence storage SPI.
+ * LockEngine is a gateway for all the <tt>ClassMolder</tt>s of a persistence 
+ * storage. It mantains dirty checking cache state and lock, and provides a 
+ * thread safe enviroment for <tt>ClassMolder</tt>. LockEngine grantees that 
+ * no two conflict operation will be let run concurrently for the same object. 
+ * <p>
+ * For example, it ensures that exactly one transaction may read (load) exclusively
+ * on one object; transaction can not deleted and object while the other is 
+ * reading it, etc.
+ * <p>
+ * It also provides caching for a persistence storage. Different {@link LRU} mechanisms
+ * can be specified. 
+ * <p>
+ * User should not create more than one instance of LockEngine for each persistent 
+ * storage. So that object can be properly locked and ObjectModifiedException can
+ * be avoided.
+ * <p>
+ * However, if more than one instance of LockEngine or some other external 
+ * application run concurrently, if the {@link Persistence} support dirty checking,
+ * like a fully complaint JDBC Relational Database, proper 
+ * ObjectModificationException will be thrown to ensure data consistency.
+ *
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="yip@intalio.com">Thomas Yip</a>
@@ -102,11 +120,6 @@ public final class LockEngine {
      * but an object can be loaded in one engine and then made
      * persistent in another. The engines are totally independent and
      * no conflicts should occur.
-     *
-     * For efficiency all objects are cached as an array of fields.
-     * Each field holds the cached field value, the identity or a
-     * related object, or a vector holding multiple identities of
-     * related objects.
      *
      * Each class heirarchy gets its own cache, so caches can be
      * controlled on a class-by-class basis.
@@ -154,8 +167,8 @@ public final class LockEngine {
      * @throws MappingException Indicate that one of the mappings is
      *  invalid
      */
-    LockEngine( MappingResolver mapResolver,
-            PersistenceFactory factory, LogInterceptor logInterceptor )
+    LockEngine( MappingResolver mapResolver, PersistenceFactory factory, 
+            LogInterceptor logInterceptor )
             throws MappingException {
 
         try {
@@ -170,6 +183,10 @@ public final class LockEngine {
             Vector waitingForBase = new Vector();
             _typeInfo = new HashMap(); 
             enum = v.elements();
+
+            // iterate thur all the ClassMolders in the LockEngine.
+            // We first create a TypeInfo for all the base class (ie not extends
+            // other class) in the first iteration.
             while ( enum.hasMoreElements() ) {
                 molder = (ClassMolder) enum.nextElement();
                 if ( molder.getExtends() != null ) {
@@ -184,14 +201,15 @@ public final class LockEngine {
                         waitingForBase.add( molder );
                     }
                 } else {
-                    // | other cache type cause problem. have to disable it for now
-                    LRU lru = LRU.create( molder.getCacheType()/*LRU.CACHE_NONE*/, molder.getCacheParam() );
+                    LRU lru = LRU.create( molder.getCacheType(), molder.getCacheParam() );
 
                     info = new TypeInfo( molder, new HashMap(), lru ); 
 
                     _typeInfo.put( molder.getJavaClass(), info );
                 }
             }
+            // we then iterate thur all extended classes in which the 
+            // using the base typeInfo.
             enum = waitingForBase.elements();
             while ( enum.hasMoreElements() ) {
                 molder = (ClassMolder) enum.nextElement();
@@ -216,6 +234,11 @@ public final class LockEngine {
         }
     }
 
+    /**
+     * Get classMolder which represent the given java data object class
+     * Dependent class will not be returned to avoid persistenting 
+     * a dependent class without 
+     */
     public ClassMolder getClassMolder( Class cls ) {
         TypeInfo info = (TypeInfo)_typeInfo.get( cls );
         if ( info != null ) {
@@ -265,7 +288,6 @@ public final class LockEngine {
         OID        lockedOid;
         ObjectLock lock;
         TypeInfo   typeInfo;
-        ObjectBin  result;
         Object[]   fields;
         Class      type;
         boolean    write;
@@ -310,22 +332,8 @@ public final class LockEngine {
             if ( _logInterceptor != null )
                 _logInterceptor.loading( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
         } catch ( ObjectDeletedWaitingForLockException except ) {
-            // This is equivalent to object not existing
+            // This is equivalent to object does not exist
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, OID.flatten(oid.getIdentities())) );
-        /*
-        } catch ( ObjectNotFoundException except ) {
-            // Object was not found in persistent storge, must dump
-            // it from the cache
-            //except.printStackTrace();
-            //typeInfo.delete( oid, tx );
-            throw except;
-        } catch ( LockNotGrantedException except ) {
-            throw except;
-        } catch ( PersistenceException except ) {
-            // Report any error talking to the persistence engine
-            //typeInfo.locks.destory( oid, tx );
-            throw except;
-        } */
         } finally {
             if ( lock != null ) lock.confirm( tx, succeed );
         }
@@ -333,88 +341,8 @@ public final class LockEngine {
     }
 
     /**
-     * Loads an object of the specified type and identity from the
-     * query results. In exclusive mode the object is always loaded
-     * and a write lock is obtained on the object, preventing
-     * concurrent updates. In non-exclusive mode the object is either
-     * loaded or obtained from the cache with a read lock. The object's
-     * OID is always returned, this OID must be used in subsequent
-     * operations on the object. Must call {@link #copyObject} to obtain
-     * the object.
-     *
-     * @param tx The transaction context
-     * @param query The query persistence engine
-     * @param identity The identity of the object to load
-     * @param accessMode The desired access mode
-     * @param timeout The timeout waiting to acquire a lock on the
-     *  object (specified in seconds)
-     * @return The object's OID
-     * @throws ObjectNotFoundException The object was not found in
-     *  persistent storage
-     * @throws LockNotGrantedException Timeout or deadlock occured
-     *  attempting to acquire lock on object
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public ObjectBin fetch( TransactionContext tx, PersistenceQuery query, Object[] identities,
-                      AccessMode accessMode, int timeout )
-            throws ObjectNotFoundException, LockNotGrantedException,
-            PersistenceException {
-
-        throw new RuntimeException("Please use load instead. Please report to castor-dev@exolab.org if you see this error message");
-        /*
-        ObjectBin   result;
-        OID        oid;
-        ObjectLock lock;
-        TypeInfo   typeInfo;
-        boolean    writeLock;
-
-        typeInfo = (TypeInfo) _typeInfo.get( query.getResultType() );
-
-        // XXX Problem, obj might be parent class but attempting
-        //     to load derived class, will still return parent class
-        //     Need to solve by swapping to a new object
-
-            // In db-lock mode we always synchronize the object with
-            // the database and obtain a lock on the object.
-        oid = new OID( this, typeInfo.molder, identities);
-        try {
-            boolean write = (accessMode==AccessMode.DbLocked || accessMode==AccessMode.Exclusive);
-            oid = typeInfo.locks.acquire( oid, tx, write, timeout, null );
-
-            if ( _logInterceptor != null )
-                _logInterceptor.loading( typeInfo.javaClass, OID.flatten( identities ) );
-
-            //result = query.fetch( tx, oid, accessMode, query );
-            result = null;
-            if ( accessMode == AccessMode.DbLocked )
-                oid.setDbLock( true );
-        } catch ( ObjectDeletedWaitingForLockException except ) {
-            // This is equivalent to object not existing
-            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", query.getResultType(), OID.flatten(identities)) );
-        //} catch ( ObjectNotFoundException except ) {
-            // Object was not found in persistent storge, must dump
-            // it from the cache
-        //    typeInfo.locks.destory( oid, tx );
-        //    throw except;
-        } catch ( PersistenceException except ) {
-            // Report any error talking to the persistence engine
-            typeInfo.locks.destory( oid, tx );
-            throw except;
-        }
-        // At this point the object is known to exist in
-        // persistence storage and we have a write lock on it.
-        //return oid;
-        return result;
-            // Non-exclusive mode, we do not attempt to touch the database
-            // at this point, simply return the object's oid.
-        */
-    }
-
-
-    /**
-     * Creates a new object in this engine. The object must not be
-     * persistent and must have a unique identity within this engine.
+     * Creates a new object in the persistence storage. The object must not 
+     * be persistent and must have a unique identity within this engine.
      * If the identity is specified the object is created in
      * persistent storage immediately with the identity. If the
      * identity is not specified, the object is created only when the
@@ -510,8 +438,6 @@ public final class LockEngine {
 
                 newoid = new OID( oid.getLockEngine(), oid.getMolder(), oid.getDepends(), newids );
 
-                //lock.setOID( newoid );
-                
                 typeInfo.rename( oid, newoid, tx );
 
                 return newoid;
@@ -551,8 +477,6 @@ public final class LockEngine {
         TypeInfo   typeInfo;
         Object[]   fields;
 
-        System.out.println("deleting "+oid+" by tx "+tx);
-
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 
         try {
@@ -572,8 +496,6 @@ public final class LockEngine {
     public void markDelete( TransactionContext tx, OID oid, Object object, int timeout )
             throws PersistenceException, LockNotGrantedException {
 
-        //(new Exception("stack trace "+"mark Delete "+oid+" by tx "+tx)).printStackTrace();
-        //System.out.println("mark Delete "+oid+" by tx "+tx);
         ObjectLock lock;
         TypeInfo   typeInfo;
         Object[]   fields;
@@ -629,12 +551,6 @@ public final class LockEngine {
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", oid.getJavaClass().getName() ) );
 
-        //ClassMolder molder = typeInfo.molder;
-        //PersistenceException pexcept = null;
-        //Object[] cache = null;
-
-        //identities = typeInfo.molder.getIdentities( object );
-        //oid = new OID( this, typeInfo.molder, identities );
         write = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
         succeed = false;
         lock = null;
@@ -871,7 +787,6 @@ public final class LockEngine {
         TypeInfo   typeInfo;
         ObjectLock lock;
 
-        System.out.println("revertObject");
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         try {
             lock = typeInfo.assure( oid, tx, false );
@@ -1052,7 +967,6 @@ public final class LockEngine {
                 int timeout ) throws ObjectDeletedWaitingForLockException, 
                 LockNotGrantedException, ObjectDeletedException {
 
-            //System.out.println("LockEngine.acquire");
             ObjectLock entry = null;
             boolean newentry = false;
             boolean failed = true;
@@ -1083,23 +997,21 @@ public final class LockEngine {
             try {
                 switch ( lockAction ) {
                 case ObjectLock.ACTION_READ:
-                    //(new Exception("acquire write lock on: "+entry)).printStackTrace();
-                    //System.out.println("acquire read lock: "+entry+" tx: "+tx);
                     entry.acquireLoadLock( tx, false, timeout );
                     break;
+
                 case ObjectLock.ACTION_WRITE:
-                    //(new Exception("acquire write lock on:"+entry)).printStackTrace();
-                    //System.out.println("acquire write lock: "+entry+" tx: "+tx);
                     entry.acquireLoadLock( tx, true, timeout );
                     break;
+
                 case ObjectLock.ACTION_CREATE:
-                    //System.out.println("acquire create lock: "+entry+" tx: "+tx);
                     entry.acquireCreateLock( tx );
                     break;
+
                 case ObjectLock.ACTION_UPDATE:
-                    //System.out.println("acquire update lock: "+entry+" tx: "+tx);
                     entry.acquireUpdateLock( tx, timeout );
                     break;
+
                 default:
                     throw new IllegalArgumentException( "lockType "+lockAction+" is undefined!"); 
                 }
@@ -1120,7 +1032,6 @@ public final class LockEngine {
                         // we ensure here that the entry which should be move 
                         // to "cache" from "locks" is actually moved.
                         if ( entry.isDisposable() ) {
-                            System.out.println("Lock "+toString()+" is disposed in acquire!");
                             locks.remove( oid );
                             cache.put( oid, entry );
                         }
@@ -1129,28 +1040,21 @@ public final class LockEngine {
             }
         }
 
-        /** 
-         * Reaasure the lock which have been successfully acquired by the 
-         * transaction.
-         *
+        /**
+         * Upgrade the lock to write lock.
+
          * @param  oid  the OID of the lock
          * @param  tx   the transaction in action
-         * @param  write  true if we want to upgrade or reassure a write lock
-         *                false for read lock
          * @param  timeout  time limit
-         *
          */
         private ObjectLock upgrade( OID oid, TransactionContext tx, int timeout ) 
                 throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
 
             ObjectLock entry = null;
-            //System.out.print("upgrade tx: "+tx);
             synchronized ( this ) {
                 entry = (ObjectLock) locks.get( oid );
                 if ( entry == null ) 
                     throw new ObjectDeletedWaitingForLockException("Lock entry not found. Deleted?");
-                    //throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
-                System.out.println(" lock "+entry);
                 if ( !entry.hasLock( tx, false ) )
                     throw new IllegalStateException("Transaction does not hold the any lock on "+oid+"!");    
                 oid = entry.getOID();
@@ -1166,18 +1070,25 @@ public final class LockEngine {
             }
         }
 
+        /** 
+         * Reaasure the lock which have been successfully acquired by the 
+         * transaction.
+         *
+         * @param  oid  the OID of the lock
+         * @param  tx   the transaction in action
+         * @param  write  true if we want to upgrade or reassure a write lock
+         *                false for read lock
+         * @param  timeout  time limit
+         *
+         */
         private synchronized ObjectLock assure( OID oid, TransactionContext tx, boolean write ) 
                 throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
 
-            //System.out.print("assure "+(write?"write":"read") +" tx: "+tx);
             ObjectLock entry = (ObjectLock) locks.get( oid );
             if ( entry == null ) 
                 throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
-            //System.out.println(" lock: "+entry);
             if ( !entry.hasLock( tx, write ) )
                 throw new IllegalStateException("Transaction "+tx+" does not hold the "+(write?"write":"read")+" lock: "+entry+"!");
-
-            //System.out.println(" entry: "+entry);
             return entry;
         }
 
@@ -1221,8 +1132,6 @@ public final class LockEngine {
             newoid.setStamp( orgoid.getStamp() );
 
             return newentry;
-            // do we bother making sure cache does not has entry for orgoid
-            // or newoid??
         }
 
         /**
@@ -1251,39 +1160,11 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
-                        System.out.println("Lock "+toString()+" is disposed in TypeInfo.delete!");
                         locks.remove( oid );
                     }
                 }
             }
         }
-
-
-        /**
-         * Invalidate the object lock. It's called after if 
-         * ObjectModifiedException is detected
-         * 
-         *
-         * @param oid is the OID of the ObjectLock
-         * @param tx is the transactionContext of transaction in action
-         *
-         */
-         /*
-        private ObjectLock invalidate( OID oid, TransactionContext tx ) {
-
-            ObjectLock entry;
-            synchronized( this ) {
-                entry = (ObjectLock) locks.get( oid );
-
-                if ( entry == null )
-                    throw new IllegalStateException("No lock to destory!");
-                entry.enter();
-            }
-
-            entry.invalidate(tx);
-            return entry;
-        }*/
-
 
         /**
          * Release the object lock. It's called after the object is 
@@ -1313,7 +1194,6 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
-                        System.out.println("Lock "+toString()+" is disposed in TypeInfo.release!");
                         cache.put( oid, entry );
                         locks.remove( oid );
                     }
