@@ -1,6 +1,7 @@
 
 Version (CVS)
 -------------
+XML:	Numerous bug fixes in Schema Object Model and Validation code (Arnaud)
 
 XML:    Added support for the extremely powerful 'handler' attribute on
         the field element for the mapping (kvisco - 20011205)
