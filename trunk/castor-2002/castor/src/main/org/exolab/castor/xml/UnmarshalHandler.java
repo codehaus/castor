@@ -283,20 +283,25 @@ public class UnmarshalHandler implements DocumentHandler {
                 str = state.buffer.toString();
                 state.buffer.setLength(0);
             }
-            else str = EMPTY_STRING;
             
             if (type == String.class)
                 state.object = str;
             //-- special handling for byte[]
             else if (byteArray) {
-                //-- Base64 decoding
-                char[] chars = str.toCharArray();
-                MimeBase64Decoder decoder = new MimeBase64Decoder();
-                decoder.translate(chars, 0, chars.length);
-                state.object = decoder.getByteArray();
+                if (str == null)
+                    state.object = new byte[0];
+                else {
+                    //-- Base64 decoding
+                    char[] chars = str.toCharArray();
+                    MimeBase64Decoder decoder = new MimeBase64Decoder();
+                    decoder.translate(chars, 0, chars.length);
+                    state.object = decoder.getByteArray();
+                }
             }
-            else
-                state.object = MarshalHelper.toPrimitiveObject(type,str);
+            else {
+                if (str == null) state.object = null;
+                else state.object = MarshalHelper.toPrimitiveObject(type,str);
+            }
         }
                
         //-- check for character content
