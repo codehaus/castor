@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1727.
+       Added DB2-specifc support for the OQL LIMIT clause.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1727
+       (Werner - 20040909)
+
 JDO:   Fixed bug 1720.
        In the case a RDBMS does not support the LIMIT/OFFSET clauses, a
        SyntaxNotSupportedException is thrown.
