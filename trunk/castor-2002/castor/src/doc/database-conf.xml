@@ -31,11 +31,14 @@
            <tr><td>instantdb</td><td>InstantDB</td></tr>
            <tr><td>interbase</td><td>Interbase</td></tr>
            <tr><td>mysql</td><td>MySQL</td></tr>
+           <tr><td>sapdb</td><td>SAP DB</td></tr>
          </table></p>
-      <p><small>Note: Castor do not work with JDBC-ODBC bridge from Sun,
-                therefore MS Access is not supported.
-                Old versions of MySQL don't work with Castor 
-                for lack of transaction support.</small></p>
+      <p><small>Don't use PostgreSQL with Castor! For now PostgreSQL doesn't support outer joins,
+                so in many cases Castor OQL queries return incorrect results.
+                </small></p>
+      <p><small>Note: Castor doesn't work with JDBC-ODBC bridge from Sun.
+                In particular, MS Access is not supported.
+                </small></p>
 
       <p>The means to acquire a database connection is specified in one of three
          ways: as a JDBC 2.0 driver URL, as a JDBC 2.0 DataSource, or as a DataSource
