@@ -91,10 +91,6 @@
         <display>Using JDO</display>
       </navLink>
       <navLink>
-        <url>examples.xml</url>
-        <display>The Examples</display>
-      </navLink>
-      <navLink>
         <url>castor-one.xml</url>
         <display>New features</display>
       </navLink>
@@ -144,6 +140,10 @@
     </section>
 
 	<section name="More">
+      <navLink>
+        <url>examples.xml</url>
+        <display>The Examples</display>
+      </navLink>
       <navLink>
         <url>conf-lib.xml</url>
         <display>Configuration</display>
