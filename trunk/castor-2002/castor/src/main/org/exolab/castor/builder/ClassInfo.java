@@ -233,8 +233,8 @@ public class ClassInfo extends XMLInfo {
      */
     public FieldInfo getElementField(String nodeName) {
 
-        for (int i = 0; i < _atts.size(); i++) {
-            FieldInfo temp = (FieldInfo)_atts.get(i);
+        for (int i = 0; i < _elements.size(); i++) {
+            FieldInfo temp = (FieldInfo)_elements.get(i);
             if (temp.getNodeName().equals(nodeName))
                  return temp;
         }
