@@ -39,8 +39,16 @@
 
     <!-- Product has reference to ProductInventory
          one inventory per product  -->
+<!--
     <field name="inventory" type="myapp.ProductInventory"/>
+ -->
 
+    <!-- Product has reference to ProductDetail
+         many details per product  -->
+<!--
+    <field name="detail" type="myapp.ProductDetail"
+           collection="vector"/>
+ -->
   </class>
 
 
@@ -65,6 +73,30 @@
       <sql-info name="cpu"/>
     </field>
   </class>
+
+
+  <!--  Mapping for Product Detail -->
+<!--
+  <class class-name="myapp.ProductDetail">
+    <sql-table table-name="prod_detail"/>
+    <description>Product detail</description>
+    <identity field-ref="id"/>
+    <container name="id" type="myapp.ProductDetailPK">
+      <field name="product" type="myapp.Product">
+        <sql-info name="prod_id"/>
+      </field>
+      <field name="detail"T>
+        <sql-info name="detail_id"/>
+      </field>
+    </container>
+    <field name="name">
+      <sql-info name="name"/>
+    </field>
+    <field name="available">
+      <sql-info name="available" type="char"/>
+    </field>
+  </class>
+-->
 
 </mapping>
 

@@ -79,9 +79,10 @@ public class Test
         OQLQuery      computerOql;
         Enumeration   enum;
         Transaction   tx;
-        
+
         // Must be associated with an open transaction in order to
         // use the ODMG database
+
         tx = odmg.newTransaction();
         tx.begin();
         logger.println( "Begin transaction" );
@@ -187,8 +188,10 @@ public class Test
         
         logger.println( "Commit transaction" );
         tx.commit();
-        
+
+        tx = odmg.newTransaction();
         tx.begin();
+        productOql = odmg.newOQLQuery();
         productOql.create( "SELECT p FROM myapp.Product p" );
         Object result;
 

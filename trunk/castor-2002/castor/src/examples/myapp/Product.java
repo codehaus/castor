@@ -25,6 +25,9 @@ public class Product
     public ProductInventory inventory;
 
 
+    public ProductDetail    detail;
+
+
     public String toString()
     {
         return ( Integer.toString( id ) ) + " " +
