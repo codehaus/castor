@@ -227,7 +227,7 @@ public class StringValidator extends PatternValidator
     {
 
        if (value == null) {
-            if (required) {
+            if (required && (!isNillable())) {
                 String err = "this is a required field and cannot be null.";
                 throw new ValidationException(err);
             }

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -46,14 +46,13 @@
 package org.exolab.castor.xml.validators;
  
 import org.exolab.castor.xml.*;
-import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.RegExpEvaluator;
  
 /**
  * A simple abstract class used for validating types
  * which allow the pattern facet
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public abstract class PatternValidator {
@@ -61,7 +60,8 @@ public abstract class PatternValidator {
     /**
      * The regular expression
      */
-    private String _pattern = null;
+    private String  _pattern  = null;
+    private boolean _nillable = false;
     
     /**
      * An instance of the regular expression evaluator
@@ -99,6 +99,17 @@ public abstract class PatternValidator {
         return _pattern;
     } //-- getPattern
     
+    
+    /**
+     * Returns whether or not objects validated by this
+     * Validator are nillable (are allowed to be null).
+     * 
+     * @return true if null is a valid value
+     */
+    public boolean isNillable() {
+    	return _nillable;
+    } //-- isNillable
+    
     /**
      * Returns true if a regular expression has been set
      * for this PatternValidator
@@ -109,6 +120,17 @@ public abstract class PatternValidator {
     public boolean hasPattern() {
         return (_pattern != null);
     } //-- hasPattern
+    
+    /**
+     * Sets whether or not objects validated by this
+     * Validator are allowed to be null (nillable).
+     * 
+     * @param nillable a boolean that when true indicates
+     * null values pass validation
+     */
+    public void setNillable(boolean nillable) {
+    	_nillable = nillable;
+    } //-- setNillable
     
     /**
      * Sets the regular expression to validate against
@@ -151,8 +173,11 @@ public abstract class PatternValidator {
         throws ValidationException 
     {
         if (object == null) {
-            String err = "PatternValidator cannot validate a null object.";
-            throw new ValidationException(err);
+            if (!_nillable) {
+                String err = "PatternValidator cannot validate a null object.";
+                throw new ValidationException(err);
+            }
+            return;
         }
         validate(object.toString(), context);
     } //-- validate
