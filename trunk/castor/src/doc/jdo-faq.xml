@@ -233,7 +233,7 @@ db.commit()
         <code><![CDATA[
         <database name="..." engine="oracle" >
             <driver class-name="oracle.jdbc.driver.OracleDriver"
-                    url="jdbc:oracle:thin:@localhost:1521:TEST" >
+                    URL="jdbc:oracle:thin:@localhost:1521:TEST" >
                 <param name="user" value="SYSTEM"/>
                 <param name="password" value="manager"/>
             </driver>
@@ -244,7 +244,7 @@ db.commit()
         <code><![CDATA[
         <database name="..." engine="oracle" >
             <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
-                <params url="jdbc:oracle:thin:@localhost:1521:TEST"
+                <params URL="jdbc:oracle:thin:@localhost:1521:TEST"
                         user="scott" 
                         password="tiger"
                 />

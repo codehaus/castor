@@ -160,7 +160,7 @@
 <code-panel>        
 <code><![CDATA[
    <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
-      <params url="jdbc:oracle:thin:@localhost:1521:TEST"
+      <params URL="jdbc:oracle:thin:@localhost:1521:TEST"
               user="scott" 
               password="tiger"
       />
