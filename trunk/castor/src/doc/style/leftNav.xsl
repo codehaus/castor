@@ -29,8 +29,20 @@
             </xsl:variable>
             <tr>
               <td valign="top" align="left">
-		&#160;&#160;
-                <a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a>
+        &#160;&#160;
+                <xsl:choose>
+                  <xsl:when test="image">
+                    <xsl:variable name="img">
+                      <xsl:call-template name="image-grabber">
+                        <xsl:with-param name="image" select="image"/>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <a href="{$url}"><span class="subMenuOff"><img src="{image}" border="0" /></span></a>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a>
+                  </xsl:otherwise>
+                </xsl:choose>
               </td>
             </tr>
           </xsl:for-each>

@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document url="http://castor.exolab.org/origins.xml">
-  <body>
+  <properties>
     <title>About The Origins Of The Name</title>
+    <abstract>
+       Describes how the project name came about.
+    </abstract>
+    <status>Final</status>
+  </properties>
+  <body>
     <header>
-      <p><i>Why did you decide to call it Castor?</i></p>
+    </header>
+    
+    <section title="The Origin of the Name">
+
+      <section title="Why did you decide to call it Castor?">
 
       <p>First, let me say you are not the first to ask this question, and you won't be the last.
          For many, the term "Castor" has a mysterious aura which leaves the user with a craving,
@@ -47,7 +57,9 @@
          scientific name for a simple little Beaver. This raises a more interesting question.
       </p>
 
-      <p><i>Why did you name your software after a beaver?</i></p>
+      </section>
+
+      <section title="Why did you name your software after a beaver?">
 
       <p>
          Let me first state that we have absolutely nothing to do with MIT. We certainly
@@ -81,6 +93,9 @@
          understanding, and feel free to come up with your own speculations.</p>
 
       <p>--Keith</p>
-    </header>
+
+      </section>
+
+    </section>
   </body>
 </document>
