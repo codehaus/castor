@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+ALL:   Fixed bug 1585 adding separate build folders for src/tests and src/examples
+       to the Eclipse project files
+       (Werner - 20040330)
+
 JDO:   Fixed bug 1573 using contribution from Stein M. Hugubakken [dulci@start.no]
        This improves code quality for the complete jdo package (except conf.*)
        by removing unused import statements and local variables.
