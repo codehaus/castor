@@ -53,7 +53,7 @@ import java.util.Enumeration;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.mapping.IntegrityException;
+import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -480,35 +480,6 @@ final class CacheEngine
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( obj.getClass() );
 
-        // Create all the dependent objects first. Must perform that
-        // operation on all descendent classes.
-        RelationHandler[] relations;
-        ClassHandler      handler;
-
-        handler = typeInfo.handler;
-        while ( handler != null ) {
-            relations = handler.getRelations();
-            for ( int i = 0 ; i < relations.length ; ++i ) {
-                if ( relations[ i ].isMulti() ) {
-                    Object[] related;
-
-                    related = relations[ i ].getRelateds( obj );
-                    if ( related != null ) {
-                        for ( int j = 0 ; j < related.length ; ++j )
-                            if ( ! tx.isPersistent( related[ j ] ) )
-                                tx.create( this, related[ j ], relations[ i ].getIdentity( related[ j ] ) );
-                    }
-                } else {
-                    Object related;
-                
-                    related = relations[ i ].getRelated( obj );
-                    if ( related != null && ! tx.isPersistent( related ) )
-                        tx.create( this, related, relations[ i ].getIdentity( related ) );
-                }
-            }
-            handler = handler.getExtends();
-        }
-
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
@@ -539,8 +510,8 @@ final class CacheEngine
             // are null, and then place it in the cache. Create it in persistent
             // store if the identity was known.
             try {
-                typeInfo.handler.checkIntegrity( obj );
-            } catch ( IntegrityException except ) {
+                typeInfo.handler.checkValidity( obj );
+            } catch ( ValidityException except ) {
                 throw new PersistenceException( except );
             }
             fields = new Object[ typeInfo.fieldCount ];
@@ -614,49 +585,44 @@ final class CacheEngine
         // Delete all the related objects as well. Detached objects are not
         // deleted when the primary object is deleted, but attached objects
         // are. These objects exist in persistent storage, but not in the cache.
-        ClassHandler      handler;
         RelationHandler[] relations;
 
-        handler = typeInfo.handler;
-        while ( handler != null ) {
-            /*
-            relations = handler.getRelations();
-            for ( int i = 0 ; i < relations.length ; ++i ) {
-                if ( relations[ i ].isMulti() ) {
-                    Object[] related;
-                    TypeInfo relTypeInfo;
-                    Object   relIdentity;
-                    
-                    related = relations[ i ].getRelateds( obj );
-                    if ( related != null ) {
-                        relTypeInfo = (TypeInfo) _typeInfo.get( relations[ i ].getRelatedClass() );
-                        for ( int j = 0 ; j < related.length ; ++j ) {
-                            relIdentity = relations[ i ].getIdentity( related[ j ] );
-                            if ( _logWriter != null )
-                                _logWriter.println( "PE: Deleting " + relations[ j ].getRelatedClass().getName() +
-                                                    " (" + relIdentity + ")" );
-                            relTypeInfo.persist.delete( tx.getConnection( this ), relIdentity );
-                        }
-                    }
-                } else {
-                    Object   related;
-                    TypeInfo relTypeInfo;
-                    Object   relIdentity;
-                    
-                    related = relations[ i ].getRelated( obj );
-                    if ( related != null ) {
-                        relTypeInfo = (TypeInfo) _typeInfo.get( relations[ i ].getRelatedClass() );
-                        relIdentity = relations[ i ].getIdentity( related );
-                        if ( _logWriter != null )
-                            _logWriter.println( "PE: Deleting " + relations[ i ].getRelatedClass().getName() +
-                                                " (" + relIdentity + ")" );
-                        relTypeInfo.persist.delete( tx.getConnection( this ), relIdentity );
-                    }
-                }
-            }
-            */
-            handler = handler.getExtends();
-        }
+        /*
+          relations = handler.getRelations();
+          for ( int i = 0 ; i < relations.length ; ++i ) {
+          if ( relations[ i ].isMulti() ) {
+          Object[] related;
+          TypeInfo relTypeInfo;
+          Object   relIdentity;
+          
+          related = relations[ i ].getRelateds( obj );
+          if ( related != null ) {
+          relTypeInfo = (TypeInfo) _typeInfo.get( relations[ i ].getRelatedClass() );
+          for ( int j = 0 ; j < related.length ; ++j ) {
+          relIdentity = relations[ i ].getIdentity( related[ j ] );
+          if ( _logWriter != null )
+          _logWriter.println( "PE: Deleting " + relations[ j ].getRelatedClass().getName() +
+          " (" + relIdentity + ")" );
+          relTypeInfo.persist.delete( tx.getConnection( this ), relIdentity );
+          }
+          }
+          } else {
+          Object   related;
+          TypeInfo relTypeInfo;
+          Object   relIdentity;
+          
+          related = relations[ i ].getRelated( obj );
+          if ( related != null ) {
+          relTypeInfo = (TypeInfo) _typeInfo.get( relations[ i ].getRelatedClass() );
+          relIdentity = relations[ i ].getIdentity( related );
+          if ( _logWriter != null )
+          _logWriter.println( "PE: Deleting " + relations[ i ].getRelatedClass().getName() +
+          " (" + relIdentity + ")" );
+          relTypeInfo.persist.delete( tx.getConnection( this ), relIdentity );
+          }
+          }
+          }
+        */
 
         if ( _logWriter != null )
             _logWriter.println( "PE: Deleting " + typeInfo.javaClass.getName() + " ("
@@ -719,7 +685,38 @@ final class CacheEngine
         original = (Object[]) lock.acquire( tx, true, timeout );
         // Get the real OID with the exclusive and stamp info.
         oid = typeInfo.cache.getOID( original );
-        
+
+        // Store/create/delete all the dependent objects first. Must perform that
+        // operation on all descendent classes.
+        RelationHandler[] relations;
+
+        relations = typeInfo.handler.getRelations();
+        for ( int i = 0 ; i < relations.length ; ++i ) {
+            if ( relations[ i ] != null ) {
+                if ( relations[ i ].isMulti() ) {
+                    Object[] related;
+                    
+                    related = relations[ i ].getRelateds( obj );
+                    if ( related != null ) {
+                        for ( int j = 0 ; j < related.length ; ++j )
+                            if ( ! tx.isPersistent( related[ j ] ) )
+                                tx.create( this, related[ j ], relations[ i ].getIdentity( related[ j ] ) );
+                    }
+                } else {
+                    Object related;
+                    
+                    related = relations[ i ].getRelated( obj );
+                    if ( related == null ) {
+                        if ( original[ i ] != null )
+                                // Potential delete original
+                            ;
+                    } else if ( ! tx.isPersistent( related ) ) {
+                        tx.create( this, related, relations[ i ].getIdentity( related ) );
+                    }
+                }
+            }
+        }
+
         // If the object has a identity, it was retrieved/created before and
         // need only be stored. If the object has no identity, the object must
         // be created at this point.
@@ -741,8 +738,8 @@ final class CacheEngine
             if ( sameIdentity || ! typeInfo.handler.isModified( obj, original ) )
                 return oid;
             try {
-                typeInfo.handler.checkIntegrity( obj );
-            } catch ( IntegrityException except ) {
+                typeInfo.handler.checkValidity( obj );
+            } catch ( ValidityException except ) {
                 throw new PersistenceException( except );
             }
             
@@ -1014,10 +1011,10 @@ final class CacheEngine
                     // it exists. We need the extends in order to share cache between objects
                     // in the same heirarchy.
                     if ( handler.getExtends() != null ) {
-                        ClassHandler extend;
-                        TypeInfo     typeInfo;
+                        ClassDescriptor extend;
+                        TypeInfo        typeInfo;
                         
-                        extend = handler.getExtends();
+                        extend = handler.getDescriptor();
                         while ( extend.getExtends() != null )
                             extend = extend.getExtends();
                         typeInfo = (TypeInfo) _typeInfo.get( extend.getJavaClass() );
