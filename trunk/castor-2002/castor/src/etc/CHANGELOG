@@ -1,6 +1,9 @@
 
 Version (CVS)
 -------------
+XML:	Added the support for the facets min/max Ex/Inclusive for the date/time types
+        and added complete implementation of date/time W3C XML Schema datatypes (Arnaud).
+
 XML:	Added new supports for XML Schema Recommendation datatypes and remove old references to
         the Candidate Recommendation document (Arnaud).
 
