@@ -44,8 +44,8 @@ grant all on test_group to test;
 drop table   test_types;
 create table test_types (
   id       numeric(10,0)  not null,
-  tdt      datetime       not null,
-  ttm      time           not null,
+  tdt      date           not null,
+  ttm      date           not null,
   int_val  integer        null,
   char_val char(1)        null,
   bool_val char(1)        null

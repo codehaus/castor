@@ -52,6 +52,7 @@ import java.util.Enumeration;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
@@ -106,7 +107,7 @@ public class KeyGenGeneric
 
         try {
             db = _category.getDatabase( stream.verbose() );
-            TestAllKeyGens( stream, db );
+            result = TestAllKeyGens( stream, db );
             db.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
@@ -116,11 +117,11 @@ public class KeyGenGeneric
         return result;
     }
 
-    protected void TestAllKeyGens( CWVerboseStream stream, Database db) 
+    protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 
             throws Exception
     {
-        TestOneKeyGen( stream, db, TestMaxObject.class, TestMaxExtends.class );
-        TestOneKeyGen( stream, db, TestHighLowObject.class, TestHighLowExtends.class );
+        return TestOneKeyGen( stream, db, TestMaxObject.class, TestMaxExtends.class )
+                && TestOneKeyGen( stream, db, TestHighLowObject.class, TestHighLowExtends.class );
     }
 
 
@@ -130,15 +131,18 @@ public class KeyGenGeneric
      * For each key generator we have a pair of classes: TestXXXObject and
      * TestXXXExtends which use key generator XXX.
      */
-    protected void TestOneKeyGen( CWVerboseStream stream, Database db,
+    protected boolean TestOneKeyGen( CWVerboseStream stream, Database db,
                                   Class objClass, Class extClass )
             throws Exception
     {
-        OQLQueryImpl        oql;
+        OQLQuery            oql;
         TestKeyGenObject    object;
         TestKeyGenObject    ext;
-        Enumeration         enum;
+        QueryResults        enum;
+        boolean             result;
         
+        result = true;
+
         // Open transaction in order to perform JDO operations
         db.begin();
         
@@ -160,37 +164,41 @@ public class KeyGenGeneric
 
         // Find the first object and remove it 
         //object = (TestKeyGenObject) db.load( objClass, object.getId() );
-        oql = (OQLQueryImpl) db.getOQLQuery();
+        oql = db.getOQLQuery();
         oql.create( "SELECT object FROM " + objClass.getName() +
                        " object WHERE id = $1" );
         oql.bind( object.getId() );
         enum = oql.execute();
         stream.writeVerbose( "Removing first object: " + object );
-        if ( enum.hasMoreElements() ) {
-            object = (TestKeyGenObject) enum.nextElement();
+        if ( enum.hasMore() ) {
+            object = (TestKeyGenObject) enum.next();
             db.remove( object );
-            stream.writeVerbose( "Removed" );
+            stream.writeVerbose( "OK: Removed" );
         } else {
-            stream.writeVerbose( "Not found" );
+            stream.writeVerbose( "Error: Not found" );
+            result = false;
         }
 
         // Find the second object and remove it
         //ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
-        oql = (OQLQueryImpl) db.getOQLQuery();
+        oql = db.getOQLQuery();
         oql.create( "SELECT ext FROM " + extClass.getName() +
                        " ext WHERE id = $1" );
         oql.bind( ext.getId() );
         enum = oql.execute();
         stream.writeVerbose( "Removing second object: " + ext );
-        if ( enum.hasMoreElements() ) {
-            ext = (TestKeyGenObject) enum.nextElement();
+        if ( enum.hasMore() ) {
+            ext = (TestKeyGenObject) enum.next();
             db.remove( ext );
-            stream.writeVerbose( "Removed" );
+            stream.writeVerbose( "OK: Removed" );
         } else {
-            stream.writeVerbose( "Not found" );
+            stream.writeVerbose( "Error: Not found" );
+            result = false;
         }
 
         db.commit();
+
+        return result;
     }
 
 
