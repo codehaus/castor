@@ -178,6 +178,10 @@ public class Product
     }
 
 
+    public void jdoUpdate()
+    {
+    }
+
 }
 
 

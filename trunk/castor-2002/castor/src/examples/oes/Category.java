@@ -123,6 +123,10 @@ public class Category
         // Delete all products? Complain if at least one product exists?
     }
 
+    public void jdoUpdate()
+    {
+    }
+
 
 }
             
