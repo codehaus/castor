@@ -743,7 +743,7 @@ public class Marshaller extends MarshalFramework {
 
                 boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) || 
                                                      ((inheritancesList.size() == 1) && 
-                                                      (((UnmarshalHandler.InheritanceMatch)inheritancesList.get(0))._parentFieldDesc == descriptor)));
+                                                      (((UnmarshalHandler.InheritanceMatch)inheritancesList.elementAt(0))._parentFieldDesc == descriptor)));
 
                 // Can we remove the xsi:type ?
                 if (foundTheRightClass && oneAndOnlyOneMatchedField) {
