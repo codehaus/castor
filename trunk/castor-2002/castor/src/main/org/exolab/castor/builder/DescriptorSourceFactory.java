@@ -287,7 +287,7 @@ public class DescriptorSourceFactory {
             jsc.append(localClassName);
             jsc.append(") object;");
 			//-- Handle optional primatives?
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()))
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()) && (!member.isMultivalued()))
 			{
 				jsc.add("if(!target."+member.getHasMethodName()+"())");
 				jsc.indent();
@@ -495,7 +495,7 @@ public class DescriptorSourceFactory {
             jsc.append(localClassName);
             jsc.append(") object;");
 			//-- Handle optional primatives?
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()))
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()) && (!member.isMultivalued()))
 			{
 				jsc.add("if(!target."+member.getHasMethodName()+"())");
 				jsc.indent();
