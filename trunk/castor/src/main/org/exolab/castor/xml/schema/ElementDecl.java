@@ -210,6 +210,11 @@ public class ElementDecl extends Particle
      * or null if no default was specified.
     **/
     public String getDefaultValue() {
+        if (isReference()) {
+        	ElementDecl elem = getReference();
+            if (elem != null)
+                return elem.getDefaultValue();
+        }
         return _default;
     } //-- getDefaultValue
 
@@ -230,6 +235,11 @@ public class ElementDecl extends Particle
      * or null if no default was specified.
      */
     public String getFixedValue() {
+        if (isReference()) {
+            ElementDecl elem = getReference();
+            if (elem != null)
+                return elem.getFixedValue();
+        }
         return _fixed;
     } //-- getFixedValue
 
@@ -320,7 +330,7 @@ public class ElementDecl extends Particle
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null) {
-            	result = element.getType();
+            	return element.getType();
             }
             else
             	return null;
