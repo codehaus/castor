@@ -123,7 +123,7 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
                 throw new IllegalStateException(err);
             }
 			//we are now sure that the base is a ComplexType
-            //but is the base of thise complexType a simpleType?
+            //but is the base of this complexType a simpleType? (see 4.3.3->simpleContent->content type)
             else if ( ( (ComplexType) baseType).getBaseType().getStructureType()
                          != Structure.SIMPLE_TYPE)
 			 {
@@ -133,7 +133,15 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
                     " must be a complexType whose base is a simpleType.";
                 throw new IllegalStateException(err);
             }
-
+			// We are sure the base is a complexType
+			// but is it already a restriction? (see CR 5.11->restriction->1.1)
+			else if (((ComplexType)baseType).isRestricted()) {
+			       String err="complexType: "+(_complexType.getName()) != null?
+                                            _complexType.getName():"\n";
+				   err +="A complex type cannot be a restriction"+
+					     " of a restriction.";
+				  throw new IllegalStateException(err);
+			}
             else {
 				 //retrieve the base type of this complexType
                  //the base type is the complexType but we have to
@@ -280,11 +288,14 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
             AttributeDecl attrDecl =
                 ((AttributeUnmarshaller)unmarshaller).getAttribute();
 
-             ComplexType baseType = (ComplexType)_complexType.getBaseType();
-             if (baseType.getAttributeDecl(attrDecl.getName()) == null)
-                error("The restricted attribute must be present in the"
-                      +" base type.");
-             baseType = null;
+			/**@todo add the validation code later*/
+
+			/*ComplexType baseType = (ComplexType)_complexType.getBaseType();
+			if ( (baseType.getAttributeDecls() == null) ||
+			     (baseType.getAttributeDecl(attrDecl.getName()) == null) )
+				      error("The restricted attribute must be present in the"
+                             +" base type.");
+             baseType = null;*/
 
             _complexType.addAttributeDecl(attrDecl);
         }
@@ -336,5 +347,8 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
             _complexType.setBaseType(baseType);
             baseType = null;
         }
+		//the restriction was properly handle
+		//we can set the flag
+		_complexType.setRestriction(true);
     }
 } //-- SimpleContentRestrictionUnmarshaller
