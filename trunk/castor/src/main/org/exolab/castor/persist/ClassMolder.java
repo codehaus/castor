@@ -53,12 +53,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,35 +67,32 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Vector;
 
-import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.engine.JDOCallback;
-import org.exolab.castor.jdo.engine.JDOClassDescriptor;
-import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
+import org.exolab.castor.jdo.engine.JDOCallback;
+import org.exolab.castor.jdo.engine.JDOClassDescriptor;
+import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
 
 
@@ -126,6 +121,12 @@ public class ClassMolder
 {
 
     /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance(ClassMolder.class);
+    
+   /**
      * The fully qualified name of the java data object class which this ClassMolder
      * corresponds to. We call it base class.
      */
@@ -189,7 +190,7 @@ public class ClassMolder
     /**
      * The LRU mechanism to be used for caching freed instance of the base class.
      */
-    private int _cachetype;
+    private String _cachetype;
 
     /**
      * The LRU parameter(or capcity) to be used for caching freed instance of the
@@ -219,13 +220,15 @@ public class ClassMolder
     private int     _priority = -1;
 
     /**
-     * Constructor
-     *
-     * @param ds      is the helper class for resolving depends and extends relationship
-     *                among all the ClassMolder in the same LockEngine.
-     * @param loader  is the mapping loader
-     * @param classDescriptor   the classDescriptor for the base class
-     * @param persist the Persistent for the base class
+     * Creates an instance of this class.
+     * @param ds is the helper class for resolving depends and extends relationship
+     *        among all the ClassMolder in the same LockEngine.
+     * @param loader the mapping loader.
+     * @param lock the lock engine.
+     * @param clsDesc the classDescriptor for the base class.
+     * @param persist the Persistence for the base class.
+     * @throws ClassNotFoundException If a class cannot be loaded.
+     * @throws MappingException if an error occured with analysing the mapping information.
      */
     ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock,
             ClassDescriptor clsDesc, Persistence persist )
@@ -263,7 +266,7 @@ public class ClassMolder
 
         if ( clsDesc instanceof JDOClassDescriptor ) {
             if ( ((JDOClassDescriptor) clsDesc).getCacheType() != null ) {
-                _cachetype = LRU.mapType( ((JDOClassDescriptor) clsDesc).getCacheType() );
+                _cachetype = ((JDOClassDescriptor) clsDesc).getCacheType();
                 _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheParam();
             }
             _isKeyGenUsed = ( ( (JDOClassDescriptor) clsDesc ).getKeyGeneratorDescriptor() != null );
@@ -407,7 +410,7 @@ public class ClassMolder
 
         fmIds = new FieldMapping[identities.length];
         fmBase = base.getFieldMapping();
-        for ( int i=0,j=0; i<fmBase.length; i++ ) {
+        for ( int i = 0; i < fmBase.length; i++ ) {
             for ( int k=0; k<identities.length; k++ ) {
                 if ( fmBase[i].getName().equals( identities[k] ) ) {
                     fmIds[k] = fmBase[i];
@@ -507,7 +510,6 @@ public class ClassMolder
         Vector result = new Vector();
         Enumeration enum;
         ClassMolder mold;
-        ClassMapping map;
         Persistence persist;
         ClassDescriptor desc;
 
@@ -538,11 +540,11 @@ public class ClassMolder
      * It method will iterate thur all of the object's field and
      * try to remove all the occurrence.
      *
-     * @param tx      the TransactionContext of the transaction in action
-     * @param object  the target object of the base type of this ClassMolder
-     * @param relatedMolder  the ClassMolder of the related object to be
+     * @param tx the TransactionContext of the transaction in action
+     * @param object the target object of the base type of this ClassMolder
+     * @param relatedMolder the ClassMolder of the related object to be
      *                       removed from the object
-     * @param related        the object to be removed
+     * @param relatedObject the object to be removed
      */
     private boolean removeRelation( TransactionContext tx, Object object,
             ClassMolder relatedMolder, Object relatedObject )  {
@@ -657,7 +659,7 @@ public class ClassMolder
      * @param oid  the object identity of the desired object
      * @param locker   the {@link DepositBox} of the object which is used to
      *                 store the dirty checking cache of the object.
-     * @param accessMode  the acessMode for the object
+     * @param suggestedAccessMode the acessMode for the object
      * @return the object stamp for the object in the persistent storage
      */
     public Object load( TransactionContext tx, OID oid, DepositBox locker,
@@ -831,7 +833,6 @@ public class ClassMolder
             throws DuplicateIdentityException, PersistenceException {
 
         ClassMolder fieldClassMolder;
-        LockEngine fieldEngine;
         ArrayList fids;
         Object[] fields;
         Object createdId;
@@ -858,7 +859,6 @@ public class ClassMolder
 
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object, tx.getClassLoader() );
                 if ( o != null ) {
                     fid = fieldClassMolder.getIdentity( tx, o );
@@ -886,7 +886,6 @@ public class ClassMolder
 
             case FieldMolder.ONE_TO_MANY:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object, tx.getClassLoader() );
                 if ( o != null ) {
                     fids = extractIdentityList( tx, fieldClassMolder, o );
@@ -896,7 +895,6 @@ public class ClassMolder
 
             case FieldMolder.MANY_TO_MANY:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object, tx.getClassLoader() );
                 if ( o != null ) {
                     fids = extractIdentityList( tx, fieldClassMolder, o );
@@ -937,7 +935,6 @@ public class ClassMolder
             switch (fieldType) {
             case FieldMolder.MANY_TO_MANY:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object, tx.getClassLoader() );
                 if ( o != null ) {
                     fids = extractIdentityList( tx, fieldClassMolder, o );
@@ -973,8 +970,6 @@ public class ClassMolder
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         boolean updateCache = false;
-        Object createdId;
-        Object ids;
         Object o;
 
         // iterate all the fields and mark all the dependent object.
@@ -1138,7 +1133,6 @@ public class ClassMolder
         Object[] fields;
         Object value;
         Iterator itor;
-        ArrayList list;
         ArrayList orgFields;
         int fieldType;
 
@@ -1558,7 +1552,6 @@ public class ClassMolder
             ObjectModifiedException, ObjectDeletedException {
 
         ClassMolder fieldClassMolder;
-        LockEngine fieldEngine;
         Object[] newfields;
         Object[] fields;
         Object value;
@@ -1601,7 +1594,6 @@ public class ClassMolder
             case FieldMolder.PERSISTANCECAPABLE:
                 if ( _fhs[i].isStored() ) {
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
                     value = _fhs[i].getValue( object, tx.getClassLoader() );
                     if ( value != null )
                         newfields[i] = fieldClassMolder.getIdentity( tx, value );
@@ -1797,11 +1789,7 @@ public class ClassMolder
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         Object[] fields;
-        Object ids;
-        AccessMode am;
-        Object value;
         Object stamp;
-        Object[] temp;
         int fieldType;
         Object o;
         AccessMode accessMode = getAccessMode( suggestedAccessMode );
@@ -1834,8 +1822,6 @@ public class ClassMolder
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
                 locker.setObject( tx, fields );
             }
-
-            ids = oid.getIdentity();
 
             // load the original field into the transaction. so, store will
             // have something to compare later.
@@ -1906,10 +1892,10 @@ public class ClassMolder
                                     }
                                 }
                             } else {
-                                ArrayList avlist = (ArrayList) fields[i];
+                                // ArrayList avlist = (ArrayList) fields[i];
                                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                                 fieldEngine = _fhs[i].getFieldLockEngine();
-                                RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, avlist );
+                                // RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, avlist );
                             }
                         } else if ( tx.isAutoStore() ) {
                             Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
@@ -2120,7 +2106,6 @@ public class ClassMolder
     public void updateCache( TransactionContext tx, OID oid, DepositBox locker, Object object ) {
 
         ClassMolder fieldClassMolder;
-        LockEngine fieldEngine;
         ArrayList fids;
         Object fid;
         Object[] fields;
@@ -2158,7 +2143,6 @@ public class ClassMolder
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
                 value = _fhs[i].getValue( object, tx.getClassLoader() );
                 if ( value != null ) {
                     fid = fieldClassMolder.getIdentity( tx, value );
@@ -2254,6 +2238,7 @@ public class ClassMolder
                         }
                     }
                 } catch ( ObjectNotFoundException e ) {
+                    _log.warn ("Could not find object", e);
                 }
             } else if ( extend._fhs[i].isManyToMany() ) {
                 extend._fhs[i].getRelationLoader().deleteRelation(
@@ -2303,6 +2288,7 @@ public class ClassMolder
                     if ( !extendPath.contains( base._extendent.get(i) ) ) {
                         //deleteExtend( tx, (ClassMolder)base._extendent.get(i), ids );
                     } else {
+                        // NB: further INVESTIGATION
                     }
 
             base = base._extends;
@@ -2602,7 +2588,7 @@ public class ClassMolder
     /**
      * Return a new instance of the base class with the provided ClassLoader object
      *
-     * @param laoder the ClassLoader object to use to create a new object
+     * @param loader the ClassLoader object to use to create a new object
      * @return Object the object reprenseted by this ClassMolder, and instanciated
      * with the provided ClassLoader instance.
      */
@@ -2613,10 +2599,15 @@ public class ClassMolder
             else
                 return Class.forName(_name).newInstance();
         } catch (ClassNotFoundException e) {
-        } catch ( IllegalAccessException e ) {
-        } catch ( InstantiationException e ) {
-        } catch ( ExceptionInInitializerError e ) {
-        } catch ( SecurityException e ) {
+            _log.warn (e);
+        } catch (IllegalAccessException e) {
+            _log.warn (e);
+        } catch (InstantiationException e) {
+            _log.warn (e);
+        } catch (ExceptionInInitializerError e) {
+            _log.warn (e);
+        } catch (SecurityException e) {
+            _log.warn (e);
         }
         return null;
     }
@@ -2855,7 +2846,7 @@ public class ClassMolder
      * Return the preferred LRU cache mechanism for caching object of this type
      *
      */
-    public int getCacheType() {
+    public String getCacheType() {
         return _cachetype;
     }
     /**
