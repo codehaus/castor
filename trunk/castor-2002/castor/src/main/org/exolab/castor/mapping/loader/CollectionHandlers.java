@@ -73,13 +73,6 @@ final class CollectionHandlers
 
 
     /**
-     * Name of special collection type in which case get/set methods are
-     * responsible for handling the enumeration.
-     */
-    public static final String Enumerate = "enumerate";
-
-
-    /**
      * Returns the collection's Java class from the collection name.
      * The collection name may be a short name (e.g. <tt>vector</tt>)
      * or the collection Java class name (e.g. <tt>java.util.Vector</tt>).
@@ -92,8 +85,6 @@ final class CollectionHandlers
     static Class getCollectionType( String name )
         throws MappingException
     {
-        if ( name.equals( Enumerate ) )
-            return null;
         for ( int i = 0 ; i < _colHandlers.length ; ++i )
             if ( _colHandlers[ i ].shortName.equals( name ) ||
                  _colHandlers[ i ].javaClass.getName().equals( name ) )
@@ -116,6 +107,20 @@ final class CollectionHandlers
             if ( _colHandlers[ i ].javaClass.equals( javaClass ) )
                 return _colHandlers[ i ].handler;
         throw new MappingException( "mapping.noCollectionHandler", javaClass.getName() );
+    }
+
+
+    /**
+     * Returns true if the collection is an enumeration. Enumeration are
+     * a special type, the 'set' method accepts an object while the 'get'
+     * method returns an enumeration of methods.
+     *
+     * @param colType The collection type as return from {@link #getCollectionType}
+     * @return True if the collection type is an enumeration
+     */
+    static boolean isEnumerate( Class colType )
+    {
+        return ( colType == Enumeration.class );
     }
 
 
@@ -155,6 +160,18 @@ final class CollectionHandlers
      * List of all the default collection handlers.
      */
     private static CollectionHandlerInfo[] _colHandlers = new CollectionHandlerInfo[] {
+        // For enumerate ([])
+        new CollectionHandlerInfo( "enumerate", Enumeration.class, new CollectionHandler() {
+            public Object add( Object collection, Object object ) {
+                return object;
+            }
+            public Enumeration elements( Object collection ) {
+                return (Enumeration) collection;
+            }
+            public String toString() {
+                return "Enumerate CollectionHandler";
+            }
+        } ),
         // For array ([])
         new CollectionHandlerInfo( "array", Object[].class, new CollectionHandler() {
             public Object add( Object collection, Object object ) {

@@ -41,6 +41,8 @@ public class IncludeDescriptor implements org.exolab.castor.xml.XMLClassDescript
 
     private java.lang.String xmlName;
 
+    private org.exolab.castor.xml.XMLFieldDescriptor identity;
+
 
       //----------------/
      //- Constructors -/
@@ -78,6 +80,7 @@ public class IncludeDescriptor implements org.exolab.castor.xml.XMLClassDescript
                 return null;
             }
         } );
+        desc.setRequired(true);
         attributes[0] = desc;
         
         //-- initialize element descriptors
@@ -142,7 +145,7 @@ public class IncludeDescriptor implements org.exolab.castor.xml.XMLClassDescript
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
-        return null;
+        return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**

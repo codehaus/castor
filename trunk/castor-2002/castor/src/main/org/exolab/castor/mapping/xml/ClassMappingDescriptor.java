@@ -41,6 +41,8 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
 
     private java.lang.String xmlName;
 
+    private org.exolab.castor.xml.XMLFieldDescriptor identity;
+
 
       //----------------/
      //- Constructors -/
@@ -52,33 +54,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         XMLFieldHandler handler = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[3];
-        //-- _className
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_className", "class-name", NodeType.Attribute);
-        desc.setHandler( new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                ClassMapping target = (ClassMapping) object;
-                return target.getClassName();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.setClassName( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new java.lang.String();
-            }
-        } );
-        attributes[0] = desc;
-        
+        attributes = new XMLFieldDescriptorImpl[4];
         //-- _access
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_access", "access", NodeType.Attribute);
         desc.setImmutable(true);
@@ -104,11 +80,38 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return null;
             }
         } );
+        attributes[0] = desc;
+        
+        //-- _identity
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_identity", "identity", NodeType.Attribute);
+        desc.setImmutable(true);
+        desc.setHandler( new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getIdentity();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setIdentity( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
         attributes[1] = desc;
         
         //-- _extends
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_extends", "extends", NodeType.Attribute);
-        desc.setImmutable(true);
+        desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_extends", "extends", NodeType.Attribute);
+        desc.setReference(true);
         desc.setHandler( new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -121,23 +124,52 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setExtends( (java.lang.String) value);
+                    target.setExtends( (java.lang.Object) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.Object();
             }
         } );
         attributes[2] = desc;
         
+        //-- _name
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
+        this.identity = desc;
+        desc.setHandler( new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getName();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setName( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setRequired(true);
+        attributes[3] = desc;
+        
         //-- initialize element descriptors
         
-        elements = new XMLFieldDescriptorImpl[7];
+        elements = new XMLFieldDescriptorImpl[4];
         //-- _description
-        desc = new XMLFieldDescriptorImpl(Description.class, "_description", "description", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -150,131 +182,47 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setDescription( (Description) value);
+                    target.setDescription( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new Description();
+                return null;
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(false);
         elements[0] = desc;
         
-        //-- _sqlTable
-        desc = new XMLFieldDescriptorImpl(SqlTable.class, "_sqlTable", "sql-table", NodeType.Element);
+        //-- _mapTo
+        desc = new XMLFieldDescriptorImpl(MapTo.class, "_mapTo", "map-to", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 ClassMapping target = (ClassMapping) object;
-                return target.getSqlTable();
+                return target.getMapTo();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setSqlTable( (SqlTable) value);
+                    target.setMapTo( (MapTo) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new SqlTable();
+                return new MapTo();
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(false);
         elements[1] = desc;
-        
-        //-- _xmlSchema
-        desc = new XMLFieldDescriptorImpl(XmlSchema.class, "_xmlSchema", "xml-schema", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                ClassMapping target = (ClassMapping) object;
-                return target.getXmlSchema();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.setXmlSchema( (XmlSchema) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new XmlSchema();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(false);
-        elements[2] = desc;
-        
-        //-- _ldapEntry
-        desc = new XMLFieldDescriptorImpl(LdapEntry.class, "_ldapEntry", "ldap-entry", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                ClassMapping target = (ClassMapping) object;
-                return target.getLdapEntry();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.setLdapEntry( (LdapEntry) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new LdapEntry();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(false);
-        elements[3] = desc;
-        
-        //-- _identity
-        desc = new XMLFieldDescriptorImpl(Identity.class, "_identity", "identity", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                ClassMapping target = (ClassMapping) object;
-                return target.getIdentity();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.setIdentity( (Identity) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new Identity();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(false);
-        elements[4] = desc;
         
         //-- _fieldMappingList
         desc = new XMLFieldDescriptorImpl(FieldMapping.class, "_fieldMappingList", "field", NodeType.Element);
@@ -303,7 +251,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         desc.setHandler(handler);
         desc.setRequired(true);
         desc.setMultivalued(true);
-        elements[5] = desc;
+        elements[2] = desc;
         
         //-- _containerList
         desc = new XMLFieldDescriptorImpl(Container.class, "_containerList", "container", NodeType.Element);
@@ -332,7 +280,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         desc.setHandler(handler);
         desc.setRequired(true);
         desc.setMultivalued(true);
-        elements[6] = desc;
+        elements[3] = desc;
         
     } //-- org.exolab.castor.mapping.xml.ClassMappingDescriptor()
 
@@ -393,7 +341,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
-        return null;
+        return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**

@@ -50,6 +50,7 @@ package org.exolab.castor.dax.engine;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
@@ -60,10 +61,8 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.LdapInfo;
 
 
 /**
@@ -84,10 +83,10 @@ public class DAXMappingLoader
     private static final String CompiledType = "DAX";
 
 
-    public DAXMappingLoader( ClassLoader loader )
+    public DAXMappingLoader( ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
-        super( loader );
+        super( loader, logWriter );
     }
 
 
@@ -100,12 +99,12 @@ public class DAXMappingLoader
         
         // If no LDAP information for class, ignore it. DAX only
         // supports DAX class descriptors.
-        if ( clsMap.getLdapEntry() == null )
+        if ( clsMap.getMapTo() == null || clsMap.getMapTo().getLdapOc() == null )
             return NoDescriptor;
 
         // See if we have a compiled descriptor.
-        clsDesc = loadClassDescriptor( clsMap.getClassName(), CompiledType, DAXClassDescriptor.class );
-        if ( clsDesc != null )
+        clsDesc = loadClassDescriptor( clsMap.getName() );
+        if ( clsDesc != null && clsDesc instanceof DAXClassDescriptor )
             return clsDesc;
 
         // Use super class to create class descriptor. Field descriptors will be
@@ -131,7 +130,7 @@ public class DAXMappingLoader
         }
         */
         
-        return new DAXClassDescriptor( clsDesc, clsMap.getLdapEntry().getObjectClass(), null );
+        return new DAXClassDescriptor( clsDesc, clsMap.getMapTo().getLdapOc(), null );
     }
 
 
@@ -142,15 +141,15 @@ public class DAXMappingLoader
         String          ldapName;
         
         // If not an LDAP field, return a stock field descriptor.
-        if ( fieldMap.getLdapInfo() == null )
+        if ( fieldMap.getLdap() == null )
             return super.createFieldDesc( javaClass, fieldMap );
         
         // Create a DAX field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
-        if ( fieldMap.getLdapInfo().getName() == null )
+        if ( fieldMap.getLdap().getName() == null )
             ldapName = fieldDesc.getFieldName();
         else
-            ldapName = fieldMap.getLdapInfo().getName();
+            ldapName = fieldMap.getLdap().getName();
         return new DAXFieldDescriptor( (FieldDescriptorImpl) fieldDesc, ldapName );
     }
 
