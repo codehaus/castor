@@ -229,10 +229,10 @@
          When you read data from the database, you can use getCharacterStream() method to obtain
          java.io.Reader from java.sql.Clob.
          When you write data to the database, you can either use the helper class
-         org.exolab.castor.util.ClobImpl to construct java.sql.Clob from java.io.Reader and the length:
+         org.exolab.castor.jdo.engine.ClobImpl to construct java.sql.Clob from java.io.Reader and the length:
          <pre>
   object.setClob(new ClobImpl(new FileReader(file), file.length());</pre>
-         or implement java.sql.Clob() interface yourself.</p>
+         or implement java.sql.Clob interface yourself.</p>
       <p>But we aware of the followng restriction: if you map BLOB to java.io.InputStream or
          CLOB to java.sql.Clob, you should set turn caching off for the Java class containing
          those values, e.g.:
