@@ -53,6 +53,8 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.Messages;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -76,6 +78,7 @@ final class TransactionContextImpl
     extends TransactionContext
 {
 
+    private static Log _log = LogFactory.getFactory().getInstance( TransactionContextImpl.class );
 
     /**
      * Lists all the connections opened for particular database engines
@@ -187,8 +190,10 @@ final class TransactionContextImpl
                 if ( ! _globalTx )
                 {
                     conn.rollback();
+                    _log.debug( "Connection rolled back" );
                 }
                 conn.close();
+                _log.debug( "Connection closed" );
             } catch ( SQLException except ) { }
         }
         _conns.clear();
