@@ -48,8 +48,6 @@ package org.exolab.castor.xml.schema.writer;
 import java.io.Writer;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Hashtable;
-
 import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.schema.*;
