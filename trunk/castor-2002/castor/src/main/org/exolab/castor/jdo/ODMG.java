@@ -83,7 +83,7 @@ public class ODMG
 {
 
 
-    private PrintWriter  _logWriter;
+    private PrintWriter     _logWriter;
 
 
     public void setLogWriter( PrintWriter logWriter )
