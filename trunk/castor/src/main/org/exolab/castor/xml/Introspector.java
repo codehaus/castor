@@ -675,7 +675,16 @@ public final class Introspector {
                     }
                 }
             
+                //-- make sure field is not transient or static final
+                int modifiers = field.getModifiers();
+                if (Modifier.isTransient(modifiers)) continue;
+                if (Modifier.isFinal(modifiers) && 
+                    Modifier.isStatic(modifiers))
+                    continue;
+                
                 Class type = field.getType();
+                
+                
                 
                 if (!isDescriptable(type)) continue;
                 
