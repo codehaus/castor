@@ -306,7 +306,9 @@ public class JMethod implements JMember {
         //-----------------/
         
         jsw.write(modifiers.toString());
-        jsw.write(' ');
+        if (modifiers.toString().length() > 0) {
+            jsw.write(' ');
+        }
         if (returnType != null) {
             jsw.write(returnType);
         }

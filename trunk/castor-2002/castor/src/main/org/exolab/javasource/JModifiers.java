@@ -62,6 +62,7 @@ public class JModifiers {
     private static final String sFinal      = "final";
     private static final String sPrivate    = "private";
     private static final String sProtected  = "protected";
+    private static final String sPackage    = "";
     private static final String sPublic     = "public";
     private static final String sStatic     = "static";
     private static final String sTransient  = "transient";
@@ -69,6 +70,7 @@ public class JModifiers {
     private static final short vPrivate   = 1;
     private static final short vProtected = 2;
     private static final short vPublic    = 3;
+    private static final short vPackage   = 4;
     
 
     /* local members */
@@ -157,6 +159,13 @@ public class JModifiers {
     } //-- makePublic
     
     /**
+     * Changes the visibility qualifier to package (= without qualifier).
+    **/
+    public void makePackage() {
+        this.visibility = vPackage;
+    } //-- makePackage
+    
+    /**
      * Returns true if the abstract qualifier is present.
      * <BR /> This is only applicable to methods and classes.
      * @return true if the abstract qualifier is present
@@ -188,6 +197,14 @@ public class JModifiers {
     public boolean isPublic() {
         return (visibility == vPublic);
     } //-- isPublic
+
+    /**
+     * Returns true if the modifier represented is package (= without qualifier).
+     * @return true if the modifier represented is package (= without qualifier).
+    **/
+    public boolean isPackage() {
+        return (visibility == vPackage);
+    } //-- isPackage
 
     /**
      * Returns true if the modifier represented is static.
@@ -257,6 +274,9 @@ public class JModifiers {
             case vProtected:
                 sb.append(sProtected);
                 break;
+            case vPackage:
+                sb.append(sPackage);
+                break;
             default:
                 sb.append(sPublic);
                 break;
@@ -264,25 +284,33 @@ public class JModifiers {
         
         //-- static
         if (isStatic) {
-            sb.append(' ');
+            if (sb.length() > 0)  {
+                sb.append(' ');
+            }
             sb.append(sStatic);
         }
         
         //-- final
         if (isFinal) {
-            sb.append(' ');
+            if (sb.length() > 0)  {
+                sb.append(' ');
+            }
             sb.append(sFinal);
         }
 
         //-- abstract
         if (isAbstract) {
-            sb.append(' ');
+            if (sb.length() > 0)  {
+                sb.append(' ');
+            }
             sb.append(sAbstract);
         }
 
         //-- transient
         if (isTransient) {
-            sb.append(' ');
+            if (sb.length() > 0)  {
+                sb.append(' ');
+            }
             sb.append(sTransient);
         }
 
