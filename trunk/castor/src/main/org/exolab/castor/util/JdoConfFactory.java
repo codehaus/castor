@@ -147,6 +147,17 @@ public class JdoConfFactory
 	 */
 	public static JdoConf createJdoConf(Database jdoDbConf, TransactionDemarcation transConf)
 	{
+		return createJdoConf (new Database[] {jdoDbConf }, transConf );
+	}
+
+	/**
+	 * create a JDO configuration
+	 * @param jdoDbConf Database configuration
+	 * @param transConf TransactionDemarcation configuration 
+	 * @return JDO configuration
+	 */
+	public static JdoConf createJdoConf(Database[] jdoDbConf, TransactionDemarcation transConf)
+	{
 		JdoConf jdoConf = new JdoConf();
 
 		jdoConf.setDatabase(jdoDbConf);
@@ -162,6 +173,17 @@ public class JdoConfFactory
 	 */
 	public static JdoConf createJdoConf(Database jdoDbConf)
 	{
+		return createJdoConf (new Database[] { jdoDbConf } );
+	}
+
+
+	/**
+	 * create a JDO configuration with simple local transaction demarcation
+	 * @param jdoDbConf Database configuration
+	 * @return JDO configuration
+	 */
+	public static JdoConf createJdoConf(Database[] jdoDbConf)
+	{
 		JdoConf jdoConf = new JdoConf();
 
 		jdoConf.setDatabase(jdoDbConf);
@@ -169,7 +191,6 @@ public class JdoConfFactory
 
 		return jdoConf;
 	}
-
 
 	/**
 	 * create a JDO driver configuration from JDBC connection parameters 
