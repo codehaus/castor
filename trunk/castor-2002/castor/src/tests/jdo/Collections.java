@@ -151,13 +151,14 @@ public class Collections extends CWTestCase {
 
             _db = _category.getDatabase( stream.verbose() );
             _conn = _category.getJDBCConnection(); 
+            _conn.setAutoCommit( false );
 
             stream.writeVerbose( "Running..." );
             stream.writeVerbose( "" );
 
             // delete everything
-            _conn.createStatement().executeUpdate( "DELETE test_col" );
-            _conn.createStatement().executeUpdate( "DELETE test_item" );
+            _conn.createStatement().executeUpdate( "DELETE FROM test_col" );
+            _conn.createStatement().executeUpdate( "DELETE FROM test_item" );
             _conn.commit();
 
             // create new TestCol object with elements
