@@ -411,7 +411,8 @@ public class XMLFieldDescriptorImpl
         //-- use containing class's namespace if
         //-- necessary
         if ((nsURI == null) && (this._contClsDescriptor != null)) {
-            if (isPrimitive(_fieldType)) {
+            if (isPrimitive(_fieldType) && (_nodeType == NodeType.Element)) 
+            {
                 if (_contClsDescriptor instanceof XMLClassDescriptor) {
                     return ((XMLClassDescriptor)_contClsDescriptor).getNameSpaceURI();
                 }
