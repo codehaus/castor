@@ -115,13 +115,13 @@ public final class SQLTypes
      * <tt>sqlType</tt> must be the return value from a previous call to
      * {@link #typeFromSQLType} or {@link #typeFromName}.
      *
-     * @param sqlType The Java class of the SQL type
+     * @param javaType The Java class of the SQL type
      * @return SQL type from the specified Java type
      */
-    public static int getSQLType( Class sqlType )
+    public static int getSQLType( Class javaType )
     {
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-            if ( sqlType.isAssignableFrom( _typeInfos[ i ].javaType ) )
+            if ( javaType.isAssignableFrom( _typeInfos[ i ].javaType ) )
                 return _typeInfos[ i ].sqlType;
         }
         return java.sql.Types.OTHER;

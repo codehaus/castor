@@ -79,6 +79,10 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -112,6 +116,10 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
@@ -143,6 +151,16 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
                 try {
                     KeyGeneratorDef target = (KeyGeneratorDef) object;
                     target.addParam( (Param) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                try {
+                    KeyGeneratorDef target = (KeyGeneratorDef) object;
+                    target.removeAllParam();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());

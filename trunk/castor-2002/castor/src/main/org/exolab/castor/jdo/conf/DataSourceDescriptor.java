@@ -79,6 +79,10 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -115,6 +119,10 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return ( (DataSource) parent ).createParams();

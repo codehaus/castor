@@ -17,10 +17,10 @@ grant all on prod_group to test
 go
 
 create table prod (
-  id        int           not null primary key,
-  name      varchar(200)  not null,
-  price     float         not null,
-  group_id  int           not null references prod_group( id )
+  id        int            not null primary key,
+  name      varchar(200)   not null,
+  price     numeric(18,2)  not null,
+  group_id  int            not null references prod_group( id )
 )
 go
 grant all on prod to test

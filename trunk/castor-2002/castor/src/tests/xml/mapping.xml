@@ -1,12 +1,32 @@
 <?xml version="1.0"?>
 <mapping>
-    <description>Castor generated mapping file</description>
-    <class access="shared" name="xml.Root">
-        <description>Default mapping for class xml.Root</description>
-        <map-to/>
-        <field transient="false" type="java.lang.String"
-            required="false" name="Name">
-            <xml mode="attribute" name="name"/>
-        </field>
-    </class>
+
+  <class name="xml.Foo">
+    <map-to xml="foo" />
+    <field name="bar" type="xml.Bar" collection="vector" >
+      <xml name="bar" />
+    </field>
+  </class>
+
+  <class name="xml.Bar">
+    <map-to xml="bar" />
+    <field name="baz" type="string" >
+      <xml name="baz-0" />
+    </field>
+  </class>
+
+  <class name="xml.Bar1" extends="xml.Bar" >
+    <map-to xml="bar1" />
+    <field name="baz1" type="integer" >
+      <xml name="baz-1" />
+    </field>
+  </class>
+
+  <class name="xml.Bar2" extends="xml.Bar" >
+    <map-to xml="bar2" />
+    <field name="baz2" type="boolean" >
+      <xml name="baz-2" />
+    </field>
+  </class>
+
 </mapping>

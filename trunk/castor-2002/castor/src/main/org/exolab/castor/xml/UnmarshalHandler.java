@@ -481,7 +481,7 @@ public class UnmarshalHandler implements DocumentHandler {
             
         XMLClassDescriptor classDesc 
             = (XMLClassDescriptor)parentState.fieldDesc.getClassDescriptor();
-        
+
         if (classDesc == null)
            classDesc = getClassDescriptor(parentState.object.getClass());
         
@@ -498,7 +498,30 @@ public class UnmarshalHandler implements DocumentHandler {
                 break;
             }
         }
-            
+
+        // Keith's fault for the below nasty code.
+        if ( descriptor == null ) {
+            org.exolab.castor.mapping.ClassDescriptor resolved;
+
+            resolved = _cdResolver.resolveByXMLName(name, null);
+            if ( resolved != null ) {
+                for(int i = 0; i< descriptors.length ; ++i ) {
+                    if (descriptors[i] == null) continue;
+                    if (descriptors[i].getFieldType().isAssignableFrom( resolved.getJavaClass() )) {
+                        try {
+                            descriptor = new XMLFieldDescriptorImpl( resolved.getJavaClass(), descriptors[i].getFieldName(),
+                                                                     name, NodeType.Element );
+                            ( (XMLFieldDescriptorImpl) descriptor ).setClassDescriptor( (XMLClassDescriptor) resolved );
+                            ( (XMLFieldDescriptorImpl) descriptor ).setHandler( descriptors[ i ].getHandler() );
+                            break;
+                        } catch ( Exception except ) {
+                            throw new SAXException( except.toString() );
+                        }
+                    }
+                }
+            }
+        }
+
         //-- Find object type and create new Object of that type
         if (descriptor != null) {
             
@@ -519,7 +542,6 @@ public class UnmarshalHandler implements DocumentHandler {
             
             //-- Find class to instantiate
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
-            
             
             FieldHandler handler = descriptor.getHandler();
             
@@ -578,7 +600,7 @@ public class UnmarshalHandler implements DocumentHandler {
             try {
                     
                 _class = descriptor.getFieldType();
-                
+
                 //-- Handle support for "Any" type
                 if (_class == Object.class) {
                     

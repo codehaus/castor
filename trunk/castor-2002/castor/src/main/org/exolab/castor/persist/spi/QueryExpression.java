@@ -230,6 +230,7 @@ public interface QueryExpression
      * modified.
      */
     public Object clone();
+    
 
 
 }

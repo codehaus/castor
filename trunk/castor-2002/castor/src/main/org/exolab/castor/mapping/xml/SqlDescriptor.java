@@ -78,6 +78,10 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
@@ -111,6 +115,10 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -142,6 +150,10 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -175,6 +187,10 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
@@ -206,6 +222,10 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
