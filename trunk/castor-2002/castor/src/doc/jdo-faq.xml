@@ -5,47 +5,51 @@
 <document url="http://castor.exolab.org/jdo-faq.html">
   <body>
     <title>Castor JDO FAQ</title>
-
+    <section title="Draft">
+        <p><b><big>First Draft</big></b></p>
+    </section>
     <section title="Castor's relation to other specifications">
 	<p><b>Does Castor JDO comply with the SUN JSR-000012 specification?</b></p>
 
-	<p>No. Castor JDO doesn't comply with the JDO specification.</p>
+	<p>No, Castor JDO doesn't comply with the SUN's JDO specification.</p>
 
-	<p>Although Castor JDO carries very similar goal as JSR's JDO, it has been developed Castor independently from JSR. In fact, Castor was started before the JSR specification, although at that time the project had not yet named.</p>
+	<p>Although Castor JDO carries very similar goals as SUN's JDO, it has been developed independently from the JSR.</p>
 
-	<p>Although it is not absolutely impossible to hammer Castor JDO into JSR's JDO specification, Between Castor and JSR, there are several major technical and design differences which make the merging unfavorable.</p>
+	<p>Although it is not impossible to shape (perhaps "hammer" is a more descriptive verb) Castor JDO into the SUN's JDO specification, there are several major technical differences which make it unfavorable to do so. Castor is RDBMS centric. Each persistence object loaded by Castor is locked. Locks in Castor are observable, meaning that locks may not be granted because of timeout or deadlock. On the other hand, the SUN's JDO hides details about locks.</p>
 
-	<p>Castor is more RDBMS centric. Castor has the concept of object Lock. Each object loaded from the underneath database will be locked. Developer can specify and must aware the timeout of lock. Exception will be thrown if dead lock is detected and developer must handler that (normally buy abort the transaction and retry). But, JSR hide the lock detail and developer must avoid lock conflict and dead lock in some other way.</p>
+	<p>Internally, Castor JDO maintains a single copy of lock (and cache) for each active persistence object for all transaction. SUN's JDO specification implicitly requires a copy of cache per object per transaction. SUN's JDO also implicitly require a bytecode modifier which Castor doesn't require. </p>
 
-	<p>Castor caches and locks one copy of each loaded (or created) object into CacheEngine for all transaction; it acts as a proxy of the underneath database. The concept is essentially different in JSR.</p>
+	<p>Castor also provides other features, such as key generators, long transaction support and OQL query which cannot be found in SUN's JSR. </p>
 
-	<p>Other differences include key generators, long transaction support and OQL query. Those features can not be found in JSR but are very important for O/R mapping.</p>
 
 	<p><b>Is Castor JDO better than EJB CMP?</b></p>
 
-	<p>The relation between JDO and EJB Entity Bean is sometimes more complicated than "one-is-better-than-the-other" issue.</p>
+	<p>The relation between JDO and EJB Bean is sometimes more complicated than simply saying, "one is better than the other".</p>
 
-	<p>First, Entity Bean may manage to persist itself. (EJB specification call it a Bean Managed Persistence, or bmp) Or, it can rely on its EJB container to persist the bean itself. (EJB call it Container Managed Persistence, or cmp). </p>
+	<p>An Entity Bean may manage to persist itself. (the EJB specification calls this Bean Managed Persistence, or bmp) It may also rely on its EJB container to do so. (EJB calls this Container Managed Persistence, or cmp). </p>
 
-	<p>Entity Bean can use Castor JDO as the bmp mechanism, or any other method to persist itself (for example, dealing with jdbc itself). </p>
+	<p>For bmp, an Entity Bean may use Castor JDO as its persistence mechanism, or use another method, such as dealing with JDBC directly, as its persistence mechanism. </p>
 
-	<p>On the other hand, an EJB Container may uses Castor JDO as CMP mechanism for the Entity Bean.</p>
+	<p>For cmp, an EJB Container vendor may implement their cmp on top of Castor JDO. In such an implementation, Castor JDO will be used to persist the Entity Bean.</p>
 
-	<p>If you would like take advantage of EJB's life-cycle management, security, written-one-deployed on any EJB app server (although they say deploy anyway, you can't run your apps without an app server), and other distributed business application facilities, then you may consider EJB server which provides you cmp.</p>
+	<p>If a developer would like to take advantage of EJB's life-cycle management, security, the "write once deploy anywhere" promise and other distributed business application facilities, then EJB will be the right choice.</p>
 
-	<p>Otherwise, the fact that Castor is simple, open source (you can always include Castor in your application or product), much less overhead, more freedom on design, and integrated with Castor XML may well be your reasons to choose Castor JDO.</p>
-
+	<p>Otherwise, the fact that Castor is simple, is open source (you can always include Castor in your application or product), has much less overhead, provides more design freedom, and is integrated with Castor XML may be enough of a reason to choose Castor JDO.</p>
     </section>
 
     <section title="XML related questions">
 	<p><b>Is it possible to make xml marshalling transactional using Castor?</b></p>
-	<p>No. The decision of putting XML and JDO together is NOT to make XML marshalling transactional.</p>
 
-	<p>Instead, consider a client server suitation. A server receives a XML message from the client. It marshalls the message into data objects. Also, the server needs some information from the database as well. So, it loads some other data objects using JDO. In such way, all the computation can be done using object-oriented way. After the computation, the server stores the data objects into JDO transactionally, and XML message is replied to the client by unmarshalling some result data objects. Castor XML and JDO are put together to deal with suitation like it.</p>
+	<p>No. The decision of putting XML and JDO together is NOT intended to make XML marshalling transactional.</p>
+
+	<p>Instead, the integration is done to help developers of a typical client-server situation: an application server receives incoming XML messages, process the messages and replies to the client. </p>
+
+	<p>With Castor, incoming XML messages can be unmarshaled into data objects. Required information can be obtained from a database using JDO in form of data objects. With this approach, all data manipulation can be done in an object-oriented way. Changes to JDO data objects can be committed transactionally, and result data objects can be marshaled into XML and returned to the client. </p>
 
 	<p><b>Is it possible to do query on a XML file using Castor?</b></p>
 
-	<p>No. At least not with Castor alone. One of the major advantage of using a DBMS is the quering capacity. If you need quering, you should consider using a DBMS to store your data and using Castor JDO to retireve it.</p>
+	<p>No, Castor does not provide an OQL query facility on a XML file. If querying is important for you, you should consider using a DBMS to store your data instead of using XML files, especially if querying performance is a concern.</p>
+
     </section>
 
     <section title="Technical questions">
@@ -148,27 +152,29 @@
 
 	<p>Let's use object loading as an example.</p>
 
-	<p>When an object is loaded and if the object is in the transactionContext( tx), tx returns the perviously loaded object with the requested identities. Otherwise, tx creates a new instance of the object of the interested type and it asks LockEngine to load the object. </p>
+	<p>When an application invoke db.load, the underneath TransactionContext is invoked. If the object with the requested identity exists in the TransactionContext, previously loaded object in the TransactionContext is returned. Otherwise, TransactionContext creates a new instance of the interested type and invokes LockEngine to "fill" the object. </p>
 
-	<p>LockEngine acquires lock for the object, and it makes sure ClassMolder have a thread-safe enviroment for loading. In ClassMolder, SQLEngine will be called to load a set of field for that object, if the fields is not in cache yet. Then, ClassMolder binds the loaded or cached fields into the new instance, and asks tx to load the related and dependent objects. Eventually, object is returned after all relationship is resolved.</p>
+	<p>LockEngine acquires a lock of the object, and it makes sure ClassMolder has a thread-safe environment when it invokes ClassMolder. In ClassMolder, if the interested set of fields representing the object is not existed in the cache yet, SQLEngine will be invoked and the set of fields from the underneath data store will be returned. ClassMolder binds the loaded or cached fields into the new instance. ClassMolder requests the TransactionContext to load the related and the dependent objects. Eventually, the object is returned after all of the relationships are resolved.</p>
 
-	<p>When commit is called, several states will be gone thur before it returns. In preStore state, each object in the tx will be checked for modification one by one, including dependent and related objects. Also, reachable object will be put into tx, if it's not yet in the tx. Object is marked dirty if modified. Also, if any modification is made which should cause related or dependent to be dirty, then method markModification will be made to tx for each of the affected related or dependent object. After all preStore state, all object mark modified should be updated will be properly stored. And, the connection is commited. Then, if the connection commit successfully, object cache in LockEngine is update and all lock is released.</p>
+	<p>The process of commit has several states. The first state is preStore. In preStore state, objects existing in the TransactionContext are checked for modification one by one, including dependent and related objects. De-referenced dependent objects are marked as delete-able, and reachable dependent objects are added into TransactionContext. An object is marked "dirty" if it is modified. Also, if any modification should cause any related or dependent to be dirty, the related or dependent object is marked as dirty as well. </p>
+
+	<p>After the preStore state, all dirty object is properly stored. And, all marked delete object will be removed. Then, the connection is committed. If succeed, all cache with be updated. Finally, all lock is released.</p>
 
 
-    <p><b>Does Castor support two-phase commits?  How is this implemented?</b></p>
+	<p><b>Does Castor support two-phase commits?  How is this implemented?</b></p>
 
-    <p>Yes, via Synchronization interface.</p>
+	<p>Yes, via Synchronization interface.</p>
 
-    <p>TransactionManager must be bound to JNDI, its JNDI name should be passed to JDO object:</p>
+	<p>TransactionManager must be bound to JNDI, its JNDI name should be passed to JDO object:</p>
 
-    <code>
-      jdo.setTransactionManager(jndiName);
-      db = jdo.getDatabase();
-    </code>
+	<code>
+	jdo.setTransactionManager(jndiName);
+	db = jdo.getDatabase();
+	</code>
 
-    <p>Database implementation also implements Synchronization and is authomatically registered with the transaction manager.</p>
+	<p>Database implementation also implements Synchronization and is authomatically registered with the transaction manager.</p>
 
-    <p>Then TM communicates with Castor via beforeCompletion() and afterCompletion() calls.</p>
+	<p>Then TM communicates with Castor via beforeCompletion() and afterCompletion() calls.</p>
 
      </section>
 
