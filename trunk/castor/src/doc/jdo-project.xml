@@ -291,6 +291,7 @@ SELECT p FROM myapp.Product p]]>
         <!--
         Items to be added to this list (in no particular order):
 
+        - Queries should check the cache before going to the database
         - Support for sub-queries, joins, order by, group by, between, functions, 
           is null, is not null, named parameters, binary, logical and match 
           operators, precedence via parens, etc. 
