@@ -227,6 +227,10 @@
         implementation than writing our own API. Because this layer will be
         pluggable, a distributed cache implementation should be provided using
         <a href="http://www.javagroups.com/">JavaGroups</a>.
+        <br />
+        <br />
+        Also, the dirty checking needs to be refactored so it's cleaner and
+        more straightforward in its duties. 
         </p>
         </section>
 
