@@ -543,30 +543,57 @@
   </xsl:template>
 
   <xsl:template match="contributor/email">
-      <xsl:value-of select="substring-before(., '@')"/>@remove-no-spam.<xsl:value-of select="substring-after(., '@')"/>
+     <xsl:call-template name="munge-email">
+         <xsl:with-param name="value" select="."/>
+     </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="munge-email">
+     <xsl:param name="value" select="''"/>
+      <xsl:choose>
+         <xsl:when test="contains($value, '@')">
+            <xsl:value-of select="concat(substring-before($value, '@'), ' ')"/>
+            AT
+            <xsl:call-template name="replace-dot">
+               <xsl:with-param name="value" select="substring-after($value, '@')"/>
+            </xsl:call-template>
+         </xsl:when>
+         <xsl:otherwise>
+            <xsl:value-of select="$value"/>
+         </xsl:otherwise>
+     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="replace-dot">
+     <xsl:param name="value" select="''"/>
+     <xsl:choose>
+        <xsl:when test="contains($value, '.')">
+            <xsl:value-of select="substring-before($value, '.')"/>
+            DOT
+            <xsl:call-template name="replace-dot">
+               <xsl:with-param name="value" select="substring-after($value, '.')"/>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+           <xsl:value-of select="$value"/>
+        </xsl:otherwise>
+     </xsl:choose>
   </xsl:template>
 
   <xsl:template match="news">
     <br />
-    <!--xsl:variable name="border" />
-    <xsl:variable name="fill" />
-    <xsl:when test="release">
-      <xsl:variable name="border">#9966cc</xsl:variable>
-      <xsl:variable name="fill">#9999ff</xsl:variable>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:variable name="border">#a9a5de</xsl:variable>
-      <xsl:variable name="fill">#ededed</xsl:variable>
-    </xsl:otherwise-->
       <table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2"><tr><td>
           <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed"><tr><td>
               <span class="newsTitle"><xsl:value-of select="title"/></span><br/><br/>
               <span class="newsSummary"><xsl:apply-templates select="summary"/><br/><br/>
-                  <xsl:when test="url">
+                  <xsl:if test="url">
                     <div align="center"><a href="{url}">[Read More/Comment]</a></div><br/>
-                  </xsl:when>
-                  Submitted by <xsl:value-of select="author"/>, on <xsl:value-of select="date"/>
-                  @ <xsl:value-of select="time"/>
+                  </xsl:if>
+                  Submitted by <xsl:value-of select="author"/>
+                  <xsl:if test="date | time">,
+                     <xsl:if test="date"> on <xsl:value-of select="date"/></xsl:if>
+                     <xsl:if test="time"> @ <xsl:value-of select="time"/></xsl:if>
+                  </xsl:if>
               </span>
           </td></tr></table>
       </td></tr></table>
@@ -593,6 +620,7 @@
       <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
 	  	 <tr bgcolor="#7270c2">
            <th align="left">Id</th>
+           <th align="left">Date</th>
            <th align="left">Fixed by</th>
            <th align="left">Committed by </th>
            <th align="left">Description</th>
@@ -606,19 +634,96 @@
   </xsl:template>
 
   <xsl:template match="bug">
-    <xsl:variable name="contributor-name"><xsl:value-of select="contributor/name"/></xsl:variable>
-    <xsl:variable name="contributor-email"><xsl:value-of select="contributor/email"/></xsl:variable>
-    <xsl:variable name="submitter-name"><xsl:value-of select="submitter/name"/></xsl:variable>
-    <xsl:variable name="submitter-email"><xsl:value-of select="submitter/email"/></xsl:variable>
-  	<tr valign="top">
-  		<td><a href="{id}"><xsl:value-of select="@id" /></a></td>
-  		<td><a href="mailto:{$contributor-email}"><xsl:value-of select="$contributor-name" /></a></td>
-  		<td><a href="mailto:{$submitter-email}"><xsl:value-of select="$submitter-name" /></a></td>
-  		<td><xsl:value-of select="description"/></td>
-  		<td><xsl:value-of select="type"/></td>
-  		<td><xsl:value-of select="project"/></td>
-  		<td><xsl:value-of select="module"/></td>
-  	</tr>
+
+    <xsl:if test="normalize-space(.) != ''">
+
+      <xsl:variable name="contributor-email">
+          <xsl:call-template name="munge-email">
+              <xsl:with-param name="value" select="contributor/email"/>
+          </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="submitter-email">
+         <xsl:call-template name="munge-email">
+           <xsl:with-param name="value" select="submitter/email"/>
+         </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="reporter-email">
+         <xsl:call-template name="munge-email">
+           <xsl:with-param name="value" select="reporter/email"/>
+         </xsl:call-template>
+
+      </xsl:variable>
+
+      <xsl:variable name="contributor-name">
+         <xsl:choose>
+            <xsl:when test="contributor/name">
+               <xsl:value-of select="contributor/name"/>
+            </xsl:when>
+            <xsl:otherwise>
+                  <xsl:value-of select="$contributor-email"/>
+            </xsl:otherwise>
+         </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="submitter-name">
+         <xsl:choose>
+            <xsl:when test="submitter/name">
+               <xsl:value-of select="submitter/name"/>
+            </xsl:when>
+            <xsl:otherwise>
+                  <xsl:value-of select="$submitter-email"/>
+            </xsl:otherwise>
+         </xsl:choose>
+
+      </xsl:variable>
+
+      <xsl:variable name="reporter-name">
+        <xsl:choose>
+           <xsl:when test="reporter/name">
+               <xsl:value-of select="reporter/name"/>
+           </xsl:when>
+           <xsl:otherwise>
+               <xsl:value-of select="$reporter-email"/>
+           </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <tr valign="top">
+         <xsl:if test="(position() mod 2) = 0">
+            <xsl:attribute name="bgcolor">#FFFFFF</xsl:attribute>
+         </xsl:if>
+         <td>
+            <xsl:choose>
+               <xsl:when test="@id != ''">
+                  <xsl:choose>
+                     <xsl:when test="@id > 0">
+                        <a href="http://bugzilla.exolab.org/show_bug.cgi?id={@id}"><xsl:value-of select="@id" /></a>
+                     </xsl:when>
+                     <xsl:otherwise>
+                        <xsl:value-of select="@id"/>
+                     </xsl:otherwise>
+                  </xsl:choose>
+               </xsl:when>
+               <xsl:otherwise>
+                     ----
+               </xsl:otherwise>
+            </xsl:choose>
+         </td>
+         <td><xsl:value-of select="date"/></td>
+         <td><a href="mailto:{$contributor-email}"><xsl:value-of select="$contributor-name" /></a></td>
+         <td><a href="mailto:{$submitter-email}"><xsl:value-of select="$submitter-name" /></a></td>
+         <td><xsl:value-of select="description"/>
+            <xsl:if test="$reporter-name != ''">
+               <br/><b>Reporter: </b>
+               <a href="mailto:{$reporter-email}"><xsl:value-of select="$reporter-name" /></a>
+            </xsl:if>
+         </td>
+         <td><xsl:value-of select="type"/></td>
+         <td><xsl:value-of select="project"/></td>
+         <td><xsl:value-of select="module"/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="tip">
