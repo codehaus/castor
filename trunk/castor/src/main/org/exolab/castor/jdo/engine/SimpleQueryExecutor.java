@@ -50,6 +50,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.util.SqlBindParser;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -86,7 +87,7 @@ public class SimpleQueryExecutor
 
   /**
    * Executes a simple query and returns the results.  The query must not
-   * return any complex objects, becuse this method can only return simple
+   * return any complex objects, because this method can only return simple
    * java objects.
    *
    * @param expr the Query Expression to be executed.
@@ -99,21 +100,23 @@ public class SimpleQueryExecutor
          throws QueryException {
     
     try {
-    
-      _conn = DatabaseRegistry.createConnection( _dbImpl.getLockEngine() );
-      _stmt = _conn.prepareStatement( expr.getStatement(false) );
 
-      if ( bindValues != null ) {
-        for ( int i = 0 ; i < bindValues.length ; ++i ) {
-          _stmt.setObject( i + 1, bindValues[ i ] );
-        }
-      }
-    
+      _conn = DatabaseRegistry.createConnection( _dbImpl.getLockEngine() );
+
+      String pre_sql = expr.getStatement(false);
+
+      // create SQL statement from pre_sql, replacing bind expressions like "?1" by "?"
+      String sql = SqlBindParser.getJdbcSql(pre_sql);
+
+      _stmt = _conn.prepareStatement( sql );
+
+      if ( bindValues != null )
+          SqlBindParser.bindJdbcValues(_stmt, pre_sql, bindValues);
+
       _rset = _stmt.executeQuery();
       return new SimpleQueryResults();
-    }
-    catch (SQLException s) {
-    
+
+    } catch (SQLException s) {
       if ( _rset != null )
         try { _rset.close(); } catch (SQLException e) {}
       if ( _stmt != null )
@@ -127,8 +130,6 @@ public class SimpleQueryExecutor
       
       throw new QueryException( s.toString() );
     }
-    
-    
   }
 
   public class SimpleQueryResults implements QueryResults {
@@ -269,5 +270,3 @@ public class SimpleQueryExecutor
   }
 
 }
-
-
