@@ -154,12 +154,12 @@ public class Dependent
             master = new TestMaster();
             master.addDetail( new TestDetail( 5 ) );
             detail = new TestDetail( 6 );
-            detail.addDetail2( new TestDetail2( 61 ) );
-            detail.addDetail2( new TestDetail2( 62 ) );
+            detail.addDetail2( new TestDetail2() );
+            detail.addDetail2( new TestDetail2() );
             master.addDetail( detail );
             detail = new TestDetail( 7 );
-            detail.addDetail2( new TestDetail2( 71 ) );
-            detail.addDetail2( new TestDetail2( 72 ) );
+            detail.addDetail2( new TestDetail2() );
+            detail.addDetail2( new TestDetail2() );
             master.addDetail( detail );
             group = new TestGroup();
             db.create( group );
@@ -190,16 +190,12 @@ public class Dependent
                     result = false;
                 }
                 detail = master.findDetail( 6 );
-                if ( detail.getDetails2() == null ||
-                     ! detail.getDetails2().contains( new TestDetail2( 61 ) ) ||
-                     ! detail.getDetails2().contains( new TestDetail2( 62 ) ) ) {
+                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                     stream.writeVerbose( "Error: loaded detail 6 without two details: " + detail );
                     result  = false;
                 }
                 detail = master.findDetail( 7 );
-                if ( detail.getDetails2() == null ||
-                     ! detail.getDetails2().contains( new TestDetail2( 71 ) ) ||
-                     ! detail.getDetails2().contains( new TestDetail2( 72 ) ) ) {
+                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                     stream.writeVerbose( "Error: loaded detail 7 without two details: " + detail );
                     result  = false;
                 }

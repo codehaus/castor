@@ -114,14 +114,15 @@ public class DependentUpdate
             QueryResults  qres;
             TestMaster    master2;
             int           cnt;
-            
+            int           detailId = 0;
+
             db = _category.getDatabase( stream.verbose() );
 
             stream.writeVerbose( "Delete everything" );
             db.begin();
             oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master" );
             qres = oql.execute();
-            
+
             for ( cnt = 0; qres.hasMore(); cnt++ ) {
                 db.remove( qres.next() );
             }
@@ -147,18 +148,18 @@ public class DependentUpdate
             }
             stream.writeVerbose( "Deleting " + cnt + " group objects" );
             db.commit();
-            
+
             stream.writeVerbose( "Attempt to create master with details" );
             db.begin();
             master = new TestMaster();
             master.addDetail( new TestDetail( 5 ) );
             detail = new TestDetail( 6 );
-            detail.addDetail2( new TestDetail2( 61 ) );
-            detail.addDetail2( new TestDetail2( 62 ) );
+            detail.addDetail2( new TestDetail2() );
+            detail.addDetail2( new TestDetail2() );
             master.addDetail( detail );
             detail = new TestDetail( 7 );
-            detail.addDetail2( new TestDetail2( 71 ) );
-            detail.addDetail2( new TestDetail2( 72 ) );
+            detail.addDetail2( new TestDetail2() );
+            detail.addDetail2( new TestDetail2() );
             master.addDetail( detail );
             group = new TestGroup();
             db.create( group );
@@ -189,16 +190,12 @@ public class DependentUpdate
                     result = false;
                 }
                 detail = master.findDetail( 6 );
-                if ( detail.getDetails2() == null ||
-                     ! detail.getDetails2().contains( new TestDetail2( 61 ) ) ||
-                     ! detail.getDetails2().contains( new TestDetail2( 62 ) ) ) {
+                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                     stream.writeVerbose( "Error: loaded detail 6 without two details: " + detail );
                     result  = false;
                 }
                 detail = master.findDetail( 7 );
-                if ( detail.getDetails2() == null ||
-                     ! detail.getDetails2().contains( new TestDetail2( 71 ) ) ||
-                     ! detail.getDetails2().contains( new TestDetail2( 72 ) ) ) {
+                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                     stream.writeVerbose( "Error: loaded detail 7 without two details: " + detail );
                     result  = false;
                 }
@@ -222,15 +219,12 @@ public class DependentUpdate
             }
             // remove detail with id == 5
             master.getDetails().remove( master.getDetails().indexOf( master.findDetail( 5 ) ) );
-            // remove detail with id == 6 explicitly
-            detail = (TestDetail) master.findDetail( 6 );
-            master.getDetails().remove( master.getDetails().indexOf( detail ) );
             //db.remove( detail );
             // add new detail
             master.addDetail( new TestDetail( 8 ) );
             // add new detail and create it explicitely
             detail = new TestDetail( 9 );
-            master.addDetail( detail );        
+            master.addDetail( detail );
             //db.create( detail );
             // delete, then create detail with id == 7 explicitly
             detail = (TestDetail) master.findDetail( 7 );
@@ -244,7 +238,9 @@ public class DependentUpdate
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
                      master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     master.getDetails().contains( new TestDetail( 6 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                     master.findDetail( 6 ).getDetails2() == null ||
+                     master.findDetail( 6 ).getDetails2().size() != 2 ||
                      ! master.getDetails().contains( new TestDetail( 7 ) ) ||
                      ! master.getDetails().contains( new TestDetail( 8 ) ) ||
                      ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
@@ -286,26 +282,28 @@ public class DependentUpdate
                 db.rollback();
                 stream.writeVerbose( "OK: Dirty checking works" );
             }
- 
+
             stream.writeVerbose( "Test 2" );
             detail = new TestDetail( 5 );
-            detail.addDetail2( new TestDetail2( 51 ) );
+            detail2 = new TestDetail2();
+            detail.addDetail2( detail2 );
             master2.addDetail( detail );
-            master2.addDetail( new TestDetail( 6 ) );
             master2.getDetails().remove( new TestDetail( 8 ) );
             master2.getDetails().remove( new TestDetail( 9 ) );
             try {
                 db.begin();
                 db.update( master2 );
                 db.commit();
+                detailId = detail2.getId();
                 stream.writeVerbose( "OK: Dirty checking works" );
             } catch ( ObjectModifiedException exept ) {
                 db.rollback();
                 stream.writeVerbose( "Error: Dirty checking doesn't work" );
                 result  = false;
             }
+
             stream.writeVerbose( "Test 3" );
-            _conn = _category.getJDBCConnection(); 
+            _conn = _category.getJDBCConnection();
             _conn.setAutoCommit( false );
             _conn.createStatement().execute( "UPDATE test_master SET value1='concurrent' WHERE id="
                     + master2.getId() );
@@ -329,8 +327,10 @@ public class DependentUpdate
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
                      ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     master.findDetail( 5 ).findDetail2( 51 ) == null  ||
+                     master.findDetail( 5 ).findDetail2( detailId ) == null  ||
                      ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                     master.findDetail( 6 ).getDetails2() == null ||
+                     master.findDetail( 6 ).getDetails2().size() != 2 ||
                      ! master.getDetails().contains( new TestDetail( 7 ) ) ||
                      master.getDetails().contains( new TestDetail( 8 ) ) ||
                      master.getDetails().contains( new TestDetail( 9 ) ) ) {
@@ -346,9 +346,10 @@ public class DependentUpdate
             db.commit();
 
             // modify an dependent object and see if it got updated
+            stream.writeVerbose( "Test 3" );
             detail = master.findDetail( 5 );
             detail.setValue1("new updated value");
-            detail.findDetail2( 51 ).setValue1("new detail 2 value");
+            detail.findDetail2( detailId ).setValue1("new detail 2 value");
             db.begin();
             db.update( master );
             db.commit();
@@ -356,14 +357,16 @@ public class DependentUpdate
             db.begin();
             master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
             if ( master != null ) {
-                if ( master.getDetails().size() == 0 ||
+                if ( master.getDetails() == null ||
+                     master.getDetails().size() == 0 ||
                      ! master.getDetails().contains( new TestDetail( 5 ) ) ||
                      ! master.getDetails().contains( new TestDetail( 6 ) ) ||
                      ! master.getDetails().contains( new TestDetail( 7 ) ) ||
                      master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     master.getDetails().contains( new TestDetail( 9 ) ) || 
+                     master.getDetails().contains( new TestDetail( 9 ) ) ||
                      ! "new updated value".equals( master.findDetail( 5 ).getValue1()) ||
-                     ! "new detail 2 value".equals( master.findDetail( 5 ).findDetail2( 51 ).getValue1() ) ) {
+                     master.findDetail( 5 ).findDetail2( detailId ) == null ||
+                     ! "new detail 2 value".equals( master.findDetail( 5 ).findDetail2( detailId ).getValue1() ) ) {
 
                     stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
 

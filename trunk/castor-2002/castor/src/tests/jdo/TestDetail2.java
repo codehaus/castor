@@ -78,6 +78,7 @@ public class TestDetail2
 
     public TestDetail2()
     {
+        _value = DefaultValue;
     }
 
 
