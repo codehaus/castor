@@ -213,13 +213,21 @@ public class DTDResolver
         throws IOException, SAXException
     {
         int         i;
-        InputSource source;
+        InputSource source = null;
 
         // First, resolve all the DTD/schema.
         for ( i = 0 ; i < _dtdInfo.length ; ++i ) {
-            if ( ( publicId != null && publicId.equals( _dtdInfo[ i ].publicId ) ) ||
-                 ( systemId != null && systemId.equals( _dtdInfo[ i ].systemId ) ) ) {
-                return new InputSource( getClass().getResourceAsStream( _dtdInfo[ i ].resource ) );
+            if  ( publicId != null && publicId.equals( _dtdInfo[ i ].publicId ) )
+            {
+                source =  new InputSource( getClass().getResourceAsStream( _dtdInfo[ i ].resource ) );
+                source.setPublicId(publicId);
+                return source;
+            }
+            if  ( systemId != null && systemId.equals( _dtdInfo[ i ].systemId ) )
+            {
+                source =  new InputSource( getClass().getResourceAsStream( _dtdInfo[ i ].resource ) );
+                source.setSystemId(systemId);
+                return source;
             }
         }
 
@@ -238,12 +246,16 @@ public class DTDResolver
 
             try {
                 url = new URL( systemId );
-                return new InputSource( url.openStream() );
+                source = new InputSource( url.openStream() );
+                source.setSystemId(systemId);
+                return source;
             } catch ( MalformedURLException except ) {
                 try {
                     url = new URL( _baseUrl, systemId );
-                    return new InputSource( url.openStream() );
-                } catch ( MalformedURLException ex2 ) { }
+                    source = new InputSource( url.openStream() );
+                    source.setSystemId(systemId);
+                    return source;
+                 } catch ( MalformedURLException ex2 ) { }
             }
             return null;
         }
