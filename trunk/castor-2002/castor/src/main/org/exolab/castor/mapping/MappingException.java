@@ -86,6 +86,12 @@ public class MappingException
     }
 
 
+    public MappingException( String message, Object arg1, Object arg2, Object arg3 )
+    {
+        super( Messages.format( message, arg1, arg2, arg3 ) );
+    }
+
+
     public MappingException( Exception except )
     {
         super( Messages.format( "mapping.nested", except.toString() ) );
