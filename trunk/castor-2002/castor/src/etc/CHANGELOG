@@ -49,6 +49,12 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Updated the Schema Object model to support the new Grouping syntax
+        - Groups are still not supported by the source code generator.
+        (kvisco)
+
+XML:    Updated Unmarshaller to support "empty" strings (kvisco)
+
 XML:    Added support for direct public field access for the Marshalling 
         Framework when no accessor methods exist. (kvisco)
 
