@@ -44,17 +44,18 @@
  */
 
 
-package org.exolab.castor.xml;
+package org.exolab.castor.xml.util;
 
+import org.exolab.castor.xml.*;
 import java.util.Hashtable;
 
 /**
- * The default implementation of the MarshalInfoResolver interface
+ * The default implementation of the ClassDescriptorResolver interface
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class CachingMarshalInfoResolver 
-    implements MarshalInfoResolver 
+public class ClassDescriptorResolverImpl
+    implements ClassDescriptorResolver 
 {
     
     
@@ -68,17 +69,17 @@ public class CachingMarshalInfoResolver
     private String  _errMessage = null;
     
     
-    public CachingMarshalInfoResolver() {
+    public ClassDescriptorResolverImpl() {
         _cache = new Hashtable();
-    } //-- CachingMarshalInfoResolver
+    } //-- ClassDescriptorResolverImpl
     
     /**
      * Associates (or binds) a class type with a given MarshalInfo
      * @param type the Class to associate
      * @param mInfo the MarshalInfo to associate the given class with
     **/
-    public void associate(Class type, MarshalInfo mInfo) {
-        _cache.put(type, mInfo);
+    public void associate(Class type, XMLClassDescriptor classDesc) {
+        _cache.put(type, classDesc);
     } //-- associate
     
     /**
@@ -102,21 +103,20 @@ public class CachingMarshalInfoResolver
     } //-- error
     
     /**
-     * Returns the MarshalInfo for the given class, if no
-     * MarshalInfo class is found, null will be returned
-     * @param type the Class to find the MarshalInfo for
-     * @return the MarshalInfo for the given class
+     * Returns the XMLClassDescriptor for the given class
+     * @param type the Class to find the XMLClassDescriptor for
+     * @return the XMLClassDescriptor for the given class
     **/
-    public MarshalInfo resolve(Class type) {
+    public XMLClassDescriptor resolve(Class type) {
         
         clearError();
         
         if (type == null) return null;
         
-        MarshalInfo mInfo = (MarshalInfo) _cache.get(type);
-        if (mInfo != null) return mInfo;
+        XMLClassDescriptor classDesc = (XMLClassDescriptor) _cache.get(type);
+        if (classDesc != null) return classDesc;
         try {
-            mInfo = MarshalHelper.getMarshalInfo(type);
+            classDesc = MarshalHelper.getClassDescriptor(type);
         }
         catch(MarshalException mx) {
             String err = mx.toString();
@@ -124,34 +124,34 @@ public class CachingMarshalInfoResolver
             else setError(err);
         }
         
-        if (mInfo != null) {
-            _cache.put(type, mInfo);
+        if (classDesc != null) {
+            _cache.put(type, classDesc);
         }
-        return mInfo;
+        return classDesc;
     } //-- resolve
     
     /**
-     * Returns the MarshalInfo for the given class name
-     * @param className the class name to find the MarshalInfo for
-     * @return the MarshalInfo for the given class name
+     * Returns the XMLClassDescriptor for the given class name
+     * @param className the class name to find the XMLClassDescriptor for
+     * @return the XMLClassDescriptor for the given class name
     **/
-    public MarshalInfo resolve(String className) {
+    public XMLClassDescriptor resolve(String className) {
         return resolve(className, null);
     } //-- resolve(String)
     
     /**
-     * Returns the MarshalInfo for the given class name
-     * @param className the class name to find the MarshalInfo for
+     * Returns the XMLClassDescriptor for the given class name
+     * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
-     * @return the MarshalInfo for the given class name
+     * @return the XMLClassDescriptor for the given class name
     **/
-    public MarshalInfo resolve(String className, ClassLoader loader) {
+    public XMLClassDescriptor resolve(String className, ClassLoader loader) {
         
-        MarshalInfo mInfo = null;
+        XMLClassDescriptor classDesc = null;
         
         if ((className == null) || (className.length() == 0)) {
             clearError(); //-- clear error flag
-            return mInfo;
+            return classDesc;
         }
             
 
@@ -167,28 +167,28 @@ public class CachingMarshalInfoResolver
         catch(ClassNotFoundException cnfe) {}
         
         if (_class != null) {
-            mInfo = resolve(_class);
+            classDesc = resolve(_class);
         }
         else clearError(); //-- clear error flag
         
         //-- try to load just MarshalInfo
-        if ((mInfo == null) && (_class == null)) {
-            String mClassName = className+"MarshalInfo";
+        if ((classDesc == null) && (_class == null)) {
+            String dClassName = className+"Descriptor";
             try {
-	            Class mClass;
+	            Class dClass;
 	            if ( loader != null )
-		            mClass = loader.loadClass(mClassName);
+		            dClass = loader.loadClass(dClassName);
 	            else
-		            mClass = Class.forName(mClassName);
+		            dClass = Class.forName(dClassName);
     		        
-                mInfo = (MarshalInfo) mClass.newInstance();
+                classDesc = (XMLClassDescriptor) dClass.newInstance();
             }
             catch(InstantiationException ie)   { /* :-) */ }
             catch(ClassNotFoundException cnfe) { /* ;-) */ }
             catch(IllegalAccessException iae)  { /* :-Þ */ }
         }
         
-        return mInfo;
+        return classDesc;
     } //-- resolve(String, ClassLoader)
     
     
@@ -208,4 +208,4 @@ public class CachingMarshalInfoResolver
         _errMessage = message;
     } //-- setError
     
-} //-- CachingMarshalInfoResolver
+} //-- ClassDescriptorResolverImpl

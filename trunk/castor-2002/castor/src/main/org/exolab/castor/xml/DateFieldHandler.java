@@ -45,49 +45,46 @@
 
 package org.exolab.castor.xml;
 
-import java.lang.reflect.InvocationTargetException;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.ValidityException;
+
 import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * A specialized MarshalDescriptor for the XML Schema 
+ * A specialized FieldHandler for the XML Schema 
  * Date/Time related types
  * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class DateMarshalDescriptor extends SimpleMarshalDescriptor {
+public class DateFieldHandler implements FieldHandler {
         
     
     public static final String DATE_FORMAT =
         "yyyy-MM-dd'T'hh:mm:ss.SSS";
         
+    private FieldHandler handler = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
 
     /**
-     * Creates a new DateMarshalDescriptor with the given class
-     * type and programmatic name. An XML name will be created
-     * automatically from the programmatic name.
-     * @param type the Class type of the described field
-     * @param name the programmatic name of the field
+     * Creates a new DateFieldHandler using the given
+     * FieldHandler for delegation.
+     * @param
     **/
-    public DateMarshalDescriptor(String name) {
-        super(String.class, name, MarshalHelper.toXMLName(name));
-    } //-- DateMarshalDescriptor
-    
-    /**
-     * Creates a new DateMarshalDescriptor with the given class
-     * type and names
-     * @param type the Class type of the described field
-     * @param name the programmatic name of the field
-     * @param xmlName the XML name of the field
-    **/
-    public DateMarshalDescriptor(String name, String xmlName) {
-        super(String.class, name, xmlName);
-    } //-- DateMarshalDescriptor
+    public DateFieldHandler(FieldHandler fieldHandler) {
+        
+        if (fieldHandler == null) {
+            String err = "The FieldHandler argument passed to " +
+                "the constructor of DateFieldHandler must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        this.handler = fieldHandler;
+    } //-- DateFieldHandler
     
     
     //------------------/
@@ -103,11 +100,10 @@ public class DateMarshalDescriptor extends SimpleMarshalDescriptor {
      * descriptor from the given target object.
     **/
     public Object getValue(Object target) 
-        throws java.lang.reflect.InvocationTargetException,
-               java.lang.IllegalAccessException
+        throws java.lang.IllegalStateException
     {
         
-        Object val = super.getValue(target);
+        Object val = handler.getValue(target);
         
         if (val == null) return val;
         
@@ -144,8 +140,7 @@ public class DateMarshalDescriptor extends SimpleMarshalDescriptor {
      * @param value the value of the field 
     **/
     public void setValue(Object target, Object value)
-        throws java.lang.reflect.InvocationTargetException,
-               java.lang.IllegalAccessException
+        throws java.lang.IllegalStateException
     {
         Date date = null;
         
@@ -163,11 +158,44 @@ public class DateMarshalDescriptor extends SimpleMarshalDescriptor {
         }
         else date = (Date)value;
         
-        super.setValue(target, date);
+        handler.setValue(target, date);
         
     } //-- setValue
     
-} //-- DateMarshalDescriptor
+    /**
+     * Checks the field validity. Returns successfully if the field
+     * can be stored, is valid, etc, throws an exception otherwise.
+     *
+     * @param object The object
+     * @throws ValidityException The field is invalid, is required and
+     *  null, or any other validity violation
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler
+     *  is not compatiable with the Java object
+     */
+    public void checkValidity( Object object )
+        throws ValidityException, IllegalStateException 
+    {
+        //-- do nothing for now
+    } //-- checkValidity
+
+
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent )
+        throws IllegalStateException
+    {
+        return new Date();
+    } //-- newInstance
+    
+    
+} //-- DateFieldHandler
 
 
 

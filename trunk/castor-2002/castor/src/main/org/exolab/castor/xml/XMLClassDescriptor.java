@@ -46,51 +46,60 @@
 
 package org.exolab.castor.xml;
 
+
+import org.exolab.castor.mapping.ClassDescriptor;
+
 /**
- * An interface for finding or "resolving" MarshalInfo classes
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * A class descriptor for describing relationships between a Class
+ * and an XML element. Implements {@link ClassDescriptor} 
+ * All fields are of type {@link XMLFieldDescriptor}.
+ * This interface used to be "MarshalInfo".
+ * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
-public interface MarshalInfoResolver {
-    
+ */
+public interface XMLClassDescriptor extends ClassDescriptor {
+
+    /**
+     * Returns the set of XMLFieldDescriptors for all members
+     * that should be marshalled as XML attributes.
+     * @return an array of XMLFieldDescriptors for all members
+     * that should be marshalled as XML attributes.
+    **/
+    public XMLFieldDescriptor[]  getAttributeDescriptors();
     
     /**
-     * Returns the last error message generated
-     * If no error String exists, null will be returned
-     * @return the last error message generated.
-     * If no error String exists, null will be returned
+     * Returns the XMLFieldDescriptor for the member
+     * that should be marshalled as text content.
+     * @return the XMLFieldDescriptor for the member
+     * that should be marshalled as text content.
     **/
-    public String getErrorMessage();
+    public XMLFieldDescriptor getContentDescriptor();
     
     /**
-     * Returns true if an error was generated on the last call
-     * to one of the resolve methods
-     * @return true if an error was generated on the last call
-     * to one of the resolve methods
+     * Returns the set of XMLFieldDescriptors for all members
+     * that should be marshalled as XML elements.
+     * @return an array of XMLFieldDescriptors for all members
+     * that should be marshalled as XML elements.
     **/
-    public boolean error();
+    public XMLFieldDescriptor[]  getElementDescriptors();
     
     /**
-     * Returns the MarshalInfo for the given class
-     * @param type the Class to find the MarshalInfo for
-     * @return the MarshalInfo for the given class
+     * @return the namespace prefix to use when marshalling as XML.
     **/
-    public MarshalInfo resolve(Class type);
+    public String getNameSpacePrefix();
     
     /**
-     * Returns the MarshalInfo for the given class name
-     * @param className the class name to find the MarshalInfo for
-     * @return the MarshalInfo for the given class name
+     * @return the namespace URI used when marshalling and unmarshalling as XML.
     **/
-    public MarshalInfo resolve(String className);
+    public String getNameSpaceURI();
     
     /**
-     * Returns the MarshalInfo for the given class name
-     * @param className the class name to find the MarshalInfo for
-     * @param loader the ClassLoader to use
-     * @return the MarshalInfo for the given class name
+     * Returns the XML Name for the Class being described.
+     * @return the XML name.
     **/
-    public MarshalInfo resolve(String className, ClassLoader loader);
+    public String getXMLName();
+
     
-    
-} //-- MarshalInfoResolver
+} //-- XMLClassDescriptor
+
+

@@ -48,6 +48,7 @@ package org.exolab.castor.xml;
 //-- xml related imports
 import org.xml.sax.*;
 import org.apache.xml.serialize.Serializer;
+import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.util.List;
@@ -101,9 +102,9 @@ public class Marshaller {
     private List _nsScope = null;
     
     /**
-     * The MarshalInfoResolver used for Resolving MarshalInfo classes
+     * The ClassDescriptorResolver used for resolving XMLClassDescriptors
     **/
-    private MarshalInfoResolver _mResolver = null;
+    private ClassDescriptorResolver _cdResolver = null;
     
     /**
      * The depth of the sub tree, 0 denotes document level
@@ -122,7 +123,7 @@ public class Marshaller {
         _nsURIKeyHash    = new Hashtable(3);
         _nsScope         = new List(3);
         _packages        = new List(3);
-        _mResolver       = new CachingMarshalInfoResolver();
+        _cdResolver       = new ClassDescriptorResolverImpl();
         _parents         = new Stack();
     } //-- Marshaller
     
@@ -166,11 +167,13 @@ public class Marshaller {
         (Object obj, Writer out, PrintWriter logger, boolean debug) 
         throws MarshalException, ValidationException
     {
-	try {
-	    marshal(obj, Configuration.getSerializer( out ), logger, debug);
-	} catch ( IOException except ) {
-	    throw new MarshalException( except );
-	}
+        try {
+       	    marshal(obj, Configuration.getSerializer( out ), logger, debug);
+       	}
+       	catch (java.io.IOException ioe) {
+       	    throw new MarshalException(ioe);
+       	}
+
         try {
             out.flush();
         }
@@ -229,7 +232,7 @@ public class Marshaller {
      * during marshaling
     **/
     public void marshal
-        (Object object, MarshalDescriptor descriptor, DocumentHandler handler) 
+        (Object object, XMLFieldDescriptor descriptor, DocumentHandler handler) 
         throws MarshalException, ValidationException
     {
         
@@ -252,7 +255,7 @@ public class Marshaller {
         
         
         if (descriptor == null)
-            descriptor = new SimpleMarshalDescriptor(_class, null);
+            descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
 
         //-- calculate Object's name
         String name = descriptor.getXMLName();
@@ -267,8 +270,10 @@ public class Marshaller {
             name = MarshalHelper.toXMLName(name);
         }
             
-        MarshalInfo marshalInfo = descriptor.getMarshalInfo();
-        if (marshalInfo == null) {
+        XMLClassDescriptor classDesc 
+            = (XMLClassDescriptor)descriptor.getClassDescriptor();
+            
+        if (classDesc == null) {
             
             //-- check for primitive or String, we need to use
             //-- the special #isPrimitive method of this class
@@ -283,11 +288,13 @@ public class Marshaller {
                 for (int i = 0; i < _packages.size(); i++) {
                     String pkgName = (String)_packages.get(i);
                     String className = pkgName+cname;
-                    marshalInfo = MarshalHelper.getMarshalInfo(className);
-                    if (marshalInfo != null) break;
+                    
+                    classDesc = MarshalHelper.getClassDescriptor(className);
+                    
+                    if (classDesc != null) break;
                 }
-                if (marshalInfo == null) {
-                    marshalInfo = new StringMarshalInfo();
+                if (classDesc == null) {
+                    classDesc = new StringMarshalInfo();
                 }
             }
             else {
@@ -300,10 +307,11 @@ public class Marshaller {
                     if (!_packages.contains(pkgName))
                         _packages.add(pkgName);
                 }
-                marshalInfo = getMarshalInfo(_class);
+                
+                classDesc = getClassDescriptor(_class);
             }
             
-            if (marshalInfo == null) {
+            if (classDesc == null) {
                 
                 //-- make sure we are allowed to marshal Object
                 if ((_class == Void.class) ||
@@ -330,12 +338,12 @@ public class Marshaller {
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();
         
-        MarshalDescriptor[] descriptors = marshalInfo.getAttributeDescriptors();
+        XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
         for (int i = 0; i < descriptors.length; i++) {
             
             if (descriptors[i] == null) continue;
             
-            MarshalDescriptor attDescriptor = descriptors[i];
+            XMLFieldDescriptor attDescriptor = descriptors[i];
             
             String xmlName = attDescriptor.getXMLName();
             
@@ -344,12 +352,9 @@ public class Marshaller {
             
             Object value = null;
             try {
-                value = attDescriptor.getValue(object);
+                value = attDescriptor.getHandler().getValue(object);
             }
-            catch(InvocationTargetException ite) {
-                continue;
-            }
-            catch(IllegalAccessException iae) {
+            catch(IllegalStateException ise) {
                 continue;
             }
             if (value == null) continue;
@@ -365,10 +370,10 @@ public class Marshaller {
         boolean addedNamespace = false;
         
         String nsPrefix = descriptor.getNameSpacePrefix();
-        if (nsPrefix == null) nsPrefix = marshalInfo.getNameSpacePrefix();
+        if (nsPrefix == null) nsPrefix = classDesc.getNameSpacePrefix();
             
         String nsURI = descriptor.getNameSpaceURI();
-        if (nsURI == null) nsURI = marshalInfo.getNameSpaceURI();
+        if (nsURI == null) nsURI = classDesc.getNameSpaceURI();
         
         if ((nsURI == null) && (nsPrefix != null)) {
             nsURI = (String) _nsPrefixKeyHash.get(nsPrefix);
@@ -402,14 +407,13 @@ public class Marshaller {
         
         
         //-- handle text content
-        MarshalDescriptor cdesc = marshalInfo.getContentDescriptor();
+        XMLFieldDescriptor cdesc = classDesc.getContentDescriptor();
         if (cdesc != null) {
             Object obj = null;
             try {
-                obj = cdesc.getValue(object);
+                obj = cdesc.getHandler().getValue(object);
             }
-            catch(InvocationTargetException ite) {}
-            catch(IllegalAccessException iae) {};
+            catch(IllegalStateException ise) {};
             if (obj != null) {
                 String str = obj.toString();
                 if ((str != null) && (str.length() > 0)) {
@@ -450,20 +454,17 @@ public class Marshaller {
         
         
         //-- handle daughter elements
-        descriptors = marshalInfo.getElementDescriptors();
+        descriptors = classDesc.getElementDescriptors();
         
         ++depth;
         for (int i = 0; i < descriptors.length; i++) {
             
-            MarshalDescriptor elemDescriptor = descriptors[i];
+            XMLFieldDescriptor elemDescriptor = descriptors[i];
             Object obj = null;
             try {
-                obj = elemDescriptor.getValue(object);
+                obj = elemDescriptor.getHandler().getValue(object);
             }
-            catch(InvocationTargetException ite) {
-                continue;
-            }
-            catch(IllegalAccessException iae) {
+            catch(IllegalStateException ise) {
                 continue;
             }
             if (obj == null) continue;
@@ -538,29 +539,29 @@ public class Marshaller {
     } //-- setLogWriter
     
     /**
-     * Finds and returns a MarshalInfo for the given class. If
-     * a MarshalInfo could not be found one will attempt to 
-     * be generated. 
-     * @param _class the Class to get the MarshalInfo for
+     * Finds and returns an XMLClassDescriptor for the given class. If
+     * a XMLClassDescriptor could not be found, this method will attempt to 
+     * create one automatically using reflection. 
+     * @param _class the Class to get the XMLClassDescriptor for
      * @exception MarshalException when there is a problem 
-     * retrieving or creating the MarshalInfo for the given class
+     * retrieving or creating the XMLClassDescriptor for the given class
     **/
-    private MarshalInfo getMarshalInfo(Class _class) 
+    private XMLClassDescriptor getClassDescriptor(Class _class) 
         throws MarshalException
     {
-        MarshalInfo mInfo = _mResolver.resolve(_class);
-        if (_mResolver.error()) {
-            throw new MarshalException(_mResolver.getErrorMessage());
+        XMLClassDescriptor classDesc = _cdResolver.resolve(_class);
+        if (_cdResolver.error()) {
+            throw new MarshalException(_cdResolver.getErrorMessage());
         }
-        return mInfo;
-    } //-- getMarshalInfo
+        return classDesc;
+    } //-- getClassDescriptor
     
     
     private void validate(Object object) 
         throws ValidationException
     {
         //-- we must have a valid element before marshalling
-        Validator.validate(object, _mResolver);
+        Validator.validate(object, _cdResolver);
     }
     
     /**

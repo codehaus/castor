@@ -46,11 +46,9 @@
 package org.exolab.castor.xml;
 
 
-  //---------------------------------/
- //- Imported classes and packages -/
-//---------------------------------/
-
-import java.lang.reflect.Method;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.AccessMode;
 
 /**
  * The default StringMarshalInfo class
@@ -58,7 +56,7 @@ import java.lang.reflect.Method;
  * @version $Revision$ $Date$
 **/
 public class StringMarshalInfo 
-    implements MarshalInfo 
+    implements XMLClassDescriptor 
 {
 
 
@@ -69,27 +67,26 @@ public class StringMarshalInfo
     /**
      * The set of element descriptors
     **/
-    private static final MarshalDescriptor[] elements =
-        new MarshalDescriptor[0];
+    private static final XMLFieldDescriptor[] elements =
+        new XMLFieldDescriptor[0];
 
     /**
      * The set of attribute descriptors
     **/
-    private static final MarshalDescriptor[] attributes =
-        new MarshalDescriptor[0];
+    private static final XMLFieldDescriptor[] attributes =
+        new XMLFieldDescriptor[0];
 
     /**
      * The content descriptor
     **/
-    private static final MarshalDescriptor contentDesc = null;
+    private static final XMLFieldDescriptor contentDesc = null;
 
-    /**
-     * the Validator to use for validating Strings described
-     * by this MarshalInfo
-    **/
-    private StringValidator _validator = null;
+    private static final FieldDescriptor[] fields = new FieldDescriptor[0];
     
-    private ValidationRule[] rules = null;
+    /**
+     * The XML name for the described object.
+    **/
+    private String _xmlName = null;
     
       //----------------/
      //- Constructors -/
@@ -97,8 +94,6 @@ public class StringMarshalInfo
 
     public StringMarshalInfo() {
         super();
-        rules = new ValidationRule[1];
-        rules[0] = new BasicValidationRule();
     } //-- StringMarshalInfo()
 
 
@@ -111,7 +106,7 @@ public class StringMarshalInfo
      * @return an array of MarshalDescriptors for all members that
      * should be marshalled as Attributes
     **/
-    public MarshalDescriptor[] getAttributeDescriptors() {
+    public XMLFieldDescriptor[] getAttributeDescriptors() {
         return attributes;
     } //-- getAttributeDescriptors() 
 
@@ -119,7 +114,7 @@ public class StringMarshalInfo
      * Returns the Class that this MarshalInfo describes
      * @return the Class that this MarshalInfo describes
     **/
-    public Class getClassType() {
+    public Class getJavaClass() {
         return java.lang.String.class;
     } //-- getClassType() 
 
@@ -128,29 +123,36 @@ public class StringMarshalInfo
      * @return an array of MarshalDescriptors for all members that
      * should be marshalled as Elements
     **/
-    public MarshalDescriptor[] getElementDescriptors() {
+    public XMLFieldDescriptor[] getElementDescriptors() {
         return elements;
     } //-- getElementDescriptors() 
 
+    /**
+     * Returns the class descriptor of the class extended by this class.
+     *
+     * @return The extended class descriptor
+     */
+    public ClassDescriptor getExtends() {
+        return null;
+    } //-- getExtends
 
     /**
+     * Returns a list of fields represented by this descriptor.
+     *
+     * @return A list of fields
+     */
+    public FieldDescriptor[] getFields() {
+        return fields;
+    } //-- getFields
+    
+    /**
      * Returns the descriptor for dealing with Text content
-     * @return the MarshalDescriptor for dealing with Text content
+     * @return the XMLFieldDescriptor for dealing with Text content
     **/
-    public MarshalDescriptor getContentDescriptor() {
+    public XMLFieldDescriptor getContentDescriptor() {
         return contentDesc;
     } //-- getContentDescriptor() 
 
-    /**
-     * Returns the ValidationRules used for validating the instances
-     * of the class associated with this MarshalInfo
-     * @return the ValidationRules used for validating the instances
-     * of the class associated with this MarshalInfo
-    **/
-    public ValidationRule[] getValidationRules() {
-        return rules;
-    } //-- getValidationRule
-    
     /**
      * @return the namespace prefix to use when marshalling as XML.
     **/
@@ -165,10 +167,45 @@ public class StringMarshalInfo
         return null;
     } //-- getNameSpaceURI
     
+    /**
+     * Returns the identity field, null if this class has no identity.
+     *
+     * @return The identity field
+     */
+    public FieldDescriptor getIdentity() {
+        return null;
+    } //-- getIdentity
+
+
+    /**
+     * Returns the access mode specified for this class.
+     *
+     * @return The access mode
+     */
+    public AccessMode getAccessMode() {
+        return null;
+    } //-- getAccessMode
+    
+    /**
+     * Returns the XML Name for the Class being described.
+     *
+     * @return the XML name.
+    **/
+    public String getXMLName() {
+        return _xmlName;
+    } //-- getXMLName   
     
     public void setValidator(StringValidator validator) {
-        this._validator = validator;
-        rules[0].setTypeValidator(_validator);
+        //this._validator = validator;
+        //rules[0].setTypeValidator(_validator);
     } //-- setValidator
+    
+    /**
+     * Sets the XML Name for the described object.
+     * @param xmlName the XML name to use for the described object.
+    **/
+    public void setXMLName(String xmlName) {
+        this._xmlName = xmlName;
+    } //-- setXMLName
     
 } //-- StringMarshalInfo

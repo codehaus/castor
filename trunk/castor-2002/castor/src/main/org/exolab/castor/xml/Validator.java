@@ -46,6 +46,8 @@
 
 package org.exolab.castor.xml;
 
+import org.exolab.castor.xml.util.*;
+
 import java.util.Enumeration;
 import java.util.Vector;
 import java.lang.reflect.*;
@@ -57,7 +59,7 @@ import java.lang.reflect.*;
 **/
 public class Validator {
     
-    private MarshalInfoResolver _mResolver = null;
+    private ClassDescriptorResolver _cdResolver = null;
     
     private static Object[] emptyParams = new Object[0];
     
@@ -69,14 +71,12 @@ public class Validator {
     } //-- Validator
     
     /**
-     * Sets the MarshalInfoResolver used for finding MarshalInfo
-     * classes
-     * @param mResolver the MarshalInfoResolver used for finding
-     * MarshalInfo classes
+     * Sets the ClassDescriptorResolver to use for finding XMLClassDescriptors
+     * @param cdResolver the ClassDescriptorResolver to use
     **/
 
-    public void setResolver(MarshalInfoResolver mResolver) {
-        this._mResolver = mResolver;
+    public void setResolver(ClassDescriptorResolver cdResolver) {
+        this._cdResolver = cdResolver;
     } //-- setResolver
     
     /**
@@ -93,16 +93,20 @@ public class Validator {
             throw new ValidationException("cannot validate a null Object.");
         } 
         
-        MarshalInfoResolver mResolver = _mResolver;
-        if (mResolver == null)
-            mResolver = new CachingMarshalInfoResolver();
+        ClassDescriptorResolver cdResolver = _cdResolver;
+        if (cdResolver == null)
+            cdResolver = new ClassDescriptorResolverImpl();
       
-        MarshalInfo mInfo = mResolver.resolve(object.getClass());
+        XMLClassDescriptor classDesc = cdResolver.resolve(object.getClass());
         
-        //-- we cannot validate object if MarshalInfo
-        //-- is null
-        if (mInfo == null) return;
+        //-- we cannot validate object if ClassDescriptor is null
+        if (classDesc == null) return;
         
+        //-- quick hack...no validation will occur until I change this!
+        
+        return;
+        
+        /*
         ValidationRule[] rules = mInfo.getValidationRules();
         
         if (rules != null) {
@@ -110,6 +114,7 @@ public class Validator {
 		if ( rules[ i ] != null )
 		    validate(object, rules[i], mInfo);
         }
+        */
         
     } //-- validate
     
@@ -238,18 +243,19 @@ public class Validator {
         
     
     /**
-     * Validates an Object model, MarshalInfo classes will be used
-     * to perform Validation. If no MarshalInfo class exists, one
+     * Validates an Object model, ClassDescriptor classes will be used
+     * to perform Validation. If no ClassDescriptor class exists, one
      * will be dynamically created
      * @param the given Object in which to validate
-     * @param mResolver the MarshalInfoResolver used for finding
-     * MarshalInfo classes, this may be null
+     * @param cdResolver the ClassDescriptorResolver used for finding
+     * XMLClassDescriptors, this may be null
     **/
-    public static void validate(Object object, MarshalInfoResolver mResolver) 
+    public static void validate
+        (Object object, ClassDescriptorResolver cdResolver) 
         throws ValidationException
     {
         Validator validator = new Validator();
-        validator.setResolver(mResolver);
+        validator.setResolver(cdResolver);
         validator.validate(object);
     } //-- validate
     

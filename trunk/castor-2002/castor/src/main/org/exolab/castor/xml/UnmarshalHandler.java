@@ -47,6 +47,8 @@ package org.exolab.castor.xml;
 
 //-- Castor imports
 import org.exolab.castor.util.MimeBase64Decoder;
+import org.exolab.castor.xml.util.*;
+import org.exolab.castor.mapping.FieldHandler;
 
 //-- xml related imports
 import org.xml.sax.*;
@@ -112,10 +114,10 @@ public class UnmarshalHandler implements DocumentHandler {
     private PrintWriter      _logWriter    = null;
 
     /**
-     * The MarshalInfoResolver which is used to "resolve"
-     * or find MarshalInfo classes
+     * The ClassDescriptorResolver which is used to "resolve"
+     * or find ClassDescriptors
     **/
-    private MarshalInfoResolver _mResolver = null;
+    private ClassDescriptorResolver _cdResolver = null;
     
     /**
      * A flag indicating whether or not to perform validation
@@ -228,7 +230,7 @@ public class UnmarshalHandler implements DocumentHandler {
         
         UnmarshalState state = (UnmarshalState) _stateInfo.pop();
         //-- make sure we have the correct closing tag
-        MarshalDescriptor descriptor = state.descriptor;
+        XMLFieldDescriptor descriptor = state.fieldDesc;
         if (!state.elementName.equals(name)) {            
             String err = "error in xml, expecting </" + state.elementName;
             err += ">, but recieved </" + name + "> instead.";
@@ -277,21 +279,18 @@ public class UnmarshalHandler implements DocumentHandler {
         //-- check for character content
         if ((state.buffer != null) && 
             (state.buffer.length() > 0) &&
-            (state.mInfo != null)) {
+            (state.classDesc != null)) {
             
-            MarshalDescriptor mdesc = state.mInfo.getContentDescriptor();
-            if (mdesc != null) {
+            XMLFieldDescriptor cdesc = state.classDesc.getContentDescriptor();
+            if (cdesc != null) {
                 try {
-                    mdesc.setValue(state.object, state.buffer.toString());
+                    FieldHandler handler = cdesc.getHandler();
+                    handler.setValue(state.object, state.buffer.toString());
                 }
-                catch(java.lang.IllegalAccessException iae) {
+                catch(java.lang.IllegalStateException ise) {
                     String err = "unable to add text content to ";
-                    err += state.descriptor.getXMLName();
-                    throw new SAXException(err);
-                }
-                catch(java.lang.reflect.InvocationTargetException itx) {
-                    String err = "unable to add text content to ";
-                    err += state.descriptor.getXMLName();
+                    err += descriptor.getXMLName();
+                    err += " due to the following error: " + ise;
                     throw new SAXException(err);
                 }
             }
@@ -301,7 +300,7 @@ public class UnmarshalHandler implements DocumentHandler {
         if (_stateInfo.empty()) {
             if (_validate) {
                 try {
-                    Validator.validate(state.object, _mResolver);
+                    Validator.validate(state.object, _cdResolver);
                 }
                 catch(ValidationException vEx) {
                     throw new SAXException(vEx);
@@ -335,8 +334,10 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         
         try {
-            descriptor.setValue(state.object, val);
+            FieldHandler handler = descriptor.getHandler();
+            handler.setValue(state.object, val);
         }
+        /*
         catch(java.lang.reflect.InvocationTargetException itx) {
             
             Throwable toss = itx.getTargetException();
@@ -347,9 +348,10 @@ public class UnmarshalHandler implements DocumentHandler {
             err += "> due to the following exception: " + toss;
             throw new SAXException(err);
         }
+        */
         catch(Exception ex) {
             String err = "unable to add '" + name + "' to <";
-            err += state.descriptor.getXMLName();
+            err += state.fieldDesc.getXMLName();
             err += "> due to the following exception: " + ex;
             throw new SAXException(err);
         }
@@ -406,32 +408,33 @@ public class UnmarshalHandler implements DocumentHandler {
         if (_stateInfo.empty()) {
             //-- Initialize since this is the first element
             
-            if (_mResolver == null) {
-                _mResolver = new CachingMarshalInfoResolver();
+            if (_cdResolver == null) {
+                _cdResolver = new ClassDescriptorResolverImpl();
             }
             _topState = new UnmarshalState();
             _topState.elementName = name;
             
-            SimpleMarshalDescriptor smd
-                = new SimpleMarshalDescriptor(_topClass, name, name);
+            XMLFieldDescriptorImpl fieldDesc
+                = new XMLFieldDescriptorImpl(_topClass, name, name, null);
             
-            _topState.descriptor = smd;
+            _topState.fieldDesc = fieldDesc;
             
-            //-- look for MarshalInfo
-            MarshalInfo mInfo = getMarshalInfo(_topClass);
-            smd.setMarshalInfo(mInfo);
+            //-- look for XMLClassDescriptor
+            XMLClassDescriptor classDesc = getClassDescriptor(_topClass);
+            fieldDesc.setClassDescriptor(classDesc);
             
-            if (mInfo == null) {
+            if (classDesc == null) {
                 //-- report error
 			    if ((!_topClass.isPrimitive()) &&
                     (!Serializable.class.isAssignableFrom( _topClass )))
                     throw new SAXException(MarshalException.NON_SERIALIZABLE_ERR);
                 else {
-                    String err = "unable to create MarshalInfo for class: ";
-                    throw new SAXException(err + _topClass.getName());
+                    String err = "unable to create XMLClassDescriptor " +
+                                 "for class: " + _topClass.getName();
+                    throw new SAXException(err);
                 }
             }
-            _topState.mInfo = mInfo;
+            _topState.classDesc = classDesc;
             _topState.type = _topClass;
             //-- try to create instance of the given Class
             String err = null;
@@ -456,7 +459,7 @@ public class UnmarshalHandler implements DocumentHandler {
             }
             
             _stateInfo.push(_topState);
-            processAttributes(atts, mInfo);
+            processAttributes(atts, classDesc);
             return;
         }
         
@@ -477,17 +480,18 @@ public class UnmarshalHandler implements DocumentHandler {
         Class _class = null;
         boolean byteArray = false;
             
-        MarshalInfo mInfo = parentState.descriptor.getMarshalInfo();
-        if (mInfo == null) {
-           mInfo = getMarshalInfo(parentState.object.getClass());
-        }
+        XMLClassDescriptor classDesc 
+            = (XMLClassDescriptor)parentState.fieldDesc.getClassDescriptor();
+        
+        if (classDesc == null)
+           classDesc = getClassDescriptor(parentState.object.getClass());
         
         //-- find Descriptor
-        MarshalDescriptor[] descriptors = mInfo.getElementDescriptors();
-        MarshalDescriptor descriptor = null;
+        XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
+        XMLFieldDescriptor descriptor = null;
         for (int i = 0; i < descriptors.length; i++) {
             //-- check for null here, since I actually ran into this
-            //-- problem
+            //-- problem once
             if (descriptors[i] == null) continue;
             
             if (descriptors[i].matches(name)) {
@@ -499,8 +503,9 @@ public class UnmarshalHandler implements DocumentHandler {
         //-- Find object type and create new Object of that type
         if (descriptor != null) {
             
-            state.descriptor = descriptor;
+            state.fieldDesc = descriptor;
             
+            /* <update>
             if (!descriptor.getAccessRights().isWritable()) {
                 if (debug) {
                     buf.setLength(0);
@@ -511,14 +516,16 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
                 return;
             }
+            */
             
             //-- Find class to instantiate
-            mInfo = descriptor.getMarshalInfo();
+            classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
             
             
-            //-- check descriptor for create method...
+            FieldHandler handler = descriptor.getHandler();
+            
+            /*
             Method creator = descriptor.getCreateMethod();
-            
             if (creator == null) {
             
                 _class = descriptor.getFieldType();
@@ -564,8 +571,11 @@ public class UnmarshalHandler implements DocumentHandler {
                     throw new SAXException(err);
                 }
             }
+            
             //-- use creator method to create a new object
             else {
+                
+            */
                 
                 if (debug) {
                     buf.setLength(0);
@@ -577,40 +587,32 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
                 try {
                     
-                    state.object = creator.invoke(parentState.object,
-                                              EMPTY_OBJECT_ARGS);
+                    state.object = handler.newInstance(parentState.object);
+                    
                     //-- assign new class value                          
                     if (state.object != null) 
                         _class = state.object.getClass();
                         
                     state.type = _class;
                 }
-                catch (java.lang.IllegalAccessException iae) {
+                catch (java.lang.IllegalStateException ise) {
                     StringBuffer msg = new StringBuffer();
                     msg.append("unable to use the create method for: ");
                     msg.append(name);
                     msg.append(" - ");
-                    msg.append(iae.toString());
+                    msg.append(ise.toString());
                     message(msg.toString());
                 }
-                catch (java.lang.reflect.InvocationTargetException ite) {
-                    StringBuffer msg = new StringBuffer();
-                    msg.append("unable to use the create method for: ");
-                    msg.append(name);
-                    msg.append(" - ");
-                    msg.append(ite.toString());
-                    message(msg.toString());
-                }
-            } //-- end if (creator)           
+            //} //-- end if (creator)           
             
             
             //-- At this point we should have a new object, unless
             //-- we are dealing with a primitive type, or a special
             //-- case such as byte[]
-            if (mInfo == null) {
-                mInfo = getMarshalInfo(_class);
+            if (classDesc == null) {
+                classDesc = getClassDescriptor(_class);
             }
-            state.mInfo = mInfo;
+            state.classDesc = classDesc;
             
             if ((state.object == null) && 
                 (!state.type.isPrimitive()) &&
@@ -636,16 +638,12 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
                 
                 try {
-                    descriptor.setValue(parentState.object, state.object);
+                    handler.setValue(parentState.object, state.object);
                 }
-                catch(java.lang.IllegalAccessException iae) {
+                catch(java.lang.IllegalStateException ise) {
                     String err = "unable to add \"" + name + "\" to ";
-                    err += parentState.descriptor.getXMLName();
-                    throw new SAXException(err);
-                }
-                catch(java.lang.reflect.InvocationTargetException itx) {
-                    String err = "unable to add \"" + name + "\" to ";
-                    err += parentState.descriptor.getXMLName();
+                    err += parentState.fieldDesc.getXMLName();
+                    err += " due to the following error: " + ise;
                     throw new SAXException(err);
                 }
             }
@@ -658,7 +656,7 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         
         if (state.object != null)
-            processAttributes(atts, mInfo);
+            processAttributes(atts, classDesc);
         else if ((state.type != null) && (!state.type.isPrimitive())) {
             StringBuffer msg = new StringBuffer("current object for '");
             msg.append(name);
@@ -700,22 +698,23 @@ public class UnmarshalHandler implements DocumentHandler {
      * Processes the given attribute list, and attempts to add each 
      * Attribute to the current Object on the stack
     **/
-    private void processAttributes(AttributeList atts, MarshalInfo mInfo) 
+    private void processAttributes
+        (AttributeList atts, XMLClassDescriptor classDesc) 
         throws org.xml.sax.SAXException
     {
         
         //System.out.println("#processAttributes");
         if (atts == null) {
             
-            if ((mInfo != null) 
-                && (mInfo.getAttributeDescriptors().length > 0)
+            if ((classDesc != null) 
+                && (classDesc.getAttributeDescriptors().length > 0)
                 && (debug))
             {
                 UnmarshalState state = (UnmarshalState)_stateInfo.peek();
                 buf.setLength(0);
                 buf.append("AttributeList for '");
                 buf.append(state.elementName);
-                buf.append("' is null, but Attribute Descriptors exist.");
+                buf.append("' is null, but attribute descriptors exist.");
                 message(buf.toString());
             }
             return;
@@ -724,11 +723,11 @@ public class UnmarshalHandler implements DocumentHandler {
         UnmarshalState state = (UnmarshalState)_stateInfo.peek();
         Object object = state.object;
         
-        if (mInfo == null) {
-            mInfo = state.mInfo;
-            if (mInfo == null) {
+        if (classDesc == null) {
+            classDesc = state.classDesc;
+            if (classDesc == null) {
                 buf.setLength(0);
-                buf.append("No MarshalInfo for '");
+                buf.append("No ClassDescriptor for '");
                 buf.append(state.elementName);
                 buf.append("', cannot process attributes.");
                 message(buf.toString());
@@ -737,12 +736,13 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         
         
-        MarshalDescriptor[] descriptors = mInfo.getAttributeDescriptors();
+        XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
         
         for (int i = 0; i < descriptors.length; i++) {
             
-            MarshalDescriptor descriptor = descriptors[i];
+            XMLFieldDescriptor descriptor = descriptors[i];
             
+            /* <update>
             if (!descriptor.getAccessRights().isWritable()) {
                 if (debug) {
                     buf.setLength(0);
@@ -753,6 +753,7 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
                 continue;
             }
+            */
             
             String attName = descriptor.getXMLName();
             String attValue = atts.getValue(attName);
@@ -781,16 +782,15 @@ public class UnmarshalHandler implements DocumentHandler {
                 value = MarshalHelper.toPrimitiveObject(type, attValue);
                 
             try {
-                descriptor.setValue(object, value);
+                FieldHandler handler = descriptor.getHandler();
+                
+                if (handler != null)
+                    handler.setValue(object, value);
             }
-            catch(java.lang.IllegalAccessException iae) {
+            catch(java.lang.IllegalStateException ise) {
                 String err = "unable to add attribute \"" + attName + "\" to ";
-                err += state.descriptor.getXMLName();
-                throw new SAXException(err);
-            }
-            catch(java.lang.reflect.InvocationTargetException itx) {
-                String err = "unable to add attribute \"" + attName + "\" to ";
-                err += state.descriptor.getXMLName();
+                err += state.fieldDesc.getXMLName();
+                err += "due to the following error: " + ise;
                 throw new SAXException(err);
             }
         }
@@ -816,32 +816,32 @@ public class UnmarshalHandler implements DocumentHandler {
      * for performance reasons.
      * @param _class the Class to get the MarshalInfo for
     **/
-    private MarshalInfo getMarshalInfo(Class _class) 
+    private XMLClassDescriptor getClassDescriptor(Class _class) 
         throws SAXException
     {
         if (_class == null) return null;
         if (_class.isArray()) return null;
         
-        if (_mResolver == null) 
-            _mResolver = new CachingMarshalInfoResolver();
+        if (_cdResolver == null) 
+            _cdResolver = new ClassDescriptorResolverImpl();
             
             
-        MarshalInfo mInfo = _mResolver.resolve(_class);
+        XMLClassDescriptor classDesc = _cdResolver.resolve(_class);
         
-        if (mInfo != null) return mInfo;
+        if (classDesc != null) return classDesc;
         
-        //-- we couldn't create a MarshalInfo, check for
+        //-- we couldn't create a ClassDescriptor, check for
         //-- error message
-        if (_mResolver.error()) {
-            message(_mResolver.getErrorMessage());
+        if (_cdResolver.error()) {
+            message(_cdResolver.getErrorMessage());
         }
         else {
             buf.setLength(0);
-            buf.append("unable to find or create a MarshalInfo for class: ");
+            buf.append("unable to find or create a ClassDescriptor for class: ");
             buf.append(_class.getName());
             message(buf.toString());
         }
-        return mInfo;
+        return classDesc;
     } //-- getMarshalInfo
     
     /**

@@ -43,60 +43,54 @@
  * $Id$
  */
 
+
 package org.exolab.castor.xml;
 
-import java.util.Vector;
-
-class UnmarshalState {
+/**
+ * An interface for finding or "resolving" XMLClassDescriptor classes
+ * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @version $Revision$ $Date$
+**/
+public interface ClassDescriptorResolver {
+    
     
     /**
-     * The xml element name of the current object
+     * Returns the last error message generated
+     * If no error String exists, null will be returned
+     * @return the last error message generated.
+     * If no error String exists, null will be returned
     **/
-    String elementName = null;
+    public String getErrorMessage();
     
     /**
-     * Characters read in during unmarshalling
+     * Returns true if an error was generated on the last call
+     * to one of the resolve methods
+     * @return true if an error was generated on the last call
+     * to one of the resolve methods
     **/
-    StringBuffer buffer = null;
+    public boolean error();
     
     /**
-     * The current that we are unmarshalling to
+     * Returns the XMLClassDescriptor for the given class
+     * @param type the Class to find the XMLClassDescriptor for
+     * @return the XMLClassDescriptor for the given class
     **/
-    Object object = null;
+    public XMLClassDescriptor resolve(Class type);
     
     /**
-     * The class of the object, mainly used for primitives
+     * Returns the XMLClassDescriptor for the given class name
+     * @param className the class name to find the XMLClassDescriptor for
+     * @return the XMLClassDescriptor for the given class name
     **/
-    Class type = null;
+    public XMLClassDescriptor resolve(String className);
     
     /**
-     * The field descriptor for the Object
+     * Returns the XMLClassDescriptor for the given class name
+     * @param className the class name to find the XMLClassDescriptor for
+     * @param loader the ClassLoader to use
+     * @return the XMLClassDescriptor for the given class name
     **/
-    XMLFieldDescriptor fieldDesc = null;
+    public XMLClassDescriptor resolve(String className, ClassLoader loader);
     
-    /**
-     * The class descriptor for the Object, in case 
-     * FieldDescriptor#getClassDescriptor returns null
-    **/
-    XMLClassDescriptor classDesc = null;
-
-    private Vector markedList = null;
     
-    UnmarshalState() {
-        super();
-        markedList = new Vector(5);
-    }
-    
-    /**
-     * Marks the given XMLFieldDescriptor as having been used
-     * @param descriptor the XMLFieldDescriptor to mark
-    **/
-    void markAsUsed(XMLFieldDescriptor descriptor) {
-        markedList.addElement(descriptor);
-    } //-- markAsUsed
-    
-    boolean isUsed(XMLFieldDescriptor descriptor) {
-        return markedList.contains(descriptor);
-    } //-- isUsed
-    
-} //-- UnmarshalState
+} //-- ClassDescriptorResolver

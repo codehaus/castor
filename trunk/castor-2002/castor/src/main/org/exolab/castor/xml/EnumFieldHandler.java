@@ -45,7 +45,9 @@
 
 package org.exolab.castor.xml;
 
-import java.lang.reflect.InvocationTargetException;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.ValidityException;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -56,39 +58,30 @@ import java.lang.reflect.Modifier;
  * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class EnumMarshalDescriptor extends SimpleMarshalDescriptor {
+public class EnumFieldHandler implements FieldHandler {
         
     
     private Class _enumType = null;
+    
     private Method valueOf  = null;
+    
+    private FieldHandler handler = null;
     
     //----------------/
     //- Constructors -/
     //----------------/
 
     /**
-     * Creates a new EnumMarshalDescriptor with the given class
-     * type and programmatic name. An XML name will be created
-     * automatically from the programmatic name.
+     * Creates a new EnumFieldHandler with the given type and
+     * FieldHandler
      * @param type the Class type of the described field
-     * @param name the programmatic name of the field
+     * @param handler the FieldHandler to delegate to
     **/
-    public EnumMarshalDescriptor(Class enumType, String name) {
-        super(String.class, name, MarshalHelper.toXMLName(name));
+    public EnumFieldHandler(Class enumType, FieldHandler handler) {
+        this.handler = handler;
         init(enumType);
     } //-- EnumMarshalDescriptor
     
-    /**
-     * Creates a new EnumMarshalDescriptor with the given class
-     * type and names
-     * @param type the Class type of the described field
-     * @param name the programmatic name of the field
-     * @param xmlName the XML name of the field
-    **/
-    public EnumMarshalDescriptor(Class enumType, String name, String xmlName) {
-        super(String.class, name, xmlName);
-        init(enumType);
-    } //-- EnumMarshalDescriptor
     
     private void init(Class type) {
         
@@ -138,10 +131,9 @@ public class EnumMarshalDescriptor extends SimpleMarshalDescriptor {
      * descriptor from the given target object.
     **/
     public Object getValue(Object target) 
-        throws java.lang.reflect.InvocationTargetException,
-               java.lang.IllegalAccessException
+        throws java.lang.IllegalStateException
     {
-        Object val = super.getValue(target);
+        Object val = handler.getValue(target);
         if (val == null) return val;
         return val.toString();
     } //-- getValue
@@ -152,15 +144,56 @@ public class EnumMarshalDescriptor extends SimpleMarshalDescriptor {
      * @param value the value of the field 
     **/
     public void setValue(Object target, Object value)
-        throws java.lang.reflect.InvocationTargetException,
-               java.lang.IllegalAccessException
+        throws java.lang.IllegalStateException
     {
         String[] args = new String[1];
         if (value != null) args[0] = value.toString();
-        Object obj = valueOf.invoke(null, args);
-        super.setValue(target, obj);        
+        Object obj = null;
+        try {
+            obj = valueOf.invoke(null, args);
+        }
+        catch(java.lang.reflect.InvocationTargetException ite) {
+            Throwable toss = ite.getTargetException();
+            throw new IllegalStateException(toss.toString());
+        }
+        catch(java.lang.IllegalAccessException iae) {
+            throw new IllegalStateException(iae.toString());
+        }
+        handler.setValue(target, obj);        
         
     } //-- setValue
+    
+    /**
+     * Checks the field validity. Returns successfully if the field
+     * can be stored, is valid, etc, throws an exception otherwise.
+     *
+     * @param object The object
+     * @throws ValidityException The field is invalid, is required and
+     *  null, or any other validity violation
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler
+     *  is not compatiable with the Java object
+     */
+    public void checkValidity( Object object )
+        throws ValidityException, IllegalStateException 
+    {
+        //-- do nothing for now
+    } //-- checkValidity
+
+
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent )
+        throws IllegalStateException
+    {
+        return "";
+    } //-- newInstance
     
 } //-- EnumMarshalDescriptor
 
