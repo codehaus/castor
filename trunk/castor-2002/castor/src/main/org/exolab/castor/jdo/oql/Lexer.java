@@ -96,6 +96,11 @@ public class Lexer implements TokenTypes {
     keywords.put("by", new Integer(KEYWORD_BY));
     keywords.put("asc", new Integer(KEYWORD_ASC));
     keywords.put("desc", new Integer(KEYWORD_DESC));
+    keywords.put("count", new Integer(KEYWORD_COUNT));
+    keywords.put("sum", new Integer(KEYWORD_SUM));
+    keywords.put("min", new Integer(KEYWORD_MIN));
+    keywords.put("max", new Integer(KEYWORD_MAX));
+    keywords.put("avg", new Integer(KEYWORD_AVG));
         
   }
 
