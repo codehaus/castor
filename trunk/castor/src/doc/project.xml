@@ -107,7 +107,10 @@
         <url>xml-faq.xml</url>
         <display>XML FAQ</display>
       </navLink>
-
+      <navLink>
+        <url>xml-fieldhandlers.xml</url>
+        <display>Custom Handlers</display>
+      </navLink>
     </section>
 
     <section name="JDO">
