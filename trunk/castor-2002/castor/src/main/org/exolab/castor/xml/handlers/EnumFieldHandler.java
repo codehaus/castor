@@ -50,23 +50,23 @@ import org.exolab.castor.mapping.ValidityException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
+import java.lang.reflect.Array;
 
 /**
- * A specialized MarshalDescriptor for the XML Schema 
+ * A specialized MarshalDescriptor for the XML Schema
  * enumeration types
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class EnumFieldHandler implements FieldHandler {
-        
-    
+
+
     private Class _enumType = null;
-    
+
     private Method valueOf  = null;
-    
+
     private FieldHandler handler = null;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -81,48 +81,49 @@ public class EnumFieldHandler implements FieldHandler {
         this.handler = handler;
         init(enumType);
     } //-- EnumMarshalDescriptor
-    
-    
+
+
     private void init(Class type) {
-        
+
         if (type == null) {
             String err = "The Class argument passed to the " +
                 "constructor of EnumMarshalDescriptor cannot be null.";
             throw new IllegalArgumentException(err);
         }
-        
+
         this._enumType = type;
         Class[] params = new Class[1];
         params[0] = String.class;
-        
+
         Method method = null;
         try {
             method = type.getMethod("valueOf", params);
         }
         catch(NoSuchMethodException nsme) {
-            String err = type.getName() + 
+            String err = type.getName() +
                 " does not contain the required method: public static " +
-                 type.getName() + " valueOf(String);";                
+                 type.getName() + " valueOf(String);";
             throw new IllegalArgumentException(err);
         }
-        
+
         int mods = method.getModifiers();
-        
+
         if (!Modifier.isStatic(mods)) {
-            String err = type.getName() + 
+            String err = type.getName() +
                 " does not contain the required method: public static " +
-                type.getName() + " valueOf(String);";                
+                type.getName() + " valueOf(String);";
             throw new IllegalArgumentException(err);
         }
-        
+
         valueOf = method;
+        method = null;
     } //-- init
-    
+
     //------------------/
     //- Public Methods -/
     //------------------/
-    
-    
+
+
     /**
      * Returns the value of the field associated with this
      * descriptor from the given target object.
@@ -130,18 +131,30 @@ public class EnumFieldHandler implements FieldHandler {
      * @return the value of the field associated with this
      * descriptor from the given target object.
     **/
-    public Object getValue(Object target) 
+    public Object getValue(Object target)
         throws java.lang.IllegalStateException
     {
         Object val = handler.getValue(target);
+        Object result = null;
         if (val == null) return val;
-        return val.toString();
+
+        if (val.getClass().isArray()) {
+           int size = Array.getLength(val);
+            String[] values = new String[size];
+
+            for (int i = 0; i < size; i++) {
+                Object obj = Array.get(val, i);
+                values[i] = obj.toString();
+            }
+            result = values;
+        } else result = val.toString();
+        return result;
     } //-- getValue
 
     /**
      * Sets the value of the field associated with this descriptor.
      * @param target the object in which to set the value
-     * @param value the value of the field 
+     * @param value the value of the field
     **/
     public void setValue(Object target, Object value)
         throws java.lang.IllegalStateException
@@ -159,14 +172,14 @@ public class EnumFieldHandler implements FieldHandler {
         catch(java.lang.IllegalAccessException iae) {
             throw new IllegalStateException(iae.toString());
         }
-        handler.setValue(target, obj);        
-        
+        handler.setValue(target, obj);
+
     } //-- setValue
 
     public void resetValue(Object targer)
     {
     }
-    
+
     /**
      * Checks the field validity. Returns successfully if the field
      * can be stored, is valid, etc, throws an exception otherwise.
@@ -179,7 +192,7 @@ public class EnumFieldHandler implements FieldHandler {
      *  is not compatiable with the Java object
      */
     public void checkValidity( Object object )
-        throws ValidityException, IllegalStateException 
+        throws ValidityException, IllegalStateException
     {
         //-- do nothing for now
     } //-- checkValidity
@@ -198,7 +211,7 @@ public class EnumFieldHandler implements FieldHandler {
     {
         return "";
     } //-- newInstance
-    
+
 } //-- EnumMarshalDescriptor
 
 
