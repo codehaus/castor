@@ -48,7 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import org.odmg.ODMGRuntimeException;
-import org.exolab.castor.jdo.desc.ObjectDesc;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
 
 
 /**
@@ -75,7 +75,7 @@ public class NameBinding
     }
 
 
-    public NameBinding( String name, Object obj, ObjectDesc objDesc )
+    public NameBinding( String name, Object obj, JDOObjectDesc objDesc )
     {
 	Object     primKey;
 

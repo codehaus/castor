@@ -47,7 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.exolab.castor.jdo.desc.ObjectDesc;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
 
 
 /**
@@ -72,15 +72,15 @@ public final class OID
     private int             _hashCode;
 
 
-    OID( DatabaseEngine engine, ObjectDesc objDesc, Object primKey )
+    OID( DatabaseEngine engine, JDOObjectDesc objDesc, Object primKey )
     {
 	_engine = engine;
 	_primKey = primKey;
 	// OID must be unique across the engine: always use the parent
 	// most class of an object, getting it from the descriptor
 	while ( objDesc.getExtends() != null )
-	    objDesc = objDesc.getExtends();
-	_type = objDesc.getObjectClass();
+	    objDesc = (JDOObjectDesc) objDesc.getExtends();
+	_type = objDesc.getObjectType();
 	_hashCode = _engine.hashCode() + _type.hashCode() +
 	    ( _primKey == null ? 0 : _primKey.hashCode() );
     }

@@ -69,9 +69,9 @@ import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
-import org.exolab.castor.jdo.MappingException;
+import org.exolab.castor.MappingException;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
-import org.exolab.castor.jdo.desc.ObjectDesc;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.util.Messages;
 
 
@@ -242,7 +242,7 @@ public final class DatabaseImpl
     {
 	TransactionContext tx;
 	NameBinding        binding;
-	ObjectDesc         objDesc;
+	JDOObjectDesc      objDesc;
 
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
