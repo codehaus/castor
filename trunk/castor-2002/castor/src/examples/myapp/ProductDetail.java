@@ -1,7 +1,11 @@
 package myapp;
 
 
+import java.io.Serializable;
+
+
 public class ProductDetail
+    implements Serializable
 {
 
 
@@ -12,6 +16,10 @@ public class ProductDetail
 
 
     public String  name;
+
+
+    public int getId() { return id; }
+    public String getName() { return name; }
 
 
     public String toString()
