@@ -123,8 +123,15 @@ public class XMLClassDescriptorAdapter
         }
         
         if ( classDesc.getIdentity() != null ) {
-            String xmlFieldName = MarshalHelper.toXMLName(classDesc.getIdentity().getFieldName());
-            addFieldDescriptor(new XMLFieldDescriptorImpl(classDesc.getIdentity(),xmlFieldName,NodeType.Attribute));
+            FieldDescriptor identity;
+            String          xmlFieldName;
+
+            identity = classDesc.getIdentity();
+            if ( identity instanceof XMLFieldDescriptor )
+                xmlFieldName = ((XMLFieldDescriptor)identity).getXMLName();
+            else
+                xmlFieldName = MarshalHelper.toXMLName(identity.getFieldName());
+            addFieldDescriptor(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
         }
 
         setJavaClass(classDesc.getJavaClass());
