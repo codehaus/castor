@@ -72,7 +72,7 @@
 
   <!-- Build all the sources with debug and deprecation -->
   <target name="main" depends="prepare">
-    <javac srcdir="${main}" destdir="${classes}"
+    <javac srcdir="${main}" destdir="${classes}" excludes="**/package.html"
            classpath="${classpath}" debug="on" deprecation="${deprecation}" />
   </target>
 
@@ -81,7 +81,7 @@
 
   <!-- Same as main, but optimization, no debug and no deprecation -->
   <target name="main-opt" depends="prepare">
-    <javac srcdir="${main}" destdir="${classes}"
+    <javac srcdir="${main}" destdir="${classes}" excludes="**/package.html"
            classpath="${classpath}" debug="off" deprecation="off" optimize="on" />
   </target>
 
@@ -99,11 +99,6 @@
            classpath="${classpath}" debug="on" deprecation="${deprecation}" />
   </target>
   
-
-  <!-- Build a full release including JAR, zip/tarball, source and documentation -->
-  <target name="release" depends="clean,jar,tarball,source,doc,javadoc">
-  </target>
-
 
   <!-- Build the JAR file using main-opt -->
   <target name="jar" depends="main-opt">
@@ -145,17 +140,27 @@
   </target>
 
 
-  <!-- Build the API JavaDoc -->
+  <!-- Build the API and full JavaDocs -->
   <target name="javadoc" depends="prepare">
-    <mkdir   dir="${build}/doc" />
-    <mkdir   dir="${build}/doc/javadoc" />
-    <javadoc sourcepath="${main}" destdir="${build}/doc/javadoc" dir="."
-             doctitle="Castor" public="true" noindex="true" author="true"
-             packagenames="org.*" />
+    <mkdir    dir="${build}/doc" />
+    <mkdir    dir="${build}/doc/javadoc" />
+    <mkdir    dir="${build}/doc/api" />
+    <property name="copyright"
+              value="Exoffice Technologies, Inc. (C) 2000. All rights reserved  http://castor.exolab.org" />
+    <javadoc  sourcepath="${main}" destdir="${build}/doc/javadoc" dir="."
+              doctitle="Castor JavaDoc" windowtitle="Castor JavaDoc" bottom="${copyright}"
+              package="true" author="true" version="true" noindex="true"
+              packagenames="org.*" />
+    <javadoc  sourcepath="${main}" destdir="${build}/doc/api" dir="."
+              doctitle="Castor API" windowtitle="Castor API" bottom="${copyright}"
+              public="true" author="true"
+              packagenames="org.exolab.castor.jdo,org.exolab.castor.dax,
+                            org.exolab.castor.xml,org.exolab.castor.dsml" />
   </target>
 
+  <!-- Build the docs, API and full JavaDocs, doc archives -->
   <target name="docs" depends="doc,javadoc">
-    <zip     zipfile="${dist}/${archive}-doc.zip" basedir="${build}" includes="doc/**" />
+    <zip    zipfile="${dist}/${archive}-doc.zip" basedir="${build}" includes="doc/**" />
     <tar    tarfile="${dist}/${archive}-doc.tar" basedir="${build}" includes="doc/**" />
     <gzip   src="${dist}/${archive}-doc.tar" zipfile="${dist}/${archive}-doc.tgz" />
     <delete file="${dist}/${archive}-doc.tar" />
@@ -169,6 +174,7 @@
     <deltree dir="${build}/${archive}" />
 
     <mkdir   dir="${build}/${archive}" />
+<!--
     <mkdir   dir="${build}/${archive}/src" />
     <copydir src="${source}" dest="${build}/${archive}/src"
              defaultexcludes="true" />
@@ -184,8 +190,21 @@
     <delete  file="${dist}/${archive}-src.tar" />
     <zip     zipfile="${dist}/${archive}-src.zip" basedir="${build}"
              includes="${archive}/**" />
+-->
+    <tar     tarfile="${dist}/${archive}-src.tar" basedir="."
+             includes="${source}/**,${lib}/**,*.sh,*.bat"
+             defaultexcludes="true" />
+    <gzip    src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
+    <zip     zipfile="${dist}/${archive}-src.zip" basedir="."
+             includes="${source}/**,${lib}/**,*.sh,*.bat"
+             defaultexcludes="true" />
+
   </target>
 
+
+  <!-- Build a full release including JAR, zip/tarball, source and documentation -->
+  <target name="release" depends="clean,jar,tarball,source,doc,javadoc">
+  </target>
 
   <!-- Build the tarball including JAR and all dependent packages -->
   <target name="tarball" depends="prepare,jar,docs">
@@ -197,10 +216,12 @@
     <copydir src="${etc}" dest="${build}/${archive}"
              includes="README,LICENSE,CHANGELOG" />
     <copydir src="${dist}" dest="${build}/${archive}"
-             includes="${archive}.jar" />
+             includes="${archive}.jar,${archive}-xml.jar" />
     <copydir src="${lib}" dest="${build}/${archive}"
-             includes="jdbc-se2.0.jar,jndi.jar,ldapjdk.jar,ldapsp.jar,odmg-3.0.jar,jta1.0.1.jar,xerces.jar"/>
+             includes="jdbc-se2.0.jar,jndi.jar,odmg-3.0.jar,jta1.0.1.jar,xerces.jar" />
     <copydir src="${schema}" dest="${build}/${archive}/schema" />
+    <copydir src="${build}/doc" dest="${build}/${archive}/doc" />
+    <deltree dir="${build}/${archive}/doc/javadoc" />
 
     <tar     tarfile="${build}/${archive}/examples.tar" basedir="${source}"
              includes="examples/**" defaultexcludes="true" />

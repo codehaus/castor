@@ -47,19 +47,18 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.odmg.Transaction;
-import org.odmg.TransactionInProgressException;
-import org.odmg.TransactionNotInProgressException;
-import org.odmg.TransactionAbortedException;
-import org.odmg.LockNotGrantedException;
-import org.odmg.ODMGRuntimeException;
-import org.odmg.ObjectNotPersistentException;
+import org.exolab.castor.jdo.Transaction;
+import org.exolab.castor.jdo.TransactionInProgressException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.ODMGRuntimeException;
+import org.exolab.castor.jdo.ObjectNotPersistentException;
 import javax.transaction.Status;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.FastThreadLocal;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
-import org.exolab.castor.util.Configuration;
 
 
 /**
@@ -174,7 +173,7 @@ public final class TransactionImpl
             _txContext.prepare();
             _txContext.commit();
         } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
-            if ( Configuration.debug() )
+            if ( Logger.debug() )
                 except.printStackTrace( Logger.getSystemLogger() );
             try {
                 _txContext.rollback();
@@ -222,7 +221,7 @@ public final class TransactionImpl
         try {
             _txContext.checkpoint();
         } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
-            if ( Configuration.debug() )
+            if ( Logger.debug() )
                 except.printStackTrace( Logger.getSystemLogger() );
             try {
                 _txContext.rollback();

@@ -84,22 +84,17 @@
 
   <!-- Process a section in the document. Nested sections are supported -->
   <xsl:template match="document//section">
+<!-- <xsl:number level="multiple" count="section" format="1.1"/>.&#xA0;&#xA0; -->
     <xsl:variable name="level" select="count(ancestor::*)"/>
     <xsl:choose>
       <xsl:when test='$level=2'>
-        <a name="{@title}"><h2>
-          <xsl:number level="multiple" count="section" format="1.1"/>.&#xA0;&#xA0;<xsl:value-of select="@title"/>
-        </h2></a>
+        <a name="{@title}"><h2><xsl:value-of select="@title"/></h2></a>
       </xsl:when>
       <xsl:when test='$level=3'>
-        <a name="{@title}"><h3>
-          <xsl:number level="multiple" count="section" format="1.1"/>.&#xA0;&#xA0;<xsl:value-of select="@title"/>
-        </h3></a>
+        <a name="{@title}"><h3><xsl:value-of select="@title"/></h3></a>
       </xsl:when>
       <xsl:when test='$level=4'>
-        <a name="{@title}"><h4>
-          <xsl:number level="multiple" count="section" format="1.1"/>.&#xA0;&#xA0;<xsl:value-of select="@title"/>
-        </h4></a>
+        <a name="{@title}"><h4><xsl:value-of select="@title"/></h4></a>
       </xsl:when>
       <xsl:when test='$level>=5'>
         <h5><xsl:copy-of select="@title"/></h5>

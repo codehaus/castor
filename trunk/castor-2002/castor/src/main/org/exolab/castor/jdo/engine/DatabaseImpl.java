@@ -51,21 +51,21 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
-import org.odmg.Database;
 import org.odmg.DatabaseOpenException;
-import org.odmg.DatabaseClosedException;
 import org.odmg.DatabaseIsReadOnlyException;
-import org.odmg.DatabaseNotFoundException;
 import org.odmg.ObjectNameNotUniqueException;
 import org.odmg.ObjectNameNotFoundException;
 import org.odmg.NotImplementedException;
-import org.odmg.ObjectNotPersistentException;
-import org.odmg.ClassNotPersistenceCapableException;
-import org.odmg.TransactionNotInProgressException;
-import org.odmg.TransactionInProgressException;
-import org.odmg.LockNotGrantedException;
-import org.odmg.ODMGException;
-import org.odmg.ODMGRuntimeException;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.DatabaseClosedException;
+import org.exolab.castor.jdo.DatabaseNotFoundException;
+import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.TransactionInProgressException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.ODMGException;
+import org.exolab.castor.jdo.ODMGRuntimeException;
 import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
@@ -155,18 +155,20 @@ public final class DatabaseImpl
 
 
     public synchronized void open( String dbName, int mode )
-        throws ODMGException
+        throws DatabaseNotFoundException
     {
         // Check that we are opening this database in a valid mode.
         if ( _mode != NOT_OPEN )
-            throw new DatabaseOpenException( Messages.message( "jdo.odmg.dbAlreadyOpen" ) );
+            throw new IllegalStateException( Messages.message( "jdo.odmg.dbAlreadyOpen" ) );
+        // throw new DatabaseOpenException( Messages.message( "jdo.odmg.dbAlreadyOpen" ) );
         switch ( mode ) {
         case OPEN_READ_ONLY:
         case OPEN_READ_WRITE:
         case OPEN_EXCLUSIVE:
             break;
         default:
-            throw new ODMGRuntimeException( Messages.message( "jdo.odmg.dbIllegalOpenMode" ) );
+            throw new IllegalArgumentException( Messages.message( "jdo.odmg.dbIllegalOpenMode" ) );
+            // throw new ODMGRuntimeException( Messages.message( "jdo.odmg.dbIllegalOpenMode" ) );
         }
         _mode = mode;
         
