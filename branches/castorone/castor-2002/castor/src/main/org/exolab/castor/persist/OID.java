@@ -70,7 +70,7 @@ public final class OID {
      * The object's identity if known, null if the object was created
      * without an identity.
      */
-    private final Object[]     _identities;
+    private final Object     _identity;
 
 
     /**
@@ -120,23 +120,26 @@ public final class OID {
     /**
      * Constructor
      */
-    OID( LockEngine engine, ClassMolder molder, Object[] identities ) {
-        this( engine, molder, null, identities );
+    OID( LockEngine engine, ClassMolder molder, Object identity ) {
+        this( engine, molder, null, identity );
     }
 
     /**
      * Constructor
      */
-    OID( LockEngine engine, ClassMolder molder, OID depends, Object[] identities ){
+    OID( LockEngine engine, ClassMolder molder, OID depends, Object identity ) {
 
         if ( engine == null )
-            throw new IllegalArgumentException("Engine can't be null");
+            throw new IllegalArgumentException("engine can't be null");
         if ( molder == null )
             throw new IllegalArgumentException("molder can't be null");
-
+        if ( identity instanceof Object[] ) {
+            IllegalArgumentException e = new IllegalArgumentException("identity can't be object array!");
+            throw e;
+        }
         _engine = engine;
         _molder = molder;
-        _identities = identities;
+        _identity = identity;
         _javaClass = molder.getJavaClass();
         _depends = depends;
         // OID must be unique across the engine: always use the parent
@@ -147,180 +150,7 @@ public final class OID {
         _topClass = molder.getJavaClass();
 
         // calculate hashCode
-        int temp = _topClass.hashCode();
-        if ( _identities != null ) {
-            for ( int i=0; i<identities.length; i++ ) {
-                if ( identities[i] != null ) {
-                    temp += _identities[i].hashCode();
-                }
-            }
-        }
-        _hashCode = temp;
-    }
-
-    /**
-     * Utility method for testing if two array contains the same elements.
-     * It is different from java.util.Arrays.equals( Object[], Object[]).
-     * If the element of the Object[] is Object[], it method will iterately
-     * call itself to evaluate if the elements are equal.
-     *
-     * @param object1 - the first object to compare.
-     * @param object2 - the second object to compare.
-     * @return true if two object is equals
-     */
-    public static boolean isEquals( Object[] object1, Object[] object2 ) {
-        if ( object1 == object2 ) 
-            return true;
-        if ( object1 == null || object2 == null )
-            return false;
-        if ( object1.length != object2.length ) 
-            return false;
-        for ( int i=0; i<object1.length; i++ ) {
-            if ( object1[i] == object2[i] ) {
-                continue;
-            }
-            if ( object1[i] == null || object2[i] == null ) {
-                return false;
-            }
-            if ( (object1[i] instanceof Object[]) && (object2[i] instanceof Object[]) ) {
-                if ( !isEquals( (Object[]) object1[i], (Object[]) object2[i] ) )
-                    return false;
-            } else if ( (object1[i] instanceof Vector) && (object2[i] instanceof Vector) ) {      
-                if ( !isEquals( (Vector) object1[i], (Vector) object2[i] ) )
-                    return false;                
-            } else {      
-                return isEquals( object1[i], object2[i] );
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Utility method for comparing for equalness of two objects.
-     *
-     */
-    public static boolean isEquals( Object object1, Object object2 ) {
-        if ( object1 == object2 ) 
-            return true;
-        if ( object1 == null || object2 == null )
-            return false;
-        if (object1 instanceof BigDecimal)
-            return ( ( (BigDecimal) object1 ).compareTo( object2 ) == 0);
-        else 
-            return object1.equals( object2 );
-    }
-
-    /**
-     * Utility method for comparing two Vector. 
-
-     * @param object1 - the first vector to compare.
-     * @param object2 - the second vector to compare.
-     * @return true if two object contains the same set of elements
-     */    
-    public static boolean isEquals( Vector object1, Vector object2 ) {
-        if ( object1 == object2 ) 
-            return true;
-        if ( object1 == null || object2 == null )
-            return false;
-        if ( object1.size() != object2.size() )
-            return false;
-
-        Enumeration enum = object1.elements();
-        while ( enum.hasMoreElements() ) {
-            if ( !object2.contains( enum.nextElement() ) ) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Utility method for comparing two ArrayVector. 
-
-     * @param object1 - the first vector to compare.
-     * @param object2 - the second vector to compare.
-     * @return true if two object contains the same set of elements
-     */    
-    public static boolean isEquals( ArrayVector object1, ArrayVector object2 ) {
-        if ( object1 == object2 ) 
-            return true;
-        if ( object1 == null || object2 == null )
-            return false;
-        if ( object1.size() != object2.size() )
-            return false;
-
-        Iterator enum = object1.iterator();
-        while ( enum.hasNext() ) {
-            if ( !object2.contains( enum.next() ) ) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** 
-     * Utility method to convert an Object[] into a comma
-     * separated string.
-     */
-    public static String flatten( Object[] objects ) {
-        if ( objects == null )
-            return null;
-
-        StringBuffer sb = new StringBuffer();
-        for ( int i=0; i<objects.length; i++ ) {
-            if ( i > 0 )
-                sb.append( "," );
-            sb.append( "<" );
-            sb.append( objects[i] );            
-            sb.append( ">" );
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Utility method to test if the identity is null.
-     *
-     * @return true if the parameter is null, or if any
-     *     element of the array is null.
-     */
-    public static boolean isIdsNull( Object[] objects ) {
-        if ( objects == null )
-            return true;
-        if ( objects.length == 0 )
-            return true;
-
-        for ( int i=0; i<objects.length; i++ ) {
-            if ( objects[i] == null )
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns true the identity is null
-     */
-    public boolean isIdsNull() {
-        if ( _identities == null )
-            return true;
-        if ( _identities.length == 0 )
-            return true;
-
-        for ( int i=0; i<_identities.length; i++ ) {
-            if ( _identities[i] == null )
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Utility method to set the identity to null.
-     */
-    public static void setIdsNull(Object[] objects) {
-        if (objects != null) {
-            for (int i = 0; i < objects.length; i++) {
-                objects[i] = null;
-            }
-        }
+        _hashCode = _topClass.hashCode() + (_identity == null? 0 : _identity.hashCode());
     }
 
     /**
@@ -417,8 +247,8 @@ public final class OID {
      *
      * @return The object's identity, or null
      */
-    Object[] getIdentities() {
-        return _identities;
+    Object getIdentity() {
+        return _identity;
     }
 
 
@@ -442,6 +272,7 @@ public final class OID {
      * identical.
      */
     public boolean equals( Object obj ) {
+        
         OID other;
         if ( this == obj )
             return true;
@@ -455,14 +286,13 @@ public final class OID {
         // have no primary identity, therefore all such objects are
         // not identical.
         other = (OID) obj;
-
-        return ( _topClass == other._topClass && _identities != null 
-                && !isIdsNull(_identities) && isEquals( _identities, other._identities ) );
+        return ( _topClass == other._topClass && _identity != null &&
+                _identity.equals( other._identity ) );
     }
 
 
     public String toString() {
-        return _javaClass.getName() + "/" + ( _identities == null ? "<new>" : OID.flatten( _identities ) );
+        return _javaClass.getName() + "/" + ( _identity == null ? "<new>" : _identity.toString() );
     }
 
 

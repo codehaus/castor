@@ -81,7 +81,7 @@ public class NameBinding
         
         this.name = name;
         type = obj.getClass().getName();
-        primKey = handler.getIdentities( obj );
+        primKey = handler.getIdentity( obj );
         // XXX Need to serialize the primary key to support non-string keys
         objectId = primKey.toString();
     }

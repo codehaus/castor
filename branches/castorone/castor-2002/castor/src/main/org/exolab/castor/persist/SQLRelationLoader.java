@@ -46,7 +46,7 @@
 
 package org.exolab.castor.persist;
 
-
+import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.ClassMapping;
@@ -70,8 +70,8 @@ import java.sql.SQLException;
 
 /**
  * SQLRelationLoader is a quick hack for creating and removing
- * relation from a many-to-many relation database from ClassMolder. 
- * Eventually, it will be merged into SQLEngine. But, it requires 
+ * relation from a many-to-many relation database from ClassMolder.
+ * Eventually, it will be merged into SQLEngine. But, it requires
  * chaning of the Persistence interface.
  *
  * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
@@ -80,194 +80,232 @@ public class SQLRelationLoader {
 
     private String tableName;
 
-	private int[] leftType;
+    private int[] leftType;
 
-	private int[] rightType;
+    private int[] rightType;
 
     private String[] left;
-    
+
     private String[] right;
 
     /**
      * the SQL statement for selecting the relation from the relation table.
-     */ 
-	private String select;
+     */
+    private String select;
 
     /**
      * the SQL statement to insert the a new relation into the relation table.
      */
-	private String insert;
+    private String insert;
 
     /**
      * the SQL statement to delete an relation from the relation table.
      */
-	private String delete;
+    private String delete;
 
     /**
      * the SQL statement to delete all the relation assoicate with the left side type
      */
-	private String deleteAll;
+    private String deleteAll;
 
     public SQLRelationLoader( String table, String[] key, int[] keyType, String[] otherKey, int[] otherKeyType ) {
         tableName = table;
         left = key;
         right = otherKey;
-		leftType = keyType;
-		rightType = otherKeyType;
+        leftType = keyType;
+        rightType = otherKeyType;
 
-		// construct select statement
-		StringBuffer sb = new StringBuffer();
-		int count = 0;
-		sb.append("SELECT ");
-		for ( int i=0; i < left.length; i++ ) {
-			if ( i > 0 ) sb.append(",");
-			sb.append( left[i] );
-			count++;
-		}
-		for ( int i=0; i < right.length; i++ ) {
-			sb.append(",");
-			sb.append( right[i] );	
-			count++;
-		}
-		sb.append(" FROM ");
-		sb.append( tableName );
-		sb.append(" WHERE ");
-		for ( int i=0; i < left.length; i++ ) {
-			if ( i > 0 ) sb.append(" AND ");
-			sb.append( left[i] );
-			sb.append("=?");
-		}
-		for ( int i=0; i < right.length; i++ ) {
-			sb.append(" AND ");
-			sb.append( right[i] );
-			sb.append("=?");
-		}
-		select = sb.toString();
+        // construct select statement
+        StringBuffer sb = new StringBuffer();
+        int count = 0;
+        sb.append("SELECT ");
+        for ( int i=0; i < left.length; i++ ) {
+            if ( i > 0 ) sb.append(",");
+            sb.append( left[i] );
+            count++;
+        }
+        for ( int i=0; i < right.length; i++ ) {
+            sb.append(",");
+            sb.append( right[i] );
+            count++;
+        }
+        sb.append(" FROM ");
+        sb.append( tableName );
+        sb.append(" WHERE ");
+        for ( int i=0; i < left.length; i++ ) {
+            if ( i > 0 ) sb.append(" AND ");
+            sb.append( left[i] );
+            sb.append("=?");
+        }
+        for ( int i=0; i < right.length; i++ ) {
+            sb.append(" AND ");
+            sb.append( right[i] );
+            sb.append("=?");
+        }
+        select = sb.toString();
 
-		// construct insert statement
-		sb = new StringBuffer();
-		count = 0;
-		sb.append("INSERT INTO ");
-		sb.append( tableName );
-		sb.append(" (");
-		for ( int i=0; i < left.length; i++ ) {
-			if ( i > 0 ) sb.append(",");
-			sb.append( left[i] );
-			count++;
-		}
-		for ( int i=0; i < right.length; i++ ) {
-			sb.append(",");
-			sb.append( right[i] );	
-			count++;
-		}
-		sb.append(") VALUES (");
-		for ( int i=0; i < count; i++ ) {
-			if ( i > 0 ) sb.append(",");
-			sb.append("?");
-		}
-		sb.append(")");
-		insert = sb.toString();
+        // construct insert statement
+        sb = new StringBuffer();
+        count = 0;
+        sb.append("INSERT INTO ");
+        sb.append( tableName );
+        sb.append(" (");
+        for ( int i=0; i < left.length; i++ ) {
+            if ( i > 0 ) sb.append(",");
+            sb.append( left[i] );
+            count++;
+        }
+        for ( int i=0; i < right.length; i++ ) {
+            sb.append(",");
+            sb.append( right[i] );
+            count++;
+        }
+        sb.append(") VALUES (");
+        for ( int i=0; i < count; i++ ) {
+            if ( i > 0 ) sb.append(",");
+            sb.append("?");
+        }
+        sb.append(")");
+        insert = sb.toString();
 
-		// construct delete statement
-		sb = new StringBuffer();
-		count = 0;
-		sb.append("DELETE FROM ");
-		sb.append( tableName );
-		sb.append(" WHERE ");
-		for ( int i=0; i < left.length; i++ ) {
-			if ( i > 0 ) sb.append(" AND ");
-			sb.append( left[i] );
-			sb.append("=?");
-		}
-		for ( int i=0; i < right.length; i++ ) {
-			sb.append(" AND ");
-			sb.append( right[i] );
-			sb.append("=?");
-		}
-		delete = sb.toString();
+        // construct delete statement
+        sb = new StringBuffer();
+        count = 0;
+        sb.append("DELETE FROM ");
+        sb.append( tableName );
+        sb.append(" WHERE ");
+        for ( int i=0; i < left.length; i++ ) {
+            if ( i > 0 ) sb.append(" AND ");
+            sb.append( left[i] );
+            sb.append("=?");
+        }
+        for ( int i=0; i < right.length; i++ ) {
+            sb.append(" AND ");
+            sb.append( right[i] );
+            sb.append("=?");
+        }
+        delete = sb.toString();
 
-		// construct delete statement for the left side only
-		sb = new StringBuffer();
-		count = 0;
-		sb.append("DELETE FROM ");
-		sb.append( tableName );
-		sb.append(" WHERE ");
-		for ( int i=0; i < left.length; i++ ) {
-			if ( i > 0 ) sb.append(" AND ");
-			sb.append( left[i] );
-			sb.append("=?");
-		}
-		deleteAll = sb.toString();
+        // construct delete statement for the left side only
+        sb = new StringBuffer();
+        count = 0;
+        sb.append("DELETE FROM ");
+        sb.append( tableName );
+        sb.append(" WHERE ");
+        for ( int i=0; i < left.length; i++ ) {
+            if ( i > 0 ) sb.append(" AND ");
+            sb.append( left[i] );
+            sb.append("=?");
+        }
+        deleteAll = sb.toString();
 
     }
-    public void createRelation( Connection conn, Object[] leftValue, Object[] rightValue ) 
+    public void createRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
-        
-		try {
-			int count = 1;
-			ResultSet rset;
+
+        try {
+            int count = 1;
+            ResultSet rset;
             PreparedStatement stmt = conn.prepareStatement( select );
-			for ( int i=0; i < leftValue.length; i++ ) {				
-				stmt.setObject( count, leftValue[i], leftType[i] );
-				count++;
-			}
-			for ( int i=0; i < rightValue.length; i++ ) {
-				stmt.setObject( count, rightValue[i], rightType[i] );
-				count++;
-			}
-			count = 1;
+            if ( leftType.length > 1 ) {
+                Complex left = (Complex) leftValue;
+                for ( int i=0; i < left.size(); i++ ) {
+                    stmt.setObject( count, left.get(i), leftType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, leftValue, leftType[0] );
+                count++;
+            }
+            if ( rightType.length > 1 ) {
+                Complex right = (Complex) rightValue;
+                for ( int i=0; i < right.size(); i++ ) {
+                    stmt.setObject( count, right.get(i), rightType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, rightValue, rightType[0] );
+            }
+            count = 1;
             rset = stmt.executeQuery();
             if ( ! rset.next() ) {
-				stmt = conn.prepareStatement( insert );
-				for ( int i=0; i < leftValue.length; i++ ) {				
-					stmt.setObject( count, leftValue[i], leftType[i] );
-					count++;
-				}
-				for ( int i=0; i < rightValue.length; i++ ) {
-					stmt.setObject( count, rightValue[i], rightType[i] );
-					count++;
-				}
-				int r = stmt.executeUpdate();
-            } 
+                stmt = conn.prepareStatement( insert );
+                if ( leftType.length > 1 ) {
+                    Complex left = (Complex) leftValue;
+                    for ( int i=0; i < left.size(); i++ ) {
+                        stmt.setObject( count, left.get(i), leftType[i] );
+                        count++;
+                    }
+                } else {
+                    stmt.setObject( count, leftValue, leftType[0] );
+                    count++;
+                }
+                if ( rightType.length > 1 ) {
+                    Complex right = (Complex) rightValue;
+                    for ( int i=0; i < right.size(); i++ ) {
+                        stmt.setObject( count, right.get(i), rightType[i] );
+                        count++;
+                    }
+                } else {
+                    stmt.setObject( count, rightValue, rightType[0] );
+                }
+                int r = stmt.executeUpdate();
+            }
         } catch ( SQLException e ) {
-			e.printStackTrace();
+            e.printStackTrace();
             throw new PersistenceException( e.toString() );
         }
     }
-    public void deleteRelation( Connection conn, Object[] leftValue ) 
+    public void deleteRelation( Connection conn, Object leftValue )
             throws PersistenceException {
 
         try {
-			int count = 1;
+            int count = 1;
             PreparedStatement stmt = conn.prepareStatement( deleteAll );
-			for ( int i=0; i < leftValue.length; i++ ) {				
-				stmt.setObject( count, leftValue[i], leftType[i] );
-				count++;
-			}
+            if ( leftType.length > 1 ) {
+                Complex left = (Complex) leftValue;
+                for ( int i=0; i < left.size(); i++ ) {
+                    stmt.setObject( count, left.get(i), leftType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, leftValue, leftType[0] );
+            }
             int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
-			e.printStackTrace();
+            e.printStackTrace();
             throw new PersistenceException( e.toString() );
         }
     }
 
-    public void deleteRelation( Connection conn, Object[] leftValue, Object[] rightValue ) 
+    public void deleteRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
 
         try {
-			int count = 1;
+            int count = 1;
             PreparedStatement stmt = conn.prepareStatement( delete );
-			for ( int i=0; i < leftValue.length; i++ ) {				
-				stmt.setObject( count, leftValue[i], leftType[i] );
-				count++;
-			}
-			for ( int i=0; i < rightValue.length; i++ ) {
-				stmt.setObject( count, rightValue[i], rightType[i] );
-				count++;
-			}
+            if ( leftType.length > 1 ) {
+                Complex left = (Complex) leftValue;
+                for ( int i=0; i < left.size(); i++ ) {
+                    stmt.setObject( count, left.get(i), leftType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, leftValue, leftType[0] );
+                count++;
+            }
+            if ( rightType.length > 1 ) {
+                Complex right = (Complex) rightValue;
+                for ( int i=0; i < right.size(); i++ ) {
+                    stmt.setObject( count, right.get(i), rightType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, rightValue, rightType[0] );
+            }
             int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
-			e.printStackTrace();
+            e.printStackTrace();
             throw new PersistenceException( e.toString() );
         }
     }
