@@ -48,6 +48,8 @@ package org.exolab.castor.xml.schema.reader;
 //-- imported classes and packages
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.simpletypes.ListType;
+
 import org.xml.sax.*;
 
 /**
@@ -78,8 +80,7 @@ public class SimpleTypeListUnmarshaller extends SaxUnmarshaller {
     /**
      * The simpleType we are unmarshalling
     **/
-    private SimpleTypeDefinition  _typeDefinition = null;
-
+    private ListType    _list             = null;
     private Schema      _schema          = null;
     private boolean     foundAnnotation  = false;
     private boolean     foundSimpleType  = false;
@@ -96,33 +97,35 @@ public class SimpleTypeListUnmarshaller extends SaxUnmarshaller {
      * @param atts the AttributeList
      * @param resolver the resolver being used for reference resolving
     **/
-    public SimpleTypeListUnmarshaller
-        (SimpleTypeDefinition typeDefinition, AttributeList atts)
+    SimpleTypeListUnmarshaller(Schema schema, AttributeList atts)
         throws SAXException
     {
         super();
-
-        _typeDefinition  = typeDefinition;
-        _schema          = typeDefinition.getSchema();
+        
+        _schema = schema;
+        _list = new ListType(schema);
 
         //-- itemType
-        String itemType = atts.getValue(SchemaNames.ITEM_TYPE_ATTR);
-        if ((itemType != null) && (itemType.length() > 0)) {
+        String itemTypeName = atts.getValue(SchemaNames.ITEM_TYPE_ATTR);
+        if ((itemTypeName != null) && (itemTypeName.length() > 0)) {
 
             foundItemType = true;
-            XMLType baseType= _schema.getType(itemType);
-            if (baseType == null)
-                _typeDefinition.setBaseTypeName(itemType);
-            else if (baseType.getStructureType() == Structure.COMPLEX_TYPE) {
+            XMLType itemType= _schema.getType(itemTypeName);
+            if (itemType == null) {
+                _list.setItemType(itemTypeName);
+            }
+            else if (itemType.getStructureType() == Structure.COMPLEX_TYPE) {
                 String err = "The item type of a list cannot "+
                     "be a complexType.";
                 throw new IllegalStateException(err);
             }
-            else _typeDefinition.setBaseType( (SimpleType) baseType);
+            else _list.setItemType((SimpleType)itemType);
         }
-
-
-    } //-- ListUnmarshaller
+        
+        //-- @id
+        _list.setId(atts.getValue(SchemaNames.ID_ATTR));
+        
+    } //-- SimpleTypeListUnmarshaller
 
       //-----------/
      //- Methods -/
@@ -139,11 +142,28 @@ public class SimpleTypeListUnmarshaller extends SaxUnmarshaller {
     } //-- elementName
 
     /**
+     * Called to signal an end of unmarshalling. This method should
+     * be overridden to perform any necessary clean up by an unmarshaller
+    **/
+    public void finish() throws SAXException {
+        if ((!foundItemType) && (!foundSimpleType)) {
+            String err = "Missing sub-component of <list>, either use "+
+                " the 'itemType' attribute, or an anonymous simpleType.";
+            error(err);
+        }
+    } //-- finish
+    
+    /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
     **/
     public Object getObject() {
-        return null;
+        if ((!foundItemType) && (!foundSimpleType)) {
+            String err = "Missing sub-component of <list>, either use "+
+                " the 'itemType' attribute, or an anonymous simpleType.";
+            throw new IllegalStateException(err);
+        }
+        return _list;
     } //-- getObject
 
     /**
@@ -215,11 +235,11 @@ public class SimpleTypeListUnmarshaller extends SaxUnmarshaller {
         //-- annotation
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
-            _typeDefinition.setAnnotation(ann);
+            _list.setLocalAnnotation(ann);
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
             SimpleType type = (SimpleType) unmarshaller.getObject();
-            _typeDefinition.setBaseType(type);
+            _list.setItemType(type);
         }
 
 
