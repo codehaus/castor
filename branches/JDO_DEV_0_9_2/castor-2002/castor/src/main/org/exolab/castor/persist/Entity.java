@@ -101,13 +101,18 @@ public final class Entity {
      */
     public boolean locked;
 
+    /** 
+     * Indicate which entity classes is this entity actually belongs to
+     */ 
+    public String[] entityClasses;
+
     /**
-     * The values of an entity grouped with the the entity class's EntityInfo,
-     * which specify the fields of the values.
-     * Notice that not every entity span all entity class and sub entity
-     * classes in the EntityInfo.
+     * Represent the actual values in the data store. The first dimension
+     * of the array corresponds to entityClasses. The second dimension
+     * corresponds to the field order in as declared in EntityInfo.fieldInfo
+     * of the entityClasses.
      */
-    public Values[] values;
+    public Object[][] values;
 
     public boolean equals(Object obj) {
         Entity ent;
@@ -127,26 +132,4 @@ public final class Entity {
         return info + "[" + identity + "]";
     }
 
-    /**
-     * Values of an entity.
-     */
-    public final static class Values {
-
-        /**
-         * The sub entity name which this values belongs to.
-         */
-        public String entityClass;
-
-        /**
-         * The fieldInfo of the values
-         */
-        public EntityFieldInfo[] fieldInfo;
-
-        /**
-         * The values of the entity that is stored in the same order
-         * and indicated in the fieldInfo.
-         */
-        public Object[] values;
-
-	}
 }
