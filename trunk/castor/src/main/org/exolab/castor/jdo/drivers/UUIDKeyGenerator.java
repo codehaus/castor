@@ -142,7 +142,7 @@ public final class UUIDKeyGenerator implements KeyGenerator
             if(sUUID == null)
               sUUID = _df.format(new Integer(st.nextToken()));
             else
-              sUUID += _df.format(new Integer(st.nextToken()));;
+              sUUID += _df.format(new Integer(st.nextToken()));
           }
 
           // getting currentTimeMillis (fixed length: 13 character)
