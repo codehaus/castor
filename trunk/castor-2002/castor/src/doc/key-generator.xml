@@ -107,9 +107,10 @@
          Note, that the auxiliary table must be in the same database as
          the table for which key is generated. So, if you work with multiple 
          databases, you must have one auxiliary table in each database.</p>
-      <p>If the grab size is set to 1 (the default value), the key generator
-         each time stores the true maximum value of the primary key to
-         the auxiliary table.
+      <p>If the grab size is set to 1, the key generator each time stores
+         the true maximum value of the primary key to the auxiliary table.
+         In this case the HIGH/LOW key generator is basically equivalent to
+         the MAX key generator.
          On you want to have LOW part of the key consisting of 3 decimal
          digits, set the grab size to 1000. If you want to have 2 LOW bytes in
          the key, set the grab size to 65536.
@@ -127,7 +128,7 @@
                    reserve primary key values</td><td>Mandatory</td></tr>
            <tr><td>grab-size</td><td>The number of new keys the key
                    generator should grab from the sequence table at a time.</td>
-                   <td>Optional, default="1"</td></tr>
+                   <td>Optional, default="10"</td></tr>
          </table></p>
       <p>Note, that the class HighLowKeyGenerator is not final, so you can 
          extend it in order to implement other variants of HIGH/LOW

@@ -135,7 +135,7 @@ public class HighLowKeyGenerator implements KeyGenerator
             throw new MappingException( Messages.format( "mapping.KeyGenParamNotSet",
                                         SEQ_VALUE, getClass().getName() ) );
 
-        factorStr = params.getProperty( GRAB_SIZE, "1" );
+        factorStr = params.getProperty( GRAB_SIZE, "10" );
         try {
             _grabSizeI = Integer.parseInt( factorStr );
         } catch ( NumberFormatException except ) {
@@ -225,19 +225,37 @@ public class HighLowKeyGenerator implements KeyGenerator
                     }
                     stmt2.executeUpdate();
                 } else {
-                    stmt = conn.prepareStatement("INSERT INTO " + _seqTable +
+                    // [Terry Child] Initialize the counter with MAX(pk) + 1
+                    // for the case of switching from some other key generator 
+                    // to HIGH/LOW
+                    stmt.close();
+                    stmt = conn.prepareStatement( JDBCSyntax.Select + "MAX(" + 
+                                                  primKeyName + ") FROM " + tableName);
+                    rs = stmt.executeQuery();
+                    if ( _sqlType == Types.INTEGER ) {
+                        int maxPK = 0;
+
+                        if ( rs.next() ) {
+                            maxPK = rs.getInt(1);
+                        }
+                        last = new Integer( maxPK + 1 );
+                        max = new Integer( maxPK + _grabSizeI );
+                    } else {
+                        BigDecimal maxPK = new BigDecimal( 0 );
+
+                        if ( rs.next() ) {
+                            maxPK = rs.getBigDecimal(1);
+                        }
+                        last = maxPK.add( ONE );
+                        max = maxPK.add( _grabSizeD );
+                    }
+                    stmt2.close();
+                    stmt2 = conn.prepareStatement("INSERT INTO " + _seqTable +
                                                 " (" + _seqKey + "," + _seqValue +
                                                 ") VALUES (?, ?)");
-                    stmt.setString( 1, tableName );
-                    stmt.setInt( 2, _grabSizeI );
-                    stmt.executeUpdate();
-                    if ( _sqlType == Types.INTEGER ) {
-                        last = new Integer( 1 );
-                        max = new Integer( _grabSizeI );
-                    } else {
-                        last = ONE;
-                        max = _grabSizeD;
-                    }
+                    stmt2.setString( 1, tableName );
+                    stmt2.setObject( 2, max );
+                    stmt2.executeUpdate();
                 }
             } catch ( SQLException ex ) {
                 throw new PersistenceException( Messages.format(
@@ -296,7 +314,7 @@ public class HighLowKeyGenerator implements KeyGenerator
      * Is key generated in the same connection as INSERT?
      */
     public final boolean isInSameConnection() {
-        return false;
+        return true;
     }
 
 }
