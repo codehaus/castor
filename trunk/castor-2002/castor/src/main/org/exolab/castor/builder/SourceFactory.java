@@ -463,9 +463,9 @@ public class SourceFactory  {
 
         //-- add vector to hold listeners
         String vName = "propertyChangeListeners";
-        JMember jMember = new JMember(SGTypes.Vector, vName);
-        jMember.getModifiers().makePrivate();
-        parent.addMember(jMember);
+        JField field = new JField(SGTypes.Vector, vName);
+        field.getModifiers().makePrivate();
+        parent.addField(field);
 
 
         JSourceCode jsc = parent.getConstructor(0).getSourceCode();
@@ -938,8 +938,8 @@ public class SourceFactory  {
         JClass jClass = state.jClass;
         String className = jClass.getLocalName();
 
-        JMember  member = null;
-        JMember  fHash  = new JMember(SGTypes.Hashtable, "_memberTable");
+        JField  field  = null;
+        JField  fHash  = new JField(SGTypes.Hashtable, "_memberTable");
         fHash.setInitString("init()");
         fHash.getModifiers().setStatic(true);
         
@@ -1018,20 +1018,20 @@ public class SourceFactory  {
             typeName = objName + "_TYPE";
 
             //-- handle int type
-            member = new JMember(JType.Int, typeName);
-            member.setComment("The " + value + " type");
-            JModifiers modifiers = member.getModifiers();
+            field = new JField(JType.Int, typeName);
+            field.setComment("The " + value + " type");
+            JModifiers modifiers = field.getModifiers();
             modifiers.setFinal(true);
             modifiers.setStatic(true);
             modifiers.makePublic();
-            member.setInitString(Integer.toString(count));
-            jClass.addMember(member);
+            field.setInitString(Integer.toString(count));
+            jClass.addField(field);
 
             //-- handle Class type
-            member = new JMember(jClass, objName);
-            member.setComment("The instance of the " + value + " type");
+            field = new JField(jClass, objName);
+            field.setComment("The instance of the " + value + " type");
 
-            modifiers = member.getModifiers();
+            modifiers = field.getModifiers();
 
             modifiers.setFinal(true);
             modifiers.setStatic(true);
@@ -1046,8 +1046,8 @@ public class SourceFactory  {
             init.append(value);
             init.append("\")");
 
-            member.setInitString(init.toString());
-            jClass.addMember(member);
+            field.setInitString(init.toString());
+            jClass.addField(field);
 
             
             //-- initializer method
@@ -1070,17 +1070,17 @@ public class SourceFactory  {
         //-- null pointer exceptions, because calling
         //-- init() will try to add null values to
         //-- the hashtable.
-        jClass.addMember(fHash);
+        jClass.addField(fHash);
         
         //-- add internal type
-        member = new JMember(JType.Int, "type");
-        member.setInitString("-1");
-        jClass.addMember(member);
+        field = new JField(JType.Int, "type");
+        field.setInitString("-1");
+        jClass.addField(field);
 
         //-- add internal stringValue
-        member = new JMember(SGTypes.String, "stringValue");
-        member.setInitString("null");
-        jClass.addMember(member);
+        field = new JField(SGTypes.String, "stringValue");
+        field.setInitString("null");
+        jClass.addField(field);
 
         //-- add #getType method
 
@@ -1139,7 +1139,7 @@ public class SourceFactory  {
         String className = jClass.getLocalName();
 
 
-        JMember     fValues = null;
+        JField      fValues = null;
         JDocComment jdc     = null;
         JSourceCode jsc     = null;
 
@@ -1147,7 +1147,7 @@ public class SourceFactory  {
         JConstructor constructor = jClass.getConstructor(0);
         constructor.getModifiers().makePrivate();
         
-        fValues = new JMember(baseType.getJType().createArray(), "values");
+        fValues = new JField(baseType.getJType().createArray(), "values");
         
         //-- Loop through "enumeration" facets
         //-- and create the default values for the type.
@@ -1189,7 +1189,7 @@ public class SourceFactory  {
         values.append("\n}");
             
         fValues.setInitString(values.toString());
-        jClass.addMember(fValues);
+        jClass.addField(fValues);
 
         //-- #valueOf method
         JMethod method = new JMethod(jClass, "valueOf");
