@@ -48,7 +48,8 @@ package org.exolab.castor.jdo;
 
 
 /**
- * Exception thrown when failed to acquire a lock on an object.
+ * Exception thrown when failed to acquire a lock on an object, a timeout
+ * occured waiting to acquire the lock, or a deadlock has been detected.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$

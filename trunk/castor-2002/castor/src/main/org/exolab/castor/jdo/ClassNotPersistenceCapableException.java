@@ -48,8 +48,8 @@ package org.exolab.castor.jdo;
 
 
 /**
- * Exception thrown to indicate the class has no mapping and therefore
- * cannot be persisted.
+ * Exception thrown to indicate objects of this class are not persistent
+ * capable.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$

@@ -22,7 +22,7 @@ public class ProductDetail
 
     public String getName() { return name; }
 
-    //    public Product getProduct() { return product; }
+    public Product getProduct() { return product; }
 
 
     public String toString()

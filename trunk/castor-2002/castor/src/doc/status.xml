@@ -95,6 +95,23 @@
       </ul>
     </section>
 
+    <section title="TODO">
+      <ul>
+        <li>Read-only queries or transactions</li>
+        <li>Update method - allow one object to be replaced with another, or an object to be introduced</li>
+        <li>Refresh option - refresh flag to request a refresh (possibly also for OQLQuery)</li>
+        <li>KeyGenerator - use one from SQLEngine, way to specify the key generator from the mapping file,
+            way to pass a key generator parameter on database creation</li>
+        <li>Support for read-only fields</li>
+        <li>Cache control at JDO configuration and mapping file specification - no-cache option,
+            cache object limit, cache time limit, LRU removal deamon</li>
+        <li>Consider three access modes: shared, exclusive, locked</li>
+        <li>Serializable, SQLData, DOM field types</li>
+        <li>Java 1.2 collection handlers</li>
+        <li>Stored procedures</li>
+      </ul>
+    </section>
+
   </body>
 </document>
 

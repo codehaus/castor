@@ -4,8 +4,8 @@ package org.exolab.castor.jdo;
 /**
  * This exception is thrown when accessing an object that was deleted.
  *
- * @author David Jordan (as Java Editor of the Object Data Management Group)
- * @version ODMG 3.0
+ * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * @version $Revision$ $Date$
  */
 public class ObjectDeletedException
     extends PersistenceException

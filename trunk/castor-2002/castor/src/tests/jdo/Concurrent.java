@@ -2,7 +2,8 @@ package jdo;
 
 
 import java.io.PrintWriter;
-import org.exolab.castor.jdo.JDOSource;
+import java.util.Enumeration;
+import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
@@ -18,7 +19,7 @@ public class Concurrent
 {
 
 
-    private JDOSource      _jdo;
+    private DataObjects    _jdo;
 
 
     private Database       _db;
@@ -36,7 +37,7 @@ public class Concurrent
     static final String    JDOName = "jdo value";
 
 
-    public Concurrent( JDOSource jdo, PrintWriter logger,
+    public Concurrent( DataObjects jdo, PrintWriter logger,
 		       String driverClass, String jdbcUri )
 	throws PersistenceException
     {
@@ -68,6 +69,7 @@ public class Concurrent
 	OQLQuery      oql;
         TestObject    object;
 	Connection    conn;
+        Enumeration   enum;
 
         // Open transaction in order to perform JDO operations
         _db.begin();
@@ -76,17 +78,18 @@ public class Concurrent
         // If it exists, set the name to some predefined value
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-        oql.bind( new Integer( TestObject.DefaultId ) );
-        object = (TestObject) oql.execute();
-        if ( object == null ) {
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMoreElements() ) {
+            object = (TestObject) enum.nextElement();
+            object.name = TestObject.DefaultName;
+            _logger.println( "Updating object: " + object );
+        } else {
             object = new TestObject();
             object.id = TestObject.DefaultId;
             object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
             _db.create( object );
-        } else {
-            object.name = TestObject.DefaultName;
-            _logger.println( "Updating object: " + object );
         }
         _db.commit();
         
@@ -94,7 +97,7 @@ public class Concurrent
         // Open a new transaction in order to conduct test
         _db.begin();
         oql.bind( new Integer( TestObject.DefaultId ) );
-        object = (TestObject) oql.execute();
+        object = (TestObject) oql.execute().nextElement();
         object.name = JDOName;
         
         // Perform direct JDBC access and override the value of that table

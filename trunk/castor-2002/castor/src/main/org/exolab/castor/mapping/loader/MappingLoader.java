@@ -374,7 +374,7 @@ public abstract class MappingLoader
 
     /**
      * Creates a new descriptor. The class mapping information is used
-     * to create a new stock {@link ClassDesc}. Implementations may
+     * to create a new stock {@link ClassDescriptor}. Implementations may
      * extend this class to create a more suitable descriptor.
      *
      * @param clsMap The class mapping information
@@ -539,7 +539,7 @@ public abstract class MappingLoader
     
     /**
      * Creates a single field descriptor. The field mapping is used to
-     * create a new stock {@link FieldDesc}. Implementations may
+     * create a new stock {@link FieldDescriptor}. Implementations may
      * extend this class to create a more suitable descriptor.
      *
      * @param javaClass The class to which the field belongs

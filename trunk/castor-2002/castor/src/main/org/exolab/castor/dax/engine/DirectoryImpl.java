@@ -199,15 +199,14 @@ public class DirectoryImpl
         
         handler = _handler;
         // clsDesc = _dirEngine.getClassDesc();
-        obj = handler.newInstance();
         try {
             if ( _tx != null ) {
-                _tx.load( _dirEngine, obj, rdn, AccessMode.Shared );
+                obj = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
             } else {
                 TransactionContext tx;
                 
                 tx = new TransactionContextImpl( _conn );
-                tx.load( _dirEngine, obj, rdn, AccessMode.ReadOnly );
+                obj = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
                 tx.commit();
             }
         } catch ( ObjectNotFoundException except ) {

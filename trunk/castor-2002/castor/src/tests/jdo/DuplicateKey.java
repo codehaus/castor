@@ -2,7 +2,8 @@ package jdo;
 
 
 import java.io.PrintWriter;
-import org.exolab.castor.jdo.JDOSource;
+import java.util.Enumeration;
+import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
@@ -15,7 +16,7 @@ public class DuplicateKey
 {
 
 
-    private JDOSource      _jdo;
+    private DataObjects    _jdo;
 
 
     private Database       _db;
@@ -24,7 +25,7 @@ public class DuplicateKey
     private PrintWriter    _logger;
 
 
-    public DuplicateKey( JDOSource jdo, PrintWriter logger )
+    public DuplicateKey( DataObjects jdo, PrintWriter logger )
 	throws PersistenceException
     {
 	_jdo = jdo;
@@ -39,6 +40,7 @@ public class DuplicateKey
     {
 	OQLQuery      oql;
 	TestObject    object;
+        Enumeration   enum;
 
         // Open transaction in order to perform JDO operations
         _db.begin();
@@ -47,17 +49,18 @@ public class DuplicateKey
         // If it exists, set the name to some predefined value
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-        oql.bind( new Integer( TestObject.DefaultId ) );
-        object = (TestObject) oql.execute();
-        if ( object == null ) {
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMoreElements() ) {
+            object = (TestObject) enum.nextElement();
+            object.name = TestObject.DefaultName;
+            _logger.println( "Updating object: " + object );
+        } else {
             object = new TestObject();
             object.id = TestObject.DefaultId;
             object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
             _db.create( object );
-        } else {
-            object.name = TestObject.DefaultName;
-            _logger.println( "Updating object: " + object );
         }
         _db.commit();
 
@@ -67,7 +70,9 @@ public class DuplicateKey
         // the cache engine.
         _db.begin();
         oql.bind( new Integer( TestObject.DefaultId ) );
-        object = (TestObject) oql.execute();
+        enum = oql.execute();
+        while ( enum.hasMoreElements() )
+            enum.nextElement();
 
         object = new TestObject();
         object.id = TestObject.DefaultId;
@@ -83,6 +88,7 @@ public class DuplicateKey
             _logger.println( "Error: " + except );
         }
         _db.commit();
+
 	    
         // Attempt to create a new object with the same identity,
         // in the database. Will report duplicate key from SQL engine.

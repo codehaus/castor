@@ -37,7 +37,8 @@
     <echo message="  tests    Builds the test packages (including debugging info)"/>
     <echo message="  jar      Builds the binary JAR in the dist directory"/>
     <echo message="  doc      Builds the documentation"/>
-    <echo message="  javadoc  Builds the API JavaDocs"/>
+    <echo message="  api      Builds the API JavaDocs"/>
+    <echo message="  javadoc  Builds the full JavaDocs"/>
     <echo message="  source   Builds the source tarball in the dist directory"/>
     <echo message="  tarball  Builds the binary distribution in the dist directory"/>
     <echo message="  cvs      Update the sources from the CVS"/>
@@ -137,20 +138,34 @@
     <copydir  src="${schema}" includes="*.dtd,*.xsd" dest="${build}/doc" />
     <replace  file="${build}/doc/download.html" token="$$VERSION$$" value="${version}" />
     <replace  file="${build}/doc/print/download.html" token="$$VERSION$$" value="${version}" />
+
+    <mkdir    dir="${build}/doc/pres" />
+    <style    basedir="${doc}/pres" destdir="${build}/doc/pres" style="style/exolab.xsl"
+              includes="**.xml" excludes="style/**,project.xml" />
+    <copydir  src="${doc}/pres" dest="${build}/doc/pres" includes="license.txt,document.dtd" />
+    <copydir  src="${doc}/pres/images" dest="${build}/doc/pres/images" />
+    <copydir  src="${doc}/pres/style" dest="${build}/doc/pres/style" includes="images/**,*.css" />
   </target>
 
 
-  <!-- Build the API and full JavaDocs -->
+  <!-- Build the full JavaDocs -->
   <target name="javadoc" depends="prepare">
     <mkdir    dir="${build}/doc" />
     <mkdir    dir="${build}/doc/javadoc" />
-    <mkdir    dir="${build}/doc/api" />
     <property name="copyright"
               value="Exoffice Technologies, Inc. (C) 2000. All rights reserved  http://castor.exolab.org" />
     <javadoc  sourcepath="${main}" destdir="${build}/doc/javadoc" dir="."
               doctitle="Castor JavaDoc" windowtitle="Castor JavaDoc" bottom="${copyright}"
               package="true" author="true" version="true" noindex="true"
               packagenames="org.*" />
+  </target>
+
+  <!-- Build the API JavaDocs -->
+  <target name="api" depends="prepare">
+    <mkdir    dir="${build}/doc" />
+    <mkdir    dir="${build}/doc/api" />
+    <property name="copyright"
+              value="Exoffice Technologies, Inc. (C) 2000. All rights reserved  http://castor.exolab.org" />
     <javadoc  sourcepath="${main}" destdir="${build}/doc/api" dir="."
               doctitle="Castor API" windowtitle="Castor API" bottom="${copyright}"
               public="true" author="true"
@@ -159,7 +174,7 @@
   </target>
 
   <!-- Build the docs, API and full JavaDocs, doc archives -->
-  <target name="docs" depends="doc,javadoc">
+  <target name="docs" depends="doc,api,javadoc">
     <zip    zipfile="${dist}/${archive}-doc.zip" basedir="${build}" includes="doc/**" />
     <tar    tarfile="${dist}/${archive}-doc.tar" basedir="${build}" includes="doc/**" />
     <gzip   src="${dist}/${archive}-doc.tar" zipfile="${dist}/${archive}-doc.tgz" />
@@ -194,7 +209,7 @@
 
 
   <!-- Build a full release including JAR, zip/tarball, source and documentation -->
-  <target name="release" depends="clean,jar,tarball,source,doc,javadoc">
+  <target name="release" depends="clean,jar,source,docs,tarball">
   </target>
 
   <!-- Build the tarball including JAR and all dependent packages -->
