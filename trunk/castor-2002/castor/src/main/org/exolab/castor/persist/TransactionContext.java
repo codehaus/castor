@@ -582,7 +582,7 @@ public abstract class TransactionContext
      */
     public synchronized OID create( LockEngine engine, ClassMolder molder, Object object, OID depended )
             throws DuplicateIdentityException, PersistenceException {
-                
+
         OID          oid;
         Object      identity;
         ObjectEntry  entry;
@@ -592,13 +592,8 @@ public abstract class TransactionContext
 
         // Make sure the object has not beed persisted in this transaction.
         identity = molder.getIdentity( this, object );
-        // [oleg] In the case where key generator is used,
-        // the value of identity is dummy, set it to null
-        if ( molder.isKeyGeneratorUsed() ) {
-            identity = null;
-        }
         entry = getObjectEntry( object );
-        
+
         // if autoStore is specified, we relieve user life a little bit here
         // so that if an object create automatically and user create it
         // again, it won't receive exception
@@ -702,7 +697,7 @@ public abstract class TransactionContext
     public synchronized OID update( LockEngine engine, ClassMolder molder, Object object, OID depended )
         throws DuplicateIdentityException, ObjectModifiedException,
             ClassNotPersistenceCapableException, PersistenceException {
-                
+
         Object     identity;
         OID          oid;
         ObjectEntry  entry;
@@ -711,7 +706,7 @@ public abstract class TransactionContext
         if ( object == null )
             throw new NullPointerException();
 
-        identity = molder.getIdentity( this, object );
+        identity = molder.getActualIdentity( this, object );
 
         // Make sure that nobody is looking at the object
         oid = new OID( engine, molder, depended, identity );
@@ -726,16 +721,16 @@ public abstract class TransactionContext
                 throw new DuplicateIdentityException( "update object which is already in the transaction" );
 
             // to prevent circular references
-            //if ( entry.object == object ) 
+            //if ( entry.object == object )
             //    return oid;
             //[Oleg] in some cases (deletion of dependent objects) objects
-            //that were previously loaded in this transaction by the same 
+            //that were previously loaded in this transaction by the same
             //update() call must be replaced. Thus, we must allow this.
             //I don't see other way.
             //release( entry.object );
             //[Yip] Hum, i don't understand why
             //[Oleg] Assume that one object B is referenced by object A
-            // in two ways (indirectly). Then during update(A) update(B) would  
+            // in two ways (indirectly). Then during update(A) update(B) would
             // be called twice.
             //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
@@ -1067,7 +1062,7 @@ public abstract class TransactionContext
                         Object       identities;
                         ClassMolder molder;
                         OID          oid;
-                    
+
                         // When storing the object it's OID might change
                         // if the primary identity has been changed
 
