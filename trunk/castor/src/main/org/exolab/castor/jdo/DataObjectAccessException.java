@@ -55,10 +55,11 @@ package org.exolab.castor.jdo;
  * @version $Revision$ $Date$
  */
 public class DataObjectAccessException
-        extends RuntimeException {
+    extends RuntimeException 
+{
 
     public DataObjectAccessException( String message, Throwable except ) {
-        super( message, except );
+        super( message /*, except */);
     }
 
     public DataObjectAccessException( String message ) {
