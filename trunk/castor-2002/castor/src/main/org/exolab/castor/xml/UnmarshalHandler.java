@@ -1582,13 +1582,13 @@ public final class UnmarshalHandler extends MarshalFramework
             while (cde.hasNext() && (descriptor == null)) {
                 cdInherited = cde.getNext();
                 Class subclass = cdInherited.getJavaClass();
-                
+
                 for (int i = 0; i < descriptors.length; i++) {
 
                     if (descriptors[i] == null) continue;
                     //-- check for inheritence
                     Class superclass = descriptors[i].getFieldType();
-                    
+
                     // It is possible that the superclass is of type object if we use any node.
                     if (superclass.isAssignableFrom(subclass) && (superclass != Object.class)) {
                         descriptor = descriptors[i];
@@ -1752,7 +1752,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 primitive = new Long(value);
         }
         // char
-        else if (type == Character.TYPE) {
+        else if ((type == Character.TYPE) || (type == Character.class)) {
             if (!isNull)
                 primitive = new Character(value.charAt(0));
             else
@@ -1773,11 +1773,17 @@ public final class UnmarshalHandler extends MarshalFramework
                 primitive = new Float(value);
         }
         // byte
-        else if (type == Byte.TYPE) {
+        else if ((type == Byte.TYPE) || (type == Byte.class)) {
             if (isNull)
                 primitive = new Byte((byte)0);
             else
                 primitive = new Byte(value);
+        }
+        //BigDecimal
+        else if (type == java.math.BigDecimal.class) {
+            if (isNull)
+               primitive = new java.math.BigDecimal(0);
+            else primitive = new java.math.BigDecimal(value);
         }
         // otherwise do nothing
         else
