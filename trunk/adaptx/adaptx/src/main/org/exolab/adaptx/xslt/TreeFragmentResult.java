@@ -175,7 +175,7 @@ public class TreeFragmentResult extends XSLTFunctionResult {
      * @return The result as a string value
      */
     public String stringValue() {
-        if (_nodes == null) return null;
+        if (_nodes == null) return "";
         return _nodes.stringValue();
     } //--stringValue
     
