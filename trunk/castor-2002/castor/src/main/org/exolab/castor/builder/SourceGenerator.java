@@ -85,7 +85,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.8.3 (2000502)";
+    static final String version = "0.8.7";
 
     /**
      * The application URI
@@ -153,6 +153,9 @@ public class SourceGenerator {
     public void generateSource(Schema schema, String packageName) {
         SGStateInfo sInfo = new SGStateInfo();
         sInfo.packageName = packageName;
+        
+        sInfo.setPromptForOverwrite(warnOnOverwrite);
+        
         createClasses(schema, sInfo);
     } //-- generateSource
 
@@ -262,6 +265,7 @@ public class SourceGenerator {
         
         desc = "Suppress non fatal warnings, such as overwritting files.";
         allOptions.addFlag("f", "", desc);
+        allOptions.setOptional("f", true);
         
         //-- source generator type-factory name flag
         allOptions.addFlag("type-factory", "type-factory-name", "Sets the source generator type-factory name (SGTypeFactory)");
@@ -316,7 +320,7 @@ public class SourceGenerator {
       
         sgen.setLineSeparator(lineSep);
         sgen.setSuppressNonFatalWarnings(force);
-        if (force) System.out.println("Suppressing non fatal warnings.");
+        if (force) System.out.println("-- Suppressing non fatal warnings.");
         
         if (schemaFilename == null) {
             System.out.println(appName);
@@ -519,22 +523,96 @@ public class SourceGenerator {
     **/
     private void processJClass(JClass jClass, SGStateInfo state) {
         
+        
+        boolean allowPrinting = true;
+        
+        if (state.promptForOverwrite()) {
+            String filename = jClass.getFilename(destDir);
+            File file = new File(filename);
+            if (file.exists()) {
+                String message = filename + " already exists. overwrite?";
+                allowPrinting = confirm(message);
+            }
+        }
+        
         //-- print class
-        jClass.setHeader(header);
-        jClass.print(destDir,lineSeparator);
+        if (allowPrinting) {
+            jClass.setHeader(header);
+            jClass.print(destDir,lineSeparator);
+        }
         
         //-- create MarshalInfo and print
         
         ClassInfo classInfo = state.resolve(jClass);
         if (classInfo != null) {
+            
+            
             JClass desc 
                 = DescriptorSourceFactory.createSource(classInfo);
-            desc.setHeader(header);
-            desc.print(destDir,lineSeparator);
+                
+            allowPrinting = true;
+            if (state.promptForOverwrite()) {
+                String filename = desc.getFilename(destDir);
+                File file = new File(filename);
+                if (file.exists()) {
+                    String message = filename + " already exists. overwrite?";
+                    allowPrinting = confirm(message);
+                }
+            }
+            
+            if (allowPrinting) {
+                desc.setHeader(header);
+                desc.print(destDir,lineSeparator);
+            }
         }
         
         state.markAsProcessed(jClass);
     } //-- processClassInfo
     
+    
+    private boolean confirm(String message) {
+        
+        try {
+            while (true) {
+                System.out.println();
+                System.out.print(message);
+                System.out.print( "(y|n|?) : ");
+                
+                int ch = System.in.read();
+                
+                //-- read eoln, or extra characters
+                while (System.in.available() > 0) {
+                    switch (System.in.read()) {
+                        case '\n':
+                        case '\r':
+                            break;
+                        default:
+                            ch = '\0';
+                    }
+                }
+                
+                System.out.println();
+                
+                //-- check ch
+                switch (ch) {
+                    case 'y':
+                        return true;
+                    case 'n':
+                        return false;
+                    case '?':
+                        System.out.println("y = yes, n = no");
+                        break;
+                    default:
+                        System.out.print("invalid input, expecting ");
+                        System.out.println("'y', 'n', or '?'.");
+                        break;
+                }
+            }
+        }
+        catch (java.io.IOException ix) {
+            System.out.println(ix);
+        }
+        return false;
+    }
 } //-- SourceGenerator
 

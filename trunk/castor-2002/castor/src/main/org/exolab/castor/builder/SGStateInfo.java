@@ -62,11 +62,13 @@ class SGStateInfo extends ClassInfoResolverImpl {
     /** 
      * The package used when creating new classes.
     **/
-    protected String      packageName = null;
+    protected String  packageName = null;
         
     private Hashtable classTypes = null;
     
-    private Vector processed = null;
+    private Vector    processed = null;
+    
+    private boolean   promptForOverwrite = true;
     
     /**
      * Constructor
@@ -91,6 +93,14 @@ class SGStateInfo extends ClassInfoResolverImpl {
         if (!processed.contains(className))
             processed.addElement(className);
     } //-- markAsProcessed
+    
+    boolean promptForOverwrite() {
+        return promptForOverwrite;
+    }
+
+    void setPromptForOverwrite(boolean promptForOverwrite) {
+        this.promptForOverwrite = promptForOverwrite;
+    } //-- setPromptForOverwrite
     
     /*
     protected JClass getJClass(String name) {
