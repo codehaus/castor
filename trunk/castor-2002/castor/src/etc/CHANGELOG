@@ -24,7 +24,7 @@ XML:     Added support in the unmarshaller for better inheritence checking.
          class descriptor. (see src/tests/xml/Inheritence.java)
 
 JDO:     Added support for paramaterized type convertors. Currently supported is boolean
-         to char convertor using T/F character values (e.g. char.01 or char.TF). More
+         to char convertor using T/F character values (e.g. char[01] or char[FT]). More
          convertors and parameter specification will be added in 0.8.7. (Oleg Nitz
          <on@ibis.odessa.ua>)
 
