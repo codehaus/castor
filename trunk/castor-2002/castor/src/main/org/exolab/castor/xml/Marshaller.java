@@ -77,7 +77,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class Marshaller {
+public class Marshaller extends MarshalFramework {
 
     /**
      * Message name for a non sax capable serializer error
@@ -544,7 +544,7 @@ public class Marshaller {
             //-- the special #isPrimitive method of this class
             //-- so that we can check for the primitive wrapper
             //-- classes
-            if (isPrimitive(_class) || (_class == String.class) || byteArray)
+            if (isPrimitive(_class) || byteArray)
             {
 
                 classDesc = _StringClassDescriptor;
@@ -808,7 +808,7 @@ public class Marshaller {
             }
         }
         /* special case for Strings and primitives */
-        else if ((_class == String.class) || isPrimitive(_class)) {
+        else if (isPrimitive(_class)) {
             char[] chars = object.toString().toCharArray();
             try {
                 handler.characters(chars,0,chars.length);
@@ -961,7 +961,7 @@ public class Marshaller {
     {
         XMLClassDescriptor classDesc = null;
 
-        if (! UnmarshalHandler.isPrimitive(_class))
+        if (!isPrimitive(_class))
             classDesc = _cdResolver.resolve(_class);
 
         if (_cdResolver.error()) {
@@ -998,22 +998,6 @@ public class Marshaller {
             validator.validate(object, _cdResolver);
         }
     }
-
-    /**
-     * Returns true if the given class should be treated as a primitive
-     * type
-     * @return true if the given class should be treated as a primitive
-     * type
-    **/
-    private boolean isPrimitive(Class type) {
-
-        if (type.isPrimitive()) return true;
-        if ((type == Boolean.class) || (type == Character.class))
-            return true;
-
-        return (type.getSuperclass() == Number.class);
-
-    } //-- isPrimitive
 
 } //-- Marshaller
 

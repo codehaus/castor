@@ -102,7 +102,7 @@ public class Validator implements ClassValidator {
       
         XMLClassDescriptor classDesc = null;
 
-        if (! UnmarshalHandler.isPrimitive(object.getClass()))
+        if (! MarshalFramework.isPrimitive(object.getClass()))
             resolver.resolve(object.getClass());
         
         //-- we cannot validate an object if ClassDescriptor is null

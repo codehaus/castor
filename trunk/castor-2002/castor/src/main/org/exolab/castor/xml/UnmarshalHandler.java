@@ -78,7 +78,9 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class UnmarshalHandler implements DocumentHandler {
+public class UnmarshalHandler extends MarshalFramework
+    implements DocumentHandler 
+{
 
 
     //----------------------------/
@@ -577,8 +579,18 @@ public class UnmarshalHandler implements DocumentHandler {
                 Class instanceClass = null;
                 Object instance = null;
                 try {
-                    instanceClass = _cdResolver.resolve(instanceClassname)
-                        .getJavaClass();
+                    
+                    XMLClassDescriptor xcd =
+                        getClassDescriptor(instanceClassname);
+                        
+                    if (xcd != null)
+                        instanceClass = xcd.getJavaClass();
+                        
+                    if (instanceClass == null) {
+                        throw new SAXException("Class not found: " + 
+                            instanceClassname);
+                    }
+                    
                     if (!_topClass.isAssignableFrom(instanceClass)) {
                         String err = instanceClass + " is not a subclass of "
                             + _topClass;
@@ -1134,6 +1146,31 @@ public class UnmarshalHandler implements DocumentHandler {
     } //-- message
 
     /**
+     * Finds and returns an XMLClassDescriptor for the given class name.
+     * If a ClassDescriptor could not be found one will attempt to
+     * be generated.
+     * @param className the name of the class to find the descriptor for
+    **/
+    private XMLClassDescriptor getClassDescriptor (String className)
+        throws SAXException
+    {
+        Class type = null;        
+        try {
+            //-- use specified ClassLoader if necessary
+		    if (_loader != null) {
+		        type = _loader.loadClass(className);
+		    }
+		    //-- no loader available use Class.forName
+		    else type = Class.forName(className);
+		}
+		catch (ClassNotFoundException cnfe) {
+		    return null;
+		}
+        return getClassDescriptor(type);
+        
+    } //-- getClassDescriptor
+
+    /**
      * Finds and returns an XMLClassDescriptor for the given class. If
      * a ClassDescriptor could not be found one will attempt to
      * be generated.
@@ -1211,24 +1248,6 @@ public class UnmarshalHandler implements DocumentHandler {
         return type.getName();
     } //-- className
 
-    /**
-     * Returns true if the given class should be treated as a primitive
-     * type
-     * @return true if the given class should be treated as a primitive
-     * type
-    **/
-    public static boolean isPrimitive(Class type) {
-
-        if (type.isPrimitive()) return true;
-
-        //-- we treat strings as primitives
-        if (type == String.class) return true;
-
-        if ((type == Boolean.class) || (type == Character.class))
-            return true;
-
-        return (type.getSuperclass() == Number.class);
-    } //-- isPrimitive
 
     /**
      * Checks the given StringBuffer to determine if it only
