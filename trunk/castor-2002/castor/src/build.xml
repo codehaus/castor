@@ -31,8 +31,7 @@
 \n  doc      Builds the documentation
 \n  javadoc  Builds the API JavaDocs
 \n  source   Builds the source tarball in the dist directory
-\n  tarball  Builds the binary distribution (Castor and all
-\n           dependent libraries) in the dist directory\n" />
+\n  tarball  Builds the binary distribution in the dist directory\n" />
   </target>
 
 
@@ -119,10 +118,10 @@
     <mkdir dir="${build}/doc/javadoc" />
     <javadoc2 sourcepath="${source}/main" destdir="${build}/doc/javadoc"
               doctitle="Castor" public="true" noindex="true" author="true"
-	      packagenames="org.exolab.castor.xml,org.exolab.castor.jdo,org.exolab.castor.dax,
-                            org.exolab.castor.persist,org.exolab.castor.util,
-                            org.exolab.castor.dsml,org.exolab.castor.dsml.jndi,org.exolab.castor.dsml.mozilla,
-                            org.exolab.castor.dsml.tools" />
+	      packagenames="org.exolab.castor.xml, org.exolab.castor.jdo, org.exolab.castor.dax,
+                            org.exolab.castor.persist, org.exolab.castor.persist.spi, org.exolab.castor.mapping,
+                            org.exolab.castor.dsml, org.exolab.castor.dsml.jndi, org.exolab.castor.dsml.mozilla,
+                            org.exolab.castor.dsml.tools, org.exolab.castor.util" />
   </target>
 
 

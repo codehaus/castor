@@ -68,7 +68,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.TransactionImpl;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
-import org.exolab.castor.jdo.engine.DatabaseEngine;
 import org.exolab.castor.jdo.engine.DatabaseSource;
 
 

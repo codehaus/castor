@@ -1,13 +1,33 @@
-Version 0.7.7  February 3, 2000
+Version 0.7.7  February 2, 2000
 -------------------------------
 
-XML:  Changed "archetype" to "type" in accordance with the 19991217
-      XML Schema draft
+XML:     Changed "archetype" to "type" in accordance with the 19991217
+         XML Schema draft
 
-XML:  Added support for "datatype"
+XML:     Added support for "datatype"
 
-XML:  fixed a bug with the Base64 encoder which caused it to throw an
-      ArrayIndexOutOfBounds exception when it recieved a zero-length array
+XML:     Fixed a bug with the Base64 encoder which caused it to throw an
+         ArrayIndexOutOfBounds exception when it recieved a zero-length array
+
+JDO:     Test for duplicate primary key only if select operation failed
+         using either the SQL state (X/Open error code) or by running a
+         separate select statement. (Contributed by Oleg Nitz)
+
+Persist: Application level APIs now deal with PersistenceEngine and not
+         with CacheEngine directly. All classes that extended CacheEngine
+         have been eliminated.
+
+Persist: Added an SPI package that defines interfaces for Castor
+         service providers (i.e. persistence implementations).
+
+Persist: Added support for XA transactions through an XAResouceImpl that
+         manages transaction context creation and association. Interface
+         initially used in DAX.
+
+Misc:    New verion of Xerces (1.0.2+) and XSL:P included in this build.
+         The Xerces update fixes several HTML printing problems, the XSL:P
+         build included in this release is 4x faster.
+
 
 Version 0.7.6  February 2, 2000
 -------------------------------

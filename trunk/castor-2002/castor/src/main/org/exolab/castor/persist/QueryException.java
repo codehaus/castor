@@ -51,6 +51,9 @@ import org.exolab.castor.util.CastorException;
 
 
 /**
+ * Reports an exception with the query, either syntax, query parameters
+ * or inability to perform the query against the persistence engine.
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
