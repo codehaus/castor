@@ -174,13 +174,13 @@ public class Marshaller extends MarshalFramework {
     **/
     private String _defaultNamespace = null;
 
-    /** 
+    /**
      * The output format to use with the serializer.
      * This will be null if the user passed in their
      * own DocumentHandler.
     **/
     private OutputFormat _format = null;
-    
+
     /**
      * The document handler we are marshalling to
     **/
@@ -365,12 +365,12 @@ public class Marshaller extends MarshalFramework {
         _asDocument = asDocument;
 
         if (_serializer != null) {
-            
+
             if (_format == null) {
                 _format = Configuration.getOutputFormat();
             }
             _format.setOmitXMLDeclaration( ! asDocument );
-            
+
             //-- reset output format, this needs to be done
             //-- any time a change occurs to the format.
             _serializer.setOutputFormat( _format );
@@ -680,7 +680,6 @@ public class Marshaller extends MarshalFramework {
 
         if (descriptor != null && descriptor.isContainer()) {
             containerField = true;
-
         }
 
         //-- add object to stack so we don't potentially get into
@@ -745,7 +744,7 @@ public class Marshaller extends MarshalFramework {
                         _packages.add(pkgName);
             }
 
-    		if (_marshalExtendedType) {
+            if (_marshalExtendedType) {
 				//  marshall as the actual value
 				classDesc = getClassDescriptor(_class);
 				saveType = (_class != descriptor.getFieldType());
@@ -828,7 +827,6 @@ public class Marshaller extends MarshalFramework {
                    // Try to find a field descriptor directly in the parent object
                      XMLClassDescriptor tempContaining = (XMLClassDescriptor)descriptor.getContainingClassDescriptor();
 
-                     //Comment for Keith: is it needed to check that tempContaining is not null?
                      XMLFieldDescriptor fieldDescMatch = tempContaining.getFieldDescriptor(xmlElementName, NodeType.Element);
 
                      // Try to find a field descriptor by inheritance in the parent object
@@ -925,10 +923,7 @@ public class Marshaller extends MarshalFramework {
 
         //-- Look for attributes in container fields,
         //-- (also handle container in container)
-        /* REMOVED For now (KV)
         processContainerAttributes(object, classDesc, atts);
-        */
-
 
         //-- xsi:type
         if (saveType) {
@@ -1219,7 +1214,7 @@ public class Marshaller extends MarshalFramework {
      * @param encoding the encoding to set
     **/
     public void setEncoding(String encoding) {
-        
+
         if (_serializer != null) {
             if (_format == null) {
                 _format = Configuration.getOutputFormat();
@@ -1291,47 +1286,51 @@ public class Marshaller extends MarshalFramework {
         throws MarshalException
     {
 
-
         XMLFieldDescriptor[] elemDescriptors = classDesc.getElementDescriptors();
-
-        for (int i = 0; i < elemDescriptors.length; i++) {
-            if (elemDescriptors[i] == null) continue;
-            if (!elemDescriptors[i].isContainer()) continue;
-
-            XMLFieldDescriptor elemDescriptor  = elemDescriptors[i];
-
-            Object containerObject = elemDescriptor.getHandler().getValue(target);
-
-            if (containerObject == null) continue;
-
-            XMLClassDescriptor containerClassDesc = (XMLClassDescriptor)elemDescriptor.getClassDescriptor();
-            if (containerClassDesc == null) {
-                containerClassDesc = getClassDescriptor(elemDescriptor.getFieldType());
-                if (containerClassDesc == null) continue;
-            }
-
-            // Look for attributes
-            XMLFieldDescriptor[] attrDescriptors = containerClassDesc.getAttributeDescriptors();
-            for (int idx = 0; idx < attrDescriptors.length; idx++) {
-                if (attrDescriptors[idx] == null) continue;
-
-                String xmlName = attrDescriptors[idx].getXMLName();
-                Object value = null;
-                try {
-                    value = attrDescriptors[idx].getHandler().getValue(containerObject);
-                }
-                catch(IllegalStateException ise) {
-                    continue;
-                }
-                if (value == null) continue;
-                atts.addAttribute(xmlName, CDATA, value.toString());
-            }
-
-
-            // recursively process containers
-            processContainerAttributes(containerObject, containerClassDesc, atts);
+        if (target.getClass().isArray()) {
+             int length = Array.getLength(target);
+             for (int j = 0; j < length; j++) {
+                  Object item = Array.get(target, j);
+                  if (item != null)
+                      processContainerAttributes(item, classDesc, atts);
+             }
         }
+        else {
+            for (int i = 0; i < elemDescriptors.length; i++) {
+                if (elemDescriptors[i] == null) continue;
+                if (!elemDescriptors[i].isContainer()) continue;
 
+                XMLFieldDescriptor elemDescriptor  = elemDescriptors[i];
+                Object containerObject = elemDescriptor.getHandler().getValue(target);
+
+                if (containerObject == null) continue;
+
+                XMLClassDescriptor containerClassDesc = (XMLClassDescriptor)elemDescriptor.getClassDescriptor();
+                if (containerClassDesc == null) {
+                    containerClassDesc = getClassDescriptor(elemDescriptor.getFieldType());
+                    if (containerClassDesc == null) continue;
+                }
+
+                // Look for attributes
+                XMLFieldDescriptor[] attrDescriptors = containerClassDesc.getAttributeDescriptors();
+                for (int idx = 0; idx < attrDescriptors.length; idx++) {
+                    if (attrDescriptors[idx] == null) continue;
+
+                    String xmlName = attrDescriptors[idx].getXMLName();
+                    Object value = null;
+                    try {
+                        value = attrDescriptors[idx].getHandler().getValue(containerObject);
+                    } catch(IllegalStateException ise) {
+                        continue;
+                    }
+                    if (value == null) continue;
+                    atts.addAttribute(xmlName, CDATA, value.toString());
+                }
+
+                // recursively process containers
+                processContainerAttributes(containerObject, containerClassDesc, atts);
+            }
+        }//else
     } //-- processContainerAttributes
 
     /**
