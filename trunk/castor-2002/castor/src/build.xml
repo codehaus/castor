@@ -6,10 +6,10 @@
   <property name="classes" value="${build}/classes" />
   <property name="dist" value="dist" />
   <property name="lib" value="lib" />
-  <property name="doc" value="doc" />
 
   <property name="classpath" value="${classpath}:${classes}" />
   <property name="build.compiler" file="classic" />
+<!-- <property name="deprecation" value="true" /> -->
   <property file="${source}/VERSION" />
 
   <property name="jar.name" value="castor-${version}"/>
@@ -132,6 +132,11 @@
     <exec command="gzip ${dist}/castor-${version}-src.tar" />
   </target>
 
+  <target name="style" depends="prepare">
+    <mkdir dir="${build}/doc" />
+    <style srcdir="${source}/doc" destdir="${build}/doc"
+           exclude="project.xml,style" style="style/exolab.xsl"/>
+  </target>
 
   <target name="tarball" depends="prepare">
     <property name="bin" value="${build}/castor-${version}" />

@@ -3,6 +3,7 @@ package jdo;
 
 import myapp.*;
 import java.util.Hashtable;
+import java.util.Enumeration;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -104,6 +105,7 @@ public class Test
 	OQLQuery      productOql;
 	OQLQuery      groupOql;
 	OQLQuery      computerOql;
+	Enumeration   enum;
 	Transaction   tx;
 
 	// Must be associated with an open transaction in order to
@@ -212,6 +214,14 @@ public class Test
 
 
 	logger.println( "Commit transaction" );
+	tx.commit();
+
+	tx.begin();
+	productOql.create( "SELECT p FROM myapp.Product p" );
+	enum = (Enumeration) productOql.execute();
+	while( enum.hasMoreElements() ) {
+	    logger.println( "Query result: " + enum.nextElement() );
+	}
 	tx.commit();
     }
 
