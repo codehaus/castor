@@ -265,7 +265,7 @@ public final class LockEngine {
         type = oid.getJavaClass();
         typeInfo = (TypeInfo) _typeInfo.get( type );
         if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
 
         ClassMolder molder = oid.getMolder();
         PersistenceException pexcept = null;
@@ -284,7 +284,7 @@ public final class LockEngine {
                 oid.setDbLock( true );
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object not existing
-            throw new ObjectNotFoundExceptionImpl( type, OID.flatten( oid.getIdentities() ) );
+            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, OID.flatten(oid.getIdentities())) );
         } catch ( ObjectNotFoundException except ) {
             // Object was not found in persistent storge, must dump
             // it from the cache
@@ -361,7 +361,7 @@ public final class LockEngine {
                 oid.setDbLock( true );
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object not existing
-            throw new ObjectNotFoundExceptionImpl( query.getResultType(), OID.flatten( identities ) );
+            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", query.getResultType(), OID.flatten(identities)) );
         //} catch ( ObjectNotFoundException except ) {
             // Object was not found in persistent storge, must dump
             // it from the cache
@@ -411,7 +411,7 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
         if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+            throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName()) );
 
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
@@ -450,7 +450,8 @@ public final class LockEngine {
                 // LockNotGranted won't happen, cus it's a new lock
                 } catch ( LockNotGrantedException except ) {
                     // Someone else is using the object, definite duplicate key
-                    throw new DuplicateIdentityExceptionImpl( object.getClass(), OID.flatten( oid.getIdentities() ) );
+                    throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), 
+							OID.flatten(oid.getIdentities())) );
                 } 
                 // Dump the memory image of the object, it might have been deleted
                 // from persistent storage
@@ -581,14 +582,14 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
         if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+            throw new ClassNotPersistenceCapableException( object.getClass() );
 
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
             // XXX If identity is null need to fine a way to determine it
             if ( identity == null )
-                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+                throw new PersistenceException( "persist.noIdentity" );
 
             try {
 
@@ -598,7 +599,7 @@ public final class LockEngine {
                 //typeInfo.molder.update( tx, oid, object );   
             } catch ( LockNotGrantedException except ) {
                 // Someone else is using the object, definite duplicate key
-                throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
+                throw new DuplicateIdentityException( object.getClass(), identity );
             } 
         }
         return oid;
@@ -658,7 +659,7 @@ public final class LockEngine {
             typeInfo.molder.store( tx, oid, object );
             return oid;
         } catch ( ClassNotPersistenceCapableException except ) {
-            throw new PersistenceExceptionImpl( "persist.internal", except.toString() );
+            throw new PersistenceException( Messages.format("persist.internal", except.toString()) );
         }
     }
 

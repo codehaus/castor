@@ -63,12 +63,10 @@ import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
-import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-
+import org.exolab.castor.util.Messages;
 
 /**
  * PersistenceQuery implementation for use with PostgreSQL stored functions
@@ -180,7 +178,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
                     _stmt.close();
                 } catch ( SQLException e2 ) { }
             }
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
     }
 
@@ -206,7 +204,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
             return new Object[] { _lastIdentity };
         } catch ( SQLException except ) {
             _lastIdentity = null;
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
     }
 
@@ -244,7 +242,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
             else
                 _lastIdentity = null;
         } catch ( SQLException except ) {
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
         return stamp;
     }
