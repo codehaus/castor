@@ -68,6 +68,7 @@
         <echo message="  source   Builds the source tarball in the dist directory"/>
         <echo message="  tarball  Builds the binary distribution in the dist directory"/>
         <echo message="  cvs      Update the sources from the CVS"/>
+        <echo message="  testsg   Launch the basic test for the source generator"/>
         <echo message=""/>
     </target>
     <!-- Prepare target directories -->
