@@ -502,16 +502,11 @@ public class Lexer {
                     //-- otherwise we switch the token to a CNAME
                     if (isMultiplicativeOp(tok)) {
                         if ((last == null) || 
+                            (last.token.type == Token.NULL) ||
                             (last.token.type == Token.AT_SYMBOL) ||
                             (last.token.type == Token.L_PAREN)   ||
                             (last.token.type == Token.L_BRACKET) ||
                             isOperator(last.token)) 
-                            // Old code...new code more correctly matches
-                            // what the XPath spec dictates for lexical
-                            // structure.
-                            //((last.token.type != Token.NUMBER) &&
-                            // (last.token.type != Token.R_PAREN) &&
-                            // (last.token.type != Token.VAR_REFERENCE))) 
                         {
                             tok.type = Token.CNAME;
                         }
@@ -878,6 +873,7 @@ public class Lexer {
         //pattern = "a/div/b/and/c";
         //pattern = "$foo mod 4";
         //pattern = "foo:*";
+        //pattern = "div";
         pattern = "(3)*(4)";
         
         System.out.println("Expr: "+pattern);
