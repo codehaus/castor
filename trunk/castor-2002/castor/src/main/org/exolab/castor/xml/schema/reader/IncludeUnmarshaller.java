@@ -76,39 +76,45 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		if (include == null)
 			throw new SAXException("'schemaLocation' attribute missing on 'include'");
 
-		//-- Has this schema locaiton been processed?
-        if (state.processed(include))
-            return;
-		state.markAsProcessed(include, schema);
-
-        // note: URI not supported (just system path), so remove any file://
+		// note: URI not supported (just system path), so remove any file://
         String absolute = include;
 		if (absolute.startsWith("file://")){
             absolute = absolute.substring(7);
             if (java.io.File.separatorChar =='\\')
-                include = absolute.substring(1);
+                absolute = absolute.substring(1);
         }
-
 
         // if the path is relative Xerces append the "user.Dir"
         // we need to keep the base directory of the document
         if (!new java.io.File(absolute).isAbsolute()) {
 
              String temp = locator.getSystemId();
-             if (include.startsWith("./"))
-                include = include.substring(2);
-             if (include.startsWith("/"))
-                include = include.substring(1);
+             if (absolute.startsWith("./"))
+                absolute = absolute.substring(2);
+             if (absolute.startsWith("/"))
+                absolute = include.substring(1);
              if (temp != null) {
                 //remove 'file://'
                 temp = temp.substring(7);
                 if (java.io.File.separatorChar =='\\')
                     temp = temp.substring(1);
                 temp = temp.substring(0,temp.lastIndexOf('/')+1);
-                include = temp + include;
+                //resolve the previous directory
+                if (absolute.startsWith("../")) {
+                    absolute = absolute.substring(3);
+                    temp = temp.substring(0,temp.lastIndexOf('/'));
+                    temp = temp.substring(0,temp.lastIndexOf('/')+1);
+                }
+                include = temp + absolute;
                 temp = null;
             }
         }
+        //-- Has this schema location been processed?
+        if (state.processed(include)) {
+            return;
+        }
+		state.markAsProcessed(include, schema);
+
 
         //just keep track of the schemaLocation
         schema.addInclude(include);
