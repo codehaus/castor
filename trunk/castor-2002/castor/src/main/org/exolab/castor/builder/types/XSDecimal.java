@@ -59,7 +59,7 @@ import java.util.Enumeration;
  * TODO : handle pattern, enumeration
  * @author <a href="mailto:andrew.fawcett@coda.com">Andrew Fawcett</a>
 **/
-public final class XSDecimal extends XSType
+public  class XSDecimal extends XSType
 {
 
     /**
