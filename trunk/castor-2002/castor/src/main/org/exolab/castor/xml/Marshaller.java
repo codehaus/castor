@@ -515,7 +515,7 @@ public class Marshaller {
             // Try to find if the type of the field is a super class of the
             // class returned by the class resolver.
             XMLClassDescriptor superclass = (XMLClassDescriptor)xmlElementNameClassDescriptor.getExtends();
-            while ((superclass != null)  &&  (superclass.getJavaClass() == descriptor.getFieldType()))
+            while ((superclass != null)  &&  (superclass.getJavaClass() != descriptor.getFieldType()))
                 superclass = (XMLClassDescriptor)superclass.getExtends();
 
             // here, superclass is null if we didn't find that xmlElementNameClassDescriptor 
