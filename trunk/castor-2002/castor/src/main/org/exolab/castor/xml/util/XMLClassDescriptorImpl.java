@@ -649,7 +649,20 @@ public class XMLClassDescriptorImpl extends Validator
                     XMLFieldDescriptor desc =
                         (XMLFieldDescriptor) elementDescriptors.get(i);
                     FieldHandler handler = desc.getHandler();
+
                     if (handler.getValue(object) != null) {
+                         //Special case if we have a Vector, an ArrayList
+                         //or an Array --> need to check if it is not empty
+                         if (desc.isMultivalued()) {
+                             Object temp = handler.getValue(object);
+                             //-- optimize this?
+                             if (java.lang.reflect.Array.getLength(temp) == 0) {
+                                  temp = null;
+                                  continue;
+                             }
+                             temp = null;
+                         }
+
                         if (found) {
                             String err = null;
                             if (desc.isContainer()) {
