@@ -441,27 +441,14 @@ public class UnmarshalHandler implements DocumentHandler {
             _topState.classDesc = classDesc;
             _topState.type = _topClass;
             //-- try to create instance of the given Class
-            String err = null;
             try {
                 _topState.object = _topClass.newInstance();
             }
-            catch(java.lang.NoSuchMethodError nsme) {
-                err = "no default constructor for class: " + _topClass.getName();
-                throw new SAXException(err);
-            }
-            catch(java.lang.IllegalAccessException iae) {
-                err = iae.getMessage();
-            }
-            catch(java.lang.InstantiationException ie) {
-                err = ie.getMessage();
-            }
-            if (_topState.object == null) {
+            catch(Exception ex) {
                 String msg = "unable to instantiate " + 
-                    _topClass.getName();
-                if (err != null) msg = msg + "; " + err;
-                throw new SAXException(msg);
+                    _topClass.getName() + "; ";
+                throw new SAXException(msg + ex);
             }
-            
             _stateInfo.push(_topState);
             processAttributes(atts, classDesc);
             return;
@@ -579,15 +566,6 @@ public class UnmarshalHandler implements DocumentHandler {
             else {
                 
             */
-                
-            if (debug) {
-                buf.setLength(0);
-                buf.append("debug: ");
-                buf.append("A create method was supplied for element '");
-                buf.append(name);
-                buf.append("'.");
-                message(buf.toString());
-            }
             try {
                     
                 _class = descriptor.getFieldType();
@@ -615,8 +593,7 @@ public class UnmarshalHandler implements DocumentHandler {
                 state.type = _class;
             }
             catch (java.lang.IllegalStateException ise) {
-                message( "unable to use the create method for: " +
-                    name + " - " + ise);
+                message(ise.toString());
             }
             ///////} //-- end if (creator)           
             
@@ -641,10 +618,10 @@ public class UnmarshalHandler implements DocumentHandler {
             if (descriptor.isIncremental()) {
                 
                 if (debug) {
-                    StringBuffer msg = new StringBuffer();
-                    msg.append("processing incrementally for element: ");
-                    msg.append(name);
-                    message(msg.toString());
+                    buf.setLength(0);
+                    buf.append("debug: Processing incrementally for element: ");
+                    buf.append(name);
+                    message(buf.toString());
                 }
                 
                 try {
@@ -659,19 +636,18 @@ public class UnmarshalHandler implements DocumentHandler {
             }
         }
         else {
-            System.out.println("descriptor is null");
-            
-            String msg = "unable to find FieldDescriptor for: ";
-            message(msg+name);
+            //System.out.println("descriptor is null");
+            message("unable to find FieldDescriptor for: " + name);
         }
         
         if (state.object != null)
             processAttributes(atts, classDesc);
-        else if ((state.type != null) && (!state.type.isPrimitive())) {
-            StringBuffer msg = new StringBuffer("current object for '");
-            msg.append(name);
-            msg.append("\' is null, ignoring attributes.");
-            message(msg.toString());
+        else if ((state.type != null) && (!state.primitiveOrImmutable)) {
+            buf.setLength(0);
+            buf.append("The current object for element '");
+            buf.append(name);
+            buf.append("\' is null, ignoring attributes.");
+            message(buf.toString());
         }
         
     } //-- void startElement(String, AttributeList) 
