@@ -169,6 +169,7 @@ public abstract class MappingLoader
      * Returns the Java class for the named type. The type name can
      * be one of the accepted short names (e.g. <tt>integer</tt>) or
      * the full Java class name (e.g. <tt>java.lang.Integer</tt>).
+     * If the short name is used, the primitive type might be returned.
      */
     protected Class resolveType( String typeName )
         throws ClassNotFoundException
@@ -239,6 +240,8 @@ public abstract class MappingLoader
             source = _resolver.resolveEntity( null, url );
             if ( source == null )
                 source = new InputSource( url );
+            else
+                source.setSystemId( url );
             if ( _logWriter != null )
                 _logWriter.println( Messages.format( "mapping.loadingFrom", url ) );
             loadMapping( source );
@@ -264,16 +267,24 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
     {
         Unmarshaller unm;
         
-        unm = new Unmarshaller( Mapping.class );
-
         if ( _cdr == null ) {
-            org.exolab.castor.xml.XMLMappingLoader xml;
-
-            _cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
-            xml = new org.exolab.castor.xml.XMLMappingLoader( _loader );
-            xml.loadMapping( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) );
-            _cdr.setMappingLoader( xml );
+            try {
+                org.exolab.castor.xml.XMLMappingLoader xml;
+                
+                unm = new Unmarshaller( org.exolab.castor.mapping.xml.MappingMapping.class );
+                _cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
+                xml = new org.exolab.castor.xml.XMLMappingLoader( _loader );
+                xml.loadMapping( (org.exolab.castor.mapping.xml.MappingMapping) unm.unmarshal( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) ) );
+                _cdr.setMappingLoader( xml );
+            } catch ( Exception except ) {
+                throw new MappingException( except );
+            }
         }
+
+        //
+        unm = new Unmarshaller( Mapping.class );
+        //
+
         unm.setResolver( _cdr );
 
         try {
@@ -329,18 +340,18 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
             addDescriptor( clsDesc );
             // If the return value is NoDescriptor then the derived
             // class was not successful in constructing a descriptor.
-            if ( clsDesc == NoDescriptor && _logWriter != null )
+            if ( clsDesc == NoDescriptor && _logWriter != null ) {
                 _logWriter.println( Messages.format( "mapping.ignoringMapping", clsMap.getClassName() ) );
+            }
         }
-
 
         enum = _clsDescs.elements();
         while ( enum.hasMoreElements() ) {
             ClassDescriptor clsDesc;
 
             clsDesc = (ClassDescriptor) enum.nextElement();
-            if ( clsDesc != NoDescriptor && clsDesc instanceof ClassDescriptorImpl )
-                resolveRelations( (ClassDescriptorImpl) clsDesc );
+            if ( clsDesc != NoDescriptor  )
+                resolveRelations( clsDesc );
         }
     }
 
@@ -362,7 +373,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
     }
 
 
-    protected void resolveRelations( ClassDescriptorImpl clsDesc )
+    protected void resolveRelations( ClassDescriptor clsDesc )
         throws MappingException
     {
         FieldDescriptor[] fields;
@@ -370,11 +381,11 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
         fields = clsDesc.getFields();
         for ( int i = 0 ; i < fields.length ; ++i ) {
             ClassDescriptor   relDesc;
-            FieldHandler      handler;
 
             relDesc = getDescriptor( fields[ i ].getFieldType() );
             if ( relDesc == NoDescriptor ) {
-            } else if ( relDesc != null ) {
+                // XXX Error message should come here
+            } else if ( relDesc != null && fields[ i ] instanceof FieldDescriptorImpl ) {
 		( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
             }
         }
@@ -624,7 +635,8 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
     protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
         throws MappingException
     {
-        return new TypeInfo( fieldType, null, null, fieldMap.getRequired(), null, colType );
+        return new TypeInfo( Types.typeFromPrimitive( fieldType ), null, null,
+                             fieldMap.getRequired(), null, colType );
     }
 
 
@@ -653,7 +665,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
                 throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
             if ( fieldType == null )
                 fieldType = Types.typeFromPrimitive( field.getType() );
-            else if ( fieldType != Types.typeFromPrimitive( field.getType() ) )
+            else if ( Types.typeFromPrimitive( fieldType ) != Types.typeFromPrimitive( field.getType() ) )
                 throw new MappingException( "mapping.fieldTypeMismatch", field, fieldType.getName() );
             return field;
         } catch ( NoSuchFieldException except ) {
@@ -693,7 +705,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
                 method = javaClass.getMethod( methodName, new Class[ 0 ] );
                 if ( fieldType == null )
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                else if ( fieldType != Types.typeFromPrimitive( method.getReturnType() ) )
+                else if ( Types.typeFromPrimitive( fieldType ) != Types.typeFromPrimitive( method.getReturnType() ) )
                     throw new MappingException( "mapping.accessorReturnTypeMismatch",
                                                 method, fieldType.getName() );
             } else {
@@ -701,9 +713,13 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
                 // method name. If the field type is know, look up a suitable
                 // method. If the fielf type is unknown, lookup the first
                 // method with that name and one parameter.
-                if ( fieldType != null )
-                    method = javaClass.getMethod( methodName, new Class[] { fieldType } );
-                else {
+                if ( fieldType != null ) {
+                    try {
+                        method = javaClass.getMethod( methodName, new Class[] { fieldType } );
+                    } catch ( Exception except ) {
+                        method = javaClass.getMethod( methodName, new Class[] { Types.typeFromPrimitive( fieldType ) } );
+                    }
+                } else {
                     methods = javaClass.getMethods();
                     method = null;
                     for ( i = 0 ; i < methods.length ; ++i ) {
@@ -714,7 +730,8 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
                         }
                     }
                     if ( method == null )
-                        throw new NoSuchMethodException();
+                        throw new MappingException( "mapping.accessorNotFound",
+                                                    methodName, fieldType );
                 }
             }
             // Make sure method is public and not abstract/static.
@@ -728,7 +745,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
         } catch ( Exception except ) {
         }
         // No such/access to method
-        throw new MappingException( "mapping.accessorNotAccessible",
+        throw new MappingException( "mapping.accessorNotFound",
                                     methodName, javaClass.getName() );
     }
 
