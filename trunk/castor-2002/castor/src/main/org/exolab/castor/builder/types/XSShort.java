@@ -46,6 +46,7 @@
 package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -66,12 +67,17 @@ public final class XSShort extends XSPatternBase {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Short;
+    private static JType jType = JType.Short;
 
-    //private Short value = null;
 
     public XSShort() {
+        this(SourceGenerator.usePrimitiveWrapper());
+    }
+
+    public XSShort(boolean asWrapper) {
         super(XSType.SHORT_TYPE);
+        if (asWrapper)
+             this.jType = new JClass("java.lang.Short");
     } //-- XSShort
 
 
@@ -260,10 +266,14 @@ public final class XSShort extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Short(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+        if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+            StringBuffer sb = new StringBuffer("new Short(");
+            sb.append(variableName);
+            sb.append(")");
+            return sb.toString();
+        }
     } //-- toJavaObject
 
     /**
@@ -275,10 +285,10 @@ public final class XSShort extends XSPatternBase {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Short)");
-        sb.append(variableName);
-        sb.append(").shortValue()");
-        return sb.toString();
+         StringBuffer sb = new StringBuffer("((Short)");
+         sb.append(variableName);
+         sb.append(").shortValue()");
+         return sb.toString();
     } //-- fromJavaObject
 
 } //-- XSShort

@@ -1097,7 +1097,9 @@ public class SourceFactory  {
             JField temp = fields[i];
             String name = temp.getName();
             if ( (temp.getType().isPrimitive()) ||
-                 (temp.getType().getName().equals("java.lang.String"))) {
+                 //hack when using the option 'primitivetowrapper'
+                 //this should not interfere with other cases
+                 (temp.getType().getName().startsWith("java.lang."))) {
                   jsc.add("result += \"Field ");
                   jsc.append(name);
                   jsc.append(":\" +");
@@ -1106,16 +1108,16 @@ public class SourceFactory  {
             }
             else {
                 jsc.add("if ( (");
-                jsc.add(name);
-                jsc.add(" != null) && (");
-                jsc.add(name);
-                jsc.add(".getClass().isAssignableFrom(CastorTestable.class)))");
+                jsc.append(name);
+                jsc.append(" != null) && (");
+                jsc.append(name);
+                jsc.append(".getClass().isAssignableFrom(CastorTestable.class)))");
                 jsc.indent();
                 jsc.add("result += ((CastorTestable)");
                 jsc.append(name);
                 jsc.append(").dumpFields();");
                 jsc.unindent();
-                jsc.append("else result += \"Field ");
+                jsc.add("else result += \"Field ");
                 jsc.append(name);
                 jsc.append(":\" +");
                 jsc.append(name);

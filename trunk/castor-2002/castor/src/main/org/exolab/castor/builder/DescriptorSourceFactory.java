@@ -300,7 +300,7 @@ public class DescriptorSourceFactory {
        jsc.append(localClassName);
        jsc.append(") object;");
        //-- handle primitives
-	   if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isMultivalued()))
+	   if ((!xsType.isEnumerated()) && xsType.isPrimitive()  && (!member.isMultivalued()))
        {
 		   jsc.add("if(!target."+member.getHasMethodName()+"())");
 		   jsc.indent();
@@ -331,7 +331,7 @@ public class DescriptorSourceFactory {
         jsc.append(localClassName);
         jsc.append(") object;");
         //-- check for null primitives
-        if (xsType.isPrimitive()) {
+        if (xsType.isPrimitive() && !SourceGenerator.usePrimitiveWrapper()) {
             if ((!member.isRequired()) && (!xsType.isEnumerated()) && (!member.isMultivalued())) {
                  jsc.add("// if null, use delete method for optional primitives ");
                  jsc.add("if (value == null) {");
@@ -352,7 +352,7 @@ public class DescriptorSourceFactory {
         jsc.add("target.");
         jsc.append(member.getWriteMethodName());
         jsc.append("( ");
-        if (xsType.isPrimitive()) {
+        if (xsType.isPrimitive() && !SourceGenerator.usePrimitiveWrapper()) {
              jsc.append(xsType.createFromJavaObjectCode("value"));
         } else if (any) {
             jsc.append(" value ");
@@ -695,7 +695,7 @@ public class DescriptorSourceFactory {
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("DoubleValidator dv = new DoubleValidator();");
-                XSReal xsDouble = (XSReal)xsType;
+                XSDouble xsDouble = (XSDouble)xsType;
                 if (xsDouble.hasMinimum()) {
                     Double min = xsDouble.getMinExclusive();
                     if (min != null)

@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.castor.xml.schema.SimpleType;
 
 import org.exolab.javasource.*;
@@ -59,10 +60,16 @@ public final class XSBoolean extends XSType {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Boolean;
+    private static JType jType = JType.Boolean;
 
     public XSBoolean() {
+        this(SourceGenerator.usePrimitiveWrapper());
+    }
+
+    public XSBoolean(boolean asWrapper) {
         super(XSType.BOOLEAN_TYPE);
+        if (asWrapper)
+            this.jType = new JClass("java.lang.Boolean");
     } //-- XSBoolean
 
 
@@ -83,10 +90,14 @@ public final class XSBoolean extends XSType {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Boolean(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+        if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+            StringBuffer sb = new StringBuffer("new Boolean(");
+            sb.append(variableName);
+            sb.append(")");
+            return sb.toString();
+        }
     } //-- toJavaObject
 
     /**

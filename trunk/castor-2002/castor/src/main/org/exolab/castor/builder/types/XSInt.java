@@ -48,6 +48,8 @@ package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
 
+import org.exolab.castor.builder.SourceGenerator;
+
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -67,12 +69,16 @@ public final class XSInt extends XSPatternBase {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Int;
+    private static JType jType = JType.Int;
 
     //private Integer value = null;
-
     public XSInt() {
+        this(SourceGenerator.usePrimitiveWrapper());
+    }
+    public XSInt(boolean asWrapper) {
         super(XSType.INT_TYPE);
+        if (asWrapper)
+            this.jType = new JClass("java.lang.Integer");
     } //-- XSInt
 
 
@@ -267,10 +273,14 @@ public final class XSInt extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Integer(");
-        sb.append(variableName);
-        sb.append(")");
-        return sb.toString();
+       if (SourceGenerator.usePrimitiveWrapper())
+            return super.createToJavaObjectCode(variableName);
+        else {
+            StringBuffer sb = new StringBuffer("new Integer(");
+            sb.append(variableName);
+            sb.append(")");
+            return sb.toString();
+        }
     } //-- toJavaObject
 
     /**
@@ -282,10 +292,10 @@ public final class XSInt extends XSPatternBase {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Integer)");
-        sb.append(variableName);
-        sb.append(").intValue()");
-        return sb.toString();
+       StringBuffer sb = new StringBuffer("((Integer)");
+       sb.append(variableName);
+       sb.append(").intValue()");
+       return sb.toString();
     } //-- fromJavaObject
 
 } //-- XSInt

@@ -139,10 +139,10 @@ public class TypeConversion {
                 //-- double
                 case SimpleTypesFactory.DOUBLE_TYPE:
                  {
-                    XSReal xsReal = new XSReal();
+                    XSDouble xsDouble = new XSDouble();
                     if (!simpleType.isBuiltInType())
-                        xsReal.setFacets(simpleType);
-                    return xsReal;
+                        xsDouble.setFacets(simpleType);
+                    return xsDouble;
                 }
                  //-- duration
                 case SimpleTypesFactory.DURATION_TYPE:
