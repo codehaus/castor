@@ -695,6 +695,25 @@ public class UnmarshalHandler extends MarshalFramework
             }
         } /* end of additional inheritance logic */
 
+        //the field descriptor is still null ->problem
+        if (descriptor == null) {
+            String msg = "unable to find FieldDescriptor for '" + name;
+            msg += "' in ClassDescriptor of " + classDesc.getXMLName();
+            //if we have no field descriptor and
+            //the class descriptor was introspected
+            //just log it
+            if (Introspector.introspected(classDesc)) {
+               message(msg);
+               return;
+            } else
+            //but if we could not find the field descriptor
+            //whereas a class descriptor has been provided (using the
+            //Source Generator for instance)
+            //it means that we try to unmarshal a 'not allowed' element
+                 throw new SAXException(msg);
+        }
+
+
 
         //-- Handler container field (handle container in container too)
         Object object = parentState.object;
@@ -715,24 +734,6 @@ public class UnmarshalHandler extends MarshalFramework
             parentState.container = containerObject;
             parentState.ContainerFieldDesc = descriptor;
             object = containerObject;
-        }
-
-
-        if (descriptor == null) {
-            String msg = "unable to find FieldDescriptor for '" + name;
-            msg += "' in ClassDescriptor of " + classDesc.getXMLName();
-            //if we have no field descriptor and
-            //the class descriptor was introspected
-            //just log it
-            if (Introspector.introspected(classDesc)) {
-               message(msg);
-               return;
-            } else
-            //but if we could not find the field descriptor
-            //where as a class descriptor has been provided (using the
-            //Source Generator for instance)
-            //it means that we try to unmarshal a 'not allowed' element
-                 throw new SAXException(msg);
         }
 
 
@@ -1114,7 +1115,7 @@ public class UnmarshalHandler extends MarshalFramework
         while (descriptor.isContainer()) {
             FieldHandler handler = descriptor.getHandler();
             Object containerObject = handler.getValue(parent);
-            
+
             if (containerObject == null) {
                 containerObject = handler.newInstance(parent);
                 handler.setValue(parent, containerObject);
@@ -1126,7 +1127,6 @@ public class UnmarshalHandler extends MarshalFramework
         }
 
         if (attValue == null) {
-
             if (descriptor.isRequired()) {
                 String err = classDesc.getXMLName() + " is missing " +
                     "required attribute: " + attName;
