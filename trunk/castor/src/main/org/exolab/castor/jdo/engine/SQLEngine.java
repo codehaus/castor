@@ -639,7 +639,7 @@ public final class SQLEngine implements Persistence {
             return identity;
 
         } catch ( SQLException except ) {
-            _log.fatal( Messages.format( "jdo.storeFatal",  _type,  _sqlCreate ) );
+            _log.fatal( Messages.format( "jdo.storeFatal",  _type,  _sqlCreate ), except );
 
             // [oleg] Check for duplicate key based on X/Open error code
             // Bad way: all validation exceptions are reported as DuplicateKey
@@ -938,7 +938,7 @@ public final class SQLEngine implements Persistence {
                     throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), identity) );
                 }                
             } catch ( SQLException except ) {
-                _log.fatal( Messages.format( "jdo.storeFatal", _type,  storeStatement ) );
+                _log.fatal( Messages.format( "jdo.storeFatal", _type,  storeStatement ), except );
                 throw new PersistenceException( Messages.format("persist.nested", except), except );
             } finally {
                 try {
@@ -993,7 +993,7 @@ public final class SQLEngine implements Persistence {
             if ( _extends != null )
                 _extends.delete( conn, identity );
         } catch ( SQLException except ) {
-            _log.fatal( Messages.format( "jdo.deleteFatal", _type, _sqlRemove ) );
+            _log.fatal( Messages.format( "jdo.deleteFatal", _type, _sqlRemove ), except );
 
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         } finally {
@@ -1002,7 +1002,7 @@ public final class SQLEngine implements Persistence {
                     stmt.close();
                 }
             } catch ( Exception e ) {
-                _log.warn ("Problem closing JDBC statement");
+                _log.warn ("Problem closing JDBC statement", e);
             }
         }
     }
@@ -1170,7 +1170,7 @@ public final class SQLEngine implements Persistence {
                 }
             }
         } catch ( SQLException except ) {
-            _log.fatal( Messages.format( "jdo.loadFatal", _type, (( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) ) );
+            _log.fatal( Messages.format( "jdo.loadFatal", _type, (( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) ), except );
 
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         } finally {
