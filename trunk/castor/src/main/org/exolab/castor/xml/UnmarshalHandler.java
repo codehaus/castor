@@ -1125,8 +1125,9 @@ public final class UnmarshalHandler extends MarshalFramework
                         //-- have a namespace match, so set descriptor to null,
                         //-- or if descriptor is not a wildcard we can also
                         //-- set to null. 
-                        if ((descriptor.getNameSpaceURI() != null) || (!descriptor.matches("*")))
+                        if ((descriptor.getNameSpaceURI() != null) || (!descriptor.matches("*"))) {
                             descriptor = null;
+                        }
                         
                     }
                 }
@@ -2254,11 +2255,12 @@ public final class UnmarshalHandler extends MarshalFramework
             UnmarshalState state = (UnmarshalState) _stateInfo.peek();
             FieldHandler handler = nsDescriptor.getHandler();
             if (handler != null) {
-                Enumeration enum = _namespaces.getLocalNamespaces();
+                Enumeration enum = _namespaces.getLocalNamespacePrefixes();
                 while (enum.hasMoreElements()) {
-                    String nsURI = (String)enum.nextElement();
-                    String nsPrefix = _namespaces.getNamespacePrefix(nsURI);
+                    String nsPrefix = (String)enum.nextElement();
                     if (nsPrefix == null) nsPrefix = "";
+                    String nsURI = _namespaces.getNamespaceURI(nsPrefix);
+                    if (nsURI == null) nsURI = "";
                     MapItem mapItem = new MapItem(nsPrefix, nsURI);
                     handler.setValue(state.object, mapItem);
                 }
