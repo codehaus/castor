@@ -490,7 +490,7 @@
   <contributor type="Feedback">
     <name surname="Suez" given="Eitan"/>
     <email>eitan@uptodata.com</email>
-    <description>Responsible for uncovering bugs that no one else noticed.</description>
+    <description>Various bug reports.</description>
   </contributor>
 
   <contributor type="Feedback">
@@ -540,7 +540,8 @@
     <name surname="Suez" given="Eitan"/>
     <email>eitan@uptodata.com</email>
     <description>
-        xml-mapping documentation clean-up and documentation on xsi:type.
+        Clean-up of <i>xml-mapping</i> documentation and documentation on xsi:type.
+        The create-method addition to the <i>tip &amp; tricks</i> page.
     </description>
   </contributor>
 
