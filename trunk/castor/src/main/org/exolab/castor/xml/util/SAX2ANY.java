@@ -244,6 +244,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
                             String qName, Attributes atts)
           throws SAXException
     {
+        
         createNodeElement(namespaceURI, localName, qName);
         //empty the namespaces stack
         //that must have been filled by startPrefixMapping()
@@ -286,8 +287,16 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
            throws SAXException
     {
         _character = false;
+        String name = null;
+        //-- if namespace processing is disabled then the localName might be null, in that case
+        //-- we use the QName
+        if (localName != null && localName.length() > 0)
+            name = localName;
+        else
+             name = qName;
+        
         //--if it is the starting element just returns
-        if (_startingNode.getLocalName().equals(localName) && _nodeStack.empty())
+        if (_startingNode.getLocalName().equals(name) && _nodeStack.empty())
            return;
 
         //--else just add the node we have built to the previous node
@@ -424,13 +433,21 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
         if ((qName.length() != 0) && (qName.indexOf(':') != -1 ))
             prefix = qName.substring(0,qName.indexOf(':'));
 
+        String name = null;
+        //-- if namespace processing is disabled then the localName might be null, in that case
+        //-- we use the QName
+        if (localName != null && localName.length() > 0)
+            name = localName;
+        else
+             name = qName;
+             
         //creates the starting ELEMENT node
         //or a default ELEMENT node
         if ( (_nodeStack.empty()) && (_startingNode == null)) {
-           _startingNode = new AnyNode(AnyNode.ELEMENT, localName, prefix, namespaceURI, null);
+           _startingNode = new AnyNode(AnyNode.ELEMENT, name, prefix, namespaceURI, null);
            _node = _startingNode;
         } else {
-          _node = new AnyNode(AnyNode.ELEMENT, localName, prefix, namespaceURI, null);
+          _node = new AnyNode(AnyNode.ELEMENT, name, prefix, namespaceURI, null);
           //push the node in the stack
           _nodeStack.push(_node);
         }
