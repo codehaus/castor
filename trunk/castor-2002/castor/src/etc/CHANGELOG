@@ -1,6 +1,10 @@
 
 Version (CVS)
 -------------
+XML:	Refactored the entire container support. A lot of changes have been made during the
+        Unmarshalling process and a method (canAccept) has been added to the XMLClassDescriptor 
+        interface. These changes fix bug 884 (and potentially many others) (Arnaud - 20020306)
+
 XML:	Allowed to set the encoding of the serializer via the Marshaller (Arnaud - 20020301)
 
 XML: 	Fix bug# 886 (Arnaud - 20020219)
