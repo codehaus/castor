@@ -718,4 +718,14 @@
     </field>
   </class>
 
+  <class name="jdo.TestSerial" identity="id">
+    <description>Table used for testing serializable field</description>
+    <map-to table="test_serial" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="serializableObject" type="serializable">
+      <sql name="dep" type="blob" dirty="ignore"/>
+    </field>
+  </class>
 </mapping>
