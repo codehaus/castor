@@ -92,7 +92,7 @@ import java.util.Enumeration;
  * so please create a new Marshaller for each thread if it
  * is to be used in a multithreaded environment.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class Marshaller extends MarshalFramework {
@@ -1309,8 +1309,36 @@ public class Marshaller extends MarshalFramework {
         }
         else qName = name;
 
+        
+        Object firstNonNullValue = null;
+        int    firstNonNullIdx   = 0;
+        
         try {
+            
+            
             if (!containerField) {
+                
+                
+                //-- isNillable?
+                if (descriptor.isNillable()) {
+                	descriptors = classDesc.getElementDescriptors();
+                    boolean isNilContent = (descriptors.length > 0);
+                    for (int i = 0; i < descriptors.length; ++i) {
+                        if (descriptors[i] == null) continue;
+                        Object value = descriptors[i].getHandler().getValue(object);
+                        if (value != null) {
+                            isNilContent = false;
+                            firstNonNullIdx = i;
+                            firstNonNullValue = value;
+                            break;
+                        }
+                    }
+                    if (isNilContent) {
+                        declareNamespace(XSI_PREFIX, XSI_NAMESPACE);
+                        atts.addAttribute(XSI_NAMESPACE, "nil", XSI_PREFIX + ":nil", CDATA, "true");
+                    }
+                }
+                
                 //-- declare all necesssary namespaces
                 _namespaces.sendStartEvents(handler);
                 //-- Make sure qName is not null
@@ -1322,8 +1350,10 @@ public class Marshaller extends MarshalFramework {
                         "http://castor.exolab.org.";
                     throw new IllegalStateException(err);
                 }
+                
+                
                 handler.startElement(nsURI, name, qName, atts);
-            }
+            } 
         }
         catch (org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
@@ -1421,18 +1451,26 @@ public class Marshaller extends MarshalFramework {
         ++depth;
         Stack wrappers = null;
         
-        //-- marshal elements
-        for (int i = 0; i < descriptors.length; i++) {
+        //-- marshal elements        
+        for (int i = firstNonNullIdx; i < descriptors.length; i++) {
 
             XMLFieldDescriptor elemDescriptor = descriptors[i];
             Object obj = null;
-            try {
-                
-                obj = elemDescriptor.getHandler().getValue(object);
+            
+            //-- used previously cached value?
+            if ((i == firstNonNullIdx) && (firstNonNullValue != null)) {
+            	obj = firstNonNullValue;
             }
-            catch(IllegalStateException ise) {
-                continue;
+            //-- obtain value from handler
+            else {
+                try {
+                    obj = elemDescriptor.getHandler().getValue(object);
+                }
+                catch(IllegalStateException ise) {
+                    continue;
+                }
             }
+            
             if (obj == null) continue;
             
             
