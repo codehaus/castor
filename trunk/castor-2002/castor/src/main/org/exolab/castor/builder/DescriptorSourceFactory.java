@@ -476,7 +476,12 @@ public class DescriptorSourceFactory {
             jsc.add("desc.setContainer(true);");
         }
 
-        //-- namespace
+        //-- Handle namespaces
+        //-- FieldInfo namespace has higher priority than ClassInfo
+        //-- namespace.
+        if (member.getNamespaceURI() != null) {
+            nsURI = member.getNamespaceURI();
+        }
         if (nsURI != null) {
             jsc.add("desc.setNameSpaceURI(\"");
             jsc.append(nsURI);
