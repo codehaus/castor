@@ -1,11 +1,11 @@
 /*
- * (C) Copyright Keith Visco 1999  All rights reserved.
+ * (C) Copyright Keith Visco 1999-2003  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -25,7 +25,7 @@ package org.exolab.adaptx.xslt;
 /**
  * A class for maintaining state information for the output
  * of the XSL result tree
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @since XSLT 19990813 (XSL:P version 19990928)
  * @version $Revision$ $Date$
 **/
@@ -39,6 +39,16 @@ public class XSLOutput extends XSLObject implements OutputFormat {
         super(XSLObject.OUTPUT);
     } //-- XSLOutput
     
+    /**
+     * Creates a new copy of this XSLOutput 
+     *
+     * @return the new XSLOutput
+     */
+    public XSLOutput copy() {
+        XSLOutput output = new XSLOutput();
+        output.copyAttributes(this);
+        return output;
+    } //-- copy
     
     /**
      * Returns the Public Id that should be used for the Doctype
@@ -109,6 +119,17 @@ public class XSLOutput extends XSLObject implements OutputFormat {
         return getAttribute(Names.VERSION_ATTR);
     } //-- getVersion
     
+    
+    /**
+     * Merges the given XSLOutput object into this one.
+     * Any attributes already existing in this XSLOutput will be
+     * over-written with the ones from the given XSLOutput.
+     *
+     * @param output the XSLOutput to merge with this one.
+     */
+    public void merge(XSLOutput output) {
+        copyAttributes(output);
+    } //-- merge
     
     /**
      * Sets the Public Id that should be used for the Doctype
