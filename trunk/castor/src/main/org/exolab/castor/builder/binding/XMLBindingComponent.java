@@ -46,6 +46,7 @@
 package org.exolab.castor.builder.binding;
 
 import org.exolab.castor.builder.BindingComponent;
+import org.exolab.castor.builder.BuilderConfiguration;
 import org.exolab.castor.builder.GroupNaming;
 import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.castor.builder.TypeConversion;
@@ -108,6 +109,11 @@ public class XMLBindingComponent implements BindingComponent {
     private ComponentBindingType _compBinding;
 
     /**
+     * The BuilderConfiguration instance for obtaining default properties
+     */
+    private BuilderConfiguration _config = null;
+    
+    /**
      * The XML Schema Annotated structure encapsulated in that XMLBinding object
      */
     private Annotated _annotated;
@@ -148,13 +154,25 @@ public class XMLBindingComponent implements BindingComponent {
         _groupNaming = new GroupNaming();
     }
 
-
+    /**
+     * The TypeConversion to use when creating XSTypes from
+     * SimpleType
+     */
+    private TypeConversion _typeConversion = null;
+    
     /**
      * Constructs an XMLBindingComponent from an XML Schema Component.
      *
+     * @param config the BuilderConfiguration instance (must not be null).
      */
-    public XMLBindingComponent() {
-    }
+    public XMLBindingComponent(BuilderConfiguration config) {
+        if (config == null) {
+            String error = "The argument 'config' must not be null.";
+            throw new IllegalArgumentException(error);
+        }
+        _config = config;
+        _typeConversion = new TypeConversion(_config);
+    } //-- XMLBindingComponent
 
 
     /**
@@ -842,12 +860,12 @@ public class XMLBindingComponent implements BindingComponent {
             if  ((packageName == null)|| (packageName.length() ==0) ) {
                 //--highest priority is schemaLocation
                 if (schemaLocation != null) {
-                    packageName = SourceGenerator.lookupPackageLocation(schemaLocation);
+                    packageName = _config.lookupPackageByLocation(schemaLocation);
                 }
                 if (( packageName == null || packageName.length() ==0))
                 {
                     //--look for a namespace mapping
-                    packageName = SourceGenerator.lookupPackageNamespace(targetNamespace);
+                    packageName = _config.lookupPackageByNamespace(targetNamespace);
                 }
             }
             _javaPackage = packageName;
@@ -934,9 +952,8 @@ public class XMLBindingComponent implements BindingComponent {
         if (getType() == CLASS) {
             return _class.getExtends();
         }
-        else return SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
-
-    }
+        else return _config.getProperty(BuilderConfiguration.Property.SUPER_CLASS, null);
+    } //-- getExtends
 
     /**
      * Returns an array of the different interface names implemented by the class
@@ -964,7 +981,7 @@ public class XMLBindingComponent implements BindingComponent {
             if (_class.hasBound())
                 return _class.getBound();
         }
-        return SourceGenerator.boundPropertiesEnabled();
+        return _config.boundPropertiesEnabled();
     }
 
     /**
@@ -979,7 +996,7 @@ public class XMLBindingComponent implements BindingComponent {
             if (_class.hasEquals())
                 return _class.getEquals();
         }
-        return SourceGenerator.equalsMethod();
+        return _config.equalsMethod();
     }
 
     /**
@@ -997,7 +1014,7 @@ public class XMLBindingComponent implements BindingComponent {
         }
         if (!result) {
             result = (_annotated.getStructureType() == Structure.COMPLEX_TYPE);
-            result = (result && SourceGenerator.mappingSchemaElement2Java());
+            result = (result && _config.mappingSchemaElement2Java());
         }
         return result;
     }
@@ -1058,7 +1075,7 @@ public class XMLBindingComponent implements BindingComponent {
                result = _member.getWrapper();
         }
         else {
-            result = SourceGenerator.usePrimitiveWrapper();
+            result = _config.usePrimitiveWrapper();
         }
         return result;
     }
@@ -1096,7 +1113,7 @@ public class XMLBindingComponent implements BindingComponent {
             if (type.isSimpleType()) {
                 String packageName = null;
                 if (((SimpleType)type).getSchema() != getSchema()) {
-                    XMLBindingComponent comp = new XMLBindingComponent();
+                    XMLBindingComponent comp = new XMLBindingComponent(_config);
                     comp.setBinding(_binding);
                     comp.setView(type);
                     packageName = comp.getJavaPackage();
@@ -1105,10 +1122,10 @@ public class XMLBindingComponent implements BindingComponent {
                 
                 if ((packageName == null) || (packageName.length() == 0)) {
                     String ns = ((SimpleType)type).getSchema().getTargetNamespace();
-                    packageName = SourceGenerator.lookupPackageNamespace(ns);
+                    packageName = _config.lookupPackageByNamespace(ns);
                 }
                     
-                result = TypeConversion.convertType((SimpleType)type, useWrapper, packageName);
+                result = _typeConversion.convertType((SimpleType)type, useWrapper, packageName);
             }
         }
         
