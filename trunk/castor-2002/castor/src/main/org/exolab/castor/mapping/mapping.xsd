@@ -42,16 +42,17 @@
       </group>
       <attribute name="class-name" type="ID" minOccurs="1"/>
       <attribute name="extends" type="IDREF" minOccurs="0"/>
+      <attribute name="access" type="string" minOccurs="0" default="shared">
+        <enumeration value="read-only"/>
+        <enumeration value="shared"/>
+        <enumeration value="exclusive"/>
+      </attribute>
     </type>
   </element>
 
   <element name="sql-table">
     <type content="empty">
       <attribute name="table-name" type="NMTOKEN" minOccurs="1"/>
-      <attribute name="locking" type="string" minOccurs="0" default="optimistic">
-        <enumeration value="optimistic"/>
-        <enumeration value="pessimistic"/>
-      </attribute>
     </type>
   </element>
 

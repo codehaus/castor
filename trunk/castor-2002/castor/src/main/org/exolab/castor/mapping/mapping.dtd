@@ -67,7 +67,8 @@
                    identity?, ( field | container )+ )>
 <!ATTLIST class
     class-name ID #REQUIRED
-    extends    IDREF #IMPLIED>
+    extends    IDREF #IMPLIED
+    access     (read-only|shared|exclusive) "shared">
 
 
 <!--
@@ -78,8 +79,7 @@
  -->
 <!ELEMENT sql-table EMPTY>
 <!ATTLIST sql-table
-    table-name NMTOKEN  #REQUIRED
-    locking    (optimistic|pessimistic) "optimistic">
+    table-name NMTOKEN  #REQUIRED>
 
 
 <!--

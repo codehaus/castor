@@ -65,6 +65,11 @@ public class ClassMapping implements java.io.Serializable {
     private Identity vIdentity;
 
     /**
+     *
+     */
+    private String   vAccessMode;
+
+    /**
      * 
     **/
     private java.util.Vector vFieldList;
@@ -115,6 +120,19 @@ public class ClassMapping implements java.io.Serializable {
     public void setClassName(java.lang.String vClassName) {
         this.vClassName = vClassName;
     } //-- void setClassName(java.lang.String) 
+
+    /**
+    **/
+    public java.lang.String getAccessMode() {
+        return this.vAccessMode;
+    } //-- java.lang.String getAccessMode() 
+
+    /**
+     * @param vAccessMode
+    **/
+    public void setAccessMode(java.lang.String vAccessMode) {
+        this.vAccessMode = vAccessMode;
+    } //-- void setAccessMode(java.lang.String) 
 
     /**
     **/

@@ -65,7 +65,7 @@ public class ClassMappingMarshalInfo implements org.exolab.castor.xml.MarshalInf
         rules = new ValidationRule[3];
         //-- initialize attributes
         
-        attributes = new MarshalDescriptor[2];
+        attributes = new MarshalDescriptor[3];
         //-- vExtends
         desc = new SimpleMarshalDescriptor(String.class, "vExtends", "extends");
         desc.setDescriptorType(DescriptorType.attribute);
@@ -95,6 +95,24 @@ public class ClassMappingMarshalInfo implements org.exolab.castor.xml.MarshalInf
         attributes[1] = desc;
         
         bvr = new BasicValidationRule("class-name");
+        bvr.setAsAttributeRule();
+        bvr.setMaxOccurs(1);
+        rules[1] = bvr;
+        rules[2] = gvr;
+
+        //-- vAccessMode
+        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vAccessMode", "access");
+        desc.setDescriptorType(DescriptorType.attribute);
+        try {
+            desc.setReadMethod(ClassMapping.class.getMethod("getAccessMode", emptyClassArgs));
+            classArgs[0] = java.lang.String.class;
+            desc.setWriteMethod(ClassMapping.class.getMethod("setAccessMode", classArgs));
+        }
+        catch(java.lang.NoSuchMethodException nsme) {};
+        
+        attributes[2] = desc;
+        
+        bvr = new BasicValidationRule("access");
         bvr.setAsAttributeRule();
         bvr.setMaxOccurs(1);
         rules[1] = bvr;
