@@ -878,14 +878,14 @@ Database db = jdo.getDatabase();
 
     	<section title = "Oracle">
 
-    		<section title="Oracle &aml; (C|B)LOB fields">
+    		<section title="Oracle &amp; (C|B)LOB fields">
     			<p>As of Oracle release 10g, the problem of Castor to handle BLOBs with a 
     			   size greater than 2kB and CLOBs with a size greater than 4 kB correctly has been resolved. 
     			   With the 10 release of Oracle's JDBC driver, both driver types (type 2 and type 4) can 
     			   be used. With earlier releases, only the OCI driver (type 2) seems to work.</p>
     			   
     			<p>The 10g release of the Oracle JDBC Driver can be downloaded
-    			   <a href="http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html>here</a>.</p>
+    			   <a href="http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html">here</a>.</p>
     			
     		</section>
     		
