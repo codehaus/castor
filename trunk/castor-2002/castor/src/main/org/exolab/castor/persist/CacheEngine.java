@@ -577,33 +577,6 @@ public final class CacheEngine
                 }
             }
 
-            // Store/create/delete all the dependent objects first.
-            RelationHandler[] relations;
-
-            relations = typeInfo.handler.getRelations();
-            for ( int i = 0 ; i < relations.length ; ++i ) {
-                if ( relations[ i ] != null && relations[ i ].isAttached() ) {
-                    Object related;
-
-                    if ( ! relations[ i ].isMulti() ) {
-                        related = relations[ i ].getRelated( object );
-                        if ( related != null && ! tx.isPersistent( related ) )
-                            tx.create( this, related, relations[ i ].getIdentity( related ) );
-                    } else {
-                        Enumeration enum;
-
-                        enum = (Enumeration) relations[ i ].getRelated( object );
-                        if ( enum != null ) {
-                            while ( enum.hasMoreElements() ) {
-                                related = enum.nextElement();
-                                if ( related != null && ! tx.isPersistent( related ) )
-                                    tx.create( this, related, relations[ i ].getIdentity( related ) );
-                            }
-                        }
-                    }
-                }
-            }
-
             // Check integrity of object before creating it, assuring no fields
             // are null, and then place it in the cache. This copy will be deleted
             // if the transaction ends up rolling back.
@@ -636,6 +609,36 @@ public final class CacheEngine
                 // This should never happen since we just created the lock
             }
             oid.setDbLock( true );
+
+            // Store/create/delete all the dependent objects last since
+            // dependent objects reference main object.
+            RelationHandler[] relations;
+
+            relations = typeInfo.handler.getRelations();
+            for ( int i = 0 ; i < relations.length ; ++i ) {
+                if ( relations[ i ] != null && relations[ i ].isAttached() ) {
+                    Object related;
+
+                    if ( ! relations[ i ].isMulti() ) {
+                        related = relations[ i ].getRelated( object );
+                        if ( related != null && ! tx.isPersistent( related ) )
+                            tx.create( this, related, relations[ i ].getIdentity( related ) );
+                    } else {
+                        Enumeration enum;
+
+                        enum = (Enumeration) relations[ i ].getRelated( object );
+                        if ( enum != null ) {
+                            while ( enum.hasMoreElements() ) {
+                                related = enum.nextElement();
+                                if ( related != null && ! tx.isPersistent( related ) )
+                                    tx.create( this, related, relations[ i ].getIdentity( related ) );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Add the object to the cache.
             typeInfo.cache.addLock( oid, lock );
         }
         return oid;
@@ -688,7 +691,29 @@ public final class CacheEngine
         if ( _logInterceptor != null )
             _logInterceptor.removing( typeInfo.javaClass, oid.getIdentity() );
         typeInfo.persist.delete( tx.getConnection( this ), oid.getIdentity() );
+    }
 
+
+
+    void markDelete( TransactionContext tx, OID oid, int timeout )
+        throws PersistenceException
+    {
+        ObjectLock lock;
+        TypeInfo   typeInfo;
+        Object[]   fields;
+
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
+        lock = typeInfo.cache.getLock( oid );
+        if ( lock == null || ! lock.hasLock( tx, false ) )
+            throw new IllegalStateException( Messages.format( "persist.internal",
+                                                              "Attempt to delete object for which no lock was acquired" ) );
+        try {
+            fields = (Object[]) lock.acquire( tx, true, 0 );
+        } catch ( LockNotGrantedException except ) {
+            throw new IllegalStateException( Messages.format( "persist.internal",
+                                                              "Attempt to delete object for which no lock was acquired" ) );
+        }
+        
         // Store/create/delete all the dependent objects first. Must perform that
         // operation on all descendent classes.
         RelationHandler[] relations;
@@ -894,7 +919,7 @@ public final class CacheEngine
                     related = relations[ i ].getRelated( object );
                     if ( related == null ) {
                         if ( original[ i ] != null && relations[ i ].isAttached() )
-                            delete( tx, relations[ i ].getRelatedClass(), original[ i ] );
+                            tx.markDelete( this, relations[ i ].getRelatedClass(), original[ i ] );
                     } else {
                         relIdentity = relations[ i ].getIdentity( related );
                         if ( original[ i ] == null ) {
@@ -911,40 +936,41 @@ public final class CacheEngine
                 } else {
 
                     Enumeration enum;
-            Object[]    origIdentity;
+                    Object[]    origIdentity;
 
                     enum = (Enumeration) relations[ i ].getRelated( object );
-            if ( original[ i ] == null )
-            origIdentity = new Object[ 0 ];
-            else {
-            origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
-            ( (Vector) original[ i ] ).copyInto( origIdentity );
-            }
+                    if ( original[ i ] == null )
+                        origIdentity = new Object[ 0 ];
+                    else {
+                        origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
+                        ( (Vector) original[ i ] ).copyInto( origIdentity );
+                    }
                     if ( enum != null ) {
                         while ( enum.hasMoreElements() ) {
                             Object related;
                             Object relIdentity;
-
+                            
                             related = enum.nextElement();
                             if ( related != null ) {
                                 relIdentity = relations[ i ].getIdentity( related );
-                for ( int j = 0 ; j < origIdentity.length ; ++j ) {
-                    if ( origIdentity[ j ] != null &&
-                     origIdentity[ j ].equals( relIdentity ) ) {
-                    if ( ! tx.isPersistent( related ) )
-                        tx.create( this, related, relIdentity );
-                    origIdentity[ j ] = null;
-                    }
+                                for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+                                    if ( origIdentity[ j ] != null &&
+                                         origIdentity[ j ].equals( relIdentity ) ) {
+                                        if ( ! tx.isPersistent( related ) )
+                                            tx.create( this, related, relIdentity );
+                                        origIdentity[ j ] = null;
+                                    }
                                 }
                             }
                         }
                     }
                     if ( relations[ i ].isAttached() ) {
                         for ( int j = 0 ; j < origIdentity.length ; ++j )
-                if ( origIdentity[ j ] != null )
-                tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
+                            if ( origIdentity[ j ] != null ) {
+                                tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
+                            }
                     }
-
+                    
                 }
             }
         }

@@ -162,6 +162,12 @@ public abstract class TransactionContext
 
 
     /**
+     * FIFO linked list of objects deleted in this transaction.
+     */
+    private ObjectEntry  _deletedList;
+
+
+    /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
      */
@@ -596,20 +602,29 @@ public abstract class TransactionContext
             return;
         }
 
-        ClassHandler handler;
-
-        handler = entry.engine.getClassHandler( object.getClass() );
-
         // Must acquire a write lock on the object in order to delete it,
         // prevents object form being deleted while someone else is
         // looking at it.
         try {
+            entry.deleted = true;
             entry.engine.softLock( this, entry.oid, _lockTimeout );
             // Mark object as deleted. This will prevent it from being viewed
             // in this transaction and will handle it properly at commit time.
             // The write lock will prevent it from being viewed in another
             // transaction.
-            entry.deleted = true;
+            entry.engine.markDelete( this, entry.oid, _lockTimeout );
+
+            // Add the entry to a FIFO linked list of deleted entries.
+            if ( _deletedList == null )
+                _deletedList = entry;
+            else {
+                ObjectEntry deleted;
+
+                deleted = _deletedList;
+                while ( deleted.nextDeleted != null )
+                    deleted = deleted.nextDeleted;
+                deleted.nextDeleted = entry;
+            }
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
@@ -706,7 +721,7 @@ public abstract class TransactionContext
             throw new ObjectDeletedExceptionImpl( object.getClass(), entry.oid.getIdentity() );
         try {
             entry.engine.softLock( this, entry.oid, timeout );
-        } catch ( ObjectDeletedException except ) {
+        } catch ( ObjectDeletedWaitingForLockException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
             removeObjectEntry( object );
@@ -767,7 +782,6 @@ public abstract class TransactionContext
     {
         Enumeration enum;
         ObjectEntry entry;
-        int         count;
 
         if ( _status == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedExceptionImpl( "persist.markedRollback" );
@@ -782,53 +796,42 @@ public abstract class TransactionContext
 
         try {
             _status = Status.STATUS_PREPARING;
-            count = 0;
-            while ( count < _objects.size() ) {
-                count = 0;
-                enum = _objects.elements();
-                while ( enum.hasMoreElements() ) {
-                    entry = (ObjectEntry) enum.nextElement();
-                    // If the object has been deleted, it is removed from the
-                    // underlying database. This call will detect duplicate
-                    // removal attempts. Otherwise the object is stored in
-                    // the database.
-                    if ( entry.prepared )
-                        ++count;
-                    else if ( entry.deleted ) {
-                        ClassHandler handler;
-
-                        handler = entry.engine.getClassHandler( entry.object.getClass() );
-                        entry.engine.delete( this, entry.object.getClass(), entry.oid.getIdentity() );
-                        entry.prepared = true;
-                    } else {
-                        Object       identity;
-                        ClassHandler handler;
-                        OID          oid;
-                        
-                        // When storing the object it's OID might change
-                        // if the primary identity has been changed
-                        handler = entry.engine.getClassHandler( entry.object.getClass() );
-                        identity = handler.getIdentity( entry.object );
-                        if ( handler.getCallback() != null )
-                            handler.getCallback().storing( entry.object );
-                        oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
-                        if ( oid != null ) {
-                            entry.oid = oid;
-                            entry.modified = true;
-                        }
-                        entry.prepared = true;
+            enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (ObjectEntry) enum.nextElement();
+                if ( ! entry.deleted ) {
+                    Object       identity;
+                    ClassHandler handler;
+                    OID          oid;
+                    
+                    // When storing the object it's OID might change
+                    // if the primary identity has been changed
+                    handler = entry.engine.getClassHandler( entry.object.getClass() );
+                    identity = handler.getIdentity( entry.object );
+                    if ( handler.getCallback() != null )
+                        handler.getCallback().storing( entry.object );
+                    oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+                    if ( oid != null ) {
+                        entry.oid = oid;
+                        entry.modified = true;
                     }
                 }
             }
+
+            // Process all deleted objects last in FIFO order.
+            while ( _deletedList != null ) {
+                ClassHandler handler;
+
+                entry = _deletedList;
+                _deletedList = _deletedList.nextDeleted;
+                handler = entry.engine.getClassHandler( entry.object.getClass() );
+                entry.engine.delete( this, entry.object.getClass(), entry.oid.getIdentity() );
+            }
+
             _status = Status.STATUS_PREPARED;
             return true;
         } catch ( Exception except ) {
             _status = Status.STATUS_MARKED_ROLLBACK;
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                entry.prepared = false;
-            }
             if ( except instanceof TransactionAbortedException )
                 throw (TransactionAbortedException) except;
             // Any error is reported as transaction aborted
@@ -951,10 +954,16 @@ public abstract class TransactionContext
                 }
             } catch ( Exception except ) { }
         }
+
         // Forget about all the objects in this transaction,
         // and mark it as completed.
         _objects.clear();
         _engineOids.clear();
+        while ( _deletedList != null ) {
+            entry = _deletedList;
+            _deletedList = entry.nextDeleted;
+            entry.nextDeleted = null;
+        }
         _status = Status.STATUS_ROLLEDBACK;
     }
 
@@ -1055,10 +1064,22 @@ public abstract class TransactionContext
 
         entry = getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) );
         if ( entry != null && ! entry.deleted ) {
-            entry.deleted = true;
-            entry.prepared = false;
             try {
+                entry.deleted = true;
                 entry.engine.softLock( this, entry.oid, _lockTimeout );
+                entry.engine.markDelete( this, entry.oid, _lockTimeout );
+
+                // Add the entry to a FIFO linked list of deleted entries.
+                if ( _deletedList == null )
+                _deletedList = entry;
+                else {
+                    ObjectEntry deleted;
+                    
+                    deleted = _deletedList;
+                    while ( deleted.nextDeleted != null )
+                        deleted = deleted.nextDeleted;
+                    deleted.nextDeleted = entry;
+                }
             } catch ( ObjectDeletedException except ) {
                 // Object has been deleted outside this transaction,
                 // forget about it
@@ -1083,7 +1104,7 @@ public abstract class TransactionContext
         ObjectEntry entry;
         Hashtable   engineOids;
 
-        entry = new ObjectEntry( engine, object );
+        entry = new ObjectEntry( (CacheEngine) engine, object );
         entry.oid = oid;
         _objects.put( object, entry );
         engineOids = (Hashtable) _engineOids.get( engine );
@@ -1155,9 +1176,8 @@ public abstract class TransactionContext
      * or it's OID as identities. The entry records the database engine used
      * to persist the object, the object's OID, the object itself, and
      * whether the object has been deleted in this transaction,
-     * created in this transaction, or already prepared. Objects
-     * identified as read only are not update when the transaction
-     * commits.
+     * created in this transaction, or modified. Objects identified as
+     * read only are not update when the transaction commits.
      */
     static final class ObjectEntry
     {
@@ -1165,7 +1185,7 @@ public abstract class TransactionContext
         /**
          * The engine with which the object was loaded/created.
          */
-        final PersistenceEngine  engine;
+        final CacheEngine        engine;
 
         /**
          * The object.
@@ -1188,17 +1208,18 @@ public abstract class TransactionContext
         boolean                  created;
 
         /**
-         * True if the object has been prepared and may be committed.
-         */
-        boolean                  prepared;
-
-        /**
          * True if the object has been modified in the transaction,
          * stored during the preparation stage and is write locked.
          */
         boolean                  modified;
 
-        ObjectEntry( PersistenceEngine  engine, Object object )
+        /**
+         * Link to the next deleted object in a FIFO list of deleted
+         * objects.
+         */
+        ObjectEntry              nextDeleted;
+
+        ObjectEntry( CacheEngine engine, Object object )
         {
             this.engine = engine;
             this.object = object;
