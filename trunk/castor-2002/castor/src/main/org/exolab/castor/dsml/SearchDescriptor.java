@@ -246,18 +246,18 @@ public class SearchDescriptor
 	if ( tagName.equals( XML.Namespace.Root ) ) {
 	    // Flag when entering (and leaving) the root element.
 	    if ( _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.elementNested",
+		throw new SAXException( Messages.format( "dsml.elementNested",
 							 XML.Namespace.Root ) );
 	    _insideRoot = true;
 	} else {
 	    if ( ! _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.expectingOpeningTag",
+		throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
 							 XML.Namespace.Root, tagName ) );
 
 	    if ( tagName.equals( Names.Element.Search ) ) {
 		_baseDN = attr.getValue( Names.Attribute.BaseDN );
 		if ( _baseDN == null )
-		    throw new SAXException( Messages.format( "castor.dsml.missingAttribute",
+		    throw new SAXException( Messages.format( "dsml.missingAttribute",
 							     Names.Element.Search, Names.Attribute.BaseDN ) );
 		_filter = attr.getValue( Names.Attribute.Filter );
 		value = attr.getValue( Names.Attribute.Scope );
@@ -269,19 +269,19 @@ public class SearchDescriptor
 		    else if ( value.equals( Names.Attribute.ScopeSubTree ) )
 			_scope = Scope.SubTree;
 		    else
-			throw new SAXException( Messages.format( "castor.dsml.invalidValue",
+			throw new SAXException( Messages.format( "dsml.invalidValue",
 								 Names.Attribute.Scope, value ) );
 		}
 	    } else if ( tagName.equals( Names.Element.ReturnAttr ) ) {
 		if ( _baseDN == null ) {
-		    throw new SAXException( Messages.format( "castor.dsml.expectingOpeningTag",
+		    throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
 							     Names.Element.Search, tagName ) );
 		}
 		// Create a string buffer, characters() will fill it up,
 		// endElement() will add it to the list.
 		_attrName = new StringBuffer();
 	    } else {
-		throw new SAXException( Messages.format( "castor.dsml.expectingOpeningTag",
+		throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
 							 Names.Element.Search, tagName ) );
 	    }
 	}
@@ -295,11 +295,11 @@ public class SearchDescriptor
 	    if ( _insideRoot )
 		_insideRoot = false;
 	    else
-		throw new SAXException( Messages.format( "castor.dsml.closingOutsideRoot",
+		throw new SAXException( Messages.format( "dsml.closingOutsideRoot",
 							 tagName ) );
 	} else {
 	    if ( ! _insideRoot )
-		throw new SAXException( Messages.format( "castor.dsml.closingOutsideRoot",
+		throw new SAXException( Messages.format( "dsml.closingOutsideRoot",
 							 tagName ) );
 	    if ( tagName.equals( Names.Element.Search ) ) {
 		// Nothing to do hare
@@ -309,7 +309,7 @@ public class SearchDescriptor
 		    _attrName = null;
 		}
 	    } else {
-		throw new SAXException( Messages.format( "castor.dsml.expectingClosingTag",
+		throw new SAXException( Messages.format( "dsml.expectingClosingTag",
 							 Names.Element.Search, tagName ) );
 	    }
 	}

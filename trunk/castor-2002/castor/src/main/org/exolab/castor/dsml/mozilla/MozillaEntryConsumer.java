@@ -108,21 +108,21 @@ class MozillaEntryConsumer
 	    // Do nothing
 	} else if ( tagName.equals( XML.Entries.Elements.Entry ) ) {
 	    if ( _attrSet != null )
-		throw new SAXException( Messages.format( "castor.dsml.openingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.openingTagNotRecognized", tagName ) );
 	    _attrSet = new LDAPAttributeSet();
 	    _entryDN = attr.getValue( XML.Entries.Attributes.DN );
 	} else if ( tagName.equals( XML.Entries.Elements.ObjectClass ) ) {
 	    if ( _attrSet == null || _attr != null )
-		throw new SAXException( Messages.format( "castor.dsml.openingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.openingTagNotRecognized", tagName ) );
 	    _attr = new LDAPAttribute( "objectclass" );
 	} else if ( tagName.equals( XML.Entries.Elements.Attribute ) ) {
 	    if ( _attrSet == null || _attr != null )
-		throw new SAXException( Messages.format( "castor.dsml.openingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.openingTagNotRecognized", tagName ) );
 	    _attr = new LDAPAttribute( attr.getValue( XML.Entries.Attributes.Name ) );
 	} else if ( tagName.equals( XML.Entries.Elements.Value ) ||
 		    tagName.equals( XML.Entries.Elements.OCValue ) ) {
 	    if ( _attrSet == null || _attr == null || _value != null )
-		throw new SAXException( Messages.format( "castor.dsml.openingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.openingTagNotRecognized", tagName ) );
 	    if ( XML.Entries.Attributes.Encodings.Base64.equals(
 		     attr.getValue( XML.Entries.Attributes.Encoding ) ) ) {
 		_decoder = new MimeBase64Decoder();
@@ -130,7 +130,7 @@ class MozillaEntryConsumer
 		_value = new StringBuffer();
 	    }
 	} else {
-	    throw new SAXException( Messages.format( "castor.dsml.openingTagNotRecognized", tagName ) );
+	    throw new SAXException( Messages.format( "dsml.openingTagNotRecognized", tagName ) );
 	}
     }
 	    
@@ -140,23 +140,23 @@ class MozillaEntryConsumer
     {
 	if ( tagName.equals( XML.Entries.Element ) ) {
 	    if ( _attrSet != null )
-		throw new SAXException( Messages.format( "castor.dsml.closingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.closingTagNotRecognized", tagName ) );
 	} else if ( tagName.equals( XML.Entries.Elements.Entry ) ) {
 	    if ( _attrSet == null || _attr != null )
-		throw new SAXException( Messages.format( "castor.dsml.closingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.closingTagNotRecognized", tagName ) );
 	    _entries.addElement( new LDAPEntry( _entryDN, _attrSet ) );
 	    _entryDN = null;
 	    _attrSet = null;
 	} else if ( tagName.equals( XML.Entries.Elements.ObjectClass ) ||
 		    tagName.equals( XML.Entries.Elements.Attribute ) ) {
 	    if ( _attrSet == null || _attr == null || _value != null )
-		throw new SAXException( Messages.format( "castor.dsml.closingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.closingTagNotRecognized", tagName ) );
 	    _attrSet.add( _attr );
 	    _attr = null;
 	} else if ( tagName.equals( XML.Entries.Elements.Value ) ||
 		    tagName.equals( XML.Entries.Elements.OCValue ) ) {
 	    if ( _attrSet == null || _attr == null || ( _value == null && _decoder == null ) )
-		throw new SAXException( Messages.format( "castor.dsml.closingTagNotRecognized", tagName ) );
+		throw new SAXException( Messages.format( "dsml.closingTagNotRecognized", tagName ) );
 	    if ( _decoder != null ) {
 		_attr.addValue( _decoder.getByteArray() );
 		_decoder = null;
@@ -165,7 +165,7 @@ class MozillaEntryConsumer
 		_value = null;
 	    }
 	} else {
-	    throw new SAXException( Messages.format( "castor.dsml.closingTagNotRecognized", tagName ) );
+	    throw new SAXException( Messages.format( "dsml.closingTagNotRecognized", tagName ) );
 	}
     }
 
