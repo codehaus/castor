@@ -141,6 +141,10 @@
 
 	<section name="More">
       <navLink>
+        <url>presentations.xml</url>
+        <display>Presentations</display>
+      </navLink>
+      <navLink>
         <url>examples.xml</url>
         <display>The Examples</display>
       </navLink>
@@ -188,7 +192,7 @@
   </navSections>
 
   <notice>
-    Copyright © 1999-2001 <a href="http://www.exolab.org">ExoLab Group</a>.  All rights reserved.  
+    Copyright © 1999-2001 <a href="http://www.exolab.org">ExoLab Group</a>.  All rights reserved.
   </notice>
   <notice>
     Java, EJB, JDBC, JNDI, JTA, Sun, Sun Microsystems are trademarks or registered
@@ -196,7 +200,7 @@
     countries. XML, XML Schema, XSLT and related standards are trademarks or registered
     trademarks of MIT, INRIA, Keio or others, and a product of the World Wide Web
     Consortium. All other product names mentioned herein are trademarks of their respective
-    owners. 
+    owners.
   </notice>
 
 </project>
