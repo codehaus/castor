@@ -66,7 +66,9 @@ public class StringFunctionCall
             throw new XPathException( INVALID_NUMBER_PARAMS + this );
         if ( nparams == 1 ) {
             XPathResult result = getParameter( 0 ).evaluate( context );
-            return new StringResult( result.stringValue() );
+            String value = result.stringValue();
+            if (value == null) value = ""; //-- prevent NPE in StringResult
+            return new StringResult( value );
         }
         XPathNode node = context.getNode();
         return new StringResult( node.getStringValue() );
