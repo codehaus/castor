@@ -145,12 +145,14 @@
 
     <section title="SEQUENCE key generator">
       <p>SEQUENCE key generator can be used only with Oracle and PostgreSQL.
-         It generates key using the system function <tt>nextval()</tt> which
-         reads and increments value of SEQUENCE.</p>    
+         It generates keys using sequences.</p>    
       <p>The key generator has one parameter:
          <table border="1" cellpadding="4">
            <tr><td>sequence</td><td>The name of the sequence</td>
                                 <td>Optional, default="{0}_seq"</td></tr>
+           <tr><td>returning</td><td>RETURNING mode for Oracle8i, values:
+                                "true"/"false"</td>
+                                <td>Optional, default="false"</td></tr>
          </table></p>
       <p>Usually one sequence is used for one table, so in general you have to
          define one key generator per table.
@@ -161,6 +163,18 @@
          of the key generator to "{0}_seq" (the default value).
          In this case the key generator will use sequence "a_seq" for table 
          "a", "b_seq" for table "b", etc.</p>
+      <p>Actually the SEQUENCE key generator is "3 in 1". 
+         With PostgreSQL it performs "SELECT nextval(sequenceName)" before 
+         INSERT and produces identity value that is then used in INSERT.
+         With Oracle by default (returning=false) it transforms the
+         Castor-generated INSERT statement into the form
+         "INSERT INTO tableName (pkName,...) VALUES 
+         (sequenceName.nextval,...)" and after INSERT it performs "SELECT 
+         seqName.currval FROM tableName" to obtain the identity value. With 
+         Oracle8i it is possible to use more efficient RETURNING mode: to 
+         the above INSERT statement is appened "RETURNING primKeyName INTO 
+         ?" and the identity value is fetched by Castor during INSERT, so 
+         that only one SQL query is needed.</p>
     </section>
 
   </body>
