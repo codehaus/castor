@@ -220,7 +220,7 @@ final class MultiRSCallQuery implements PersistenceQuery
             try {
                 _rs.close();
             } catch ( SQLException except ) {
-            	_log.warn (Messages.message("rsClosingFailed"), except);
+            	_log.warn (Messages.message("persist.rsClosingFailed"), except);
             }
             _rs = null;
         }
@@ -228,7 +228,7 @@ final class MultiRSCallQuery implements PersistenceQuery
             try {
                 _stmt.close();
             } catch ( SQLException except ) { 
-            	_log.warn (Messages.message("stClosingFailed"), except);
+            	_log.warn (Messages.message("persist.stClosingFailed"), except);
             }
             _stmt = null;
         }
