@@ -46,9 +46,6 @@
  */
 package org.exolab.castor.types;
 
-import org.exolab.castor.types.TimePeriod;
-import org.exolab.castor.xml.NotSupportedOperationException;
-
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
 import java.text.SimpleDateFormat;
@@ -80,7 +77,7 @@ public class Year extends TimePeriod {
             temp = -temp;
             try {
                 this.setZoneNegative();
-            } catch(NotSupportedOperationException e) {
+            } catch(OperationNotSupportedException e) {
             }
         }
         short zhour = (short) (temp / (60*60*1000));
@@ -88,59 +85,59 @@ public class Year extends TimePeriod {
         short zmin = (short)(temp / (60*1000));
         try {
             this.setZone(zhour,zmin);
-        } catch (NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
         }
     }
 
 
     /*Disallow the access to set month method*/
     public void setMonth(short month)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the month field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
     /*Disallow the access to set day method*/
     public void setDay(short day)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the day field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
     /*Disallow the access to set time methods */
     public void setHour(short hour)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the hour field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setMinute(short minute)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the minute field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setSecond(short second,short millsecond)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the second fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setZone(short hour, short minute)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the time zone fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setZoneNegative()
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Year : the time zone fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     /**
@@ -215,7 +212,7 @@ public class Year extends TimePeriod {
         }
         try {
             result.setYear(Short.parseShort( str.substring(2,4) ));
-        } catch(NotSupportedOperationException e) {
+        } catch(OperationNotSupportedException e) {
         }
         return result;
     }//parse

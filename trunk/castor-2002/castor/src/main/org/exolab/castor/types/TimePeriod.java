@@ -42,14 +42,13 @@
  *
  * $Id$
  * Date         Author          Changes
- * 12/05/2000   Aranud Blandin  Added support for NotSupportedOperationException
+ * 12/05/2000   Aranud Blandin  Added support for OperationNotSupportedException
  * 11/02/2000   Arnaud Blandin  Changed the constructor
  * 26/10/2000   Arnaud Blandin  Created
  */
 
 package org.exolab.castor.types;
 import org.exolab.castor.types.RecurringDuration;
-import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.StringTokenizer;
@@ -142,7 +141,7 @@ public class TimePeriod extends RecurringDuration{
         }
         try {
             this.setYear(Short.parseShort( temp.substring(2,4) ));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -157,7 +156,7 @@ public class TimePeriod extends RecurringDuration{
         }
         try {
             this.setMonth(Short.parseShort(temp));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -171,7 +170,7 @@ public class TimePeriod extends RecurringDuration{
         }
         try {
             this.setDay(Short.parseShort(temp));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -193,7 +192,7 @@ public class TimePeriod extends RecurringDuration{
 
          try {
             this.setHour(Short.parseShort( temp ));
-         } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+         } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
          }
@@ -207,7 +206,7 @@ public class TimePeriod extends RecurringDuration{
         }
         try {
             this.setMinute( Short.parseShort(temp));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -228,7 +227,7 @@ public class TimePeriod extends RecurringDuration{
         try {
             this.setSecond(Short.parseShort(temp.substring(0,2)),
                            Short.parseShort(milsecond));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -238,7 +237,7 @@ public class TimePeriod extends RecurringDuration{
         if (timeZone) {
             try {
                 if (zoneStr.startsWith("-")) this.setZoneNegative();
-            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
             }
@@ -248,7 +247,7 @@ public class TimePeriod extends RecurringDuration{
             try {
                 this.setZone(Short.parseShort(zoneStr.substring(1,3)),
                              Short.parseShort(zoneStr.substring(4,6)));
-            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a timePeriod type
             //(if not a ParseException is thrown) so we can never reach that point
             }
@@ -260,9 +259,9 @@ public class TimePeriod extends RecurringDuration{
 
 
      public void setPeriod(TimeDuration period)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
-        throw new NotSupportedOperationException("in a time period type,the period must not be changed");
+        throw new OperationNotSupportedException("in a time period type,the period must not be changed");
     }
 
 } //TimePeriod

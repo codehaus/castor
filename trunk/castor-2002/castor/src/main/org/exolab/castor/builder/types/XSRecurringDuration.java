@@ -160,7 +160,7 @@ public class XSRecurringDuration extends XSType {
                 _maxExclusive.setDuration(this.getDuration());
             if (_maxExclusive.getPeriod() == null)
                 _maxExclusive.setPeriod(this.getPeriod());
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (org.exolab.castor.types.OperationNotSupportedException e) {
             String err = "XSRecurringDuration : "+e;
             throw new IllegalArgumentException(err);
         }
@@ -181,7 +181,7 @@ public class XSRecurringDuration extends XSType {
                 _maxInclusive.setDuration(this.getDuration());
             if (_maxExclusive.getPeriod() == null)
                 _maxInclusive.setPeriod(this.getPeriod());
-          } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+          } catch (org.exolab.castor.types.OperationNotSupportedException e) {
             String err = "XSRecurringDuration : "+e;
             throw new IllegalArgumentException(err);
         }
@@ -204,7 +204,7 @@ public class XSRecurringDuration extends XSType {
                 _minExclusive.setDuration(this.getDuration());
             if (_minExclusive.getPeriod() == null)
                 _minExclusive.setPeriod(this.getPeriod());
-          } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+          } catch (org.exolab.castor.types.OperationNotSupportedException e) {
             String err = "XSRecurringDuration : "+e;
             throw new IllegalArgumentException(err);
         }
@@ -226,7 +226,7 @@ public class XSRecurringDuration extends XSType {
                 _minInclusive.setDuration(this.getDuration());
             if (_minInclusive.getPeriod() == null)
                 _minInclusive.setPeriod(this.getPeriod());
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (org.exolab.castor.types.OperationNotSupportedException e) {
             String err = "XSRecurringDuration : "+e;
             throw new IllegalArgumentException(err);
         }

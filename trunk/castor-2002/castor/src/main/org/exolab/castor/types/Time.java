@@ -209,7 +209,7 @@ public class Time extends RecurringDurationBase {
         }
         try {
             result.setHour(Short.parseShort( temp ));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a time type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -221,7 +221,7 @@ public class Time extends RecurringDurationBase {
         }
         try {
             result.setMinute( Short.parseShort(temp));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a time type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -241,7 +241,7 @@ public class Time extends RecurringDurationBase {
         try {
             result.setSecond(Short.parseShort(temp.substring(0,2)),
                          Short.parseShort(milsecond));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a time type
             //(if not a ParseException is thrown) so we can never reach that point
         }
@@ -251,7 +251,7 @@ public class Time extends RecurringDurationBase {
         if (timeZone) {
             try {
                 if (zoneStr.startsWith("-")) result.setZoneNegative();
-            } catch(org.exolab.castor.xml.NotSupportedOperationException e) {
+            } catch(OperationNotSupportedException e) {
                 //-- can never happen (a parse exception is thrown if the
                 //-- object is not valide)
             }
@@ -263,7 +263,7 @@ public class Time extends RecurringDurationBase {
             try {
                 result.setZone(Short.parseShort(zoneStr.substring(1,3)),
                                 Short.parseShort(zoneStr.substring(4,6)));
-            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a time type
             //(if not a ParseException is thrown) so we can never reach that point
             }

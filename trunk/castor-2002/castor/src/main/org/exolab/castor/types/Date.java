@@ -49,7 +49,6 @@
 
 package org.exolab.castor.types;
 import org.exolab.castor.types.TimePeriod;
-import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.StringTokenizer;
@@ -79,7 +78,7 @@ public class Date extends TimePeriod {
             temp = -temp;
             try {
                 this.setZoneNegative();
-            } catch (NotSupportedOperationException e) {
+            } catch (OperationNotSupportedException e) {
             }
         }
         short zhour = (short) (temp / (60*60*1000));
@@ -87,7 +86,7 @@ public class Date extends TimePeriod {
         short zmin  = (short)(temp / (60*1000));
         try {
             this.setZone(zhour,zmin);
-        } catch (NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
         }
     }
 
@@ -105,7 +104,7 @@ public class Date extends TimePeriod {
         try {
             this.setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
             this.setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             // we can never reach that point because
             // we are allowed in a date type to set those fields
         }
@@ -114,7 +113,7 @@ public class Date extends TimePeriod {
         try {
             this.setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
             this.setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             // we can never reach that point because
             // we are allowed in a date type to set those fields
         }
@@ -124,37 +123,37 @@ public class Date extends TimePeriod {
 
      /*Disallow the access to time method */
      public void setHour(short hour)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Date : the hour field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
      }
 
     public void setMinute(short minute)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Date : the minute field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setSecond(short second,short millsecond)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Date : the second fields must not be changed";
-        throw new NotSupportedOperationException(err);}
+        throw new OperationNotSupportedException(err);}
 
     public void setZone(short hour, short minute)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
       String err = "In a Date : the time zone fields must not be changed";
-      throw new NotSupportedOperationException(err);
+      throw new OperationNotSupportedException(err);
     }
 
     public void setZoneNegative()
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Date : the time zone fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
 
@@ -242,7 +241,7 @@ public class Date extends TimePeriod {
         }
         try {
             result.setYear(Short.parseShort( temp.substring(2,4) ));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             // we can never reach that point because
             // we are allowed in a date type to set those fields
         }
@@ -255,7 +254,7 @@ public class Date extends TimePeriod {
         }
         try {
             result.setMonth(Short.parseShort(temp));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             // we can never reach that point because
             // we are allowed in a date type to set those fields
         }
@@ -268,7 +267,7 @@ public class Date extends TimePeriod {
         }
         try {
             result.setDay(Short.parseShort(temp));
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             // we can never reach that point because
             // we are allowed in a date type to set those fields
         }

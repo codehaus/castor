@@ -42,13 +42,10 @@
  *
  * $Id
  * Date         Author              Changes
- * 12/05/2000   Arnaud Blandin      Added the support for NotSupportedOperationException
+ * 12/05/2000   Arnaud Blandin      Added the support for OperationNotSupportedException
  * 11/01/2000   Arnaud Blandin      Created
  */
 package org.exolab.castor.types;
-
-import org.exolab.castor.types.TimePeriod;
-import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
@@ -81,7 +78,7 @@ public class Century extends TimePeriod {
             temp = -temp;
             try {
                 this.setZoneNegative() ;
-            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            } catch (OperationNotSupportedException e) {
             //we are sure that we are dealing with a Century type
             //so we can never reach that point
             }
@@ -92,7 +89,7 @@ public class Century extends TimePeriod {
             temp = temp % (60*60*1000);
             short zmin = (short)(temp / (60*1000));
             this.setZone(zhour, zmin);
-        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that we are dealing with a Century type
             //so we can never reach that point
         }
@@ -102,61 +99,61 @@ public class Century extends TimePeriod {
 
     /*Disallow the access to set year method*/
     public void setYear(short year)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Century : the year field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     /*Disallow the access to set month method*/
     public void setMonth(short month)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Century : the month field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
     /*Disallow the access to set day method*/
     public void setDay(short day)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Century : the day field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     /*Disallow the access to set time methods */
     public void setHour(short hour)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Century : the hour field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setMinute(short minute)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
       String err = "In a Century : the minute field must not be changed";
-      throw new NotSupportedOperationException(err);
+      throw new OperationNotSupportedException(err);
     }
 
     public void setSecond(short second,short millsecond)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
       String err = "In a Century : the second field must not be changed";
-      throw new NotSupportedOperationException(err);
+      throw new OperationNotSupportedException(err);
     }
 
     public void setZone(short hour, short minute)
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
      String err = "In a Century : the time zone field must not be changed";
-     throw new NotSupportedOperationException(err);
+     throw new OperationNotSupportedException(err);
     }
 
     public void setZoneNegative()
-         throws NotSupportedOperationException
+         throws OperationNotSupportedException
     {
         String err = "In a Century : the time zone field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
 
