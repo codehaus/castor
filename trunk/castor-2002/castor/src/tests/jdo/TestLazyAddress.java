@@ -73,4 +73,17 @@ public class TestLazyAddress {
 		sb.append(">");
 		return sb.toString();
 	}
+    public boolean equals( Object o ) {
+        if ( this == o )
+            return true;
+
+        if ( o instanceof TestLazyAddress ) {
+            TestLazyAddress other = (TestLazyAddress) o;
+            if ( other._id == _id )
+                return true;
+            else
+                return false;
+        } else
+            return false;
+    }
 }
