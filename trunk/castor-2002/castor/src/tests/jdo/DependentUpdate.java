@@ -211,7 +211,6 @@ public class DependentUpdate extends CastorTestCase {
         master.addDetail( detail );
         _db.commit();
 
-
         _db.begin();
         master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
         if ( master != null ) {
@@ -290,10 +289,11 @@ public class DependentUpdate extends CastorTestCase {
             _db.commit();
             stream.println( "Error: Dirty checking doesn't work" );
             fail("dirty check failed");
-        } catch ( ObjectModifiedException exept ) {
+        } catch ( ObjectModifiedException except ) {
             if (_db.isActive()) {
                 _db.rollback();
             }
+
             stream.println( "OK: Dirty checking works" );
         }
         _db.begin();
