@@ -110,8 +110,10 @@ final class KeyGeneratorRegistry
                 keyGen = keyGenFactory.getKeyGenerator( factory, desc.getParams(), sqlType );
                 if ( keyGen != null ) 
                 {
-                    _log.debug( "Key generator " + desc.getKeyGeneratorFactoryName() +
+                    if(_log.isDebugEnabled()){
+                    	_log.debug( "Key generator " + desc.getKeyGeneratorFactoryName() +
                             " has been instantiated, parameters: " + desc.getParams() );
+					}
                 }
             }
             if ( keyGen == null ) {
