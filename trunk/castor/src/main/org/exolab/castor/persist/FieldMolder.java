@@ -289,7 +289,7 @@ public class FieldMolder {
         ReflectService rf = getContextReflectService ( loader );
         
         if (_log.isDebugEnabled()) {
-        	_log.debug ("Calling " + rf._addMethod.getName() + " on " + object.getClass().getName());
+        	_log.debug ("Calling " + rf._addMethod.getName() + " on " + object.getClass().getName() + " with value " + value);
         }
         
         try {
@@ -653,21 +653,24 @@ public class FieldMolder {
 
                 _defaultReflectService._setMethod = findAccessor( javaClass, METHOD_SET_PREFIX + capitalize( name ), methodClass, false );
 
-                if ( _defaultReflectService._setMethod == null )
-                    _defaultReflectService._addMethod
-                        = findAccessor( javaClass, METHOD_ADD_PREFIX + capitalize( name ), declaredClass, false );
+                if ( _defaultReflectService._setMethod == null ) {
+                	_defaultReflectService._addMethod
+					= findAccessor( javaClass, METHOD_ADD_PREFIX + capitalize( name ), declaredClass, false );
+                	
+                	// look again, but this time without a trailing 's'
+                	if ( _defaultReflectService._addMethod == null && name.endsWith("s") )
+                		_defaultReflectService._addMethod
+						= findAccessor( javaClass, METHOD_ADD_PREFIX + capitalize( name ).substring(0,name.length()-1), declaredClass, false );
 
-                if ( _defaultReflectService._addMethod == null && name.endsWith("s") )
-                    _defaultReflectService._addMethod
-                        = findAccessor( javaClass, METHOD_ADD_PREFIX + capitalize( name ).substring(0,name.length()-1), declaredClass, false );
-
+                	// if add<FieldName>() has been found, set _addable to true 
+                	if ( _defaultReflectService._addMethod != null )
+                        _addable = true;
+                }
+                
                 if ( _defaultReflectService._setMethod == null && _defaultReflectService._addMethod == null )
-                    throw new MappingException( "mapping.accessorNotFound",
-                        METHOD_SET_PREFIX + "/" + METHOD_ADD_PREFIX + capitalize( name ), declaredClass, javaClass.getName() );
-
-                if ( _defaultReflectService._addMethod != null )
-                    _addable = true;
-
+                	throw new MappingException( "mapping.accessorNotFound",
+                			METHOD_SET_PREFIX + "/" + METHOD_ADD_PREFIX + capitalize( name ), declaredClass, javaClass.getName() );
+            	
             } else {
 
                 // Bean type object, map field to get<Method>/set<Method>
