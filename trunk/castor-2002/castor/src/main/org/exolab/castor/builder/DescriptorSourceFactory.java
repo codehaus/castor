@@ -445,6 +445,12 @@ public class DescriptorSourceFactory {
         }
         else jsc.add("desc.setHandler(handler);");
 
+
+        //-- container
+        if (member.isContainer()) {
+            jsc.add("desc.setContainer(true);");
+        }
+        
         //-- namespace
         if (nsURI != null) {
             jsc.add("desc.setNameSpaceURI(\"");
@@ -452,6 +458,7 @@ public class DescriptorSourceFactory {
             jsc.append("\");");
         }
 
+        //-- required
         if (member.isRequired()) {
             jsc.add("desc.setRequired(true);");
         }

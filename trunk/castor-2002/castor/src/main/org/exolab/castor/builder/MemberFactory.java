@@ -297,6 +297,9 @@ public class MemberFactory {
         XSType   xsType     = null;
 
         XMLType xmlType = eDecl.getType();
+        
+        boolean isContainer = false;
+        
         //-- SimpleType
         if ((xmlType != null) && xmlType.isSimpleType()) {
 
@@ -330,6 +333,13 @@ public class MemberFactory {
         }
         //-- ComplexType
         else {
+            
+            ComplexType cType = (ComplexType)xmlType;
+            int max = cType.getMaxOccurs();
+            if ((max < 0) || (max > 1)) {
+                //isContainer = true;
+            }
+            
 			String className = null;
 			//-- Java class name depends on mapping setup in properties file
 			if (SourceGenerator.mappingSchemaElement2Java())
@@ -382,6 +392,7 @@ public class MemberFactory {
 
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName(true));
+        fieldInfo.setContainer(isContainer);
 
         //-- add annotated comments
 
@@ -462,6 +473,7 @@ public class MemberFactory {
 
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName("-error-if-this-is-used-");
+        fieldInfo.setContainer(true);
 
         //-- add annotated comments
         String comment = null;

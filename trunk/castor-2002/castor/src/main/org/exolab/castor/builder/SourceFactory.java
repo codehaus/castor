@@ -274,15 +274,17 @@ public class SourceFactory  {
     } //-- createSourceCode
 
     /**
-     * Creates a new ClassInfo for the given XML Schema type declaration.
-     * The type declaration must be a top-level declaration.
+     * Creates the necessary JClass and ClassInfo objects for
+     * the given ComplexType.
+     * The complex type declaration must be a top-level declaration.
+     *
      * @param type the XML Schema type declaration to create the
-     * ClassInfo for
+     * JClass and ClassInfo objects for
      * @param resolver the ClassInfoResolver for resolving "derived" types.
      * @param packageName the package to which generated classes should belong
-	 * @param createMarshall whether or not to create marshalling framework methods
+     * @return the array of JClass objects created for the ComplexType
     **/
-    public JClass createSourceCode
+    public JClass[] createSourceCode
         (ComplexType type, ClassInfoResolver resolver, String packageName)
     {
         if (type == null)
@@ -291,8 +293,25 @@ public class SourceFactory  {
         if (!type.isTopLevel())
             throw new IllegalArgumentException("ComplexType is not top-level.");
 
+        JClass[] classes = null;
+        
         String className = JavaNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
+
+
+        boolean createGroupItem = false;
+        
+        int max = type.getMaxOccurs();
+        
+        if ((max < 0) || (max > 1)) {
+            
+            createGroupItem = true;
+            className += "Item";
+            classes = new JClass[2];
+        }
+        else {
+            classes = new JClass[1];
+        }
 
         FactoryState state
             = new FactoryState(className, resolver, packageName);
@@ -307,12 +326,6 @@ public class SourceFactory  {
         if (base != null)
             jClass.setSuperClass(base);
 
-        //-- make class abstract?
-		//-- when mapping elements to Java classes this class forms the
-		//-- base for elements that reference this type.
-		if (SourceGenerator.mappingSchemaElement2Java())
-			jClass.getModifiers().setAbstract(true);
-
 		//-- name information
         classInfo.setNodeName(type.getName());
 
@@ -320,19 +333,62 @@ public class SourceFactory  {
         Schema  schema = type.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
 
+        processComplexType(type, state);
+
+        if (createGroupItem) {
+            
+            resolver.bindReference(jClass, classInfo);
+            classes[1] = jClass;
+                        
+            //-- create main group class
+            String fname = type.getName() + "Item";
+            fname  = JavaNaming.toJavaMemberName(fname, false);
+            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass), 
+                                                           "_items", fname);
+            fInfo.setContainer(true);                                               
+            className = className.substring(0,className.length()-4);
+            
+            state     = new FactoryState(className, resolver, packageName);
+		    classInfo = state.classInfo;
+            jClass    = state.jClass;
+		    initialize(jClass);
+		    
+            classInfo.addFieldInfo(fInfo);
+            fInfo.createJavaField(jClass);
+            fInfo.createAccessMethods(jClass);
+            fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
+            
+            //-- set super class if necessary
+            if (base != null) jClass.setSuperClass(base);
+
+		    //-- name information
+            classInfo.setNodeName(type.getName());
+
+            //-- namespace information
+            classInfo.setNamespaceURI(schema.getTargetNamespace());
+            
+            //-- mark as a container
+            classInfo.setContainer(true);
+        }
+        
         //-- process annotation
         String comment  = processAnnotations(type);
         if (comment != null)
             jClass.getJDocComment().setComment(comment);
+            
+        //-- make class abstract?
+		//-- when mapping elements to Java classes this class forms the
+		//-- base for elements that reference this type.
+		if (SourceGenerator.mappingSchemaElement2Java())
+			jClass.getModifiers().setAbstract(true);
+			
 
-
-        processComplexType(type, state);
-
-        //-- add imports required by the marshal methods
-        jClass.addImport("java.io.Writer");
-        jClass.addImport("java.io.Reader");
 
 		if (_createMarshalMethods) {
+            //-- add imports required by the marshal methods
+            jClass.addImport("java.io.Writer");
+            jClass.addImport("java.io.Reader");
+            
             boolean isAbstract = jClass.getModifiers().isAbstract();
             //-- #validate()
             createValidateMethods(jClass);
@@ -354,8 +410,10 @@ public class SourceFactory  {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(type, classInfo);
         }
+        
+        classes[0] = jClass;
 
-        return jClass;
+        return classes;
 
     } //-- createSourceCode(ComplexType)
 
@@ -453,21 +511,38 @@ public class SourceFactory  {
      * ClassInfo for
      * @param resolver the ClassInfoResolver for resolving "derived" types.
      * @param packageName the package to which generated classes should belong
-	 * @param createMarshall whether or not to create marshalling framework methods
     **/
-    public JClass createSourceCode
+    public JClass[] createSourceCode
         (Group group, ClassInfoResolver resolver, String packageName)
     {
+
 
         String groupName = group.getName();
         if (groupName == null) {
             throw new IllegalArgumentException("Currently unnamed groups are not supported.");
             //groupName = "Group" + sgInfo.getNextGroupNumber();
         }
+        
 
+        JClass[] classes = null;
+        
         String className = JavaNaming.toJavaClassName(groupName);
         className = resolveClassName(className, packageName);
-
+        
+        boolean createGroupItem = false;
+        
+        int max = group.getMaxOccurs();
+        
+        if ((max < 0) || (max > 1)) {
+            createGroupItem = true;
+            className += "Item";
+            classes = new JClass[2];
+        }
+        else {
+            classes = new JClass[1];
+        }
+        
+        
         FactoryState state
             = new FactoryState(className, resolver, packageName);
 		ClassInfo classInfo = state.classInfo;
@@ -485,15 +560,58 @@ public class SourceFactory  {
         //Schema  schema = group.getSchema();
         //classInfo.setNamespaceURI(schema.getTargetNamespace());
 
+        
+        Order order = group.getOrder();
+        if (order == Order.choice) {
+            classInfo.getGroupInfo().setAsChoice();
+        }
+
+        processContentModel(group, state);
+
+        if (createGroupItem) {
+            
+		    //-- create Bound Properties code
+		    if (state.hasBoundProperties())
+		        createPropertyChangeMethods(jClass);
+           
+            resolver.bindReference(jClass, classInfo);
+            
+            classes[1] = jClass;
+            
+            //-- create main group class
+            String fname = groupName + "Item";
+            fname  = JavaNaming.toJavaMemberName(fname, false);
+            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass), 
+                                                           "_items", fname);
+            fInfo.setContainer(true);                                               
+            className = className.substring(0,className.length()-4);
+            System.out.println(className);
+            
+            state     = new FactoryState(className, resolver, packageName);
+		    classInfo = state.classInfo;
+            jClass    = state.jClass;
+		    initialize(jClass);
+		    
+            classInfo.addFieldInfo(fInfo);
+            fInfo.createJavaField(jClass);
+            fInfo.createAccessMethods(jClass);
+            fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
+            
+            //-- set super class if necessary
+            if (base != null) jClass.setSuperClass(base);
+
+		    //-- name information
+            classInfo.setNodeName(groupName);
+
+            //-- mark as a container
+            classInfo.setContainer(true);
+        }
+
         //-- process annotation
         String comment  = processAnnotations(group);
         if (comment != null)
             jClass.getJDocComment().setComment(comment);
-
-
-        processContentModel(group, state);
-
-
+            
 		if (_createMarshalMethods) {
             //-- add imports required by the marshal methods
             jClass.addImport("java.io.Writer");
@@ -517,51 +635,11 @@ public class SourceFactory  {
         resolver.bindReference(jClass, classInfo);
         resolver.bindReference(group, classInfo);
 
-        return jClass;
+        classes[0] = jClass;
+        
+        return classes;
 
     } //-- createSourceCode(Group)
-
-
-    /**
-     * Creates Source Code from the given ClassDescriptor
-     * NOT YET IMPLEMENTED
-    **
-    public JClass createSourceCode(ClassDescriptor descriptor)
-    {
-
-        //-- handle null arguments
-        if (descriptor == null) {
-            String err = "ClassDescriptor passed as an argument to "+
-                " SourceFactory#createSourceCode cannot be null.";
-            throw new IllegalArgumentException(err);
-        }
-
-        ClassDescriptor classDesc = descriptor;
-        /*
-        if (descriptor instanceof XMLClassDescriptor)
-            classDesc = (XMLClassDescriptor) descriptor;
-        else {
-            try {
-                classDesc = new XMLClassDescriptorAdapter(descriptor, null);
-            }
-            catch(org.exolab.castor.mapping.MappingException mx) {
-                throw new IllegalStateException(mx.toString());
-            }
-        }
-        *
-
-        Class type = classDesc.getJavaClass();
-        JClass jClass = new JClass(type.getName());
-
-        //-- Loop through fields and add members
-        JMember field = null;
-        FieldDescriptor[] fields = classDesc.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-        }
-
-        return jClass;
-
-    } //-- createSourceCode
 
     //-------------------/
     //- Private Methods -/
@@ -1042,11 +1120,11 @@ public class SourceFactory  {
 				if (cInfo == null) {
 
 					String packageName = state.jClass.getPackageName();
-					JClass jClass = createSourceCode((ComplexType)base,
+					JClass[] classes = createSourceCode((ComplexType)base,
 					                                    state,
 					                                    packageName);
 					cInfo = state.resolve(base);
-					className = jClass.getName();
+					className = classes[0].getName();
 				}
 				else className = cInfo.getJClass().getName();
 			}
@@ -1144,6 +1222,7 @@ public class SourceFactory  {
         //- handle elements and groups -/
         //------------------------------/
 
+
         Enumeration enum = contentModel.enumerate();
 
         FieldInfo fieldInfo = null;
@@ -1206,21 +1285,26 @@ public class SourceFactory  {
                 //-- handle groups
                 case Structure.GROUP:
                     Group group = (Group) struct;
+                    
+                    int max = group.getMaxOccurs();
+                    if ((max < 0) || (max > 1)) {
+                        GroupInfo gInfo = state.classInfo.getGroupInfo();
+                        gInfo.setMaxOccurs(max);
+                        gInfo.setMinOccurs(group.getMinOccurs());
+                    }
                     //-- if not nested, set compositor
                     if (contentModel instanceof ComplexType) {
                         Order order = group.getOrder();
                         if (order == Order.choice)
-                            state.classInfo.setAsChoice();
+                            state.classInfo.getGroupInfo().setAsChoice();
                         else if (order == Order.seq)
-                            state.classInfo.setAsSequence();
+                            state.classInfo.getGroupInfo().setAsSequence();
                         else
-                            state.classInfo.setAsAll();
+                            state.classInfo.getGroupInfo().setAsAll();
                     }
-
                     //-- handle named groups
                     else if (group.getName() != null) {
-                        JClass groupClass
-                            = createSourceCode(group, state, state.packageName);
+                        //createSourceCode(group, state, state.packageName);
                         fieldInfo = memberFactory.createFieldInfo(group, state);
                         handleField(fieldInfo, state);
                         break;

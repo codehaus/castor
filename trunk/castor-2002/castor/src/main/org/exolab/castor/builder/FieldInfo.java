@@ -104,6 +104,11 @@ public class FieldInfo extends XMLInfo {
     private boolean _bound = false;
     
     /**
+     * A flag to indicate a container field
+    **/
+    private boolean _isContainer = false;
+    
+    /**
      * Creates a new FieldInfo with the given XML Schema type
      * and the given member name
      * @param XSType the XML Schema type of this member
@@ -377,6 +382,17 @@ public class FieldInfo extends XMLInfo {
     } //-- isBound
     
     /**
+     * Returns true if this FieldInfo describes a container
+     * class. A container class is a class which should not be 
+     * marshalled as XML, but whose members should be.
+     *
+     * @return true if this ClassInfo describes a container class.
+    **/
+    public boolean isContainer() {
+        return _isContainer;
+    } //-- isContainer
+    
+    /**
      * Returns true if this FieldInfo is a transient member. Transient
      * members are members which should be ignored by the 
      * Marshalling framework
@@ -420,6 +436,19 @@ public class FieldInfo extends XMLInfo {
     public void setBound(boolean bound) {
         _bound = bound;
     } //-- setBound
+    
+    /**
+     * Sets whether or not this FieldInfo describes a container
+     * field. A container field is a field which should not be 
+     * marshalled directly as XML, but whose members should be. 
+     * By default this is false.
+     *
+     * @param isContainer the boolean value when true indicates
+     * this class should be a container class.
+    **/
+    public void setContainer(boolean isContainer) {
+        _isContainer = isContainer;
+    } //-- setContainer
     
     public void setDeclaringClassInfo(ClassInfo declaringClassInfo) {
         this.declaringClassInfo = declaringClassInfo;
