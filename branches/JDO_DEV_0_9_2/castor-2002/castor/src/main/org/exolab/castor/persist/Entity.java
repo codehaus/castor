@@ -122,7 +122,7 @@ public final class Entity implements Cloneable {
      */
     public Entity() {
         super();
-    }
+    } // -- Entity
 
     /**
      * Constructor
@@ -131,7 +131,7 @@ public final class Entity implements Cloneable {
         super();
         this.base = base;
         this.identity = identity;
-    }
+    } // -- Entity
 
     /**
      * Constructor
@@ -141,7 +141,7 @@ public final class Entity implements Cloneable {
         this.base = base;
         this.actual = actual;
         this.identity = identity;
-    }
+    } // -- Entity
 
     /**
      * Test if this object belongs to the same entity type and has the 
@@ -157,7 +157,7 @@ public final class Entity implements Cloneable {
         }
         ent = (Entity) obj;
         return (base.equals(ent.base) && identity.equals(ent.identity));
-    }
+    } // -- equals
 
     /**
      * Determines this entity and the specified entitiy is strickly equals.
@@ -194,7 +194,7 @@ public final class Entity implements Cloneable {
                 return false;
         }
         return true;
-    }
+    } // -- strictEquals
 
     /**
      * Return the hashCode of this entity
@@ -203,7 +203,7 @@ public final class Entity implements Cloneable {
      */
     public int hashCode() {
         return base.hashCode() + (identity == null ? 0 : identity.hashCode());
-    }
+    } // -- hashCode
 
     /**
      * Get a string representing this entity
@@ -212,7 +212,7 @@ public final class Entity implements Cloneable {
      */
     public String toString() {
         return base + "[" + identity + "]";
-    }
+    } // -- toString
 
     /**
      * Get a clone of this object
@@ -230,7 +230,7 @@ public final class Entity implements Cloneable {
             target.values = null;
         }
         return target;
-    }
+    } // -- clone
 
     /**
      * Copy all the fields of this entity into the target entity
@@ -251,7 +251,7 @@ public final class Entity implements Cloneable {
         } else {
             target.values = null;
         }
-    }
+    } // -- copyInto
 
     /**
      * Obtain the value of a field represented by fieldInfo, if this entity
@@ -276,7 +276,7 @@ public final class Entity implements Cloneable {
         int pos  = fieldInfo.entityClass.getFieldOffset();
             pos += fieldInfo.getFieldPos();
         return values[pos];
-    }
+    } // -- getFieldValue(...)
 
     /**
      * Set the value of the field represents by the specified fieldInfo
@@ -324,6 +324,6 @@ public final class Entity implements Cloneable {
         int pos  = fieldInfo.entityClass.getFieldOffset();
             pos += fieldInfo.getFieldPos();
         values[pos] = value;
-    }
+    } // -- setFieldValue
 
 }
