@@ -392,17 +392,19 @@
     </section>
 
 
-    <section title="Usage Pattern">
+    <section title="Examples">
 
-      <p>Here is an example of a mapping file and the corresponding Java object and
-      DDL for the databse table.</p>
+       <p>Here are examples of object mappings and the corresponding Java objects and
+          DDL for the database table.</p>
 
-        <p>The following is an example Java object:</p>
-
-        <table border="1" cellpadding="4">
-            <tr>
+       <section title="Java class files">
+       
+          <p>The following fragment shows the Java class declaration for the Product class:</p>
+       
+          <table border="1" cellpadding="4">
+             <tr>
                 <td BGCOLOR="#CCCCCC">
-                    <code>
+                   <code>
 package myapp;
 
 public class Product 
@@ -416,41 +418,68 @@ public class Product
     private ProductGroup _group;
 
 
-    public int getId()
-    ...
+    public int getId() { ... }
 
-    public void setId( int anId )
-    ...
+    public void setId( int anId ) { ... }
 
-    public String getName()
-    ...
+    public String getName() { ... }
 
-    public void setName( String aName )
-    ...
+    public void setName( String aName ) { ... }
 
-    public float getPrice()
-    ...
+    public float getPrice() { ... }
 
-    public void setPrice( float aPrice )
-    ...
+    public void setPrice( float aPrice ) { ... }
 
-    public ProductGroup getProductGroup()
-    ...
+    public ProductGroup getProductGroup() { ... }
 
-    public void setProductGroup( ProductGroup aProductGroup )
-    ...
+    public void setProductGroup( ProductGroup aProductGroup ) { ... }
 }
-                    </code>
-                  </td>
-              </tr>
-        </table>
+               </code>
+            </td>
+         </tr>
+      </table>
 
-        <p>The following is the relational database table:</p>
-        
-        <table border="1" cellpadding="4">
-            <tr>
+      <p>The following fragment shows the Java class declaration for the ProductGroup class:</p>
+      
+      <table border="1" cellpadding="4">
+              <tr>
                 <td BGCOLOR="#CCCCCC">
                     <code>
+
+
+public class ProductGroup
+{
+
+    private int       _id;
+
+    private String    _name;
+
+    public int getId() { ... }
+
+    public void setId( int id ) { ... }
+
+    public String getName() { ... }
+
+    public void setName( String name ) { ... }
+
+}
+                  </code>
+               </td>
+            </tr>
+         </table>
+      </section>
+        
+       <section title="DDL">
+       
+          <p>The following sections show the DDL for the relational database tables 
+             PROD, PROD_GROUP and PROD_DETAIL:</p>
+        
+          <p><b>PROD</b>:</p>
+          
+          <table border="1" cellpadding="4">
+             <tr>
+                <td BGCOLOR="#CCCCCC">
+                   <code>
 create table prod 
 (
   id        int           not null,
@@ -458,13 +487,48 @@ create table prod
   price     numeric(18,2) not null,
   group_id  int           not null
 );
-                    </code>
-                  </td>
-              </tr>
-        </table>
+                   </code>
+                </td>
+             </tr>
+          </table>
 
-        <p>The following is the mapping file for the example Java object:</p>
+          <p><b>PROD_GROUP</b>:</p>
+          
+          <table border="1" cellpadding="4">
+             <tr>
+                <td BGCOLOR="#CCCCCC">
+                   <code>
+create table prod_group (
+  id        int           not null,
+  name      varchar(200)  not null
+);
+                   </code>
+                </td>
+             </tr>
+          </table>
+          
+          <p><b>PROD_DETAIL</b>:</p>
+          
+          <table border="1" cellpadding="4">
+             <tr>
+                <td BGCOLOR="#CCCCCC">
+                   <code>
+create table prod_detail (
+  id        int           not null,
+  prod_id   int           not null,
+  name      varchar(200)  not null
+);
+                   </code>
+                </td>
+             </tr>
+          </table>
+          
+       </section>
+       
+       <section title="Object Mappings">
 
+        <p>The following code fragment shows the object mapping for the ProductGroup class:</p>
+           
         <table border="1" cellpadding="4">
             <tr>
                 <td BGCOLOR="#CCCCCC">
@@ -474,9 +538,43 @@ create table prod
                          "http://castor.exolab.org/mapping.dtd">
 &lt;mapping>
 
-    &lt;class name="myapp.Product" identity="id">
+  &lt;class name="myapp.ProductGroup" identity="id"&gt;
+  
+    &lt;description&gt;Product group&lt;/description&gt;
+    
+    &lt;map-to table="prod_group" xml="group" /&gt;
+    
+    &lt;field name="id" type="integer" &gt;
+      &lt;sql name="id" type="integer"/&gt;
+    &lt;/field&gt;
+    
+    &lt;field name="name" type="string"&gt;
+      &lt;sql name="name" type="char" /&gt;
+    &lt;/field&gt;
+    
+  &lt;/class>
 
-        &lt;map-to table="prod" />
+&lt;/mapping>
+                    </code>
+                  </td>
+              </tr>
+        </table>
+
+       <section title="1:1 relation">
+
+        <p>The following code fragment shows the mapping file for the Product class. 
+           Apart from the simple field declarations, this includes a simple 1:1 relation between 
+           Product and ProductGroup, where every product instance is associated with a 
+           ProductGroup:</p>
+
+        <table border="1" cellpadding="4">
+            <tr>
+                <td BGCOLOR="#CCCCCC">
+                    <code>
+    ...
+    &lt;class name="myapp.Product" identity="id"&gt;
+
+        &lt;map-to table="prod" /&gt;
 
         &lt;field name="id" type="integer">
             &lt;sql name="id" type="integer" />
@@ -490,18 +588,199 @@ create table prod
             &lt;sql name="price" type="numeric" />
         &lt;/field>
 
-        &lt;field name="group" type="myapp.ProductGroup" >
-            &lt;sql name="group_id" />
-        &lt;/field>
+        <font color="red">&lt;field name="group" type="myapp.ProductGroup" &gt;
+            &lt;sql name="group_id" /&gt;
+        &lt;/field&gt;</font>
+        
+        &lt;field name="details" type="myapp.ProductDetail"
+               collection="vector"&gt;
+           &lt;sql many-key="prod_id"/&gt;
+        &lt;/field&gt;
+        
+        &lt;field name="categories" type="myapp.Category" collection="vector"&gt;
+           &lt;sql name="category_id"
+                many-table="category_prod" many-key="prod_id" /&gt;
+        &lt;/field&gt;
 
-    &lt;/class>
-
-&lt;/mapping>
-
-                    </code>
+    &lt;/class&gt;
+    ...
+                     </code>
                   </td>
               </tr>
         </table>
+       </section>
+       
+          <section title="1:M relation">
+             <p>The following code fragment shows (again) the mapping file for the Product class. 
+                The field definition highlighted shows how to declare a 1:M relation between 
+                Product and ProductDetail, where every product instance is made up of many 
+                ProductDetails:</p>
+                
+             <table border="1" cellpadding="4">
+                <tr>
+                   <td BGCOLOR="#CCCCCC">
+                      <code>
+    ...
+    &lt;class name="myapp.Product" identity="id"&gt;
+
+        &lt;map-to table="prod" /&gt;
+
+        &lt;field name="id" type="integer">
+            &lt;sql name="id" type="integer" />
+        &lt;/field>
+
+        &lt;field name="name" type="string">
+            &lt;sql name="name" type="char" />
+        &lt;/field>
+
+        &lt;field name="price" type="float">
+            &lt;sql name="price" type="numeric" />
+        &lt;/field>
+
+        &lt;field name="group" type="myapp.ProductGroup" &gt;
+            &lt;sql name="group_id" /&gt;
+        &lt;/field&gt;
+        
+        <font color="red">&lt;field name="details" type="myapp.ProductDetail" <font color="red">collection="vector"</font>&gt;
+           &lt;sql many-key="prod_id"/&gt;
+        &lt;/field&gt;</font>
+
+        &lt;field name="categories" type="myapp.Category" collection="vector"&gt;
+           &lt;sql name="category_id"
+                many-table="category_prod" many-key="prod_id" /&gt;
+        &lt;/field&gt;
+    &lt;/class&gt;
+    ...
+                       </code>
+                   </td>
+                </tr>
+             </table>
+             
+             <p>The following code fragment shows the corresponding mapping entry for the 
+                ProductDetail class that defines the second leg of the 1:M relation
+                between Product and ProductDetail.</p>
+
+             <table border="1" cellpadding="4">
+                <tr>
+                   <td BGCOLOR="#CCCCCC">
+                      <code>
+  ...
+  &lt;class name="myapp.ProductDetail" identity="id" depends="myapp.Product" &gt;
+
+    &lt;description&gt;Product detail&lt;/description&gt;
+
+    &lt;map-to table="prod_detail" xml="detail" /&gt;
+
+    &lt;field name="id" type="integer"&gt;
+      &lt;sql name="id" type="integer"/&gt;
+    &lt;/field&gt;
+
+    &lt;field name="name" type="string"&gt;
+      &lt;sql name="name" type="char"/&gt;
+    &lt;/field&gt;
+
+    <font color="red">&lt;field name="product" type="myapp.Product"&gt;
+      &lt;sql name="prod_id" /&gt;
+    &lt;/field&gt;</font>
+
+  %lt;/class&gt;
+  ...
+                       </code>
+                   </td>
+                </tr>
+             </table>
+
+          </section>
+       
+          <section title="M:N relation">
+             <p>The following code fragment shows (again) the mapping file for the Product class. 
+                The field definition highlighted shows how to declare a M:N relation between 
+                Product and ProductCategory, where many products can be mapped to many 
+                product categories:</p>
+                
+             <table border="1" cellpadding="4">
+                <tr>
+                   <td BGCOLOR="#CCCCCC">
+                      <code>
+    ...
+    &lt;class name="myapp.Product" identity="id"&gt;
+
+        &lt;map-to table="prod" /&gt;
+
+        &lt;field name="id" type="integer">
+            &lt;sql name="id" type="integer" />
+        &lt;/field>
+
+        &lt;field name="name" type="string">
+            &lt;sql name="name" type="char" />
+        &lt;/field>
+
+        &lt;field name="price" type="float">
+            &lt;sql name="price" type="numeric" />
+        &lt;/field>
+
+        &lt;field name="group" type="myapp.ProductGroup" &gt;
+            &lt;sql name="group_id" /&gt;
+        &lt;/field&gt;
+        
+        &lt;field name="details" type="myapp.ProductDetail" collection="vector"&gt;
+           &lt;sql many-key="prod_id">/&gt;
+        &lt;/field&gt;
+
+        <font color="red">&lt;field name="categories" type="myapp.Category" collection="vector"&gt;
+           &lt;sql name="category_id"
+                many-table="category_prod" many-key="prod_id" /&gt;
+        &lt;/field&gt;</font>
+        
+    &lt;/class&gt;
+    ...
+                       </code>
+                   </td>
+                </tr>
+             </table>
+             
+             <p>The following code fragment shows the corresponding mapping entry for the 
+                ProductCategory class that defines the second leg of the M:N relation
+                between Product and Category.</p>
+
+             <table border="1" cellpadding="4">
+                <tr>
+                   <td BGCOLOR="#CCCCCC" width="100%">
+                      <code>
+  ...
+  &lt;class name="myapp.Category" identity="id"&gt;
+  
+    &lt;description&gt;
+        A product category, any number of products can belong to
+        the same category, a product can belong to any number of
+        categories
+    &lt;/description&gt;
+    
+    &lt;map-to table="category" xml="category" /&gt;
+    
+    &lt;field name="id" type="integer"&gt;
+      &lt;sql name="id" type="integer"/&gt;
+    &lt;/field&gt;
+    
+    &lt;field name="name" type="string"&gt;
+      &lt;sql name="name" type="char"/&gt;
+    &lt;/field&gt;
+    
+    <font color="red">&lt;field name="products" type="myapp.Product" collection="vector"&gt;
+      &lt;sql name="prod_id"
+           many-table="category_prod" many-key="category_id" /&gt;
+    &lt;/field&gt;</font>
+    
+  &lt;/class&gt;
+  ...
+                       </code>
+                   </td>
+                </tr>
+             </table>
+
+          </section>
+
+       </section>
 
     </section>
 
