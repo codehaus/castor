@@ -78,12 +78,12 @@ import org.exolab.castor.util.Messages;
 /**
  * LockEngine is a gateway for all the <tt>ClassMolder</tt>s of a persistence 
  * storage. It mantains dirty checking cache state and lock, and provides a 
- * thread safe enviroment for <tt>ClassMolder</tt>. LockEngine grantees that 
- * no two conflict operation will be let run concurrently for the same object. 
+ * thread safe enviroment for <tt>ClassMolder</tt>. LockEngine garantees that 
+ * no two conflicting operations will be let running concurrently for the same object. 
  * <p>
  * For example, it ensures that exactly one transaction may read (load) exclusively
- * on one object; transaction can not deleted and object while the other is 
- * reading it, etc.
+ * on one object; transaction can not deleted an object while the other is 
+ * reading it, etc...
  * <p>
  * It also provides caching for a persistence storage. Different {@link LRU} mechanisms
  * can be specified. 
@@ -93,9 +93,9 @@ import org.exolab.castor.util.Messages;
  * be avoided.
  * <p>
  * However, if more than one instance of LockEngine or some other external 
- * application run concurrently, if the {@link Persistence} support dirty checking,
+ * application run concurrently, if the {@link Persistence} supports dirty checking,
  * like a fully complaint JDBC Relational Database, proper 
- * ObjectModificationException will be thrown to ensure data consistency.
+ * ObjectModifiedException will be thrown to ensure data consistency.
  *
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
@@ -114,7 +114,7 @@ public final class LockEngine {
      * persistent in another. The engines are totally independent and
      * no conflicts should occur.
      *
-     * Each class heirarchy gets its own cache, so caches can be
+     * Each class hierarchy gets its own cache, so caches can be
      * controlled on a class-by-class basis.
      *
      */
@@ -134,6 +134,7 @@ public final class LockEngine {
      */
     private HashMap _xaTx = new HashMap();
 
+    
     /**
      * Used by the constructor when creating handlers to temporarily
      * hold the persistence factory for use by {@link #addClassHandler}.
@@ -148,14 +149,14 @@ public final class LockEngine {
 
 
     /**
-     * Construct a new cache engine with the specified name, mapping
-     * table and persistence engine.
+     * Construct a new cache engine with the specified mapping table, 
+     * persistence engine and the log interceptor.
      *
      * @param mapResolver Provides mapping information for objects
      *  supported by this cache
      * @param factory Factory for creating persistence engines for each
      *  object described in the map
-     * @param logWriter Log writer to use for cache and all its
+     * @param logInterceptor Log interceptor to use for cache and all its
      *  persistence engines
      * @throws MappingException Indicate that one of the mappings is
      *  invalid
@@ -177,7 +178,7 @@ public final class LockEngine {
             _typeInfo = new HashMap(); 
             enum = v.elements();
 
-            // iterate thur all the ClassMolders in the LockEngine.
+            // iterates through all the ClassMolders in the LockEngine.
             // We first create a TypeInfo for all the base class (ie not extends
             // other class) in the first iteration.
             while ( enum.hasMoreElements() ) {
@@ -201,7 +202,7 @@ public final class LockEngine {
                     _typeInfo.put( molder.getJavaClass(), info );
                 }
             }
-            // we then iterate thur all extended classes in which the 
+            // we then iterate through all extended classes in which the 
             // using the base typeInfo.
             enum = waitingForBase.elements();
             while ( enum.hasMoreElements() ) {
@@ -228,7 +229,7 @@ public final class LockEngine {
     }
 
     /**
-     * Get classMolder which represent the given java data object class
+     * Get classMolder which represents the given java data object class
      * Dependent class will not be returned to avoid persistenting 
      * a dependent class without 
      */
@@ -259,8 +260,8 @@ public final class LockEngine {
      * the object.
      *
      * @param tx The transaction context
-     * @param type The type of the object to load
-     * @param identity The identity of the object to load
+     * @param oid The identity of the object to load
+     * @param object The type of the object to load
      * @param accessMode The desired access mode
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
@@ -344,8 +345,8 @@ public final class LockEngine {
      * specified.
      *
      * @param tx The transaction context
+     * @param oid The identity of the object, or null
      * @param object The newly created object
-     * @param identity The identity of the object, or null
      * @return The object's OID
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
@@ -459,8 +460,8 @@ public final class LockEngine {
      * </ul>
      *
      * @param tx The transaction context
-     * @param type The object type
-     * @param identity The object's identity
+     * @param oid The object's identity
+     * @param object The object type
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
@@ -510,6 +511,7 @@ public final class LockEngine {
      * the object's timestamp.
      *
      * @param tx The transaction context
+     * @param oid The object's identity
      * @param object The object
      * @param accessMode The desired access mode
      * @param timeout The timeout waiting to acquire a lock on the
@@ -603,8 +605,8 @@ public final class LockEngine {
      * object was not stored (not modified), null is returned.
      *
      * @param tx The transaction context
+     * @param oid The object's identity
      * @param object The object to store
-     * @param identity The object's identity
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
      * @return The object's OID if stored, null if ignored
