@@ -741,7 +741,7 @@ public class ClassMolder {
                     // and we ask transactionContext in action to load it.
                     try {
                         temp = tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
-                    } catch (Exception ex) {
+                    } catch (ObjectNotFoundException ex) {
                         temp = null;
                     }
                     _fhs[i].setValue( object, temp, tx.getClassLoader() );
