@@ -560,17 +560,86 @@ create table prod_detail (
               </tr>
         </table>
 
+       <p>As a result of that declaration, Castor JDO would create the following SQL statements
+          for creating, deleting, loading and updating instances of ProductGroup:</p>
+          
+       <table border="1" cellpadding="4">
+         <tr>
+           <td BGCOLOR="#CCCCCC">
+             <code>
+create: INSERT INTO prod_group (id, name) VALUES (?,?)
+delete: DELETE FROM prod_group WHERE id=?
+load:   SELECT prod_group.id, prod_group.name FROM prod_group WHERE prod_group.id=?;
+update: UPDATE prod_group SET name=? WHERE id=?
+             </code>
+           </td>
+         </tr>
+       </table>
+          
+       <section title="Read-only fields">
+
+          <p>To declare the <i>name</i> field <b>read-only</b>, above field definition for the 
+             field <i>name</i> needs to be changed to:</p>
+
+          <code-panel>
+             <code>
+  &lt;class name="myapp.ProductGroup" identity="id"&gt;
+  
+    ...    
+    &lt;field name="name" type="string"&gt;
+      &lt;sql name="name" type="char" <font color="red">read-only="true"</font> /&gt;
+    &lt;/field&gt;
+    
+  &lt;/class>
+             </code>
+          </code-panel>
+         
+          <p>As a result of that declaration, Castor JDO creates the following SQL statements
+            for creating, deleting, loading and updating instances of ProductGroup:</p>
+          
+          <code-panel> 
+             <code>
+create: INSERT INTO prod_group (id) VALUES (?)
+delete: DELETE FROM prod_group WHERE id=?
+load:   SELECT prod_group.id, prod_group.name FROM prod_group WHERE prod_group.id=?;
+update: <i>no statement will be generated</i>
+             </code>
+          </code-panel> 
+         
+       </section>
+
+<!--
+       <section title="Transient fields">
+
+          <p>To declare the <i>name</i> field <b>transient</b> with regards to persistence, above field 
+             definition for the field <i>name</i> needs to be changed to:</p>
+
+          <code-panel>
+             <code>
+  &lt;class name="myapp.ProductGroup" identity="id"&gt;
+  
+    ...    
+    &lt;field name="name" type="string" &gt;
+      &lt;sql name="name" type="char" <font color="red">transient="true"</font> /&gt;
+    &lt;/field&gt;
+    
+  &lt;/class>
+             </code>
+          </code-panel>
+
+       </section>
+    
+-->
+          
        <section title="1:1 relation">
 
-        <p>The following code fragment shows the mapping file for the Product class. 
-           Apart from the simple field declarations, this includes a simple 1:1 relation between 
-           Product and ProductGroup, where every product instance is associated with a 
-           ProductGroup:</p>
+          <p>The following code fragment shows the mapping file for the Product class. 
+             Apart from the simple field declarations, this includes a simple 1:1 relation between 
+             Product and ProductGroup, where every product instance is associated with a 
+             ProductGroup:</p>
 
-        <table border="1" cellpadding="4">
-            <tr>
-                <td BGCOLOR="#CCCCCC">
-                    <code>
+          <code-panel>
+             <code>
     ...
     &lt;class name="myapp.Product" identity="id"&gt;
 
@@ -604,10 +673,8 @@ create table prod_detail (
 
     &lt;/class&gt;
     ...
-                     </code>
-                  </td>
-              </tr>
-        </table>
+             </code>
+          </code-panel>
        </section>
        
           <section title="1:M relation">
@@ -616,10 +683,8 @@ create table prod_detail (
                 Product and ProductDetail, where every product instance is made up of many 
                 ProductDetails:</p>
                 
-             <table border="1" cellpadding="4">
-                <tr>
-                   <td BGCOLOR="#CCCCCC">
-                      <code>
+             <code-panel>
+                <code>
     ...
     &lt;class name="myapp.Product" identity="id"&gt;
 
@@ -651,19 +716,15 @@ create table prod_detail (
         &lt;/field&gt;
     &lt;/class&gt;
     ...
-                       </code>
-                   </td>
-                </tr>
-             </table>
+                </code>
+             </code-panel>
              
              <p>The following code fragment shows the corresponding mapping entry for the 
                 ProductDetail class that defines the second leg of the 1:M relation
                 between Product and ProductDetail.</p>
-
-             <table border="1" cellpadding="4">
-                <tr>
-                   <td BGCOLOR="#CCCCCC">
-                      <code>
+                
+             <code-panel>
+                <code>
   ...
   &lt;class name="myapp.ProductDetail" identity="id" depends="myapp.Product" &gt;
 
@@ -685,11 +746,9 @@ create table prod_detail (
 
   %lt;/class&gt;
   ...
-                       </code>
-                   </td>
-                </tr>
-             </table>
-
+                </code>
+             </code-panel>
+ 
           </section>
        
           <section title="M:N relation">
@@ -698,10 +757,8 @@ create table prod_detail (
                 Product and ProductCategory, where many products can be mapped to many 
                 product categories:</p>
                 
-             <table border="1" cellpadding="4">
-                <tr>
-                   <td BGCOLOR="#CCCCCC">
-                      <code>
+             <code-panel>
+                <code>
     ...
     &lt;class name="myapp.Product" identity="id"&gt;
 
@@ -734,19 +791,15 @@ create table prod_detail (
         
     &lt;/class&gt;
     ...
-                       </code>
-                   </td>
-                </tr>
-             </table>
+                </code>
+             </code-panel>
              
              <p>The following code fragment shows the corresponding mapping entry for the 
                 ProductCategory class that defines the second leg of the M:N relation
                 between Product and Category.</p>
 
-             <table border="1" cellpadding="4">
-                <tr>
-                   <td BGCOLOR="#CCCCCC" width="100%">
-                      <code>
+             <code-panel>
+                <code>
   ...
   &lt;class name="myapp.Category" identity="id"&gt;
   
@@ -773,11 +826,8 @@ create table prod_detail (
     
   &lt;/class&gt;
   ...
-                       </code>
-                   </td>
-                </tr>
-             </table>
-
+                </code>
+             </code-panel>
           </section>
 
        </section>
