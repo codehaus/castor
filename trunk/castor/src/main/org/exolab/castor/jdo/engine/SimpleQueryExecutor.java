@@ -72,7 +72,6 @@ public class SimpleQueryExecutor
 
   private DatabaseImpl _dbImpl;
 
-  private Connection _conn = null;
   private PreparedStatement _stmt = null;
   private ResultSet _rset = null;
 
@@ -96,19 +95,17 @@ public class SimpleQueryExecutor
    * @return the results of the query.
    * 
    */
-  public QueryResults execute( QueryExpression expr, Object[] bindValues )
+  public QueryResults execute( Connection conn, QueryExpression expr, Object[] bindValues )
          throws QueryException {
     
     try {
-
-      _conn = DatabaseRegistry.createConnection( _dbImpl.getLockEngine() );
 
       String pre_sql = expr.getStatement(false);
 
       // create SQL statement from pre_sql, replacing bind expressions like "?1" by "?"
       String sql = SqlBindParser.getJdbcSql(pre_sql);
 
-      _stmt = _conn.prepareStatement( sql );
+      _stmt = conn.prepareStatement( sql );
 
       if ( bindValues != null )
           SqlBindParser.bindJdbcValues(_stmt, pre_sql, bindValues);
@@ -121,12 +118,9 @@ public class SimpleQueryExecutor
         try { _rset.close(); } catch (SQLException e) {}
       if ( _stmt != null )
         try { _stmt.close(); } catch (SQLException e) {}
-      if ( _conn != null )
-        try { _conn.close(); } catch (SQLException e) {}
         
       _rset = null;
       _stmt = null;
-      _conn = null;
       
       throw new QueryException( s.toString() );
     }
@@ -255,12 +249,8 @@ public class SimpleQueryExecutor
         try { _rset.close(); } catch (SQLException s) {}
       if ( _stmt != null ) 
         try { _stmt.close(); } catch (SQLException s) {}
-      if ( _conn != null ) 
-        try { _conn.close(); } catch (SQLException s) {}
       _rset = null;
       _stmt = null;
-      _conn = null;
-      
     }
 
     protected void finalize() throws Throwable {
