@@ -65,7 +65,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     /**
      * The current SaxUnmarshaller
     **/
-    private SaxUnmarshaller unmarshaller;
+    private FacetUnmarshaller unmarshaller;
     
     /**
      * The current branch depth
@@ -77,23 +77,20 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     **/
     private AttributeDecl _attribute = null;
     
-    private CharacterUnmarshaller charUnmarshaller = null;
-    
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public AttributeUnmarshaller(AttributeList atts, Resolver resolver) {
+    public AttributeUnmarshaller
+        (Schema schema, AttributeList atts, Resolver resolver) 
+    {
         super();
         setResolver(resolver);
         
-        _attribute = new AttributeDecl();
+        _attribute = new AttributeDecl(schema, atts.getValue("name"));
         
-        //-- handle attributes
+        //-- handle remaining attributes
         String attValue = null;
-        
-        //-- name
-        _attribute.setName(atts.getValue("name"));
         
         //-- type
         attValue = atts.getValue("type");
@@ -106,7 +103,6 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             _attribute.setMinOccurs(toInt(attValue));
         }
         
-        charUnmarshaller = new CharacterUnmarshaller();
     } //-- AttributeUnmarshaller
 
       //-----------/
@@ -146,9 +142,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
-        //-- for all facets use the character unmarshaller
-        charUnmarshaller.clear();
-        unmarshaller = charUnmarshaller;
+        unmarshaller = new FacetUnmarshaller(name, atts);
     
     } //-- startElement
 
@@ -167,20 +161,25 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
+        //-- call unmarshaller finish to perform any necessary cleanup
+        unmarshaller.finish();
+        
         //-- Use JVM internal String
         name = name.intern();
         
-        //-- call unmarshaller finish to perform any necessary cleanup
-        unmarshaller.finish();
         
         if ( (name == SchemaNames.MAX_EXCLUSIVE) ||
                   (name == SchemaNames.MAX_INCLUSIVE) ||
                   (name == SchemaNames.MIN_EXCLUSIVE) ||
                   (name == SchemaNames.MIN_INCLUSIVE) )
         {
+            
+            Facet tmpFacet = unmarshaller.getFacet();
+            
             NumberFacet facet = new NumberFacet(name);
-            facet.setValue(charUnmarshaller.getString());
-            _attribute.getDataType().addFacet(facet);
+            facet.setValue(facet.getValue());
+            
+            _attribute.getDatatype().addFacet(facet);
         }
         
         unmarshaller = null;

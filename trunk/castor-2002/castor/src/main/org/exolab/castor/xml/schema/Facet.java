@@ -56,12 +56,12 @@ public abstract class Facet {
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
-    
+    public static final String ENUMERATION      = "enumeration";
     
     /**
      * The character value of this Facet
     **/
-    private String value = null;
+    private String _value = null;
     
     /**
      * Returns the name of this Facet
@@ -75,7 +75,7 @@ public abstract class Facet {
      * @return the value of this facet
     **/
     public String getValue() {
-        return this.value;
+        return this._value;
     } //-- getValue
     
     /**
@@ -83,7 +83,7 @@ public abstract class Facet {
      * @param value the new character value of this facet
     **/
     public void setValue(String value) {
-        this.value = value;
+        this._value = value;
     } //-- setValue
     
     /**
@@ -91,7 +91,15 @@ public abstract class Facet {
      * @return an int representation of the value of this facet
     **/
     public int toInt() throws NumberFormatException {
-        return Integer.parseInt(value);
+        return Integer.parseInt(_value);
+    } //-- toInt
+    
+    /**
+     * Returns a double representation of the value of this facet
+     * @return a double representation of the value of this facet
+    **/
+    public double toDouble() throws NumberFormatException {
+        return Double.valueOf(_value).doubleValue();
     } //-- toInt
     
 } //-- Facet

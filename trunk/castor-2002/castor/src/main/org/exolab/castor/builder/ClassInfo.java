@@ -463,23 +463,23 @@ public class ClassInfo  {
             member.setXMLNodeType(SGMember.ATTRIBUTE);
             member.setCodeHelper(new IntegerCodeHelper(xsInteger));
             //-- handle integer related facets
-            DataType dataType = attribute.getDataType();
+            Datatype datatype = attribute.getDatatype();
             NumberFacet facet = null;
                     
             //-- maxExclusive
-            facet = (NumberFacet) dataType.getFacet(Facet.MAX_EXCLUSIVE);
+            facet = (NumberFacet) datatype.getFacet(Facet.MAX_EXCLUSIVE);
             if (facet != null) xsInteger.setMaxExclusive(facet.toInt());
                     
             //-- maxInclusive
-            facet = (NumberFacet) dataType.getFacet(Facet.MAX_INCLUSIVE);
+            facet = (NumberFacet) datatype.getFacet(Facet.MAX_INCLUSIVE);
             if (facet != null) xsInteger.setMaxInclusive(facet.toInt());
                     
             //-- minExclusive
-            facet = (NumberFacet) dataType.getFacet(Facet.MIN_EXCLUSIVE);
+            facet = (NumberFacet) datatype.getFacet(Facet.MIN_EXCLUSIVE);
             if (facet != null) xsInteger.setMinExclusive(facet.toInt());
                     
             //-- minInclusive
-            facet = (NumberFacet) dataType.getFacet(Facet.MIN_INCLUSIVE);
+            facet = (NumberFacet) datatype.getFacet(Facet.MIN_INCLUSIVE);
             if (facet != null) xsInteger.setMinInclusive(facet.toInt());
                     
         }

@@ -58,7 +58,7 @@ public class XSIdRef extends XSType {
      * The JType represented by this XSType
     **/
     private static final JType jType 
-        = new JClass("org.exolab.xml.marshal.ResolvableReference");
+        = new JClass("org.exolab.castor.xml.ResolvableReference");
         
     private String value = null;
     

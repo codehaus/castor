@@ -74,7 +74,7 @@ public class SourceGenerator {
     static final String appName = "Castor XML Data Binder for Java";
     static String DEFAULT_PARSER_CLASS = "org.apache.xerces.parsers.SAXParser";
     
-    private static final String version = "0.8 (20000114)";
+    private static final String version = "0.7.7 (20000203)";
     
     private String lineSeparator = null;
     
@@ -82,22 +82,32 @@ public class SourceGenerator {
         super();    
     } //-- SourceGenerator
     
-    
+
     /**
-     * Creates Java Source code for the Schema with the 
-     * associated filename
-     * @param filename the full path to the XML Schema definition
+     * Creates Java Source code (Object model) for the given XML Schema 
+     * @param schema the XML schema to generate the Java sources for
      * @param packageName the package for the generated source files
     **/
-    public void generateSource(String filename, String packageName) {
-        
+    public void generateSource(Schema schema, String packageName) {
         SGStateInfo sInfo = new SGStateInfo();
         sInfo.packageName = packageName;
+        createClasses(schema, sInfo);
+    } //-- generateSource
+
+    /**
+     * Creates Java Source code (Object model) for the given XML Schema 
+     * @param reader the Reader with which to read the XML Schema definition. 
+     * The caller should close the reader, since thie method will not do so.
+     * @param packageName the package for the generated source files
+    **/
+    public void generateSource(Reader reader, String packageName) {
         
         
+        //-- read the XML Schema definition
         String parserClass = System.getProperty("org.xml.sax.parser");
         if ((parserClass == null) || (parserClass.length() == 0))
             parserClass = DEFAULT_PARSER_CLASS;
+
             
         Parser parser = null;
         try {
@@ -115,21 +125,8 @@ public class SourceGenerator {
         parser.setDocumentHandler(schemaUnmarshaller);
         parser.setErrorHandler(schemaUnmarshaller);
         
-        
-        
-        File schemaFile = new File(filename);
-        FileReader fileReader = null;
         try {
-            fileReader = new FileReader(schemaFile);
-        }
-        catch(java.io.FileNotFoundException fne) {
-            System.out.println("unable to open XML schema file");
-            return;
-        }
-        
-        try {
-            parser.parse(new InputSource(fileReader));
-            fileReader.close();
+            parser.parse(new InputSource(reader));
         }
         catch(java.io.IOException ioe) {
             System.out.println("error reading XML Schema file");
@@ -150,7 +147,26 @@ public class SourceGenerator {
         }
         
         Schema schema = schemaUnmarshaller.getSchema();
-        createClasses(schema, sInfo);
+        generateSource(schema, packageName);
+        
+    } //-- generateSource
+    
+    /**
+     * Creates Java Source code (Object model) for the given XML Schema
+     * @param filename the full path to the XML Schema definition
+     * @param packageName the package for the generated source files
+    **/
+    public void generateSource(String filename, String packageName) 
+        throws java.io.FileNotFoundException
+    {
+        
+        FileReader reader = new FileReader(new File(filename));
+        generateSource(reader, packageName);
+        try {
+            reader.close();
+        }
+        catch(java.io.IOException iox) {};
+            
         
     } //-- generateSource
     
@@ -171,26 +187,26 @@ public class SourceGenerator {
         SourceGenerator sgen = new SourceGenerator();
         
         
-        CommandLineOptions cmdLineOpts = new CommandLineOptions();
+        CommandLineOptions allOptions = new CommandLineOptions();
         
         //-- filename flag
-        cmdLineOpts.addFlag("i", "filename", "Sets the input filename");
+        allOptions.addFlag("i", "filename", "Sets the input filename");
         
         //-- package name flag
-        cmdLineOpts.addFlag("package", "package-name", "Sets the package name");
-        cmdLineOpts.setOptional("package", true);
+        allOptions.addFlag("package", "package-name", "Sets the package name");
+        allOptions.setOptional("package", true);
         
         //-- line break flag
         String desc = "Sets the line separator style for the desired platform";
-        cmdLineOpts.addFlag("line-separator", "( unix | mac | win)", desc);
-        cmdLineOpts.setOptional("line-separator", true);
+        allOptions.addFlag("line-separator", "( unix | mac | win)", desc);
+        allOptions.setOptional("line-separator", true);
         
-        //-- Process command line options
-        Properties options = cmdLineOpts.getOptions(args);
+        //-- Process the specified command line options
+        Properties options = allOptions.getOptions(args);
         
         String schemaFilename = options.getProperty("i");
-        String packageName = options.getProperty("package");
-        String lineSepStyle = options.getProperty("line-separator");
+        String packageName    = options.getProperty("package");
+        String lineSepStyle   = options.getProperty("line-separator");
         
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
@@ -216,10 +232,17 @@ public class SourceGenerator {
         
         if (schemaFilename == null) {
             System.out.println(appName);
-            cmdLineOpts.printUsage(new PrintWriter(System.out));
+            allOptions.printUsage(new PrintWriter(System.out));
             return;
         }
-        sgen.generateSource(schemaFilename, packageName);
+        
+        try {
+            sgen.generateSource(schemaFilename, packageName);
+        }
+        catch(java.io.FileNotFoundException fne) {
+            System.out.println("unable to open XML schema file");
+            return;
+        }
         
     } //-- main
     

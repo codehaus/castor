@@ -49,7 +49,6 @@ package org.exolab.castor.xml.schema.reader;
 import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 import java.io.Reader;
-import org.xml.sax.HandlerBase;
 import org.exolab.castor.xml.Resolver;
 
 /**
@@ -57,13 +56,20 @@ import org.exolab.castor.xml.Resolver;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public abstract class SaxUnmarshaller extends org.xml.sax.HandlerBase {
+public abstract class SaxUnmarshaller 
+    implements DocumentHandler, org.xml.sax.ErrorHandler
+{
 
     
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
+    /**
+     * The document locator
+    **/
+    Locator _locator = null;
+    
     /**
      * The resolver to be used for resolving id references
     **/
@@ -171,5 +177,92 @@ public abstract class SaxUnmarshaller extends org.xml.sax.HandlerBase {
         }
     } //-- toInt
     
-} //-- Unmarshaller
+    
+    //---------------------------------------/
+    //- org.xml.sax.DocumentHandler methods -/
+    //---------------------------------------/
+    
+    public void characters(char[] ch, int start, int length) 
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+        
+    } //-- characters
+    
+    public void endDocument()
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+        
+    } //-- endDocument
+    
+    public void endElement(String name) 
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+        
+    } //-- endElement
+
+
+    public void ignorableWhitespace(char[] ch, int start, int length) 
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+        
+    } //-- ignorableWhitespace
+
+    public void processingInstruction(String target, String data) 
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+
+    } //-- processingInstruction
+    
+    public void setDocumentLocator(Locator locator) {
+        this._locator = locator;
+    } //-- setDocumentLocator
+    
+    public void startDocument()
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+        
+    } //-- startDocument
+
+    
+    public void startElement(String name, AttributeList atts) 
+        throws org.xml.sax.SAXException
+    {
+        //-- do nothing
+        
+    } //-- startElement
+    
+
+    //------------------------------------/
+    //- org.xml.sax.ErrorHandler methods -/
+    //------------------------------------/
+    
+    public void error(SAXParseException exception)
+        throws org.xml.sax.SAXException
+    {
+        throw exception;
+        
+    } //-- error
+    
+    public void fatalError(SAXParseException exception)
+        throws org.xml.sax.SAXException
+    {
+        throw exception;
+        
+    } //-- fatalError
+    
+    
+    public void warning(SAXParseException exception)
+        throws org.xml.sax.SAXException
+    {
+        throw exception;
+        
+    } //-- warning
+    
+} //-- SaxUnmarshaller
 

@@ -52,7 +52,8 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 
 /**
- * An XML Schema Definition
+ * An XML Schema Definition. This class also contains the Factory methods for
+ * creating Top-Level structures.
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -61,6 +62,11 @@ public class Schema extends SchemaBase {
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/TR/1999/09/24-xmlschema";
         
+        
+    private static final String NULL_ARGUMENT
+        = "A null argument was passed to " + 
+           Schema.class.getName() + "#";
+           
     private String name     = null;
     private String schemaNS = null;
     private String targetNS = null;
@@ -71,6 +77,12 @@ public class Schema extends SchemaBase {
     **/
     private Hashtable archetypes = null;
     
+    
+    /**
+     * A list of defined datatypes
+    **/
+    private Hashtable datatypes = null;
+
     /**
      * A list of defined elements
     **/
@@ -90,13 +102,15 @@ public class Schema extends SchemaBase {
     public Schema(String schemaNS) {
         super();
         archetypes = new Hashtable();
-        elements = new Hashtable();
+        datatypes  = new Hashtable();
+        elements   = new Hashtable();
         this.schemaNS = schemaNS;
     } //-- ScehamDef
     
+    
     /**
      * Adds the given Archetype definition to this Schema defintion
-     * @param archetype the Archetype to add to this SchemaDef
+     * @param archetype the Archetype to add to this Schema
      * @exception SchemaException if the Archetype does not have
      * a name or if another Archetype already exists with the same name
     **/
@@ -121,6 +135,30 @@ public class Schema extends SchemaBase {
         archetypes.put(name, archetype);
         
     } //-- addArchetype
+
+    /**
+     * Adds the given Datatype definition to this Schema defintion
+     * @param datatype the Datatype to add to this Schema
+     * @exception SchemaException if the Archetype does not have
+     * a name or if another Archetype already exists with the same name
+    **/
+    public synchronized void addDatatype(Datatype datatype) 
+        throws SchemaException 
+    {
+        
+        String name = datatype.getName();
+        
+        if (datatype.getSchema() != this) {
+            String err = "invalid attempt to add a datatype which ";
+            err += "belongs to a different Schema; type name: " + name;
+        }
+        if (datatypes.get(name) != null) {
+            String err = "a datatype already exists with the given name: ";
+            throw new SchemaException(err + name);
+        }
+        datatypes.put(name, datatype);
+        
+    } //-- addDatatype
 
     /**
      * Adds the given Element declaration to this Schema defintion
@@ -152,7 +190,7 @@ public class Schema extends SchemaBase {
     /**
      * Creates a new Archetype using this Schema as the owning Schema
      * document. A call to #addArchetype must still be made in order
-     * add the archetype to this Schema.
+     * to add the archetype to this Schema.
      * @return the new Archetype
     **/
     public Archetype createArchetype() {
@@ -160,13 +198,49 @@ public class Schema extends SchemaBase {
     } //-- createArchetype
     
     /**
+     * Creates a new Archetype using this Schema as the owning Schema
+     * document. A call to #addArchetype must still be made in order
+     * to add the archetype to this Schema.
+     * @param name the name of the Archetype 
+     * @return the new Archetype
+    **/
+    public Archetype createArchetype(String name) {
+        return new Archetype(this, name);
+    } //-- createArchetype
+    
+    /**
+     * Creates a new Datatype using this Schema as the owning Schema
+     * document. A call to #addDatatype must till be made in order
+     * to add the Datatype to this Schema.
+     * @param name the name of the Datatype
+     * @return the new Datatype.
+    **/
+    public Datatype createDatatype(String name) {
+        return new Datatype(this, name);
+    } //-- createDatatype(String)
+    
+    /**
      * Returns the Archetype of associated with the given name
      * @return the Archetypel of associated with the given name, or
      *  null if no Archetype with the given name was found.
     **/
     public Archetype getArchetype(String name) {
+        if (name == null)  {
+            String err = NULL_ARGUMENT + "getArchetype: ";
+            err += "'name' cannot be null.";
+            throw new IllegalArgumentException(err);
+        }
         return (Archetype)archetypes.get(name);
     } //-- getArchetype
+    
+    public Datatype getDatatype(String name) {
+        if (name == null)  {
+            String err = NULL_ARGUMENT + "getDatatype: ";
+            err += "'name' cannot be null.";
+            throw new IllegalArgumentException(err);
+        }
+        return (Datatype)datatypes.get(name);
+    } //-- getDatatype
     
     /**
      * Returns the type of this SchemaBase

@@ -58,6 +58,12 @@ import java.util.Vector;
 public class AttributeDecl extends SchemaBase {
 
     
+    /**
+     * Error message for a null argument
+    **/
+    private static String NULL_ARGUMENT
+        = "A null argument was passed to the constructor of " +
+           AttributeDecl.class.getName();
     
     /**
      * The name of attributes defined by this AttributeDecl
@@ -69,15 +75,20 @@ public class AttributeDecl extends SchemaBase {
     **/
     private int minOccurs = 0;
     
-    DataType dataType = null;
+    Datatype datatype = null;
+    
+    /**
+     * The Schema to which this AttributeDecl belongs
+    **/
+    private Schema schema = null;
     
     /**
      * Creates a default Attribute declaration.
      * Since name is required for a valid Attribute declaration
      * this should be set before using
     **/
-    public AttributeDecl() {
-        this(null, 0);
+    public AttributeDecl(Schema schema, String name) {
+        this(schema, name, 0);
     } //-- Attribute
     
     /**
@@ -88,10 +99,20 @@ public class AttributeDecl extends SchemaBase {
      * <BR />
      * The only valid values for minOccurs are 0 and 1.
     **/
-    public AttributeDecl(String name, int minOccurs) {
+    public AttributeDecl(Schema schema, String name, int minOccurs) {
+        if (schema == null) {
+            String err = NULL_ARGUMENT + "; 'schema' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        if ((name == null) || (name.length() == 0)) {
+            String err = NULL_ARGUMENT + 
+                "; 'name' must not be null or zero-length.";
+            throw new IllegalArgumentException(err);
+        }
         this.name = name;
+        this.schema = schema;
         setMinOccurs(minOccurs);
-        dataType = new DataType(null, "string");
+        datatype = new Datatype(schema, "string");
     } //-- AttrDecl
     
     
@@ -116,12 +137,12 @@ public class AttributeDecl extends SchemaBase {
      * Returns the data type associated with this AttributeDecl
      * @return the data type associated with this AttributeDecl
     **/
-    public DataType getDataType() {
-        return dataType;
+    public Datatype getDatatype() {
+        return datatype;
     } //-- getDataType
 
     public String getDataTypeRef() {
-        return dataType.getBaseTypeRef();
+        return datatype.getBaseTypeRef();
     } //-- getDataTypeRef
     
     /**
@@ -158,7 +179,7 @@ public class AttributeDecl extends SchemaBase {
     } //-- getRequired
     
     public void setDataTypeRef(String name) {
-        dataType.setBaseTypeRef(name);
+        datatype.setBaseTypeRef(name);
     } //-- setDataTypeRef
     
     
@@ -195,7 +216,7 @@ public class AttributeDecl extends SchemaBase {
             String err = "<attribute> is missing required 'name' attribute.";
             throw new ValidationException(err);
         }
-        dataType.validate();
+        datatype.validate();
         
     } //-- validate
     
