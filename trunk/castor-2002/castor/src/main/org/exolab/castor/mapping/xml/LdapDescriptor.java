@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -57,7 +57,6 @@ public class LdapDescriptor extends org.exolab.castor.xml.util.XMLClassDescripto
         
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -77,7 +76,7 @@ public class LdapDescriptor extends org.exolab.castor.xml.util.XMLClassDescripto
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -86,11 +85,7 @@ public class LdapDescriptor extends org.exolab.castor.xml.util.XMLClassDescripto
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors

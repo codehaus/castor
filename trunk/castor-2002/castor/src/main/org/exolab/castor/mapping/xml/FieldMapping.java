@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -35,28 +35,28 @@ public class FieldMapping implements java.io.Serializable {
 
     private java.lang.String _type;
 
-    private boolean _required;
+    private boolean _required = false;
 
     /**
      * keeps track of state for field: _required
     **/
     private boolean _has_required;
 
-    private boolean _transient;
+    private boolean _transient = false;
 
     /**
      * keeps track of state for field: _transient
     **/
     private boolean _has_transient;
 
-    private boolean _direct;
+    private boolean _direct = false;
 
     /**
      * keeps track of state for field: _direct
     **/
     private boolean _has_direct;
 
-    private boolean _lazy;
+    private boolean _lazy = false;
 
     /**
      * keeps track of state for field: _lazy
@@ -75,7 +75,7 @@ public class FieldMapping implements java.io.Serializable {
 
     private Sql _sql;
 
-    private Xml _xml;
+    private BindXml _bindXml;
 
     private Ldap _ldap;
 
@@ -120,6 +120,13 @@ public class FieldMapping implements java.io.Serializable {
     {
         this._has_transient= false;
     } //-- void deleteTransient() 
+
+    /**
+    **/
+    public BindXml getBindXml()
+    {
+        return this._bindXml;
+    } //-- BindXml getBindXml() 
 
     /**
     **/
@@ -214,13 +221,6 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public Xml getXml()
-    {
-        return this._xml;
-    } //-- Xml getXml() 
-
-    /**
-    **/
     public boolean hasDirect()
     {
         return this._has_direct;
@@ -281,6 +281,15 @@ public class FieldMapping implements java.io.Serializable {
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
+
+    /**
+     * 
+     * @param _bindXml
+    **/
+    public void setBindXml(BindXml _bindXml)
+    {
+        this._bindXml = _bindXml;
+    } //-- void setBindXml(BindXml) 
 
     /**
      * 
@@ -402,15 +411,6 @@ public class FieldMapping implements java.io.Serializable {
     {
         this._type = _type;
     } //-- void setType(java.lang.String) 
-
-    /**
-     * 
-     * @param _xml
-    **/
-    public void setXml(Xml _xml)
-    {
-        this._xml = _xml;
-    } //-- void setXml(Xml) 
 
     /**
      * 

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -57,7 +57,6 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -77,7 +76,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -86,16 +85,11 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _type
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -115,7 +109,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -124,16 +118,11 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _manyTable
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyTable", "many-table", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -153,7 +142,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -162,16 +151,11 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         
         //-- validation code for: _manyTable
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _manyKey
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyKey", "many-key", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -191,7 +175,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -200,11 +184,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         
         //-- validation code for: _manyKey
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _dirty

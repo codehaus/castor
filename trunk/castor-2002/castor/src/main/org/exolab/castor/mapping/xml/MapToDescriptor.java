@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -57,7 +57,6 @@ public class MapToDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
         
         //-- _table
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_table", "table", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -77,7 +76,7 @@ public class MapToDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -86,11 +85,7 @@ public class MapToDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
         
         //-- validation code for: _table
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _xml
@@ -171,7 +166,6 @@ public class MapToDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
         
         //-- _nsPrefix
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_nsPrefix", "ns-prefix", NodeType.Attribute);
-        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -191,7 +185,7 @@ public class MapToDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
                 }
             }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
@@ -200,11 +194,7 @@ public class MapToDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
         
         //-- validation code for: _nsPrefix
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
-            fieldValidator.setValidator(sv);
-        }
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _ldapDn

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -39,7 +39,7 @@ public class Sql implements java.io.Serializable {
 
     private java.lang.String _manyKey;
 
-    private org.exolab.castor.mapping.xml.types.DirtyType _dirty;
+    private org.exolab.castor.mapping.xml.types.DirtyType _dirty = org.exolab.castor.mapping.xml.types.DirtyType.valueOf("check");;
 
 
       //----------------/

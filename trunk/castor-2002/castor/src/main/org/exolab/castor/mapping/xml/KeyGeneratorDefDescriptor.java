@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -49,7 +49,7 @@ public class KeyGeneratorDefDescriptor extends org.exolab.castor.xml.util.XMLCla
     public KeyGeneratorDefDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/";
-        xmlName = "key-generator";
+        xmlName = "key-generator-def";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -34,14 +34,14 @@ public class Container implements java.io.Serializable {
 
     private java.lang.String _type;
 
-    private boolean _required;
+    private boolean _required = false;
 
     /**
      * keeps track of state for field: _required
     **/
     private boolean _has_required;
 
-    private boolean _direct;
+    private boolean _direct = false;
 
     /**
      * keeps track of state for field: _direct
