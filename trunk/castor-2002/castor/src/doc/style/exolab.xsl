@@ -95,7 +95,10 @@
           <table cols="1" rows="2" border="0" cellpadding="0" cellspacing="0" width="400">
             <tr>
               <td valign="top" align="left"><br/>
-              <xsl:apply-templates select="logo"/>
+                <img border="0" height="34" hspace="0"
+                  src="images/castor.gif" vspace="0" width="115"/><br/>
+                <img border="0" height="10" hspace="0"
+                  src="images/dotTrans.gif"/>
               </td>
             </tr>
           </table>
