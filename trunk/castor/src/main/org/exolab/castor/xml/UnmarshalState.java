@@ -48,7 +48,12 @@ package org.exolab.castor.xml;
 import java.util.Vector;
 
 class UnmarshalState {
-
+    
+    /**
+     * Holds the current location path
+     */
+    String location = "";
+    
     /**
      * The xml element name of the current object
      */
@@ -110,7 +115,6 @@ class UnmarshalState {
      */
     boolean wrapper = false;
     
-    
     /**
      * The UnmarshalState which contains information
      * about the parent object for object containted
@@ -122,6 +126,27 @@ class UnmarshalState {
     UnmarshalState() {
         super();
     }
+    
+    /**
+     * Reinitializes all variables
+     */
+    void clear() {
+        location = "";
+        elementName = null;
+        buffer = null;
+        key = null;
+        object = null;
+        type = null;
+        fieldDesc = null;
+        classDesc = null;
+        primitiveOrImmutable = false;
+        if (_markedList != null) {
+            _markedList.removeAllElements();
+        }
+        derived = false;
+        wrapper = false;
+        targetState = null;
+    } //-- clear
 
     /**
      * Marks the given XMLFieldDescriptor as having been used
@@ -143,5 +168,6 @@ class UnmarshalState {
         return _markedList.contains(descriptor);
     } //-- isUsed
 
+    
 
 } //-- UnmarshalState
