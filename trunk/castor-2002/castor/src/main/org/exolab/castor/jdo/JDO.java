@@ -195,15 +195,21 @@ public class JDO
 
     /**
      * The resolver can be used to resolve cached entities, e.g.
-     * for external mapping documents. 
+     * for external mapping documents.
      */
     private EntityResolver _entityResolver;
 
-    
+
     /**
      * The transactions to databases map for database pooling
      */
     private TxDatabaseMap  _txDbPool;
+
+    /*
+     * True if user prefer all reachable object to be stored automatically.
+     * False (default) if user want only dependent object to be stored.
+     */
+    private boolean        _autoStore = false;
 
     /**
      * Constructs a new JDO database factory. Must call {@link
@@ -513,6 +519,21 @@ public class JDO
         return _txDbPool != null;
     }
 
+    /*
+     * True if user prefer all reachable object to be stored automatically.
+     * False if user want only dependent object to be stored.
+     */
+    public void setAutoStore( boolean autoStore ) {
+        _autoStore = autoStore;
+    }
+
+    /*
+     * Return if the next Database instance will be set to autoStore.
+     */
+    public boolean isAutoStore() {
+        return _autoStore;
+    }
+
     /**
      * Opens and returns a connection to the database. Throws an
      * {@link DatabaseNotFoundException} if the database named was not
@@ -545,7 +566,7 @@ public class JDO
             InitialContext     ctx;
             Transaction        tx;
             DatabaseImpl       dbImpl;
-            
+
             try {
                 if(tm == null) {
                     ctx = new InitialContext();
@@ -556,8 +577,8 @@ public class JDO
                     return _txDbPool.get( tx );
 
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, 
-                            _callback, tx, _classLoader );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor,
+                            _callback, tx, _classLoader, _autoStore );
 
                     if ( _txDbPool != null )
                         _txDbPool.put( tx, dbImpl );
@@ -575,8 +596,8 @@ public class JDO
                     _logInterceptor.exception( except );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, 
-                _callback, null, _classLoader );
+        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor,
+                _callback, null, _classLoader, _autoStore );
     }
 
 

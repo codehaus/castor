@@ -95,4 +95,15 @@ public interface DataObjects
     public String getDescription();
 
 
+    /*
+     * True if user prefer all reachable object to be stored automatically.
+     * False if user want only dependent object to be stored.
+     */
+    public void setAutoStore( boolean autoStore );
+
+    /*
+     * Return if the next Database instance will be set to autoStore.
+     */
+    public boolean isAutoStore();
+
 }
