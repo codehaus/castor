@@ -55,6 +55,7 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.MappingRuntimeException;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.util.Messages;
 
@@ -463,8 +464,7 @@ public final class FieldHandlerImpl
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
             } catch ( InvocationTargetException except ) {
                 // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                                  toString(), except.getMessage() ) );
+                throw new MappingRuntimeException(except.getTargetException());
             }
 
         } else if ( value != null ) {
@@ -520,8 +520,7 @@ public final class FieldHandlerImpl
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
             } catch ( InvocationTargetException except ) {
                 // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                                  toString(), except.getMessage() ) );
+                throw new MappingRuntimeException(except.getTargetException());
             }
 
         }
@@ -561,8 +560,7 @@ public final class FieldHandlerImpl
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
             } catch ( InvocationTargetException except ) {
                 // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                                  toString(), except.getMessage() ) );
+                throw new MappingRuntimeException(except.getTargetException());
             }
 
         } else {
@@ -593,8 +591,7 @@ public final class FieldHandlerImpl
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
             } catch ( InvocationTargetException except ) {
                 // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                                  toString(), except.getMessage() ) );
+                throw new MappingRuntimeException(except.getTargetException());
             }
 
         }
@@ -626,8 +623,7 @@ public final class FieldHandlerImpl
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
             } catch ( InvocationTargetException except ) {
                 // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                                  toString(), except.getMessage() ) );
+                throw new MappingRuntimeException(except.getTargetException());
             }
         }
         return Types.newInstance( _fieldType );
