@@ -1,0 +1,363 @@
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Exoffice Technologies.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+
+package org.exolab.castor.dax.engine;
+
+
+import java.util.Enumeration;
+import java.util.Vector;
+import java.util.Hashtable;
+import netscape.ldap.LDAPConnection;
+import netscape.ldap.LDAPException;
+import netscape.ldap.LDAPEntry;
+import netscape.ldap.LDAPAttribute;
+import netscape.ldap.LDAPAttributeSet;
+import netscape.ldap.LDAPModification;
+import netscape.ldap.LDAPModificationSet;
+import netscape.ldap.util.DN;
+import netscape.ldap.util.RDN;
+import org.exolab.castor.dax.engine.DAXFieldDesc;
+import org.exolab.castor.dax.engine.DAXObjectDesc;
+import org.exolab.castor.mapping.FieldDesc;
+import org.exolab.castor.mapping.ContainerFieldDesc;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.Persistence;
+import org.exolab.castor.persist.DuplicateIdentityException;
+import org.exolab.castor.persist.ObjectNotFoundException;
+import org.exolab.castor.persist.ObjectModifiedException;
+import org.exolab.castor.persist.ObjectDeletedException;
+import org.exolab.castor.persist.PersistenceException;
+
+
+
+/**
+ *
+ * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * @version $Revision$ $Date$
+ */
+public class MozillaEngine
+    implements Persistence
+{
+
+
+    private DAXObjectDesc  _objDesc;
+
+
+    private Hashtable      _fields;
+
+
+    private DAXFieldDesc[] _dnFields;
+
+
+    private String         _dnFieldName;
+
+ 
+    private FieldDesc      _attrField;
+
+
+    private String         _rootDN;
+
+
+    public MozillaEngine( DAXObjectDesc objDesc, String rootDN )
+	throws MappingException
+    {
+	FieldDesc[] fields;
+	FieldDesc   dnField;
+
+	_objDesc = objDesc;
+	_attrField = _objDesc.getAttributeSetField();
+	fields = objDesc.getFields();
+	_fields = new Hashtable();
+	for ( int i = 0 ; i < fields.length ; ++i ) {
+	    if ( _fields.put( ( (DAXFieldDesc) fields[ i ] ).getLdapName(), fields[ i ] ) != null )
+		throw new MappingException( "Duplicate LDAP attribute" );
+	}
+
+	dnField = _objDesc.getIdentityField();
+	if ( dnField instanceof ContainerFieldDesc ) {
+	    _dnFields = (DAXFieldDesc[]) ( (ContainerFieldDesc) dnField ).getContainedFields();
+	} else {
+	    _dnFieldName = ( (DAXFieldDesc) _objDesc.getIdentityField() ).getLdapName();
+	}
+	_rootDN = rootDN;
+    }
+
+
+    public Object create( Object conn, Object obj, Object identity )
+	throws DuplicateIdentityException, PersistenceException
+    {
+	LDAPAttributeSet ldapSet;
+	String           dn;
+	Enumeration      enum;
+	DAXFieldDesc     field;
+	boolean          exists;
+
+	dn = getDN( identity );
+	try {
+	    ldapSet = new LDAPAttributeSet();
+	    enum = _fields.elements();
+	    while ( enum.hasMoreElements() ) {
+		field = (DAXFieldDesc) enum.nextElement();
+		ldapSet.add( field.getAttribute( obj ) );
+	    }
+	    // XXX
+	    // Also need to create all the attributes in the attrSet
+	    DAXObjectDesc type;
+	    
+	    type = _objDesc;
+	    while ( type != null ) {
+		ldapSet.add( new LDAPAttribute( "objectclass", type.getLdapClass() ) );
+		type = (DAXObjectDesc) type.getExtends();
+	    }
+	    ( (LDAPConnection) conn ).add( new LDAPEntry( dn, ldapSet ) );
+	    return null;
+	} catch ( LDAPException except ) {
+	    if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
+		throw new DuplicateIdentityException( obj.getClass(), identity );
+	    throw new PersistenceException( except );
+	}
+    }
+
+
+    public Object load( Object conn, Object obj, Object identity, boolean lock )
+	throws ObjectNotFoundException, PersistenceException
+    {
+	LDAPAttributeSet ldapSet;
+	LDAPAttribute    ldapAttr;
+	LDAPEntry        entry;
+	String           dn;
+	DAXFieldDesc     field;
+	Enumeration      enum;
+
+	dn = getDN( identity );
+	try {
+	    entry = ( (LDAPConnection) conn ).read( dn );
+	    if ( entry == null )
+		throw new ObjectNotFoundException( obj.getClass(), identity );
+	} catch ( LDAPException except ) {
+	    if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
+		throw new ObjectNotFoundException( obj.getClass(), identity );
+	    throw new PersistenceException( except );
+	}
+
+	ldapSet = entry.getAttributeSet();
+	for ( int i = 0 ; i < ldapSet.size() ; ++i ) {
+	    ldapAttr = ldapSet.elementAt( i );
+	    if ( ldapAttr.getName().equals( "objectclass" ) ) {
+
+		String[] classes;
+		boolean  match;
+
+		/*
+		classes = ldapAttr.getStringValueArray();
+		match = false;
+		for ( int j = 0 ; j < classes.length ; ++j ) {
+		    if ( classes[ j ].equals( _objDesc.getLdapClass() ) ) {
+			match = true;
+			break;
+		    }
+		}
+		if ( ! match ) {
+		    throw new IllegalStateException( "LDAP entry does not match object class " +
+						     _objDesc.getLdapClass() );
+		}
+		*/
+
+	    } else {
+
+		field = (DAXFieldDesc) _fields.get( ldapAttr.getName() );
+		if ( field != null ) {
+		    field.setValue( obj, entry );
+		} else if ( _attrField != null ) {
+		    Hashtable     attrSet;
+		    
+		    attrSet = (Hashtable) _attrField.getValue( obj );
+		    if ( attrSet == null ) {
+			attrSet = new Hashtable();
+			_attrField.setValue( obj, attrSet );
+		    }
+		    attrSet.put( ldapAttr.getName(), ldapAttr.getStringValueArray() );
+		}
+	    }
+	}
+	return null;
+    }
+
+
+    public Object store( Object conn, Object obj, Object identity,
+			 Object original, Object stamp )
+	throws ObjectModifiedException, ObjectDeletedException, PersistenceException
+    {
+	LDAPModificationSet modifs;
+	String              dn;
+	Enumeration         enum;
+	LDAPEntry           entry;
+	LDAPAttributeSet    ldapSet;
+	boolean             exists;
+
+	dn = getDN( identity );
+	try {
+	    entry = ( (LDAPConnection) conn ).read( dn );
+	    if ( entry == null )
+		throw new ObjectDeletedException( obj.getClass(), identity );
+	} catch ( LDAPException except ) {
+	    if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
+		throw new ObjectDeletedException( obj.getClass(), identity );
+	    throw new PersistenceException( except );
+	}
+	ldapSet = entry.getAttributeSet();
+
+	modifs = new LDAPModificationSet();
+	enum = _fields.elements();
+	while ( enum.hasMoreElements() ) {
+	    DAXFieldDesc        field;
+	    LDAPAttribute       attr;
+
+	    field = (DAXFieldDesc) enum.nextElement();
+	    exists = ( ldapSet.getAttribute( field.getLdapName() ) != null );
+	    attr = field.getAttribute( obj );
+	    if ( exists )
+		ldapSet.remove( field.getLdapName() );
+	    if ( attr == null ) {
+		if ( exists )
+		    modifs.add( LDAPModification.DELETE, new LDAPAttribute( field.getLdapName() ) );
+	    } else {
+		modifs.add( ( exists ? LDAPModification.REPLACE : LDAPModification.ADD ), attr );
+	    }
+	}
+
+	if ( _attrField != null ) {
+	    Hashtable    attrSet;
+	    Enumeration  attrs;
+	    String       name;
+	    Object       value;
+	    
+	    attrSet = (Hashtable) _attrField.getValue( obj );
+	    attrs = attrSet.keys();
+	    while ( attrs.hasMoreElements() ) {
+		name = (String) attrs.nextElement();
+		exists = ( ldapSet.getAttribute( name ) != null );
+		if ( exists )
+		    ldapSet.remove( name );
+		value = attrSet.get( name.toString() );
+		if ( value instanceof String[] )
+		    modifs.add( ( exists ? LDAPModification.REPLACE : LDAPModification.ADD ),
+				new LDAPAttribute( name, (String[]) value ) );
+		else
+		    modifs.add( ( exists ? LDAPModification.REPLACE : LDAPModification.ADD ),
+				new LDAPAttribute( name, value.toString() ) );
+	    }
+	}
+
+	enum = ldapSet.getAttributes();
+	while ( enum.hasMoreElements() ) {
+	    LDAPAttribute ldapAttr;
+
+	    ldapAttr = (LDAPAttribute) enum.nextElement();
+	    if ( ! ldapAttr.getName().equals( "objectclass" ) ) {
+		modifs.add( LDAPModification.DELETE, ldapAttr );
+	    }
+	}
+	try {
+	    ( (LDAPConnection) conn ).modify( dn, modifs );
+	    return null;
+	} catch ( LDAPException except ) {
+	    throw new PersistenceException( except );
+	}
+    }
+
+
+    public void delete( Object conn, Object obj, Object identity )
+	throws PersistenceException
+    {
+	String dn;
+
+	dn = getDN( identity );
+	try {
+	    ( (LDAPConnection) conn ).delete( dn );
+	} catch ( LDAPException except ) {
+	    throw new PersistenceException( except );
+	}
+    }
+
+
+    public void writeLock( Object conn, Object obj, Object identity )
+	throws ObjectDeletedException, PersistenceException
+    {
+    }
+
+
+    public void changeIdentity( Object conn, Object obj,
+				Object oldIdentity, Object newIdentity )
+	throws DuplicateIdentityException, PersistenceException
+    {
+    }
+
+
+    private String getDN( Object identity )
+    {
+	StringBuffer dn;
+
+	dn = new StringBuffer();
+	if ( _dnFields != null ) {
+	    for ( int i = 0 ; i < _dnFields.length ; ++i ) {
+		if ( i > 0 )
+		    dn.append( ',' );
+		dn.append( _dnFields[ i ].getLdapName() ).append( '=' );
+		dn.append( _dnFields[ i ].getValue( identity ).toString() );
+	    }
+	} else {
+	    dn.append( _dnFieldName );
+	    dn.append( '=' ).append( identity.toString() );
+	}
+	if ( _rootDN != null )
+	    dn.append( ',' ).append( _rootDN );
+	return dn.toString();
+    }
+
+
+}
+
