@@ -5,22 +5,22 @@
     <header>
       <ul>For FTP access use <url>ftp://ftp.exolab.org/pub/</url>.
         <li>The Castor JAR (XML, JDO, DAX)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$.jar</url>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JAR (XML only)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$-xml.jar</url>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-xml.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JARs, docs, DTDs, command line tools and examples<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$.tgz</url><br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$.zip</url>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.tgz</url><br/>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.zip</url>
             <br/>&#xA0;</li>
         <li>Full documentation including all JavaDocs and specs (big)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$-doc.tgz</url><br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$-doc.zip</url>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-doc.tgz</url><br/>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-doc.zip</url>
             <br/>&#xA0;</li>
         <li>Full CVS snapshot: all sources, docs, libraries (big)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$-src.tgz</url><br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.0/castor-$VERSION$-src.zip</url>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-src.tgz</url><br/>
+            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-src.zip</url>
             <br/>&#xA0;</li>
       </ul>
 
