@@ -1645,6 +1645,7 @@ public final class SQLEngine implements Persistence {
                     // "skip" all rows till the first one with a new identity.
                     fetchRaw( null );
                 }
+                clearRaw();
 
                 identity = loadIdentity();
 
@@ -1809,7 +1810,7 @@ public final class SQLEngine implements Persistence {
         }
 
 
-        // Fill the given fields[] with the "chached" stuff from our _fields[] .
+        // Fill the given fields[] with the "cached" stuff from our _fields[] .
         public Object fetch( Object[] fields, Object identity ) throws ObjectNotFoundException, PersistenceException
         {
             for( int i = 0; i < _fields.length; i++ ) {
@@ -1821,8 +1822,10 @@ public final class SQLEngine implements Persistence {
 
         private Object fetchRaw( Object identity ) throws ObjectNotFoundException, PersistenceException
         {
-            if( _fields == null )
-                _fields = new Object[_engine._fields.length];
+            // maybe we can optimize a little bit here when we have time.
+            // Instead of creating new Object[] and ArrayList for each 
+            // "multi field" each fetchRaw is called, we might reuse them.
+            _fields = new Object[_engine._fields.length];
 
             // It would prove a little difficult to fetch if we don't have any rows with data left :-)
             if ( _resultSetDone )
