@@ -1,13 +1,17 @@
 Version 0.8.4  May 0? 2000
 -----------------------------
 
+XML:     Fixed a ClassLoader issue with the ClassDescriptorResolver
+
 XML:     Added validation back into the generator sources
 
 XML:     Added some changes from Frank Thelen to allow subclassing FieldInfoFactory
 
-XML:     Fixed bug that occur when an enumeration uses uppercase values
+XML:     Fixed bug that occured when an enumeration uses uppercase values
 
-JDO:     Where clause now supports: 
+XML:     Fixed bug with using datatype
+
+JDO:     Where clause now supports:
          - unary operators: +, -, abs, not
          - binary operators: +, -, *, /, mod, ||, LIKE, >, >=, <, <=, =, !=, and,
          - parenthesis: passed through to SQL as in OQL
