@@ -655,7 +655,7 @@ public class UnmarshalHandler implements DocumentHandler {
         else {
             System.out.println("descriptor is null");
             
-            String msg = "unable to find MarshalDescriptor for: ";
+            String msg = "unable to find FieldDescriptor for: ";
             message(msg+name);
         }
         
