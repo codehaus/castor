@@ -417,4 +417,22 @@
         </ant>
     </target>
 
+   <target name="automated_build" depends="jar,tests">
+      <!-- this mimics the CTFRun.sh script -->
+         <delete includeEmptyDirs="true">
+            <fileset dir="build/tests" includes="output/**"/>
+         </delete>
+      <java classname="org.exolab.castor.tests.framework.CastorTestSuiteRunner"
+            failonerror="true" fork="yes">
+         <arg line="-verbose -printStack -text src/tests/MasterTestSuite"/>
+            <classpath>
+               <fileset dir="lib">
+                  <include name="**/*.jar"/>
+               </fileset>
+               <pathelement path="build/classes"/>
+               <pathelement path="build/tests"/>
+            </classpath>
+      </java>
+   </target>
+
 </project>
