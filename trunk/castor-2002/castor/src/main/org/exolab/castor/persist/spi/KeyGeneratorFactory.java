@@ -64,11 +64,15 @@ public interface KeyGeneratorFactory
 {
     /**
      * Produce the key generator.
-     * @factory Helper object for obtaining database-specific QuerySyntax.
-     * @params Parameters for key generator.
+     * @param factory Helper object for obtaining database-specific QuerySyntax.
+     * @param params Parameters for key generator.
+     * @param sqlType The SQL type of the primary key,
+     * the generated identities must have the corresponding Java type,
+     * e.g. java.sql.Types.INTEGER corresponds to java.lang.Integer, 
+     * java.sql.Types.NUMERIC corresponds to java.lang.BigDecimal.
      */
     public KeyGenerator getKeyGenerator( PersistenceFactory factory,
-            Properties params )
+            Properties params, int sqlType )
             throws MappingException;
 
     /**

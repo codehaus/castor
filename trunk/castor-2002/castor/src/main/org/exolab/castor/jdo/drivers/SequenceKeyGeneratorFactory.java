@@ -79,10 +79,10 @@ public final class SequenceKeyGeneratorFactory implements KeyGeneratorFactory
      * @params Parameters for key generator.
      */
     public KeyGenerator getKeyGenerator( PersistenceFactory factory,
-            Properties params )
+            Properties params, int sqlType )
             throws MappingException
     {
-        return new SequenceKeyGenerator( factory, params );
+        return new SequenceKeyGenerator( factory, params, sqlType );
     }
 
     /**

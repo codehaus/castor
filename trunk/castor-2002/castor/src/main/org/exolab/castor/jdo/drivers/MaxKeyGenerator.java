@@ -52,10 +52,9 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Properties;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -73,14 +72,21 @@ public final class MaxKeyGenerator implements KeyGenerator
 {
     private static final BigDecimal ONE = new BigDecimal( 1 );
 
+    private final int _sqlType;
+
     private final PersistenceFactory _factory;
     
     /**
      * Initialize the MAX key generator.
      */
-    public MaxKeyGenerator( PersistenceFactory factory )
+    public MaxKeyGenerator( PersistenceFactory factory, int sqlType )
+            throws MappingException
     {
         _factory = factory;
+        _sqlType = sqlType;
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
     }
 
     /**
@@ -123,20 +129,15 @@ public final class MaxKeyGenerator implements KeyGenerator
             rs = stmt.executeQuery( sql );
 
             if ( rs.next() ) {
-                identity = rs.getObject( 1 );
-                if ( !(identity instanceof BigDecimal) ) {
-                    try {
-                        identity = Types.getConvertor( identity.getClass(),
-                                BigDecimal.class ).convert( identity, null );
-                    } catch ( Exception except ) {
-                        throw new PersistenceException(
-                                Messages.format( "mapping.keyGenWrongType",
-                                getClass().getName(), identity.getClass() ) );
-                    }
-                }
-                identity = ( (BigDecimal) identity ).add( ONE );
+                if ( _sqlType == Types.INTEGER ) 
+                    identity = new Integer( rs.getInt( 1 ) + 1 ); 
+                else 
+                    identity = rs.getBigDecimal( 1 ).add( ONE );
             } else {
-                identity = ONE;
+                if ( _sqlType == Types.INTEGER )
+                    identity = new Integer( 1 );
+                else 
+                    identity = ONE;
             }
         } catch ( SQLException ex ) {
             throw new PersistenceException( Messages.format(

@@ -52,6 +52,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Properties;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
@@ -68,16 +69,24 @@ import org.exolab.castor.util.Messages;
  */
 public final class IdentityKeyGenerator implements KeyGenerator
 {
+
+    private final int _sqlType;
+
+
     /**
      * Initialize the IDENTITY key generator.
      */
-    public IdentityKeyGenerator( PersistenceFactory factory ) throws MappingException
+    public IdentityKeyGenerator( PersistenceFactory factory, int sqlType ) throws MappingException
     {
         String fName = factory.getFactoryName();
         if ( !fName.equals("sybase") && !fName.equals("sql-server")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
+        _sqlType = sqlType;
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
     }
 
     /**
@@ -95,14 +104,18 @@ public final class IdentityKeyGenerator implements KeyGenerator
     {
         Statement stmt = null;
         ResultSet rs;
-        Object identity = null;
+        int value;
 
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery( "SELECT @@identity" );
 
             if ( rs.next() ) {
-                return rs.getObject( 1 );
+                value = rs.getInt( 1 );
+                if ( _sqlType == Types.INTEGER ) 
+                    return new Integer( value );
+                else
+                    return new BigDecimal( value );
             } else {
                 throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
             }

@@ -161,7 +161,9 @@ public final class SQLEngine
             keyGenDesc = _clsDesc.getKeyGeneratorDescriptor();
             if ( keyGenDesc != null ) {
                 _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
-                        _factory, keyGenDesc, _logInterceptor );
+                        _factory, keyGenDesc,
+                        ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType(),
+                        _logInterceptor );
             }
         }
         try {
@@ -230,34 +232,8 @@ public final class SQLEngine
         identity = _keyGen.generateKey( (Connection) conn, _clsDesc.getTableName(),
                 ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName(), null );
 
-        if ( identity == null ) {
+        if ( identity == null ) 
             throw new PersistenceExceptionImpl( "persist.noIdentity" );
-        }
-
-        // Convert type if needed
-        return fixIdentityType( identity );
-    }
-
-
-    // Convert identity type if needed (for generated identities)
-    private Object fixIdentityType( Object identity ) throws PersistenceException
-    {
-        String primKey;
-        Class idClass;
-        Class pkClass;
-        TypeConvertor conv;
-
-        try {
-            idClass = identity.getClass();
-            pkClass = SQLTypes.typeFromSQLType(
-                    ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType() );
-            if ( !pkClass.isAssignableFrom( idClass ) ) {
-                conv = Types.getConvertor( idClass, pkClass );
-                identity = conv.convert( identity, null );
-            }
-        } catch ( Exception except ) {
-            throw new PersistenceExceptionImpl( "persist.keyGenNoConvertor" );
-        }
 
         return identity;
     }
@@ -307,7 +283,10 @@ public final class SQLEngine
             // Generate key during INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
                 CallableStatement cstmt = (CallableStatement) stmt;
-                cstmt.registerOutParameter( count, java.sql.Types.INTEGER );
+                int sqlType;
+
+                sqlType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
+                cstmt.registerOutParameter( count, sqlType );
                 cstmt.execute();
 
                 // First skip all results "for maximum portability"
@@ -315,10 +294,11 @@ public final class SQLEngine
                 while ( cstmt.getMoreResults() || cstmt.getUpdateCount() != -1 );
 
                 // Identity is returned in the last parameter
-                identity = cstmt.getObject( count );
-
-                // Convert type if needed
-                identity = fixIdentityType( identity );
+                // Workaround: for INTEGER type in Oracle getObject returns BigDecimal
+                if ( sqlType == java.sql.Types.INTEGER )
+                    identity = new Integer( cstmt.getInt( count ) );
+                else 
+                    identity = cstmt.getObject( count );
             } else 
                 stmt.executeUpdate();
             
