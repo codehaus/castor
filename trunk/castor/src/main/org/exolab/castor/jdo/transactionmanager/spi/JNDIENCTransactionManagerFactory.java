@@ -95,26 +95,31 @@ public class JNDIENCTransactionManagerFactory
         throws TransactionManagerAcquireException
     {
         Context context = null;
+        Object objectFound = null;
 
         try 
         {
             context = new InitialContext();
             
             String jndiENC = params.getProperty("jndiEnc", TRANSACTION_MANAGER_NAME );
-            _transactionManager = (TransactionManager) context.lookup(jndiENC);
+            objectFound = context.lookup(jndiENC);
+            _transactionManager = (TransactionManager) objectFound;  
         } 
+        catch (ClassCastException e) {
+        	throw new TransactionManagerAcquireException (Messages.format (
+        		"jdo.transaction.unableToCastToTransactionManager", objectFound.getClass().getName()), e); 
+        }
         catch (NoInitialContextException e) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()));
+                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e);
         } 
         catch (NameNotFoundException e) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()));
+                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()));
+                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e);
         }
 
         return _transactionManager;
