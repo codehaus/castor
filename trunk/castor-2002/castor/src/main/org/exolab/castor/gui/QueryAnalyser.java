@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.tools;
+package org.exolab.castor.gui;
 
 import javax.swing.UIManager;
 import java.awt.*;
