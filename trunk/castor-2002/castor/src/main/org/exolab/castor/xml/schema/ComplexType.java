@@ -296,6 +296,33 @@ public class ComplexType extends XMLType
     } //-- getReferenceId
 
 
+   /**
+    * A helper method that returns true if this complexType
+    * contains an <any> element.
+    * @return  method that returns true if this complexType
+    * contains an <any> element.
+    */
+    public boolean hasAny() {
+        boolean result = false;
+        Enumeration enum = _contentModel.enumerate();
+        while (enum.hasMoreElements() && !result) {
+            Structure struct = (Structure)enum.nextElement();
+            switch (struct.getStructureType()) {
+                case Structure.ELEMENT:
+                    break;
+                case Structure.GROUP:
+                case Structure.MODELGROUP:
+                    result = ((Group)struct).hasAny();
+                    break;
+                case Structure.WILDCARD:
+                    result = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
     /**
      * Returns true if this ComplexType has been marked as Abstract.
      *
@@ -336,7 +363,7 @@ public class ComplexType extends XMLType
 	 * @returns true if this complexType is a restriction
 	 */
 	public boolean isRestricted() {
-	       return _restricted;
+        return _restricted;
 	}
 
     /**
@@ -371,7 +398,6 @@ public class ComplexType extends XMLType
            }
         }
         _anyAttribute = wildcard;
-
      }
 
 
