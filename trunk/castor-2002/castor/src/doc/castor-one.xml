@@ -7,13 +7,14 @@
       <p>Reference: <api package="org.exolab.castor.jdo">The Java Data Objects API</api></p>
     </header>
 
+	<!--
     <section title="What is Castor JDO">
 	<p>
 	   Castor JDO is an Object-Relational Mapping and Data-Binding Framework, which is written in 100% pure Java[tm]. Castor can map relational database data into Java Data Object based on user-defined mapping schema. In the other point-of-view, it provides java data objects a persistence layer. </p>
 
         <p>
 	   It frees programmer from dealing with database directly and replacing the entire burden of composing updating the database. Proper SQL statements are automatically generated for loading, updating, creating and deleting. Changes to object in transaction automatically done to data source at commit time. Thus programmer can stay in pure-Java and without remember all the details in the backing database, after the creation of database tables and the mapping schema. The separation of persistence and programming logic also enable much clearer object-oriented design, which is important in larger projects. </p>
-    </section>
+    </section>-->
 
     <section title="What is in Castor JDO 0.9">
         <p>
