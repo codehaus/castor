@@ -126,15 +126,15 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     public void endDocument() throws SAXException {
     }
 
-     public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
-       throw new java.lang.UnsupportedOperationException("Method ignorableWhitespace() not yet implemented.");
-     }
-     public void processingInstruction(String target, String data) throws SAXException {
-        throw new java.lang.UnsupportedOperationException("Method processingInstruction() not yet implemented.");
-     }
-     public void skippedEntity(String name) throws SAXException {
-        throw new java.lang.UnsupportedOperationException("Method skippedEntity() not yet implemented.");
-     }
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+        return;
+    }
+    public void processingInstruction(String target, String data) throws SAXException {
+        return;
+    }
+    public void skippedEntity(String name) throws SAXException {
+        return;
+    }
     //-------------------------------------------------
 
     //--Namespace related (SAX2 Events)
