@@ -111,6 +111,13 @@ final class TransactionContextImpl
         super( db );
         _globalTx = globalTx;
     }
+	
+	public TransactionContextImpl( Database db, boolean globalTx , javax.transaction.Transaction transaction )
+    {
+        super( db , transaction );
+        _globalTx = globalTx;
+    }
+	
 
     protected void commitConnections()
         throws TransactionAbortedException
@@ -122,8 +129,18 @@ final class TransactionContextImpl
             enumeration = _conns.elements();
             while ( enumeration.hasMoreElements() ) {
                 try {
-                    ( (Connection) enumeration.nextElement() ).close();
-                } catch ( SQLException except ) { }
+					( (Connection) enumeration.nextElement() ).close();
+				} 
+				catch ( SQLException except ) { 
+					_log.warn( "SQLException occured when closing JDBC Connection instance.", except);
+				} 
+//				TODO: reenable below catch clause, see bug 1491 ????
+//				catch ( Exception except ) { 
+//					_log.error( "Exception occured in commitConnections", except );
+//					throw new TransactionAbortedException( "Exception in commitConnections" , except );
+//					
+				}
+				
             }
 
             _conns.clear();
