@@ -280,23 +280,23 @@ public class MemberFactory {
         //-- If mapping schema elements, replace element passed in with referenced element
         //-- if not we just retrieve the correct NCNAME and check to see if the element referenced
         //-- really exist (this check must be handle by the new version of the SOM)
+
         if (eDecl.isReference()) {
+
             ElementDecl eRef = eDecl.getReference();
             if (eRef == null) {
                 String err = "unable to resolve element reference: ";
-			    err += element.getName();
-			    System.out.println(err);
-			    return null;
+                err += element.getName();
+                System.out.println(err);
+                return null;
             }
-
             if (SourceGenerator.mappingSchemaElement2Java())
-		        eDecl = eRef;
-			else
-               eDecl.setName(eRef.getName());
+                eDecl = eRef;
+
             //garbage collected
             eRef = null;
-		}
-		//-- determine type
+        }
+        //-- determine type
 
         JSourceCode jsc     = null;
         FieldInfo fieldInfo = null;
@@ -341,13 +341,13 @@ public class MemberFactory {
         else {
 
             String className = null;
-			//-- Java class name depends on mapping setup in properties file
-			if (SourceGenerator.mappingSchemaElement2Java())
-			{
-				// Java class name is element name
-				className = JavaNaming.toJavaClassName(eDecl.getName());
+            //-- Java class name depends on mapping setup in properties file
+            if (SourceGenerator.mappingSchemaElement2Java())
+            {
+                // Java class name is element name
+                className = JavaNaming.toJavaClassName(eDecl.getName());
                 if (className==null)
-					return null;
+                    return null;
                 else {
                     //make sure we append namespaces information
                     //if defined in the property file
@@ -357,20 +357,20 @@ public class MemberFactory {
                     }
                    packageName = null;
                 }
-			}
-			else if (SourceGenerator.mappingSchemaType2Java())
-			{
-				// Java class name is schema type name
-				className = JavaNaming.toJavaClassName(getElementType(eDecl));
-				// Prefix package qualifier?
-				if (eDecl.getType()!=null)
-				{
-					Schema elementSchema = eDecl.getSchema();
-					Schema typeSchema = eDecl.getType().getSchema();
-					if (elementSchema!=typeSchema)
-						className = SourceGenerator.getQualifiedClassName(typeSchema.getTargetNamespace(),className);
-				}
-			}
+            }
+            else if (SourceGenerator.mappingSchemaType2Java())
+            {
+                // Java class name is schema type name
+                className = JavaNaming.toJavaClassName(getElementType(eDecl));
+                // Prefix package qualifier?
+                if (eDecl.getType()!=null)
+                {
+                    Schema elementSchema = eDecl.getSchema();
+                    Schema typeSchema = eDecl.getType().getSchema();
+                    if (elementSchema!=typeSchema)
+                        className = SourceGenerator.getQualifiedClassName(typeSchema.getTargetNamespace(),className);
+                }
+            }
             xsType = new XSClass(new JClass(className));
             if ((xmlType != null) && (xmlType.isComplexType())) {
                 ComplexType cType = (ComplexType)xmlType;
@@ -381,14 +381,14 @@ public class MemberFactory {
             }
         } // complexType
 
-        String fieldName = JavaNaming.toJavaMemberName(eDecl.getName(true));
+        String fieldName = JavaNaming.toJavaMemberName(eDecl.getName(false));
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
         if (maxOccurs != 1) {
             String vName = fieldName+"List";
             CollectionInfo cInfo
-                = infoFactory.createCollection(xsType, vName, eDecl.getName());
+                = infoFactory.createCollection(xsType, vName, eDecl.getName(false));
 
             XSList xsList = cInfo.getXSList();
             xsList.setMaximumSize(maxOccurs);
@@ -400,14 +400,14 @@ public class MemberFactory {
              if (xsType.getType() == xsType.COLLECTION)
                  fieldInfo = infoFactory.createCollection( ((XSList) xsType).getContentType(),
                                                              fieldName,
-                                                             eDecl.getName()
+                                                             eDecl.getName(false)
                                                               );
 
              else fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
         }
 
         fieldInfo.setRequired(minOccurs > 0);
-        fieldInfo.setNodeName(eDecl.getName(true));
+        fieldInfo.setNodeName(eDecl.getName(false));
         fieldInfo.setContainer(isContainer);
         //handle fixed or default values
         String value = (eDecl.getDefaultValue() != null)?eDecl.getDefaultValue():eDecl.getFixedValue();
@@ -502,7 +502,7 @@ public class MemberFactory {
         XSType xsType       = null;
 
         JClass groupClass = null;
-		String className = null;
+        String className = null;
 
         ClassInfo classInfo = sgState.resolve(group);
         if (classInfo != null) {
@@ -511,13 +511,13 @@ public class MemberFactory {
         }
 
 
-		if (groupClass == null) {
-		    // Java class name is group name or.
-		    className = JavaNaming.toJavaClassName(groupName);
-		    xsType = new XSClass(new JClass(className));
-		}
-		else {
-		    className = groupClass.getName();
+        if (groupClass == null) {
+            // Java class name is group name or.
+            className = JavaNaming.toJavaClassName(groupName);
+            xsType = new XSClass(new JClass(className));
+        }
+        else {
+            className = groupClass.getName();
         }
 
         String fieldName = JavaNaming.toJavaMemberName(className);
@@ -552,49 +552,49 @@ public class MemberFactory {
     } //-- createFieldInfo(Group)
 
 
-	/**
-	 * Returns the actual element type (handles 'ref' attribute and anonymous complextypes)
-	 * @param e The element the type is need from
-	 * @return The actual element type
-	 */
-	private String getElementType(ElementDecl e)
-	{
-		ElementDecl element = e;
-		Hashtable refs = new Hashtable();
-		String className = null;
-		while(className==null)
-		{
-			// Handle element's with 'ref' attribute
-			if (e.isReference())
-				e = e.getReference();
+    /**
+     * Returns the actual element type (handles 'ref' attribute and anonymous complextypes)
+     * @param e The element the type is need from
+     * @return The actual element type
+     */
+    private String getElementType(ElementDecl e)
+    {
+        ElementDecl element = e;
+        Hashtable refs = new Hashtable();
+        String className = null;
+        while(className==null)
+        {
+            // Handle element's with 'ref' attribute
+            if (e.isReference())
+                e = e.getReference();
             if (e == null) {
                 String err = "unable to resolve element reference: ";
                 err += element.getName(false);
                 System.out.println(err);
                 return null;
             }
-			else if (refs.get(e.getName())!=null) {
+            else if (refs.get(e.getName())!=null) {
                 String err = "cyclic element reference: ";
                 err += element.getName(false);
                 System.out.println(err);
                 return null;
-			}
-			refs.put(e.getName(), e);
-			if (e.isReference())
-				continue;
+            }
+            refs.put(e.getName(), e);
+            if (e.isReference())
+                continue;
 
-			// Is element using a named complexType?
-			XMLType xmlType = e.getType();
-			if (xmlType!=null)
-				className = xmlType.getName();
-			if (className==null)
-				// No type, then class is the element name (elements using anonymous complexType's)
-				className = e.getName(false);
-		}
-		return className;
-	}
+            // Is element using a named complexType?
+            XMLType xmlType = e.getType();
+            if (xmlType!=null)
+                className = xmlType.getName();
+            if (className==null)
+                // No type, then class is the element name (elements using anonymous complexType's)
+                className = e.getName(false);
+        }
+        return className;
+    }
 
-	/**
+    /**
      * Creates a comment to be used in Javadoc from
      * the given Annotated Structure.
      * @param annotated the Annotated structure to process
