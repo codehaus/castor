@@ -480,7 +480,10 @@ public class OQLQueryImpl
      * Get the generated SQL statement for this OQLQuery
      */
     public String getSQL() throws org.exolab.castor.jdo.QueryException {
-        return _expr.getStatement(true);
+	  if(_expr != null)
+          return _expr.getStatement(true);
+        else
+         return  _spCall;
     }
 
     public void close()

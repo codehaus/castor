@@ -406,6 +406,7 @@ public final class SQLEngine implements Persistence {
         FieldDescriptor[] fields;
         String[] jdoFields0;
         String[] jdoFields;
+	  String sql;
         int[] sqlTypes0;
         int[] sqlTypes;
         int count;
@@ -433,7 +434,15 @@ public final class SQLEngine implements Persistence {
         sqlTypes = new int[ count ];
         System.arraycopy( jdoFields0, 0, jdoFields, 0, count );
         System.arraycopy( sqlTypes0, 0, sqlTypes, 0, count );
-        return ((BaseFactory) _factory).getCallQuery( spCall, types, _clsDesc.getJavaClass(), jdoFields, sqlTypes );
+        // changes for the SQL Direct interface begins here
+	  if(spCall.startsWith("SQL")){
+		sql =spCall.substring(4);
+	  	return new SQLQuery( this, sql, types );
+	  } else{
+        	return ((BaseFactory) _factory).getCallQuery( spCall, types,_clsDesc.getJavaClass(), jdoFields, sqlTypes );
+	  }
+
+       
     }
 
     public QueryExpression getQueryExpression() {
