@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,6 +47,7 @@
 package org.exolab.castor.mapping.loader;
 
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.text.DateFormat;
@@ -218,6 +219,53 @@ public class Types
         try {
             return type.newInstance();
         } catch ( IllegalAccessException except ) {
+            // This should never happen unless  bytecode changed all of a sudden
+            throw new IllegalStateException( Messages.format( "mapping.schemaNotConstructable",
+                                                              type.getName(), except.getMessage() ) );
+        } catch ( InstantiationException except ) {
+            // This should never happen unless  bytecode changed all of a sudden
+            throw new IllegalStateException( Messages.format( "mapping.schemaNotConstructable",
+                                                              type.getName(), except.getMessage() ) );
+        }
+    }
+
+    /**
+     * Constructs a new object from the given class. Does not generate any
+     * checked exceptions, since object creation has been proven to work
+     * when creating descriptor from mapping.
+     *
+     * @throws IllegalStateException The Java object cannot be constructed
+     */
+    public static Object newInstance( Class type, Object args[] )
+        throws IllegalStateException
+    {
+        
+        if ((args == null) || (args.length == 0))
+            return newInstance( type );
+            
+        try {
+            Class[] paramTypes = new Class[args.length];
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] != null) {
+                    paramTypes[i] = args[i].getClass();
+                }
+                else {
+                    throw new IllegalStateException("Null arguments to constructor not accepted at this time.");
+                }
+            }
+            Constructor cons = type.getConstructor(paramTypes);
+            return cons.newInstance(args);
+        }
+        catch (NoSuchMethodException except) {
+            throw new IllegalStateException( Messages.format( "mapping.constructorNotFound",
+                                                              type.getName(), except.getMessage() ) );
+        }
+        catch ( java.lang.reflect.InvocationTargetException except) {
+            // This should never happen unless  bytecode changed all of a sudden
+            throw new IllegalStateException( Messages.format( "mapping.schemaNotConstructable",
+                                                              type.getName(), except.getMessage() ) );
+        }
+        catch ( IllegalAccessException except ) {
             // This should never happen unless  bytecode changed all of a sudden
             throw new IllegalStateException( Messages.format( "mapping.schemaNotConstructable",
                                                               type.getName(), except.getMessage() ) );

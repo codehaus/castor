@@ -171,6 +171,26 @@ public abstract class GeneralizedFieldHandler
         }
         return _handler.newInstance(parent);
     }
+    
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @param args the set of constructor arguments
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent, Object[] args )
+        throws IllegalStateException 
+    {
+        if (_handler instanceof ExtendedFieldHandler) {
+            return ((ExtendedFieldHandler)_handler).newInstance(parent, args);
+        }
+        
+        //-- backward compatibility: ignore arguments
+        return newInstance( parent );
+    }
         
     /**
      * Sets the value of the field to a default value.
