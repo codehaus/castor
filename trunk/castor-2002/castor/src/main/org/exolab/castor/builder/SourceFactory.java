@@ -84,6 +84,12 @@ public class SourceFactory  {
 
     private short enumerationType = OBJECT_TYPE_ENUMERATION;
 
+	/**
+	 * A flag indicating whether or not to generate XML marshalling
+	 * framework specific methods.
+	 */
+	private boolean _createMarshall = true;
+
     /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
@@ -106,6 +112,19 @@ public class SourceFactory  {
         this.memberFactory = new MemberFactory(infoFactory);
     } //-- SourceFactory
 
+   /**
+     * Sets whether or not to create the XML marshalling framework specific
+     * methods (marshall, unmarshall, validate) in the generated classes.
+	 * By default, these methods are generated.
+	 *
+     * @param createMarshall a boolean, when true indicates
+     * to generated the marshalling framework methods
+     *
+    **/
+    public void setMarshallCreation(boolean createMarshall) {
+        _createMarshall = createMarshall;
+    } //-- setDescriptorCreation
+
 
     //------------------/
     //- Public Methods -/
@@ -118,6 +137,7 @@ public class SourceFactory  {
      * @param resolver the ClassInfoResolver for resolving "derived" types.
      * @param packageName the package to use when generating source
      * from this ClassInfo
+	 * @param createMarshall whether or not to create marshalling framework methods
     **/
     public JClass createSourceCode
         (ElementDecl element, ClassInfoResolver resolver, String packageName)
@@ -200,14 +220,16 @@ public class SourceFactory  {
         jClass.addImport("java.io.Writer");
         jClass.addImport("java.io.Reader");
 
-        //-- #validate()
-        createValidateMethods(jClass);
-        //-- #marshal()
-        createMarshalMethods(jClass);
-        //-- #unmarshal()
-        createUnmarshalMethods(jClass);
+		if (_createMarshall) {
+           //-- #validate()
+           createValidateMethods(jClass);
+           //-- #marshal()
+           createMarshalMethods(jClass);
+           //-- #unmarshal()
+           createUnmarshalMethods(jClass);
+		}
 
-        //-- This boolean is set to create bound properties
+		//-- This boolean is set to create bound properties
         //-- even if the user has set the SUPER CLASS property
 
         boolean realDerived = derived;
@@ -231,8 +253,8 @@ public class SourceFactory  {
      * @param type the XML Schema type declaration to create the
      * ClassInfo for
      * @param resolver the ClassInfoResolver for resolving "derived" types.
-     * @param packageName the package to which generated classes should
-     * belong
+     * @param packageName the package to which generated classes should belong
+	 * @param createMarshall whether or not to create marshalling framework methods
     **/
     public JClass createSourceCode
         (ComplexType type, ClassInfoResolver resolver, String packageName)
@@ -284,15 +306,17 @@ public class SourceFactory  {
         jClass.addImport("java.io.Writer");
         jClass.addImport("java.io.Reader");
 
-        //-- #validate()
-        createValidateMethods(jClass);
-		//-- Output Marshalling methods for non abstract classes
-		if (jClass.getModifiers().isAbstract()==false)
-		{
-			//-- #marshal()
-			createMarshalMethods(jClass);
-			//-- #unmarshal()
-			createUnmarshalMethods(jClass);
+		if (_createMarshall) {
+           //-- #validate()
+           createValidateMethods(jClass);
+		   //-- Output Marshalling methods for non abstract classes
+		   if (jClass.getModifiers().isAbstract()==false)
+		   {
+			  //-- #marshal()
+			  createMarshalMethods(jClass);
+			  //-- #unmarshal()
+			  createUnmarshalMethods(jClass);
+		    }
 		}
 
 		//-- create Bound Properties code
