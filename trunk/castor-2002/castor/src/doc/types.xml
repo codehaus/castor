@@ -70,6 +70,7 @@
       <table border="1" cellpadding="2">
         <tr><td><b>Short Name</b></td><td><b>Java Type</b></td></tr>
         <tr><td>big-decimal</td><td>java.math.BigDecimal</td></tr>
+        <tr><td>big-integer</td><td>java.math.BigInteger</td></tr>
         <tr><td>boolean</td><td>java.lang.Boolean</td></tr>
         <tr><td>byte</td><td>java.lang.Byte</td></tr>
         <tr><td>bytes</td><td>byte[]</td></tr>
@@ -82,6 +83,7 @@
         <tr><td>long</td><td>java.lang.Long</td></tr>
         <tr><td>short</td><td>java.lang.Short</td></tr>
         <tr><td>string</td><td>java.lang.String</td></tr>
+        <tr><td>strings</td><td>java.lang.String[]</td></tr>
       </table>
 
     </section>
