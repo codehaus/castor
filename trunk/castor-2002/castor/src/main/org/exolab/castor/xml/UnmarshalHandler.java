@@ -85,30 +85,36 @@ public final class UnmarshalHandler extends MarshalFramework
 {
 
 
-    //----------------------------/
-    //- Private Member Variables -/
-    //----------------------------/
+    //---------------------------/
+    //- Private Class Variables -/
+    //---------------------------/
 
     private static final Class[]  EMPTY_CLASS_ARGS  = new Class[0];
     private static final Object[] EMPTY_OBJECT_ARGS = new Object[0];
     private static final String   EMPTY_STRING      = "";
 
-
-    // constants used for namespace declaration.
-   /**
-    * Attribute name for default namespace declaration
-    */
+ 
+    /**
+     * Attribute name for default namespace declaration
+    **/
     private static final String   XMLNS             = "xmlns";
-   /**
-    * Attribute prefix for prefixed namespace declaration
-    */
+    
+    /**
+     * Attribute prefix for prefixed namespace declaration
+    **/
     private final static String XMLNS_PREFIX        = "xmlns:";
     private final static int    XMLNS_PREFIX_LENGTH = XMLNS_PREFIX.length();
+    
     /**
-     * The name of the QName type
-     */
-    private static final String QNAME_NAME = "QName";
+     * The type attribute (xsi:type) used to denote the 
+     * XML Schema type of the parent element
+    **/
+    private static final String XSI_TYPE = "type";
 
+    //----------------------------/
+    //- Private Member Variables -/
+    //----------------------------/
+    
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
     private Class            _topClass     = null;
@@ -183,6 +189,8 @@ public final class UnmarshalHandler extends MarshalFramework
       */
      private Namespaces _namespaces = null;
 
+    private Hashtable _nsPackageMappings = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -208,6 +216,8 @@ public final class UnmarshalHandler extends MarshalFramework
         buf           = new StringBuffer();
         _topClass     = _class;
         _namespaces   = new Namespaces();
+        _nsPackageMappings = new Hashtable();
+        
     } //-- UnmarshalHandler(Class)
 
     public Object getObject() {
@@ -688,7 +698,8 @@ public final class UnmarshalHandler extends MarshalFramework
             _topState.type = _topClass;
 
             // Retrieving the xsi:type attribute, if present
-            String instanceClassname = getInstanceType(atts);
+            String topPackage = getJavaPackage(_topClass);
+            String instanceClassname = getInstanceType(atts, topPackage);
             if (instanceClassname != null) {
                 Class instanceClass = null;
                 Object instance = null;
@@ -924,7 +935,8 @@ public final class UnmarshalHandler extends MarshalFramework
                 _class = descriptor.getFieldType();
 
             // Retrieving the xsi:type attribute, if present
-            String instanceType = getInstanceType(atts);
+            String currentPackage = getJavaPackage(parentState.type);
+            String instanceType = getInstanceType(atts, currentPackage);
             if (instanceType != null) {
                 Class instanceClass = null;
                 try {
@@ -1134,23 +1146,63 @@ public final class UnmarshalHandler extends MarshalFramework
     //-------------------/
 
     /**
-     * Returns the instance type attribute.
-     * @return String the value of the xsi:type attribute, or null if there is
-     * no xsi:type attribute
+     * Returns the resolved instance type attribute (xsi:type). 
+     * If present the instance type attribute is resolved into 
+     * a java class name and then returned.
+     *
+     * @param atts the AttributeList to search for the instance type
+     * attribute.
+     * @return the java class name corresponding to the value of
+     * the instance type attribute, or null if no instance type 
+     * attribute exists in the given AttributeList.
      */
-    private String getInstanceType(AttributeList atts) {
-        String xsiTypeAttribute = atts.getValue("xsi:type");
-        if (xsiTypeAttribute != null) {
-            if (xsiTypeAttribute.startsWith("java:")) {
-                return xsiTypeAttribute.substring(5);
+    private String getInstanceType(AttributeList atts, String currentPackage) {
+        
+        String type = null;
+        
+        //-- find xsi:type attribute
+        String prefix = _namespaces.getNamespacePrefix(XSI_NAMESPACE);
+        if (prefix == null) return null;
+        prefix += ':';
+        
+        for (int i = 0; i < atts.getLength(); i++) {
+            String attName = atts.getName(i);
+            if (attName.startsWith(prefix)) {
+                attName = attName.substring(prefix.length());
+                if (attName.equals(XSI_TYPE)) {
+                    type = atts.getValue(i);
+                    break;
+                }
             }
-            // Retrieve the type corresponding to the schema name and
-            // return it.
+        }
+        
+        if (type != null) {
+            if (type.startsWith(JAVA_PREFIX)) {
+                return type.substring(JAVA_PREFIX.length());
+            }
+            //-- Retrieve the type corresponding to the schema name and
+            //-- return it.
             XMLClassDescriptor classDesc =
-                _cdResolver.resolveByXMLName(xsiTypeAttribute, null, null);
+                _cdResolver.resolveByXMLName(type, null, _loader);
 
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
+                
+            //-- if class descriptor is not found here, then no descriptors
+            //-- existed in memory...try to load one based on name of
+            //-- Schema type
+            String className = JavaNaming.toJavaClassName(type);
+            classDesc = _cdResolver.resolve(className, _loader);
+            if (classDesc != null) 
+                return classDesc.getJavaClass().getName();
+                
+            //-- try to use "current Package"
+            className = currentPackage + '.' + className;
+            classDesc = _cdResolver.resolve(className, _loader);
+            if (classDesc != null) 
+                return classDesc.getJavaClass().getName();
+            
+            
         }
         return null;
     } //-- getInstanceType
@@ -1397,7 +1449,7 @@ public final class UnmarshalHandler extends MarshalFramework
             prefix = result.substring(0,idx);
             result = result.substring(idx+1);
         }
-        result = "{"+_namespaces.getNamespaceURI(prefix)+"}"+result;
+        result = '{'+_namespaces.getNamespaceURI(prefix)+'}'+result;
         return result;
     }
 
@@ -1513,6 +1565,23 @@ public final class UnmarshalHandler extends MarshalFramework
         return classDesc;
     } //-- getClassDescriptor
 
+    /**
+     * Returns the package for the given Class
+     *
+     * @param type the Class to return the package of
+     * @return the package for the given Class
+    **/
+    private String getJavaPackage(Class type) {
+        if (type == null) return null;
+        String pkg = type.getName();
+        int idx = pkg.lastIndexOf('.');
+        if (idx > 0) {
+            pkg = pkg.substring(0,idx);
+        }
+        else pkg = "";
+        return pkg;
+    } //-- getJavaPackage
+    
     /**
      * Searches for Container descriptors that match the given element name.
      * This is a patch, which will hopefully be changed at a later date.
