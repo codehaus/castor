@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:    Fixed bug 1313: Default capacity on count-limited cache type is 30 not 100
+        Fix noted by Stein M. Eliassen <stein.m.eliassen@start.no>
+        (Bruce - 20030516)
+
 XML:    Fixed issue with mapping multiple elements with the same name but
         different namespace to separate fields.
         (kvisco - 20030423)
