@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -58,12 +58,13 @@ import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
-import org.exolab.castor.mapping.xml.types.AutoNamingType;
+import org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType;
 import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.util.Configuration;
 
@@ -278,9 +279,9 @@ public class XMLMappingLoader
             isReference = xml.getReference();
             
             //-- autonaming
-            AutoNamingType autoName = xml.getAutoNaming();
+            BindXmlAutoNamingType autoName = xml.getAutoNaming();
             if (autoName != null) {
-                deriveNameByClass = (autoName == AutoNamingType.DERIVEBYCLASS);
+                deriveNameByClass = (autoName == BindXmlAutoNamingType.DERIVEBYCLASS);
             }
         }
         
@@ -302,7 +303,7 @@ public class XMLMappingLoader
                 nodeType = _primitiveNodeType;
             else
                 nodeType = NodeType.Element;
-        }
+        }        
 
         //-- Create XML name if necessary. Note if name is to be derived
         //-- by class..we just make sure we set the name to null...
@@ -353,6 +354,17 @@ public class XMLMappingLoader
         if (colType != null) {
             xmlDesc.setMapped((colType == CollectionType.HASHTABLE) ||
                (colType == CollectionType.MAP));
+               
+            //-- special NodeType.Namespace handling
+            //-- prevent FieldHandlerImpl from using CollectionHandler
+            //-- during calls to #getValue
+            if (nodeType == NodeType.Namespace) {
+                Object handler = xmlDesc.getHandler();
+                if (handler instanceof FieldHandlerImpl) {
+                    FieldHandlerImpl handlerImpl = (FieldHandlerImpl)handler;
+                    handlerImpl.setConvertFrom(new IdentityConvertor());
+                }
+            }
         }
 
         return xmlDesc;
@@ -384,7 +396,20 @@ public class XMLMappingLoader
 
     } //-- isPrimitive
     
-}
+    /**
+     * A special TypeConvertor that simply returns the object
+     * given. This is used for preventing the FieldHandlerImpl
+     * from using a CollectionHandler when getValue is called.
+    **/
+    class IdentityConvertor implements TypeConvertor {
+        public Object convert( Object object, String param )
+            throws ClassCastException
+        {
+            return object;
+        }
+    } //-- class: IdentityConvertor
+    
+} //-- class: XMLMappingLoader
 
 
 

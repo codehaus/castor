@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999, 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,6 +51,9 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.MapHandler;
+import org.exolab.castor.mapping.handlers.MapHandlers;
+
 import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
@@ -969,6 +972,25 @@ public class Marshaller extends MarshalFramework {
             if (descriptors[i] == null) continue;
 
             XMLFieldDescriptor attDescriptor = descriptors[i];
+            
+            //-- process Namespace nodes from Object Model,
+            //-- if necessary.
+            if (attDescriptor.getNodeType() == NodeType.Namespace) {
+                Object map = attDescriptor.getHandler().getValue(object);
+                MapHandler mapHandler = MapHandlers.getHandler(map);
+                if (mapHandler != null) {
+                    Enumeration keys = mapHandler.keys(map);
+                    while (keys.hasMoreElements()) {
+                        Object key = keys.nextElement();
+                        Object val = mapHandler.get(map, key);
+                        String prefix = key.toString();
+                        String nsURI = val.toString();
+                        declareNamespace(prefix, nsURI);
+                    }
+                }
+                continue;
+            }
+            
             String xmlName = attDescriptor.getXMLName();
 
             //-- handle attribute namespaces
