@@ -63,8 +63,7 @@ public class XSInteger extends XSType {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
-        = new JClass("int");
+    private static final JType jType = JType.Int;
         
     //private Integer value = null;
     

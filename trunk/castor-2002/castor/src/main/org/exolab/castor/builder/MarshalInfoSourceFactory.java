@@ -96,24 +96,14 @@ public class MarshalInfoSourceFactory {
         JMethod     method = null;
         JSourceCode vcode  = null;
         
-        String className   = classInfo.getClassName();
-        String nsPrefix    = classInfo.getNameSpacePrefix();
-        String nsURI       = classInfo.getNameSpaceURI();
+        String className   = classInfo.getJClass().getName();
+        String nsPrefix    = classInfo.getNamespacePrefix();
+        String nsURI       = classInfo.getNamespaceURI();
         
         
         String variableName = "_"+className;
         
-        
-        //-- initial set up
-        String packageName = null;
-        int idx = -1;
-        if ((idx = className.lastIndexOf('.')) < 0)
-            packageName = classInfo.getPackageName();
-            
-        if (packageName == null) packageName = "";
-        else packageName += ".";
-        
-        JClass marshalInfo = new JClass(packageName+className+"MarshalInfo");
+        JClass marshalInfo = new JClass(className+"MarshalInfo");
         marshalInfo.addInterface("org.exolab.castor.xml.MarshalInfo");
         marshalInfo.addImport("org.exolab.castor.xml.*");
         marshalInfo.addImport("java.lang.reflect.Method");
@@ -180,7 +170,7 @@ public class MarshalInfoSourceFactory {
         
         
         
-        SGMember[] atts = classInfo.getAttributeMembers();
+        FieldInfo[] atts = classInfo.getAttributeFields();
         
         //-- initialized rules
         jsc.add("rules = new ValidationRule[");
@@ -196,12 +186,15 @@ public class MarshalInfoSourceFactory {
         
         for (int i = 0; i < atts.length; i++) {
             
-            SGMember member = atts[i];
+            FieldInfo member = atts[i];
+            
+            //-- skip transient members
+            if (member.isTransient()) continue;
             
             jsc.add("//-- ");
             jsc.append(member.getName());
                 
-            XSType xsType = member.getXSType();
+            XSType xsType = member.getSchemaType();
             jsc.add("desc = new ");
             
             switch (xsType.getType()) {
@@ -209,16 +202,25 @@ public class MarshalInfoSourceFactory {
                 case XSType.TIME_INSTANT:
                     jsc.append("DateMarshalDescriptor(\"");
                     break;
+                case XSType.CLASS:
+                    XSClass xsClass = (XSClass)xsType;
+                    if (xsClass.isEnumerated()) {
+                        jsc.append("EnumMarshalDescriptor(");
+                        jsc.append(xsClass.getName());
+                        jsc.append(".class,\"");
+                        break;
+                    }
+                    //-- do not break here
                 default:
                     jsc.append("SimpleMarshalDescriptor(");
-                    jsc.append(classType(xsType));
+                    jsc.append(classType(xsType.getJType()));
                     jsc.append(", \"");
                     break;
             }
             
             jsc.append(member.getName());
             jsc.append("\", \"");
-            jsc.append(member.getXMLName());
+            jsc.append(member.getNodeName());
             jsc.append("\");");
             jsc.add("desc.setDescriptorType(DescriptorType.attribute);");
                 
@@ -235,7 +237,7 @@ public class MarshalInfoSourceFactory {
                 
             //-- write method
             jsc.add("classArgs[0] = ");
-            jsc.append(member.getXSType().getJType().getName());
+            jsc.append(xsType.getJType().getName());
             jsc.append(".class;");
                 
             jsc.add("desc.setWriteMethod(");
@@ -249,7 +251,7 @@ public class MarshalInfoSourceFactory {
             jsc.add("catch(java.lang.NoSuchMethodException nsme) {};");
             jsc.add("");
             
-            if (member.getRequired()) {
+            if (member.isRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
             
@@ -260,7 +262,7 @@ public class MarshalInfoSourceFactory {
             
             //-- Add Validation Code
             jsc.add("bvr = new BasicValidationRule(\"");
-            jsc.append(member.getXMLName());
+            jsc.append(member.getNodeName());
             jsc.append("\");");
             jsc.add("bvr.setAsAttributeRule();");
             validationCode(member, jsc);
@@ -277,7 +279,7 @@ public class MarshalInfoSourceFactory {
         jsc.append(Integer.toString(atts.length));
         jsc.append("] = gvr;");
         
-        SGMember[] elements = classInfo.getElementMembers();
+        FieldInfo[] elements = classInfo.getElementFields();
         
         jsc.add("//-- initialize elements");
         jsc.add("");
@@ -287,11 +289,15 @@ public class MarshalInfoSourceFactory {
         
         for (int i = 0; i < elements.length; i++) {
             
-            SGMember member = elements[i];
+            FieldInfo member = elements[i];
             
-            XSType xsType = member.getXSType();
+            //-- skip transient members
+            if (member.isTransient()) continue;
+            
+            XSType xsType = member.getSchemaType();
+            
             if (xsType.getType() == XSType.LIST)
-                xsType = ((SGList)member).getContent().getXSType();
+                xsType = ((SGList)member).getContent().getSchemaType();
             
             jsc.add("//-- ");
             jsc.append(member.getName());
@@ -300,11 +306,11 @@ public class MarshalInfoSourceFactory {
             //-- a hack, I know, I will change later (kv)
             if (member.getName().equals("_anyList")) {
                 jsc.add("desc = (new SimpleMarshalDescriptor(");
-                jsc.append(classType(xsType));
+                jsc.append(classType(xsType.getJType()));
                 jsc.append(", \"");
                 jsc.append(member.getName());
                 jsc.append("\", \"");
-                jsc.append(member.getXMLName());
+                jsc.append(member.getNodeName());
                 jsc.append("\") {");
                 jsc.indent();
                 jsc.add("public boolean matches(String xmlName) {");
@@ -321,15 +327,24 @@ public class MarshalInfoSourceFactory {
                     case XSType.TIME_INSTANT:
                         jsc.append("DateMarshalDescriptor(\"");
                         break;
+                    case XSType.CLASS:
+                        XSClass xsClass = (XSClass)xsType;
+                        if (xsClass.isEnumerated()) {
+                            jsc.append("EnumMarshalDescriptor(");
+                            jsc.append(xsClass.getJType().getName());
+                            jsc.append(".class,\"");
+                            break;
+                        }
+                        //-- do not break here
                     default:
                         jsc.append("SimpleMarshalDescriptor(");
-                        jsc.append(classType(xsType));
+                        jsc.append(classType(xsType.getJType()));
                         jsc.append(", \"");
                         break;
                 }
                 jsc.append(member.getName());
                 jsc.append("\", \"");
-                jsc.append(member.getXMLName());
+                jsc.append(member.getNodeName());
                 jsc.append("\");");
             }
             
@@ -365,7 +380,7 @@ public class MarshalInfoSourceFactory {
             jsc.add("}");
             jsc.add("catch(java.lang.NoSuchMethodException nsme) {};");
             jsc.add("");
-            if (member.getRequired()) {
+            if (member.isRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
             //-- mark as multi or single valued
@@ -379,7 +394,7 @@ public class MarshalInfoSourceFactory {
             
             //-- Add Validation Code
             jsc.add("bvr = new BasicValidationRule(\"");
-            jsc.append(member.getXMLName());
+            jsc.append(member.getNodeName());
             jsc.append("\");");
             validationCode(member, jsc);
             jsc.add("gvr.addValidationRule(bvr);");
@@ -397,9 +412,7 @@ public class MarshalInfoSourceFactory {
         jsc = method.getSourceCode();
         jsc.add("return ");
         
-        XSType xsType = classInfo.getDataType();
-        
-        jsc.append(classType(xsType));
+        jsc.append(classType(classInfo.getJClass()));
         jsc.append(";");
         
         marshalInfo.addMethod(method);
@@ -417,6 +430,13 @@ public class MarshalInfoSourceFactory {
         jsc = method.getSourceCode();
         jsc.add("return contentDesc;");
         marshalInfo.addMethod(method);
+
+
+        //-- create getMarshalFilter method
+        //method = new JMethod(mdClass, "getMarshalFilter");
+        //jsc = method.getSourceCode();
+        //jsc.add("return null;");
+        //marshalInfo.addMethod(method);
         
         //-- create getNameSpacePrefix method
         method = new JMethod(SGTypes.String, "getNameSpacePrefix");
@@ -452,33 +472,29 @@ public class MarshalInfoSourceFactory {
     /**
      * Returns the Class type (as a String) for the given XSType
     **/
-    private static String classType(XSType xsType) {
-        switch (xsType.getType()) {
-            case XSType.INTEGER:
+    private static String classType(JType jType) {
+        if (jType.isPrimitive()) {
+            if (jType == JType.Int)
                 return "java.lang.Integer.TYPE";
-            case XSType.REAL:
+            else if (jType == JType.Double)
                 return "java.lang.Double.TYPE";
-            case XSType.STRING:
-            case XSType.TIME_INSTANT:
-            case XSType.CLASS:
-            default:
-                return xsType.getJType().toString() + ".class";
         }
+        return jType.toString() + ".class";
     } //-- classType
     
-    private static void validationCode(SGMember member, JSourceCode jsc) {
+    private static void validationCode(FieldInfo member, JSourceCode jsc) {
         
         //-- a hack, I know, I will change later
         if (member.getName().equals("_anyList")) return;
         
-        XSType xsType = member.getXSType();
+        XSType xsType = member.getSchemaType();
         
         //-- create local copy of field
         JMember jMember = member.createMember();
         
         
         if (xsType.getType() != XSType.LIST) {
-            if (member.getRequired()) {
+            if (member.isRequired()) {
                 jsc.add("bvr.setMinOccurs(1);");
             }
             jsc.add("bvr.setMaxOccurs(1);");
@@ -533,7 +549,7 @@ public class MarshalInfoSourceFactory {
             case XSType.LIST:
                 XSList xsList = (XSList)xsType;
                 SGList sgList = (SGList)member;
-                SGMember content = sgList.getContent();
+                FieldInfo content = sgList.getContent();
                 
                 jsc.add("bvr.setMinOccurs(");
                 jsc.append(Integer.toString(xsList.getMinimumSize()));

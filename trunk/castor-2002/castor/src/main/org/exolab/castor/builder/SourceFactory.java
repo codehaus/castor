@@ -46,8 +46,13 @@
 package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
-import org.exolab.javasource.*;
+import org.exolab.castor.builder.util.*;
 import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.types.BuiltInType;
+import org.exolab.javasource.*;
+
+import java.util.Enumeration;
 
 /**
  * This class takes an ElementDecl and creates the Java Source 
@@ -59,7 +64,7 @@ public class SourceFactory  {
     
     
     private static final String NULL_RESOLVER_ERR 
-        = "A null Resolver was passed as an argument to the SGClass constructor.";
+        = "A null Resolver was passed as an argument to the constructor.";
         
     private static final String REFERABLE_INTERFACE
         = "org.exolab.castor.xml.Referable";
@@ -76,106 +81,227 @@ public class SourceFactory  {
     //------------------/
     
     /**
-     * Creates the source code for the given ClassInfo.
-     * @param classInfo the ClassInfo object to create Source code for
-     * @return the JClass representing the java source code for the
-     * ClassInfo argument
+     * Creates a new ClassInfo for the given XML Schema element declaration
+     * @param element the XML Schema element declaration to create the 
+     * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+     * @param packageName the package to use when generating source
+     * from this ClassInfo
     **/
-    public static JClass createClassSource(ClassInfo classInfo) {
+    public static JClass createSourceCode
+        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
+    {
         
-        JMethod      jMethod     = null;
-        JSourceCode  jsc         = null;
-        JClass       cMain       = null;
-        JConstructor constructor = null;
+        FactoryState state = null;
         
-        String packageName = classInfo.getPackageName();
-        String cName = classInfo.getClassName();
-        if (packageName != null)
-            cName = packageName+"."+cName;
+        String elementName = element.getName();
+        String className = JavaXMLNaming.toJavaClassName(elementName);
         
-        cMain = new JClass(cName);
-        cMain.addInterface("java.io.Serializable");
+        className = resolveClassName(className, packageName);
         
-        String comment = classInfo.getComment();
-        if (comment != null)
-            cMain.getJDocComment().setComment(comment);
+        state = new FactoryState(className, resolver);
         
-        if (classInfo.isDerived()) {
-            ClassInfo sourceInfo = classInfo.getSuperClassInfo();
-            cMain.setSuperClass(sourceInfo.getClassName());
-        }
+        ClassInfo classInfo = state.classInfo;
+        JClass    jClass    = state.jClass;
         
-        //-- check for abstract class
-        cMain.getModifiers().setAbstract(classInfo.isAbstract());
+        initialize(jClass);
         
-        cMain.addConstructor(constructor = cMain.createConstructor());
-        constructor.getSourceCode().add("super();");
+        //-- name information
+        classInfo.setNodeName(element.getName());
         
-        //-- add imports
-        cMain.addImport("org.exolab.castor.xml.*");
-        cMain.addImport("java.io.Writer");
-        cMain.addImport("java.io.Reader");
-        cMain.addImport("java.io.Serializable");
+        //-- namespace information
+        Schema  schema = element.getSchema();        
+        classInfo.setNamespacePrefix(element.getSchemaAbbrev());
+        classInfo.setNamespaceURI(schema.getTargetNamespace());
         
-        
-        
-        
-        //-- handle attributes
-        SGMember[] atts = classInfo.getAttributeMembers();
-        
-        for (int i = 0; i < atts.length; i++) {
-            SGMember member = atts[i];
+        //-- process annotation
+        String comment  = processAnnotations(element);
+        if (comment != null) 
+            jClass.getJDocComment().setComment(comment);
             
-            //-- skip derived types
-            if (classInfo.isDerived(member)) continue;
+        
+        Archetype archetype = element.getArchetype();
+        
+        boolean derived = false;
+        
+        if (archetype != null) {
+            processArchetype(archetype, state);
+        }
+        else {
+            Datatype datatype = element.getDatatype();
+            if (datatype != null)
+                classInfo.setSchemaType(TypeConversion.convertType(datatype));
+            else
+                classInfo.setSchemaType(new XSClass(state.jClass));
+        }
+        
+        //-- add imports required by the marshal methods
+        jClass.addImport("java.io.Writer");
+        jClass.addImport("java.io.Reader");
+        
+        //-- #validate()
+        createValidateMethods(jClass);
+        //-- #marshal()
+        createMarshalMethods(jClass);
+        //-- #unmarshal()
+        createUnmarshalMethods(jClass);
+        
+        if (resolver != null)
+            resolver.bindReference(jClass, classInfo);
+        
+        return jClass;
+    } //-- createSourceCode
+    
+    /**
+     * Creates a new ClassInfo for the given XML Schema type declaration.
+     * The type declaration must be a top-level declaration.
+     * @param type the XML Schema type declaration to create the 
+     * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+     * @param packageName the package to which generated classes should
+     * belong
+    **/
+    public static JClass createSourceCode
+        (Archetype type, ClassInfoResolver resolver, String packageName) 
+    {
+        if (type == null)
+            throw new IllegalArgumentException("null archetype");
             
-            cMain.addMember(member.createMember());
-            cMain.addMethods(member.createAccessMethods());
-            //-- Add initialization code
-            member.generateInitializerCode(constructor.getSourceCode());
-        }
+        if (!type.isTopLevel())
+            throw new IllegalArgumentException("Archetype is not top-level.");
         
-        //-- handle elements
-        SGMember[] elements = classInfo.getElementMembers();
+        String className = JavaXMLNaming.toJavaClassName(type.getName());
+        className = resolveClassName(className, packageName);
         
-        for (int i = 0; i < elements.length; i++) {
-            SGMember member = elements[i];
+        FactoryState state = new FactoryState(className, resolver);
+        
+        ClassInfo classInfo = state.classInfo;
+        JClass    jClass    = state.jClass;
+        
+        initialize(jClass);
+        
+        //-- make class abstract
+        jClass.getModifiers().setAbstract(true);
+        
+        
+        //-- name information
+        classInfo.setNodeName(type.getName());
+        
+        //-- namespace information
+        Schema  schema = type.getSchema();        
+        classInfo.setNamespaceURI(schema.getTargetNamespace());
+        
+        //-- process annotation
+        String comment  = processAnnotations(type);
+        if (comment != null) 
+            jClass.getJDocComment().setComment(comment);
             
-            //-- skip derived types
-            if (classInfo.isDerived(member)) continue;
+        
+        processArchetype(type, state);
+        
+        //-- add imports required by the marshal methods
+        jClass.addImport("java.io.Writer");
+        jClass.addImport("java.io.Reader");
+        
+        //-- #validate()
+        createValidateMethods(jClass);
+        //-- #marshal()
+        //createMarshalMethods(jClass);
+        //-- #unmarshal()
+        //createUnmarshalMethods(jClass);
+        
+        if (resolver != null) {
+            resolver.bindReference(jClass, classInfo);
+            resolver.bindReference(type, classInfo);
+        }
+        
+        return jClass;
+        
+    } //-- ClassInfo
+    
+    /**
+     * Creates the Java source code to support the given Datatype
+     * @param datatype the Datatype to create the Java source for
+     * @return the JClass representation of the given Datatype
+    **/
+    public static JClass createSourceCode
+        (Datatype datatype, ClassInfoResolver resolver, String packageName) 
+    {
+        
+        if (datatype instanceof BuiltInType) {
+            String err = "You cannot construct a ClassInfo for a " +
+                "built-in datatype.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        
+        //-- class name information
+        String className = JavaXMLNaming.toJavaClassName(datatype.getName());
+        className = resolveClassName(className, packageName);
+        
+        FactoryState state = new FactoryState(className, resolver);
+        
+        ClassInfo classInfo = state.classInfo;
+        JClass    jClass    = state.jClass;
+        
+        initialize(jClass);
+        
+        //-- XML information
+        Schema  schema = datatype.getSchema();        
+        classInfo.setNamespaceURI(schema.getTargetNamespace());
+        classInfo.setNodeName(datatype.getName());
+        
+        
+        //-- process annotation
+        String comment  = processAnnotations(datatype);
+        if (comment != null) 
+            jClass.getJDocComment().setComment(comment);
             
-            cMain.addMember(member.createMember());
-            cMain.addMethods(member.createAccessMethods());
-            //-- Add initialization code
-            member.generateInitializerCode(constructor.getSourceCode());
+        classInfo.setSchemaType(new XSClass(jClass, datatype.getName()));
+        
+        //-- handle enumerated types
+        
+        if (datatype.hasFacet("enumeration")) {
+            processEnumeration(datatype, state);
         }
         
-        //-- handle text content
-        if (classInfo.allowsTextContent()) {
-            JMember text = new JMember(SGTypes.String, "vContent");
-            text.setComment("internal character storage");
-            cMain.addMember(text);
-            cMain.addMethod(SGHelper.createGetMethod(text));
-            cMain.addMethod(SGHelper.createSetMethod(text));
-            constructor.getSourceCode().add("vContent = new String();");
+        if (resolver != null) {
+            resolver.bindReference(jClass, classInfo);
+            resolver.bindReference(datatype, classInfo);
         }
         
-        if (!classInfo.isAbstract()) {
-            //-- #validate()
-            createValidateMethods(cMain);
-            //-- #marshal()
-            createMarshalMethods(cMain);
-            //-- #unmarshal()
-            createUnmarshalMethods(cMain);
-        }
+        return jClass;
         
-        return cMain;
     } //-- createClassSource
+    
+    
+    /**
+     * Initializes the given JClass
+    **/
+    private static void initialize(JClass jClass) {
+        
+        
+        jClass.addInterface("java.io.Serializable");
+        
+        //-- add default constructor
+        JConstructor con = jClass.createConstructor();
+        jClass.addConstructor(con);
+        con.getSourceCode().add("super();");
+        
+        //-- add default import list
+        jClass.addImport("org.exolab.castor.xml.*");
+        jClass.addImport("java.io.Serializable");
+        
+    } //-- initialize
     
     //-------------------/        
     //- Private Methods -/        
     //-------------------/        
-        
+    
+    /**
+     * Creates the #marshal methods for the given JClass
+     * @param parent the JClass to create the #marshal methods for
+    **/
     private static void createMarshalMethods(JClass parent) {
         
         //-- create main marshal method
@@ -282,5 +408,369 @@ public class SourceFactory  {
         
     } //-- createValidateMethods
     
+    //-------------------/        
+    //- Private Methods -/        
+    //-------------------/        
+     
+    /**
+     * Resolves the className out of the given name and the packageName
+    **/
+    private static String resolveClassName(String name, String packageName) {
+        if ((packageName != null) && (packageName.length() > 0)) {
+            return packageName+"."+name;
+        }
+        return name;
+    } //-- resolveClassName
+    
+    /**
+     * @param archetype the Archetype for this ClassInfo
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+    **/    
+    private static void processArchetype
+        (Archetype archetype, FactoryState state) 
+    {
+        
+        String typeName = archetype.getName();
+        
+        ClassInfo classInfo = state.classInfo;
+        classInfo.setSchemaType(new XSClass(state.jClass, typeName));
+        
+        Schema schema = archetype.getSchema();
+        classInfo.setNamespaceURI(schema.getTargetNamespace());
+        
+        
+        
+        //- Handle derived types
+        if (archetype.getSource() != null) {
+        
+            String sourceName = archetype.getSource();
+            Archetype source = schema.getArchetype(sourceName);
+            if (source != null) {
+                
+                String className = null;
+                
+                ClassInfo cInfo = state.resolve(source);
+                if (cInfo == null) {
+                    
+                    String packageName = state.jClass.getPackageName();
+                    JClass jClass = createSourceCode(source, 
+                                                     state,
+                                                     packageName);
+                    cInfo = state.resolve(source);
+                    className = jClass.getName();
+                }
+                else className = cInfo.getJClass().getName();
+                
+                    
+                state.jClass.setSuperClass(className);
+                
+                //-- copy members from super class
+                classInfo.addFieldInfo(cInfo.getAttributeFields());
+                classInfo.addFieldInfo(cInfo.getElementFields());
+            }
+            else {
+                //-- will this ever be null, if we have a valid Schema?
+                //-- ignore for now...but add comment in case we
+                //-- ever see it.
+                System.out.print("ClassInfo#init: ");
+                System.out.print("A referenced archetype is null: ");
+                System.out.println(sourceName);
+            }
+        }
+        
+        //---------------------/
+        //- handle attributes -/
+        //---------------------/
+        //-- loop throug each attribute
+        Enumeration enum = archetype.getAttributeDecls();
+        while (enum.hasMoreElements()) {
+            AttributeDecl attr = (AttributeDecl)enum.nextElement();
+            FieldInfo fieldInfo = MemberFactory.createFieldInfo(attr);
+            handleField(fieldInfo, state);
+        }
+        
+        //------------------------/
+        //- handle content model -/
+        //------------------------/
+        //-- check contentType
+        ContentType contentType = archetype.getContent();
+            
+        //-- create text member
+        if ((contentType == ContentType.textOnly) ||
+            (contentType == ContentType.mixed) ||
+            (contentType == ContentType.any)) 
+        {
+            
+            FieldInfo fieldInfo = MemberFactory.createFieldInfoForText();
+            handleField(fieldInfo, state);
+            
+            if (contentType == ContentType.any) {
+                fieldInfo = MemberFactory.createFieldInfoForAny();
+                handleField(fieldInfo, state);
+            }
+                
+        }
+        processContentModel(archetype, state);
+    } //-- processArchetype
+
+
+    private static void handleField(FieldInfo fieldInfo, FactoryState state) {
+        
+        if (fieldInfo == null) return;
+        
+        JSourceCode scInitializer 
+            = state.jClass.getConstructor(0).getSourceCode();
+            
+        
+        state.classInfo.addFieldInfo(fieldInfo);
+        
+        state.jClass.addMember(fieldInfo.createMember());
+        
+        //-- do not create access methods for transient fields
+        if (!fieldInfo.isTransient()) {
+            state.jClass.addMethods(fieldInfo.createAccessMethods());
+        }
+        
+        //-- Add initialization code
+        fieldInfo.generateInitializerCode(scInitializer);
+        
+    } //-- handleField
+    
+    /**
+     * Processes the given ContentModelGroup
+     * @param contentModel the ContentModelGroup to process
+    **/
+    private static void processContentModel
+        (ContentModelGroup contentModel, FactoryState state) 
+    {
+        
+        //------------------------------/
+        //- handle elements and groups -/
+        //------------------------------/
+                
+        Enumeration enum = contentModel.enumerate();
+                
+        FieldInfo fieldInfo = null;
+        while (enum.hasMoreElements()) {
+                    
+            Structure struct = (Structure)enum.nextElement();
+            switch(struct.getStructureType()) {
+                case Structure.ELEMENT:
+                    fieldInfo 
+                        = MemberFactory.createFieldInfo((ElementDecl)struct);
+                    handleField(fieldInfo, state);
+                    break;
+                case Structure.GROUP:
+                    processContentModel((Group)struct, state);
+                    break;
+                default:
+                    break;
+            }
+        }
+            
+    } //-- process(ContentModelGroup)
+    
+    /**
+     * Creates Comments from Schema annotations
+     * @param annotated the Annotated structure to process
+     * @return the generated comment
+    **/
+    private static String processAnnotations(Annotated annotated) {
+        //-- process annotations
+        Enumeration enum = annotated.getAnnotations();
+        if (enum.hasMoreElements()) {
+            StringBuffer comment = new StringBuffer();
+            while (enum.hasMoreElements()) {
+                Annotation ann = (Annotation) enum.nextElement();
+                Enumeration infos = ann.getInfo();
+                while (infos.hasMoreElements()) {
+                    Info info = (Info) infos.nextElement();
+                    String content = info.getContent();
+                    if ( content != null) comment.append(content);
+                }
+            }
+            return comment.toString();
+        }
+        return null;
+    } //-- processAnnotations
+    
+    /**
+     * Creates all the necessary enumeration code from the given 
+     * datatype
+    **/
+    private static void processEnumeration
+        (Datatype datatype, FactoryState state) 
+    {
+        
+        Enumeration enum = datatype.getFacets("enumeration");
+        
+        
+        
+        JClass jClass = state.jClass;
+        String className = jClass.getLocalName();
+        
+        JMember     member = null;
+        JDocComment jdc    = null;
+        JSourceCode jsc    = null;
+        
+        //-- modify constructor
+        JConstructor constructor = jClass.getConstructor(0);
+        constructor.getModifiers().makePrivate();
+        constructor.addParameter(new JParameter(JType.Int, "type"));
+        constructor.addParameter(new JParameter(SGTypes.String, "value"));
+        jsc = constructor.getSourceCode();
+        jsc.add("this.type = type;");
+        jsc.add("this.stringValue = value;");
+        
+        
+        
+        //-- #valueOf method
+        JMethod mValueOf = new JMethod(jClass, "valueOf");
+        mValueOf.addParameter(new JParameter(SGTypes.String, "string"));
+        mValueOf.getModifiers().setStatic(true);
+        jClass.addMethod(mValueOf);
+        jdc = mValueOf.getJDocComment();
+        jdc.appendComment("Returns a new " + className);
+        jdc.appendComment(" based on the given String value.");
+
+        JSourceCode srcValueOf = mValueOf.getSourceCode();
+        
+        //-- #toString method
+        JMethod mToString = new JMethod(SGTypes.String, "toString");
+        jClass.addMethod(mToString);
+        jdc = mToString.getJDocComment();
+        jdc.appendComment("Returns the String representation of this ");
+        jdc.appendComment(className);
+        mToString.getSourceCode().add("return this.stringValue;");
+        
+        //-- Loop through "enumeration" facets
+        int count = 0;
+        
+        while (enum.hasMoreElements()) {
+            
+            Facet facet = (Facet) enum.nextElement();
+            
+            String value = facet.getValue();
+            String typeName = value.toUpperCase();
+            String objName = JavaXMLNaming.toJavaMemberName(value);
+            
+            
+            //-- handle int type
+            member = new JMember(JType.Int, typeName);
+            member.setComment("The " + value + " type");
+            JModifiers modifiers = member.getModifiers();
+            modifiers.setFinal(true);
+            modifiers.setStatic(true);
+            modifiers.makePublic();
+            member.setInitString(Integer.toString(count));
+            jClass.addMember(member);
+            
+            //-- handle Class type
+            member = new JMember(jClass, objName);
+            member.setComment("The instance of the " + value + " type");
+            
+            modifiers = member.getModifiers();
+            
+            modifiers.setFinal(true);
+            modifiers.setStatic(true);
+            modifiers.makePublic();
+            
+            StringBuffer init = new StringBuffer();
+            init.append("new ");
+            init.append(className);
+            init.append("(");
+            init.append(typeName);
+            init.append(", \"");
+            init.append(value);
+            init.append("\")");
+            
+            member.setInitString(init.toString());
+            jClass.addMember(member);
+            
+            //-- add #valueOf code
+            
+            if (count != 0) srcValueOf.add("else if (\"");
+            else srcValueOf.add("if (\"");
+            
+            srcValueOf.append(value);
+            srcValueOf.append("\".equals(string))");
+            srcValueOf.indent();
+            srcValueOf.add("return ");
+            srcValueOf.append(objName);
+            srcValueOf.append(";");
+            srcValueOf.unindent();
+            
+            ++count;
+        }
+        
+        //-- add internal type
+        member = new JMember(JType.Int, "type");
+        member.setInitString("-1");
+        jClass.addMember(member);
+        
+        //-- add internal stringValue
+        member = new JMember(SGTypes.String, "stringValue");
+        member.setInitString("null");
+        jClass.addMember(member);
+        
+        
+        //-- finish #valueOf
+        srcValueOf.add("String err = \"'\" + string + \"' is not a valid ");
+        srcValueOf.append(className);
+        srcValueOf.append("\";");
+        srcValueOf.add("throw new IllegalArgumentException(err);");
+        
+        //-- add #getType method
+        
+        JMethod mGetType = new JMethod(JType.Int, "getType");
+        mGetType.getSourceCode().add("return this.type;");
+        jdc = mGetType.getJDocComment();
+        jdc.appendComment("Returns the type of this " + className);
+        jClass.addMethod(mGetType);
+        
+        
+        
+    } //-- processEnumeration
     
 } //-- SourceFactory
+
+
+/**
+ * A class used to save State information for the SourceFactory
+ * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+**/
+class FactoryState implements ClassInfoResolver {
+    
+    JClass    jClass           = null;
+    ClassInfo classInfo        = null;
+    
+    private ClassInfoResolver _resolver = null;
+    
+    protected FactoryState(String className, ClassInfoResolver resolver) {
+        jClass    = new JClass(className);
+        classInfo = new ClassInfo(jClass);
+        if (resolver == null)
+            _resolver = new ClassInfoResolverImpl();
+        else
+            _resolver = resolver;
+    } //-- FactoryState
+    
+    /**
+     * Adds the given Reference to this ClassInfo resolver
+     * @param key the key to bind a reference to
+     * @param classInfo the ClassInfo which is being referenced
+    **/
+    public void bindReference(Object key, ClassInfo classInfo) {
+        _resolver.bindReference(key, classInfo);
+    } //-- bindReference
+    
+    /**
+     * Returns the ClassInfo which has been bound to the given key
+     * @param key the object to which the ClassInfo has been bound
+     * @return the ClassInfo which has been bound to the given key
+    **/
+    public ClassInfo resolve(Object key) {
+        return _resolver.resolve(key);
+    } //-- resolve
+    
+} //-- FactoryState

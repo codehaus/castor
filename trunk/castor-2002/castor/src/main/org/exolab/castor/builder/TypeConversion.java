@@ -140,6 +140,17 @@ public class TypeConversion {
         
         XSType xsType = null;
         
+        
+        //-- enumerated types
+        if (datatype.hasFacet("enumeration")) {
+            String className 
+                = JavaXMLNaming.toJavaClassName(datatype.getName());
+                
+            XSClass xsClass = new XSClass(new JClass(className));
+            xsClass.setAsEnumertated(true);
+            return xsClass;
+        }
+        
         //-- determine base type
         Datatype base = datatype;
         while ((base != null) && (!(base instanceof BuiltInType))) {

@@ -45,6 +45,8 @@
 
 package org.exolab.castor.builder;
 
+import org.exolab.castor.builder.util.ClassInfoResolverImpl;
+
 import org.exolab.javasource.*;
 import java.util.Hashtable;
 import java.util.Stack;
@@ -55,25 +57,16 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class SGStateInfo {
+class SGStateInfo extends ClassInfoResolverImpl {
         
-        
-    /**
-     * The ClassInfoResolver (need I say more?)
-    **/
-    protected ClassInfoResolver resolver = null;
-    
     /** 
      * The package used when creating new classes.
     **/
     protected String      packageName = null;
         
-    /**
-     * A list of generated archetypes
-    **/
-    protected Vector sourceGenerated = null;
-    
     private Hashtable classTypes = null;
+    
+    private Vector processed = null;
     
     /**
      * Constructor
@@ -82,10 +75,24 @@ class SGStateInfo {
         super();
         classTypes       = new Hashtable();
         packageName      = "";
-        resolver         = new ClassInfoResolver();
-        sourceGenerated  = new Vector();
+        processed = new Vector();
     } //-- SGStateInfo
     
+    /**
+     * Returns true if the given JClass has been marked as processed
+     * @param jClass the JClass to check for being marked as processed
+    **/
+    boolean processed(JClass jClass) {
+        return processed.contains(jClass.getName());
+    } //-- processed
+    
+    void markAsProcessed(JClass jClass) {
+        String className = jClass.getName();
+        if (!processed.contains(className))
+            processed.addElement(className);
+    } //-- markAsProcessed
+    
+    /*
     protected JClass getJClass(String name) {
         
         if (name == null) return null;
@@ -97,6 +104,7 @@ class SGStateInfo {
         }
         return jClass;
     }
+    */
     
 } //-- SGStateInfo
  

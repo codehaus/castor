@@ -54,9 +54,78 @@ import org.exolab.javasource.*;
 **/
 public abstract class XSType {
     
+    
+    /**
+     * The name of the binary type
+    **/
+    public static final String BINARY_NAME         = "binary";
+
+    /**
+     * The name of the boolean type
+    **/
+    public static final String BOOLEAN_NAME        = "boolean";
+    
+    /**
+     * The name of the decimal type
+    **/
+    public static final String DECIMAL_NAME        = "decimal";
+    
+    /**
+     * The name of the double type
+    **/
+    public static final String DOUBLE_NAME         = "double";
+
+    /**
+     * The name of the ID type
+    **/
+    public static final String ID_NAME             = "ID";
+
+    /**
+     * The name of the IDREF type
+    **/
+    public static final String IDREF_NAME          = "IDREF";
+    
+    /**
+     * The name of the integer type
+    **/
+    public static final String INTEGER_NAME        = "integer";
+    
+    /**
+     * The name of the NCName type
+    **/
+    public static final String NCNAME_NAME         = "NCName";
+    
+    /**
+     * The name of the negative-interger type
+    **/
+    public static final String NEGATIVE_INTEGER_NAME  = "negative-integer";
+    
+    
+    /**
+     * The name of the NMTOKEN type
+    **/
+    public static final String NMTOKEN_NAME        = "NMTOKEN";
+    
+    /**
+     * The name of the posative-interger type
+    **/
+    public static final String POSITIVE_INTEGER_NAME  = "positive-integer";
+    
+    /**
+     * The name of the string type
+    **/
+    public static final String STRING_NAME         = "string";
+    
+    /**
+     * The name of the timeInstant type
+    **/
+    public static final String TIME_INSTANT_NAME   = "timeInstant";
+    
+    
+    
     public static final short NULL               = -1;
     
-    //-- this type should change to Archetype or
+    //-- this type should change to user-defined or
     //-- something like that
     public static final short CLASS              =  0;
     //--
@@ -137,5 +206,40 @@ public abstract class XSType {
                 return false;
         }
     }
+    
+    /** 
+     * Returns the name of this XSType
+     * @return the name of this XSType
+    **/
+    public String getName() {
+        switch (type) {
+            case BINARY:
+                return BINARY_NAME;
+            case BOOLEAN:
+                return BOOLEAN_NAME;
+            case ID:
+                return ID_NAME;
+            case IDREF:
+                return IDREF_NAME;
+            case INTEGER:
+                return INTEGER_NAME;
+            case NCNAME:
+                return NCNAME_NAME;
+            case NEGATIVE_INTEGER:
+                return NEGATIVE_INTEGER_NAME;
+            case NMTOKEN:
+                return NMTOKEN_NAME;
+            case POSITIVE_INTEGER:
+                return POSITIVE_INTEGER_NAME;
+            case REAL:
+                return DOUBLE_NAME;
+            case STRING:
+                return STRING_NAME;
+            case TIME_INSTANT:
+                return TIME_INSTANT_NAME;
+            default:
+                return null;
+        }
+    } //-- getName
     
 } //-- XSType

@@ -45,13 +45,7 @@
 
 package org.exolab.castor.builder;
 
-import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.types.*;
-import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaXMLNaming;
-import org.exolab.castor.xml.Resolver;
 import org.exolab.javasource.*;
-
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -62,551 +56,152 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ClassInfo  {
+public class ClassInfo extends XMLInfo {
     
     
-    private Vector    elements       = null;
-    private Vector    atts           = null;
+    private Vector atts     = null;
+    private Vector elements = null;
     
-    private String packageName = null;
-    private String elementName = null;
-    private String className = null;
-    
-    private String nsPrefix  = null;
-    private String nsURI     = null;
-    
-    private boolean _allowTextContent = false;
+    private FieldInfo textField = null;
     
     /**
-     * The XML Schema type for this ClassInfo
+     * A reference to the JClass that this ClassInfo describes
     **/
-    private XSType dataType = null;
+    private JClass _class = null;
     
     /**
-     * A flag to signal derivation
+     * Creates a new ClassInfo
+     * @param jClass the JClass which this ClassInfo describes
     **/
-    private boolean derived = false;
-    
-    /**
-     * The ClassInfo with which this ClassInfo derives from
-    **/
-    private ClassInfo sourceInfo = null;
-
-    private boolean _abstract = false;
-    
-    private String  _comment  = null;
-    
-    /**
-     * Creates a new ClassInfo for the given XML Schema element declaration
-     * @param element the XML Schema element declaration to create the 
-     * ClassInfo for
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-    **/
-    public ClassInfo(ElementDecl element, ClassInfoResolver resolver)
-    {
-        this(element, resolver, null);
+    public ClassInfo(JClass jClass) {
+        super(XMLInfo.ELEMENT_TYPE);
+        if (jClass == null) { 
+            String err = "JClass passed to constructor of ClassInfo "+
+                "must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        this._class = jClass;
     } //-- ClassInfo
     
-    /**
-     * Creates a new ClassInfo for the given XML Schema element declaration
-     * @param element the XML Schema element declaration to create the 
-     * ClassInfo for
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-     * @param packageName the package to use when generating source
-     * from this ClassInfo
-    **/
-    public ClassInfo
-        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
-    {
-        this.elementName = element.getName();
-        this.nsPrefix    = element.getSchemaAbbrev();
-        this.nsURI       = element.getSchemaName();
-        this.className   = JavaXMLNaming.toJavaClassName(elementName);
-        this.packageName = packageName;
-        this._comment    = processAnnotations(element);
-        
-        Archetype archetype = element.getArchetype();
-        
-        boolean derived = false;
-        
-        if (archetype != null) {
-            init(archetype, resolver);
-        }
-        else {
-            Datatype datatype = element.getDatatype();
-            if (datatype != null) {
-                init(datatype, resolver);
-            }
-            else {
-                dataType = new XSClass(new JClass(this.className));
-            }
-                
-        }
-        
-    } //-- ClassInfo
-    
-    /**
-     * Creates a new ClassInfo for the given XML Schema type declaration.
-     * The type declaration must be a top-level declaration.
-     * @param type the XML Schema type declaration to create the 
-     * ClassInfo for
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-    **/
-    public ClassInfo(Archetype type, ClassInfoResolver resolver) 
-    {
-        this(type, resolver, null);
-    } //-- ClassInfo
-    
-    /**
-     * Creates a new ClassInfo for the given XML Schema type declaration.
-     * The type declaration must be a top-level declaration.
-     * @param type the XML Schema type declaration to create the 
-     * ClassInfo for
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-     * @param packageName the package to which generated classes should
-     * belong
-    **/
-    public ClassInfo
-        (Archetype type, ClassInfoResolver resolver, String packageName) 
-    {
-        if (type == null)
-            throw new IllegalArgumentException("null archetype");
-            
-        if (!type.isTopLevel())
-            throw new IllegalArgumentException("Archetype is not top-level.");
-            
-        this.packageName = packageName;
-        this._comment    = processAnnotations(type);
-        this._abstract = true;
-        
-        this.elementName = type.getName();
-        this.className   = JavaXMLNaming.toJavaClassName(elementName);
-        init(type, resolver);
-        
-    } //-- ClassInfo
-    
-    
-    /**
-     * Initializes this ClassInfo using the given Datatype
-     * @param datatype the Datatype for this ClassInfo
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-    **/
-    private void init(Datatype datatype, ClassInfoResolver resolver) {
-        
-        this.dataType = TypeConversion.convertType(datatype);
-        if (datatype instanceof BuiltInType) return;
-        
-        //-- modify package name so we don't have
-        //-- name collisions, since XML Schema uses
-        //-- separate namespaces for elements and datatypes
-        if (this.packageName == null)
-            this.packageName = "types";
-        else
-            this.packageName += ".types";
-            
-        Schema schema = datatype.getSchema();
-        
-        if (schema != null) {
-            this.nsURI = schema.getTargetNamespace();
-        }
-        
-    } //-- init
-    
-    /**
-     * Initializes this ClassInfo using the given Archetype
-     * and makes the initial call to #process
-     * @param archetype the Archetype for this ClassInfo
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-    **/    
-    private void init(Archetype archetype, ClassInfoResolver resolver) {
-        
-        
-        atts     = new Vector(3);
-        elements = new Vector(5);
-        
-        this.dataType = new XSClass(new JClass(className));
-        
-        Schema schema = archetype.getSchema();
-        
-        if (schema != null) {
-            this.nsURI = schema.getTargetNamespace();
-        }
-            
-        //- Handle derived types
-        if (archetype.getSource() != null) {
-            derived = true;
-            String sourceName = archetype.getSource();
-            Archetype source = schema.getArchetype(sourceName);
-            if (source != null) {
-                
-                ClassInfo classInfo = null;
-                
-                if (resolver != null) 
-                    classInfo = resolver.resolve(source);
-                    
-                if (classInfo == null)
-                    classInfo = new ClassInfo(source, resolver, packageName);
-                
-                if (resolver != null) 
-                    resolver.bindReference(source, classInfo);
-                    
-                sourceInfo = classInfo;
-                
-                //-- copy members from super class
-                addMembers(sourceInfo.getAttributeMembers());
-                addMembers(sourceInfo.getElementMembers());
-            }
-            else {
-                //-- will this ever be null, if we have a valid Schema?
-                //-- ignore for now...but add comment in case we
-                //-- ever see it.
-                System.out.print("ClassInfo#init: ");
-                System.out.print("A referenced archetype is null: ");
-                System.out.println(sourceName);
-            }
-        }
-        
-        //---------------------/
-        //- handle attributes -/
-        //---------------------/
-        //-- loop throug each attribute
-        Enumeration enum = archetype.getAttributeDecls();
-        while (enum.hasMoreElements()) {
-            processAttribute((AttributeDecl)enum.nextElement());
-        }
-        //------------------------/
-        //- handle content model -/
-        //------------------------/
-        //-- check contentType
-        ContentType contentType = archetype.getContent();
-            
-        //-- create text member
-        if ((contentType == ContentType.textOnly) ||
-            (contentType == ContentType.mixed) ||
-            (contentType == ContentType.any)) 
-        {
-            _allowTextContent = true;
-                
-            if (contentType == ContentType.any) {
-                addMember(MemberFactory.createMemberForAny());
-            }
-                
-        }
-        process(archetype);
-    } //-- init
     
     //------------------/
     //- Public Methods -/
     //------------------/
     
     /**
-     * Adds the given SGMember to this ClassInfo
-     * @param member the SGMember to add
+     * Adds the given FieldInfo to this ClassInfo
+     * @param fieldInfo the FieldInfo to add
     **/
-    public void addMember(SGMember member) {
-        if (member.getXMLNodeType() == SGMember.ATTRIBUTE) {
-            if (atts == null) atts = new Vector(3);
-            atts.addElement(member);
+    public void addFieldInfo(FieldInfo fieldInfo) {
+        
+        if (fieldInfo == null) return;
+        
+        switch(fieldInfo.getNodeType()) {
+            case FieldInfo.ATTRIBUTE_TYPE:
+                if (atts == null) atts = new Vector(3);
+                if (!atts.contains(fieldInfo)) 
+                    atts.addElement(fieldInfo);
+                break;
+            case FieldInfo.TEXT_TYPE:
+                textField = fieldInfo;
+                break;
+            default:
+                if (elements == null) elements = new Vector(5);
+                if (!elements.contains(fieldInfo)) 
+                    elements.addElement(fieldInfo);
+                break;
         }
-        else {
-            if (elements == null) elements = new Vector(5);
-            elements.addElement(member);
-        }
-    } //-- addMember
+    } //-- addFieldInfo
     
     /**
-     * Adds the given set of SGMembers to this ClassInfo
-     * @param members an Array of SGMember objects
+     * Adds the given set of FieldInfos to this ClassInfo
+     * @param fields an Array of FieldInfo objects
     **/
-    public void addMembers(SGMember[] members) {
-        for (int i = 0; i < members.length; i++)
-            addMember(members[i]);
-    } //-- addMembers
+    public void addFieldInfo(FieldInfo[] fields) {
+        for (int i = 0; i < fields.length; i++)
+            addFieldInfo(fields[i]);
+    } //-- addFieldInfo
     
     /**
      * @return true if Classes created with this ClassInfo allow
      * text content
     **/
     public boolean allowsTextContent() {
-        return this._allowTextContent;
+        return (textField != null);
     } //-- allowsTextContent
     
     /**
-     * Returns true if the given member is a member of this ClassInfo
-     * @return true if the given member is a member of this ClassInfo
+     * Returns true if the given FieldInfo is contained within this ClassInfo
+     * @return true if the given FieldInfo is contained within this ClassInfo
     **/
-    public boolean contains(SGMember member) {
+    public boolean contains(FieldInfo fieldInfo) {
         boolean val = false;
         
-        if (atts != null) 
-            if (atts.contains(member)) return true;
+        if (fieldInfo == null) return false;
+        
+        switch(fieldInfo.getNodeType()) {
             
-        if (elements != null) 
-            if (elements.contains(member)) return true;
+            case FieldInfo.ATTRIBUTE_TYPE:
+                if (atts != null) 
+                    return atts.contains(fieldInfo);
+                break;
+            case FieldInfo.TEXT_TYPE:
+                return (fieldInfo == textField);
+            default:
+                if (elements != null) 
+                    return elements.contains(fieldInfo);
+                break;
+        }
             
-        if (sourceInfo != null) 
-            return sourceInfo.contains(member);
+        //if (sourceInfo != null) 
+        //    return sourceInfo.contains(fieldInfo);
             
         return false;
     } //-- contains
     
     /**
-     * @return an array of attribute members
+     * Returns an array of XML attribute associated fields
+     * @return an array of XML attribute associated fields
     **/
-    public SGMember[] getAttributeMembers() {
-        SGMember[] members = null;
+    public FieldInfo[] getAttributeFields() {
+        FieldInfo[] fields = null;
         if (atts != null) {
-            members = new SGMember[atts.size()];
-            atts.copyInto(members);
+            fields = new FieldInfo[atts.size()];
+            atts.copyInto(fields);
         }
-        else members = new SGMember[0];
-        return members;
-    } //-- getAttributeMembers
+        else fields = new FieldInfo[0];
+        return fields;
+    } //-- getAttributeFields
     
     /**
-     * Returns the class name for this ClassInfo
-     * @return the class name that should be used when creating classes
-     * from this ClassInfo
+     * Returns an array of XML element associated fields
+     * @return an array of XML element associated fields
     **/
-    public String getClassName() {
-        return this.className;
-    } //-- getClassName
-    
-    /**
-     * Returns the comment generated via processing Annotations.
-     * @return the comment which was generated by processing Annotations,
-     * or null if no comment was created.
-    **/
-    public String getComment() {
-        return _comment;
-    } //-- getComment
-    
-    /**
-     * Returns the XML Schema data type for this ClassInfo
-     * @return the XML Schema data type for this ClassInfo
-    **/
-    public XSType getDataType() {
-        return dataType;
-    } //-- XSType
-    
-    /**
-     * Returns the XML element name
-     * @return the XML element name
-    **/
-    public String getElementName() {
-        return this.elementName;
-    } //-- getElementName
-    
-    /**
-     * @return an array of element members
-    **/
-    public SGMember[] getElementMembers() {
-        SGMember[] members = null;
+    public FieldInfo[] getElementFields() {
+        FieldInfo[] members = null;
         if (elements != null) {
-            members = new SGMember[elements.size()];
+            members = new FieldInfo[elements.size()];
             elements.copyInto(members);
         }
-        else members = new SGMember[0];
+        else members = new FieldInfo[0];
         return members;
-    } //-- getElementMembers
+    } //-- getElementFields
     
     /**
-     * @return the namespace prefix to use when marshalling as XML.
+     * Returns the JClass described by this ClassInfo
+     * @return the JClass which is described by this ClassInfo
     **/
-    public String getNameSpacePrefix() {
-        return nsPrefix;
-    } //-- getNameSpacePrefix
+    public JClass getJClass() {
+        return _class;
+    } //-- getJClass
     
     /**
-     * @return the namespace URI used when marshalling and unmarshalling as XML.
+     * Returns the FieldInfo for the XML text associated field.
+     * @return the FieldInfo for the text content associated field,
+     * this may be null.
     **/
-    public String getNameSpaceURI() {
-        return nsURI;
-    } //-- getNameSpaceURI
-    
-    /**
-     * Returns the package name for this ClassInfo
-     * @return the package name that should be used when creating classes
-     * from this ClassInfo
-    **/
-    public String getPackageName() {
-        return this.packageName;
-    } //-- getPackageName
-    
-    /**
-     * Returns, if necessary, the ClassInfo in which this ClassInfo
-     * derives from
-     * @return the ClassInfo in which this ClassInfo derives from
-    **/
-    public ClassInfo getSuperClassInfo() {
-        return sourceInfo;
-    } //-- getSuperClassName
-    
-    /**
-     * Returns true if the class created by using this ClassInfo should 
-     * be declared as abstract, otherwise false
-     * @return true if the class created by using this ClassInfo should 
-     * be declared as abstract, otherwise false
-    **/
-    public boolean isAbstract() {
-        return this._abstract;
-    } //-- isAbstract
-    
-    /**
-     * Returns true if this Class created by this ClassInfo
-     * is "derived" from another class, otherwise false.
-     * @return true if this Class created by this ClassInfo
-     * is "derived" from another class, otherwise false.
-    **/
-    public boolean isDerived() {
-        return derived;
-    } //-- isDerived
-    
-    /**
-     * Returns true if the given member was derived from another ClassInfo,
-     * otherwise false if the member is local.
-     * @return true if the given member was derived from another ClassInfo,
-     * otherwise false will be returned
-    **/
-    public boolean isDerived(SGMember member) {
-        if ((member == null) || (sourceInfo == null)) 
-            return false;
-            
-        return sourceInfo.contains(member);
-    } //-- isDerived
-    
-    /**
-     * Sets the class name for this SGClass
-     * @param className the name to use for class name
-     * @exception IllegalArgumentException when the given className is not
-     * a valid Java Class Name
-    **/
-    public void setClassName(String className) {
-        this.className = className;
-    } //-- setClassName
-    
-    /**
-     * Sets the package name for this ClassInfo
-     * @param packageName the package name to use for this ClassInfo
-    **/
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    } //-- setPackageName
-    
-    //-------------------/        
-    //- Private Methods -/        
-    //-------------------/        
-        
-    /**
-     * Processes the given XML attribute declaration and adds
-     * an SGMember to this ClassInfo for the declaration
-     * @param attribute the XML attribute declaration to process
-    **/
-    private void processAttribute(AttributeDecl attribute) {
-        
-        String typeRef = attribute.getDatatypeRef();
-        
-        String memberName = "v"+
-            JavaXMLNaming.toJavaClassName(attribute.getName());
-            
-        SGMember member = null;
-                
-        Datatype datatype = attribute.getDatatype();
-        XSType   xsType = null;
-        
-        if (datatype != null)
-            xsType = TypeConversion.convertType(datatype);
-        else
-            xsType = new XSString();
-            
-        switch (xsType.getType()) {
-            case XSType.INTEGER:
-                member = new SGMember(xsType, memberName);
-                member.setXMLNodeType(SGMember.ATTRIBUTE);
-                
-                member.setCodeHelper(
-                    new IntegerCodeHelper((XSInteger)xsType)
-                );
-                    
-                break;
-            case XSType.ID:
-                member = new SGId(memberName);
-                break;
-            case XSType.IDREF:
-                member = new SGIdRef(memberName);
-                break;
-            default:
-                member = new SGMember(xsType, memberName);
-                member.setXMLNodeType(SGMember.ATTRIBUTE);
-                break;
-        }
-        member.setSchemaType(attribute.getDatatypeRef());
-        member.setXMLName(attribute.getName());
-        member.setRequired(attribute.getRequired());
-        
-        //-- add annotated comments
-        String comment = processAnnotations(attribute);
-        if (comment != null) member.setComment(comment);
-        
-        atts.addElement(member);
-    } //-- processAttributes
-    
-    /**
-     * Processes the given ContentModelGroup into a set of members
-     * for this ClassInfo
-     * @param contentModel the ContentModelGroup to process
-    **/
-    private void process(ContentModelGroup contentModel) {
-        
-        //------------------------------/
-        //- handle elements and groups -/
-        //------------------------------/
-                
-        Enumeration enum = contentModel.enumerate();
-                
-        SGMember member = null;
-        while (enum.hasMoreElements()) {
-                    
-            Structure struct = (Structure)enum.nextElement();
-            switch(struct.getStructureType()) {
-                case Structure.ELEMENT:
-                    member = MemberFactory.createMember((ElementDecl)struct);
-                    String comment = processAnnotations((Annotated)struct);
-                    if (comment != null) member.setComment(comment);
-                    addMember(member);
-                    break;
-                case Structure.GROUP:
-                    process((Group)struct);
-                    break;
-                default:
-                    break;
-            }
-        }
-            
-    } //-- process(ContentModelGroup)
-    
-    /**
-     * Creates Comments from Schema annotations
-     * @param annotated the Annotated structure to process
-     * @return the generated comment
-    **/
-    private String processAnnotations(Annotated annotated) {
-        //-- process annotations
-        Enumeration enum = annotated.getAnnotations();
-        if (enum.hasMoreElements()) {
-            StringBuffer comment = new StringBuffer();
-            while (enum.hasMoreElements()) {
-                Annotation ann = (Annotation) enum.nextElement();
-                Enumeration infos = ann.getInfo();
-                while (infos.hasMoreElements()) {
-                    Info info = (Info) infos.nextElement();
-                    String content = info.getContent();
-                    if ( content != null) comment.append(content);
-                }
-            }
-            return comment.toString();
-        }
-        return null;
-    } //-- processAnnotations
+    public FieldInfo getTextField() {
+        return textField;
+    } //-- getTextField
     
 } //-- ClassInfo

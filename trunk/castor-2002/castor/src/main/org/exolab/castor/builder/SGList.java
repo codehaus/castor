@@ -55,24 +55,24 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SGList extends SGMember {
+public class SGList extends FieldInfo {
  
         
     private XSList xsList      = null;
     private String contentName = null;
     private XSType contentType = null;
     
-    private SGMember content   = null;
+    private FieldInfo content   = null;
     private String elementName;
     
     public SGList(XSType contentType, String name, String elementName) {
         
         super(new XSList(contentType), name);
-        xsList = (XSList) getXSType();
+        xsList = (XSList) getSchemaType();
         this.contentType = contentType;
         this.contentName = "v" + JavaXMLNaming.toJavaClassName(elementName);
         this.elementName = elementName;
-        content = new SGMember(contentType, contentName);
+        content = new FieldInfo(contentType, contentName);
     } //-- SGList
     
     /**
@@ -362,7 +362,7 @@ public class SGList extends SGMember {
         return xsList;
     }
     
-    public SGMember getContent() {
+    public FieldInfo getContent() {
         return content;
     }
     
@@ -373,12 +373,6 @@ public class SGList extends SGMember {
     public boolean isMultivalued() {
         return true;
     }
-    
-    public void setXMLName(String xmlName) {
-        super.setXMLName(xmlName);
-        content.setXMLName(xmlName);
-    } //-- setXMLName
-    
     
 } //-- SGList
 

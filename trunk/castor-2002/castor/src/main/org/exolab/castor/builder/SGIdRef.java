@@ -55,12 +55,12 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SGIdRef extends SGMember {
+public class SGIdRef extends FieldInfo {
  
     
     public SGIdRef(String name) {
         super(new XSIdRef(), name);
-        setXMLNodeType(SGMember.ATTRIBUTE);
+        setNodeType(XMLInfo.ATTRIBUTE_TYPE);
     } //-- SGId
     
     public JMethod[] createAccessMethods() {
@@ -80,7 +80,8 @@ public class SGIdRef extends SGMember {
         //-- create set method
         methods[1] = new JMethod(null, "set"+mname);
         
-        methods[1].addParameter(new JParameter(getXSType().getJType(), getName()));
+        XSType xsType = getSchemaType();
+        methods[1].addParameter(new JParameter(xsType.getJType(), getName()));
         jsc = methods[1].getSourceCode();
         jsc.add("this.");
         jsc.append(getName());
@@ -97,7 +98,7 @@ public class SGIdRef extends SGMember {
     **/
     public void generateMarshalCode(JSourceCode jsc) {
         jsc.add("atts.addAttribute(\"");
-        jsc.append(getXMLName());
+        jsc.append(getNodeName());
         jsc.append("\", null, this.");
         jsc.append(getName());
         jsc.append(".get().getReferenceId());");
