@@ -186,6 +186,22 @@ public class ODMG
     /**
      * Load database configuration from the specified URL. <tt>url</tt>
      * must point to a JDO configuration file describing the database
+     * name, connection factory and mappings.
+     * 
+     * @param url The JDO configuration file
+     * @throw MappingException The mapping file is invalid, or any
+     *  error occured trying to load the JDO configuration/mapping
+     */
+    public void loadDatabase( String url )
+        throws MappingException
+    {
+        DatabaseSource.loadDatabase( new InputSource( url ), null, _logWriter, null );
+    }
+
+
+    /**
+     * Load database configuration from the specified URL. <tt>url</tt>
+     * must point to a JDO configuration file describing the database
      * name, connection factory and mappings. <tt>loader</tt> is
      * optional, if null the default class loader is used.
      * 
