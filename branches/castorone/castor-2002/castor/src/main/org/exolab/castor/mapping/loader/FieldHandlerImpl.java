@@ -77,6 +77,12 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The prefix for an "add" method
+    **/
+    private static final String ADD_PREFIX = "add";
+    
+
+    /**
      * The underlying field handler used by this handler.
      */
     private final FieldHandler _handler;
@@ -98,6 +104,13 @@ public final class FieldHandlerImpl
      * The sequence of methods used to create the nested object. May be null.
      */
     private Method[]      _setSequence;
+
+
+    /** 
+      * The method used to "incrementally" set the value of this field.  
+      * This is only used if the field is a collection 
+      */ 
+    private Method        _addMethod; 
 
 
     /**
@@ -283,8 +296,19 @@ public final class FieldHandlerImpl
         
         _getSequence = getSequence;
         _setSequence = setSequence;
-        if ( setMethod != null )
-            setWriteMethod( setMethod );
+
+        if ( setMethod != null ) {
+            //-- might be an "add" method
+            if ( setMethod.getName().startsWith(ADD_PREFIX) ) {
+                Class pType = setMethod.getParameterTypes()[0];
+                if (pType != typeInfo.getFieldType() )
+                    setAddMethod (setMethod);
+                else 
+                    setWriteMethod(setMethod);
+            }
+            else setWriteMethod( setMethod );
+        }
+        
         if ( getMethod != null )
             setReadMethod(getMethod);
         
@@ -373,6 +397,7 @@ public final class FieldHandlerImpl
     }
     
 
+
     public void setValue( Object object, Object value )
     {
         if ( _colHandler == null ) {
@@ -391,29 +416,35 @@ public final class FieldHandlerImpl
                     _handler.setValue( object, value );
                 else if ( _field != null )
                     _field.set( object, value == null ? _default : value );
-                else if ( _setMethod != null ) {
-                    if ( _getSequence != null ) 
-                        for ( int i = 0; i < _getSequence.length; i++ ) {
-                            Object last;
+                else {
+                    
+                    //-- either add or set
+                    Method setter = selectWriteMethod( value );
+                    
+                    if (setter != null) {
+                        if ( _getSequence != null ) 
+                            for ( int i = 0; i < _getSequence.length; i++ ) {
+                                Object last;
 
-                            last = object;
-                            object = _getSequence[ i ].invoke( object, null );
-                            if ( object == null ) {
-                                // if the value is not null, we must instantiate
-                                // the object in the sequence
-                                if ( value == null || _setSequence[ i ] == null )
-                                    break;
-                                else {
-                                    object = Types.newInstance( _getSequence[ i ].getReturnType() );
-                                    _setSequence[ i ].invoke( last, new Object[] { object } );
+                                last = object;
+                                object = _getSequence[ i ].invoke( object, null );
+                                if ( object == null ) {
+                                    // if the value is not null, we must instantiate
+                                    // the object in the sequence
+                                    if ( value == null || _setSequence[ i ] == null )
+                                        break;
+                                    else {
+                                        object = Types.newInstance( _getSequence[ i ].getReturnType() );
+                                        _setSequence[ i ].invoke( last, new Object[] { object } );
+                                    }
                                 }
                             }
+                        if ( object != null ) {
+                            if ( value == null && _deleteMethod != null )
+                                _deleteMethod.invoke( object, null );
+                            else
+                                setter.invoke( object, new Object[] { value == null ? _default : value } );
                         }
-                    if ( object != null ) {
-                        if ( value == null && _deleteMethod != null )
-                            _deleteMethod.invoke( object, null );
-                        else
-                            _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                     }
                 }
                 // If the field has no set method, ignore it.
@@ -678,6 +709,63 @@ public final class FieldHandlerImpl
                                         method, method.getDeclaringClass().getName() );
         _setMethod = method;
     }
+
+
+    /**
+     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
+     */
+    public void setAddMethod( Method method ) 
+        throws MappingException
+    {
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.writeMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _addMethod = method;
+        
+        //-- make sure add method is not the same as the set method
+        if (_addMethod == _setMethod) _setMethod = null;
+        
+    } //-- setAddMethod
+    
+    /** 
+      * Selects the appropriate "write" method based on the 
+      * value. This is used when there is an "add" method 
+      * and a "set" method. 
+      * 
+      * @return the selected write method 
+     **/ 
+     private Method selectWriteMethod( Object value ) { 
+          
+          
+         Method setter = null; 
+          
+         if (_setMethod != null) { 
+              
+             if (_addMethod == null) return _setMethod; 
+              
+             if (value == null) { 
+                 if (_default != null) value = _default; 
+                 else return _setMethod; 
+             } 
+              
+             //-- check value's class type 
+             Class paramType = _setMethod.getParameterTypes()[0]; 
+                                  
+             if (paramType.isAssignableFrom(value.getClass())) 
+                 return _setMethod; 
+         } 
+          
+         return _addMethod; 
+          
+     } //-- selectWriteMethod 
+  
+    
 
 
     public String toString()
