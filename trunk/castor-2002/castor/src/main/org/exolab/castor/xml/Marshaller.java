@@ -127,6 +127,11 @@ public class Marshaller {
     **/
     private Hashtable _nsURIKeyHash = null;
 
+	/**
+	 * Insert NameSpace prefix declarations at the root node
+	 */
+	private boolean _nsPrefixAtRoot = false;
+	
     /**
      * The default namespace
     **/
@@ -293,6 +298,23 @@ public class Marshaller {
 
     } //-- setNamespacePrefix
 
+	/**
+	 * Set to True to declare the given namespace mappings at the root node. Default is False.
+	 * @param nsPrefixAtRoot
+	 */
+	public void setNSPrefixAtRoot(boolean nsPrefixAtRoot)
+	{
+		_nsPrefixAtRoot = nsPrefixAtRoot;
+	}
+	
+	/**
+	 * Returns True if the given namespace mappings will be declared at the root node.
+	 */
+	public boolean getNSPrefixAtRoot()
+	{
+		return _nsPrefixAtRoot;
+	}
+	
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
      * @param cdr the ClassDescriptorResolver to use
@@ -414,8 +436,10 @@ public class Marshaller {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
 
+		boolean atRoot = false;		
         if (descriptor == null) {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
+			atRoot = true;			
         }
 
         //-- calculate Object's name
@@ -624,10 +648,22 @@ public class Marshaller {
             nsPrefix = (String) _nsURIKeyHash.get(nsURI);
         }
 
-        boolean declaredNS = false;
-        if (nsURI != null)
-            declaredNS = declareNamespace(nsPrefix, nsURI, atts);
-
+        boolean declaredNS = false;		
+		//-- declare namespace at this element scope?
+		if (nsURI != null)
+			//-- only if prefix not already been declared at root (via setNSPrefixAtRoot method)
+			if (!(_nsPrefixAtRoot && nsPrefix!=null)) 
+				declaredNS = declareNamespace(nsPrefix, nsURI, atts);
+		
+		//-- declare all namespace prefix at root (via setNSPrefixAtRoot method)?
+		if (_nsPrefixAtRoot && atRoot)
+		{
+			//-- insert all namespace declarations at the root level
+			Enumeration keys = _nsPrefixKeyHash.keys();
+			Enumeration elements = _nsPrefixKeyHash.elements();
+			while(keys.hasMoreElements())
+				declareNamespace((String)keys.nextElement(), (String)elements.nextElement(), atts);
+		}
 
         String qName = null;
         if (nsPrefix != null) {
