@@ -176,8 +176,8 @@ public class SourceFactory  {
         
         //-- create main marshal method
         JMethod jMethod = new JMethod(null,"marshal");
-        jMethod.addException(SGTypes.IOException);
-        jMethod.addException(SGTypes.SAXException);
+        jMethod.addException(SGTypes.MarshalException);
+        jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(SGTypes.Writer, "out"));
         parent.addMethod(jMethod);
         JSourceCode jsc = jMethod.getSourceCode();
@@ -192,8 +192,8 @@ public class SourceFactory  {
         //-- be built up as we process the given ElementDecl
         jMethod = new JMethod(null, "marshal");
         JClass jc = new JClass("org.xml.sax.DocumentHandler");
-        jMethod.addException(SGTypes.IOException);
-        jMethod.addException(SGTypes.SAXException);
+        jMethod.addException(SGTypes.MarshalException);
+        jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(jc, "handler"));
         parent.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
@@ -209,7 +209,8 @@ public class SourceFactory  {
         //-- create main marshal method
         JMethod jMethod = new JMethod(parent,"unmarshal");
         jMethod.getModifiers().setStatic(true);
-        jMethod.addException(SGTypes.IOException);
+        jMethod.addException(SGTypes.MarshalException);
+        jMethod.addException(SGTypes.ValidationException);
         jMethod.addParameter(new JParameter(SGTypes.Reader, "reader"));
         parent.addMethod(jMethod);
         JSourceCode jsc = jMethod.getSourceCode();
