@@ -14,13 +14,15 @@ JDO:     Fixed the way in which null fields are handled, so has/delete methods a
 
 JDO:     Changed callback sequence. jdoRemove is now called on deleted objects,
          unsetDatabase on objects that become transient (including those removes).
-         setDatabase is still not called on any object.
+         setDatabase is called whenever the object becomes persistent (that is,
+         used in a transaction) and passes the database to support lazy loading.
 
 JDO:     Fixed SQLTypes to pick up proper SQL type form field of type java.util.Date.
          Fixed SQLEngine to use SQL type in some calls to setObject.
          (Contributed by Donald Ball <balld@webslingerz.com>)
 
-JDO:     Added quoting to column and table names to support white spaces and keywords.
+JDO:     Added quoting to column and table names to support white spaces and keywords
+         (Only Postgres, Sybase and SQL Server).
 
 Mapping: Added resetValue() method to field handler. This generally resets a field to
          it's default value or empties a collection field.
