@@ -246,6 +246,10 @@ public class DescriptorSourceFactory {
             jsc.append(member.getName());
 
             XSType xsType = member.getSchemaType();
+            //--Attribute can handle COLLECTION type for NMTOKENS or IDREFS for instance
+            if (xsType.getType() == XSType.COLLECTION)
+                    xsType = ((CollectionInfo)member).getContent().getSchemaType();
+
             jsc.add("desc = new XMLFieldDescriptorImpl(");
             jsc.append(classType(xsType.getJType()));
             jsc.append(", \"");
@@ -344,6 +348,7 @@ public class DescriptorSourceFactory {
             if (xsType.isPrimitive()) {
                 jsc.append(xsType.createFromJavaObjectCode("value"));
             }
+
             else {
                 jsc.append("(");
                 jsc.append(xsType.getJType().toString());
@@ -396,6 +401,11 @@ public class DescriptorSourceFactory {
             }
             else if (xsType.getType() == XSType.DECIMAL) {
                 jsc.add("desc.setHandler( new DecimalFieldHandler(");
+                jsc.append("handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
+            else if (member.getSchemaType().getType() == XSType.COLLECTION) {
+                jsc.add("desc.setHandler( new CollectionFieldHandler(");
                 jsc.append("handler));");
                 jsc.add("desc.setImmutable(true);");
             }
@@ -635,6 +645,11 @@ public class DescriptorSourceFactory {
             }
             else if (xsType.getType() == XSType.DECIMAL) {
                 jsc.add("desc.setHandler( new DecimalFieldHandler(");
+                jsc.append("handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
+            else if (member.getSchemaType().getType() == XSType.COLLECTION) {
+                jsc.add("desc.setHandler( new CollectionFieldHandler(");
                 jsc.append("handler));");
                 jsc.add("desc.setImmutable(true);");
             }
