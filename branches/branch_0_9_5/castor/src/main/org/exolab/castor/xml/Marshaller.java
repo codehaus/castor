@@ -850,6 +850,7 @@ public class Marshaller extends MarshalFramework {
         //-- add object to stack so we don't potentially get into
         //-- an endlessloop
         if (_parents.search(object) >= 0) return;
+       
         _parents.push(object);
 
         Class _class = object.getClass();
@@ -887,7 +888,7 @@ public class Marshaller extends MarshalFramework {
         boolean saveType = false; /* flag for xsi:type */
         if (_class == descriptor.getFieldType())
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
-
+            
         if (classDesc == null) {
             //-- check for primitive or String, we need to use
             //-- the special #isPrimitive method of this class
@@ -906,47 +907,61 @@ public class Marshaller extends MarshalFramework {
                 }
             }
             else {
-                saveType = (_class.isArray());
+                saveType = _class.isArray();
                 //-- save package information for use when searching
                 //-- for MarshalInfo classes
                 String className = _class.getName();
                 int idx = className.lastIndexOf(".");
+                String pkgName = null;
                 if (idx > 0) {
-                    String pkgName = className.substring(0,idx+1);
+                    pkgName = className.substring(0,idx+1);
                     if (!_packages.contains(pkgName))
                         _packages.add(pkgName);
                 }
 
                 if (_marshalExtendedType) {
-				    //  marshall as the actual value
+                    
+                    //-- Check to see if we can determine the class or 
+                    //-- ClassDescriptor from the type specified in the 
+                    //-- FieldHandler or from the current CDR state
+                    
+                    if ((_class != descriptor.getFieldType()) || atRoot) {
+                        
+                        saveType = true;
+                        
+                        String nsURI = descriptor.getNameSpaceURI();
+                        boolean containsDesc 
+                            = (_cdResolver.resolveByXMLName(name, nsURI, null) != null);
+                                            
+                        if (!containsDesc) {
+                            //-- check for class mapping, we don't use the
+                            //-- resolver directly because it will try to
+                            //-- load a compiled descriptor, or introspect
+                            //-- one
+                            XMLMappingLoader ml = _cdResolver.getMappingLoader();
+                            if (ml != null) {
+                                containsDesc = (ml.getDescriptor(_class) != null);
+                            }
+                            
+                            //-- The following logic needs to be expanded to use
+                            //-- namespace -to- package mappings
+                            if ((!containsDesc) && (pkgName == null)) {
+                                String tmpName1 = descriptor.getXMLName();
+                                String tmpName2 = _naming.toXMLName(_class.getName());
+                                if (tmpName2.equals(tmpName1))
+                                    saveType = false;
+                            }
+                        }
+                        if (containsDesc) saveType = false;
+                        
+                    }
+                    
+				    //  marshal as the actual type
 				    classDesc = getClassDescriptor(_class);
     				
-				    //-- check to see if we need to save the type
-				    //-- information in the XML using xsi:type
-				    //-- If we can resolve the class based on the
-				    //-- XML name, we don't need to save the type.
-				    if (((_class != descriptor.getFieldType()) || atRoot) && 
-				        (classDesc != null)) 
-				    {
-				        String nsURI = classDesc.getNameSpaceURI();
-				        String tmpName = name;
-				        if (autoNameByClass) {
-				            if (classDesc.getXMLName() != null) 
-				                tmpName = classDesc.getXMLName();
-				        }
-    				    
-				        ClassDescriptor tmpCDesc = 
-				            _cdResolver.resolveByXMLName(tmpName, nsURI, null);
-				        if (tmpCDesc != null) {
-				            saveType = (tmpCDesc.getJavaClass() != classDesc.getJavaClass());
-				        }
-				        else {
-				            saveType = true;
-				        }
-				    }
 			    } //-- end if (marshalExtendedType)
 			    else {
-			        // marshall as the base field type
+			        // marshal as the base field type
 				    _class = descriptor.getFieldType();
 				    classDesc = getClassDescriptor(_class);
                 } 
@@ -1002,10 +1017,12 @@ public class Marshaller extends MarshalFramework {
                 saveType = false;
         }
         
+        
 
         //-- Suppress 'xsi:type' attributes when Castor is able to infer
         //-- the correct type during unmarshalling
         if (saveType) {
+            
              // When the type of the instance of the field is not the
              // type specified for the field, it might be necessary to
              // store the type explicitly (using xsi:type) to avoid
