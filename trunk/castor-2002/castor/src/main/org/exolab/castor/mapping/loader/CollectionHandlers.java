@@ -87,7 +87,7 @@ final class CollectionHandlers
         if ( _info == null )
             loadInfo();
         for ( int i = 0 ; i < _info.length ; ++i )
-            if ( _info[ i ].shortName.equals( name ) ||
+            if ( _info[ i ].shortName.equalsIgnoreCase( name ) ||
                  _info[ i ].javaClass.getName().equals( name ) )
                 return _info[ i ].javaClass;
         //throw new MappingException( "mapping.noCollectionHandler", name );
