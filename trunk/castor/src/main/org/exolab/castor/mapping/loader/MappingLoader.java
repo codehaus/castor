@@ -56,8 +56,8 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.CollectionHandler;
@@ -90,7 +90,7 @@ public abstract class MappingLoader
 	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
 	 * Commons Logging</a> instance used for all logging.
 	 */
-	private static Log log = LogFactory.getFactory().getInstance(MappingLoader.class);
+	//private static Log log = LogFactory.getFactory().getInstance(MappingLoader.class);
 	
     /**
      * The prefix for the "add" method
