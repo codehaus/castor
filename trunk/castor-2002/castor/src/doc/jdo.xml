@@ -208,7 +208,7 @@ db.close();
            created from the database using an OQL statement. If there are any parameters, the
            second step involves binding these paramaters. Parameters are bound in the same
            order as they appear in the OQL statement. The third step involves executing the
-           query and obtaining a result set of type <api>org.exolab.castor.jdo.JDO</api>.</p>
+           query and obtaining a result set of type <api>org.exolab.castor.jdo.QueryResults</api>.</p>
  
         <p>A query can be created once and executed multiple times. Each time it is executed
            the bound parameters are lost, and must be supplied a second time. The result of
