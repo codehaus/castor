@@ -682,6 +682,51 @@ public class DescriptorSourceFactory {
 
         switch (xsType.getType()) {
 
+            case XSType.DECIMAL:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DecimalValidator dv = new DecimalValidator();");
+                XSDecimal xsDecimal = (XSDecimal)xsType;
+                if (xsDecimal.hasMinimum()) {
+                    java.math.BigDecimal min = xsDecimal.getMinExclusive();
+                    if (min != null)
+                        jsc.add("dv.setMinExclusive(");
+                    else {
+                        min = xsDecimal.getMinInclusive();
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append(min.toString());
+                    jsc.append(");");
+                }
+                if (xsDecimal.hasMaximum()) {
+                    java.math.BigDecimal max = xsDecimal.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("dv.setMaxExclusive(");
+                    else {
+                        max = xsDecimal.getMaxInclusive();
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append(max.toString());
+                    jsc.append(");");
+                }
+
+                if (xsDecimal.getScale() != null) {
+                    jsc.add("dv.setScale(");
+                    jsc.append(xsDecimal.getScale().toString());
+                    jsc.append(");");
+                }
+
+                if (xsDecimal.getPrecision() != null) {
+                    jsc.add("dv.setPrecision(");
+                    jsc.append(xsDecimal.getPrecision().toString());
+                    jsc.append(");");
+                }
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+
             case XSType.NEGATIVE_INTEGER:
             case XSType.POSITIVE_INTEGER:
             case XSType.INTEGER:
