@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:    Patch to XMLMappingLoader to fix dropped multiple id fields. This is a
+        actually a patch to fix bugs which occur in MappingLoader and an errant
+        implementation of ClassDescriptor (ClassDescriptorImpl). This fix should
+        be moved once we have consensus from both JDO + XML teams (kvisco - 20011204).
+
 XML:    Support for Identity-Constraints in the Schema Object Model and 
         SchemaWriter. Not yet supported in SourceGenerator (kvisco) 20011120
 
