@@ -55,7 +55,6 @@ import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 
 //-- xml related imports
 import org.xml.sax.*;
-import org.xml.sax.helpers.AttributeListImpl;
 import org.xml.sax.helpers.ParserFactory;
 
 import java.io.PrintWriter;
@@ -145,6 +144,21 @@ public class UnmarshalHandler extends MarshalFramework
 
     private static final StringClassDescriptor _stringDescriptor
         = new StringClassDescriptor();
+
+    /**
+     * A SAX2ANY unmarshaller in case we are dealing with <any>
+     */
+     private SAX2ANY _anyUnmarshaller = null;
+
+    /**
+     * The any branch depth
+     */
+    private int _depth = 0;
+
+    /**
+     * The AnyNode to add (if any)
+     */
+     private org.exolab.castor.types.AnyNode _node = null;
 
     //----------------/
     //- Constructors -/
@@ -261,10 +275,14 @@ public class UnmarshalHandler extends MarshalFramework
         if (_stateInfo.empty()) {
             return;
         }
-        UnmarshalState state = (UnmarshalState)_stateInfo.peek();
+        if (_anyUnmarshaller != null)
+           _anyUnmarshaller.characters(ch, start, length);
+        else {
+             UnmarshalState state = (UnmarshalState)_stateInfo.peek();
 
-        if (state.buffer == null) state.buffer = new StringBuffer();
-        state.buffer.append(ch, start, length);
+             if (state.buffer == null) state.buffer = new StringBuffer();
+             state.buffer.append(ch, start, length);
+        }
     } //-- characters
 
 
@@ -282,6 +300,17 @@ public class UnmarshalHandler extends MarshalFramework
         throws org.xml.sax.SAXException
     {
 
+        //-- Do delagation if necessary
+        if ( (_anyUnmarshaller != null) && (_depth > 0)) {
+            _anyUnmarshaller.endElement(name);
+            --_depth;
+            if (_depth == 0) {
+               _node = _anyUnmarshaller.getStartingNode();
+               _anyUnmarshaller = null;
+            }
+            else return;
+        }
+
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
         }
@@ -296,7 +325,7 @@ public class UnmarshalHandler extends MarshalFramework
         XMLFieldDescriptor descriptor = state.fieldDesc;
         if (!state.elementName.equals(name)) {
             String err = "error in xml, expecting </" + state.elementName;
-            err += ">, but recieved </" + name + "> instead.";
+            err += ">, but received </" + name + "> instead.";
             throw new SAXException(err);
         }
 
@@ -372,8 +401,8 @@ public class UnmarshalHandler extends MarshalFramework
                     err += " due to the following error: " + ise;
                     throw new SAXException(err);
                 }
-            }
-            else {
+           }
+           else {
                 //-- check for non-whitespace...and report error
                 if (!isWhitespace(state.buffer)) {
                     String err = "Illegal Text data found as child of: "
@@ -381,7 +410,7 @@ public class UnmarshalHandler extends MarshalFramework
                     err += "\n  value: \"" + state.buffer + "\"";
                     throw new SAXException(err);
                 }
-            }
+           }
         }
 
         //-- if we are at root....just validate and we are done
@@ -418,6 +447,11 @@ public class UnmarshalHandler extends MarshalFramework
         if (descriptor.isIncremental()) return; //-- already added
 
         Object val = state.object;
+        //--special code for AnyNode handling
+        if (_node != null) {
+           val = _node;
+           _node = null;
+        }
 
         //-- get target object
         state = (UnmarshalState) _stateInfo.peek();
@@ -510,8 +544,15 @@ public class UnmarshalHandler extends MarshalFramework
         throws org.xml.sax.SAXException
     {
 
-        //-- handle namespaces
+        //-- if we are in an <any> section
+        //-- we delegate the event handling
+        if ( (_anyUnmarshaller != null) && (_depth>0) ) {
+            _depth++;
+           _anyUnmarshaller.startElement(name,atts);
+           return;
+        }
 
+        //-- handle namespaces
         String namespace = null;
 
         if (hasNameSpace(name)) {
@@ -563,13 +604,10 @@ public class UnmarshalHandler extends MarshalFramework
                                              NodeType.Element);
 
             _topState.fieldDesc = fieldDesc;
-
             //-- look for XMLClassDescriptor if null
             if (classDesc == null)
                 classDesc = getClassDescriptor(_topClass);
-
             fieldDesc.setClassDescriptor(classDesc);
-
             if (classDesc == null) {
                 //-- report error
 			    if ((!_topClass.isPrimitive()) &&
@@ -639,14 +677,12 @@ public class UnmarshalHandler extends MarshalFramework
             _stateInfo.push(_topState);
             processAttributes(atts, classDesc);
             return;
-        }
+        } //--rootElement
 
 
         //-- get MarshalDescriptor for the given element
 
         UnmarshalState parentState = (UnmarshalState)_stateInfo.peek();
-
-
         //-- create new state object
         state = new UnmarshalState();
         state.elementName = name;
@@ -669,7 +705,6 @@ public class UnmarshalHandler extends MarshalFramework
         //-- we wish to unmarshal
         XMLFieldDescriptor descriptor = null;
         descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
-
         /*
           If descriptor is null, we need to handle possible inheritence,
           which might not be described in the current ClassDescriptor.
@@ -705,12 +740,11 @@ public class UnmarshalHandler extends MarshalFramework
             if (Introspector.introspected(classDesc)) {
                message(msg);
                return;
-            } else
+            }
             //but if we could not find the field descriptor
             //whereas a class descriptor has been provided (using the
             //Source Generator for instance)
-            //it means that we try to unmarshal a 'not allowed' element
-                 throw new SAXException(msg);
+                else throw new SAXException(msg);
         }
 
 
@@ -770,7 +804,6 @@ public class UnmarshalHandler extends MarshalFramework
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
 
         FieldHandler handler = descriptor.getHandler();
-
         boolean useHandler = true;
 
         try {
@@ -806,8 +839,12 @@ public class UnmarshalHandler extends MarshalFramework
                     }
                     else
                         instanceClass = loadClass(instanceType, null);
-
-                    if (( ! ((FieldHandlerImpl)descriptor.getHandler()).isCollection() ) &&
+                        //the FieldHandler can be either an XMLFieldHandler
+                        //or a FieldHandlerImpl
+                        FieldHandler tempHandler = descriptor.getHandler();
+                        boolean collection = (tempHandler instanceof FieldHandlerImpl)?
+                                             ((FieldHandlerImpl)tempHandler).isCollection():false;
+                        if ( (! collection ) &&
                          ! _class.isAssignableFrom(instanceClass)) {
                         String err = instanceClass
                             + " is not a subclass of " + _class;
@@ -825,14 +862,12 @@ public class UnmarshalHandler extends MarshalFramework
 
             //-- Handle support for "Any" type
             if (_class == Object.class) {
-
                 Class pClass = parentState.type;
                 ClassLoader loader = pClass.getClassLoader();
 
                 //-- first look for a descriptor based
                 //-- on the XML name
                 classDesc = _cdResolver.resolveByXMLName(name, loader);
-
                 //-- if null, create classname, and try resolving
                 String cname = null;
                 if (classDesc == null) {
@@ -858,9 +893,15 @@ public class UnmarshalHandler extends MarshalFramework
                     useHandler = false;
                 }
                 else {
-                    String err = "unable to determine class for " +
+                    //we are dealing with an AnyNode
+                    //1- creates a new SAX2ANY handler
+                    _anyUnmarshaller = new SAX2ANY();
+                    //2- delegates the element handling
+                    _anyUnmarshaller.startElement(name, atts);
+                    _depth++;
+                    /*String err = "unable to determine class for " +
                         "element: " + name;
-                    throw new SAXException(err);
+                    throw new SAXException(err);*/
                 }
             }
 
