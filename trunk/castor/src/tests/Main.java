@@ -44,20 +44,13 @@
  */
 
 
-import java.util.Vector;
-import java.util.Enumeration;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.FileInputStream;
 import java.net.URL;
 
-// jUnit framework classes
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
 import junit.framework.TestResult;
-import junit.textui.TestRunner;
-
 // harness is the root of the test configuration
 import harness.Harness;
 import harness.TestHarness;
@@ -87,11 +80,6 @@ public class Main extends TestHarness {
      * but not running them.
      */
     private boolean printInfo;
-
-    /**
-     * Indicates that the gui runner should be used
-     */
-    private boolean gui;
 
     /**
      * The test file
