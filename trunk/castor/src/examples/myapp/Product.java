@@ -5,9 +5,10 @@ import java.util.Vector;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.TimeStampable;
 
 
-public class Product implements Persistent
+public class Product implements Persistent, TimeStampable
 {
 
 
@@ -24,6 +25,10 @@ public class Product implements Persistent
 
 
     private Database     _db;
+
+
+    private long   _timeStamp;
+
 
     /** Java 1.2
     private java.util.ArrayList  _details = new java.util.ArrayList();
@@ -175,9 +180,23 @@ public class Product implements Persistent
     }
 
 
+    public void jdoSetTimeStamp( long timeStamp )
+    {
+        System.out.println( "CHANGING TIMESTAMP FROM: " + _timeStamp + " TO: " + timeStamp );
+        _timeStamp = timeStamp;
+    }
+
+
+    public long jdoGetTimeStamp()
+    {
+        System.out.println( "GRABBING TIMESTAMP " + _timeStamp );
+        return _timeStamp;
+    }
+
+
     public String toString()
     {
-        return "<id: " + _id + " name: " + _name + ">";
+        return "<id: " + _id + " name: " + _name + " price: " + _price + ">";
     }
 
 }

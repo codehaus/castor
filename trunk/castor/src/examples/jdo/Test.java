@@ -89,7 +89,7 @@ public class Test
         throws Exception
     {
         Database      db;
-        Product       product;
+        Product       product = null;
         ProductGroup  group;
         Category      category;
         ProductDetail detail;
@@ -113,6 +113,7 @@ public class Test
         {
             productOql.bind( i );
             results = productOql.execute();
+
             while ( results.hasMore() ) 
             {
                 product = ( Product ) results.next();
@@ -132,6 +133,7 @@ public class Test
         computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE c.id = $1" );
         computerOql.bind( 11 );
         results = computerOql.execute();
+
         while ( results.hasMore() ) 
         {
             computer = ( Computer ) results.next();
@@ -173,6 +175,7 @@ public class Test
         groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
         groupOql.bind( 3 );
         results = groupOql.execute();
+
         if ( ! results.hasMore() ) 
         {
             group = new ProductGroup();
@@ -193,6 +196,7 @@ public class Test
         //       created first, but can be persisted later
         productOql.bind( 4 );
         results = productOql.execute();
+
         if ( ! results.hasMore() ) 
         {
             product = new Product();
@@ -226,6 +230,7 @@ public class Test
         //       created first, but can be persisted later
         computerOql.bind( 11 );
         results = computerOql.execute();
+
         if ( ! results.hasMore() ) {
             computer = new Computer();
             computer.setId( 11 );
@@ -262,6 +267,7 @@ public class Test
             int j = i + 1;
             productOql.bind( j );
             results = productOql.execute();
+
             if ( ! results.hasMore() ) 
             {
                 product = new Product();
@@ -287,21 +293,18 @@ public class Test
 
 
         db.begin();
-        writer.println( "Begin transaction: many-to-many relations and long transaction" );
+        writer.println( "Begin transaction: many-to-many relations" );
 
         for ( int x = 4; x < 7; ++x )
         {
             int y = x + 3;
             product = ( Product ) db.load( Product.class, new Integer( y ) ); 
-//
-// Don't forget to implement TimeStampable for the long transaction!!!
-//
-            // db.update( product );
 
             // If no such categories exists in the database, create new
             // objects and persist them
             categoryOql.bind( x );
             results = categoryOql.execute();
+
             if ( ! results.hasMore() ) 
             {
                 category = new Category();
@@ -318,8 +321,22 @@ public class Test
             }
         }
 
-        writer.println( "End transaction: many-to-many relations and long transaction" );
+        writer.println( "End transaction: many-to-many relations" );
         db.commit();
+
+        product.setPrice( 333 );
+        writer.println( "Updated price: " + product );
+
+        db.begin();
+        writer.println( "Begin transaction: long transaction" );
+
+        //
+        // Don't forget to implement TimeStampable for the long transaction!!!
+        //
+        db.update( product );
+        writer.println( "End transaction: long transaction" );
+        db.commit();
+
 
         Marshaller     marshaller;
 
@@ -328,10 +345,13 @@ public class Test
 
         db.begin();
         writer.println( "Begin transaction: marshalling objects to XML" );
+
         computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c" );
         results = computerOql.execute();
+
         while( results.hasMore() )
             marshaller.marshal( results.next() );
+
         writer.println( "End transaction: marshalling objects to XML" );
         db.commit();
 
