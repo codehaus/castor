@@ -118,6 +118,18 @@ public final class PostgreSQLFactory
     }
 
 
+    /**
+     * For BLOB/CLOB types are not supported.
+     */
+    public Class adjustSqlType( Class sqlType ) {
+        if (sqlType == java.sql.Clob.class) {
+            return java.lang.String.class;
+        } else if (sqlType == java.io.InputStream.class) {
+            return byte[].class;
+        } else {
+            return sqlType;
+        }
+    }
 }
 
 
