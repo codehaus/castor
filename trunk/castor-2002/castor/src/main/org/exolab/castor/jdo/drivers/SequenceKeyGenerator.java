@@ -98,11 +98,12 @@ public final class SequenceKeyGenerator implements KeyGenerator
         String fName = factory.getFactoryName();
         boolean returning = "true".equals( params.getProperty("returning") );
 
-        if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) && ! fName.equals( "interbase" ) ) {
+        if ( ! fName.equals( "oracle" ) && ! fName.equals( "postgresql" ) && ! fName.equals( "interbase" ) && ! fName.equals( "sapdb" ) ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
-        if ( fName.equals( "postgresql" ) && returning ) {
+        if ( ( fName.equals( "postgresql" ) || fName.equals( "interbase" ) || fName.equals( "sapdb" ) )
+                && returning ) {
             throw new MappingException( Messages.format( "mapping.keyGenParamNotCompat",
                                         "returning=\"true\"", getClass().getName(), fName ) );
         }

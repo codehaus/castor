@@ -53,72 +53,28 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
- * {@link PersistenceFactory} for Oracle 7/8 driver.
+ * PersistenceFactory for SAP DB.
  *
- * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public class OracleFactory
-    extends GenericFactory
+public final class SapDbFactory
+    extends OracleFactory
 {
 
 
     public String getFactoryName()
     {
-        return "oracle";
+        return "sapdb";
     }
 
 
     public QueryExpression getQueryExpression()
     {
-        return new OracleQueryExpression( this );
+        return new SapDbQueryExpression( this );
     }
 
 
-    public Boolean isDuplicateKeyException( Exception except )
-    {
-        // Sometime gives wrong results
-        //if ( except instanceof SQLException )
-        //    return ( (SQLException) except ).getErrorCode() == 1 ? Boolean.TRUE : Boolean.FALSE;
-        return null;
-    }
-
-
-    public String quoteName( String name )
-    {
-        return doubleQuoteName( name ).toUpperCase();
-    }
-
-
-    /**
-     * Needed to process OQL queries of "CALL" type (using stored procedure
-     * call). This feature is specific for JDO.
-     * @param call Stored procedure call (without "{call")
-     * @param paramTypes The types of the query parameters
-     * @param javaClass The Java class of the query results
-     * @param fields The field names
-     * @param sqlTypes The field SQL types
-     * @return null if this feature is not supported.
-     */
-    public PersistenceQuery getCallQuery( String call, Class[] paramTypes, Class javaClass,
-                                          String[] fields, int[] sqlTypes )
-    {
-        return new ReturnedRSCallQuery( call, paramTypes, javaClass, fields, sqlTypes );
-    }
-
-    /**
-     * For INTEGER type ResultSet.getObject() returns BigDecimal:
-     * dependent objects with integer identity cause type conversion error
-     * (need to fix SimpleQueryExecutor).
-     */
-    public Class adjustSqlType( Class sqlType )
-    {
-        if (sqlType == java.lang.Integer.class) {
-            return java.math.BigDecimal.class;
-        } else {
-            return sqlType;
-        }
-    }
 }
 
 
