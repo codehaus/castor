@@ -137,9 +137,8 @@ public class Unmarshaller {
     **/
     public Unmarshaller(Class c, ClassLoader loader) {
         super();
+        initConfig();
         this._class = c;
-        this.debug = Configuration.debug();
-        this.validate = Configuration.marshallingValidation();
         _loader = loader;
         _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)
@@ -153,13 +152,21 @@ public class Unmarshaller {
         throws MappingException
     {
         super();
-        this.debug = Configuration.debug();
+        initConfig();
         if (mapping != null) {
             setMapping(mapping);
             this._loader = mapping.getClassLoader();
         }
     } //-- Unmarshaller(Mapping)
 
+    /**
+     * Used by constructors to get configuration information
+    **/
+    private void initConfig() {
+        debug = Configuration.debug();
+        validate = Configuration.marshallingValidation();
+    } //-- initConfig
+    
     /**
      * Sets the ClassLoader to use when loading new classes
      * @param loader the ClassLoader to use
