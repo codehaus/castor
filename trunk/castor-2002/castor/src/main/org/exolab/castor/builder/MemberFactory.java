@@ -264,8 +264,11 @@ public class MemberFactory {
         FieldInfo fieldInfo = null;
         XSType   xsType     = null;
         
-        SimpleType simpleType = eDecl.getSimpleType();
-        if (simpleType != null) {
+        XMLType xmlType = eDecl.getType();
+        //-- SimpleType
+        if ((xmlType != null) && xmlType.isSimpleType()) {
+            
+            SimpleType simpleType = (SimpleType)xmlType;
             
             //-- handle special case for enumerated types
             if (simpleType.hasFacet(Facet.ENUMERATION)) {
@@ -282,6 +285,7 @@ public class MemberFactory {
             if (xsType == null) 
                 xsType = TypeConversion.convertType(simpleType);
         }
+        //-- ComplexType
         else {
             String className = JavaXMLNaming.toJavaClassName(eDecl.getName());
             xsType = new XSClass(new JClass(className));

@@ -144,26 +144,27 @@ public class SourceFactory  {
             jClass.getJDocComment().setComment(comment);
             
         
-        ComplexType complexType = element.getComplexType();
+        XMLType type = element.getType();
         
         boolean derived = false;
         
-        if (complexType != null) {
-            processComplexType(complexType, state);
+        // No Type?
+        if (type == null) {
+            // ???
+            classInfo.setSchemaType(new XSClass(state.jClass));
         }
+        // ComplexType
+        else if (type.isComplexType()) {
+            processComplexType( (ComplexType)type, state);
+        }
+        // SimpleType
         else {
-            SimpleType simpleType = element.getSimpleType();
-            if (simpleType != null) {
-                classInfo.setSchemaType(TypeConversion.convertType(simpleType));
-                
-                //-- handle our special case for enumerated types
-                if (simpleType.hasFacet(Facet.ENUMERATION)) {
-                    createSourceCode(simpleType, state, state.packageName);
-                }
+            SimpleType simpleType = (SimpleType)type;
+            classInfo.setSchemaType(TypeConversion.convertType(simpleType));
+            //-- handle our special case for enumerated types
+            if (simpleType.hasFacet(Facet.ENUMERATION)) {
+                createSourceCode(simpleType, state, state.packageName);
             }
-            else
-                classInfo.setSchemaType(new XSClass(state.jClass));
-            
         }
         
         //-- add imports required by the marshal methods
@@ -271,7 +272,21 @@ public class SourceFactory  {
         boolean enumeration = false;
         
         //-- class name information
-        String className = JavaXMLNaming.toJavaClassName(simpleType.getName());
+        String typeName = simpleType.getName();
+        if (typeName == null) {
+            Structure struct = simpleType.getParent();
+            switch (struct.getStructureType()) {
+                case Structure.ATTRIBUTE:
+                    typeName = ((AttributeDecl)struct).getName();
+                    break;
+                case Structure.ELEMENT:
+                    typeName = ((ElementDecl)struct).getName();
+                    break;
+            }
+            typeName += "Type";
+        }
+        
+        String className = JavaXMLNaming.toJavaClassName(typeName);
         
         if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
@@ -296,7 +311,7 @@ public class SourceFactory  {
         //-- XML information
         Schema  schema = simpleType.getSchema();        
         classInfo.setNamespaceURI(schema.getTargetNamespace());
-        classInfo.setNodeName(simpleType.getName());
+        classInfo.setNodeName(typeName);
         
         
         //-- process annotation
@@ -304,7 +319,7 @@ public class SourceFactory  {
         if (comment != null) 
             jClass.getJDocComment().setComment(comment);
             
-        XSClass xsClass = new XSClass(jClass, simpleType.getName());
+        XSClass xsClass = new XSClass(jClass, typeName);
         
         classInfo.setSchemaType(xsClass);
         
@@ -570,7 +585,7 @@ public class SourceFactory  {
         //- handle content model -/
         //------------------------/
         //-- check contentType
-        ContentType contentType = complexType.getContent();
+        ContentType contentType = complexType.getContentType();
             
         //-- create text member
         if ((contentType == ContentType.textOnly) ||
