@@ -61,10 +61,6 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.persist.DuplicateIdentityExceptionImpl;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
-import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
-import org.exolab.castor.persist.ObjectDeletedExceptionImpl;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -88,6 +84,7 @@ import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.mapping.loader.RelationDescriptor;
 import org.exolab.castor.persist.OID;
+import org.exolab.castor.util.Messages;
 
 
 // ToDo (written on Aug 6, 2000)
@@ -666,7 +663,7 @@ public final class SQLEngine implements Persistence {
                 _ids[0].name, null );
 
         if ( identity == null )
-            throw new PersistenceExceptionImpl( "persist.noIdentity" );
+            throw new PersistenceException( "persist.noIdentity" );
 
         if ( _ids[0].convertTo != null && _ids[0].convertTo != null ) {
             identity = _ids[0].convertTo.convert( identity, _ids[0].convertParam );
@@ -695,7 +692,7 @@ public final class SQLEngine implements Persistence {
                 identities = _extends.create( conn, fields, identities );
 
             if ( _keyGen == null && identities == null )
-                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+                throw new PersistenceException( "persist.noIdentity" );
 
 			if ( identities != null ) {
 				resultIds = new Object[identities.length];
@@ -781,16 +778,16 @@ public final class SQLEngine implements Persistence {
             // Bad way: all validation exceptions are reported as DuplicateKey
             //if ( except.getSQLState() != null &&
             //     except.getSQLState().startsWith( "23" ) )
-            //    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
+            //    throw new DuplicateIdentityException( _clsDesc.getJavaClass(), identity );
 
             // Good way: let PersistenceFactory try to determine
             Boolean isDupKey;
 
             isDupKey = _factory.isDuplicateKeyException( except );
             if ( Boolean.TRUE.equals( isDupKey ) ) {
-                throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), OID.flatten(identities) );
+                throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), OID.flatten(identities)) );
             } else if ( Boolean.FALSE.equals( isDupKey ) ) {
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
             // else unknown, let's check directly.
 
@@ -808,7 +805,7 @@ public final class SQLEngine implements Persistence {
                 }
                 if ( stmt.executeQuery().next() ) {
                     stmt.close();
-                    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), OID.flatten(identities) );
+                    throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), OID.flatten(identities)) );
                 }
             } catch ( SQLException except2 ) {
                 // Error at the stage indicates it wasn't a duplicate
@@ -821,7 +818,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format("persist.nested", except) );
         }
     }
 
@@ -919,12 +916,12 @@ public final class SQLEngine implements Persistence {
                         }
                         stmt.close();
                         System.out.println("");
-                        throw new ObjectModifiedException( Messages.format( "persist.objectModified", _clsDesc.getJavaClass().getName(), OID.flatten(identities) ) );
+                        throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), OID.flatten(identities)) );
                     }
                     stmt.close();
                 }
 
-                throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), OID.flatten( identities ) );
+                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), OID.flatten( identities )) );
             }
             stmt.close();
             return null;
@@ -934,7 +931,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format("persist.nested", except) );
         }
     }
 
@@ -969,7 +966,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format("persist.nested", except) );
         }
     }
 
@@ -993,7 +990,7 @@ public final class SQLEngine implements Persistence {
             // If no query was performed, the object has been previously
             // removed from persistent storage. Complain about this.
             if ( ! stmt.executeQuery().next() )
-                throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), OID.flatten( identities ) );
+                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), OID.flatten(identities)) );
             stmt.close();
         } catch ( SQLException except ) {
             try {
@@ -1001,7 +998,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format("persist.nested", except) );
         }
     }
 
@@ -1031,7 +1028,7 @@ public final class SQLEngine implements Persistence {
 
             rs = stmt.executeQuery();
             if ( ! rs.next() )
-                throw new ObjectNotFoundExceptionImpl( _clsDesc.getJavaClass(), OID.flatten( identities ) );
+                throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _clsDesc.getJavaClass().getName(), OID.flatten(identities)) );
             // Load all the fields of the object including one-one relations
 
             count = 1;
@@ -1097,7 +1094,7 @@ public final class SQLEngine implements Persistence {
             stmt.close();
 
         } catch ( SQLException except ) {
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format("persist.nested", except) );
         }
         return stamp;
     }
@@ -1698,7 +1695,7 @@ public final class SQLEngine implements Persistence {
                         _stmt.close();
                     } catch ( SQLException e2 ) { }
                 }
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
 
@@ -1754,7 +1751,7 @@ public final class SQLEngine implements Persistence {
                 return _engine.idToJava( _lastIdentities );
             } catch ( SQLException except ) {
                 _lastIdentities = null;
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
 
@@ -1850,7 +1847,7 @@ public final class SQLEngine implements Persistence {
                 } else
                     _lastIdentities = null;
             } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
 
             return stamp;
@@ -1944,7 +1941,7 @@ public final class SQLEngine implements Persistence {
                 _stmt.execute();
                 _rs = _stmt.getResultSet();
             } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
 
@@ -1990,7 +1987,7 @@ public final class SQLEngine implements Persistence {
                 return _engine.idToJava( _lastIdentities );
             } catch ( SQLException except ) {
                 _lastIdentities = null;
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
 
@@ -2085,7 +2082,7 @@ public final class SQLEngine implements Persistence {
                 } else
                     _lastIdentities = null;
             } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
             return stamp;
         }

@@ -50,9 +50,10 @@ package org.exolab.castor.jdo.engine;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.ObjectNotPersistentExceptionImpl;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.util.Messages;
 
 /**
  * The utility class which adds to the standard JDO functionality
@@ -115,7 +116,7 @@ public class LongTransactionSupport
         result = null;
         //handler.fillFromCopy( object, _tx, _dbEngine );
         if ( result == object ) 
-            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
+            throw new ObjectNotPersistentException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
         return result;
     }
     

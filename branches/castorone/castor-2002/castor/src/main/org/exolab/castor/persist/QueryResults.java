@@ -54,8 +54,6 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
 
@@ -239,7 +237,7 @@ public final class QueryResults
                 if ( entry.deleted )
                     // Object has been deleted in this transaction, so skip
                     // to next object.
-                    throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), _lastIdentity );
+                    throw new ObjectNotFoundException( handler.getJavaClass(), _lastIdentity );
                 else {
                     if ( ( _accessMode == AccessMode.Exclusive ||
                            _accessMode == AccessMode.DbLocked ) &&
@@ -249,7 +247,7 @@ public final class QueryResults
                         // problem. We cannot return an object that is not
                         // synchronized with the database, but we cannot
                         // synchronize a live object.
-                        throw new PersistenceExceptionImpl( "persist.lockConflict",
+                        throw new PersistenceException( "persist.lockConflict",
                                                             _query.getResultType(), _lastIdentity );
                     } else {
                         // Either read only or exclusive mode, and we
@@ -283,7 +281,7 @@ public final class QueryResults
                         handler.getCallback().releasing( object, false );
                     if ( except instanceof PersistenceException )
                         throw (PersistenceException) except;
-                    throw new PersistenceExceptionImpl( except );
+                    throw new PersistenceException( except );
                 }         
            
                 if ( _accessMode == AccessMode.ReadOnly ) {

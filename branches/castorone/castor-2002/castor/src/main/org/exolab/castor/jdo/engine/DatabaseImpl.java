@@ -71,8 +71,6 @@ import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
-import org.exolab.castor.persist.ClassNotPersistenceCapableExceptionImpl;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
@@ -193,7 +191,7 @@ public class DatabaseImpl
                         _ctx.rollback();
                     } catch ( Exception except ) {
                     }
-                    throw new PersistenceExceptionImpl( "jdo.dbClosedTxRolledback" );
+                    throw new PersistenceException( "jdo.dbClosedTxRolledback" );
                 }
             }
         } finally {
@@ -224,7 +222,7 @@ public class DatabaseImpl
         tx = getTransaction();
         info = _scope.getPersistenceInfo( type );
         if ( info == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
+            throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", type.getName() ) );
 
         return tx.load( info.engine, info.molder, identities, null );
     }
@@ -264,7 +262,7 @@ public class DatabaseImpl
         tx = getTransaction();
         info = _scope.getPersistenceInfo( type );
         if ( info == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
         
         return tx.load( info.engine, info.molder, identities, mode );
     }
@@ -278,7 +276,7 @@ public class DatabaseImpl
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
         if ( info == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
 
         tx.create( info.engine, info.molder, object, null );
     }
@@ -293,7 +291,7 @@ public class DatabaseImpl
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
         if ( info == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+            throw new ClassNotPersistenceCapableException( object.getClass() );
 
         tx.update( _scope, object );
         */
@@ -321,7 +319,7 @@ public class DatabaseImpl
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
         if ( info == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
 
         tx.delete( object );
     }

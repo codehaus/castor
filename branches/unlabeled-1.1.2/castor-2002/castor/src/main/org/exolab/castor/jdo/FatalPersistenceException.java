@@ -57,14 +57,7 @@ package org.exolab.castor.jdo;
  * @version $Revision$ $Date$
  */
 public class FatalPersistenceException
-    extends PersistenceException
-{
-
-
-    public FatalPersistenceException( Exception except )
-    {
-        super( except );
-    }
+    extends PersistenceException {
 
 
     public FatalPersistenceException( String message )

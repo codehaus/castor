@@ -59,9 +59,8 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.LockEngine;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TransactionAbortedExceptionImpl;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -127,9 +126,9 @@ final class TransactionContextImpl
             // [oleg] Check for rollback exception based on X/Open error code
             if ( except.getSQLState() != null &&
                  except.getSQLState().startsWith( "40" ) )
-                throw new TransactionAbortedExceptionImpl( except );
+                throw new TransactionAbortedException( Messages.format("persist.nested", except) );
             
-            throw new TransactionAbortedExceptionImpl( except );
+            throw new TransactionAbortedException( Messages.format("persist.nested", except) );
         } finally {
             enum = _conns.elements();
             while ( enum.hasMoreElements() ) {
@@ -179,7 +178,7 @@ final class TransactionContextImpl
                     conn.setAutoCommit( false );
                 _conns.put( engine, conn );
             } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
         return conn;
