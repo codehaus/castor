@@ -57,6 +57,13 @@
     <description>XML enhancements, lots of testing.</description>
   </contributor>
 
+  <contributor type="Committer">
+    <name surname="Fawcett" given="Andrew"/>
+    <email>Andrew.Fawcett@coda.com</email>
+    <company id="coda"/>
+    <description>XML enhancements.</description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Thelen" given="Frank"/>
     <email>Frank.Thelen@poet.de</email>
@@ -80,16 +87,12 @@
   </contributor>
 
   <contributor type="Contributor">
-    <name surname="Fawcett" given="Andrew"/>
-    <email>Andrew.Fawcett@coda.com</email>
-    <company id="coda"/>
-    <description>XML enhancements.</description>
-  </contributor>
-
-  <contributor type="Contributor">
     <name surname="Higgins" given="Patrick"/>
     <email>phiggins@transzap.com</email>
-    <description>XML enhancements.</description>
+    <description>
+        Enhancements to the javasource classes to fix support for abstract
+        methods. Some changes for Java 2 types compatibiliy.
+    </description>
   </contributor>
 
   <contributor type="Feedback">
