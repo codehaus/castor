@@ -48,7 +48,6 @@
 package org.exolab.castor.types;
 
 import org.exolab.castor.types.TimePeriod;
-import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.StringTokenizer;
@@ -81,7 +80,7 @@ public class Month extends TimePeriod {
             temp = -temp;
             try {
                 this.setZoneNegative();
-            } catch (NotSupportedOperationException e) {
+            } catch (OperationNotSupportedException e) {
             }
         }
         short zhour = (short) (temp / (60*60*1000));
@@ -89,55 +88,55 @@ public class Month extends TimePeriod {
         short zmin = (short)(temp / (60*1000));
         try {
             this.setZone(zhour,zmin);
-        } catch (NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
         }
     }
 
     /*Disallow the access to set day method*/
     public void setDay(short day)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Month : the day field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     /*Disallow the access to set time methods */
     public void setHour(short hour)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Month : the hour field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
     public void setMinute(short minute)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Month : the minute field must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
 
     public void setSecond(short second,short millsecond)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Month : the second fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
 
     public void setZone(short hour, short minute)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Month : the time zone fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
 
     public void setZoneNegative()
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "In a Month : the tinme zone fields must not be changed";
-        throw new NotSupportedOperationException(err);
+        throw new OperationNotSupportedException(err);
     }
 
 
@@ -214,7 +213,7 @@ public class Month extends TimePeriod {
         }
         try {
             result.setYear(Short.parseShort( temp.substring(2,4) ));
-        } catch(NotSupportedOperationException e){
+        } catch(OperationNotSupportedException e){
         }
         temp=token.nextToken();
         if (temp.length() != 2)
@@ -224,7 +223,7 @@ public class Month extends TimePeriod {
         }
         try {
             result.setMonth(Short.parseShort(temp));
-        } catch(NotSupportedOperationException e) {
+        } catch(OperationNotSupportedException e) {
         }
         temp = null;
         return result;

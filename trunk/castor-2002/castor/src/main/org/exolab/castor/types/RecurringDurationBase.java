@@ -54,7 +54,6 @@ package org.exolab.castor.types;
 
 import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.xml.ValidationException;
-import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -130,7 +129,7 @@ abstract class RecurringDurationBase {
         try {
             this.setDuration(duration);
             this.setPeriodInternal(period);
-        } catch (NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             String err = "Recurring Duration :"+e;
             throw new IllegalArgumentException(err);
         }
@@ -172,7 +171,7 @@ abstract class RecurringDurationBase {
      */
 
     public RecurringDurationBase(String duration, String period, short[] values)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         new RecurringDuration(duration, period);
         if (values.length != 6) {
@@ -194,11 +193,11 @@ abstract class RecurringDurationBase {
     /**
      * set the period facet for this recurringDuration
      * @param period the period to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the period facet is not allowed
      */
     public void setPeriod (TimeDuration period)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         setPeriodInternal(period);
     }
@@ -206,11 +205,11 @@ abstract class RecurringDurationBase {
     /**
      * set the period facet for this recurringDuration
      * @param period the period to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the period facet is not allowed
      */
     public void setPeriod (String period)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         try {
             setPeriodInternal(TimeDuration.parse(period));
@@ -223,11 +222,11 @@ abstract class RecurringDurationBase {
     /**
      * set the duration facet for this recurringDuration
      * @param duration the period to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the duration facet is not allowed
      */
      public void setDuration (TimeDuration duration)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         _duration = duration;
     }
@@ -235,11 +234,11 @@ abstract class RecurringDurationBase {
     /**
      * set the duration facet for this recurringDuration
      * @param duration the period to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the duration facet is not allowed
      */
     public void setDuration(String duration)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         try {
             _duration = (TimeDuration.parse(duration));
@@ -253,11 +252,11 @@ abstract class RecurringDurationBase {
     /**
      * set the hour field for this recurringDuration
      * @param hour the hour to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the hour field is not allowed
      */
     public void setHour(short hour)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "";
         if (hour > 23) {
@@ -270,11 +269,11 @@ abstract class RecurringDurationBase {
     /**
      * set the minute field for this recurringDuration
      * @param minute the minute to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the minute field is not allowed
      */
     public void setMinute(short minute)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
          String err = "";
          if (minute > 59) {
@@ -288,11 +287,11 @@ abstract class RecurringDurationBase {
      * set the second field for this recurringDuration
      * @param second the second to set
      * @param millsecond the millisecond to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the second field is not allowed
      */
     public void setSecond(short second,short millsecond)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
      {
          String err = "";
          if (second > 60) {
@@ -307,11 +306,11 @@ abstract class RecurringDurationBase {
      * set the time zone fields for this recurringDuration
      * @param hour the time zone hour to set
      * @param minute the time zone minute to set
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the time zone fields is not allowed
      */
     public void setZone(short hour, short minute)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
          String err = "";
          if (hour > 23) {
@@ -338,11 +337,11 @@ abstract class RecurringDurationBase {
      *      <li>zoneHour</li>
      *      <li>zoneMinute</li>
      * </ul>
-     * @throws NotSupportedOperationException this exception is thrown when changing
+     * @throws OperationNotSupportedException this exception is thrown when changing
      *         the value of a time related field is not allowed
      */
      public void setValues(short[] values)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         this.setHour(values[0]);
         this.setMinute(values[1]);
@@ -360,12 +359,12 @@ abstract class RecurringDurationBase {
 
     /**
      * set the time zone negative field to true
-     * @throws NotSupportedOperationException this exception is thrown when
+     * @throws OperationNotSupportedException this exception is thrown when
      *         changing the time zone fields is not allowed
      */
 
     public void setZoneNegative()
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         _zoneNegative = true;
     }

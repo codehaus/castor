@@ -42,7 +42,7 @@
  *
  * $Id$
  * Date         Author          Changes
- * 12/05/2000   Arnaud Blandin  Added the support for NotSupportedOperationException
+ * 12/05/2000   Arnaud Blandin  Added the support for OperationNotSupportedException
  * 11/08/2000   Arnaud Blandin  Added new constructor and setValues method
  * 11/07/2000   Arnaud Blandin  Added isEqual() and isGreater() methods
  * 11/02/2000   Arnaud Blandin  Changed the constructor
@@ -52,9 +52,6 @@
 package org.exolab.castor.types;
 
 import org.exolab.castor.xml.ValidationException;
-import org.exolab.castor.xml.NotSupportedOperationException;
-import org.exolab.castor.types.TimeDuration;
-import org.exolab.castor.types.RecurringDurationBase;
 
 import java.util.Date;
 import java.util.SimpleTimeZone;
@@ -126,7 +123,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * @see setValues
      */
      public RecurringDuration(String duration, String period, short[] values)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         new RecurringDuration(duration, period);
         if (values.length != 10) {
@@ -154,7 +151,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * @param the year to set up
      */
     public void setYear(short year)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err ="";
         if (year < 0) {
@@ -176,7 +173,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * Note 1<month<12
      */
     public void setMonth(short month)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err ="";
         if (month < 1) {
@@ -200,7 +197,7 @@ public class RecurringDuration extends RecurringDurationBase{
      */
 
     public void setDay(short day)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         String err = "";
         if (day < 1) {
@@ -268,12 +265,12 @@ public class RecurringDuration extends RecurringDurationBase{
      *      <li>zoneMinute</li>
      * </ul>
      *
-     * @throws NotSupportedOperationException this exception is thrown if changing
+     * @throws OperationNotSupportedException this exception is thrown if changing
      *         the value of one field os not allowed
      * @see RecurringDurationBase.setValues
      */
      public void setValues(short[] values)
-        throws NotSupportedOperationException
+        throws OperationNotSupportedException
     {
         this.setCentury(values[0]);
         this.setYear(values[1]);
@@ -575,7 +572,7 @@ public class RecurringDuration extends RecurringDurationBase{
             }
             else result.isUTC();
             temp = null;
-        } catch (NotSupportedOperationException e) {
+        } catch (OperationNotSupportedException e) {
             //we are sure that this method is used with a recurringDuration
             //(if not a ParseException is thrown) so we can never reach that point
         }
