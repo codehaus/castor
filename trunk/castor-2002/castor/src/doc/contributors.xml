@@ -101,6 +101,14 @@
     <description>Testing for Oracle and Castor XML.</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Skolnik" given="Radovan"/>
+    <email>rskolnik@inmail.sk</email>
+    <description>
+       Testing/Feedback on mapping file usage related to Castor XML
+    </description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Stewart" given="George"/>
     <email>georgestewartiv@yahoo.com</email>
