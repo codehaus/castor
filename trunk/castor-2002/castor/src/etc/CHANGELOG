@@ -1,3 +1,10 @@
+Version 0.7.8
+-------------------------------
+
+XML:    Added support for "annotation" as a child for most of the structures.
+XML:    Added more support for "datatype"
+
+
 Version 0.7.7  February 2, 2000
 -------------------------------
 
