@@ -71,9 +71,10 @@ import org.exolab.castor.persist.oql.TokenTypes;
 import org.exolab.castor.persist.oql.ParseTreeNode;
 import org.exolab.castor.persist.oql.ParseTreeWalker;
 import org.exolab.castor.persist.oql.ParamInfo;
-import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.session.OID;
+import org.exolab.castor.persist.session.DatabaseRegistry;
+import org.exolab.castor.persist.session.TransactionContext;
 import org.exolab.castor.persist.resolvers.Resolver;
-import org.exolab.castor.persist.DatabaseRegistry;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
@@ -86,10 +87,10 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
-import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.types.Complex;
 import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.persist.sql.SimpleQueryExecutor;
+
 
 /**
  *
