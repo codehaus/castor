@@ -92,6 +92,10 @@ public class TestTypes
 
     private java.util.Date _timestamp2;
 
+    private byte[] _blob;
+
+    private String _clob;
+
 
     static final int       DefaultId = 3;
 
@@ -250,6 +254,30 @@ public class TestTypes
     public java.util.Date getTimestamp2()
     {
         return _timestamp2;
+    }
+
+
+    public void setBlob( byte[] blob )
+    {
+        _blob = blob;
+    }
+
+
+    public byte[] getBlob()
+    {
+        return _blob;
+    }
+
+
+    public void setClob( String clob )
+    {
+        _clob = clob;
+    }
+
+
+    public String getClob()
+    {
+        return _clob;
     }
 
 

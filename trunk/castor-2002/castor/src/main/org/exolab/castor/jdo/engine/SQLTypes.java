@@ -426,9 +426,11 @@ public final class SQLTypes
         new TypeInfo( java.sql.Types.VARBINARY,     "varbinary",     byte[].class ),
         new TypeInfo( java.sql.Types.LONGVARBINARY, "longvarbinary", byte[].class ),
         new TypeInfo( java.sql.Types.OTHER,         "other",         java.lang.Object.class ),
-        new TypeInfo( java.sql.Types.JAVA_OBJECT,   "javaobject",    java.lang.Object.class )
+        new TypeInfo( java.sql.Types.JAVA_OBJECT,   "javaobject",    java.lang.Object.class ),
+        new TypeInfo( java.sql.Types.BLOB,          "blob",          byte[].class ),
+        new TypeInfo( java.sql.Types.CLOB,          "clob",          java.lang.String.class ),
     };
-    
+
 
 }
 

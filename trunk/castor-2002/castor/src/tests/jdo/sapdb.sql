@@ -221,7 +221,9 @@ create table test_types (
   bool_val char(1)        null,
   int_date integer        null,
   str_time char(12)       null,
-  num_date fixed(17,0)  null
+  num_date fixed(17,0)    null,
+  blob_val long byte      null,
+  clob_val long           null
 );
 
 create unique index test_types_pk

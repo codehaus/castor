@@ -98,6 +98,8 @@ public class TypeHandling
     {
         boolean result = true;
         Database db;
+        final byte[] BLOB_VALUE = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        final String CLOB_VALUE = "0123456789";
 
         try {
             OQLQuery      oql;
@@ -145,7 +147,7 @@ public class TypeHandling
                 db.remove( types );
             } else {
                 stream.writeVerbose( "Error: Could not load types object" );
-                result = false; 
+                result = false;
             }
             db.commit();
             db.begin();
@@ -314,6 +316,40 @@ public class TypeHandling
             else
                 stream.writeVerbose( "OK: date->int/numeric/char conversion passed" );
 
+
+            stream.writeVerbose( "Testing BLOB and CLOB fields" );
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                types.setBlob( BLOB_VALUE );
+                types.setClob( CLOB_VALUE );
+            }
+            db.commit();
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+
+                if ( types.getBlob() == null || ! (new String(types.getBlob())).equals(new String(BLOB_VALUE)) ) {
+                    stream.writeVerbose( "Error: BLOB value was not set" );
+                    result = false;
+                }
+                if ( ! CLOB_VALUE.equals(types.getClob()) ) {
+                    stream.writeVerbose( "Error: CLOB value was not set" );
+                    result = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            else
+                stream.writeVerbose( "OK: value in character field passed" );
 
             db.close();
         } catch ( Exception except ) {

@@ -436,6 +436,12 @@
     <field name="timestamp2" type="java.util.Date" >
       <sql name="num_date" type="numeric[YMDhmsS]" />
     </field>
+    <field name="blob" type="bytes" >
+      <sql name="blob_val" type="blob" dirty="ignore" />
+    </field>
+    <field name="clob" type="string" >
+      <sql name="clob_val" type="clob" dirty="ignore" />
+    </field>
   </class>
 
 
