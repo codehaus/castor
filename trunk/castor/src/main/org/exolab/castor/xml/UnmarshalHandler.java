@@ -1492,6 +1492,11 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- who knows
                 if (state.object != null) {
                     _class = state.object.getClass();
+                    if (classDesc != null) {
+                        if (classDesc.getJavaClass() != _class) {
+                            classDesc = null;
+                        }
+                    }
                 }
                 else {
                     try {
