@@ -925,9 +925,18 @@ public class Marshaller extends MarshalFramework {
                         saveType = true;
                         
                         String nsURI = descriptor.getNameSpaceURI();
-                        boolean containsDesc 
-                            = (_cdResolver.resolveByXMLName(name, nsURI, null) != null);
-                                            
+                        
+                        
+                        boolean containsDesc = false;
+                        
+                        //-- if we're not at the root, check to see if we can resolve name.
+                        //-- if we're at the root, the name will most likely be resolvable
+                        //-- due to the validation step, so in most cases, if we are not
+                        //-- using a mapping we need the xsi:type at the root
+                        if (!atRoot) {
+                        	containsDesc = (_cdResolver.resolveByXMLName(name, nsURI, null) != null);
+                        }
+                        
                         if (!containsDesc) {
                             //-- check for class mapping, we don't use the
                             //-- resolver directly because it will try to
@@ -941,18 +950,25 @@ public class Marshaller extends MarshalFramework {
                             //-- The following logic needs to be expanded to use
                             //-- namespace -to- package mappings
                             if ((!containsDesc) && (pkgName == null)) {
-                                String tmpName1 = descriptor.getXMLName();
-                                String tmpName2 = _naming.toXMLName(_class.getName());
-                                if (tmpName2.equals(tmpName1))
-                                    saveType = false;
+                                //-- check to see if the class name is guessable
+                                //-- from the xml name
+                                classDesc = getClassDescriptor(_class);                                
+                                if (classDesc != null) {
+                                    String tmpName1 = classDesc.getXMLName();
+                                    String tmpName2 = _naming.toXMLName(_class.getName());
+                                    if (tmpName2.equals(tmpName1))
+                                        saveType = false;
+                                }
                             }
                         }
+                        
                         if (containsDesc) saveType = false;
                         
                     }
                     
                     //  marshal as the actual type
-                    classDesc = getClassDescriptor(_class);
+                    if (classDesc == null)
+                        classDesc = getClassDescriptor(_class);
                     
 			    } //-- end if (marshalExtendedType)
 			    else {
@@ -1817,6 +1833,7 @@ public class Marshaller extends MarshalFramework {
      public void setSuppressXSIType(boolean suppressXSIType) {
         _suppressXSIType = suppressXSIType;
      } //-- setSuppressXSIType
+
      
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
