@@ -56,6 +56,7 @@ import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.util.ClassUtils;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
@@ -277,7 +278,7 @@ public class ParseTreeWalker implements TokenTypes
     }
     
     try {
-      _objClass = Class.forName( _fromClassName );
+      _objClass = ClassUtils.loadAppClass( _fromClassName );
     } 
     catch ( ClassNotFoundException except ) {
       throw new QueryException( "Could not find class " + _fromClassName );

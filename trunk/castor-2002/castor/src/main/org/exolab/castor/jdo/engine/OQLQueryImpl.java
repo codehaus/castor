@@ -86,6 +86,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
+import org.exolab.castor.util.ClassUtils;
 
 
 /**
@@ -371,7 +372,7 @@ public class OQLQueryImpl
             throw new QueryException( "Missing object name" );
         }
         try {
-            _objClass = Class.forName( objType );
+            _objClass = ClassUtils.loadAppClass( objType );
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
