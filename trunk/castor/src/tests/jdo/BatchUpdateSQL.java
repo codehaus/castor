@@ -44,13 +44,10 @@
  */
 package jdo;
 
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.io.Reader;
 import java.util.Properties;
-import java.util.Hashtable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.sql.DriverManager;
@@ -59,10 +56,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.NameNotFoundException;
 import org.xml.sax.InputSource;
-import org.xml.sax.EntityResolver;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
@@ -273,44 +267,44 @@ public class BatchUpdateSQL {
 
         database = (Database) unm.unmarshal( source );
 
-        if ( database.getDriver() != null ) {
+        if ( database.getDatabaseChoice().getDriver() != null ) {
             // JDO configuration file specifies a driver, use the driver
             // properties to create a new registry object.
             Properties  props;
             Enumeration params;
             Param       param;
 
-            if ( database.getDriver().getClassName() != null ) {
-                Class.forName( database.getDriver().getClassName() ).newInstance();
+            if ( database.getDatabaseChoice().getDriver().getClassName() != null ) {
+                Class.forName( database.getDatabaseChoice().getDriver().getClassName() ).newInstance();
             }
-            if ( DriverManager.getDriver( database.getDriver().getUrl() ) == null )
+            if ( DriverManager.getDriver( database.getDatabaseChoice().getDriver().getUrl() ) == null )
                 throw new RuntimeException( "jdo.missingDriver" );
 
             props = new Properties();
-            params = database.getDriver().enumerateParam();
+            params = database.getDatabaseChoice().getDriver().enumerateParam();
             while ( params.hasMoreElements() ) {
                 param = (Param) params.nextElement();
                 props.put( param.getName(), param.getValue() );
             }
 
-            return DriverManager.getConnection( database.getDriver().getUrl(), props );
+            return DriverManager.getConnection( database.getDatabaseChoice().getDriver().getUrl(), props );
 
-        } else if ( database.getDataSource() != null ) {
+        } else if ( database.getDatabaseChoice().getDataSource() != null ) {
             // JDO configuration file specifies a DataSource object, use the
             // DataSource which was configured from the JDO configuration file
             // to create a new registry object.
             DataSource ds;
 
-            ds = (DataSource) database.getDataSource().getParams();
+            ds = (DataSource) database.getDatabaseChoice().getDataSource().getParams();
             if ( ds == null )
                 throw new RuntimeException( "jdo.missingDataSource" );
             return ds.getConnection();
-        } else if ( database.getJndi() != null ) {
+        } else if ( database.getDatabaseChoice().getJndi() != null ) {
             // JDO configuration file specifies a DataSource lookup through JNDI,
             // locate the DataSource object frome the JNDI namespace and use it.
             Object    ds;
 
-            ds = new InitialContext().lookup( database.getJndi().getName() );
+            ds = new InitialContext().lookup( database.getDatabaseChoice().getJndi().getName() );
             if ( ! ( ds instanceof DataSource ) )
                 throw new RuntimeException( "jdo.jndiNameNotFound" );
 
