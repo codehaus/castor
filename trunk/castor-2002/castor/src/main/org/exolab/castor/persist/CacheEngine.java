@@ -775,10 +775,9 @@ public final class CacheEngine
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to store object for which no lock was acquired" ) );
 
-        // Must acquire a write lock on the object in order to proceed to
-        // storing the object. Will wait until another transaction releases
-        // its lock on the object.
-        original = (Object[]) lock.acquire( tx, true, timeout );
+        // Acquire a read lock first. Only if the object has been modified
+        // do we need a write lock.
+        original = (Object[]) lock.acquire( tx, false, timeout );
         // Get the real OID with the exclusive and stamp info.
         oid = typeInfo.cache.getOID( original );
 
@@ -885,12 +884,21 @@ public final class CacheEngine
                 throw new PersistenceExceptionImpl( except );
             }
 
+            // Object has been modified, must write it. Acquire a write lock and
+            // block is some other transaction has a read lock on the object.
+            // First one to call this method gets to commit.
+            original = (Object[]) lock.acquire( tx, true, timeout );
+
             // The object has an old identity, it existed before, one need
             // to store the new contents.
             if ( _logWriter != null )
                 _logWriter.println( "Castor: Storing " + typeInfo.javaClass.getName() + " (" +
                                     identity + ")" );
 
+            // Create a new field set, copy the object into that set and try
+            // to update the database. Use the original fields for dirty checking.
+            // If the update succeeded, time to reflect that in the cache and
+            // proceed to the next step.
             fields = typeInfo.handler.newFieldSet();
             typeInfo.handler.copyInto( object, fields );
             if ( oid.isExclusive() )
@@ -899,8 +907,10 @@ public final class CacheEngine
             else
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                       fields, identity, original, oid.getStamp() ) );
+            /* XXX Is this necessary?
             for ( int i = 0 ; i < fields.length ; ++i )
                 original[ i ] = fields[ i ];
+            */
             oid.setExclusive( false );
         }
         return oid;
