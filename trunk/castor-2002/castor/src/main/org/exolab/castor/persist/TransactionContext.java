@@ -452,7 +452,10 @@ public abstract class TransactionContext
         // [oleg] complicated scenarios of object reloading may
         // replace the instance of dependent object.
         // Looks bad, but works. Need to do this better in castorone...
-        entry = getObjectEntry( engine, oid );
+        if ( accessMode == AccessMode.ReadOnly ) 
+            entry = getReadOnlyObjectEntry( oid );
+        if ( entry == null ) 
+            entry = getObjectEntry( engine, oid );
         if ( entry != null ) 
             object = entry.object;
 
@@ -1364,9 +1367,21 @@ public abstract class TransactionContext
      */
     ObjectEntry removeObjectEntry( Object object )
     {
+        Object key;
+        Enumeration enum;
         int size;
         ObjectEntry entry;
 
+        // Remove from readonly list
+        for ( enum = _readOnlyObjects.keys(); enum.hasMoreElements(); ) {
+            key = enum.nextElement();
+            if ( _readOnlyObjects.get( key ) == object ) {
+                _readOnlyObjects.remove( key );
+                break;
+            }
+        }
+
+        // Remove from the transction
         size = _objects.size();
         for ( int i = 0; i < size; i++ ) {
             entry = (ObjectEntry) _objects.elementAt( i );
@@ -1389,12 +1404,24 @@ public abstract class TransactionContext
      */
     ObjectEntry removeObjectEntryWithDependent( Object object )
     {
+        Object key;
         int size;
         ObjectEntry entry;
         RelationHandler[] relations;
         Object related;
         Enumeration enum;
 
+        // Remove from readonly list
+        for ( enum = _readOnlyObjects.keys(); enum.hasMoreElements(); ) {
+            key = enum.nextElement();
+            entry = (ObjectEntry) _readOnlyObjects.get( key );
+            if ( entry.object == object ) {
+                _readOnlyObjects.remove( key );
+                break;
+            }
+        }
+
+        // Remove from the transction
         size = _objects.size();
         for ( int i = 0; i < size; i++ ) {
             entry = (ObjectEntry) _objects.elementAt( i );

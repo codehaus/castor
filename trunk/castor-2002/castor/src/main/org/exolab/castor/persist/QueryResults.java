@@ -204,7 +204,7 @@ public final class QueryResults
         throws TransactionNotInProgressException, PersistenceException,
                ObjectNotFoundException, LockNotGrantedException
     {
-        TransactionContext.ObjectEntry entry;
+        TransactionContext.ObjectEntry entry = null;
         OID              oid;
         ClassHandler     handler;
         Object           object;
@@ -244,7 +244,10 @@ public final class QueryResults
             
             // Did we already load (or created) this object in this
             // transaction.
-            entry = _tx.getObjectEntry( _engine, oid );
+            if ( _accessMode == AccessMode.ReadOnly ) 
+                entry = _tx.getReadOnlyObjectEntry( oid );
+            if ( entry == null ) 
+                entry = _tx.getObjectEntry( _engine, oid );
             if ( entry != null ) {
                 // The object has already been loaded in this transaction
                 // and is available from the persistence engine.
@@ -300,7 +303,10 @@ public final class QueryResults
                     // [oleg] complicated scenarios of object reloading may
                     // replace the instance of dependent object.
                     // Looks bad, but works. Need to do this better in castorone...
-                    entry = _tx.getObjectEntry( _engine, oid );
+                    if ( _accessMode == AccessMode.ReadOnly ) 
+                        entry = _tx.getReadOnlyObjectEntry( oid );
+                    if ( entry == null ) 
+                        entry = _tx.getObjectEntry( _engine, oid );
                     if ( entry != null ) 
                         object = entry.object;
                 } catch ( Exception except ) {
