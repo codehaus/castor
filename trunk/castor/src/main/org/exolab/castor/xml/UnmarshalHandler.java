@@ -1961,10 +1961,20 @@ public final class UnmarshalHandler extends MarshalFramework
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException
     { 
+        //-- Patch for Xerces 2.x bug
+        //-- prevent attempting to declare "XML" namespace
+        if (Namespaces.XML_NAMESPACE_PREFIX.equals(prefix) && 
+            Namespaces.XML_NAMESPACE.equals(uri))             
+        {
+            return;
+        }
+        //-- end Xerces 2.x bug
+        
         if (_createNamespaceScope) {
             _namespaces = _namespaces.createNamespaces();
             _createNamespaceScope = false;
         }
+        
         
         _namespaces.addNamespace(prefix, uri);
         
