@@ -126,7 +126,7 @@ public class ClobImpl implements Clob {
 
         try {
             _reader.reset();
-            _reader.skip(pos);
+            _reader.skip(pos - 1);
             _reader.read(buf);
         } catch (IOException ex) {
             throw new SQLException(ex.toString());
