@@ -209,6 +209,15 @@ public final class Namespaces {
     } //-- method: getNamespacePrefix
 
     /**
+     * Returns all namespace prefixes declared locally
+     * 
+     * @return an Enumeration of locally declared namespace prefixes
+     */
+    public Enumeration getLocalNamespacePrefixes() {
+        return new NamespaceEnumerator(_first, NamespaceEnumerator.PREFIX);
+    } //-- method: getLocalNamespacePrefixes
+
+    /**
      * Returns all namespace prefixes associated with the given URI,
      * including those from parent scopes. 
      * 
@@ -374,15 +383,23 @@ public final class Namespaces {
 
     /**
      * A simple Enumeration for Namespace objects
-    **/
-    class NamespaceEnumerator
+     */
+    static class NamespaceEnumerator
         implements java.util.Enumeration
     {
+        public static final int URI = 0;
+        public static final int PREFIX = 1;
 
         private Namespace _namespace = null;
+        private int _returnType = URI;
 
         NamespaceEnumerator(Namespace namespace) {
             _namespace = namespace;
+        }
+        
+        NamespaceEnumerator(Namespace namespace, int returnType) {
+            _namespace = namespace;
+            _returnType = returnType;
         }
 
         public boolean hasMoreElements() {
@@ -390,13 +407,17 @@ public final class Namespaces {
         }
 
         public Object nextElement() {
-            String nsURI = null;
+            String obj = null;
             if (_namespace != null) {
-                nsURI = _namespace.uri;
+                if (_returnType == URI)
+                    obj = _namespace.uri;
+                else 
+                    obj = _namespace.prefix;
                 _namespace = _namespace.next;
             }
-            return nsURI;
+            return obj;
         }
+        
     } //-- class: NamespaceEnumerator
 
 } //-- class: Namespaces
