@@ -407,6 +407,12 @@
   <!-- Last names begin with E-H -->
 
   <contributor type="Contributor">
+    <name surname="La Ferla" given="Robert"/>
+    <email>robertlaferla@comcast.net</email>
+    <description>Conributed EnumeratedTypeaccess interface..</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Gaillard" given="Gilles"/>
     <email>gillesGaillard@compuserve.com</email>
     <description>
