@@ -66,18 +66,18 @@ public class DTDResolver
 
 
     private static final String[] PublicId = new String[] {
-	Constants.DTD.PublicId,
-	Constants.Schema.SystemId
+	MappingSchema.DTD.PublicId,
+	MappingSchema.Schema.SystemId
     };
 
     private static final String[] SystemId = new String[] {
-	Constants.DTD.PublicId,
-	Constants.Schema.PublicId
+	MappingSchema.DTD.PublicId,
+	MappingSchema.Schema.PublicId
     };
 
     private static final String[] Resource = new String[] {
-	Constants.DTD.Resource,
-	Constants.Schema.Resource
+	MappingSchema.DTD.Resource,
+	MappingSchema.Schema.Resource
     };
 
 

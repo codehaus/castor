@@ -53,7 +53,7 @@ package org.exolab.castor.mapping;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class Constants
+public class MappingSchema
 {
 
 
