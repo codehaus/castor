@@ -798,7 +798,8 @@ public class SourceFactory  {
 
         //- Handle derived types
         XMLType base = complexType.getBaseType();
-		//-- if the base is a complexType, we need to process it
+
+        //-- if the base is a complexType, we need to process it
 		if ((base != null) && (base.isComplexType())) {
 
             String className = null;
@@ -832,7 +833,7 @@ public class SourceFactory  {
         }
 		//--if the base a simpleType,we create a field info to handle the content
 		if ( (base != null) && (base.isSimpleType()) ) {
-		   FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(
+           FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(
                                TypeConversion.convertType((SimpleType)base));
 		   handleField(fieldInfo,state);
         }
