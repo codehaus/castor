@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -149,6 +149,78 @@ public class SchemaNames {
 
     //-- Wildcard name
     public static final String WILDCARD         = "wildcard";
+    
+    
+    /**
+     * Returns the name for the Schema Structure.
+     *
+     * @param structure the Structure to return the name for
+     * @return the Structure name
+     */
+    public static String getStructureName(Structure structure) {
+        
+        if (structure == null) return null;
+        
+        switch (structure.getStructureType()) {
+            case Structure.ANYTYPE:
+                return ANYTYPE;
+            case Structure.ANNOTATION:
+                return ANNOTATION;
+            case Structure.APPINFO:
+                return APPINFO;
+            case Structure.ATTRIBUTE:
+                return ATTRIBUTE;
+            case Structure.ATTRIBUTE_GROUP: 
+                return ATTRIBUTE_GROUP;
+            case Structure.COMPLEX_CONTENT:
+                return COMPLEX_CONTENT;
+            case Structure.COMPLEX_TYPE:
+                return COMPLEX_TYPE;
+            case Structure.DOCUMENTATION:
+                return DOCUMENTATION;
+            case Structure.ELEMENT:
+                return ELEMENT;
+            case Structure.FACET:
+                Facet facet = (Facet)structure;
+                return facet.getName();
+            case Structure.GROUP:
+                Group group = (Group)structure;
+                Order order = group.getOrder();
+                return order.toString();
+            case Structure.IDENTITY_FIELD:
+                return FIELD;
+            case Structure.IDENTITY_SELECTOR:
+                return SELECTOR;
+            case Structure.KEY:
+                return KEY;
+            case Structure.KEYREF:
+                return KEYREF;
+            case Structure.LIST:
+                return LIST;
+            case Structure.MODELGROUP:
+                return GROUP;
+            case Structure.MODELGROUP_REF:
+                return GROUP;
+            case Structure.REDEFINE:
+                return REDEFINE;
+            case Structure.SCHEMA:
+                return SCHEMA;
+            case Structure.SIMPLE_CONTENT:
+                return SIMPLE_CONTENT;
+            case Structure.SIMPLE_TYPE:
+                return SIMPLE_TYPE;
+            case Structure.UNION:
+                return UNION;
+            case Structure.UNIQUE:
+                return UNIQUE;
+            case Structure.WILDCARD:
+                return ANY;
+            default:
+                break;
+        }
+        return null;        
+    } //-- getStructureName
+    
     /**
      * Determines whether or not the given name is the name
      * of an XML Schema group structure.
