@@ -12,14 +12,14 @@
     <header>
     </header>
 
-    <section title="">
+    <section title="Castor News">
 
       <!--table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#990033"><tr><td>
           <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#EDEDED"><tr><td>
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
-        <news>
+        <news id="20">
             <title>Castor - A new home</title>
             <author>Werner Guttmann</author>
             <date>14 Feb 2005</date>
@@ -38,22 +38,22 @@
 				- <a href="http://dist.codehaus.org/castor">Download</a>
             </summary>
         </news>
-        <news>
+        <news id="19">
             <title>Castor JDO - New committers</title>
             <author>Werner Guttmann</author>
             <date>14 Feb 2005</date>
             <time>21:21:21</time>
             <summary>
-                Please join me to welcome Gregory, Martin, Ralf and Stein as new committers
-				for Castor JDO. I am more than happy to have them on board, as all of them 
-				have shown their dedication to the project through numerous occasions (incl.
-				patches and willingness to spend time with me and Bruce ...).
+                Please join me to welcome Gregory Block, Martin Fuchs, Ralf Joachim and Stein 
+				as new committers for Castor JDO. I am more than happy to have them on board, as 
+				all of them have shown their dedication to the project through numerous occasions 
+				(incl. patches and willingness to spend time with myself ...).
 				
 				Details about the current and past committers (as well as contributors) 
 				can be found at <a href="http://castor.codehaus.org/contributors.html">here</a>.
             </summary>
         </news>
-        <news>
+        <news id="18">
             <title>Castor 0.9.6 - Final release</title>
             <author>Werner Guttmann</author>
             <date>09 Feb 2005</date>
@@ -72,7 +72,7 @@
 				mailing lists.
             </summary>
         </news>
-        <news>
+        <news id="17">
             <title>Castor 0.9.6 - 3rd release candidates</title>
             <author>Werner Guttmann</author>
             <date>11 Jan 2005</date>
@@ -90,7 +90,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="16">
             <title>Castor 0.9.5.4 Final Release</title>
             <author>Keith Visco</author>
             <date>18 Nov 2004</date>
@@ -107,7 +107,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="15">
             <title>Castor 0.9.6 Release Candidates</title>
             <author>Werner Guttmann</author>
             <date>28 Oct 2004</date>
@@ -132,7 +132,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="14">
             <title>Castor 0.9.5.4 Release Candidates</title>
             <author>Keith Visco</author>
             <date>18 Oct 2004</date>
@@ -155,7 +155,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="13">
             <title>Castor Message Board</title>
             <author>Keith Visco</author>
             <date>04 Jul 2004</date>
@@ -173,7 +173,7 @@
                ever communication method you prefer.
             </summary>
         </news>
-        <news>
+        <news id="12">
             <title>CastorLive Book in the Works</title>
             <author>Bruce Snyder</author>
             <date>20 Jun 2004</date>
@@ -192,7 +192,7 @@
             for additional information.
             </summary>
         </news>
-        <news>
+        <news id="11">
             <release />
             <title>Current Release</title>
             <author>Keith Visco</author>
@@ -217,7 +217,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="10">
             <release />
             <title>Next Release</title>
             <author>Keith Visco</author>
@@ -228,7 +228,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="9">
             <release />
             <title>Possible Interim Release</title>
             <author>Keith Visco</author>
@@ -240,7 +240,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="8">
             <title>Welcome Stein Hugubakken to the Team</title>
             <author>Bruce Snyder</author>
             <date>01 May 2004</date>
@@ -252,7 +252,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="7">
             <title>Welcome Patrick van Kaan to the Team</title>
             <author>Bruce Snyder</author>
             <date>15 Jan 2004</date>
@@ -265,8 +265,8 @@
             </summary>
         </news>
 
-        <news>
-            <title>Welcome Werner Guttman to the Team</title>
+        <news id="6">
+            <title>Welcome Werner Guttmann to the Team</title>
             <author>Bruce Snyder</author>
             <date>11 Nov 2003</date>
             <time>18:38:10</time>
@@ -277,7 +277,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="5">
             <title>CastorWiki Now Available</title>
             <author>Keith Visco</author>
             <date>19 Jun 2003</date>
@@ -291,7 +291,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="4">
             <title>RefactorIt to Include Castor</title>
             <author>Keith Visco</author>
             <date>12 Mar 2003</date>
@@ -305,7 +305,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="3">
             <title>Congratulations Bruce!</title>
             <author>Keith Visco</author>
             <date>14 Nov 2002</date>
@@ -317,7 +317,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="2">
             <title>Welcome Micka�l Guessant to the Team</title>
             <author>Bruce Snyder</author>
             <date>24 Oct 2002</date>
@@ -329,7 +329,7 @@
             </summary>
         </news>
 
-        <news>
+        <news id="1">
             <title>Bruce Snyder Promoted to Castor JDO Lead</title>
             <author>Keith Visco</author>
             <date>10 July 2002</date>
