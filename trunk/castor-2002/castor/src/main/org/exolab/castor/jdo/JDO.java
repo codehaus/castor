@@ -47,9 +47,9 @@
 package org.exolab.castor.jdo;
 
 
+import java.io.PrintWriter;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Hashtable;
 import org.xml.sax.InputSource;
@@ -73,6 +73,8 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.persist.OutputLogInterceptor;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -139,10 +141,10 @@ public class JDO
 
 
     /**
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
+     * The log intercpetor to which all logging and tracing messages
+     * will be sent.
      */
-    private PrintWriter    _logWriter;
+    private LogInterceptor  _logInterceptor;
 
 
     /**
@@ -202,21 +204,35 @@ public class JDO
      */
     public void setLogWriter( PrintWriter logWriter )
     {
-        _logWriter = logWriter;
+        if ( logWriter == null )
+            _logInterceptor = null;
+        else
+            _logInterceptor = new OutputLogInterceptor( logWriter );
     }
 
 
     /**
-     * Sets the log writer for this database source.
+     * Sets the log interceptor for this database source.
      * <p>
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
+     * The interceptor is a callback to to which all
+     * logging and tracing messages are sent.
      *
-     * @param logWriter The log writer, null if disabled
+     * @param logInterceptor The log interceptor, null if disabled
      */
-    public PrintWriter getLogWriter()
+    public void setLogInterceptor( LogInterceptor logInterceptor )
     {
-        return _logWriter;
+        _logInterceptor = logInterceptor;
+    }
+
+
+    /**
+     * Returns the log interceptor for this database source.
+     *
+     * @return The log interceptor, null if disabled
+     */
+    public LogInterceptor getLogInterceptor()
+    {
+        return _logInterceptor;
     }
 
 
@@ -379,7 +395,7 @@ public class JDO
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logWriter, null );
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, null );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( Messages.format( "persist.nested", except.toString() ) );
             }
@@ -396,7 +412,7 @@ public class JDO
                 tm = (TransactionManager) ctx.lookup( _tmName );
                 tx = tm.getTransaction();
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logWriter, tx );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx );
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
@@ -406,11 +422,11 @@ public class JDO
                 // No TransactionManager object. Just ignore.
             } catch ( Exception except ) {
                 // NamingException, SystemException, RollbackException
-                if ( _logWriter != null )
-                    _logWriter.println( except );
+                if ( _logInterceptor != null )
+                    _logInterceptor.exception( except );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logWriter, null );
+        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, null );
     }
 
 
@@ -438,14 +454,13 @@ public class JDO
      * 
      * @param url The JDO configuration file
      * @param loader The class loader to use, null for the default
-     * @param logWriter Mapping information is printed there, if not null
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadConfiguration( String url, ClassLoader loader, PrintWriter logWriter )
+    public static void loadConfiguration( String url, ClassLoader loader )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( new InputSource( url ), null, logWriter, loader );
+        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, loader );
     }
     
     
@@ -460,15 +475,14 @@ public class JDO
      * @param source The JDO configuration file
      * @param resolve An optional entity resolver
      * @param loader The class loader to use, null for the default
-     * @param logWriter Mapping information is printed there, if not null
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
     public static void loadConfiguration( InputSource source, EntityResolver resolver,
-                                          ClassLoader loader, PrintWriter logWriter )
+                                          ClassLoader loader )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( source, resolver, logWriter, loader );
+        DatabaseRegistry.loadDatabase( source, resolver, null, loader );
     }
 
 

@@ -302,8 +302,8 @@ public class OQLQueryImpl
             return execute( AccessMode.Shared );
         case Database.Exclusive:
             return execute( AccessMode.Exclusive );
-        case Database.Locked:
-            return execute( AccessMode.Locked );
+        case Database.DbLocked:
+            return execute( AccessMode.DbLocked );
         default:
             throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
         }
