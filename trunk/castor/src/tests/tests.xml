@@ -149,6 +149,7 @@
     <case class="jdo.TimeStampMismatched" />
     <case class="jdo.ExpireManyToMany" />
     <case class="jdo.ExpireLazyEmployee" />
+    <case class="jdo.TestLimitClause" id="TC62" />
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">
@@ -241,6 +242,7 @@
     <case class="jdo.TimeStampMismatched" />
     <case class="jdo.ExpireManyToMany" />
     <case class="jdo.ExpireLazyEmployee" />
+    <case class="jdo.TestLimitClause" id="TC62" />
   </category>
 
 <category name="mssql" class="jdo.JDOCategory">
