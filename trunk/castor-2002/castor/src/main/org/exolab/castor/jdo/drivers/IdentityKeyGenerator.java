@@ -73,16 +73,21 @@ public final class IdentityKeyGenerator implements KeyGenerator
     private final int _sqlType;
 
 
+    private final String _identityFunc;
+
+
     /**
      * Initialize the IDENTITY key generator.
      */
     public IdentityKeyGenerator( PersistenceFactory factory, int sqlType ) throws MappingException
     {
         String fName = factory.getFactoryName();
-        if ( !fName.equals("sybase") && !fName.equals("sql-server")) {
+        if ( !fName.equals("sybase") && !fName.equals("sql-server") && 
+                !fName.equals("hsql")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
+        _identityFunc = ( fName.equals("hsql") ? "IDENTITY()" : "@@identity" );
         _sqlType = sqlType;
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
@@ -108,7 +113,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
 
         try {
             stmt = conn.createStatement();
-            rs = stmt.executeQuery( "SELECT @@identity" );
+            rs = stmt.executeQuery( "SELECT " + _identityFunc );
 
             if ( rs.next() ) {
                 value = rs.getInt( 1 );
