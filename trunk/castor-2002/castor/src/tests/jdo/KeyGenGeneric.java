@@ -54,6 +54,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -74,7 +75,14 @@ public class KeyGenGeneric
     public KeyGenGeneric( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC07", "Key generator" );
+        this( "TC07", "Key generators: MAX, HIGH/LOW", category );
+    }
+
+
+    public KeyGenGeneric( String name, String description, CWTestCategory category )
+        throws CWClassConstructorException
+    {
+        super( name, description );
         _category = (JDOCategory) category;
     }
 
@@ -126,7 +134,7 @@ public class KeyGenGeneric
                                   Class objClass, Class extClass )
             throws Exception
     {
-        OQLQuery            oql;
+        OQLQueryImpl        oql;
         TestKeyGenObject    object;
         TestKeyGenObject    ext;
         Enumeration         enum;
@@ -151,14 +159,36 @@ public class KeyGenGeneric
         db.begin();
 
         // Find the first object and remove it 
-        object = (TestKeyGenObject) db.load( objClass, object.getId() );
+        //object = (TestKeyGenObject) db.load( objClass, object.getId() );
+        oql = (OQLQueryImpl) db.getOQLQuery();
+        oql.newCreate( "SELECT object FROM " + objClass.getName() +
+                       " object WHERE id = $1" );
+        oql.newBind( object.getId() );
+        enum = oql.execute();
         stream.writeVerbose( "Removing first object: " + object );
-        db.remove( object );
+        if ( enum.hasMoreElements() ) {
+            object = (TestKeyGenObject) enum.nextElement();
+            db.remove( object );
+            stream.writeVerbose( "Removed" );
+        } else {
+            stream.writeVerbose( "Not found" );
+        }
 
         // Find the second object and remove it
-        ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
+        //ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
+        oql = (OQLQueryImpl) db.getOQLQuery();
+        oql.newCreate( "SELECT ext FROM " + extClass.getName() +
+                       " ext WHERE id = $1" );
+        oql.newBind( ext.getId() );
+        enum = oql.execute();
         stream.writeVerbose( "Removing second object: " + ext );
-        db.remove( ext );
+        if ( enum.hasMoreElements() ) {
+            ext = (TestKeyGenObject) enum.nextElement();
+            db.remove( ext );
+            stream.writeVerbose( "Removed" );
+        } else {
+            stream.writeVerbose( "Not found" );
+        }
 
         db.commit();
     }
