@@ -62,6 +62,7 @@ import org.xml.sax.helpers.AttributeListImpl;
 import org.apache.xml.serialize.Serializer;
 
 
+
 /**
  * A class for serializing Schema models
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -586,13 +587,21 @@ public class SchemaWriter {
             //add the targetNamespace prefix if necessary
             if (baseType.isComplexType()) {
                 String targetNamespace = baseType.getSchema().getTargetNamespace();
-                if (targetNamespace != null ) {
-                    String nsPrefix = getNSPrefix(complexType.getSchema(), targetNamespace);
-                    if ((nsPrefix != null) && (nsPrefix.length() != 0))
-                        baseTypeName = nsPrefix +':'+ baseTypeName;
-                    targetNamespace = null;
-                    nsPrefix = null;
+                //-- targetNamespace is null
+                if (targetNamespace == null) {
+                	if (complexType.isRedefined()) {
+                		targetNamespace =  complexType.getSchema().getTargetNamespace();
+                	}
                 }
+                
+                else {
+                	String nsPrefix = getNSPrefix(complexType.getSchema(), targetNamespace);
+	                if ((nsPrefix != null) && (nsPrefix.length() != 0))
+	                    baseTypeName = nsPrefix +':'+ baseTypeName;
+	                targetNamespace = null;
+	                nsPrefix = null;
+                }
+
             }
             _atts.clear();
             _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, baseTypeName);
@@ -686,7 +695,6 @@ public class SchemaWriter {
     private void processElement(ElementDecl element, String schemaPrefix)
         throws SAXException
     {
-
         String ELEMENT_NAME = schemaPrefix + ELEMENT;
 
         _atts.clear();
@@ -1129,46 +1137,127 @@ public class SchemaWriter {
         while (enum.hasMoreElements()) {
             processImport((Schema)enum.nextElement(), schemaPrefix);
         }
-
+        
+        //-- process all cached included schemas
+        enum = schema.getCachedIncludedSchemas();
+        while (enum.hasMoreElements()) {
+        	processIncludedSchema((Schema)enum.nextElement(), schemaPrefix);
+        }
+        
+        //-- process all redefinitions
+        enum = schema.getRedefineSchema();
+        while (enum.hasMoreElements()) {
+        	processRedefinition((RedefineSchema)enum.nextElement(), schema, schemaPrefix);
+        }
+        
         //-- process all top level attributeGroup declarations
         enum = schema.getAttributeGroups();
         while (enum.hasMoreElements()) {
-            processAttributeGroup((AttributeGroup) enum.nextElement(),
-                schemaPrefix);
+        	boolean found = false;
+        	AttributeGroup temp = (AttributeGroup) enum.nextElement();
+        	//-- check if this attributeGroup is not 
+            //-- part of a redefinition
+           if (temp instanceof AttributeGroupDecl) {
+	          if (((AttributeGroupDecl)temp).isRedefined())
+	          	found = true;
+           }
+            
+           //--check if this attributeGroup is not 
+           //-- included 
+           Enumeration includedSchemas = schema.getCachedIncludedSchemas();
+           while (includedSchemas.hasMoreElements()) {
+               Schema tempSchema = (Schema)includedSchemas.nextElement();
+               if (temp instanceof AttributeGroupDecl) {
+                   String name = ((AttributeGroupDecl)temp).getName();	
+                   found = (tempSchema.getAttributeGroup(name)!= null);
+               }
+           }
+           
+           if (!found)
+                processAttributeGroup(temp,schemaPrefix);
         }
 
         //-- process all top level attribute declarations
         enum = schema.getAttributes();
         while (enum.hasMoreElements()) {
-            processAttribute((AttributeDecl) enum.nextElement(),
-                schemaPrefix);
+        	AttributeDecl temp = (AttributeDecl) enum.nextElement();
+        	boolean found = false;
+        	//--check if this attributeGroup is not 
+        	//-- included 
+        	Enumeration includedSchemas = schema.getCachedIncludedSchemas();
+        	while (includedSchemas.hasMoreElements()) {
+        		Schema tempSchema = (Schema)includedSchemas.nextElement();
+        		found = (tempSchema.getAttribute(temp.getName())!= null);
+        	}
+        	
+        	if (!found)
+                processAttribute(temp,schemaPrefix);
         }
 
         //-- process all top level element declarations
         enum = schema.getElementDecls();
         while (enum.hasMoreElements()) {
-            processElement((ElementDecl) enum.nextElement(),
-                schemaPrefix);
+        	ElementDecl temp = (ElementDecl) enum.nextElement();
+        	boolean found = false;
+        	//--check if this attributeGroup is not 
+        	//-- included 
+        	Enumeration includedSchemas = schema.getCachedIncludedSchemas();
+        	while (includedSchemas.hasMoreElements()) {
+        		Schema tempSchema = (Schema)includedSchemas.nextElement();
+        		found = (tempSchema.getElementDecl(temp.getName())!= null);
+        	}
+        	
+        	if (!found)
+        	    processElement(temp,schemaPrefix);
         }
 
         //-- process all top level complex types
         enum = schema.getComplexTypes();
         while (enum.hasMoreElements()) {
-            processComplexType((ComplexType) enum.nextElement(),
-                schemaPrefix);
+            ComplexType temp = (ComplexType) enum.nextElement();
+            boolean found = false;
+            //--check if this attributeGroup is not 
+            //-- included 
+            Enumeration includedSchemas = schema.getCachedIncludedSchemas();
+            while (includedSchemas.hasMoreElements()) {
+            	Schema tempSchema = (Schema)includedSchemas.nextElement();
+            	found = (tempSchema.getComplexType(temp.getName())!= null);
+            }
+            if (!temp.isRedefined() && !found)
+                processComplexType(temp, schemaPrefix);
         }
 
         //-- process all top level groups
         enum = schema.getModelGroups();
         while (enum.hasMoreElements()) {
-            processGroup((Group)enum.nextElement(), schemaPrefix);
+        	ModelGroup temp = (ModelGroup)enum.nextElement();
+        	boolean found = false;
+        	//--check if this Group is not 
+        	//-- included 
+        	Enumeration includedSchemas = schema.getCachedIncludedSchemas();
+        	while (includedSchemas.hasMoreElements()) {
+        		Schema tempSchema = (Schema)includedSchemas.nextElement();
+        		found = (tempSchema.getModelGroup(temp.getName())!= null);
+        	}
+        	
+        	if (!temp.isRedefined() && !found)
+        	    processGroup(temp, schemaPrefix);
         }
 
         //-- process all top level simple types
         enum = schema.getSimpleTypes();
         while (enum.hasMoreElements()) {
-            processSimpleType((SimpleType) enum.nextElement(),
-                schemaPrefix);
+            SimpleType temp = (SimpleType) enum.nextElement();
+            boolean found = false;
+            //--check if this attributeGroup is not 
+            //-- included 
+            Enumeration includedSchemas = schema.getCachedIncludedSchemas();
+            while (includedSchemas.hasMoreElements()) {
+            	Schema tempSchema = (Schema)includedSchemas.nextElement();
+            	found = (tempSchema.getSimpleType(temp.getName())!= null);
+            }
+            if (!temp.isRedefined() && !found)
+                processSimpleType(temp, schemaPrefix);
         }
 
         _handler.endElement(ELEM_SCHEMA);
@@ -1254,6 +1343,76 @@ public class SchemaWriter {
         _atts.addAttribute("schemaLocation", null, schemaLoc);
         _handler.startElement(ELEMENT_NAME, _atts);
         _handler.endElement(ELEMENT_NAME);
+    } //-- processImport
+    
+    /**
+     * Process an included schema
+     *
+     * @param schema the imported Schema to process
+     * @param schemaPrefix the namespace prefix to use for schema elements
+     **/
+    private void processIncludedSchema(Schema schema, String schemaPrefix)
+	throws SAXException
+	{
+    	String ELEMENT_NAME = schemaPrefix + SchemaNames.INCLUDE;
+    	_atts.clear();
+
+    	String schemaLoc = schema.getSchemaLocation();
+
+    	_atts.addAttribute("schemaLocation", null, schemaLoc);
+    	_handler.startElement(ELEMENT_NAME, _atts);
+    	_handler.endElement(ELEMENT_NAME);
+    } //-- processImport
+    
+    /**
+     * Process a set of redefinitions 
+     *
+     * @param schema the redefined Schema to process
+     * @param schemaPrefix the namespace prefix to use for schema elements
+     **/
+    private void processRedefinition(RedefineSchema schema, Schema parentSchema, String schemaPrefix)
+	throws SAXException
+	{
+    	String ELEMENT_NAME = schemaPrefix + SchemaNames.REDEFINE;
+    	_atts.clear();
+        
+    	String schemaLoc = schema.getSchemaLocation();
+    	if (schemaLoc != "") 
+      	    _atts.addAttribute("schemaLocation", null, schemaLoc);
+    	
+    	_handler.startElement(ELEMENT_NAME, _atts);
+        
+    	//-- process annotations
+    	processAnnotated(schema, schemaPrefix);
+    	
+    	if (schemaLoc != "") {
+	    	Enumeration enum = null;
+	    	//--process complexTypes
+	        enum = schema.enumerateComplexTypes();
+	        while (enum.hasMoreElements()) {
+	        	ComplexType type = (ComplexType)enum.nextElement();
+	        	processComplexType(type, schemaPrefix);
+	        }
+	    	//--process simpleTypes
+	        enum = schema.enumerateSimpleTypes();
+	        while (enum.hasMoreElements()) {
+	        	SimpleType type = (SimpleType)enum.nextElement();
+	        	processSimpleType(type, schemaPrefix);
+	        }
+	    	//--process groups
+	        enum = schema.enumerateGroups();
+	        while (enum.hasMoreElements()) {
+	        	ModelGroup group= (ModelGroup)enum.nextElement();
+	        	processGroup(group, schemaPrefix);
+	        }
+	    	//--process AttributeGroups
+	        enum = schema.enumerateAttributeGroups();
+	        while (enum.hasMoreElements()) {
+	        	AttributeGroupDecl attGroup = (AttributeGroupDecl)enum.nextElement();
+	        	processAttributeGroup(attGroup, schemaPrefix);
+	        }
+    	}
+	    _handler.endElement(ELEMENT_NAME);
     } //-- processImport
 
     /**
@@ -1469,8 +1628,10 @@ public class SchemaWriter {
      * @param namespace the namespace for which a prefix will be returned
     **/
     private String getNSPrefix(Schema schema, String namespace){
-        return schema.getNamespaces().getNamespacePrefix(namespace);
+    	if (namespace == null)
+    		namespace = "";
+    	return schema.getNamespaces().getNamespacePrefix(namespace);
     } //-- getNSPrefix
-
+    
 
 } //-- SchemaWriter
