@@ -263,13 +263,16 @@ public class ClassDescriptorResolverImpl
     } //-- resolve(String, ClassLoader)
     
     /**
-     * Returns the XMLClassDescriptor for the given xml name
+     * Returns the first XMLClassDescriptor that matches the given
+     * XML name and namespaceURI. Null is returned if no descriptor
+     * can be found.
+     *
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
-     * @return the XMLClassDescriptor for the given class name
+     * @return the XMLClassDescriptor for the given XML name
     **/
     public XMLClassDescriptor resolveByXMLName
-        (String xmlName, ClassLoader loader) 
+        (String xmlName, String namespaceURI, ClassLoader loader) 
     {
         if ((xmlName == null) || (xmlName.length() == 0)) {
             clearError(); //-- clear previous error flag
@@ -278,15 +281,16 @@ public class ClassDescriptorResolverImpl
         }
         
         XMLClassDescriptor classDesc = null;
-        Enumeration enum = null;
+        Enumeration enum             = null;
         
         //-- check mapping loader first
         if (mappingLoader != null) {
             enum = mappingLoader.listDescriptors();
             while (enum.hasMoreElements()) {
                 classDesc = (XMLClassDescriptor)enum.nextElement();
-                if (xmlName.equals(classDesc.getXMLName()))
+                if (xmlName.equals(classDesc.getXMLName())) {
                     return classDesc;
+                }
                 classDesc = null;
             }
         }
@@ -295,12 +299,58 @@ public class ClassDescriptorResolverImpl
         enum = _cache.elements();
         while (enum.hasMoreElements()) {
             classDesc = (XMLClassDescriptor)enum.nextElement();
-            if (xmlName.equals(classDesc.getXMLName()))
+            if (xmlName.equals(classDesc.getXMLName())) {
                 return classDesc;
+            }
             classDesc = null;
         }
         
         return classDesc;
+   
+    } //-- resolveByXMLName
+
+    /**
+     * Returns an enumeration of XMLClassDescriptor objects that
+     * match the given xml name
+     *
+     * @param className the class name to find the XMLClassDescriptor for
+     * @param loader the ClassLoader to use
+     * @return an enumeration of XMLClassDescriptor objects.
+    **/
+    public ClassDescriptorEnumeration resolveAllByXMLName
+        (String xmlName, String namespaceURI, ClassLoader loader)
+    {
+        if ((xmlName == null) || (xmlName.length() == 0)) {
+            clearError(); //-- clear previous error flag
+            setError("Cannot resolve a null or zero-length xml name.");
+            return null;
+        }
+        
+        XCDEnumerator xcdEnumerator  = new XCDEnumerator();
+        XMLClassDescriptor classDesc = null;
+        Enumeration enum             = null;
+        
+        //-- check mapping loader first
+        if (mappingLoader != null) {
+            enum = mappingLoader.listDescriptors();
+            while (enum.hasMoreElements()) {
+                classDesc = (XMLClassDescriptor)enum.nextElement();
+                if (xmlName.equals(classDesc.getXMLName())) {
+                    xcdEnumerator.add(classDesc);
+                }
+            }
+        }
+        
+        //-- next look in local cache
+        enum = _cache.elements();
+        while (enum.hasMoreElements()) {
+            classDesc = (XMLClassDescriptor)enum.nextElement();
+            if (xmlName.equals(classDesc.getXMLName())) {
+                xcdEnumerator.add(classDesc);
+            }
+        }
+        
+        return xcdEnumerator;
         
     } //-- resolveByXMLName
     
@@ -370,4 +420,68 @@ public class ClassDescriptorResolverImpl
 
 
 
+/**
+ * A locally used implementation of ClassDescriptorEnumeration
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @version $Revision$ $Date$
+**/
+class XCDEnumerator implements ClassDescriptorEnumeration {
+    
+    private Entry _current = null;
+    
+    private Entry _last = null;
+    
+    /**
+     * Creates an XCDEnumerator
+    **/
+    XCDEnumerator() {
+        super();
+    } //-- XCDEnumerator
+    
+    /**
+     * Adds the given XMLClassDescriptor to this XCDEnumerator
+    **/
+    protected void add(XMLClassDescriptor classDesc) {
+        Entry entry = new Entry();
+        entry.classDesc = classDesc;
+        if (_current == null) {
+            _current = entry;
+            _last    = entry;
+        }
+        else {
+            _last.next = entry;
+            _last = entry;
+        }
+    } //-- add
+    
+    /** 
+     * Returns true if there are more XMLClassDescriptors
+     * available.
+     *
+     * @return true if more XMLClassDescriptors exist within this
+     * enumeration.
+    **/
+    public boolean hasNext() {
+        return (_current != null);
+    } //-- hasNext
+    
+    /**
+     * Returns the next XMLClassDescriptor in this enumeration.
+     *
+     * @return the next XMLClassDescriptor in this enumeration.
+    **/
+    public XMLClassDescriptor getNext() {
+        if (_current == null) return null;
+        Entry entry = _current;
+        _current = _current.next;
+        return entry.classDesc;
+    } //-- getNext
+        
+    class Entry {
+        XMLClassDescriptor classDesc = null;
+        Entry next = null;
+    }
+    
+} //-- ClassDescriptorEnumeration
 
