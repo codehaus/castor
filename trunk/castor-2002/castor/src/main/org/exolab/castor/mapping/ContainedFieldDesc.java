@@ -61,7 +61,7 @@ public class ContainedFieldDesc
      * The field in the parent object that should be used to
      * access this object.
      */
-    protected FieldDesc   _parentField;
+    protected FieldDesc   _containerField;
 
 
     /**
@@ -75,39 +75,39 @@ public class ContainedFieldDesc
      * Constructs a new contained field descriptor. A contained field
      * descriptor is created for each field in the contained object.
      * The actual field descriptor is passed, along with the field in the
-     * parent object used to access the contained object.
+     * parent object (contained field) used to access the contained object.
      *
      * @param fieldDesc The descriptor of this field
      * @param objectDesc The descriptor of this field's object type
-     * @param parentField The field in the parent object used to access
+     * @param containerField The field in the parent object used to access
      *   this contained object
      * @throws MappingException This should never happen
      */
-    public ContainedFieldDesc( FieldDesc fieldDesc, FieldDesc parentField )
+    public ContainedFieldDesc( FieldDesc fieldDesc, FieldDesc containerField )
 	throws MappingException
     {
-	this( fieldDesc, parentField, null );
+	this( fieldDesc, containerField, null );
     }
 
 
-    public ContainedFieldDesc( FieldDesc fieldDesc, FieldDesc parentField,
+    public ContainedFieldDesc( FieldDesc fieldDesc, FieldDesc containerField,
 			       FieldDesc parentRefField )
 	throws MappingException
     {
 	super( fieldDesc );
-	if ( parentField == null )
-	    throw new IllegalArgumentException( "Argument 'parentField' is null" );
-	if ( ! Types.isConstructable( parentField.getFieldType() ) )
-	    throw new MappingException( "The field type " + parentField.getFieldType().getName() +
+	if ( containerField == null )
+	    throw new IllegalArgumentException( "Argument 'containerField' is null" );
+	if ( ! Types.isConstructable( containerField.getFieldType() ) )
+	    throw new MappingException( "The field type " + containerField.getFieldType().getName() +
 					" is not a consturctable class" );
-	_parentField = parentField;
+	_containerField = containerField;
 	_parentRefField = parentRefField;
     }
 
 
-    FieldDesc getParentField()
+    FieldDesc getContainerField()
     {
-	return _parentField;
+	return _containerField;
     }
 
 
@@ -116,7 +116,7 @@ public class ContainedFieldDesc
 	// This is always called with an instance of the parent
 	// object, so we have to obtain the contained object
 	// first before retrieving the field from it.
-	obj = _parentField.getValue( obj );
+	obj = _containerField.getValue( obj );
 	if ( obj == null )
 	    return null;
 	return super.getValue( obj );
@@ -130,14 +130,14 @@ public class ContainedFieldDesc
 	// This is always called with an instance of the parent
 	// object, so we have to obtain the contained object
 	// first before retrieving the field from it.
-	self = _parentField.getValue( obj );
+	self = _containerField.getValue( obj );
 	if ( self == null ) {
 	    // If the contained object does not exist, it is
 	    // created at this point.
-	    self = Types.createNew( _parentField.getFieldType() );
+	    self = Types.createNew( _containerField.getFieldType() );
 	    if ( _parentRefField != null )
 		_parentRefField.setValue( self, obj );
-	    _parentField.setValue( obj, self );
+	    _containerField.setValue( obj, self );
 	}
 	super.setValue( self, value );
     }
@@ -145,7 +145,7 @@ public class ContainedFieldDesc
 
     public String toString()
     {
-	return super.toString() + " on " + _parentField.getFieldName();
+	return super.toString() + " on " + _containerField.getFieldName();
     }
 
 

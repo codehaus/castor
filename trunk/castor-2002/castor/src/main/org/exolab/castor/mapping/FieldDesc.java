@@ -57,7 +57,7 @@ import java.lang.reflect.InvocationTargetException;
  * A field descriptor describes and is used to access the field in a
  * Java object. This class is a wrapper around the <tt>Field</tt>
  * class of the reflection package and provides additional information
- * about target name and type, read/write access, etc.
+ * about name and type, read/write access, etc.
  * <p>
  * This class is used as the common parent for all derived classes
  * including {@link ContainedFieldDesc}, {@link ObjectFieldDesc}, etc.
@@ -69,7 +69,7 @@ import java.lang.reflect.InvocationTargetException;
  * @version $Revision$ $Date$
  * @see ObjectDesc
  */
-public abstract class FieldDesc
+public class FieldDesc
 {
 
 
@@ -96,13 +96,6 @@ public abstract class FieldDesc
      * name, even if it set through accessor methods.
      */
     private String _fieldName;
-
-
-    /**
-     * The target name of this field (XML, SQL, etc). The field must
-     * have a target name if it exists in the target.
-     */
-    private String _targetName;
 
 
     /**
@@ -146,13 +139,8 @@ public abstract class FieldDesc
      * Construct a new field descriptor for the specified field.
      * The field must be public, and may not be static or transient.
      * The field name and type are determined from the Java field.
-     * The target name is optional, however fields that have no target
-     * name cannot be used on input/output. The target type is
-     * optional, and required only if different than the field type.
      *
      * @param field The field being described
-     * @param targetName The target name of this field, if the field is
-     *   to be set on input/output
      * @param required True if the field is required and may not be null
      *    on output
      * @param readable True if the field is readable
@@ -160,8 +148,7 @@ public abstract class FieldDesc
      * @throws MappingException If the field is not public, is static or
      *    transient
      */
-    public FieldDesc( Field field, String targetName,
-		      boolean required, boolean readable, boolean writeable )
+    public FieldDesc( Field field, boolean required, boolean readable, boolean writeable )
 	throws MappingException
     {
 	if ( field.getModifiers() != Modifier.PUBLIC &&
@@ -171,7 +158,6 @@ public abstract class FieldDesc
 	_field = field;
 	_fieldName = field.getName();
 	_fieldType = Types.typeFromPrimitive( field.getType() );
-	_targetName = targetName;
 	_required = required;
 	_readable = readable;
 	_writeable = writeable;
@@ -187,10 +173,7 @@ public abstract class FieldDesc
      * required for descriptive purposes. The field type must match
      * the return value of the get method and the single parameter of
      * the set method. A set method is mandatory for readable fields,
-     * a get method is mandatory for writable fields. The target name
-     * is optional, however fields that have no target name cannot be
-     * used on input/output. The target type is optional, and required
-     * only if different than the field type.
+     * a get method is mandatory for writable fields.
      *
      * @param fieldName The field being described
      * @param fieldType The field type being described
@@ -200,8 +183,6 @@ public abstract class FieldDesc
      * @param setMethod The method used to set the field value, required
      *   if the field is readable, must accept a single paramater that
      *   is castable to the field type
-     * @param targetName The target name of this field, if the field is
-     *   to be set on input/output
      * @param required True if the field is required and may not be null
      *    on output
      * @param readable True if the field is readable
@@ -211,11 +192,11 @@ public abstract class FieldDesc
      *
      */
     public FieldDesc( String fieldName, Class fieldType,
-		      Method getMethod, Method setMethod, String targetName,
+		      Method getMethod, Method setMethod,
 		      boolean required, boolean readable, boolean writeable )
 	throws MappingException
     {
-	this( fieldName, fieldType, targetName, required, readable, writeable );
+	this( fieldName, fieldType, required, readable, writeable );
 	if ( fieldName == null )
 	    throw new IllegalArgumentException( "Argument 'fieldName' is null" );
 	
@@ -255,7 +236,6 @@ public abstract class FieldDesc
      *
      * @param fieldName The field being described
      * @param fieldType The field type being described
-     * @param targetName The target name of this field, if the field is
      *   to be set on input/output
      * @param required True if the field is required and may not be null
      *    on output
@@ -264,12 +244,11 @@ public abstract class FieldDesc
      * @throws MappingException If the field is not public, is static or
      *    transient
      */
-    protected FieldDesc( String fieldName, Class fieldType, String targetName,
+    protected FieldDesc( String fieldName, Class fieldType,
 			 boolean required, boolean readable, boolean writeable )
     {
 	_fieldName = fieldName;
 	_fieldType = Types.typeFromPrimitive( fieldType );
-	_targetName = targetName;
 	_required = required;
 	_readable = readable;
 	_writeable = writeable;
@@ -289,7 +268,6 @@ public abstract class FieldDesc
 	_fieldType = desc._fieldType;
 	_getMethod = desc._getMethod;
 	_setMethod = desc._setMethod;
-	_targetName = desc._targetName;
 	_required = desc._required;
 	_readable = desc._readable;
 	_writeable = desc._writeable;
@@ -307,20 +285,6 @@ public abstract class FieldDesc
     public String getFieldName()
     {
 	return _fieldName;
-    }
-
-
-    /**
-     * Returns the target name of this field (XML, SQL, etc). The
-     * field must have a target name if it exists in the target.
-     * Some fields (e.g. object fields) do not exist in the target.
-     *
-     * @return The target field name, null if the field does not
-     *   exist in the target
-     */
-    public String getTargetName()
-    {
-	return _targetName;
     }
 
 
@@ -488,10 +452,7 @@ public abstract class FieldDesc
 
     public String toString()
     {
-	if ( _targetName != null )
-	    return "Field " + _fieldName + " as " + _targetName;
-	else
-	    return "Field " + _fieldName + " (no target)";
+        return "Field " + _fieldName;
     }
     
 
