@@ -3,12 +3,14 @@
   <body>
     <title>CVS Access</title>
 
-    <section title="WebCVS and Snapshots">
+    <section title="WebCVS, Snapshots, Bugzilla">
 
       <p><a href="http://castor.exolab.org/cgi-bin/cvsweb.cgi/castor/?cvsroot=Castor">WebCVS access to the repository.</a></p>
 
       <p>Or, <a href="download.xml">download the full source distribution</a>
          containing the latest snapshot of the CVS.</p>
+
+      <p><a href="http://bugzilla.exolab.org">Use Bugzilla for bug tracking.</a></p>
 
     </section>
 
