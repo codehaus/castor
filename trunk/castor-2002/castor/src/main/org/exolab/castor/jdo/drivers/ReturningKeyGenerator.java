@@ -54,7 +54,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
@@ -68,10 +67,8 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see ReturningKeyGeneratorFactory
  */
-public final class ReturningKeyGenerator implements KeyGenerator
+public final class ReturningKeyGenerator extends SequenceKeyGenerator
 {
-
-    private final String seqName;
 
     /**
      * Initialize the RETURNING key generator.
@@ -80,12 +77,14 @@ public final class ReturningKeyGenerator implements KeyGenerator
             Properties params )
             throws MappingException
     {
+        super( factory, params );
+
         String fName = factory.getFactoryName();
+
         if ( !fName.equals("oracle") ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
-        seqName = params.getProperty("sequence", "{0}_seq");
     }
 
 
@@ -115,43 +114,8 @@ public final class ReturningKeyGenerator implements KeyGenerator
      */
     public String patchSQL( String insert, String primKeyName )
             throws MappingException {
-        StringTokenizer st;
-        String tableName;
-        StringBuffer sb;
-        int lp1;  // the first left parenthesis, which starts fields list
-        int lp2;  // the second left parenthesis, which starts values list
-        char c;
-
-        // First find the table name
-        st = new StringTokenizer( insert );
-        if ( !st.hasMoreTokens() || !st.nextToken().equalsIgnoreCase("INSERT") ) {
-            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
-                                                         insert ) );
-        }
-        if ( !st.hasMoreTokens() || !st.nextToken().equalsIgnoreCase("INTO") ) {
-            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
-                                                         insert ) );
-        }
-        if ( !st.hasMoreTokens() ) {
-            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
-                                                         insert ) );
-        }
-        tableName = st.nextToken();
-
-        lp1 = insert.indexOf( '(' );
-        lp2 = insert.indexOf( '(', lp1 + 1 );
-        if ( lp1 < 0 || lp2 < 0 ) {
-            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
-                                                         insert ) );
-        }
-        sb = new StringBuffer( insert );
-        // don't change insert order, otherwise index becomes invalid
-        sb.insert( lp2 + 1, MessageFormat.format( seqName, new String[] {tableName}) + ".nextval" + ",");
-        sb.insert( lp1 + 1, primKeyName + "," );
-        sb.append( " RETURNING " );
-        sb.append( primKeyName );
-        sb.append( " INTO ?" );
-        return sb.toString();
+        return super.patchSQL( insert, primKeyName ) +
+                " RETURNING " + _factory.quoteName( primKeyName ) + " INTO ?";
     }
 
 

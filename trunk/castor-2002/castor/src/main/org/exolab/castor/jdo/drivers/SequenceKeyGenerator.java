@@ -54,6 +54,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
@@ -67,10 +68,18 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see SequenceKeyGeneratorFactory
  */
-public final class SequenceKeyGenerator implements KeyGenerator
+public class SequenceKeyGenerator implements KeyGenerator
 {
 
-    private final String seqName;
+
+    protected final PersistenceFactory _factory;
+
+
+    protected final String _seqName;
+
+
+    private final byte _style;
+
 
     /**
      * Initialize the SEQUENCE key generator.
@@ -84,7 +93,9 @@ public final class SequenceKeyGenerator implements KeyGenerator
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
-        seqName = params.getProperty("sequence", "{0}_seq");
+        _factory = factory;
+        _seqName = params.getProperty("sequence", "{0}_seq");
+        _style = ( fName.equals("oracle") ? AFTER_INSERT : BEFORE_INSERT );
     }
 
 
@@ -107,8 +118,15 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
         try {
             stmt = conn.createStatement();
-            rs = stmt.executeQuery( "SELECT nextval('" +
-                    MessageFormat.format( seqName, new String[] {tableName}) + "')" );
+
+            if ( _style == BEFORE_INSERT ) {
+                rs = stmt.executeQuery( "SELECT nextval('" +
+                        MessageFormat.format( _seqName, new String[] {tableName}) + "')" );
+            } else {
+                rs = stmt.executeQuery( "SELECT " +
+                        MessageFormat.format( _seqName, new String[] {tableName}) +
+                        ".currval FROM " + tableName );
+            }
 
             if ( rs.next() ) {
                 return rs.getObject( 1 );
@@ -132,8 +150,8 @@ public final class SequenceKeyGenerator implements KeyGenerator
     /**
      * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
      */
-    public final byte getStyle() {
-        return BEFORE_INSERT;
+    public byte getStyle() {
+        return _style;
     }
 
 
@@ -141,9 +159,53 @@ public final class SequenceKeyGenerator implements KeyGenerator
      * Gives a possibility to patch the Castor-generated SQL statement
      * for INSERT (makes sense for DURING_INSERT key generators)
      */
-    public final String patchSQL( String insert, String primKeyName )
+    public String patchSQL( String insert, String primKeyName )
             throws MappingException {
-        return insert;
+        StringTokenizer st;
+        String tableName;
+        String seqName;
+        StringBuffer sb;
+        int lp1;  // the first left parenthesis, which starts fields list
+        int lp2;  // the second left parenthesis, which starts values list
+        char c;
+
+        if ( _style == BEFORE_INSERT ) {
+            return insert;
+        }
+
+        // First find the table name
+        st = new StringTokenizer( insert );
+        if ( !st.hasMoreTokens() || !st.nextToken().equalsIgnoreCase("INSERT") ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        if ( !st.hasMoreTokens() || !st.nextToken().equalsIgnoreCase("INTO") ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        if ( !st.hasMoreTokens() ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        tableName = st.nextToken();
+
+        // remove quotes
+        if ( tableName.startsWith("\"") ) {
+            tableName = tableName.substring( 1, tableName.length() - 1 );
+        }
+        seqName = MessageFormat.format( _seqName, new String[] {tableName});
+
+        lp1 = insert.indexOf( '(' );
+        lp2 = insert.indexOf( '(', lp1 + 1 );
+        if ( lp1 < 0 || lp2 < 0 ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        sb = new StringBuffer( insert );
+        // don't change insert order, otherwise index becomes invalid
+        sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
+        sb.insert( lp1 + 1, primKeyName + "," );
+        return sb.toString();
     }
 
 
@@ -151,7 +213,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
      * Is key generated in the same connection as INSERT?
      */
     public boolean isInSameConnection() {
-        return false;
+        return true;
     }
 
 }
