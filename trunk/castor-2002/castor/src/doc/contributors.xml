@@ -278,6 +278,12 @@
     <description>Improve the documentation of Castor JDO. Also, bug reports and feedback.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Maria" given="Damon" />
+	<email>damon@mahu-ika.com</email>
+   <description>Bug reports and bug fixes for readonly locking mode in Castor JDO</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
