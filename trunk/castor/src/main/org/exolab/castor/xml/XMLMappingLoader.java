@@ -502,6 +502,22 @@ public class XMLMappingLoader
                 }
             }
         }
+        
+        //-- constructor argument?
+        String setter = fieldMap.getSetMethod();
+        if (setter != null) {
+            if (setter.startsWith("%")) {
+                int index = 0;
+                setter = setter.substring(1);
+                index = Integer.parseInt(setter);
+                if ((index < 1) || (index > 9)) {
+                    throw new MappingException("mapper.invalidParameterIndex", setter);
+                }
+                //-- adjust index to base zero
+                --index;
+                xmlDesc.setConstructorArgumentIndex(index);
+            }
+        }
 
         return xmlDesc;
     }
@@ -510,9 +526,8 @@ public class XMLMappingLoader
     protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
     {
-        fieldType = Types.typeFromPrimitive( fieldType );
         return new TypeInfo( fieldType, null, null, null,
-                             fieldMap.getRequired(), null, colHandler, false );
+                             fieldMap.getRequired(), null, colHandler, false );                             
     }
 
     /**
