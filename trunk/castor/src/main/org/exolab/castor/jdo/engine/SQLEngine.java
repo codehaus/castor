@@ -1008,7 +1008,7 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             
-            _log.debug( Messages.format( "jdo.load", ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
+            _log.debug( Messages.format( "jdo.loading", ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
             
             int count = 1;
             // bind the identity of the preparedStatement
