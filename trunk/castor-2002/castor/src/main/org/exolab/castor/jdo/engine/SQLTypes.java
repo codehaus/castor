@@ -675,6 +675,11 @@ public final class SQLTypes
                 return new Short( ( (Long) obj ).shortValue() );
             }
         } ),
+        new TypeConvertorInfo( new SQLTypeConvertor( java.math.BigDecimal.class, java.lang.Short.class ) {
+            public Object convert( Object obj, String param ) {
+                return new Short( (short) ((BigDecimal)obj).intValue() );
+            }
+        } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.String.class, java.lang.Short.class ) {
             public Object convert( Object obj, String param ) {
                 return Short.valueOf( (String) obj );
@@ -689,6 +694,11 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Integer.class, java.lang.Byte.class ) {
             public Object convert( Object obj, String param ) {
                 return new Byte( ( (Integer) obj ).byteValue() );
+            }
+        } ),
+        new TypeConvertorInfo( new SQLTypeConvertor( java.math.BigDecimal.class, java.lang.Byte.class ) {
+            public Object convert( Object obj, String param ) {
+                return new Byte( (byte) ( (BigDecimal) obj ).intValue() );
             }
         } ),
         // Convertors to double
@@ -765,6 +775,16 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Integer.class, java.math.BigDecimal.class ) {
             public Object convert( Object obj, String param ) {
                 return BigDecimal.valueOf( ( (Integer) obj ).intValue() );
+            }
+        } ),
+        new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Byte.class, java.math.BigDecimal.class ) {
+            public Object convert( Object obj, String param ) {
+                return BigDecimal.valueOf( ((Byte) obj).byteValue() );
+            }
+        } ),
+        new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Short.class, java.math.BigDecimal.class ) {
+            public Object convert( Object obj, String param ) {
+                return BigDecimal.valueOf( ((Short) obj).shortValue() );
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Long.class, java.math.BigDecimal.class ) {
