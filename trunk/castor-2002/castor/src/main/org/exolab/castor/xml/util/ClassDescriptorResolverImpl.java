@@ -230,14 +230,14 @@ public class ClassDescriptorResolverImpl
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
      * @return the XMLClassDescriptor for the given class name
-    **
+    **/
     public XMLClassDescriptor resolveByXMLName
         (String xmlName, ClassLoader loader) 
     {
             
         if ((xmlName == null) || (xmlName.length() == 0)) {
             clearError(); //-- clear previous error flag
-            setError("Cannot resolve a null or zero-length class name.");
+            setError("Cannot resolve a null or zero-length xml name.");
             return null;
         }
                 
@@ -254,7 +254,6 @@ public class ClassDescriptorResolverImpl
         }
         return classDesc;
     } //-- resolveByXMLName
-    */
     
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
         this.mappingLoader = mappingLoader;

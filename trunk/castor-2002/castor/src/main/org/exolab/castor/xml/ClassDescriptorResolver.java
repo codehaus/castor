@@ -99,10 +99,9 @@ public interface ClassDescriptorResolver {
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
      * @return the XMLClassDescriptor for the given class name
-    **
+    **/
     public XMLClassDescriptor resolveByXMLName
         (String xmlName, ClassLoader loader);
-    */
     
     public void setMappingLoader(XMLMappingLoader xmlMappingLoader);
     
