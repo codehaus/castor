@@ -62,7 +62,7 @@
       </navLink>
       <navLink>
         <url>cvs.xml</url>
-        <display>CVS</display>
+        <display>CVS / Bugzilla</display>
       </navLink>
     </section>
 
@@ -83,6 +83,11 @@
         <url>xml-mapping.xml</url>
         <display>XML Mapping</display>
       </navLink>
+      <navLink>
+        <url>xml-faq.xml</url>
+        <display>XML FAQ</display>
+      </navLink>
+
     </section>
 
 	<section name="JDO">
@@ -104,7 +109,7 @@
       </navLink>
       <navLink>
         <url>jdo-faq.xml</url>
-        <display>FAQs</display>
+        <display>JDO FAQ</display>
       </navLink>
     </section>
 
