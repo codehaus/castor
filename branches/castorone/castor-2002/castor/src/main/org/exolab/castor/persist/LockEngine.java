@@ -185,9 +185,9 @@ public final class LockEngine {
                     }
                 } else {
                     // | other cache type cause problem. have to disable it for now
-                    LRU lru = LRU.create( /*molder.getCacheType() */LRU.CACHE_NONE, molder.getCacheParam() );
+                    LRU lru = LRU.create( molder.getCacheType()/*LRU.CACHE_NONE*/, molder.getCacheParam() );
 
-                    info = new TypeInfo( molder, new HashMap(), lru );
+                    info = new TypeInfo( molder, new HashMap(), lru ); 
 
                     _typeInfo.put( molder.getJavaClass(), info );
                 }
@@ -309,11 +309,10 @@ public final class LockEngine {
 
             if ( _logInterceptor != null )
                 _logInterceptor.loading( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
-        } 
-        /*
-        catch ( ObjectDeletedWaitingForLockException except ) {
+        } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object not existing
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, OID.flatten(oid.getIdentities())) );
+        /*
         } catch ( ObjectNotFoundException except ) {
             // Object was not found in persistent storge, must dump
             // it from the cache
@@ -327,7 +326,7 @@ public final class LockEngine {
             //typeInfo.locks.destory( oid, tx );
             throw except;
         } */
-        finally {
+        } finally {
             if ( lock != null ) lock.confirm( tx, succeed );
         }
         return oid;
@@ -573,7 +572,8 @@ public final class LockEngine {
     public void markDelete( TransactionContext tx, OID oid, Object object, int timeout )
             throws PersistenceException, LockNotGrantedException {
 
-        System.out.println("mark Delete "+oid+" by tx "+tx);
+        //(new Exception("stack trace "+"mark Delete "+oid+" by tx "+tx)).printStackTrace();
+        //System.out.println("mark Delete "+oid+" by tx "+tx);
         ObjectLock lock;
         TypeInfo   typeInfo;
         Object[]   fields;
@@ -715,14 +715,12 @@ public final class LockEngine {
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public OID store( TransactionContext tx, OID oid, Object object, int timeout ) 
-            throws LockNotGrantedException, ObjectDeletedException,
-            ObjectModifiedException, DuplicateIdentityException,
-            PersistenceException {
+    public OID preStore( TransactionContext tx, OID oid, Object object, int timeout ) 
+            throws LockNotGrantedException, PersistenceException {
 
 
         TypeInfo   typeInfo;
-        ObjectLock lock;
+        ObjectLock lock = null;
         boolean    modified;
 
 
@@ -732,6 +730,7 @@ public final class LockEngine {
         // do we need a write lock.
 
         oid = new OID( this, typeInfo.molder, oid.getIdentities() );
+
         // acquire read lock
         // getLockedField();
         // isPersistFieldChange()?
@@ -739,18 +738,57 @@ public final class LockEngine {
         // if yes, get flattened fields, 
         // acquire write lock
         // setLockedField( );
-        // 
-        lock = typeInfo.assure( oid, tx, false );
+        try {
+            lock = typeInfo.assure( oid, tx, false );
 
-        oid = lock.getOID();
+            oid = lock.getOID();
 
-        modified = typeInfo.molder.store( tx, oid, lock, object );
+            modified = typeInfo.molder.preStore( tx, oid, lock, object, timeout );
+        } catch ( LockNotGrantedException e ) {
+            throw e;
+        } catch ( ObjectModifiedException e ) {
+            lock.invalidate( tx );
+            throw e;
+        } catch ( ObjectDeletedException e ) {
+            lock.delete( tx );
+            throw e;
+        }
 
         if ( modified )
             return oid;
         else
             return null;
     }
+
+    public void store( TransactionContext tx, OID oid, Object object ) 
+            throws LockNotGrantedException, ObjectDeletedException,
+            ObjectModifiedException, DuplicateIdentityException,
+            PersistenceException {
+
+        ObjectLock lock = null;
+        TypeInfo   typeInfo;
+
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
+        // Attempt to obtain a lock on the database. If this attempt
+        // fails, release the lock and report the exception.
+
+        try {
+            lock = typeInfo.assure( oid, tx, false );
+
+            typeInfo.molder.store( tx, oid, lock, object );
+        } catch ( ObjectModifiedException e ) {
+            lock.invalidate( tx );
+            throw e;
+        } catch ( DuplicateIdentityException e ) {
+            throw e;
+        } catch ( LockNotGrantedException e ) {
+            throw e;
+        } catch ( PersistenceException e ) {
+            lock.invalidate( tx );
+            throw e;
+        } 
+    }
+
 
 
     /**
@@ -837,9 +875,10 @@ public final class LockEngine {
         TypeInfo   typeInfo;
         ObjectLock lock;
 
+        System.out.println("revertObject");
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         try {
-            lock = typeInfo.assure( oid, tx, true );
+            lock = typeInfo.assure( oid, tx, false );
             typeInfo.molder.revertObject( tx, oid, lock, object );
         } catch ( LockNotGrantedException e ) {
             throw new IllegalStateException("Write Lock expected!");
@@ -867,7 +906,7 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         try {
-            lock = typeInfo.assure( oid, tx, false );
+            lock = typeInfo.assure( oid, tx, true );
             typeInfo.molder.updateCache( tx, oid, lock, object );
         } catch ( LockNotGrantedException e ) {
             throw new IllegalStateException("Write Lock expected!");
@@ -890,6 +929,7 @@ public final class LockEngine {
         ObjectLock lock;
         TypeInfo   typeInfo;
 
+        //(new Exception("stack trace for release lock")).printStackTrace();
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = typeInfo.release( oid, tx );
         lock.getOID().setDbLock( false );
@@ -1048,20 +1088,20 @@ public final class LockEngine {
                 switch ( lockAction ) {
                 case ObjectLock.ACTION_READ:
                     //(new Exception("acquire write lock on: "+entry)).printStackTrace();
-                    System.out.println("acquire read lock: "+entry+" tx: "+tx);
+                    //System.out.println("acquire read lock: "+entry+" tx: "+tx);
                     entry.acquireLoadLock( tx, false, timeout );
                     break;
                 case ObjectLock.ACTION_WRITE:
                     //(new Exception("acquire write lock on:"+entry)).printStackTrace();
-                    System.out.println("acquire write lock: "+entry+" tx: "+tx);
+                    //System.out.println("acquire write lock: "+entry+" tx: "+tx);
                     entry.acquireLoadLock( tx, true, timeout );
                     break;
                 case ObjectLock.ACTION_CREATE:
-                    System.out.println("acquire create lock: "+entry+" tx: "+tx);
+                    //System.out.println("acquire create lock: "+entry+" tx: "+tx);
                     entry.acquireCreateLock( tx );
                     break;
                 case ObjectLock.ACTION_UPDATE:
-                    System.out.println("acquire update lock: "+entry+" tx: "+tx);
+                    //System.out.println("acquire update lock: "+entry+" tx: "+tx);
                     entry.acquireUpdateLock( tx, timeout );
                     break;
                 default:
@@ -1084,7 +1124,7 @@ public final class LockEngine {
                         // we ensure here that the entry which should be move 
                         // to "cache" from "locks" is actually moved.
                         if ( entry.isDisposable() ) {
-                            System.out.println("Lock "+toString()+" is disposed!");
+                            System.out.println("Lock "+toString()+" is disposed in acquire!");
                             locks.remove( oid );
                             cache.put( oid, entry );
                         }
@@ -1215,12 +1255,39 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
-                        System.out.println("Lock "+toString()+" is disposed!");
+                        System.out.println("Lock "+toString()+" is disposed in TypeInfo.delete!");
                         locks.remove( oid );
                     }
                 }
             }
         }
+
+
+        /**
+         * Invalidate the object lock. It's called after if 
+         * ObjectModifiedException is detected
+         * 
+         *
+         * @param oid is the OID of the ObjectLock
+         * @param tx is the transactionContext of transaction in action
+         *
+         */
+         /*
+        private ObjectLock invalidate( OID oid, TransactionContext tx ) {
+
+            ObjectLock entry;
+            synchronized( this ) {
+                entry = (ObjectLock) locks.get( oid );
+
+                if ( entry == null )
+                    throw new IllegalStateException("No lock to destory!");
+                entry.enter();
+            }
+
+            entry.invalidate(tx);
+            return entry;
+        }*/
+
 
         /**
          * Release the object lock. It's called after the object is 
@@ -1250,7 +1317,7 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
-                        System.out.println("Lock "+toString()+" is disposed!");
+                        System.out.println("Lock "+toString()+" is disposed in TypeInfo.release!");
                         cache.put( oid, entry );
                         locks.remove( oid );
                     }
