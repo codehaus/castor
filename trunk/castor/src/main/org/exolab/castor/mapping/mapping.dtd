@@ -190,7 +190,7 @@
           support for it in the future.
  -->
 
-<!ELEMENT bind-xml ( class? )>
+<!ELEMENT bind-xml ( class?, property* )>
 <!ATTLIST bind-xml
     name         NMTOKEN   #IMPLIED
     type         NMTOKEN   #IMPLIED
@@ -201,6 +201,10 @@
     node  ( attribute | element | namespace | text )  #IMPLIED
     auto-naming ( deriveByClass | deriveByField ) #IMPLIED
     transient (true|false) "false">
+
+<!ELEMENT property ( name, value )>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
 
 
 <!--
