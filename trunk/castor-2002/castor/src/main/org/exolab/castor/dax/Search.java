@@ -81,7 +81,7 @@ public interface Search
      *
      * @return Number of query parameters
      */
-    public void getParameterCount();
+    public int getParameterCount();
 
 
     /**

@@ -135,19 +135,9 @@
   </xsl:template>
 
 
-  <!-- Substitution for simple project-wide variables that
-       may appear in the document
-    -->
-  <xsl:template match="project-name">
-    <xsl:value-of select="$project/@name"/>
-  </xsl:template>
-
-  <xsl:template match="project-repository">
-    <xsl:value-of select="$project/@repository"/>
-  </xsl:template>
-
-  <xsl:template match="project-title">
-    <xsl:value-of select="$project/title"/>
+  <!-- Paragraphs are separated with one empty line -->
+  <xsl:template match="body-note">
+    <blockquote><hr size="1" noshadow=""/><xsl:apply-templates/><hr size="1" noshadow=""/></blockquote>
   </xsl:template>
 
 

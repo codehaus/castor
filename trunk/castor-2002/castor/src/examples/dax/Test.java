@@ -1,11 +1,13 @@
 package dax;
 
 
+import java.util.Enumeration;
 import java.net.URL;
 import org.xml.sax.InputSource;
 import org.exolab.castor.dax.engine.DirectorySourceImpl;
 import org.exolab.castor.dax.Directory;
 import org.exolab.castor.dax.DirectorySource;
+import org.exolab.castor.dax.Search;
 
 
 public class Test
@@ -26,7 +28,14 @@ public class Test
 	    dir.begin();
 
 	    User                user;
+	    Search              search;
+	    Enumeration         results;
 
+	    search = dir.createSearch( "(ou=people)" );
+	    results = search.execute();
+	    while ( results.hasMoreElements() ) {
+		System.out.println( results.nextElement() );
+	    }
 	    user = (User) dir.read( "kvisco" );
 	    if ( user == null || user != null ) {
 		user = new User();

@@ -947,7 +947,7 @@ class SQLEngine
 	}
 
 
-	public int getLocation()
+	public int getPosition()
 	    throws PersistenceException
 	{
 	    try {

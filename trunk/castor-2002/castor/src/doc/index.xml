@@ -22,8 +22,9 @@
           <li>Castor DSML: LDAP directory exchange through XML</li>
           <li>XML-based mapping file specify the mapping between one model and another</li>
           <li>Support for schema-less Java to XML binding</li>
-          <li>Persistence engine supports ransactions, rollbacks, deadlocks</li>
-          <li>ODMG API support with OQL queries</li>
+          <li>In memory caching and write-at-commit reduces JDBC operations</li>
+          <li>Two phase commit transactions, object rollback and deadlock detection</li>
+          <li>OQL query mapping to SQL queries</li>
           <li>EJB container managed persistence provider for OpenEJB</li>
         </ul>
         See the <a href="status.xml">status page</a> for more information.</p>
@@ -60,7 +61,7 @@
       <p>Most of the code released through the Castor Project has been developed by Keith Visco,
          Chief XML Architect, Exoffice Technologies, Inc. &lt;<email>visco@exoffice.com</email>&gt;
          and Assaf Arkin, CTO &lt;<email>arkin@exoffice.com</email>&gt;. Contributors are welcome
-         to join this project and should contact join@castor.exolab.org.</p>
+         to join this project. Please join us on the <a href="list.xml">mailing list</a>.</p>
     </section>
 
   </body>
