@@ -58,37 +58,38 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 class SGStateInfo extends ClassInfoResolverImpl {
-        
-    /** 
+
+    /**
      * The package used when creating new classes.
     **/
     protected String    packageName = null;
-        
+
     private Hashtable   _classTypes  = null;
-    
+
     private Vector      _processed   = null;
-    
+
     private boolean     _promptForOverwrite = true;
-    
+
     private boolean     _verbose     = false;
-    
+
+    private FactoryState _currentFactoryState = null;
     /**
      * The helper class for naming unnamed groups
     **/
     private GroupNaming _groupNaming = null;
-    
+
     /**
      * Creates a new SGStateInfo
     **/
-    protected SGStateInfo() {        
+    protected SGStateInfo() {
         super();
         packageName    = "";
         _classTypes    = new Hashtable();
         _processed     = new Vector();
         _groupNaming   = new GroupNaming();
     } //-- SGStateInfo
-    
-    
+
+
     /**
      * Marks the given JClass as having been processed.
      * @param jClass the JClass to mark as having been processed.
@@ -98,7 +99,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
         if (!_processed.contains(className))
             _processed.addElement(className);
     } //-- markAsProcessed
-        
+
     /**
      * Returns true if the given JClass has been marked as processed
      * @param jClass the JClass to check for being marked as processed
@@ -106,7 +107,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
     boolean processed(JClass jClass) {
         return _processed.contains(jClass.getName());
     } //-- processed
-    
+
     boolean promptForOverwrite() {
         return _promptForOverwrite;
     } //-- promptForOverwrite
@@ -114,7 +115,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
     void setPromptForOverwrite(boolean promptForOverwrite) {
         this._promptForOverwrite = promptForOverwrite;
     } //-- setPromptForOverwrite
-    
+
     /**
      * Returns the helper class used for naming groups
      *
@@ -123,7 +124,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
     GroupNaming getGroupNaming() {
         return _groupNaming;
     } //-- getGroupNaming
-    
+
     /**
      * Sets whether or not the source code generator prints
      * additional messages during generating source code
@@ -133,7 +134,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
     void setVerbose(boolean verbose) {
         this._verbose = verbose;
     } //-- setVerbose
-    
+
     /**
      * Returns the value of the verbose flag. A true value
      * indicates that additional messages may be printed
@@ -143,13 +144,31 @@ class SGStateInfo extends ClassInfoResolverImpl {
     boolean verbose() {
         return this._verbose;
     } //-- verbose
-    
+
+    /**
+     * Returns the current FactoryState that
+     * holds information about the classes being generated.
+     * @return the current FactoryState
+     *
+     */
+    FactoryState getCurrentFactoryState() {
+        return _currentFactoryState;
+    }
+
+    /**
+     * Sets the current FactoryState.
+     * @param state the current FactoryState
+     * @see #getCurrentFactoryState
+     */
+    void setCurrentFactoryState(FactoryState state) {
+       _currentFactoryState = state;
+    }
     /*
     protected JClass getJClass(String name) {
-        
+
         if (name == null) return null;
         JClass jClass = (JClass)classTypes.get(name);
-        
+
         if (jClass == null) {
             jClass = new JClass(name);
             classTypes.put(name, jClass);
@@ -157,6 +176,5 @@ class SGStateInfo extends ClassInfoResolverImpl {
         return jClass;
     }
     */
-    
+
 } //-- SGStateInfo
- 
