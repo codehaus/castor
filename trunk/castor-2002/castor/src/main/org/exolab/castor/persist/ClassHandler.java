@@ -328,6 +328,10 @@ public final class ClassHandler
      *  read/only
      * <li>If the transaction is defined as read/only the access mode
      *  is read/only
+     * <li>If the class is defined as locked the access mode is
+     *  exclusive
+     * <li>If the transaction is defined as locked the access mode
+     *  is exclusive
      * <li>If the class is defined as exclusive the access mode is
      *  exclusive
      * <li>If the transaction is defined as exclusive the access mode
@@ -347,6 +351,8 @@ public final class ClassHandler
         clsMode = _clsDesc.getAccessMode();
         if ( clsMode == AccessMode.ReadOnly || txMode == AccessMode.ReadOnly )
             return AccessMode.ReadOnly;
+        if ( clsMode == AccessMode.Locked || txMode == AccessMode.Locked )
+            return AccessMode.Locked;
         if ( clsMode == AccessMode.Exclusive || txMode == AccessMode.Exclusive )
             return AccessMode.Exclusive;
         return txMode;
