@@ -110,7 +110,8 @@ public class Types
     public static Object getDefault( Class type )
     {
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-            if ( _typeInfos[ i ].primitive == type )
+            if ( _typeInfos[ i ].primitive == type ||
+                 _typeInfos[ i ].javaType == type )
                 return _typeInfos[ i ].defValue;
         }
         return null;

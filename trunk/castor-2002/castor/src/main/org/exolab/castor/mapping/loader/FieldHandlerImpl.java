@@ -272,7 +272,7 @@ public final class FieldHandlerImpl
 
             // If there is a default value, use it for a null field.
             // Otherwise, if there is a convertor, apply conversion.
-            if ( value == null && _default != null )
+            if ( value == null )
                 value = _default;
             else if ( _convertTo != null ) {
                 try {
