@@ -335,6 +335,7 @@ public abstract class XSType {
             case POSITIVE_INTEGER:
 			case SHORT:
 			case INT:
+            case RECURRING_DURATION:
             case TIME_DURATION:
                 return true;
             default:
