@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -50,15 +50,12 @@ import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.xml.XMLFieldHandler;
 
 import java.lang.reflect.Array;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import java.util.SimpleTimeZone;
 import java.util.Vector;
 
 /**
@@ -70,12 +67,38 @@ import java.util.Vector;
 public class DateFieldHandler extends XMLFieldHandler {
 
 
-    public static final String DATE_FORMAT =
-        "yyyy-MM-dd'T'HH:mm:ss.SSS";
-    public static final String DATE_FORMAT_2 =
-        "yyyy-MM-dd'T'HH:mm:ss";
-
-	private static TimeZone _defaultTimezone = TimeZone.getDefault();
+    /** 
+     * The default length of the date string, used by
+     * the format method
+     */
+    private static final byte DEFAULT_DATE_LENGTH = 23;
+    
+    
+    /**
+     * The error message prefix
+     */
+    private static final String INVALID_DATE = "Invalid dateTime format: ";
+    
+    
+    // The various flags used when parsing dates
+    private static final byte START_FLAG    = -1;
+    private static final byte YEAR_FLAG     = START_FLAG    +   1; 
+    private static final byte MONTH_FLAG    = YEAR_FLAG     +   1; 
+    private static final byte DAY_FLAG      = MONTH_FLAG    +   1; 
+    private static final byte HOURS_FLAG    = DAY_FLAG      +   1; 
+    private static final byte MINUTES_FLAG  = HOURS_FLAG    +   1; 
+    private static final byte SECONDS_FLAG  = MINUTES_FLAG  +   1; 
+    private static final byte MILLIS_FLAG   = SECONDS_FLAG  +   1;
+    
+    /** 
+     * The string name for the UTC TimeZone
+     */
+    private static final String UTC_TIMEZONE = "UTC";
+    
+    /**
+     * The local timezone offset from UTC
+     */
+	private static int TIMEZONE_OFFSET = TimeZone.getDefault().getRawOffset();
 
     private FieldHandler handler = null;
 
@@ -124,7 +147,7 @@ public class DateFieldHandler extends XMLFieldHandler {
         Class type = val.getClass();
         
         if (java.util.Date.class.isAssignableFrom(type)) {
-            formatted = getFormattedDate((Date)val);
+            formatted = format((Date)val);
         }
         else if (type.isArray()) {
             int size = Array.getLength(val);
@@ -162,27 +185,12 @@ public class DateFieldHandler extends XMLFieldHandler {
 
         if (! (value instanceof Date) ) {
 
-            DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-
-            if ( (value.toString().indexOf(".")) == -1)
-                df = new SimpleDateFormat(DATE_FORMAT_2);
-
-            // Check for XML Schema supported timezone portion
-            TimeZone tz = getTimeZone( value.toString() );
-
-            if ( tz != null ) {
-                df.setTimeZone( tz );
-            }
-
             try {
-                date = df.parse(value.toString());
+                date = parse(value.toString());
             }
-            catch (java.text.ParseException ex) {
-                //-- if there is no value we return
-                //-- a new date
-                if (value == null) date = new Date();
-                //-- else it is not a valid timeInstant
-                throw new IllegalStateException("Bad 'timeInstant' format:it should be "+DATE_FORMAT+".\n");
+            catch (java.text.ParseException px) {
+                //-- invalid dateTime
+                throw new IllegalStateException(px.getMessage());
             }
         }
         else date = (Date)value;
@@ -227,7 +235,9 @@ public class DateFieldHandler extends XMLFieldHandler {
     public Object newInstance( Object parent )
         throws IllegalStateException
     {
-        return new Date();
+        Object obj = handler.newInstance( parent );
+        if (obj == null) obj = new Date();
+        return obj;
     } //-- newInstance
 
     /**
@@ -249,65 +259,335 @@ public class DateFieldHandler extends XMLFieldHandler {
     //-------------------/
     //- Private Methods -/
     //-------------------/
-
+    
     /**
-     * Interrogate datetime value for XML Schema Recommendation
-     * compliant timezone.
+     * Parses the given string, which must be in the following format:
+     * <b>CCYY-MM-DDThh:mm:ss</b> or <b>CCYY-MM-DDThh:mm:ss.sss</b>
+     * where "CC" represents the century, "YY" the year, "MM" the 
+     * month and "DD" the day. The letter "T" is the date/time 
+     * separator and "hh", "mm", "ss" represent hour, minute and 
+     * second respectively.
+     * 
+     * CCYY represents the Year and each 'C' and 'Y' must be a digit 
+     * from 0-9. A minimum of 4 digits must be present.
+     * 
+     * MM represents the month and each 'M' must be a digit from 0-9, 
+     * but together "MM" must not represent a value greater than 12.
+     * "MM" must be 2 digits, use of leading zero is required for
+     * all values less than 10.
+     * 
+     * DD represents the day of the month and each 'D' must be a digit 
+     * from 0-9. DD must be 2 digits (use a leading zero if necessary) 
+     * and must not be greater than 31.
      *
-     * Datetime string expected to be one of following formats:
-     *      (i)     yyyy-MM-dd'T'HH:mm:ss'Z'
-     *      (ii)    yyyy-MM-dd'T'HH:mm:ss'+'HH:mm
-     *      (iii)   yyyy-MM-dd'T'HH:mm:ss'-'HH:mm
+     * 'T' is the date/time separator and must exist!
      *
-     * @param dateTime The datetime as a String
-     * @return The timezone if found, null otherwise
-     * @throws IllegalStateException datetime contains unsupported timezone or
-     *                               timezone indicator in wrong format
+     * hh represents the hour using 0-23. 
+     * mm represents the minute using 0-59.
+     * ss represents the second using 0-60. (60 for leap second)
+     * sss represents the millisecond using 0-999.
+     * 
+     * @param dateTime the string to convert to a Date
+     * @return a new Date that represents the given string.
+     * @exception ParseException when the given string does not conform
+     * to the above string.
      */
-    private TimeZone getTimeZone( String dateTime ) throws IllegalStateException {
-        TimeZone tz = null;
-        int pos = -1;
-
-        // First, check for UTC timezone
-        if ( dateTime.indexOf( 'Z' ) != -1 ) {
-            tz = TimeZone.getTimeZone( "UTC" );
-        } else if ( ( pos = dateTime.indexOf( '+' ) ) != -1 ) {
-            // Check that timezone conforms to HH:mm schema format
-            try {
-                Date dt = new SimpleDateFormat( "HH:mm" ).parse( dateTime.substring( pos + 1 ) );
-                Calendar cal = new GregorianCalendar();
-                cal.setTime( dt );
-
-                int offset = ( cal.get( Calendar.HOUR_OF_DAY ) * 60 * 60 * 1000 ) +
-                             ( cal.get( Calendar.MINUTE ) * 60 * 1000 );
-				return new SimpleTimeZone(offset, "UTC");
-
-            } catch ( ParseException pe ) {
-                throw new IllegalStateException( "Invalid 'timezone' format : should be '+HH:mm'\n" );
+    private final static Date parse( String dateTime ) 
+            throws ParseException 
+    {
+                
+        if (dateTime == null)
+            throw new ParseException(INVALID_DATE + "null", 0);
+            
+        int values[] = new int[7];
+        
+        byte flags          = START_FLAG;
+        byte sign           = 1;
+        int value           = 0;
+        int count           = 0;
+        boolean delimiter   = true;
+        char[] chars = dateTime.toCharArray();
+        int i   = 0;
+        boolean timezone    = false;
+        for ( ; i < chars.length; i++) {
+            char ch = chars[i];
+            switch(ch) {
+                case '-':
+                    delimiter = true;
+                    switch(flags) {
+                        case START_FLAG:
+                            sign = -1;
+                            break;
+                        case YEAR_FLAG:
+                            if (value == 0) {
+                                String err = INVALID_DATE + dateTime + 
+                                    "; Year must be greater than 0";
+                                throw new ParseException(err, i);
+                            }
+                            break;
+                        case MONTH_FLAG:
+                            value = value-1;
+                            break;
+                        case MILLIS_FLAG:
+                        case SECONDS_FLAG:
+                            timezone = true;
+                            delimiter = false;
+                            break;
+                        default:
+                            throw new ParseException(INVALID_DATE + dateTime, i);
+                    }
+                    break;
+                case 'T':
+                    delimiter = true;
+                    if (flags != DAY_FLAG)
+                        throw new ParseException(INVALID_DATE + dateTime, i);
+                    break;
+                case ':':
+                    delimiter = true;
+                    switch(flags) {
+                        case HOURS_FLAG:
+                        case MINUTES_FLAG:
+                            break;
+                        default:
+                            throw new ParseException(INVALID_DATE + dateTime, i);
+                    }
+                    break;
+                case '.':
+                    delimiter = true;
+                    if (flags != SECONDS_FLAG)
+                        throw new ParseException(INVALID_DATE + dateTime, i);
+                    break;
+                case '+':
+                case 'Z':
+                    switch(flags) {
+                        case SECONDS_FLAG:
+                        case MILLIS_FLAG:
+                            break;
+                        default:
+                            throw new ParseException(INVALID_DATE + dateTime, i);
+                    }
+                    timezone = true;
+                    break;
+                default:
+                    delimiter = false;
+                    if (flags == START_FLAG) flags = YEAR_FLAG;
+                    if ((ch >= '0') && (ch <= '9')) {
+                        ++count; 
+                        if ((count > 3) && (flags == MILLIS_FLAG)) {
+                            // save additional fractional seconds?
+                        }
+                        else value = (value*10) + Character.digit(ch,10);
+                    }
+                    else {
+                        throw new ParseException(INVALID_DATE + dateTime, i);
+                    }
+                    break;
             }
-        } else if ( ( pos = dateTime.lastIndexOf( '-' ) ) != -1 ) {
-            // Check that dash not part of the date ( i.e. must be after the 'T' separator )
-            int posT = dateTime.indexOf( 'T' );
-
-            if ( pos > posT ) {
-                // Check that timezone conforms to HH:mm schema format
-                try {
-                    Date dt = new SimpleDateFormat( "HH:mm" ).parse( dateTime.substring( pos + 1 ) );
-                    Calendar cal = new GregorianCalendar();
-                    cal.setTime( dt );
-
-                    int offset = -1 * ( ( cal.get( Calendar.HOUR_OF_DAY ) * 60 * 60 * 1000 ) +
-                                        ( cal.get( Calendar.MINUTE ) * 60 * 1000 ) );
-					return new SimpleTimeZone(offset, "UTC");
-
-                } catch ( ParseException pe ) {
-                    throw new IllegalStateException( "Invalid 'timezone' format : should be '-HH:mm'\n" );
+            if (delimiter) {
+                if (flags != START_FLAG) {
+                    values[flags] = value;
+                }
+                ++flags;
+                value = 0;
+                count = 0;
+            }
+            if (timezone) break;
+        }
+        
+        Calendar cal = new GregorianCalendar(values[YEAR_FLAG],
+                                             values[MONTH_FLAG], 
+                                             values[DAY_FLAG],
+                                             values[HOURS_FLAG],
+                                             values[MINUTES_FLAG],
+                                             values[SECONDS_FLAG]);
+        
+        //-- Set Seconds (if no '.') or Milliseconds 
+        //-- Otherwise report error
+        switch(flags) {
+            case SECONDS_FLAG:
+                cal.set(Calendar.SECOND, value);
+                break;
+            case MILLIS_FLAG:
+                cal.set(Calendar.MILLISECOND, value);
+                break;
+            default:
+                throw new ParseException(INVALID_DATE + dateTime, i);
+        }
+        
+        
+        //-- Handle TimeZone
+        if (timezone) {
+            TimeZone tz = TimeZone.getTimeZone(UTC_TIMEZONE);
+            char designator = chars[i++];
+            flags = HOURS_FLAG;
+            int millis = 0;
+            count = 0;
+            value = 0;
+            for (; i < chars.length; i++) {
+                char ch = chars[i];
+                switch(ch) {
+                    case ':':
+                        if ((count != 2) || (flags != HOURS_FLAG)) {
+                            String err = INVALID_DATE + dateTime + 
+                                "; TimeZone offset must be in the format 'hh:mm'";
+                            throw new ParseException(err, i);
+                        }
+                        //-- convert hours to milliseconds
+                        millis = value * 3600000; // 3600000 = (60 * 60 * 1000)
+                        count = 0;
+                        value = 0;
+                        ++flags;
+                        break;
+                    default:
+                        if ((ch >= '0') && (ch <= '9')) {
+                            if (count == 2) {
+                                //-- Be friendly to timezone without ':' between
+                                //-- hours and minutes such as -0500, which occur
+                                //-- frequently
+                                //-- convert hours to milliseconds
+                                millis = value * 3600000; // 3600000 = (60 * 60 * 1000)
+                                count = 0;
+                                value = 0;
+                                ++flags;
+                            }
+                            ++count; //-- keep track of number of digits
+                            value = (value*10) + Character.digit(ch,10);
+                        }
+                        else {
+                            throw new ParseException("Unparseable date: " + dateTime, i);
+                        }
+                        break;
                 }
             }
+            if (flags == MINUTES_FLAG) {
+                if (count != 2) {
+                    String err = INVALID_DATE + dateTime + 
+                        "; TimeZone offset must be in the format 'hh:mm'";
+                    throw new ParseException(err, i);
+                }
+                millis = millis + (value * 60000);
+                if (designator == '-') millis = 0 - millis;
+                tz.setRawOffset(millis);
+            }
+            else if (designator != 'Z') {
+                String err = INVALID_DATE + dateTime + 
+                    "; TimeZone offset must be in the format 'hh:mm'";
+                throw new ParseException(err, i);
+            }
+            cal.setTimeZone(tz);
         }
+        else {
+            TimeZone tz = cal.getTimeZone();
+            tz.setRawOffset(TIMEZONE_OFFSET);
+        }
+        
+        return cal.getTime();
+    } //-- parse
 
-        return tz;
-    } //-- getTimeZone
+    /** 
+     * Returns the given date in a String format, using the
+     * ISO8601 format as specified in the W3C XML Schema 1.0
+     * Recommendation (Part 2: Datatypes) for dataTime.
+     *
+     * @param date the Date to format
+     * @return the formatted string
+     */
+    private final static String format( Date date ) {
+
+        StringBuffer buffer = null;
+        //-- Year: CCYY
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        int value   = cal.get(Calendar.YEAR);
+        if (value > 9999) {
+            buffer = new StringBuffer(DEFAULT_DATE_LENGTH+2);
+        }
+        else {
+            buffer = new StringBuffer(DEFAULT_DATE_LENGTH);
+            //-- pad year to 4 digits if necessary
+            for (int tmp = 1000; value < tmp; tmp = tmp / 10)
+                buffer.append('0');
+        }
+        buffer.append(value);
+        
+        //-- Year/Month Separator
+        buffer.append('-');
+        
+        //-- Month: MM
+        value = cal.get(Calendar.MONTH) + 1;
+        if (value < 10) buffer.append('0');
+        buffer.append(value);
+        
+        //-- Month/Day Separator
+        buffer.append('-');
+        
+        //-- Day of Month: DD
+        value = cal.get(Calendar.DAY_OF_MONTH);
+        if (value < 10) buffer.append('0');
+        buffer.append(value);
+        
+        //-- Date/Time Separator
+        buffer.append('T');
+        
+        //-- Hours: hh
+        value = cal.get(Calendar.HOUR_OF_DAY);
+        if (value < 10) buffer.append('0');
+        buffer.append(value);
+        
+        //-- Hours/Minutes Separator
+        buffer.append(':');
+        
+        //-- Minutes: mm
+        value = cal.get(Calendar.MINUTE);
+        if (value < 10) buffer.append('0');
+        buffer.append(value);
+        
+        //-- Minutes/Seconds Separator
+        buffer.append(':');
+        
+        //-- Seconds: ss
+        value = cal.get(Calendar.SECOND);
+        if (value < 10) buffer.append('0');
+        buffer.append(value);
+        
+        //-- Milliseconds
+        buffer.append('.');
+        value = cal.get(Calendar.MILLISECOND);
+        for (int tmp = 100; value < tmp; tmp = tmp / 10)
+            buffer.append(0);
+        if (value > 0) 
+            buffer.append(value);
+        
+        //-- TimeZone
+        value = cal.get(Calendar.ZONE_OFFSET);
+        if (value == 0) {
+            buffer.append('Z'); // UTC
+        }
+        else if (value != TIMEZONE_OFFSET) {
+            if (value > 0) 
+                buffer.append('+');
+            else {
+                value = 0-value;
+                buffer.append('-');
+            }
+            
+            //-- convert to minutes from milliseconds
+            int minutes = value / 60000;
+            
+            //-- hours: hh
+            value = minutes / 60;
+            if (value < 10) buffer.append('0');
+            buffer.append(value);
+            buffer.append(':');
+            
+            //-- remaining minutes: mm
+            value = minutes % 60;
+            if (value < 10) buffer.append('0');
+            buffer.append(value);
+        }
+        return buffer.toString();
+    } //-- format
+
 
     /**
      * Formats the given object. If the object is a Date, a call
@@ -320,44 +600,11 @@ public class DateFieldHandler extends XMLFieldHandler {
         if (object == null) 
             return null;
         if (object instanceof java.util.Date) {
-            return getFormattedDate((Date)object);
+            return format((Date)object);
         }
         return object.toString();
     } //-- format
      
-	/**
-	 * Returns the Date formatted as
-	 *  yyyy-MM-dd'T'HH:mm:ss.SSSZ or
-	 *  yyyy-MM-dd'T'HH:mm:ss.SSS+HH:MM or
-	 *  yyyy-MM-dd'T'HH:mm:ss.SSS-HH:MM
-	 *
-     * @return The date formatted as an xs:dateTime string (uses default TimeZone)
-	 */
-	private static String getFormattedDate(Date date)
-	{
-		// Retrieve the time zone offset
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeZone(_defaultTimezone);
-		cal.setTime(date);
-		int zoneOffset = cal.get(Calendar.ZONE_OFFSET)+cal.get(Calendar.DST_OFFSET);
-
-		// Format the date
-        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-		df.setTimeZone(_defaultTimezone);
-		String xmlDate = df.format( date );
-		if (zoneOffset==0)
-			return xmlDate+"Z";
-
-		// Format the time zone offset
-		String tz = (zoneOffset<0) ? "-" : "+";
-		zoneOffset = Math.abs(zoneOffset);
-		short zhour = (short) (zoneOffset / (60*60*1000));
-		zoneOffset = zoneOffset % (60*60*1000);
-		short zmin = (short)(zoneOffset / (60*1000));
-		tz+= (zhour<10 ? "0"+zhour : ""+zhour) + ":" + (zmin<10 ? "0"+zmin : ""+zmin);
-		return xmlDate+tz;
-
-	} //-- getFormattedDate
 
     /**
      * Sets the TimeZone used when marshalling out xsd:dateTime values using this handler
@@ -366,7 +613,10 @@ public class DateFieldHandler extends XMLFieldHandler {
     **/
 	public static void setDefaultTimeZone(TimeZone timeZone)
 	{
-		_defaultTimezone = timeZone;
+	    if (timeZone == null) {
+	        timeZone = TimeZone.getDefault();
+		}
+	    TIMEZONE_OFFSET = timeZone.getRawOffset();
 	} //-- setDefaultTimeZone
 
 } //-- DateFieldHandler

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -1546,7 +1546,15 @@ public final class UnmarshalHandler extends MarshalFramework
             classDesc = _cdResolver.resolve(className, _loader);
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
-
+                
+            //-- Still can't find type, this may be due to an
+            //-- attempt to unmarshal an older XML instance
+            //-- that was marshalled with a previous Castor. A
+            //-- bug fix in the XMLMappingLoader prevents old
+            //-- xsi:type that are missing the "java:"
+            classDesc = _cdResolver.resolve(type, _loader);
+            if (classDesc != null)
+                return classDesc.getJavaClass().getName();
 
         }
         return null;

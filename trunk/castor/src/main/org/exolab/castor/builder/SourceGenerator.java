@@ -462,13 +462,24 @@ public class SourceGenerator {
             err += ve.getMessage();
             throw new IllegalArgumentException(err);
         }
-        if (packageName == null) {
+        //--This code shouldn't be needed anymore since XMLBindingComponent
+        //--should handle the lookup(Arnaud 20030120)
+        /*if (packageName == null) {
             String schemaLocation = schema.getSchemaLocation();
             packageName = lookupPackageLocation(schemaLocation);
             if (packageName == null) {
                 String targetNamespace = schema.getTargetNamespace();
                 packageName = lookupPackageNamespace(targetNamespace);
             }
+        }*/
+        
+        //--map the targetNamespace of the schema with the packageName defined
+        if (packageName != null) {
+            String targetNamespace = schema.getTargetNamespace();
+            //-- adjust targetNamespace
+            if (targetNamespace == null)
+                targetNamespace = "";
+            _nspackages.put(targetNamespace, packageName);
         }
         sInfo.packageName = packageName;
         sInfo.setDialog(_dialog);
@@ -730,7 +741,7 @@ public class SourceGenerator {
 	 * Gets a Java package to an XML namespace URL
 	 */
 	public static String lookupPackageNamespace(String nsURL) {
-        if (nsURL == null) return "";
+        if (nsURL == null) nsURL = "";
 
 		//-- Ensure properties have been loaded
 		getDefault();
@@ -1055,11 +1066,17 @@ public class SourceGenerator {
                 sgen = new SourceGenerator(factory);
             }
             catch(Exception x) {
-                System.out.print("- invalid option for types: ");
-                System.out.println(typeFactory);
-                System.out.println(x);
-                System.out.println("-- using default source generator types");
-                sgen = new SourceGenerator(); // default
+                //--one might want to use its own FieldInfoFactory
+                try {
+                    sgen = new SourceGenerator((FieldInfoFactory)Thread.currentThread().getContextClassLoader().loadClass( typeFactory).newInstance());
+                } catch (Exception e) {
+                
+                    System.out.print("- invalid option for types: ");
+                    System.out.println(typeFactory);
+                    System.out.println(x);
+                    System.out.println("-- using default source generator types");
+                    sgen = new SourceGenerator(); // default
+                }
             }
         }
         else {
@@ -1370,9 +1387,6 @@ public class SourceGenerator {
         if (simpleType.getSchema() != sInfo.getSchema()) 
             return;
             
-        String packageName = sInfo.packageName;
-       
-        
         //-- Right now the only time we actually
         //-- generate source for a simpletype is
         //-- when it's an enumeration

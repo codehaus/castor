@@ -157,11 +157,12 @@ public class OQLQueryImpl
 
             //do type checking and conversion
             Class paramClass = info.getTheClass();
-            Class valueClass = value.getClass();
             Class fieldClass = info.getFieldType();
             Class sqlClass = info.getSQLType();
 
             if ( value != null ) {
+                Class valueClass = value.getClass();
+
                 if ( paramClass.isAssignableFrom( valueClass ) ) {
                     ClassMolder molder = _dbImpl.getLockEngine().getClassMolder( valueClass );
 

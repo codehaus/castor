@@ -131,7 +131,7 @@ public final class URIResolverImpl implements URIResolver {
              if (documentBase != null) {
 
                 //--resolve the previous directory
-                if (href.startsWith("../")) {
+                while (href.startsWith("../")) {
                     href = href.substring(3);
                     documentBase = documentBase.substring(0,documentBase.lastIndexOf('/'));
                     documentBase = documentBase.substring(0,documentBase.lastIndexOf('/')+1);

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,9 +52,10 @@ import org.exolab.castor.xml.*;
  * The Integer Validation class. This class handles validation
  * for the integer type as well as all integer derived types
  * such as positive-integer and negative-integer
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class LongValidator extends PatternValidator
     implements TypeValidator
 {
@@ -95,6 +96,57 @@ public class LongValidator extends PatternValidator
     public void clearMin() {
         useMin = false;
     } //-- clearMin
+    /**
+     * Returns the fixed value that longs validated with this
+     * validator must be equal to. A null value is returned
+     * if no fixed value has been specified.
+     *
+     * @return the fixed value to validate against.
+     */
+    public Long getFixed() {
+        if (useFixed) {
+            return new Long(fixed);
+        }
+        return null;
+    } //-- getFixed
+
+    /**
+     * Returns the maximum value that longs validated with this
+     * validator must be equal to or less than. A null value 
+     * is returned if no maximum value has been specified.
+     *
+     * @return the maximum inclusive value to validate against.
+     */
+    public Long getMaxInclusive() {
+        if (useMax) {
+            return new Long(max);
+        }
+        return null;
+    } //-- getMaxInclusive
+    
+    /**
+     * Returns the minimum value that longs validated with this
+     * validator must be equal to or greater than. A null value 
+     * is returned if no minimum value has been specified.
+     *
+     * @return the minimum inclusive value to validate against.
+     */
+    public Long getMinInclusive() {
+        if (useMin) {
+            return new Long(min);
+        }
+        return null;
+    } //-- getMinInclusive
+
+    /**
+     * Returns true if a fixed value, to validate against, has been
+     * set.
+     *
+     * @return true if a fixed value has been set.
+     */
+    public boolean hasFixed() {
+        return useFixed;
+    } //-- hasFixed
 
     /**
      * Sets the fixed value that integers validated with this
@@ -188,6 +240,17 @@ public class LongValidator extends PatternValidator
 
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

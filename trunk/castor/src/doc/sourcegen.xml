@@ -94,7 +94,8 @@
              <tr>
                <td align="center">types</td><td><i>type-factory</i></td>
                <td>Sets which type factory to use. This is useful if you
-                   you want JDK 1.2 collections instead of JDK 1.1
+                   you want JDK 1.2 collections instead of JDK 1.1 or if you want
+                   to pass in your own FieldInfoFactory.
                    (see <a href="#Collection Types">Collection types</a>)
                </td>
                <td>Optional</td>
@@ -158,6 +159,9 @@
                <li>Java 1.2: use the option <tt>-types j2</tt>, collection type is java.util.Collection</li>
                <li>ODMG 3.0: use the option <tt>-types odmg</tt>, collection tyoe is odmg.DArray</li>
             </ul>
+            You can also write your own FieldInfoFactory to handle specific collection types. All you have to do is to 
+            pass in the fully qualified name of that FieldInfoFactory: <tt>-types com.personal.MyCoolFactory</tt>
+            
          </p>
          </section>
 

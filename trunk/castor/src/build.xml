@@ -30,7 +30,7 @@
         <property name="schema" value="${source}/schema"/>
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
-        <property name="main.opt.debug" value="false"/>
+        <property name="main.opt.debug" value="true"/>
         <property name="archive" value="${project}-${version}"/>
         <property name="exampleexcludes" value="SourceGenerator/*,**/dax/**"/>
         <property name="excludes" value="**/package.html,**/dax/**,**/dax/engine/**"/>
@@ -297,6 +297,10 @@
          <copy todir="${build}/doc">
             <fileset dir="${main}/org/exolab/castor/mapping"
                      includes="mapping.dtd,mapping.xsd"/>
+         </copy>
+         <copy todir="${build}/doc">
+            <fileset dir="${main}/org/exolab/castor/builder/binding"
+                     includes="binding.xsd"/>
          </copy>
          <copy todir="${build}/doc/images">
             <fileset dir="${doc}/images" />

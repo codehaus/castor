@@ -117,7 +117,7 @@ public class ExtendedBinding extends Binding {
      */
     public ExtendedBinding() {
         super();
-        _componentBindings = new Hashtable(10);
+        _componentBindings = new Hashtable();
     }
     
 	/**
@@ -255,54 +255,53 @@ public class ExtendedBinding extends Binding {
      * @param xPath the current XPath location that points to the parent of the given ComponentBindingType.
      * @param type an integer that indicates the type of the given ComponentBindingType
      */
-    private void handleComponent(ComponentBindingType binding,StringBuffer xPath, int type) {
+    private void handleComponent(ComponentBindingType binding,String xPath, int type) {
 
 	    if (binding == null)
 		    return;
 
-	    if (xPath == null) {
-		    xPath = new StringBuffer(20);
+        if (xPath== null) {
+		    xPath = new String();
         }
-
+        
 	    String name = binding.getName();
 	    boolean xpathUsed = (name.indexOf("/") != -1);
 
 	    switch (type) {
 		    case ATTRIBUTE :
-			//--handle attributes
-			if (!xpathUsed) {
-				xPath.append(PATH_SEPARATOR);
-				xPath.append(ATTRIBUTE_PREFIX);
-			}
-			xPath.append(name);
-			_componentBindings.put(xPath.toString(), binding);
-			break;
+			    //--handle attributes
+			    if (!xpathUsed) {
+				    xPath = xPath + PATH_SEPARATOR + ATTRIBUTE_PREFIX;
+			    }
+			    xPath += name;
+			    _componentBindings.put(xPath, binding);
+			    break;
 
 		    case COMPLEXTYPE :
 			    //--handle complexType
 			    if (!xpathUsed) {
-				    xPath.append(COMPLEXTYPE_ID);
+				    xPath += COMPLEXTYPE_ID;
                 }
-                xPath.append(name);
-			    _componentBindings.put(xPath.toString(), binding);
+                xPath += name;
+			    _componentBindings.put(xPath, binding);
 			    break;
 
 		    case ELEMENT :
 			    //--handle element
 			    if (!xpathUsed) {
-				    xPath.append(PATH_SEPARATOR);
+				    xPath += PATH_SEPARATOR;
 			    }
-			    xPath.append(name);
-			    _componentBindings.put(xPath.toString(), binding);
+			    xPath += name;
+			    _componentBindings.put(xPath, binding);
 			    break;
 
 		    case GROUP :
 			    //--handle group
 			    if (!xpathUsed) {
-				    xPath.append(GROUP_ID);
+				    xPath += GROUP_ID;
 			    }
-			    xPath.append(name);
-			    _componentBindings.put(xPath.toString(), binding);
+			    xPath += name;
+			    _componentBindings.put(xPath, binding);
 			    break;
 
 		    default :
@@ -312,7 +311,7 @@ public class ExtendedBinding extends Binding {
 	    
 	    //--process children
 	    ComponentBindingType temp;
-        ComponentBindingType[] tempBindings = binding.getAttributeBinding();
+	    ComponentBindingType[] tempBindings = binding.getAttributeBinding();
         
         //1--attributes
         for (int i=0; i<tempBindings.length; i++) {

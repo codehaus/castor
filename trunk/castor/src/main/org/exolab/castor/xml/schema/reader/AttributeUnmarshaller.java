@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -140,12 +140,20 @@ public class AttributeUnmarshaller extends ComponentReader {
         //-- @form
         attValue = atts.getValue(SchemaNames.FORM);
         if (attValue != null) {
+            if (_attribute.isReference()) {
+                String err = "An attribute reference cannot have a 'form' attribute.";
+                throw new IllegalArgumentException(err);
+            }
             _attribute.setForm(Form.valueOf(attValue));
         }
 
         //-- @type
         attValue = atts.getValue(SchemaNames.TYPE_ATTR);
         if (attValue != null) {
+            if (_attribute.isReference()) {
+                String err = "An attribute reference cannot have a 'type' attribute.";
+                throw new IllegalArgumentException(err);
+            }
             _attribute.setSimpleTypeReference(attValue);
         }
 

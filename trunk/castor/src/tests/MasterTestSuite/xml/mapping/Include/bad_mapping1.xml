@@ -1,7 +1,7 @@
 
 <mapping>
         <!--include itself mapping -->
-        <include href="./src/tests/MasterTestSuite/xml/mapping/include/bad_mapping1.xml"/>
+        <include href="./src/tests/MasterTestSuite/xml/mapping/Include/bad_mapping1.xml"/>
         
         <class name="A">
                 <map-to xml="A"/>

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -15,16 +15,17 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.ContentHandler;
 
 /**
- * 
+ * Class UnitTestCaseChoice.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class UnitTestCaseChoice implements java.io.Serializable {
 
 
@@ -32,8 +33,14 @@ public class UnitTestCaseChoice implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _mapping_File
+     */
     private java.lang.String _mapping_File;
 
+    /**
+     * Field _schema
+     */
     private java.lang.String _schema;
 
 
@@ -51,27 +58,29 @@ public class UnitTestCaseChoice implements java.io.Serializable {
     //-----------/
 
     /**
-     * Returns the value of field 'mapping_File'.
+     * Method getMapping_FileReturns the value of field
+     * 'mapping_File'.
      * 
      * @return the value of field 'mapping_File'.
-    **/
+     */
     public java.lang.String getMapping_File()
     {
         return this._mapping_File;
     } //-- java.lang.String getMapping_File() 
 
     /**
-     * Returns the value of field 'schema'.
+     * Method getSchemaReturns the value of field 'schema'.
      * 
      * @return the value of field 'schema'.
-    **/
+     */
     public java.lang.String getSchema()
     {
         return this._schema;
     } //-- java.lang.String getSchema() 
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -84,10 +93,10 @@ public class UnitTestCaseChoice implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -96,10 +105,10 @@ public class UnitTestCaseChoice implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param handler
-    **/
+     */
     public void marshal(org.xml.sax.ContentHandler handler)
         throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -108,30 +117,31 @@ public class UnitTestCaseChoice implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Sets the value of field 'mapping_File'.
+     * Method setMapping_FileSets the value of field
+     * 'mapping_File'.
      * 
      * @param mapping_File the value of field 'mapping_File'.
-    **/
+     */
     public void setMapping_File(java.lang.String mapping_File)
     {
         this._mapping_File = mapping_File;
     } //-- void setMapping_File(java.lang.String) 
 
     /**
-     * Sets the value of field 'schema'.
+     * Method setSchemaSets the value of field 'schema'.
      * 
      * @param schema the value of field 'schema'.
-    **/
+     */
     public void setSchema(java.lang.String schema)
     {
         this._schema = schema;
     } //-- void setSchema(java.lang.String) 
 
     /**
-     * 
+     * Method unmarshal
      * 
      * @param reader
-    **/
+     */
     public static org.exolab.castor.tests.framework.testDescriptor.UnitTestCaseChoice unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -139,7 +149,8 @@ public class UnitTestCaseChoice implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCaseChoice unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,21 +11,19 @@ package org.exolab.castor.tests.framework.testDescriptor;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import org.exolab.castor.tests.framework.testDescriptor.types.TypeType;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.ContentHandler;
 
 /**
- * 
+ * Class ListenerType.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public abstract class ListenerType implements java.io.Serializable {
 
 
@@ -33,11 +31,20 @@ public abstract class ListenerType implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _goldFile
+     */
     private java.lang.String _goldFile;
 
+    /**
+     * Field _className
+     */
     private java.lang.String _className;
 
-    private org.exolab.castor.tests.framework.testDescriptor.types.TypeType _type = org.exolab.castor.tests.framework.testDescriptor.types.TypeType.valueOf("Both");;
+    /**
+     * Field _type
+     */
+    private org.exolab.castor.tests.framework.testDescriptor.types.TypeType _type = org.exolab.castor.tests.framework.testDescriptor.types.TypeType.valueOf("Both");
 
 
       //----------------/
@@ -55,37 +62,38 @@ public abstract class ListenerType implements java.io.Serializable {
     //-----------/
 
     /**
-     * Returns the value of field 'className'.
+     * Method getClassNameReturns the value of field 'className'.
      * 
      * @return the value of field 'className'.
-    **/
+     */
     public java.lang.String getClassName()
     {
         return this._className;
     } //-- java.lang.String getClassName() 
 
     /**
-     * Returns the value of field 'goldFile'.
+     * Method getGoldFileReturns the value of field 'goldFile'.
      * 
      * @return the value of field 'goldFile'.
-    **/
+     */
     public java.lang.String getGoldFile()
     {
         return this._goldFile;
     } //-- java.lang.String getGoldFile() 
 
     /**
-     * Returns the value of field 'type'.
+     * Method getTypeReturns the value of field 'type'.
      * 
      * @return the value of field 'type'.
-    **/
+     */
     public org.exolab.castor.tests.framework.testDescriptor.types.TypeType getType()
     {
         return this._type;
     } //-- org.exolab.castor.tests.framework.testDescriptor.types.TypeType getType() 
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -98,53 +106,38 @@ public abstract class ListenerType implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
-     * 
-     * 
-     * @param out
-    **/
-    public abstract void marshal(java.io.Writer out)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
-
-    /**
-     * 
-     * 
-     * @param handler
-    **/
-    public abstract void marshal(org.xml.sax.ContentHandler handler)
-        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
-
-    /**
-     * Sets the value of field 'className'.
+     * Method setClassNameSets the value of field 'className'.
      * 
      * @param className the value of field 'className'.
-    **/
+     */
     public void setClassName(java.lang.String className)
     {
         this._className = className;
     } //-- void setClassName(java.lang.String) 
 
     /**
-     * Sets the value of field 'goldFile'.
+     * Method setGoldFileSets the value of field 'goldFile'.
      * 
      * @param goldFile the value of field 'goldFile'.
-    **/
+     */
     public void setGoldFile(java.lang.String goldFile)
     {
         this._goldFile = goldFile;
     } //-- void setGoldFile(java.lang.String) 
 
     /**
-     * Sets the value of field 'type'.
+     * Method setTypeSets the value of field 'type'.
      * 
      * @param type the value of field 'type'.
-    **/
+     */
     public void setType(org.exolab.castor.tests.framework.testDescriptor.types.TypeType type)
     {
         this._type = type;
     } //-- void setType(org.exolab.castor.tests.framework.testDescriptor.types.TypeType) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {

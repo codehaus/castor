@@ -1,7 +1,7 @@
 
 <mapping>
         <!--include a local mapping -->
-        <include href="./src/tests/MasterTestSuite/xml/mapping/include/test/mapping.xml"/>
+        <include href="./src/tests/MasterTestSuite/xml/mapping/Include/test/mapping.xml"/>
         
         <class name="A">
                 <map-to xml="A"/>

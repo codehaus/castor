@@ -90,9 +90,10 @@ import java.util.Vector;
 
 /**
  * A Marshaller to allowing serializing Java Object's to XML
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class Marshaller extends MarshalFramework {
 
 
@@ -145,6 +146,7 @@ public class Marshaller extends MarshalFramework {
     private static final StringClassDescriptor _StringClassDescriptor
         = new StringClassDescriptor();
 
+    
     //---------------------------/
     //- Public member variables -/
     //---------------------------/
@@ -280,7 +282,6 @@ public class Marshaller extends MarshalFramework {
      * The validation flag
     **/
     private boolean _validate = false;
-
 
     /**
      * Creates a new Marshaller with the given DocumentHandler.
@@ -579,6 +580,7 @@ public class Marshaller extends MarshalFramework {
 		_marshalExtendedType = marshalExtendedType;
 	} //-- setMarshalExtendedType
 
+    
 	/**
 	 * If True the marshaller will use the 'xsi:type' attribute
 	 * to marshall a field value that extended the defined field type.
@@ -847,9 +849,7 @@ public class Marshaller extends MarshalFramework {
                 }
             }
             else {
-                if (_class.isArray()) {
-                    saveType = true;
-                }
+                saveType = (_class.isArray());
                 //-- save package information for use when searching
                 //-- for MarshalInfo classes
                 String className = _class.getName();
@@ -934,21 +934,26 @@ public class Marshaller extends MarshalFramework {
                 name = classDesc.getXMLName();
         }
 
+        //------------------------------------------------/
+        //- Next few sections of code deal with xsi:type -/
+        //- prevention, if necessary                     -/
+        //------------------------------------------------/
 
-        //-- Suppress 'xsi:type' attributes when Castor is able to infer the
-        //-- information from the mapping file
-        //-- XXXX Date fix
-        if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
-            saveType = false;
-        //-- XXXX end Date fix
-        //-- XXX Enumeration fix
-        if (saveType && (descriptor.getHandler() instanceof EnumFieldHandler))
-            saveType = false;
-        //-- XXX end Enumeration fix
-        
         //-- Allow user to prevent xsi:type
         saveType = (saveType && (!_suppressXSIType));
+        
+        //-- Suppress xsi:type for special types
+        if (saveType) {
+            //-- java.util.Enumeration and java.util.Date fix
+            if (descriptor.getHandler() instanceof DateFieldHandler)
+                saveType = false;
+            else if (descriptor.getHandler() instanceof EnumFieldHandler)
+                saveType = false;
+        }
+        
 
+        //-- Suppress 'xsi:type' attributes when Castor is able to infer
+        //-- the correct type during unmarshalling
         if (saveType) {
              // When the type of the instance of the field is not the
              // type specified for the field, it might be necessary to
@@ -1022,14 +1027,15 @@ public class Marshaller extends MarshalFramework {
              }
          }//--- End of "if (saveType)"
 
-        //-- Set a new namespace scoping
-        if (!atRoot) {
-            _namespaces = _namespaces.createNamespaces();
-        }
                 
         //------------------------/
         //- Namespace Management -/
         //------------------------/
+        
+        //-- Set a new namespace scoping
+        if (!atRoot) {
+            _namespaces = _namespaces.createNamespaces();
+        }
         
         //-- Must be done before any attributes are processed
         //-- since attributes can be namespaced as well.
@@ -1061,7 +1067,7 @@ public class Marshaller extends MarshalFramework {
 		else {
 		    //-- redeclare default namespace as empty
 		    String defaultNamespace = _namespaces.getNamespaceURI("");
-		    if (!"".equals(defaultNamespace))
+		    if ((defaultNamespace != null) && (!"".equals(defaultNamespace)))
 		        _namespaces.addNamespace("", "");
 		}
         
@@ -1288,6 +1294,7 @@ public class Marshaller extends MarshalFramework {
             XMLFieldDescriptor elemDescriptor = descriptors[i];
             Object obj = null;
             try {
+                
                 obj = elemDescriptor.getHandler().getValue(object);
             }
             catch(IllegalStateException ise) {
@@ -1297,32 +1304,22 @@ public class Marshaller extends MarshalFramework {
 
             Class type = obj.getClass();
             
-            //-- handle arrays
-            if (type.isArray()) {
-                //-- special case for byte[]
-                if (type.getComponentType() == Byte.TYPE) {
-                    marshal(obj, elemDescriptor, handler);
-                }
-                else {
-                    int length = Array.getLength(obj);
-                    for (int j = 0; j < length; j++) {
-                        Object item = Array.get(obj, j);
-                        if (item != null)
-                           marshal(item, elemDescriptor, handler);
-                    }
-
-                }
+            //-- handle byte arrays
+            if (type.isArray() && (type.getComponentType() == Byte.TYPE)) {
+                marshal(obj, elemDescriptor, handler);
             }
-            //-- handle enumerations
-            else if (obj instanceof java.util.Enumeration) {
-                Enumeration enum = (Enumeration)obj;
+            //-- handle all other collection types
+            else if (isCollection(type)) {
+                CollectionHandler colHandler = getCollectionHandler(type);
+                Enumeration enum = colHandler.elements(obj);
                 while (enum.hasMoreElements()) {
                     Object item = enum.nextElement();
-                    if (item != null)
-                       marshal(item, elemDescriptor, handler);
+                    if (item != null) {
+                        marshal(item, elemDescriptor, handler);
+                    }
                 }
             }
-
+            //-- otherwise just marshal object as is
             else marshal(obj, elemDescriptor, handler);
         }
         //-- finish element

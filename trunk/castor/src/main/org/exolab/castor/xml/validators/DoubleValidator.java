@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author           Changes
@@ -53,6 +53,7 @@ import org.exolab.castor.xml.*;
 /**
  * The Double Validation class. This class handles validation
  * for the double type.
+ *
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
@@ -185,6 +186,17 @@ public class DoubleValidator extends PatternValidator
 
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

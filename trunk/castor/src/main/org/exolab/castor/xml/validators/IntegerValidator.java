@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,9 +52,10 @@ import org.exolab.castor.xml.*;
  * The Integer Validation class. This class handles validation
  * for the integer type as well as all integer derived types
  * such as positive-integer and negative-integer
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class IntegerValidator extends PatternValidator
     implements TypeValidator
 {
@@ -98,6 +99,72 @@ public class IntegerValidator extends PatternValidator
         useMin = false;
     } //-- clearMin
 
+    /**
+     * Returns the fixed value that integers validated with this
+     * validator must be equal to. A null value is returned
+     * if no fixed value has been specified.
+     *
+     * @return the fixed value to validate against.
+     */
+    public Integer getFixed() {
+        if (useFixed) {
+            return new Integer(fixed);
+        }
+        return null;
+    } //-- getFixed
+
+    /**
+     * Returns the maximum value that integers validated with this
+     * validator must be equal to or less than. A null value 
+     * is returned if no maximum value has been specified.
+     *
+     * @return the maximum inclusive value to validate against.
+     */
+    public Integer getMaxInclusive() {
+        if (useMax) {
+            return new Integer(max);
+        }
+        return null;
+    } //-- getMaxInclusive
+    
+    /**
+     * Returns the minimum value that integers validated with this
+     * validator must be equal to or greater than. A null value 
+     * is returned if no minimum value has been specified.
+     *
+     * @return the minimum inclusive value to validate against.
+     */
+    public Integer getMinInclusive() {
+        if (useMin) {
+            return new Integer(min);
+        }
+        return null;
+    } //-- getMinInclusive
+
+    /**
+     * Returns the total number of digits that integers validated with this
+     * validator must have. A null value 
+     * is returned if no total number of digits has been specified.
+     *
+     * @return the total number of digits
+     */
+    public Integer getTotalDigits() {
+        if (_totalDigits >= 0) {
+            return new Integer(_totalDigits);
+        }
+        return null;
+    } //-- getTotalDigits
+    
+    /**
+     * Returns true if a fixed value, to validate against, has been
+     * set.
+     *
+     * @return true if a fixed value has been set.
+     */
+    public boolean hasFixed() {
+        return useFixed;
+    } //-- hasFixed
+    
     /**
      * Sets the fixed value that integers validated with this
      * validated must be equal to
@@ -212,6 +279,17 @@ public class IntegerValidator extends PatternValidator
 
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

@@ -35,7 +35,7 @@ public class PrimitivesBuilder implements ObjectModelBuilder
         
         test.setIntTest(new Integer(12));
 	  
-        test.setIntegerTest(new Integer(325325));
+        test.addIntegerTest(new Integer(325325));
         
         test.setLongTest(new Long(98998989898L));
         

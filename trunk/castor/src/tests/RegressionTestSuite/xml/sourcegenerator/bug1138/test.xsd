@@ -18,8 +18,9 @@ default="1"/>
 maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:complexType>
+  
+  <xsd:element name="Books" type="tns:BooksType"/>
 
-  <xsd:element name='books' type='tns:BooksType'/>
 </xsd:schema>
 
 

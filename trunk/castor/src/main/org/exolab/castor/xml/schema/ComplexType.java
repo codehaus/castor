@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -232,14 +232,31 @@ public class ComplexType extends XMLType
     } //-- getAttributeDecl
 
     /**
-     * Returns an Enumeration of all the AttributeDecl objects
-     * declared within this Complextype
+     * Returns an Enumeration of *all* the AttributeDecl objects
+     * declared within this ComplexType. The Enumeration 
+     * will contain all AttributeDecl from AttributeGroup
+     * references as well. To return only locally declared
+     * attributes make a call to 
+     * <code>getLocalAttributeDecls</code>.
+     *
      * @return an Enumeration of all the AttributeDecl objects
      * declared within this Complextype
-    **/
+     */
     public Enumeration getAttributeDecls() {
         return _attributes.getAttributes();
     } //-- getAttributeDecls
+
+    /**
+     * Returns an Enumeration of *all* locally defined AttributeDecl
+     * declared within this ComplexType. The Enumeration 
+     * will not contain any AttributeDecl from AttributeGroup
+     * references. 
+     *
+     * @return an Enumeration of all locally declared AttributeDecl.
+     */
+    public Enumeration getLocalAttributeDecls() {
+        return _attributes.getLocalAttributes();
+    } //-- getLocalAttributeDecls
 
     /**
      * Returns an Enumeration of all the AttributeGroup that are referenced
@@ -249,7 +266,7 @@ public class ComplexType extends XMLType
      * within this ComplexType.
      */
     public Enumeration getAttributeGroupReferences() {
-        return _attributes.getMyAttributeGroupReferences();
+        return _attributes.getLocalAttributeGroupReferences();
     }
 
     /**

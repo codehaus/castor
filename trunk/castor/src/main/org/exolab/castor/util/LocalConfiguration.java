@@ -121,8 +121,11 @@ public final class LocalConfiguration extends Configuration {
     public LocalConfiguration() {
         super();
         load();
-        String key = (_resourceUrl == null) ? "" : _resourceUrl;
-        _configurations.put(key, this);
+        //-- Disable for now, not needed yet until we work on
+        //-- a way to differentiate different configurations
+        //-- throughout the framework...
+        //String key = (_resourceUrl == null) ? "" : _resourceUrl;
+        //_configurations.put(key, this);
     } //-- LocalConfiguration
     
     /**
@@ -133,8 +136,16 @@ public final class LocalConfiguration extends Configuration {
      * @return the LocalConfiguration
      */
     public static synchronized LocalConfiguration getInstance() {
+        
         LocalConfiguration config = null;
-        URL url = LocalConfiguration.class.getResource("/" + Property.FileName);
+        URL url = null;
+        
+        //-- disable for now, it's a huge performance hit, for no gain,
+        //-- at the moment anyway. We need to come up with a clean, fast
+        //-- way to differentiate between different configurations
+        //-- throughout the framework...
+        //url = LocalConfiguration.class.getResource("/" + Property.FileName);
+        
         String key = "";
         if (url != null) {
             key = url.toString();
@@ -142,8 +153,10 @@ public final class LocalConfiguration extends Configuration {
         config = (LocalConfiguration)_configurations.get(key);
         if (config == null) {
             config = new LocalConfiguration();
+            _configurations.put(key, config);
         }
         return config;
+        
     } //-- getInstance
     
     

@@ -46,7 +46,9 @@
 package org.exolab.castor.xml;
 
 import org.exolab.castor.xml.descriptors.CoreDescriptors;
+import org.exolab.castor.xml.handlers.ContainerFieldHandler;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
+import org.exolab.castor.xml.util.ContainerElement;
 import org.exolab.castor.xml.util.DefaultNaming;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
@@ -72,13 +74,44 @@ import java.util.Vector;
  * basically the common code base between the two. This
  * class handles the introspection to dynamically create
  * descriptors.
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public final class Introspector {
     
           
-          
+    /**
+     * The property name for enabling collection wrapping.
+     * The property controls whether or not collections 
+     * (arrays, vectors, etc) should be wrapped in a container element. 
+     * For example:
+     *
+     * <pre>
+     *    &lt;foos&gt;
+     *       &lt;foo&gt;foo1&lt;/foo&gt;
+     *       &lt;foo&gt;foo2&lt;/foo&gt;
+     *    &lt;/foos&gt;
+     * 
+     *   instead of the default:
+     *
+     *    &lt;foos&gt;foo1&lt;foos&gt;
+     *    &lt;foos&gt;foo2&lt;/foos&gt;
+     *
+     * </pre>
+     * 
+     * Use this property with a value of true or false in the 
+     * castor.properties file
+     *
+     * org.exolab.castor.xml.introspector.wrapCollections=true
+     * -or-
+     * org.exolab.castor.xml.introspector.wrapCollections=false
+     *
+     * This property is false by default.
+     */
+     public static final String WRAP_COLLECTIONS_PROPERTY =
+        "org.exolab.castor.xml.introspector.wrapCollections";
+     
     private static final String ADD     = "add";
     private static final String GET     = "get";
     private static final String IS      = "is";
@@ -88,7 +121,24 @@ public final class Introspector {
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
 
+    /**
+     * Name of the java.util.List collection
+     */
     private static final String LIST = "java.util.List";
+
+    /**
+     * Used as a prefix for the name of a container field
+     */
+    private static final String COLLECTION_WRAPPER_PREFIX = "##container_for_";
+    
+    
+    /**
+     * The default flag indicating whether or not collections 
+     * (arrays, vectors, etc) should be wrapped in a container element. 
+     *
+     * @see _wrapCollectionsInContainer
+     */
+    private static final boolean WRAP_COLLECTIONS_DEFAULT = false;
     
     /**
      * The set of available collections to use
@@ -113,6 +163,27 @@ public final class Introspector {
     private NodeType _primitiveNodeType = null;
     
     
+    /**
+     * The variable flag indicating whether or not collections 
+     * (arrays, vectors, etc) should be wrapped in a container element. 
+     * For example:
+     *
+     * <pre>
+     *    &lt;foos&gt;
+     *       &lt;foo&gt;foo1&lt;/foo&gt;
+     *       &lt;foo&gt;foo2&lt;/foo&gt;
+     *    &lt;/foos&gt;
+     * 
+     *   instead of the default:
+     *
+     *    &lt;foos&gt;foo1&lt;foos&gt;
+     *    &lt;foos&gt;foo2&lt;/foos&gt;
+     *
+     * </pre>
+     *
+     */
+    private boolean _wrapCollectionsInContainer = WRAP_COLLECTIONS_DEFAULT;
+    
     public Introspector() {
         super();
         init();
@@ -127,6 +198,13 @@ public final class Introspector {
         }
         _naming = _defaultNaming;
         setPrimitiveNodeType(config.getPrimitiveNodeType());
+        
+        //-- wrap collections in a container element?
+        String wrap = config.getProperty(WRAP_COLLECTIONS_PROPERTY, null);
+        if (wrap != null) {
+            _wrapCollectionsInContainer = Boolean.valueOf(wrap).booleanValue();
+        }
+        
     }
     /**
      * Returns the NodeType for java primitives
@@ -354,9 +432,16 @@ public final class Introspector {
             if (isCollection && (methodSet.add == null)) {
                 typeInfo = new TypeInfo(type);
                 colHandler = typeInfo.getCollectionHandler();
+                
                 //-- Find component type
                 if (type.isArray()) {
-                    type = type.getComponentType();
+                    //-- Byte arrays are handled as a special case
+                    //-- so don't use CollectionHandler
+                    if (type.getComponentType() == Byte.TYPE) {
+                        colHandler = null;
+                    }
+                    else type = type.getComponentType();
+                        
                 }
             }
             
@@ -399,6 +484,41 @@ public final class Introspector {
                         
             fieldDesc.setHandler(handler);
             
+            //-- Wrap collections?
+            if (isCollection && _wrapCollectionsInContainer) {
+                String fieldName = COLLECTION_WRAPPER_PREFIX + methodSet.fieldName;
+                //-- If we have a field 'c' that is a collection and
+                //-- we want to wrap that field in an element <e>, we
+                //-- need to create a field descriptor for 
+                //-- an object that represents the element <e> and
+                //-- acts as a go-between from the parent of 'c' 
+                //-- denoted as P(c) and 'c' itself
+                //  
+                //   object model: P(c) -> c
+                //   xml : <p><e><c></e><p>
+                
+                //-- Make new class descriptor for the field that
+                //-- will represent the container element <e>
+                Class cType = ContainerElement.class;
+                XMLClassDescriptorImpl containerClassDesc = new XMLClassDescriptorImpl(cType);
+                
+                //-- add the field descriptor to our new class descriptor
+                containerClassDesc.addFieldDescriptor(fieldDesc);        
+                //-- nullify xmlName so that auto-naming will be enabled, 
+                //-- we can't do this in the constructor because
+                //-- XMLFieldDescriptorImpl will create a default one.
+                fieldDesc.setXMLName(null);
+                fieldDesc.setMatches("*");
+                                
+                //-- wrap the field handler in a special container field
+                //-- handler that will actually do the delgation work 
+                FieldHandler cHandler = new ContainerFieldHandler(handler);
+                fieldDesc.setHandler(cHandler);
+                
+                fieldDesc = createFieldDescriptor(cType, fieldName, xmlName);
+                fieldDesc.setClassDescriptor(containerClassDesc);
+                fieldDesc.setHandler(cHandler);
+            }
             //-- add FieldDescriptor to ClassDescriptor
             classDesc.addFieldDescriptor(fieldDesc);
 
@@ -434,7 +554,13 @@ public final class Introspector {
                     colHandler = typeInfo.getCollectionHandler();
                     //-- Find component type
                     if (type.isArray()) {
-                        type = type.getComponentType();
+                        //-- Byte arrays are handled as a special case
+                        //-- so don't use CollectionHandler
+                        if (type.getComponentType() == Byte.TYPE) {
+                            colHandler = null;
+                        }
+                        else type = type.getComponentType();
+                        
                     }
                 }
                 
@@ -486,6 +612,32 @@ public final class Introspector {
         
         return classDesc;
     } //-- generateClassDescriptor
+    
+    /**
+     * Sets whether or not collections (arrays, vectors, etc) 
+     * should be wrapped in a container element. For example:
+     *
+     * <pre>
+     *
+     *    &lt;foos&gt;
+     *       &lt;foo&gt;foo1&lt;/foo&gt;
+     *       &lt;foo&gt;foo2&lt;/foo&gt;
+     *    &lt;/foos&gt;
+     * 
+     *   instead of the default:
+     *
+     *    &lt;foos&gt;foo1&lt;foos&gt;
+     *    &lt;foos&gt;foo2&lt;/foos&gt;
+     *
+     * </pre>
+     *
+     * @param wrapCollections a boolean that when true indicates
+     * collections should be wrapped in a container element.
+     *
+     */
+    public void setWrapCollections(boolean wrapCollections) {
+        _wrapCollectionsInContainer = wrapCollections;
+    } //-- setWrapCollections
     
     /**
      * Returns true if the given XMLClassDescriptor was created via

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -110,7 +110,70 @@ public final class CollectionHandlers
         }
         return _collectionClass;
     }
+    
+    /**
+     * Returns true if the given class has an associated CollectionHandler.
+     *
+     * @param javaClass the class to search collection handlers for
+     * @return true if the given class has an associated CollectionHandler,
+     * otherwise false.
+     */
+     public static boolean hasHandler(Class javaClass) {
+        
+        if ( _info == null )
+            loadInfo();
+            
+        //-- Adjust javaClass for arrays, needed for arrays of
+        //-- primitives, except for byte[] which shouldn't
+        //-- use a collection handler
+        if (javaClass.isArray()) {
+            if (javaClass.getComponentType() != Byte.TYPE)
+                javaClass = Object[].class;
+        }
+            
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].javaClass.isAssignableFrom( javaClass ) )
+                return true;
+                
+        return false;
+        
+     } //-- hasHandler
 
+
+    /**
+     * Returns the associated string name for a given collection.
+     *
+     * @param javaClass the class to search collection handlers for
+     * @return the string name for the given collection type or null
+     * if no association has been defined.
+     */
+     public static String getCollectionName(Class javaClass) {
+        
+        if ( _info == null )
+            loadInfo();
+            
+        //-- Adjust javaClass for arrays, needed for arrays of
+        //-- primitives, except for byte[] which shouldn't
+        //-- use a collection handler
+        if (javaClass.isArray()) {
+            if (javaClass.getComponentType() != Byte.TYPE)
+                javaClass = Object[].class;
+        }
+            
+        //-- First check direct class equality, to provide a better match 
+        //-- (for example in JDK 1.2 a Vector is also a Collection)
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].javaClass.equals( javaClass ) )
+                return _info[ i ].shortName;
+                
+        //-- handle Possible inheritence
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].javaClass.isAssignableFrom( javaClass ) )
+                return _info[ i ].shortName;
+                
+        return null;
+        
+     } //-- hasHandler
 
     /**
      * Returns the collection's handler based on the Java class.
@@ -124,9 +187,27 @@ public final class CollectionHandlers
     {
         if ( _info == null )
             loadInfo();
+            
+        //-- Adjust javaClass for arrays, needed for arrays of
+        //-- primitives, except for byte[] which shouldn't
+        //-- use a collection handler
+        if (javaClass.isArray()) {
+            if (javaClass.getComponentType() != Byte.TYPE)
+                javaClass = Object[].class;
+        }
+            
+        //-- First check direct class equality, to provide a better match 
+        //-- (for example in JDK 1.2 a Vector is also a Collection)
         for ( int i = 0 ; i < _info.length ; ++i )
             if ( _info[ i ].javaClass.equals( javaClass ) )
                 return _info[ i ].handler;
+                
+        //-- handle Possible inheritence
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].javaClass.isAssignableFrom( javaClass ) )
+                return _info[ i ].handler;
+        
+        
         throw new MappingException( "mapping.noCollectionHandler", javaClass.getName() );
     }
 

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -1450,7 +1450,7 @@ public class Schema extends Annotated {
      * @return the namespace prefix associaed with the
      * given namespace.
     **/
-    private String getNamespacePrefix(String namespace) {
+    protected String getNamespacePrefix(String namespace) {
         if (namespace == null) return null;
         Enumeration enum = _namespaces.keys();
         while (enum.hasMoreElements()) {

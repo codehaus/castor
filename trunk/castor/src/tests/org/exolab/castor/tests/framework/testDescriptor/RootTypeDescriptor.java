@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -12,21 +12,15 @@ package org.exolab.castor.tests.framework.testDescriptor;
 //---------------------------------/
 
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.FieldValidator;
 import org.exolab.castor.xml.TypeValidator;
 import org.exolab.castor.xml.XMLFieldDescriptor;
-import org.exolab.castor.xml.handlers.*;
-import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.xml.validators.*;
 
 /**
- * 
+ * Class RootTypeDescriptor.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDescriptor.StringTypeDescriptor {
 
 
@@ -34,12 +28,24 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field nsPrefix
+     */
     private java.lang.String nsPrefix;
 
+    /**
+     * Field nsURI
+     */
     private java.lang.String nsURI;
 
+    /**
+     * Field xmlName
+     */
     private java.lang.String xmlName;
 
+    /**
+     * Field identity
+     */
     private org.exolab.castor.xml.XMLFieldDescriptor identity;
 
 
@@ -52,14 +58,14 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
         setExtendsWithoutFlatten(new org.exolab.castor.tests.framework.testDescriptor.StringTypeDescriptor());
         nsURI = "http://castor.exolab.org/Test";
         xmlName = "RootType";
-        XMLFieldDescriptorImpl  desc           = null;
-        XMLFieldHandler         handler        = null;
-        FieldValidator          fieldValidator = null;
+        org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
+        org.exolab.castor.xml.XMLFieldHandler              handler        = null;
+        org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
         
         //-- _random
-        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_random", "random", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_random", "random", org.exolab.castor.xml.NodeType.Attribute);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -80,7 +86,7 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
                     }
                     target.setRandom( ((Boolean)value).booleanValue());
                 }
-                catch (Exception ex) {
+                catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
@@ -92,16 +98,15 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
         addFieldDescriptor(desc);
         
         //-- validation code for: _random
-        fieldValidator = new FieldValidator();
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
         { //-- local scope
-            BooleanValidator bv = new BooleanValidator();
-            fieldValidator.setValidator(bv);
+            BooleanValidator typeValidator = new BooleanValidator();
+            fieldValidator.setValidator(typeValidator);
         }
         desc.setValidator(fieldValidator);
-        
         //-- _dump
-        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_dump", "dump", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_dump", "dump", org.exolab.castor.xml.NodeType.Attribute);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -122,7 +127,7 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
                     }
                     target.setDump( ((Boolean)value).booleanValue());
                 }
-                catch (Exception ex) {
+                catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
@@ -134,13 +139,12 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
         addFieldDescriptor(desc);
         
         //-- validation code for: _dump
-        fieldValidator = new FieldValidator();
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
         { //-- local scope
-            BooleanValidator bv = new BooleanValidator();
-            fieldValidator.setValidator(bv);
+            BooleanValidator typeValidator = new BooleanValidator();
+            fieldValidator.setValidator(typeValidator);
         }
         desc.setValidator(fieldValidator);
-        
         //-- initialize element descriptors
         
     } //-- org.exolab.castor.tests.framework.testDescriptor.RootTypeDescriptor()
@@ -151,21 +155,24 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
     //-----------/
 
     /**
-    **/
+     * Method getAccessMode
+     */
     public org.exolab.castor.mapping.AccessMode getAccessMode()
     {
         return null;
     } //-- org.exolab.castor.mapping.AccessMode getAccessMode() 
 
     /**
-    **/
+     * Method getExtends
+     */
     public org.exolab.castor.mapping.ClassDescriptor getExtends()
     {
         return super.getExtends();
     } //-- org.exolab.castor.mapping.ClassDescriptor getExtends() 
 
     /**
-    **/
+     * Method getIdentity
+     */
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
         if (identity == null)
@@ -174,35 +181,40 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**
-    **/
+     * Method getJavaClass
+     */
     public java.lang.Class getJavaClass()
     {
         return org.exolab.castor.tests.framework.testDescriptor.RootType.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**
-    **/
+     * Method getNameSpacePrefix
+     */
     public java.lang.String getNameSpacePrefix()
     {
         return nsPrefix;
     } //-- java.lang.String getNameSpacePrefix() 
 
     /**
-    **/
+     * Method getNameSpaceURI
+     */
     public java.lang.String getNameSpaceURI()
     {
         return nsURI;
     } //-- java.lang.String getNameSpaceURI() 
 
     /**
-    **/
+     * Method getValidator
+     */
     public org.exolab.castor.xml.TypeValidator getValidator()
     {
         return this;
     } //-- org.exolab.castor.xml.TypeValidator getValidator() 
 
     /**
-    **/
+     * Method getXMLName
+     */
     public java.lang.String getXMLName()
     {
         return xmlName;

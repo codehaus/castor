@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -15,16 +15,17 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.ContentHandler;
 
 /**
- * 
+ * Class TestDescriptorChoice.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class TestDescriptorChoice implements java.io.Serializable {
 
 
@@ -32,11 +33,20 @@ public class TestDescriptorChoice implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
-    private SourceGeneratorTest _sourceGeneratorTest;
+    /**
+     * Field _sourceGeneratorTest
+     */
+    private org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest _sourceGeneratorTest;
 
-    private MarshallingTest _marshallingTest;
+    /**
+     * Field _marshallingTest
+     */
+    private org.exolab.castor.tests.framework.testDescriptor.MarshallingTest _marshallingTest;
 
-    private SchemaTest _schemaTest;
+    /**
+     * Field _schemaTest
+     */
+    private org.exolab.castor.tests.framework.testDescriptor.SchemaTest _schemaTest;
 
 
       //----------------/
@@ -53,37 +63,40 @@ public class TestDescriptorChoice implements java.io.Serializable {
     //-----------/
 
     /**
-     * Returns the value of field 'marshallingTest'.
+     * Method getMarshallingTestReturns the value of field
+     * 'marshallingTest'.
      * 
      * @return the value of field 'marshallingTest'.
-    **/
-    public MarshallingTest getMarshallingTest()
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.MarshallingTest getMarshallingTest()
     {
         return this._marshallingTest;
-    } //-- MarshallingTest getMarshallingTest() 
+    } //-- org.exolab.castor.tests.framework.testDescriptor.MarshallingTest getMarshallingTest() 
 
     /**
-     * Returns the value of field 'schemaTest'.
+     * Method getSchemaTestReturns the value of field 'schemaTest'.
      * 
      * @return the value of field 'schemaTest'.
-    **/
-    public SchemaTest getSchemaTest()
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.SchemaTest getSchemaTest()
     {
         return this._schemaTest;
-    } //-- SchemaTest getSchemaTest() 
+    } //-- org.exolab.castor.tests.framework.testDescriptor.SchemaTest getSchemaTest() 
 
     /**
-     * Returns the value of field 'sourceGeneratorTest'.
+     * Method getSourceGeneratorTestReturns the value of field
+     * 'sourceGeneratorTest'.
      * 
      * @return the value of field 'sourceGeneratorTest'.
-    **/
-    public SourceGeneratorTest getSourceGeneratorTest()
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest getSourceGeneratorTest()
     {
         return this._sourceGeneratorTest;
-    } //-- SourceGeneratorTest getSourceGeneratorTest() 
+    } //-- org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest getSourceGeneratorTest() 
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -96,10 +109,10 @@ public class TestDescriptorChoice implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -108,10 +121,10 @@ public class TestDescriptorChoice implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param handler
-    **/
+     */
     public void marshal(org.xml.sax.ContentHandler handler)
         throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -120,41 +133,43 @@ public class TestDescriptorChoice implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Sets the value of field 'marshallingTest'.
+     * Method setMarshallingTestSets the value of field
+     * 'marshallingTest'.
      * 
      * @param marshallingTest the value of field 'marshallingTest'.
-    **/
-    public void setMarshallingTest(MarshallingTest marshallingTest)
+     */
+    public void setMarshallingTest(org.exolab.castor.tests.framework.testDescriptor.MarshallingTest marshallingTest)
     {
         this._marshallingTest = marshallingTest;
-    } //-- void setMarshallingTest(MarshallingTest) 
+    } //-- void setMarshallingTest(org.exolab.castor.tests.framework.testDescriptor.MarshallingTest) 
 
     /**
-     * Sets the value of field 'schemaTest'.
+     * Method setSchemaTestSets the value of field 'schemaTest'.
      * 
      * @param schemaTest the value of field 'schemaTest'.
-    **/
-    public void setSchemaTest(SchemaTest schemaTest)
+     */
+    public void setSchemaTest(org.exolab.castor.tests.framework.testDescriptor.SchemaTest schemaTest)
     {
         this._schemaTest = schemaTest;
-    } //-- void setSchemaTest(SchemaTest) 
+    } //-- void setSchemaTest(org.exolab.castor.tests.framework.testDescriptor.SchemaTest) 
 
     /**
-     * Sets the value of field 'sourceGeneratorTest'.
+     * Method setSourceGeneratorTestSets the value of field
+     * 'sourceGeneratorTest'.
      * 
      * @param sourceGeneratorTest the value of field
      * 'sourceGeneratorTest'.
-    **/
-    public void setSourceGeneratorTest(SourceGeneratorTest sourceGeneratorTest)
+     */
+    public void setSourceGeneratorTest(org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest sourceGeneratorTest)
     {
         this._sourceGeneratorTest = sourceGeneratorTest;
-    } //-- void setSourceGeneratorTest(SourceGeneratorTest) 
+    } //-- void setSourceGeneratorTest(org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest) 
 
     /**
-     * 
+     * Method unmarshal
      * 
      * @param reader
-    **/
+     */
     public static org.exolab.castor.tests.framework.testDescriptor.TestDescriptorChoice unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -162,7 +177,8 @@ public class TestDescriptorChoice implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.TestDescriptorChoice unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {

@@ -2,6 +2,64 @@
 Version (CVS) 
 -------------
 
+Version 0.9.4.3, February 12, 2003
+----------------------------------
+
+XML:    Fixed the handling of include in the binding file. Problem reported
+        by Brett Ramdeen [bramdeen@certapay.com] 
+        (Arnaud - 20030210)
+ 
+JDO:    Fixed Bug 1151 : Use Complex primary key crashed
+        (Mickael - 20030207)
+
+XML:    Fixed issue when processing the annotations of element and attribute 
+        references for creating Javadoc. If local annoations do not exist,
+        then the annotations from the referenced declaration is used.
+        (kvisco - 20030206)
+
+XML:    Fixed bug 1195: support for unbounded XML Schema int types was broken.
+        (Arnaud - 20030205)
+
+XML:    Source Generator: The '-type' command line parameter now allows a fully 
+        qualified class name as an input. This class must extend FieldInfoFactory.
+        (Arnaud - 20030205)
+
+XML:    Fixed issue with attribute references and AttributeDecl#getUse() 
+        incorrectly following the reference to obtain the value from the 
+        referenced AttributeDecl. Attribute references specify the "use"
+        value, top-level elements do not.
+        (kvisco - 20030204)
+
+XML:    Fixed bug #1193: Decimal validation was not handling correctly min/maxExclusive.
+        Reported by ahoeltje@extensity.com
+        (Arnaud - 20030203)
+
+XML:    Fixed bug #1180: URIResolver wasn't resolving correctly the relative paths.
+        Patch submitted by Erik Ostermueller.
+        (Arnaud - 20030203)
+
+XML:    Fixed issue with AttributeDecl#getName not returning an NCName.
+        Added AttributeDecl#getReferenceName to return the full QName.
+        Also added ElementDecl#getReferenceName.
+        (kvisco - 20030129)
+ 
+XML:    Fixed bug #1182: Schema with no targetNamespace is producing
+        incorrect package information for member variables of enumerated 
+        types. Reported by [bryan@skyauction.com].
+        (kvisco - 20030124)
+
+XML:    Added new options in the CTF XML to specify a binding file and to allow
+        the processing of several XML Schemas. Regenerate the CTF object model.
+        (Arnaud - 20030119)
+
+JDO:    Fixed bug #1184 Unprotected call to potentially null object
+        report by Graham Bygrave [Graham.Bygrave@BarclaysGlobal.com]
+        (Bruce - 20030122)
+
+XML:    Improved DateFieldHandler parsing routines. Removed the use
+        of SimpleDateFormat.
+        (kvisco - 20030119)
+
 Version 0.9.4.2  January 16, 2003
 ----------------------------------
 

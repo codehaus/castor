@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -117,7 +117,7 @@ public class TypeInfo
      * @param fieldType The field type
     **/
     public TypeInfo(Class fieldType) {
-        this(fieldType, null, null, null, false, null, null );
+        this(fieldType, null, null, null, false, null, null, true );
     } //-- TypeInfo
 
     
@@ -138,7 +138,8 @@ public class TypeInfo
     public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,
                      boolean required, Object defaultValue, CollectionHandler colHandler )
     {
-        this(fieldType, convertorTo, convertorFrom, null, required, defaultValue, colHandler );
+        this(fieldType, convertorTo, convertorFrom, 
+            null, required, defaultValue, colHandler, true );
     }
 
 
@@ -162,19 +163,53 @@ public class TypeInfo
                      String convertorParam, boolean required, Object defaultValue,
                      CollectionHandler colHandler )
     {
+        this(fieldType, convertorTo, convertorFrom, 
+            convertorParam, required, defaultValue, colHandler, true);
+    }
+    
+    /**
+     * Construct new type information for the field.
+     *
+     * @param fieldType The field type
+     * @param convertorTo Convertor to the field type from external
+     *  type, or null if no conversion is required
+     * @param convertorFrom Convertor from the field type to external
+     *  type, or null if no conversion is required
+     * @param convertorParam Optional parameter for the convertor,
+     *  or null if either no conversion is required or no parameter is specified
+     * @param required True if the field is required
+     * @param defaultValue The default value of the field, null to
+     *  use the known Java defaults
+     * @param colHandler The collection handler for this field, or null if
+     *  field is singular
+     */
+    public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,
+                     String convertorParam, boolean required, Object defaultValue,
+                     CollectionHandler colHandler, boolean checkForCollection )
+    {
 
-        if (colHandler == null) {            
+        if ((colHandler == null) && checkForCollection) {
+            
             if (fieldType.isArray()) {
-                try {
-                    colHandler = CollectionHandlers.getHandler(Object[].class);
-                } catch (Exception e) {
-                    throw new NullPointerException("Impossible to locate CollectionHandler for array.");
+                //-- byte[] should not use a CollectionHandler since it
+                //-- needs to be base64 encoded/decoded.
+                if (fieldType.getComponentType() != Byte.TYPE) {
+                    try {
+                        colHandler = CollectionHandlers.getHandler(Object[].class);
+                    } 
+                    catch (Exception e) {
+                        //-- If we make it here, there was probably something wrong
+                        //-- with loading the J1CollectionHandlers class...
+                        throw new NullPointerException("Impossible to locate CollectionHandler for array.");
+                    }
                 }
                 
-            } else {
+            } 
+            else {
                 try {
                     colHandler = CollectionHandlers.getHandler(fieldType);
-                } catch (Exception e) {
+                } 
+                catch (Exception e) {
                     // NOOP : It just mean that there is not handler for the collection
                     // and that this fieldType is not a collection
                 }
@@ -291,6 +326,18 @@ public class TypeInfo
     public void setRequired(boolean required) {
         this._required = required;
     } //-- setRequired
-}
+    
+    /**
+     * Sets the CollectionHandler to use for the field
+     * described by this TypeInfo.
+     *
+     * @param handler the CollectionHandler, or null if no
+     * CollectionHandler should be used.
+     */
+    public void setCollectionHandler(CollectionHandler handler) {
+        _colHandler = handler;
+    } //-- setCollectionHandler
+    
+} 
 
 
