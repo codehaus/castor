@@ -160,17 +160,19 @@ public class EnumFieldHandler implements FieldHandler {
         throws java.lang.IllegalStateException
     {
         String[] args = new String[1];
-        if (value != null) args[0] = value.toString();
         Object obj = null;
-        try {
-            obj = valueOf.invoke(null, args);
-        }
-        catch(java.lang.reflect.InvocationTargetException ite) {
-            Throwable toss = ite.getTargetException();
-            throw new IllegalStateException(toss.toString());
-        }
-        catch(java.lang.IllegalAccessException iae) {
-            throw new IllegalStateException(iae.toString());
+        if (value != null) {
+            args[0] = value.toString();
+            try {
+                obj = valueOf.invoke(null, args);
+            }
+            catch(java.lang.reflect.InvocationTargetException ite) {
+                Throwable toss = ite.getTargetException();
+                throw new IllegalStateException(toss.toString());
+            }
+            catch(java.lang.IllegalAccessException iae) {
+                throw new IllegalStateException(iae.toString());
+            }
         }
         handler.setValue(target, obj);
 
