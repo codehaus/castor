@@ -66,12 +66,16 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 
 		String include = atts.getValue("schemaLocation");
 		if (include==null)
-			throw new SAXException("'schemaLocation' attribute missing on 'include'");
+			throw new SAXException("'include' attribute missing on 'include'");
         //if the path is relative Xerces append the "user.Dir"
         //we need to keep the base directory of the document
         // note: URI not supported (just system path)
         if (!new java.io.File(include).isAbsolute()) {
              String temp = locator.getSystemId();
+             if (include.startsWith("./"))
+                include = include.substring(2);
+             if (include.startsWith("/"))
+                include = include.substring(1);
              if (temp != null) {
                 //remove 'file://'
                 temp = temp.substring(7);
@@ -80,7 +84,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
                 temp = temp.substring(0,temp.lastIndexOf('/')+1);
                 include = temp + include;
                 temp = null;
-             }
+            }
         }
 
         if (schema.includeProcessed(include))
@@ -105,7 +109,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		}
 
 		try {
-		    parser.parse(new InputSource(include));
+            parser.parse(new InputSource(include));
 		}
 		catch(java.io.IOException ioe) {
 		    throw new SAXException("Error reading include file '"+include+"'");

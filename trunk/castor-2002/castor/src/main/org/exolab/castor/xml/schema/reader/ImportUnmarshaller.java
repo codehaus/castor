@@ -73,6 +73,10 @@ public class ImportUnmarshaller extends SaxUnmarshaller
         if (!new java.io.File(schemalocation).isAbsolute()) {
              String temp = locator.getSystemId();
              if (temp != null) {
+               if (schemalocation.startsWith("./"))
+                  schemalocation = schemalocation.substring(2);
+               if (schemalocation.startsWith("/"))
+                  schemalocation = schemalocation.substring(1);
                 //remove 'file://'
                 temp = temp.substring(7);
                 if (java.io.File.separatorChar =='\\')
