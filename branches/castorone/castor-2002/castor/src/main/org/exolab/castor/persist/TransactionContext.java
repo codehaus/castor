@@ -125,10 +125,10 @@ public abstract class TransactionContext
 
     /**
      * Collection of objects accessed during this transaction.
-     * The object is used as key and {@link ObjectEntry} is the value.
+     * Actually the vector contains instances of {@link ObjectEntry}.
      * @see #addObjectEntry
      */
-    private final Hashtable   _objects = new Hashtable();
+    private final Vector  _objects = new Vector();
 
 
     /**
@@ -138,6 +138,18 @@ public abstract class TransactionContext
      * is the key and {@link ObjectEntry} is the value.
      */
     private final Hashtable   _engineOids = new Hashtable();
+
+
+    /**
+     * Collection of objects loaded in read-only mode during this transaction.
+     * They are not persistent anymore, but we have to keep them in order
+     * to provide uniqueness of objects. E.g., if one depenent object
+     * contains reference to another one, the latter shouldn't be loaded twice.
+     * In the hashtable {@link OID} is the key and {@link ObjectEntry}
+     * is the value.
+     * @see #addObjectEntry
+     */
+    private final Hashtable  _readOnlyObjects = new Hashtable();
 
 
     /**
@@ -281,7 +293,7 @@ public abstract class TransactionContext
     public synchronized Object fetch( LockEngine engine, ClassMolder molder, 
             Object[] identities, AccessMode accessMode ) 
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
-        ObjectEntry entry;
+        ObjectEntry entry = null;
         OID         oid;
         System.out.println("Tx.fetch() class: "+molder.getJavaClass().getName()+" : "+OID.flatten( identities ));
 
@@ -289,7 +301,10 @@ public abstract class TransactionContext
             throw new PersistenceException("Identities can't be null!");
 
         oid = new OID( engine, molder, identities );
-        entry = getObjectEntry( engine, oid );
+        if ( accessMode == AccessMode.ReadOnly )
+            entry = getReadOnlyObjectEntry( oid );
+        if ( entry == null )
+            entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
             // If the object has been loaded in this transaction from a
             // different engine this is an error. If the object has been
@@ -300,7 +315,7 @@ public abstract class TransactionContext
                 throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getJavaClass(), OID.flatten( identities )) );
             if ( entry.deleted )
                 //throw new ObjectNotFoundException( molder.getJavaClass(), OID.flatten( identities ) );
-				return null;
+                return null;
             if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getJavaClass(), OID.flatten( identities )) );
             if ( entry.created )
@@ -400,7 +415,7 @@ public abstract class TransactionContext
         try {
             if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
-                molder.getCallback().loaded( object );
+                molder.getCallback().loaded( object, accessMode.toShort() );
             }
         } catch ( Exception except ) {
             removeObjectEntry( object );
@@ -413,9 +428,9 @@ public abstract class TransactionContext
         }
 
         if ( accessMode == AccessMode.ReadOnly ) {
-            removeObjectEntry( entry.object );
+            makeReadOnly( object );
         }
-		System.out.println("new instance (return): "+object);
+        System.out.println("new instance (return): "+object);
         return object;
     }
 
@@ -481,7 +496,7 @@ public abstract class TransactionContext
         if ( entry != null && ! entry.deleted ) {
             throw new PersistenceException( Messages.format("persist.objectAlreadyPersistent", object.getClass().getName(), OID.flatten(entry.oid.getIdentities())) );
         }
-		/*
+        /*
         if ( depended != null ) {
             Object[] dependedIds  = depended.getIdentities();
             Object[] tempIds = identities;
@@ -567,8 +582,8 @@ public abstract class TransactionContext
      * transaction.
      *
      * @param engine The persistence engine
+     * @param molder The object's molder
      * @param object The object to persist
-     * @param identity The object's identity (may be null)
      * @return The object's OID
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
@@ -576,38 +591,62 @@ public abstract class TransactionContext
      *  persistence engine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long 
+     *  transaction.
      */
-     /*
-    public synchronized OID update( Object object )
-            throws DuplicateIdentityException, PersistenceException {
+    public synchronized OID update( LockEngine engine, ClassMolder molder, Object object)
+        throws DuplicateIdentityException, ObjectModifiedException,
+               ClassNotPersistenceCapableException, PersistenceException
+    {
+        Object[]     identities;
         OID          oid;
         ObjectEntry  entry;
-        Object       identity;
+        AccessMode   accessMode = null;
 
-        // Make sure the object has not beed persisted in this transaction.
-        entry = getObjectEntry( object );
+        identities = molder.getIdentities( object );
+
+        // Make sure that nobody is looking at the object
+        oid = new OID( engine, molder, identities );
+        entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
             if ( entry.deleted )
-                throw new ObjectDeletedException( object.getClass(), identity );
-            throw new PersistenceException( "persist.objectAlreadyPersistent", object.getClass(), identity );
+                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass(), OID.flatten(identities) ) );
+            // to prevent circular references
+            if ( entry.object == object ) 
+                return oid;
+            //[Oleg] in some cases (deletion of dependent objects) objects
+            //that were previously loaded in this transaction by the same 
+            //update() call must be replaced. Thus, we must allow this.
+            //I don't see other way.
+            release( entry.object );
+            //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
 
-        identity = entry.molder.getIdentity( object );
-        if ( identity == null )
-            throw new PersistenceException( "persist.noIdentity" );
+        // to prevent circular references
+        addObjectEntry( oid, object );
+        accessMode = molder.getAccessMode( accessMode );
+        oid = engine.update( this, oid.getJavaClass(), object, accessMode, _lockTimeout );
 
-        // Update the object. This can only happen once for each object in
-        // all transactions running on the same engine, so after updating
-        // add a new entry for this object and use this object as the view
+        // If the object isn't found in the cache, then attempt to create it.
+        if ( oid == null ) {
+            removeObjectEntry( object );
+            return create( engine, molder, object, null );
+        }
 
-        oid = new OID( entry.molder, identity );
-        if ( getObjectEntry( engine, oid ) != null )
-            throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
-        entry = addObjectEntry( engine, molder, oid, object );
-        if ( entry.molder.getCallback() != null )
-            entry.molder.getCallback().using( object, _db );
+        try {
+            if ( molder.getCallback() != null ) {
+                molder.getCallback().using( object, _db );
+                molder.getCallback().updated( object );
+            }
+        } catch ( Exception except ) {
+            release( object );
+            if ( except instanceof PersistenceException )
+                throw (PersistenceException) except;
+            throw new PersistenceException( except.getMessage(), except );
+        }
         return oid;
-    } */
+    }
 
 
     /**
@@ -968,8 +1007,9 @@ public abstract class TransactionContext
         }
         // Forget about all the objects in this transaction,
         // and mark it as completed.
-        _objects.clear();
+        _objects.removeAllElements();
         _engineOids.clear();
+        _readOnlyObjects.clear();
         _status = Status.STATUS_COMMITTED;
     }
 
@@ -1022,8 +1062,9 @@ public abstract class TransactionContext
 
         // Forget about all the objects in this transaction,
         // and mark it as completed.
-        _objects.clear();
+        _objects.removeAllElements();
         _engineOids.clear();
+        _readOnlyObjects.clear();
         while ( _deletedList != null ) {
             entry = _deletedList;
             _deletedList = entry.nextDeleted;
@@ -1049,19 +1090,19 @@ public abstract class TransactionContext
 
 
 
-	public boolean isDepended( OID master, Object dependent ) {
-		ObjectEntry entry;
-		OID depends;
+    public boolean isDepended( OID master, Object dependent ) {
+        ObjectEntry entry;
+        OID depends;
 
-		entry = getObjectEntry( dependent );
-		if ( entry == null )
-			return false;
-		depends = entry.oid.getDepends();
-		if ( depends == null )
-			return false;
-		
-		return depends.equals( master );
-	}
+        entry = getObjectEntry( dependent );
+        if ( entry == null )
+            return false;
+        depends = entry.oid.getDepends();
+        if ( depends == null )
+            return false;
+        
+        return depends.equals( master );
+    }
     /**
      * Returns the object's identity. If the identity was determined when
      * the object was created, or if the object was retrieved, that identity
@@ -1201,7 +1242,7 @@ public abstract class TransactionContext
 
         entry = new ObjectEntry( engine, molder, oid, object );
         entry.oid = oid;
-        _objects.put( object, entry );
+        _objects.addElement( entry );
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null ) {
             engineOids = new Hashtable();
@@ -1241,7 +1282,14 @@ public abstract class TransactionContext
      */
     ObjectEntry getObjectEntry( Object object )
     {
-        return (ObjectEntry) _objects.get( object );
+        ObjectEntry entry;
+
+        for ( Enumeration enum = _objects.elements(); enum.hasMoreElements(); ) {
+            entry = (ObjectEntry) enum.nextElement();
+            if ( entry.object == object )
+                return entry;
+        }
+        return null;
     }
 
 
@@ -1254,15 +1302,46 @@ public abstract class TransactionContext
      */
     ObjectEntry removeObjectEntry( Object object )
     {
+        int size;
         ObjectEntry entry;
 
-        entry = (ObjectEntry) _objects.remove( object );
-        if ( entry == null )
-            return null;
-        ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
-        return entry;
+        size = _objects.size();
+        for ( int i = 0; i < size; i++ ) {
+            entry = (ObjectEntry) _objects.elementAt( i );
+            if ( entry.object == object ) {
+                _objects.removeElementAt( i );
+                ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
+                return entry;
+            }
+        }
+        return null;
     }
 
+
+    /**
+     * Makes the object read-only: move it to the hashtable of readonly objects
+     * The object must be already in the transaction.
+     * Readonly objects should be unique in bounds of the transaction,
+     * otherwise they may be loaded twice (e.g.: one dependent object
+     * contains reference to another).
+     */
+    void makeReadOnly( Object object )
+    {
+        ObjectEntry entry;
+
+        entry = removeObjectEntry( object );
+        if ( entry == null )
+            throw new IllegalStateException( Messages.format( "persist.internal",
+                                                              "Attempt to make read-only object that is not in transaction" ) );
+        _readOnlyObjects.put( entry.oid, entry );
+        entry.engine.releaseLock( this, entry.oid );
+    }
+
+
+    ObjectEntry getReadOnlyObjectEntry( OID oid )
+    {
+        return (ObjectEntry) _readOnlyObjects.get( oid );
+    }
 
     /**
      * A transaction records all objects accessed during the lifetime

@@ -216,14 +216,26 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );
-        if ( lp1 < 0 || lp2 < 0 ) {
+        if ( lp1 < 0 ) {
             throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
                                                          insert ) );
         }
         sb = new StringBuffer( insert );
-        // don't change insert order, otherwise index becomes invalid
-        sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
-        sb.insert( lp1 + 1, primKeyName + "," );
+        if ( lp2 < 0 ) {
+            // Only one pk field in the table, the INSERT statement would be
+            // INSERT INTO table VALUES ()
+            lp2 = lp1;
+            lp1 = insert.indexOf( " VALUES " );
+            // don't change the order of lines below,
+            // otherwise index becomes invalid
+            sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ));
+            sb.insert( lp1 + 1, "(" + _factory.quoteName( primKeyName ) + ") " );
+        } else {
+            // don't change the order of lines below,
+            // otherwise index becomes invalid
+            sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
+            sb.insert( lp1 + 1, _factory.quoteName( primKeyName ) + "," );
+        }
         if ( _style == DURING_INSERT ) {
             // append 'RETURNING primKeyName INTO ?'
             sb.append( " RETURNING " );

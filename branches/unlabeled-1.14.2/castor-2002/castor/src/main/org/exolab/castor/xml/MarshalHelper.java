@@ -180,6 +180,8 @@ public class MarshalHelper {
                     TypeInfo typeInfo = new TypeInfo(type);
                     try {
                         handler = new FieldHandlerImpl(fieldName,
+                                                       null,
+                                                       null,
                                                        method,
                                                        null, 
                                                        typeInfo);
@@ -242,6 +244,8 @@ public class MarshalHelper {
                     TypeInfo typeInfo = new TypeInfo(type);
                     try {
                         handler = new FieldHandlerImpl(fieldName,
+                                                       null,
+                                                       null,
                                                        null,
                                                        method, 
                                                        typeInfo);
@@ -324,7 +328,7 @@ public class MarshalHelper {
         
         if (( !type.isInterface() || (type == Object.class))) {
             
-            if (!type.isPrimitive()) {
+            if (!isPrimitive(type)) {
                 
                 //-- make sure type is serializable
                 // if (!Serializable.class.isAssignableFrom( type ))
@@ -395,36 +399,66 @@ public class MarshalHelper {
         
         //-- I tried to order these in the order in which
         //-- (I think) types are used more frequently
+        
+        boolean isNull = ((value == null) || (value.length() == 0));
+        
         // int
         if ((type == Integer.TYPE) || (type == Integer.class)) {
-            primitive = new Integer(value);
+            if (isNull)
+                primitive = new Integer(0);
+            else
+                primitive = new Integer(value);
         }
         // boolean
-        else if ((type == Boolean.TYPE) || (type == Boolean.class))
-            primitive = new Boolean(value);
+        else if ((type == Boolean.TYPE) || (type == Boolean.class)) {
+            if (isNull)
+                primitive = new Boolean(false);
+            else
+                primitive = new Boolean(value);
+        }
         // double
-        else if ((type == Double.TYPE) || (type == Double.class))
-            primitive = new Double(value);
+        else if ((type == Double.TYPE) || (type == Double.class)) {
+            if (isNull)
+                primitive = new Double(0.0);
+            else
+                primitive = new Double(value);
+        }
         // long
-        else if ((type == Long.TYPE) || (type == Long.class))
-            primitive = new Long(value);
+        else if ((type == Long.TYPE) || (type == Long.class)) {
+            if (isNull)
+                primitive = new Long(0);
+            else
+                primitive = new Long(value);
+        }
         // char
         else if (type == Character.TYPE) {
-            if (value.length() > 0)
+            if (!isNull)
                 primitive = new Character(value.charAt(0));
             else 
                 primitive = new Character('\0');
         }
         // short
-        else if ((type == Short.TYPE) || (type == Short.class))
-            primitive = new Short(value);
+        else if ((type == Short.TYPE) || (type == Short.class)) {
+            if (isNull)
+                primitive = new Short((short)0);
+            else 
+                primitive = new Short(value);
+        }
         // float
-        else if ((type == Float.TYPE) || (type == Float.class))
-            primitive = new Float(value);
+        else if ((type == Float.TYPE) || (type == Float.class)) {
+            if (isNull)
+                primitive = new Float((float)0);
+            else
+                primitive = new Float(value);
+        }
         // byte
-        else if (type == Byte.TYPE)
-            primitive = new Byte(value);
-        // do nothing
+        else if (type == Byte.TYPE) {
+            if (isNull)
+                primitive = new Byte((byte)0);
+            else
+                primitive = new Byte(value);
+        }
+        // otherwise do nothing
         else 
             primitive = value;
         
@@ -511,7 +545,7 @@ public class MarshalHelper {
         
         if ( (!type.isInterface())  && 
              (type != Object.class) &&
-             (!type.isPrimitive())) {
+             (!isPrimitive(type))) {
             
             //-- make sure type is serializable
             //if (!Serializable.class.isAssignableFrom( type ))
@@ -532,5 +566,29 @@ public class MarshalHelper {
         }
         return true;
     } //-- isDescriptable
+
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    private static boolean isPrimitive(Class type) {
+
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class)   ||
+            (type == Byte.class)      ||
+            (type == Character.class) ||
+            (type == Double.class)    ||
+            (type == Float.class)     ||
+            (type == Integer.class)   ||
+            (type == Long.class)      ||
+            (type == Short.class)) 
+            return true;
+            
+       return false;
+       
+    } //-- isPrimitive
     
 } //-- MarshalHelper

@@ -134,5 +134,9 @@ public class OutputLogInterceptor
     }
 
 
+    public PrintWriter getPrintWriter() {
+        return _writer;
+    }
+
 }
 

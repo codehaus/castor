@@ -135,23 +135,21 @@ public class Persistent
             parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
             if ( parent != null ) {
                 if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
-                     ! parent.getChildren().contains( new TestPersistent( 71 ) ) ||
-                     ! parent.getChildren().contains( new TestPersistent( 72 ) ) ||
-                     ! parent.getChildren().contains( new TestPersistent( 73 ) ) ) {
-                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );					
+                     parent.findChild( 71 ) == null ||
+                     parent.findChild( 72 ) == null ||
+                     parent.findChild( 73 ) == null ) {
+                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );
                     result  = false;
-                } else {
-	                child = parent.findChild( 73 );
-	                if ( child == null || child.getChildren() == null || 
-	                     child.getChildren().size() != 2 ||
-	                     ! child.getChildren().contains( new TestPersistent( 731 ) ) ||
-	                     ! child.getChildren().contains( new TestPersistent( 732 ) ) ) {
-	                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
-	                    result  = false;
-	                } else {
-						child.setValue("new value");
-					}
-				}
+                }
+                child = parent.findChild( 73 );
+                if ( child == null || child.getChildren() == null || 
+                     child.getChildren().size() != 2 ||
+                     child.findChild( 731 ) == null ||
+                     child.findChild( 732 ) == null ) {
+                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
+                    result  = false;
+                }
+                child.setValue("new value");
             } else {
                 stream.writeVerbose( "Error: failed to create parent with children" );
                 result = false;
@@ -162,7 +160,8 @@ public class Persistent
             db.commit();
             afterModTime = System.currentTimeMillis() / 1000;
             db.begin();
-            child = (TestPersistent) db.load( TestPersistent.class, new Integer( 73 ) );
+            parent = (TestPersistent) db.load( TestPersistent.class, new Integer( 7 ) );
+            child = parent.findChild( 73 );
             if ( child == null ) {
                 stream.writeVerbose( "Error: child not loaded" );
                 result  = false;
@@ -177,6 +176,57 @@ public class Persistent
                 }
             }
             db.commit();
+
+            stream.writeVerbose( "Long transaction test" );
+            parent.setValue( "long transaction parent" );
+            parent.getChildren().removeElement( parent.findChild( 71 ) );
+            child = new TestPersistent( 74 );
+            child.setValue( "long transaction child" );
+            child.addChild( new TestPersistent( 741 ) );
+            parent.addChild( child );
+            parent.findChild( 73 ).getChildren().removeElement(
+                    parent.findChild( 73 ).findChild( 731 ) );
+            parent.findChild( 73 ).addChild( new TestPersistent( 733 ) );
+            db.begin();
+            db.update( parent );
+            db.commit();
+            db.begin();
+            parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
+            if ( parent != null ) {
+                if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
+                     ! "long transaction parent".equals( parent.getValue() ) ||
+                     parent.findChild( 71 ) != null ||
+                     parent.findChild( 72 ) == null ||
+                     parent.findChild( 73 ) == null ||
+                     parent.findChild( 74 ) == null ) {
+                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );
+                    result  = false;
+                }
+                child = parent.findChild( 73 );
+                if ( child == null || child.getChildren() == null || 
+                     child.getChildren().size() != 2 ||
+                     child.findChild( 731 ) != null ||
+                     child.findChild( 732 ) == null ||
+                     child.findChild( 733 ) == null ) {
+                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
+                    result  = false;
+                }
+                child = parent.findChild( 74 );
+                if ( child == null || child.getChildren() == null || 
+                     child.getChildren().size() != 1 ||
+                     ! "long transaction child".equals( child.getValue() ) ||
+                     child.findChild( 741 ) == null ) {
+                    stream.writeVerbose( "Error: loaded child without one grandchildren: " + child );
+                    result  = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to create parent with children" );
+                result = false;
+            }
+            if ( result )
+                stream.writeVerbose( "Created parent with children: " + parent );
+            db.commit();
+
             if ( ! result )
                 return false;
 

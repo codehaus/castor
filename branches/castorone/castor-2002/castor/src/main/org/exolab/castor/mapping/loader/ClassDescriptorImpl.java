@@ -146,6 +146,19 @@ public class ClassDescriptorImpl
             _identities = identities;
         }
 
+        // fritz: propagate containing class to fields
+        // oleg: don't alter the identity's info if the identity was taken
+        // from the ancestor class.
+        // So complicated condition is needed since for JDO fields first a pure
+        // ClassDescriptorImpl is created, and then JDOClassDescriptorImpl for
+        // the same class
+        if ( _identities != null && ( _identities[0].getContainingClassDescriptor() == null ||
+                                      _identities[0].getContainingClassDescriptor().getJavaClass() == _javaClass ) ) {
+            for ( int i = 0; i < _identities.length; i++ )
+                _identities[i].setContainingClassDescriptor( this );
+        }
+        for ( int i = 0; i < _fields.length; i++ )
+            _fields[i].setContainingClassDescriptor( this );
     }
 
     public ClassMapping getMapping() {

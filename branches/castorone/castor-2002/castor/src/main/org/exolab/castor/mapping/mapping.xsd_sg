@@ -18,7 +18,7 @@
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="include" minOccurs="0" />
       <element ref="many-to-many" minOccurs="0" />
-      <element ref="class-mapping" minOccurs="1" />
+      <element ref="class-mapping" minOccurs="0" />
       <element ref="key-generator-def" minOccurs="0" />
     </type>
   </element>
@@ -92,10 +92,10 @@
       <attribute name="collection" type="string" minOccurs="0">
         <enumeration value="array"/>
         <enumeration value="vector"/>
-	<enumeration value="hashtable"/>
-	<enumeration value="collection"/>
-	<enumeration value="set"/>
-	<enumeration value="map"/>
+    <enumeration value="hashtable"/>
+    <enumeration value="collection"/>
+    <enumeration value="set"/>
+    <enumeration value="map"/>
         <enumeration value="enumerate"/>
       </attribute>
       <attribute name="transient" type="boolean" minOccurs="0" default="false"/>

@@ -47,6 +47,9 @@
 package org.exolab.castor.persist.spi;
 
 
+import java.io.PrintWriter;
+
+
 /**
  * A log interceptor recieves notifications on various events that
  * occur in the persistence layer is responsible for reporting them.
@@ -164,6 +167,12 @@ public interface LogInterceptor
      * @param exception The exception
      */
     public void exception( Exception except );
+
+
+    /**
+     * Returns the PrintWriter for this LogInterceptor
+     */
+    public PrintWriter getPrintWriter();
 
 
 }

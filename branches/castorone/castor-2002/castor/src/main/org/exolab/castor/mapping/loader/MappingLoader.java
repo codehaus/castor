@@ -117,7 +117,6 @@ public abstract class MappingLoader
     private ClassLoader _loader;
 
 
-
     public static final ClassDescriptor NoDescriptor = new ClassDescriptorImpl( Class.class );
 
 
@@ -243,7 +242,8 @@ public abstract class MappingLoader
 
             clsMap = (ClassMapping) enum.nextElement();
             clsDesc = createDescriptor( clsMap );
-            addDescriptor( clsDesc );
+            if ( clsDesc != NoDescriptor )
+                addDescriptor( clsDesc );
             // If the return value is NoDescriptor then the derived
             // class was not successful in constructing a descriptor.
             if ( clsDesc == NoDescriptor && _logWriter != null ) {
@@ -567,6 +567,8 @@ public abstract class MappingLoader
         String            fieldName;
         Method            getMethod = null;
         Method            setMethod = null;
+        Method[]          getSequence = null;
+        Method[]          setSequence = null;
 
 
         // Set RelationDescriptor for the field
@@ -596,12 +598,13 @@ public abstract class MappingLoader
             }
         }
 
+        fieldName = fieldMap.getName();
+
         // If get/set methods not specified, use field names to determine them.
         if ( fieldMap.getDirect() ) {
             // No accessor, map field directly.
             Field field; 
             
-            fieldName = fieldMap.getName();
             field = findField( javaClass, fieldName, ( colType == null ? fieldType : colType ) );
             if ( field == null )
                 throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
@@ -611,24 +614,72 @@ public abstract class MappingLoader
             handler = new FieldHandlerImpl( field, typeInfo );
         } else {
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
+                int    point;
+                Vector getSeq = new Vector();
+                Vector setSeq = new Vector();
+                String methodName;
+                Method method;
                 
-                if ( fieldMap.getName() == null )
+                if ( fieldName == null )
                     throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
-                getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
-                                          ( colType == null ? fieldType : colType ), true );
-                if ( getMethod == null );
+
+                try {
+                    while ( true ) {
+                        Class last;
+
+                        point = fieldName.indexOf( '.' );
+                        if ( point < 0 ) 
+                            break;
+                        last = javaClass;
+                        // getter
+                        methodName = "get" + capitalize( fieldName.substring( 0, point ) );
+                        method = javaClass.getMethod( methodName, null );
+                        fieldName = fieldName.substring( point + 1 );
+                        // Make sure method is not abstract/static
+                        // (note: Class.getMethod() returns only public methods).
+                        if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+                             ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                            throw new MappingException( "mapping.accessorNotAccessible",
+                                                        methodName, javaClass.getName() );
+                        getSeq.addElement( method );
+                        javaClass = method.getReturnType();
+                        // setter;   Note: javaClass already changed, use "last"
+                        methodName = "set" + methodName.substring(3);
+                        try {
+                            method = last.getMethod( methodName, new Class[] { javaClass } );
+                            if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+                                 ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                                method = null;
+                        } catch ( Exception except ) {
+                            method = null;
+                        }
+                        setSeq.addElement( method );
+                    }
+                    if ( getSeq.size() > 0 ) {
+                        getSequence = new Method[ getSeq.size() ];
+                        getSeq.copyInto( getSequence );
+                        setSequence = new Method[ setSeq.size() ];
+                        setSeq.copyInto( setSequence );
+                    }
+                    getMethod = findAccessor( javaClass, "get" + capitalize( fieldName ),
+                                            ( colType == null ? fieldType : colType ), true );
+                } catch ( MappingException except ) {
+                    throw except;
+                } catch ( Exception except ) {
+                }
+                //if ( getMethod == null )
                     //throw new MappingException( "mapping.accessorNotFound",
-                    //                            "get" + capitalize( fieldMap.getName() ),
-                    //                           ( colType == null ? fieldType : colType ),
+                    //                            "get" + capitalize( fieldName ),
+                    //                            ( colType == null ? fieldType : colType ),
                     //                            javaClass.getName() );
                 if ( fieldType == null && colType == null )
                     fieldType = getMethod.getReturnType();
                 if ( colType == null || getSetCollection ) {
-                    setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
+                    setMethod = findAccessor( javaClass, "set" + capitalize( fieldName ),
                                               ( colType == null ? fieldType : colType ), false );
-                    if ( setMethod == null );
+                    //if ( setMethod == null )
                         //throw new MappingException( "mapping.accessorNotFound",
-                        //                            "set" + capitalize( fieldMap.getName() ),
+                        //                            "set" + capitalize( fieldName ),
                         //                            ( colType == null ? fieldType : colType ),
                         //                            javaClass.getName() );
                 }
@@ -657,14 +708,13 @@ public abstract class MappingLoader
                         fieldType = setMethod.getParameterTypes()[ 0 ];
                 }
             }
-
             
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             
             fieldName = fieldMap.getName();
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
-            handler = new FieldHandlerImpl( fieldName, getMethod, setMethod, typeInfo );
+            handler = new FieldHandlerImpl( fieldName, getSequence, setSequence, getMethod, setMethod, typeInfo );
         }
 
         // If there is a create method, add it to the field handler
@@ -679,30 +729,30 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.createMethodNotFound",
                                             fieldMap.getCreateMethod(), javaClass.getName() );
             }
-        } else if ( fieldMap.getName() != null && ! Types.isSimpleType( fieldType ) ) {
+        } else if ( fieldName != null && ! Types.isSimpleType( fieldType ) ) {
             try {
                 Method method;
 
-                method = javaClass.getMethod( "create" + capitalize( fieldMap.getName() ), null );
+                method = javaClass.getMethod( "create" + capitalize( fieldName ), null );
                 handler.setCreateMethod( method );
             } catch ( Exception except ) { }
         }
 
         // If there is an has/delete method, add them to field handler
-        if ( fieldMap.getName() != null ) {
+        if ( fieldName != null ) {
             Method hasMethod = null;
             Method deleteMethod = null;
 
             try {
-                hasMethod = javaClass.getMethod( "has" + capitalize( fieldMap.getName() ), null );
-                if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                hasMethod = javaClass.getMethod( "has" + capitalize( fieldName ), null );
+                if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) != 0 ||
                      ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                     hasMethod = null;
                 try {
-                    if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                    if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) != 0 ||
                          ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                         deleteMethod = null;
-                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldMap.getName() ), null );
+                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldName ), null );
                 } catch ( Exception except ) { }
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
@@ -773,6 +823,8 @@ public abstract class MappingLoader
     {
         Method   method;
         Method[] methods;
+        Class[] parameterTypes;
+        Class fieldTypeFromPrimitive;
         int      i;
         
         try {
@@ -787,32 +839,44 @@ public abstract class MappingLoader
                     throw new MappingException( "mapping.accessorReturnTypeMismatch",
                                                 method, fieldType.getName() );
             } else {
+                method = null;
+                fieldTypeFromPrimitive = null;
                 // Set method: look for the named method or prepend set to the
                 // method name. If the field type is know, look up a suitable
                 // method. If the fielf type is unknown, lookup the first
                 // method with that name and one parameter.
                 if ( fieldType != null ) {
+                    fieldTypeFromPrimitive = Types.typeFromPrimitive( fieldType );
                     try {
                         method = javaClass.getMethod( methodName, new Class[] { fieldType } );
                     } catch ( Exception except ) {
-                        method = javaClass.getMethod( methodName, new Class[] { Types.typeFromPrimitive( fieldType ) } );
+                        try {
+                            method = javaClass.getMethod( methodName, new Class[] { fieldTypeFromPrimitive } );
+                        } catch ( Exception except2 ) {
+                        }
                     }
-                } else {
+                } 
+                if ( null == method ) {
                     methods = javaClass.getMethods();
                     method = null;
                     for ( i = 0 ; i < methods.length ; ++i ) {
-                        if ( methods[ i ].getName().equals( methodName ) &&
-                             methods[ i ].getParameterTypes().length == 1 ) {
-                            method = methods[ i ];
-                            break;
+                        if ( methods[ i ].getName().equals( methodName ) ) {
+                            parameterTypes = methods[ i ].getParameterTypes();
+                            if (( parameterTypes.length == 1 ) &&
+                                (( fieldType == null ) || 
+                                 Types.typeFromPrimitive( parameterTypes[0] ).isAssignableFrom( fieldTypeFromPrimitive ) )) {
+                                method = methods[ i ];
+                                break;
+                            }
                         }
                     }
                     if ( method == null )
                         return null;
                 }
             }
-            // Make sure method is public and not abstract/static.
-            if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+            // Make sure method is not abstract/static.
+            // (note: Class.getMethod() returns only public methods).
+            if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
                  ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
                 throw new MappingException( "mapping.accessorNotAccessible",
                                             methodName, javaClass.getName() );

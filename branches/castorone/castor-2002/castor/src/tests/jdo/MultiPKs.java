@@ -134,6 +134,7 @@ public class MultiPKs extends CWTestCase {
 			person.setFirstName( "First" );
 			person.setLastName( "Person" );
 			person.setBirthday( new Date(1922, 2, 2) );
+            person.setStartDate( new Date(2000, 2, 2) );
 
 			TestPKsAddress address1 = new TestPKsAddress();
 			address1.setId(1);

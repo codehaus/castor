@@ -68,10 +68,10 @@ public class JDOCallback
     }
 
 
-    public void loaded( Object object )
+    public Class loaded( Object object, short accessMode )
         throws Exception
     {
-        ( (Persistent) object ).jdoLoad();
+        return ( (Persistent) object ).jdoLoad(accessMode);
     }
 
 
@@ -99,6 +99,13 @@ public class JDOCallback
     public void releasing( Object object, boolean committed )
     {
         ( (Persistent) object ).jdoTransient();
+    }
+
+
+    public void updated( Object object )
+        throws Exception
+    {
+        ( (Persistent) object ).jdoUpdate();
     }
 
 

@@ -282,19 +282,17 @@ public class DatabaseImpl
     }
 
     public void update( Object object )
-            throws ClassNotPersistenceCapableException, DuplicateIdentityException,
-            TransactionNotInProgressException, PersistenceException {
-        /*
+        throws ClassNotPersistenceCapableException,
+               TransactionNotInProgressException, PersistenceException
+    {
         TransactionContext tx;
         PersistenceInfo    info;
 
         tx = getTransaction();
         info = _scope.getPersistenceInfo( object.getClass() );
         if ( info == null )
-            throw new ClassNotPersistenceCapableException( object.getClass() );
-
-        tx.update( _scope, object );
-        */
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
+        tx.update( info.engine, info.molder, object);
     }
 
 
