@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1768 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       'Overloaded' JDO-CTF test jdo.Size with oracle-specific implementation.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1768
+       (Werner - 20041214)
+
 JDO:   Fixed bug 1812 using contribution from Gregory Block [gblock@ctoforaday]
        Fixed various problems related to ClassLoader usage.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1812
