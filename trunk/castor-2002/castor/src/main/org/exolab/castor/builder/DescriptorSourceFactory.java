@@ -75,12 +75,6 @@ public class DescriptorSourceFactory {
         
     private static JType fdArrayClass = fdClass.createArray();
 
-    /**
-     * The resolver class type
-    **/
-    private static JClass iResolver 
-        = new JClass("org.exolab.castor.xml.Resolver");
-        
     private static JClass gvrClass 
         = new JClass("org.exolab.castor.xml.GroupValidationRule");
         
@@ -324,7 +318,7 @@ public class DescriptorSourceFactory {
             }
             else {
                 jsc.append("(");
-                jsc.append(xsType.getJType().getName());
+                jsc.append(xsType.getJType().toString());
                 jsc.append(") value");
             }
             jsc.append(");");
@@ -345,6 +339,7 @@ public class DescriptorSourceFactory {
             jsc.add("return ");
             
             if (xsType.isPrimitive() || 
+                xsType.getJType().isArray() ||
                 (xsType.getType() == XSType.STRING))
             {
                 jsc.append("null;");
@@ -556,6 +551,7 @@ public class DescriptorSourceFactory {
                 jsc.add("desc.setHandler( new EnumFieldHandler(");
                 jsc.append(classType(xsType.getJType()));
                 jsc.append(", handler));");
+                jsc.add("desc.setImmutable(true);");
             }
             else jsc.add("desc.setHandler(handler);");
             
