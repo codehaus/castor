@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -99,6 +99,13 @@ public final class FieldHandlerImpl
      */
     private Method[]      _setSequence;
 
+
+    /**
+     * The method used to "incrementally" set the value of this field. 
+     * This is only used if the field is a collection
+     */
+    private Method        _addMethod;
+    
 
     /**
      * The method used to obtain the value of this field. May be null.
@@ -399,29 +406,35 @@ public final class FieldHandlerImpl
                     _handler.setValue( object, value );
                 else if ( _field != null )
                     _field.set( object, value == null ? _default : value );
-                else if ( _setMethod != null ) {
-                    if ( _getSequence != null ) 
-                        for ( int i = 0; i < _getSequence.length; i++ ) {
-                            Object last;
+                else {
+                    
+                    //-- either add or set
+                    Method setter = selectWriteMethod( value );
+                    
+                    if (setter != null) {
+                        if ( _getSequence != null ) 
+                            for ( int i = 0; i < _getSequence.length; i++ ) {
+                                Object last;
 
-                            last = object;
-                            object = _getSequence[ i ].invoke( object, null );
-                            if ( object == null ) {
-                                // if the value is not null, we must instantiate
-                                // the object in the sequence
-                                if ( value == null || _setSequence[ i ] == null )
-                                    break;
-                                else {
-                                    object = Types.newInstance( _getSequence[ i ].getReturnType() );
-                                    _setSequence[ i ].invoke( last, new Object[] { object } );
+                                last = object;
+                                object = _getSequence[ i ].invoke( object, null );
+                                if ( object == null ) {
+                                    // if the value is not null, we must instantiate
+                                    // the object in the sequence
+                                    if ( value == null || _setSequence[ i ] == null )
+                                        break;
+                                    else {
+                                        object = Types.newInstance( _getSequence[ i ].getReturnType() );
+                                        _setSequence[ i ].invoke( last, new Object[] { object } );
+                                    }
                                 }
                             }
+                        if ( object != null ) {
+                            if ( value == null && _deleteMethod != null )
+                                _deleteMethod.invoke( object, null );
+                            else
+                                setter.invoke( object, new Object[] { value == null ? _default : value } );
                         }
-                    if ( object != null ) {
-                        if ( value == null && _deleteMethod != null )
-                            _deleteMethod.invoke( object, null );
-                        else
-                            _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                     }
                 }
                 // If the field has no set method, ignore it.
@@ -596,6 +609,25 @@ public final class FieldHandlerImpl
     }
 
 
+    /**
+     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
+     */
+    public void setAddMethod( Method method ) 
+        throws MappingException
+    {
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.writeMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _addMethod = method;
+        
+    } //-- setAddMethod
+    
 
     /**
      * Mutator method used by {@link MappingLoader} and
@@ -693,6 +725,37 @@ public final class FieldHandlerImpl
         return _fieldName;
     }
     
+    /**
+     * Selects the appropriate "write" method based on the
+     * value. This is used when there is an "add" method
+     * and a "set" method.
+     *
+     * @return the selected write method
+    **/
+    private Method selectWriteMethod( Object value ) {
+        
+        
+        Method setter = null;
+        
+        if (_setMethod != null) {
+            
+            if (_addMethod == null) return _setMethod;
+            
+            if (value == null) {
+                if (_default != null) value = _default;
+                else return _setMethod;
+            }
+            
+            //-- check value's class type
+            Class paramType = _setMethod.getParameterTypes()[0];
+                                
+            if (paramType.isAssignableFrom(value.getClass()))
+                return _setMethod;
+        }
+        
+        return _addMethod;
+        
+    } //-- selectWriteMethod
 
 }
 
