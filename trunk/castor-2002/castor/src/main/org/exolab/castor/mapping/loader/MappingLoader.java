@@ -75,6 +75,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.util.DTDResolver;
 
 
 /**
@@ -272,12 +273,12 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
                 org.exolab.castor.xml.XMLMappingLoader xml;
                 
                 unm = new Unmarshaller( org.exolab.castor.mapping.xml.Mapping.class );
+                unm.setEntityResolver( _resolver );
                 _cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
                 xml = new org.exolab.castor.xml.XMLMappingLoader( _loader );
                 xml.loadMapping( (org.exolab.castor.mapping.xml.Mapping) unm.unmarshal( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) ) );
                 _cdr.setMappingLoader( xml );
             } catch ( MappingException except ) {
-except.printStackTrace();
                 throw except;
             } catch ( Exception except ) {
                 throw new MappingException( except );
@@ -574,11 +575,11 @@ except.printStackTrace();
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
     {
-        TypeInfo     typeInfo;
-        Class        fieldType = null;
-        Class        colType = null;
-        FieldHandler handler;
-        String       fieldName;
+        TypeInfo         typeInfo;
+        Class            fieldType = null;
+        Class            colType = null;
+        FieldHandlerImpl handler;
+        String           fieldName;
 
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. If the field is declared as a collection, grab
@@ -593,6 +594,9 @@ except.printStackTrace();
             }
         }
         if ( fieldMap.getCollection() != null ) {
+            // Note: will return a collection type, for which a handler can be
+            // obtained; null for the special 'enumerate' collection type;
+            // or throw an exception if the collection is not supported.
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
         }
 
@@ -632,6 +636,21 @@ except.printStackTrace();
             typeInfo = getTypeInfo( fieldType, colType, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
         }
+
+        // If there is a create method, add it to the field handler
+        if ( fieldMap.getCreateMethod() != null ) {
+            try {
+                Method method;
+
+                method = javaClass.getMethod( fieldMap.getCreateMethod(), null );
+                handler.setCreateMethod( method );
+            } catch ( Exception except ) {
+                // No such/access to method
+                throw new MappingException( "mapping.createMethodNotFound",
+                                            fieldMap.getCreateMethod(), javaClass.getName() );
+            }
+        }
+
         return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
     }
 
@@ -735,7 +754,7 @@ except.printStackTrace();
                     }
                     if ( method == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                                                    methodName, fieldType );
+                                                    methodName, fieldType, javaClass.getName() );
                 }
             }
             // Make sure method is public and not abstract/static.
@@ -750,7 +769,7 @@ except.printStackTrace();
         }
         // No such/access to method
         throw new MappingException( "mapping.accessorNotFound",
-                                    methodName, javaClass.getName() );
+                                    methodName, fieldType, javaClass.getName() );
     }
 
 
