@@ -9,6 +9,12 @@
         <br />
         <b>$RELEASE_DATE$</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.
         <ul>
+            <li><b>10 Nov 2003</b> - Please welcome Werner Guttman as the 
+                newest committer to the Castor team! Werner's contributions
+                moving forward with the Castor JDO refactoring are key, as is
+                his experience with J2EE and IBM WebSphere. 
+            </li>
+
             <li><b>06 Jun 2003</b> - Can't find it here? Check out the
                 <a href="http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main">CastorWiki</a>.
                 An effort put together by a number of Castor users to document the undocumented!
