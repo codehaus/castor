@@ -338,7 +338,7 @@ public class TimeLimitedLRU implements LRU {
 	/*
 	 * inner class for putting test cases only. Safe to delete.
 	 */
-	public static class Test {
+	private static class Test {
 		public static void main (String args[]) throws Exception {
 			class TestLRU extends TimeLimitedLRU {
 				public TestLRU(int count) {
