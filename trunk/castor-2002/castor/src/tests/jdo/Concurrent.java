@@ -113,6 +113,7 @@ public class Concurrent
         try {
             _db = _category.getDatabase( stream.verbose() );
             _conn = _category.getJDBCConnection(); 
+            _conn.setAutoCommit( false );
 
             stream.writeVerbose( "Running in access mode shared" );
             if ( ! runOnce( stream, Database.Shared ) )
@@ -176,11 +177,12 @@ public class Concurrent
             object.setValue1( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
-            _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
+            if ( accessMode != Database.DbLocked ) {
+                _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
                                              "' WHERE id=" + TestObject.DefaultId );
-            _conn.commit();
-            stream.writeVerbose( "Updated test object from JDBC" );
+                _conn.commit();
+                stream.writeVerbose( "Updated test object from JDBC" );
+            }
         
             // Commit JDO transaction, this should report object modified
             // exception
@@ -210,12 +212,13 @@ public class Concurrent
             object.setValue2( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
-            _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_table SET value2='" + JDBCValue +
-                                             "' WHERE id=" + TestObject.DefaultId );
-            _conn.commit();
-            stream.writeVerbose( "Updated test object from JDBC" );
-        
+            if ( accessMode != Database.DbLocked ) {
+                _conn.createStatement().execute( "UPDATE test_table SET value2='" + JDBCValue +
+                                                 "' WHERE id=" + TestObject.DefaultId );
+                _conn.commit();
+                stream.writeVerbose( "Updated test object from JDBC" );
+            }
+
             // Commit JDO transaction, this should report object modified
             // exception
             stream.writeVerbose( "Committing JDO update: no dirty checking field not modified" );
