@@ -49,7 +49,6 @@ package org.exolab.castor.mapping;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
-import java.util.Vector;
 import java.lang.reflect.Constructor;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -641,7 +640,7 @@ public class Mapping
 
         /**
          * Returns true if the given systemID has been marked as processed
-         * @param schema location the systemID  to check for being marked as processed
+         * @param systemID location the systemID  to check for being marked as processed
          */
         boolean processed(String systemID) {
             return _processed.containsKey(systemID);
@@ -662,10 +661,14 @@ public class Mapping
     class IncludeListener implements UnmarshalListener {
 
         /* Not used for includes processing */
-        public void initialized (Object object) {};
+        public void initialized (Object object) {
+            // not used
+        };
 
         /* Not used for includes processing */
-        public void attributesProcessed(Object object) {};
+        public void attributesProcessed(Object object) {
+            // not used ...
+        };
 
         /* Not used for includes processing */
         public void fieldAdded (String fieldName, Object parent, Object child) 
