@@ -47,26 +47,26 @@
 package org.exolab.castor.mapping;
 
 
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.lang.reflect.Constructor;
-import java.io.PrintWriter;
 import java.io.IOException;
-import java.net.URL;
+import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import org.exolab.castor.mapping.loader.MappingLoader;
+import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.mapping.xml.Include;
+import org.exolab.castor.mapping.xml.KeyGeneratorDef;
+import org.exolab.castor.mapping.xml.MappingRoot;
+import org.exolab.castor.util.DTDResolver;
+import org.exolab.castor.util.Messages;
+import org.exolab.castor.xml.UnmarshalListener;
+import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.xml.UnmarshalListener;
-import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.mapping.xml.MappingRoot;
-import org.exolab.castor.mapping.xml.Include;
-import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.KeyGeneratorDef;
-import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.DTDResolver;
 
 
 /**
@@ -560,13 +560,7 @@ public class Mapping
             while ( enumeration.hasMoreElements() ) {
                 _mapping.addKeyGeneratorDef( (KeyGeneratorDef) enumeration.nextElement() );
             }
-        } 
-        catch ( MarshalException except ) {
-            if ( except.getException() != null )
-                throw new MappingException( except.getException() );
-            throw new MappingException( except );
-        } 
-        catch ( Exception except ) {
+        } catch ( Exception except ) {
             throw new MappingException( except );
         }
     } //-- loadMappingInternal
