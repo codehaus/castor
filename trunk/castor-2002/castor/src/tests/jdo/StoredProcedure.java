@@ -155,7 +155,7 @@ public class StoredProcedure
             // by the rule "read access group".
             // We expect to fetch objects with identities 1,2,3.
             db.begin();
-            oql = db.getOQLQuery( "CALL sp_check_permissions($,$) AS jdo.TestObject" );
+            oql = db.getOQLQuery( "CALL proc_check_permissions($,$) AS jdo.TestObject" );
             oql.bind( USER1 );
             oql.bind( GROUP1 );
             enum = oql.execute();

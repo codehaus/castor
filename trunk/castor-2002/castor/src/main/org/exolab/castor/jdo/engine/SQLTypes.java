@@ -266,13 +266,16 @@ public final class SQLTypes
     public static Object getObject( ResultSet rs, int index, int sqlType )
             throws SQLException
     {
+        Object value;
+
         switch ( sqlType ) {
-        case Types.TIME:       return rs.getTime( index );
-        case Types.DATE:       return rs.getDate( index );
-        case Types.TIMESTAMP:  return rs.getTimestamp( index );
-        case Types.INTEGER:    return new Integer( rs.getInt( index ) );
-        default:               return rs.getObject( index );
+        case Types.TIME:       value = rs.getTime( index ); break;
+        case Types.DATE:       value = rs.getDate( index ); break;
+        case Types.TIMESTAMP:  value = rs.getTimestamp( index ); break;
+        case Types.INTEGER:    value = new Integer( rs.getInt( index ) ); break;
+        default:               value = rs.getObject( index ); break;
         }
+        return ( rs.wasNull() ? null : value );
     }
 
 

@@ -142,3 +142,19 @@ create table test_persistent (
 );
 create unique index test_persistent_pk on test_persistent ( id );
 
+CREATE OR REPLACE PACKAGE test AS
+    TYPE TestCursor IS REF CURSOR RETURN test_table%ROWTYPE;
+END test;
+/
+
+-- The test stored procedure on PL/SQL
+CREATE OR REPLACE FUNCTION proc_check_permissions ( userName VARCHAR,
+                                                    groupName VARCHAR)
+    RETURN test.TestCursor AS
+res test.TestCursor;
+BEGIN
+    OPEN res FOR SELECT id, value1, value2 FROM test_table WHERE value1 = userName
+           UNION SELECT id, value1, value2 FROM test_table WHERE value2 = groupName;
+    RETURN res;
+END;
+/
