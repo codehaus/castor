@@ -325,7 +325,8 @@ public abstract class TransactionContext
                 throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
                 return entry.object;
-            if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
+            if ( ( accessMode == AccessMode.Exclusive ||
+                   accessMode == AccessMode.Locked ) && ! entry.oid.isExclusive() ) {
                 // If we are in exclusive mode and object has not been
                 // loaded in exclusive mode before, then we have a
                 // problem. We cannot return an object that is not

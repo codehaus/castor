@@ -108,7 +108,7 @@ public final class QueryResults
         _tx = tx;
         _engine = engine;
         _query = query;
-        _accessMode = accessMode;
+        _accessMode =  engine.getClassHandler( _query.getResultType() ).getAccessMode( accessMode );
     }
 
 
@@ -226,7 +226,8 @@ public final class QueryResults
                     // to next object.
                     throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), _lastIdentity );
                 else {
-                    if ( _accessMode == AccessMode.Exclusive &&
+                    if ( ( _accessMode == AccessMode.Exclusive ||
+                           _accessMode == AccessMode.Locked ) &&
                          ! oid.isExclusive() ) {
                         // If we are in exclusive mode and object has not been
                         // loaded in exclusive mode before, then we have a
