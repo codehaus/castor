@@ -452,7 +452,7 @@ public class SimpleTypesFactory
             intCode= getClass().getDeclaredField(type.getCode()).getInt(null);
         }
         catch (Exception ex) {
-            
+
             String error = Messages.message("schema.cantLoadBuiltInTypes")
                 + ex;
             throw new SimpleTypesFactoryException(ex, error);
@@ -495,11 +495,11 @@ public class SimpleTypesFactory
     private SimpleType createInstance(String builtInTypeName)
     {
         Type type= getType(builtInTypeName);
-
-        //If the type is derived by list, return a new ListType.
+       //If the type is derived by list, return a new ListType.
         String derivation= type.getDerivedBy();
+        ListType resultList = null;
         if ( (derivation != null) && (derivation.equals(SchemaNames.LIST)) ) {
-            ListType result= new ListType();
+            resultList = new ListType();
         }
 
         //Finds the primitive ancestor (defines the class that represents it)
@@ -515,17 +515,22 @@ public class SimpleTypesFactory
 
         if (implClass == null) return null;
 
-        SimpleType result;
+        AtomicType result;
         try
         {
-            result= (SimpleType)implClass.newInstance();
+            result = (AtomicType)implClass.newInstance();
         }
         catch (Exception except)
         {
             except.printStackTrace();
             result= null;
         }
-        return result;
+
+        if (resultList != null) {
+              resultList.setType(result);
+              return resultList;
+        }
+        else return result;
     }
 
 }
@@ -566,7 +571,7 @@ class SimpleTypesFactoryException
         super(exception.toString());
         _exception = exception;
     } //-- SimpleTypesFactoryException
-    
+
     /**
      * Creates a new SimpleTypesFactoryException
      *
@@ -607,7 +612,7 @@ class SimpleTypesFactoryException
 
 
     public void printStackTrace( PrintWriter print ) {
-        if ( _exception == null ) 
+        if ( _exception == null )
             super.printStackTrace( print );
         else
             _exception.printStackTrace( print );
