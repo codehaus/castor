@@ -83,6 +83,14 @@ public final class CacheEngine
      * persistent in another. The engines are totally independent and
      * no conflicts should occur.
      *
+     * For efficiency all objects are cached as an array of fields.
+     * Each field holds the cached field value, the identity or a
+     * related object, or a vector holding multiple identities of
+     * related objects.
+     *
+     * Each class heirarchy gets its own cache, so caches can be
+     * controlled on a class-by-class basis.
+     *
      */
 
 
@@ -108,6 +116,28 @@ public final class CacheEngine
 
 
     /**
+     * Used by the constructor for creating handlers and temporarily
+     * registering them to prevent circular references. See {@link
+     * #addClassHandler}.
+     */
+    private Hashtable _handlers = new Hashtable();
+
+
+    /**
+     * Used by the constructor when creating handlers to temporarily
+     * hold the mapping resolver for use by {@link #addClassHandler}.
+     */
+    private MappingResolver _mapResolver;
+
+
+    /**
+     * Used by the constructor when creating handlers to temporarily
+     * hold the persistence factory for use by {@link #addClassHandler}.
+     */
+    private PersistenceFactory _factory;
+
+
+    /**
      * Construct a new cache engine with the specified name, mapping
      * table and persistence engine.
      *
@@ -130,6 +160,7 @@ public final class CacheEngine
         _logWriter = logWriter;
         _mapResolver = mapResolver;
         _factory = factory;
+        _handlers = new Hashtable();
         // This step creates the handlers and persistence engines for all
         // the classes resolved from the mapping file. addClassHandler has
         // special mechanisms to deal with inheritance and relations that
@@ -137,15 +168,64 @@ public final class CacheEngine
         enum = mapResolver.listJavaClasses();
         while ( enum.hasMoreElements() )
             handler = addClassHandler( (Class) enum.nextElement() );
+        _handlers = null;
         _mapResolver = null;
         _factory = null;
     }
 
-    private Hashtable _handlers = new Hashtable();
 
-    private MappingResolver _mapResolver;
+    /**
+     * Used by the constructor and {@link ClassHandler} to create a
+     * new class handler and register it. The class handler must be
+     * registered before it has been fully created, and then normalized,
+     * in order to prevent circular references when handling relations.
+     */
+    ClassHandler addClassHandler( Class javaClass )
+        throws MappingException
+    {
+        ClassHandler handler;
 
-    private PersistenceFactory _factory;
+        // If a handler exists for the class, return it, otherwise create a new one.
+        handler = (ClassHandler) _handlers.get( javaClass );
+        if ( handler == null ) {
+            ClassDescriptor clsDesc;
+            Persistence     persist;
+
+            clsDesc = _mapResolver.getDescriptor( javaClass );
+            if ( clsDesc != null ) {
+                // Place the handler in the hashtable first, since normalize() might
+                // reference it (extends, relation, etc) and we don't want an infinite loop
+                handler = new ClassHandler( clsDesc );
+                _handlers.put( javaClass, handler );
+                handler.normalize( this );
+
+                // Create a new persistence engine for that type and add the type info
+                persist = _factory.getPersistence( handler.getDescriptor(), _logWriter );
+                if ( persist != null ) {
+                    // At this point the extends typeInfo has been registered, so we know
+                    // it exists. We need the extends in order to share cache between objects
+                    // in the same heirarchy.
+                    if ( handler.getExtends() != null ) {
+                        ClassDescriptor extend;
+                        TypeInfo        typeInfo;
+
+                        extend = handler.getDescriptor();
+                        while ( extend.getExtends() != null )
+                            extend = extend.getExtends();
+                        typeInfo = (TypeInfo) _typeInfo.get( extend.getJavaClass() );
+                        if ( typeInfo == null )
+                            _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
+                        else
+                            _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, typeInfo.cache ) );
+                    } else
+                        _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, new Cache() ) );
+                } else if ( _logWriter != null )
+                    _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
+            }
+        }
+        return handler;
+    }
+
 
     public Persistence getPersistence( Class type )
     {
@@ -184,7 +264,7 @@ public final class CacheEngine
      * concurrent updates. In non-exclusive mode the object is either
      * loaded or obtained from the cache with a read lock. The object's
      * OID is always returned, this OID must be used in subsequent
-     * operations on the object. Must call {@link #acquire} to obtain
+     * operations on the object. Must call {@link #copyObject} to obtain
      * the object.
      *
      * @param tx The transaction context
@@ -277,7 +357,7 @@ public final class CacheEngine
 
             // Object has not been loaded yet, or cleared from the cache.
             // The object is now loaded and a lock is acquired.
-            fields = new Object[ typeInfo.fieldCount ];
+            fields = typeInfo.handler.newFieldSet();
             try {
                 if ( _logWriter != null )
                     _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() + " ("
@@ -316,7 +396,7 @@ public final class CacheEngine
      * concurrent updates. In non-exclusive mode the object is either
      * loaded or obtained from the cache with a read lock. The object's
      * OID is always returned, this OID must be used in subsequent
-     * operations on the object. Must call {@link #acquire} to obtain
+     * operations on the object. Must call {@link #copyObject} to obtain
      * the object.
      *
      * @param tx The transaction context
@@ -402,7 +482,7 @@ public final class CacheEngine
 
             // Object has not been loaded yet, or cleared from the cache.
             // The object is now loaded from the query and a lock is acquired.
-            fields = new Object[ typeInfo.fieldCount ];
+            fields = typeInfo.handler.newFieldSet();
             try {
                 if ( _logWriter != null )
                     _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
@@ -471,6 +551,8 @@ public final class CacheEngine
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
             oid = new OID( typeInfo.handler, identity );
+            // XXX If identity is null need to fine a way to determine it
+
             if ( identity != null ) {
                 // If the object has a known identity at creation time, perform
                 // duplicate identity check.
@@ -501,14 +583,14 @@ public final class CacheEngine
                 if ( relations[ i ] != null ) {
                     Object related;
 
-                    if ( ! relations[ i ].isMulti() ) {
+                    if ( ! relations[ i ].isMany() ) {
                         related = relations[ i ].getRelated( object );
                         if ( related != null && ! tx.isPersistent( related ) )
                             tx.create( this, related, relations[ i ].getIdentity( related ) );
                     } else {
                         Enumeration enum;
 
-                        enum = relations[ i ].listRelated( object );
+                        enum = relations[ i ].getCollection( object );
                         if ( enum != null ) {
                             while ( enum.hasMoreElements() ) {
                                 related = enum.nextElement();
@@ -528,7 +610,7 @@ public final class CacheEngine
             } catch ( ValidityException except ) {
                 throw new PersistenceException( except );
             }
-            fields = new Object[ typeInfo.fieldCount ];
+            fields = typeInfo.handler.newFieldSet();
             typeInfo.handler.copyInto( object, fields );
 
 
@@ -611,7 +693,7 @@ public final class CacheEngine
         for ( int i = 0 ; i < relations.length ; ++i ) {
             if ( relations[ i ] != null && fields[ i ] != null &&
                  relations[ i ].isAttached() ) {
-                if ( ! relations[ i ].isMulti() ) {
+                if ( ! relations[ i ].isMany() ) {
                     tx.markDelete( this, relations[ i ].getRelatedClass(), fields[ i ] );
                 } else {
                     Vector  related;
@@ -669,7 +751,6 @@ public final class CacheEngine
         Object     oldIdentity;
         TypeInfo   typeInfo;
         OID        oid;
-        boolean    sameIdentity;
 
         typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
         oid = new OID( typeInfo.handler, identity );
@@ -696,7 +777,7 @@ public final class CacheEngine
                 // XXX Need validity check and better testing for null elements
 
                 // relations[ i ].checkValidity( object );
-                if ( ! relations[ i ].isMulti() ) {
+                if ( ! relations[ i ].isMany() ) {
 
                     Object related;
                     Object relIdentity;
@@ -721,10 +802,15 @@ public final class CacheEngine
                 } else {
 
                     Enumeration enum;
-                    Vector      originals;
+		    Object[]    origIdentity;
 
-                    enum = relations[ i ].listRelated( object );
-                    originals = (Vector) original[ i ];
+                    enum = relations[ i ].getCollection( object );
+		    if ( original[ i ] == null )
+			origIdentity = new Object[ 0 ];
+		    else {
+			origIdentity = new Object[ ( (Vector) original[ i ] ).size() ];
+			( (Vector) original[ i ] ).copyInto( origIdentity );
+		    }
                     if ( enum != null ) {
                         while ( enum.hasMoreElements() ) {
                             Object related;
@@ -733,16 +819,21 @@ public final class CacheEngine
                             related = enum.nextElement();
                             if ( related != null ) {
                                 relIdentity = relations[ i ].getIdentity( related );
-                                if ( originals == null || ! originals.removeElement( relIdentity ) ) {
-                                    if ( ! tx.isPersistent( related ) )
-                                        tx.create( this, related, relIdentity );
+				for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+				    if ( origIdentity[ j ] != null &&
+					 origIdentity[ j ].equals( relIdentity ) ) {
+					if ( ! tx.isPersistent( related ) )
+					    tx.create( this, related, relIdentity );
+					origIdentity[ j ] = null;
+				    }
                                 }
                             }
                         }
                     }
-                    if ( relations[ i ].isAttached() && originals != null ) {
-                        for ( int j = 0 ; j < originals.size() ; ++j )
-                            tx.markDelete( this, relations[ i ].getRelatedClass(), originals.elementAt( j ) );
+                    if ( relations[ i ].isAttached() ) {
+                        for ( int j = 0 ; j < origIdentity.length ; ++j )
+			    if ( origIdentity[ j ] != null )
+				tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
                     }
 
                 }
@@ -764,10 +855,13 @@ public final class CacheEngine
                 throw new PersistenceException( "persist.internal", except.toString() );
             }
         } else {
-            sameIdentity = identity.equals( oldIdentity );
+            // Identity change not supported
+            if ( ! identity.equals( oldIdentity ) )
+                throw new PersistenceException( "persist.changedIdentity",
+                                                typeInfo.javaClass.getName(), identity );
 
             // Check if object has been modified, and whether it can be stored.
-            if ( sameIdentity && ! typeInfo.handler.isModified( object, original ) )
+            if ( ! typeInfo.handler.isModified( object, original ) )
                 return oid;
             try {
                 typeInfo.handler.checkValidity( object );
@@ -781,33 +875,17 @@ public final class CacheEngine
                 _logWriter.println( "PE: Storing " + typeInfo.javaClass.getName() + " (" +
                                     identity + ")" );
 
-            fields = new Object[ typeInfo.fieldCount ];
+            fields = typeInfo.handler.newFieldSet();
             typeInfo.handler.copyInto( object, fields );
             if ( oid.isExclusive() )
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-                                                      fields, oldIdentity, null, null ) );
+                                                      fields, identity, null, null ) );
             else
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
-                                                      fields, oldIdentity, original, oid.getStamp() ) );
+                                                      fields, identity, original, oid.getStamp() ) );
             for ( int i = 0 ; i < fields.length ; ++i )
                 original[ i ] = fields[ i ];
             oid.setExclusive( false );
-
-            if ( ! sameIdentity ) {
-                // The object identity has changed, need to modify the identity
-                // and then store the new object value. This requires a new OID.
-                // If the transaction is rolledback, both old and new OID will be
-                // removed.
-                typeInfo.persist.changeIdentity( tx.getConnection( this ),
-                                                 oldIdentity, identity );
-                typeInfo.cache.removeLock( typeInfo.cache.removeOID( original ) );
-                oid = new OID( typeInfo.handler, identity );
-                if ( typeInfo.cache.getLock( oid ) != null )
-                    throw new DuplicateIdentityException( typeInfo.javaClass, identity );
-                typeInfo.cache.removeLock( typeInfo.cache.removeOID( original ) );
-                typeInfo.cache.setLock( oid, lock );
-                typeInfo.cache.setOID( original, oid );
-            }
         }
         return oid;
     }
@@ -1017,53 +1095,6 @@ public final class CacheEngine
     }
 
 
-    ClassHandler addClassHandler( Class javaClass )
-        throws MappingException
-    {
-        ClassHandler handler;
-
-        // If a handler exists for the class, return it, otherwise create a new one.
-        handler = (ClassHandler) _handlers.get( javaClass );
-        if ( handler == null ) {
-            ClassDescriptor clsDesc;
-            Persistence     persist;
-
-            clsDesc = _mapResolver.getDescriptor( javaClass );
-            if ( clsDesc != null ) {
-                // Place the handler in the hashtable first, since normalize() might
-                // reference it (extends, relation, etc) and we don't want an infinite loop
-                handler = new ClassHandler( clsDesc );
-                _handlers.put( javaClass, handler );
-                handler.normalize( this );
-
-                // Create a new persistence engine for that type and add the type info
-                persist = _factory.getPersistence( handler, _logWriter );
-                if ( persist != null ) {
-                    // At this point the extends typeInfo has been registered, so we know
-                    // it exists. We need the extends in order to share cache between objects
-                    // in the same heirarchy.
-                    if ( handler.getExtends() != null ) {
-                        ClassDescriptor extend;
-                        TypeInfo        typeInfo;
-
-                        extend = handler.getDescriptor();
-                        while ( extend.getExtends() != null )
-                            extend = extend.getExtends();
-                        typeInfo = (TypeInfo) _typeInfo.get( extend.getJavaClass() );
-                        if ( typeInfo == null )
-                            _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
-                        else
-                            _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, typeInfo.cache ) );
-                    } else
-                        _typeInfo.put( handler.getJavaClass(), new TypeInfo( handler, persist, new Cache() ) );
-                } else if ( _logWriter != null )
-                    _logWriter.println( Messages.format( "persist.noEngine", handler.getJavaClass() ) );
-            }
-        }
-        return handler;
-    }
-
-
     /**
      * Provides information about an object of a specific type
      * (class). This information includes the object's descriptor and
@@ -1089,11 +1120,6 @@ public final class CacheEngine
         final Persistence  persist;
 
         /**
-         * The number of fields required by this class for the cached copy.
-         */
-        final int          fieldCount;
-
-        /**
          * The cache used by this class (always the cache of the top level class).
          */
         final Cache        cache;
@@ -1103,7 +1129,6 @@ public final class CacheEngine
             this.persist = persist;
             this.handler = handler;
             this.javaClass = handler.getJavaClass();
-            this.fieldCount = handler.getFieldCount();
             this.cache = cache;
         }
 
