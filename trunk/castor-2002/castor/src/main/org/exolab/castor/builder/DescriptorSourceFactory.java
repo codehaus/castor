@@ -49,8 +49,7 @@ import org.exolab.javasource.*;
 import org.exolab.castor.builder.util.DescriptorJClass;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.types.Time;
-import org.exolab.castor.types.Duration;
+import org.exolab.castor.types.*;
 
 /**
  * A factory for creating the source code of descriptor classes
@@ -943,95 +942,27 @@ public class DescriptorSourceFactory {
                 }
                 break;
 
-            /*case XSType.TIME_TYPE:
-                jsc.add("{ //-- local scope");
+
+            case XSType.DATE_TYPE:
+            jsc.add("{ //-- local scope");
                 jsc.indent();
-                jsc.add("TimeValidator tv = new TimeValidator();");
-                XSTime xsTime = (XSTime)xsType;
-                if (xsTime.hasMinimum()) {
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSDate xsDate = (XSDate)xsType;
+                if (xsDate.hasMinimum()) {
                     jsc.add("try {");
                     jsc.indent();
-                   RecurringDuration min = xsTime.getMinExclusive();
-                    if (min != null)
-                        jsc.add("tv.setMinExclusive(");
-                    else {
-                        min = xsTime.getMinInclusive();
-                        jsc.add("tv.setMinInclusive(");
-                    }
-                    jsc.append("org.exolab.castor.types.Time.parseTime(\""
-                                +min.toString()+"\"");
-                    jsc.append(");");
-                    jsc.unindent();
-                    jsc.add("} catch (java.text.ParseException e) {");
-                    jsc.indent();
-                    jsc.add("System.out.println(e);");
-                    jsc.add("e.printStackTrace();");
-                    jsc.add("return;");
-                    jsc.unindent();
-                    jsc.add("}");
-
-                }//hasMinimum?
-
-                if (xsTime.hasMaximum()) {
-                    jsc.add("try {");
-                    jsc.indent();
-                   RecurringDuration max = xsTime.getMaxExclusive();
-                    if (max != null)
-                        jsc.add("tv.setMaxExclusive(");
-                    else {
-                        max = xsTime.getMaxInclusive();
-                        jsc.add("tv.setMaxInclusive(");
-                    }
-                    jsc.append("org.exolab.castor.types.Time.parseTime(\""
-                                +max.toString()+"\"");
-                    jsc.append(");");
-                    jsc.unindent();
-                    jsc.add("} catch (java.text.ParseException e) {");
-                    jsc.indent();
-                    jsc.add("System.out.println(e);");
-                    jsc.add("e.printStackTrace();");
-                    jsc.add("return;");
-                    jsc.unindent();
-                    jsc.add("}");
-
-                }//hasMaximum
-                //-- pattern facet
-
-                jsc.add("fieldValidator.setValidator(tv);");
-                jsc.unindent();
-                jsc.add("}");
-                break;
-            //-- Time
-
-            case XSType.CENTURY:
-            case XSType.YEAR:
-            case XSType.MONTH:
-            case XSType.DATE:
-            case XSType.TIME_PERIOD:
-            case XSType.RECURRING_DURATION:
-                jsc.add("{ //-- local scope");
-                jsc.indent();
-                jsc.add("RecurringDurationValidator rv = new RecurringDurationValidator();");
-                XSRecurringDuration xsReccD = (XSRecurringDuration)xsType;
-                if (xsReccD.hasMinimum()) {
-                    jsc.add("try {");
-                    jsc.indent();
-                    RecurringDuration min = xsReccD.getMinExclusive();
+                    Date min = xsDate.getMinExclusive();
                     if (min != null) {
-                        jsc.add("org.exolab.castor.types.RecurringDuration min ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
+                        jsc.add("org.exolab.castor.types.Date min ="
+                                +"org.exolab.castor.types.Date.parseDate("
                                 +"\""+min.toString()+"\");");
-                        jsc.add("min.setDuration(\""+min.getDuration().toString()+"\");");
-                        jsc.add("min.setPeriod(\""+min.getPeriod().toString()+"\");");
-                        jsc.add("rv.setMinExclusive(");
+                        jsc.add("dv.setMinExclusive(");
                     } else {
-                        min = xsReccD.getMinInclusive();
-                        jsc.add("org.exolab.castor.types.RecurringDuration min ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
+                        min = xsDate.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.Date min ="
+                                +"org.exolab.castor.types.Date.parseDate("
                                 +"\""+min.toString()+"\");");
-                         jsc.add("min.setDuration(\""+min.getDuration().toString()+"\");");
-                         jsc.add("min.setPeriod(\""+min.getPeriod().toString()+"\");");
-                   jsc.add("rv.setMinInclusive(");
+                        jsc.add("dv.setMinInclusive(");
                     }
                     jsc.append("min");
                     jsc.append(");");
@@ -1046,26 +977,22 @@ public class DescriptorSourceFactory {
 
                 }//hasMinimum?
 
-                if (xsReccD.hasMaximum()) {
+                if (xsDate.hasMaximum()) {
                     jsc.add("try {");
                     jsc.indent();
-                    RecurringDuration max = xsReccD.getMaxExclusive();
+                    Date max = xsDate.getMaxExclusive();
                     if (max != null) {
-                        jsc.add("org.exolab.castor.types.RecurringDuration max ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
+                        jsc.add("org.exolab.castor.types.Date max ="
+                                +"org.exolab.castor.types.Date.parseDate("
                                 +"\""+max.toString()+"\");");
-                        jsc.add("max.setDuration(\""+max.getDuration().toString()+"\");");
-                        jsc.add("max.setPeriod(\""+max.getPeriod().toString()+"\");");
-                        jsc.add("rv.setMaxExclusive(");
+                        jsc.add("dv.setMaxExclusive(");
                     }
                     else {
-                        max = xsReccD.getMaxInclusive();
-                        jsc.add("org.exolab.castor.types.RecurringDuration max ="
-                                +"org.exolab.castor.types.RecurringDuration.parseRecurringDuration("
+                        max = xsDate.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.Date max ="
+                                +"org.exolab.castor.types.Date.parseDate("
                                 +"\""+max.toString()+"\");");
-                        jsc.add("max.setDuration(\""+max.getDuration().toString()+"\");");
-                        jsc.add("max.setPeriod(\""+max.getPeriod().toString()+"\");");
-                        jsc.add("rv.setMaxInclusive(");
+                        jsc.add("dv.setMaxInclusive(");
                     }
                     jsc.append("max");
                     jsc.append(");");
@@ -1081,11 +1008,437 @@ public class DescriptorSourceFactory {
                 }//hasMaximum
                 //-- pattern facet
 
-                jsc.add("fieldValidator.setValidator(rv);");
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                xsDate = null;
+                break;
+            //-- date
+            case XSType.GDAY_TYPE:
+            jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSGDay xsDay = (XSGDay)xsType;
+                if (xsDay.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GDay min = xsDay.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.GDay min ="
+                                +"org.exolab.castor.types.GDay.parseGDay("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinExclusive(");
+                    } else {
+                        min = xsDay.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.GDay min ="
+                                +"org.exolab.castor.types.GDay.parseGDay("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsDay.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GDay max = xsDay.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.GDay max ="
+                                +"org.exolab.castor.types.GDay.parseGDay("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsDay.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.GDay max ="
+                                +"org.exolab.castor.types.GDay.parseGDay("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                xsDay = null;
+                break;
+            //-- gDay
+            case XSType.GMONTHDAY_TYPE:
+            jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSGMonthDay xsMonthDay = (XSGMonthDay)xsType;
+                if (xsMonthDay.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GMonthDay min = xsMonthDay.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.GMonthDay min ="
+                                +"org.exolab.castor.types.GMonthDay.parseGMonthDay("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinExclusive(");
+                    } else {
+                        min = xsMonthDay.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.GMonthDay min ="
+                                +"org.exolab.castor.types.GMonthDay.parseGMonthDay("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsMonthDay.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GMonthDay max = xsMonthDay.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.GMonthDay max ="
+                                +"org.exolab.castor.types.GMonthDay.parseGMonthDay("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsMonthDay.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.GMonthDay max ="
+                                +"org.exolab.castor.types.GMonthDay.parseGMonthDay("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                xsMonthDay = null;
+                break;
+            //-- gMonthDay
+            case XSType.GMONTH_TYPE:
+            jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSGMonth xsMonth = (XSGMonth)xsType;
+                if (xsMonth.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GMonth min = xsMonth.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.GMonth min ="
+                                +"org.exolab.castor.types.GMonth.parseGMonth("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinExclusive(");
+                    } else {
+                        min = xsMonth.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.GMonth min ="
+                                +"org.exolab.castor.types.GMonth.parseGMonth("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsMonth.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GMonth max = xsMonth.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.GMonth max ="
+                                +"org.exolab.castor.types.GMonth.parseGMonth("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsMonth.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.GMonth max ="
+                                +"org.exolab.castor.types.GMonth.parseGMonth("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(dv);");
                 jsc.unindent();
                 jsc.add("}");
                 break;
-            //-- RecurringDuration*/
+            //-- gMonth
+            case XSType.GYEARMONTH_TYPE:
+            jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSGYearMonth xsYearMonth = (XSGYearMonth)xsType;
+                if (xsYearMonth.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GYearMonth min = xsYearMonth.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.GYearMonth min ="
+                                +"org.exolab.castor.types.GYearMonth.parseGYearMonth("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinExclusive(");
+                    } else {
+                        min = xsYearMonth.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.GYearMonth min ="
+                                +"org.exolab.castor.types.GYearMonth.parseGYearMonth("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsYearMonth.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GYearMonth max = xsYearMonth.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.GYearMonth max ="
+                                +"org.exolab.castor.types.GYearMonth.parseGYearMonth("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsYearMonth.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.GYearMonth max ="
+                                +"org.exolab.castor.types.GYearMonth.parseGYearMonth("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                xsYearMonth =null;
+                break;
+            //-- gYearMonth
+            case XSType.GYEAR_TYPE:
+            jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSGYear xsYear = (XSGYear)xsType;
+                if (xsYear.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GYear min = xsYear.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.GYear min ="
+                                +"org.exolab.castor.types.GYear.parseGYear("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinExclusive(");
+                    } else {
+                        min = xsYear.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.GYear min ="
+                                +"org.exolab.castor.types.GYear.parseGYear("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsYear.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    GYear max = xsYear.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.GYear max ="
+                                +"org.exolab.castor.types.GYear.parseGYear("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsYear.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.GYear max ="
+                                +"org.exolab.castor.types.GYear.parseGYear("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                xsYear = null;
+                break;
+            //-- gYear
+            case XSType.TIME_TYPE:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("DateTimeValidator dv = new DateTimeValidator();");
+                XSTime xsTime = (XSTime)xsType;
+                if (xsTime.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    Time min = xsTime.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.Time min ="
+                                +"org.exolab.castor.types.Time.parseTime("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinExclusive(");
+                    } else {
+                        min = xsTime.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.Time min ="
+                                +"org.exolab.castor.types.Time.parseTime("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("dv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsTime.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    Time max = xsTime.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.Time max ="
+                                +"org.exolab.castor.types.Time.parseTime("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsTime.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.Time max ="
+                                +"org.exolab.castor.types.Time.parseTime("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("dv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(dv);");
+                jsc.unindent();
+                jsc.add("}");
+                xsTime = null;
+                break;
+            //-- time
 
             case XSType.DURATION_TYPE:
                 jsc.add("{ //-- local scope");

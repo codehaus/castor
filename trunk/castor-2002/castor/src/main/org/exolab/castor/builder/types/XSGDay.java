@@ -45,10 +45,14 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.types.GDay;
+
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
 
+import java.text.ParseException;
+import java.util.Enumeration;
 /**
  * The XML Schema gDay type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
@@ -63,6 +67,10 @@ public class XSGDay extends XSType {
     private static final JType jType
         = new JClass ("org.exolab.castor.types.GDay");
 
+    private GDay _maxInclusive;
+    private GDay _maxExclusive;
+    private GDay _minInclusive;
+    private GDay _minExclusive;
 
     public XSGDay() {
        super(XSType.GDAY_TYPE);
@@ -80,6 +88,142 @@ public class XSGDay extends XSType {
         return this.jType;
     }
 
-    public void setFacets(SimpleType simpleType){
+    /**
+     * Returns the maximum exclusive value that this XSGDay can hold.
+     * @return the maximum exclusive value that this XSGDay can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public GDay getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
+    /**
+     * Returns the maximum inclusive value that this XSGDay can hold.
+     * @return the maximum inclusive value that this XSGDay can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public GDay getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSGDay can hold.
+     * @return the minimum exclusive value that this XSGDay can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public GDay getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSGDay can hold.
+     * @return the minimum inclusive value that this can XSGDay hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public GDay getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSGDay can hold.
+     * @param max the maximum exclusive value this XSGDay can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(GDay max) {
+        _maxExclusive = max;
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSGDay can hold.
+     * @param max the maximum inclusive value this XSGDay can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(GDay max) {
+        _maxInclusive = max;
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSGDay can hold.
+     * @param max the minimum exclusive value this XSGDay can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(GDay min) {
+        _minExclusive = min;
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSGDay can hold.
+     * @param max the minimum inclusive value this XSGDay can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(GDay min) {
+        _minInclusive = min;
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
     }
-}
+
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
+    /**
+     * Reads and sets the facets for XSXSGDay
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
+     */
+
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(GDay.parseGDay(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(GDay.parseGDay(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(GDay.parseGDay(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(GDay.parseGDay(facet.getValue()));
+                //-- pattern
+                else if (Facet.PATTERN.equals(name)) {
+                    //do nothing for the moment
+                    System.out.println("Warning: The facet 'pattern' is not currently supported for XSGDay.");
+                }
+            } catch (ParseException e) {
+                //not possible to set the facet properly
+                //This can't happen since a ParseException would have been set
+                //during the unmarshalling of the facets
+                e.printStackTrace();
+                return;
+            }
+        }//while
+
+    }//setFacets
+
+}//XSGDay

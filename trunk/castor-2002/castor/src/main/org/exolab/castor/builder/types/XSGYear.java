@@ -45,10 +45,13 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.types.GYear;
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
 
+import java.util.Enumeration;
+import java.text.ParseException;
 /**
  * The XML Schema gYear type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
@@ -62,6 +65,12 @@ public class XSGYear extends XSType {
      */
     private static final JType jType
         = new JClass ("org.exolab.castor.types.GYear");
+
+    private GYear _maxInclusive;
+    private GYear _maxExclusive;
+    private GYear _minInclusive;
+    private GYear _minExclusive;
+
 
 
     public XSGYear() {
@@ -80,6 +89,141 @@ public class XSGYear extends XSType {
         return this.jType;
     }
 
-    public void setFacets(SimpleType simpleType){
+    /**
+     * Returns the maximum exclusive value that this XSGYear can hold.
+     * @return the maximum exclusive value that this XSGYear can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public GYear getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
+    /**
+     * Returns the maximum inclusive value that this XSGYear can hold.
+     * @return the maximum inclusive value that this XSGYear can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public GYear getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSGYear can hold.
+     * @return the minimum exclusive value that this XSGYear can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public GYear getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSGYear can hold.
+     * @return the minimum inclusive value that this can XSGYear hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public GYear getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSGYear can hold.
+     * @param max the maximum exclusive value this XSGYear can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(GYear max) {
+        _maxExclusive = max;
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSGYear can hold.
+     * @param max the maximum inclusive value this XSGYear can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(GYear max) {
+        _maxInclusive = max;
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSGYear can hold.
+     * @param max the minimum exclusive value this XSGYear can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(GYear min) {
+        _minExclusive = min;
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSGYear can hold.
+     * @param max the minimum inclusive value this XSGYear can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(GYear min) {
+        _minInclusive = min;
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
     }
+
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
+    /**
+     * Reads and sets the facets for XSXSGYear
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
+     */
+
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(GYear.parseGYear(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(GYear.parseGYear(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(GYear.parseGYear(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(GYear.parseGYear(facet.getValue()));
+                //-- pattern
+                else if (Facet.PATTERN.equals(name)) {
+                    //do nothing for the moment
+                    System.out.println("Warning: The facet 'pattern' is not currently supported for XSGYear.");
+                }
+            } catch (ParseException e) {
+                //not possible to set the facet properly
+                //This can't happen since a ParseException would have been set
+                //during the unmarshalling of the facets
+                e.printStackTrace();
+                return;
+            }
+        }//while
+
+    }//setFacets
 }
