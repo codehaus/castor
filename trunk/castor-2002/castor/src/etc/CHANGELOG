@@ -10,6 +10,9 @@ Mapping: The mapping package has been upgraded to the new mapping DTD,
       mapping information. MappingResolver and MappingHelper are used
       to convert mapping files into descriptors.
 
+Mapping: Added type strings (array of String) and big-integer
+      (java.math.BigInteger).
+
 
 Version 0.7.5  January 28, 2000
 -------------------------------
