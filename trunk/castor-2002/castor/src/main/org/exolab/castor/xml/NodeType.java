@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -71,9 +71,14 @@ public class NodeType
     public static final short ELEMENT    = 1;
     
     /**
+     * The namespace node type
+    **/
+    public static final short NAMESPACE  = 2;
+    
+    /**
      * The text type
     **/
-    public static final short TEXT       = 2;
+    public static final short TEXT       = 3;
     
     /**
      * Attribute node type (<tt>attribute</tt>). This field will appear
@@ -89,6 +94,13 @@ public class NodeType
      */
     public static final NodeType Element 
         = new NodeType( NodeType.ELEMENT, "element" );
+
+    /**
+     * Namespace node type (<tt>namespace</tt>). This field will appear
+     * in the XML document as a namespace declaration.
+     */
+    public static final NodeType Namespace
+        = new NodeType( NodeType.NAMESPACE, "namespace" );
 
 
     /**
@@ -112,7 +124,9 @@ public class NodeType
         if ( nodeType == null )
             return Attribute;
         if ( nodeType.equals( Attribute._name ) )
-            return Attribute;
+            return Attribute;        
+        if ( nodeType.equals( Namespace._name ) )
+            return Namespace;
         if ( nodeType.equals( Element._name ) )
             return Element;
         if ( nodeType.equals( Text._name ) )
