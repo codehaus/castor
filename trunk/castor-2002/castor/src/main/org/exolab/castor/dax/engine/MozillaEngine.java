@@ -70,7 +70,6 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.ObjectNotFoundException;
@@ -80,6 +79,7 @@ import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.FatalPersistenceException;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.QueryExpression;
 
 
 
@@ -93,7 +93,7 @@ public class MozillaEngine
 {
 
 
-    private ClassHandler         _handler;
+    private DAXClassDescriptor    _clsDesc;
 
 
     private DAXFieldDescriptor[]  _fields;
@@ -114,25 +114,23 @@ public class MozillaEngine
     private int                  _firstField;
 
 
-    public MozillaEngine( ClassHandler handler, String rootDN )
+    public MozillaEngine( DAXClassDescriptor clsDesc, String rootDN )
         throws MappingException
     {
         FieldDescriptor[] fields;
-        ClassDescriptor   clsDesc;
         
-        _handler = handler;
+        _clsDesc = clsDesc;
         _firstField = 0;
         /*
         _attrField = _clsDesc.getAttributeSetField();
         */
-        clsDesc = (DAXClassDescriptor) _handler.getDescriptor();
-        fields = clsDesc.getFields();
+        fields = _clsDesc.getFields();
         _fields = new DAXFieldDescriptor[ fields.length ];
         for ( int i = 0 ; i < fields.length ; ++i ) {
             if ( fields[ i ] instanceof DAXFieldDescriptor )
                 _fields[ i ] = (DAXFieldDescriptor) fields[ i ];
         }
-        _dnFieldName = ( (DAXFieldDescriptor) clsDesc.getIdentity() ).getLdapName();
+        _dnFieldName = ( (DAXFieldDescriptor) _clsDesc.getIdentity() ).getLdapName();
         _rootDN = rootDN;
     }
 
@@ -153,18 +151,18 @@ public class MozillaEngine
 
             // XXX
             // Also need to create all the attributes in the attrSet
-            DAXClassDescriptor type;
+            DAXClassDescriptor clsDesc;
             
-            type = (DAXClassDescriptor) _handler.getDescriptor();
-            while ( type != null ) {
-                ldapSet.add( new LDAPAttribute( "objectclass", type.getLdapClass() ) );
-                type = (DAXClassDescriptor) type.getExtends();
+            clsDesc = _clsDesc;
+            while ( clsDesc != null ) {
+                ldapSet.add( new LDAPAttribute( "objectclass", clsDesc.getLdapClass() ) );
+                clsDesc = (DAXClassDescriptor) clsDesc.getExtends();
             }
             ( (LDAPConnection) conn ).add( new LDAPEntry( dn, ldapSet ) );
             return null;
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
-                throw new DuplicateIdentityException( _handler.getJavaClass(), identity );
+                throw new DuplicateIdentityException( _clsDesc.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -188,10 +186,10 @@ public class MozillaEngine
         try {
             entry = ( (LDAPConnection) conn ).read( dn );
             if ( entry == null )
-                throw new ObjectNotFoundException( _handler.getJavaClass(), identity );
+                throw new ObjectNotFoundException( _clsDesc.getJavaClass(), identity );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectNotFoundException( _handler.getJavaClass(), identity );
+                throw new ObjectNotFoundException( _clsDesc.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -259,10 +257,10 @@ public class MozillaEngine
         try {
             entry = ( (LDAPConnection) conn ).read( dn );
             if ( entry == null )
-                throw new ObjectDeletedException( _handler.getJavaClass(), identity );
+                throw new ObjectDeletedException( _clsDesc.getJavaClass(), identity );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectDeletedException( _handler.getJavaClass(), identity );
+                throw new ObjectDeletedException( _clsDesc.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
@@ -357,33 +355,10 @@ public class MozillaEngine
     }
     
     
-    public void changeIdentity( Object conn, Object oldIdentity, Object newIdentity )
-        throws ObjectDeletedException, DuplicateIdentityException, PersistenceException
-    {
-        String oldDN;
-        String newRDN;
-        
-        oldDN = getDN( oldIdentity, true );
-        newRDN = getDN( newIdentity, false );
-        try {
-            ( (LDAPConnection) conn ).rename( oldDN, newRDN, false );
-        } catch ( LDAPException except ) {
-            if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectDeletedException( _handler.getJavaClass(), oldIdentity );
-            if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
-                throw new DuplicateIdentityException( _handler.getJavaClass(), newIdentity );
-            if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
-                 except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
-                throw new FatalPersistenceException( except );
-            throw new PersistenceException( except );
-        }
-    }
-    
-
-    public PersistenceQuery createQuery( String query, Class[] types )
+    public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException
     {
-        return new MozillaQuery( query, types );
+        return new MozillaQuery( query.getStatement( false ), types );
     }
 
 
@@ -430,7 +405,7 @@ public class MozillaEngine
         if ( _dnFields != null ) {
             Object identity;
             
-            identity = Types.newInstance( _handler.getDescriptor().getIdentity().getFieldType() );
+            identity = Types.newInstance( _clsDesc.getIdentity().getFieldType() );
             for ( int i = _dnFields.length ; i-- > 0 ; )
                 _dnFields[ i ].getHandler().setValue( identity, rdns[ i ] );
             return identity;
@@ -581,7 +556,7 @@ public class MozillaEngine
         
         public Class getResultType()
         {
-            return _handler.getJavaClass();
+            return _clsDesc.getJavaClass();
         }
         
         
@@ -607,6 +582,13 @@ public class MozillaEngine
                     throw new FatalPersistenceException( except );
                 throw new PersistenceException( except );
             }
+        }
+
+
+        public void close()
+        {
+            _results = null;
+            _lastResult = null;
         }
         
         
