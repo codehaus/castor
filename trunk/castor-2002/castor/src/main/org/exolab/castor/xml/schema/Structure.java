@@ -73,11 +73,12 @@ public abstract class Structure implements java.io.Serializable {
     public static final short KEYREF              = 13;
     public static final short MODELGROUP          = 14;
     public static final short MODELGROUP_REF      = 15;
-    public static final short SCHEMA              = 16;
-    public static final short SIMPLE_CONTENT      = 17;
-    public static final short SIMPLE_TYPE         = 18;
-    public static final short UNIQUE              = 19;
-    public static final short WILDCARD            = 20;
+    public static final short REDEFINE            = 16;
+    public static final short SCHEMA              = 17;
+    public static final short SIMPLE_CONTENT      = 18;
+    public static final short SIMPLE_TYPE         = 19;
+    public static final short UNIQUE              = 20;
+    public static final short WILDCARD            = 21;
 
     //-- should be removed eventually
     public static final short UNKNOWN         = -1;
