@@ -80,7 +80,6 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
      */
     protected MarshallingTest _marshallingConf;
 
-
     /**
      * Creates a CTF test case for the Marshalling framework.
      */
@@ -154,16 +153,16 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         _hasDump =   rootType.getDump();
         _hasRandom = rootType.getRandom();
         
-        //-- Compile class files (if necessary)
-        //-- NOTE: This really slows things down, so we should
-        //-- optimize the compilation and only do it, if needed
-        //-- better yet, it should be moved to build.xml
-        verbose("-->Compiling any necessary source files");
-        try {
-            compileDirectory(_outputRootFile);
-        } catch (BuildException e) {
-            if (_printStack)
-                e.printStackTrace(System.out); 
+        if (!_test.isDirectoryCompiled()) {
+            verbose("-->Compiling any necessary source files");
+            try {
+                compileDirectory(_outputRootFile);
+                //-- if we reach here, directory was successfully compiled.
+                _test.setDirectoryCompiled(true);
+            } catch (BuildException e) {
+                if (_printStack)
+                    e.printStackTrace(System.out); 
+            }
         }
         
         //-- Add outputRoot to classpath
