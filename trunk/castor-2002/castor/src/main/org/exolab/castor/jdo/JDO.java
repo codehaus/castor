@@ -50,8 +50,19 @@ package org.exolab.castor.jdo;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Hashtable;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
+import java.rmi.Remote;
+import javax.naming.Referenceable;
+import javax.naming.Reference;
+import javax.naming.StringRefAddr;
+import javax.naming.RefAddr;
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.spi.ObjectFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.TransactionImpl;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
@@ -66,7 +77,8 @@ import org.exolab.castor.jdo.engine.DatabaseRegistry;
  * @version $Revision$ $Date$
  */
 public class JDO
-    implements DatabaseSource
+    implements JDOSource, Referenceable,
+	       ObjectFactory, Serializable
 {
 
 
@@ -74,6 +86,12 @@ public class JDO
 
 
     private String          _dbName;
+
+
+    /**
+     * Description of this datasource.
+     */
+    private String _description = "Castor JDOSource";
 
 
     public void setLogWriter( PrintWriter logWriter )
@@ -85,6 +103,32 @@ public class JDO
     public PrintWriter getLogWriter()
     {
         return _logWriter;
+    }
+
+
+    /**
+     * Sets the description of this datasource.
+     * The standard name for this property is <tt>description</tt>.
+     *
+     * @param description The description of this datasource
+     */
+    public synchronized void setDescription( String description )
+    {
+	if ( description == null )
+	    throw new NullPointerException( "DataSource: Argument 'description' is null" );
+	_description = description;
+    }
+
+
+    /**
+     * Returns the description of this datasource.
+     * The standard name for this property is <tt>description</tt>.
+     *
+     * @return The description of this datasource
+     */
+    public String getDescription()
+    {
+	return _description;
     }
 
 
@@ -109,18 +153,6 @@ public class JDO
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
         db = new DatabaseImpl( _dbName, _logWriter );
         return db;
-    }
-
-
-    public Transaction newTransaction()
-    {
-        return new TransactionImpl();
-    }
-
-
-    public Transaction currentTransaction()
-    {
-        return TransactionImpl.getCurrent();
     }
 
 
@@ -178,6 +210,56 @@ public class JDO
         DatabaseRegistry.loadDatabase( source, resolver, null, loader );
     }
 
+
+    public synchronized Reference getReference()
+    {
+	Reference ref;
+
+	// We use same object as factory.
+	ref = new Reference( getClass().getName(), getClass().getName(), null );
+
+        if ( _description != null )
+            ref.add( new StringRefAddr( "description", _description ) );
+        if ( _dbName != null )
+            ref.add( new StringRefAddr( "dbName", _dbName ) );
+ 	return ref;
+    }
+
+
+    public Object getObjectInstance( Object refObj, Name name, Context nameCtx, Hashtable env )
+        throws NamingException
+    {
+	Reference ref;
+
+	// Can only reconstruct from a reference.
+	if ( refObj instanceof Reference ) {
+	    ref = (Reference) refObj;
+	    // Make sure reference is of datasource class.
+	    if ( ref.getClassName().equals( getClass().getName() ) ) {
+
+		JDO     ds;
+		RefAddr addr;
+
+		try {
+		    ds = (JDO) Class.forName( ref.getClassName() ).newInstance();
+		} catch ( Exception except ) {
+		    throw new NamingException( except.toString() );
+		}
+		addr = ref.get( "description" );
+		if ( addr != null )
+		    ds._description = (String) addr.getContent();
+		addr = ref.get( "dbName" );
+		if ( addr != null )
+		    ds._dbName = (String) addr.getContent();
+		return ds;
+
+	    } else
+		throw new NamingException( "JDOSource: Reference not constructed from class " + getClass().getName() );
+	} else if ( refObj instanceof Remote )
+	    return refObj;
+	else
+	    return null;
+    }
 
 }
 
