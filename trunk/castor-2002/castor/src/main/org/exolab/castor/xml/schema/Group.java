@@ -80,8 +80,14 @@ public class Group extends Particle
      * The Compositor for the Group
     **/
     private Order order = Order.seq;
-    
+
     private String _id  = null;
+
+    /**
+     * True if was created for a group tag, false otherwise
+     *  (all, choice, sequence)
+     *  */
+    private boolean _isModelGroupDefinition= false;
 
     /**
      * Creates a new Group, with no name
@@ -101,7 +107,7 @@ public class Group extends Particle
     } //-- Group
 
 
-    /** 
+    /**
      * Returns the Model Group Collection type for this Group
      *
      * This should be removed?
@@ -131,11 +137,11 @@ public class Group extends Particle
      * Returns the compositor for this Group
      * @return the compositor for this Group
     **/
-    public Order getOrder() {        
-        
+    public Order getOrder() {
+
         //-- Return proper compositor...
-        //-- according to XML Schema spec 20000407 section 4.3.5 
-        
+        //-- according to XML Schema spec 20000407 section 4.3.5
+
         //-- Note: it's important not to simply call
         //-- #getParticleCount or #getParticle because those
         //-- methods also perform some trickery
@@ -143,12 +149,31 @@ public class Group extends Particle
             Particle particle = _contentModel.getParticle(0);
             if (particle.getStructureType() == Structure.GROUP) {
                 if ((getMinOccurs() == 1) && (getMaxOccurs() == 1))
-                    return ((Group)particle).getOrder();                
+                    return ((Group)particle).getOrder();
             }
         }
         return this.order;
     } //-- getOrder
-    
+
+
+    /**
+     * Sets if the group is a model group definition
+     */
+    public void setIsModelGroupDefinition(boolean isModelGroupDefinition) {
+        _isModelGroupDefinition= isModelGroupDefinition;
+    }
+
+
+    /**
+     * Tells if the group is a model group definition
+     * @return true if the group is a model group definition (<group> tag), false
+     * otherwise (<all>, <choice>, or <sequence> tags.
+     */
+    public boolean isModelGroupDefinition() {
+        return _isModelGroupDefinition;
+    }
+
+
     /**
      * Returns the Id used to Refer to this Object
      * @return the Id used to Refer to this Object
@@ -221,14 +246,14 @@ public class Group extends Particle
     **/
     public Enumeration enumerate() {
         //-- Some trickery to properly handle
-        //-- XML Schema spec 20000407 section 4.3.5 
+        //-- XML Schema spec 20000407 section 4.3.5
         if (_contentModel.getParticleCount() == 1) {
             Particle particle = _contentModel.getParticle(0);
             if (particle.getStructureType() == Structure.GROUP) {
                 if ((getMinOccurs() == 1) && (getMaxOccurs() == 1))
-                    return ((Group)particle).enumerate();                
+                    return ((Group)particle).enumerate();
             }
-        }        
+        }
         return _contentModel.enumerate();
     } //-- enumerate
 
@@ -239,17 +264,17 @@ public class Group extends Particle
     **/
     public Particle getParticle(int index) {
         //-- Some trickery to properly handle
-        //-- XML Schema spec 20000407 section 4.3.5 
+        //-- XML Schema spec 20000407 section 4.3.5
         if (_contentModel.getParticleCount() == 1) {
             Particle particle = _contentModel.getParticle(0);
             if (particle.getStructureType() == Structure.GROUP) {
                 if ((getMinOccurs() == 1) && (getMaxOccurs() == 1))
-                    return ((Group)particle).getParticle(index);                
+                    return ((Group)particle).getParticle(index);
             }
-        }        
+        }
         return _contentModel.getParticle(index);
     } //-- getParticle
-    
+
     /**
      * Returns the number of particles contained within
      * this ContentModelGroup
@@ -258,14 +283,14 @@ public class Group extends Particle
     **/
     public int getParticleCount() {
         //-- Some trickery to properly handle
-        //-- XML Schema spec 20000407 section 4.3.5 
+        //-- XML Schema spec 20000407 section 4.3.5
         if (_contentModel.getParticleCount() == 1) {
             Particle particle = _contentModel.getParticle(0);
             if (particle.getStructureType() == Structure.GROUP) {
                 if ((getMinOccurs() == 1) && (getMaxOccurs() == 1))
-                    return ((Group)particle).getParticleCount();                
+                    return ((Group)particle).getParticleCount();
             }
-        }        
+        }
         return _contentModel.getParticleCount();
     } //-- getParticleCount
 
