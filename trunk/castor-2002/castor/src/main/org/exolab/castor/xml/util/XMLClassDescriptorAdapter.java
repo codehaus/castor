@@ -152,7 +152,7 @@ public class XMLClassDescriptorAdapter
                 XMLNaming naming = XMLNaming.getInstance();
                 xmlFieldName = naming.toXMLName(identity.getFieldName());
             }
-            addFieldDescriptor(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
+            setIdentity(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
         }
 
         setJavaClass(classDesc.getJavaClass());
