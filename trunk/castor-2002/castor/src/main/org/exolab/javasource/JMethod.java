@@ -107,9 +107,9 @@ public class JMethod implements JMember {
         }
         
         _classes   = new Vector(1);
-        this.jdc          = new JDocComment();
         this.source       = new JSourceCode();
         _signature = new JMethodSignature(name, returnType);
+        this.jdc          = _signature.getJDocComment();
         
     } //-- JMethod
 
