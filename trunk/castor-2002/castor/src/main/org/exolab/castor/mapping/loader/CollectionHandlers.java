@@ -73,6 +73,13 @@ final class CollectionHandlers
 
 
     /**
+     * Name of special collection type in which case get/set methods are
+     * responsible for handling the enumeration.
+     */
+    public static final String Enumerate = "enumerate";
+
+
+    /**
      * Returns the collection's Java class from the collection name.
      * The collection name may be a short name (e.g. <tt>vector</tt>)
      * or the collection Java class name (e.g. <tt>java.util.Vector</tt>).
@@ -85,6 +92,8 @@ final class CollectionHandlers
     static Class getCollectionType( String name )
         throws MappingException
     {
+        if ( name.equals( Enumerate ) )
+            return null;
         for ( int i = 0 ; i < _colHandlers.length ; ++i )
             if ( _colHandlers[ i ].shortName.equals( name ) ||
                  _colHandlers[ i ].javaClass.getName().equals( name ) )
