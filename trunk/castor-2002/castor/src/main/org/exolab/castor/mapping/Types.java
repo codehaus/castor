@@ -157,10 +157,12 @@ public abstract class Types
             return type.newInstance();
         } catch ( IllegalAccessException except ) {
             // This should never happen unless  bytecode changed all of a sudden
-            throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
+            throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable",
+                                                         type.getName(), except.getMessage() ) );
         } catch ( InstantiationException except ) {
             // This should never happen unless  bytecode changed all of a sudden
-            throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
+            throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable",
+                                                         type.getName(), except.getMessage() ) );
         }
     }
 
@@ -216,6 +218,19 @@ public abstract class Types
                 return _typeInfos[ i ].immutable;
         }
         return false;
+    }
+
+
+    /**
+     * Returns true if the Java type implements the {@link Cloneable}
+     * interface.
+     *
+     * @param type The Java type
+     * @return True if declared as cloneable
+     */
+    public static boolean isCloneable( Class type )
+    {
+        return ( Cloneable.class.isAssignableFrom( type ) );
     }
 
 
