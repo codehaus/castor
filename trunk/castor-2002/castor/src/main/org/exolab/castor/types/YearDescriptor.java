@@ -337,8 +337,8 @@ public class YearDescriptor
             //-- update current instance of time with new year
             try {
                 Year temp = Year.parseYear(value.toString()) ;
-                yearTarget.setYear(temp.getYear());
                 yearTarget.setCentury(temp.getCentury());
+                yearTarget.setYear(temp.getYear());
             }
             catch (Exception ex) {
                 //-- ignore for now

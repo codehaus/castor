@@ -338,9 +338,9 @@ public class MonthDescriptor
             //-- update current instance of time with new month
             try {
                 Month temp = Month.parseMonth(value.toString()) ;
-                monthTarget.setMonth(temp.getMonth());
-                monthTarget.setYear(temp.getYear());
                 monthTarget.setCentury(temp.getCentury());
+                monthTarget.setYear(temp.getYear());
+                monthTarget.setMonth(temp.getMonth());
             }
             catch (Exception ex) {
                 //-- ignore for now
