@@ -127,14 +127,14 @@ public class TestMaster
     }
 
 
-    public void setDetail( TestDetail detail )
+    public void addDetail( TestDetail detail )
     {
         _details.addElement( detail );
     }
 
-    public Enumeration getDetail()
+    public Vector getDetails()
     {
-        return _details.elements();
+        return _details;
     }
 
 

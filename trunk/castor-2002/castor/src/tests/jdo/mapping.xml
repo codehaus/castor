@@ -31,7 +31,7 @@
     <field name="group" type="jdo.TestGroup" required="true">
       <sql name="group_id" />
     </field>
-    <field name="detail" type="jdo.TestDetail" collection="enumerate">
+    <field name="details" type="jdo.TestDetail" collection="vector">
     </field>
   </class>
 

@@ -110,7 +110,7 @@ public class TypeHandling
             db.begin();
             oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
             // This one tests that bind performs type conversion
-            oql.bind( (long) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -127,7 +127,7 @@ public class TypeHandling
             db.begin();
             oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
             // This one tests that bind performs type conversion
-            oql.bind( (long) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();

@@ -673,7 +673,7 @@ Will be adding this later.
 
                 relDesc = (JDOClassDescriptor) fields[ i ].getClassDescriptor();
                 if ( relDesc == null )
-                    System.out.println( "No relation for " + fields[ i ] );
+                    System.err.println( "No relation for " + fields[ i ] );
                 else {
                     FieldDescriptor[] relFields;
                     String            foreKey = null;
@@ -729,6 +729,11 @@ Will be adding this later.
                 this.dirtyCheck = false;
                 this.sqlType = java.sql.Types.OTHER;
             }
+        }
+
+        public String toString()
+        {
+            return name;
         }
 
     }

@@ -34,7 +34,7 @@
        <pre>
   JDO         jdo;
   Database    db;
-  OQLQuery    oql;
+  Query       oql;
   Enumeration enum;
 
   <font color="red">// Define a new database source</font>
@@ -46,12 +46,12 @@
   db.begin();
 
   <font color="red">// Select all the products in a given group</font>
-  oql = db.getOQLQuery( "SELECT p FROM Product p WHERE group=$" );
+  oql = db.getQuery( "SELECT p FROM Product p WHERE group=$" );
   oql.bind( groupId );
   enum = oql.execute();
-  while ( enum.hasMoreElements() ) {
+  while ( enum.hasMore() ) {
     <font color="red">// A 25% mark down for each product and mark as sale</font>
-    prod = (Product) enum.nextElement();
+    prod = (Product) enum.next();
     prod.markDown( 0.25 );
     prod.setOnSale( true );
   }

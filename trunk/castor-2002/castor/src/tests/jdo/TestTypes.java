@@ -47,6 +47,9 @@
 package jdo;
 
 
+import java.math.BigDecimal;
+
+
 /**
  * Test tyoe handling against test_types.
  */
@@ -54,7 +57,7 @@ public class TestTypes
 {
 
 
-    private long    _id;
+    private long           _id;
 
 
     private java.util.Date _date;

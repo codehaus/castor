@@ -15,7 +15,7 @@
 
     <property name="classpath" value="${classpath}:${classes}" />
     <property name="build.compiler" file="classic" />
-    <property name="deprecation" value="true" />
+    <property name="deprecation" value="false" />
     <property file="${etc}/VERSION" />
     <property name="archive" value="${project}-${version}" />
   </target>
