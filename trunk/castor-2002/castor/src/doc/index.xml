@@ -24,17 +24,19 @@
           <li>ODMG API support with OQL queries</li>
           <li>EJB container managed persistence provider for OpenEJB</li>
         </ul>
-      </p>
+        See the <a href="status.xml">status page</a> for more information.</p>
 
     </section>
 
     <section title="News">
-
+      <p>
       <ul>
+        <li>Jan 31, 2000: Version 0.7.6, first DAX release</li>
         <li>Jan 24, 2000: Version 0.7.5, full persistence engine</li>
         <li>Jan 7, 2000: Version 0.7, first to include JDO</li>
         <li>Dec 21, 1999: Version 0.6</li>
       </ul>
+       See the <a href="changelog.xml">change log page</a> for more information.</p>
 
     </section>
 

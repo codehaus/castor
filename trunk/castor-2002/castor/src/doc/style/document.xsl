@@ -127,7 +127,9 @@
 
   <xsl:template match="ul/li">
     <tr>
-      <td align="left" valign="top" width="15"><img src="images/bullets/blue.gif" height="22" width="15" alt="*"/></td>
+      <td align="left" valign="top" width="15">
+        <img src="style/images/bullets/blue.gif" height="22" width="15" alt="*"/>
+     </td>
       <td align="left" valign="top"><xsl:apply-templates/></td>
     </tr>
   </xsl:template>
