@@ -548,16 +548,16 @@ public final class LockEngine {
         }
     }
 
-    public void markDelete( TransactionContext tx, OID oid, Object object, int timeout )
-            throws PersistenceException, LockNotGrantedException {
+    public void markDelete(TransactionContext tx, OID oid, Object object, int timeout)
+        throws PersistenceException, LockNotGrantedException {
 
-        ObjectLock lock;
-        TypeInfo   typeInfo;
-        typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
+        TypeInfo typeInfo = (TypeInfo) _typeInfo.get(oid.getName());
 
-        lock = typeInfo.upgrade( oid, tx, timeout );
+        ObjectLock lock = typeInfo.upgrade(oid, tx, timeout);
 
-        typeInfo.molder.markDelete( tx, oid, lock, object );
+        typeInfo.molder.markDelete(tx, oid, lock, object);
+
+        lock.expire();
     }
 
 
