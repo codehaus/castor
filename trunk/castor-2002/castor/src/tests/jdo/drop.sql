@@ -16,3 +16,4 @@ drop table test_keygen_ext;
 
 drop table test_seqtable;
 
+drop procedure sp_check_permissions;

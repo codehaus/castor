@@ -628,10 +628,13 @@ public final class CacheEngine
 
             if ( _logInterceptor != null )
                 _logInterceptor.creating( typeInfo.javaClass, identity );
-            // Create the object in persistent storage acquiring a lock on the object.
-            // If no identity was given for the object, this method will attempt to
-            // create an identity using a key generator.
-            identity = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
+            // Is it creating after delete?
+            if ( ! tx.getObjectEntry( object ).deleted ) {
+                // Create the object in persistent storage acquiring a lock on the object.
+                // If no identity was given for the object, this method will attempt to
+                // create an identity using a key generator.
+                identity = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
+            }
             if ( identity == null )
                 throw new PersistenceExceptionImpl( "persist.noIdentity" );
             typeInfo.handler.setIdentity( object, identity );
@@ -657,11 +660,7 @@ public final class CacheEngine
                 if ( relations[ i ] != null && relations[ i ].isAttached() ) {
                     Object related;
 
-                    if ( ! relations[ i ].isMulti() ) {
-                        related = relations[ i ].getRelated( object );
-                        if ( related != null && ! tx.isPersistent( related ) )
-                            tx.create( this, related, relations[ i ].getIdentity( related ) );
-                    } else {
+                    if ( relations[ i ].isMulti() ) {
                         Enumeration enum;
 
                         enum = (Enumeration) relations[ i ].getRelated( object );
@@ -848,11 +847,7 @@ public final class CacheEngine
                 if ( relations[ i ] != null ) {
                     Object related;
 
-                    if ( ! relations[ i ].isMulti() ) {
-                        related = relations[ i ].getRelated( object );
-                        if ( related != null && ! tx.isPersistent( related ) )
-                            tx.create( this, related, relations[ i ].getIdentity( related ) );
-                    } else {
+                    if ( relations[ i ].isMulti() ) {
                         Enumeration enum;
 
                         enum = (Enumeration) relations[ i ].getRelated( object );
@@ -963,30 +958,7 @@ public final class CacheEngine
 	                // XXX Need validity check and better testing for null elements
 
 	                // relations[ i ].checkValidity( object );
-	                if ( ! relations[ i ].isMulti() ) {
-	                    Object related;
-	                    Object relIdentity;
-
-	                    related = relations[ i ].getRelated( object );
-	                    if ( related == null ) {
-	                        if ( original[ i ] != null && relations[ i ].isAttached() )
-	                            tx.markDelete( this, relations[ i ].getRelatedClass(), original[ i ] );
-	                    } else {
-	                        relIdentity = relations[ i ].getIdentity( related );
-	                        if ( original[ i ] == null ) {
-	                            if ( ! tx.isPersistent( related ) )
-	                                tx.create( this, related, relIdentity );
-	                        } else if ( ! original[ i ].equals( relIdentity ) ) {
-	                            // oleg: Wrong! Don't delete master!
-	                            // if ( relations[ i ].isAttached() )
-	                            //     tx.markDelete( this, relations[ i ].getRelatedClass(), original[ i ] );
-	                            if ( ! tx.isPersistent( related ) )
-	                                tx.create( this, related, relIdentity );
-	                        }
-	                    }
-
-	                } else {
-
+                    if ( relations[ i ].isMulti() ) {
 	                    Enumeration enum;
 	                    Object[]    origIdentity;
 

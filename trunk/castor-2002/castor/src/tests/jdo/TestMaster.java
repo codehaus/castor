@@ -140,6 +140,22 @@ public class TestMaster
     }
 
 
+    public TestDetail findDetail(int id)
+    {
+        Enumeration enum;
+        TestDetail detail;
+
+        enum = _details.elements();
+        while ( enum.hasMoreElements() ) {
+            detail = (TestDetail) enum.nextElement();
+            if ( detail.getId() == id ) {
+                return detail;
+            }
+        }
+        return null;
+    }
+
+
     public TestDetail createDetail()
     {
         return new TestDetail();

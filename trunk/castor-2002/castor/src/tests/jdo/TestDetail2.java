@@ -47,30 +47,93 @@
 package jdo;
 
 
-import org.exolab.castor.jdo.Database;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
-
-
 /**
- * Test for RETURNING key generator.
+ * Test object mapping to test_detail2 used to conduct relation tests.
  */
-public class KeyGenReturning
-    extends KeyGenGeneric
+public class TestDetail2
 {
 
 
-    public KeyGenReturning( CWTestCategory category )
-        throws CWClassConstructorException
+    private int        _id;
+
+
+    private String     _value;
+
+
+    private TestDetail _detail;
+
+
+    static final int       DefaultId = 5;
+
+
+    static final String    DefaultValue = "value";
+
+
+    public TestDetail2( int id )
     {
-        super( "TC14", "Key generator: SEQUENCE in RETURNING mode", category );
+        _id = id;
+        _value = DefaultValue;
     }
 
-    protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 
-            throws Exception
+
+    public TestDetail2()
     {
-        return TestOneKeyGen( stream, db, TestReturningObject.class, TestReturningExtends.class );
     }
+
+
+    public void setId( int id )
+    {
+        _id = id;
+    }
+
+
+    public int getId()
+    {
+        return _id;
+    }
+
+
+    public void setValue( String value )
+    {
+        _value = value;
+    }
+
+
+    public String getValue()
+    {
+        return _value;
+    }
+
+
+    public void setDetail( TestDetail detail )
+    {
+        _detail = detail;
+    }
+
+
+    public TestDetail getDetail()
+    {
+        return _detail;
+    }
+
+
+    public String toString()
+    {
+        return _id + " / " + _value + " / " + _detail.getId();
+    }
+
+
+    public boolean equals( Object other )
+    {
+        if ( other == this )
+            return true;
+        if ( other != null && other instanceof TestDetail2 ) {
+            if ( ( (TestDetail2) other )._id == _id &&
+                 ( (TestDetail2) other )._value.equals( _value ) )
+                return true;
+        }
+        return false;
+    }
+
 
 }

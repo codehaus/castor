@@ -72,6 +72,23 @@
     <field name="master" type="jdo.TestMaster" required="true">
       <sql name="master_id" />
     </field>
+    <field name="details2" type="jdo.TestDetail2" collection="vector" required="false">
+    </field>
+  </class>
+
+
+  <class name="jdo.TestDetail2" access="shared" identity="id">
+    <description>Test detail2 table</description>
+    <map-to table="test_detail2" />
+    <field name="id" type="integer">
+      <sql name="detail2_id" type="numeric" />
+    </field>
+    <field name="value" type="string" required="true">
+      <sql name="value" type="varchar" />
+    </field>
+    <field name="detail" type="jdo.TestDetail" required="true">
+      <sql name="detail_id" />
+    </field>
   </class>
 
 
@@ -102,7 +119,7 @@
       <sql name="ttm" type="time" dirty="ignore" />
     </field>
     <field name="intValue" type="integer" required="false" >
-      <sql name="int_val" type="integer" />
+      <sql name="int_val" type="integer" dirty="ignore" />
     </field>
     <field name="charValue" type="char" required="false" >
       <sql name="char_val" type="char" />

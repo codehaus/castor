@@ -55,6 +55,7 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.engine.LongTransactionSupport;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -103,6 +104,8 @@ public class Join
             TestGroup     group;
             TestDetail    detail;
             Enumeration   enum;
+            TestMaster    master2;
+            LongTransactionSupport lts;
             
             db = _category.getDatabase( stream.verbose() );
             db.begin();
@@ -205,69 +208,13 @@ public class Join
                     stream.writeVerbose( "Error: loaded master without three details: " + master );
                     result  = false;
                 } else {
-                    // don't remove: it is used in the next test
-                    //db.remove( master );
+                    db.remove( master );
                     stream.writeVerbose( "Created master with details: " + master );
                 }
             } else {
                 stream.writeVerbose( "Error: failed to create master with details group" );
                 result = false;
             }
-            db.commit();
-            if ( ! result )
-                return false;
-
-
-            stream.writeVerbose( "Attempt to change details" );
-            db.begin();
-            oql.bind( TestMaster.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                master = (TestMaster) enum.nextElement();
-            } else {
-                stream.writeVerbose( "Error: failed to find master with details group" );
-                return false;
-            }
-            // remove detail with id == TestDetail.DefaultId
-            master.getDetails().removeElementAt( 0 );
-            // remove detail with id == TestDetail.DefaultId + 1 explicitly
-            detail = (TestDetail) master.getDetails().elementAt( 0 );
-            master.getDetails().removeElementAt( 0 );
-            db.remove( detail );
-            // add new detail
-            master.addDetail( new TestDetail( TestDetail.DefaultId + 3 ) );
-            // add new detail and create it explicitely
-            detail = new TestDetail( TestDetail.DefaultId + 4 );
-            master.addDetail( detail );
-            db.create( detail );
-            // delete, then create detail with id == TestDetail.DefaultId + 2 explicitly
-            detail = (TestDetail) master.getDetails().elementAt( 0 );
-            master.getDetails().removeElementAt( 0 );
-            db.remove( detail );
-            master.addDetail( detail );
-            db.create( detail );
-            db.commit();
-            db.begin();
-            oql.bind( TestMaster.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                master = (TestMaster) enum.nextElement();
-                if ( master.getDetails().size() == 0 ||
-                     master.getDetails().contains( new TestDetail( TestDetail.DefaultId ) ) ||
-                     master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 1 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 2 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 3 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 4 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
-                    result  = false;
-                } else {
-                    stream.writeVerbose( "Details changed correctly: " + master );
-                }
-            } else {
-                stream.writeVerbose( "Error: master not found" );
-                result = false;
-            }
-            db.remove( master );
             db.commit();
             if ( ! result )
                 return false;
