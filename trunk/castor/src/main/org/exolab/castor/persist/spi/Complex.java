@@ -218,13 +218,23 @@ public class Complex {
         else
             return _all[i];
     }
+    
+    /* 
+     * Overrides Object.toString()
+     * @see java.lang.Object#toString()
+     */
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("<");
         for( int i=0; i < _size; i++ ) {
-            if ( i != 0 ) sb.append(",");
-            sb.append(get(i));
-            sb.append("("+get(i).hashCode()+")");
+        	if ( i != 0 ) 
+        		sb.append(",");
+        	Object obj = get(i);
+            sb.append(obj);
+            if (obj != null)
+            	sb.append("(").append(obj.hashCode()).append(")");
+            else
+            	sb.append ("(N/A)");
         }
         sb.append(">");
         return sb.toString();
