@@ -50,14 +50,15 @@ import org.exolab.castor.xml.XMLClassDescriptor;
 
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Vector;
 
 /**
- * The default java.util.Vector class descriptor
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * The default set of built-in ClassDescriptors
+ * 
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public final class CoreDescriptors {
 
     private static final String LIST_CLASS_NAME = "java.util.List";
@@ -84,7 +85,13 @@ public final class CoreDescriptors {
     private static final XMLClassDescriptor DATE_DESCRIPTOR =
         new DateClassDescriptor();
         
-        
+    
+    /**
+     * The java.util.Locale ClassDescriptor
+     */
+    private static final XMLClassDescriptor LOCALE_DESCRIPTOR =
+        new LocaleDescriptor();
+    
     /**
      * The java.sql.Date ClassDescriptor
      */
@@ -156,6 +163,10 @@ public final class CoreDescriptors {
         if (LIST_DESCRIPTOR != null) {
             if ((LIST_CLASS == clazz) || LIST_CLASS.isAssignableFrom(clazz))
                 return LIST_DESCRIPTOR;
+        }
+        
+        if (clazz == Locale.class) {
+            return LOCALE_DESCRIPTOR;
         }
         
         //-- java.sql Date/Time classes
