@@ -16,9 +16,9 @@
     <section title="Quick Description">
 
       <p>
-         Castor is an Open Source data binding framework for Java[tm]. It's 
-         the shortest path between Java objects, XML documents and relational 
-         tables. Castor provides Java-to-XML binding, Java-to-SQL persistence, 
+         Castor is an Open Source data binding framework for Java[tm]. It's
+         the shortest path between Java objects, XML documents and relational
+         tables. Castor provides Java-to-XML binding, Java-to-SQL persistence,
          and more.
       </p>
 
@@ -26,7 +26,7 @@
 
     <section title="News">
       <!-- include the latest news -->
-      <include href="news.xml"/>
+      <include href="news.xml" select-node="news" max-nodes="8"/>
     </section>
 
   </body>
