@@ -45,11 +45,8 @@
 
 package org.exolab.castor.xml;
 
-//-- xml related imports
-import org.xml.sax.*;
-import org.w3c.dom.*;
-import org.apache.xml.serialize.Serializer;
-import org.apache.xml.serialize.OutputFormat;
+
+//-- castor imports
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
@@ -62,9 +59,17 @@ import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.List;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
+import org.exolab.castor.util.NestedIOException;
 import org.exolab.castor.util.Stack;
 
+//-- misc xml related imports
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributeListImpl;
+import org.xml.sax.helpers.ParserAdapter;
+
+import org.w3c.dom.Node;
+import org.apache.xml.serialize.Serializer;
+import org.apache.xml.serialize.OutputFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -252,8 +257,6 @@ public class Marshaller extends MarshalFramework {
     private boolean _validate = false;
 
 
-
-
     /**
      * Creates a new Marshaller with the given DocumentHandler.
      *
@@ -268,6 +271,37 @@ public class Marshaller extends MarshalFramework {
         initialize();
     } //-- Marshaller
 
+
+    /**
+     * Creates a new Marshaller with the given SAX ContentHandler.
+     *
+     * @param handler the ContentHandler to "marshal" to.
+    **/
+    public Marshaller( ContentHandler handler ) 
+        throws IOException
+    {
+        if ( handler == null )
+            throw new IllegalArgumentException( "Argument 'handler' is null." );
+            
+        
+        //-- wrap content handler to be compatable with
+        //-- document handler
+        if (handler instanceof DocumentHandler)
+            _handler = (DocumentHandler)handler;
+        else {
+            try {
+                ParserAdapter adapter = new ParserAdapter();
+                adapter.setContentHandler(handler);
+                _handler = adapter;
+            }
+            catch(SAXException sx) {
+                throw new NestedIOException(sx);
+            }
+        }
+
+        // call internal initializer
+        initialize();
+    } //-- Marshaller
 
     /**
      * Creates a new Marshaller with the given writer.
