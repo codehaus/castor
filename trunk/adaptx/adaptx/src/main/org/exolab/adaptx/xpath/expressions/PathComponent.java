@@ -40,6 +40,26 @@ public interface PathComponent
     extends XPathExpression, MatchExpression
 {
 
+    /**
+     * Returns true if this PathComponent is a FilterExpr.
+     * Note that if this method returns true, then a call to 
+     * #isLocationStep must return false.
+     *
+     * @return true if this PathComponent is a FilterExpr
+     * @see isLocationStep
+     */
+    public boolean isFilterExpr();
+    
+    /**
+     * Returns true if this PathComponent is a LocationStep.
+     * Note that if this method returns true, then a call to 
+     * #isFilterExpr must return false.
+     *
+     * @return true if this PathComponent is a LocationStep
+     * @see isFilterExpr
+     */
+    public boolean isLocationStep();
+    
 
     /**
      * Determines the priority of a PatternExpr as follows:
@@ -60,6 +80,17 @@ public interface PathComponent
     public abstract double getDefaultPriority();
     
 
+    /**
+     * Returns the sub-expression encapsulated by this PathComponent.
+     * the sub-expression will either be a PrimaryExpr if this
+     * PathComponent is a FilterExpr, or a NodeExpression if this
+     * Pathcomponent is a LocationStep. This method may return
+     * null if no such sub-expression exists for the PathComponent.
+     *
+     * @return the sub-expression encapsulated by this PathComponent.
+     */
+    public XPathExpression getSubExpression();
+    
     /**
      * Evaluates the PredicateExpr of this PathComponent against the given 
      * NodeSet and XPathContext.
@@ -84,11 +115,6 @@ public interface PathComponent
      */
     public boolean hasPredicates();
     
-    
-    //public int getAncestryOp()
-    //{
-    //    return this.ancestryOp;
-    //} //-- getAncestryOp
 
     
 } //-- PathComponent
