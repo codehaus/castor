@@ -1,6 +1,11 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed the SQLTypes TypeConverters so that each anonymous method 
+       that calls a getter that wraps DateFormat et al. only does so 
+       once. 
+       (Bruce - 20031124)
+
 JDO:   Switched the logging mechanism in Castor over to use Jakarta Commons
        Logging with Log4J as the default logging package. 
        (Bruce - 20031110) 
