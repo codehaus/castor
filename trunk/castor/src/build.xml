@@ -279,7 +279,7 @@
 
     </target>
 
-    <target name="jar.all" depends="release,jar.jdotests"
+    <target name="jar.all" depends="release,srcgen.anttask.jar,jar.jdotests"
             description="An alias to call the release and jar.jdotests targets"/>
 
     <target name="jar.jdotests" depends="tests" description="Creates a JAR file of the JDO tests">
@@ -436,10 +436,10 @@
         <zip zipfile="${dist}/${archive.name}-src.zip" basedir="${build}" includes="${archive.name}/**"/>
     </target>
 
-    <target name="release" depends="clean,jar,source,docs,tarball"
+    <target name="release" depends="clean,jar,srcgen.anttask.jar,source,docs,tarball"
             description="An alias to call the clean, jar, source, docs and tarball targets"/>
 
-    <target name="tarball" depends="prepare,doc,jar" description="Build the binary distrutions (tarball and zip archive.names)">
+    <target name="tarball" depends="prepare,doc,jar,srcgen.anttask.jar" description="Build the binary distrutions (tarball and zip archive.names)">
         <delete file="${dist}/${archive.name}.tgz"/>
         <delete file="${dist}/${archive.name}.zip"/>
         <delete dir="${build}/${archive.name}"/>
@@ -448,7 +448,8 @@
             <fileset dir="${etc}" includes="README,LICENSE,CHANGELOG,sourceGen*"/>
         </copy>
         <copy todir="${build}/${archive.name}">
-            <fileset dir="${dist}" includes="${archive.name}.jar,${archive.name}-xml.jar"/>
+            <fileset dir="${dist}"
+            includes="${archive.name}.jar,${archive.name}-xml.jar,${srcgen.ant.task.name}.jar"/>
         </copy>
         <copy todir="${build}/${archive.name}">
             <fileset dir="${lib}" includes="jdbc-se2.0.jar,jndi.jar,jta1.0.1.jar,xerces.jar,ldapjdk.jar,xslp.jar"/>
