@@ -180,17 +180,20 @@ public final class XADatabaseImpl
     public void commit()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
-        throw new IllegalStateException();
+        throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
     }
 
 
     public void rollback()
         throws TransactionNotInProgressException
     {
-        throw new IllegalStateException();
+        throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
     }
 
 
+    /**
+     * @deprecated Use {@link #commit} and {@link #rollback} instead
+     */
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException
     {

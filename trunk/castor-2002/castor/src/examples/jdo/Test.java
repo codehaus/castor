@@ -127,9 +127,9 @@ public class Test
         // Checkpoint commits all the updates to the database
         // but leaves the transaction (and locks) open
         writer.println( "Transaction checkpoint" );
-        db.checkpoint();
-        
-        
+        db.commit();
+
+        db.begin();
         // If no such group exists in the database, create a new
         // object and persist it
         groupOql.bind( 3 );
@@ -196,7 +196,6 @@ public class Test
         } else {
             writer.println( "Query result: " + enum.nextElement() );
         }
-        
         writer.println( "Commit transaction" );
         db.commit();
 
