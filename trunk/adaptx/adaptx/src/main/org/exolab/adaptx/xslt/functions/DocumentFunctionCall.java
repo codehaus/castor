@@ -25,6 +25,7 @@ import org.exolab.adaptx.net.URIException;
 import org.exolab.adaptx.net.URIResolver;
 import org.exolab.adaptx.net.URILocation;
 import org.exolab.adaptx.net.impl.URIResolverImpl;
+import org.exolab.adaptx.net.impl.URIUtils;
 import org.exolab.adaptx.xslt.ProcessorState;
 import org.exolab.adaptx.xslt.util.Configuration;
 import org.exolab.adaptx.xslt.XSLTFunction;
@@ -74,12 +75,23 @@ public class DocumentFunctionCall extends XSLTFunction {
             
         NodeSet nodeSet = new NodeSet();
         
+        String documentBase = null;
+        if (args.length == 2) {
+            NodeSet baseNodes = (NodeSet) args[1];
+            if (baseNodes.size() > 0) {
+                documentBase = getDocumentBase(baseNodes.item(0));
+            }
+        }
+        
         switch (args[0].getResultType()) {
             case XPathResult.NODE_SET:
                 NodeSet nodes = (NodeSet)args[0];
                 for (int i = 0; i < nodes.size(); i++) {
                     String href = nodes.item(i).getStringValue();
-                    Document doc = getDocument(href);
+                    if (args.length == 1) {
+                        documentBase = getDocumentBase(nodes.item(i));
+                    }
+                    Document doc = getDocument(href, documentBase);
                     if (doc == null) {
                         String warn = "Unable to read document: " + href;
                         ps.getErrorObserver().receiveError(warn,
@@ -92,7 +104,7 @@ public class DocumentFunctionCall extends XSLTFunction {
                 break;
             default:
                 String href = args[0].stringValue();
-                Document doc = getDocument(href);
+                Document doc = getDocument(href, documentBase);
                 if (doc == null) {
                     String warn = "Unable to read document: " + href;
                     ps.getErrorObserver().receiveError(warn,
@@ -106,7 +118,7 @@ public class DocumentFunctionCall extends XSLTFunction {
         return nodeSet;
     } //-- evaluate
     
-    private Document getDocument(String href) {
+    private Document getDocument(String href, String documentBase) {
         
         URILocation target        = null;
         URILocation styleLocation = ps.getStylesheetLocation();
@@ -116,8 +128,7 @@ public class DocumentFunctionCall extends XSLTFunction {
             target = styleLocation;
         }
         else {
-            String documentBase = null;
-            if (styleLocation != null) 
+            if ((documentBase == null) && (styleLocation != null))
                 documentBase = styleLocation.getBaseURI();
                 
             URIResolver resolver = ps.getURIResolver();
@@ -137,4 +148,11 @@ public class DocumentFunctionCall extends XSLTFunction {
         
     }
     
+    private String getDocumentBase(XPathNode node) {
+        String uri = ps.getDocumentURI(node);
+        if (uri != null) {
+            return URIUtils.getDocumentBase(uri);
+        }
+        return null;
+    }
 } //-- DocumentFunctionCall
