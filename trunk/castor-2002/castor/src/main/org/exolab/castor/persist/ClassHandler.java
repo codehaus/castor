@@ -54,9 +54,11 @@ import java.io.ObjectInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
+import org.exolab.castor.jdo.engine.JDOCallback;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
@@ -142,6 +144,8 @@ public final class ClassHandler
     ClassHandler( ClassDescriptor clsDesc )
     {
         _clsDesc = clsDesc;
+        if ( Persistent.class.isAssignableFrom( _clsDesc.getJavaClass() )  )
+            _callback = new JDOCallback();
     }
 
 
