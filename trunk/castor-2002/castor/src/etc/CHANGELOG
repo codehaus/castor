@@ -1,7 +1,8 @@
 
 Version (CVS)
 -------------
-XML:	Fixed bug 879 (Arnaud - 20020405)
+XML:	Fixed bug 879: The generated classes now reflect the 'Restriction' inheritence
+        model for complexType as defined by W3C XML Schema (Arnaud - 20020405)
 
 XML:    Added Unmarshaller#setAllowExtraAttributes method to allow control
         over whether or not extra (non-matched) attributes should be flagged
