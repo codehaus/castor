@@ -2,10 +2,15 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1784 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Fixed problem using JDOConfFactory with JDBC DataSources.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1784
+       (Werner - 20041127)
+
 JDO:   Fixed bug 1797 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Fixed problem with resetting the capacity of CountLimited cache (ArrayIndexOutOfBoundExceptions).
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1797
-       (Werner - 20041019)
+       (Werner - 20041127)
        
 JDO:   Fixed bug 1774.
        Fixed problem with "sqltime" field type where it was incorrectly mapped to java.sql.Date 
