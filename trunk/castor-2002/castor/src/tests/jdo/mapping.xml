@@ -115,8 +115,9 @@
     <field name="date" type="java.util.Date">
       <sql name="tdt" type="timestamp" />
     </field>
+    <!-- Dirty check fails due to small precision of Sybase smalldatetime -->
     <field name="time" type="java.util.Date">
-      <sql name="ttm" type="timestamp" />
+      <sql name="ttm" type="timestamp" dirty="ignore" />
     </field>
     <field name="intValue" type="integer" required="false" >
       <sql name="int_val" type="integer" dirty="ignore" />
