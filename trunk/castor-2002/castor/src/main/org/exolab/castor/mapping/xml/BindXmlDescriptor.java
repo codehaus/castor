@@ -160,6 +160,38 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         }
         desc.setValidator(fieldValidator);
 
+        //-- _qNamePrefix
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_qNamePrefix", "QName-prefix", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object )
+                throws IllegalStateException
+            {
+                BindXml target = (BindXml) object;
+                return target.getQNamePrefix();
+            }
+            public void setValue( Object object, Object value)
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    BindXml target = (BindXml) object;
+                    target.setQNamePrefix( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+
+        //-- validation code for: _qNamePrefix
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+
         //-- _node
         desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.NodeType.class, "_node", "node", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
