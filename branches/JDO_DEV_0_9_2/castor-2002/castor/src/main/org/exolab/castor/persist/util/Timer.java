@@ -145,7 +145,7 @@ public final class Timer extends Thread {
         public void tick();
     }
 
-    private Iterator nullItor = new Iterator() {
+    private static Iterator nullItor = new Iterator() {
         public boolean hasNext() {
             return false;
         }
