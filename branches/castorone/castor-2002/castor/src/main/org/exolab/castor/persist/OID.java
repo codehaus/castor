@@ -383,7 +383,7 @@ public final class OID {
         other = (OID) obj;
 
         return ( _topClass == other._topClass && _identities != null 
-                && isEquals( _identities, other._identities ) );
+                && !isIdsNull(_identities) && isEquals( _identities, other._identities ) );
     }
 
 
