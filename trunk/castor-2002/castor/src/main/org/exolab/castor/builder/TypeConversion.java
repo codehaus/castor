@@ -143,9 +143,10 @@ public class TypeConversion {
 
         //-- enumerated types
         if (simpleType.hasFacet("enumeration")) {
-            String className
-                = JavaXMLNaming.toJavaClassName(simpleType.getName());
-
+            String className = JavaXMLNaming.toJavaClassName(simpleType.getName());
+			className = SourceGeneratorConfiguration.getQualifiedClassName(
+							simpleType.getSchema().getTargetNamespace(), 
+							"types."+className);
             XSClass xsClass = new XSClass(new JClass(className));
             xsClass.setAsEnumertated(true);
             return xsClass;

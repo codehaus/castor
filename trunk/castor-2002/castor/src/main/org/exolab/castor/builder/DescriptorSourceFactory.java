@@ -101,7 +101,6 @@ public class DescriptorSourceFactory {
         
         String variableName = "_"+className;
         
-        
         DescriptorJClass classDesc 
             = new DescriptorJClass(className+"Descriptor", jClass);
                                             
@@ -109,6 +108,7 @@ public class DescriptorSourceFactory {
         
         JConstructor cons = classDesc.getConstructor(0);
         jsc = cons.getSourceCode();
+		jsc.add("super();");
         
         //-- Set namespace prefix
         String nsPrefix    = classInfo.getNamespacePrefix();
@@ -157,7 +157,7 @@ public class DescriptorSourceFactory {
         //-- handle text content
         if (classInfo.allowsTextContent()) {
             
-            jsc.add("contentDesc = new XMLFieldDescriptorImpl(");
+            jsc.add("XMLFieldDescriptorImpl contentDesc = new XMLFieldDescriptorImpl(");
             jsc.append("String.class, \"_content\", \"PCDATA\", ");
             jsc.append("NodeType.Text);");
                     
@@ -213,6 +213,7 @@ public class DescriptorSourceFactory {
             
             jsc.unindent();
             jsc.add("} );");
+			jsc.add("addFieldDescriptor(contentDesc);");
         }
         
         FieldInfo[] atts = classInfo.getAttributeFields();
@@ -228,9 +229,6 @@ public class DescriptorSourceFactory {
         
         jsc.add("//-- initialize attribute descriptors");
         jsc.add("");
-        jsc.add("attributes = new XMLFieldDescriptorImpl[");
-        jsc.append(Integer.toString(atts.length));
-        jsc.append("];");
         
         for (int i = 0; i < atts.length; i++) {
             
@@ -389,9 +387,7 @@ public class DescriptorSourceFactory {
             }
             
             
-            jsc.add("attributes[");
-            jsc.append(Integer.toString(i));
-            jsc.append("] = desc;");
+			jsc.add("addFieldDescriptor(desc);");
             jsc.add("");
             
             //-- Add Validation Code
@@ -416,9 +412,6 @@ public class DescriptorSourceFactory {
         
         jsc.add("//-- initialize element descriptors");
         jsc.add("");
-        jsc.add("elements = new XMLFieldDescriptorImpl[");
-        jsc.append(Integer.toString(elements.length));
-        jsc.append("];");
         
         for (int i = 0; i < elements.length; i++) {
             
@@ -602,9 +595,7 @@ public class DescriptorSourceFactory {
             jsc.add("desc.setMultivalued("+member.isMultivalued());
             jsc.append(");");
             
-            jsc.add("elements[");
-            jsc.append(Integer.toString(i));
-            jsc.append("] = desc;");
+			jsc.add("addFieldDescriptor(desc);");
             jsc.add("");
             
             //-- Add Validation Code

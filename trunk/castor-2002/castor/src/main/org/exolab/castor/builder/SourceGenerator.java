@@ -157,6 +157,8 @@ public class SourceGenerator {
     public void generateSource(Schema schema, String packageName) {
         SGStateInfo sInfo = new SGStateInfo();
         sInfo.packageName = packageName;
+		if(sInfo.packageName==null)
+			sInfo.packageName=SourceGeneratorConfiguration.getJavaPackage(schema.getTargetNamespace());
 
         sInfo.setPromptForOverwrite(warnOnOverwrite);
 
@@ -418,20 +420,21 @@ public class SourceGenerator {
 
 		//-- when mapping schema types, only interested in producing classes
 		//-- for elements with anonymous complex types
-		if (Configuration.mappingSchemaType2Java())
-			if (elementDecl.getType()!=null)
+		if (SourceGeneratorConfiguration.mappingSchemaType2Java())
+			if (elementDecl.isReference() ||
+				(elementDecl.getType()!=null &&
+				 elementDecl.getType().getName()!=null))
 				return;
-
+		
         //-- create classes for sub-elements if necessary
         XMLType xmlType = elementDecl.getType();
-
-
+		
         //-- No type definition
         if (xmlType == null) {
             System.out.print("Type not found for element: ");
             System.out.println(elementDecl.getName());
             return;
-        }
+        }	
         //-- ComplexType
         else if (xmlType.isComplexType()) {
 
@@ -476,7 +479,8 @@ public class SourceGenerator {
 
             //-- process base complextype if necessary
             XMLType baseType= complexType.getBaseType();
-            if (baseType != null) {
+            if (baseType != null &&
+				baseType.getSchema() == complexType.getSchema()) {
                 processComplexType((ComplexType)baseType, sInfo); //This is wrong: a complex type can extend a simple type.
             }
 
