@@ -353,7 +353,7 @@ public final class Introspector {
             }
             
             //-- Handle Collections
-            isCollection = (type.isArray() || isCollection(type));
+            isCollection = (isCollection || isCollection(type));
                 
             XMLFieldDescriptorImpl fieldDesc 
                 = createFieldDescriptor(type, methodSet.fieldName, xmlName);
@@ -613,6 +613,9 @@ public final class Introspector {
      * @see loadCollections
     **/
     public static boolean isCollection(Class clazz) {
+        
+        if (clazz.isArray()) return true;
+        
         for (int i = 0; i < _collections.length; i++) {
             //-- check to see if clazz is either the
             //-- same as or a subclass of one of the
