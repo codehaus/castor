@@ -157,13 +157,14 @@ public class UnmarshalHandler implements DocumentHandler {
      * @see #setLogWriter.
     **/
     public void setDebug(boolean debug) {
-        this.debug = debug;
+System.out.println("overriding debug, always on");
+        this.debug = debug || true;
         
-        if (debug && (_logWriter == null)) {
+        if (this.debug && (_logWriter == null)) {
             _logWriter = new PrintWriter(System.out, true);
             killWriter = true;
         }
-        if ((!debug) && killWriter) {
+        if ((!this.debug) && killWriter) {
             _logWriter = null;
             killWriter = false;
         }
@@ -221,8 +222,6 @@ public class UnmarshalHandler implements DocumentHandler {
     public void endElement(String name) 
         throws org.xml.sax.SAXException
     {
-        
-        // System.out.println("#endElement: " + name);
         
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
@@ -399,8 +398,6 @@ public class UnmarshalHandler implements DocumentHandler {
         
         //-- handle namespaces
         
-        //System.out.println("debug - UnmarshalHandler#startElement: " + name);
-        
         String namespace = null;
         
         if (hasNameSpace(name)) {
@@ -569,6 +566,27 @@ public class UnmarshalHandler implements DocumentHandler {
             try {
                     
                 _class = descriptor.getFieldType();
+                
+                //-- Handle support for "Any" type
+                if (_class == Object.class) {
+                    
+                    //-- create class name
+                    String cname = MarshalHelper.toJavaName(name,true);
+                    
+                    //-- use parent to get package information
+                    Class pClass = parentState.classDesc.getJavaClass();
+                    String pkg = pClass.getName();
+                    int idx = pkg.lastIndexOf('.');
+                    if (idx > 0) {
+                        pkg = pkg.substring(0,idx);
+                        cname = pkg + cname;
+                    }
+                    classDesc = getClassDescriptor(cname, pClass.getClassLoader());
+                    if (classDesc != null) {
+                        _class = classDesc.getJavaClass();
+                    }
+                }
+                
                 boolean byteArray = false;
                 if (_class.isArray())
                     byteArray = (_class.getComponentType() == Byte.TYPE);
@@ -589,6 +607,16 @@ public class UnmarshalHandler implements DocumentHandler {
                     //-- who knows
                     if (state.object != null) 
                         _class = state.object.getClass();
+                    else {
+                        try {
+                            state.object = _class.newInstance();
+                        }
+                        catch(java.lang.Exception ex) {
+                            String err = "unable to instantiate a new type of: ";
+                            err += className(_class);
+                            throw new SAXException(err);
+                        }
+                    }
                 }
                 state.type = _class;
             }
@@ -796,11 +824,10 @@ public class UnmarshalHandler implements DocumentHandler {
     } //-- message
     
     /**
-     * Finds and returns a MarshalInfo for the given class. If
-     * a MarshalInfo could not be found one will attempt to 
-     * be generated. This method makes use of a cache
-     * for performance reasons.
-     * @param _class the Class to get the MarshalInfo for
+     * Finds and returns an XMLClassDescriptor for the given class. If
+     * a ClassDescriptor could not be found one will attempt to 
+     * be generated. 
+     * @param _class the Class to get the ClassDescriptor for
     **/
     private XMLClassDescriptor getClassDescriptor(Class _class) 
         throws SAXException
@@ -810,7 +837,6 @@ public class UnmarshalHandler implements DocumentHandler {
         
         if (_cdResolver == null) 
             _cdResolver = new ClassDescriptorResolverImpl();
-            
             
         XMLClassDescriptor classDesc = _cdResolver.resolve(_class);
         
@@ -829,6 +855,39 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         return classDesc;
     } //-- getMarshalInfo
+
+    
+    /**
+     * Finds and returns a ClassDescriptor for the given class. If
+     * a ClassDescriptor could not be found one will attempt to 
+     * be generated. 
+     * @param className the name of the class to get the Descriptor for
+    **/
+    private XMLClassDescriptor getClassDescriptor
+        (String className, ClassLoader loader) 
+    {
+        if (_cdResolver == null) 
+            _cdResolver = new ClassDescriptorResolverImpl();
+            
+        XMLClassDescriptor classDesc 
+            = _cdResolver.resolve(className, loader);
+        
+        if (classDesc != null) return classDesc;
+        
+        //-- we couldn't create a ClassDescriptor, check for
+        //-- error message
+        if (_cdResolver.error()) {
+            message(_cdResolver.getErrorMessage());
+        }
+        else {
+            buf.setLength(0);
+            buf.append("unable to find or create a ClassDescriptor for class: ");
+            buf.append(className);
+            message(buf.toString());
+        }
+        return classDesc;
+    } //-- getClassDescriptor
+    
     
     /**
      * Returns the name of a class, handles array types
