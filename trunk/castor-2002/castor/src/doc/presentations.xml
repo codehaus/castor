@@ -3,7 +3,7 @@
   <body>
     <title>Castor Presentations and Articles</title>
 
-    <section title="">
+    <section title="Articles">
       <p><b>Presentations about Castor...</b></p>
       <p>
          <b>Javaworld (April 2002)</b>
@@ -25,7 +25,10 @@
          Dion Almaer gives a good introduction to Castor XML.
          <a href="http://www.onjava.com/pub/a/onjava/2001/10/24/xmldatabind.html">Read</a>
       </p>
-      
+    </section>
+    
+    
+    <section title="Books/Chapters">  
       <p>
          <b>XML Application Developer's Guide by BORLAND (2001)</b>
          <p/>
@@ -35,13 +38,6 @@
       </p>
 
       <p>
-         <b>XML One Amsterdam (September 2001)</b>
-         <p/>
-         Andrew Fawcett, of CODA - our main evangelist, gave a presentation on implementing XML data binding
-         solutions using web-services with Castor at the XML One conference in Amsterdam, September 2001.
-         <a href="http://ftp.exolab.org/ftp/castor/presentations/xml-one-amsterdam-20010919%20.zip">Download</a>
-      </p>
-      <p>
          <b>Professional XML (2nd Edition) Chapter 15 (June 2001)</b>
          <p/>
          A chapter written by Keith Visco about Castor XML. Available for
@@ -49,6 +45,17 @@
          <a href="http://www.wrox.com/Support/PDF/SampleChapter_5059.pdf">Download</a>
       </p>
 
+    </section>
+
+    <section title="Presentations">
+      <p>
+         <b>XML One Amsterdam (September 2001)</b>
+         <p/>
+         Andrew Fawcett, of CODA - our main evangelist, gave a presentation on implementing XML data binding
+         solutions using web-services with Castor at the XML One conference in Amsterdam, September 2001.
+         <a href="http://ftp.exolab.org/ftp/castor/presentations/xml-one-amsterdam-20010919%20.zip">Download</a>
+      </p>
+    
       <p>
          <b>XML One London (March 2001)</b>
          <p/>
