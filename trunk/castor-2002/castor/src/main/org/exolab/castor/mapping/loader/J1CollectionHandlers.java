@@ -134,8 +134,7 @@ public final class J1CollectionHandlers
                     ( (Vector) collection ).addElement( object );
                     return collection;
                 } else {
-                    if ( ! ( (Vector) collection ).contains( object ) )
-                        ( (Vector) collection ).addElement( object );
+                    ( (Vector) collection ).addElement( object );
                     return null;
                 }
             }
@@ -166,8 +165,7 @@ public final class J1CollectionHandlers
                     ( (Hashtable) collection ).put( object, object );
                     return collection;
                 } else {
-                    if ( ! ( (Hashtable) collection ).contains( object ) )
-                        ( (Hashtable) collection ).put( object, object );
+                    ( (Hashtable) collection ).put( object, object );
                     return null;
                 }
             }
