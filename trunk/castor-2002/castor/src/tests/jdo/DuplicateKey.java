@@ -6,6 +6,7 @@ import org.exolab.castor.jdo.JDOSource;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
 
 
 /**
@@ -45,7 +46,7 @@ public class DuplicateKey
         // Determine if test object exists, if not create it.
         // If it exists, set the name to some predefined value
         // that this test will later override.
-        oql = _db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( new Integer( TestObject.DefaultId ) );
         object = (TestObject) oql.execute();
         if ( object == null ) {
@@ -75,9 +76,11 @@ public class DuplicateKey
         _logger.println( "Will report duplicate identity from cache engine" );
         try {
             _db.makePersistent( object );
+            _logger.println( "Error: DuplicateIdentityException not thrown" );
+        } catch ( DuplicateIdentityException except ) {
+            _logger.println( "OK: DuplicateIdentityException thrown" );
         } catch ( Exception except ) {
-            _logger.println( except );
-	    except.printStackTrace( _logger );
+            _logger.println( "Error: " + except );
         }
         _db.commit();
 	    
@@ -91,9 +94,11 @@ public class DuplicateKey
         _logger.println( "Will report duplicate identity from SQL engine" );
         try {
             _db.makePersistent( object );
+            _logger.println( "Error: DuplicateIdentityException not thrown" );
+        } catch ( DuplicateIdentityException except ) {
+            _logger.println( "OK: DuplicateIdentityException thrown" );
         } catch ( Exception except ) {
-            _logger.println( except );
-	    except.printStackTrace( _logger );
+            _logger.println( "Error: " + except );
         }
         _db.commit();
     }

@@ -4,7 +4,7 @@
 
   <!-- Mapping for TestObject to test_table
        Single object mapping, shared access, dirty checking on all fields -->
-  <class class-name="test.TestObject">
+  <class class-name="jdo.TestObject">
     <sql-table table-name="test_table"/>
     <description>Table used for concurrency and performance testing</description>
     <identity field-ref="id" />

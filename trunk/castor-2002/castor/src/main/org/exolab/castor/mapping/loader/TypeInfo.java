@@ -112,6 +112,7 @@ public class TypeInfo
     public TypeInfo(Class fieldType) {
         this(fieldType, null, null, false, null, null );
     } //-- TypeInfo
+
     
     /**
      * Construct new type information for the field.
