@@ -183,7 +183,7 @@ public class WildcardUnmarshaller extends ComponentReader {
                 }
            }
          }//if
-         else _wildcard.addNamespace("##"+SchemaNames.ANY);
+         else _wildcard.addNamespace(SchemaNames.NAMESPACE_ANY);
 
         /*
          * @maxOccurs
