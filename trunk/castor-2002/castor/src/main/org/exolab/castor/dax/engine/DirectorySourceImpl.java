@@ -59,6 +59,8 @@ import netscape.ldap.LDAPException;
 import org.exolab.castor.dax.Directory;
 import org.exolab.castor.dax.DirectorySource;
 import org.exolab.castor.dax.DirectoryException;
+import org.exolab.castor.dax.XADirectory;
+import org.exolab.castor.dax.XADirectorySource;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.DTDResolver;
@@ -77,7 +79,7 @@ import org.exolab.castor.xml.Unmarshaller;
  * @see Directory
  */
 public class DirectorySourceImpl
-    implements DirectorySource
+    implements DirectorySource, XADirectorySource
 {
 
 
@@ -112,8 +114,6 @@ public class DirectorySourceImpl
 	    throw new MalformedURLException( "LDAP URL must specify root DN" );
 	if ( _rootDN.charAt( 0 ) == '/' )
 	    _rootDN = _rootDN.substring( 1 );
-	else
-System.out.println( "DirectourSourceImpl: Check it out" );
 	// Normalize the URL, so that we can match it to a mapping
 	_url = new LDAPUrl( _url.getHost(), _url.getPort(), _url.getDN() );
     }
@@ -139,12 +139,6 @@ System.out.println( "DirectourSourceImpl: Check it out" );
     }
 
 
-    /**
-     * Attempt to establish connection to a directory.
-     *
-     * @return An open connection to the directory
-     * @throws DirectoryException Directory access failed
-     */
     public Directory getDirectory()
 	throws DirectoryException
     {
@@ -152,18 +146,26 @@ System.out.println( "DirectourSourceImpl: Check it out" );
     }
 
 
-    /**
-     * Attempt to establish connection to a directory.
-     *
-     * @param userDN The DN of the authenticating user
-     * @param password The password of the authenticating user
-     * @return An open connection to the directory
-     * @throws DirectoryException Directory access failed
-     */
     public Directory getDirectory( String userDN, String password )
 	throws DirectoryException
     {
 	return new DirectoryImpl( getConnection( userDN, password ), _url, _mapResolver, _logWriter );
+    }
+
+
+    public XADirectory getXADirectory()
+	throws DirectoryException
+    {
+	return new XADirectoryImpl( new DirectoryImpl( getConnection( null, null ),
+						       _url, _mapResolver, _logWriter ) );
+    }
+
+
+    public XADirectory getXADirectory(  String userDN, String password )
+	throws DirectoryException
+    {
+	return new XADirectoryImpl( new DirectoryImpl( getConnection( userDN, password ),
+						       _url, _mapResolver, _logWriter ) );
     }
 
 
