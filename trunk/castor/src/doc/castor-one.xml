@@ -81,15 +81,30 @@ design, which is important in larger projects. </p>
     </section>
 
     <section title="LRU Cache">
-        <p>
-            Castor maintains and properly locks one copy of the dirty checking cache for each object it loads from or creates into persistence storage. Until all transactions involving the object are completed (See <a href="design-persist.html#Persistence">Design: Persistence</a>), the cache is released. Starting from Castor 0.8.6, performance cache is implemented and developer can specify the mechanism and capacity of performance cache for each persistence capable type. Options includes none, count-limited, time-limited and unlimited. Performance cache is write-through, because all changes to objects of a transaction should be persisted at commit time without delay. </p>
+    
+        <p>Castor maintains and properly locks one copy of the dirty checking cache for each 
+           object it loads from or creates into persistence storage. Until all transactions 
+           involving the object are completed (See 
+           <a href="design-persist.html#Persistence">Design: Persistence</a>), the cache is released. 
+           Starting from Castor 0.8.6, performance cache is implemented and developer can specify the 
+           mechanism and capacity of performance cache for each persistence capable type. Options includes 
+           'none', 'count-limited', 'time-limited' and 'unlimited'. Performance cache is write-through, 
+           because all changes to objects of a transaction should be persisted at commit time 
+           without delay.</p>
 
-        <p>
-            Performance cache options do not affect the behavior of short transactions or locking. Nor do the options affect the dirty checking cache, because they’re maintained separately. It only affects persistence object that is freed from any transaction. Performance cache enhances the performance by reducing the number of read operations done to persistence storage, by using the last read or committed values of the object. </p>
+        <p>Performance caches enhance the application performance by reducing the number of read 
+           operations against the persistence storage, by storing and reusing the last read or 
+           committed values of the object. Performance caches do not affect the behavior of 
+           short transactions or locking. It only affects persistence objects that have been released 
+           from any transactional context. </p>
 
-        <p>
-            Performance cache is also serves a dual purpose as dirty checking cache for long transactions. The object's duration in the performance cache determines the allowed time span of a long transaction. ObjectModifedException will be thrown if an application trys to update an object that is disposed from performance cache. See <a href="long-transact.html">long-transactions</a> for details. </p>
-
+        <p>With the current release, performance caches also serve a dual purpose as dirty checking 
+           caches for <a href="long-transact.html">long-transactions</a>. This limitation implies that 
+           the object's duration in the performance cache determines the allowed time span of a long 
+           transaction. This might become an issue when performance caches of type 'count-limited' or 
+           'time-limited' are being used, as objects will eventually be disposed. If an application 
+           tries to update an object that has been disposed from the dirty checking cache, 
+           an ObjectModifedException will be thrown.</p>
 
         <p>The DTD declaration is as the following:
             <pre><![CDATA[
