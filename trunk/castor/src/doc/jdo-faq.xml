@@ -756,22 +756,36 @@ class Employee {
         </section>
 
         <section title="Does Castor support two-phase commits? How is this implemented?">
+            <p>Yes, via <tt>javax.transaction.Synchronization</tt> interface.</p>
+            
             <p>
-            Yes, via <tt>javax.transaction.Synchronization</tt> interface. The 
-            TransactionManager must be bound to JNDI, its JNDI name should be 
-            passed to JDO object:
+            For Castor to work with global transactions, Castor must be configured
+            to use global transaction demarcation in its main configuration file:
             </p>
 
             <code><![CDATA[
-jdo.setTransactionManager(jndiName);
-db = jdo.getDatabase();
+<jdo-conf>
+   ...
+   <transaction-demarcation mode="global" >
+      <transaction-manager name="jndi" />
+   </transaction-demarcation>
+</jdo-conf>
             ]]></code>
 
+            <p>When retrieving a Database instance via</p>
+
+            <code><![CDATA[
+...
+JDO jdo = JDO.createInstance ("myDB");
+...
+Database db = jdo.getDatabase();
+            ]]></code>
+            
             <p>
-            The <tt>Database</tt> implementation also implements <tt>Synchronization</tt> 
-            and is authomatically registered with the transaction manager.
-            Then the TM communicates with Castor via beforeCompletion() and 
-            afterCompletion() calls.
+            the <tt>Database</tt> implementation will authomatically be registered with 
+            the transaction manager, as it implements <tt>javax.jta.Synchronization</tt>
+            interface. Subsequently, the transaction manager communicates with Castor 
+            via the beforeCompletion() and afterCompletion() calls.
             </p>
         </section>
 
