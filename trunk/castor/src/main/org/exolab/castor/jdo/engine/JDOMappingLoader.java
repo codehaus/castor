@@ -121,7 +121,7 @@ public class JDOMappingLoader
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
         if ( clsMap.getMapTo() == null || clsMap.getMapTo().getTable() == null )
-            return NoDescriptor;
+            return JDOMappingLoader.NoDescriptor;
 
         // See if we have a compiled descriptor.
         clsDesc = loadClassDescriptor( clsMap.getName() );
