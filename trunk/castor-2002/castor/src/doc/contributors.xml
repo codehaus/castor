@@ -284,6 +284,12 @@
    <description>Bug reports and bug fixes for readonly locking mode in Castor JDO</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Ballanger" given="Andrew" />
+	<email>AWBALLAN@smumn.edu</email>
+   <description>An improvement for generated SQL statement syntax</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
