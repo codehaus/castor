@@ -68,7 +68,6 @@ import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Version;
 
-import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.XMLException;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.*;
@@ -78,14 +77,11 @@ import java.io.Reader;
 import java.io.PrintWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.OutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
 
 //--Java util imports
 import java.util.Enumeration;
-import java.util.Hashtable;
+//import java.util.Hashtable;
+import java.util.Vector;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Hashtable;
@@ -177,6 +173,10 @@ public class SourceGenerator
     **/
     private static final String IMPORT_WARNING
         = "Warning: Do not forget to generate source code for the following imported schema: ";
+        
+    private static final String GENERATE_IMPORT_MSG 
+        = "Imported XML Schemas will be processed automatically.";
+          
 
     /**
      * Castor configuration
@@ -224,6 +224,12 @@ public class SourceGenerator
 	* org.exolab.castor.tests.framework.CastorTestable
 	*/
 	private boolean _testable  = false;
+    
+    /**
+     * A flag indicating whether or not to generate sources 
+     * for imported XML Schemas.
+     */
+    private boolean _generateImported = false;
 
     /**
      * The DescriptorSourceFactory instance
@@ -242,6 +248,12 @@ public class SourceGenerator
 
    
     private ConsoleDialog _dialog = null;
+    
+    /**
+     * A vector that keeps track of all the schemas processed
+     *
+     */
+    private Vector _schemasProcessed = null;
 
 
     /**
@@ -305,7 +317,8 @@ public class SourceGenerator
             String err = "The argument 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
-            
+        
+        //-- reset the vector, most of the time only one schema to process
         SGStateInfo sInfo = new SGStateInfo(schema, this);
         //--make sure the XML Schema is valid
         try {
@@ -333,6 +346,9 @@ public class SourceGenerator
         sInfo.setSuppressNonFatalWarnings(_suppressNonFatalWarnings);
 
         createClasses(schema, sInfo);
+        
+        //--reset the vector of schemas processed
+        _schemasProcessed = null;
     } //-- generateSource
 
      /**
@@ -499,6 +515,17 @@ public class SourceGenerator
         if (_sourceFactory != null)
 		   _sourceFactory.setCreateMarshalMethods(createMarshalMethods);
     } //-- setCreateMarshalMethods
+    
+    /**
+     * Sets whether or not to generate Java sources for imported XML Schema.
+     * By default Java sources for imported XML schemas are not generated.
+     * 
+     * @param generate true to generate the java classes for the imported XML Schema
+     */
+    public void setGenerateImportedSchemas(boolean generate) {
+        _generateImported = generate;
+    }
+    
 
    /**
      * Sets whether or not to create the XML marshalling framework specific
@@ -629,6 +656,10 @@ public class SourceGenerator
         //-- Source Generator Binding
         desc = "Sets the Source Generator Binding File name";
         allOptions.addFlag("binding-file","filename",desc,true);
+        
+        //-- Generates sources for imported XML Schemas
+        desc = "Generates sources for imported XML schemas";
+        allOptions.addFlag("generateImportedSchemas","",desc,true);
 
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
@@ -752,6 +783,12 @@ public class SourceGenerator
             }
             sgen.setBinding(binding);
         }
+        
+        if (options.getProperty("generateImportedSchemas") != null) {
+            sgen.setGenerateImportedSchemas(true);
+            System.out.print("-- ");
+            System.out.println(GENERATE_IMPORT_MSG);
+        }
 
 
 
@@ -791,15 +828,28 @@ public class SourceGenerator
     private void createClasses(Schema schema, SGStateInfo sInfo) {
 
         //-- ** print warnings for imported schemas **
-		if (!_suppressNonFatalWarnings)
+		if (!_suppressNonFatalWarnings || _generateImported)
 		{
-			Enumeration enum = schema.getImportedSchema();
+            Enumeration enum = schema.getImportedSchema();
 			while (enum.hasMoreElements()) {
 				Schema importedSchema = (Schema)enum.nextElement();
-				System.out.println();
-				System.out.println(IMPORT_WARNING +
-					importedSchema.getSchemaLocation());
-			}
+                if (!_generateImported) {
+                    System.out.println();
+                    System.out.println(IMPORT_WARNING +
+                        importedSchema.getSchemaLocation());
+                } else {
+                    if (_schemasProcessed == null)
+                        _schemasProcessed = new Vector(7); 
+                    _schemasProcessed.add(schema);
+                    if (!_schemasProcessed.contains(importedSchema)) {
+                        SGStateInfo importedSInfo = new SGStateInfo(importedSchema, this);
+                        importedSInfo.packageName = sInfo.packageName;
+                        createClasses(importedSchema, importedSInfo);
+                        //--discard the SGStateInfo
+                        importedSInfo = null;
+                    }
+                }
+            }
 		}
 
         //-- ** Generate code for all TOP-LEVEL structures **
