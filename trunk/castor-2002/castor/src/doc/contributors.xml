@@ -127,6 +127,12 @@
     <description>XML Schema related issues</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Ozyurt" given="Burak"/>
+    <email>bozyurt@san.rr.com</email>
+    <description>Added InstantDB to the list of supported databases.</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
