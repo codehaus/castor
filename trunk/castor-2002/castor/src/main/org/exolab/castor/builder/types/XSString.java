@@ -87,7 +87,7 @@ public final class XSString extends XSPatternBase {
      * Creates a new XSString
      */
      public XSString() {
-        super(XSType.STRING);
+        super(XSType.STRING_TYPE);
     }
 
 

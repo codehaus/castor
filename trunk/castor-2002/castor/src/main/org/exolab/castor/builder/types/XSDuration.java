@@ -38,20 +38,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author              Changes
- * 10/27/2000   Arnaud Blandin      Added the support for min/max facets
- * 10/9/2000    Arnaud Blandin      Created
+ * 05/22/2001   Arnaud Blandin      Created
  */
 
 package org.exolab.castor.builder.types;
 
-import org.exolab.castor.types.TimeDuration;
+import org.exolab.castor.types.Duration;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
@@ -59,18 +57,18 @@ import org.exolab.javasource.JClass;
 import java.text.ParseException;
 import java.util.Enumeration;
 
-public final class XSTimeDuration extends XSType {
+public final class XSDuration extends XSType {
 
     private static final JType JTYPE =
-                    new JClass("org.exolab.castor.types.TimeDuration");
+                    new JClass("org.exolab.castor.types.Duration");
 
-    private TimeDuration _maxInclusive;
-    private TimeDuration _maxExclusive;
-    private TimeDuration _minInclusive;
-    private TimeDuration _minExclusive;
+    private Duration _maxInclusive;
+    private Duration _maxExclusive;
+    private Duration _minInclusive;
+    private Duration _minExclusive;
 
-    public XSTimeDuration() {
-        super(XSType.TIME_DURATION);
+    public XSDuration() {
+        super(XSType.DURATION_TYPE);
     }
 
 
@@ -78,74 +76,74 @@ public final class XSTimeDuration extends XSType {
         return this.JTYPE;
     }
      /**
-     * Returns the maximum exclusive value that this XSTimeDuration can hold.
-     * @return the maximum exclusive value that this XSTimeDuration can hold. If
+     * Returns the maximum exclusive value that this XSDuration can hold.
+     * @return the maximum exclusive value that this XSDuration can hold. If
      * no maximum exclusive value has been set, Null will be returned
      * @see getMaxInclusive
     **/
-    public TimeDuration getMaxExclusive() {
+    public Duration getMaxExclusive() {
         return _maxExclusive;
     } //-- getMaxExclusive
 
     /**
-     * Returns the maximum inclusive value that this XSTimeDuration can hold.
-     * @return the maximum inclusive value that this XSTimeDuration can hold. If
+     * Returns the maximum inclusive value that this XSDuration can hold.
+     * @return the maximum inclusive value that this XSDuration can hold. If
      * no maximum inclusive value has been set, Null will be returned
      * @see getMaxExclusive
     **/
-    public TimeDuration getMaxInclusive() {
+    public Duration getMaxInclusive() {
         return _maxInclusive;
     } //-- getMaxInclusive
 
 
     /**
-     * Returns the minimum exclusive value that this XSTimeDuration can hold.
-     * @return the minimum exclusive value that this XSTimeDuration can hold. If
+     * Returns the minimum exclusive value that this XSDuration can hold.
+     * @return the minimum exclusive value that this XSDuration can hold. If
      * no minimum exclusive value has been set, Null will be returned
      * @see getMinInclusive
      * @see setMaxInclusive
     **/
-    public TimeDuration getMinExclusive() {
+    public Duration getMinExclusive() {
         return _minExclusive;
     } //-- getMinExclusive
 
     /**
-     * Returns the minimum inclusive value that this XSTimeDuration can hold.
-     * @return the minimum inclusive value that this can XSTimeDuration hold. If
+     * Returns the minimum inclusive value that this XSDuration can hold.
+     * @return the minimum inclusive value that this can XSDuration hold. If
      * no minimum inclusive value has been set, Null will be returned
      * @see getMinExclusive
     **/
-    public TimeDuration getMinInclusive() {
+    public Duration getMinInclusive() {
         return _minInclusive;
     } //-- getMinInclusive
 
     /**
-     * Sets the maximum exclusive value that this XSTimeDuration can hold.
-     * @param max the maximum exclusive value this XSTimeDuration can be
+     * Sets the maximum exclusive value that this XSDuration can hold.
+     * @param max the maximum exclusive value this XSDuration can be
      * @see setMaxInclusive
     **/
-    public void setMaxExclusive(TimeDuration max) {
+    public void setMaxExclusive(Duration max) {
         _maxExclusive = max;
         _maxInclusive = null;
     } //-- setMaxExclusive
 
     /**
-     * Sets the maximum inclusive value that this XSTimeDuration can hold.
-     * @param max the maximum inclusive value this XSTimeDuration can be
+     * Sets the maximum inclusive value that this XSDuration can hold.
+     * @param max the maximum inclusive value this XSDuration can be
      * @see setMaxExclusive
     **/
-    public void setMaxInclusive(TimeDuration max) {
+    public void setMaxInclusive(Duration max) {
         _maxInclusive = max;
         _maxExclusive = null;
     } //-- setMaxInclusive
 
 
     /**
-     * Sets the minimum exclusive value that this XSTimeDuration can hold.
-     * @param max the minimum exclusive value this XSTimeDuration can be
+     * Sets the minimum exclusive value that this XSDuration can hold.
+     * @param max the minimum exclusive value this XSDuration can be
      * @see setMinInclusive
     **/
-    public void setMinExclusive(TimeDuration min) {
+    public void setMinExclusive(Duration min) {
         _minExclusive = min;
         _minInclusive = null;
     } //-- setMinExclusive
@@ -155,7 +153,7 @@ public final class XSTimeDuration extends XSType {
      * @param max the minimum inclusive value this XSInt can be
      * @see setMinExclusive
     **/
-    public void setMinInclusive(TimeDuration min) {
+    public void setMinInclusive(Duration min) {
         _minInclusive = min;
         _minExclusive = null;
     } //-- setMinInclusive
@@ -170,7 +168,7 @@ public final class XSTimeDuration extends XSType {
     }
 
     /**
-     * Reads and sets the facets for XSTimeDuration
+     * Reads and sets the facets for XSDuration
      * override the readFacet method of XSType
      * @param simpletype the Simpletype containing the facets
      * @param xsType the XSType to set the facets of
@@ -189,29 +187,31 @@ public final class XSTimeDuration extends XSType {
             try {
                 //-- maxExclusive
                 if (Facet.MAX_EXCLUSIVE.equals(name))
-                    this.setMaxExclusive(TimeDuration.parseTimeDuration(facet.getValue()));
+                    this.setMaxExclusive(Duration.parseDuration(facet.getValue()));
                 //-- maxInclusive
                 else if (Facet.MAX_INCLUSIVE.equals(name))
-                    this.setMaxInclusive(TimeDuration.parseTimeDuration(facet.getValue()));
+                    this.setMaxInclusive(Duration.parseDuration(facet.getValue()));
                 //-- minExclusive
                 else if (Facet.MIN_EXCLUSIVE.equals(name))
-                    this.setMinExclusive(TimeDuration.parseTimeDuration(facet.getValue()));
+                    this.setMinExclusive(Duration.parseDuration(facet.getValue()));
                 //-- minInclusive
                 else if (Facet.MIN_INCLUSIVE.equals(name))
-                    this.setMinInclusive(TimeDuration.parseTimeDuration(facet.getValue()));
+                    this.setMinInclusive(Duration.parseDuration(facet.getValue()));
                 //-- pattern
                 else if (Facet.PATTERN.equals(name)) {
                     //do nothing for the moment
+                    System.out.println("Warning: The facet 'pattern' is not currently supported for Duration.");
                 }
             } catch (ParseException e) {
-                // trow a new exception
-                System.out.println(e);
+                //not possible to set the facet properly
+                //This can't happen since a ParseException would have been set
+                //during the unmarshalling of the facets
+                e.printStackTrace();
                 return;
             }
         }//while
 
-    }//readTimeFacets
+    }//setFacets
 
 
-
-} //--XSTimeDuration
+} //--XSDuration

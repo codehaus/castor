@@ -38,57 +38,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
 
-package org.exolab.castor.builder.types;
+package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.javasource.*;
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.Schema;
 
 /**
- * The XML Schema timeInstant type
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$
+ * Represents date/time XML SChema types
+ * @author <a href="mailto:berry@intalio.com">Arnaud Blandin</a>
+ * @version $Revision:
 **/
-public final class XSTimeInstant extends XSType {
+public class DateTimeType extends AtomicType
+{
+}
 
-    /**
-     * The JType represented by this XSType
-    **/
-    private static final JType jType
-        = new JClass("java.util.Date");
-    //private static final JType jType
-    //    = new JClass("org.exolab.castor.types.TimeInstant");
 
-    private String value = null;
 
-    public XSTimeInstant() {
-        super(XSType.TIME_INSTANT);
-    } //-- XSNMToken
 
-    /**
-     * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful
-     * for primitive types
-     * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an
-     * instance of this XSType
-    **/
-    public String createFromJavaObjectCode(String variableName) {
-        //return "(org.exolab.castor.types.TimeInstant)"+variableName;
-        return "(java.util.Date)"+variableName;
-    } //-- fromJavaObject
-
-    public void setFacets(SimpleType simpleType) {}
-    /**
-     * Returns the JType that this XSType represents
-     * @return the JType that this XSType represents
-    **/
-    public JType getJType() {
-        return this.jType;
-    }
-
-} //-- XSTimeInstant

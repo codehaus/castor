@@ -55,18 +55,6 @@ import org.exolab.castor.xml.schema.Schema;
 **/
 public class BinaryType extends AtomicType
 {
-    /**
-     * Gets the ENCODING facet
-     * returns null if there is none
-    **/
-    String getEncoding()
-    {
-        Facet encodingFacet= getFacet(Facet.ENCODING);
-        if (encodingFacet == null) return null;
-
-        return encodingFacet.getValue();
-    }
-
 }
 
 

@@ -84,7 +84,7 @@ public final class XSQName extends XSPatternBase {
 
 
     public XSQName() {
-        super(XSType.QNAME);
+        super(XSType.QNAME_TYPE);
     } //-- XSNCName
 
     /**

@@ -71,7 +71,7 @@ public final class XSShort extends XSPatternBase {
     //private Short value = null;
 
     public XSShort() {
-        super(XSType.SHORT);
+        super(XSType.SHORT_TYPE);
     } //-- XSShort
 
 

@@ -62,7 +62,7 @@ public final class XSId extends XSType {
         = new JClass("java.lang.String");
 
     public XSId() {
-        super(XSType.ID);
+        super(XSType.ID_TYPE);
     } //-- XSId
 
 

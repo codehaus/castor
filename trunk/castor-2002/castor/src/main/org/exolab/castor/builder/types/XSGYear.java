@@ -38,53 +38,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
- *
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  * $Id$
  */
 
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.javasource.*;
+import org.exolab.castor.types.GYear;
+import org.exolab.javasource.JType;
+import org.exolab.javasource.JClass;
 
 /**
- * The XML Schema NCName type
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$
-**/
-public final class XSNCName extends XSType {
+ * The XML Schema gYear type
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @version $Revision $ $Date$
+ */
+
+public class XSGYear extends XSType {
 
     /**
      * The JType represented by this XSType
-    **/
+     */
     private static final JType jType
-        = new JClass("java.lang.String");
+        = new JClass ("org.exolab.castor.types.GYear");
 
-    public XSNCName() {
-        super(XSType.NCNAME);
-    } //-- XSNCName
+
+    public XSGYear() {
+       super(XSType.GYEAR_TYPE);
+    }
 
     /**
-     * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful
-     * for primitive types
-     * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an
-     * instance of this XSType
-    **/
-    public String createFromJavaObjectCode(String variableName) {
-        return "(String)"+variableName;
-    } //-- fromJavaObject
+     * Returns the Java code necessary to create a new instance of the
+     * JType associated with this XSType
+     */
+    public String newInstanceCode() {
+         return "new "+getJType().getName()+"();";
+    } //-- newInstanceCode
 
-    public void setFacets(SimpleType simpleType) {}
-    /**
-     * Returns the JType that this XSType represents
-     * @return the JType that this XSType represents
-    **/
     public JType getJType() {
         return this.jType;
     }
 
-
-} //-- XSNCName
+    public void setFacets(SimpleType simpleType){
+    }
+}

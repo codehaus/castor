@@ -62,7 +62,7 @@ public final class XSIdRef extends XSType {
         = new JClass("java.lang.Object");
 
     public XSIdRef() {
-        super(XSType.IDREF);
+        super(XSType.IDREF_TYPE);
     } //-- XSId
 
     public void setFacets(SimpleType simpleType) {}

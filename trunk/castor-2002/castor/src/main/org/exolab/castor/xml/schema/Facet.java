@@ -54,8 +54,6 @@ import org.exolab.castor.xml.ValidationException;
 **/
 public class Facet extends Annotated {
 
-    public static final String DURATION         = "duration";
-    public static final String ENCODING         = "encoding";
     public static final String ENUMERATION      = "enumeration";
     public static final String LENGTH           = "length";
     public static final String PATTERN          = "pattern";
@@ -66,9 +64,9 @@ public class Facet extends Annotated {
     public static final String MIN_INCLUSIVE    = "minInclusive";
     public static final String MAX_LENGTH       = "maxLength";
     public static final String MIN_LENGTH       = "minLength";
-    public static final String PERIOD           = "period";
-    public static final String SCALE            = "scale";
     public static final String WHITESPACE       = "whiteSpace";
+    public static final String TOTALDIGITS      = "totalDigits";
+    public static final String FRACTIONDIGITS   = "fractionDigits";
 
     /**
      * The name of this Facet
@@ -127,15 +125,6 @@ public class Facet extends Annotated {
     public String getValue() {
         return this._value;
     } //-- getValue
-
-
-   /**
-     * Sets the value of this facet
-     * @param value the new character value of this facet
-    **/
-//    public void setValue(String value) {
-//       this._value = value;
-//    } //-- setValue
 
 
     /**

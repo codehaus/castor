@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -48,12 +48,13 @@ package org.exolab.castor.xml.schema.simpletypes;
 import org.exolab.castor.xml.schema.Schema;
 
 /**
- * Represents the string type (and its derivations)
- * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
- * @version $Revision:
+ * Represents the XML Schema string type.
+ * This class should be the base class for all the types derived from XML Schema
+ * String.
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @version $Revision$
 **/
-public class StringType extends AtomicType
-{
+public class StringType extends AtomicType {
 }
 
 

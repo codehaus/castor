@@ -72,7 +72,7 @@ public final class XSInt extends XSPatternBase {
     //private Integer value = null;
 
     public XSInt() {
-        super(XSType.INT);
+        super(XSType.INT_TYPE);
     } //-- XSInt
 
 

@@ -63,7 +63,7 @@ public class TypeList
 
     public TypeList()
     {
-        types= new Vector(43); //There are 43 built in types in the spec
+        types= new Vector(44); //There are 43 built in types in the spec
     }
 
     public Vector getTypes()             { return types;}
