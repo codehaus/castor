@@ -573,7 +573,8 @@ final class ObjectLock implements DepositBox {
             //System.out.println("cofirm == null");
             if ( !succeed ) {
                 // remove it from readLock
-                if ( _readLock.tx == tx )
+                if ( _readLock == null ) {
+                } else if ( _readLock.tx == tx )
                     _readLock = _readLock.next;
                 else {
                     LinkedTx link = _readLock;
