@@ -288,6 +288,12 @@
   <!-- Last names begin with I-L -->
 
   <contributor type="Contributor">
+    <name surname="Joachim" given="Ralf" />
+    <email>ralf.joachim@syscon-world.de</email>
+    <description>Patch to fix parameterized types with whitespace support</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Kelly" given="Shaun" />
     <email>shaun.kelly@bigpond.com</email>
     <description>

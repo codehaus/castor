@@ -307,7 +307,7 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
-
+<!--
   <class name="jdo.TestObject2" access="shared" identity="id" key-generator="MAX">
     <description>Table used for timestamp testing</description>
     <map-to table="test_table2" />
@@ -321,7 +321,7 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
-
+-->
   <class name="jdo.TestObjectExtends" access="shared" extends="jdo.TestObject">
     <description>Table used for cache testing</description>
     <map-to table="test_table_extends" />
@@ -616,7 +616,7 @@
       <sql name="int_date" type="integer[YMD]" />
     </field>
     <field name="time2" type="date" >
-      <sql name="str_time" type="char[HH:mm:ss.SSS]" />
+      <sql name="str_time" type="char[yyyy/MM/dd HH:mm:ss.SSS]" />
     </field>
     <field name="timestamp2" type="date" >
       <sql name="num_date" type="numeric[YMDhmsS]" />
