@@ -447,6 +447,12 @@ public class XMLBindingComponent implements BindingComponent {
                 }
                 //-- use targetNamespace of schema
                 break;
+            case Structure.COMPLEX_TYPE:
+                ComplexType complexType = (ComplexType)_annotated;
+                schema = complexType.getSchema();
+                if (complexType.getParent() == schema)
+                    break;
+                return null;
             default:
                 break;
         }

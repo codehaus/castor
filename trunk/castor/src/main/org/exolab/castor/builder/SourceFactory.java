@@ -309,7 +309,7 @@ public class SourceFactory  {
                 //generate class if the complexType is anonymous and we create classes
                 //for an element OR if the complexType is top-level and we create
                 //classes for it.
-                else if (complexType.isTopLevel() ^ creatingForAnElement) {
+                else if (complexType.isTopLevel() || creatingForAnElement) {
 
                     //-- check Group type
                     if (complexType.getParticleCount() == 1) {
@@ -1232,7 +1232,8 @@ public class SourceFactory  {
         ClassInfo classInfo = state.classInfo;
         classInfo.setSchemaType(new XSClass(state.jClass, typeName));
 
-        classInfo.setNamespaceURI(component.getTargetNamespace());
+        /// I don't believe this should be here: kv 20030423
+        ///classInfo.setNamespaceURI(component.getTargetNamespace());
 
         //- Handle derived types
         XMLType base = complexType.getBaseType();
