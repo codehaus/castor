@@ -91,6 +91,9 @@ import org.xml.sax.InputSource;
  * used to obtain a new database connection. Any number of database 
  * connections can be obtained from the same JDO object.
  * 
+ * <p>Please note that this clas is provided on an <b>experimental</b>
+ *    base, and might still undergo minor changes.</p> 
+ * 
  * <p>An instance of this class is contructed with a two-step 
  * approach:</p> 
  * 
