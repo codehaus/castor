@@ -57,7 +57,7 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.Sql;
-import org.exolab.castor.mapping.xml.Xml;
+import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.*;
@@ -70,7 +70,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
  * A single query that takes OQL query language, reads data from an
  * RDBMS, and returns the results as SAX events. The query can be
  * parameterized, and be re-used with different bound values.
- * 
+ *
  * There are currently some severe limitations on the contents of the
  * OQL query. The query needs to be a SELECT and must return a single
  * class.  However, it can handle multiple returned objects, which are
@@ -82,9 +82,9 @@ import org.exolab.castor.persist.spi.QueryExpression;
  * An additional note: the bind() methods take the parameters in order
  * that they appear, NOT using the number value of the parameter
  * name. So, if you have a query like:
- * 
+ *
  * <pre>... WHERE foo.id = $2 AND bar.name = $1 ... </pre>
- * 
+ *
  * then the statement bind(1, 12) will bind the value 12 to the first
  * parameter, even though it's named "$2." This may or may not be
  * changed in future releases.
@@ -111,13 +111,13 @@ public class DTXQuery {
      * Set the DocumentHandler that will receive the results (as SAX
      * events) for this query. By default, the query will use the
      * document handler of its DTXEngine.
-     * 
+     *
      * Changing the DocumentHandler in the middle of a query is
      * ill-advised.
      *
      * @param handler The DocumentHandler to use.
      */
-     
+
     public void setHandler(DocumentHandler handler) {
 	_handler = handler;
     }
@@ -126,17 +126,17 @@ public class DTXQuery {
      * Set the DocumentHandler that will receive the results (as SAX
      * events) for this query. By default, the query will use the
      * document handler of its DTXEngine.
-     * 
+     *
      * @param handler The DocumentHandler to use.
      */
-     
+
     public void setLogWriter(PrintWriter logWriter) {
 	_logWriter = logWriter;
     }
 
     /**
      * Binds an Object value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value Object to bind.
      */
@@ -155,7 +155,7 @@ public class DTXQuery {
 
     /**
      * Binds an String value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value String to bind.
      */
@@ -174,7 +174,7 @@ public class DTXQuery {
 
     /**
      * Binds an integer value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value int to bind.
      */
@@ -193,7 +193,7 @@ public class DTXQuery {
 
     /**
      * Binds a long integer value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value long integer to bind.
      */
@@ -212,7 +212,7 @@ public class DTXQuery {
 
     /**
      * Binds a float value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value float to bind.
      */
@@ -231,7 +231,7 @@ public class DTXQuery {
 
     /**
      * Binds a double value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value double to bind.
      */
@@ -250,7 +250,7 @@ public class DTXQuery {
 
     /**
      * Binds a boolean value to a parameter in the query.
-     * 
+     *
      * @param param 1-based index of the param (see note above).
      * @param value boolean to bind.
      */
@@ -270,8 +270,8 @@ public class DTXQuery {
     /**
      * This method executes the query. All results of the query are
      * sent to the DocumentHandler specified by setHandler() as SAX
-     * events. 
-     *  
+     * events.
+     *
      * @param handler The DocumentHandler to use.
      */
 
@@ -337,7 +337,7 @@ public class DTXQuery {
     /* Recursive SAX emitter. Emits top-level elements, attributes,
        and simple (non-object) elements, then descends recursively
        into lower and lower child elements.
-       
+
        This code is -highly- loopy, and it makes some assumptions
        about the ordering of sub-elements that may be unacceptable.
     */
@@ -345,7 +345,7 @@ public class DTXQuery {
     protected boolean emitSaxInt(ResultSet rs, int idIndex) throws DTXException {
 
 	boolean hasValue = true;
-	
+
 	try {
 	    String initParentValue = null;
 	    String parentValue = null;
@@ -365,7 +365,7 @@ public class DTXQuery {
 	    DTXClassDescriptor desc = (DTXClassDescriptor) _classes.get(idCol);
 	    ClassMapping clsMapping = desc.getClassMapping();
 	    String elementName = null;
-	    
+
 	    if (clsMapping.getMapTo() == null ||
 		clsMapping.getMapTo().getXml() == null) {
 		elementName = clsMapping.getName();
@@ -391,10 +391,10 @@ public class DTXQuery {
 		    Integer attrColNum = (Integer) _cols.get(attrCol);
 		    FieldMapping field = desc.getAttr(attrCol);
 		    String attrName = null;
-		    if (field.getXml() == null || field.getXml().getName() == null) {
+		    if (field.getBindXml() == null || field.getBindXml().getName() == null) {
 			attrName = field.getName();
 		    } else {
-			attrName = field.getXml().getName();
+			attrName = field.getBindXml().getName();
 		    }
 
 		    String attrValue = rs.getString(attrColNum.intValue());
@@ -408,10 +408,10 @@ public class DTXQuery {
 		    Integer elementColNum = (Integer) _cols.get(simpleElementCol);
 		    FieldMapping elField = desc.getSimpleElement(simpleElementCol);
 		    String elName = null;
-		    if (elField.getXml() == null || elField.getXml().getName() == null) {
+		    if (elField.getBindXml() == null || elField.getBindXml().getName() == null) {
 			elName = elField.getName();
 		    } else {
-			elName = elField.getXml().getName();
+			elName = elField.getBindXml().getName();
 		    }
 
 		    String elValue = rs.getString(elementColNum.intValue());
@@ -442,7 +442,7 @@ public class DTXQuery {
 
 		if (newIdVal.equalsIgnoreCase(idVal)) {
 		    hasValue = rs.next();
-		} 
+		}
 		if (hasValue) {
 		    if (idIndex != 0) {
 			parentValue = rs.getString(parentColNum);
@@ -488,7 +488,7 @@ public class DTXQuery {
 		throw new DTXException("Missing object name");
 	    if (! _objName.equals(token.nextToken()))
 		throw new DTXException("Object name not same in SELECT and FROM");
-        
+
 	    if (_logWriter != null) {
 		_logWriter.println("Querying " + _objName + " of type " + _objType);
 	    }
@@ -506,7 +506,7 @@ public class DTXQuery {
 	    }
 
 	    QueryExpression expr = factory.getQueryExpression();
-	
+
 	    if (expr == null) {
 		throw new DTXException("dtx.NoQueryExpression");
 	    }
@@ -541,7 +541,7 @@ public class DTXQuery {
 	    if (_logWriter != null) {
 		_logWriter.println("SQL: " + sql);
 	    }
-	    
+
 	    return sql;
 
 	} catch (Exception e) {
@@ -578,7 +578,7 @@ public class DTXQuery {
         FieldMapping[] fields = clsMapping.getFieldMapping();
 	FieldMapping identity = null;
 
-        String identityName = clsMapping.getIdentity();
+        String identityName = clsMapping.getIdentity(0);
 
 	for (int j = 0; j < fields.length; j++) {
 	    if (fields[j].getName().equals(identityName)) {
@@ -602,19 +602,28 @@ public class DTXQuery {
 	_ids.add(table + "." + identitySQL);
 
 	DTXClassDescriptor desc = new DTXClassDescriptor(clsMapping);
- 
+
 	_classes.put(table + "." + identitySQL, desc);
 
         // If this class extends another class, create a join with the parent table and
         // add the load fields of the parent class (but not the store fields)
         if (clsMapping.getExtends() != null) {
-	    MapTo extendsTo = ((ClassMapping) clsMapping.getExtends()).getMapTo();
+
+        /**
+          * TODO : Needs to be resolved by Hand
+          */
+
+        MapTo extendsTo = new MapTo();//(ClassMapping) clsMapping.getExtends()).getMapTo();
 	    if (extendsTo == null) {
 		throw new DTXException("no mapping info for extends table.");
 	    }
 	    String extendsTable = extendsTo.getTable();
             expr.addInnerJoin(table, identitySQL, extendsTable, identitySQL);
-            initQuery((ClassMapping) clsMapping.getExtends(), expr);
+            /**
+             * needs to be resolved by hand
+             */
+            initQuery(new ClassMapping(), expr);
+            //(ClassMapping) clsMapping.getExtends(), expr);
         }
 
         for (int i = 0; i < fields.length; ++i) {
@@ -639,7 +648,7 @@ public class DTXQuery {
 
 		    String relId = null;
                     String foreKey = null;
-                    
+
                     for (int k = 0; k < relFields.length; k++ ) {
 			Sql relSql = relFields[k].getSql();
                         if (relSql != null) {
@@ -664,11 +673,11 @@ public class DTXQuery {
 				}
 				String relFullName = relTable + "." + relFieldName;
 
-				Xml relFieldXml = relFields[n].getXml();
+				BindXml relFieldXml = relFields[n].getBindXml();
 				String node = "element";
 				if (relFieldXml != null) {
 				    node = relFieldXml.getNode().toString();
-				} 
+				}
 
 				if (!relFieldName.equals(foreKey)) {
 				    expr.addColumn(relTable, relFieldName);
@@ -700,11 +709,11 @@ public class DTXQuery {
 		}
 		String fullName = table + "." + fieldName;
 
-		Xml fieldXml = field.getXml();
+		BindXml fieldXml = field.getBindXml();
 		String node = "element";
 		if (fieldXml != null) {
 		     node = fieldXml.getNode().toString();
-		} 
+		}
 
 		if (node.equalsIgnoreCase("attribute")) {
 		    desc.addAttr(fullName, field);
@@ -745,7 +754,7 @@ public class DTXQuery {
         String op = token.nextToken();
         if (! token.hasMoreTokens())
             throw new DTXException("Missing field value");
-        
+
         String value = token.nextToken();
         if (name.indexOf(".") > 0) {
             name = name.substring(name.indexOf(".") + 1);
@@ -760,7 +769,7 @@ public class DTXQuery {
                 break;
             }
         }
-        
+
         if (field == null) {
             throw new DTXException("The field " + name + " was not found");
 	}

@@ -88,22 +88,22 @@ import java.util.ArrayList;
 
 
 /**
- * ClassMolder is a binder for one type of data object and its 
- * {@link Persistence}. For example, when ClassMolder is asked to load 
+ * ClassMolder is a binder for one type of data object and its
+ * {@link Persistence}. For example, when ClassMolder is asked to load
  * an object, it acquires values from {@link Persistence} and binds it
- * into an target object. It also resolves relations via 
- * {@link TransactionContext} and bind related object into an target object. 
+ * into an target object. It also resolves relations via
+ * {@link TransactionContext} and bind related object into an target object.
  * <p>
  * Beside loading, ClassMolder is also repsonsible for storing, removing,
- * creating an object to and from a persistence storage, as well as 
+ * creating an object to and from a persistence storage, as well as
  * reverting an object to previous state.
  * <p>
- * Each instance of ClassMolder deals with exactly one persistable type, 
- * interacts with one instance of Persistent and belongs to one 
+ * Each instance of ClassMolder deals with exactly one persistable type,
+ * interacts with one instance of Persistent and belongs to one
  * {@link LockEngine}.
  * <p>
  *
- * 
+ *
  * @author <a href="yip@intalio.com">Thomas Yip</a>
  */
 
@@ -117,7 +117,7 @@ public class ClassMolder {
 
     /**
      * The fully qualified name of the base class.
-     */ 
+     */
     private String _name;
 
     /**
@@ -127,24 +127,24 @@ public class ClassMolder {
 
     /**
      * <tt>FieldMolder</tt>s of the fields of the base class
-     */ 
+     */
     private FieldMolder[] _fhs;
-    
+
     /**
-     * <tt>ClassMolder</tt> of the java data object class's ClassMolder which 
+     * <tt>ClassMolder</tt> of the java data object class's ClassMolder which
      * the base class extends.
      */
     private ClassMolder _extends;
 
     /**
-     * <tt>ClassMolder</tt> of the java data object class's ClassMolder which 
+     * <tt>ClassMolder</tt> of the java data object class's ClassMolder which
      * the base class depends on. <tt>null</tt> if it class is an indenpendent
      * class.
      */
     private ClassMolder _depends;
 
     /**
-     * A Vector of <tt>ClassMolder</tt>s for all the direct dependent class of the 
+     * A Vector of <tt>ClassMolder</tt>s for all the direct dependent class of the
      * base class.
      */
     private Vector _dependent;
@@ -152,7 +152,7 @@ public class ClassMolder {
     /**
      * A Vector of <tt>ClassMolder</tt>s for all the direct extending class of the
      * base class.
-     */ 
+     */
     private Vector _extendent;
 
     /**
@@ -218,7 +218,7 @@ public class ClassMolder {
         ds.register( _name, this );
 
         ClassMapping dep = (ClassMapping) clsMap.getDepends();
-        ClassMapping ext = (ClassMapping) clsMap.getExtends();
+        String ext = clsMap.getExtends();
 
         if ( dep != null && ext != null )
             throw new MappingException("A JDO cannot both extends and depends on other objects");
@@ -228,7 +228,7 @@ public class ClassMolder {
         }
 
         if ( ext != null ) {
-            ds.pairExtends( this, ext.getName() );
+            ds.pairExtends( this, ext );
         }
 
         if ( clsDesc instanceof JDOClassDescriptor ) {
@@ -254,7 +254,7 @@ public class ClassMolder {
         for ( int i=0; i<_fhs.length; i++ ) {
             if ( fmFields[i].getSql() != null && fmFields[i].getSql().getManyTable() != null ) {
                 // the fields is not primitive
-                String manyTable = null; 
+                String manyTable = null;
                 String[] idSQL = null;
                 int[] idType = null;
                 String[] relatedIdSQL = null;
@@ -267,7 +267,7 @@ public class ClassMolder {
                 FieldDescriptor[] fd = ((ClassDescriptorImpl)clsDesc).getIdentities();
                 for ( int j=0; j < fmId.length; j++ ) {
                     idSQL[j] = fmId[j].getSql().getName();
-                    
+
                     if ( fd[j] instanceof JDOFieldDescriptor ) {
                         idType[j] = ((JDOFieldDescriptor)fd[j]).getSQLType();
                     } else {
@@ -338,7 +338,7 @@ public class ClassMolder {
                     start = count;
                     continue;
                 }
-            } 
+            }
             count++;
         }
         if ( start < (count - 1) ) {
@@ -350,15 +350,15 @@ public class ClassMolder {
         return result;
     }
 
-    /* 
+    /*
      * Get the all the id fields of a class
      * If the class, C, is a dependent class, then
-     * the depended class', D, id fields will be 
+     * the depended class', D, id fields will be
      * appended at the back and returned.
      * If the class is an extended class, the id
      * fields of the extended class will be returned.
      */
-    private FieldMapping[] getIdFields( ClassMapping clsMap ) 
+    private FieldMapping[] getIdFields( ClassMapping clsMap )
             throws MappingException {
         ClassMapping base;
         FieldMapping[] fmDepended;
@@ -370,13 +370,17 @@ public class ClassMolder {
 
         // start with the extended class
         base = clsMap;
-        while ( base.getExtends() != null ) {
+        /**
+         * Fix the following .... resolve by hand
+         */
+      /* while ( base.getExtends() != null ) {
             base = (ClassMapping) base.getExtends();
-        }
-        fmDepended = null; 
+        }*/
+        fmDepended = null;
 
-        identities = breakApart( base.getIdentity(), ' ' );
-       
+        identities = base.getIdentity();
+        // breakApart( base.getIdentity(), ' ' );
+
         if ( identities == null || identities.length == 0 )
             throw new MappingException("Identity is null!");
 
@@ -397,7 +401,7 @@ public class ClassMolder {
                 j++;
             }
         }
-        if ( fmDepended == null ) 
+        if ( fmDepended == null )
             return fmIds;
 
         // join depend ids and class id
@@ -410,14 +414,17 @@ public class ClassMolder {
      * Get all the field mapping, including all the field
      * in extended class, but id fields
      */
-    private FieldMapping[] getFullFields( ClassMapping clsMap ) 
+    private FieldMapping[] getFullFields( ClassMapping clsMap )
             throws MappingException {
         FieldMapping[] extendFields;
         FieldMapping[] thisFields;
         FieldMapping[] fields = null;
         String[] identities;
         boolean idfield;
-        ClassMapping extend = (ClassMapping) clsMap.getExtends();
+        /**
+         * Needs to be resolved
+         */
+        ClassMapping extend =  new ClassMapping();//(ClassMapping) clsMap.getExtends();
 
 
         if ( extend != null ) {
@@ -428,10 +435,11 @@ public class ClassMolder {
             System.arraycopy( extendFields, 0, fields, 0, extendFields.length );
             System.arraycopy( thisFields, 0, fields, extendFields.length, thisFields.length );
         } else {
-            identities = breakApart( clsMap.getIdentity(), ' ' );
+            identities = clsMap.getIdentity();
+            //breakApart( clsMap.getIdentity(), ' ' );
             if ( identities == null || identities.length == 0 )
                 throw new MappingException("Identity is null!");
-            
+
             // return array of fieldmapping without the id field
             thisFields = clsMap.getFieldMapping();
             fields = new FieldMapping[thisFields.length-identities.length];
@@ -451,7 +459,7 @@ public class ClassMolder {
                 }
             }
 
-        }        
+        }
         return fields;
     }
 
@@ -459,12 +467,12 @@ public class ClassMolder {
      * Resolve and construct all the <tt>ClassMolder</tt>s given a MappingLoader.
      *
      * @param   loader    MappingLoader for the LockEngine
-     * @param   lock      LockEngine for all the ClassMolder 
+     * @param   lock      LockEngine for all the ClassMolder
      * @param   factory   factory class for getting Persistent of the ClassMolder
      *
      * @return  Vector of all of the <tt>ClassMolder</tt>s from a MappingLoader
      */
-    public static Vector resolve( MappingLoader loader, LockEngine lock, 
+    public static Vector resolve( MappingLoader loader, LockEngine lock,
             PersistenceFactory factory, LogInterceptor logInterceptor )
             throws MappingException, ClassNotFoundException {
 
@@ -489,7 +497,7 @@ public class ClassMolder {
     }
 
     /**
-     * Remove the reference of a related object from an object of. 
+     * Remove the reference of a related object from an object of.
      * the base class. <p>
      *
      * If the related object is PersistanceCapable, the field will
@@ -558,27 +566,27 @@ public class ClassMolder {
      *
      * @param tx   the TransactionContext in action
      * @param oid  the object identity of the desired object
-     * @param locker   the {@link DepositBox} of the object which is used to 
+     * @param locker   the {@link DepositBox} of the object which is used to
      *                 store the dirty checking cache of the object.
      * @param accessMode  the acessMode for the object
      * @return the object stamp for the object in the persistent storage
      */
-    public Object load( TransactionContext tx, OID oid, DepositBox locker, 
+    public Object load( TransactionContext tx, OID oid, DepositBox locker,
             Object object, AccessMode accessMode )
-            throws ObjectNotFoundException, PersistenceException {       
+            throws ObjectNotFoundException, PersistenceException {
 
         Connection conn;
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         Object[] fields;
         Object ids;
-        Object stamp = null;        
+        Object stamp = null;
         Object temp;
         int fieldType;
 
-        if ( oid.getIdentity() == null ) 
+        if ( oid.getIdentity() == null )
             throw new PersistenceException("The identities of the object to be loaded is null");
-      
+
         // load the fields from the persistent storage if the cache is empty
         // and the accessMode is readOnly.
         fields = (Object[]) locker.getObject( tx );
@@ -606,7 +614,7 @@ public class ClassMolder {
             case FieldMolder.PRIMITIVE:
                 // simply set the corresponding Persistent field value into the object
                 temp = fields[i];
-                if ( temp != null ) 
+                if ( temp != null )
                     _fhs[i].setValue( object, temp );
                 else
                     _fhs[i].setValue( object, null );
@@ -616,7 +624,7 @@ public class ClassMolder {
                 // field is not primitive type. Related object will be loaded
                 // thru the transaction in action if needed.
 
-                // lazy loading for object (hollow object) is not support in 
+                // lazy loading for object (hollow object) is not support in
                 // this version. Warns user if lazy loading is specified.
                 if ( _fhs[i].isLazy() )
                     System.err.println( "Warning: Lazy loading of object is not yet support!" );
@@ -625,7 +633,7 @@ public class ClassMolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
                 if ( fields[i] != null ) {
-                    // use the corresponding Persistent fields as the identity, 
+                    // use the corresponding Persistent fields as the identity,
                     // and we ask transactionContext in action to load it.
                     temp = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
                     _fhs[i].setValue( object, temp );
@@ -635,14 +643,14 @@ public class ClassMolder {
                 break;
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
-                // field is one-to-many and many-to-many type. All the related 
-                // object will be loaded and put in a Collection. And, the 
+                // field is one-to-many and many-to-many type. All the related
+                // object will be loaded and put in a Collection. And, the
                 // collection will be set as the field.
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
                 if ( !_fhs[i].isLazy() ) {
-                    // lazy loading is not specified, load all objects into 
+                    // lazy loading is not specified, load all objects into
                     // the collection and set the Collection as the data object
                     // field.
                     ArrayList col = new ArrayList();
@@ -675,7 +683,7 @@ public class ClassMolder {
      * Create an object of the base class with specified identity into the persistence storage.
      *
      * @param tx   transaction in action
-     * @param oid  the object identity of the object to be created. 
+     * @param oid  the object identity of the object to be created.
      * @param locker the dirty checking cache of the object
      * @param object  the object to be created
      * @return  the identity of the object
@@ -695,9 +703,9 @@ public class ClassMolder {
         int fieldType;
 
         if ( _persistence == null )
-            throw new PersistenceException("non persistence capable: "+oid.getJavaClass());        
+            throw new PersistenceException("non persistence capable: "+oid.getJavaClass());
 
-        // optimization note: because getObject is an expensive operation, 
+        // optimization note: because getObject is an expensive operation,
         // if this method divided into 3 phase, the performance will be
         // enhanced.
         // 1/ getObject into array
@@ -754,7 +762,7 @@ public class ClassMolder {
         }
 
         // ask Persistent to create the object into the persistence storage
-        createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()), 
+        createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()),
                 fields, ids );
 
         if ( createdId == null )
@@ -788,15 +796,15 @@ public class ClassMolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     if ( _fhs[i].isDependent() ) {
-                        if ( !tx.isPersistent( o ) ) 
+                        if ( !tx.isPersistent( o ) )
                             tx.create( fieldEngine, fieldClassMolder, o, oid );
-                        else 
+                        else
                             // fail-fast principle: if the object depend on another object,
                             // throw exception
                             if ( !tx.isDepended( oid, o ) )
                                 throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
                     } else {
-                        //if ( !tx.isPersistent( o ) ) 
+                        //if ( !tx.isPersistent( o ) )
                         //    tx.create( fieldEngine, fieldClassMolder, o, null );
                     }
                 }
@@ -813,18 +821,18 @@ public class ClassMolder {
                         if ( _fhs[i].isDependent() ) {
                             if ( !tx.isPersistent( oo ) ) {
                                 tx.create( fieldEngine, fieldClassMolder, oo, oid );
-                            } else 
+                            } else
                                 // fail-fast principle: if the object depend on another object,
                                 // throw exception
                                 if ( !tx.isDepended( oid, oo ) )
                                     throw new PersistenceException("Dependent object may not change its master");
                         } else {
-                            // only dependent object will be created when 
-                            // master object is created. 
-                            // user should create all independent object 
+                            // only dependent object will be created when
+                            // master object is created.
+                            // user should create all independent object
                             // manually.
 
-                            // if ( !tx.isPersistent( oo ) ) 
+                            // if ( !tx.isPersistent( oo ) )
                             //    tx.create( fieldEngine, fieldClassMolder, oo, null );
                         }
                     }
@@ -840,9 +848,9 @@ public class ClassMolder {
                     // many-to-many relation is never dependent relation
                     while (itor.hasNext()) {
                         Object oo = itor.next();
-                        if ( !tx.isPersistent( oo ) )                         
-                            _fhs[i].getRelationLoader().createRelation( 
-                            (Connection)tx.getConnection(oid.getLockEngine()), 
+                        if ( !tx.isPersistent( oo ) )
+                            _fhs[i].getRelationLoader().createRelation(
+                            (Connection)tx.getConnection(oid.getLockEngine()),
                             oid.getIdentity(), fieldClassMolder.getIdentity(oo) );
                     }
                 }
@@ -855,12 +863,12 @@ public class ClassMolder {
 
         if ( createdId != ids )
             return createdId;
-        else 
+        else
             return null;
     }
 
-    private boolean isEquals( Collection c1, Collection c2 ) { 
-                
+    private boolean isEquals( Collection c1, Collection c2 ) {
+
         if ( c1 == c2 )
             return true;
         if ( c1 == null || c2 == null )
@@ -869,9 +877,9 @@ public class ClassMolder {
             return true;
         return false;
     }
-    
+
     private boolean isEquals( Object o1, Object o2 ) {
-        
+
         if ( o1 == o2 )
             return true;
         if ( o1 == null || o2 == null )
@@ -882,11 +890,11 @@ public class ClassMolder {
     }
 
     /**
-     * Check the object for modification. If dpendent object is dereferenced, it 
-     * method will remove the object thru the transaction. If an related object 
-     * is dereferenced, it method will make sure the formally object will be 
+     * Check the object for modification. If dpendent object is dereferenced, it
+     * method will remove the object thru the transaction. If an related object
+     * is dereferenced, it method will make sure the formally object will be
      * dereferenced from the other side as well.
-     * 
+     *
      * This method is called in prepare (for commit) state of the transaction.
      * This method indicates if the object needed to be persist or cache should
      * be update using TransactionContext.markDelete.
@@ -915,15 +923,15 @@ public class ClassMolder {
         boolean lockrequired;
         boolean updateCache;
 
-        if ( oid.getIdentity() == null ) 
+        if ( oid.getIdentity() == null )
             throw new PersistenceException("The identity of the object to be stored is null");
 
-        if ( !oid.getIdentity().equals( getIdentity( object ) ) ) 
+        if ( !oid.getIdentity().equals( getIdentity( object ) ) )
             throw new PersistenceException("Identity changes is not allowed!");
 
         fields = (Object[]) locker.getObject( tx );
 
-        if ( fields == null ) 
+        if ( fields == null )
             throw new PersistenceException("Object, "+oid+",  isn't loaded in the persistence storage!");
 
         newfields = new Object[_fhs.length];
@@ -973,16 +981,16 @@ public class ClassMolder {
                     if ( value != null ) {
                         if ( _fhs[i].isDependent() ) {
                             if ( fields[i].equals( newfields[i] ) ) {
-                                if ( fields[i] != null ) { 
+                                if ( fields[i] != null ) {
                                     Object reldel = tx.fetch( fieldEngine, fieldClassMolder, fields[i], null );
                                     if ( reldel != null ) {
                                         tx.delete( reldel );
                                     } else {
                                         // should i notify user that the object does not exist?
                                         // user can't delete dependent object himself. So, must
-                                        // error.                                   
+                                        // error.
                                     }
-                                        
+
                                 }
                                 if ( newfields[i] != null ) {
                                     if ( !tx.isPersistent( value ) ) {
@@ -991,7 +999,7 @@ public class ClassMolder {
                                     } else {
                                         // should i notify user that the object does not exist?
                                         // user can't create dependent object himself. So, must
-                                        // error.                                   
+                                        // error.
                                     }
                                 }
                             }
@@ -1011,14 +1019,14 @@ public class ClassMolder {
                 orgFields = (ArrayList)fields[i];
                 if ( ! (value instanceof Lazy) ) {
                     // get a list of all of the identities from the object
-                    
+
                     itor = getIterator( value );
                     ArrayList v = (ArrayList) value;
                     list = new ArrayList( v.size() );
                     for ( int j=0; j<v.size(); j++ ) {
                         list.add( fieldClassMolder.getIdentity( v.get(j) ) );
                     }
-                    
+
                     ArrayList cachedList = (ArrayList)fields[i];
                     if ( !isEquals( cachedList, list ) ) {
                         updateCache = true;
@@ -1037,7 +1045,7 @@ public class ClassMolder {
                                 if ( !list.contains( orgFields.get(j) ) ) {
                                     Object reldel = tx.fetch( fieldEngine, fieldClassMolder, orgFields.get(j), null );
                                     if ( reldel != null ) {
-                                        if ( _fhs[i].isDependent() ) 
+                                        if ( _fhs[i].isDependent() )
                                             tx.delete( reldel );
                                         else
                                             fieldClassMolder.removeRelation( tx, reldel, this, object );
@@ -1057,7 +1065,7 @@ public class ClassMolder {
                                         } else {
                                         // should i notify user that the object does not exist?
                                         // user can't create dependent object himself. So, must
-                                        // error.                                   
+                                        // error.
                                         }
                                     }
                                 }
@@ -1066,7 +1074,7 @@ public class ClassMolder {
                             for ( int j=0; j<orgFields.size(); j++ ) {
                                 Object reldel = tx.fetch( fieldEngine, fieldClassMolder, orgFields.get(j), null );
                                 if ( reldel != null ) {
-                                    if ( _fhs[i].isDependent() ) 
+                                    if ( _fhs[i].isDependent() )
                                         tx.delete( reldel );
                                     else
                                         fieldClassMolder.removeRelation( tx, reldel, this, object );
@@ -1075,8 +1083,8 @@ public class ClassMolder {
                                     // user can't delete dependent object himself. So, must
                                     // error.
                                 }
-                            }                                
-                        } else {    // list != null 
+                            }
+                        } else {    // list != null
                             for ( int j=0; j<list.size(); j++ ) {
                                 if ( _fhs[i].isDependent() ) {
                                     if ( !tx.isPersistent( v.get(j) ) ) {
@@ -1084,7 +1092,7 @@ public class ClassMolder {
                                     } else {
                                     // should i notify user that the object does not exist?
                                     // user can't create dependent object himself. So, must
-                                    // error.                                   
+                                    // error.
                                     }
                                 }
                             }
@@ -1113,8 +1121,8 @@ public class ClassMolder {
                                 if ( _fhs[i].isDependent() )
                                     tx.delete( toBeDeleted );
                                 else
-                                    fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );    
-                            } else { 
+                                    fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );
+                            } else {
                                 // what to do if it happens?
                             }
                         }
@@ -1162,7 +1170,7 @@ public class ClassMolder {
                         for ( int j=0; j<v.size(); j++ ) {
                             list.add( fieldClassMolder.getIdentity( v.get(j) ) );
                         }
-                    
+
                     orgFields = (ArrayList)fields[i];
                     if ( !isEquals( orgFields, list ) ) {
                         updateCache = true;
@@ -1177,8 +1185,8 @@ public class ClassMolder {
                                 //    tx.create( fieldEngine, fieldClassMolder, newobj, oid );
                                 //}
                                 // create the relation in relation table too
-                                _fhs[i].getRelationLoader().createRelation( 
-                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                _fhs[i].getRelationLoader().createRelation(
+                                (Connection)tx.getConnection(oid.getLockEngine()),
                                 oid.getIdentity(), fieldClassMolder.getIdentity(newobj) );
                             }
                         }
@@ -1193,17 +1201,17 @@ public class ClassMolder {
                                     Object reldel = tx.load( fieldEngine, fieldClassMolder, orgFields.get(j), null );
                                     if ( reldel != null ) {
                                         tx.writeLock( reldel, tx.getLockTimeout() );
-                                     
-                                        _fhs[i].getRelationLoader().deleteRelation( 
-                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+
+                                        _fhs[i].getRelationLoader().deleteRelation(
+                                        (Connection)tx.getConnection(oid.getLockEngine()),
                                         oid.getIdentity(), orgFields.get(j) );
 
                                         fieldClassMolder.removeRelation( tx, reldel, this, object );
                                     } else {
                                         // the object not there, and we try to delete the rubbish relation,
                                         // if there is
-                                        _fhs[i].getRelationLoader().deleteRelation( 
-                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        _fhs[i].getRelationLoader().deleteRelation(
+                                        (Connection)tx.getConnection(oid.getLockEngine()),
                                         oid.getIdentity(), orgFields.get(j) );
                                     }
                                 }
@@ -1216,16 +1224,16 @@ public class ClassMolder {
                                     Object reladd = tx.load( fieldEngine, fieldClassMolder, list.get(j), null );
                                     if ( reladd != null ) {
                                         tx.writeLock( reladd, tx.getLockTimeout() );
-                                     
-                                        _fhs[i].getRelationLoader().createRelation( 
-                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+
+                                        _fhs[i].getRelationLoader().createRelation(
+                                        (Connection)tx.getConnection(oid.getLockEngine()),
                                         oid.getIdentity(), orgFields.get(j) );
                                     } else {
-                                        // ignored if object not found, if later in transaction 
-                                        // the other side of object is added. then, the relation 
-                                        // will be added if the other side of object is just 
-                                        // deleted in this transaction, then it seem to be an 
-                                        // non-critical error ignore it seem to better than annoy 
+                                        // ignored if object not found, if later in transaction
+                                        // the other side of object is added. then, the relation
+                                        // will be added if the other side of object is just
+                                        // deleted in this transaction, then it seem to be an
+                                        // non-critical error ignore it seem to better than annoy
                                         // user
                                     }
                                 }
@@ -1237,17 +1245,17 @@ public class ClassMolder {
                                 Object reldel = tx.load( fieldEngine, fieldClassMolder, orgFields.get(j), null );
                                 if ( reldel != null ) {
                                     tx.writeLock( reldel, tx.getLockTimeout() );
-                                 
-                                    _fhs[i].getRelationLoader().deleteRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+
+                                    _fhs[i].getRelationLoader().deleteRelation(
+                                    (Connection)tx.getConnection(oid.getLockEngine()),
                                     oid.getIdentity(), orgFields.get(j) );
 
-                                    fieldClassMolder.removeRelation( tx, reldel, this, object );                                   
+                                    fieldClassMolder.removeRelation( tx, reldel, this, object );
                                 } else {
                                     // the object not there, and we try to delete the rubbish relation,
                                     // if there is
-                                    _fhs[i].getRelationLoader().deleteRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    _fhs[i].getRelationLoader().deleteRelation(
+                                    (Connection)tx.getConnection(oid.getLockEngine()),
                                     oid.getIdentity(), orgFields.get(j) );
                                 }
                             }
@@ -1258,16 +1266,16 @@ public class ClassMolder {
                                 Object reladd = tx.load( fieldEngine, fieldClassMolder, list.get(j), null );
                                 if ( reladd != null ) {
                                     tx.writeLock( reladd, tx.getLockTimeout() );
-                                 
-                                    _fhs[i].getRelationLoader().createRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+
+                                    _fhs[i].getRelationLoader().createRelation(
+                                    (Connection)tx.getConnection(oid.getLockEngine()),
                                     oid.getIdentity(), orgFields.get(j) );
                                 } else {
-                                    // ignored if object not found, if later in transaction 
-                                    // the other side of object is added. then, the relation 
-                                    // will be added if the other side of object is just 
-                                    // deleted in this transaction, then it seem to be an 
-                                    // non-critical error ignore it seem to better than annoy 
+                                    // ignored if object not found, if later in transaction
+                                    // the other side of object is added. then, the relation
+                                    // will be added if the other side of object is just
+                                    // deleted in this transaction, then it seem to be an
+                                    // non-critical error ignore it seem to better than annoy
                                     // user
                                 }
                             }
@@ -1294,12 +1302,12 @@ public class ClassMolder {
                             if ( toBeDeleted != null && !tx.isPersistent(toBeDeleted) ) {
                                 tx.writeLock( toBeDeleted, 0 );
 
-                                _fhs[i].getRelationLoader().deleteRelation( 
-                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                _fhs[i].getRelationLoader().deleteRelation(
+                                (Connection)tx.getConnection(oid.getLockEngine()),
                                 oid.getIdentity(), deletedId );
 
                                 fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );
-                            } else { 
+                            } else {
                                 // what to do if it happens?
                             }
                         }
@@ -1322,8 +1330,8 @@ public class ClassMolder {
                             Object addedId = itor.next();
                             Object toBeAdded = lazy.find( addedId );
                             if ( toBeAdded != null ) {
-                                _fhs[i].getRelationLoader().createRelation( 
-                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                _fhs[i].getRelationLoader().createRelation(
+                                (Connection)tx.getConnection(oid.getLockEngine()),
                                 oid.getIdentity(), addedId );
                             } else {
                                 // what to do if it happens?
@@ -1335,7 +1343,7 @@ public class ClassMolder {
             default:
             }
         }
- 
+
 
         if ( lockrequired ) {
             //tx.writeLock( object, tx.getTransactionTimeout() );
@@ -1380,15 +1388,15 @@ public class ClassMolder {
         Object value;
         int fieldType;
 
-        if ( oid.getIdentity() == null ) 
+        if ( oid.getIdentity() == null )
             throw new PersistenceException("The identities of the object to be stored is null");
 
-        if ( !oid.getIdentity().equals( getIdentity( object ) ) ) 
+        if ( !oid.getIdentity().equals( getIdentity( object ) ) )
             throw new PersistenceException("Identities changes is not allowed!");
 
         fields = (Object[]) locker.getObject( tx );
 
-        if ( fields == null ) 
+        if ( fields == null )
             throw new PersistenceException("Object, "+oid+",  isn't loaded in the persistence storage!");
 
         newfields = new Object[_fhs.length];
@@ -1402,7 +1410,7 @@ public class ClassMolder {
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 value = _fhs[i].getValue( object );
-                if ( value != null ) 
+                if ( value != null )
                     newfields[i] = fieldClassMolder.getIdentity( value );
                 break;
             case FieldMolder.ONE_TO_MANY:
@@ -1419,7 +1427,7 @@ public class ClassMolder {
 
     /**
      * Update the object which loaded or created in the other transaction to
-     * the persistent storage. 
+     * the persistent storage.
      *
      * @param tx Transaction in action
      * @param oid the object identity of the stored object
@@ -1436,7 +1444,7 @@ public class ClassMolder {
         Object ids;
         AccessMode am;
         Object value;
-        Object stamp;        
+        Object stamp;
         Object[] temp;
         int fieldType;
         long timestamp;
@@ -1467,7 +1475,7 @@ public class ClassMolder {
             if ( ts.jdoGetTimeStamp() != timestamp ) {
                 throw new ObjectModifiedException( "Time stamp mismatched!" );
                     /*Messages.format( "persist.objectModified", object.getClass(), OID.flatten( ids ) ) ); */
-            } 
+            }
         } else if ( !isDependent() ) {
             throw new IllegalArgumentException("A long transaction object must implement the TimeStampable interface!");
         }
@@ -1487,7 +1495,7 @@ public class ClassMolder {
                         // depedent class won't have persistenceInfo in LockEngine
                         // must look at fieldMolder for it
 
-                        // load the cached dependent object from the data store. 
+                        // load the cached dependent object from the data store.
                         // The loaded will be compared with the new one
                         value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
                         o = _fhs[i].getValue( object );
@@ -1529,7 +1537,7 @@ public class ClassMolder {
                                     // load all the object
                                     tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
                                 }
-                            } 
+                            }
                         } else {
                             ArrayList avlist = (ArrayList) fields[i];
                             fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -1540,13 +1548,13 @@ public class ClassMolder {
                         // related object should be update maually
                         /*
                         o = _fhs[i].getValue( object );
-                        if ( !tx.isPersistent( o ) ) 
+                        if ( !tx.isPersistent( o ) )
                             //tx.update( fieldEngine, fieldClassMolder, o, null );
-                        else 
+                        else
                             //tx.create( fieldEngine, fieldClassMolder, o, null );
                         */
                     }
-                    break;                
+                    break;
                 case FieldMolder.MANY_TO_MANY:
                     break;
                 }
@@ -1572,12 +1580,12 @@ public class ClassMolder {
         Object fid;
         Object[] fields;
         Object value;
-        
+
         int fieldType;
 
         fields = new Object[_fhs.length];
 
-        if ( oid.getIdentity() == null ) 
+        if ( oid.getIdentity() == null )
             throw new IllegalStateException("The identities of the cache to be updated is null");
 
         for ( int i=0; i < _fhs.length; i++ ) {
@@ -1645,26 +1653,26 @@ public class ClassMolder {
     }
 
     /**
-     * It method is called by delete to delete the extended object of the base 
+     * It method is called by delete to delete the extended object of the base
      * type from the Persistence.
      *
      */
-    private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object identity ) 
+    private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object identity )
             throws ObjectNotFoundException, PersistenceException {
         // if the extend field contains dependent of field type,
         // fields must be loaded, so that we get the foreign key
-        // of the depedent table. We may get no result. And, it 
+        // of the depedent table. We may get no result. And, it
         // is good and we don't have to process further.
         // it will be cheaper if we go directly to SQL and load
         // only the foreign field needed. But, it require extra
-        // method in Persistent SPI. So, maybe we rather stay 
+        // method in Persistent SPI. So, maybe we rather stay
         // with the expensive appoarch.
 
         // if there is any depedent field of reference type, the simplest way is
-        // to load the dependent objects and delete it using tansaction. 
-        // (Will ObjectNotFound throws in the loading??)        
+        // to load the dependent objects and delete it using tansaction.
+        // (Will ObjectNotFound throws in the loading??)
 
-        // if the extend field has many-to-many field, we must delete the 
+        // if the extend field has many-to-many field, we must delete the
         // relation from he relation table.
         Object[] persistFields = null;
         for ( int i=0; i < extend._fhs.length; i++ ) {
@@ -1673,7 +1681,7 @@ public class ClassMolder {
                     if ( persistFields == null ) {
 
                         persistFields = new Object[extend._fhs.length];
-                        extend._persistence.load( (Connection)tx.getConnection(extend._engine), 
+                        extend._persistence.load( (Connection)tx.getConnection(extend._engine),
                         persistFields, identity, AccessMode.ReadOnly );
                     }
 
@@ -1687,22 +1695,22 @@ public class ClassMolder {
                 } catch ( ObjectNotFoundException e ) {
                 }
             } else if ( extend._fhs[i].isManyToMany() ) {
-                extend._fhs[i].getRelationLoader().deleteRelation( 
-                (Connection)tx.getConnection(extend._fhs[i].getFieldLockEngine()), 
+                extend._fhs[i].getRelationLoader().deleteRelation(
+                (Connection)tx.getConnection(extend._fhs[i].getFieldLockEngine()),
                 identity );
             }
         }
     }
 
     /**
-     * Delete an object of the base type from the persistence storage. 
-     * All object to be deleted by this method will be <tt>markDelete</tt> 
+     * Delete an object of the base type from the persistence storage.
+     * All object to be deleted by this method will be <tt>markDelete</tt>
      * before it method is called.
      *
      * @param tx - transaction in action
      * @param oid - the object identity of the target object
      */
-    public void delete( TransactionContext tx, OID oid ) 
+    public void delete( TransactionContext tx, OID oid )
             throws PersistenceException {
 
         Object ids = oid.getIdentity();
@@ -1720,8 +1728,8 @@ public class ClassMolder {
 
         base = _depends;
         while ( base != null ) {
-            if ( base._extendent != null ) 
-                for ( int i=0; i < base._extendent.size(); i++ ) 
+            if ( base._extendent != null )
+                for ( int i=0; i < base._extendent.size(); i++ )
                     if ( !extendPath.contains( base._extendent.get(i) ) ) {
                         //deleteExtend( tx, (ClassMolder)base._extendent.get(i), ids );
                     } else {
@@ -1773,7 +1781,7 @@ public class ClassMolder {
                     Object fetched = null;
                     if ( fid != null ) {
                         fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
-                        if ( fetched != null ) 
+                        if ( fetched != null )
                             tx.delete( fetched );
                     }
 
@@ -1805,9 +1813,9 @@ public class ClassMolder {
                     for ( int j=0; j<alist.size(); j++ ) {
                         Object fid =  alist.get(j);
                         Object fetched = null;
-                        if ( fid != null ) {    
+                        if ( fid != null ) {
                             fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
-                            if ( fetched != null ) 
+                            if ( fetched != null )
                                 tx.delete( fetched );
                         }
                     }
@@ -1824,9 +1832,9 @@ public class ClassMolder {
                     for ( int j=0; j<alist.size(); j++ ) {
                         Object fid = alist.get(j);
                         Object fetched = null;
-                        if ( fid != null ) {    
+                        if ( fid != null ) {
                             fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
-                            if ( fetched != null ) { 
+                            if ( fetched != null ) {
                                 fieldClassMolder.removeRelation( tx, fetched, this, object );
                             }
                         }
@@ -1844,8 +1852,8 @@ public class ClassMolder {
             case FieldMolder.MANY_TO_MANY:
                 // delete the relation in relation table too
                 /*
-                _fhs[i].getRelationLoader().deleteRelation( 
-                (Connection)tx.getConnection(oid.getLockEngine()), 
+                _fhs[i].getRelationLoader().deleteRelation(
+                (Connection)tx.getConnection(oid.getLockEngine()),
                 oid.getIdentity() );
                 */
 
@@ -1860,7 +1868,7 @@ public class ClassMolder {
                 for ( int j=0; j<alist.size(); j++ ) {
                     Object fid = alist.get(j);
                     Object fetched = null;
-                    if ( fid != null ) {    
+                    if ( fid != null ) {
                         fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
                         if ( fetched != null ) {
                             fieldClassMolder.removeRelation( tx, fetched, this, object );
@@ -1882,9 +1890,9 @@ public class ClassMolder {
         }
     }
 
-    /** 
+    /**
      * Revert the object back to the state of begining of the transaction
-     * If the object is loaded, it will be revert as it was loaded. If the 
+     * If the object is loaded, it will be revert as it was loaded. If the
      * object is created, it will be revert as it was just created.
      *
      * @param tx - transaction in action
@@ -1892,7 +1900,7 @@ public class ClassMolder {
      * @param locker - the dirty checking cache of the target object
      * @param object - the target object
      */
-    public void revertObject( TransactionContext tx, OID oid, DepositBox locker, Object object ) 
+    public void revertObject( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws PersistenceException {
 
         ClassMolder fieldClassMolder;
@@ -1901,7 +1909,7 @@ public class ClassMolder {
         Object value;
         int fieldType;
 
-        if ( oid.getIdentity() == null ) 
+        if ( oid.getIdentity() == null )
             throw new PersistenceException("The identities of the object to be revert is null");
 
         fields = (Object[]) locker.getObject( tx );
@@ -1920,7 +1928,7 @@ public class ClassMolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
                 if ( fields[i] != null ) {
-                    // will load() work as we wanted if the the 
+                    // will load() work as we wanted if the the
                     // persistenceCapable field was deleted in
                     // the transaction?
                     value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
@@ -1959,9 +1967,9 @@ public class ClassMolder {
     }
 
     /**
-     * Acquire a write lock on an object of the base type with the specified 
+     * Acquire a write lock on an object of the base type with the specified
      * identity from the persistence storage.
-     * 
+     *
      * @param tx - Transaction in action
      * @param oid - the object identity of the target object
      * @param locker - the dirty checking cache of the object
@@ -2042,20 +2050,20 @@ public class ClassMolder {
     }
 
     /**
-     * Set the identity into an object 
+     * Set the identity into an object
      *
-     * @param object 
-     * @param identity 
+     * @param object
+     * @param identity
      */
-    public void setIdentity( Object object, Object identity ) 
+    public void setIdentity( Object object, Object identity )
             throws PersistenceException {
-                
+
         if ( _ids.length > 1 ) {
             if ( identity instanceof Complex ) {
                 Complex com = (Complex) identity;
                 if ( com.size() != _ids.length )
                     throw new PersistenceException( "Complex size mismatched!" );
-                
+
                 for ( int i=0; i<_ids.length; i++ ) {
                     _ids[i].setValue( object, com.get(i) );
                 }
@@ -2063,7 +2071,7 @@ public class ClassMolder {
         } else {
             if ( identity instanceof Complex )
                 throw new PersistenceException( "Complex type not accepted!" );
-            
+
             _ids[0].setValue( object, identity );
         }
     }
@@ -2102,7 +2110,7 @@ public class ClassMolder {
     /**
      * Get the FieldMolder of the fields of the base type,
      * except the identity fields.
-     */ 
+     */
     public FieldMolder[] getFields() {
         return _fhs;
     }
@@ -2128,7 +2136,7 @@ public class ClassMolder {
     public ClassMolder getDepends() {
         return _depends;
     }
-    
+
     /**
      * Get the LockEngine which this ClassMolder belongs to.
      *
@@ -2220,18 +2228,18 @@ public class ClassMolder {
         if ( o instanceof Collection ) {
             return ((Collection) o).iterator();
         } else if ( o instanceof Vector ) {
-            return null;            
+            return null;
         } else {
             return null;
         }
     }
 
     /**
-     * Return all the object identity of a Collection of object of the same 
+     * Return all the object identity of a Collection of object of the same
      * type.
-     * 
+     *
      * @param molder - class molder of the type of the objects
-     * @param o - a Collection or Vector containing 
+     * @param o - a Collection or Vector containing
      * @return a list of <tt>Object[]</tt>s which contains object identity
      */
     private ArrayList getIds( ClassMolder molder, Object o ) {

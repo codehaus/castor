@@ -75,7 +75,7 @@ public class ClassDescriptorImpl
      */
     private final Class                _javaClass;
 
-    /**    
+    /**
      * The fields described for this class.
      */
     protected final FieldDescriptor[]  _fields;
@@ -107,7 +107,7 @@ public class ClassDescriptorImpl
      * Constructs a new descriptor for the specified class. When describing
      * inheritence, the descriptor of the parent class should be used and only
      * the fields added in this object must be supplied here.
-     * 
+     *
      * @param javaClass The Java type of this class
      * @param fields The fields described for this class
      * @param identity The field of the identity (key) of this class,
@@ -132,7 +132,7 @@ public class ClassDescriptorImpl
         _accessMode = accessMode;
         _depends = depend;
 
-        if ( extend != null && depend != null ) 
+        if ( extend != null && depend != null )
             throw new MappingException( "Class must either extends or depends on other classes, but not both!" );
 
         if ( extend != null ) {
@@ -144,8 +144,8 @@ public class ClassDescriptorImpl
                 _identities = ( identities == null ? ((ClassDescriptorImpl)_extends).getIdentities() : identities );
             else
                 // a quick hack to fix a ClassCastException :-(
-                _identities = ( identities == null ? 
-                (_extends.getIdentity() == null? null : new FieldDescriptor[] { _extends.getIdentity() } ) 
+                _identities = ( identities == null ?
+                (_extends.getIdentity() == null? null : new FieldDescriptor[] { _extends.getIdentity() } )
                 : identities );
         } else {
             _extends = null;
@@ -158,7 +158,7 @@ public class ClassDescriptorImpl
         // So complicated condition is needed since for JDO fields first a pure
         // ClassDescriptorImpl is created, and then JDOClassDescriptorImpl for
         // the same class
-        if ( _identities != null && ( _identities[0].getContainingClassDescriptor() == null ||
+        if ( (_identities != null) && (_identities.length >0) && ( _identities[0].getContainingClassDescriptor() == null ||
                                       _identities[0].getContainingClassDescriptor().getJavaClass() == _javaClass ) ) {
             for ( int i = 0; i < _identities.length; i++ )
                 _identities[i].setContainingClassDescriptor( this );
@@ -174,7 +174,7 @@ public class ClassDescriptorImpl
     public void setMapping( ClassMapping map ) {
         _map = map;
     }
-    
+
     /**
      * Constructor used by derived classes.
      */
@@ -247,7 +247,7 @@ public class ClassDescriptorImpl
                                              object.getClass().getName(), _fields[ i ].getFieldName() );
         }
     }
-    
+
 
     public String toString()
     {
