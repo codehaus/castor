@@ -38,7 +38,7 @@ public class CollectionInfoODMG30 extends CollectionInfo {
     public void generateInitializerCode(JSourceCode jsc) {
         jsc.add(getName());
         //jsc.append(" = new Vector();");
-		jsc.append(" = ODMG.impl.newDArray();");
+		jsc.append(" = ODMG.getImplementation().newDArray();");
     } //-- generateConstructorCode
         
     //------------------/
