@@ -16,6 +16,13 @@
         <br />
         <b>$RELEASE_DATE$</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.
         <ul>
+            <li><b>06 Jun 2003</b> - Can't find it here? Check out the
+                <a href="http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main">CastorWiki</a>.
+                An effort put together by a number of Castor users to document the undocumented!
+                Hosted off site by Lance Lavandowska, and championed by Tek1 (whose real name is
+                a mystery to us all!).
+            </li>
+
             <li><b>12 Mar 2003</b> - We're pleased to announce that the folks at
                <a href="http://www.refactorit.com/index.html?id=649">RefactorIt</a>
                have included Castor as part of their Open Source Community License.

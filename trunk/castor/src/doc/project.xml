@@ -68,6 +68,10 @@
         <url>support.xml</url>
         <display>Support</display>
       </navLink>
+      <navLink>
+         <url>http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main</url>
+         <display>CastorWiki (offsite)</display>
+      </navLink>
     </section>
 
     <section name="XML">
@@ -189,6 +193,10 @@
       <navLink>
         <url>javadoc/overview-summary.html</url>
         <display>Full JavaDoc</display>
+      </navLink>
+      <navLink>
+         <url>http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main</url>
+         <display>CastorWiki (offsite)</display>
       </navLink>
 	</section>
 
