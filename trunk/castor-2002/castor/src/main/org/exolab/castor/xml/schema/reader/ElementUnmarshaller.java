@@ -119,38 +119,55 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             _element.setReference(attValue);
         }
 
-
         //-- @name
         _element.setName(atts.getValue(SchemaNames.NAME_ATTR));
 
+        //-- @abstract
+        attValue = atts.getValue(SchemaNames.ABSTRACT);
+        if (attValue != null) {
+            _element.setAbstract((new Boolean(attValue)).booleanValue());
+        }
+        
+        //-- @block
+        _element.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));
+        
         //-- @default
-        String temp = atts.getValue(SchemaNames.DEFAULT_ATTR);
-        if (temp != null) {
+        attValue = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        if (attValue != null) {
             if (_element.getFixedValue() != null)
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _element.setDefaultValue(temp);
+            _element.setDefaultValue(attValue);
         }
 
-        //@fixed
-        temp = atts.getValue(SchemaNames.FIXED_ATTR);
-        if (temp != null) {
+        //-- @final
+        _element.setFinal(atts.getValue(SchemaNames.FINAL_ATTR));
+        
+        //-- @fixed
+        attValue = atts.getValue(SchemaNames.FIXED_ATTR);
+        if (attValue != null) {
             if (_element.getDefaultValue() != null)
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _element.setFixedValue(temp);
+            _element.setFixedValue(attValue);
         }
         
         //-- @form
-        temp = atts.getValue(SchemaNames.FORM);
-        if (temp != null) {
-            _element.setForm(Form.valueOf(temp));
+        attValue = atts.getValue(SchemaNames.FORM);
+        if (attValue != null) {
+            _element.setForm(Form.valueOf(attValue));
         }
-
-        temp = null;
+        
+        //-- @id
+        _element.setId(atts.getValue(SchemaNames.ID_ATTR));
+        
+        //-- @substitutionGroup
+        attValue = atts.getValue(SchemaNames.SUBSTITUTION_GROUP_ATTR);
+        _element.setSubstitutionGroup(attValue);
+        
         //-- @type
         attValue = atts.getValue(SchemaNames.TYPE_ATTR);
         if (attValue != null) _element.setTypeReference(attValue);
 
-        //-- @nullable
+        //-- @nillable
         attValue = atts.getValue(SchemaNames.NILLABLE_ATTR);
         if (attValue != null) {
             if (attValue.equals("true")) _element.setNillable(true);
@@ -189,9 +206,6 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             _element.setMaxOccurs(minOccurs);
         else
             _element.setMaxOccurs(1);
-
-        //-- @block
-        _element.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));
 
         charUnmarshaller = new CharacterUnmarshaller();
     } //-- ElementUnmarshaller
