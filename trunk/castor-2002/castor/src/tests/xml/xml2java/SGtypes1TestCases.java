@@ -273,7 +273,7 @@ import junit.extensions.*;
 
         try {
             assert("both nonPositiveInteger are not equals: " + test_obj.getNonPositiveInteger()
-                   + " and " + "1234.56789",
+                   + " and " + "-12",
                    (test_obj.getNonPositiveInteger()==-12));
         } catch (Exception excep) {
             fail("error: " + excep);
