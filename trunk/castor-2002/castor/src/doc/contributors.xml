@@ -176,6 +176,14 @@
     <description>Mapping GUI</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Skopp" given="Martin"/>
+    <email>skopp@riege.de</email>
+    <description>
+       Enhancements to the org.exolab.javasource package.
+    </description>
+  </contributor>
+
 
   <contributor type="Contributor">
     <name surname="Stewart" given="George"/>
