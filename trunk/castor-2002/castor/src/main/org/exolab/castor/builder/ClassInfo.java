@@ -58,33 +58,9 @@ import java.util.Vector;
 **/
 public class ClassInfo extends XMLInfo {
     
-    
-    /** 
-     * The compositor value that indicates that all fields are
-     * required, but order is not important.
-     * <I>default</I>
-    **/ 
-    public static final int ALL    = 0;
-    
-    /**
-     * The compositor value that indicates that only one 
-     * field may be present
-    **/
-    public static final int CHOICE = 1;
-    
-    /** 
-     * The compositor value that indicates that all fields are
-     * required and order is important
-    **/ 
-    public static final int SEQUENCE = 2;
-    
-    private Vector atts     = null;
-    private Vector elements = null;
-    
-    private FieldInfo textField = null;
-    
-    
-    private int _compositor = ALL;
+    private Vector    _atts      = null;
+    private Vector    _elements  = null;
+    private FieldInfo _textField = null;
     
     /**
      * A reference to the JClass that this ClassInfo describes
@@ -120,17 +96,17 @@ public class ClassInfo extends XMLInfo {
         
         switch(fieldInfo.getNodeType()) {
             case FieldInfo.ATTRIBUTE_TYPE:
-                if (atts == null) atts = new Vector(3);
-                if (!atts.contains(fieldInfo)) 
-                    atts.addElement(fieldInfo);
+                if (_atts == null) _atts = new Vector(3);
+                if (!_atts.contains(fieldInfo)) 
+                    _atts.addElement(fieldInfo);
                 break;
             case FieldInfo.TEXT_TYPE:
-                textField = fieldInfo;
+                _textField = fieldInfo;
                 break;
             default:
-                if (elements == null) elements = new Vector(5);
-                if (!elements.contains(fieldInfo)) 
-                    elements.addElement(fieldInfo);
+                if (_elements == null) _elements = new Vector(5);
+                if (!_elements.contains(fieldInfo)) 
+                    _elements.addElement(fieldInfo);
                 break;
         }
     } //-- addFieldInfo
@@ -149,7 +125,7 @@ public class ClassInfo extends XMLInfo {
      * text content
     **/
     public boolean allowsTextContent() {
-        return (textField != null);
+        return (_textField != null);
     } //-- allowsTextContent
     
     /**
@@ -164,14 +140,14 @@ public class ClassInfo extends XMLInfo {
         switch(fieldInfo.getNodeType()) {
             
             case FieldInfo.ATTRIBUTE_TYPE:
-                if (atts != null) 
-                    return atts.contains(fieldInfo);
+                if (_atts != null) 
+                    return _atts.contains(fieldInfo);
                 break;
             case FieldInfo.TEXT_TYPE:
-                return (fieldInfo == textField);
+                return (fieldInfo == _textField);
             default:
-                if (elements != null) 
-                    return elements.contains(fieldInfo);
+                if (_elements != null) 
+                    return _elements.contains(fieldInfo);
                 break;
         }
             
@@ -187,9 +163,9 @@ public class ClassInfo extends XMLInfo {
     **/
     public FieldInfo[] getAttributeFields() {
         FieldInfo[] fields = null;
-        if (atts != null) {
-            fields = new FieldInfo[atts.size()];
-            atts.copyInto(fields);
+        if (_atts != null) {
+            fields = new FieldInfo[_atts.size()];
+            _atts.copyInto(fields);
         }
         else fields = new FieldInfo[0];
         return fields;
@@ -201,9 +177,9 @@ public class ClassInfo extends XMLInfo {
     **/
     public FieldInfo[] getElementFields() {
         FieldInfo[] members = null;
-        if (elements != null) {
-            members = new FieldInfo[elements.size()];
-            elements.copyInto(members);
+        if (_elements != null) {
+            members = new FieldInfo[_elements.size()];
+            _elements.copyInto(members);
         }
         else members = new FieldInfo[0];
         return members;
@@ -223,48 +199,9 @@ public class ClassInfo extends XMLInfo {
      * this may be null.
     **/
     public FieldInfo getTextField() {
-        return textField;
+        return _textField;
     } //-- getTextField
     
 
-    /**
-     * Returns true if the compositor of this ClassInfo is a choice
-     * @return true if the compositor of this ClassInfo is a choice
-    **/
-    public boolean isChoice() {
-        return (_compositor == CHOICE);
-    } //-- isChoice
-
-    /**
-     * Returns true if the compositor of this ClassInfo is a sequence
-     * @return true if the compositor of this ClassInfo is a sequence
-    **/
-    public boolean isSequence() {
-        return (_compositor == SEQUENCE);
-    } //-- isSequence
-    
-    /**
-     * Sets the compositor for the fields of this class to
-     * be "all".
-    **/
-    public void setAsAll() {
-        this._compositor = ALL;
-    } //-- setAsAll
-    
-    /**
-     * Sets the compositor for the fields of this class to
-     * be a choice
-    **/
-    public void setAsChoice() {
-        this._compositor = CHOICE;
-    } //-- setAsChoice
-    
-    /**
-     * Sets the compositor for the fields of this class to
-     * be a sequence
-    **/
-    public void setAsSequence() {
-        this._compositor = SEQUENCE;
-    } //-- setAsSequence
     
 } //-- ClassInfo

@@ -777,6 +777,8 @@ public class SourceGenerator {
                     createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
+                    //-- 
+                    
                     processContentModel((Group)struct, sInfo);
                     break;
                 default:

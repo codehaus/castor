@@ -379,7 +379,8 @@ public class UnmarshalHandler implements DocumentHandler {
         if (_stateInfo.empty()) {
             if (_validate) {
                 try {
-                    Validator.validate(state.object, _cdResolver);
+                    Validator validator = new Validator();
+                    validator.validate(state.object, _cdResolver);
                 }
                 catch(ValidationException vEx) {
                     throw new SAXException(vEx);

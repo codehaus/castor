@@ -50,6 +50,7 @@ package org.exolab.castor.xml.util;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.xml.*;
 
@@ -61,9 +62,29 @@ import org.exolab.castor.util.List;
  * @version $Revision$ $Date$
  * <b>Note:</b>This used to be SimpleMarshalInfo.
  */
-public class XMLClassDescriptorImpl 
-    implements XMLClassDescriptor 
+public class XMLClassDescriptorImpl extends Validator
+    implements XMLClassDescriptor
 {
+    
+    /**
+     * The ALL compositor to signal the fields of
+     * the described class must all be present and valid,
+     * if they are required.
+    **/
+    private static final short ALL       = 0;
+    
+    /**
+     * The CHOICE compositor to signal the fields of
+     * the described class must be only a choice. They
+     * are mutually exclusive.
+    **/
+    private static final short CHOICE    = 1;
+    
+    /**
+     * The SEQUENCE compositor....currently is the same as ALL.
+    **/
+    private static final short SEQUENCE  = 2;
+    
     
     private static final String NULL_CLASS_ERR 
         = "The Class passed as an argument to the constructor of " +
@@ -148,6 +169,11 @@ public class XMLClassDescriptorImpl
     **/
     private boolean            _introspected = false;
     
+    
+    private short              _compositor = ALL;
+    
+    private static Validator   _internalValidator = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -158,6 +184,8 @@ public class XMLClassDescriptorImpl
     **/
     static {
         _naming = XMLNaming.getInstance();
+        if (_internalValidator == null)
+            _internalValidator = new Validator();
     } 
     
     /**
@@ -329,7 +357,9 @@ public class XMLClassDescriptorImpl
      * ClassDescriptor. 
     **/
     public TypeValidator getValidator() {
-        return validator;
+        if (validator != null) 
+            return validator;
+        return this;
     } //-- getValidator
     
     /**
@@ -365,6 +395,30 @@ public class XMLClassDescriptorImpl
         }
             
     } //-- removeFieldDescriptor
+    
+    /**
+     * Sets the compositor for the fields of the described
+     * class to be ALL.
+    **/
+    public void setCompositorAsAll() {
+        _compositor = ALL;
+    }  //-- setCompositorAsAll
+
+    /**
+     * Sets the compositor for the fields of the described
+     * class to be CHOICE.
+    **/
+    public void setCompositorAsChoice() {
+        _compositor = CHOICE;
+    }  //-- setCompositorAsChoice
+
+    /**
+     * Sets the compositor for the fields of the described
+     * class to be a Sequence.
+    **/
+    public void setCompositorAsSequence() {
+        _compositor = SEQUENCE;
+    }  //-- setCompositorAsSequence
     
     /**
      * Sets the XMLClassDescriptor that this descriptor inherits from
@@ -436,9 +490,9 @@ public class XMLClassDescriptorImpl
      * of the described class. This may be null to signal default
      * validation.
     **/
-    public void setValidator(TypeValidator validator) {
-        this.validator = validator;
-    } //-- setValidator
+    //public void setValidator(TypeValidator validator) {
+    //    this.validator = validator;
+    //} //-- setValidator
     
     /**
      * Sets the XML name for the Class described by this XMLClassDescriptor
@@ -524,6 +578,94 @@ public class XMLClassDescriptorImpl
         return str;
     } //-- toString
 
+    /**
+     * Validates the given Object
+     * @param object the Object to validate
+    **/
+    public void validate(Object object)
+        throws ValidationException 
+    {
+        validate(object, (ClassDescriptorResolver)null);
+    } //-- validate
+    
+    /**
+     * Validates the given object 
+     * @param object the Object to validate
+     * @param resolver the ClassDescriptorResolver to use when
+     * loading ClassDescriptors
+    **/
+    public void validate(Object object, ClassDescriptorResolver resolver) 
+        throws ValidationException
+    {
+        
+        if (object == null) {
+            throw new ValidationException("Cannot validate a null object.");
+        }
+        
+        if (!_class.isAssignableFrom(object.getClass())) {
+            String err = "The given object is not an instance of the class"+
+                " described by this ClassDecriptor.";
+            throw new ValidationException(err);
+        }
+        
+        switch (_compositor) {
+            
+            case CHOICE:
+                boolean found = false;
+                String fieldName = null;
+                
+                //-- handle elements, affected by choice
+                for (int i = 0; i < elementDescriptors.size(); i++) {
+                    XMLFieldDescriptor desc = 
+                        (XMLFieldDescriptor) elementDescriptors.get(i);
+                    FieldHandler handler = desc.getHandler();
+                    if (handler.getValue(object) != null) {
+                        if (found) {
+                            String err = "The field '" + desc.getFieldName();
+                            err += "' cannot exist at the same time that field '";
+                            err += fieldName + "' also exists.";
+                        }
+                        found = true;
+                        fieldName = desc.getFieldName();
+                        
+                        FieldValidator fieldValidator = desc.getValidator();
+                        if (fieldValidator != null)
+                            fieldValidator.validate(object, resolver);
+                    }
+                }
+                //-- handle attributes, not affected by choice
+                for (int i = 0; i < attributeDescriptors.size(); i++) {
+                    XMLFieldDescriptor desc = 
+                        (XMLFieldDescriptor) attributeDescriptors.get(i);
+                    FieldValidator fieldValidator = desc.getValidator();
+                    if (fieldValidator != null)
+                        fieldValidator.validate(object, resolver);
+                }
+                break;
+            //-- Currently SEQUENCE is handled the same as all
+            case SEQUENCE:
+            //-- ALL
+            default:
+                //-- handle elements
+                for (int i = 0; i < elementDescriptors.size(); i++) {
+                    XMLFieldDescriptor desc = 
+                        (XMLFieldDescriptor) elementDescriptors.get(i);
+                    FieldValidator fieldValidator = desc.getValidator();
+                    if (fieldValidator != null)
+                        fieldValidator.validate(object, resolver);
+                }
+                //-- handle attributes
+                for (int i = 0; i < attributeDescriptors.size(); i++) {
+                    XMLFieldDescriptor desc = 
+                        (XMLFieldDescriptor) attributeDescriptors.get(i);
+                    FieldValidator fieldValidator = desc.getValidator();
+                    if (fieldValidator != null)
+                        fieldValidator.validate(object, resolver);
+                }
+                break;
+        }
+        
+    } //-- validate
     
     //-------------------------------------/
     //- Implementation of ClassDescriptor -/
@@ -594,6 +736,7 @@ public class XMLClassDescriptorImpl
         return _accessMode;
     } //-- getAccessMode
     
+        
     //---------------------/
     //- Protected Methods -/
     //---------------------/

@@ -72,6 +72,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
     
     private boolean   _verbose     = false;
     
+    private int       _groupCount  = 0;
     
     /**
      * Creates a new SGStateInfo
@@ -111,12 +112,20 @@ class SGStateInfo extends ClassInfoResolverImpl {
     } //-- setPromptForOverwrite
     
     /**
+     * Returns the next available group number for generating
+     * automatic group names
+    **/
+    int getNextGroupNumber() {
+        return ++_groupCount;
+    } //-- getNextGroupNumber
+    
+    /**
      * Sets whether or not the source code generator prints
      * additional messages during generating source code
      * @param verbose a boolean, when true indicates to
      * print additional messages
     **/
-    public void setVerbose(boolean verbose) {
+    void setVerbose(boolean verbose) {
         this._verbose = verbose;
     } //-- setVerbose
     
@@ -126,7 +135,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
      * during processing
      * @return the value of the verbose flag.
     **/
-    public boolean verbose() {
+    boolean verbose() {
         return this._verbose;
     } //-- verbose
     
