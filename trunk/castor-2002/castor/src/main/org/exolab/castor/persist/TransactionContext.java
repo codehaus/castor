@@ -881,18 +881,18 @@ public abstract class TransactionContext
         // regards to the persistence engine.
         enum = _objects.elements();
         while ( enum.hasMoreElements() ) {
-            entry = (ObjectEntry) enum.nextElement();
-            if ( entry.deleted ) {
-                ClassHandler handler;
+            ClassHandler handler;
 
-                handler = entry.engine.getClassHandler( entry.object.getClass() );
+            entry = (ObjectEntry) enum.nextElement();
+            handler = entry.engine.getClassHandler( entry.object.getClass() );
+            if ( entry.deleted ) {
 
                 // Object has been deleted inside transaction,
                 // engine must forget about it.
                 entry.engine.forgetObject( this, entry.oid );
                 if ( handler.getCallback() != null ) {
                     try {
-                        handler.getCallback().clearing( entry.object );
+                        handler.getCallback().removing( entry.object );
                     } catch ( Throwable thrw ) { }
                 }
                 entry.engine.getClassHandler( entry.object.getClass() ).setFieldsNull( entry.object );
@@ -902,6 +902,11 @@ public abstract class TransactionContext
                 if ( entry.modified )
                     entry.engine.updateObject( this, entry.oid, entry.object );
                 entry.engine.releaseLock( this, entry.oid );
+            }
+            if ( handler.getCallback() != null ) {
+                try {
+                    handler.getCallback().releasing( entry.object );
+                } catch ( Throwable thrw ) { }
             }
         }
         // Forget about all the objects in this transaction,
@@ -938,7 +943,10 @@ public abstract class TransactionContext
         // database engine
         enum = _objects.elements();
         while ( enum.hasMoreElements() ) {
+            ClassHandler handler;
+                
             entry = (ObjectEntry) enum.nextElement();
+            handler = entry.engine.getClassHandler( entry.object.getClass() );
             try {
                 if ( entry.created ) {
                     // Object has been created in this transaction,
@@ -951,6 +959,11 @@ public abstract class TransactionContext
                     if ( entry.modified )
                         entry.engine.copyObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
+                }
+                if ( handler.getCallback() != null ) {
+                    try {
+                        handler.getCallback().releasing( entry.object );
+                    } catch ( Throwable thrw ) { }
                 }
             } catch ( Exception except ) { }
         }

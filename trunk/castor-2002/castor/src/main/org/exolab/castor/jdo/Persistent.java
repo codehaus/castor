@@ -58,8 +58,36 @@ public interface Persistent
 
 
     /**
+     * Called to set the database to which this object belongs when
+     * this object becomes persistent. The object may use the database
+     * to load/create/delete related objects.
+     * <p>
+     * Called when the object is first created as the result of a
+     * query, perior to calling {@link #jdoLoad}, or after {@link
+     * Database.create} has been called on the object, prior to
+     * calling {@link #jdoStore}.
+     *
+     * @param db The database to which this object belongs
+     */
+    public void setDatabase( Database db );
+
+
+    /**
+     * Called to indicate the object is now transient. The object may
+     * no longer use the database object assigned to it, and will
+     * become hollow with various fields set to null.
+     * <p>
+     * Called when the object transaction completes following any
+     * call to {@link #jdoStore} or when the object is deleted from
+     * the database.
+     */
+    public void unsetDatabase();
+
+
+    /**
      * Called to indicate that the object has been loaded from persistent
-     * storage.
+     * storage. This method is called immediately after synchronizing an
+     * object with the database.
      *
      * @throws Exception An exception occured, the object cannot be loaded
      */
@@ -69,7 +97,9 @@ public interface Persistent
 
     /**
      * Called to indicate that an object is to be stored in persistent
-     * stored.
+     * stored. This method is called at commit time on all persistent
+     * objects in this transaction. Managed fields may not necessarily be
+     * persisted if the object has not been identified as modified.
      *
      * @throws Exception An exception occured, the object cannot be stored
      */
@@ -78,12 +108,11 @@ public interface Persistent
 
 
     /**
-     * Called to indicate that an object has been made transient.
-     * <p>
-     * This method is made at commit time on objects deleted during the
-     * transaction before setting their fields to null.
+     * Called to indicate that an object is to be removed from persistent
+     * storge. This method is called at commit time on all objects deleted
+     * during the transaction.
      */
-    public void jdoClear();
+    public void jdoRemove();
     
 
 }
