@@ -166,7 +166,7 @@ final class Namespaces {
 
     } //-- method: getNamespaceURI
 
-     /**
+    /**
      * Returns the Namespace prefix associated with the given URI
      *
      * @param nsURI the namespace URI to lookup
@@ -190,7 +190,38 @@ final class Namespaces {
         }
         return null;
 
-    } //-- method: getNamespaceURI
+    } //-- method: getNamespacePrefix
+
+    /**
+     * Returns the Namespace prefix associated with the given URI.
+     * Or null if no prefix has been declared. This method will
+     * ignore the default namespace. This is useful when dealing
+     * with attributes that do not use the default namespace.
+     *
+     * @param nsURI the namespace URI to lookup
+     * @return the namespace prefix associated with the given URI
+    **/
+    public String getNonDefaultNamespacePrefix(String nsURI) {
+        //-- adjust prefix to prevent null value
+        if (nsURI == null)
+            throw new IllegalArgumentException("Namespace URI must not be null.");
+
+        Namespace ns = _first;
+        while (ns != null) {
+            if (ns.uri.equals(nsURI)) {
+                if (ns.prefix.length() > 0) {
+                    return ns.prefix;
+                }
+            }
+            ns = ns.next;
+        }
+
+        if (_parent != null) {
+            return _parent.getNonDefaultNamespacePrefix(nsURI);
+        }
+        return null;
+
+    } //-- method: getNonDefaultNamespacePrefix
 
     /**
      * Returns the parent Namespaces for this Namespaces instance.
