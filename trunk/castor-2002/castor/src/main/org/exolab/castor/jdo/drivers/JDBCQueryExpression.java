@@ -264,7 +264,7 @@ public class JDBCQueryExpression
     {
         StringBuffer sql;
 
-        if ( _cols.size() == 0 )
+        if ( _cols.size() == 0  && _select == null )
             return "1";
 
         sql = new StringBuffer();
