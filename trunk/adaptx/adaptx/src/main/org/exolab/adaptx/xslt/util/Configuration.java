@@ -126,7 +126,7 @@ public class Configuration {
 	        props.put(DOM_PARSER, DEFAULT_PARSER);
 	        
 	    try {
-	        Class _DOMParserClass = Class.forName(parser);	            
+	        Class _DOMParserClass = Class.forName(parser);
 	        _DOMParser = (DOMParser) _DOMParserClass.newInstance();
 	    }
 	    catch(Exception ex) {
@@ -289,12 +289,11 @@ public class Configuration {
 	            is = new FileInputStream(propsFile);
 	        // look in class directory
 	        else {
-	            
 	            propsFile = new File(PROPERTIES_PATH, PROPERTIES_FILE);
 	            if (propsFile.exists())
     	            is = new FileInputStream(propsFile);
 	            else 
-	                is = getResourceAsStream("/"+PROPERTIES_PATH + 
+	                is = getResourceAsStream("/" + PROPERTIES_PATH + "/" +
 	                    PROPERTIES_FILE);
 	        }
 	        
