@@ -5,7 +5,7 @@
 
     The Castor JDO database configuration file XML Schema
 
-    Namespace: http://castor.exolab.org/
+    Namespace: http://castor.exolab.org/JDO
     System:    http://castor.exolab.org/jdo-conf.xsd
     Public:    -//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN
 
@@ -13,7 +13,9 @@
 
  -->
 
-<schema>
+<xsd:schema xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+  targetNamespace="http://castor.exolab.org/JDO"
+  version="0.8">
 
   <element name="database">
     <type content="elemOnly" order="seq">
