@@ -367,7 +367,7 @@ create table test_types (
   char_val char(1)        null,
   bool_val char(1)        null,
   int_date integer        null,
-  str_time char(12)       null,
+  str_time char(23)       null,
   num_date numeric(17,0)  null,
   blob_val image          null,
   clob_val text           null,
