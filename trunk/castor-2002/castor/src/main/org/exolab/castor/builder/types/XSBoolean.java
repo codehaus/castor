@@ -62,7 +62,7 @@ public final class XSBoolean extends XSType {
     private static final JType jType = JType.Boolean;
 
     public XSBoolean() {
-        super(XSType.BOOLEAN);
+        super(XSType.BOOLEAN_TYPE);
     } //-- XSBoolean
 
 

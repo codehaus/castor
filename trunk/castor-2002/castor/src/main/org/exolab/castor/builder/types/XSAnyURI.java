@@ -44,30 +44,46 @@
  */
 
 package org.exolab.castor.builder.types;
-
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.javasource.*;
+
+import org.exolab.javasource.JType;
+import org.exolab.javasource.JClass;
 
 /**
- * The binary XML Schema datatype.
- * This class represents both hexBinary and base64Binary, no distinction
- * is made between both types.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * The XML Schema URIReference type
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public final class XSBinary extends XSType {
+public final class XSAnyURI extends XSType {
 
     /**
      * The JType represented by this XSType
+     * It could be better to use the org.apache.xerces.utils.URI
+     * pro : represent a real URI
+     * con : the source code generated must rely on Xerces
     **/
     private static final JType jType
-        = JType.Byte.createArray();
+        = new JClass("java.lang.String");
 
-    public XSBinary(short type) {
-        super(type);
-        if ( (type != XSType.BASE64BINARY_TYPE) && (type != XSType.HEXBINARY_TYPE))
-            throw new IllegalArgumentException("Value not allowed for an XML Schema binary.");
-    } //-- XSBinary
+    private String value = null;
+
+    //TODO VALIDATE THE URI
+
+    public XSAnyURI() {
+        super(XSType.ANYURI_TYPE);
+    }
+
+    /**
+     * Returns the String necessary to convert an Object to
+     * an instance of this XSType. This method is really only useful
+     * for primitive types
+     * @param variableName the name of the Object
+     * @return the String necessary to convert an Object to an
+     * instance of this XSType
+    **/
+    public String createFromJavaObjectCode(String variableName) {
+        return "(String)"+variableName;
+    } //-- fromJavaObject
 
     public void setFacets(SimpleType simpleType) {}
     /**
@@ -76,6 +92,10 @@ public final class XSBinary extends XSType {
     **/
     public JType getJType() {
         return this.jType;
-    } //-- getJType
+    }
 
-} //-- XSBinary
+    public String toString() {
+        return value;
+    }
+
+} //-- XSUriReference

@@ -49,9 +49,8 @@ import org.exolab.javasource.*;
 import org.exolab.castor.builder.util.DescriptorJClass;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.types.TimeDuration;
-import org.exolab.castor.types.RecurringDuration;
 import org.exolab.castor.types.Time;
+import org.exolab.castor.types.Duration;
 
 /**
  * A factory for creating the source code of descriptor classes
@@ -268,14 +267,14 @@ public class DescriptorSourceFactory {
                 case XSType.CLASS:
                    isEnumerated = ((XSClass)xsType).isEnumerated();
                    break;
-               case XSType.STRING:
+               case XSType.STRING_TYPE:
                    jsc.add("desc.setImmutable(true);");
                    break;
                //only for attributes
-               case XSType.IDREF:
+               case XSType.IDREF_TYPE:
                        jsc.add("desc.setReference(true);" );
                        break;
-               case XSType.ID:
+               case XSType.ID_TYPE:
                        jsc.add("this.identity = desc;" );
                        break;
                /***********************/
@@ -396,7 +395,7 @@ public class DescriptorSourceFactory {
         if (any || isEnumerated ||
                 xsType.isPrimitive() ||
                 xsType.getJType().isArray() ||
-                (xsType.getType() == XSType.STRING))
+                (xsType.getType() == XSType.STRING_TYPE))
         {
             jsc.append("null;");
         }
@@ -416,12 +415,12 @@ public class DescriptorSourceFactory {
             jsc.append(", handler));");
             jsc.add("desc.setImmutable(true);");
         }
-        else if (xsType.getType() == XSType.TIME_INSTANT) {
+        else if (xsType.getType() == XSType.DATETIME_TYPE) {
             jsc.add("desc.setHandler( new DateFieldHandler(");
             jsc.append("handler));");
             jsc.add("desc.setImmutable(true);");
         }
-        else if (xsType.getType() == XSType.DECIMAL) {
+        else if (xsType.getType() == XSType.DECIMAL_TYPE) {
             jsc.add("desc.setHandler( new DecimalFieldHandler(");
             jsc.append("handler));");
             jsc.add("desc.setImmutable(true);");
@@ -431,10 +430,10 @@ public class DescriptorSourceFactory {
         else if (member.getSchemaType().getType() == XSType.COLLECTION) {
 
             switch (xsType.getType()) {
-                case XSType.NMTOKEN:
-                case XSType.NMTOKENS:
-                case XSType.IDREF:
-                case XSType.IDREFS:
+                case XSType.NMTOKEN_TYPE:
+                case XSType.NMTOKENS_TYPE:
+                case XSType.IDREF_TYPE:
+                case XSType.IDREFS_TYPE:
                     jsc.add("desc.setHandler( new CollectionFieldHandler(");
                     jsc.append("handler));");
                     break;
@@ -450,7 +449,7 @@ public class DescriptorSourceFactory {
         if (member.isContainer()) {
             jsc.add("desc.setContainer(true);");
         }
-        
+
         //-- namespace
         if (nsURI != null) {
             jsc.add("desc.setNameSpaceURI(\"");
@@ -523,7 +522,7 @@ public class DescriptorSourceFactory {
 
         switch (xsType.getType()) {
 
-            case XSType.DECIMAL:
+            case XSType.DECIMAL_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("DecimalValidator dv = new DecimalValidator();");
@@ -569,7 +568,7 @@ public class DescriptorSourceFactory {
                 break;
 
             //-- float
-            case XSType.FLOAT:
+            case XSType.FLOAT_TYPE:
             {
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -631,7 +630,7 @@ public class DescriptorSourceFactory {
             }
 
               //-- double
-            case XSType.DOUBLE:
+            case XSType.DOUBLE_TYPE:
             {
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -683,11 +682,11 @@ public class DescriptorSourceFactory {
                 break;
             }
 
-            case XSType.NON_NEGATIVE_INTEGER:
-            case XSType.NON_POSITIVE_INTEGER:
-            case XSType.NEGATIVE_INTEGER:
-            case XSType.POSITIVE_INTEGER:
-            case XSType.INTEGER:
+            case XSType.NON_NEGATIVE_INTEGER_TYPE:
+            case XSType.NON_POSITIVE_INTEGER_TYPE:
+            case XSType.NEGATIVE_INTEGER_TYPE:
+            case XSType.POSITIVE_INTEGER_TYPE:
+            case XSType.INTEGER_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("IntegerValidator iv = new IntegerValidator();");
@@ -736,7 +735,7 @@ public class DescriptorSourceFactory {
                 jsc.unindent();
                 jsc.add("}");
                 break;
-			case XSType.INT:
+			case XSType.INT_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("IntegerValidator iv = new IntegerValidator();");
@@ -786,7 +785,7 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
             //-- long
-            case XSType.LONG:
+            case XSType.LONG_TYPE:
             {
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -837,7 +836,7 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
             }
-            case XSType.STRING:
+            case XSType.STRING_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("StringValidator sv = new StringValidator();");
@@ -882,24 +881,24 @@ public class DescriptorSourceFactory {
                 jsc.add("}");
                 break;
 
-             case XSType.CDATA:
+             case XSType.NORMALIZEDSTRING_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("NameValidator nv = new NameValidator(NameValidator.CDATA);");
-                XSCData xsCdata = (XSCData)xsType;
-                if ( (xsCdata.hasMinLength()) && (!xsCdata.hasLength()) ){
+                XSNormalizedString xsNormalString = (XSNormalizedString)xsType;
+                if ( (xsNormalString.hasMinLength()) && (!xsNormalString.hasLength()) ){
                     jsc.add("nv.setMinLength(");
-                    jsc.append(Integer.toString(xsCdata.getMinLength()));
+                    jsc.append(Integer.toString(xsNormalString.getMinLength()));
                     jsc.append(");");
                 }
-                if ( (xsCdata.hasMaxLength()) && (!xsCdata.hasLength()) ) {
+                if ( (xsNormalString.hasMaxLength()) && (!xsNormalString.hasLength()) ) {
                     jsc.add("nv.setMaxLength(");
-                    jsc.append(Integer.toString(xsCdata.getMaxLength()));
+                    jsc.append(Integer.toString(xsNormalString.getMaxLength()));
                     jsc.append(");");
                 }
-                if ( xsCdata.hasLength()) {
+                if ( xsNormalString.hasLength()) {
                     jsc.add("nv.setLength(");
-                    jsc.append(Integer.toString(xsCdata.getLength()));
+                    jsc.append(Integer.toString(xsNormalString.getLength()));
                     jsc.append(");");
                 }
                 //-- fixed values
@@ -909,7 +908,7 @@ public class DescriptorSourceFactory {
                     jsc.append("\");");
                 }
                 //-- pattern facet
-                pattern = xsCdata.getPattern();
+                pattern = xsNormalString.getPattern();
                 if (pattern != null) {
                     jsc.add("nv.setPattern(\"");
                     jsc.append(escapePattern(pattern));
@@ -922,10 +921,10 @@ public class DescriptorSourceFactory {
                 break;
 
 
-            case XSType.NCNAME:
+            case XSType.NCNAME_TYPE:
                 jsc.add("fieldValidator.setValidator(new NameValidator());");
                 break;
-            case XSType.NMTOKEN:
+            case XSType.NMTOKEN_TYPE:
                 jsc.add("fieldValidator.setValidator(new NameValidator(");
                 jsc.append("NameValidator.NMTOKEN));");
                 break;
@@ -944,7 +943,7 @@ public class DescriptorSourceFactory {
                 }
                 break;
 
-            case XSType.TIME:
+            /*case XSType.TIME_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("TimeValidator tv = new TimeValidator();");
@@ -1086,49 +1085,49 @@ public class DescriptorSourceFactory {
                 jsc.unindent();
                 jsc.add("}");
                 break;
-            //-- RecurringDuration
+            //-- RecurringDuration*/
 
-            case XSType.TIME_DURATION:
+            case XSType.DURATION_TYPE:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
-                jsc.add("TimeDurationValidator tv = new TimeDurationValidator();");
-                XSTimeDuration xsTimeD = (XSTimeDuration)xsType;
-                if (xsTimeD.hasMinimum()) {
-                    TimeDuration min = xsTimeD.getMinExclusive();
+                jsc.add("DurationValidator durationv = new DurationValidator();");
+                XSDuration xsDuration = (XSDuration)xsType;
+                if (xsDuration.hasMinimum()) {
+                    Duration min = xsDuration.getMinExclusive();
                     if (min != null)
-                        jsc.add("tv.setMinExclusive(");
+                        jsc.add("durationv.setMinExclusive(");
                     else {
-                        min = xsTimeD.getMinInclusive();
-                        jsc.add("tv.setMinInclusive(");
+                        min = xsDuration.getMinInclusive();
+                        jsc.add("durationv.setMinInclusive(");
                     }
                     /* it is better for a good understanding to use
                     the parse method with 'min.toSring()' but in that case
                     we have to deal with the ParseException*/
-                    jsc.append("new org.exolab.castor.types.TimeDuration("+min.toLong()+"L)");
+                    jsc.append("new org.exolab.castor.types.Duration("+min.toLong()+"L)");
                     jsc.append(");");
                 }
-                if (xsTimeD.hasMaximum()) {
-                    TimeDuration max = xsTimeD.getMaxExclusive();
+                if (xsDuration.hasMaximum()) {
+                    Duration max = xsDuration.getMaxExclusive();
                     if (max != null)
-                        jsc.add("tv.setMaxExclusive(");
+                        jsc.add("durationv.setMaxExclusive(");
                     else {
-                        max = xsTimeD.getMaxInclusive();
-                        jsc.add("tv.setMaxInclusive(");
+                        max = xsDuration.getMaxInclusive();
+                        jsc.add("durationv.setMaxInclusive(");
                     }
                     /* it is better for a good understanding to use
                     the parse method with 'min.toSring()' but in that case
                     we have to deal with the ParseException*/
-                    jsc.append("new org.exolab.castor.types.TimeDuration("+max.toLong()+"L)");
+                    jsc.append("new org.exolab.castor.types.Duration("+max.toLong()+"L)");
                     jsc.append(");");
                 }
 
                 //-- pattern facet
 
-                jsc.add("fieldValidator.setValidator(tv);");
+                jsc.add("fieldValidator.setValidator(durationv);");
                 jsc.unindent();
                 jsc.add("}");
                 break;
-            //-- TimeDuration
+            //-- Duration
 
             default:
                 break;

@@ -74,20 +74,6 @@ public class TypeConversion {
         if (simpleType == null) return null;
 
         XSType xsType = null;
-
-        //-- enumerated types
-        //-- not sure it is needed since ENUMERATION
-        //-- is a special case handle in SourceFactory
-       /* if (simpleType.hasFacet("enumeration")) {
-            String className = JavaNaming.toJavaClassName(simpleType.getName());
-			className = SourceGenerator.getQualifiedClassName(
-							simpleType.getSchema().getTargetNamespace(),
-							"types."+className);
-            XSClass xsClass = new XSClass(new JClass(className));
-            xsClass.setAsEnumertated(true);
-            return xsClass;
-        }*/
-
         //-- determine base type
         SimpleType base = simpleType;
 
@@ -111,9 +97,9 @@ public class TypeConversion {
                 //-- IDREFS
                 case SimpleTypesFactory.IDREFS_TYPE:
                     return new XSList(new XSIdRef());
-                //--URIREFERENCE
-                case SimpleTypesFactory.URIREFERENCE_TYPE:
-                    return new XSUriReference();
+                //--AnyURI
+                case SimpleTypesFactory.ANYURI_TYPE:
+                    return new XSAnyURI();
                 //-- NCName
                 case SimpleTypesFactory.NCNAME_TYPE:
                     return new XSNCName();
@@ -123,27 +109,30 @@ public class TypeConversion {
                 //-- NMTOKENS
                 case SimpleTypesFactory.NMTOKENS_TYPE:
                     return new XSList(new XSNMToken());
-                //-- binary
-                case SimpleTypesFactory.BINARY_TYPE:
-                    return new XSBinary();
+                //-- base64Bbinary
+                case SimpleTypesFactory.BASE64BINARY_TYPE:
+                    return new XSBinary(XSType.BASE64BINARY_TYPE);
+                //-- hexBinary
+                case SimpleTypesFactory.HEXBINARY_TYPE:
+                     return new XSBinary(XSType.HEXBINARY_TYPE);
                 //-- boolean
                 case SimpleTypesFactory.BOOLEAN_TYPE:
                     return new XSBoolean();
-                //-- century
-                case SimpleTypesFactory.CENTURY_TYPE:
-                    return new XSCentury();
-                //-- CDATA
-                case SimpleTypesFactory.CDATA_TYPE:
+                //-- normalizedString
+                case SimpleTypesFactory.NORMALIZEDSTRING_TYPE:
                 {
-                    XSCData xsCdata = new XSCData();
+                    XSNormalizedString xsNormalString = new XSNormalizedString();
                     if (!simpleType.isBuiltInType())
-                        xsCdata.setFacets(simpleType);
-                    return xsCdata;
+                        xsNormalString.setFacets(simpleType);
+                    return xsNormalString;
                 }
 
                 //-- date
                 case SimpleTypesFactory.DATE_TYPE:
                     return new XSDate();
+                //-- dateTime
+                case SimpleTypesFactory.DATETIME_TYPE:
+                    return new XSDateTime();
                 //-- double
                 case SimpleTypesFactory.DOUBLE_TYPE:
                  {
@@ -161,6 +150,23 @@ public class TypeConversion {
                         xsFloat.setFacets(simpleType);
                     return xsFloat;
                 }
+                //--GDay
+                case SimpleTypesFactory.GDAY_TYPE:
+                    return new XSGDay();
+                //--GMonthDay
+                case SimpleTypesFactory.GMONTHDAY_TYPE:
+                    return new XSGMonthDay();
+                //--GMonth
+                case SimpleTypesFactory.GMONTH_TYPE:
+                    return new XSGMonth();
+                //--GYearMonth
+                case SimpleTypesFactory.GYEARMONTH_TYPE:
+                    return new XSGYearMonth();
+                //--GYear
+                case SimpleTypesFactory.GYEAR_TYPE:
+                    return new XSGYear();
+
+
                 //-- integer
                 case SimpleTypesFactory.INTEGER_TYPE:
                 {
@@ -185,9 +191,6 @@ public class TypeConversion {
                         xsLong.setFacets(simpleType);
                     return xsLong;
                 }
-                //-- month
-                case SimpleTypesFactory.MONTH_TYPE:
-                    return new XSMonth();
                 //-- nonPositiveInteger
                 case SimpleTypesFactory.NON_POSITIVE_INTEGER_TYPE:
                 {
@@ -225,23 +228,6 @@ public class TypeConversion {
                     xsQName.setFacets(simpleType);
                     return xsQName;
                 }
-                //recurringDuration
-                case SimpleTypesFactory.RECURRING_DURATION_TYPE:
-                {
-                    XSRecurringDuration xsrecduration = new XSRecurringDuration();
-                    xsrecduration.setFacets(simpleType);
-                     if ((xsrecduration.getDuration()==null) ||
-                        (xsrecduration.getPeriod()==null)) {
-                            String err = "It is an error for recurringDuration to be";
-                            err += " used directly in a Schema \n";
-                            err += "you must set the duration facet AND the period one";
-                            System.out.println(err);
-                            return null;
-                            // later don't forget to
-                            //throw new ValidationException(err);
-                     }
-                    return xsrecduration;
-                }
                 //-- string
                 case SimpleTypesFactory.STRING_TYPE:
                 {
@@ -250,32 +236,14 @@ public class TypeConversion {
                         xsString.setFacets(simpleType);
                     return xsString;
                 }
-                //-- time
-                case SimpleTypesFactory.TIME_TYPE:
-                    return new XSTime();
-                //-- timeInstant
-                case SimpleTypesFactory.TIME_INSTANT_TYPE:
-                    return new XSTimeInstant();
-                //-- Time duration
-                case SimpleTypesFactory.TIME_DURATION_TYPE:
+                //-- duration
+                case SimpleTypesFactory.DURATION_TYPE:
                 {
-					XSTimeDuration xsTimeD = new XSTimeDuration();
+					XSDuration xsDuration = new XSDuration();
 					if (!simpleType.isBuiltInType())
-					   xsTimeD.setFacets(simpleType);
-                    return xsTimeD;
+					   xsDuration.setFacets(simpleType);
+                    return xsDuration;
                 }
-                    //return new XSLong();
-                //-- timePeriod
-                case SimpleTypesFactory.TIME_PERIOD_TYPE:
-                {
-                    XSTimePeriod xsTimeP = new XSTimePeriod();
-                    if (!simpleType.isBuiltInType())
-                        xsTimeP.setFacets(simpleType);
-                    return xsTimeP;
-                }
-                //-- year
-                case SimpleTypesFactory.YEAR_TYPE:
-                    return new XSYear();
                 //-- decimal
                 case SimpleTypesFactory.DECIMAL_TYPE:
                 {
@@ -291,6 +259,8 @@ public class TypeConversion {
 					xsShort.setFacets(simpleType);
                     return xsShort;
                 }
+                case SimpleTypesFactory.TIME_TYPE:
+                    return new XSTime();
                 default:
                     //-- error
                     String warning = "Warning: The W3C datatype "+simpleType.getName();

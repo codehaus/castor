@@ -179,14 +179,14 @@ public class MemberFactory {
             xsType = new XSString();
 
         switch (xsType.getType()) {
-            case XSType.INTEGER:
+            case XSType.INTEGER_TYPE:
                 fieldInfo = infoFactory.createFieldInfo(xsType, memberName);
                 fieldInfo.setCodeHelper(
                     new IntegerCodeHelper((XSInteger)xsType)
                 );
 
                 break;
-            case XSType.ID:
+            case XSType.ID_TYPE:
                 fieldInfo = infoFactory.createIdentity(memberName);
                 break;
             case XSType.COLLECTION:
@@ -322,11 +322,11 @@ public class MemberFactory {
 
             //-- print warning message if ID, IDREF, IDREFS, NMTOKEN, NTOKENS are
             //-- used as element type
-             if ( (xsType.getType() == xsType.ID) ||
-                 (xsType.getType() == xsType.IDREF)||
+             if ( (xsType.getType() == xsType.ID_TYPE) ||
+                 (xsType.getType() == xsType.IDREFS_TYPE)||
                  ( (xsType.getType() == xsType.COLLECTION) &&
-                   ( ( (XSList) xsType).getContentType().getType() == xsType.IDREF) ) ||
-                 (xsType.getType() == xsType.NMTOKEN)  )
+                   ( ( (XSList) xsType).getContentType().getType() == xsType.IDREF_TYPE) ) ||
+                 (xsType.getType() == xsType.NMTOKEN_TYPE)  )
                     System.out.println("Warning : For XML Compatibility " +
                                         xsType.getName()+" should be used only on attributes\n");
 

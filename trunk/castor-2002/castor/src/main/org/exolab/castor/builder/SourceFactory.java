@@ -294,17 +294,17 @@ public class SourceFactory  {
             throw new IllegalArgumentException("ComplexType is not top-level.");
 
         JClass[] classes = null;
-        
+
         String className = JavaNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
 
 
         boolean createGroupItem = false;
-        
+
         int max = type.getMaxOccurs();
-        
+
         if ((max < 0) || (max > 1)) {
-            
+
             createGroupItem = true;
             className += "Item";
             classes = new JClass[2];
@@ -336,28 +336,28 @@ public class SourceFactory  {
         processComplexType(type, state);
 
         if (createGroupItem) {
-            
+
             resolver.bindReference(jClass, classInfo);
             classes[1] = jClass;
-                        
+
             //-- create main group class
             String fname = type.getName() + "Item";
             fname  = JavaNaming.toJavaMemberName(fname, false);
-            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass), 
+            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass),
                                                            "_items", fname);
-            fInfo.setContainer(true);                                               
+            fInfo.setContainer(true);
             className = className.substring(0,className.length()-4);
-            
+
             state     = new FactoryState(className, resolver, packageName);
 		    classInfo = state.classInfo;
             jClass    = state.jClass;
 		    initialize(jClass);
-		    
+
             classInfo.addFieldInfo(fInfo);
             fInfo.createJavaField(jClass);
             fInfo.createAccessMethods(jClass);
             fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
-            
+
             //-- set super class if necessary
             if (base != null) jClass.setSuperClass(base);
 
@@ -366,29 +366,29 @@ public class SourceFactory  {
 
             //-- namespace information
             classInfo.setNamespaceURI(schema.getTargetNamespace());
-            
+
             //-- mark as a container
             classInfo.setContainer(true);
         }
-        
+
         //-- process annotation
         String comment  = processAnnotations(type);
         if (comment != null)
             jClass.getJDocComment().setComment(comment);
-            
+
         //-- make class abstract?
 		//-- when mapping elements to Java classes this class forms the
 		//-- base for elements that reference this type.
 		if (SourceGenerator.mappingSchemaElement2Java())
 			jClass.getModifiers().setAbstract(true);
-			
+
 
 
 		if (_createMarshalMethods) {
             //-- add imports required by the marshal methods
             jClass.addImport("java.io.Writer");
             jClass.addImport("java.io.Reader");
-            
+
             boolean isAbstract = jClass.getModifiers().isAbstract();
             //-- #validate()
             createValidateMethods(jClass);
@@ -410,7 +410,7 @@ public class SourceFactory  {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(type, classInfo);
         }
-        
+
         classes[0] = jClass;
 
         return classes;
@@ -522,17 +522,17 @@ public class SourceFactory  {
             throw new IllegalArgumentException("Currently unnamed groups are not supported.");
             //groupName = "Group" + sgInfo.getNextGroupNumber();
         }
-        
+
 
         JClass[] classes = null;
-        
+
         String className = JavaNaming.toJavaClassName(groupName);
         className = resolveClassName(className, packageName);
-        
+
         boolean createGroupItem = false;
-        
+
         int max = group.getMaxOccurs();
-        
+
         if ((max < 0) || (max > 1)) {
             createGroupItem = true;
             className += "Item";
@@ -541,8 +541,8 @@ public class SourceFactory  {
         else {
             classes = new JClass[1];
         }
-        
-        
+
+
         FactoryState state
             = new FactoryState(className, resolver, packageName);
 		ClassInfo classInfo = state.classInfo;
@@ -560,7 +560,7 @@ public class SourceFactory  {
         //Schema  schema = group.getSchema();
         //classInfo.setNamespaceURI(schema.getTargetNamespace());
 
-        
+
         Order order = group.getOrder();
         if (order == Order.choice) {
             classInfo.getGroupInfo().setAsChoice();
@@ -569,34 +569,34 @@ public class SourceFactory  {
         processContentModel(group, state);
 
         if (createGroupItem) {
-            
+
 		    //-- create Bound Properties code
 		    if (state.hasBoundProperties())
 		        createPropertyChangeMethods(jClass);
-           
+
             resolver.bindReference(jClass, classInfo);
-            
+
             classes[1] = jClass;
-            
+
             //-- create main group class
             String fname = groupName + "Item";
             fname  = JavaNaming.toJavaMemberName(fname, false);
-            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass), 
+            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass),
                                                            "_items", fname);
-            fInfo.setContainer(true);                                               
+            fInfo.setContainer(true);
             className = className.substring(0,className.length()-4);
             System.out.println(className);
-            
+
             state     = new FactoryState(className, resolver, packageName);
 		    classInfo = state.classInfo;
             jClass    = state.jClass;
 		    initialize(jClass);
-		    
+
             classInfo.addFieldInfo(fInfo);
             fInfo.createJavaField(jClass);
             fInfo.createAccessMethods(jClass);
             fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
-            
+
             //-- set super class if necessary
             if (base != null) jClass.setSuperClass(base);
 
@@ -611,7 +611,7 @@ public class SourceFactory  {
         String comment  = processAnnotations(group);
         if (comment != null)
             jClass.getJDocComment().setComment(comment);
-            
+
 		if (_createMarshalMethods) {
             //-- add imports required by the marshal methods
             jClass.addImport("java.io.Writer");
@@ -636,7 +636,7 @@ public class SourceFactory  {
         resolver.bindReference(group, classInfo);
 
         classes[0] = jClass;
-        
+
         return classes;
 
     } //-- createSourceCode(Group)
@@ -1285,7 +1285,7 @@ public class SourceFactory  {
                 //-- handle groups
                 case Structure.GROUP:
                     Group group = (Group) struct;
-                    
+
                     int max = group.getMaxOccurs();
                     if ((max < 0) || (max > 1)) {
                         GroupInfo gInfo = state.classInfo.getGroupInfo();
@@ -1693,7 +1693,7 @@ public class SourceFactory  {
             //-- indent for fun
             values.append("    ");
 
-            if (baseType.getType() == XSType.STRING) {
+            if (baseType.getType() == XSType.STRING_TYPE) {
                 values.append('\"');
                 //-- escape value
                 values.append(escapeValue(value));
