@@ -49,6 +49,7 @@ package org.exolab.castor.mapping;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Vector;
 import java.lang.reflect.Constructor;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -175,7 +176,13 @@ public class Mapping
      */
     private MappingRoot  _mapping;
 
-
+    /**
+     * The IDResolver to give to the Unmarshaller
+     * This allows resolving "extends" and "depends"
+     * for included Mappings
+    **/
+    private ClassMappingResolver _idResolver = null;
+    
     /**
      * The cached resolvers.
      */
@@ -193,6 +200,7 @@ public class Mapping
             loader = getClass().getClassLoader();
         _loader = loader;
         _resolver = new DTDResolver();
+        _idResolver = new ClassMappingResolver();
     }
 
 
@@ -446,8 +454,10 @@ public class Mapping
         // second time based on the new mappings loaded
         _resolvers.clear();
         try {
-            if ( _mapping == null )
+            if ( _mapping == null ) {
                 _mapping = new MappingRoot();
+                _idResolver.setMapping(_mapping);
+            }
 
             // Load the specificed mapping source
             unm = new Unmarshaller( MappingRoot.class );
@@ -455,11 +465,13 @@ public class Mapping
             if ( _logWriter != null )
                 unm.setLogWriter( _logWriter );
             unm.setClassLoader( Mapping.class.getClassLoader() );
+            unm.setIDResolver(_idResolver);
+            
             loaded = (MappingRoot) unm.unmarshal( source );
             // gather "class" tags
             enum = loaded.enumerateClassMapping();
             while ( enum.hasMoreElements() )
-                _mapping.addClassMapping( (ClassMapping) enum.nextElement() );
+                _mapping.addClassMapping( (ClassMapping) enum.nextElement() );                
 
             // gather "key-generator" tags
             enum = loaded.enumerateKeyGeneratorDef();
@@ -487,7 +499,41 @@ public class Mapping
         }
     }
 
-
+    /**
+     * An IDResolver to allow us to resolve ClassMappings
+     * from included Mapping files
+    **/
+    class ClassMappingResolver 
+        implements org.exolab.castor.xml.IDResolver 
+    {
+        private MappingRoot _mapping = null;
+        
+        ClassMappingResolver() {
+            super();
+        }
+                
+        public void setMapping(MappingRoot mapping) {
+            this._mapping = mapping;
+        } //-- setMapping
+        
+        /**
+         * Returns the Object whose id matches the given IDREF,
+         * or null if no Object was found.
+         * @param idref the IDREF to resolve.
+         * @return the Object whose id matches the given IDREF.
+        **/
+        public Object resolve(String idref) {
+            if (_mapping == null) return null;
+            for (int i = 0; i < _mapping.getClassMappingCount(); i++) {
+                ClassMapping clsMap = _mapping.getClassMapping(i);
+                if (idref.equals(clsMap.getName()))
+                    return clsMap;
+            }
+            return null;
+        } //-- resolve
+        
+    } //-- ClassMappingResolver
+        
 }
 
 
