@@ -58,16 +58,16 @@ import java.util.Hashtable;
  * @version $Revision$ $Date$
 **/
 public class GroupNaming {
-    
+
     private Hashtable _groupNames = null;
-    
+
     /**
      * Creates a new GroupNaming
     **/
     public GroupNaming() {
         _groupNames = new Hashtable();
     } //-- GroupNaming
-    
+
     /**
      * Creates a class name for the given Group. A null value
      * will be returned if a name cannot be created for the group.
@@ -79,13 +79,13 @@ public class GroupNaming {
         if (name != null) {
             return JavaNaming.toJavaClassName(name);
         }
-        else {            
+        else {
             name = (String)_groupNames.get(group);
             if (name != null) return name;
-            
+
             Structure parent = group.getParent();
             if (parent == null) return null;
-            
+
             boolean addOrder = true;
             switch(parent.getStructureType()) {
                 case Structure.GROUP:
@@ -94,6 +94,7 @@ public class GroupNaming {
                 case Structure.MODELGROUP:
                     name = ((ModelGroup)parent).getName();
                     name = JavaNaming.toJavaClassName(name);
+                    addOrder = false;
                     break;
                 case Structure.COMPLEX_TYPE:
                     name = getClassName((ComplexType)parent);
@@ -102,14 +103,14 @@ public class GroupNaming {
                 default:
                     break;
             }
-            
+
             if (name != null) {
-                
+
                 if (addOrder) {
                     String order = group.getOrder().toString();
                     name += JavaNaming.toJavaClassName(order);
                 }
-                
+
                 int count = 2;
                 String tmpName = name;
                 while (_groupNames.contains(name)) {
@@ -121,20 +122,20 @@ public class GroupNaming {
         }
         return name;
     } //-- createClassName
-    
+
     /**
      * Returns the class name for the given ComplexType
-     * 
+     *
      * @return the class name for the given ComplexType
     **/
     private static String getClassName(ComplexType complexType) {
-        
+
         //-- if complexType has name, simply return it
         String name = complexType.getName();
         if (name != null) {
             return JavaNaming.toJavaClassName(name);
         }
-        
+
         //-- otherwise get name of containing element
         Structure parent = complexType.getParent();
         if (parent != null) {
@@ -147,5 +148,5 @@ public class GroupNaming {
         }
         return name;
     } //-- getName
-    
+
 } //-- class GroupNaming
