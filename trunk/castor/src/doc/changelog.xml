@@ -12,6 +12,213 @@
     </pre></section>
     -->
 
+    <section title="Version 0.9.5.4 November 08, 2004"><pre>
+
+XML:   Added support for namespace to package mappings on the Unmarshaller
+       and UnmarshalHandler. This basically fixes issues where Castor
+       can't find the right package to look for classes during
+       unmarshalling. This is main for those people using generated
+       source code, as using a mapping file you must specify the
+       packages and namespaces appropriately.
+       (kvisco - 20041104)
+
+XML:   Fixed bug in SourceGenerator where class names for SimpleType
+       instances with Enumeration facets were not getting resolved properly.
+       (kvisco - 20041104)
+
+XML:   Fixed bug 1685, A StackOverflowError was occuring at certain times
+       during container processing if the input XML was invalid.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1685
+       (kvisco - 20041005)
+
+XML:   Fixed StackOverflowError in FieldValidator which can occur during
+       validation of object models with circular references.
+       (kvisco - 20041005)
+
+XML:   Fixed bug 1592: DecimalValidator was not taking into account a leading
+       sign ('+' or '-').
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1592
+       (kvisco - 20041004)
+
+
+XML:   Fixed bug 1666: UnmarshalState._markedList Vector is a performance
+       bottleneck. Applied patch from David Thal which replaces the
+       Vector with a HashSet.
+       (kvisco - 20040910)
+
+XML:   Fixed bug 1658: Handling of whitespace is never preserved for
+       container objects. Applied patch from Chris Giordano which
+       basically inherits the whitespace preserving state from
+       the parent UnmarshalState.
+       (kvisco - 20040910)
+
+XML:   Fixed bug 1634: Whitespace handling while unmarshalling is flawed.
+       Updated the whitespace handling logic in UnmarshalHandler#characters
+       method and checked in a test case.
+       (kvisco - 20040910)
+
+XML:   Updated the Marshaller to use ContentHandler directly instead
+       of wrapping in a ParserAdapter. Users Marshalling to a
+       ContentHandler should see a significant speed up when
+       Marshalling.
+       (kvisco - 20040910)
+
+XML:   Fixed a bug in the Marshaller with the xsi:type logic not being
+       strict enough. Sometimes the Marshaller was not adding xsi:type
+       when it was needed. I've modified this logic a bit to make it
+       output xsi:type more often in order to preserve round tripping.
+       (kvisco - 20040910)
+
+
+XML:   Fixed bug 1560 by adding some additional checks for null
+       in the XMLClassDescriptorImpl.
+       (kvisco - 20040729)
+
+XML:   Updated the Unmarshaller to make sure it gets the ClassLoader
+       from the passed in class if no user specific loader has been
+       specified.
+       (kvisco - 20040729)
+
+XML:   Fixed bug with FieldHandlerFactory support in introspector by
+       making sure the the type specified by the FieldHandler
+       replaces that of the introspection. This allows primitives
+       to be correctly handled by the custom FieldHandler.
+       (kvisco - 20040720)
+
+XML:   Fixed java.util.Set support in the introspector.
+       (kvisco - 20040713)
+
+XML:   Fixed a cyclic include bug with the IncludeUnmarshaller, added
+       some code to make sure the main schema couldn't include itself.
+       (kvisco - 20040624)
+
+XML:   Fixed bug 1524: Stack Overflow when container elements occur in
+       instance document. The problem was primarily due to the
+       MarshalFramework#searchInheritence method which was allowing
+       the ClassDescriptors for schema groups to be searched.
+       (kvisco - 20040608)
+
+XML:   Fixed bug 1633 XML Date Timezone Not unmarshalled correctly.
+       Patch from axia@sonusnet.com.
+       (kvisco - 20040527)
+
+JDO:   Fixed bug 1617 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
+       Fixed an incorrectly coded equality check related to global transaction demarcation.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1617
+       (Werner - 20040516)
+
+JDO:   Fixed bug 1534.
+       Added code to allow users to use their own cache implementation with Castor.
+       In general, available cache implementations are now specified in castor.properties.
+       (Werner - 20040513)
+
+XML:   Fix for bug 1632. StringValidator.normalize wasn't handling empty
+       strings properly. Patch from Ulli Hafner.
+       (kvisco - 20040511)
+
+XML:   Performance change to org.exolab.castor.util.List to demand create internal Object[]
+       From various performance improvements contributed by Ian Richards (also CODA)
+       (afawcett - 20040510)
+
+XML:   One fix and various minor enhancements to classes in 'javasource' package.
+       (afawcett - 20040510)
+
+XML:   Performance enhancement to AnyNode2SAX.java (use when processing xsd:any elements)
+       from various performance improvements contributed by Ian Richards (also CODA)
+       (afawcett - 20040508)
+
+XML:   Fixed bug 1506 - Enhancement for EnumeratedTypeAccess interface
+       using patch contributed by Robert La Ferla.
+       (kvisco - 20040505)
+
+ALL:   Reworked the mailing list guidelines. Added various sections re: cross-posting, etc.
+       (Werner - 20040502)
+
+JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
+       Brought test setup for SAP DB in-line with test requirements.
+       (Werner - 20040429)
+
+JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
+       Brought test config file for SAP DB in-line with XML Schema.
+       (Werner - 20040429)
+
+JDO:   Fixed bug 1368 using contribution from Tim O'Brien [tobrien@discursive.com].
+	   Small (mostly syntactical) changes to src/doc/jdo-faq.xml. Added a reference
+	   to XPath as well.
+       (Werner - 20040428)
+
+JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
+       Added test for IdentityKeyGenerator to SAP DB test suite.
+       (Werner - 20040428)
+
+JDO:   Fixed bug 1092 using contribution from Rhett Sutphin [rhett-sutphin@uiowa.edu].
+	   Fixed default namespace declaration, changed some small syntax issues.
+       (Werner - 20040427)
+
+JDO:   Fixed bug 1606 using contribution from Emir Causevic [emirc@gawab.com]
+       Fixed problem with incorrectly quoting non-function names for SAP DB.
+       (Werner - 20040427)
+
+JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
+       Added support for SAB DB to IdentityKeyGenerator.
+       (Werner - 20040427)
+
+JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
+       Fixed various problems related to the setup of JDO test data with SAP DB.
+       (Werner - 20040427)
+
+JDO:   Fixed bug 1615 using contribution from frric@wmdata.com [frric@wmdata.com]
+       Fixed a typo in a debug statement (wrong message resource key used).
+       (Werner - 20040426)
+
+JDO:   Fixed bug 1601 using contribution from Tomasz Piontek [piontek@man.poznan.pl]
+       Added code to support org.exolab.castor.types.Duration as a native type
+       in Castor JDO. Added convertors for type conversion org.exolab.castor.types.Duration
+       &lt;--&gt; java.lang.Long.
+       (Werner - 20040421)
+
+JDO:   Fixed bug 1554 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Fixes a memory leak with the linked-list implementation by removing LinkedList
+       completely; uses the Hashtable directly, resulting in much better performance.
+       ValuesEnumeration no longer use a Vector, but intercepts the initial
+       enumeration to provide the values.
+       (Werner - 20040420)
+
+JDO:   Fixed bug 1597 using patch from Emir Causevic [emirc@gawab.com]
+       (Bruce - 20040408)
+
+JDO:   Fixed bug 1588.
+       Introduces various checks and additional exception handling wrt to using TimeStampables.
+       (Werner - 20040406)
+
+ALL:   Fixed bug 1585 adding separate build folders for src/tests and src/examples
+       to the Eclipse project files
+       (Werner - 20040330)
+
+JDO:   Fixed bug 1573 using contribution from Stein M. Hugubakken [dulci@start.no]
+       This improves code quality for the complete jdo package (except conf.*)
+       by removing unused import statements and local variables.
+       (Werner - 20040330)
+
+ALL:   Fixed bug 1568 using contribution from jpinto@inescporto.pt [João Luis Pinto].
+       Streamlines Eclipse related project files.
+       (Werner - 20040319)
+
+JDO:   Added many enhancements to the tx mgr API including code improvements,
+       jdo-conf.xsd changes, dynamic code generation using Castor XML as well
+       as a refactored Ant build descriptor all from both myself and Werner.
+       (Bruce - 20040323)
+
+ALL:   Fixed bug 1563 using a patch from Keith
+       (Bruce - 20040323)
+
+ALL:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
+       Updates Eclipse related project files.
+       (Werner - 20040319)
+
+
+    </pre></section>
+
     <section title="Version 0.9.5.3 March 09, 2004"><pre>
 
 XML:   Fixed bug with new HashMap handling when dealing with
