@@ -36,7 +36,7 @@
     </section>
 
     <section title="XML related questions">
-        <p><b>Is it possible to make xml marshalling transactional using Castor?</b></p>
+        <p><b>Is it possible to make xml marshalling transactionally using Castor?</b></p>
 
         <p>No. The decision of putting XML and JDO together is NOT intended to make XML marshalling transactional.</p>
 
@@ -44,18 +44,26 @@
 
         <p>With Castor, incoming XML messages can be unmarshaled into data objects. Required information can be obtained from a database using JDO in form of data objects. With this approach, all data manipulation can be done in an object-oriented way. Changes to JDO data objects can be committed transactionally, and result data objects can be marshaled into XML and returned to the client. </p>
 
-        <p><b>Is it possible to do query on a XML file using Castor?</b></p>
+        <p><b>Is it possible to do queries on a XML file using Castor?</b></p>
 
         <p>No, Castor does not provide an OQL query facility on a XML file. If querying is important for you, you should consider using a DBMS to store your data instead of using XML files, especially if querying performance is a concern.</p>
 
     </section>
 
     <section title="Technical questions">
-    <p><b>I have encountered problems using Sun JDBC-ODBC bridge with Castor...</b></p>
+        <p><b>Where can I find some examples to start with?</b></p>
+
+        <p>Download the full CVS snapshot and look into the castor\src\tests\jdo directory</p>
+
+
+
+        <p><b>I have encountered problems using Sun JDBC-ODBC bridge with Castor...</b></p>
 
         <p>It cannot be used with Castor, because it doesn't allow to keep two open ResultSets at the same time.
            Either use JDBC driver of type &gt; 1, or use some other JDBC-ODBC bridge without such restriction
            (for example, from <a href="http://www.easysoft.com">Easysoft</a>).</p>
+
+
 
         <p><b>My get-method for the Collection of dependent objects returns <tt>null</tt>. Why?</b></p>
 
@@ -69,11 +77,15 @@
          </code>
         </p>
 
+
+
         <p><b>Should my JDO classes implement some special interface?</b></p>
 
         <p>In general, no. If you need some behavior that is not directly supported by Castor, you can implement interface org.exolab.castor.jdo.Persistent.
         In order to use dirty checking for long transaction you should implement interface org.exolab.castor.jdo.TimeStampable.
         If you need an example of use of these interfaces, see Persistent.java and TestPersistent.java among Castor JDO tests.</p>
+
+
 
         <p><b>Can Castor automatically create/remove related objects?</b></p>
 
@@ -94,6 +106,8 @@
         <p>If you wish some independent object was created and/or removed automatically on operations on other independent object,
            you may use interface Persistent to code the desired behavior.</p>
 
+
+
         <p><b>Is Castor JDO using any connection pooling mechanism to improve the overall performance ?</b></p>
 
         <p>No, Castor JDO doesn't have any built-in JDBC resource pooling. However the
@@ -110,6 +124,8 @@
         </code>
         will be executed in much less time with the resource pooling because it will avoid creating
         a new physical JDBC connection at every execution.</p>
+
+
 
         <p>With Oracle, instead of specifying the usual JDBC driver you can use a
         DataSource that specifically provides some Connection caching/pooling.</p>
@@ -140,6 +156,8 @@
         or Session Bean), then the Container usually provides the JDBC Resource
         through the JNDI ENC, which implicitely includes pooling facilities.</p>
 
+
+
         <p><b>I am getting ClassNotFoundException for my JDO class, but it is in the class path. Why?</b></p>
 
         <p>Probably castor.jar file is in jre/lib/ext directory. In this case you should call
@@ -147,6 +165,8 @@
   jdo.setClassLoader(getClass().getClassLoader());
          </code>
        before jdo.getDatabase().</p>
+
+
 
         <p><b>I am getting exception "the class ... is not persistence capable...". Why?</b></p>
 
@@ -156,9 +176,17 @@
         </code>
         <p>and seek in the output for warnings and errors.</p>
 
+
+
         <p><b>I call db.remove() on the dependent object and commit, but this doesn't work...</b></p>
 
         <p>You should not add/remove dependent objects directly. In order to add/remove the dependent object you should just add/remove it from the collection in the master object and call db.commit()</p>
+
+        <p>Dependent object cannot be created/removed explicitly. It's created automatically when it is added to a master object, and removed automatically when it de-linked/dereferenced from a master object.</p>
+
+        <p>Otherwise, we will be ran into problem like: a dependent object created explicitly but removed implicitly (delinked from a master object), or vice versa. It can also lead to other problems that are harder to detect.</p>
+
+
 
         <p><b>How should I represent string/date/boolean literals in OQL query?</b></p>
 
@@ -190,20 +218,45 @@
 
         <p>Your JDBC driver is not JDBC 2.0 compliant, upgrade it or find another one.</p>
 
+    </section>
 
-    
+    <section title="OQL">
+        <p><b>Is there any document available for Castor OQL</b></p>
+
+        <p>Yes. It is available from the Castor website: <a href="oql.html">Advanced JDO --> OQL</a></p>
+
+        <p><b>The OQL document describes several phases of development. Which is the current phase?</b></p>
+        <p>We are currently working on Phase 3</p>
+
+        <p><b>Does Castor OQL support sub queries</b></p>
+        <p>Not yet</p>
+
+        <p><b>I cannot get Castor OQL to join two objects for me. Is it supported?</b></p>
+
+        <p>Yes or no. Castor OQL supports implicit joins. And, in most case, you simply don't need explicit join.</p>
+
+        <p>Consider the following example, 
+        <code>
+        SELECT o FROM Order o, LineItem i
+            WHERE o.id = i.id AND i.price>100
+        </code></p>
+        <p>It is simply equivalent to the following OQL
+        <code>
+        SELECT o FROM Order o,
+            WHERE o.lineItem.price>100
+        </code></p>
     </section>
 
     <section title="Features requests">
         <p><b>Can a foreign key be part of multiple primary keys?</b></p>
 
-        <p>Unfortunately, the answer is no. We're awared that many users request it. It is now very high prority in our Todo list.</p>
+        <p>Unfortunately, the answer is no. We're aware of that many users request it. It is now very high priority in our Todo list.</p>
 
         <p>If foreign key is the primary key, then user may consider to work around it using extend relationship.</p>
 
         <p><b>Is polymorphic collection supported?</b></p>
 
-        <p>Unfortunaely, the answer is no</p>
+        <p>Unfortunately, the answer is no</p>
         
         <p>In version 0.8.11, we tried to enable polymorphic collection by introducing the notation of Object Reloading. Object Reloading delegates the determination of the class to a data object. However, it is proved that reloading can only be done before any instance of the target object is returned to user, and we have no way to determine that. As a result, we removed the support in version 0.9.x.</p>
         
@@ -213,7 +266,77 @@
 
      </section>
 
-     <section title="Design issues">
+     <section title="Data model issues">
+        <p><b>Is it possible to map an object to more than one tables?</b></p>
+
+        <p>Yes, if the two tables share the same identity, you can specify one data object to "extends" the other. When the extended data object is loaded, its table (specified in <![CDATA[<map-to/>]]> will be joined with all the tables of its super classes'.</p>
+
+        <p>Another solution (in my opinion more flexible) is having two set of methods in the main object. One for Castor JDO and another for application.</p>
+
+        <p>Consider the following example:
+        <code>
+        class Employee {
+           private int _employeeNumber;
+           private Address _address;
+           private Collection _workGroup;
+
+           public int getEmployeeNumber() {
+                return _employeeNumber;
+           }
+           public void setEmployeeNumber( int id ) {
+                _employeeNumber = id;
+           }
+
+           // methods for Castor JDO
+           public Address getAddress() {
+               return _address;
+           }
+           public void setAddress( Address address ) {
+                _address = address;
+           }
+           public Collection getWorkGroup() {
+                return _workGroup;
+           }
+           public Collection setWorkGroup( Collection workGroup ) {
+                _workGroup = workGroup;
+           }
+
+           // methods for application
+           public String getAddressCity() {
+               return _address.getCity();
+           }
+           public String getAddressZip() {
+               return _address.getZip();
+           }
+           // ...
+        }
+        </code></p>
+
+
+
+        <p><b>Can an object with the same identity be re-created after being removed in the same transaction?</b></p>
+
+        <p>Yes, as long as the deleted object is the same instance as the one being recreated.</p>
+
+
+
+        <p><b>What does "dependent object" means, really?</b></p>
+
+        <p>Dependent object is actually a concept from the object-oriented database world:</p>
+
+        <p>Dependent object's lifetime is depends on its master object. So, create/delete/update of the master object will trigger the proper actions, newly linked dependent object will be automatically created and de-referenced dependent object will be removed.</p>
+
+        <p>The concept was also used in the earlier CMP 2.0 draft, although it is later removed.</p>
+
+
+
+        <p><b>Can data object involves in many-to-many relationship be dependent</b></p>
+
+        <p>No</p>
+
+     </section>
+
+     <section title="Castor JDO design">
         <p><b>How does Castor JDO work anyway?</b></p>
 
         <p>Let's use object loading as an example.</p>
@@ -241,6 +364,11 @@
         <p>Database implementation also implements Synchronization and is authomatically registered with the transaction manager.</p>
 
         <p>Then TM communicates with Castor via beforeCompletion() and afterCompletion() calls.</p>
+
+
+        <p><b>Does Castor support nested transaction?</b></p>
+
+        <p>No</p>
 
      </section>
 
