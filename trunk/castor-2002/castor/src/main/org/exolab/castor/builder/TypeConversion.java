@@ -139,6 +139,14 @@ public class TypeConversion {
                     return xsReal;
                 }
 
+                //-- float
+                case SimpleTypesFactory.FLOAT_TYPE:
+                {
+                    XSFloat xsFloat = new XSFloat();
+                    if (!simpleType.isBuiltInType())
+                        xsFloat.setFacets(simpleType);
+                    return xsFloat;
+                }
                 //-- integer
                 case SimpleTypesFactory.INTEGER_TYPE:
                 {

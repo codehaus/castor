@@ -91,6 +91,11 @@ public abstract class XSType {
     public static final String DOUBLE_NAME         = "double";
 
     /**
+     * The name of the float type
+     */
+     public static final String FLOAT_NAME  = "float";
+
+    /**
      * The name of the ID type
     **/
     public static final String ID_NAME             = "ID";
@@ -195,7 +200,7 @@ public abstract class XSType {
     //-- this type should change to user-defined or
     //-- something like that
     public static final short CLASS              =  0;
-    
+
     //--
     public static final short BINARY             =  1;
     public static final short BOOLEAN            =  2;
@@ -224,6 +229,7 @@ public abstract class XSType {
     public static final short YEAR               = 25;
     public static final short RECURRING_DURATION = 26;
     public static final short TIME_PERIOD        = 27;
+    public static final short FLOAT             = 28;
     private short   type       = NULL;
 
     /**
@@ -330,6 +336,7 @@ public abstract class XSType {
         switch (type) {
             case BOOLEAN:
             case DOUBLE:
+            case FLOAT:
             case INTEGER:
             case LONG:
             case NEGATIVE_INTEGER:
@@ -360,6 +367,8 @@ public abstract class XSType {
                 return DECIMAL_NAME;
             case DOUBLE:
                 return DOUBLE_NAME;
+            case FLOAT:
+                return FLOAT_NAME;
             case ID:
                 return ID_NAME;
             case IDREF:
