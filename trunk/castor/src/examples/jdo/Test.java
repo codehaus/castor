@@ -1,39 +1,23 @@
 package jdo;
 
 
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
 
 import myapp.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xml.serialize.*;
 
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDO;
+import org.exolab.castor.jdo.JDO2;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
-import org.exolab.castor.mapping.xml.Sql;
-import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.xml.Marshaller;
-
-import org.xml.sax.ContentHandler;
 
 /**
  * This example is only intended to show how castor can be set up 
@@ -61,7 +45,7 @@ public class Test
     private Mapping  _mapping;
 
 
-    private JDO      _jdo;
+    private JDO2      _jdo;
 
 
     public static void main( String[] args )
@@ -88,15 +72,11 @@ public class Test
     {
         // Load the mapping file
         _mapping = new Mapping( getClass().getClassLoader() );
-        // _mapping.setLogWriter( writer );
          _mapping.loadMapping( getClass().getResource( MappingFile ) );
 
-        _jdo = new JDO();
-        // _jdo.setLogWriter( writer );
-        String jdoConf =  getClass().getResource( JdoConfFile ).toString();
-        _log.debug( "loading jdo descriptor: " + jdoConf );
-        _jdo.setConfiguration( getClass().getResource( JdoConfFile ).toString() );
-        _jdo.setDatabaseName( "test" );
+         String jdoConf =  getClass().getResource( JdoConfFile ).toString();
+         JDO2.loadConfiguration (jdoConf);
+         _jdo = JDO2.createInstance("test");
     }
 
 
