@@ -95,4 +95,10 @@ public interface DataObjects
     public String getDescription();
 
 
+    /**
+     * Returns the name of this database.
+     * @return The name of this database
+     */
+    public String getDatabaseName();
+
 }
