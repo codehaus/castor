@@ -234,6 +234,13 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Coleman" given="Alan"/>
+    <email>alan@kenamea.com</email>
+    <company id="kenamea"/>
+    <description>Contributions to Castor XML (patch for bug 1319)</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Cumberland" given="David"/>
     <email>dcumberl@truelink.com</email>
     <description>Patch for DateTimeValidator.</description>
@@ -882,6 +889,11 @@
   <company id="intalio">
     <name>Intalio, Inc.</name>
     <url>www.intalio.com</url>
+  </company>
+
+  <company id="kenamea">
+    <name>Kenamea, Inc.</name>
+    <url>www.kenamea.com</url>
   </company>
 
   <!-- Company Names (M-P) -->
