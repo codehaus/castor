@@ -34,6 +34,18 @@ JDO:     Added support for stored procedures in OQLQuery. Now it is possible to
          relations the sequence is: identity, then all other fields in the same
          order as in mapping.xml). (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:     Added some namespace support to the XML Schema reader. It currently doesn't
+         properly handle namespace scoping as you go down the tree, so if you are
+         changing your namespace declarations for some reason on sub-elements it
+         probably won't work properly and you'll need to wait until Monday when I
+         finish it up.
+
+XML:     Fixed problem when using attributes that are of enumerated datatypes,
+         the types subpackage was not getting imported (reported by markd@lutris.com)
+
+XML:     Fixed problem when using enumerated datatypes with enumeration values
+         that contained Java keywords (reported by markd@lutris.com)
+
 XML:     Support for ODMG 3.0 DArray collection in the XML source code generator.
          When running the source code generator with the FieldInfoFactoryODMG30
          collection fields will use org.odmg.DArray as the collection type for
