@@ -580,49 +580,45 @@ public class UnmarshalHandler implements DocumentHandler {
                 
             */
                 
-                if (debug) {
-                    buf.setLength(0);
-                    buf.append("debug: ");
-                    buf.append("A create method was supplied for element '");
-                    buf.append(name);
-                    buf.append("'.");
-                    message(buf.toString());
-                }
-                try {
+            if (debug) {
+                buf.setLength(0);
+                buf.append("debug: ");
+                buf.append("A create method was supplied for element '");
+                buf.append(name);
+                buf.append("'.");
+                message(buf.toString());
+            }
+            try {
                     
-                    _class = descriptor.getFieldType();
-                    boolean byteArray = false;
-                    if (_class.isArray())
-                        byteArray = (_class.getComponentType() == Byte.TYPE);
+                _class = descriptor.getFieldType();
+                boolean byteArray = false;
+                if (_class.isArray())
+                    byteArray = (_class.getComponentType() == Byte.TYPE);
                     
-                    //-- check for immutable
-                    if (isPrimitive(_class) || 
-                        descriptor.isImmutable() || 
-                        byteArray) 
-                    {
-                        state.object = null; 
-                        state.primitiveOrImmutable = true;
-                    }
-                    else {
-                        state.object = handler.newInstance(parentState.object);
-                        //-- reassign class in case there is a conflict
-                        //-- between descriptor#getFieldType and
-                        //-- handler#newInstance...I should hope not, but
-                        //-- who knows
-                        if (state.object != null) 
-                            _class = state.object.getClass();
-                    }
-                    state.type = _class;
+                //-- check for immutable
+                if (isPrimitive(_class) || 
+                    descriptor.isImmutable() || 
+                    byteArray) 
+                {
+                    state.object = null; 
+                    state.primitiveOrImmutable = true;
                 }
-                catch (java.lang.IllegalStateException ise) {
-                    StringBuffer msg = new StringBuffer();
-                    msg.append("unable to use the create method for: ");
-                    msg.append(name);
-                    msg.append(" - ");
-                    msg.append(ise.toString());
-                    message(msg.toString());
+                else {
+                    state.object = handler.newInstance(parentState.object);
+                    //-- reassign class in case there is a conflict
+                    //-- between descriptor#getFieldType and
+                    //-- handler#newInstance...I should hope not, but
+                    //-- who knows
+                    if (state.object != null) 
+                        _class = state.object.getClass();
                 }
-            //} //-- end if (creator)           
+                state.type = _class;
+            }
+            catch (java.lang.IllegalStateException ise) {
+                message( "unable to use the create method for: " +
+                    name + " - " + ise);
+            }
+            ///////} //-- end if (creator)           
             
             
             //-- At this point we should have a new object, unless
@@ -635,12 +631,9 @@ public class UnmarshalHandler implements DocumentHandler {
             
             if ((state.object == null) && (!state.primitiveOrImmutable))
             {
-                StringBuffer err = new StringBuffer("unable to unmarshal: ");
-                err.append(name);
-                err.append("\n");
-                err.append("unable to instantiate: ");
-                err.append(className(_class));
-                throw new SAXException(err.toString());
+                String err = "unable to unmarshal: " + name + "\n";
+                err += " - unable to instantiate: " + className(_class);
+                throw new SAXException(err);
             }
             
             //-- assign object, if incremental
