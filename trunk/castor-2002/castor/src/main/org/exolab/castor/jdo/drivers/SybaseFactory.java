@@ -112,6 +112,14 @@ public class SybaseFactory
     {
         return new MultiRSCallQuery( call, paramTypes, javaClass, fields, sqlTypes );
     }
+
+    /**
+     * Sybase supports setNull for "WHERE fld=?".
+     */
+    public boolean supportsSetNullInWhere()
+    {
+        return true;
+    }
 }
 
 
