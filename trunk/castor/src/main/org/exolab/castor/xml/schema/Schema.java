@@ -155,6 +155,11 @@ public class Schema extends Annotated {
      * A list of defined top-levels groups
      */
     private Hashtable _groups = null;
+    
+    /**
+     * A list of defined <redefine>
+     */
+    private Hashtable _redefineSchemas = null;
 
     /**
      * The ID for this Schema
@@ -165,6 +170,13 @@ public class Schema extends Annotated {
      * A list of imported schemas
     **/
     private Hashtable _importedSchemas = null;
+    
+    /**
+     * A list of included schemas meant to be used only 
+     * when the cache mechanism is enabled.
+     **/
+    private Hashtable _cachedincludedSchemas = null;
+    
 
     /**
      * A list of  XML Schema files included in this schema
@@ -204,6 +216,13 @@ public class Schema extends Annotated {
      * attribute
     **/
     private String _version  = null;
+    
+    /**
+     * A reference to the master schema used when this
+     * instance of Schema is used in another schema
+     * (redefine, include or import)
+     */
+    private Schema _masterSchema = null;
 
     //----------------/
     //- Constructors -/
@@ -246,6 +265,8 @@ public class Schema extends Annotated {
         _importedSchemas  = new Hashtable();
         _includedSchemas  = new Vector();
         _namespaces       = new Namespaces();
+        _redefineSchemas  = new Hashtable();
+        _cachedincludedSchemas = new Hashtable();
 
         _schemaNamespace = schemaNS;
         if (_schemaNamespace == null) {
@@ -290,8 +311,12 @@ public class Schema extends Annotated {
                 attribute.getName(false);
             throw new SchemaException(err);
         }
-        Object obj = _attributes.get(name);
-
+        //-- we check if the attribute is not already present in the schema 
+        //-- the attribute can be already added
+        //-- the attribute can be part of a schema redefinition
+        //-- the attribute can be part of a cached included schema
+        Object obj = getAttribute(name);
+        
         if (obj == attribute) return;
 
         if (obj != null) {
@@ -346,11 +371,12 @@ public class Schema extends Annotated {
             throw new SchemaException(err);
         }
 
-        Object obj = _attributeGroups.get(name);
-
+        Object obj = getAttributeGroup(name);
+      
         if (obj == attrGroup) return;
-
-        if (obj != null) {
+        boolean redefine = attrGroup.isRedefined();
+        
+        if (obj != null && !redefine) {
             String err = "Error attempting to add an AttributeGroup to this " +
                 "Schema definition, an AttributeGroup already exists with " +
                 "the given name: ";
@@ -383,7 +409,11 @@ public class Schema extends Annotated {
             err += "belongs to a different Schema; type name: " + name;
             throw new SchemaException(err);
         }
-        if (_complexTypes.get(name) != null) {
+        //-- we check if the complexType is not already present in the schema 
+        //-- the complexType can be already added
+        //-- the complexType can be part of a schema redefinition
+        //-- the complexType can be part of a cached included schema
+        if (getComplexType(name) != null  && !complexType.isRedefined()) {
             String err = "a ComplexType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
@@ -415,7 +445,7 @@ public class Schema extends Annotated {
             String err = "an element declaration must contain a name.";
             throw new SchemaException(err);
         }
-        if (_elements.get(name) != null) {
+        if (getElementDecl(name) != null) {
             String err = "an element declaration already exists with the given name: ";
             throw new SchemaException(err + name);
         }
@@ -429,7 +459,7 @@ public class Schema extends Annotated {
      * Adds the given Group declaration to this Schema definition
      * @param group the Group to add to this SchemaDef
      * @exception SchemaException when an Group already
-     * exists with the same name as the given ElementDecl
+     * exists with the same name as the given Group
     **/
     public void addModelGroup(ModelGroup group)
         throws SchemaException
@@ -441,14 +471,44 @@ public class Schema extends Annotated {
             String err = "a group declaration must contain a name.";
             throw new SchemaException(err);
         }
-        if (_groups.get(name) != null) {
-            String err = "an group declaration already exists with the given name: ";
+        
+        if (getModelGroup(name) != null && !group.isRedefined()) {
+            String err = "a group declaration already exists with the given name: ";
             throw new SchemaException(err + name);
         }
 
         _groups.put(name, group);
         group.setParent(this);
     } //-- addModelGroup
+    
+    /**
+     * Adds the given redefinition of structures to this Schema definition.
+     * This structure is mainly used to allow the writing of an XML schema that
+     * contains redefinitions. The validation process is permissive since the method
+     * won't check that the XML Schema is already imported nor will it check that the 
+     * redefined structures exist.
+     * 
+     * @param redefineSchema the Group to add to this SchemaDef
+     * @exception SchemaException when an redefintion already
+     * exists with the same name as the given ElementDecl
+     **/
+    public void addRedefineSchema(RedefineSchema schema) throws SchemaException
+	{
+
+    	String uri = schema.getSchemaLocation();
+
+    	if ( (uri == null) && (schema.hasRedefinition()) ) {
+    		String err = "A <redefine> structure with no 'schemaLocation' attribute must contain only <annotation> elements";
+    		throw new SchemaException(err);
+    	}
+    	if (_redefineSchemas.get(uri) != null) {
+    		String err = "The redefinition for schema:"+ uri +" can only be used once.";
+    		throw new SchemaException(err);
+    	}
+        
+    	_redefineSchemas.put(uri, schema);
+    } //-- addModelGroup
+    
 
     /**
      * Adds the given Schema definition to this Schema definition as an imported schenma
@@ -467,6 +527,27 @@ public class Schema extends Annotated {
         }
         _importedSchemas.put(targetNamespace, schema);
     } //-- addImportedSchema
+    
+    /**
+     * Caches the given Schema definition as an included XML Schema of this
+     * Schema definition.
+     * 
+     * @param schema the Schema to add to this Schema as a cached included schema.
+     * @exception SchemaException if the Schema already exists
+     */
+    public synchronized void cacheIncludedSchema(Schema schema)
+	throws SchemaException
+	{
+    	String schemaLocation = schema.getSchemaLocation();
+    	if (schemaLocation == null) schemaLocation= "";
+    	if (_cachedincludedSchemas.get(schemaLocation)!=null)
+    	{
+    		String err = "a Schema has already been included with the given schemaLocation: ";
+    		throw new SchemaException(err + schemaLocation);
+    	}
+    	_cachedincludedSchemas.put(schemaLocation, schema);
+    } //-- addImportedSchema
+    
 
     /**
      * Adds to the namespaces declared in this Schema
@@ -499,7 +580,7 @@ public class Schema extends Annotated {
             err += "belongs to a different Schema; type name: " + name;
             throw new SchemaException(err);
         }
-        if (_simpleTypes.get(name) != null) {
+        if (getSimpleType(name, _targetNamespace) != null && !simpleType.isRedefined()) {
             String err = "a SimpleType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
@@ -574,7 +655,38 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level Attribute declarations
     **/
     public Enumeration getAttributes() {
-        return _attributes.elements();
+    	Vector result = new Vector(_attributes.size()*2);
+    	Enumeration tempAtt = _attributes.elements();
+    	while (tempAtt.hasMoreElements()) {
+    		result.add((AttributeDecl)tempAtt.nextElement());	
+    	}
+    
+    	Enumeration cachedincluded = _cachedincludedSchemas.elements();
+    	while (cachedincluded.hasMoreElements()) {
+    		Schema tempSchema = (Schema)cachedincluded.nextElement();
+    		tempAtt = tempSchema.getAttributes();
+    		while (tempAtt.hasMoreElements()) {
+    		    result.add((AttributeDecl)tempAtt.nextElement());	
+    		}
+    	}
+    	
+    	Enumeration redefinition = _redefineSchemas.elements();
+    	while (redefinition.hasMoreElements()) {
+    		Schema tempSchema = ((RedefineSchema)redefinition.nextElement()).getOriginalSchema();
+            //-- a redefinition doesn't always contain a schema
+    		if (tempSchema != null) {
+    			//-- Sets the master schema
+    			//-- The master schema will help resolving the links at runtime between
+    			//-- an structure and its type.
+    			tempSchema.setMasterSchema(this);
+    			tempAtt = tempSchema.getAttributes();
+	    		while (tempAtt.hasMoreElements()) {
+	    			result.add((AttributeDecl)tempAtt.nextElement());	
+	    		}
+    		}
+    	}
+    	
+    	return result.elements();
     } //-- getAttributes
 
     /**
@@ -609,12 +721,42 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(_targetNamespace)) )
-            return (AttributeDecl)_attributes.get(canonicalName);
+        if ((ns==null) || (ns.equals(_targetNamespace)) ) {
+        	AttributeDecl tempAtt = (AttributeDecl)_attributes.get(canonicalName);
+        	if (tempAtt == null) {
+    			Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+    			boolean found = false;
+    			while (cacheIncluded.hasMoreElements() && !found) {
+    				Schema temp = (Schema)cacheIncluded.nextElement();
+    				tempAtt = temp.getAttribute(canonicalName);
+    				if (tempAtt != null)
+    					found = true;
+    			}
+    			
+                //--look in the redefinition
+    			if (!found) {
+    				Enumeration redefinition = _redefineSchemas.elements();
+    				while (redefinition.hasMoreElements() && !found) {
+    					RedefineSchema temp = (RedefineSchema)redefinition.nextElement();
+    					Schema tempSchema = ((RedefineSchema)redefinition.nextElement()).getOriginalSchema();
+    					if (tempSchema != null) {
+    						//-- Sets the master schema
+    						//-- The master schema will help resolving the links at runtime between
+    						//-- an structure and its type.
+    						tempSchema.setMasterSchema(this);
+    						tempAtt = tempSchema.getAttribute(canonicalName);
+    					    if (tempAtt != null)
+    						    found = true;
+    					}
+    				}
+    			}
+        	}
+        	return tempAtt;
+        }
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
-                AttributeDecl att = schema.getAttribute(canonicalName);;
+                AttributeDecl att = schema.getAttribute(canonicalName);
                 return att;
             }
         }
@@ -629,7 +771,54 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level AttributeGroup declarations
     **/
     public Enumeration getAttributeGroups() {
-        return _attributeGroups.elements();
+    	Vector result = new Vector(_attributeGroups.size()*2);
+    	Enumeration tempAtt = _attributeGroups.elements();
+    	while (tempAtt.hasMoreElements()) {
+    		result.add((AttributeGroup)tempAtt.nextElement());	
+    	}
+    	
+    	Enumeration cachedincluded = _cachedincludedSchemas.elements();
+    	while (cachedincluded.hasMoreElements()) {
+    		Schema tempSchema = (Schema)cachedincluded.nextElement();
+    		tempAtt = tempSchema.getAttributeGroups();
+    		while (tempAtt.hasMoreElements()) {
+    			result.add((AttributeGroup)tempAtt.nextElement());	
+    		}
+    	}
+    	
+    	Enumeration redefinition = _redefineSchemas.elements();
+    	while (redefinition.hasMoreElements()) {
+    		RedefineSchema redefine = (RedefineSchema)redefinition.nextElement();
+    		//1--  Add the AttributeGroups from the RedefineSchema
+    		tempAtt = redefine.enumerateAttributeGroups();
+    		while (tempAtt.hasMoreElements()) {
+    			AttributeGroupDecl tempGroup = (AttributeGroupDecl)tempAtt.nextElement();
+    			result.add(tempGroup);
+    		}
+    		
+    		//2-- Add the AttributeGroups from the Original Schema of the
+    		//--  RedefineSchema Structure by making sure that the AttributeGroups
+    		//--  are not redefined.
+    		Schema tempSchema = redefine.getOriginalSchema();
+    		//-- a redefinition doesn't always contain a schema
+    		if (tempSchema != null) {
+    			//-- Sets the master schema
+    			//-- The master schema will help resolving the links at runtime between
+    			//-- a structure and its type.
+    			tempSchema.setMasterSchema(this);
+    			tempAtt= tempSchema.getAttributeGroups();
+	    		while (tempAtt.hasMoreElements()) {
+	    			AttributeGroup tempGroup = (AttributeGroup)tempAtt.nextElement();
+	    			boolean alreadyRedefined = true;
+	    			if (tempGroup instanceof AttributeGroupDecl)
+	    				alreadyRedefined = redefine.hasAttributeGroupRedefinition(((AttributeGroupDecl)tempGroup).getName());
+	    			if (!alreadyRedefined)
+	    			    result.add(tempGroup);	
+	    		}
+    		}
+    	}
+    	
+    	return result.elements();
     } //-- getAttributeGroups
 
     /**
@@ -646,7 +835,8 @@ public class Schema extends Annotated {
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-
+        
+        AttributeGroup result = null;
         //-- Namespace prefix?
         String canonicalName = name;
         String nsprefix = "";
@@ -664,15 +854,54 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(_targetNamespace)) )
-            return (AttributeGroup)_attributeGroups.get(canonicalName);
+        if ((ns==null) || (ns.equals(_targetNamespace)) ) {
+        	result = (AttributeGroup)_attributeGroups.get(canonicalName);
+            
+        	if (result == null) {
+            	Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+            	boolean found = false;
+            	while (cacheIncluded.hasMoreElements() && !found) {
+            	    Schema temp = (Schema)cacheIncluded.nextElement();
+            		result = temp.getAttributeGroup(canonicalName);
+            		if (result != null)
+            			found = true;
+            	}
+            	
+            	//--we look in the redefinitions
+            	if (!found) {
+	            	//-- Search through the redefinition:
+                	Enumeration redefinitions = getRedefineSchema();
+	            	while (redefinitions.hasMoreElements() && !found) {
+	            		RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	            		
+	            		//-- the AttributeGroup can be redefined
+	            		if (redefine.hasAttributeGroupRedefinition(canonicalName)) {
+	            			result = redefine.getAttributeGroup(canonicalName);
+	            			if (result != null)
+	            				found = true;
+	            			break;
+	            		}
+	            		
+	            		//-- or if can be part of the Original Schema of the Redefined structures.
+	            		Schema schema = redefine.getOriginalSchema();
+	            		if (schema != null) {
+	            			//-- Sets the master schema
+	            			//-- The master schema will help resolving the links at runtime between
+	            			//-- an structure and its type.
+	            			schema.setMasterSchema(this);
+	            			result = schema.getAttributeGroup(name);
+	            		}
+	            	}    
+            	}//--end of redefinition
+            }//--result == null
+        }
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null)
-                return schema.getAttributeGroup(canonicalName);
+                result = schema.getAttributeGroup(canonicalName);
         }
 
-        return null;
+        return result;
 
     } //-- getAttributeGroup
 
@@ -706,7 +935,7 @@ public class Schema extends Annotated {
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-
+        ComplexType result = null;
         //-- Namespace prefix?
         String canonicalName = name;
         String nsprefix = "";
@@ -723,18 +952,55 @@ public class Schema extends Annotated {
                 throw new IllegalArgumentException(err);
             }
         }
-
+        
         //-- Get GetComplexType object
-        if ((ns==null) || (ns.equals(_targetNamespace)) )
-            return (ComplexType)_complexTypes.get(canonicalName);
+        if ((ns==null) || (ns.equals(_targetNamespace)) ) {
+            result = (ComplexType)_complexTypes.get(canonicalName);
+            if (result == null) {
+            	boolean found = false;
+            	//-- check for any included schemas that are cached
+            	Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+            	while (cacheIncluded.hasMoreElements() && !found) {
+            		Schema temp = (Schema)cacheIncluded.nextElement();
+            		result = temp.getComplexType(canonicalName);
+            		if (result != null)
+            			found = true;
+            	}
+            	if (!found) {
+	            	//--we might face a redefinition
+	            	Enumeration redefinitions = getRedefineSchema();
+	            	while (redefinitions.hasMoreElements() && result == null) {
+	            		RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	            		//-- the ComplexType can be redefined
+	            		if (redefine.hasComplexTypeRedefinition(canonicalName)) {
+	            			result = redefine.getComplexType(canonicalName);
+	            			
+	            			if (result != null)
+	            				found = true;
+	            			break;
+	            		}
+	            		
+	            		Schema schema = redefine.getOriginalSchema();
+		            	if (schema != null) {
+                            //-- Sets the master schema
+		            		//-- The master schema will help resolving the links at runtime between
+		            		//-- an structure and its type.
+		            		schema.setMasterSchema(this);
+		            		result = schema.getComplexType(canonicalName);
+		            	}
+	            	}
+            	}
+            	
+            }
+        }
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
-                return schema.getComplexType(canonicalName);
+            	result = schema.getComplexType(canonicalName);
             }
         }
 
-        return null;
+        return result;
 
     } //-- getComplexType
 
@@ -743,7 +1009,48 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level ComplexType declarations
     **/
     public Enumeration getComplexTypes() {
-        return _complexTypes.elements();
+    	Vector result = new Vector(_complexTypes.size()*2);
+    	Enumeration tempEnum = _complexTypes.elements();
+    	while (tempEnum.hasMoreElements()) {
+    		result.add((ComplexType)tempEnum.nextElement());	
+    	}
+    	
+    	Enumeration cachedincluded = _cachedincludedSchemas.elements();
+    	while (cachedincluded.hasMoreElements()) {
+    		Schema tempSchema = (Schema)cachedincluded.nextElement();
+    		tempEnum = tempSchema.getComplexTypes();
+    		while (tempEnum.hasMoreElements()) {
+    			result.add((ComplexType)tempEnum.nextElement());	
+    		}
+    	}
+    	
+    	Enumeration redefinition = _redefineSchemas.elements();
+    	while (redefinition.hasMoreElements()) {
+    		RedefineSchema redefine = (RedefineSchema)redefinition.nextElement();
+            //1--  Add the ComplexType from the RedefineSchema
+    		tempEnum = redefine.enumerateComplexTypes();
+    		while (tempEnum.hasMoreElements()) {
+    			result.add(tempEnum.nextElement());
+    		}
+    		
+    		Schema tempSchema = redefine.getOriginalSchema();
+            //-- a redefinition doesn't always contain a schema
+    		if (tempSchema != null) {
+                //-- Sets the master schema
+    			//-- The master schema will help resolving the links at runtime between
+    			//-- an structure and its type.
+    			tempSchema.setMasterSchema(this);
+    			tempEnum = tempSchema.getComplexTypes();
+	    		while (tempEnum.hasMoreElements()) {
+	    			ComplexType tempType = (ComplexType)tempEnum.nextElement();
+	    			if (!redefine.hasComplexTypeRedefinition(tempType.getName()))
+	    				result.add(tempType);	
+	    		}
+    		}
+    	}
+    	
+    	return result.elements();
+    	
     } //-- getComplextypes
 
     /**
@@ -759,7 +1066,7 @@ public class Schema extends Annotated {
             err += " 'name' can not be null";
             throw new IllegalArgumentException(err);
         }
-
+        ElementDecl result = null;
         int idx = name.indexOf(':');
         if (idx >= 0)
         {
@@ -773,16 +1080,44 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(_targetNamespace)) )
-            return (ElementDecl)_elements.get(name);
+        if ((ns==null) || (ns.equals(_targetNamespace)) ) {
+           result = (ElementDecl)_elements.get(name);
+		   if (result == null) {
+            	//-- check for any included schemas that are cached
+            	Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+            	boolean found = false;
+            	while (cacheIncluded.hasMoreElements() && !found) {
+            		Schema temp = (Schema)cacheIncluded.nextElement();
+            		result = temp.getElementDecl(name);
+            		if (result != null)
+            			found = true;
+            	}
+            	//--look in the redefinition
+            	if (!found) {
+            		Enumeration redefinition = _redefineSchemas.elements();
+            		while (redefinition.hasMoreElements() && !found) {
+            			Schema schema = ((RedefineSchema)redefinition.nextElement()).getOriginalSchema();
+            			if (schema != null) {
+                            //-- Sets the master schema
+            				//-- The master schema will help resolving the links at runtime between
+            				//-- an structure and its type.
+            				schema.setMasterSchema(this);
+            				result = schema.getElementDecl(name);
+            				if (result != null)
+            					found = true;	
+            			}
+            		}
+             	}
+		   }
+        }
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
-                return schema.getElementDecl(name);
+                result = schema.getElementDecl(name);
             }
         }
 
-        return null;
+        return result;
     } //--getElementDecl
 
     /**
@@ -790,7 +1125,39 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level element declarations
     **/
     public Enumeration getElementDecls() {
-        return _elements.elements();
+    	Vector result = new Vector(_elements.size()*2);
+    	Enumeration tempEnum = _elements.elements();
+    	while (tempEnum.hasMoreElements()) {
+    		result.add((ElementDecl)tempEnum.nextElement());	
+    	}
+    	
+    	Enumeration cachedincluded = _cachedincludedSchemas.elements();
+    	while (cachedincluded.hasMoreElements()) {
+    		Schema tempSchema = (Schema)cachedincluded.nextElement();
+    		tempEnum = tempSchema.getElementDecls();
+    		while (tempEnum.hasMoreElements()) {
+    			result.add((ElementDecl)tempEnum.nextElement());	
+    		}
+    	}
+    	
+    	Enumeration redefinition = _redefineSchemas.elements();
+    	while (redefinition.hasMoreElements()) {
+    		RedefineSchema redefine = (RedefineSchema)redefinition.nextElement();
+    		Schema tempSchema = redefine.getOriginalSchema();
+            //-- a redefinition doesn't always contain a schema
+    		if (tempSchema != null) {
+                //-- Sets the master schema
+    			//-- The master schema will help resolving the links at runtime between
+    			//-- an structure and its type.
+    			tempSchema.setMasterSchema(this);
+    			tempEnum = tempSchema.getElementDecls();
+	    		while (tempEnum.hasMoreElements()) {
+	    			result.add((ElementDecl)tempEnum.nextElement());	
+	    		}
+    		}
+    	}
+    	
+    	return result.elements();
     } //-- getElementDecls
 
     /**
@@ -847,14 +1214,14 @@ public class Schema extends Annotated {
             }
         }
         else {
-            ns = (String) _namespaces.getNamespaceURI(nsPrefix);
+        	ns = (String) _namespaces.getNamespaceURI(nsPrefix);
         }
-
+        
         //--if at this point, there is no namespace
         //--then we assume it is the targetNamespace
         if (ns == null)
             ns = _targetNamespace;
-
+       
         return getSimpleType(name, ns);
 
     } //-- getSimpleType
@@ -884,12 +1251,11 @@ public class Schema extends Annotated {
             namespace = (String)_namespaces.getNamespaceURI("");
             isDefaultNS = true;
         }
-
-        
+       
         //-- Get SimpleType object
         SimpleType result = null;
         if ((namespace == null) || (isDefaultNS)) {
-
+            
             //-- first check user-defined types
             result = (SimpleType)_simpleTypes.get(name);
             if (result != null) {
@@ -918,10 +1284,10 @@ public class Schema extends Annotated {
         else if (namespace.equals(_schemaNamespace)) {
             result= simpleTypesFactory.getBuiltInType(name);
             if (result == null)  {
-                    String err = "getSimpleType: the simple type '"+name+
+        		String err = "getSimpleType: the simple type '"+name+
                                 "' is not a built-in type as defined in XML Schema specification.";
                     throw new IllegalArgumentException(err);
-                }
+            }
         }
         else if (namespace.equals(_targetNamespace)) {
             result = (SimpleType)_simpleTypes.get(name);
@@ -936,6 +1302,40 @@ public class Schema extends Annotated {
                         _simpleTypes.put(name, result);
                     }
                 }
+            }
+            if (result == null) {
+            	//-- check the cached included schema
+        		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+        		boolean found = false;
+        		while (cacheIncluded.hasMoreElements() && !found) {
+        			Schema temp = (Schema)cacheIncluded.nextElement();
+        			result = temp.getSimpleType(name, namespace);
+        			if (result != null)
+        				found = true;
+        		}
+        	    if (!found) {
+	            	//--we might face a redefinition
+	            	Enumeration redefinitions = getRedefineSchema();
+	            	while (redefinitions.hasMoreElements() && result == null) {
+                        RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	            		//-- the SimpleType can be redefined
+	            		if (redefine.hasSimpleTypeRedefinition(name)) {
+	            			result = redefine.getSimpleType(name);
+	            			if (result != null)
+	            				found = true;
+	            			break;
+	            		}
+	            		
+	            		Schema schema = redefine.getOriginalSchema();
+	            		if (schema != null) {
+	            			//-- Sets the master schema
+	            			//-- The master schema will help resolving the links at runtime between
+	            			//-- an structure and its type.
+	            			schema.setMasterSchema(this);
+	            			result = schema.getSimpleType(name, namespace);
+	            		}
+	            	}    
+        	    }
             }
         }
         else {
@@ -972,7 +1372,48 @@ public class Schema extends Annotated {
                 }
             }
         }
-        return _simpleTypes.elements();
+        Vector result = new Vector(_simpleTypes.size()*2);
+        Enumeration tempEnum = _simpleTypes.elements();
+        while (tempEnum.hasMoreElements()) {
+        	result.add(tempEnum.nextElement());	
+        }
+        
+        Enumeration cachedincluded = _cachedincludedSchemas.elements();
+        while (cachedincluded.hasMoreElements()) {
+        	Schema tempSchema = (Schema)cachedincluded.nextElement();
+        	tempEnum = tempSchema.getSimpleTypes();
+        	while (tempEnum.hasMoreElements()) {
+        		result.add(tempEnum.nextElement());	
+        	}
+        }
+        
+        Enumeration redefinition = _redefineSchemas.elements();
+        while (redefinition.hasMoreElements()) {
+        	RedefineSchema redefine = (RedefineSchema)redefinition.nextElement();
+            //1--  Add the SimpleType from the RedefineSchema
+        	tempEnum = redefine.enumerateSimpleTypes();
+        	while (tempEnum.hasMoreElements()) {
+        		result.add(tempEnum.nextElement());
+        	}
+        	
+        	Schema tempSchema = redefine.getOriginalSchema();
+            //-- a redefinition doesn't always contain a schema
+        	if (tempSchema != null) {
+        		//-- Sets the master schema
+        		//-- The master schema will help resolving the links at runtime between
+        		//-- an structure and its type.
+        		tempSchema.setMasterSchema(this);
+        		tempEnum = tempSchema.getSimpleTypes();
+	        	while (tempEnum.hasMoreElements()) {
+	        		SimpleType tempType= (SimpleType)tempEnum.nextElement();
+	        		if (!redefine.hasSimpleTypeRedefinition(tempType.getName()))   			
+	        			result.add(tempType);	
+	        	}
+        	}
+        }
+        
+        
+        return result.elements();
     } //-- getSimpleTypes
 
     /**
@@ -997,7 +1438,7 @@ public class Schema extends Annotated {
             err += " 'name' can not be null";
             throw new IllegalArgumentException(err);
         }
-
+        ModelGroup result = null;
         int idx = name.indexOf(':');
         if (idx >= 0)
         {
@@ -1011,16 +1452,52 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(_targetNamespace)) )
-            return (ModelGroup)_groups.get(name);
+        if ((ns==null) || (ns.equals(_targetNamespace)) ) {
+            result = (ModelGroup)_groups.get(name);
+            if (result == null) {
+        		//-- check for any included schemas that are cached
+        		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+        		boolean found = false;
+        		while (cacheIncluded.hasMoreElements() && !found) {
+        			Schema temp = (Schema)cacheIncluded.nextElement();
+        			result = temp.getModelGroup(name);
+        			if (result != null)
+        				found = true;
+        		}
+        	    
+        		if (!found) {
+	            	//--we might face a redefinition
+	            	Enumeration redefinitions = getRedefineSchema();
+	            	while (redefinitions.hasMoreElements() && result == null) {
+                        RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	            		//-- the ModelGroup can be redefined
+	            		if (redefine.hasGroupRedefinition(name)) {
+	            			result = redefine.getModelGroup(name);
+	            			if (result != null)
+	            				found = true;
+	            			break;
+	            		}
+	            		
+	            		Schema schema = redefine.getOriginalSchema();
+	            		if (schema != null) {
+	            			//-- Sets the master schema
+	            			//-- The master schema will help resolving the links at runtime between
+	            			//-- an structure and its type.
+	            			schema.setMasterSchema(this);
+	            		    result = schema.getModelGroup(name);
+	            		}
+	            	}    
+        		}
+            }
+        }
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
-                return schema.getModelGroup(name);
+                result =  schema.getModelGroup(name);
             }
         }
 
-        return null;
+        return result;
     } //--getModelGroup
 
     /**
@@ -1028,7 +1505,47 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level ModelGroup declarations
     **/
     public Enumeration getModelGroups() {
-        return _groups.elements();
+    	Vector result = new Vector(_groups.size()*2);
+    	Enumeration tempEnum = _groups.elements();
+    	while (tempEnum.hasMoreElements()) {
+    		result.add(tempEnum.nextElement());	
+    	}
+    	
+    	Enumeration cachedincluded = _cachedincludedSchemas.elements();
+    	while (cachedincluded.hasMoreElements()) {
+    		Schema tempSchema = (Schema)cachedincluded.nextElement();
+    		tempEnum = tempSchema.getModelGroups();
+    		while (tempEnum.hasMoreElements()) {
+    			result.add(tempEnum.nextElement());	
+    		}
+    	}
+    	Enumeration redefinition = _redefineSchemas.elements();
+    	while (redefinition.hasMoreElements()) {
+    		RedefineSchema redefine = (RedefineSchema)redefinition.nextElement();
+    		//1--  Add the AttributeGroups from the RedefineSchema
+    		tempEnum = redefine.enumerateGroups();
+    		while (tempEnum.hasMoreElements()) {
+    		     result.add(tempEnum.nextElement());
+    		}
+    		
+    		Schema tempSchema = redefine.getOriginalSchema();
+           //-- a redefinition doesn't always contain a schema
+    		if (tempSchema != null) {	
+    			//-- Sets the master schema
+    			//-- The master schema will help resolving the links at runtime between
+    			//-- an structure and its type.
+    			tempSchema.setMasterSchema(this);
+    			
+    			tempEnum = tempSchema.getModelGroups();
+	    		while (tempEnum.hasMoreElements()) {
+	    			ModelGroup tempGroup = (ModelGroup)tempEnum.nextElement();
+	    			if (!redefine.hasGroupRedefinition(tempGroup.getName())) 			
+	    				result.add(tempGroup);	
+	    		}
+    		}
+    	}
+    	
+    	return result.elements();
     } //-- getmodelGroup
 
     /**
@@ -1059,6 +1576,46 @@ public class Schema extends Annotated {
         return getImportedSchema(ns, null);
     } //-- getImportedSchema
     
+    /**
+     * Returns an enumeration of redefined schemas.
+     * @return an enumeration of redefined schemas.
+     */
+    public Enumeration getRedefineSchema() {
+    	return _redefineSchemas.elements();
+    }
+    
+    /**
+     * Returns the redefined schema corresponding schemaLocation.
+     * @param schemaLocation the string corresponding to the schemaLocation.
+     * @return the redefined schema corresponding schemaLocation.
+     */
+    public RedefineSchema getRedefineSchema(String schemaLocation) {
+    	RedefineSchema result = (RedefineSchema) _redefineSchemas.get(schemaLocation);
+    	return result;
+    }
+    
+    /**
+     * Returns the cached included schema with the given SchemaLocation
+     * 
+     * @param schemaLocation the schemaLocation value used as a key to store the 
+     * cached included XML schema
+     * @return the cached included XML schema
+     */
+    public Schema getCachedIncludedSchema(String schemaLocation) {
+    		return (Schema)_cachedincludedSchemas.get(schemaLocation);
+    } //-- getCachedIncludedSchema
+    
+    /**
+     * Returns an enumeration of all the included schemas that are cached 
+     * in this XML Schema Definition.
+     * 
+     * @return an enumeration of all the included schemas that are cached 
+     * in this XML Schema Definition.
+     * 
+     */
+    public Enumeration getCachedIncludedSchemas() {
+    	return _cachedincludedSchemas.elements();
+    } //-- getCachedIncludedSchemas    
     /**
      * Returns the imported schema with the given namespace
      * 
@@ -1194,14 +1751,32 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
     **/
     public boolean removeComplexType(ComplexType complexType) {
-        if (complexType.isTopLevel()) {
+        boolean result = false;
+    	if (complexType.isTopLevel()) {
             if (_complexTypes.contains(complexType)) {
                 _complexTypes.remove(complexType.getName());
                 complexType.setParent(null);
-                return true;
+                result = true;
             }
-        }
-        return false;
+            if (!result) {
+	            //--check the cached included schemas
+	            Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+	            while (cacheIncluded.hasMoreElements() &&!result) {
+	                Schema temp = (Schema)cacheIncluded.nextElement();
+	                result = temp.removeComplexType(complexType);
+	            }
+	            //--Still false?
+	            if (!result) {
+		            //--check the redefinition
+		            Enumeration redefinitions = getRedefineSchema();
+		            while (redefinitions.hasMoreElements() && !result) {
+		            	RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+		            	result = redefine.removeComplexType(complexType);
+		            }
+	            }
+            }
+    	}
+        return result;
     } //-- removeComplexType
 
     /**
@@ -1212,11 +1787,20 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
     **/
     public boolean removeElement(ElementDecl element) {
-        if (_elements.contains(element)) {
+        boolean result = false;
+    	if (_elements.contains(element)) {
             _elements.remove(element.getName());
-            return true;
+            result = true;
         }
-        return false;
+    	if (result = false) {
+    		//--check the cached included schemas
+    		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+    		while (cacheIncluded.hasMoreElements() &&!result) {
+    			Schema temp = (Schema)cacheIncluded.nextElement();
+    			result = temp.removeElement(element);
+    		}
+    	}
+        return result;
     } //-- removeElement
 
 
@@ -1228,10 +1812,19 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
      */
     public boolean removeAttribute(AttributeDecl attribute) {
-        if (_attributes.contains(attribute)) {
+        boolean result = false;
+    	if (_attributes.contains(attribute)) {
             _attributes.remove(attribute.getName());
-            return true;
+            result = true;
         }
+    	if (result = false) {
+    		//--check the cached included schemas
+    		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+    		while (cacheIncluded.hasMoreElements() &&!result) {
+    			Schema temp = (Schema)cacheIncluded.nextElement();
+    			result = temp.removeAttribute(attribute);
+    		}
+    	}
         return false;
     } //-- removeAttribute
 
@@ -1243,12 +1836,84 @@ public class Schema extends Annotated {
      * didn't exist in this Schema.
      */
     public boolean removeGroup(ModelGroup group) {
-        if (_groups.contains(group)) {
+        boolean result = false;
+    	if (_groups.contains(group)) {
             _groups.remove(group.getName());
-            return true;
+            result = true;
         }
-        return false;
+    	if (!result) {
+    		//--check the cached included schemas
+    		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+    		while (cacheIncluded.hasMoreElements() &&!result) {
+    			Schema temp = (Schema)cacheIncluded.nextElement();
+    			result = temp.removeGroup(group);
+    		}
+    		
+    		if (!result) {
+	    		//--check the redefinition
+	    		Enumeration redefinitions = getRedefineSchema();
+	    		while (redefinitions.hasMoreElements() && !result) {
+	    			RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	    			result = redefine.removeGroup(group);
+	    		}
+    		}
+    	}
+    	
+       
+        return result;
     } //-- removeGroup
+    
+    /**
+     * Removes the given AttributeGroup definition from this Schema
+     * @param group the AttributeGroup definition to remove
+     * @return true if the AttributeGroup definition has been removed.
+     */
+    public boolean removeAttributeGroup(AttributeGroupDecl group) {
+    	boolean result = false;
+    	if (_attributeGroups.contains(group)) {
+    		_attributeGroups.remove(group.getName());
+    		result = true;
+    	}
+    	if (result = false) {
+    		//--check the cached included schemas
+    		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+    		while (cacheIncluded.hasMoreElements() &&!result) {
+    			Schema temp = (Schema)cacheIncluded.nextElement();
+    			result = temp.removeAttributeGroup(group);
+    		}
+    		
+    		if (!result) {
+	    		//--check the redefinition
+	    		Enumeration redefinitions = getRedefineSchema();
+	    		while (redefinitions.hasMoreElements() && !result) {
+	    			RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	    			result = redefine.removeAttributeGroup(group);
+	    		}
+    		}
+    	}
+        
+    	return result;
+    } //-- removeGroup
+    
+    /**
+     * Removes the given cached included schema from this Schema definition's 
+     * list of cached included schema.
+     *
+     * @param schema the Schema to remove from this Schema's redefinition list
+     *
+     * @return true if the Schema was removed, otherwise false
+     */
+    public synchronized boolean removeCachedIncludedSchema(Schema schema)
+	{
+    	if (schema == null) return false;
+    	String schemaLocation = schema.getSchemaLocation();
+    	Schema tmp = (Schema)_cachedincludedSchemas.get(schemaLocation);
+    	if (schema.equals(tmp)) {
+    		_cachedincludedSchemas.remove(schemaLocation);
+    		return true;
+    	}
+    	return false;
+    } //-- removeImportedSchema
 
     /**
      * Removes the given Schema definition from this Schema definition's 
@@ -1283,6 +1948,25 @@ public class Schema extends Annotated {
     } //-- removeNamespace
     
     /**
+     * Removes the given redefined structure from this Schema definition's 
+     * list of redefinitions.
+     *
+     * @param schema the Schema to remove from this Schema's redefinition list
+     *
+     * @return true if the Schema was removed, otherwise false
+     */
+    public synchronized boolean removeRedefineSchema(RedefineSchema schema)
+	{
+    	if (schema == null) return false;
+    	String schemaLocation = schema.getSchemaLocation();
+    	RedefineSchema tmp = (RedefineSchema)_redefineSchemas.get(schemaLocation);
+    	if (schema.equals(tmp)) {
+    		_redefineSchemas.remove(schemaLocation);
+    		return true;
+    	}
+    	return false;
+    } //-- removeRedefineSchema
+    /**
      * Removes the given top level SimpleType from this Schema
      * @param SimpleType the SimpleType to remove
      * @return true if the SimpleType has been removed, or
@@ -1290,11 +1974,29 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
     **/
     public boolean removeSimpleType(SimpleType simpleType) {
-        if (_simpleTypes.contains(simpleType)) {
+        boolean result = false;
+    	if (_simpleTypes.contains(simpleType)) {
             _simpleTypes.remove(simpleType.getName());
-            return true;
+            result = true;
         }
-        return false;
+    	if (result = false) {
+    		//--check the cached included schemas
+    		Enumeration cacheIncluded = _cachedincludedSchemas.elements();
+    		while (cacheIncluded.hasMoreElements() &&!result) {
+    			Schema temp = (Schema)cacheIncluded.nextElement();
+    			result = temp.removeSimpleType(simpleType);
+    		}
+    		
+    		if (!result) {
+	            //--check the redefinition
+	    		Enumeration redefinitions = getRedefineSchema();
+	    		while (redefinitions.hasMoreElements() && !result) {
+	    			RedefineSchema redefine = (RedefineSchema)redefinitions.nextElement();
+	    			result = redefine.removeSimpleType(simpleType);
+	    		}
+    		}
+    	}    	
+        return result;
     } //-- removeSimpleType
 
     /**
@@ -1398,12 +2100,14 @@ public class Schema extends Annotated {
         if (ns == null) {
             ns = (String)_namespaces.getNamespaceURI(prefix);
         }
-        
+       
         //--if at this point, there is no namespace
         //--then we assume it is the targetNamespace
-        if (ns == null)
-            ns = _targetNamespace;
-            
+        if (ns == null) {
+            //--SHOULD WE THROW AN EXCEPTION?
+        	ns = _targetNamespace;
+        }
+        
         //1--support for anyType
         if (localName.equals(SchemaNames.ANYTYPE)) {
             //--if 'anyType' in the default schema namespace-->type is anyType
@@ -1528,7 +2232,6 @@ public class Schema extends Annotated {
         while (enum.hasMoreElements()) {
             ((Group)enum.nextElement()).validate();
         }
-
         //-- top-level attribute groups
 
     } //-- validate
@@ -1547,6 +2250,31 @@ public class Schema extends Annotated {
     protected String getNamespacePrefix(String namespace) {
         return _namespaces.getNamespacePrefix(namespace);
     }
+    
+    /**
+     * Returns the master schema in which this instance of schema
+     * is used at runtime. This method is meant to be used at runtime.
+     * 
+     * @return  the master schema in which this instance of schema
+     * is used at runtime. This method is meant to be used at runtime.
+     */
+     protected Schema getMasterSchema() {
+     	return _masterSchema;
+     }
+     
+     /**
+      * Sets the master schema in which this instance of schema
+      * is used at runtime. This method is meant to be used at runtime.
+      * A master schema is a schema in which this instance of Schema is
+      * included, redefined or imported.
+      * 
+      * @param the master schema in which this instance of schema
+      * is used at runtime. This method is meant to be used at runtime.
+      */
+     protected void setMasterSchema(Schema masterSchema) {
+     	_masterSchema = masterSchema;
+     }
+     
 
 } //-- Schema
 
