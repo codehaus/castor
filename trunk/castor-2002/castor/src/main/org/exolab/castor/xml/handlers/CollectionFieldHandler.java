@@ -54,12 +54,14 @@ import java.lang.reflect.Array;
 
 /**
  * A  FieldHandler for the XML Schema Collection type.
+ * TODO : support all kind of XSList
  * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
 public class CollectionFieldHandler extends XMLFieldHandler {
 
-    private FieldHandler handler = null;
+    private FieldHandler _handler = null;
+
 
     //----------------/
     //- Constructors -/
@@ -77,7 +79,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
                 "the constructor of CollectionFieldHandler must not be null.";
             throw new IllegalArgumentException(err);
         }
-        this.handler = fieldHandler;
+        this._handler = fieldHandler;
     } //-- CollectionFieldHandler
 
 
@@ -87,7 +89,6 @@ public class CollectionFieldHandler extends XMLFieldHandler {
 
     /**
      * Sets the value of the field associated with this descriptor.
-     * NOTE : for the moment it is only handling array of strings
      * @param target the object in which to set the value
      * @param value the value of the field
     **/
@@ -96,22 +97,29 @@ public class CollectionFieldHandler extends XMLFieldHandler {
     {
 
         if ( value == null )
-            handler.setValue(target,"");
+            _handler.setValue(target,"");
+
         if (value instanceof String) {
             StringTokenizer temp = new StringTokenizer((java.lang.String)value," ");
             int size = temp.countTokens();
             for (int i=0; i<size; i++) {
-                handler.setValue(target, temp.nextToken());
+                _handler.setValue(target, temp.nextToken());
             }
         }
+        else _handler.setValue(target, value);
     } //-- setValue
 
-    //delegate to the handler
+    /**
+     * Gets the value of the field associated with this descriptor.
+     * If the value is an array, it returns a string 'representing' this array
+     * @param target the object in which to set the value
+     * @param value the value of the field
+    **/
     public Object getValue(Object target)
         throws java.lang.IllegalStateException
     {
-        //For the moment only if the content of XSList is a string
-        Object temp = handler.getValue(target);
+        // Needs to return the proper object
+        Object temp = _handler.getValue(target);
         String result = "";
         if (temp.getClass().isArray()) {
             int size = Array.getLength(temp);
@@ -125,6 +133,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
                 //remove the last ' '
                 result=result.substring(0,result.length()-2);
             }
+            return result;
         }
         return result;
     }
@@ -132,7 +141,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
     public void resetValue(Object target)
         throws java.lang.IllegalStateException
     {
-        handler.resetValue(target);
+        _handler.resetValue(target);
     }
 
 
