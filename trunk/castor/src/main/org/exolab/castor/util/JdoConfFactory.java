@@ -238,7 +238,7 @@ public class JdoConfFactory
 	{
 		DataSource dsConf = new DataSource();
 
-		dsConf.setParams(ds);
+		// dsConf.addParam(ds);
 		dsConf.setClassName(ds.getClass().getName());
 
 		return dsConf;
