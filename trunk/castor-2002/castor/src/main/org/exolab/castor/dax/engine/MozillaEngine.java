@@ -64,15 +64,14 @@ import netscape.ldap.LDAPv2;
 import netscape.ldap.LDAPDN;
 import netscape.ldap.util.DN;
 import netscape.ldap.util.RDN;
-import org.exolab.castor.dax.engine.DAXFieldDesc;
-import org.exolab.castor.dax.engine.DAXClassDesc;
-import org.exolab.castor.mapping.FieldDesc;
-import org.exolab.castor.mapping.ContainerFieldDesc;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.Types;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.persist.FetchContext;
+import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.ObjectNotFoundException;
@@ -80,7 +79,8 @@ import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.ObjectDeletedException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.FatalPersistenceException;
-import org.exolab.castor.persist.RelationContext;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 
@@ -94,59 +94,42 @@ public class MozillaEngine
 {
 
 
-    private DAXClassDesc  _clsDesc;
+    private ClassHandler         _handler;
 
 
-    private Hashtable      _fields;
+    private Hashtable            _fields;
 
 
-    private DAXFieldDesc[] _dnFields;
+    private DAXFieldDescriptor[] _dnFields;
 
 
-    private String         _dnFieldName;
+    private String               _dnFieldName;
 
  
-    private FieldDesc      _attrField;
+    private FieldHandler         _attrField;
 
 
-    private String         _rootDN;
+    private String               _rootDN;
 
 
-    public MozillaEngine( DAXClassDesc clsDesc, String rootDN )
+    public MozillaEngine( ClassHandler handler, String rootDN )
         throws MappingException
     {
-        FieldDesc[] fields;
-        FieldDesc   dnField;
+        FieldDescriptor[] fields;
+        ClassDescriptor   clsDesc;
         
-        _clsDesc = clsDesc;
+        _handler = handler;
+        /*
         _attrField = _clsDesc.getAttributeSetField();
+        */
+        clsDesc = (DAXClassDescriptor) _handler.getDescriptor();
         fields = clsDesc.getFields();
         _fields = new Hashtable();
         for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ] instanceof ContainerFieldDesc ) {
-                FieldDesc[] contained;
-                
-                contained = ( (ContainerFieldDesc) fields[ i ] ).getFields();
-                for ( int j = 0 ; j < contained.length ; ++j ) {
-                    if ( _fields.put( ( (DAXFieldDesc) contained[ j ] ).getLdapName(),
-                                      new DAXContainedFieldDesc( (DAXFieldDesc) contained[ j ], (ContainerFieldDesc) fields[ i ] ) ) != null )
-                        throw new MappingException( "Duplicate LDAP attribute" );
-                }
-            } else {
-                if ( _fields.put( ( (DAXFieldDesc) fields[ i ] ).getLdapName(), fields[ i ] ) != null )
-                    throw new MappingException( "Duplicate LDAP attribute" );
-            }
+            if ( _fields.put( ( (DAXFieldDescriptor) fields[ i ] ).getLdapName(), fields[ i ] ) != null )
+                throw new MappingException( "Duplicate LDAP attribute" );
         }
-        
-        dnField = _clsDesc.getIdentity();
-        if ( dnField instanceof ContainerFieldDesc ) {
-            fields = ( (ContainerFieldDesc) dnField ).getFields();
-            _dnFields = new DAXFieldDesc[ fields.length ];
-            for ( int i = 0 ; i < fields.length ; ++i )
-                _dnFields[ i ] = (DAXFieldDesc) fields[ i ];
-        } else {
-            _dnFieldName = ( (DAXFieldDesc) _clsDesc.getIdentity() ).getLdapName();
-        }
+        _dnFieldName = ( (DAXFieldDescriptor) clsDesc.getIdentity() ).getLdapName();
         _rootDN = rootDN;
     }
 
@@ -154,28 +137,28 @@ public class MozillaEngine
     public Object create( Object conn, Object obj, Object identity )
         throws DuplicateIdentityException, PersistenceException
     {
-        LDAPAttributeSet ldapSet;
-        String           dn;
-        Enumeration      enum;
-        DAXFieldDesc     field;
-        boolean          exists;
+        LDAPAttributeSet   ldapSet;
+        String             dn;
+        Enumeration        enum;
+        DAXFieldDescriptor field;
+        boolean            exists;
         
         dn = getDN( identity );
         try {
             ldapSet = new LDAPAttributeSet();
             enum = _fields.elements();
             while ( enum.hasMoreElements() ) {
-                field = (DAXFieldDesc) enum.nextElement();
+                field = (DAXFieldDescriptor) enum.nextElement();
                 ldapSet.add( field.getAttribute( obj ) );
             }
             // XXX
             // Also need to create all the attributes in the attrSet
-            DAXClassDesc type;
+            DAXClassDescriptor type;
             
-            type = _clsDesc;
+            type = (DAXClassDescriptor) _handler.getDescriptor();
             while ( type != null ) {
                 ldapSet.add( new LDAPAttribute( "objectclass", type.getLdapClass() ) );
-                type = (DAXClassDesc) type.getExtends();
+                type = (DAXClassDescriptor) type.getExtends();
             }
             ( (LDAPConnection) conn ).add( new LDAPEntry( dn, ldapSet ) );
             return null;
@@ -190,16 +173,16 @@ public class MozillaEngine
     }
 
 
-    public Object load( Object conn, RelationContext rtx, Object obj, Object identity,
+    public Object load( Object conn, FetchContext ctx, Object obj, Object identity,
                         AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException
     {
-        LDAPAttributeSet ldapSet;
-        LDAPAttribute    ldapAttr;
-        LDAPEntry        entry;
-        String           dn;
-        DAXFieldDesc     field;
-        Enumeration      enum;
+        LDAPAttributeSet   ldapSet;
+        LDAPAttribute      ldapAttr;
+        LDAPEntry          entry;
+        String             dn;
+        DAXFieldDescriptor field;
+        Enumeration        enum;
         
         dn = getDN( identity );
         try {
@@ -240,7 +223,7 @@ public class MozillaEngine
                 
             } else {
                 
-                field = (DAXFieldDesc) _fields.get( ldapAttr.getName() );
+                field = (DAXFieldDescriptor) _fields.get( ldapAttr.getName() );
                 if ( field != null ) {
                     field.setValue( obj, entry );
                 } else if ( _attrField != null ) {
@@ -288,10 +271,10 @@ public class MozillaEngine
         modifs = new LDAPModificationSet();
         enum = _fields.elements();
         while ( enum.hasMoreElements() ) {
-            DAXFieldDesc        field;
+            DAXFieldDescriptor  field;
             LDAPAttribute       attr;
             
-            field = (DAXFieldDesc) enum.nextElement();
+            field = (DAXFieldDescriptor) enum.nextElement();
             exists = ( ldapSet.getAttribute( field.getLdapName() ) != null );
             attr = field.getAttribute( obj );
             if ( exists )
@@ -348,7 +331,7 @@ public class MozillaEngine
     }
     
     
-    public void delete( Object conn, Object obj, Object identity )
+    public void delete( Object conn, Object identity )
         throws PersistenceException
     {
         String dn;
@@ -395,7 +378,7 @@ public class MozillaEngine
     }
     
 
-    public PersistenceQuery createQuery( RelationContext rtx, String query, Class[] types )
+    public PersistenceQuery createQuery( FetchContext ctx, String query, Class[] types )
         throws QueryException
     {
         return new MozillaQuery( query, types );
@@ -422,7 +405,7 @@ public class MozillaEngine
                 else
                     dn.append( ',' );
                 dn.append( _dnFields[ i ].getLdapName() ).append( '=' );
-                dn.append( _dnFields[ i ].getValue( identity ).toString() );
+                dn.append( _dnFields[ i ].getHandler().getValue( identity ).toString() );
             }
         } else {
             dn.append( _dnFieldName );
@@ -445,9 +428,9 @@ public class MozillaEngine
         if ( _dnFields != null ) {
             Object identity;
             
-            identity = Types.newInstance( _clsDesc.getIdentity().getFieldType() );
+            identity = Types.newInstance( _handler.getDescriptor().getIdentity().getFieldType() );
             for ( int i = _dnFields.length ; i-- > 0 ; )
-                _dnFields[ i ].setValue( identity, rdns[ i ] );
+                _dnFields[ i ].getHandler().setValue( identity, rdns[ i ] );
             return identity;
         } else {
             return rdns[ 0 ];
@@ -521,7 +504,7 @@ public class MozillaEngine
         
         public Class getResultType()
         {
-            return _clsDesc.getJavaClass();
+            return _handler.getJavaClass();
         }
         
         
@@ -612,10 +595,10 @@ public class MozillaEngine
         public Object fetch( Object obj )
             throws ObjectNotFoundException, PersistenceException
         {
-            LDAPAttributeSet ldapSet;
-            LDAPAttribute    ldapAttr;
-            DAXFieldDesc     field;
-            Enumeration      enum;
+            LDAPAttributeSet   ldapSet;
+            LDAPAttribute      ldapAttr;
+            DAXFieldDescriptor field;
+            Enumeration        enum;
             
             if ( _lastResult == null )
                 throw new PersistenceException( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
@@ -626,7 +609,7 @@ public class MozillaEngine
                 if ( ldapAttr.getName().equals( "objectclass" ) ) {
                     // No need to load or match objectclass, query took care of that
                 } else {
-                    field = (DAXFieldDesc) _fields.get( ldapAttr.getName() );
+                    field = (DAXFieldDescriptor) _fields.get( ldapAttr.getName() );
                     if ( field != null ) {
                         field.setValue( obj, _lastResult );
                     } else if ( _attrField != null ) {
