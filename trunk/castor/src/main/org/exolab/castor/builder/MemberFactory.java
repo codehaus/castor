@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004 (C) Intalio Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the course
+ * of employment at Intalio Inc.
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ * 
  * $Id$
  */
 
@@ -58,7 +63,7 @@ import java.util.Enumeration;
  * The "Factory" responsible for creating fields for
  * the given schema components
  *
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class MemberFactory {
