@@ -90,6 +90,12 @@ public class DateFieldHandler extends XMLFieldHandler {
     private static final byte SECONDS_FLAG  = MINUTES_FLAG  +   1; 
     private static final byte MILLIS_FLAG   = SECONDS_FLAG  +   1;
     
+    
+    /**
+     * The default parse options when none are specified
+     */
+    private static final ParseOptions DEFAULT_PARSE_OPTIONS = new ParseOptions();
+    
     /** 
      * The string name for the UTC TimeZone
      */
@@ -105,6 +111,7 @@ public class DateFieldHandler extends XMLFieldHandler {
      */
 	private static final TimeZone UTC_TIMEZONE_INSTANCE = TimeZone.getTimeZone( UTC_TIMEZONE );    
     
+    
     /**
      * A boolean to indicate that the TimeZone can be suppressed
      * if the TimeZone is equivalent to the "default" timezone.
@@ -117,6 +124,11 @@ public class DateFieldHandler extends XMLFieldHandler {
     private FieldHandler _handler = null;
     
     /**
+     * The current set of parse options
+     */
+    private ParseOptions _options = new ParseOptions();
+    
+    /**
      * A boolean to indicate milliseconds should be
      * suppressed upon formatting to a String
      * (marshalling)
@@ -124,7 +136,13 @@ public class DateFieldHandler extends XMLFieldHandler {
     private static boolean _suppressMillis = false;
     
     
+    /**
+     * A flag to indicate that java.sql.Date should
+     * be returned instead
+     */
     private boolean _useSQLDate = false;
+    
+    
     
     //----------------/
     //- Constructors -/
@@ -209,7 +227,7 @@ public class DateFieldHandler extends XMLFieldHandler {
         if ( (value != null) && ! (value instanceof Date) ) {
 
             try {
-                date = parse(value.toString());
+                date = parse(value.toString(), _options);
                 //-- java.sql.Date?
                 if ((_useSQLDate) && (date != null)) {
                     date = new java.sql.Date(date.getTime());
@@ -315,12 +333,14 @@ public class DateFieldHandler extends XMLFieldHandler {
      */
     public void setUseSQLDate(boolean useSQLDate) {
         _useSQLDate = useSQLDate;
+        _options.allowNoTime = (_useSQLDate);
     } //-- setUseSQLDate
     
 
     //-------------------/
     //- Private Methods -/
     //-------------------/
+    
     
     /**
      * Parses the given string, which must be in the following format:
@@ -357,9 +377,51 @@ public class DateFieldHandler extends XMLFieldHandler {
     protected static Date parse( String dateTime ) 
             throws ParseException 
     {
+        return parse( dateTime, DEFAULT_PARSE_OPTIONS);
+    } //-- parse
+                
+                
+    /**
+     * Parses the given string, which must be in the following format:
+     * <b>CCYY-MM-DDThh:mm:ss</b> or <b>CCYY-MM-DDThh:mm:ss.sss</b>
+     * where "CC" represents the century, "YY" the year, "MM" the 
+     * month and "DD" the day. The letter "T" is the date/time 
+     * separator and "hh", "mm", "ss" represent hour, minute and 
+     * second respectively.
+     * 
+     * CCYY represents the Year and each 'C' and 'Y' must be a digit 
+     * from 0-9. A minimum of 4 digits must be present.
+     * 
+     * MM represents the month and each 'M' must be a digit from 0-9, 
+     * but together "MM" must not represent a value greater than 12.
+     * "MM" must be 2 digits, use of leading zero is required for
+     * all values less than 10.
+     * 
+     * DD represents the day of the month and each 'D' must be a digit 
+     * from 0-9. DD must be 2 digits (use a leading zero if necessary) 
+     * and must not be greater than 31.
+     *
+     * 'T' is the date/time separator and must exist!
+     *
+     * hh represents the hour using 0-23. 
+     * mm represents the minute using 0-59.
+     * ss represents the second using 0-60. (60 for leap second)
+     * sss represents the millisecond using 0-999.
+     * 
+     * @param dateTime the string to convert to a Date
+     * @return a new Date that represents the given string.
+     * @exception ParseException when the given string does not conform
+     * to the above string.
+     */
+    protected static Date parse( String dateTime, ParseOptions options ) 
+            throws ParseException 
+    {
+                
                 
         if (dateTime == null)
             throw new ParseException(INVALID_DATE + "null", 0);
+            
+        if (options == null) options = DEFAULT_PARSE_OPTIONS;
             
         int values[] = new int[7];
         
@@ -510,6 +572,11 @@ public class DateFieldHandler extends XMLFieldHandler {
             case MILLIS_FLAG:
                 cal.set(Calendar.MILLISECOND, value);
                 break;
+            case DAY_FLAG:
+                if (options.allowNoTime) {
+                    break;
+                }
+                //-- do not break here (intentional)
             default:
                 throw new ParseException(INVALID_DATE + dateTime, i);
         }
@@ -727,4 +794,10 @@ public class DateFieldHandler extends XMLFieldHandler {
         return object.toString();
     } //-- format
      
+    /**
+     * A class for controlling the parse options
+     */
+    static class ParseOptions {
+        public boolean allowNoTime = false;
+    }
 } //-- DateFieldHandler
