@@ -7,6 +7,14 @@
       <p>Reference: <api package="org.exolab.castor.persist.cache">API documentation</api></p>
     </header>
 
+    <section title="News">
+       <p><b>Release 0.9.6</b>:<br/>
+          <ul>
+             <li>Added a section about (selectively) expiring caches, using the CacheManager interface.</li>
+          </ul>
+       </p>
+    </section>
+
     <section title="Introduction">
     
        <p>As explained in <api package="org.exolab.castor.jdo.persist">API docs for the persists package</api>,
@@ -147,6 +155,37 @@ org.exolab.castor.jdo.cacheFactories=\
           </code-panel>
        </section>
 
+   </section>
+   
+   <section title="CacheManager and clearing caches">
+   
+	  <p>Sometimes it is necessary to (selectively) clear a Castor performance cache of its content. 
+	     For this purpose a <api class="org.exolab.castor.jdo.CacheManager">CacheManager</api> can 
+	     be obtained from a <api class="org.exolab.castor.jdo.Database">Database</api> instance by 
+	     issuing the following code:</p>
+	  
+	  <code-panel>
+	     <code>
+JDO jdo = ....;
+Database db = jdo.getDatabase();
+CacheManager manager = ((DatabaseImpl) db.getCacheManager();
+	     </code>
+	  </code-panel>
+	
+	  <p>This instance can subsequently be used to selectively clear the Castor performance 
+	     cache using one of the following methods:</p>
+	     
+	  <p><ul>
+	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache()</api></li>
+	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache(Class,Object)</api></li>
+	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache(Class,Object[])</api></li>
+	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache(Class[])</api></li>
+	     </ul></p>
+	     
+	  <p>Please note that once you have closed the Database instance from which you have obtained 
+	     the CacheManager, the CacheManager cannot  be used anymore and will throw a 
+	     <api class="org.exolab.castor.jdo.PersistenceException">PersistenceException</api>.</p>
+   
    </section>
        
    </body>       
