@@ -122,7 +122,6 @@ public class OQLQueryImpl
 
     public void bind( Object value )
     {
-
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         if ( _fieldNum == _paramInfo.size() )
@@ -179,16 +178,10 @@ public class OQLQueryImpl
             if ( _bindValues == null )
                 _bindValues = new Object[ _bindTypes.length ];
 
-            for (Enumeration e = info.getParamMap().elements(); e.hasMoreElements(); )
-            {
-                int fieldNum = ( (Integer) e.nextElement() ).intValue();
-                _bindValues[ fieldNum - 1 ] = value;
-            }
-
+            _bindValues[_fieldNum++] = value;
         } catch ( IllegalArgumentException except ) {
             throw except;
         }
-        ++_fieldNum;
     }
 
     public void bind( boolean value )
@@ -260,33 +253,14 @@ public class OQLQueryImpl
         _projectionType = walker.getProjectionType();
         _pathInfo = walker.getPathInfo();
 
-
-        //port param info types back to the format of old bind types.
-        //first get the maximum SQL param.
-        int max = 0;
+        // create the types array and fill it
+        _bindTypes = new Class[_paramInfo.size()];
+        int paramIndex = 0;
         for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); ) {
             ParamInfo info = (ParamInfo) e.nextElement();
-            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); )
-            {
-                int paramIndex = ( (Integer) f.nextElement() ).intValue();
-                if (  paramIndex > max )
-                    max = paramIndex;
-            }
-        }
 
-        //then create the types array and fill it
-        _bindTypes = new Class[max];
-        for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); )
-        {
-            ParamInfo info = (ParamInfo) e.nextElement();
-            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); )
-            {
-                int paramIndex = ((Integer) f.nextElement()).intValue();
-                _bindTypes[ paramIndex - 1 ] = (info.getSQLType() == null ? info.getTheClass()
-                                                                          : info.getSQLType());
-            }
+            _bindTypes[paramIndex++] = (info.getSQLType()==null? info.getTheClass(): info.getSQLType());
         }
-
     }
 
     public void createCall( String oql ) throws QueryException {
@@ -346,7 +320,7 @@ public class OQLQueryImpl
                         if ( info == null ) {
                             info = new ParamInfo( "", "java.lang.Object", null, _dbImpl.getClassLoader());
                         }
-                        info.mapToSQLParam( paramCnt + 1 );
+                        //info.mapToSQLParam( paramCnt + 1 );
                         _paramInfo.put( paramNo , info );
                         paramCnt++;
 
@@ -390,7 +364,7 @@ public class OQLQueryImpl
                     if ( info == null ) {
                         info = new ParamInfo( "", "java.lang.Object", null, _dbImpl.getClassLoader());
                     }
-                    info.mapToSQLParam( paramCnt + 1 );
+                    //info.mapToSQLParam( paramCnt + 1 );
                     _paramInfo.put( paramNo , info );
                     paramCnt++;
                 }

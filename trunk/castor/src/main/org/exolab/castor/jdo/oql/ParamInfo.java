@@ -46,8 +46,6 @@
 
 package org.exolab.castor.jdo.oql;
 
-import java.util.Vector;
-
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.jdo.engine.SQLTypes;
@@ -66,8 +64,6 @@ public class ParamInfo {
   private String _systemType;
 
   private Class _class;
-
-  private Vector _sqlQueryParamMap;
 
   private Class _fieldType;
 
@@ -104,8 +100,6 @@ public class ParamInfo {
     _userDefinedType = userDefinedType;
     _systemType = systemType;
     _classLoader = classLoader;
-
-    _sqlQueryParamMap = new Vector();
 
     Class userClass = null;
     Class systemClass = null;
@@ -211,24 +205,6 @@ public class ParamInfo {
    */
   public boolean isUserDefined() {
     return ! _userDefinedType.equals("");
-  }
-
-  /**
-   * Maps this numbered parameter to the numbered SQL parameter.
-   *
-   * @param sqlParamIndex The SQL parameter number.
-   */
-  public void mapToSQLParam(int sqlParamIndex) {
-    _sqlQueryParamMap.addElement(new Integer(sqlParamIndex));
-  }
-
-  /**
-   * Accessor method for _sqlQueryParamMap.
-   *
-   * @return private member _sqlQueryParamMap.
-   */
-  public Vector getParamMap() {
-    return _sqlQueryParamMap;
   }
 
   /**

@@ -58,7 +58,6 @@ import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.util.SqlBindParser;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
@@ -86,7 +85,6 @@ public class ParseTreeWalker implements TokenTypes
   private QueryExpression _queryExpr;
   private DbMetaInfo _dbInfo;
 
-  private int _SQLParamIndex; //Alex
   private Hashtable _paramInfo;
   private Hashtable _fieldInfo;
   private Hashtable _pathInfo;
@@ -123,7 +121,6 @@ public class ParseTreeWalker implements TokenTypes
     _classLoader = classLoader;
     _dbInfo = dbInfo;
 
-    _SQLParamIndex = 1; //Alex
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
     _pathInfo = new Hashtable();
@@ -733,7 +730,7 @@ public class ParseTreeWalker implements TokenTypes
         systemType = getParamTypeForComparison(paramTree.getParent());
         desc = getJDOFieldDescriptor(paramTree.getParent());
         break;
-    case KEYWORD_LIST:
+      case KEYWORD_LIST:
         systemType = getParamTypeForList(paramTree.getParent());
         break;
     }
@@ -834,7 +831,7 @@ public class ParseTreeWalker implements TokenTypes
    *    contains non literals.
    */
   private void checkInClauseRightSide(ParseTreeNode theList)
-        throws QueryException
+  		throws QueryException
   {
     if ( theList.getToken().getTokenType() != KEYWORD_LIST )
       throw new QueryException( "The right side of the IN operator must be a LIST." );
@@ -1133,11 +1130,9 @@ public class ParseTreeWalker implements TokenTypes
    *
    * @param whereClause the parse tree node with the where clause
    */
-  private void addWhereClause(ParseTreeNode whereClause) {
+  private void addWhereClause(ParseTreeNode whereClause)
+  {
     String sqlExpr = getSQLExpr(whereClause.getChild(0));
-
-    //Map numbered parameters
-    mapBindParameters(sqlExpr);
 
 	_queryExpr.addWhereClause(sqlExpr);
   }
@@ -1153,9 +1148,6 @@ public class ParseTreeWalker implements TokenTypes
   {
     String sqlExpr = getSQLExpr(limitClause/*.getChild(0)*/);
 
-    //Map numbered parameters
-    mapBindParameters(sqlExpr);
-
 	_queryExpr.addLimitClause(sqlExpr);
   }
 
@@ -1169,29 +1161,7 @@ public class ParseTreeWalker implements TokenTypes
   {
     String sqlExpr = getSQLExpr(offsetClause/*.getChild(0)*/);
 
-    //Map numbered parameters
-    mapBindParameters(sqlExpr);
-
 	_queryExpr.addOffsetClause(sqlExpr);
-  }
-
-  /**
-   * Map numbered parameters of the given SQL expression 
-   * 
-   * @param sqlExpr
-   */
-  private void mapBindParameters(String sqlExpr)
-  {
-      SqlBindParser parser = new SqlBindParser(sqlExpr);
-
-      int SQLParamIndex = _SQLParamIndex;
-      while(parser.next()) {
-          int paramNum = parser.getParamNumber();
-          ParamInfo paramInfo = (ParamInfo) _paramInfo.get(new Integer(paramNum));
-          paramInfo.mapToSQLParam(SQLParamIndex++);
-      }
-
-      _SQLParamIndex = SQLParamIndex;
   }
 
   /**
