@@ -45,11 +45,7 @@
 
 package org.exolab.castor.persist.cache;
 
-
 import java.util.Enumeration;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Base implementation of all LRU cache types. 
@@ -69,7 +65,7 @@ implements Cache
     /**
      * Cache capacity.
      */
-    private int _capacity;
+    private int _capacity = 0;
     
     /**
      * Class name of object cached in this cache instance
