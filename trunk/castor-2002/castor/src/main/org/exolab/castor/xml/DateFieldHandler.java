@@ -59,7 +59,7 @@ import java.util.Date;
  * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class DateFieldHandler implements FieldHandler {
+public class DateFieldHandler extends XMLFieldHandler {
         
     
     public static final String DATE_FORMAT =
