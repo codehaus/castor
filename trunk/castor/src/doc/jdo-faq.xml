@@ -406,6 +406,18 @@ query.bind(false);
             </p>
         </section>
 
+        <section title="I'm receiving a java.sql.SQLException: ORA-01461">
+            <p>
+            When using Weblogic Portal 4.0 with Oracle I am receiving the following error:
+            <code><![CDATA[
+            java.sql.SQLException: ORA-01461: can bind a LONG value only for insert into a LONG column
+            ]]></code>
+            According to 
+            <a href="http://edocs.bea.com/wlp/docs40/relnotes/relnotes.htm#300245">Weblogic Release Notes</a>,
+            this error can remedied by setting a Weblogic environment variable. 
+            </p>
+        </section>
+
     </section>
 
     <section title="OQL">
