@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,7 +47,18 @@ package org.exolab.castor.xml;
 
 import java.util.HashSet;
 
+/**
+ * The state information class for the UnmarshalHandler
+ * 
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @revision $Revision$ $Date$
+ */
 class UnmarshalState {
+    
+    /**
+     * Holds on to Constructor arguments
+     */
+    UnmarshalHandler.Arguments args = null;
     
     /**
      * Holds the current location path
@@ -143,6 +154,8 @@ class UnmarshalState {
      * Reinitializes all variables
      */
     void clear() {
+        
+        args = null;
         location = "";
         elementName = null;
         buffer = null;
