@@ -126,7 +126,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.add("return ");
         jsc.append(getName());
         jsc.append(".remove(");
-        jsc.append(getContentName());
+        jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
     } //-- createRemoveMethod
 
