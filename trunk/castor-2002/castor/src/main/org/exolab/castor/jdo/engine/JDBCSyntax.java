@@ -83,6 +83,7 @@ public interface JDBCSyntax
 
     public String InnerJoin = " INNER JOIN ";
 
+    public String Distinct = " DISTINCT ";
 
 }
 
