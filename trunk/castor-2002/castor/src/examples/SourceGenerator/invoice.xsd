@@ -130,16 +130,16 @@
    <xsd:simpleType name="PriceType">
    		<xsd:restriction base="xsd:decimal">
    			<xsd:fractionDigits value="2"/>
-    		<xsd:totalDigits value="5"/>
-    		<xsd:minInclusive value="1"/>
+    		        <xsd:totalDigits value="5"/>
+    		        <xsd:minInclusive value="1"/>
    			<xsd:maxInclusive value="100"/>
    		</xsd:restriction>
    </xsd:simpleType>
 
    <!-- The attributes for an Item -->
    <xsd:attributeGroup name="ItemAttributes">
-        <xsd:attribute name="Id" type="xsd:ID" minOccurs="1" maxOccurs="1"/>
-   		<xsd:attribute name="InStock" type="xsd:boolean" default="false"/>
-   		<xsd:attribute name="Category" type="xsd:string" use="required"/>
+        <xsd:attribute name="Id" type="xsd:ID" use="required"/>
+   	<xsd:attribute name="InStock" type="xsd:boolean" default="false"/>
+   	<xsd:attribute name="Category" type="xsd:string" use="required"/>
     </xsd:attributeGroup>
 </xsd:schema>
