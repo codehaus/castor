@@ -55,7 +55,7 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$ 
 **/
 public class Datatype extends Annotated 
-    implements org.exolab.castor.xml.Referable
+    implements Referable
 {
 
     /**

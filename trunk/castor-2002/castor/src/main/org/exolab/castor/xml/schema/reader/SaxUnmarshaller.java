@@ -49,7 +49,6 @@ package org.exolab.castor.xml.schema.reader;
 import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 import java.io.Reader;
-import org.exolab.castor.xml.Resolver;
 
 /**
  * The base class for unmarshallers
