@@ -62,9 +62,10 @@ public class SchemaNames {
     public static final String ALL              = "all";
     public static final String ANNOTATION       = "annotation";
     public static final String APPINFO          = "appinfo";    
+    public static final String ATTRIBUTE        = "attribute";
+    public static final String ATTRIBUTE_GROUP  = "attributeGroup";
     public static final String CHOICE           = "choice";    
     public static final String COMPLEX_TYPE     = "complexType";
-    public static final String ATTRIBUTE        = "attribute";
     public static final String ELEMENT          = "element";
     public static final String ENUMERATION      = "enumeration";
     public static final String GROUP            = "group";

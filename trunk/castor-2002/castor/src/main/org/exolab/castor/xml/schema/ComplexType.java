@@ -60,7 +60,7 @@ public class ComplexType extends XMLType
    implements ContentModelGroup, Referable
 {
 
-    private Hashtable attributes = null;
+    private AttributeGroupDecl attributes = null;
 
     private ContentType content  = ContentType.elemOnly;
 
@@ -99,30 +99,35 @@ public class ComplexType extends XMLType
 
         setSchema(schema);
         setName(name);
-        attributes   = new Hashtable();
+        attributes = new AttributeGroupDecl(schema);
         _contentModel = new ContentModelGroupImpl();
     } //-- Complextype
 
     /**
-     * Adds the given AttributeDecl to this Complextype
-     * @param attrDecl the AttributeDecl to add to this Complextype
+     * Adds the given AttributeDecl to this ComplexType
+     *
+     * @param attrDecl the AttributeDecl to add to this ComplexType
      * @exception SchemaException when an AttributeDecl already
      * exists with the same name as the given AttributeDecl
     **/
     public void addAttributeDecl(AttributeDecl attrDecl)
         throws SchemaException
     {
-
-        if (attributes.get(attrDecl.getName()) != null) {
-            String err = "An attribute declaration with the given name, ";
-            err += attrDecl.getName() + ", already exists in this scope.";
-            throw new SchemaException(err);
-        }
-
-        attributes.put(attrDecl.getName(), attrDecl);
-
+        attributes.addAttribute(attrDecl);
     } //-- addAttributeDecl
 
+    /**
+     * Adds the given AttributeGroupReference to this ComplexType
+     *
+     * @param attrGroupRef the AttributeGroupReference to add to this
+     * ComplexType
+    **/
+    public void addAttributeGroupReference
+        (AttributeGroupReference attrGroupRef)
+    {
+        attributes.addReference(attrGroupRef);
+    } //-- addAttributeGroupReference
+    
     /**
      * Creates an AttributeDecl with the given name. The attribute
      * declaration will still need to be added to this Complextype,
@@ -136,12 +141,12 @@ public class ComplexType extends XMLType
     } //-- createAttributeDecl
 
     /**
-     * Returns the AttributeDecl of associated with the given name
-     * @return the AttributeDecl of associated with the given name, or
+     * Returns the AttributeDecl associated with the given name
+     * @return the AttributeDecl associated with the given name, or
      *  null if no AttributeDecl with the given name was found.
     **/
     public AttributeDecl getAttributeDecl(String name) {
-        return (AttributeDecl)attributes.get(name);
+        return attributes.getAttribute(name);
     } //-- getAttributeDecl
 
     /**
@@ -151,7 +156,7 @@ public class ComplexType extends XMLType
      * declared within this Complextype
     **/
     public Enumeration getAttributeDecls() {
-        return attributes.elements();
+        return attributes.getAttributes();
     } //-- getAttributeDecls
 
     /**
