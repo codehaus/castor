@@ -283,7 +283,7 @@ public abstract class TransactionContext
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
         ObjectEntry entry;
         OID         oid;
-        System.out.println("Tx.fetch(): "+OID.flatten( identities ));
+        System.out.println("Tx.fetch() class: "+molder.getJavaClass().getName()+" : "+OID.flatten( identities ));
 
         if ( identities == null ) 
             throw new PersistenceException("Identities can't be null!");
@@ -381,7 +381,6 @@ public abstract class TransactionContext
             entry = addObjectEntry( oid, object );
             oid = engine.load( this, oid, object, accessMode, _lockTimeout );
             // add entry again using new oid
-            System.out.println("Tx.load return "+oid);
             removeObjectEntry( object );
             entry = addObjectEntry( oid, object );
 
@@ -416,6 +415,7 @@ public abstract class TransactionContext
         if ( accessMode == AccessMode.ReadOnly ) {
             removeObjectEntry( entry.object );
         }
+		System.out.println("new instance (return): "+object);
         return object;
     }
 

@@ -222,6 +222,24 @@ public class ClassMolder implements CacheHolder {
                     }
                 }
 
+				// if many-key exist, idSQL is overridden
+				String manyKey = fmFields[i].getSql().getManyKey();
+				String[] keys = breakApart( manyKey, ' ' );
+				if ( keys != null && keys.length != 0 ) {
+					if ( keys.length != idSQL.length ) 
+						throw new MappingException("The number of many-keys doesn't match referred object: "+clsDesc.getJavaClass().getName());
+					idSQL = keys;
+				}
+
+				// if name="" exist, relatedIdSQL is overridden
+				String manyName = fmFields[i].getSql().getName();
+				String[] names = breakApart( manyName, ' ' );
+				if ( names != null && names.length != 0 ) {
+					if ( names.length != relatedIdSQL.length ) 
+						throw new MappingException("The number of many-keys doesn't match referred object: "+relDesc.getJavaClass().getName());
+					relatedIdSQL = names;
+				}
+
                 _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, idSQL, idType, relatedIdSQL, relatedIdType ); 
             } else {
                 _fhs[i] = new FieldMolder( ds, this, fmFields[i] ); 
@@ -637,7 +655,7 @@ public class ClassMolder implements CacheHolder {
             throw new DuplicateIdentityException("Object exist in the persistence storage!");
 
         if ( _persistence == null )
-            throw new PersistenceException("non persistence capable");        
+            throw new PersistenceException("non persistence capable: "+oid.getJavaClass());        
 
         ci.fields = new Object[_fhs.length];
         ids = oid.getIdentities();
@@ -753,14 +771,15 @@ public class ClassMolder implements CacheHolder {
                     while (itor.hasNext()) {
                         Object oo = itor.next();
                         if ( _fhs[i].isDependent() ) {
-                            if ( !tx.isPersistent( oo ) )
+                            if ( !tx.isPersistent( oo ) ) {
                                 tx.create( fieldEngine, fieldClassMolder, oo, oid );
-							else 
+							} else 
 								// fail-fast principle: if the object depend on another object,
 								// throw exception
 								if ( !tx.isDepended( oid, oo ) )
 									throw new PersistenceException("Dependent object may not change its master");
                         } else {
+							System.out.println("@@@@@@@@@@"+_fhs[i].getJavaClass().getName()+" is not depend. won't create");
                             //if ( !tx.isPersistent( oo ) ) 
                             //    tx.create( fieldEngine, fieldClassMolder, oo, null );
                         }
