@@ -56,6 +56,13 @@ import java.util.Date;
 
 
 /**
+ * Simple logging facility. This logger extends <tt>PrintWriter</tt>
+ * which is used to trace SQL statements, Castor operations and
+ * mapping resolutions.
+ * <p>
+ * This logger augments <tt>PrintWriter</tt> by adding a prefix to
+ * each printed line and optionally a time stamp, enabling easy
+ * post-mortem analysis.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -65,21 +72,39 @@ public class Logger
 {
 
     
+    /**
+     * The default prefix to show at the beginning of each line.
+     */
     private static final String  Prefix = "Castor";
 
 
+    /**
+     * The underlying print writer.
+     */
     private static PrintWriter  _logger = new Logger( System.out ).setPrefix( Prefix );
 
 
+    /**
+     * True if the time should be printed on each line.
+     */
     private boolean  _logTime = false;
 
 
+    /**
+     * The prefix to use for this logger, null if lines should not be prefixed.
+     */
     private String  _prefix = null;
 
 
+    /**
+     * True if at the beginning of a line.
+     */
     private boolean _newLine;
 
 
+    /**
+     * Constructs a new logger to use the specified output stream.
+     */
     public Logger( OutputStream output )
     {
         super( output, true );
@@ -87,9 +112,12 @@ public class Logger
     }
 
 
-    public Logger( Writer output )
+    /**
+     * Constructs a new logger to use the specified writer.
+     */
+    public Logger( Writer writer )
     {
-        super( output, true );
+        super( writer, true );
         _newLine = true;
     }
 
@@ -146,15 +174,6 @@ public class Logger
     {
         _logTime = logTime;
         return this;
-    }
-
-
-    /**
-     * Returns true if the configuration specifies debugging.
-     */
-    public static boolean debug()
-    {
-        return Configuration.debug();
     }
 
 

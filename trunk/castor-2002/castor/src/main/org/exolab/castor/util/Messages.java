@@ -52,7 +52,14 @@ import java.util.*;
 
 
 /**
- *
+ * I18N message formatting class. A static factory for obtaining
+ * messages and formatting messages with arguments.
+ * <p>
+ * The resource file <tt>org.exolab.castor.util.resources.messages</tt>
+ * contains a list of all the messages in English. Additional resource
+ * files can be added for other languages and locales by placing them
+ * in the same package with a language/locale prefix. See the I18N
+ * documentation and use of resource bundles in the JDK docs.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -61,33 +68,79 @@ public class Messages
 {
 
 
+    /**
+     * The name of the resource holding all the messages in the English
+     * language. Resources for other languages and locales use the same
+     * name with a language/locale prefix.
+     */
     public static final String ResourceName = "org.exolab.castor.util.resources.messages";
     
 
+    /**
+     * The resource bundle holds all the messages.
+     */
     private static ResourceBundle   _messages;
     
     
+    /**
+     * Once a format has been created once, it is cached here.
+     */
     private static Hashtable        _formats;
     
 
+    /**
+     * Format the named message using a single argument and return the
+     * full message text.
+     *
+     * @param message The message name
+     * @param arg1 The first argument
+     * @return The full message text
+     */
     public static String format( String message, Object arg1 )
     {
         return format( message, new Object[] { arg1 } );
     }
 
     
+    /**
+     * Format the named message using two argument and return the
+     * full message text.
+     *
+     * @param message The message name
+     * @param arg1 The first argument
+     * @param arg2 The second argument
+     * @return The full message text
+     */
     public static String format( String message, Object arg1, Object arg2 )
     {
         return format( message, new Object[] { arg1, arg2 } );
     }
 
     
+    /**
+     * Format the named message using three argument and return the
+     * full message text.
+     *
+     * @param message The message name
+     * @param arg1 The first argument
+     * @param arg2 The second argument
+     * @param arg3 The third argument
+     * @return The full message text
+     */
     public static String format( String message, Object arg1, Object arg2, Object arg3 )
     {
         return format( message, new Object[] { arg1, arg2, arg3 } );
     }
 
     
+    /**
+     * Format the named message using any number of arguments and return the
+     * full message text.
+     *
+     * @param message The message name
+     * @param args Argument list
+     * @return The full message text
+     */
     public static String format( String message, Object[] args )
     {
         MessageFormat   mf;
@@ -110,7 +163,13 @@ public class Messages
         }
     }
     
-    
+
+    /**
+     * Return the text of the named message without formatting.
+     *
+     * @param message The message name
+     * @return The full message text
+     */
     public static String message( String message )
     {
         try {
@@ -121,9 +180,15 @@ public class Messages
     }
 
     
+    /**
+     * Set the locale to use for loading messages. Calling this method
+     * will reload all the messages based on the new locale name.
+     *
+     * @param message The message name
+     * @return The full message text
+     */
     public static void setLocale( Locale locale )
     {
-        _formats = new Hashtable();
         try {
             if ( locale == null )
                 _messages = ResourceBundle.getBundle( ResourceName ); 
@@ -134,6 +199,7 @@ public class Messages
             Logger.getSystemLogger().println( "Failed to locate messages resource " +
                                               ResourceName );
         }
+        _formats = new Hashtable();
     }
     
     

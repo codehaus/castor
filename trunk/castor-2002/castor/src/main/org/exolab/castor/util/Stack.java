@@ -51,6 +51,7 @@ package org.exolab.castor.util;
  * A representation of a Stack that does not use Synchronization.
  * For compatibility this class supports the same methods as a 
  * java.util.Stack (JDK)
+ *
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/

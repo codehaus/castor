@@ -29,6 +29,7 @@ import java.util.Vector;
 
 /**
  * A utility class for generating command line options
+ *
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/

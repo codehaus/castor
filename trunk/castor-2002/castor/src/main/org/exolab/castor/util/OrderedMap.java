@@ -27,6 +27,7 @@ import java.util.Vector;
 
 /**
  * A simple String to Object mapping which preserves order
+ *
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
