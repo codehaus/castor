@@ -148,6 +148,16 @@ public class CollectionInfoJ2 extends CollectionInfo {
 
         createSetArrayMethod(method);
 
+         //---------------------------/
+        //- Create Enumerate Method -/
+       //---------------------------/
+
+        method = new JMethod(SGTypes.Enumeration, "enumerate"+cName);
+        jClass.addMethod(method);
+
+        createEnumerateMethod(method);
+
+
           //-------------------/
          //- getCount method -/
         //-------------------/
