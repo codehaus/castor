@@ -245,7 +245,6 @@ public interface Database
                TransactionNotInProgressException, PersistenceException;
 
     /**
-     * <b>Experimental</b>
      * <p>
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
@@ -271,7 +270,6 @@ public interface Database
 
 
     /**
-     * <b>Experimental</b>
      * <p>
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
@@ -297,7 +295,6 @@ public interface Database
                TransactionNotInProgressException, PersistenceException;
 
     /**
-     * <b>Experimental</b>
      * <p>
      * Load an object of the specified type and given identity into 
      * a given instance of object.
