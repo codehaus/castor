@@ -344,13 +344,14 @@ public class MemberFactory {
 
             //-- print warning message if ID, IDREF, IDREFS, NMTOKEN, NTOKENS are
             //-- used as element type
-             if ( (xsType.getType() == xsType.ID_TYPE) ||
-                 (xsType.getType() == xsType.IDREFS_TYPE)||
-                 ( (xsType.getType() == xsType.COLLECTION) &&
-                   ( ( (XSList) xsType).getContentType().getType() == xsType.IDREF_TYPE) ) ||
-                 (xsType.getType() == xsType.NMTOKEN_TYPE)  )
+            short type =  xsType.getType();
+            if (type == XSType.COLLECTION)
+               type = ((XSList)xsType).getContentType().getType();
+             if ( (type == XSType.ID_TYPE)    ||
+                  (type == XSType.IDREF_TYPE) ||
+                  (type == XSType.NMTOKEN_TYPE) )
                     System.out.println("Warning : For XML Compatibility " +
-                                        xsType.getName()+" should be used only on attributes\n");
+                                        xsType.getName()+" should be used only as attributes\n");
 
         }
         //-- ComplexType
@@ -425,7 +426,7 @@ public class MemberFactory {
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName(false));
         fieldInfo.setContainer(isContainer);
-        
+
         //-- handle namespace URI / prefix
         Schema schema = eDecl.getSchema();
         if (schema != null) {
@@ -434,7 +435,7 @@ public class MemberFactory {
                 fieldInfo.setNamespaceURI(nsURI);
             }
         }
-        
+
         //handle fixed or default values
         String value = (eDecl.getDefaultValue() != null)?eDecl.getDefaultValue():eDecl.getFixedValue();
 
@@ -470,6 +471,7 @@ public class MemberFactory {
                 tmp += "\");";
                 value = tmp;
             }
+
             else if (!xsType.getJType().isPrimitive()) {
                  //XXX This works only if a constructor
                  //XXX with String as parameter exists
@@ -667,10 +669,10 @@ public class MemberFactory {
         int count = 0;
         int i = 0;
         boolean skip = false;
-        
+
         while (i < chars.length) {
             char ch = chars[i++];
-            
+
             if ((ch == ' ') || (ch == '\t')) {
                 if ((!skip) && (count != 0)) {
                     newChars[count++] = ' ';
