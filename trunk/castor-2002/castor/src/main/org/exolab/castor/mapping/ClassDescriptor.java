@@ -46,6 +46,8 @@
 
 package org.exolab.castor.mapping;
 
+import org.exolab.castor.mapping.xml.ClassMapping;
+
 
 /**
  * Describes the properties of a class and its fields. Implementations

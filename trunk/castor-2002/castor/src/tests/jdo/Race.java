@@ -98,7 +98,7 @@ public class Race extends CWTestCase {
     public Race( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC18", "Race" );
+        super( "TC07", "Race" );
         _category = (JDOCategory) category;
         _leak = false;
     }
@@ -302,7 +302,7 @@ public class Race extends CWTestCase {
                         little:
                         while ( !isOk ) {
                             try {
-                                if ( (i % 4) == 0 || (i % 4) == 1 ) {
+                                if ( (i % 4) == 0  ) {
                                     db.begin();
                                     OQLQuery oql = db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
                                     oql.bind( i );
@@ -317,7 +317,7 @@ public class Race extends CWTestCase {
                                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
                                         throw new NoSuchElementException("No element found (a).");
                                     }
-                                } else if ( (i % 4) == 10  ) {
+                                } else if ( (i % 4) == 1  ) {
                                     db.begin();
                                     OQLQuery oql = db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
                                     oql.bind( i );

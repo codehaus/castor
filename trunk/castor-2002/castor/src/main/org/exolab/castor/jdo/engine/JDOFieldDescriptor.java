@@ -97,20 +97,21 @@ public class JDOFieldDescriptor
      * @param fieldDesc The field descriptor
      * @throws MappingException Invalid mapping information
      */
-    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, Class sqlType,
+    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, /*Class sqlType*/int sqlType,
                                boolean dirtyCheck, String manyTable, String manyKey )
         throws MappingException
     {
         super( fieldDesc );
         if ( fieldDesc.isTransient() || fieldDesc.getHandler() == null )
             throw new IllegalArgumentException( "Argument 'fieldDesc' is a transient field or has no handler" );
-        if ( sqlName == null )
-            throw new IllegalArgumentException( "Argument 'sqlName' is null" );
+        //if ( sqlName == null )
+        //    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = sqlName;
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;
         _manyKey = manyKey;
-        _sqlType = SQLTypes.getSQLType( sqlType );
+        _sqlType = sqlType;
+        //SQLTypes.getSQLType( sqlType );
     }
 
 

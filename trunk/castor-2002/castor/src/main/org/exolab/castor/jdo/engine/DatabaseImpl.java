@@ -55,8 +55,8 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
-import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
@@ -67,13 +67,18 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.ClassHandler;
+import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
-import org.exolab.castor.persist.ClassNotPersistenceCapableExceptionImpl;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.PersistenceInfo;
+import org.exolab.castor.persist.PersistenceInfoGroup;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+
 
 
 /**
@@ -91,8 +96,8 @@ public class DatabaseImpl
     /**
      * The database engine used to access the underlying SQL database.
      */
-    protected PersistenceEngine   _dbEngine;
-
+    //protected LockEngine   _dbEngine;
+    protected PersistenceInfoGroup  _scope;
 
     /**
      * The transaction context is this database was accessed with an
@@ -134,18 +139,15 @@ public class DatabaseImpl
     private ClassLoader _classLoader;
 
 
-    /** 
-     * In EJB environment the databased should be actually closed only after 
-     * _transaction.commit(), because jdoStore which is called on that phase
-     * need to operate with the Database instance.
+    /**
+     * All the thread which has called begin, but not yet commit.
      */
-    private boolean _dbMarkedClosed;
+    private static ThreadTracer _threadTracer = new ThreadTracer( 5000 );
 
 
     public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
                          Transaction transaction, ClassLoader classLoader )
-        throws DatabaseNotFoundException
-    {
+            throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
@@ -155,7 +157,8 @@ public class DatabaseImpl
         dbs = DatabaseRegistry.getDatabaseRegistry( dbName, classLoader );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
-        _dbEngine = DatabaseRegistry.getPersistenceEngine( dbs );
+        LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
+        _scope = new PersistenceInfoGroup( pe );
         _logInterceptor = logInterceptor;
         _dbName = dbName;
         _lockTimeout = lockTimeout;
@@ -168,10 +171,12 @@ public class DatabaseImpl
         _classLoader = classLoader;
     }
 
-
-    PersistenceEngine getPersistenceEngine()
+    LockEngine getLockEngine()
     {
-        return _dbEngine;
+        return _scope.getLockEngine();
+    }
+    public PersistenceInfoGroup getScope() {
+        return _scope;
     }
 
 
@@ -194,51 +199,59 @@ public class DatabaseImpl
                         _ctx.rollback();
                     } catch ( Exception except ) {
                     }
-                    throw new PersistenceExceptionImpl( "jdo.dbClosedTxRolledback" );
+                    try {
+                        _ctx.close();
+                    } catch ( Exception except ) {
+                    }
+                     throw new PersistenceException( "jdo.dbClosedTxRolledback" );
                 }
-            } else {
-                _ctx.close();
             }
         } finally {
-            // In EJB environment Database.close() should be called before
-            // the end of transaction, but may be used in jdoStore/jdoRemove
-            // which may be called on commit.
-            // Therefore, we have to close the Database in afterCompletion
-            if ( _transaction == null ) 
-                _dbEngine = null;
-            else 
-                _dbMarkedClosed = true;
+            _scope = null;
         }
     }
 
 
     public boolean isClosed()
     {
-        return ( _dbEngine == null );
+        return ( _scope == null );
     }
 
+    public Object load( Class type, Object identity ) 
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
+    
+        Object[] identities = { identity };
+        return load( type, identities );
+    }
 
-    public Object load( Class type, Object identity )
-        throws TransactionNotInProgressException, ObjectNotFoundException,
-               LockNotGrantedException, PersistenceException
-    {
+    public Object load( Class type, Object[] identities )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( type );
-        if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
-        return tx.load( _dbEngine, handler, handler.convertIdentity( identity ), null );
+        info = _scope.getPersistenceInfo( type );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", type.getName() ) );
+
+        return tx.load( info.engine, info.molder, identities, null );
     }
 
-
     public Object load( Class type, Object identity, short accessMode )
-        throws TransactionNotInProgressException, ObjectNotFoundException,
-               LockNotGrantedException, PersistenceException
-    {
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
+
+        Object[] identities = { identity };
+        return load( type, identities, accessMode );
+    }
+
+    public Object load( Class type, Object[] identities, short accessMode )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
         AccessMode         mode;
 
         switch ( accessMode ) {
@@ -257,41 +270,42 @@ public class DatabaseImpl
         default:
             throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
         }
-        tx = getTransaction();
-        handler = _dbEngine.getClassHandler( type );
-        if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
-        return tx.load( _dbEngine, handler, handler.convertIdentity( identity ), mode );
-    }
 
+        tx = getTransaction();
+        info = _scope.getPersistenceInfo( type );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
+        
+        return tx.load( info.engine, info.molder, identities, mode );
+    }
 
     public void create( Object object )
-        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
-               TransactionNotInProgressException, PersistenceException
-    {
+            throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+            TransactionNotInProgressException, PersistenceException {
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( object.getClass() );
-        if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
-        tx.create( _dbEngine, object, handler.getIdentity( object ) );
+        info = _scope.getPersistenceInfo( object.getClass() );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
+
+        tx.create( info.engine, info.molder, object, null );
     }
 
-
     public void update( Object object )
-        throws ClassNotPersistenceCapableException,
+        throws ClassNotPersistenceCapableException, ObjectModifiedException,
                TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( object.getClass() );
-        if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
-        tx.update( _dbEngine, object, handler.getIdentity( object ) );
+        info = _scope.getPersistenceInfo( object.getClass() );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
+
+        tx.update( info.engine, info.molder, object, null );
     }
 
 
@@ -311,8 +325,13 @@ public class DatabaseImpl
                TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
+        PersistenceInfo info;
         
         tx = getTransaction();
+        info = _scope.getPersistenceInfo( object.getClass() );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
+
         tx.delete( object );
     }
 
@@ -327,7 +346,7 @@ public class DatabaseImpl
         remove( object );
     }
 
-
+    /*
     public boolean isPersistent( Object object )
     {
         TransactionContext tx;
@@ -338,16 +357,16 @@ public class DatabaseImpl
             return _ctx.isPersistent( object );
         return false;
     }
+    */
 
-
-    public Object getIdentity( Object object )
+    public Object[] getIdentities( Object object )
     {
         TransactionContext tx;
         
-        if ( _dbEngine == null )
+        if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.getIdentity( object );
+            return _ctx.getIdentities( object );
         return null;
     }
 
@@ -388,7 +407,7 @@ public class DatabaseImpl
     protected void finalize()
         throws Throwable
     {
-        if ( _dbEngine != null )
+        if ( _scope != null )
             close();
     }
 
@@ -398,7 +417,7 @@ public class DatabaseImpl
     {
         TransactionContext tx;
         
-        if ( _dbEngine == null )
+        if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
             return _ctx;
@@ -414,14 +433,17 @@ public class DatabaseImpl
 
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
+
         _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
+        _threadTracer.add( Thread.currentThread(), this );
     }
 
 
     public void commit()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
+
         if ( _transaction != null )
             throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
 
@@ -430,13 +452,18 @@ public class DatabaseImpl
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         try {
+            _threadTracer.remove( Thread.currentThread() );
             _ctx.prepare();
             _ctx.commit();
         } catch ( TransactionAbortedException except ) {
             _ctx.rollback();
             throw except;
         } finally {
-            _ctx = null;
+             try {
+                _ctx.close();
+            } catch (Exception ex) {
+            }
+           _ctx = null;
         }
     }
 
@@ -450,6 +477,7 @@ public class DatabaseImpl
         // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        _threadTracer.remove( Thread.currentThread() );
         _ctx.rollback();
         _ctx = null;
     }
@@ -486,14 +514,12 @@ public class DatabaseImpl
 
     public void afterCompletion( int status )
     {
-        if ( _transaction == null || _ctx == null )
+        if ( _transaction == null || _ctx == null || ! _ctx.isOpen() )
             throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
             return;
         if ( _ctx.getStatus() != Status.STATUS_PREPARED )
             throw new IllegalStateException( "Unexpected state: afterCompletion called at status " + _ctx.getStatus() );
-        if ( _dbMarkedClosed )
-            _dbEngine = null;
         switch ( status ) {
         case Status.STATUS_COMMITTED:
             try {
@@ -537,19 +563,51 @@ public class DatabaseImpl
         return _dbName;
     }
 
-    /**
-     * Get the underlying JDBC Connection.
-     * Only for internal / advanced use !
-     * Never try to close it (is done by castor).
-     */
-    public Object /* java.sql.Connection */ getConnection()
-    throws org.exolab.castor.jdo.PersistenceException
-    { return _ctx.getConnection( _dbEngine ); }
 
+    private static class ThreadTracer extends Thread {
+        private HashMap _threads = new HashMap();
+        private long _interval;
+        private ThreadTracer( long interval ) {
+            super("Dead Transaction Tracer");
+            _interval = interval;
+            setDaemon( true );
+            start();
+        }
+        private synchronized void add( Thread thread, Database database ) {
+            _threads.put( thread, database );
+        }
+        private synchronized void remove( Thread thread ) {
+            _threads.remove( thread );
+        }
+        public void run() {
+            while ( true ) {
+                try {
+                    sleep(_interval);
 
+                    //synchronized ( this ) {
+                        Iterator threads = _threads.keySet().iterator();
+                        while ( threads.hasNext() ) {
+                            Thread t = (Thread) threads.next();
+                            if ( !t.isAlive() ) {
+                                /*
+                                Database db = (Database) _threads.get( t );
+                                if ( db.isActive() ) {
+                                    try {
+                                        db.rollback();
+                                    } catch ( TransactionNotInProgressException e ) {
+                                        threads.remove();
+                                    }
+                                }
+                                threads.remove();
+                                */
+                            }
+                        }
+                    //}
+                } catch ( InterruptedException e ) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+    }
 }
-
-
-
-
-

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -30,17 +30,17 @@ public class MapTo implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _nsUri;
-
     private java.lang.String _ldapOc;
 
-    private java.lang.String _table;
+    private java.lang.String _ldapDn;
+
+    private java.lang.String _nsUri;
 
     private java.lang.String _xml;
 
     private java.lang.String _nsPrefix;
 
-    private java.lang.String _ldapDn;
+    private java.lang.String _table;
 
 
       //----------------/

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -32,17 +32,19 @@ public class Container implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
+    private java.lang.String _name;
+
+    private java.lang.String _type;
+
     private java.lang.String _setMethod;
 
     private java.lang.String _createMethod;
 
     private java.lang.String _getMethod;
 
-    private java.lang.String _type;
-
     private boolean _required = false;
 
-    private java.lang.String _name;
+    private boolean _direct = false;
 
     private java.lang.String _description;
 
@@ -90,6 +92,12 @@ public class Container implements java.io.Serializable {
     public java.lang.String getDescription() {
         return this._description;
     } //-- java.lang.String getDescription() 
+
+    /**
+    **/
+    public boolean getDirect() {
+        return this._direct;
+    } //-- boolean getDirect() 
 
     /**
      * 
@@ -222,6 +230,14 @@ public class Container implements java.io.Serializable {
     public void setDescription(java.lang.String _description) {
         this._description = _description;
     } //-- void setDescription(java.lang.String) 
+
+    /**
+     * 
+     * @param _direct
+    **/
+    public void setDirect(boolean _direct) {
+        this._direct = _direct;
+    } //-- void setDirect(boolean) 
 
     /**
      * 

@@ -54,8 +54,6 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
 
@@ -82,7 +80,7 @@ public final class QueryResults
     /**
      * The persistence engine against which this query was executed.
      */
-    private final PersistenceEngine   _engine;
+    private final LockEngine   _engine;
     
     
     /**
@@ -100,7 +98,7 @@ public final class QueryResults
     /**
      * The last identity retrieved with a call to {@link #nextIdentity}.
      */
-    private Object              _lastIdentity;
+    private Object[]              _lastIdentities;
 
 
     /*
@@ -109,13 +107,13 @@ public final class QueryResults
     private Database            _db;
 
 
-    QueryResults( TransactionContext tx, PersistenceEngine engine,
+    QueryResults( TransactionContext tx, LockEngine engine,
                   PersistenceQuery query, AccessMode accessMode, Database db )
     {
         _tx = tx;
         _engine = engine;
         _query = query;
-        _accessMode =  engine.getClassHandler( _query.getResultType() ).getAccessMode( accessMode );
+        _accessMode =  engine.getClassMolder( _query.getResultType() ).getAccessMode( accessMode );
         _db = db;
     }
 
@@ -155,19 +153,19 @@ public final class QueryResults
      * @throws TransactionNotInProgressException The transaction
      *  has been closed
      */
-    public Object nextIdentity()
+    public Object[] nextIdentities()
         throws TransactionNotInProgressException, PersistenceException
     {
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
         try {
-            _lastIdentity = _query.nextIdentity( _lastIdentity );
+            _lastIdentities = _query.nextIdentities( _lastIdentities );
         } catch ( PersistenceException except ) {
-            _lastIdentity = null;
+            _lastIdentities = null;
             throw except;
         }
-        return _lastIdentity;
+        return _lastIdentities;
     }
 
 
@@ -206,102 +204,22 @@ public final class QueryResults
     {
         TransactionContext.ObjectEntry entry;
         OID              oid;
-        ClassHandler     handler;
+        ClassMolder     handler;
         Object           object;
         
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
-        if ( _lastIdentity == null )
+        if ( _lastIdentities == null )
             throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
 
-        synchronized ( _tx ) {
-            // Get the next OID from the query engine. The object is
-            // already loaded into the persistence engine at this point and
-            // has a lock based on the original query (i.e. read write
-            // or exclusive). If no next record return null.
-            handler = _engine.getClassHandler( _query.getResultType() );
-            oid = new OID( handler, _lastIdentity );
-            
-            // Did we already load (or created) this object in this
-            // transaction.
-            entry = _tx.getObjectEntry( _engine, oid );
-            if ( entry != null ) {
-                // The object has already been loaded in this transaction
-                // and is available from the persistence engine.
-                if ( entry.deleted )
-                    // Object has been deleted in this transaction, so skip
-                    // to next object.
-                    throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), _lastIdentity );
-                else {
-                    if ( ( _accessMode == AccessMode.Exclusive && ! entry.engine.hasLock( _tx, oid, true ) )
-                            || ( _accessMode == AccessMode.DbLocked && ! entry.oid.isDbLock() ) ) {
-                        // If we are in exclusive mode and object has not been
-                        // loaded in exclusive mode before, then we have a
-                        // problem. We cannot return an object that is not
-                        // synchronized with the database, but we cannot
-                        // synchronize a live object.
-                        throw new PersistenceExceptionImpl( "persist.lockConflict",
-                                                            _query.getResultType(), _lastIdentity );
-                    } else {
-                        // Either read only or exclusive mode, and we
-                        // already have an object in that mode, so we
-                        // return that object.
-                        return entry.object;
-                    }
-                }
-            } else {
+        handler = _engine.getClassMolder( _query.getResultType() );
 
-                // First time we see the object in this transaction,
-                // must create a new record for this object. We only
-                // record the object in the transaction if in read-write
-                // or exclusive mode.
-                oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-                handler = _engine.getClassHandler( oid.getJavaClass() );
-                if ( handler == null )
-                    throw new ClassNotPersistenceCapableExceptionImpl( oid.getJavaClass() );
-                object = handler.newInstance();
-                entry = _tx.addObjectEntry( object, oid, _engine );
-                try {
-                    _engine.copyObject( _tx, oid, object, _accessMode );
-                    if ( handler.getCallback() != null ) {
-                        Class reloadClass;
+        // load the object thur the transaction of the query
+        object = _tx.load( _engine, handler, _lastIdentities, _accessMode );
 
-                        handler.getCallback().using( object, _db );
-                        reloadClass = handler.getCallback().loaded( object, _tx.toDatabaseAccessMode( _accessMode ) );
-                        if ( reloadClass != null && object.getClass() != reloadClass ) {
-                            _tx.release( object );
-                            _engine.forgetObject( _tx, oid );
-                            handler = _engine.getClassHandler( reloadClass );
-                            if ( handler == null )
-                                throw new ClassNotPersistenceCapableExceptionImpl( reloadClass );
-                            object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
-                        }
-                    }
-                    // [oleg] complicated scenarios of object reloading may
-                    // replace the instance of dependent object.
-                    // Looks bad, but works. Need to do this better in castorone...
-                    if ( _accessMode == AccessMode.ReadOnly )
-                        entry = _tx.getReadOnlyObjectEntry( oid );
-                    if ( entry == null )
-                        entry = _tx.getObjectEntry( _engine, oid );
-                    if ( entry != null )
-                        object = entry.object;
-                } catch ( Exception except ) {
-                    _tx.release( object );
-                    _engine.forgetObject( _tx, oid );
-                    if ( except instanceof PersistenceException )
-                        throw (PersistenceException) except;
-                    throw new PersistenceExceptionImpl( except );
-                }         
-           
-                if ( _accessMode == AccessMode.ReadOnly ) {
-                    _tx.removeObjectEntryWithDependent( object );
-                    _engine.releaseLockWithDependent( _tx, oid );
-                }
-                return object;
-            }
-        }
+        return object;
+
     }
 
 

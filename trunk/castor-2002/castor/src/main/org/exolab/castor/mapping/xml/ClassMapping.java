@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -36,15 +36,17 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.String _identity;
 
+    private java.lang.String _name;
+
     private java.lang.Object _extends;
+
+    private java.lang.Object _depends;
 
     private java.lang.String _keyGenerator;
 
-    private java.lang.String _name;
-
     private java.lang.String _description;
 
-    private CacheTypeMapping _cacheType;
+    private CacheTypeMapping _cacheTypeMapping;
 
     private MapTo _mapTo;
 
@@ -85,7 +87,6 @@ public class ClassMapping implements java.io.Serializable {
     public void addFieldMapping(FieldMapping vFieldMapping) 
         throws java.lang.IndexOutOfBoundsException
     {
-	vFieldMapping.setClassMapping( this );
         _fieldMappingList.addElement(vFieldMapping);
     } //-- void addFieldMapping(FieldMapping) 
 
@@ -110,7 +111,7 @@ public class ClassMapping implements java.io.Serializable {
     /**
     **/
     public CacheTypeMapping getCacheTypeMapping() {
-        return this._cacheType;
+        return this._cacheTypeMapping;
     } //-- CacheTypeMapping getCacheTypeMapping() 
 
     /**
@@ -144,6 +145,12 @@ public class ClassMapping implements java.io.Serializable {
     public int getContainerCount() {
         return _containerList.size();
     } //-- int getContainerCount() 
+
+    /**
+    **/
+    public java.lang.Object getDepends() {
+        return this._depends;
+    } //-- java.lang.Object getDepends() 
 
     /**
     **/
@@ -299,11 +306,11 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _cacheType
+     * @param _cacheTypeMapping
     **/
-    public void setCacheTypeMapping(CacheTypeMapping _cacheType) {
-        this._cacheType = _cacheType;
-    } //-- void setCacheType(CacheType) 
+    public void setCacheTypeMapping(CacheTypeMapping _cacheTypeMapping) {
+        this._cacheTypeMapping = _cacheTypeMapping;
+    } //-- void setCacheTypeMapping(CacheTypeMapping) 
 
     /**
      * 
@@ -319,6 +326,14 @@ public class ClassMapping implements java.io.Serializable {
         }
         _containerList.setElementAt(vContainer, index);
     } //-- void setContainer(Container, int) 
+
+    /**
+     * 
+     * @param _depends
+    **/
+    public void setDepends(java.lang.Object _depends) {
+        this._depends = _depends;
+    } //-- void setDepends(java.lang.Object) 
 
     /**
      * 

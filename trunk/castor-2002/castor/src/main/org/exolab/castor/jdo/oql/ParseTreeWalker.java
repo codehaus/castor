@@ -49,7 +49,7 @@ package org.exolab.castor.jdo.oql;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Vector;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.SQLEngine;
@@ -68,7 +68,7 @@ import org.exolab.castor.jdo.engine.JDBCSyntax;
 public class ParseTreeWalker implements TokenTypes
 {
 
-  private PersistenceEngine _dbEngine;
+  private LockEngine _dbEngine;
   
   private ParseTreeNode _parseTree;
 
@@ -108,7 +108,7 @@ public class ParseTreeWalker implements TokenTypes
    * @param parseTree The parse tree to walk
    * @throws QueryException Thrown by checkErrors.
    */
-  public ParseTreeWalker(PersistenceEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader ) 
+  public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader )
       throws QueryException 
   {
     _dbEngine = dbEngine;
@@ -342,7 +342,7 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
-   * Checks a projection (one of the items selected).  Determines the 
+   * Checks a projection (one of the items selected).  Determines the
    * _projectionType.
    *
    * @param projection The ParseTreeNode containing the projection.
@@ -355,11 +355,11 @@ public class ParseTreeWalker implements TokenTypes
    * @return a JDOFieldDescriptor representation of the field, if it represents a field.
    */
   private JDOFieldDescriptor checkProjection( ParseTreeNode projection,
-                                boolean topLevel, 
+                                boolean topLevel,
                                 boolean onlySimple )
           throws QueryException {
     JDOFieldDescriptor field = null;
-    
+
     if ( projection.getChildCount() == 0 ) {
       if ( topLevel ) {
         _projectionType = PARENT_OBJECT;
@@ -379,19 +379,19 @@ public class ParseTreeWalker implements TokenTypes
         case IDENTIFIER:
           //a SQL function call -- check the arguments
           _projectionType = FUNCTION;
-          for (Enumeration e = projection.getChild(0).children(); 
-               e.hasMoreElements(); ) 
+          for (Enumeration e = projection.getChild(0).children();
+               e.hasMoreElements(); )
             checkProjection( (ParseTreeNode) e.nextElement(), false, true );
           break;
-          
+
         case DOT:
-          //a path expression -- check if it is valid, and create a paramInfo 
+          //a path expression -- check if it is valid, and create a paramInfo
           Enumeration e = projection.children();
           ParseTreeNode curNode = null;
           String curName = null;
           StringBuffer projectionName = new StringBuffer();
           Vector projectionInfo = new Vector();
-          
+
           //check that the first word before the dot is our class
           if ( e.hasMoreElements() ) {
             curNode = (ParseTreeNode) e.nextElement();
@@ -407,7 +407,7 @@ public class ParseTreeWalker implements TokenTypes
             projectionName.append(curName);
             projectionInfo.addElement(curName);
           }
-              
+
           //use the ClassDescriptor to check that the rest of the path is valid.
           JDOClassDescriptor curClassDesc = _clsDesc;
           JDOFieldDescriptor curField = null;
@@ -433,7 +433,7 @@ public class ParseTreeWalker implements TokenTypes
             projectionInfo.addElement(curName);
             curClassDesc = (JDOClassDescriptor) curField.getClassDescriptor();
             if ( curClassDesc == null && e.hasMoreElements() )
-              throw new QueryException( "An non-reference field was requested: " + curName );
+                throw new QueryException( "An non-reference field was requested: " + curName );
             count++;
           }
           field = curField;
@@ -442,10 +442,10 @@ public class ParseTreeWalker implements TokenTypes
           _fieldInfo.put( projection, curField );
 
           Class theClass = curField.getFieldType();
-          // is it actually a Java primitive, or String, 
+          // is it actually a Java primitive, or String,
           // or a subclass of Number
           boolean isSimple = Types.isSimpleType(theClass);
-          
+
           if ( topLevel ) {
             _projectionName = projectionName.toString();
             if ( isSimple )
@@ -460,7 +460,7 @@ public class ParseTreeWalker implements TokenTypes
             if ( ! isSimple && onlySimple )
               throw new QueryException( "Only primitive values are allowed to be passed as parameters to Aggregate and SQL functions." );
           break;
-          
+
         case KEYWORD_COUNT:
           //count a special case
           _projectionType = AGGREGATE;
@@ -471,7 +471,7 @@ public class ParseTreeWalker implements TokenTypes
             //can call count on object types -- recurse over child
             checkProjection( projection.getChild(0), false, false );
           break;
-            
+
         case KEYWORD_SUM:
         case KEYWORD_MIN:
         case KEYWORD_MAX:
@@ -480,7 +480,7 @@ public class ParseTreeWalker implements TokenTypes
           _projectionType = AGGREGATE;
           checkProjection( projection.getChild(0), false, true );
           break;
-          
+
         default:
           //we use function to describe sql expressions also, like
           // SELECT s.age - 5 FROM Student s
@@ -494,7 +494,7 @@ public class ParseTreeWalker implements TokenTypes
 
   /**
    * Traverses the where clause sub-tree and checks for errors.  Creates a
-   * Hashtables with FieldInfo for fields of selected objects which are 
+   * Hashtables with FieldInfo for fields of selected objects which are
    * mentioned in the where clause (i.e. nodes with tokenType of IDENTIFIER
    * or (DOT, IDENTIFIER, IDENTIFIER)).  Als creates a Hashtable of paramInfo
    * with type information for query parameters (i.e. $(Class)1 or $1).
@@ -507,7 +507,7 @@ public class ParseTreeWalker implements TokenTypes
     int tokenType = whereClause.getToken().getTokenType();
     switch (tokenType) {
       case DOT:
-    checkProjection( whereClause, false, false );
+        checkProjection( whereClause, false, false );
         break;
       case IDENTIFIER:
         checkField(whereClause);
@@ -526,7 +526,7 @@ public class ParseTreeWalker implements TokenTypes
     }
   }
 
-
+  
   /**
    * Traverses the limit clause sub-tree and checks for errors. Creates
    * a Hashtable of paramInfo with type information for query parameters
@@ -585,9 +585,9 @@ public class ParseTreeWalker implements TokenTypes
    * Checks a numbered parameter from an OQL Parse Tree.  Creates a {@link ParamInfo}
    * object which stores the user or system defined class for this parameter.
    * If there's a user defined type for this parameter it is compared to see if
-   * it is castable from the system defined class.  If not, an exception is 
-   * thrown.  If a user defined type is specified for a numbered parameter which 
-   * has already been examined, and the user defined types don't match an 
+   * it is castable from the system defined class.  If not, an exception is
+   * thrown.  If a user defined type is specified for a numbered parameter which
+   * has already been examined, and the user defined types don't match an
    * exception is thrown.
    *
    * @param paramTree the Tree node containing DOLLAR, with children user 
@@ -700,25 +700,25 @@ public class ParseTreeWalker implements TokenTypes
     for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
 
-      int tokenType = curChild.getToken().getTokenType();
-      switch (tokenType) {
-      case KEYWORD_ASC:
-      case KEYWORD_DESC:
-          // iterate on child
-          curChild = curChild.getChild(0);
-          tokenType = curChild.getToken().getTokenType();
-      }
-      switch (tokenType) {
-      case DOT:
-          checkProjection( curChild, false, false );
-          break;
-      case IDENTIFIER:
-          checkField(curChild);
-          break;
-      default:
-          throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
-      }
-    }
+	  int tokenType = curChild.getToken().getTokenType();
+	  switch (tokenType) {
+	  case KEYWORD_ASC:
+	  case KEYWORD_DESC:
+		  // iterate on child
+		  curChild = curChild.getChild(0);
+		  tokenType = curChild.getToken().getTokenType();
+	  }
+	  switch (tokenType) {
+	  case DOT:
+		  checkProjection( curChild, false, false );
+		  break;
+	  case IDENTIFIER:
+		  checkField(curChild);
+		  break;
+	  default:
+		  throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
+	  }
+	}
   }
 
   /**
@@ -792,7 +792,7 @@ public class ParseTreeWalker implements TokenTypes
    *
    */
   private void addJoinsForPathExpression( Vector path ) {
-      if ( path == null )
+    if ( path == null )
       throw new IllegalStateException( "path = null !" );
 
     JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
@@ -902,13 +902,7 @@ public class ParseTreeWalker implements TokenTypes
    * @return The SQL translation of the expr.
    */
   private String getSQLExpr(ParseTreeNode exprTree) {
-      /* For debugging uncomment this:
-      String ret = _getSQLExpr(exprTree);
-      System.out.println( exprTree.toStringEx()+" => "+ret );
-      return ret;
-  }
-  private String _getSQLExpr(ParseTreeNode exprTree) {
-      */
+ 
     StringBuffer sb = null;
     int tokenType =  exprTree.getToken().getTokenType();
 
@@ -1104,7 +1098,7 @@ public class ParseTreeWalker implements TokenTypes
 
     
   }
-  
+
 
   private String getSQLExprForLimit(ParseTreeNode limitClause) {
 
@@ -1112,7 +1106,7 @@ public class ParseTreeWalker implements TokenTypes
     for (Enumeration e = limitClause.children(); e.hasMoreElements(); ) {
         ParseTreeNode exprTree = (ParseTreeNode) e.nextElement();
       int tokenType =  exprTree.getToken().getTokenType();
-          switch( tokenType ) {
+      switch( tokenType ) {
       //parameters
         case DOLLAR:
         //return a question mark with the parameter number.  The calling function
@@ -1128,10 +1122,9 @@ public class ParseTreeWalker implements TokenTypes
         case DOUBLE_LITERAL:
         case CHAR_LITERAL:
           return exprTree.getToken().getTokenValue();
-
-        }
       }
-      return sb.toString();
+    }
+    return sb.toString();
   }
 
 

@@ -100,7 +100,7 @@ public class Deadlock
     public Deadlock( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC02", "Deadlock detection" );
+        super( "TC06", "Deadlock detection" );
         _category = (JDOCategory) category;
     }
 

@@ -57,10 +57,10 @@ import javax.transaction.xa.XAResource;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TransactionAbortedExceptionImpl;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -109,35 +109,31 @@ final class TransactionContextImpl
     {
         Enumeration enum;
         Connection  conn;
-        
+
         if ( _globalTx ) {
-            return;
-        }
-        try {
-            // Go through all the connections opened in this transaction,
-            // commit and close them one by one.
-            enum = _conns.elements();
-            while ( enum.hasMoreElements() ) {
-                conn = (Connection) enum.nextElement();
-                // Checkpoint can only be done if transaction is not running
-                // under transaction monitor
-                conn.commit();
-            }
-        } catch ( SQLException except ) {
-            // [oleg] Check for rollback exception based on X/Open error code
-            if ( except.getSQLState() != null &&
-                 except.getSQLState().startsWith( "40" ) )
-                throw new TransactionAbortedExceptionImpl( except );
-            
-            throw new TransactionAbortedExceptionImpl( except );
-        } finally {
-            enum = _conns.elements();
-            while ( enum.hasMoreElements() ) {
-                try {
-                    ( (Connection) enum.nextElement() ).close();
-                } catch ( SQLException except ) { }
-            }
             _conns.clear();
+        } else {
+            try {
+                // Go through all the connections opened in this transaction,
+                // commit and close them one by one.
+                enum = _conns.elements();
+                while ( enum.hasMoreElements() ) {
+                    conn = (Connection) enum.nextElement();
+                    // Checkpoint can only be done if transaction is not running
+                    // under transaction monitor
+                    conn.commit();
+                }
+            } catch ( SQLException except ) {
+                throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
+            } finally {
+                enum = _conns.elements();
+                while ( enum.hasMoreElements() ) {
+                    try {
+                        ( (Connection) enum.nextElement() ).close();
+                    } catch ( SQLException except ) { }
+                }
+                _conns.clear();
+            }
         }
     }
 
@@ -147,7 +143,7 @@ final class TransactionContextImpl
     {
         Enumeration enum;
         Connection  conn;
-        Exception   error = null; 
+        Exception   error = null;
 
         if ( ! _globalTx ) {
             return;
@@ -166,7 +162,7 @@ final class TransactionContextImpl
         }
         _conns.clear();
         if ( error != null ) {
-            throw new TransactionAbortedExceptionImpl( error );
+            throw new TransactionAbortedException( Messages.format("persist.nested", error ), error );
         }
     }
 
@@ -192,11 +188,9 @@ final class TransactionContextImpl
     }
 
 
-    public Object getConnection( PersistenceEngine engine )
-        throws PersistenceException
-    {
+    public Object getConnection( LockEngine engine ) throws PersistenceException {
         Connection conn;
-        
+
         conn = (Connection) _conns.get( engine );
         if ( conn == null ) {
             try {
@@ -210,7 +204,7 @@ final class TransactionContextImpl
                     conn.setAutoCommit( false );
                 _conns.put( engine, conn );
             } catch ( SQLException except ) {
-                throw new PersistenceExceptionImpl( except );
+                throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
         return conn;

@@ -50,7 +50,6 @@ package org.exolab.castor.mapping.loader;
 import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.io.Serializable;
@@ -137,19 +136,19 @@ public class Types
         // TODO: the closest possible match
         for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
             if ( _typeConvertors[ i ].fromType.equals( fromType ) &&
-                 toType.equals( _typeConvertors[ i ].toType ) )
+                 toType.equals( _typeConvertors[ i ].toType ) ) 
                 return _typeConvertors[ i ].convertor;
         }
 
         // else seek for any match
         for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
             if ( _typeConvertors[ i ].fromType.isAssignableFrom( fromType ) &&
-                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) )
+                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) ) 
                 return _typeConvertors[ i ].convertor;
         }
         throw new MappingException( "mapping.noConvertor", fromType.getName(), toType.getName() );
     }
-
+    
 
     /**
      * Maps from a primitive Java type to a Java class. Returns the same class
@@ -172,12 +171,6 @@ public class Types
      */
     public static Class typeFromPrimitive( Class type )
     {
-        /// Fix for arrays
-        if ((type != null) && (type.isArray())
-                           && !type.getComponentType().isPrimitive()) {
-            return typeFromPrimitive( type.getComponentType() );
-        }
-        /// end fix
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( _typeInfos[ i ].primitive == type )
                 return _typeInfos[ i ].javaType;
@@ -312,16 +305,16 @@ public class Types
      * @return The full pattern
      */
     public static String getFullDatePattern( String pattern )
-    {
+    {        
         StringBuffer sb;
-        int len;
+        int len; 
 
         if ( pattern == null || pattern.length() == 0 )
             return "yyyyMMdd";
-
+        
         sb = new StringBuffer();
         len = pattern.length();
-
+        
         for ( int i = 0; i < len; i++ ) {
             switch ( pattern.charAt( i ) ) {
             case 'y': case 'Y': sb.append( "yyyy" ); break;
@@ -333,7 +326,7 @@ public class Types
             case 'S':           sb.append( "SSS" ); break;
             }
         }
-
+        
         return sb.toString();
     }
 
@@ -348,7 +341,7 @@ public class Types
          * The short type name (e.g. <tt>integer</tt>).
          */
         final String  shortName;
-
+        
         /**
          * The primitive Java type, if exists (e.g. <tt>Integer.TYPE</tt>).
          */
@@ -356,19 +349,19 @@ public class Types
 
         /**
          * The Java type (e.g. <tt>java.lang.Integer</tt>).
-         */
+         */        
         final Class   javaType;
-
+        
         /**
          * True if the type is immutable.
          */
         final boolean immutable;
-
+        
         /**
          * The default value for the type, if known.
          */
         final Object  defValue;
-
+        
         TypeInfo( String shortName, Class primitive, Class javaType,
                   boolean immutable, Object defValue )
         {
@@ -378,10 +371,10 @@ public class Types
             this.immutable  = immutable;
             this.defValue   = defValue;
         }
-
+        
     }
 
-
+    
     /**
      * List of all the simple types supported by Castor.
      */
@@ -420,28 +413,6 @@ public class Types
                       String[].class,             false,    null ),
         new TypeInfo( "locale",      null,
                       java.util.Locale.class,     true,     null ),
-
-
-        /* Mapping for the java array of primitive type so they use the same
-         * naming encoding as array of object.
-         */
-        new TypeInfo( "[Lbyte;",      null,
-                      byte[].class,    false,     null ),
-        new TypeInfo( "[Lchar;",      null,
-                      char[].class,    false,     null ),
-        new TypeInfo( "[Ldouble;",    null,
-                      double[].class,  false,     null ),
-        new TypeInfo( "[Lfloat;",     null,
-                      float[].class,   false,     null ),
-        new TypeInfo( "[Lint;",       null,
-                      int[].class,     false,     null ),
-        new TypeInfo( "[Llong;",      null,
-                      long[].class,    false,     null ),
-        new TypeInfo( "[Lshort;",     null,
-                      int[].class,     false,     null ),
-        new TypeInfo( "[Lboolean;",   null,
-                      int[].class,     false,     null ),
-
         /*
           new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
           new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
@@ -449,19 +420,19 @@ public class Types
           new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
         */
     };
-
-
+    
+    
     /**
      * Information used to locate a type convertor.
      */
     static class TypeConvertorInfo
     {
-
+       
         /**
          *  The type being converted to.
          */
         final Class toType;
-
+        
         /**
          * The type being converted from.
          */
@@ -469,16 +440,16 @@ public class Types
 
         /**
          * The convertor.
-         */
+         */        
         final TypeConvertor convertor;
-
+        
         TypeConvertorInfo( Class fromType, Class toType, TypeConvertor convertor )
         {
             this.fromType  = fromType;
             this.toType    = toType;
             this.convertor = convertor;
         }
-
+        
     }
 
 
@@ -486,22 +457,15 @@ public class Types
      * Date format used by the date convertor.
      */
     private static DateFormat _dateFormat = new SimpleDateFormat();
-
-
+    
+    
     /**
-     * Date format used by the date convertor when nonempy parameter
+     * Date format used by the date convertor when nonempy parameter 
      * is specified.
      */
     private static SimpleDateFormat _paramDateFormat = new SimpleDateFormat();
-
-    /**
-     * Date format used by the double->date convertor.
-     */
-    private static DecimalFormat _decimalFormat = new DecimalFormat("#################0");
-
-
-
-
+    
+    
     /**
      * List of all the default convertors between Java types.
      */
@@ -526,7 +490,7 @@ public class Types
                     case 1: char ch = ( (String) obj ).charAt( 0 );
                         if (param == null || param.length() != 2 )
                             return ( ch == 'T' || ch == 't'  ) ? Boolean.TRUE : Boolean.FALSE;
-                        else
+                        else 
                             return ( ch == param.charAt( 1 ) ) ? Boolean.TRUE : Boolean.FALSE;
                     case 4: return ( (String) obj ).equalsIgnoreCase( "true" ) ? Boolean.TRUE : Boolean.FALSE;
                     case 5: return ( (String) obj ).equalsIgnoreCase( "false" ) ? Boolean.TRUE : Boolean.FALSE;
@@ -534,12 +498,6 @@ public class Types
                 return Boolean.FALSE;
             }
             public String toString() { return "String->Boolean"; }
-        } ),
-        new TypeConvertorInfo( java.math.BigDecimal.class, java.lang.Boolean.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                return new Boolean( ( (java.math.BigDecimal) obj).intValue() != 0 );
-            }
-            public String toString() { return "BigDecimal->Boolean"; }
         } ),
         // Convertors to integer
         new TypeConvertorInfo( java.lang.Byte.class, java.lang.Integer.class, new TypeConvertor() {
@@ -691,13 +649,6 @@ public class Types
             }
             public String toString() { return "BigDecimal->Double"; }
         } ),
-        new TypeConvertorInfo( java.util.Date.class, java.lang.Double.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
-                return new Double( _paramDateFormat.format( (Date) obj ) );
-            }
-            public String toString() { return "Date->Double"; }
-        } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Double.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 return Double.valueOf( (String) obj );
@@ -738,15 +689,13 @@ public class Types
         // Convertors to big decimal
         new TypeConvertorInfo( java.lang.Double.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                // Don't remove "toString" below! Otherwise the result is incorrect.
-                return new BigDecimal( ( (Double) obj ).toString() );
+                return new BigDecimal( ( (Double) obj ).doubleValue() );
             }
             public String toString() { return "Double->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                // Don't remove "toString" below! Otherwise the result is incorrect.
-                return new BigDecimal( ( (Float) obj ).toString() );
+                return new BigDecimal( ( (Float) obj ).floatValue() );
             }
             public String toString() { return "Float->BigDecimal"; }
         } ),
@@ -774,12 +723,6 @@ public class Types
                 return new BigDecimal( _paramDateFormat.format( (Date) obj ) + ".0" );
             }
             public String toString() { return "Date->BigDecimal"; }
-        } ),
-        new TypeConvertorInfo( java.lang.Boolean.class, java.math.BigDecimal.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                return BigDecimal.valueOf( ( (Boolean) obj).booleanValue() ? 1 : 0 );
-            }
-            public String toString() { return "Boolean->BigDecimal"; }
         } ),
         // Convertors to string
         new TypeConvertorInfo( java.lang.Short.class, java.lang.String.class, new TypeConvertor() {
@@ -855,7 +798,7 @@ public class Types
             public Object convert( Object obj, String param ) {
                 if ( param == null || param.length() != 2 )
                     return ( (Boolean) obj ).booleanValue() ? "T" : "F";
-                else
+                else 
                     return ( (Boolean) obj ).booleanValue() ? param.substring( 1, 2 ) : param.substring( 0, 1 );
             }
             public String toString() { return "Boolean->String"; }
@@ -921,17 +864,6 @@ public class Types
             }
             public String toString() { return "BigDecimal->Date"; }
         } ),
-        new TypeConvertorInfo( java.lang.Double.class, java.util.Date.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                try {
-                    _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
-                    return _paramDateFormat.parse( _decimalFormat.format(obj).trim() );
-                } catch ( ParseException except ) {
-                    throw new IllegalArgumentException( except.toString() );
-                }
-            }
-            public String toString() { return "Double->Date"; }
-        } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 return new java.sql.Date( ( (java.util.Date) obj ).getTime() );
@@ -962,54 +894,12 @@ public class Types
             }
             public String toString() { return "util.Date->sql.Timestamp"; }
         } ),
-
         new TypeConvertorInfo( java.sql.Timestamp.class, java.util.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 return obj;
             }
             public String toString() { return "sql.Timestamp->util.Date"; }
-        } ),
-
-        new TypeConvertorInfo( java.util.Date.class, org.exolab.castor.types.Date.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                return new org.exolab.castor.types.Date((java.util.Date) obj);
-            }
-            public String toString() { return "util.Date->castor.types.Date"; }
-        } ),
-
-        new TypeConvertorInfo( org.exolab.castor.types.Date.class, java.util.Date.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                Object result = null;
-                try {
-                    result = ((org.exolab.castor.types.Date)obj).toDate();
-                } catch (java.text.ParseException e) {
-                    //we can never reach that point
-                }
-                return result;
-            }
-            public String toString() { return "castor.types.Date->util.Date"; }
-        } ),
-
-        new TypeConvertorInfo( java.sql.Date.class, org.exolab.castor.types.Date.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                return new org.exolab.castor.types.Date((java.util.Date) obj);
-            }
-            public String toString() { return "sql.Date->castor.types.Date"; }
-        } ),
-
-        new TypeConvertorInfo( org.exolab.castor.types.Date.class, java.sql.Date.class, new TypeConvertor() {
-            public Object convert( Object obj, String param ) {
-                Object result = null;
-                try {
-                    result = new java.sql.Date( ((org.exolab.castor.types.Date)obj).toDate().getTime() );
-                } catch (java.text.ParseException e) {
-                    //we can never reach that point
-                }
-                return result;
-            }
-            public String toString() { return "castor.types.Date->sql.Date"; }
         } )
-
     };
 
 

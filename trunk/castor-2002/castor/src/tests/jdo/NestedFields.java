@@ -78,7 +78,7 @@ public class NestedFields
     public NestedFields( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC11", "Nested fields" );
+        super( "TC27", "Nested fields" );
         _category = (JDOCategory) category;
     }
 
@@ -104,7 +104,7 @@ public class NestedFields
             OQLQuery         oql;
             TestNestedFields t;
             QueryResults     res;
-            
+
             // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
             db.begin();
@@ -136,6 +136,7 @@ public class NestedFields
                 }
             }
             db.commit();
+            oql.close();
 
             stream.writeVerbose( "Testing nested fields in OQLQuery..." );
             db.begin();
@@ -148,6 +149,7 @@ public class NestedFields
                 stream.writeVerbose( "Error" );
                 result = false;
             }
+            oql.close();
             db.commit();
 
             db.close();

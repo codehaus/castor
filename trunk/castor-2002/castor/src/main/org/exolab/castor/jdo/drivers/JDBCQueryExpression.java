@@ -133,11 +133,11 @@ public class JDBCQueryExpression
 
     public String encodeColumn( String tableName, String columnName )
     {
-    return _factory.quoteName( tableName + 
+        return _factory.quoteName( tableName + 
                    JDBCSyntax.TableColumnSeparator +
                    columnName );
     }
- 
+
 
     public void addInnerJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
@@ -148,8 +148,25 @@ public class JDBCQueryExpression
     }
 
 
+    public void addInnerJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn )
+    {
+        _tables.put( leftTable, leftTable );
+        _tables.put( rightTable, rightTable );
+        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, false ) );
+    }
+
+
     public void addOuterJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
+    {
+        _tables.put( leftTable, leftTable );
+        _tables.put( rightTable, rightTable );
+        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, true ) );
+    }
+
+    public void addOuterJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn )
     {
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
@@ -219,10 +236,14 @@ public class JDBCQueryExpression
             }
         }
         if ( _where != null ) {
-        sql.append( first ? JDBCSyntax.Where : ( JDBCSyntax.And + "( " ) );
+            if ( first ) {
+                sql.append( JDBCSyntax.Where );
+                first = false;
+            } else
+                sql.append( JDBCSyntax.And );
+            sql.append( '(' );
             sql.append( _where );
-        if ( ! first )
-        sql.append( " )" );
+            sql.append( ')' );
         }
         return first;
     }

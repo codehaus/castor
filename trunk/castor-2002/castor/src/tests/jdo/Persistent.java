@@ -77,7 +77,7 @@ public class Persistent
     public Persistent( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC16", "Persistence interface tests" );
+        super( "TC47", "Persistence interface tests" );
         _category = (JDOCategory) category;
     }
 

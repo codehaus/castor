@@ -1,10 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
- * $Id$
- *
- * Note: This file has been modified by hand
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -17,10 +15,12 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-
+import org.exolab.castor.xml.validators.*;
 
 /**
  * 
@@ -81,10 +81,6 @@ public class IncludeDescriptor implements org.exolab.castor.xml.XMLClassDescript
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -96,7 +92,10 @@ public class IncludeDescriptor implements org.exolab.castor.xml.XMLClassDescript
         //-- validation code for: _href
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
@@ -180,7 +179,7 @@ public class IncludeDescriptor implements org.exolab.castor.xml.XMLClassDescript
         return null;
         
     } //-- getFieldDescriptor
-    
+
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor[] getFields() {

@@ -1,10 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
- * $Id$
- *
- * Note: This file has been modified by hand.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -17,9 +15,12 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
+import org.exolab.castor.xml.validators.*;
 
 /**
  * 
@@ -58,7 +59,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[5];
+        attributes = new XMLFieldDescriptorImpl[6];
         //-- _access
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_access", "access", NodeType.Attribute);
         desc.setImmutable(true);
@@ -80,10 +81,6 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -93,7 +90,10 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- validation code for: _access
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _identity
@@ -117,10 +117,6 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -130,7 +126,44 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- validation code for: _identity
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _name
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
+        this.identity = desc;
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getName();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setName( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        attributes[2] = desc;
+        
+        //-- validation code for: _name
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
         desc.setValidator(fieldValidator);
         
         //-- _extends
@@ -154,18 +187,46 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
+            public Object newInstance( Object parent ) {
+                return new java.lang.Object();
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[3] = desc;
+        
+        //-- validation code for: _extends
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
+        //-- _depends
+        desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_depends", "depends", NodeType.Attribute);
+        desc.setReference(true);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
             {
-                setValue( object, null );
+                ClassMapping target = (ClassMapping) object;
+                return target.getDepends();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setDepends( (java.lang.Object) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.Object();
             }
         } );
         desc.setHandler(handler);
-        attributes[2] = desc;
+        attributes[4] = desc;
         
-        //-- validation code for: _extends
+        //-- validation code for: _depends
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
@@ -190,58 +251,19 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        attributes[3] = desc;
+        attributes[5] = desc;
         
         //-- validation code for: _keyGenerator
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
-        desc.setValidator(fieldValidator);
-        
-        //-- _name
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
-        this.identity = desc;
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                ClassMapping target = (ClassMapping) object;
-                return target.getName();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.setName( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return new java.lang.String();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        attributes[4] = desc;
-        
-        //-- validation code for: _name
-        fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
@@ -268,10 +290,6 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -282,7 +300,42 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- validation code for: _description
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _cacheTypeMapping
+        desc = new XMLFieldDescriptorImpl(CacheTypeMapping.class, "_cacheTypeMapping", "cache-type", NodeType.Element);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getCacheTypeMapping();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setCacheTypeMapping( (CacheTypeMapping) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new CacheTypeMapping();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
+        elements[1] = desc;
+        
+        //-- validation code for: _cacheTypeMapping
+        fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
         //-- _mapTo
@@ -305,56 +358,15 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return new MapTo();
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(false);
-        elements[1] = desc;
-        
-        //-- validation code for: _mapTo
-        fieldValidator = new FieldValidator();
-        desc.setValidator(fieldValidator);
-
-        //-- _cacheTypeMapping
-        desc = new XMLFieldDescriptorImpl(CacheTypeMapping.class, "_cacheTypeMapping", "cache-type", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                ClassMapping target = (ClassMapping) object;
-                return target.getCacheTypeMapping();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.setCacheTypeMapping( (CacheTypeMapping) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return new CacheTypeMapping();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
-        desc.setMultivalued(false);
         elements[2] = desc;
         
-        //-- validation code for: _cacheTypeMapping
+        //-- validation code for: _mapTo
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
@@ -373,17 +385,6 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 try {
                     ClassMapping target = (ClassMapping) object;
                     target.addFieldMapping( (FieldMapping) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.removeAllFieldMapping();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -424,17 +425,6 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             }
             public Object newInstance( Object parent ) {
                 return new Container();
-            }
-            public void resetValue( Object object) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    ClassMapping target = (ClassMapping) object;
-                    target.removeAllContainer();
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
             }
         } );
         desc.setHandler(handler);

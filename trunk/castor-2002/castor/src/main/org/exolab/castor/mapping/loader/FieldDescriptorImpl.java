@@ -122,6 +122,7 @@ public class FieldDescriptorImpl
     private ClassDescriptor      _clsDesc;
 
 
+    private RelationDescriptor _relation;
     /**
      * Constructs a new field descriptor.
      *
@@ -130,8 +131,7 @@ public class FieldDescriptorImpl
      * @param handler The field handler (may be null)
      * @param trans True if the field is transient
      */
-    public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo, 
-				FieldHandler handler, boolean trans )
+    public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo, FieldHandler handler, boolean trans, RelationDescriptor rd )
         throws MappingException
     {
         if ( fieldName == null )
@@ -143,6 +143,7 @@ public class FieldDescriptorImpl
         _required = typeInfo.isRequired();
         _transient = trans;
         _multi = ( typeInfo.getCollectionHandler() != null );
+        _relation = rd;
     }
 
 
@@ -151,7 +152,7 @@ public class FieldDescriptorImpl
      */
     protected FieldDescriptorImpl( FieldDescriptor fieldDesc )
     {
-	this._contClsDesc = fieldDesc.getContainingClassDescriptor();
+        this._contClsDesc = fieldDesc.getContainingClassDescriptor();
         this._handler = fieldDesc.getHandler();
         this._fieldName = fieldDesc.getFieldName();
         this._fieldType = fieldDesc.getFieldType();
@@ -160,17 +161,31 @@ public class FieldDescriptorImpl
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
         this._multi = fieldDesc.isMultivalued();
+        if ( fieldDesc instanceof FieldDescriptorImpl ) {
+            this._relation = ((FieldDescriptorImpl)fieldDesc).getRelation();
+        }
     }
+
 
     public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
     {
-	_contClsDesc = contClsDesc;
+        _contClsDesc = contClsDesc;
     }
+    
+    
     public ClassDescriptor getContainingClassDescriptor()
     {
-	return _contClsDesc;
+        return _contClsDesc;
     }
 
+
+    public RelationDescriptor getRelation() {
+        return _relation;
+    }
+
+    public void setRelation( RelationDescriptor rd ) {
+        _relation = rd;
+    }
 
     public String getFieldName()
     {

@@ -144,7 +144,7 @@ public interface PersistenceQuery
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object nextIdentity( Object identity )
+    public Object[] nextIdentities( Object[] identities )
         throws PersistenceException;
     
 
@@ -171,7 +171,7 @@ public interface PersistenceQuery
      * @throws PersistenceException A persistence error occured
      * @see Persistence#load
      */
-    public Object fetch( Object[] fields, Object identity )
+    public Object fetch( Object[] fields, Object[] identities )
         throws ObjectNotFoundException, PersistenceException;
 
 

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -81,6 +81,7 @@ public final class FieldHandlerImpl
     **/
     private static final String ADD_PREFIX = "add";
     
+
     /**
      * The underlying field handler used by this handler.
      */
@@ -105,12 +106,12 @@ public final class FieldHandlerImpl
     private Method[]      _setSequence;
 
 
-    /**
-     * The method used to "incrementally" set the value of this field. 
-     * This is only used if the field is a collection
-     */
-    private Method        _addMethod;
-    
+    /** 
+      * The method used to "incrementally" set the value of this field.  
+      * This is only used if the field is a collection 
+      */ 
+    private Method        _addMethod; 
+
 
     /**
      * The method used to obtain the value of this field. May be null.
@@ -291,12 +292,12 @@ public final class FieldHandlerImpl
         if ( fieldName == null )
             throw new IllegalArgumentException( "Argument 'fieldName' is null" );
         if ( getMethod == null && setMethod == null )
-            throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
+        //    throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
         _getSequence = getSequence;
         _setSequence = setSequence;
+
         if ( setMethod != null ) {
-            
             //-- might be an "add" method
             if ( setMethod.getName().startsWith(ADD_PREFIX) ) {
                 Class pType = setMethod.getParameterTypes()[0];
@@ -307,6 +308,7 @@ public final class FieldHandlerImpl
             }
             else setWriteMethod( setMethod );
         }
+        
         if ( getMethod != null )
             setReadMethod(getMethod);
         
@@ -325,6 +327,16 @@ public final class FieldHandlerImpl
         _convertParam = typeInfo.getConvertorParam();
         _colHandler = typeInfo.getCollectionHandler();
     }
+
+        public TypeConvertor getConvertFrom() {
+            return _convertFrom;
+        }
+        public TypeConvertor getConvertTo() {
+            return _convertTo;
+        }
+        public String getConvertParam() {
+            return _convertParam;
+        }
 
 
     public Object getValue( Object object )
@@ -383,25 +395,8 @@ public final class FieldHandlerImpl
             throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor",  value.getClass().getName() ) );
         }
     }
-
-
-    /** 
-     * Convert from the Java type to sql type.
-     * This is a hack for ClassHandler.convertIdentity(), 
-     * which is needed for JDO.load().
-     * To be removed in castorone.
-     */
-    public Object convertFrom( Object value ) {
-        // If there is a convertor, apply it
-        if ( _convertFrom == null || value == null )
-            return value;
-        try {
-            return _convertFrom.convert( value, _convertParam );
-        } catch ( ClassCastException except ) {
-            throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor",  value.getClass().getName() ) );
-        }
-    }
     
+
 
     public void setValue( Object object, Object value )
     {
@@ -492,29 +487,7 @@ public final class FieldHandlerImpl
                         for ( int i = 0; i < _getSequence.length; i++ ) 
                             object = _getSequence[ i ].invoke( object, null );
                     collect = _getMethod.invoke( object, null );
-
-                    // If we deal with a collection who is an array of primitive
-                    // and that has not been instantiated, we have to handle the
-                    // instantiation here rather than in J1CollectionHandler,
-                    // because we have acces to the Field object here.
-                    if (collect == null) {
-                        // The return type of the get method should be the type of the collection.
-                        Class type = _getMethod.getReturnType();
-                        
-                        // The other cases are handled in the
-                        // J1CollectionHandler during the add(collect,value) call
-                        if (type.isArray() && type.getComponentType().isPrimitive()) {
-                            try {
-                                collect = java.lang.reflect.Array.newInstance(type.getComponentType(), 0);
-                            } catch (Exception e) {
-                                throw new IllegalStateException("Unable to instantiate an array of '" + type.getComponentType() + "' : " + e);
-                            }
-                        }
-                    }
-
-
                     collect = _colHandler.add( collect, value );
-
                     if ( collect != null && _setMethod != null)
                         _setMethod.invoke( object, new Object[] { collect } );
                 }                
@@ -646,28 +619,6 @@ public final class FieldHandlerImpl
     }
 
 
-    /**
-     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
-     * Please understand how this method is used before you start
-     * playing with it! :-)
-     */
-    public void setAddMethod( Method method ) 
-        throws MappingException
-    {
-        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
-             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
-            throw new MappingException( "mapping.accessorNotAccessible",
-                                        method, method.getDeclaringClass().getName() );
-        if ( method.getParameterTypes().length != 1 )
-            throw new MappingException( "mapping.writeMethodNoParam",
-                                        method, method.getDeclaringClass().getName() );
-        _addMethod = method;
-        
-        //-- make sure add method is not the same as the set method
-        if (_addMethod == _setMethod) _setMethod = null;
-        
-    } //-- setAddMethod
-    
 
     /**
      * Mutator method used by {@link MappingLoader} and
@@ -749,7 +700,6 @@ public final class FieldHandlerImpl
     public void setWriteMethod( Method method )
         throws MappingException
     {
-        
         if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
              ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
             throw new MappingException( "mapping.accessorNotAccessible",
@@ -761,42 +711,68 @@ public final class FieldHandlerImpl
     }
 
 
+    /**
+     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
+     */
+    public void setAddMethod( Method method ) 
+        throws MappingException
+    {
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.writeMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _addMethod = method;
+        
+        //-- make sure add method is not the same as the set method
+        if (_addMethod == _setMethod) _setMethod = null;
+        
+    } //-- setAddMethod
+    
+    /** 
+      * Selects the appropriate "write" method based on the 
+      * value. This is used when there is an "add" method 
+      * and a "set" method. 
+      * 
+      * @return the selected write method 
+     **/ 
+     private Method selectWriteMethod( Object value ) { 
+          
+          
+         Method setter = null; 
+          
+         if (_setMethod != null) { 
+              
+             if (_addMethod == null) return _setMethod; 
+              
+             if (value == null) { 
+                 if (_default != null) value = _default; 
+                 else return _setMethod; 
+             } 
+              
+             //-- check value's class type 
+             Class paramType = _setMethod.getParameterTypes()[0]; 
+                                  
+             if (paramType.isAssignableFrom(value.getClass())) 
+                 return _setMethod; 
+         } 
+          
+         return _addMethod; 
+          
+     } //-- selectWriteMethod 
+  
+    
+
+
     public String toString()
     {
         return _fieldName;
     }
     
-    /**
-     * Selects the appropriate "write" method based on the
-     * value. This is used when there is an "add" method
-     * and a "set" method.
-     *
-     * @return the selected write method
-    **/
-    private Method selectWriteMethod( Object value ) {
-        
-        
-        Method setter = null;
-        
-        if (_setMethod != null) {
-            
-            if (_addMethod == null) return _setMethod;
-            
-            if (value == null) {
-                if (_default != null) value = _default;
-                else return _setMethod;
-            }
-            
-            //-- check value's class type
-            Class paramType = _setMethod.getParameterTypes()[0];
-                                
-            if (paramType.isAssignableFrom(value.getClass()))
-                return _setMethod;
-        }
-        
-        return _addMethod;
-        
-    } //-- selectWriteMethod
 
 }
 

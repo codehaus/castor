@@ -100,7 +100,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
 
     private transient Database _db;
 
-
+    
     private long           _timeStamp;
 
 
@@ -336,23 +336,23 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }
 
 
-    public void jdoCreate() 
+    public void jdoAfterCreate()
         throws Exception
     {
-        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) 
+        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); )
             _db.create( enum.nextElement() );
         _origChildren = (Vector) _children.clone();
-    }                   
-         
-    
-    public void jdoRemove() 
+    }
+
+
+    public void jdoBeforeRemove()
         throws Exception
     {
-        for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); ) 
+        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); )
             _db.remove( enum.nextElement() );
-    }                   
-         
-    
+    }
+
+
     public void jdoAfterRemove()
         throws Exception
     {

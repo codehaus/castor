@@ -47,7 +47,7 @@
 package org.exolab.castor.jdo;
 
 
-
+import org.exolab.castor.persist.PersistenceInfoGroup;
 
 /**
  * An open connection to the database. This object represents an open
@@ -192,6 +192,10 @@ public interface Database
     public Query getQuery();
 
 
+
+    public PersistenceInfoGroup getScope();
+
+
     /**
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
@@ -210,12 +214,25 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object identity )
+    public Object load( Class type, Object[] identities )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
 
+    public Object load( Class type, Object identity )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
+
+    public Object load( Class type, Object identity, short accessMode )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
+
+
     /**
+     * <b>Experimental</b>
+     * <p>
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
      * the same identity in the same transaction will return the same
@@ -234,7 +251,7 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object identity, short accessMode )
+    public Object load( Class type, Object[] identities, short accessMode )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
@@ -287,6 +304,8 @@ public interface Database
 
 
     /**
+     * <b>Experimental</b>
+     * <p>
      * Creates a new object in persistent storage. The object will be
      * persisted only if the transaction commits.
      * <p>
@@ -295,12 +314,6 @@ public interface Database
      * transaction. If the identity is null, duplicate identity check
      * occurs when the transaction completes and the object is not
      * visible to queries until the transaction commits.
-     * <p>
-     * It is recommended to use this method in "long" transaction scenario:
-     * the object was read in one of the previous "short" transaction, 
-     * modified and now is being "included"in the current "short" transaction.
-     * The object must implement interface {@link TimeStampable} in order to 
-     * perform dirty checking.
      *
      * @param object The object to create
      * @throws TransactionNotInProgressException Method called while
@@ -309,13 +322,12 @@ public interface Database
      *  persistent capable
      * @throws PersistenceException An error reported by the
      *  persistence engine
-     * @throws ObjectModifiedException Dirty checking mechanism may immediately
-     *  report that the object was modified in the database during the long 
-     *  transaction.
      */
+
     public void update( Object object )
-        throws ClassNotPersistenceCapableException, ObjectModifiedException,
+        throws ClassNotPersistenceCapableException,
                TransactionNotInProgressException, PersistenceException;
+
 
 
     /**
@@ -437,7 +449,7 @@ public interface Database
      * @param object The object
      * @return True if persistent in this transaction
      */
-    public boolean isPersistent( Object object );
+    //public boolean isPersistent( Object object );
 
 
     /**
@@ -451,7 +463,7 @@ public interface Database
      * @param object The object
      * @return The object's identity, or null
      */
-    public Object getIdentity( Object object );
+    public Object[] getIdentities( Object object );
 
 
     /**
@@ -479,13 +491,6 @@ public interface Database
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException;
 
-    /**
-     * Get the underlying JDBC Connection.
-     * Only for internal / advanced use !
-     * Never try to close it (is done by castor).
-     */
-    public Object /* java.sql.Connection */ getConnection()
-    throws org.exolab.castor.jdo.PersistenceException ;
 
 }
 

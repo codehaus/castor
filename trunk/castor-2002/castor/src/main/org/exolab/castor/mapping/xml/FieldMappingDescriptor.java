@@ -1,10 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
- * $Id$
- *
- * Note: This file has been modified by hand.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -17,9 +15,12 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
+import org.exolab.castor.xml.validators.*;
 
 /**
  * 
@@ -58,7 +59,136 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[9];
+        attributes = new XMLFieldDescriptorImpl[11];
+        //-- _name
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return target.getName();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setName( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        attributes[0] = desc;
+        
+        //-- validation code for: _name
+        fieldValidator = new FieldValidator();
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _lazy
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_lazy", "lazy", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return new Boolean(target.getLazy());
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setLazy( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[1] = desc;
+        
+        //-- validation code for: _lazy
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
+        //-- _direct
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_direct", "direct", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return new Boolean(target.getDirect());
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setDirect( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[2] = desc;
+        
+        //-- validation code for: _direct
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
+        //-- _transient
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_transient", "transient", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return new Boolean(target.getTransient());
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setTransient( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[3] = desc;
+        
+        //-- validation code for: _transient
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
         //-- _collection
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_collection", "collection", NodeType.Attribute);
         desc.setImmutable(true);
@@ -80,20 +210,19 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        attributes[0] = desc;
+        attributes[4] = desc;
         
         //-- validation code for: _collection
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _setMethod
@@ -116,54 +245,14 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
-        attributes[1] = desc;
+        attributes[5] = desc;
         
         //-- validation code for: _setMethod
-        fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
-        desc.setValidator(fieldValidator);
-        
-        //-- _createMethod
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_createMethod", "create-method", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                FieldMapping target = (FieldMapping) object;
-                return target.getCreateMethod();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    FieldMapping target = (FieldMapping) object;
-                    target.setCreateMethod( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return new java.lang.String();
-            }
-        } );
-        desc.setHandler(handler);
-        attributes[2] = desc;
-        
-        //-- validation code for: _createMethod
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
@@ -188,55 +277,79 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
-        attributes[3] = desc;
+        attributes[6] = desc;
         
         //-- validation code for: _getMethod
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
-        //-- _transient
-        desc = new XMLFieldDescriptorImpl(boolean.class, "_transient", "transient", NodeType.Attribute);
+        //-- _required
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_required", "required", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 FieldMapping target = (FieldMapping) object;
-                return new Boolean(target.getTransient());
+                return new Boolean(target.getRequired());
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     FieldMapping target = (FieldMapping) object;
-                    target.setTransient( ((Boolean)value).booleanValue());
+                    target.setRequired( ((Boolean)value).booleanValue());
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        attributes[4] = desc;
+        attributes[7] = desc;
         
-        //-- validation code for: _transient
+        //-- validation code for: _required
         fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
+        //-- _createMethod
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_createMethod", "create-method", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return target.getCreateMethod();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setCreateMethod( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[8] = desc;
+        
+        //-- validation code for: _createMethod
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- _type
@@ -259,128 +372,51 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
-        attributes[5] = desc;
+        attributes[9] = desc;
         
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
-        //-- _required
-        desc = new XMLFieldDescriptorImpl(boolean.class, "_required", "required", NodeType.Attribute);
+        //-- _manyToMany
+        desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_manyToMany", "many-to-many", NodeType.Attribute);
+        desc.setReference(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 FieldMapping target = (FieldMapping) object;
-                return new Boolean(target.getRequired());
+                return target.getManyToMany();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     FieldMapping target = (FieldMapping) object;
-                    target.setRequired( ((Boolean)value).booleanValue());
+                    target.setManyToMany( (java.lang.Object) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
-                return null;
+                return new java.lang.Object();
             }
         } );
         desc.setHandler(handler);
-        attributes[6] = desc;
+        attributes[10] = desc;
         
-        //-- validation code for: _required
+        //-- validation code for: _manyToMany
         fieldValidator = new FieldValidator();
-        desc.setValidator(fieldValidator);
-        
-        //-- _direct
-        desc = new XMLFieldDescriptorImpl(boolean.class, "_direct", "direct", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                FieldMapping target = (FieldMapping) object;
-                return new Boolean(target.getDirect());
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    FieldMapping target = (FieldMapping) object;
-                    target.setDirect( ((Boolean)value).booleanValue());
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        attributes[7] = desc;
-        
-        //-- validation code for: _direct
-        fieldValidator = new FieldValidator();
-        desc.setValidator(fieldValidator);
-
-        //-- _name
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                FieldMapping target = (FieldMapping) object;
-                return target.getName();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    FieldMapping target = (FieldMapping) object;
-                    target.setName( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return new java.lang.String();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        attributes[8] = desc;
-        
-        //-- validation code for: _name
-        fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
@@ -407,10 +443,6 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -421,7 +453,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- validation code for: _description
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _sql
@@ -444,10 +479,6 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return new Sql();
             }
@@ -461,10 +492,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         desc.setValidator(fieldValidator);
         
         //-- _xml
-        desc = new XMLFieldDescriptorImpl(Xml.class, "_xml", "bind-xml", NodeType.Element);
-        //-- begin backward compatibility
-        desc.setMatches("bind-xml xml");
-        //-- end backward compatibility
+        desc = new XMLFieldDescriptorImpl(Xml.class, "_xml", "xml", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -482,10 +510,6 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new Xml();
@@ -518,10 +542,6 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new Ldap();

@@ -2,9 +2,7 @@
  * This class was automatically generated with 
  * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
  * XML Schema.
- * $Id$
- *
- * Note: This file has been modified by hand.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -55,7 +53,6 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
     //----------------/
 
     public CacheTypeMappingDescriptor() {
-        nsURI = "http://castor.exolab.org/";
         xmlName = "cache-type";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
@@ -88,7 +85,6 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         attributes[0] = desc;
         
         //-- validation code for: _capacity
@@ -125,7 +121,6 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         attributes[1] = desc;
         
         //-- validation code for: _type
