@@ -96,13 +96,18 @@ public class JDOClassDescriptor
     private final int _cacheParam;
 
 
-    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName, 
-            KeyGeneratorDescriptor keyGenDesc, String cacheType, int cacheParam ) 
+    /**
+     * The names of columns that the identity consists of
+     */
+    private String[] _idnames;
+
+    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName,
+            KeyGeneratorDescriptor keyGenDesc, String cacheType, int cacheParam )
             throws MappingException {
 
-        super( clsDesc.getJavaClass(), clsDesc.getFields(), 
+        super( clsDesc.getJavaClass(), clsDesc.getFields(),
                (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getIdentities():null),
-               clsDesc.getExtends(), 
+               clsDesc.getExtends(),
                (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getDepends(): null), 
                clsDesc.getAccessMode() );
         if ( tableName == null )
@@ -118,8 +123,13 @@ public class JDOClassDescriptor
         _keyGenDesc = keyGenDesc;
         _cacheType = cacheType;
         _cacheParam = cacheParam;
-        if ( clsDesc instanceof ClassDescriptorImpl )
+        if ( clsDesc instanceof ClassDescriptorImpl ) {
             _depends = ((ClassDescriptorImpl)clsDesc).getDepends();
+        }
+        _idnames = new String[_identities.length];
+        for (int i = 0; i < _idnames.length; i++) {
+            _idnames[i] = ((JDOFieldDescriptor) _identities[i]).getSQLName()[0];
+        }
     }
 
 
@@ -183,7 +193,7 @@ public class JDOClassDescriptor
         }
 
         return field;
-                
+
     }
 
 
@@ -195,6 +205,13 @@ public class JDOClassDescriptor
     public KeyGeneratorDescriptor getKeyGeneratorDescriptor()
     {
         return _keyGenDesc;
+    }
+
+    /**
+     * @return The names of columns that the identity consists of.
+     */
+    public String[] getIdentityColumnNames() {
+        return _idnames;
     }
 
 

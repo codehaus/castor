@@ -49,6 +49,8 @@ package org.exolab.castor.jdo.oql;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Iterator;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.jdo.QueryException;
@@ -344,6 +346,49 @@ public class ParseTreeWalker implements TokenTypes
             return field;
     }
     return null;
+  }
+
+  /**
+   * Search for the field in the given class descriptor and descriptors of the superclasses,
+   * return null if not found.
+   * Returns new Object[2] {fieldDesc, classDesc}, where classDesc is a descriptor of the class where
+   * the field was found.
+   * Also adds inner joins to the QueryExpression.
+   * @param tableAlias The path info vector to build the alias with
+   * @param pathIndex Field index in the path info
+   */
+  private Object[] getFieldAndClassDesc(String fieldName, JDOClassDescriptor clsDesc, QueryExpression expr,
+                                        Vector path, int tableIndex) {
+    JDOFieldDescriptor field = null;
+    JDOClassDescriptor cd = clsDesc;
+    Object[] retVal;
+
+    while (cd != null) {
+        field = cd.getField(fieldName);
+        if (field != null) {
+            break;
+        }
+        cd = (JDOClassDescriptor) cd.getExtends();
+    }
+    if (field == null) {
+        return null;
+    }
+
+    // prepare the return value
+    retVal = new Object[] {field, cd};
+    if (cd != clsDesc) {
+        // now add inner join for "extends"
+        String tableAlias1 = clsDesc.getTableName();
+        String tableAlias2 = cd.getTableName();
+        if (tableIndex > 0) {
+            tableAlias1 = buildTableAlias(tableAlias1, path, tableIndex);
+            tableAlias2 = buildTableAlias(tableAlias2, path, tableIndex);
+        }
+        expr.addTable(cd.getTableName(), tableAlias2);
+        expr.addInnerJoin(clsDesc.getTableName(), clsDesc.getIdentityColumnNames(), tableAlias1,
+                          cd.getTableName(), cd.getIdentityColumnNames(), tableAlias2);
+    }
+    return retVal;
   }
 
   /**
@@ -876,7 +921,7 @@ public class ParseTreeWalker implements TokenTypes
           }
           // fix for oracle support. If we have a 30 character table name, adding
           // anything to it (_#) will cause it to be too long and will make oracle
-          // barf. the length we are trying to evaluate is: 
+          // barf. the length we are trying to evaluate is:
           // length of the table name + the length of the index number we are using
           // + the _ character.
           String stringIndex = String.valueOf(index);
@@ -912,12 +957,14 @@ public class ParseTreeWalker implements TokenTypes
 
         // Find the sourceclass and the fielsddescriptor
         // in the class hierachie
-        while(fieldDesc == null){
-            fieldDesc = sourceClass.getField( (String) path.elementAt(i) );
-            if(fieldDesc ==null){
-                sourceClass=(JDOClassDescriptor) sourceClass.getExtends();
-            }
+        Object[] fieldAndClass = getFieldAndClassDesc((String) path.elementAt(i), sourceClass,
+                                                      _queryExpr, path, i - 1);
+        if (fieldAndClass == null) {
+            throw new IllegalStateException( "Field not found:" + path.elementAt(i));
         }
+        fieldDesc = (JDOFieldDescriptor) fieldAndClass[0];
+        sourceClass = (JDOClassDescriptor) fieldAndClass[1];
+
         JDOClassDescriptor clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
         if ( clsDesc != null /*&& clsDesc != sourceClass*/ ) {
             //we must add this table as a join
@@ -1181,35 +1228,19 @@ public class ParseTreeWalker implements TokenTypes
                 clsTableAlias = buildTableAlias( clsDesc.getTableName(), path, path.size() - 2 );
                 JDOClassDescriptor srcDesc = _clsDesc;
                 for ( int i = 1; i < path.size() - 1; i++ ) {
-                    JDOFieldDescriptor fieldDesc = null;
-                    while ( fieldDesc == null ) {
-                        fieldDesc = srcDesc.getField( (String) path.elementAt(i) );
-                        if ( fieldDesc == null ) {
-                            srcDesc = (JDOClassDescriptor) srcDesc.getExtends();
-                        }
+                    Object[] fieldAndClass = getFieldAndClassDesc((String) path.elementAt(i), srcDesc,
+                                                                  _queryExpr, path, i - 1);
+                    if (fieldAndClass == null) {
+                        throw new IllegalStateException( "Field not found: " + path.elementAt(i) + " class " + srcDesc.getJavaClass());
                     }
+                    JDOFieldDescriptor fieldDesc = (JDOFieldDescriptor) fieldAndClass[0];
                     srcDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
-                }
-
-                if ( !clsDesc.getJavaClass().getName().equals(srcDesc.getJavaClass().getName()) ) {
-
-                    JDOFieldDescriptor clsIdentity = (JDOFieldDescriptor) clsDesc.getIdentity();
-                    JDOFieldDescriptor srcIdentity = (JDOFieldDescriptor) srcDesc.getIdentity();
-                    String srcTableAlias = buildTableAlias( srcDesc.getTableName(), path, path.size() - 2 );
-
-                    _queryExpr.addInnerJoin( srcDesc.getTableName(),
-                                             srcIdentity.getSQLName(),
-                                             srcTableAlias,
-                                             clsDesc.getTableName(),
-                                             clsIdentity.getSQLName(),
-                                             clsTableAlias );
                 }
             } else {
                 clsTableAlias = buildTableAlias( clsDesc.getTableName(), path, 9999 );
             }
-            _queryExpr.addTable( clsDesc.getTableName(), clsTableAlias );
 
-            return _queryExpr.encodeColumn( clsTableAlias, field.getSQLName()[0] );
+            return _queryExpr.encodeColumn(clsTableAlias, field.getSQLName()[0]);
         }
 
       //parameters
