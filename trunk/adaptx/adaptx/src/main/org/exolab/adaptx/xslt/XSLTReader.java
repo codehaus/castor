@@ -190,6 +190,47 @@ public class XSLTReader extends ErrorObserverAdapter {
     
     
     /**
+     * Reads an XSL stylesheet using the given DOM Node
+     *
+     * @param node the DOM Node that contains the Stylesheet
+     * @param filename the full path and filename of the Stylesheet
+     *  which is used for resolving relative URIs.
+     */
+    public XSLTStylesheet read(Node node, String filename) 
+        throws XSLException
+    {
+        
+        StylesheetHandler handler = new StylesheetHandler(this);
+        XSLTStylesheet stylesheet = handler.getStylesheet();
+        if (filename != null) {
+            stylesheet.setURILocation(new URILocationImpl(filename));
+        }
+        
+        if (node == null) return stylesheet;
+        
+        try {
+            DOM2SAX.process(node, handler);
+        }
+        catch(org.xml.sax.SAXException sx) {
+            
+            String message = sx.getMessage();
+            Exception ex = sx.getException();
+            if (ex != null) {
+                if (message == null) message = ex.getMessage();
+                if (ex instanceof SAXParseException) {
+                    //-- add better support for SAXParseException
+                }
+            }
+            if (message == null) {
+                message = "XSLReader: stylesheet parse error.";
+            }
+            throw new XSLException(message);
+        }
+        return stylesheet;
+    } //-- read(Document, filename)
+    
+    
+    /**
      * Reads an XSL stylesheet from the given uri (filename)
      * @param uri the file name of the XSLT stylesheet to read
      * @return the new XSLStylesheet
