@@ -214,6 +214,17 @@ db.close();
            the bound parameters are lost, and must be supplied a second time. The result of
            a query can be used while the query is being executed a second time.</p>
 
+        <p>The is also a special form of query that gives a possibility to call stored
+           procedures:
+           <code>
+oql = db.getOQLQuery( "CALL sp_something($) AS myapp.Product" );
+           </code>
+           Here sp_something is a stored procedure returning one or more
+           ResultSets with the same sequence of fields as Castor-generated
+           SELECT for the OQL query "SELECT p FROM myapp.Product p"
+           (for objects without relations the sequence is: identity, then all
+           other fields in the same order as in mapping.xml).</p>
+
       </section>
 
       <section title="Create/remove/update">
