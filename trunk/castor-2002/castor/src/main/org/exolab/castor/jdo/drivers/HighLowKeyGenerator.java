@@ -163,9 +163,13 @@ public class HighLowKeyGenerator implements KeyGenerator
                 sql = JDBCSyntax.Select + _seqValue + JDBCSyntax.From + _seqTable +
                     JDBCSyntax.Where + _seqKey + QueryExpression.OpEquals +
                     JDBCSyntax.Parameter;
-                stmt = conn.prepareStatement( sql );
-                // stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
-                //                                 ResultSet.CONCUR_UPDATABLE );
+                if ( conn.getMetaData().supportsResultSetConcurrency(
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE) ) {
+                    stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
+                                                       ResultSet.CONCUR_UPDATABLE );
+                } else {
+                    stmt = conn.prepareStatement( sql );
+                }
                 stmt.setString(1, tableName);
 
                 rs = stmt.executeQuery();
@@ -207,7 +211,6 @@ public class HighLowKeyGenerator implements KeyGenerator
                     max = _grabSize;
                 }
             } catch ( SQLException ex ) {
-ex.printStackTrace();
                 throw new PersistenceException( Messages.format(
                         "persist.keyGenSQL", ex.toString() ), ex );
             } finally {
@@ -230,12 +233,24 @@ ex.printStackTrace();
         return last;
     }
 
+
     /**
-     * Is key generated before INSERT? 
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
      */
-    public final boolean isBeforeInsert() {
-        return true;
+    public final byte getStyle() {
+        return BEFORE_INSERT;
     }
+
+
+    /**
+     * Gives a possibility to patch the Castor-generated SQL statement
+     * for INSERT (makes sense for DURING_INSERT key generators)
+     */
+    public final String patchSQL( String insert, String primKeyName )
+            throws MappingException {
+        return insert;
+    }
+
 
     /**
      * Is key generated in the same connection as INSERT?
@@ -243,5 +258,6 @@ ex.printStackTrace();
     public final boolean isInSameConnection() {
         return false;
     }
+
 }
 

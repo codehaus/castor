@@ -56,8 +56,10 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 
 /**
  * SEQUENCE key generator factory.
- * The short name of this key generator is "SEQUENCE".
- * It uses Oracle/PostrgeSQL SEQUENCEs
+ * The short name of this key generator is "RETURNING".
+ * It uses Oracle SEQUENCEs and the syntax of the INSERT statement 
+ * specific for Oracle8i: "INSERT INTO tbl (pk, fld1, ...) 
+ * VALUES (seq.nextval,?....,?) RETURNING pk INTO ?"
  * There is one optional parameter for this key generator,
  * which name is "sequence" and the default value is "{0}_seq".
  * It is possible to use naming patterns like this for obtaining
@@ -66,9 +68,9 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  *
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see SequenceKeyGenerator
+ * @see ReturningKeyGenerator
  */
-public final class SequenceKeyGeneratorFactory implements KeyGeneratorFactory
+public final class ReturningKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
      * Produce the key generator.
@@ -79,13 +81,13 @@ public final class SequenceKeyGeneratorFactory implements KeyGeneratorFactory
             Properties params )
             throws MappingException
     {
-        return new SequenceKeyGenerator( factory, params );
+        return new ReturningKeyGenerator( factory, params );
     }
 
     /**
-     * The short name of this key generator is "SEQUENCE"
+     * The short name of this key generator is "RETURNING"
      */
     public String getName() {
-        return "SEQUENCE";
+        return "RETURNING";
     }
 }

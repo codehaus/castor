@@ -71,10 +71,34 @@ import org.exolab.castor.mapping.MappingException;
 public interface KeyGenerator
 {
     /**
+     * For the key generators of BEFORE_INSERT style {@link #generateKey}
+     * is called before INSERT.
+     * {@link #patchSQL} may be used but usually doesn't.
+     */
+    public static final byte BEFORE_INSERT = -1;
+
+
+    /**
+     * For the key generators of DURING_INSERT style {@link #generateKey}
+     * is never called, all work is done by {@link #patchSQL}.
+     */
+    public static final byte DURING_INSERT = 0;
+
+
+    /**
+     * For the key generators of AFTER_INSERT style {@link #generateKey}
+     * is called after INSERT.
+     * {@link #patchSQL} may be used but usually doesn't.
+     */
+    public static final byte AFTER_INSERT = 1;
+
+
+    /**
      * Generate a new key for the specified table. This method is
      * called when a new object is about to be created. In some
      * environments the name of the owner of the object is known,
      * e.g. the principal in a J2EE server.
+     * This method is never called for DURING_INSERT key generators.
      *
      * @param conn An open connection within the given transaction
      * @param tableName The table name
@@ -88,13 +112,42 @@ public interface KeyGenerator
             String primKeyName, Properties props )
         throws PersistenceException;
 
+
     /**
-     * Is key generated before INSERT? 
+     * Style of the key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT.
      */
-    public boolean isBeforeInsert();
+    public byte getStyle();
+
+
+    /**
+     * Gives a possibility to patch the Castor-generated SQL statement
+     * for INSERT (indended mainly for DURING_INSERT style of key generators, 
+     * other key generators usually simply return the passed parameter).
+     * The original statement contains primary key column on the first place
+     * for BEFORE_INSERT style and doesn't contain it for the other styles.
+     * This method is called once for each class and must return String 
+     * with '?' that can be passed to CallableStatement (for DURING_INSERT 
+     * style) or to PreparedStatement (for the others).
+     * Then for each record being created actual field values are substituted, 
+     * starting from the primary key value for BEFORE_INSERT style, of starting
+     * from the first of other fields for the other styles.
+     * The DURING_INSERT key generator must add one OUT parameter to the end
+     * of the parameter list, which will return the generated identity.
+     * For example, ReturningKeyGenerator for Oracle8i transforms
+     * "INSERT INTO tbl (pk, fld1, ...,fldN)  VALUES (?,?...,?)" to
+     * "INSERT INTO tbl (pk, fld1, ...) VALUES (seq.nextval,?....,?)
+     * RETURNING pk INTO ?".
+     * DURING_INSERT key generator also may be implemented as a stored procedure.
+     * @param insert Castor-generated INSERT statement
+     * @param primKeyName The primary key name
+     */
+    public String patchSQL( String insert, String primKeyName )
+            throws MappingException;
+
 
     /**
      * Is key generated in the same connection as INSERT?
+     * For DURING_INSERT style this method is never called.
      */
     public boolean isInSameConnection();
 }

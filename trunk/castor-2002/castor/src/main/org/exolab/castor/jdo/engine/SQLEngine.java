@@ -77,6 +77,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 
 
@@ -214,28 +215,35 @@ Will be adding this later.
         return (QueryExpression) _sqlFinder.clone();
     }
 
+
     private Object generateKey( Object conn ) throws PersistenceException
     {
         Object identity;
-        JDOFieldDescriptor pkDesc;
+
+        identity = _keyGen.generateKey( (Connection) conn, _clsDesc.getTableName(),
+                ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName(), null );
+
+        if ( identity == null ) {
+            throw new PersistenceExceptionImpl( "persist.noIdentity" );
+        }
+
+        // Convert type if needed
+        return fixIdentityType( identity );
+    }
+
+
+    // Convert identity type if needed (for generated identities)
+    private Object fixIdentityType( Object identity ) throws PersistenceException
+    {
         String primKey;
         Class idClass;
         Class pkClass;
         TypeConvertor conv;
 
-        pkDesc = (JDOFieldDescriptor) _clsDesc.getIdentity();
-        primKey = pkDesc.getSQLName();
-
-        identity = _keyGen.generateKey( (Connection) conn,
-                                        _clsDesc.getTableName(), primKey, null );
-        if ( identity == null ) {
-            throw new PersistenceExceptionImpl( "persist.noIdentity" );
-        }
-
-        // Type conversion
         try {
             idClass = identity.getClass();
-            pkClass = SQLTypes.typeFromSQLType(pkDesc.getSQLType());
+            pkClass = SQLTypes.typeFromSQLType(
+                    ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType() );
             if ( !pkClass.isAssignableFrom( idClass ) ) {
                 conv = Types.getConvertor( idClass, pkClass );
                 identity = conv.convert( identity );
@@ -265,13 +273,17 @@ Will be adding this later.
                 throw new PersistenceExceptionImpl( "persist.noIdentity" );
 
             // Generate key before INSERT
-            if ( _keyGen != null && _keyGen.isBeforeInsert() )
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) 
                 identity = generateKey( conn );
 
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) 
+                stmt = ( (Connection) conn ).prepareCall( _sqlCreate );
+            else
+                stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
+
             // Must remember that SQL column index is base one
-            stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
             count = 1;
-            if ( _keyGen == null || _keyGen.isBeforeInsert() ) {
+            if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
                 stmt.setObject( 1, identity );
                 count++;
             }
@@ -284,11 +296,27 @@ Will be adding this later.
                         stmt.setObject( count, fields[ i ] );
                     ++count;
                 }
-            stmt.executeUpdate();
+
+            // Generate key during INSERT
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
+                stmt.execute();
+
+                // First skip all results "for maximum portability"
+                // as proposed in CallableStatement javadocs.
+                while ( stmt.getMoreResults() || stmt.getUpdateCount() != -1 );
+
+                // Identity is returned in the last parameter
+                identity = ( (CallableStatement) stmt ).getObject( count );
+
+                // Convert type if needed
+                identity = fixIdentityType( identity );
+            } else 
+                stmt.executeUpdate();
+            
             stmt.close();
 
             // Generate key after INSERT
-            if ( _keyGen != null && !_keyGen.isBeforeInsert() )
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT )
                 identity = generateKey( conn );
             return identity;
         } catch ( SQLException except ) {
@@ -518,6 +546,7 @@ Will be adding this later.
         int                  count;
         QueryExpression      query;
         String               wherePK;
+        String               primKeyName;
 
         query = _factory.getQueryExpression();
         query.addParameter( clsDesc.getTableName(), ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName(),
@@ -538,8 +567,9 @@ Will be adding this later.
         sql = new StringBuffer( "INSERT INTO " );
         sql.append( clsDesc.getTableName() ).append( " (" );
         count = 0;
-        if ( _keyGen == null || _keyGen.isBeforeInsert() ) {
-            sql.append( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() );
+        primKeyName = ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName();
+        if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
+            sql.append( primKeyName );
             count++;
         }
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
@@ -559,6 +589,18 @@ Will be adding this later.
         }
         sql.append( ')' );
         _sqlCreate = sql.toString();
+        if ( _keyGen != null ) {
+            try {
+                _sqlCreate = _keyGen.patchSQL( _sqlCreate, primKeyName );
+            } catch ( MappingException except )  {
+                Logger.getSystemLogger().println( except.toString() );
+
+                // proceed without this stupid key generator
+                _keyGen = null;
+                buildSql( clsDesc, logInterceptor );
+                return;
+            }
+        }
         if ( logInterceptor != null )
             logInterceptor.storeStatement( "SQL for creating " + clsDesc.getJavaClass().getName() +
                                            ": " + _sqlCreate );
