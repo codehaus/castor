@@ -145,7 +145,7 @@ public class Size extends CastorTestCase
         QueryResults enum;
          OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
-        assert("size should be > 0",enum.size() > 0);
+        assertTrue("size should be > 0",enum.size() > 0);
         _db.commit();
     }
 
@@ -163,8 +163,8 @@ public class Size extends CastorTestCase
         while (enum.hasMore())
         {
             enum.next();
-            assert("size should be > 0", enum.size() > 0);
-            assert("size should be ==25", enum.size() == 25);
+            assertTrue("size should be > 0", enum.size() > 0);
+            assertTrue("size should be ==25", enum.size() == 25);
         }
         _db.commit();
     }
@@ -186,7 +186,7 @@ public class Size extends CastorTestCase
             realSize ++;
         }
         _db.commit();
-        assert("realsize didn't equal expectedsize", realSize==expectedSize);
+        assertTrue("realsize didn't equal expectedsize", realSize==expectedSize);
     }
 
     /**
@@ -204,11 +204,11 @@ public class Size extends CastorTestCase
             int expectedSize = enum.size();
             _db.commit();
             // This test fails when executed against PostgreSQL. 
-            assert("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).",false);
+            assertTrue("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).",false);
         }
         catch (Exception e)
         {
-            assert(true);
+            assertTrue(true);
         }
     
     }    

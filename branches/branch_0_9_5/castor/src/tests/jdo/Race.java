@@ -257,8 +257,8 @@ public class Race extends CastorTestCase {
             }
         }
         // report result
-        assert("Value in database does not match the expected value", num == jdos.length );
-        assert("Leak detected", !_leak );
+        assertTrue("Value in database does not match the expected value", num == jdos.length );
+        assertTrue("Leak detected", !_leak );
     }
     
     private class RaceThread extends Thread {

@@ -146,12 +146,12 @@ public class Absolute extends CastorTestCase {
         QueryResults enum;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
-        assert("should have been able to move to 1", enum.absolute(1));
-        assert("should have been able to move to 5",enum.absolute(5));
-        assert("should have been able to move to 10",enum.absolute(10));
-        assert("should have been able to move to 15",enum.absolute(15));
-        assert("should have been able to move to 20",enum.absolute(20));
-        assert("should have been able to move to 25",enum.absolute(25));
+        assertTrue("should have been able to move to 1", enum.absolute(1));
+        assertTrue("should have been able to move to 5",enum.absolute(5));
+        assertTrue("should have been able to move to 10",enum.absolute(10));
+        assertTrue("should have been able to move to 15",enum.absolute(15));
+        assertTrue("should have been able to move to 20",enum.absolute(20));
+        assertTrue("should have been able to move to 25",enum.absolute(25));
         _db.commit();
     }
 
@@ -186,8 +186,8 @@ public class Absolute extends CastorTestCase {
         QueryResults enum;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
-        assert("shouldn't be able to move to -50", enum.absolute(-50) == false);
-        assert("shouldn't be able to move to 99999",enum.absolute(99999) == false);
+        assertTrue("shouldn't be able to move to -50", enum.absolute(-50) == false);
+        assertTrue("shouldn't be able to move to 99999",enum.absolute(99999) == false);
         _db.commit();
     }
 
@@ -205,9 +205,9 @@ public class Absolute extends CastorTestCase {
             // following should fail.
             enum.absolute(5);
             _db.commit();
-            assert("Shouldn't reach here, calling absolute on a non-scrollable resultset should fail",false);
+            assertTrue("Shouldn't reach here, calling absolute on a non-scrollable resultset should fail",false);
         } catch (Exception e) {
-            assert(true);
+            assertTrue(true);
         }
     }
 

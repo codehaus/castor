@@ -867,10 +867,10 @@ public class LazyLoading extends CastorTestCase {
         projects = loadPerson.getProjects();
 
         // is the collection populated?
-        assert( "The projects collection is not valid!.", projects != null && projects.size() > 0 );
+        assertTrue( "The projects collection is not valid!.", projects != null && projects.size() > 0 );
 
         // is the collection instanceof Lazy? 
-        assert( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
+        assertTrue( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
             loadPerson.getProjects() instanceof org.exolab.castor.persist.Lazy );
 
         // OK, the collection of projects is there, let's test a rollback for bug #1046
@@ -878,7 +878,7 @@ public class LazyLoading extends CastorTestCase {
         _db.rollback();
 
         // test it again since the rollback - is the collection instanceof Lazy? 
-        assert( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
+        assertTrue( "Collection has to be lazy! It is " + loadPerson.getProjects().getClass(), 
             loadPerson.getProjects() instanceof org.exolab.castor.persist.Lazy );
     }
 
