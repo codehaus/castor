@@ -125,10 +125,15 @@ public class XMLMappingLoader
             relDesc = getDescriptor( fields[ i ].getFieldType() );
             if ( relDesc == NoDescriptor ) {
                 // XXX Error message should come here
-            } else if ( relDesc != null && relDesc instanceof XMLClassDescriptor &&
-                        fields[ i ] instanceof XMLFieldDescriptorImpl ) {
-		( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
-                ( (XMLFieldDescriptorImpl) fields[ i ] ).setNodeType( NodeType.Element );
+            } 
+            else if ( relDesc != null && 
+                      relDesc instanceof XMLClassDescriptor &&
+                      fields[ i ] instanceof XMLFieldDescriptorImpl )
+            {
+		        ( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
+		        
+		        //-- removed kvisco 20010814 
+                // ( (XMLFieldDescriptorImpl) fields[ i ] ).setNodeType( NodeType.Element );
             }
         }
         if ( clsDesc instanceof XMLClassDescriptorImpl )
@@ -172,22 +177,41 @@ public class XMLMappingLoader
             } catch (MarshalException mx) {
                 throw new MappingException("Unable to introspect class for auto-complete: " + mx);
             }
-
+            
+            //-- check for identity
+            String identity = "";
+            if (clsMap.getIdentityCount() > 0) 
+                identity = clsMap.getIdentity(0);            
+                
             FieldDescriptor[] fields = xmlClassDesc.getFields();
 
             // Attributes
             XMLFieldDescriptor[] introFields = introspectedDesc.getAttributeDescriptors();
-            for (int i = 0; i<introFields.length; ++i)
-                if (!isMatchFieldName(fields, introFields[i].getFieldName()))
+            for (int i = 0; i<introFields.length; ++i) {
+                if (!isMatchFieldName(fields, introFields[i].getFieldName())) {
                     // If there is no field with this name, we can add it
-                    xmlClassDesc.addFieldDescriptor(introFields[i]);
+                    if (introFields[i].getFieldName().equals(identity)) {
+                        xmlClassDesc.setIdentity(introFields[i]);
+                    }
+                    else {
+                        xmlClassDesc.addFieldDescriptor(introFields[i]);
+                    }
+                }
+            }
             
             // Elements
             introFields = introspectedDesc.getElementDescriptors();
-            for (int i = 0; i<introFields.length; ++i)
-                if (!isMatchFieldName(fields, introFields[i].getFieldName()))
+            for (int i = 0; i<introFields.length; ++i) {
+                if (!isMatchFieldName(fields, introFields[i].getFieldName())) {
                     // If there is no field with this name, we can add it
-                    xmlClassDesc.addFieldDescriptor(introFields[i]);
+                    if (introFields[i].getFieldName().equals(identity)) {
+                        xmlClassDesc.setIdentity(introFields[i]);
+                    }
+                    else {
+                        xmlClassDesc.addFieldDescriptor(introFields[i]);
+                    }
+                }
+            }
 
             // Content
             XMLFieldDescriptor field = introspectedDesc.getContentDescriptor();
@@ -196,6 +220,7 @@ public class XMLMappingLoader
                     // If there is no field with this name, we can add
                     xmlClassDesc.addFieldDescriptor(field);
 
+            
         } //-- End of auto-complete
         
          
@@ -212,13 +237,12 @@ public class XMLMappingLoader
      * Match if a field named <code>fieldName</code> is in fields
      */
     private boolean isMatchFieldName(FieldDescriptor[] fields, String fieldName) {
-
         for (int i=0; i< fields.length; ++i)
             if (fields[i].getFieldName().equals(fieldName))
                 return true;
 
         return false;
-    }
+    } //-- method: isMatchFieldName
 
 
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
@@ -229,6 +253,7 @@ public class XMLMappingLoader
         NodeType               nodeType = null;
         String                 match    = null;
         XMLFieldDescriptorImpl xmlDesc;
+        boolean                isReference = false;
         
         // Create an XML field descriptor
         
@@ -245,6 +270,9 @@ public class XMLMappingLoader
             
             //-- matches
             match = xml.getMatches();
+            
+            //-- reference
+            isReference = xml.getReference();
         }
         
         if (nodeType == null) {
@@ -263,6 +291,9 @@ public class XMLMappingLoader
         
         //-- matches
         if (match != null) xmlDesc.setMatches(match);
+        
+        //-- reference
+        xmlDesc.setReference(isReference);
             
         xmlDesc.setContainer(fieldMap.getContainer());
 
