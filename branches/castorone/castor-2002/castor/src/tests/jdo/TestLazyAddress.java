@@ -3,7 +3,6 @@
 package jdo;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -50,5 +49,28 @@ public class TestLazyAddress {
 	}
 	public TestLazyPerson getPerson() {
 		return _person;
+	}
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<");
+		sb.append(_id);
+		sb.append(": ");
+		sb.append(_street);
+		sb.append("  ");
+		sb.append(_city);
+		sb.append("  ");
+		sb.append(_state);
+		sb.append("  ");
+		sb.append(_zip);
+		sb.append(" of ");
+		if ( _person != null ) {
+			sb.append(_person.getLastName());
+			sb.append(", ");
+			sb.append(_person.getFirstName());
+		} else {
+			sb.append("--nobody--");
+		}
+		sb.append(">");
+		return sb.toString();
 	}
 }

@@ -3,7 +3,6 @@
 package jdo;
 
 import java.util.Collection;
-import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -11,7 +10,7 @@ import java.util.Date;
 public class TestLazyContractCategory {
     private int _id;
 	private String _name;
-	private ArrayList _contract;
+	private Collection _contract;
 
     public void setId( int id ) {
         _id = id;
@@ -25,10 +24,10 @@ public class TestLazyContractCategory {
 	public String getName() {
 		return _name;
 	}
-	public void setContract( ArrayList contract ) {
+	public void setContract( Collection contract ) {
 		_contract = contract;
 	}
-	public ArrayList getContract() {
+	public Collection getContract() {
 		return _contract;
 	}
 }
