@@ -101,7 +101,7 @@ public class SearchDescriptor
     }
 
 
-    private int              _scope = Scope.Base;;
+    private int              _scope = Scope.Base;
 
 
     private String           _baseDN;
