@@ -77,151 +77,151 @@ public class JNDIProducer
 
     public JNDIProducer( DocumentHandler docHandler, boolean namespace  )
     {
-	super( docHandler, namespace );
+        super( docHandler, namespace );
     }
 
 
     public void produce( String name, Attributes attrs )
-	throws SAXException, NamingException
+        throws SAXException, NamingException
     {
-	AttributeListImpl  attrList;
-	Attribute          attr;
-	NamingEnumeration  enum;
-	NamingEnumeration  values;
-	Object             value;
+        AttributeListImpl  attrList;
+        Attribute          attr;
+        NamingEnumeration  enum;
+        NamingEnumeration  values;
+        Object             value;
 
-	leaveSchema();
-	enterDirectory();
+        leaveSchema();
+        enterDirectory();
 
-	// dsml:entry dn
-	attrList = new AttributeListImpl();
-	attrList.addAttribute( XML.Entries.Attributes.DN, "CDATA", name );
-	// dsml:entry
-	_docHandler.startElement( prefix( XML.Entries.Elements.Entry ), attrList );
+        // dsml:entry dn
+        attrList = new AttributeListImpl();
+        attrList.addAttribute( XML.Entries.Attributes.DN, "CDATA", name );
+        // dsml:entry
+        _docHandler.startElement( prefix( XML.Entries.Elements.Entry ), attrList );
 
-	if ( attrs != null ) {
-	    attr = attrs.get( "objectclass" );
-	    if ( attr != null ) {
-		// dsml:objectclass
-		attrList = new AttributeListImpl();
-		_docHandler.startElement( prefix( XML.Entries.Elements.ObjectClass ),
-					  attrList );
-		values = attr.getAll();
-		while ( values.hasMore() ) {
-		    char[] chars;
-		    
-		    // dsml:oc-value
-		    value = values.next();
-		    if ( value != null )
-			chars = value.toString().toCharArray();
-		    else
-			chars = new char[ 0 ];
-		    attrList = new AttributeListImpl();
-		    _docHandler.startElement( prefix( XML.Entries.Elements.OCValue ), attrList );
-		    _docHandler.characters( chars, 0, chars.length );
-		    _docHandler.endElement( prefix( XML.Entries.Elements.OCValue ) );
-		}
-		_docHandler.endElement( prefix( XML.Entries.Elements.ObjectClass ) );
-	    }
-	    
-	    enum = attrs.getAll();
-	    while ( enum.hasMore() ) {
-		// dsml:attr
-		attr = (Attribute) enum.next();
-		if ( attr.getID().equals( "objectclass" ) )
-		    continue;
-		attrList = new AttributeListImpl();
-		attrList.addAttribute( XML.Entries.Attributes.Name, "CDATA", attr.getID() );
-		_docHandler.startElement( prefix( XML.Entries.Elements.Attribute ), attrList );
-		
-		values = attr.getAll();
-		while ( values.hasMore() ) {
-		    char[] chars = null;
-		    byte[] bytes = null;
-		    
-		    attrList = new AttributeListImpl();
+        if ( attrs != null ) {
+            attr = attrs.get( "objectclass" );
+            if ( attr != null ) {
+                // dsml:objectclass
+                attrList = new AttributeListImpl();
+                _docHandler.startElement( prefix( XML.Entries.Elements.ObjectClass ),
+                                          attrList );
+                values = attr.getAll();
+                while ( values.hasMore() ) {
+                    char[] chars;
 
-		    // dsml:value
-		    value = values.next();
-		    if ( value == null ) {
-			chars = new char[ 0 ];
-		    } else if ( value instanceof String ) {
-			chars = ( (String) value ).toCharArray();
-		    } else if (value instanceof byte[]) {
-					bytes = (byte[])value;
-				} else {
-					chars = value.toString().toCharArray();
-				}
-				if (chars != null) {
-					boolean encode = false;
-					boolean wchar = false;
-					int i = 0;
-					while (i < chars.length && !wchar) {
-						char c = chars[i++];
-						if (c >= '\u0100')
-							encode = wchar = true;
-						else if (c >= '\u0080' || (c < ' ' && c != '\n' && c != '\t'))
-							encode = true;
-					}
-					if (encode) {
-						MimeBase64Encoder encoder;
-						encoder = new MimeBase64Encoder();
-						if (wchar) {
-							bytes = new byte[chars.length << 1];
-							int j = 0;
-							// bigendian
-							for (i = 0; i < chars.length; i++) {
-								bytes[j++] = (byte) (chars[i] >> 8);
-								bytes[j++] = (byte) (0xff & chars[i]);
-							}
-						} else {
-							bytes = new byte[chars.length];
-							for (i = 0; i < chars.length; i++) {
-								bytes[i] = (byte)chars[i];
-							}
-						}
-				encoder.translate( bytes );
-				chars = encoder.getCharArray();
-				attrList.addAttribute( XML.Entries.Attributes.Encoding, "NMTOKEN",
-															 XML.Entries.Attributes.Encodings.Base64 );
-				}
-			}
+                    // dsml:oc-value
+                    value = values.next();
+                    if ( value != null )
+                        chars = value.toString().toCharArray();
+                    else
+                        chars = new char[ 0 ];
+                    attrList = new AttributeListImpl();
+                    _docHandler.startElement( prefix( XML.Entries.Elements.OCValue ), attrList );
+                    _docHandler.characters( chars, 0, chars.length );
+                    _docHandler.endElement( prefix( XML.Entries.Elements.OCValue ) );
+                }
+                _docHandler.endElement( prefix( XML.Entries.Elements.ObjectClass ) );
+            }
 
-		    _docHandler.startElement( prefix( XML.Entries.Elements.Value ), attrList );
-		    _docHandler.characters( chars, 0, chars.length );
-		    _docHandler.endElement( prefix( XML.Entries.Elements.Value ) );
-		}
-		_docHandler.endElement( prefix( XML.Entries.Elements.Attribute ) );
-	    }
-	}
-	_docHandler.endElement( prefix( XML.Entries.Elements.Entry ) );
+            enum = attrs.getAll();
+            while ( enum.hasMore() ) {
+                // dsml:attr
+                attr = (Attribute) enum.next();
+                if ( attr.getID().equals( "objectclass" ) )
+                    continue;
+                attrList = new AttributeListImpl();
+                attrList.addAttribute( XML.Entries.Attributes.Name, "CDATA", attr.getID() );
+                _docHandler.startElement( prefix( XML.Entries.Elements.Attribute ), attrList );
+
+                values = attr.getAll();
+                while ( values.hasMore() ) {
+                    char[] chars = null;
+                    byte[] bytes = null;
+
+                    attrList = new AttributeListImpl();
+
+                    // dsml:value
+                    value = values.next();
+                    if ( value == null ) {
+                        chars = new char[ 0 ];
+                    } else if ( value instanceof String ) {
+                        chars = ( (String) value ).toCharArray();
+                    } else if (value instanceof byte[]) {
+                                        bytes = (byte[])value;
+                                } else {
+                                        chars = value.toString().toCharArray();
+                                }
+                                if (chars != null) {
+                                        boolean encode = false;
+                                        boolean wchar = false;
+                                        int i = 0;
+                                        while (i < chars.length && !wchar) {
+                                                char c = chars[i++];
+                                                if (c >= '\u0100')
+                                                        encode = wchar = true;
+                                                else if (c >= '\u0080' || (c < ' ' && c != '\n' && c != '\t'))
+                                                        encode = true;
+                                        }
+                                        if (encode) {
+                                                MimeBase64Encoder encoder;
+                                                encoder = new MimeBase64Encoder();
+                                                if (wchar) {
+                                                        bytes = new byte[chars.length << 1];
+                                                        int j = 0;
+                                                        // bigendian
+                                                        for (i = 0; i < chars.length; i++) {
+                                                                bytes[j++] = (byte) (chars[i] >> 8);
+                                                                bytes[j++] = (byte) (0xff & chars[i]);
+                                                        }
+                                                } else {
+                                                        bytes = new byte[chars.length];
+                                                        for (i = 0; i < chars.length; i++) {
+                                                                bytes[i] = (byte)chars[i];
+                                                        }
+                                                }
+                                encoder.translate( bytes );
+                                chars = encoder.getCharArray();
+                                attrList.addAttribute( XML.Entries.Attributes.Encoding, "NMTOKEN",
+                                                       XML.Entries.Attributes.Encodings.Base64 );
+                                }
+                        }
+
+                    _docHandler.startElement( prefix( XML.Entries.Elements.Value ), attrList );
+                    _docHandler.characters( chars, 0, chars.length );
+                    _docHandler.endElement( prefix( XML.Entries.Elements.Value ) );
+                }
+                _docHandler.endElement( prefix( XML.Entries.Elements.Attribute ) );
+            }
+        }
+        _docHandler.endElement( prefix( XML.Entries.Elements.Entry ) );
     }
-    
+
 
     public void produce( SearchResult result )
-	throws SAXException
+        throws SAXException
     {
-	try {
-	    produce( result.getName(), result.getAttributes() );
-	} catch ( NamingException except ) {
-	    throw new SAXException( except.toString() );
-	}
+        try {
+            produce( result.getName(), result.getAttributes() );
+        } catch ( NamingException except ) {
+            throw new SAXException( except.toString() );
+        }
     }
 
 
     public void produce( NamingEnumeration results )
-	throws ImportExportException, SAXException
+        throws ImportExportException, SAXException
     {
-	SearchResult result;
+        SearchResult result;
 
-	try {
-	    while ( results.hasMore() ) {
-		result = (SearchResult) results.next();
-		produce( result.getName(), result.getAttributes() );
-	    }
-	} catch ( NamingException except ) {
-	    throw new ImportExportException( except );
-	}
+        try {
+            while ( results.hasMore() ) {
+                result = (SearchResult) results.next();
+                produce( result.getName(), result.getAttributes() );
+            }
+        } catch ( NamingException except ) {
+            throw new ImportExportException( except );
+        }
     }
 
 
