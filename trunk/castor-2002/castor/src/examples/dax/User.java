@@ -1,9 +1,8 @@
 package dax;
 
 
+import java.util.Hashtable;
 import java.util.Enumeration;
-import org.exolab.castor.dax.Attribute;
-import org.exolab.castor.dax.AttributeSet;
 
 
 public class User
@@ -28,7 +27,7 @@ public class User
     public String   ou;
 
 
-    public AttributeSet attrSet;
+    public Hashtable attrSet;
 
 
     public String toString()
