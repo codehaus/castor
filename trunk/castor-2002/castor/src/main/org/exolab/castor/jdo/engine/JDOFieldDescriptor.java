@@ -82,6 +82,11 @@ public class JDOFieldDescriptor
     private String         _sqlName;
 
 
+    private String         _manyTable;
+
+    private String         _manyKey;
+
+
     /**
      * Construct a new field descriptor for the specified field. This is
      * a JDO field descriptor wrapping a field descriptor and adding JDO
@@ -90,7 +95,7 @@ public class JDOFieldDescriptor
      * @param fieldDesc The field descriptor
      * @throws MappingException Invalid mapping information
      */
-    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, boolean dirtyCheck )
+    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, boolean dirtyCheck, String manyTable, String manyKey )
         throws MappingException
     {
         super( fieldDesc );
@@ -100,6 +105,20 @@ public class JDOFieldDescriptor
             throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = sqlName;
         _dirtyCheck = dirtyCheck;
+        _manyTable = manyTable;
+        _manyKey = manyKey;
+    }
+
+
+    public String getManyTable()
+    {
+        return _manyTable;
+    }
+
+
+    public String getManyKey()
+    {
+        return _manyKey;
     }
 
 
