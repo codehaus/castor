@@ -46,11 +46,16 @@ package org.exolab.castor.persist.resolvers;
 
 import java.util.Iterator;
 import java.util.SortedMap;
+import java.util.Collection;
+import org.exolab.castor.util.Messages;
+import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.persist.Resolver;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.DataObjectAccessException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
@@ -93,7 +98,7 @@ public class DataObjectResolver extends Resolver {
      * The root of the EntityInfo tree that this DataObjectResolver 
      * reponsible for.
      */
-    protected EntityInfo     info;
+    protected EntityInfo     entityInfo;
 
     /**
      * The collection contains all ResolvingStrategy for the EntityInfo tree
@@ -143,7 +148,7 @@ public class DataObjectResolver extends Resolver {
         // the right class here.
         // It is where we add determinance support later too.
         //     
-        //     after we determined, we call tx.addObject( id, object)
+        //     after we determined, we call tx.addObjectEntry( id, object)
         //     before we iterate htur the avaliable strategies
 
         // get the right set of accessors, depend on the actual
@@ -155,27 +160,30 @@ public class DataObjectResolver extends Resolver {
 
         LockEngine le        = getLockEngine( tx, oid );
 
-        AccessMode effective = declaredMode.getEffectiveMode( mode )
+        AccessMode effective = declaredMode.getEffectiveMode( mode );
 
-        lockEngine.load( tx.getKey(), entity, effectiveMode, timeout );
+        lockEngine.load( tx.getKey(), entity, effective, timeout );
 
         Object newInstance   = getNewInstance( tx, oid, entity );
 
         // must add to transaction first to to prevent circular references.
-        tx.addObject( oid, newInstance );
+        tx.addObjectEntry( oid, newInstance );
 
         // set the identities into the target object
+        /* re-factored into a strategy
         setIdentity( tx, object, oid.getIdentity() );
+        */
 
         // set the timeStamp of the data object to locker's timestamp
+        /* re-factored into a strategy
         if ( object instanceof TimeStampable ) {
             ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
-        }
+        }*/
 
         Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.load( tx, newInstance, entity, mode, timeout );
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.load( tx, oid, newInstance, entity, mode, timeout );
         }
         return newInstance;
     }
@@ -186,13 +194,13 @@ public class DataObjectResolver extends Resolver {
         Entity entity = new Entity();
 
         // must add to transaction first to to prevent circular references.
-        tx.addObject( oid, objectToBeCreated );
+        tx.addObjectEntry( oid, objectToBeCreated );
 
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.create( tx, objectToBeCreated, entity );
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.create( tx, oid, objectToBeCreated, entity );
         }
 
         LockEngine le        = getLockEngine( tx, oid );
@@ -201,9 +209,9 @@ public class DataObjectResolver extends Resolver {
 
         // iterate thru all avaliable strategies
         itor = strategies.iterator();
-        while ( stra.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.postCreate( tx, objectToBeCreated, entity );
+        while ( itor.hasNext() ) {
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.postCreate( tx, oid, objectToBeCreated, entity );
         }
     }
 
@@ -215,44 +223,34 @@ public class DataObjectResolver extends Resolver {
         Entity entity = new Entity();
 
         // must add to transaction first to to prevent circular references.
-        tx.addObject( oid, objectToBeUpdated );
+        tx.addObjectEntry( oid, objectToBeUpdated );
 
         LockEngine le        = getLockEngine( tx, oid );
 
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.update( tx, objectToBeUpdated, entity );
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.update( tx, oid, objectToBeUpdated, entity, timeout );
         }
 
-        le.update( tx.getKey(), entity );
+        le.update( tx.getKey(), entity, AccessMode.Exclusive, timeout );
     }
 
     public void writeLock( TransactionContext tx, OID oid, Object objectToBeLocked,
             int timeout )
-            throws PersistenceException {
-
-        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
-            throw new PersistenceException(
-                      Message.message("persist.changedIdentity",
-                      oid.getJavaClass().getName(),oid.getIdentity()) );
+            throws LockNotGrantedException, PersistenceException {
 
         Entity entity = new Entity( entityInfo, oid.getIdentity() );
-        oid.getLockEngine().lock( tx.getKey(), entity );
+        oid.getLockEngine().writeLock( tx.getKey(), entity, timeout );
     }
 
     public void softLock( TransactionContext tx, OID oid, Object objectToBeLocked,
             int timeout )
             throws LockNotGrantedException {
 
-        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
-            throw new PersistenceException(
-                      Message.message("persist.changedIdentity",
-                      oid.getJavaClass().getName(),oid.getIdentity()) );
-
         Entity entity = new Entity( entityInfo, oid.getIdentity() );
-        oid.getLockEngine().softLock( tx.getKey(), entity );
+        oid.getLockEngine().softLock( tx.getKey(), entity, timeout );
     }
 
     public void markDelete( TransactionContext tx, OID oid, Object objectToBeDeleted,
@@ -260,9 +258,9 @@ public class DataObjectResolver extends Resolver {
             throws ObjectNotFoundException, LockNotGrantedException, 
             PersistenceException {
 
-        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
+        if ( !oid.getIdentity().equals( getIdentity( tx, objectToBeDeleted ) ) )
             throw new PersistenceException(
-                      Message.message("persist.changedIdentity",
+                      Messages.format("persist.changedIdentity",
                       oid.getJavaClass().getName(),oid.getIdentity()) );
 
         Entity entity = new Entity( entityInfo, oid.getIdentity() );
@@ -271,8 +269,8 @@ public class DataObjectResolver extends Resolver {
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.markDelete( tx, objectToBeDeleted, entity );
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.markDelete( tx, oid, objectToBeDeleted, entity, timeout );
         }
     }
 
@@ -280,9 +278,9 @@ public class DataObjectResolver extends Resolver {
             Object objectToBeTestForModification, int timeout )
             throws LockNotGrantedException, PersistenceException {
 
-        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
+        if ( !oid.getIdentity().equals( getIdentity( tx, objectToBeTestForModification ) ) )
             throw new PersistenceException(
-                      Message.message("persist.changedIdentity",
+                      Messages.format("persist.changedIdentity",
                       oid.getJavaClass().getName(),oid.getIdentity()) );
 
         // load the locked fields from LockEngine
@@ -292,8 +290,8 @@ public class DataObjectResolver extends Resolver {
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.preStore( tx, objectToBeTestForModification, entity );
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.preStore( tx, oid, objectToBeTestForModification, entity, timeout );
         }
     }
 
@@ -301,7 +299,7 @@ public class DataObjectResolver extends Resolver {
     public void delete( TransactionContext tx, OID oid, Object objectToBeDeleted )
             throws PersistenceException {
 
-        Entity entity = new Entity( entitiyInfo, oid.getIdentity() );
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
         oid.getLockEngine().delete( tx.getKey(), entity );
     }
 
@@ -315,8 +313,8 @@ public class DataObjectResolver extends Resolver {
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
         while ( itor.hasNext() ) {
-            Strategy strategy = (Strategy) itor.next();
-            strategy.store( tx, objectToBeStored, entity );
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.store( tx, oid, objectToBeStored, entity );
         }
 
         oid.getLockEngine().store( tx.getKey(), entity );
@@ -325,13 +323,13 @@ public class DataObjectResolver extends Resolver {
     public void revertObject( TransactionContext tx, OID oid, Object objectToBeReverted ) {
 
         Entity entity = new Entity( entityInfo, oid.getIdentity() );
-        oid.getLockEngine().revertLock( tx.getKey(), entity );
+        oid.getLockEngine().reload( tx.getKey(), entity );
 
         // iterate thru all avaliable strategies
-        Iterator stra = strategies.iterator();
-        while ( stra.hasNext() ) {
-            Strategy stra = (Strategy) stra.next();
-            stras.revertObject( tx, objectToBeReverted, entity );
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            ResolvingStrategy strategy = (ResolvingStrategy) itor.next();
+            strategy.revert( tx, oid, objectToBeReverted, entity );
         }
     }
 
@@ -355,7 +353,7 @@ public class DataObjectResolver extends Resolver {
         // LockEngine to be used.
         
         // for now, we simply return the only lockEngine
-        oid.setLockEngine( le );
+        oid.setLockEngine( lockEngine );
         return lockEngine;
     }
 
@@ -374,9 +372,9 @@ public class DataObjectResolver extends Resolver {
             EntityInfo info = (EntityInfo) itor.next();
             
             iterateEntityClasses:
-            for ( int i = 0; i <= info.length; i++ ) {
-                if ( entityClasses[i].equals( info ) ) {
-                    subClass = classMap.get( info );
+            for ( int i = 0; i <= entity.entityClasses.length; i++ ) {
+                if ( entity.entityClasses[i].equals( info ) ) {
+                    subClass = (Class) classMap.get( info );
                     break iterateEntityClasses;
                 }
             }
@@ -384,7 +382,7 @@ public class DataObjectResolver extends Resolver {
 
         if ( subClass == oid.getJavaClass() ) {
         } else if ( oid.getJavaClass().isAssignableFrom(subClass) ) {
-        } else if ( subClass.isAssignableFrom( oid.getJavaClass() ) {
+        } else if ( subClass.isAssignableFrom( oid.getJavaClass() ) ) {
             subClass = oid.getJavaClass();
         } else {
             subClass = oid.getJavaClass();
@@ -396,10 +394,37 @@ public class DataObjectResolver extends Resolver {
             return result;
         } catch ( InstantiationException ie ) {
             throw new DataObjectAccessException( 
-            Message.message("dataaccess.instantiationFailed", subClass.getName() );
+            Messages.format("dataaccess.instantiationFailed", subClass.getName() ) );
         } catch ( IllegalAccessException iae ) {
             throw new DataObjectAccessException(
-            Message.message("dataaccess.constructorNotAccessible", subClass.getName() );
+            Messages.format("dataaccess.constructorNotAccessible", subClass.getName()) );
         }
     }
+
+    
+    /**
+     * Get the identity from a object of the base type
+     * If object isn't persistent and key generator is used, returns null
+     *
+     * @param tx the transaction context
+     * @param o - object of the base type
+     * @return return an Object[] which contains the identity of the object
+     */
+    public Object getIdentity( TransactionContext tx, Object o ) {
+        throw new RuntimeException("Method not implemented");
+    }
+
+    
+    /**
+     * Get the identity from a object of the base type
+     *
+     * @param tx the transaction context
+     * @param o - object of the base type
+     * @return return an Object[] which contains the identity of the object
+     */
+    public Object getActualIdentity( TransactionContext tx, Object o ) {
+        throw new RuntimeException("Method not implemented");
+    }
+
+
 }
