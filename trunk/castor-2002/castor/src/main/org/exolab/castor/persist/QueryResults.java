@@ -216,7 +216,7 @@ public final class QueryResults
         handler = _engine.getClassMolder( _query.getResultType() );
 
         // load the object thur the transaction of the query
-        object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
+        object = _tx.load( _engine, handler, _lastIdentity, null, _accessMode );
 
         return object;
 

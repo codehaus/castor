@@ -692,7 +692,7 @@ public class ClassMolder {
                     // use the corresponding Persistent fields as the identity,
                     // and we ask transactionContext in action to load it.
                     try {
-                        temp = tx.load( fieldEngine, fieldClassMolder, fields[i], suggestedAccessMode );
+                        temp = tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
                     } catch (Exception ex) {
                         temp = null;
                     }
@@ -718,7 +718,7 @@ public class ClassMolder {
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), suggestedAccessMode ) );
+                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode ) );
                         }
                         cp.close();
                         //_fhs[i].setValue( object, cp.getCollection() );
@@ -1347,7 +1347,7 @@ public class ClassMolder {
                         Object id = removedItor.next();
                         // must be loaded thur transaction, so that the related object
                         // is properly locked and updated before we delete it.
-                        Object reldel = tx.load( fieldEngine, fieldClassMolder, id, null );
+                        Object reldel = tx.load( fieldEngine, fieldClassMolder, id, null, null );
                         if ( reldel != null && tx.isPersistent( reldel ) ) {
                             tx.writeLock( reldel, tx.getLockTimeout() );
 
@@ -1710,7 +1710,7 @@ public class ClassMolder {
                         // load the cached dependent object from the data store.
                         // The loaded will be compared with the new one
                         if ( fields[i] != null ) {
-                            value = tx.load( fieldEngine, fieldClassMolder, fields[i], suggestedAccessMode );
+                            value = tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
                             if ( o != null )
                                 tx.update( fieldEngine, fieldClassMolder, o, oid );
                         }
@@ -1747,7 +1747,7 @@ public class ClassMolder {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     // load all the dependent object in cache for modification
                                     // check at commit time.
-                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), suggestedAccessMode );
+                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
                                 }
                             }
                         } else {
@@ -1772,7 +1772,7 @@ public class ClassMolder {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     // load all the dependent object in cache for modification
                                     // check at commit time.
-                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), suggestedAccessMode );
+                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
                                 }
                             }
                         }
@@ -2200,7 +2200,7 @@ public class ClassMolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
                 if ( fields[i] != null ) {
-                    value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
+                    value = tx.load( fieldEngine, fieldClassMolder, fields[i], null, null );
                     _fhs[i].setValue( object, value, tx.getClassLoader() );
                 } else {
                     _fhs[i].setValue( object, null, tx.getClassLoader() );
@@ -2221,7 +2221,7 @@ public class ClassMolder {
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
+                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, null ) );
                         }
                         cp.close();
                         //_fhs[i].setValue( object, cp.getCollection() );

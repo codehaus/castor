@@ -292,6 +292,33 @@ public interface Database
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
+    /**
+     * <b>Experimental</b>
+     * <p>
+     * Load an object of the specified type and given identity into 
+     * a given instance of object.
+     *
+     * Once loaded the object is persistent. Calling this method with
+     * the same identity in the same transaction will return the same
+     * object. This method is equivalent to a query that returns a
+     * single object. If the identity spans on more than one field, all
+     * of the identity fields can be wrapped in a Complex object.
+     *
+     * @param type The object's type
+     * @param identity The object's identity
+     * @param object The object instance to be loaded into
+     * @throws ObjectNotFoundException No object of the given type and
+     *  identity was found in persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire a lock on the object
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public Object load( Class type, Object identity, Object object )
+        throws ObjectNotFoundException, LockNotGrantedException,
+               TransactionNotInProgressException, PersistenceException;
 
     /**
      * Creates a new object in persistent storage. The object will be

@@ -473,7 +473,7 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized Object load( LockEngine engine, ClassMolder molder,
-    Object identity, AccessMode suggestedAccessMode )
+            Object identity, Object objectToBeLoaded, AccessMode suggestedAccessMode )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
 
         ObjectEntry entry = null;
@@ -485,12 +485,20 @@ public abstract class TransactionContext
 
         oid = new OID( engine, molder, identity );
 
+        if ( objectToBeLoaded != null 
+            && !molder.getJavaClass( _db.getClassLoader() ).isAssignableFrom( objectToBeLoaded.getClass() ) )
+            throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), entry.object.getClass() ) );
         AccessMode accessMode = molder.getAccessMode( suggestedAccessMode );
         if ( accessMode == AccessMode.ReadOnly )
             entry = getReadOnlyObjectEntry( oid );
         if ( entry == null )
             entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
+            // If the object has been loaded, but the instance sugguested to 
+            // be loaded into is not the same as the loaded instance, 
+            // error is reported.
+            if ( objectToBeLoaded != null && objectToBeLoaded != entry.object )
+                throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getName(), identity ) );
             // If the object has been loaded in this transaction from a
             // different engine this is an error. If the object has been
             // deleted in this transaction, it cannot be re-loaded. If the
@@ -502,7 +510,7 @@ public abstract class TransactionContext
                 throw new ObjectNotFoundException( "Object is deleted" + molder.getName() + identity );
             // ssa, multi classloader feature
             // ssa, FIXME : Are the two following statements equivalent ?
-//            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
+            // if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
             if ( ! molder.getJavaClass( _db.getClassLoader() ).isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), entry.object.getClass() ) );
             if ( entry.created )
@@ -513,7 +521,6 @@ public abstract class TransactionContext
             }
             return entry.object;
         }
-
         // Load (or reload) the object through the persistence engine with the
         // requested lock. This might report failure (object no longer exists),
         // hold until a suitable lock is granted (or fail to grant), or
@@ -522,13 +529,15 @@ public abstract class TransactionContext
             // ssa, multi classloader feature
             // ssa, FIXME : No better way to do that ?
             //object = molder.newInstance();
-            object = molder.newInstance( _db.getClassLoader() );
+            if ( objectToBeLoaded != null )
+                object = objectToBeLoaded;
+            else
+                object = molder.newInstance( _db.getClassLoader() );
             entry = addObjectEntry( oid, object );
             oid = engine.load( this, oid, object, suggestedAccessMode, _lockTimeout );
-            // add entry again using new oid
+
+            // rehash the object entry, because oid might have changed!
             entry = removeObjectEntry( object );
-            if ( entry == null )
-                throw new IllegalStateException("to be removed after debug");
             entry = addObjectEntry( oid, object );
 
         } catch ( ObjectNotFoundException except ) {
