@@ -48,6 +48,8 @@ package org.exolab.castor.builder;
 import org.exolab.javasource.*;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.types.TimeDuration;
+import org.exolab.castor.types.RecurringDuration;
+import org.exolab.castor.types.Time;
 import org.exolab.castor.builder.util.DescriptorJClass;
 
 /**
@@ -933,6 +935,151 @@ public class DescriptorSourceFactory {
                     jsc.append(");");
                 }
                 break;
+
+            case XSType.TIME:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("TimeValidator tv = new TimeValidator();");
+                XSTime xsTime = (XSTime)xsType;
+                if (xsTime.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                   RecurringDuration min = xsTime.getMinExclusive();
+                    if (min != null)
+                        jsc.add("tv.setMinExclusive(");
+                    else {
+                        min = xsTime.getMinInclusive();
+                        jsc.add("tv.setMinInclusive(");
+                    }
+                    jsc.append("org.exolab.castor.types.Time.parse(\""
+                                +min.toString()+"\"");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsTime.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                   RecurringDuration max = xsTime.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("tv.setMaxExclusive(");
+                    else {
+                        max = xsTime.getMaxInclusive();
+                        jsc.add("tv.setMaxInclusive(");
+                    }
+                    jsc.append("org.exolab.castor.types.Time.parse(\""
+                                +max.toString()+"\"");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(tv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+            //-- Time
+
+            case XSType.CENTURY:
+            case XSType.YEAR:
+            case XSType.MONTH:
+            case XSType.DATE:
+            case XSType.TIME_PERIOD:
+            case XSType.RECURRING_DURATION:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("RecurringDurationValidator rv = new RecurringDurationValidator();");
+                XSRecurringDuration xsReccD = (XSRecurringDuration)xsType;
+                if (xsReccD.hasMinimum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    RecurringDuration min = xsReccD.getMinExclusive();
+                    if (min != null) {
+                        jsc.add("org.exolab.castor.types.RecurringDuration min ="
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"\""+min.toString()+"\");");
+                        jsc.add("min.setDuration(\""+min.getDuration().toString()+"\");");
+                        jsc.add("min.setPeriod(\""+min.getPeriod().toString()+"\");");
+                        jsc.add("rv.setMinExclusive(");
+                    } else {
+                        min = xsReccD.getMinInclusive();
+                        jsc.add("org.exolab.castor.types.RecurringDuration min ="
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"\""+min.toString()+"\");");
+                         jsc.add("min.setDuration(\""+min.getDuration().toString()+"\");");
+                         jsc.add("min.setPeriod(\""+min.getPeriod().toString()+"\");");
+                   jsc.add("rv.setMinInclusive(");
+                    }
+                    jsc.append("min");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMinimum?
+
+                if (xsReccD.hasMaximum()) {
+                    jsc.add("try {");
+                    jsc.indent();
+                    RecurringDuration max = xsReccD.getMaxExclusive();
+                    if (max != null) {
+                        jsc.add("org.exolab.castor.types.RecurringDuration max ="
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("max.setDuration(\""+max.getDuration().toString()+"\");");
+                        jsc.add("max.setPeriod(\""+max.getPeriod().toString()+"\");");
+                        jsc.add("rv.setMaxExclusive(");
+                    }
+                    else {
+                        max = xsReccD.getMaxInclusive();
+                        jsc.add("org.exolab.castor.types.RecurringDuration max ="
+                                +"org.exolab.castor.types.RecurringDuration.parseRecurring("
+                                +"\""+max.toString()+"\");");
+                        jsc.add("max.setDuration(\""+max.getDuration().toString()+"\");");
+                        jsc.add("max.setPeriod(\""+max.getPeriod().toString()+"\");");
+                        jsc.add("rv.setMaxInclusive(");
+                    }
+                    jsc.append("max");
+                    jsc.append(");");
+                    jsc.unindent();
+                    jsc.add("} catch (java.text.ParseException e) {");
+                    jsc.indent();
+                    jsc.add("System.out.println(e);");
+                    jsc.add("e.printStackTrace();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+
+                }//hasMaximum
+                //-- pattern facet
+
+                jsc.add("fieldValidator.setValidator(rv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+            //-- RecurringDuration
+
             case XSType.TIME_DURATION:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -979,9 +1126,9 @@ public class DescriptorSourceFactory {
                 break;
         }
     } //-- validationCode
-    
+
     /**
-     * Escapes special characters in the given String so that it can 
+     * Escapes special characters in the given String so that it can
      * be printed correctly.
      *
      * @param str the String to escape
@@ -989,20 +1136,20 @@ public class DescriptorSourceFactory {
     **/
     private static String escapePattern(String str) {
         if (str == null) return str;
-        
+
         //-- make sure we have characters to escape
         if (str.indexOf('\\') < 0) return str;
-        
+
         StringBuffer sb = new StringBuffer();
         char[] chars = str.toCharArray();
-        
+
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
             if (ch == '\\') sb.append(ch);
             sb.append(ch);
         }
         return sb.toString();
-        
+
     } //-- escape
-    
+
 } //-- DescriptorSourceFactory
