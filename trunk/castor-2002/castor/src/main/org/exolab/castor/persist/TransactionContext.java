@@ -308,11 +308,6 @@ public abstract class TransactionContext
         ObjectEntry entry;
         OID         oid;
 
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
-
         // Handle the case where object has already been loaded in
         // the context of this transaction. The case where object
         // has been loaded in another transaction is handled by the
@@ -426,11 +421,6 @@ public abstract class TransactionContext
         OID         oid;
         Object      object;
 
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
-
         oid = new OID( handler, identity );
         entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
@@ -517,10 +507,6 @@ public abstract class TransactionContext
         throws TransactionNotInProgressException, QueryException,
                PersistenceException
     {
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
         // Need to execute query at this point. This will result in a
         // new result set from the query, or an exception.
         query.execute( getConnection( engine ), accessMode );
@@ -558,10 +544,6 @@ public abstract class TransactionContext
         ObjectEntry  entry;
         ClassHandler handler;
 
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
         // Make sure the object has not beed persisted in this transaction.
         if ( getObjectEntry( object ) != null )
             throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
@@ -577,16 +559,19 @@ public abstract class TransactionContext
         oid = new OID( handler, identity );
         entry = addObjectEntry( object, oid, engine );
         entry.created = true;
-        try {
-            // Must perform creation after object is recorded in transaction
-            // to prevent circular references.
-            engine.create( this, object, identity );
-        } catch ( DuplicateIdentityException except ) {
-            removeObjectEntry( object );
-            throw except;
-        } catch ( PersistenceException except ) {
-            removeObjectEntry( object );
-            throw except;
+
+        if ( identity != null ) {
+            try {
+                // Must perform creation after object is recorded in transaction
+                // to prevent circular references.
+                engine.create( this, object, identity );
+            } catch ( DuplicateIdentityException except ) {
+                removeObjectEntry( object );
+                throw except;
+            } catch ( PersistenceException except ) {
+                removeObjectEntry( object );
+                throw except;
+            }
         }
         return oid;
     }
@@ -616,10 +601,6 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
@@ -687,10 +668,6 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
@@ -729,10 +706,6 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        /*
-        if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
-        */
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
