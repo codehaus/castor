@@ -223,7 +223,7 @@ public class JdoConfFactory
 	 * @param value parameter value
 	 * @return Param object
 	 */
-	private static Param createJdoConfParam(String name, String value)
+	public static Param createJdoConfParam(String name, String value)
 	{
 		Param param = new Param();
 
@@ -236,15 +236,14 @@ public class JdoConfFactory
 
 	/**
 	 * create a JDO DataSource configuration from a JDBC DataSource instance
-	 * @param ds JDBC DataSource instance
+	 * @param String dsClassName JDBC DataSource class name
 	 * @return JDO Datasource configuration 
 	 */
-	public static DataSource createJdoDSConf(javax.sql.DataSource ds)
+	public static DataSource createJdoDSConf(String dsClassName)
 	{
 		DataSource dsConf = new DataSource();
 
-		// dsConf.addParam(ds);
-		dsConf.setClassName(ds.getClass().getName());
+		dsConf.setClassName(dsClassName);
 
 		return dsConf;
 	}
