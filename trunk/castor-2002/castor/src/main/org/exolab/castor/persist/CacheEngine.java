@@ -47,12 +47,15 @@
 package org.exolab.castor.persist;
 
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Properties;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -598,6 +601,7 @@ public final class CacheEngine
         ObjectLock lock;
         Object[]   fields;
         TypeInfo   typeInfo;
+        Object     stamp;
 
         typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
         if ( typeInfo == null )
@@ -657,6 +661,11 @@ public final class CacheEngine
             typeInfo.handler.setIdentity( object, identity );
             oid = new OID( typeInfo.handler, identity );
             oid.setDbLock( true );
+            stamp = null;
+            // XXX Here we must get the database stamp of the created object, if supported 
+            //     (not implemented yet, therefore use the local timestamp).
+            oid.setStamp( stamp ); 
+            setObjectTimeStamp( object, oid.getStamp() );
 
             // Copy the contents of the object we just created into the
             // cache engine.
@@ -802,105 +811,123 @@ public final class CacheEngine
      * persistent and must not have the identity of a persistent object.
      * The object's OID is returned. The OID is guaranteed to be unique
      * for this engine even if no identity was specified.
+     * If the object implements TimeStampable interface, verify 
+     * the object's timestamp.
      *
      * @param tx The transaction context
-     * @param object The object to update
-     * @param identity The identity of the object, or null
-     * @param db The database in which the object was created
+     * @param type The type of the object to load
+     * @param object The object
+     * @param accessMode The desired access mode
+     * @param timeout The timeout waiting to acquire a lock on the
+     *  object (specified in seconds)
      * @return The object's OID
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
      * @throws PersistenceException An error reported by the
      *  persistence engine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long 
+     *  transaction.
      */
-    public OID update( TransactionContext tx, Object object, Object identity )
-        throws DuplicateIdentityException, PersistenceException,
-               ClassNotPersistenceCapableException
+    public OID update( TransactionContext tx, Class type, Object object,
+                       AccessMode accessMode, int timeout )
+        throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
+               PersistenceException, ClassNotPersistenceCapableException
     {
+        Object[]   fields;
+        Object     identity;
         OID        oid;
         ObjectLock lock;
-        Object[]   fields;
         TypeInfo   typeInfo;
+        boolean    writeLock;
 
-        typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
+        typeInfo = (TypeInfo) _typeInfo.get( type );
         if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+            throw new ClassNotPersistenceCapableExceptionImpl( type );
 
-        // Must prevent concurrent attempt to create the same object
-        // Best way to do that is through the type
-        synchronized ( typeInfo ) {
-            // XXX If identity is null need to fine a way to determine it
-            if ( identity == null )
-                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+        // Create an OID to represent the object and see if we
+        // have a lock (i.e. object is cached).
+        identity = typeInfo.handler.getIdentity( object );
+        oid = new OID( typeInfo.handler, identity );
+        lock = typeInfo.cache.getLockForAquire( oid );
+        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
 
-            oid = new OID( typeInfo.handler, identity );
+        if ( lock != null ) {
+            // Object has been loaded before, must acquire lock
+            // on it (write in exclusive mode)
+            try {
+                // Get the actual OID of the object, this one contains the
+                // object's stamp that will be used for dirty checking.
+                oid = lock.getOID();
 
-            // If the object has a known identity at creation time, perform
-            // duplicate identity check.
-            lock = typeInfo.cache.getLockForAquire( oid );
-            if ( lock != null ) {
+                // If it implements TimeStampable interface, verify 
+                // the object's timestamp against the cache
+                if ( object instanceof TimeStampable ) {
+                    if ( oid.getStamp() == null ) 
+                        throw new IllegalStateException( Messages.format( "persist.internal",
+                                                        "Cache stamp for the TimeStamped object is null " ) );
+                    if ( ! checkObjectTimeStamp( object, oid.getStamp() ) ) 
+                        throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), identity ) );
+                }
+                
+                fields = (Object[]) lock.acquire( tx, writeLock, timeout );
+            } catch ( ObjectDeletedWaitingForLockException except ) {
+                // This is equivalent to object not existing
+                throw new ObjectNotFoundExceptionImpl( type, identity );
+            } finally {
+                // signal cache that it's now safe to release the object
+                // from transcation state to cache state.
+                typeInfo.cache.finishLockForAquire( oid );
+            }
+            if ( writeLock && ! oid.isDbLock() ) {
+                // Db-lock mode we always synchronize the object with
+                // the database and obtain a lock on the object.
                 try {
-                    fields = (Object[]) lock.acquire( tx, true, 0 );
-                } catch ( LockNotGrantedException except ) {
-                    // Someone else is using the object, definite duplicate key
-                    throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
-                } finally {
-
-                    // signal cache that it's now safe to release the object
-                    // from transcation state to cache state.
-                    typeInfo.cache.finishLockForAquire( oid );
+                    if ( _logInterceptor != null )
+                        _logInterceptor.loading( typeInfo.javaClass, identity );
+                    oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
+                                                         fields, identity, accessMode ) );
+                    if ( accessMode == AccessMode.DbLocked )
+                        oid.setDbLock( true );
+                } catch ( ObjectNotFoundException except ) {
+                    // Object was not found in persistent storge, must dump
+                    // it from the cache
+                    typeInfo.cache.removeLock( oid );
+                    lock.delete( tx );
+                    throw except;
+                } catch ( PersistenceException except ) {
+                    // Report any error talking to the persistence engine
+                    typeInfo.cache.removeLock( oid );
+                    lock.delete( tx );
+                    throw except;
                 }
-                // Dump the memory image of the object, it might have been deleted
-                // from persistent storage
-                typeInfo.cache.removeLock( oid );
-                lock.delete( tx );
+                // At this point the object is known to exist in
+                // persistence storage and we have a write lock on it.
+                return oid;
+            } else {
+                // Non-exclusive mode, we do not attempt to touch the database
+                // at this point, just load the object from the cache
+                return oid;
             }
-
-            // Store/create/delete all the dependent objects first.
-            RelationHandler[] relations;
-
-            relations = typeInfo.handler.getRelations();
-            for ( int i = 0 ; i < relations.length ; ++i ) {
-                if ( relations[ i ] != null ) {
-                    Object related;
-
-                    if ( relations[ i ].isMulti() ) {
-                        Enumeration enum;
-
-                        enum = (Enumeration) relations[ i ].getRelated( object );
-                        if ( enum != null ) {
-                            while ( enum.hasMoreElements() ) {
-                                related = enum.nextElement();
-                                if ( related != null && ! tx.isPersistent( related ) )
-                                    tx.create( this, related, relations[ i ].getIdentity( related ) );
-                            }
-                        }
-                    }
-                }
+        } else {
+            // Object has not been loaded yet, or cleared from the cache.
+            if ( object instanceof TimeStampable ) {
+                // XXX If there is a database timestamp field, we must read it and 
+                //     compare with the object's timestamp.
+                // Otherwise report ObjectModifiedException
+                throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), 
+                                                    typeInfo.handler.getIdentity( object ) ) );
+            } else {
+                // Long transaction dirty checking is impossible, so merely 
+                // load the object (then it will be filled with the new values),
+                // assuming that the programmer knows what he does :-)
+                return load( tx, type, identity, accessMode, timeout );
             }
-
-            // Check integrity of object before creating it, assuring no fields
-            // are null, and then place it in the cache. This copy will be deleted
-            // if the transaction ends up rolling back.
-            try {
-                typeInfo.handler.checkValidity( object );
-            } catch ( ValidityException except ) {
-                throw new PersistenceExceptionImpl( except );
-            }
-            fields = typeInfo.handler.newFieldSet();
-            typeInfo.handler.copyInto( object, fields );
-
-            // Copy the contents of the object we just created into the
-            // cache engine.
-            lock = new ObjectLock( fields, oid );
-            try {
-                lock.acquire( tx, true, 0 );
-            } catch ( Exception except ) {
-                // This should never happen since we just created the lock
-            }
-            typeInfo.cache.addLock( oid, lock );
         }
-        return oid;
     }
 
 
@@ -1099,6 +1126,7 @@ public final class CacheEngine
                         }
                         throw except;
                     }
+                    setObjectTimeStamp( object, oid.getStamp() );
                 }
             }
         } finally {
@@ -1257,6 +1285,57 @@ public final class CacheEngine
         }
         typeInfo.handler.setIdentity( object, oid.getIdentity() );
         typeInfo.handler.copyInto( fields, object, new FetchContext( tx, this ) );
+        setObjectTimeStamp( object, oid.getStamp() );
+    }
+
+
+    /**
+     * Set object's timestamp of type "long" from the OID's stamp of type Object
+     * if the object is TimeStampable
+     */
+    private void setObjectTimeStamp(Object object, Object stamp) {
+        long timeStamp = 0;
+        
+        if ( ! (object instanceof TimeStampable) || ( stamp == null ) ) {
+            return;
+        }
+
+        if ( stamp instanceof Long ) {
+            timeStamp = ( (Long) stamp ).longValue(); 
+        } else if ( stamp instanceof Date ) {
+            timeStamp = ( (Date) stamp ).getTime(); 
+        } else if ( stamp instanceof Integer ) {
+            timeStamp = ( (Integer) stamp ).intValue(); 
+        } else if ( stamp instanceof BigDecimal ) {
+            timeStamp = ( (BigDecimal) stamp ).longValue(); 
+        }
+        ( (TimeStampable) object ).jdoSetTimeStamp( timeStamp );
+    }
+
+
+    /**
+     * Check equality of object's timestamp of type "long" and the OID's stamp of type Object
+     * if the object is TimeStampable, otherwise return true
+     */
+    private boolean checkObjectTimeStamp(Object object, Object stamp) {
+        long timeStamp = 0;
+        
+        // if object is not instance of TimeStampable or stamp is null, 
+        // we assume that the chech should not be performed, all is fine
+        if ( ! (object instanceof TimeStampable) || ( stamp == null ) ) {
+            return true;
+        }
+
+        if ( stamp instanceof Long ) {
+            timeStamp = ( (Long) stamp ).longValue(); 
+        } else if ( stamp instanceof Date ) {
+            timeStamp = ( (Date) stamp ).getTime(); 
+        } else if ( stamp instanceof Integer ) {
+            timeStamp = ( (Integer) stamp ).intValue(); 
+        } else if ( stamp instanceof BigDecimal ) {
+            timeStamp = ( (BigDecimal) stamp ).longValue(); 
+        }
+        return ( timeStamp == ( (TimeStampable) object ).jdoGetTimeStamp() );
     }
 
 

@@ -50,6 +50,8 @@ package jdo;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.QueryResults;
@@ -57,7 +59,7 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.engine.LongTransactionSupport;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -69,6 +71,9 @@ import org.exolab.exceptions.CWClassConstructorException;
 public class Dependent
     extends CWTestCase
 {
+
+
+    private Connection     _conn;
 
 
     private JDOCategory    _category;
@@ -107,7 +112,6 @@ public class Dependent
             TestDetail    detail;
             QueryResults  qres;
             TestMaster    master2;
-            LongTransactionSupport lts;
             int           cnt;
             
             db = _category.getDatabase( stream.verbose() );
@@ -235,11 +239,11 @@ public class Dependent
             master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
-                     master.getDetails().contains( new TestDetail( TestDetail.DefaultId ) ) ||
-                     master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 1 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 2 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 3 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 4 ) ) ) {
+                     master.getDetails().contains( new TestDetail( 5 ) ) ||
+                     master.getDetails().contains( new TestDetail( 6 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( 8 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
                     stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
                     result  = false;
                 } else {
@@ -254,20 +258,66 @@ public class Dependent
                 return false;
 
 
-            stream.writeVerbose( "Test long transaction support (LTS)" );
+            stream.writeVerbose( "Test long transaction with dirty checking" );
             db.begin();
             master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
             if ( master == null ) {
                 stream.writeVerbose( "Error: failed to find master with details group" );
                 return false;
             }
-            master2 = new TestMaster();
+            db.commit();
+            db.begin();
+            master2 = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
+            master2.setValue( master2.getValue() + "2" );
+            db.commit();
+
+            stream.writeVerbose( "Test 1" );
+            try {
+                db.begin();
+                db.update( master );
+                db.commit();
+                stream.writeVerbose( "Error: Dirty checking doesn't work" );
+                result  = false;
+            } catch ( ObjectModifiedException exept ) {
+                db.rollback();
+                stream.writeVerbose( "OK: Dirty checking works" );
+            }
+ 
+            stream.writeVerbose( "Test 2" );
             master2.addDetail( new TestDetail( 5 ) );
             master2.addDetail( new TestDetail( 6 ) );
-            master2.addDetail( new TestDetail( 7 ) );
-            lts = new LongTransactionSupport( db );
-            lts.copyObject( master2, master );
-            db.commit();
+            master2.getDetails().removeElement( new TestDetail( 8 ) );
+            master2.getDetails().removeElement( new TestDetail( 9 ) );
+            try {
+                db.begin();
+                db.update( master2 );
+                db.commit();
+                stream.writeVerbose( "OK: Dirty checking works" );
+            } catch ( ObjectModifiedException exept ) {
+                db.rollback();
+                stream.writeVerbose( "Error: Dirty checking doesn't work" );
+                result  = false;
+            }
+            stream.writeVerbose( "Test 3" );
+            _conn = _category.getJDBCConnection(); 
+            _conn.setAutoCommit( false );
+            _conn.createStatement().execute( "UPDATE test_master SET value='concurrent' WHERE id=" 
+                    + master2.getId() );
+            _conn.commit();
+            _conn.close();
+            master2.addDetail( new TestDetail( 10 ) );
+            try {
+                db.begin();
+                db.update( master2 );
+                db.commit();
+                stream.writeVerbose( "Error: Dirty checking doesn't work" );
+                result  = false;
+            } catch ( ObjectModifiedException exept ) {
+                if (db.isActive()) {
+                    db.rollback();
+                }
+                stream.writeVerbose( "OK: Dirty checking works" );
+            }
             db.begin();
             master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
             if ( master != null ) {
@@ -280,13 +330,13 @@ public class Dependent
                     stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
                     result  = false;
                 } else {
-                    stream.writeVerbose( "With LTS Details changed correctly: " + master );
+                    stream.writeVerbose( "Details changed correctly in the long transaction: " + master );
                 }
             } else {
                 stream.writeVerbose( "Error: master not found" );
                 result = false;
             }
-            db.remove( master );
+            //db.remove( master );
             db.commit();
             if ( ! result )
                 return false;

@@ -137,7 +137,11 @@ final class OID
      */
     void setStamp( Object stamp )
     {
-        _stamp = stamp;
+        if (stamp == null) {
+            _stamp = new Long( System.currentTimeMillis() );
+        } else {  
+            _stamp = stamp;
+        }
     }
 
 
