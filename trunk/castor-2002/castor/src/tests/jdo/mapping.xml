@@ -14,7 +14,7 @@
     <field name="value1" type="string"  required="true">
       <sql name="value1" type="varchar" />
     </field>
-    <field name="people" type="jdo.TestManyPerson" collection="arraylist"
+    <field name="people" type="jdo.TestManyPerson" collection="collection"
     required="false" >
     <sql many-table="test_group_person"/>
     </field>
@@ -35,7 +35,7 @@
     <field name="sthelse" type="string"  >
       <sql name="sthelse" type="varchar" />
     </field>
-    <field name="group" type="jdo.TestManyGroup" collection="arraylist"
+    <field name="group" type="jdo.TestManyGroup" collection="collection"
     required="false">
       <sql many-table="test_group_person"/>
     </field>
@@ -51,7 +51,7 @@
     <field name="value1" type="string"  required="true">
       <sql name="value1" type="varchar" />
     </field>
-    <field name="people" type="jdo.TestManyPersonKeyGen" collection="arraylist"
+    <field name="people" type="jdo.TestManyPersonKeyGen" collection="collection"
     required="false" >
     <sql many-table="test_group_person"/>
     </field>
@@ -73,7 +73,7 @@
     <field name="sthelse" type="string"  >
       <sql name="sthelse" type="varchar" />
     </field>
-    <field name="group" type="jdo.TestManyGroupKeyGen" collection="arraylist"
+    <field name="group" type="jdo.TestManyGroupKeyGen" collection="collection"
     required="false">
       <sql many-table="test_group_person"/>
     </field>
@@ -92,7 +92,7 @@
     <field name="birthday" type="date"  >
       <sql name="bday" type="date" />
     </field>
-    <field name="address" type="jdo.TestLazyAddress" collection="arraylist" lazy="true"/>
+    <field name="address" type="jdo.TestLazyAddress" collection="collection" lazy="true"/>
   </class>
 
   <class name="jdo.TestLazyAddress" depends="jdo.TestLazyPerson" identity="id">
@@ -140,7 +140,7 @@
     <field name="comment" type="string">
       <sql name="c_comment" type="varchar"/>
     </field>
-    <field name="category" type="jdo.TestLazyContractCategory" collection="arraylist" >
+    <field name="category" type="jdo.TestLazyContractCategory" collection="collection" >
       <sql many-table="test_pks_category_contract" many-key="policy_no contract_no" name="cate_id" />
     </field>
     <field name="employee" type="jdo.TestLazyEmployee" >
@@ -156,7 +156,7 @@
     <field name="name" type="string">
       <sql name="name" type="varchar" />
     </field>
-    <field name="contract" type="jdo.TestLazyContract" collection="arraylist" >
+    <field name="contract" type="jdo.TestLazyContract" collection="collection" >
       <sql many-table="test_pks_category_contract" many-key="cate_id" name="policy_no contract_no" />
     </field>
   </class>
@@ -899,7 +899,7 @@
     <!-- this is a dirty hack, don't follows. It only work if load always
          done by db.load( MyClass.class, id ). -->
     <map-to table="test_col" />
-    <field name="item" type="jdo.TestItem" collection="arraylist">
+    <field name="item" type="jdo.TestItem" collection="collection">
     </field>
   </class>
 
