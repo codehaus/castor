@@ -63,6 +63,7 @@ import org.xml.sax.helpers.AttributeListImpl;
 
 import org.apache.xml.serialize.Serializer;
 
+
 /**
  * A class for serializing Schema models
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -561,10 +562,17 @@ public class SchemaWriter {
                 //the base type can be a complexType in extension
                 if (baseType.isSimpleType()) {
                     SimpleType simpleType = (SimpleType)baseType;
-                    if ((baseTypeName.indexOf(':') < 0) &&
-                         simpleType.isBuiltInType())
-                    {
-                         baseTypeName = schemaPrefix + baseTypeName;
+                    if (baseTypeName.indexOf(':') < 0) {
+                        if (simpleType.isBuiltInType()) {
+                            baseTypeName = schemaPrefix + baseTypeName;
+                        }
+                        else {
+                            String targetNamespace = simpleType.getSchema().getTargetNamespace();
+                            String prefix = getNSPrefix(complexType.getSchema(), targetNamespace);
+                            if ((prefix != null) && (prefix.length() > 0)) {
+                                baseTypeName = prefix + ":" + baseTypeName;
+                            }
+                        }
                     }
                 }
             }
@@ -1304,8 +1312,17 @@ public class SchemaWriter {
 
             String typeName = base.getName();
             //-- add "xsd" prefix if necessary
-            if ((typeName.indexOf(':') < 0) && base.isBuiltInType()) {
-                typeName = schemaPrefix + typeName;
+            if (typeName.indexOf(':') < 0) {
+                if (base.isBuiltInType()) {
+                    typeName = schemaPrefix + typeName;
+                }
+                else {
+                    String targetNamespace = base.getSchema().getTargetNamespace();
+                    String prefix = getNSPrefix(simpleType.getSchema(), targetNamespace);
+                    if ((prefix != null) && (prefix.length() > 0)) {
+                        typeName = prefix + ":" + typeName;
+                    }
+                }
             }
             _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, typeName);
 
