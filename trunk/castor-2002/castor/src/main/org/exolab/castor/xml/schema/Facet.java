@@ -108,7 +108,15 @@ public abstract class Facet extends Annotated {
     public int toInt() throws NumberFormatException {
         return Integer.parseInt(_value);
     } //-- toInt
-    
+        
+    /**
+     * Returns an short representation of the value of this facet
+     * @return an short representation of the value of this facet
+    **/
+    public short toShort() throws NumberFormatException {
+        return Short.parseShort(_value);
+    } //-- toShort
+	
     /**
      * Returns a double representation of the value of this facet
      * @return a double representation of the value of this facet

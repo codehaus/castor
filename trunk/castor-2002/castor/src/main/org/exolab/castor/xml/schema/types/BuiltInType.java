@@ -207,6 +207,17 @@ public abstract class BuiltInType extends SimpleType {
      * The type associated with timeInstant
     **/
     public static final short  TIME_INSTANT_TYPE        = 14;
+		
+	/**
+	 * The name of the int type
+	 */
+	public static final String INT_NAME					= "int";
+    
+    /**
+     * The type associated with int
+    **/
+    public static final short INT_TYPE					= 15;
+	
     
     
     //----------------/

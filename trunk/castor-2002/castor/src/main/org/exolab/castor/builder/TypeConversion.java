@@ -217,6 +217,16 @@ public class TypeConversion {
                 //-- decimal
                 case BuiltInType.DECIMAL_TYPE:
                     return new XSDecimal();
+                //-- short
+                case BuiltInType.SHORT_TYPE:
+					XSShort xsShort = new XSShort();
+					readShortFacets(simpleType, xsShort);
+                    return xsShort;
+                //-- short
+				case BuiltInType.INT_TYPE:
+					XSInt xsInt = new XSInt();
+					readIntFacets(simpleType, xsInt);
+                    return xsInt;
                 default:
                     //-- error
                     String className 
@@ -278,6 +288,71 @@ public class TypeConversion {
         }
         
     } //-- toXSInteger
+	
+    /**
+     * Converts the given simpletype to an XSInteger
+     * @param simpletype the Simpletype to convert
+     * @return the XSInteger representation of the given Simpletype
+    **/
+    private static void readIntFacets
+        (SimpleType simpleType, XSInt xsInt) 
+    {
+        
+        //-- copy valid facets
+        Enumeration enum = simpleType.getFacets();
+        while (enum.hasMoreElements()) {
+            
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+            
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                xsInt.setMaxExclusive(facet.toInt());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                xsInt.setMaxInclusive(facet.toInt());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(facet.getName()))
+                xsInt.setMinExclusive(facet.toInt());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
+                xsInt.setMinInclusive(facet.toInt());
+            
+        }
+        
+    } //-- toXSInt
+    
+    /**
+     * Converts the given simpletype to an XSShort
+     * @param simpletype the Simpletype to convert
+     * @param xsShort the XSShort to set the facets in
+    **/
+    private static void readShortFacets
+        (SimpleType simpleType, XSShort xsShort) 
+    {        
+        //-- copy valid facets
+        Enumeration enum = simpleType.getFacets();
+        while (enum.hasMoreElements()) {
+            
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+            
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                xsShort.setMaxExclusive(facet.toShort());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                xsShort.setMaxInclusive(facet.toShort());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(facet.getName()))
+                xsShort.setMinExclusive(facet.toShort());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
+                xsShort.setMinInclusive(facet.toShort());
+            
+        }
+        
+    } //-- toXSShort
     
     /**
      * Converts the given simpletype to an XSString
@@ -324,6 +399,8 @@ public class TypeConversion {
         nameMap.put("string",              "java.lang.String");
         nameMap.put("timeInstant",         "java.util.Date");
         nameMap.put("decimal",             "java.util.BigDecimal");
+		nameMap.put("short",               "short");
+        nameMap.put("int",		           "int");				
         
         return nameMap;
     } //-- iCreateNameMap
