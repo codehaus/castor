@@ -488,9 +488,7 @@ public abstract class TransactionContext
 
         // Make sure the object has not beed persisted in this transaction.
         entry = getObjectEntry( object );
-        if ( entry != null ) {
-            if ( entry.deleted )
-                throw new ObjectDeletedExceptionImpl( object.getClass(), identity );
+        if ( entry != null && ! entry.deleted ) {
             throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
         handler = engine.getClassHandler( object.getClass() );
@@ -503,7 +501,7 @@ public abstract class TransactionContext
         oid = new OID( handler, identity );
         entry = getObjectEntry( engine, oid );
         if ( identity != null && entry != null ) {
-            if ( ! entry.deleted ) 
+            if ( ! entry.deleted || entry.object != object ) 
                 throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
             else {
                 // If the object was already deleted in this transaction, 
@@ -512,14 +510,19 @@ public abstract class TransactionContext
                 if ( _deletedList != null ) {
                     ObjectEntry deleted;
                     
-                    deleted = _deletedList;
-                    while ( deleted.nextDeleted != null && deleted.nextDeleted != entry )
-                        deleted = deleted.nextDeleted;
-                    if ( deleted.nextDeleted == entry ) {
-                        deleted.nextDeleted = entry.nextDeleted;
+                    if ( _deletedList == entry ) 
+                        _deletedList = entry.nextDeleted;
+                    else {
+                        deleted = _deletedList;
+                        while ( deleted.nextDeleted != null && deleted.nextDeleted != entry ) 
+                            deleted = deleted.nextDeleted;
+                        if ( deleted.nextDeleted == entry ) 
+                            deleted.nextDeleted = entry.nextDeleted;
+                        else 
+                            throw new PersistenceExceptionImpl( "persist.deletedNotFound", identity );
                     }
                 }
-                removeObjectEntry( entry.object );
+                removeObjectEntry( object );
                 try {
                     // Emulate object deleting
                     if ( handler.getCallback() != null )
@@ -807,6 +810,7 @@ public abstract class TransactionContext
             throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
+System.out.println("release lock");
         removeObjectEntry( object );
         handler = entry.engine.getClassHandler( object.getClass() );
         if ( handler.getCallback() != null )
