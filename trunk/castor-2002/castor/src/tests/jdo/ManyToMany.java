@@ -404,9 +404,35 @@ public class ManyToMany extends CastorTestCase {
             if ( person2.getId() == person2Id )
                 fail("Error: person2 is not removed");
         }
-        groupA = (TestManyGroup)_db.load( TestManyGroup.class, new Integer(groupBId) );
-        if ( groupA.getPeople() != null && groupA.getPeople().size() != 0 )
+        groupB = (TestManyGroup)_db.load( TestManyGroup.class, new Integer(groupBId) );
+        if ( groupB.getPeople() != null && groupB.getPeople().size() != 0 )
             fail("Error: person2 is not removed");
+
+        // make a dangerous add (add to only one side)
+        // user shouldn't rely on this behavior, but 
+        // should always link both side before commit
+        person1 = (TestManyPerson)_db.load( TestManyPerson.class, new Integer(person1Id) );
+        person1.getGroup().add(groupB);
+        _db.commit();
+
+        // check if adding group into existing collection work
+        _db.begin();
+        person1 = (TestManyPerson)_db.load( TestManyPerson.class, new Integer(person1Id) );
+        Iterator tempItor = person1.getGroup().iterator();
+        if ( !tempItor.hasNext() )
+            fail("Error: expected group from person1 not found");
+        groupA = (TestManyGroup)tempItor.next();
+        int tempGroupId = groupA.getId();
+        if ( tempGroupId != groupAId && tempGroupId != groupBId )
+            fail("Error: unexpected group from person1 found");
+
+        if ( !tempItor.hasNext() )
+            fail("Error: expected group from person1 not found");
+        groupA = (TestManyGroup)tempItor.next();
+        if ( tempGroupId == groupA.getId() )
+            fail("Error: duplicated group found!");
+        if ( groupA.getId() != groupAId && groupA.getId() != groupBId )
+            fail("Error: unexpected group from person1 found");
         _db.commit();
 
         // test long transaction support
@@ -505,6 +531,27 @@ public class ManyToMany extends CastorTestCase {
         } else {
             fail("Error: object not found!");
         }
+        person3 = (TestManyPerson)_db.load( TestManyPerson.class, new Integer(person3Id) );
+        _db.commit();
+
+        // modify and commit to long trans
+        groupA.getPeople().add( person3 );
+        person3.getGroup().add( groupA );
+        _db.begin();
+        _db.update( groupA );
+        _db.commit();
+
+        // load and check
+        _db.begin();
+        person3 = (TestManyPerson)_db.load( TestManyPerson.class, new Integer(person3Id) );
+        tempItor = person3.getGroup().iterator();
+        if ( !tempItor.hasNext() )
+            fail( "Error: group not found" );
+        groupA = (TestManyGroup)tempItor.next();
+        if ( groupA.getId() != groupAId )
+            fail( "Error: unexpected group found" );
+        if ( !tempItor.hasNext() )
+            fail( "Error: too many group" );
         _db.commit();
     }
 
