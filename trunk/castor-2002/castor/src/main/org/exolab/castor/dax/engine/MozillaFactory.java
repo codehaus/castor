@@ -117,6 +117,11 @@ public final class MozillaFactory
     }
 
 
+    public String quoteName( String name )
+    {
+        return name;
+    }
+
 
 }
 
