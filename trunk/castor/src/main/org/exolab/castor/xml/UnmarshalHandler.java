@@ -315,7 +315,6 @@ public final class UnmarshalHandler extends MarshalFramework
         super();
         _stateInfo          = new Stack();
         _idResolver         = new IDResolverImpl();
-        _resolveTable       = new Hashtable();
 		_javaPackages 		= new Hashtable();        
         buf                 = new StringBuffer();
         _topClass           = _class;
@@ -690,6 +689,7 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             //-- remove current namespace scoping
             _namespaces = _namespaces.getParent();
+            freeState(state);
             return;
         }
 
@@ -704,6 +704,7 @@ public final class UnmarshalHandler extends MarshalFramework
         if ((state.object == null) && (!state.primitiveOrImmutable)) {
             //-- remove current namespace scoping
             _namespaces = _namespaces.getParent();
+            freeState(state);
             return;
         }
         
@@ -793,6 +794,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 UnmarshalState pState = (UnmarshalState)_stateInfo.peek();
                 processIDREF(state.buffer.toString(), descriptor, pState.object);
                 _namespaces = _namespaces.getParent();
+                freeState(state);
                 return;
             }
             else {
@@ -850,7 +852,6 @@ public final class UnmarshalHandler extends MarshalFramework
                     throw new SAXException(first);
                 }
             }
-
             return;
         }
 
@@ -859,6 +860,7 @@ public final class UnmarshalHandler extends MarshalFramework
         if (descriptor.isIncremental()) {
             //-- remove current namespace scoping
            _namespaces = _namespaces.getParent();
+           freeState(state);
            return; //-- already added
         }
 
@@ -917,14 +919,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 firstOccurance = true;
             }
             //-- record usage of descriptor
-            state.markAsUsed(descriptor);
-            //-- special handling for mapped objects
-            if (descriptor.isMapped()) {
-                if (!(val instanceof MapItem)) {
-                    MapItem mapItem = new MapItem(fieldState.key, val);
-                    val = mapItem;
-                }
-            }
+            state.markAsUsed(descriptor);            
         }
 
         try {
@@ -947,13 +942,33 @@ public final class UnmarshalHandler extends MarshalFramework
                      addObject = (!tmp.equals(val));
                  }
             }
+            
+            //-- special handling for mapped objects
+            if (descriptor.isMapped()) {
+                if (!(val instanceof MapItem)) {
+                    MapItem mapItem = new MapItem(fieldState.key, val);
+                    val = mapItem;
+                }
+                else {
+                    //-- make sure value exists (could be a reference)
+                    MapItem mapItem = (MapItem)val;
+                    if (mapItem.getValue() == null) {
+                        //-- save for later...
+                        addObject = false;
+                        addReference(mapItem.toString(), state.object, descriptor);
+                    }
+                }
+            }
+            
             if (addObject) {
                 //-- clear any collections if necessary
                 if (firstOccurance && _clearCollections) {
                     handler.resetValue(state.object);
                 }
+                
                 //-- finally set the value!!
                 handler.setValue(state.object, val);
+                
                 // If there is a parent for this object, pass along
                 // a notification that we've finished adding a child
                 if ( _unmarshalListener != null ) {
@@ -1600,6 +1615,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- create new state object
         state = getState();
         state.elementName = name;
+        state.parent = parentState;
         
         if (xmlSpace != null)        
             state.wsPreserve = PRESERVE.equals(xmlSpace);
@@ -2247,6 +2263,27 @@ public final class UnmarshalHandler extends MarshalFramework
     //-------------------/
 
     /**
+     * Adds the given reference to the "queue" until the referenced object
+     * has been unmarshalled.
+     *
+     * @param idRef the ID being referenced
+     * @param parent the target/parent object for the field
+     * @param descriptor the XMLFieldDescriptor for the field
+     */
+    private void addReference(String idRef, Object parent, XMLFieldDescriptor descriptor) 
+    {
+        
+        ReferenceInfo refInfo = new ReferenceInfo(idRef, parent, descriptor);
+        
+        if (_resolveTable == null) 
+            _resolveTable = new Hashtable();
+        else {
+            refInfo.next = (ReferenceInfo)_resolveTable.get(idRef);
+        }
+        _resolveTable.put(idRef, refInfo);
+    } //-- addReference
+    
+    /**
      * Creates an instance of the given class
      */
      private Object createInstance(Class type, Arguments args) 
@@ -2697,6 +2734,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- if this is the identity then save id
         if (classDesc.getIdentity() == descriptor) {
+            
             _idResolver.bind(attValue, parent);
 
             //-- save key in current state
@@ -2825,24 +2863,22 @@ public final class UnmarshalHandler extends MarshalFramework
      * @param idRef the ID of the object in which to reference
      * @param descriptor the current FieldDescriptor
      * @param parent the current parent object
-    **/
-    private void processIDREF
+     * @return true if the ID was found and resolved properly
+     */
+    private boolean processIDREF
         (String idRef, XMLFieldDescriptor descriptor, Object parent)
     {
         Object value = _idResolver.resolve(idRef);
         if (value == null) {
             //-- save state to resolve later
-            ReferenceInfo refInfo
-                = new ReferenceInfo(idRef, parent, descriptor);
-            refInfo.next
-                = (ReferenceInfo)_resolveTable.remove(idRef);
-            _resolveTable.put(idRef, refInfo);
+            addReference(idRef, parent, descriptor);
         }
         else {
             FieldHandler handler = descriptor.getHandler();
             if (handler != null)
                 handler.setValue(parent, value);
         }
+        return (value != null);
     } //-- processIDREF
 
     /**
@@ -3211,6 +3247,7 @@ public final class UnmarshalHandler extends MarshalFramework
         throws org.xml.sax.SAXException
     {
         if ((id == null) || (value == null)) return;
+        if (_resolveTable == null) return;
 
         ReferenceInfo refInfo = (ReferenceInfo)_resolveTable.remove(id);
         while (refInfo != null) {
@@ -3218,6 +3255,11 @@ public final class UnmarshalHandler extends MarshalFramework
                 FieldHandler handler = refInfo.descriptor.getHandler();
                 if (handler != null)
                     handler.setValue(refInfo.target, value);
+                    
+                //-- special handling for MapItems
+                if (refInfo.target instanceof MapItem) {
+                    resolveReferences(refInfo.target.toString(), refInfo.target);
+                }
             }
             catch(java.lang.IllegalStateException ise) {
 
@@ -3412,6 +3454,7 @@ public final class UnmarshalHandler extends MarshalFramework
      * Internal class used to save state for reference resolving
     **/
     class ReferenceInfo {
+        
         String id = null;
         Object target = null;
         XMLFieldDescriptor descriptor = null;
