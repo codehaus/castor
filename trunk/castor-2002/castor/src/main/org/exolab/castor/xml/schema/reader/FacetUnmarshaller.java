@@ -193,7 +193,7 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
         }
     } //-- characters
 
-    private boolean isFacet(String name) {
+    protected static boolean isFacet(String name) {
 
         if (Facet.DURATION.equals(name))      return true;
         if (Facet.ENCODING.equals(name))      return true;

@@ -59,9 +59,17 @@ import java.util.Enumeration;
 **/
 public class Schema extends Annotated {
 
-
-    public static final String DEFAULT_SCHEMA_NS
+    /*
+      April 200 Working Draft Namespace
         = "http://www.w3.org/1999/XMLSchema";
+    */
+    
+    /**
+     * The default Schema namespace, currently
+     * supporting W3C XML Schema, October 2000 Candidate Release
+    **/
+    public static final String DEFAULT_SCHEMA_NS
+        = "http://www.w3.org/2000/10/XMLSchema";
 
 
     private static final String NULL_ARGUMENT
@@ -407,10 +415,23 @@ public class Schema extends Annotated {
      * @param derivation the name of the derivation method (""/"list"/"restriction")
      * @return the new SimpleType.
     **/
-    public SimpleType createUserSimpleType(String name, String baseName, String derivation)
+    public SimpleType createSimpleType(String name, String baseName, String derivation)
     {
         return simpleTypesFactory.createUserSimpleType(this, name, baseName, derivation, true);
-    }
+    } //-- createSimpleType
+    
+    /**
+     * Creates a new SimpleType using this Schema as the owning Schema
+     * document. A call to #addSimpleType must till be made in order
+     * to add the SimpleType to this Schema if the type is to be global.
+     * @param name the name of the SimpleType
+     * @param baseType the base type of the SimpleType to create
+     * @return the new SimpleType.
+    **/
+    public SimpleType createSimpleType(String name, SimpleType baseType)
+    {
+        return simpleTypesFactory.createUserSimpleType(this, name, baseType, "restriction");
+    } //-- createSimpleType
 
     /**
      * Returns the top-level Attribute associated with the given name.
@@ -873,9 +894,11 @@ public class Schema extends Annotated {
     public void validate()
         throws ValidationException
     {
-        //-- do nothing
+        //-- do nothing for now...eventually we need
+        //-- to cascade calls to all structure types
+        
     } //-- validate
 
-} //-- SchemaDef
+} //-- Schema
 
 

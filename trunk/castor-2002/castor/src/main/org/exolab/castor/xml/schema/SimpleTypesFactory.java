@@ -73,7 +73,7 @@ import org.xml.sax.InputSource;
  * that represent the simple types defined by xmlschema and those derived from them.
  *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
- * @version $Revision:
+ * @version $Revision$ $Date$
 **/
 public class SimpleTypesFactory
 {
@@ -255,6 +255,42 @@ public class SimpleTypesFactory
             else
                 return null;
         }
+        
+        return createUserSimpleType(schema, name, baseType, derivation);
+    } 
+        
+    /**
+     * Creates an instance of a class derived from SimpleType, representing the
+     * user type defined by the given name, baseName and derivation method.
+     *
+     * Package private (used by Schema and DeferredSimpleType).
+     *
+     * The given schema is used as the owning Schema document, yet a call to
+     * schema#addSimpleType must still be made to add the SimpleType to the 
+     * Schema if the SimpleType is not anonymous.
+     *
+     * If the base type is not found in the schema, a DeferredSimpleType
+     * will be returned if createDeferredSimpleType is true, null otherwise.
+     *
+     * @param schema the owning schema
+     * @param name the name of the SimpleType
+     * @param baseType the base type
+     * @param derivation the name of the derivation method (null/""/"list"/"restriction")
+     * @return the new SimpleType, or null if its parent could not be found.
+    **/
+    SimpleType createUserSimpleType( Schema schema,
+                                     String name,
+                                     SimpleType baseType,
+                                     String derivation)
+    {
+        String internalName = name;
+        if (name == null) internalName = "anonymous-simple-type";
+        
+        if ( (baseType == null) ) {
+            //We need a base type
+            sendToLog(Messages.format( "schema.noBaseType", internalName ));
+            return null;
+        }
 
         SimpleType result= null;
 
@@ -262,7 +298,9 @@ public class SimpleTypesFactory
             //derive as list
             if ( !(baseType instanceof AtomicType) ) {
                 //only lists of atomic values are allowed by the specification
-                sendToLog( Messages.format("schema.deriveByListError", name, baseName) );
+                sendToLog( Messages.format("schema.deriveByListError", 
+                                           internalName, 
+                                           baseType.getName()) );
                 return null;
             }
             result= new ListType();
@@ -272,8 +310,9 @@ public class SimpleTypesFactory
             //derive as restriction (only derivation allowed apart from list for simple types)
             //Find the built in ancestor type
             SimpleType builtInBase= baseType.getBuiltInBaseType();
-            if (baseType == null) {
-               sendToLog( Messages.format("schema.noBuiltInParent", name) );
+            if (builtInBase == null) {
+               sendToLog( Messages.format("schema.noBuiltInParent", 
+                                          internalName) );
                return null;
             }
 
@@ -290,7 +329,7 @@ public class SimpleTypesFactory
         result.setDerivationMethod(derivation);
         result.setTypeCode(USER_TYPE);
         return result;
-    }
+    } //-- createUserSimpleType
 
     /**
      * Returns the log writer.

@@ -81,17 +81,6 @@ public class ElementDecl extends Particle {
     **/
     String elementRef = null;
 
-
-    /**
-     * The Schema URI for this Element Declaration
-    **/
-    private String schemaName = null;
-
-    /**
-     * The Schema Abbreviation for the Schema name
-    **/
-    private String schemaAbbrev = null;
-
     /**
      * The XMLType for this element declaration
     **/
@@ -107,6 +96,10 @@ public class ElementDecl extends Particle {
     **/
     private Schema schema = null;
 
+    private boolean nullable = false;
+    
+    private String _default = null;
+    
     /**
      * Creates a new default element definition
      * @param schema, the XML Schema to which this element declartion
@@ -134,6 +127,16 @@ public class ElementDecl extends Particle {
         this.name = name;
     } //-- ElementDecl
 
+    /**
+     * Returns the default value of this element definition.
+     *
+     * @return the default value of this element definition,
+     * or null if no default was specified.
+    **/
+    public String getDefaultValue() {
+        return _default;
+    } //-- getDefaultValue
+    
     /**
      * Returns the name of this Element declaration. The name of the 
      * referenced element is returned if the 'ref' attribute was used.
@@ -194,21 +197,6 @@ public class ElementDecl extends Particle {
         return this.schema;
     } //-- getSchema
 
-    /**
-     * Returns the Schema Abbreviation for the Schema name
-     * @return the Schema Abbreviation for the Schema name
-    **/
-    public String getSchemaAbbrev() {
-        return this.schemaAbbrev;
-    } //-- getSchemaAbbrev
-
-    /**
-     * Returns the Schema Name for this Element declaration.
-     * @return the Schema Name for this Element declaration.
-    **/
-    public String getSchemaName() {
-        return this.schemaName;
-    } //-- getSchemaName
 
     /**
      * Returns true if this element definition is abstract
@@ -218,6 +206,17 @@ public class ElementDecl extends Particle {
         return isAbstract;
     } //-- isAbstract
 
+    /**
+     * Returns whether or not instances of this element definition
+     * may appear with no content.
+     *
+     * @return true if instances of this element definition
+     * may appear with no content, otherwise false.
+    **/
+    public boolean isNullable() {
+        return nullable;
+    } //-- isNullable
+    
     /**
      * Returns true if this element definition simply references another
      * element Definition
@@ -237,6 +236,15 @@ public class ElementDecl extends Particle {
     } //-- isAbstract
 
     /**
+     * Sets the default value for this element definition.
+     *
+     * @param value the default value for this element definition.
+    **/
+    public void setDefaultValue(String value) {
+        this._default = value;
+    } //-- setDefaultValue
+    
+    /**
      * Sets the name of the element that this Element definition defines
      * @param name the name of the defined element
     **/
@@ -244,6 +252,17 @@ public class ElementDecl extends Particle {
         this.name = name;
     } //-- setName
 
+    /**
+     * Sets whether or not instances of this element definition may
+     * contain empty content
+     *
+     * @param nullable the flag when true indicates that instances
+     * of this element definition may appear with empty content
+    **/
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    } //-- setNullable
+    
     /**
      * Sets the reference for this element definition
      * @param reference the Element definition that this definition references
@@ -263,27 +282,7 @@ public class ElementDecl extends Particle {
     public void setReference(String reference) {
         this.elementRef = reference;
     } //-- setReference
-
-    /**
-     * Sets the Schema Abbreviation for the Schema name
-     * @param abbrev the Schema Abbreviation for the Schema name
-     * @see #setSchemaName
-    **/
-    public void setSchemaAbbrev(String abbrev) {
-        this.schemaAbbrev = abbrev;
-    } //-- setSchemaAbbrev
-
-    /**
-     * Sets the Schema Name for this Element declaration.
-     * @param uri, the Schema Name, which is a URI for this element
-     * declaration
-     * @see #setSchemaAbbrev
-    **/
-    public void setSchemaName(String uri) {
-        this.schemaName = uri;
-    } //-- setSchemaName
-
-
+    
     /**
      * Sets the XMLType for this Element declaration.
      * @param type the XMLType for this element declaration.

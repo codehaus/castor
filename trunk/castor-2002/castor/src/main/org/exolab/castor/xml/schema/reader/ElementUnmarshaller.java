@@ -86,6 +86,11 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     
     private Schema _schema = null;
     
+    private boolean foundAnnotation         = false;
+    private boolean foundIdentityConstraint = false;
+    private boolean foundSimpleType         = false;
+    private boolean foundComplexType        = false;
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -118,10 +123,24 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         //-- @name
         _element.setName(atts.getValue("name"));
             
+        //-- @default
+        _element.setDefaultValue(atts.getValue(SchemaNames.DEFAULT_ATTR));
+        
         //-- @type
         attValue = atts.getValue("type");
         if (attValue != null) _element.setTypeReference(attValue);
-                
+          
+        //-- @nullable
+        attValue = atts.getValue(SchemaNames.NULLABLE_ATTR);
+        if (attValue != null) {
+            if (attValue.equals("true")) _element.setNullable(true);
+            else if (!attValue.equals("false")) {
+                String err = "Invalid value for the 'nullable' attribute of "+
+                    "an element definition: " + attValue;
+                throw new IllegalArgumentException(err);
+            }
+        }
+        
         /*
          * @minOccurs
          * if minOccurs is present the value is the int value of
@@ -150,12 +169,6 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             _element.setMaxOccurs(minOccurs);
         else
             _element.setMaxOccurs(1);
-        
-        //-- @schemaAbbrev
-        _element.setSchemaAbbrev(atts.getValue("schemaAbbrev"));
-        
-        //-- @schemaName
-        _element.setSchemaName(atts.getValue("schemaName"));
         
         charUnmarshaller = new CharacterUnmarshaller();
     } //-- ElementUnmarshaller
@@ -205,19 +218,63 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
-        //-- Use JVM internal String
-        name = name.intern();
-        
         if (SchemaNames.ANNOTATION.equals(name)) {
+            if (foundSimpleType || foundIdentityConstraint ||foundComplexType)
+                error("An annotation may only appear as the first child "+
+                    "of an element definition.");
+            
+            
+            if (foundAnnotation)
+                error("Only one (1) 'annotation' is allowed as a child of "+
+                    "element definitions.");
+                    
+            foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
+            
+            if (foundComplexType) 
+                error("Only one (1) 'complexType' may appear in an "+
+                    "element definition.");
+            if (foundSimpleType)
+                error("Both 'simpleType' and 'complexType' cannot appear "+
+                    "in the same element definition.");
+            
+            if (foundIdentityConstraint) 
+                error("A 'complexType' must appear before 'key', "+
+                    "'keyref' and 'unique' elements.");
+                    
+            foundComplexType = true;
             unmarshaller 
                 = new ComplexTypeUnmarshaller(_schema, atts, getResolver());
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            unmarshaller 
-                = new SimpleTypeUnmarshaller(_schema, atts, getResolver());
+            
+            if (foundSimpleType) 
+                error("Only one (1) 'simpleType' may appear in an "+
+                    "element definition.");
+            if (foundComplexType)
+                error("Both 'simpleType' and 'complexType' cannot appear "+
+                    "in the same element definition.");
+            
+            if (foundIdentityConstraint) 
+                error("A 'simpleType' must appear before 'key', "+
+                    "'keyref' and 'unique' elements.");
+                    
+            foundSimpleType = true;
+            unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
+        }
+        else if (SchemaNames.KEY.equals(name)) {
+            foundIdentityConstraint = true;
+            error("Identity constraints are not yet supported");
+        }
+        else if (SchemaNames.KEYREF.equals(name)) {
+            foundIdentityConstraint = true;
+            error("Identity constraints are not yet supported");
+        }
+        else if (SchemaNames.UNIQUE.equals(name)) {
+            foundIdentityConstraint = true;
+            error("Identity constraints are not yet supported");
         }
         else illegalElement(name);
         
@@ -259,27 +316,15 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         }
         else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
             
-            XMLType xmlType = _element.getType();
-            
-            if ((xmlType != null) && xmlType.isComplexType()) {
-                String err = "Error defining '" + _element.getName();
-                err += "'. You may not have more than one 'complexType'.";
-                redefinedElement(name, err);
-            }
-            
-            xmlType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
+            XMLType xmlType 
+                = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
+                
             _element.setType(xmlType);
             
         } 
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            XMLType xmlType = _element.getType();
-            if (xmlType != null) {
-                String err = "Error defining '" + _element.getName();
-                err += "'. You may not have more than one type.";
-                redefinedElement(name, err);
-            }
-            
-            xmlType = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
+            XMLType xmlType 
+                = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
             _element.setType(xmlType);
         }
         

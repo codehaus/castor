@@ -77,12 +77,18 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
     **/
     private ComplexType _complexType = null;
 
-    private boolean allowRefines = true;
-
-    private boolean allowContentModel = true;
-
+    private boolean allowAnnotation     = true;
+    private boolean foundAnnotation     = false;
+    private boolean foundAttributes     = false;
+    private boolean foundSimpleContent  = false;
+    private boolean foundComplexContent = false;
+    private boolean foundModelGroup     = false;
+    
+    
+    
     private Schema _schema = null;
 
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -189,55 +195,125 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-
+        
+        
         //-- attribute declarations
         if (SchemaNames.ATTRIBUTE.equals(name)) {
-            allowRefines = false;
-            allowContentModel = false;
+            if (foundComplexContent)
+                error("an attribute definition cannot appear as a child "+
+                    "of 'complexType' if 'complexContent' also exists");
+            if (foundSimpleContent)
+                error("an attribute definition cannot appear as a child "+
+                    "of 'complexType' if 'simpleContent' also exists");
+                    
+            foundAttributes = true;
+            allowAnnotation = false;
             unmarshaller
                 = new AttributeUnmarshaller(_schema, atts, getResolver());
         }
         //-- attribute group declarations
         else if (SchemaNames.ATTRIBUTE_GROUP.equals(name)) {
-            allowRefines = false;
-            allowContentModel = false;
-            
             //-- make sure we have an attribute group
             //-- reference and not a definition
             
             if (atts.getValue(SchemaNames.REF_ATTR) == null) {
-                String err = "A complexType may contain referring "+
-                    "attribute groups, but not defining ones.";
-                error(err);
+                error("A 'complexType' may contain referring "+
+                    "attributeGroups, but not defining ones.");
             }
+            if (foundComplexContent)
+                error("an attributeGroup reference cannot appear as a child "+
+                    "of 'complexType' if 'complexContent' also exists");
+            if (foundSimpleContent)
+                error("an attributeGroup reference cannot appear as a child "+
+                    "of 'complexType' if 'simpleContent' also exists");
             
+            foundAttributes = true;
+            allowAnnotation = false;
             unmarshaller
                 = new AttributeGroupUnmarshaller(_schema, atts);
         }
-        //-- element declarations
-        else if (SchemaNames.ELEMENT.equals(name)) {
-            allowRefines = false;
-            if (allowContentModel)
-                unmarshaller
-                    = new ElementUnmarshaller(_schema, atts, getResolver());
-            else
-                outOfOrder(name);
+        //-- simpleContent
+        else if (SchemaNames.SIMPLE_CONTENT.equals(name)) {
+            
+            if (foundAttributes)
+                error("'simpleContent' and attribute definitions cannot both "+
+                    "appear as children of 'complexType' at the same time.");
+            if (foundComplexContent) 
+                error("'simpleContent' and 'complexContent' cannot both "+
+                    "appear as children of 'complexType'.");
+            if (foundSimpleContent)
+                error("Only one (1) 'simpleContent' may appear as a child of "+
+                    "'complexType'.");
+            if (foundModelGroup)
+                error("'simpleContent' cannot appear as a child of "+
+                    "'complexType' if 'all', 'sequence', 'choice' or "+
+                    "'group' also exist");
+                
+            foundSimpleContent = true;
+            allowAnnotation = false;
+            
+            unmarshaller
+                = new SimpleContentUnmarshaller(_complexType, atts, getResolver());
         }
+        //-- simpleContent
+        else if (SchemaNames.COMPLEX_CONTENT.equals(name)) {
+            
+            if (foundAttributes)
+                error("'complexContent' and attribute definitions cannot both "+
+                    "appear as children of 'complexType' at the same time.");
+            if (foundSimpleContent) 
+                error("'simpleContent' and 'complexContent' cannot both "+
+                    "appear as children of 'complexType'.");
+            if (foundComplexContent)
+                error("Only one (1) 'complexContent' may appear as a child of "+
+                    "'complexType'.");
+            if (foundModelGroup)
+                error("'complexContent' cannot appear as a child of "+
+                    "'complexType' if 'all', 'sequence', 'choice' or "+
+                    "'group' also exist");
+                
+            foundComplexContent = true;
+            allowAnnotation = false;
+            
+            unmarshaller
+                = new ComplexContentUnmarshaller(_complexType, atts, getResolver());
+        }        
         //-- ModelGroup declarations (choice, all, sequence, group)
         else if (SchemaNames.isGroupName(name)) {
-            allowRefines = false;
-            if (allowContentModel)
-                unmarshaller
-                    = new GroupUnmarshaller(_schema, name, atts, getResolver());
-            else
-                outOfOrder(name);
-        }
-        else if (name.equals("restrictions")) {
-            String err = "<restrictions> element not yet supported.";
-            throw new SAXException(err);
+            
+            if (foundAttributes)
+                error("'" + name + "' must appear before any attribute "+
+                    "definitions when a child of 'complexType'.");
+            if (foundComplexContent) 
+                error("'"+name+"' and 'complexContent' cannot both "+
+                    "appear as children of 'complexType'.");
+            if (foundSimpleContent)
+                error("'"+name+"' and 'simpleContent' cannot both "+
+                    "appear as children of 'complexType'.");
+            if (foundModelGroup)
+                error("'"+name+"' cannot appear as a child of 'complexType' "+
+                    "if another 'all', 'sequence', 'choice' or "+
+                    "'group' also exists.");
+            
+            foundModelGroup = true;
+            allowAnnotation = false;
+            unmarshaller
+                = new GroupUnmarshaller(_schema, name, atts, getResolver());
         }
         else if (name.equals(SchemaNames.ANNOTATION)) {
-            unmarshaller = new AnnotationUnmarshaller(atts);
+            if (allowAnnotation) {
+                unmarshaller = new AnnotationUnmarshaller(atts);
+                allowAnnotation = false;
+                foundAnnotation = true;
+            }
+            else {
+                if (foundAnnotation) {
+                    error("Only one (1) annotation may appear as a child of "+
+                        "'complexType' elements");
+                }
+                error("An annotation must appear as the first child of " +
+                    "'complexType' elements.");
+            }
         }
         else illegalElement(name);
 
