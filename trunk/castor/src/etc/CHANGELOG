@@ -1,6 +1,11 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1514 adding Eclipse related project files.
+	   Added new Ant target 'prepare-eclipse' to copy Eclipse-specific project files 
+	   to the base directory.
+       (Werner - 20040212)
+       
 JDO:   Fixed bug 1462 using contribution from Christoph Ernst [christoph.ernst@dit.de]
 	   Fixes a problem with SQL type conversions between java.sql.Timestamp and 
 	   java.util.Date and vice versa. Additionally, this fixes a couple of problems 
