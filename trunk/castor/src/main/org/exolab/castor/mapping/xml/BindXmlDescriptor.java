@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -57,6 +57,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         super();
         nsURI = "http://castor.exolab.org/";
         xmlName = "bind-xml";
+        
+        //-- set grouping compositor
+        setCompositorAsSequence();
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
         org.exolab.castor.xml.XMLFieldHandler              handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
@@ -385,6 +388,39 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- initialize element descriptors
         
+        //-- _classMapping
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.ClassMapping.class, "_classMapping", "class", org.exolab.castor.xml.NodeType.Element);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                BindXml target = (BindXml) object;
+                return target.getClassMapping();
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    BindXml target = (BindXml) object;
+                    target.setClassMapping( (org.exolab.castor.mapping.xml.ClassMapping) value);
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new org.exolab.castor.mapping.xml.ClassMapping();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _classMapping
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
     } //-- org.exolab.castor.mapping.xml.BindXmlDescriptor()
 
 

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -111,6 +111,11 @@ public class BindXml implements java.io.Serializable {
      */
     private boolean _has_transient;
 
+    /**
+     * Field _clazz
+     */
+    private org.exolab.castor.mapping.xml.ClassMapping _classMapping;
+
 
       //----------------/
      //- Constructors -/
@@ -162,6 +167,16 @@ public class BindXml implements java.io.Serializable {
     {
         return this._autoNaming;
     } //-- org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType getAutoNaming() 
+
+    /**
+     * Returns the value of field 'classMapping'.
+     * 
+     * @return the value of field 'classMapping'.
+     */
+    public org.exolab.castor.mapping.xml.ClassMapping getClassMapping()
+    {
+        return this._classMapping;
+    } //-- org.exolab.castor.mapping.xml.ClassMapping getClassMapping() 
 
     /**
      * Returns the value of field 'location'. The field 'location'
@@ -329,6 +344,16 @@ public class BindXml implements java.io.Serializable {
     } //-- void setAutoNaming(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType) 
 
     /**
+     * Sets the value of field 'classMapping'.
+     * 
+     * @param clazz the value of field 'classMapping'.
+     */
+    public void setClassMapping(org.exolab.castor.mapping.xml.ClassMapping classMapping)
+    {
+        this._classMapping = classMapping;
+    } //-- void setClassMapping(org.exolab.castor.mapping.xml.ClassMapping) 
+
+    /**
      * Sets the value of field 'location'. The field 'location' has
      * the following description: Allows specifying a nested
      * location path for this field,
@@ -425,11 +450,11 @@ public class BindXml implements java.io.Serializable {
      * 
      * @param reader
      */
-    public static org.exolab.castor.mapping.xml.BindXml unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.BindXml) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.BindXml.class, reader);
-    } //-- org.exolab.castor.mapping.xml.BindXml unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshal(java.io.Reader) 
 
     /**
      * Method validate
