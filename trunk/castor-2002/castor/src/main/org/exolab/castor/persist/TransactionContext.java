@@ -239,18 +239,15 @@ public abstract class TransactionContext
 
     /**
      * The derived class must implement this method and commit all the
-     * connections used in this transaction. If the <tt>keepOpen</tt>
-     * flag is true, the connections must remain open. Otherwise, the
-     * connections may be closed. If the transaction could not commit
-     * fully or partially, this method will throw an {@link
+     * connections used in this transaction. If the transaction could
+     * not commit fully or partially, this method will throw an {@link
      * TransactionAbortedException}, causing a rollback to occur as
      * the next step.
      *
-     * @param keepOpen True if connections should be kept open
      * @throws TransactionAbortedException The transaction could not
      *  commit fully or partially and should be rolled back
      */
-    protected abstract void commitConnections( boolean keepOpen )
+    protected abstract void commitConnections()
         throws TransactionAbortedException;
 
 
@@ -287,7 +284,7 @@ public abstract class TransactionContext
             if ( entry.created )
                 return oid;
             if ( ( accessMode == AccessMode.Exclusive ||
-                   accessMode == AccessMode.Locked ) && ! entry.oid.isExclusive() ) {
+                   accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
                 // If we are in exclusive mode and object has not been
                 // loaded in exclusive mode before, then we have a
                 // problem. We cannot return an object that is not
@@ -364,7 +361,7 @@ public abstract class TransactionContext
             if ( entry.created )
                 return;
             if ( ( accessMode == AccessMode.Exclusive ||
-                   accessMode == AccessMode.Locked ) && ! entry.oid.isExclusive() ) {
+                   accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
                 // If we are in exclusive mode and object has not been
                 // loaded in exclusive mode before, then we have a
                 // problem. We cannot return an object that is not
@@ -773,82 +770,6 @@ public abstract class TransactionContext
 
 
     /**
-     * Commits all changes but does not closes the transaction and does
-     * not releases any locks. All objects remain persistent, except for
-     * objects deleted during the transaction. May be called any number
-     * of times prior to committing/aborting the transaction.
-     *
-     * @throws TransactionAbortedException The transaction has been
-     *   aborted due to inconsistency, duplicate object identity, error
-     *   with the persistence engine or any other reason
-     * @throws  IllegalStateException Method called if transaction is
-     *  not in the proper state to perform this operation
-     */
-    public void checkpoint()
-        throws TransactionAbortedException
-    {
-        Enumeration enum;
-        ObjectEntry entry;
-
-        if ( _xid != null )
-            throw new IllegalStateException( Messages.message( "persist.checkpointNotSupported" ) );
-        // Never commit transaction that has been marked for rollback
-        if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
-            rollback();
-            throw new TransactionAbortedExceptionImpl( "persist.markedRollback" );
-        }
-        // Prepare the transaction
-        prepare();
-
-        try {
-            _status = Status.STATUS_COMMITTING;
-
-            // Go through all the connections opened in this transaction,
-            // commit and close them one by one.
-            commitConnections( true );
-
-            // Assuming all went well in the connection department,
-            // no deadlocks, etc. clean all the transaction locks with
-            // regards to the persistence engine.
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                if ( entry.deleted ) {
-                    // Object has been deleted inside transaction,
-                    // engine must forget about it.
-                    entry.engine.forgetObject( this, entry.oid );
-                    removeObjectEntry( entry.object );
-                } else {
-                    // Object has been created/accessed inside the
-                    // transaction must retain the database lock
-                    // (which is always write lock since object was
-                    // just updated)
-                    if ( entry.modified ) {
-                        entry.engine.updateObject( this, entry.oid, entry.object );
-                        entry.engine.softLock( this, entry.oid, 0 );
-                    }
-                    entry.created = false;
-                }
-            }
-            _status = Status.STATUS_ACTIVE;
-        } catch ( Exception except ) {
-            // Any error that happens, we're going to rollback the transaction.
-            _status = Status.STATUS_MARKED_ROLLBACK;
-            rollback();
-            if ( except instanceof TransactionAbortedException )
-                throw (TransactionAbortedException) except;
-            throw new TransactionAbortedExceptionImpl( except );
-        } finally {
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                entry.prepared = false;
-            }
-        }
-    }
-
-
-    /**
      * Commits all changes and closes the transaction releasing all
      * locks on all objects. All objects are now transient. Must be
      * called after a call to {@link #prepare} has returned successfully.
@@ -878,7 +799,7 @@ public abstract class TransactionContext
 
             // Go through all the connections opened in this transaction,
             // commit and close them one by one.
-            commitConnections( false );
+            commitConnections();
 
             // Assuming all went well in the connection department,
             // no deadlocks, etc. clean all the transaction locks with
