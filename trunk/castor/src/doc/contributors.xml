@@ -620,6 +620,16 @@
     <description>Patch to add InstanceFactory support</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Dankert" given="Edwin"/>
+    <email>edankert@cladonia.com</email>
+    <description>
+       Patch to org.exolab.castor.xml.schema.util.DatatypeHandler to
+       allow empty strings to be handled properly and prevent an
+       exception when "guessing" the type.
+    </description>
+  </contributor>
+
   <!-- Last names begin with E-H -->
 
   <contributor type="Feedback">
