@@ -327,17 +327,190 @@ public final class Entity implements Cloneable {
     } // -- setFieldValue
 
     /**
-     * Get a new instance of Create Iterator
+     * Get a new instance of Create Helper
      */
-    public CreateIterator cIteartor() {
-        return new CreateIterator( this );
-    } // -- cIterator
+    public CreateHelper helper() {
+        return new CreateHelper( this );
+    } // -- helper
 
-        
+    /**
+     * Get a new instance of Iterator
+     *
+     * @throws IllegalStateException if the entity is raw. Specifically,
+     *         "base" and "real" is not set
+     */
+    public EntityIterator iterator() 
+            throws IllegalStateException {
+        return new EntityIterator( this );
+    } // -- iterator
+
+    /**
+     * Entity Iterator
+     */
+    public static class EntityIterator {
+        /**
+         * The entity to iterate on
+         */
+        private Entity          entity;
+
+        /**
+         * The EntityInfo in the current position
+         */
+        private EntityInfo      cur;
+
+        /**
+         * The offset position of sub entity field value
+         */
+        private int             valuesOffset;
+
+        /**
+         * The path to the entity.real from entity.base
+         */
+        private long            level;
+
+        /**
+         * The level of the cur entity in the path
+         */
+
+        /**
+         * Constrcutor
+         */
+        private EntityIterator( Entity entity )
+                throws NullPointerException, IllegalStateException {
+
+            if ( entity.base == null || entity.actual == null )
+                throw new IllegalStateException( "Entity is not initalized!" );
+
+            this.entity = entity;
+        } // -- EntityIterator
+
+        //===================
+        //  Global
+        //===================
+        /**
+         * Get the entity info represents the base of the entity that
+         * this iterator iterating on.
+         */
+        public EntityInfo getBaseEntityInfo() {
+            return entity.base;
+        } // -- EntityInfo
+
+        //===================
+        //  Sub Entity level
+        //===================
+        /**
+         * Iterate to the next avaliable entity
+         */
+        public boolean next() {
+            int deep = entity.actual.getDeep();
+            if ( ++level > deep ) {
+                cur == null;
+                return false;
+            }
+
+            if ( level == 1 ) {
+                cur = entity.base;
+                valuesOffset = cur.getFieldOffset();
+                return true;
+            }
+
+            cur = entity.actual;
+            for ( int i = 0; i < (deep-level); i++ ) {
+                cur = cur.superEntity;
+            }
+            valuesOffset = cur.getFieldOffset();
+            return true;
+        } // -- next
+
+        /**
+         * Returns the EntityInfo of the current position
+         *
+         * @throws IllegalStateException if next() is not called
+         */
+        public EntityInfo getEntityInfo() 
+                throws IllegalStateException {
+
+            if ( cur == null )
+                throw new IllegalStateException("next() should be called first!");
+
+            return cur;
+        } // -- getEntityInfo
+
+        //=====================
+        //  Entity Field level
+        //=====================
+        /**
+         * Get the specified field info of the current entity
+         *
+         * @throws IllegalStateException if next() is not called
+         * @throws ArrayIndexOutOfBoundsException if there is no field
+         *         matches to the specified fieldNumber
+         */
+        public EntityFieldInfo getEntityFieldInfo( int fieldNumber ) 
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
+            if ( cur == null )
+                throw new IllegalStateException("next() should be called first!");
+
+            return cur.fieldInfo[fieldNumber];
+        } // -- getEntityFieldInfo
+
+        /**
+         * Get the specified field value of the current entity
+         *
+         * @throws IllegalStateException if next() is not called
+         * @throws ArrayIndexOutOfBoundsException if there is no field
+         *         matches to the specified fieldNumber
+         */
+        public Object getFieldValue( int fieldNumber ) 
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
+            if ( cur == null )
+                throw new IllegalStateException("next() should be called first!");
+
+            // let java to check ArrayIndex for me
+            Object junk = cur.fieldInfo[fieldNumber];
+
+            if ( entity.values == null 
+                    || entity.values.length < valuesOffset+cur.fieldInfo.length )
+                return null;
+
+            return entity.values[valuesOffset+fieldNumber];
+        } // -- getFieldValue
+
+        /**
+         * Get the specified field value of the current entity
+         *
+         * @throws IllegalStateException if next is not called
+         * @throws ArrayIndexOutOfBoundsException if there is no field
+         *         matches to the specified fieldNumber
+         */
+        public void setFieldValue( int fieldNumber, Object value )
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
+            if ( cur == null )
+                throw new IllegalStateException("next() should be called first!");
+
+            // let java to check ArrayIndex for me
+            Object junk = cur.fieldInfo[fieldNumber];
+
+            if ( entity.values == null ) {
+                entity.values = new Object[entity.base.getMaxLength()];
+            } else if ( entity.values.length < valuesOffset+cur.fieldInfo.length ) {
+                Object[] temp = entity.values;
+                entity.values = new Object[entity.base.getMaxLength()];
+                System.arraycopy( temp, 0, entity.values, 0, temp.length );
+            }
+
+            entity.values[valuesOffset+fieldNumber] = value;
+        } // -- setFieldValue
+
+    } // == EntityIterator
+
     /**
      * Create Iterator
      */
-    public static class CreateIterator {
+    public static class CreateHelper {
         /**
          * The entity to iterate on
          */
@@ -358,10 +531,15 @@ public final class Entity implements Cloneable {
          *
          * @throws NullPointerException if entity is null
          */
-        private CreateIterator( Entity entity ) 
+        private CreateHelper( Entity entity ) 
                 throws NullPointerException {
+
+            if ( entity == null )
+                throw new NullPointerException();
+
             this.entity = entity;
-        } // -- CreateIterator
+
+        } // -- CreateHelper
 
         //=============
         //  Global
@@ -452,7 +630,7 @@ public final class Entity implements Cloneable {
         } // -- getSubEntityInfo
 
         /**
-         * Iterator to the specified sub entity from the current entity
+         * Iterates to the specified sub entity from the current entity
          *
          * @throws IllegalStateException if entity base is not set
          * @throws ArrayIndexOutOfBoundsException if there is no sub entity
@@ -554,6 +732,6 @@ public final class Entity implements Cloneable {
             entity.values[valuesOffset+fieldNumber] = value;
         } // -- setFieldValue
 
-    } // == CreateIterator
+    } // == CreateHelper
 
 }
