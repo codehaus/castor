@@ -7,9 +7,6 @@
       <p>Reference: <api package="org.exolab.castor.jdo">The Java Data Objects API</api></p>
     </header>
 
-    <section title="FAQ for JDO">
-      <p>FAQ for JDO is now <a href="jdo-faq.html">avaliable</a>.</p>
-    </section>
     <section title="Opening A JDO Database">
 
       <p>Castor JDO supports two type of environments, client applications and J2EE servers.
