@@ -626,6 +626,9 @@
     <field name="boolValue" type="boolean" required="true" >
       <sql name="bool_val" type="char[01]" />
     </field>
+    <field name="boolIsMethod" type="boolean" required="true" >
+      <sql name="bool_is_method" type="char[01]" />
+    </field>
     <field name="date2" type="date" >
       <sql name="int_date" type="integer[YMD]" />
     </field>
