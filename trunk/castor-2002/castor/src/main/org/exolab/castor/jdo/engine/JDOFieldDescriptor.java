@@ -106,11 +106,11 @@ public class JDOFieldDescriptor
             throw new IllegalArgumentException( "Argument 'fieldDesc' is a transient field or has no handler" );
         //if ( sqlName == null )
         //    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
-        _sqlName = (sqlName.length>0? sqlName : null);
+        _sqlName = (sqlName.length>0? sqlName : new String[] {getFieldName()});
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;
         _manyKey = (manyKey.length>0? manyKey : null);
-        _sqlType = (sqlType.length>0? sqlType : null);
+        _sqlType = (sqlType.length>0? sqlType : new int[] {SQLTypes.getSQLType(getFieldType())});
     }
 
 
