@@ -46,7 +46,14 @@
 
 package org.exolab.castor.jdo.engine;
 
-
+import java.io.Reader;
+import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.sql.Date;
@@ -57,6 +64,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.io.IOException;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.mapping.MappingException;
 
@@ -273,7 +281,46 @@ public final class SQLTypes
         case Types.DATE:       value = rs.getDate( index ); break;
         case Types.TIMESTAMP:  value = rs.getTimestamp( index ); break;
         case Types.INTEGER:    value = new Integer( rs.getInt( index ) ); break;
-        default:               value = rs.getObject( index ); break;
+        case Types.LONGVARBINARY:
+        case Types.VARBINARY:
+        case Types.BINARY:
+            return rs.getBytes(index);
+        case Types.CHAR:
+        case Types.VARCHAR:
+        case Types.LONGVARCHAR:
+            return rs.getString(index);
+        case Types.BLOB:
+            try {
+                Blob blob = rs.getBlob( index );
+                InputStream blobIs = blob.getBinaryStream();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[256];
+                int len = 0;
+                int b;
+                while ( (len = blobIs.read(buffer)) > 0 )
+                    bos.write( buffer, 0, len );
+
+                return bos.toByteArray();
+            } catch ( IOException e ) {
+                throw new SQLException("IOException thrown while reading BLOB into a byte array!");
+            }
+        case Types.CLOB:
+            try {
+                Clob blob = rs.getClob( index );
+                Reader blobIs = blob.getCharacterStream();
+                CharArrayWriter bos = new CharArrayWriter();
+                char[] buffer = new char[256];
+                int len = 0;
+                int b;
+                while ( (len = blobIs.read(buffer)) > 0 )
+                    bos.write( buffer, 0, len );
+
+                return bos.toString();
+            } catch ( IOException e ) {
+                throw new SQLException("IOException thrown while reading CLOB into a string!");
+            }
+        default:               
+			value = rs.getObject( index ); break;
         }
         return ( rs.wasNull() ? null : value );
     }
