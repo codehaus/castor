@@ -46,9 +46,8 @@
 
 package org.exolab.castor.jdo.oql;
 
-import java.lang.String;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * Test class for {@link Parser}. 
