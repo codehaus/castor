@@ -69,7 +69,7 @@ public interface Persistent
      *
      * @param db The database to which this object belongs
      */
-    public void setDatabase( Database db );
+    public void jdoPersistent( Database db );
 
 
     /**
@@ -81,7 +81,7 @@ public interface Persistent
      * call to {@link #jdoStore} or when the object is deleted from
      * the database.
      */
-    public void unsetDatabase();
+    public void jdoTransient();
 
 
     /**
