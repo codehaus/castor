@@ -171,16 +171,8 @@ public class XMLMappingLoader
     protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
     {
-        TypeConvertor convertorTo;
-        TypeConvertor convertorFrom;
-
-        if ( Types.isSimpleType( fieldType ) && fieldMap.getXml() != null ) {
-            fieldType = Types.typeFromPrimitive( fieldType );
-            convertorTo = Types.getConvertor( String.class, fieldType );
-            convertorFrom = Types.getConvertor( fieldType, String.class );
-        } else
-            convertorTo = convertorFrom = null;
-        return new TypeInfo( fieldType, convertorTo, convertorFrom,
+        fieldType = Types.typeFromPrimitive( fieldType );
+        return new TypeInfo( fieldType, null, null,
                              fieldMap.getRequired(), null, colHandler );
     }
 
