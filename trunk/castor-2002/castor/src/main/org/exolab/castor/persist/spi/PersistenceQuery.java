@@ -68,6 +68,10 @@ import org.exolab.castor.persist.ObjectNotFoundException;
  * <p>
  * See {@link Persistence} for information about locks, loading
  * objects, identities and stamps.
+ * <p>
+ * Queries are either forward only or traversable, depending on the
+ * underlying implementation. Traversable queries implement the {@link
+ * #getIdentity(int)} and {@link #getLocation} methods.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -133,6 +137,8 @@ public interface PersistenceQuery
     /**
      * Returns the identity of the next object to be returned.
      * Calling this method multiple time will skip objects.
+     * When the result set has been exhuasted, this method will
+     * return null.
      *
      * @return The identity of the next object
      * @throws PersistenceException An error reported by the
@@ -143,12 +149,54 @@ public interface PersistenceQuery
 
 
     /**
-     * Returns the next object. If the object is locked by another
-     * transaction this method will block until the lock is released,
-     * or a timeout occured. If a timeout occurs or the object has
-     * been deleted by the other transaction, this method will report
-     * an {@link ObjectNotFoundException}. The query may proceed to
-     * the next identity.
+     * Returns the identity of the object at the specified position.
+     * If the specified position is beyond the end of the result
+     * set, this method will return null. Indexes are one based.
+     * <p>
+     * This method will throw an exception if the query results are
+     * forward only.
+     *
+     * @param index The index of the requested identity (one based)
+     * @return The identity of the next object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public Object getIdentity( int index )
+	throws PersistenceException;
+
+
+    /**
+     * Returns the location of the last identity retrieved. The
+     * index is one based.
+     *
+     * @return The index of the last identity retruned (one based) 
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public int getLocation()
+	throws PersistenceException;
+
+
+    /**
+     * Returns true if this is a forward only result set. Forward only
+     * results set implement {@link #nextIdentity} but not {@link
+     * #getIdentity}.
+     *
+     * @return True if forward only result set
+     */
+    public boolean isForwardOnly();
+
+
+    /**
+     * Returns the next object. This method must be called immediately
+     * after {@link #nextIdentity} or {@link #getIdentity}.
+     * <p>
+     * If the object is locked by another transaction this method will
+     * block until the lock is released, or a timeout occured. If a
+     * timeout occurs or the object has been deleted by the other
+     * transaction, this method will report an {@link
+     * ObjectNotFoundException}. The query may proceed to the next
+     * identity.
      * <p>
      * This method is equivalent to {@link Persistence#load} with a
      * know cache engine, identity and lock and acts on the query

@@ -265,7 +265,7 @@ public class OQLQueryImpl
 	    while ( identity != null ) {
 		try {
 		    obj = _dbEngine.getObjectDesc( results.getResultType() ).createNew();
-		    results.fetch( obj, identity );
+		    results.fetch( obj );
 		    set.addElement( obj );
 		} catch ( ObjectNotFoundException except ) {
 		}

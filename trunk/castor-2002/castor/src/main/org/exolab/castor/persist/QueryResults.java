@@ -106,28 +106,135 @@ public final class QueryResults
     }
     
     
-    public Object nextIdentity()
-	throws TransactionNotInProgressException, PersistenceException
-    {
-	// Make sure transaction is still open.
-	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-	    throw new TransactionNotInProgressException();
-	
-	// Get the next OID from the query engine. The object is
-	// already loaded into the persistence engine at this point and
-	// has a lock based on the original query (i.e. read write
-	// or exclusive). If no next record return null.
-	return _query.nextIdentity();
-    }
-
-
+    /**
+     * Returns the type of object returned by this query.
+     *
+     * @return The type of object returned by this query
+     */
     public Class getResultType()
     {
 	return _query.getResultType();
     }
     
     
-    public boolean fetch( Object obj, Object identity )
+    /**
+     * Returns the identity of the next object to be returned.
+     * Calling this method multiple time will skip objects.
+     * When the result set has been exhuasted, this method will
+     * return null.
+     *
+     * @return The identity of the next object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws TransactionNotInProgressException The transaction
+     *  has been closed
+     */
+    public Object nextIdentity()
+	throws TransactionNotInProgressException, PersistenceException
+    {
+	// Make sure transaction is still open.
+	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+	    throw new TransactionNotInProgressException();
+	_lastIdentity = null;
+	_lastIdentity = _query.nextIdentity();
+	return _lastIdentity;
+    }
+
+
+    /**
+     * Returns the identity of the object at the specified position.
+     * If the specified position is beyond the end of the result
+     * set, this method will return null. Indexes are one based.
+     * <p>
+     * This method will throw an exception if the query results are
+     * forward only.
+     *
+     * @param index The index of the requested identity (one based)
+     * @return The identity of the next object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws TransactionNotInProgressException The transaction
+     *  has been closed
+     */
+    public Object getIdentity( int index )
+	throws TransactionNotInProgressException, PersistenceException
+    {
+	// Make sure transaction is still open.
+	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+	    throw new TransactionNotInProgressException();
+	_lastIdentity = null;
+	_lastIdentity = _query.getIdentity( index );
+	return _lastIdentity;
+    }
+
+
+    /**
+     * Returns the location of the last identity retrieved. The
+     * index is one based.
+     *
+     * @return The index of the last identity retruned (one based) 
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws TransactionNotInProgressException The transaction
+     *  has been closed
+     */
+    public int getLocation()
+	throws TransactionNotInProgressException, PersistenceException
+    {
+	// Make sure transaction is still open.
+	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+	    throw new TransactionNotInProgressException();
+	return _query.getLocation();
+    }
+
+
+    /**
+     * Returns true if this is a forward only result set. Forward only
+     * results set implement {@link #nextIdentity} but not {@link
+     * #getIdentity}.
+     *
+     * @return True if forward only result set
+     */
+    public boolean isForwardOnly()
+    {
+	return _query.isForwardOnly();
+    }
+
+
+    /**
+     * Loads the specified object with the identity. The identity must
+     * have been retrieved with a call to {@link #nextIdentity} or
+     * {@link #getIdentity(int)}.
+     * <p>
+     * If the object is locked by another transaction this method will
+     * block until the lock is released, or a timeout occured. If a
+     * timeout occurs or the object has been deleted by the other
+     * transaction, this method will report an {@link
+     * ObjectNotFoundException}. The query may proceed to the next
+     * identity.
+     * <p>
+     * If the object has been deleted in this transaction, this method
+     * will report an {@link ObjectDeletedException}. However, the
+     * caller may iterate to and obtain the next object.
+     * <p>
+     * This method is equivalent to {@link TransactionContext#load}
+     * with a know cache engine, identity and lock and acts on the query
+     * results rather than issuing a new query to load the object.
+     *
+     * @param obj The object to load into
+     * @return True if the object contents has been modified to reflect
+     *  the values in pesistent storage
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws LockNotGrantedException Could not acquire a lock on
+     *  the object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws TransactionNotInProgressException The transaction
+     *  has been closed
+     * @see TransactionContext#load
+     */
+    public boolean fetch( Object obj )
 	throws TransactionNotInProgressException, PersistenceException,
 	       ObjectNotFoundException, LockNotGrantedException
     {
@@ -138,8 +245,8 @@ public final class QueryResults
 	// Make sure transaction is still open.
 	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
 	    throw new TransactionNotInProgressException();
-	if ( identity == null )
-	    throw new IllegalArgumentException( "Argument 'identity' is null" );
+	if ( _lastIdentity == null )
+	    throw new IllegalStateException( "Not called after 'nextIdentity' 'getIdentity' returned an identity" );
 	
 	synchronized ( _tx ) {
 	    // Handle the case where object has already been loaded in
@@ -154,9 +261,9 @@ public final class QueryResults
 		// object has been created in this transaction, it cannot be
 		// re-loaded but no error is reported.
 		if ( entry.engine != _engine )
-		    throw new PersistenceException( "persist.multipleLoad", obj.getClass(), identity );
+		    throw new PersistenceException( "persist.multipleLoad", obj.getClass(), _lastIdentity );
 		if ( entry.deleted )
-		    throw new ObjectNotFoundException( obj.getClass(), identity );
+		    throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
 		if ( obj.getClass() != entry.obj.getClass() )
 		    throw new PersistenceException( "persist.typeMismatch", obj.getClass(), entry.obj.getClass() );
 		if ( entry.created )
@@ -169,7 +276,7 @@ public final class QueryResults
 		    // synchronized with the database, but we cannot
 		    // synchronize a live object.
 		    throw new PersistenceException( "persist.lockConflict",
-						    obj.getClass(), identity );
+						    obj.getClass(), _lastIdentity );
 		}
 		return false;
 	    }
@@ -179,7 +286,7 @@ public final class QueryResults
 	    // has a lock based on the original query (i.e. read write
 	    // or exclusive). If no next record return null.
 	    objDesc = _engine.getObjectDesc( _query.getResultType() );
-	    oid = new OID( objDesc, identity );
+	    oid = new OID( objDesc, _lastIdentity );
 	    
 	    // Did we already load (or created) this object in this
 	    // transaction.
@@ -190,7 +297,7 @@ public final class QueryResults
 		if ( entry.deleted )
 		    // Object has been deleted in this transaction, so skip
 		    // to next object.
-		    throw new ObjectNotFoundException( obj.getClass(), identity );
+		    throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
 		else {
 		    if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
 			 ! oid.isExclusive() ) {
@@ -200,7 +307,7 @@ public final class QueryResults
 			// synchronized with the database, but we cannot
 			// synchronize a live object.
 			throw new PersistenceException( "persist.lockConflict",
-							_query.getResultType(), identity );
+							_query.getResultType(), _lastIdentity );
 		    } else {
 			// Either read only or exclusive mode, and we
 			// already have an object in that mode, so we
@@ -214,19 +321,24 @@ public final class QueryResults
 		// must create a new record for this object. We only
 		// record the object in the transaction if in read-write
 		// or exclusive mode.
-		_engine.fetch( _tx, _query, identity,
-			      ( _accessMode == TransactionContext.AccessMode.Exclusive ),
-			      _tx.getLockTimeout() );
-		_engine.copyObject( _tx, oid, obj );
-		if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
-		    _engine.releaseLock( _tx, oid );
-		else
-		    _tx.addObjectEntry( obj, oid, _engine );
-		return true;
+		try {
+		    _engine.fetch( _tx, _query, _lastIdentity,
+				   ( _accessMode == TransactionContext.AccessMode.Exclusive ),
+				   _tx.getLockTimeout() );
+		    _engine.copyObject( _tx, oid, obj );
+		    if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
+			_engine.releaseLock( _tx, oid );
+		    else
+			_tx.addObjectEntry( obj, oid, _engine );
+		    return true;
+		} finally {
+		    _lastIdentity = null;
+		}
 	    }
 	}
     }
     
     
 }
+
 
