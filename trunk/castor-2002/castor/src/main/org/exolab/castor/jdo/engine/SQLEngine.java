@@ -93,9 +93,16 @@ class SQLEngine
     PrimaryKeyDesc           _primKey;
 
 
-    private boolean         _checkKeyOnCreate = false;
+    private boolean         _checkKeyOnCreate = true;
+
 
     private boolean         _specifyKeyForCreate = true;
+
+
+    private boolean         _useCursorForLock = false;
+
+
+    String                  _stampField; // = "ctid";
 
 
     private String          _pkLookup;
@@ -210,7 +217,12 @@ class SQLEngine
 		    throw new PersistenceException( "This implementation requires a primary key to be set prior to object creation" );
 
 		// Check that there is no duplicity in the table
-		stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+		// [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
+		if ( _useCursorForLock )
+		    stmt = ( (Connection) conn ).prepareStatement( _pkLookup,
+		        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE );
+		else
+		    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 		if ( _primKey.isPrimitive() ) {
 		    stmt.setObject( 1, identity );
 		} else {
@@ -289,10 +301,15 @@ class SQLEngine
 	ResultSet         rs;
 	JDOFieldDesc[]    pkDescs = null;
 	Object            pk;
-	Object            thisPk;
+	Object            stamp = null;
 
 	try {
-	    stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
+	    // [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
+	    if ( _useCursorForLock )
+		stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad,
+                    ResultSet.TYPE_FORWARD_ONLY, lock ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY );
+	    else
+		stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
 	    if ( _primKey.isPrimitive() ) {
 		stmt.setObject( 1, identity );
 	    } else {
@@ -301,7 +318,7 @@ class SQLEngine
 		    pkDescs[ i ].getValue( identity, stmt, i + 1 );
 		}
 	    }
-	    
+
 	    rs = stmt.executeQuery();
 	    if ( ! rs.next() )
 		throw new ObjectNotFoundException( obj.getClass(), identity );
@@ -315,12 +332,14 @@ class SQLEngine
 		    _loadFields[ i ].setValue( obj, rs, i + 1 );
 		}
 	    } while ( rs.next() );
+	    if ( _stampField != null )
+		stamp = rs.getObject( _loadFields.length + 1 );
 	    rs.close();
 	    stmt.close();
 	} catch ( SQLException except ) {
 	    throw new PersistenceException( except );
 	}
-	return null;
+	return stamp;
     }
 
 
@@ -336,7 +355,6 @@ class SQLEngine
 	Object            value;
 
 	try {
-
 	    if ( _related != null ) {
 		for ( i = 0 ; i < _related.length ; ++i ) {
 		    if ( _related[ i ].getRelationType() == Relation.OneToOne ) {
@@ -447,7 +465,13 @@ class SQLEngine
 		_extends.writeLock( conn, obj, identity );
 	    }
 	    // Only write locks are implemented by locking the row.
-	    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+	    // [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
+	    if ( _useCursorForLock )
+		stmt = ( (Connection) conn ).prepareStatement( _pkLookup, ResultSet.TYPE_FORWARD_ONLY,
+							       ResultSet.CONCUR_UPDATABLE );
+	    else
+		stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+
 	    if ( _primKey.isPrimitive() ) {
 		stmt.setObject( 1, identity );
 	    } else {
@@ -469,8 +493,6 @@ class SQLEngine
 	throws DuplicateIdentityException, PersistenceException
     {
     }
-
-
 
 
     protected void buildRelated( PrintWriter logWriter )
@@ -656,6 +678,8 @@ class SQLEngine
 	sqlJoin = new StringBuffer( " WHERE " );
 	addLoadSql( _objDesc, sqlFields, sqlFrom,
 		    sqlJoin, loadFields, 0, false );
+	if ( _stampField != null )
+	    sqlFields.append( ',' ).append( _stampField );
 
 	_sqlLoad = sqlFields.append( sqlFrom ).append( sqlJoin ).toString();
 	_sqlLoadLock = _sqlLoad + " FOR UPDATE";
@@ -667,6 +691,8 @@ class SQLEngine
 	sqlJoin = new StringBuffer( "" );
 	addLoadSql( _objDesc, sqlFields, sqlFrom,
 		    sqlJoin, loadFields, 0, true );
+	if ( _stampField != null )
+	    sqlFields.append( ',' ).append( _stampField );
 	_sqlFinder = sqlFields.append( sqlFrom ).append( " WHERE " ).toString();
 	_sqlFinderJoin = sqlJoin.toString();
     }
@@ -884,7 +910,8 @@ class SQLEngine
 	public Object fetch( Object obj )
 	    throws ObjectNotFoundException, PersistenceException
 	{
-	    int count;
+	    int    count;
+	    Object stamp = null;
 	    
 	    try {
 		if ( _engine._primKey.isPrimitive() )
@@ -894,10 +921,12 @@ class SQLEngine
 		for ( int i = 0; i < _engine._loadFields.length ; ++i  ) {
 		    _engine._loadFields[ i ].setValue( obj, _rs, i + count );
 		}
+		if ( _engine._stampField != null )
+		    stamp = _rs.getString( _engine._loadFields.length + count );
 	    } catch ( SQLException except ) {
 		throw new PersistenceException( except );
 	    }
-	    return null;
+	    return stamp;
 	}
 
     }
