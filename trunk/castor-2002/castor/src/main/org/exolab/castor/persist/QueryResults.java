@@ -204,25 +204,6 @@ public final class QueryResults
         throws TransactionNotInProgressException, PersistenceException,
                ObjectNotFoundException, LockNotGrantedException
     {
-        TransactionContext.ObjectEntry entry = null;
-        OID              oid;
-        ClassHandler     handler;
-        Object           object;
-        
-        // Make sure transaction is still open.
-        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
-        if ( _lastIdentity == null )
-            throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
-
-        handler = _engine.getClassHandler( _query.getResultType() );
-
-        // load the object thur the transaction of the query
-        object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
-
-        return object;
-
-        /*
         TransactionContext.ObjectEntry entry;
         OID              oid;
         ClassHandler     handler;
@@ -244,10 +225,7 @@ public final class QueryResults
             
             // Did we already load (or created) this object in this
             // transaction.
-            if ( _accessMode == AccessMode.ReadOnly ) 
-                entry = _tx.getReadOnlyObjectEntry( oid );
-            if ( entry == null ) 
-                entry = _tx.getObjectEntry( _engine, oid );
+            entry = _tx.getObjectEntry( _engine, oid );
             if ( entry != null ) {
                 // The object has already been loaded in this transaction
                 // and is available from the persistence engine.
@@ -303,11 +281,11 @@ public final class QueryResults
                     // [oleg] complicated scenarios of object reloading may
                     // replace the instance of dependent object.
                     // Looks bad, but works. Need to do this better in castorone...
-                    if ( _accessMode == AccessMode.ReadOnly ) 
+                    if ( _accessMode == AccessMode.ReadOnly )
                         entry = _tx.getReadOnlyObjectEntry( oid );
-                    if ( entry == null ) 
+                    if ( entry == null )
                         entry = _tx.getObjectEntry( _engine, oid );
-                    if ( entry != null ) 
+                    if ( entry != null )
                         object = entry.object;
                 } catch ( Exception except ) {
                     _tx.release( object );
@@ -323,7 +301,7 @@ public final class QueryResults
                 }
                 return object;
             }
-        }*/
+        }
     }
 
 
