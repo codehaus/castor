@@ -149,7 +149,7 @@ public class ClassDescriptorResolverImpl
         if (classDesc == null) {
             try {
                 classDesc = MarshalHelper.generateClassDescriptor(type);
-                _cache.put(type, classDesc);
+                if (classDesc != null) _cache.put(type, classDesc);
             }
             catch (MarshalException mx) {
                 String err = mx.toString();

@@ -47,13 +47,7 @@
 package org.exolab.castor.xml.util;
 
 
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.CollectionHandler;
-
-
+import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
 
 /**
@@ -63,7 +57,9 @@ import org.exolab.castor.xml.*;
  * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
+public class XMLFieldDescriptorImpl 
+    implements XMLFieldDescriptor
+{
 
 
     private static final String NULL_CLASS_ERR
@@ -130,6 +126,11 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
     private NodeType _nodeType = null;
     
     /**
+     * True if the field is a reference to another Object in the hierarchy.
+    **/
+    public boolean _isReference = false;
+    
+    /**
      * indicates a required field when true
     **/
     public boolean _required = false;
@@ -145,7 +146,9 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
     private String _xmlName    = null;
 
 
-
+    
+    private TypeValidator _validator = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -326,6 +329,15 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
     } //-- isMultivalued
     
     /**
+     * Returns true if the field described by this descriptor is
+     * a reference (ie. IDREF) to another object in the 
+     * "Object Model" (XML tree)
+    **/
+    public boolean isReference() {
+        return this._isReference;
+    } //-- isReference
+    
+    /**
      * Returns true if the field described by this descriptor is a required
      * field
      * @return true if the field described by this descriptor is a required
@@ -368,18 +380,20 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
      */
     public void setClassDescriptor(XMLClassDescriptor classDescriptor) {
         this._classDescriptor = classDescriptor;
-    } //-- setHandler
+    } //-- setClassDescriptor
+
 
     /**
-     * Sets the FieldHandler for the field associated with this
-     * FieldDescriptor
+     * Sets the FieldHandler for the field being described
+     * by this FieldDescriptor
      *
-     * @param handler the FieldHandler for the described field.
-     */
+     * @param handler the FieldHandler for the field being described
+     * by this FieldDescriptor
+    **/
     public void setHandler(FieldHandler handler) {
         this._handler = handler;
     } //-- setHandler
-
+    
     /**
      * Sets the incremental flag which indicates whether this member
      * can be added before the unmarshaller is finished unmarshalling it.
@@ -407,6 +421,16 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
     public void setMultivalued(boolean multivalued) {
         this.multivalued = multivalued;
     } //-- setMultivalued
+    
+    /**
+     * Sets the flag indicating that the field described by this 
+     * descriptor is a reference to another field in the object model.
+     * 
+     * @param isReference, true if the field is a reference to another field.
+    **/
+    public void setReference(boolean isReference) {
+        this._isReference = isReference;
+    } //-- setReference
     
     /**
      * Sets the namespace prefix used when marshalling as XML.
@@ -454,6 +478,9 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
         _transient = isTransient;
     } //-- isTransient
     
+    public void setValidator(TypeValidator validator) {
+        this._validator = validator;
+    } //-- setValidator
     
     public String toString()
     {

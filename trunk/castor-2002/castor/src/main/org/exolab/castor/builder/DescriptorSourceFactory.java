@@ -271,6 +271,12 @@ public class DescriptorSourceFactory {
                     //    break;
                     //}
                     break;
+                case XSType.IDREF:
+                    jsc.add("desc.setReference(true);");
+                    break;
+                case XSType.ID:
+                    jsc.add("this.identity = desc;");
+                    break;
                 default:
                     break;
             }

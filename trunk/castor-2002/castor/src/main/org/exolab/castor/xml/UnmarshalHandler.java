@@ -124,6 +124,10 @@ public class UnmarshalHandler implements DocumentHandler {
     **/
     private boolean          _validate     = true;
     
+    private Hashtable _idReferences = null;
+    
+    private Hashtable _resolveTable = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -137,6 +141,8 @@ public class UnmarshalHandler implements DocumentHandler {
         _stateInfo = new Stack();
         _topClass = _class;
         buf = new StringBuffer();
+        _idReferences = new Hashtable();
+        _resolveTable = new Hashtable();
     } //-- UnmarshalHandler(Class)
     
     protected Object getObject() {
@@ -157,8 +163,7 @@ public class UnmarshalHandler implements DocumentHandler {
      * @see #setLogWriter.
     **/
     public void setDebug(boolean debug) {
-System.out.println("overriding debug, always on");
-        this.debug = debug || true;
+        this.debug = debug;
         
         if (this.debug && (_logWriter == null)) {
             _logWriter = new PrintWriter(System.out, true);
@@ -784,16 +789,45 @@ System.out.println("overriding debug, always on");
                     message(buf.toString());
                 }
                 */
-                continue;
+                
+                if (descriptor.isRequired()) {
+                    String err = classDesc.getXMLName() + " is missing " +
+                        "required attribute: " + attName;
+                    if (_locator != null) {
+                        err += "\n  - line: " + _locator.getLineNumber() +
+                            " column: " + _locator.getColumnNumber();
+                    }
+                    throw new SAXException(err);
+                }
+                else continue;
             }
             
             Object value = attValue;
             
-            //-- check for proper type
-            Class type = descriptor.getFieldType();
-            
-            if (type.isPrimitive())
-                value = MarshalHelper.toPrimitiveObject(type, attValue);
+            //-- if this is the identity then save id
+            if (classDesc.getIdentity() == descriptor) {
+                _idReferences.put(attValue, state.object);
+                //-- resolve waiting references
+                resolveReferences(attValue, state.object);
+            }
+            else if (descriptor.isReference()) {
+                value = _idReferences.get(attValue);
+                if (value == null) {
+                    //-- save state to resolve later 
+                    ReferenceInfo refInfo 
+                        = new ReferenceInfo(attValue, object, descriptor);
+                    refInfo.next 
+                        = (ReferenceInfo)_resolveTable.remove(attValue);
+                    _resolveTable.put(attValue, refInfo);
+                    continue;
+                }
+            }
+            else {
+                //-- check for proper type
+                Class type = descriptor.getFieldType();
+                if (type.isPrimitive())
+                    value = MarshalHelper.toPrimitiveObject(type, attValue);
+            }
                 
             try {
                 FieldHandler handler = descriptor.getHandler();
@@ -923,6 +957,56 @@ System.out.println("overriding debug, always on");
        return false;
        
     } //-- isPrimitive
+    
+    /**
+     * Resolves the current set of waiting references for the given Id
+     * @param id the id that references are waiting for
+     * @param value, the value of the resolved id
+    **/
+    private void resolveReferences(String id, Object value) 
+        throws org.xml.sax.SAXException
+    {
+        if ((id == null) || (value == null)) return;
+        
+        ReferenceInfo refInfo = (ReferenceInfo)_resolveTable.remove(id);
+        while (refInfo != null) {
+            try {
+                FieldHandler handler = refInfo.descriptor.getHandler();
+                if (handler != null)
+                    handler.setValue(refInfo.target, value);
+            }
+            catch(java.lang.IllegalStateException ise) {
+                        
+                String err = "Attempting to resolve an IDREF: " +
+                        id + "resulted in the following error: " +
+                        ise.toString();
+                throw new SAXException(err);
+            }
+            refInfo = refInfo.next;
+        }
+    } //-- resolveReferences
+    
+    /**
+     * Internal class used to save state for reference resolving
+    **/
+    class ReferenceInfo {
+        String id = null;
+        Object target = null;
+        XMLFieldDescriptor descriptor = null;
+        ReferenceInfo next = null;
+        
+        public ReferenceInfo() {
+            super();
+        }
+        
+        public ReferenceInfo
+            (String id, Object target, XMLFieldDescriptor descriptor) 
+        {
+            this.id = id;
+            this.target = target;
+            this.descriptor = descriptor;
+        }
+    }
     
 } //-- Unmarshaller
 

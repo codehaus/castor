@@ -121,6 +121,7 @@ public class DescriptorJClass extends JClass {
         addMember(new JMember(SGTypes.String,  "nsPrefix"));
         addMember(new JMember(SGTypes.String,  "nsURI"));
         addMember(new JMember(SGTypes.String,  "xmlName"));
+        addMember(new JMember(_XMLFieldDescriptorClass, "identity"));
         
         //-- create default constructor
         addConstructor( createConstructor() );
@@ -223,7 +224,7 @@ public class DescriptorJClass extends JClass {
         //-- create getIdentity method
         method = new JMethod(_FieldDescriptorClass, "getIdentity");
         jsc = method.getSourceCode();
-        jsc.add("return null;");
+        jsc.add("return identity;");
         addMethod(method);
         _getIdentity = method;
         
