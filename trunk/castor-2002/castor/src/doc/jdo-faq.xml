@@ -265,14 +265,14 @@
 	   Note: if you use mm.MySQL JDBC driver, then you need version 2.0.3 or higher.</p>
 	
 	<p><b>Which open source database is supported better?</b></p>
-	
-	<p>For now only with <a href="http://www.sapdb.org">SAP DB</a> you get a full set of Castor features.
-	   PostgreSQL doesn't support outer joins, other open source databases doesn't support select with write lock,
+
+	<p>For now only with <a href="http://www.postgresql.org">PostgreSQL 7.1</a> and
+       <a href="http://www.sapdb.org">SAP DB</a> you get a full set of Castor features.
+	   Other open source databases doesn't support select with write lock,
 	   so db-locked locking mode doesn't work properly (it works in the same way as exclusive locking mode).
 	   All other Castor features are supported with <a href="http:/www.mysql.com">MySQL</a>,
 	   <a href="http://www.interbase2000.org">Interbase</a>, <a href="http://instantdb.enhydra.org">InstantDB</a>
 	   and <a href="http://www.hypersonicsql.com">Hypersonic SQL</a>.</p>
-	
     </section>
 
   </body>
