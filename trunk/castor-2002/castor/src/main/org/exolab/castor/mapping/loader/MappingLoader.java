@@ -94,7 +94,16 @@ public abstract class MappingLoader
     **/
     private static final String ADD_METHOD_PREFIX = "add";
 
-
+    /**
+     * The standard prefix for the getter method
+    **/
+    private static final String GET_METHOD_PREFIX = "get";
+    
+    /**
+     * The prefix for the "is" method for booleans
+    **/
+    private static final String IS_METHOD_PREFIX = "is";
+    
     /**
      * All class descriptors added so far, keyed by Java class.
      */
@@ -666,7 +675,8 @@ public abstract class MappingLoader
             handler = new FieldHandlerImpl( field, typeInfo );
         } 
         else {
-
+            //-- if both methods (get/set) are not specified, then
+            //-- automatically determine them.
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                 int    point;
                 Vector getSeq = new Vector();
@@ -676,19 +686,41 @@ public abstract class MappingLoader
 
                 if ( fieldName == null )
                     throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
+                    
+                //-- get method normally starts with "get", but
+                //-- may start with "is" if it's a boolean.
+                String getPrefix = GET_METHOD_PREFIX;
 
                 try {
+                    
                     while ( true ) {
+                        
                         Class last;
 
                         point = fieldName.indexOf( '.' );
                         if ( point < 0 )
                             break;
                         last = javaClass;
-                        // getter
-                        methodName = "get" + capitalize( fieldName.substring( 0, point ) );
-                        method = javaClass.getMethod( methodName, null );
+                        
                         fieldName = fieldName.substring( point + 1 );
+                        
+                        // * getter *
+                        
+                        //-- reassign getPrefix for each time through 
+                        //-- the loop.
+                        getPrefix = GET_METHOD_PREFIX;
+                        methodName = getPrefix + capitalize( fieldName );
+                        method = javaClass.getMethod( methodName, null );                        
+                        if (method == null) {
+                            if ((fieldType == Boolean.class) ||
+                                (fieldType == Boolean.TYPE)) 
+                            {
+                                getPrefix = IS_METHOD_PREFIX;
+                                methodName = getPrefix + capitalize( fieldName );
+                                method = javaClass.getMethod( methodName, null);
+                            }
+                        }
+                        
                         // Make sure method is not abstract/static
                         // (note: Class.getMethod() returns only public methods).
                         if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
@@ -698,7 +730,7 @@ public abstract class MappingLoader
                         getSeq.addElement( method );
                         javaClass = method.getReturnType();
                         // setter;   Note: javaClass already changed, use "last"
-                        methodName = "set" + methodName.substring(3);
+                        methodName = "set" + methodName.substring(getPrefix.length());
                         try {
                             method = last.getMethod( methodName, new Class[] { javaClass } );
                             if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
@@ -715,15 +747,29 @@ public abstract class MappingLoader
                         setSequence = new Method[ setSeq.size() ];
                         setSeq.copyInto( setSequence );
                     }
-                    getMethod = findAccessor( javaClass, "get" + capitalize( fieldName ),
+                    
+                    
+                    getMethod = findAccessor( javaClass, getPrefix + capitalize( fieldName ),
                                             ( colType == null ? fieldType : colType ), true );
+                                          
+                    //-- check for boolean type
+                    if (getMethod == null) {
+                        if ((fieldType == Boolean.class) || 
+                            (fieldType == Boolean.TYPE)) 
+                        {
+                            getPrefix = IS_METHOD_PREFIX;
+                            getMethod = findAccessor(javaClass, 
+                                getPrefix + capitalize( fieldName ),
+                                ( colType == null ? fieldType : colType ), true );
+                        }
+                    }
                 } catch ( MappingException except ) {
                     throw except;
                 } catch ( Exception except ) {
                 }
                 if ( getMethod == null )
                     throw new MappingException( "mapping.accessorNotFound",
-                                                "get" + capitalize( fieldName ),
+                                                getPrefix + capitalize( fieldName ),
                                                 ( colType == null ? fieldType : colType ),
                                                 javaClass.getName() );
                 if ( fieldType == null && colType == null )
