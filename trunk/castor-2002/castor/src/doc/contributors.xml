@@ -346,6 +346,12 @@
     <description>A patch to OQL parser: retrieving fields from a superclass</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Rhodes" given="Phillip" />
+    <email>rhodespc@telerama.com</email>
+    <description>Fixed JDO bug: non-null columns sometimes were returned as null</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
