@@ -230,8 +230,9 @@ final class ObjectLock
 		_readLock = null;
 		_writeLock = tx;
 		return _object;
-	    } else if ( ! write && _writeLock == null ) {
+	    } else if ( ! write && _writeLock == null && _writeWaiting == null ) {
 		// Looking for read lock and no write locks, can acquire
+                // But only if not other transaction is waiting for write lock first
 		// Make sure we do not wait twice for the same lock
 		LinkedTx read;
 		
