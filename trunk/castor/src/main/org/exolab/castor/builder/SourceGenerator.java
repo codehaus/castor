@@ -354,7 +354,7 @@ public class SourceGenerator
      /**
      * Creates Java Source code (Object model) for the given XML Schema
      *
-     * @param InputSource - the InputSource representing the XML schema.
+     * @param source - the InputSource representing the XML schema.
      * @param packageName the package for the generated source files
     **/
     public void generateSource(InputSource source, String packageName) {
