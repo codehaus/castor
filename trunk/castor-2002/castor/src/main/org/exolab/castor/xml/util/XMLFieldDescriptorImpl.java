@@ -52,6 +52,7 @@ import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.util.List;
 import java.util.StringTokenizer;
+import java.util.Hashtable;
 
 /**
  * XML field descriptor. Wraps {@link FieldDescriptor} and adds
@@ -154,6 +155,17 @@ public class XMLFieldDescriptorImpl
      * True if the field is a container field
      */
     private boolean _container = false;
+
+    /**
+     * The XML Schema type of this field value
+     */
+     private String _schemaType = null;
+
+    /**
+     * The prefix used in case the
+     * value of the field described is of type QName.
+     */
+     private String _qNamePrefix = null;
 
     /**
      * The XML name of the field.
@@ -283,7 +295,7 @@ public class XMLFieldDescriptorImpl
     //- Public Methods -/
     //------------------/
 
-    /** 
+    /**
      * Returns true if two XMLFieldDescriptors should be treated as
      * equal. Any XMLFieldDescriptor that handles the same field
      * is considered equal.
@@ -291,7 +303,7 @@ public class XMLFieldDescriptorImpl
     public boolean equals(Object obj) {
         if ((obj == null) || (!(obj instanceof XMLFieldDescriptor)))
             return false;
-            
+
         XMLFieldDescriptor descriptor = (XMLFieldDescriptor)obj;
         if (_handler == null) {
             return (obj == this);
@@ -301,7 +313,7 @@ public class XMLFieldDescriptorImpl
         }
         return (_handler.equals(descriptor.getHandler()));
     } //-- equals
-    
+
     /**
      * Set the class which contains this field
      */
@@ -398,10 +410,21 @@ public class XMLFieldDescriptorImpl
         return nsURI;
     } //-- getNameSpaceURI
 
+
     public NodeType getNodeType()
     {
         return _nodeType;
     }
+
+     /**
+      * Returns the prefix used in case the value of the
+      * field described by this descriptor is of type QName.
+      * This is helpful for the Marshaller but not mandatory.
+      * @return the prefix used in the QName value.
+      */
+      public String getQNamePrefix() {
+          return _qNamePrefix;
+      }
 
     /**
      * Returns a specific validator for the field described by
@@ -414,6 +437,13 @@ public class XMLFieldDescriptorImpl
         return _validator;
     } //-- getValidator
 
+    /**
+     * Returns the XML Schema type of the value
+     * of the field described by this descriptor.
+     */
+     public String getSchemaType() {
+         return _schemaType;
+     }
 
     /**
      * Returns true if the field type is immutable.
@@ -591,6 +621,25 @@ public class XMLFieldDescriptorImpl
     } //-- setMultivalued
 
     /**
+     * Sets the type of the XML Schema type of the value
+     * for the field being described.
+     * @param type the value type.
+     */
+     public void setSchemaType(String schemaType) {
+        _schemaType =schemaType;
+     }
+
+     /**
+      * Sets the prefix used in case the value
+      * of the field described by this descriptor is of type
+      * QName.
+      * @param qNamePrefix
+      */
+      public void setQNamePrefix(String qNamePrefix) {
+          _qNamePrefix = qNamePrefix;
+      }
+
+    /**
      * Sets the flag indicating that the field described by this
      * descriptor is a reference to another field in the object model.
      *
@@ -617,6 +666,7 @@ public class XMLFieldDescriptorImpl
     public void setNameSpaceURI(String nsURI) {
         this.nsURI = nsURI;
     } //-- setNameSpaceURI
+
 
     /**
      * Sets the XML node type for the described field
