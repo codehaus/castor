@@ -106,7 +106,7 @@
     <case class="jdo.TimeStampMismatched" />
     <case class="jdo.Size" />
     <case class="jdo.Absolute" />
-    <case class="jdo.TestLimitClause" id="TC62" />
+    <case class="jdo.TestLimitWithOffsetClause" id="TC62a" />
 
   </category>
 
@@ -154,7 +154,7 @@
     <case class="jdo.TimeStampMismatched" />
     <case class="jdo.ExpireManyToMany" />
     <case class="jdo.ExpireLazyEmployee" />
-    <case class="jdo.TestLimitClause" id="TC62" />
+    <case class="jdo.TestLimitWithOffsetClause" id="TC62a" />
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">
@@ -250,7 +250,7 @@
     <case class="jdo.TimeStampMismatched" />
     <case class="jdo.ExpireManyToMany" />
     <case class="jdo.ExpireLazyEmployee" />
-    <case class="jdo.TestLimitClause" id="TC62" />
+    <case class="jdo.TestLimitWithOffsetClause" id="TC62a" />
   </category>
 
   <category name="mssql" class="jdo.JDOCategory">
@@ -295,9 +295,10 @@
     <!-- <case class="jdo.StoredProcedure" /> -->
 
     <!-- D -->
-    <!-- jdo.ListTypes is a helper class for
-    writing castor jdo driver      -->
+    <!-- jdo.ListTypes is a helper class for writing castor jdo driver      -->
     <!-- <case class="jdo.ListTypes" /> -->
+    <case class="jdo.TestLimitClause" id="TC62" />
+  </category>
   </category>
 
   <category name="hsql" class="jdo.JDOCategory">
