@@ -116,6 +116,11 @@ class UnmarshalState {
     boolean wrapper = false;
     
     /**
+     * The whitespace preserve flag
+     */
+    boolean wsPreserve = false;
+    
+    /**
      * The UnmarshalState which contains information
      * about the parent object for object containted
      * within this state. Used when handling
@@ -146,6 +151,7 @@ class UnmarshalState {
         derived = false;
         wrapper = false;
         targetState = null;
+        wsPreserve = false;
     } //-- clear
 
     /**
