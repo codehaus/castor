@@ -52,7 +52,7 @@ import java.util.Vector;
 import java.io.*;
 
 /**
- * A class that "WILL EVENTUALLY" represent a Java Doc Comment.
+ * A class that "SOMEWHAT" represents a Java Doc Comment.
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -63,13 +63,12 @@ public class JDocComment {
     /**
      * An ordered list of descriptors
     **/
-    Vector _descriptors = null;
-
-
-    /**
-     * The main comment for this JDocComment
+    private Vector       _descriptors = null;
+    
+    /** 
+     * The internal buffer for this JDocComment
     **/
-    StringBuffer _comment = null;
+    private StringBuffer _comment     = null;
     
     /**
      * Creates a new JavaDoc Comment
@@ -139,18 +138,16 @@ public class JDocComment {
     **/
     public void print(JSourceWriter jsw) {
         
-        jsw.writeln("/**");
-        //-- print main comment
-        LineFormatter formatter = new LineFormatter(_comment.toString());
-        while(formatter.hasMoreLines())
-            jsw.writeln(formatter.nextLine());
+        //-- I reuse JComment for printing
+        JComment jComment = new JComment(JComment.JAVADOC_STYLE);
+        
+        jComment.setComment(_comment.toString());
         
         for (int i = 0; i < _descriptors.size(); i++) {
-            jsw.write(" * ");
-            jsw.writeln(_descriptors.elementAt(i));
+            jComment.appendComment("\n");
+            jComment.appendComment(_descriptors.elementAt(i).toString());
         }
-        jsw.writeln("**/");
-        jsw.flush();
+        jComment.print(jsw);
     } //-- print
     
     /**
@@ -176,80 +173,5 @@ public class JDocComment {
         return sb.toString();
     } //-- toString
 
-    
-    /**
-     * Formats a given String for use within a Java Doc comment
-    **/
-    static class LineFormatter {
-        
-        static final int MAX_LENGTH = 60;
-        
-        String comment = null;
-        
-        int offset = 0;
-        int length = 0;
-        
-        LineFormatter(String comment) {
-            this.comment = comment;
-            if (comment != null)
-                this.length = comment.length();
-        }
-        
-        boolean hasMoreLines() {
-            if (comment == null) return false;
-            return (offset < length);
-        } //-- isFinished
-        
-        String nextLine() {
-            if (comment == null) return null;
-            
-            StringBuffer sb = new StringBuffer();
-            sb.append(" * ");
-            
-            int len = comment.length();
-            
-            int diff = length - offset;
-            if (diff <= MAX_LENGTH) {
-                sb.append(comment.substring(offset));
-                offset = length;
-            }
-            else {
-                int cc = offset+MAX_LENGTH;
-                
-                boolean done = false;
-                while (cc > offset) {
-                    if (isBreakChar(comment.charAt(cc))) break;
-                    else --cc;
-                }
-                if (offset == cc) {
-                    // no place to break
-                    //-- we must look ahead
-                    cc = offset+MAX_LENGTH+1;
-                    while(cc < length) {
-                        if (isBreakChar(comment.charAt(cc))) break;
-                        else ++cc;
-                    }
-                }
-                sb.append(comment.substring(offset, cc));
-                offset = cc+1;
-            }
-            return sb.toString();
-        } //-- getNextLine
-        
-        
-        private boolean isBreakChar(char ch) {
-            switch(ch) {
-                case '\n':
-                case '\r':
-                case '\t':
-                case  ' ':
-                    return true;
-                default:
-                    break;
-            }
-            return false;
-        }
-    } //-- LineFormatter
-    
 } //-- JDocComment
 
