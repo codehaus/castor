@@ -356,7 +356,7 @@ public class Types
         new TypeInfo( "byte",        java.lang.Byte.TYPE,
                       java.lang.Byte.class,       true,     new Byte( (byte) 0 ) ),
         new TypeInfo( "date",        null,
-                      java.util.Date.class,       true,     new Date() ),
+                      java.util.Date.class,       true,     null ),
         new TypeInfo( "short",       java.lang.Short.TYPE,
                       java.lang.Short.class,      true,     new Short( (short) 0 ) ),
         new TypeInfo( "char",        java.lang.Character.TYPE,
