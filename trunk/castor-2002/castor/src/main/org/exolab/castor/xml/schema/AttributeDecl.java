@@ -202,8 +202,10 @@ public class AttributeDecl extends Annotated {
      * The only valid values for minOccurs are 0 and 1.
     **/
     public void setMinOccurs(int minOccurs) {
-        if (minOccurs > 0) minOccurs = 1;
-        else minOccurs = 0;
+        if (minOccurs > 0) 
+            this.minOccurs = 1;
+        else 
+            this.minOccurs = 0;
     } //-- setMinOccurs
     
     /**
