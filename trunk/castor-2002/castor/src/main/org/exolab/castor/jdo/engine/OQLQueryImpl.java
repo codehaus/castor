@@ -68,8 +68,8 @@ import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.LockNotGrantedException;
 import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.RelationContext;
-import org.exolab.castor.mapping.ContainerFieldDesc;
+import org.exolab.castor.persist.FetchContext;
+import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 
 
@@ -121,15 +121,15 @@ public class OQLQueryImpl
     public void create( String oql )
         throws QueryInvalidException
     {
-        StringTokenizer token;
-        String          objType;
-        String          objName;
-        StringBuffer    sql;
-        JDOClassDesc   clsDesc;
-        SQLEngine       engine;
-        Vector          types;
-        Class[]         array;
-        QueryExpr       expr;
+        StringTokenizer    token;
+        String             objType;
+        String             objName;
+        StringBuffer       sql;
+        JDOClassDescriptor clsDesc;
+        SQLEngine          engine;
+        Vector             types;
+        Class[]            array;
+        QueryExpr          expr;
         
         _fieldNum = 0;
         types = new Vector();
@@ -159,7 +159,7 @@ public class OQLQueryImpl
         if ( _dbEngine == null )
             throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-        clsDesc = engine.getClassDesc();
+        clsDesc = engine.getDescriptor();
 
         expr = engine.getFinder();
         if ( token.hasMoreTokens() ) {
@@ -176,7 +176,7 @@ public class OQLQueryImpl
         array = new Class[ types.size() ];
         types.copyInto( array );
         try {
-            _query = engine.createQuery( new RelationContext( TransactionImpl.getCurrentContext(), _dbEngine ),
+            _query = engine.createQuery( new FetchContext( TransactionImpl.getCurrentContext(), _dbEngine ),
                                          expr.getQuery( false ), array );
         } catch ( QueryException except ) {
             throw new QueryInvalidException( except.getMessage() );
@@ -184,15 +184,15 @@ public class OQLQueryImpl
     }
     
     
-    private void parseField( JDOClassDesc clsDesc, StringTokenizer token,
+    private void parseField( JDOClassDescriptor clsDesc, StringTokenizer token,
                              QueryExpr expr, Vector types )
         throws QueryInvalidException
     {
-        String         name;
-        String         op;
-        String         value;
-        JDOFieldDesc[] fields;
-        JDOFieldDesc   field;
+        String               name;
+        String               op;
+        String               value;
+        FieldDescriptor[]    fields;
+        JDOFieldDescriptor   field;
         
         if ( ! token.hasMoreTokens() )
             throw new QueryInvalidException( "Missing field name" );
@@ -206,26 +206,20 @@ public class OQLQueryImpl
         value = token.nextToken();
         if ( name.indexOf( "." ) > 0 )
             name = name.substring( name.indexOf( "." ) + 1 );
-        fields = (JDOFieldDesc[]) clsDesc.getFields();
+        fields = clsDesc.getFields();
         field = null;
         for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ].getFieldName().equals( name ) ) {
-                field = fields[ i ];
+            if ( fields[ i ] instanceof JDOFieldDescriptor &&
+                 fields[ i ].getFieldName().equals( name ) ) {
+                field = (JDOFieldDescriptor) fields[ i ];
                 break;
             }
         }
         
         if ( field == null ) {
-            if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
-                fields = (JDOFieldDesc[]) ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
-                for ( int i = 0 ; i < fields.length ; ++i ) {
-                    if ( fields[ i ].getFieldName().equals( name ) ) {
-                        field = fields[ i ];
-                        break;
-                    }
-                }
-            } else if ( clsDesc.getIdentity().getFieldName().equals( name ) ) {
-                field = (JDOFieldDesc) clsDesc.getIdentity();
+            if ( clsDesc.getIdentity() instanceof JDOFieldDescriptor &&
+                 clsDesc.getIdentity().getFieldName().equals( name ) ) {
+                field = (JDOFieldDescriptor) clsDesc.getIdentity();
             }
         }
         

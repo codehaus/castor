@@ -111,7 +111,7 @@ public class DTDResolver
      */
     public DTDResolver( EntityResolver resolver )
     {
-        _resolver = new org.exolab.castor.mapping.DTDResolver( resolver );
+        _resolver = new org.exolab.castor.mapping.desc.DTDResolver( resolver );
     }
 
 
@@ -120,7 +120,7 @@ public class DTDResolver
      */
     public DTDResolver()
     {
-        _resolver = new org.exolab.castor.mapping.DTDResolver();
+        _resolver = new org.exolab.castor.mapping.desc.DTDResolver();
     }
 
 
