@@ -66,7 +66,6 @@ JDO:   Fixed bug 1615 using contribution from frric@wmdata.com [frric@wmdata.com
        Fixed a typo in a debug statement (wrong message resource key used).
        (Werner - 20040426)
        
->>>>>>> 1.70
 JDO:   Fixed bug 1601 using contribution from Tomasz Piontek [piontek@man.poznan.pl]
        Added code to support org.exolab.castor.types.Duration as a native type
        in Castor JDO. Added convertors for type conversion org.exolab.castor.types.Duration 
