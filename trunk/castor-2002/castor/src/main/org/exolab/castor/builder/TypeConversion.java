@@ -47,9 +47,14 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
 import org.exolab.javasource.*;
-
 import org.exolab.castor.util.OrderedMap;
 
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.schema.Datatype;
+import org.exolab.castor.xml.schema.types.*;
+
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 
@@ -76,6 +81,7 @@ public class TypeConversion {
         else return schemaTypeName;
     } //-- getJavaTypeName
     
+    /*
     public static XSType createXSType(String schemaType) {
         
         XSType xsType = null;
@@ -121,7 +127,76 @@ public class TypeConversion {
         }
         return xsType;
     } //-- createXSType
+    */
     
+    
+    /**
+     * Converts the given Datatype to the appropriate XSType.
+     * @return the XSType which represets the given Datatype
+    **/
+    public static XSType convertType(Datatype datatype) {
+        
+        if (datatype == null) return null;
+        
+        XSType xsType = null;
+        
+        //-- determine base type
+        Datatype base = datatype;
+        while ((base != null) && (!(base instanceof BuiltInType))) {
+            base = base.getSource();
+        }
+        if (base == null) {
+            String className 
+                = JavaXMLNaming.toJavaClassName(datatype.getName());
+            xsType = new XSClass(new JClass(className));
+        }
+        else {
+            switch ( ((BuiltInType)base).getType() ) {
+                
+                //-- ID
+                case BuiltInType.ID_TYPE:
+                    return new XSId();
+                //-- IDREF
+                case BuiltInType.IDREF_TYPE:
+                    return new XSIdRef();
+                //-- NCName
+                case BuiltInType.NCNAME_TYPE:
+                    return new XSNCName();
+                //-- NMTOKEN
+                case BuiltInType.NMTOKEN_TYPE:
+                    return new XSNMToken();
+                //-- binary
+                case BuiltInType.BINARY_TYPE:
+                    return new XSBinary();
+                //-- boolean
+                case BuiltInType.BOOLEAN_TYPE:
+                    return new XSBoolean();
+                //-- integer
+                case BuiltInType.INTEGER_TYPE:
+                    return toXSInteger(datatype);
+                //-- double
+                case BuiltInType.DOUBLE_TYPE:
+                    return new XSReal();
+                //-- string
+                case BuiltInType.STRING_TYPE:
+                    return toXSString(datatype);
+                //-- timeInstant
+                case BuiltInType.TIME_INSTANT_TYPE:
+                    return new XSTimeInstant();
+                default:
+                    //-- error
+                    String className 
+                        = JavaXMLNaming.toJavaClassName(datatype.getName());
+                    xsType = new XSClass(new JClass(className));
+                    break;
+                
+            }
+        }
+        return xsType;
+        
+    } //-- convertType
+    
+        
     /**
      * Determines if the given type is a built in Schema datatype
     **/
@@ -137,6 +212,49 @@ public class TypeConversion {
       //-------------------/
      //- Private Methods -/
     //-------------------/
+    
+    /**
+     * Converts the given datatype to an XSInteger
+     * @param datatype the Datatype to convert
+     * @return the XSInteger representation of the given Datatype
+    **/
+    private static XSInteger toXSInteger(Datatype datatype) {
+        XSInteger xsInteger = new XSInteger();
+        
+        //-- copy valid facets
+        Enumeration enum = datatype.getFacets();
+        while (enum.hasMoreElements()) {
+            
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+            
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                xsInteger.setMaxExclusive(facet.toInt());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                xsInteger.setMaxInclusive(facet.toInt());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(facet.getName()))
+                xsInteger.setMinExclusive(facet.toInt());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
+                xsInteger.setMinInclusive(facet.toInt());
+            
+        }
+        
+        return xsInteger;
+    } //-- toXSInteger
+    
+    /**
+     * Converts the given datatype to an XSString
+     * @param datatype the Datatype to convert
+     * @return the XSString representation of the given Datatype
+    **/
+    private static XSString toXSString(Datatype datatype) {
+        XSString xsString = new XSString();
+        return xsString;
+    } //-- toXSString
     
     /**
      * Creates the naming table for type conversion

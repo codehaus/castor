@@ -49,6 +49,7 @@ import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.castor.xml.schema.*;
 
+import org.exolab.javasource.JClass;
 import org.exolab.javasource.JSourceCode;
 
 /**
@@ -103,16 +104,20 @@ public class MemberFactory {
             }
             else eDecl = eRef;
         }
-        String typeRef = eDecl.getTypeRef();
-        if (typeRef == null) {
-            typeRef = JavaXMLNaming.toJavaClassName(eDecl.getName());
-        }
                 
         //-- determine type
                 
         JSourceCode jsc = null;
         SGMember member = null;
-        XSType xsType = TypeConversion.createXSType(typeRef);
+        XSType   xsType = null;
+        
+        Datatype datatype = eDecl.getDatatype();
+        if (datatype != null)
+           xsType = TypeConversion.convertType(datatype);
+        else {
+            String className = JavaXMLNaming.toJavaClassName(eDecl.getName());
+            xsType = new XSClass(new JClass(className));
+        }
                 
         String memberName = "v"+JavaXMLNaming.toJavaClassName(eDecl.getName());
                 
@@ -128,7 +133,7 @@ public class MemberFactory {
         else {
             member = new SGMember(xsType, memberName);
         }
-        member.setSchemaType(typeRef);
+        member.setSchemaType(eDecl.getTypeRef());
         member.setRequired(minOccurs > 0);
         member.setXMLName(eDecl.getName());
         return member;
