@@ -48,18 +48,44 @@ package org.exolab.castor.dtx;
 import java.io.PrintWriter;
 import java.io.PrintStream;
 
+/**
+ * A general class for exceptions associated with Castor DTX. Can
+ * haved a nested exception or just a regular message.
+ *
+ * @author <a href="0@exoffice.com">Evan Prodromou</a> 
+ * @version $Revision$ $Date$
+ */
+
 public class DTXException extends Exception {
     
     private Exception _except = null;
     private String _message = null;
 
+    /**
+     * Constructor using a nested exception.
+     *
+     * @param except The nested exception.
+     */
+
     public DTXException(Exception except) {
 	_except = except;
     }
 
+    /**
+     * Constructor using a simple string message.
+     *
+     * @param message The message.
+     */
+
     public DTXException(String message) {
 	_message = message;
     }
+
+    /**
+     * Returns this message, or the nested exception's message.
+     *
+     * @return String value of the message.
+     */
 
     public String getMessage() {
 	String _msg = null;
@@ -70,6 +96,12 @@ public class DTXException extends Exception {
 	}
 	return _msg;
     }
+
+    /**
+     * Gets the nested exception, if there is one.
+     *
+     * @return Nested exception, or null if this is a message exception only.
+     */
 
     public Exception getNestedException() {
 	return _except;
