@@ -154,7 +154,7 @@ public class FieldInfo extends XMLInfo {
         //-- special supporting fields
         
         //-- has_field
-        if ((!type.isEnumerated()) && type.isPrimitive() && (!isRequired())) {
+        if ((!type.isEnumerated()) && type.isPrimitive()) {
             jMember = new JMember(JType.Boolean, "_has" + name);
             jMember.setComment("keeps track of state for field: " + name);
             jClass.addMember(jMember);
@@ -192,8 +192,7 @@ public class FieldInfo extends XMLInfo {
         
         
         boolean needs_has 
-            = ((!xsType.isEnumerated()) && xsType.isPrimitive() &&
-                (!isRequired()));
+            = ((!xsType.isEnumerated()) && xsType.isPrimitive());
             
         //-- create get method
         method = new JMethod(jType, "get"+mname);
@@ -262,13 +261,15 @@ public class FieldInfo extends XMLInfo {
             jsc.append(getName());
             jsc.append(";");
 			
-			//-- create nullMethod
-            method = new JMethod(null, "delete"+mname);
-            jClass.addMethod(method);
-            jsc = method.getSourceCode();
-            jsc.add("this._has");
-            jsc.append(getName());
-            jsc.append("= false;");			
+			//-- if optional then create delete method
+			if (!isRequired()) {
+                method = new JMethod(null, "delete"+mname);
+                jClass.addMethod(method);
+                jsc = method.getSourceCode();
+                jsc.add("this._has");
+                jsc.append(getName());
+                jsc.append("= false;");			
+            }
         }
 		
         
@@ -302,12 +303,12 @@ public class FieldInfo extends XMLInfo {
     } //-- getFixedValue
     
     /**
-     * Returns the name of the read method for this FieldInfo
-     * @return the name of the read method for this FieldInfo
+     * Returns the name of the delete method for this FieldInfo.
+     * @return the name of the delete method for this FieldInfo
     **/
-    public String getReadMethodName() {
-        return "get" + methodSuffix();
-    } //-- getReadMethodName
+    public String getDeleteMethodName() {
+        return "delete" + methodSuffix();
+    } //-- getDeleteMethodName
     
     /**
      * Returns the name of the has method for this FieldInfo
@@ -315,7 +316,16 @@ public class FieldInfo extends XMLInfo {
     **/
     public String getHasMethodName() {
         return "has" + methodSuffix();
+    } //-- getHasMethodName
+    
+    /**
+     * Returns the name of the read method for this FieldInfo
+     * @return the name of the read method for this FieldInfo
+    **/
+    public String getReadMethodName() {
+        return "get" + methodSuffix();
     } //-- getReadMethodName
+    
     
     /**
      * Returns the name of the write method for this FieldInfo
