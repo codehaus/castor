@@ -483,7 +483,6 @@ public class OQLQueryImpl
                 case ParseTreeWalker.PARENT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT_VALUE:
-
                     try {
                         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
                         if ( _expr != null ) {
@@ -506,18 +505,18 @@ public class OQLQueryImpl
                     else
                       _results = new OQLEnumeration( results, _pathInfo, _clsDesc);
                     break;
+
                 case ParseTreeWalker.DEPENDANT_VALUE:
                 case ParseTreeWalker.AGGREGATE:
                 case ParseTreeWalker.FUNCTION:
-
                     SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
                     _results =  sqe.execute( _expr, _bindValues);
                     _fieldNum = 0;
-
             }
         } catch ( PersistenceException except ) {
             throw except;
         }
+
         return _results;
     }
 
