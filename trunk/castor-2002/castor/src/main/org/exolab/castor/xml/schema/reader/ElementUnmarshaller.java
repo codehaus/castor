@@ -57,6 +57,9 @@ import org.xml.sax.*;
 **/
 public class ElementUnmarshaller extends SaxUnmarshaller {
 
+    /**
+     * The value of the maximum occurance wild card
+    **/
     private static final String MAX_OCCURS_WILDCARD = "unbounded";
 
       //--------------------/
@@ -119,20 +122,34 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         attValue = atts.getValue("type");
         if (attValue != null) _element.setTypeRef(atts.getValue("type"));
                 
-        //-- @minOccurs
+        /*
+         * @minOccurs
+         * if minOccurs is present the value is the int value of
+         * of the attribute, otherwise minOccurs is 1.
+         */
         attValue = atts.getValue(SchemaNames.MIN_OCCURS_ATTR);
+        int minOccurs = 1;
         if (attValue != null) {
-            int minOccurs = toInt(attValue);
+            minOccurs = toInt(attValue);
             _element.setMinimumOccurance(minOccurs);
         }
-        //-- @maxOccurs
-        attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
-        if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
         
+        /*
+         * @maxOccurs
+         * If maxOccurs is present, the value is either unbounded
+         * or the int value of the attribute, otherwise maxOccurs 
+         * equals the minOccurs value.
+         */
+        attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
         if (attValue != null) {
-            int maxOccurs = toInt(attValue);
-            _element.setMaximumOccurance(maxOccurs);
+            if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
+            else {
+                int maxOccurs = toInt(attValue);
+                _element.setMaximumOccurance(maxOccurs);
+            }
         }
+        else _element.setMaximumOccurance(minOccurs);
+        
         //-- @schemaAbbrev
         _element.setSchemaAbbrev(atts.getValue("schemaAbbrev"));
         
