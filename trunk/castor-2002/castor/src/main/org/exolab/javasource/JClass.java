@@ -131,6 +131,20 @@ public class JClass extends JType {
         throws IllegalArgumentException
     {
         super(name);
+        
+        //-- verify name is a valid java class name
+        if (!isValidClassName(name)) {
+            String lname = getLocalName();
+            String err = "'" + lname + "' is ";
+            if (JNaming.isKeyword(lname))
+                err += "a reserved word and may not be used as "
+                    + " a class name.";
+            else 
+                err += "not a valid Java identifier.";
+
+            throw new IllegalArgumentException(err);
+        }
+        
         this.packageName = getPackageFromClassName(name);
         imports          = new Vector();
         interfaces       = new Vector();
@@ -503,8 +517,15 @@ public class JClass extends JType {
     } //-- removeImport
 
     public static boolean isValidClassName(String name) {
-        //** add class name validation */
-        return true;
+        
+        if (name == null) return false;
+        
+        //-- ignore package information, for now
+		int period = name.lastIndexOf(".");
+		if (period>0)
+			name = name.substring(period+1);
+	    
+	    return JNaming.isValidJavaIdentifier(name);
     } //-- isValidClassName
 
     public void print() {
