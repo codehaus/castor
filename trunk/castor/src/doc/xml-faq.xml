@@ -159,6 +159,23 @@
                There are some <a href="extras.xml">3rd party</a> tools as well.
             </p>
             </section>
+            <section title="How do I specify a namespace in the mapping file?">
+            <p>
+               For a specific field you can use a QName for the value of the bind-xml name
+               attribute as such:
+               <code>
+  &lt;bind-xml name="foo:bar" xmlns:foo="http://www.acme.com/foo"/&gt;
+               </code>
+               Note: The namespace prefix is only used for qualification during the loading
+               of the mapping, it is not used during Marshalling. To map namespace prefixes
+               during marshalling you currently need to set these via the Marshaller directly.
+            </p>
+            <p>
+               For a class mapping, use the &lt;map-to&gt; element. For more information see
+               the <a href="xml-mapping.xml">XML Mapping documentation</a>.
+            </p>
+            </section>
+
         </section>
 
     </section>
