@@ -46,7 +46,7 @@
 package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
 
 import java.util.Vector;
@@ -478,9 +478,9 @@ public class FieldInfo extends XMLInfo {
     **/
     protected String methodSuffix() {
         if (name.startsWith("_"))
-            return JavaXMLNaming.toJavaClassName(name.substring(1));
+            return JavaNaming.toJavaClassName(name.substring(1));
         else
-            return JavaXMLNaming.toJavaClassName(name);
+            return JavaNaming.toJavaClassName(name);
     }
     
 } //-- FieldInfo

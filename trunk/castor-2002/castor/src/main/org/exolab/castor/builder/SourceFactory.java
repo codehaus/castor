@@ -125,7 +125,7 @@ public class SourceFactory  {
         FactoryState state = null;
 
         String elementName = element.getName();
-        String className = JavaXMLNaming.toJavaClassName(elementName);
+        String className = JavaNaming.toJavaClassName(elementName);
 
         className = resolveClassName(className, packageName);
 
@@ -179,7 +179,7 @@ public class SourceFactory  {
             else {
 
                 String typeName = complexType.getName();
-                String superClass = JavaXMLNaming.toJavaClassName(typeName);
+                String superClass = JavaNaming.toJavaClassName(typeName);
 
                 superClass = resolveClassName(superClass, packageName);
                 jClass.setSuperClass(superClass);
@@ -243,7 +243,7 @@ public class SourceFactory  {
         if (!type.isTopLevel())
             throw new IllegalArgumentException("ComplexType is not top-level.");
 
-        String className = JavaXMLNaming.toJavaClassName(type.getName());
+        String className = JavaNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
 
         FactoryState state
@@ -339,7 +339,7 @@ public class SourceFactory  {
             typeName += "Type";
         }
 
-        String className = JavaXMLNaming.toJavaClassName(typeName);
+        String className = JavaNaming.toJavaClassName(typeName);
 
         if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
@@ -722,7 +722,7 @@ public class SourceFactory  {
 				className =
 					SourceGenerator.getQualifiedClassName(
 							base.getSchema().getTargetNamespace(),
-							JavaXMLNaming.toJavaClassName(base.getName()));
+							JavaNaming.toJavaClassName(base.getName()));
 			}
 
 			//-- Set super class
@@ -933,7 +933,7 @@ public class SourceFactory  {
         while (enum.hasMoreElements()) {
             Facet facet = (Facet)enum.nextElement();
             String value = facet.getValue().toUpperCase();
-            if (!JavaXMLNaming.isValidJavaIdentifier(value)) {
+            if (!JavaNaming.isValidJavaIdentifier(value)) {
                 useValuesAsName = false;
                 break;
             }

@@ -53,7 +53,7 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.*;
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
 
 
@@ -105,7 +105,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
             
         JSourceCode jsc = null;
         
-        String cName = JavaXMLNaming.toJavaClassName(getElementName());
+        String cName = JavaNaming.toJavaClassName(getElementName());
         
         //-- add{Name}(Object)
         method = new JMethod(null, "add"+cName);
@@ -140,7 +140,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         
         //-- array setter
         JType arrayType = contentParam.getType().createArray();
-        String pName = JavaXMLNaming.toJavaMemberName(cName);
+        String pName = JavaNaming.toJavaMemberName(cName);
         JParameter arrayParam = new JParameter(arrayType, pName+"Array");
         method = new JMethod(null, "set"+cName);
         method.addParameter(arrayParam);

@@ -46,7 +46,7 @@
 package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.util.Configuration;
 
@@ -145,7 +145,7 @@ public class MemberFactory {
     {
 
         String memberName
-            = JavaXMLNaming.toJavaMemberName(attribute.getName());
+            = JavaNaming.toJavaMemberName(attribute.getName());
 
         if (!memberName.startsWith("_"))
             memberName = "_"+memberName;
@@ -324,14 +324,14 @@ public class MemberFactory {
 			if (SourceGenerator.mappingSchemaElement2Java())
 			{
 				// Java class name is element name
-				className = JavaXMLNaming.toJavaClassName(eDecl.getName());
+				className = JavaNaming.toJavaClassName(eDecl.getName());
 				if (className==null)
 					return null;
 			}
 			else if (SourceGenerator.mappingSchemaType2Java())
 			{
 				// Java class name is schema type name
-				className = JavaXMLNaming.toJavaClassName(getElementType(eDecl));
+				className = JavaNaming.toJavaClassName(getElementType(eDecl));
 				// Prefix package qualifier?
 				if (eDecl.getType()!=null)
 				{
@@ -344,7 +344,7 @@ public class MemberFactory {
             xsType = new XSClass(new JClass(className));
         }
 
-        String fieldName = JavaXMLNaming.toJavaMemberName(eDecl.getName());
+        String fieldName = JavaNaming.toJavaMemberName(eDecl.getName());
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
