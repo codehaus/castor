@@ -78,6 +78,10 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     private AttributeDecl _attribute = null;
 
     private Schema _schema = null;
+    
+    private boolean foundAnnotation = false;
+    private boolean foundSimpleType = false;
+    
 
       //----------------/
      //- Constructors -/
@@ -91,26 +95,32 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
 
         setResolver(resolver);
 
-        _attribute = new AttributeDecl(schema, atts.getValue("name"));
+        if (atts.getValue(SchemaNames.REF_ATTR) != null) {
+            String err = "Attribute references are currently not supported.";
+            throw new IllegalStateException(err);
+        }
+        
+        String name = atts.getValue(SchemaNames.NAME_ATTR);
+        
+        _attribute = new AttributeDecl(schema, name);
 
-        //-- handle remaining attributes
-        String attValue = null;
-
+        //-- form (Not yet supported)
+        //_attribute.setForm(...);
+        
+        //-- id
+        _attribute.setId(atts.getValue(SchemaNames.ID_ATTR));
+        
         //-- value
-        String defaultValue = atts.getValue(SchemaNames.VALUE_ATTR);
-        _attribute.setDefaultValue(defaultValue);
+        _attribute.setValue(atts.getValue(SchemaNames.VALUE_ATTR));
 
         //-- use
-        String useValue = atts.getValue(SchemaNames.USE_ATTR);
-        if (useValue == null) {
-            useValue = "default";
-        }
-        _attribute.setUseValue(useValue);
-
+        String use = atts.getValue(SchemaNames.USE_ATTR);
+        if (use != null) _attribute.setUse(use);
+        
         //-- type
-        attValue = atts.getValue("type");
-        if (attValue != null) {
-            _attribute.setSimpleTypeReference(attValue);
+        String type = atts.getValue("type");
+        if (type != null) {
+            _attribute.setSimpleTypeReference(type);
         }
 
     } //-- AttributeUnmarshaller
@@ -161,9 +171,24 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         }
 
         if (SchemaNames.ANNOTATION.equals(name)) {
+            
+            if (foundAnnotation)
+                error("Only one (1) annotation is allowed as a child of " +
+                    "an attribute declaration.");
+                    
+            if (foundSimpleType)
+                error("An annotation may only appear as the first child of "+
+                    "an attribute declaration.");
+            
+            foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
+            if (foundSimpleType)
+                error("Only one (1) simpleType is allowed as a child of " +
+                    "an attribute declaration.");
+            
+            foundSimpleType = true;
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
         else {
