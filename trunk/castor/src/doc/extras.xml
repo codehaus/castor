@@ -530,12 +530,12 @@
             </table>
         </section>
 
-        <section title="Out-of-the-Box">
+        <section title="BlueGlue">
             <table border="0">
                 <tr>
                     <td valign="top">Description:</td>
                     <td>
-                    Out-of-the-Box? 2.1 is an intelligent distribution of over 
+                    BlueGlue is an intelligent distribution of over 
                     100 (and counting) Open Source projects for Java and LAMP 
                     developers. It provides instant infrastructure with all the 
                     things developers need to be productive: web server, web app 
@@ -548,7 +548,7 @@
                 </tr>
                 <tr>
                     <td valign="top">URL:</td>
-                    <td><url>http://www.ejbsolutions.com/</url></td>
+                    <td><url>http://www.openlogic.com/</url></td>
                 </tr>
             </table>
         </section>
