@@ -112,7 +112,7 @@ public final class JMethodSignature {
         this.modifiers    = new JModifiers();
         this.params       = new JNamedMap(3);
         this.exceptions   = new Vector(1); 
-        
+ 
         //-- add Return type descriptor
         if (returnType != null) {
             jdc.addDescriptor(JDocDescriptor.createReturnDesc(returnType.getLocalName()));
@@ -250,7 +250,16 @@ public final class JMethodSignature {
         return returnType;
     } //-- getReturnType
 
-    
+	/**
+	 * Sets the name of the method.
+	 *
+	 * @param name the name of the method
+	 **/
+	public void setName(String name) 
+	{
+		this.name = name;
+	} //-- setName
+   
     /**
      * Sets the comment describing this JMethodSignature. 
      *
