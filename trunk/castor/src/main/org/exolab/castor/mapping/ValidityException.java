@@ -49,7 +49,6 @@ package org.exolab.castor.mapping;
 
 import java.io.PrintWriter;
 import java.io.PrintStream;
-import java.sql.SQLException;
 import org.exolab.castor.util.Messages;
 
 
