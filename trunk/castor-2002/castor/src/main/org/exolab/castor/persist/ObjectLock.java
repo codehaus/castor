@@ -473,7 +473,7 @@ final class ObjectLock
                     _writeWaiting = _writeWaiting.next;
                 } else {
                     LinkedTx wait;
-
+                    
                     wait = _writeWaiting;
                     while ( wait.next != null ) {
                         if ( wait.next.tx == tx ) {
@@ -489,7 +489,7 @@ final class ObjectLock
                     _readWaiting = _readWaiting.next;
                 } else {
                     LinkedTx wait;
-
+                    
                     wait = _readWaiting;
                     while ( wait.next != null ) {
                         if ( wait.next.tx == tx ) {
