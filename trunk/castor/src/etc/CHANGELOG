@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1764 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Extends new SQL parameter binding code to SimpleQueryExecutor.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1764
+       (Werner - 20041018)
+
 JDO:   Fixed bug 1763.
        Improved exception handling in the persist.cache package, by ensuring proper exception
        chaining.
@@ -373,7 +378,6 @@ XML:   Fix for bug 1632. StringValidator.normalize wasn't handling empty
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1632
        (kvisco - 20040511)
 
->>>>>>> 1.99
 XML:   Performance change to org.exolab.castor.util.List to demand create internal Object[]
        From various performance improvements contributed by Ian Richards (also CODA)
        (afawcett - 20040510)
@@ -3304,8 +3308,6 @@ Version 0.7  January 7, 2000
 - Fixed bug with using primitives as PCDATA content of elements.
 
 - Added timeInstant, NMToken and NCName types
-
-=======
 
 
 Version 0.6  December 20, 1999
