@@ -49,6 +49,7 @@ package org.exolab.castor.persist;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Vector;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
@@ -837,6 +838,8 @@ public abstract class TransactionContext
     public synchronized boolean prepare()
         throws TransactionAbortedException
     {
+        Vector todo;
+        Vector done;
         Enumeration enum;
         ObjectEntry entry;
 
@@ -852,26 +855,38 @@ public abstract class TransactionContext
         }
 
         try {
+            done = new Vector();
             _status = Status.STATUS_PREPARING;
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                if ( ! entry.deleted ) {
-                    Object       identity;
-                    ClassHandler handler;
-                    OID          oid;
-                    
-                    // When storing the object it's OID might change
-                    // if the primary identity has been changed
-                    handler = entry.engine.getClassHandler( entry.object.getClass() );
-                    identity = handler.getIdentity( entry.object );
-                    if ( handler.getCallback() != null )
-                        handler.getCallback().storing( entry.object );
-                    oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
-                    if ( oid != null ) {
-                        entry.oid = oid;
-                        entry.modified = true;
+            while ( _objects.size() != done.size() ) {
+                todo = new Vector();
+                enum = _objects.elements();
+                while ( enum.hasMoreElements() ) {
+                    entry = (ObjectEntry) enum.nextElement();
+                    if ( ! done.contains( entry ) ) {
+                        todo.addElement( entry );
                     }
+                }
+                enum = todo.elements();
+                while ( enum.hasMoreElements() ) {
+                    entry = (ObjectEntry) enum.nextElement();
+                    if ( ! entry.deleted ) {
+                        Object       identity;
+                        ClassHandler handler;
+                        OID          oid;
+                    
+                        // When storing the object it's OID might change
+                        // if the primary identity has been changed
+                        handler = entry.engine.getClassHandler( entry.object.getClass() );
+                        identity = handler.getIdentity( entry.object );
+                        if ( handler.getCallback() != null )
+                            handler.getCallback().storing( entry.object );
+                        oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+                        if ( oid != null ) {
+                            entry.oid = oid;
+                            entry.modified = true;
+                        }
+                    }
+                    done.addElement( entry );
                 }
             }
 
