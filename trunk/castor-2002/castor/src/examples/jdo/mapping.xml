@@ -13,7 +13,7 @@
     </field>
     <field name="Name">
       <sql name="name" dirty="check" />
-      <xml name="name" node="text" />
+      <xml name="name" node="element" />
     </field>
   </class>
 
