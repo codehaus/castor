@@ -111,7 +111,53 @@
 	<p>If you wish some independent object was created and/or removed automatically on operations on other independent object,
 	   you may use interface Persistent to code the desired behavior.</p>
 
-	<p><b>I am getting ClassNotFoundException for my JDO class, but it is in the class path. Why?</b></p>
+	<p><b>Is Castor JDO using any connection pooling mechanism to improve the overall performance ?</b></p>
+        
+        <p>No, Castor JDO doesn't have any built-in JDBC resource pooling. However the 
+        framework can transparently use any resource pooling facilities provided through 
+        DataSource implementation of -even better- through JDNI. In fact we even recommend
+        people to use some Connection and PreparedStatement pool with Castor as this can 
+        increase Castor's performance 3-5 fold.</p>
+
+        <p>For example the following set of statements :
+        <code>
+        db.begin();
+        db.execute(...)
+        db.commit()
+        </code>
+        will be executed in much less time with the resource pooling because it will avoid creating 
+        a new physical JDBC connection at every execution.</p>
+
+        <p>With Oracle, instead of specifying the usual JDBC driver you can use a
+        DataSource that specifically provides some Connection caching/pooling.</p>
+
+        <p>Thus if your jdo config file looks like :
+        <code><![CDATA[
+        <database name="..." engine="oracle" >
+            <driver class-name="oracle.jdbc.driver.OracleDriver" 
+                    url="jdbc:oracle:thin:@localhost:1521:TEST" >
+                <param name="user" value="SYSTEM"/>
+                <param name="password" value="manager"/>
+            </driver>
+            ...
+        </database>
+        ]]></code>
+        then it can be changed into (for example):
+        <code><![CDATA[
+        <database name="..." engine="oracle" >
+            <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl"> 
+                <params URL="jdbc:oracle:thin:@localhost:1521:TEST" user="SYSTEM" password="manager"/>
+            </data-source> 
+            ...
+        </database>
+        ]]></code>
+        </p>
+        
+        <p>When Castor is used inside a Container such as an EJB container (within BMP 
+        or Session Bean), then the Container usually provides the JDBC Resource 
+        through the JNDI ENC, which implicitely includes pooling facilities.</p>
+
+        <p><b>I am getting ClassNotFoundException for my JDO class, but it is in the class path. Why?</b></p>
 
 	<p>Probably castor.jar file is in jre/lib/ext directory. In this case you should call
          <code>
