@@ -399,7 +399,7 @@ public class JDO
             try {
                 DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, null );
             } catch ( MappingException except ) {
-                throw new DatabaseNotFoundException( Messages.format( "persist.nested", except.toString() ) );
+                throw new DatabaseNotFoundException( except );
             }
         }
 
