@@ -179,13 +179,12 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
             }
         } );
         desc.setHandler(handler);
-        desc.setRequired(true);
         desc.setMultivalued(true);
         elements[2] = desc;
         
         //-- validation code for: _classMappingList
         fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
+        fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
         
         //-- _keyGeneratorDefList

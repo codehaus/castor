@@ -18,7 +18,7 @@
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="include" minOccurs="0" />
-      <element ref="class-mapping" minOccurs="1" />
+      <element ref="class-mapping" minOccurs="0" />
       <element ref="key-generator-def" minOccurs="0" />
       <element ref="relation-mapping" minOccurs="0" />
     </type>
@@ -62,11 +62,11 @@
       <element ref="map-to" minOccurs="0" maxOccurs="1" />
       <element ref="cache-type-mapping" minOccurs="0" maxOccurs="1" />
       <element name="related-mapping" minOccurs="2" maxOccurs="2">
-	<type content="elemOnly" order="seq">
-	  <element ref="sql" minOccurs="0" maxOccurs="1"/>
+    <type content="elemOnly" order="seq">
+      <element ref="sql" minOccurs="0" maxOccurs="1"/>
           <attribute name="name" type="IDREF" minOccurs="1"/>
           <attribute name="type" type="NMTOKEN" minOccurs="0"/>
-	</type>
+    </type>
       </element>
       <attribute name="name" type="ID" minOccurs="1"/>
     </type>
@@ -115,10 +115,10 @@
       <attribute name="collection" type="string" minOccurs="0">
         <enumeration value="array"/>
         <enumeration value="vector"/>
-	<enumeration value="hashtable"/>
-	<enumeration value="collection"/>
-	<enumeration value="set"/>
-	<enumeration value="map"/>
+    <enumeration value="hashtable"/>
+    <enumeration value="collection"/>
+    <enumeration value="set"/>
+    <enumeration value="map"/>
         <enumeration value="enumerate"/>
       </attribute>
       <attribute name="transient" type="boolean" minOccurs="0" default="false"/>
