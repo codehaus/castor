@@ -405,6 +405,7 @@
   <!-- Classes for testing type handling -->
   <class name="jdo.TestTypes" access="shared" identity="id">
     <description>Test various type handling and conversions</description>
+    <cache-type type="none"/>
     <map-to table="test_types" />
     <field name="id" type="long">
       <sql name="id" type="numeric" />
@@ -441,6 +442,12 @@
     </field>
     <field name="clob" type="string" >
       <sql name="clob_val" type="clob" dirty="ignore" />
+    </field>
+    <field name="blob2" type="stream" >
+      <sql name="blob_val2" type="blob" dirty="ignore" />
+    </field>
+    <field name="clob2" type="clob" >
+      <sql name="clob_val2" type="clob" dirty="ignore" />
     </field>
   </class>
 

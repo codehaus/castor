@@ -218,7 +218,7 @@ public class DatabaseImpl
         return ( _scope == null );
     }
 
-    public Object load( Class type, Complex identity ) 
+    public Object load( Class type, Complex identity )
             throws TransactionNotInProgressException, ObjectNotFoundException,
             LockNotGrantedException, PersistenceException {
     
@@ -491,6 +491,7 @@ public class DatabaseImpl
         }
         try {
             _ctx.prepare();
+            _ctx.close();
         } catch ( TransactionAbortedException except ) {
             if ( _logInterceptor != null )
                 _logInterceptor.exception( except );

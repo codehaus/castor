@@ -594,6 +594,7 @@ public abstract class TransactionContext
             }
             return oid;
         } catch ( Exception except ) {
+except.printStackTrace();            
             if ( molder.getCallback() != null )
                 molder.getCallback().releasing( object, false );
             removeObjectEntry( object );

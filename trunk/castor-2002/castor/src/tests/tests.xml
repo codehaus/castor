@@ -110,6 +110,7 @@
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenIdentity" />
     <!-- -->
     <case class="jdo.Persistent" />
 

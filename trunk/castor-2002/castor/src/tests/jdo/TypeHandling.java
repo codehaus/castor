@@ -48,6 +48,11 @@ package jdo;
 
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayReader;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.Enumeration;
 import java.text.DateFormat;
@@ -58,6 +63,7 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.util.ClobImpl;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -100,6 +106,9 @@ public class TypeHandling
         Database db;
         final byte[] BLOB_VALUE = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         final String CLOB_VALUE = "0123456789";
+        int len;
+        byte[] bbuf = new byte[BLOB_VALUE.length + 1];
+        char[] cbuf = new char[CLOB_VALUE.length() + 1];
 
         try {
             OQLQuery      oql;
@@ -110,10 +119,10 @@ public class TypeHandling
             Date          timestamp;
             SimpleDateFormat df;
 
-            
+
             // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
-            
+
             // Determine if test object exists, if not create it.
             // If it exists, set the name to some predefined value
             // that this test will later override.
@@ -270,7 +279,66 @@ public class TypeHandling
             else
                 stream.writeVerbose( "OK: The boolean->char[01] conversion passed" );
 
-            
+
+            stream.writeVerbose( "Testing BLOB and CLOB fields" );
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                types.setBlob( BLOB_VALUE );
+                types.setClob( CLOB_VALUE );
+                types.setBlob2( new ByteArrayInputStream( BLOB_VALUE ) );
+                types.setClob2( new ClobImpl( new StringReader( CLOB_VALUE ), CLOB_VALUE.length() ) );
+            }
+            db.commit();
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+
+                if ( types.getBlob() == null || ! (new String(types.getBlob())).equals(new String(BLOB_VALUE)) ) {
+                    stream.writeVerbose( "Error: BLOB value was not set" );
+                    result = false;
+                }
+                if ( ! CLOB_VALUE.equals(types.getClob()) ) {
+                    stream.writeVerbose( "Error: CLOB value was not set" );
+                    result = false;
+                }
+                if ( types.getBlob2() == null ) {
+                    stream.writeVerbose( "Error: InputStream value was not set" );
+                    result = false;
+                } else {
+                    len = types.getBlob2().read(bbuf);
+                    if ( ! (new String(bbuf, 0, len)).equals(new String(BLOB_VALUE)) ) {
+                        stream.writeVerbose( "Error: InputStream value is wrong" );
+                        result = false;
+                    }
+                }
+                if ( types.getClob2() == null ) {
+                    stream.writeVerbose( "Error: Clob value was not set" );
+                    result = false;
+                } else {
+                    long clobLen = types.getClob2().length();
+                    len = types.getClob2().getCharacterStream().read(cbuf);
+                    if ( clobLen != CLOB_VALUE.length() ||
+                            ! (new String(cbuf, 0, len)).equals(CLOB_VALUE) ) {
+                        stream.writeVerbose( "Error: Clob value is wrong" );
+                        result = false;
+                    }
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            else
+                stream.writeVerbose( "OK: BLOB and CLOB fields passed" );
+
+
             stream.writeVerbose( "Testing date->int/numeric/char parameterized conversion" );
             df = new SimpleDateFormat();
             df.applyPattern("yyyy/MM/dd");
@@ -317,40 +385,6 @@ public class TypeHandling
                 stream.writeVerbose( "OK: date->int/numeric/char conversion passed" );
 
 
-            stream.writeVerbose( "Testing BLOB and CLOB fields" );
-            db.begin();
-            oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
-                types.setBlob( BLOB_VALUE );
-                types.setClob( CLOB_VALUE );
-            }
-            db.commit();
-            db.begin();
-            oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
-
-                if ( types.getBlob() == null || ! (new String(types.getBlob())).equals(new String(BLOB_VALUE)) ) {
-                    stream.writeVerbose( "Error: BLOB value was not set" );
-                    result = false;
-                }
-                if ( ! CLOB_VALUE.equals(types.getClob()) ) {
-                    stream.writeVerbose( "Error: CLOB value was not set" );
-                    result = false;
-                }
-            } else {
-                stream.writeVerbose( "Error: failed to load object" );
-                result = false;
-            }
-            db.commit();
-            if ( ! result )
-                return false;
-            else
-                stream.writeVerbose( "OK: value in character field passed" );
-
             db.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
@@ -362,3 +396,4 @@ public class TypeHandling
 
 
 }
+

@@ -76,6 +76,19 @@ public final class MySQLFactory
         return new MySQLQueryExpression( this );
     }
 
+    /**
+     * For CLOB type ResultSet.setClob() is not supported yet by mm.MySql JDBC driver.
+     * BLOB support is buggy in MM.MySQL 2.0.3: it handles NULL values in incorrect way.
+     */
+    public Class adjustSqlType( Class sqlType ) {
+        if (sqlType == java.sql.Clob.class) {
+            return java.lang.String.class;
+        } else if (sqlType == java.io.InputStream.class) {
+            return byte[].class;
+        } else {
+            return sqlType;
+        }
+    }
 }
 
 

@@ -1455,7 +1455,7 @@ public class ClassMolder {
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
                 locker.setObject( tx, fields );
             }
-        }
+        } 
 
         timestamp = locker.getTimeStamp();
 
