@@ -563,7 +563,7 @@ public final class ClassHandler
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( isModified( _fields[ i ], object, original[ i ] ) ) {
                 if ( _fields[ i ].dirty )
-                    modified = LockRequired;
+                    return LockRequired;
                 else if ( modified == Unmodified )
                     modified = Modified;
             }
