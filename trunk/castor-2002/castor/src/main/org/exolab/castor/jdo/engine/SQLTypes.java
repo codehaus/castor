@@ -371,6 +371,13 @@ public final class SQLTypes
             // java.io.InputStream and java.io.Reader, respectively,
             // while JDBC driver expects java.sql.Blob and java.sql.Clob.
             switch ( sqlType ) {
+            case Types.FLOAT:
+            case Types.DOUBLE:
+                stmt.setDouble( index, ((Double)value).doubleValue() );
+                break;
+            case Types.REAL:
+                stmt.setFloat( index, ((Float)value).floatValue() );
+                break;
             case Types.BLOB:
                 try {
                     InputStream stream = (InputStream) value;
