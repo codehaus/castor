@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
+<document id="ELPD-2000-01-07-KV01-PR" project="../project.xml">
+  <body title="Castor">
+    <p>Castor is a versatile B2B connector (marketing pitch) which integrates Java[tm] objects,
+       XML documents, SQL relational databases and LDAP directories in a unified model that allows
+       information to be exchanged, persisted and manipulated in a variety of ways. The Castor moto
+       is simplifying the exchange and persistence of information.</p>
+
+    <p>The current release of Castor includes the following packages:</p>
+
+    <ul>
+      <li>Castor XML: Java[tm] object to XML document mapping</li>
+      <li>Castor JDO: Java[tm] object to SQL relational database mapping</li>
+      <li>Castor DSML: LDAP directory exchange through XML</li>
+    </ul>
+
+    <h2>About the Castor Project</h2>
+    <p>Most of the code released through the Castor Project has been developed by Keith Visco,
+       Chief XML Architect, Exoffice Technologies, Inc. &lt;<email>visco@exoffice.com</email>&gt;
+       and Assaf Arkin, CTO &lt;<email>arkin@exoffice.com</email>&gt;. Contributors are welcome
+       to join this project and should contact join@castor.exolab.org.</p>
+
+  </body>
+</document>
