@@ -2220,6 +2220,18 @@ public class Marshaller extends MarshalFramework {
                 value = getObjectID(value);
             }
         }
+        else if (value != null) {
+            //-- handle base64 content
+            Class objType = value.getClass();
+            if (objType.isArray() &&
+               (objType.getComponentType() == Byte.TYPE))
+            {
+                MimeBase64Encoder encoder = new MimeBase64Encoder();
+                encoder.translate((byte[])value);
+                value = new String(encoder.getCharArray());
+            }
+        }
+        
 
         if (value != null) {
             //check if the value is a QName that needs to
