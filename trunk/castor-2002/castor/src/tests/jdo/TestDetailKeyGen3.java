@@ -47,16 +47,10 @@
 package jdo;
 
 
-import java.util.Enumeration;
-import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-
 /**
- * Test object mapping to test_detaul used to conduct relation tests.
+ * Test object mapping to test_detail2 used to conduct relation tests.
  */
-public class TestDetailKeyGen
+public class TestDetailKeyGen3
 {
 
 
@@ -66,31 +60,25 @@ public class TestDetailKeyGen
     private String              _value;
 
 
-    private TestMasterKeyGen    _master;
-
-
-    private ArrayList           _details2;
-
-
-    private TestDetailKeyGen3   _detail3;
+    private TestDetailKeyGen    _detail;
 
 
     static final int            DefaultId = 5;
 
 
-    static final String         DefaultValue = "group";
+    static final String         DefaultValue = "value";
 
 
-    public TestDetailKeyGen( int id ) 
+    public TestDetailKeyGen3( int id )
     {
-        this();
         _id = id;
+        _value = DefaultValue;
     }
 
-    public TestDetailKeyGen()
+
+    public TestDetailKeyGen3()
     {
         _value = DefaultValue;
-        _details2 = new ArrayList();
     }
 
 
@@ -118,89 +106,21 @@ public class TestDetailKeyGen
     }
 
 
-    public void setMaster( TestMasterKeyGen master )
+    public void setDetail( TestDetailKeyGen detail )
     {
-        _master = master;
+        _detail = detail;
     }
 
 
-    public TestMasterKeyGen getMaster()
+    public TestDetailKeyGen getDetail()
     {
-        return _master;
-    }
-
-
-    public void addDetail2( TestDetailKeyGen2 detail2 )
-    {
-        _details2.add( detail2 );
-        detail2.setDetail( this );
-    }
-
-
-    public ArrayList getDetails2()
-    {
-        return _details2;
-    }
-
-
-    public void setDetail3( TestDetailKeyGen3 detail3 )
-    {
-        if ( _detail3 != null )
-            _detail3.setDetail( null );
-
-        if ( detail3 != null ) 
-            detail3.setDetail( this );
-        _detail3 = detail3;
-    }
-
-
-    public TestDetailKeyGen3 getDetail3() {
-        return _detail3;
-    }
-
-
-    public void setDetails2( ArrayList list ) {
-        _details2 = list;
-    }
-
-    public TestDetailKeyGen2 createDetail2()
-    {
-        return new TestDetailKeyGen2();
-    }
-
-
-    public TestDetailKeyGen2 findDetail2( int id )
-    {
-        Iterator enum;
-        TestDetailKeyGen2 detail2;
-
-        if ( _details2 == null ) {
-            return null;
-        }
-
-        enum = _details2.iterator();
-        while ( enum.hasNext() ) {
-            detail2 = (TestDetailKeyGen2) enum.next();
-            if ( detail2.getId() == id ) {
-                return detail2;
-            }
-        }
-        return null;
+        return _detail;
     }
 
 
     public String toString()
     {
-        String details2 = "";
-
-        if ( _details2 != null ) {
-            for ( int i = 0 ; i < _details2.size() ; ++i ) {
-                if ( i > 0 )
-                    details2 = details2 + ", ";
-                details2 = details2 + _details2.get( i ).toString();
-            }
-        }
-        return "<detail: "+_id + " / " + _value + " / " + (_master==null?0:_master.getId()) + " / { " + details2 + " }"+">";
+        return _id + " / " + _value + " / " + (_detail==null?0:_detail.getId());
     }
 
 
@@ -212,8 +132,8 @@ public class TestDetailKeyGen
     {
         if ( other == this )
             return true;
-        if ( other != null && other instanceof TestDetailKeyGen ) {
-           return ( ( (TestDetailKeyGen) other )._id == _id );
+        if ( other != null && other instanceof TestDetailKeyGen2 ) {
+           return ( ( (TestDetailKeyGen3) other )._id == _id );
         }
         return false;
     }
