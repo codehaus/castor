@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author           Changes
+ * 04/18/2002   Arnaud           String constructor
  * 05/22/2000   Arnaud Blandin   Created
  */
 
@@ -103,6 +104,15 @@ public class Duration
      * default constructor
      */
     public Duration() {
+    }
+
+   /**
+    * Constructs a duration from a string
+    * @param duration the string representation of the duration to create
+    */
+    public Duration(String duration) throws ParseException {
+        this();
+        parseDurationInternal(duration, this);
     }
 
      /**
@@ -344,7 +354,13 @@ public class Duration
      * @throws ParseException thrown when the string is not valid
      */
      public static Duration parseDuration (String str) throws ParseException
-    {
+     {
+         Duration result = new Duration();
+         return parseDurationInternal(str, result);
+     }
+
+     private static Duration parseDurationInternal(String str, Duration result) throws ParseException
+     {
 
 
         if (str == null) {
@@ -353,7 +369,8 @@ public class Duration
 
         }
 
-        Duration result = new Duration();
+        if (result == null)
+            result = new Duration();
         char[] chars = str.toCharArray();
         int idx = 0;
 

@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author              Changes
+ * 04/18/2002   Arnaud              constructor with string
  * 05/24/2001   Arnaud Blandin      Created
  */
 
@@ -111,6 +112,15 @@ public class GYearMonth extends Date {
     public GYearMonth(short[] values) {
         setValues(values);
     }
+
+    /**
+     * Constructs a GYearMonth given a string representation
+     * @param gyearMonth the string representation of the GYearMonth to instantiate
+     */
+     public GYearMonth(String gyearMonth) throws ParseException {
+         this();
+         parseGYearMonthInternal(gyearMonth, this);
+     }
 
     /**
      * Sets all the fields by reading the values in an array
@@ -257,11 +267,18 @@ public class GYearMonth extends Date {
      *                        of this class)
      */
     public static GYearMonth parseGYearMonth(String str) throws ParseException {
+        GYearMonth result = new GYearMonth();
+        return parseGYearMonthInternal(str, result);
+    }
 
+    private static GYearMonth parseGYearMonthInternal(String str, GYearMonth result)
+        throws ParseException
+    {
         if (str == null)
              throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
-        GYearMonth result = new GYearMonth();
+        if (result == null)
+              result = new GYearMonth();
         char[] chars = str.toCharArray();
         int idx = 0;
 

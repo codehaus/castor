@@ -108,6 +108,15 @@ public class GYear extends GYearMonth {
         this.setValues(values);
     }
 
+   /**
+    * Construct a GYear from a string value
+    * @param gyear the string representation of the GYear to instantiate
+    */
+    public GYear(String gyear) throws ParseException {
+         this();
+         parseGYearInternal(gyear, this);
+    }
+
     /**
      * Sets all the fields by reading the values in an array
      * <p>if a Time Zone is specificied it has to be set by using
@@ -246,11 +255,16 @@ public class GYear extends GYearMonth {
      *                        of this class)
      */
     public static GYear parseGYear(String str) throws ParseException {
+        GYear result = new GYear();
+        return parseGYearInternal(str, result);
+    }
 
+    private static GYear parseGYearInternal(String str, GYear result) throws ParseException{
         if (str == null)
              throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
-        GYear result = new GYear();
+        if (result == null)
+            result = new GYear();
         char[] chars = str.toCharArray();
         int idx = 0;
 

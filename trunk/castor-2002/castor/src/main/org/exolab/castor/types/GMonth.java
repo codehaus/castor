@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author              Changes
+ * 04/18/2002   Arnaud              String constructor
  * 05/24/2001   Arnaud Blandin      Created
  */
 
@@ -83,7 +84,7 @@ public class GMonth extends GMonthDay {
         setMonth(month);
     }
 
-     /**
+    /**
      * Constructs a XML Schema GMonth instance given all the values of
      * the different fields.
      * By default a GMonth is not UTC and is local.
@@ -94,6 +95,14 @@ public class GMonth extends GMonthDay {
         setMonth((short)month);
     }
 
+   /**
+    * Constructs a GMonth from a string value.
+    * @param gmonth the string representation of the GMonth to instantiate
+    */
+    public GMonth(String gmonth) throws ParseException {
+        this();
+        parseGMonthInternal(gmonth, this);
+    }
 
 
 
@@ -187,7 +196,7 @@ public class GMonth extends GMonthDay {
     }
 
     /**
-     * parse a String and convert it into a GMOnth.
+     * parse a String and convert it into a GMonth.
      * @param str the string to parse
      * @return the Date represented by the string
      * @throws ParseException a parse exception is thrown if the string to parse
@@ -195,11 +204,17 @@ public class GMonth extends GMonthDay {
      *                        of this class)
      */
     public static GMonth parseGMonth(String str) throws ParseException {
+         GMonth result = new GMonth();
+         return parseGMonthInternal(str, result);
+    }
+
+    private static GMonth parseGMonthInternal(String str, GMonth result) throws ParseException {
 
         if (str == null)
              throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
-        GMonth result = new GMonth();
+        if (result == null)
+            result = new GMonth();
         char[] chars = str.toCharArray();
         int idx = 0;
 
