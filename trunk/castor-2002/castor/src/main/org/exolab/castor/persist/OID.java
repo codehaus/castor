@@ -47,7 +47,7 @@
 package org.exolab.castor.persist;
 
 import java.math.BigDecimal;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -117,6 +117,11 @@ public final class OID {
     private String _topClassName;
 
     /**
+     * The full qualified names of all superclasses, used for equating OIDs based on commong parent.
+     */
+    private String[] _superClassNames;
+
+    /**
      * Constructor
      */
     OID( LockEngine engine, ClassMolder molder, Object identity ) {
@@ -127,6 +132,7 @@ public final class OID {
      * Constructor
      */
     OID( LockEngine engine, ClassMolder molder, OID depends, Object identity ) {
+        ArrayList superClassNames = null;
 
         if ( engine == null )
             throw new IllegalArgumentException("engine can't be null");
@@ -143,10 +149,18 @@ public final class OID {
         _depends = depends;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        while ( molder.getExtends() != null )
+        while ( molder.getExtends() != null ) {
+            if (superClassNames == null) {
+                superClassNames = new ArrayList();
+            }
             molder = (ClassMolder) molder.getExtends();
-        
+            superClassNames.add(molder.getName());
+        }
         _topClassName = molder.getName();
+        if (superClassNames != null) {
+            _superClassNames = new String[superClassNames.size()];
+            superClassNames.toArray(_superClassNames);
+        }
 
         // calculate hashCode
         _hashCode = _topClassName.hashCode() + (_identity == null? 0 : _identity.hashCode());
@@ -261,7 +275,18 @@ public final class OID {
     String getName() {
         return _name;
     }
-    
+
+
+    /**
+     * Return the full qualified names of the object's superclasses, if any,
+     * otherwise returns null.
+     *
+     * @return The object's type's superclasses full name
+     */
+    String[] getSuperClassNames() {
+        return _superClassNames;
+    }
+
 
     /**
      * Returns true if the two OID's are identical. Two OID's are
@@ -271,7 +296,7 @@ public final class OID {
      * identical.
      */
     public boolean equals( Object obj ) {
-        
+
         OID other;
         if ( this == obj )
             return true;
