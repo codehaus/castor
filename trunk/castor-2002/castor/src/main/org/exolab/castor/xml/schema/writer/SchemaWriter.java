@@ -205,17 +205,30 @@ public class SchemaWriter {
         boolean hasAnonymousType = false;
         SimpleType type = attribute.getSimpleType();
         if (type.getName() != null) {
-            _atts.addAttribute("type", null, type.getName());
+            
+            String typeName = type.getName();
+            
+            //-- add "xsd" prefix if necessary
+            if (typeName.indexOf(':') < 0) {
+                typeName = "xsd:" + typeName;
+            }
+            _atts.addAttribute("type", null, typeName);
         }
         else hasAnonymousType = true;
 
-        //-- use flag....kinda nasty
+        //-- required?
         if (attribute.isRequired()) {
             _atts.addAttribute("use", null, "required");
         }
-        else if (attribute.isFixed()) {
-            _atts.addAttribute("use", null, "fixed");
-            _atts.addAttribute("value", null, attribute.getValue());
+        
+        //-- default value
+        if (attribute.isDefault()) {
+            _atts.addAttribute("default", null, attribute.getValue());
+        }
+        
+        //-- fixed value
+        if (attribute.isFixed()) {
+            _atts.addAttribute("fixed", null, attribute.getValue());
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
