@@ -43,7 +43,7 @@
  * $Id$
  * Date         Author              Changes
  * 04/06/2001   Arnaud Blandin      Created
- * 09/09/2004   Keith Visco         Modified for SAX 2 support
+ * 09/09/2004   Keith Visco         Modified for SAX 2 ContentHandler
  */
 
 package org.exolab.castor.xml.util;
