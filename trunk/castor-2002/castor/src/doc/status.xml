@@ -18,7 +18,8 @@
               mapping based on an XML schema</li>
 
           <li>Supports XML schema data types including integer, real (float/double),
-              NMTOKEN, NCName, timeInstant, ID/IDREF, boolean and binary (base 64 encoded)</li>
+              NMTOKEN, NCName, timeInstant, ID/IDREF, boolean and binary (base 64 encoded)
+          </li>
 
           <li>Supports arbitrary object marshalling when object type is known at
               run-time and XML schema is determined dynamically based on the

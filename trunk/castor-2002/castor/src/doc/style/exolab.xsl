@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!-- Content Stylesheet                             -->
 <!-- Ismael Ghalimi ghalimi@exoffice.com            -->
 <!-- Copyright (c) Exoffice Technologies, Inc. 1999 -->
@@ -13,7 +13,7 @@
   <xsl:include href="widgets.xsl"/>
 
 
-  <xsl:output method="html" indent="no"/>
+  <xsl:output method="html" indent="yes"/>
 
 
   <!-- Color -->
