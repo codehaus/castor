@@ -222,6 +222,10 @@ public class MemberFactory {
         String value = attribute.getValue();
         if (value != null) {
 
+          //adjustement for Float
+           if (xsType.getType() == XSType.FLOAT_TYPE)
+               value = value + 'f';
+
            if (value.length() == 0)
               value="\"\"";
             //-- XXX Need to change this...and we
@@ -252,7 +256,7 @@ public class MemberFactory {
                 tmp += "\");";
                 value = tmp;
             }
-            else if (!xsType.getJType().isPrimitive()) {
+            else if (!xsType.getJType().isPrimitive() && !xsType.isDateTime()) {
                  //XXX This works only if a constructor
                  //XXX with String as parameter exists
                  value = "new "+xsType.getJType().toString()+"(\""+value+"\")";
@@ -441,6 +445,10 @@ public class MemberFactory {
 
         if (value != null) {
 
+           //adjustement for Float
+           if (xsType.getType() == XSType.FLOAT_TYPE)
+               value = value + 'f';
+
            if (value.length() == 0)
               value="\"\"";
             //-- XXX Need to change this...and we
@@ -473,7 +481,7 @@ public class MemberFactory {
             }
             //don't generate code for date/time type since the constructor that parses
             //a string is throwing exception
-            else if (!xsType.getJType().isPrimitive() && !xsType.isDateTime()) {
+            else if (!xsType.getJType().isPrimitive()) {
                  //XXX This works only if a constructor
                  //XXX with String as parameter exists
                  value = "new "+xsType.getJType().toString()+"(\""+value+"\")";
