@@ -53,6 +53,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.KeyGenerator;
@@ -156,12 +157,24 @@ public final class MaxKeyGenerator implements KeyGenerator
         return identity;
     }
 
+
     /**
-     * Is key generated before INSERT? 
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
      */
-    public boolean isBeforeInsert() {
-        return true;
+    public final byte getStyle() {
+        return BEFORE_INSERT;
     }
+
+
+    /**
+     * Gives a possibility to patch the Castor-generated SQL statement
+     * for INSERT (makes sense for DURING_INSERT key generators)
+     */
+    public final String patchSQL( String insert, String primKeyName )
+            throws MappingException {
+        return insert;
+    }
+
 
     /**
      * Is key generated in the same connection as INSERT?

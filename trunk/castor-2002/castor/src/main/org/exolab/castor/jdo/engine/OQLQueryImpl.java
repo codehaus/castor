@@ -294,7 +294,7 @@ public class OQLQueryImpl
         String objType;
         ParamInfo info;
         StringBuffer sb;
-        int paramNo;
+        Integer paramNo;
 
         if ( !oql.startsWith("CALL ") ) {
             throw new QueryException( "Stored procedure call must start with CALL" );
@@ -320,8 +320,6 @@ public class OQLQueryImpl
             sql.append( '(' );
             for ( int i = leftParen + 1; i < rightParen; i++ ) {
                 if ( oql.charAt( i ) == '$' ) {
-                    info = new ParamInfo( "", "java.lang.Object");
-                    info.mapToSQLParam( paramCnt + 1 );
                     // get parameter number if given
                     sb = new StringBuffer();
                     for ( int j = i + 1; j < rightParen; j++ ) {
@@ -334,11 +332,16 @@ public class OQLQueryImpl
                         sb.append( c );
                     }
                     if ( sb.length() > 0 ) {
-                        paramNo = Integer.parseInt( sb.toString() );
+                        paramNo = Integer.valueOf( sb.toString() );
                     } else {
-                        paramNo = paramCnt + 1;
+                        paramNo = new Integer( paramCnt + 1 );
                     }
-                    _paramInfo.put(new Integer( paramNo ), info);
+                    info = (ParamInfo) _paramInfo.get( paramNo );
+                    if ( info == null ) {
+                        info = new ParamInfo( "", "java.lang.Object");
+                    }
+                    info.mapToSQLParam( paramCnt + 1 );
+                    _paramInfo.put( paramNo , info );
                     paramCnt++;
                 }
             }
@@ -362,9 +365,7 @@ public class OQLQueryImpl
             throw new QueryException( "Could not find class " + objType );
         }
         _dbEngine = _dbImpl.getPersistenceEngine();
-        if ( _dbEngine == null )
-            throw new QueryException( "Could not find an engine supporting class " + objType );
-        if ( _dbEngine.getPersistence( _objClass ) == null )
+        if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
     

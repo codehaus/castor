@@ -62,25 +62,25 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.util.Messages;
 
 /**
- * SEQUENCE key generator.
+ * RETURNING key generator.
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see SequenceKeyGeneratorFactory
+ * @see ReturningKeyGeneratorFactory
  */
-public final class SequenceKeyGenerator implements KeyGenerator
+public final class ReturningKeyGenerator implements KeyGenerator
 {
 
     private final String seqName;
 
     /**
-     * Initialize the SEQUENCE key generator.
+     * Initialize the RETURNING key generator.
      */
-    public SequenceKeyGenerator( PersistenceFactory factory,
+    public ReturningKeyGenerator( PersistenceFactory factory,
             Properties params )
             throws MappingException
     {
         String fName = factory.getFactoryName();
-        if ( !fName.equals("oracle") && !fName.equals("postgresql")) {
+        if ( !fName.equals("oracle") ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
@@ -89,69 +89,57 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
 
     /**
-     * @param conn An open connection within the given transaction
-     * @param tableName The table name
-     * @param primKeyName The primary key name
-     * @param props A temporary replacement for Principal object
-     * @return A new key
-     * @throws PersistenceException An error occured talking to persistent
-     *  storage
+     * For DURING_INSERT style this method is never called.
      */
     public Object generateKey( Connection conn, String tableName, String primKeyName,
             Properties props )
             throws PersistenceException
     {
-        Statement stmt = null;
-        ResultSet rs;
-        Object identity = null;
-
-        try {
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery( "SELECT nextval('" +
-                    MessageFormat.format( seqName, new String[] {tableName}) + "')" );
-
-            if ( rs.next() ) {
-                return rs.getObject( 1 );
-            } else {
-                throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
-            }
-        } catch ( SQLException ex ) {
-            throw new PersistenceException( Messages.format(
-                    "persist.keyGenSQL", ex.toString() ) );
-        } finally {
-            if ( stmt != null ) {
-                try {
-                    stmt.close();
-                } catch ( SQLException ex ) {
-                }
-            }
-        }
+        return null;
     }
 
 
     /**
      * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
      */
-    public final byte getStyle() {
-        return BEFORE_INSERT;
+    public byte getStyle() {
+        return DURING_INSERT;
     }
 
 
     /**
-     * Gives a possibility to patch the Castor-generated SQL statement
-     * for INSERT (makes sense for DURING_INSERT key generators)
+     * Adds the primary key name to fields list,
+     * 'table_seq.nextval' to values list and appends
+     * 'RETURNING primKeyName INTO ?'
      */
-    public final String patchSQL( String insert, String primKeyName )
+    public String patchSQL( String insert, String primKeyName )
             throws MappingException {
-        return insert;
+        StringBuffer sb;
+        int lp1;  // the first left parenthesis, which starts fields list
+        int lp2;  // the second left parenthesis, which starts values list
+        char c;
+
+        lp1 = insert.indexOf( '(' );
+        lp2 = insert.indexOf( '(', lp1 + 1 );
+        if ( lp1 < 0 || lp2 < 0 ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        sb = new StringBuffer( insert );
+        // don't change insert order, otherwise index becomes invalid
+        sb.insert( lp2 + 1, seqName + ".nextval" + ",");
+        sb.insert( lp1 + 1, primKeyName + "," );
+        sb.append( " RETURNING " );
+        sb.append( primKeyName );
+        sb.append( " INTO ?" );
+        return sb.toString();
     }
 
 
     /**
-     * Is key generated in the same connection as INSERT?
+     * For DURING_INSERT style this method is never called.
      */
     public boolean isInSameConnection() {
-        return false;
+        return true;
     }
-
 }

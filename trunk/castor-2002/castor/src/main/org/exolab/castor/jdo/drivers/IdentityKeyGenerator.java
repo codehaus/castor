@@ -119,11 +119,22 @@ public final class IdentityKeyGenerator implements KeyGenerator
         }
     }
 
+
     /**
-     * Is key generated before INSERT?
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
      */
-    public boolean isBeforeInsert() {
-        return false;
+    public final byte getStyle() {
+        return AFTER_INSERT;
+    }
+
+
+    /**
+     * Gives a possibility to patch the Castor-generated SQL statement
+     * for INSERT (makes sense for DURING_INSERT key generators)
+     */
+    public final String patchSQL( String insert, String primKeyName )
+            throws MappingException {
+        return insert;
     }
 
     /**
@@ -132,4 +143,5 @@ public final class IdentityKeyGenerator implements KeyGenerator
     public boolean isInSameConnection() {
         return true;
     }
+
 }
