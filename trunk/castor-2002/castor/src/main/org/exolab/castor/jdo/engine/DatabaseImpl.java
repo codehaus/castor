@@ -74,6 +74,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.util.Messages;
 
 
@@ -103,7 +104,7 @@ public final class DatabaseImpl
     /**
      * The database engine used to access the underlying SQL database.
      */
-    private DatabaseEngine   _dbEngine;
+    private PersistenceEngine   _dbEngine;
 
 
     /**
@@ -132,7 +133,7 @@ public final class DatabaseImpl
     }
 
 
-    public DatabaseImpl( DatabaseEngine dbEngine )
+    public DatabaseImpl( PersistenceEngine dbEngine )
     {
 	if ( dbEngine == null )
 	    throw new IllegalArgumentException( "Argument 'dbEngine' is null" );
@@ -184,11 +185,7 @@ public final class DatabaseImpl
 	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoMapping", dbName ) );
 	if ( ! dbs.canConnect() )
 	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoDataSource", dbName ) );
-	try {
-	    _dbEngine = DatabaseEngine.getDatabaseEngine( dbs, _logWriter );
-	} catch ( MappingException except ) {
-	    throw new ODMGException( except.getMessage() );
-	}
+	_dbEngine = DatabaseSource.getPersistenceEngine( dbs );
     }
 
 
@@ -430,7 +427,7 @@ public final class DatabaseImpl
 	    case TMNOFLAGS:
 		_ctx = (TransactionContext) _resManager.get( xid );
 		if ( _ctx == null ) {
-		    _ctx = new TransactionContext( xid );
+		    _ctx = new TransactionContextImpl( xid );
 		    _resManager.put( xid, _ctx );
 		}
 		break;

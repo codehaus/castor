@@ -65,11 +65,12 @@ import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
-import org.exolab.castor.persist.PersistenceQuery;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.LockNotGrantedException;
+import org.exolab.castor.persist.PersistenceEngine;
 
 
 /**
@@ -86,7 +87,7 @@ public class OQLQueryImpl
     private int                _fieldNum;
 
 
-    private DatabaseEngine     _dbEngine;
+    private PersistenceEngine  _dbEngine;
 
 
     private Class              _objClass;
@@ -153,7 +154,7 @@ public class OQLQueryImpl
 	} catch ( ClassNotFoundException except ) {
 	    throw new QueryInvalidException( "Could not find class " + objType );
 	}
-	_dbEngine = DatabaseEngine.getDatabaseEngine( _objClass ); 
+	_dbEngine = DatabaseSource.getPersistenceEngine( _objClass ); 
 	if ( _dbEngine == null )
 	    throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
 	engine = (SQLEngine) _dbEngine.getPersistence( _objClass );

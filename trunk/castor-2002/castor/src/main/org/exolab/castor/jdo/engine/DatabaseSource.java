@@ -63,7 +63,6 @@ import org.xml.sax.EntityResolver;
 import org.odmg.ODMGException;
 import org.odmg.DatabaseNotFoundException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.MappingTable;
 import org.exolab.castor.jdo.mapping.Databases;
 import org.exolab.castor.jdo.mapping.Database;
@@ -71,6 +70,13 @@ import org.exolab.castor.jdo.mapping.Param;
 import org.exolab.castor.jdo.mapping.Mapping;
 import org.exolab.castor.jdo.mapping.Include;
 import org.exolab.castor.jdo.schema.DTDResolver;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.PersistenceEngineFactory;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
@@ -98,33 +104,67 @@ public class DatabaseSource
     private String            _dbName;
 
 
+    private PersistenceEngine _engine;
+
+
+    private static Hashtable  _engines = new Hashtable();
     private static Hashtable  _dataSources = new Hashtable();
 
 
     DatabaseSource( String dbName, String url, Properties props, MappingTable mapTable )
+	throws MappingException
     {
 	_driverUrl = url;
 	_driverProps = props;
 	if ( mapTable != null )
 	    _mapTable = mapTable;
 	_dbName = dbName;
+	_engine = new PersistenceEngineFactory().createEngine(  mapTable, new SQLEngineFactory(), null );
+	_engines.put( _engine, this );
     }
 
 
     DatabaseSource( String dbName, DataSource dataSource, MappingTable mapTable )
+	throws MappingException
     {
 	_dataSource = dataSource;
 	if ( mapTable != null )
 	    _mapTable = mapTable;
 	_dbName = dbName;
+	_engine = new PersistenceEngineFactory().createEngine(  mapTable, new SQLEngineFactory(), null );
+	_engines.put( _engine, this );
     }
 
 
     DatabaseSource( String dbName, MappingTable mapTable )
+	throws MappingException
     {
 	if ( mapTable != null )
 	    _mapTable = mapTable;
 	_dbName = dbName;
+	_engine = new PersistenceEngineFactory().createEngine(  mapTable, new SQLEngineFactory(), null );
+	_engines.put( _engine, this );
+    }
+
+
+    static PersistenceEngine getPersistenceEngine( Class objType )
+    {
+	Enumeration    enum;
+	DatabaseSource dbs;
+
+	enum = _dataSources.elements();
+	while ( enum.hasMoreElements() ) {
+	    dbs = (DatabaseSource) enum.nextElement();
+	    if ( dbs._mapTable.getDescriptor( objType ) != null )
+		return dbs._engine;
+	}
+	return null;
+    }
+
+
+    static PersistenceEngine getPersistenceEngine( DatabaseSource dbs )
+    {
+	return dbs._engine;
     }
 
 
@@ -333,14 +373,16 @@ public class DatabaseSource
     }
 
 
-    Connection getConnection()
+    static Connection createConnection( PersistenceEngine engine )
 	throws SQLException
     {
-	if ( _driverUrl != null ) {
-	    return DriverManager.getConnection( _driverUrl, _driverProps );
-	} else {
-	    return _dataSource.getConnection();
-	}
+	DatabaseSource dbs;
+
+	dbs = (DatabaseSource) _engines.get( engine );
+	if ( dbs._dataSource != null )
+	    return dbs._dataSource.getConnection();
+	else
+	    return DriverManager.getConnection( dbs._driverUrl, dbs._driverProps );
     }
 
 
@@ -386,6 +428,23 @@ public class DatabaseSource
 	return null;
     }
 
+
+    static class SQLEngineFactory
+	implements PersistenceFactory
+    {
+	
+	public Persistence getPersistence( ObjectDesc objDesc, PrintWriter logWriter )
+	    throws MappingException
+	{
+	    try {
+		return new SQLEngine( (JDOObjectDesc) objDesc, logWriter );
+	    } catch ( MappingException except ) {
+		logWriter.println( except.toString() );
+		return null;
+	    }
+	}
+
+    }
 
 
 }
