@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -52,32 +53,36 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSTimeInstant extends XSType {
-    
+public final class XSTimeInstant extends XSType {
+
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
+    private static final JType jType
         = new JClass("java.util.Date");
-        
+    //private static final JType jType
+    //    = new JClass("org.exolab.castor.types.TimeInstant");
+
     private String value = null;
-    
+
     public XSTimeInstant() {
         super(XSType.TIME_INSTANT);
     } //-- XSNMToken
-    
+
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
+        //return "(org.exolab.castor.types.TimeInstant)"+variableName;
         return "(java.util.Date)"+variableName;
     } //-- fromJavaObject
-    
+
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -85,5 +90,5 @@ public class XSTimeInstant extends XSType {
     public JType getJType() {
         return this.jType;
     }
-        
+
 } //-- XSTimeInstant

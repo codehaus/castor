@@ -44,7 +44,7 @@
  */
 
 package org.exolab.castor.builder.types;
-
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -53,27 +53,27 @@ import org.exolab.javasource.*;
  * @version $Revision$ $Date$
 **/
 public class XSList extends XSType {
-    
-    
+
+
     int maxSize = -1; //-- undefined
-    int minSize = 0; 
-    
+    int minSize = 0;
+
     XSType contentType = null;
-    
+
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
+    private static final JType jType
         = new JClass("java.util.Vector");
-        
+
     private String value = null;
-    
+
     public XSList(XSType contentType) {
         super(XSType.COLLECTION);
         this.contentType = contentType;
     } //-- XSList
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -81,7 +81,7 @@ public class XSList extends XSType {
     public JType getJType() {
         return this.jType;
     }
-    
+
     public int getMinimumSize() {
         return minSize;
     } //-- getMinimumSize
@@ -89,17 +89,18 @@ public class XSList extends XSType {
     public int getMaximumSize() {
         return maxSize;
     } //-- getMaximumSize
-    
+
     public XSType getContentType() {
         return contentType;
     }
-    
+
     public void setMaximumSize(int size) {
         maxSize = size;
     } //-- setMaximumSize
-    
+
     public void setMinimumSize(int size) {
         minSize = size;
     } //-- setMinimumSize
-    
+
+    public void setFacets(SimpleType simpleType) {}
 } //-- XSList

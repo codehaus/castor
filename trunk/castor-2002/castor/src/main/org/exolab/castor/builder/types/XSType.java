@@ -45,7 +45,13 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
 import org.exolab.javasource.*;
+
+import java.util.Hashtable;
+import java.util.Enumeration;
+
 
 /**
  * The base XML Schema Type class
@@ -212,12 +218,38 @@ public abstract class XSType {
     public abstract JType getJType();
 
     /**
+     * Reads and sets the facets for XSType
+     * @param simpleType the SimpleType containing the facets
+     */
+     public abstract void setFacets(SimpleType simpleType);
+
+    /**
      * Returns the type of this XSType
      * @return the type of this XSType
     **/
     public short getType() {
         return this.type;
     } //-- getType
+
+
+	/**
+	 * Returns a list of Facets from the simpleType
+	 *	(duplicate facets due to extension are filtered out)
+     * @param simpletype the Simpletype we want the facets for
+     * @return Unique list of facets from the simple type
+	 */
+	protected static Enumeration getFacets(SimpleType simpleType)
+	{
+		Hashtable hashTable = new Hashtable();
+        Enumeration enum = simpleType.getFacets();
+		while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+			hashTable.put(name, facet);
+		}
+		return hashTable.elements();
+	}
 
     /**
      * Returns the String necessary to convert an instance of this XSType

@@ -49,11 +49,17 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.types.TimeDuration;
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
 
-public class XSTimeDuration extends XSType {
+import java.text.ParseException;
+import java.util.Enumeration;
+
+public final class XSTimeDuration extends XSType {
 
     private static final JType JTYPE =
                     new JClass("org.exolab.castor.types.TimeDuration");
@@ -158,8 +164,54 @@ public class XSTimeDuration extends XSType {
         return ( (_minInclusive != null) || (_minExclusive != null) );
     }
 
+
     public boolean hasMaximum() {
        return ( (_maxInclusive != null) || (_maxExclusive != null) );
     }
 
-} //XSTimeDuration
+    /**
+     * Reads and sets the facets for XSTimeDuration
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
+     */
+
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(TimeDuration.parse(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(TimeDuration.parse(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(TimeDuration.parse(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(TimeDuration.parse(facet.getValue()));
+                //-- pattern
+                else if (Facet.PATTERN.equals(name)) {
+                    //do nothing for the moment
+                }
+            } catch (ParseException e) {
+                // trow a new exception
+                System.out.println(e);
+                return;
+            }
+        }//while
+
+    }//readTimeFacets
+
+
+
+} //--XSTimeDuration

@@ -53,14 +53,14 @@ import org.exolab.javasource.*;
  * @version $Revision$ $Date$
 **/
 public abstract class XSPatternBase extends XSType {
-    
-    
+
+
     /**
      * The value of the pattern facet
     **/
     private String _pattern = null;
-    
-    
+
+
     /**
      * Creates a new XSPatternBase
      * @param type that this XSType represents
@@ -68,7 +68,7 @@ public abstract class XSPatternBase extends XSType {
     protected XSPatternBase(short type) {
         super(type);
     } //-- XSPatternBase
-    
+
     /**
      * Creates a new XSPatternBase with the given regular
      * expression and type.
@@ -80,7 +80,7 @@ public abstract class XSPatternBase extends XSType {
         super(type);
         _pattern = pattern;
     } //-- XSPatternBase
-    
+
     /**
      * Returns the pattern facet for this XSType
      *
@@ -89,15 +89,14 @@ public abstract class XSPatternBase extends XSType {
     public String getPattern() {
         return _pattern;
     } //-- setPattern
-    
+
     /**
      * Sets the pattern facet for this XSType
-     *
      * @param pattern the regular expression for this XSType
     **/
     public void setPattern(String pattern) {
         _pattern = pattern;
     } //-- setPattern
-    
-    
+
+
 } //-- XSPatternBase

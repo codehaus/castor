@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -52,21 +53,21 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSId extends XSType {
-    
+public final class XSId extends XSType {
+
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
+    private static final JType jType
         = new JClass("java.lang.String");
-        
+
     private String value = null;
-    
+
     public XSId() {
         super(XSType.ID);
     } //-- XSId
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -74,9 +75,11 @@ public class XSId extends XSType {
     public JType getJType() {
         return this.jType;
     }
-    
+
+    public void setFacets(SimpleType simpletype) {}
+
     public String toString() {
         return value;
     }
-    
+
 } //-- XSId

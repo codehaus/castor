@@ -45,6 +45,8 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
+
 import org.exolab.javasource.*;
 
 /**
@@ -52,18 +54,18 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSBoolean extends XSType {
-    
+public final class XSBoolean extends XSType {
+
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Boolean;        
-    
+    private static final JType jType = JType.Boolean;
+
     public XSBoolean() {
         super(XSType.BOOLEAN);
     } //-- XSBoolean
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -71,7 +73,8 @@ public class XSBoolean extends XSType {
     public JType getJType() {
         return this.jType;
     } //-- getJType
-        
+
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -88,10 +91,10 @@ public class XSBoolean extends XSType {
 
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
@@ -100,5 +103,5 @@ public class XSBoolean extends XSType {
         sb.append(").booleanValue()");
         return sb.toString();
     } //-- fromJavaObject
-    
+
 } //-- XSBoolean
