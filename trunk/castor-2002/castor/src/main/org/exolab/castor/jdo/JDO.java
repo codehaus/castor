@@ -71,38 +71,137 @@ import org.exolab.castor.util.Messages;
 
 
 /**
+ * Implementation of the JDO engine used for obtaining database
+ * connection. A JDO object is constructed with the name of a database
+ * and other properties, and {@link #getDatabase} is used to obtain a
+ * new database connection. Any number of database connections can be
+ * obtained from the same JDO object.
+ * <p>
+ * The database configuration can be loaded using one of the {@link
+ * #loadConfiguration} method. Alternatively, {@link #setConfiguration}
+ * can be used to specify the URL of a database configuration file.
+ * The configuration will loaded only once.
+ * <p>
+ * For example:
+ * <pre>
+ * <font color="red">// Load the database configuration</font>
+ * JDO.loadConfiguration( "database.xml" );
  *
+ * . . .
+ *
+ * JDO      jdo;
+ * Database db;
+ *
+ * <font color="red">// Construct a new JDO for the database 'mydb'</font>
+ * jdo = new JDO( "mydb" );
+ * <font color="red">// Open a connection to the database</font>
+ * db = jdo.getDatabase();
+ * </pre>
+ * Or,
+ * <pre>
+ * JDO      jdo;
+ * Database db;
+ *
+ * <font color="red">// Construct a new JDO and specify the configuration file</font>
+ * jdo = new JDO( "mydb" );
+ * jdo.setConfiguration( "database.xml" );
+ * <font color="red">// Open a connection to the database</font>
+ * db = jdo.getDatabase();
+ * </pre>
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public class JDO
-    implements JDOSource, Referenceable,
+    implements DataObjects, Referenceable,
 	       ObjectFactory, Serializable
 {
 
 
-    private PrintWriter     _logWriter;
+    /**
+     * The default lock timeout for this database is 10 seconds.
+     */
+    public static final int DefaultLockTimeout = 10;
 
 
-    private String          _dbName;
-
-
+    /**
+     * Tthe URL of the database configuration file. If the URL is
+     * specified, the first attempt to load a database of this type
+     * will use the specified configuration file.
+     */
     private String          _dbConf;
 
 
     /**
-     * Description of this datasource.
+     * The log writer is a character output stream to which all
+     * logging and tracing messages will be printed.
      */
-    private String _description = "Castor JDOSource";
+    private PrintWriter    _logWriter;
 
 
+    /**
+     * The lock timeout for this database. Zero for immediate
+     * timeout, an infinite value for no timeout. The timeout is
+     * specified in seconds.
+     */
+    private int            _lockTimeout = DefaultLockTimeout;
+
+
+    /**
+     * The name of this database.
+     */
+    private String          _dbName;
+
+
+    /**
+     * Description of this database.
+     */
+    private String         _description = "Castor JDO";
+
+
+    /**
+     * Constructs a new JDO database factory. Must call {@link
+     * #setDatabaseName} before calling {@link #getDatabase}.
+     */
+    public JDO()
+    {
+    }
+
+
+    /**
+     * Constructs a new JDO database factory for databases with
+     * the given name.
+     *
+     * @param name The database name
+     */
+    public JDO( String name )
+    {
+        _dbName = name;
+    }
+
+
+    /**
+     * Returns the log writer for this database source.
+     * <p>
+     * The log writer is a character output stream to which all
+     * logging and tracing messages will be printed.
+     *
+     * @return The log writer, null if disabled
+     */
     public void setLogWriter( PrintWriter logWriter )
     {
         _logWriter = logWriter;
     }
 
 
+    /**
+     * Sets the log writer for this database source.
+     * <p>
+     * The log writer is a character output stream to which all
+     * logging and tracing messages will be printed.
+     *
+     * @param logWriter The log writer, null if disabled
+     */
     public PrintWriter getLogWriter()
     {
         return _logWriter;
@@ -110,12 +209,13 @@ public class JDO
 
 
     /**
-     * Sets the description of this datasource.
+     * Sets the description of this database.
+     * <p>
      * The standard name for this property is <tt>description</tt>.
      *
-     * @param description The description of this datasource
+     * @param description The description of this database
      */
-    public synchronized void setDescription( String description )
+    public void setDescription( String description )
     {
 	if ( description == null )
 	    throw new NullPointerException( "DataSource: Argument 'description' is null" );
@@ -124,10 +224,11 @@ public class JDO
 
 
     /**
-     * Returns the description of this datasource.
+     * Returns the description of this database.
+     * <p>
      * The standard name for this property is <tt>description</tt>.
      *
-     * @return The description of this datasource
+     * @return The description of this database
      */
     public String getDescription()
     {
@@ -135,35 +236,105 @@ public class JDO
     }
 
 
-    public void setDatabaseName( String dbName )
+    /**
+     * Sets the name of this database. This attribute is required
+     * in order to identify which database to open.
+     * <p>
+     * The standard name for this property is <tt>databaseName</tt>.
+     *
+     * @param name The name of this database
+     */
+    public void setDatabaseName( String name )
     {
-        _dbName = dbName;
+        _dbName = name;
     }
 
 
+    /**
+     * Returns the name of this database.
+     * <p>
+     * The standard name for this property is <tt>databaseName</tt>.
+     *
+     * @return The name of this database
+     */
     public String getDatabaseName()
     {
         return _dbName;
     }
 
 
+    /**
+     * Sets the lock timeout for this database. Use zero for immediate
+     * timeout, an infinite value for no timeout. The timeout is
+     * specified in seconds.
+     * <p>
+     * The standard name for this property is <tt>lockTimeout</tt>.
+     *
+     * @param seconds The lock timeout, specified in seconds
+     */
+    public void setLockTimeout( int seconds )
+    {
+        _lockTimeout = seconds;
+    }
+
+
+    /**
+     * Returns the lock timeout for this database.
+     * <p>
+     * The standard name for this property is <tt>lockTimeout</tt>.
+     *
+     * @return The lock timeout, specified in seconds
+     */
+    public int getLockTimeout()
+    {
+        return _lockTimeout;
+    }
+
+
+    /**
+     * Sets the URL of the database configuration file. If the URL is
+     * specified, the first attempt to load a database of this type
+     * will use the specified configuration file. If the URL is not
+     * specified, use one of the {@link #loadConfiguration} methods
+     * instead.
+     * <p>
+     * The standard name for this property is <tt>configuration</tt>.
+     *
+     * @param url The URL of the database configuration file
+     */
     public void setConfiguration( String url )
     {
         _dbConf = url;
     }
 
 
+    /**
+     * Return the URL of the database configuration file.
+     * <p>
+     * The standard name for this property is <tt>configuration</tt>.
+     *
+     * @return The URL of the database configuration file
+     */
     public String getConfiguration()
     {
         return _dbConf;
     }
 
 
+    /**
+     * Opens and returns a connection to the database. Throws an
+     * {@link DatabaseNotFoundException} if the database named was not
+     * set in the constructor or with a call to {@link #setDatabaseName},
+     * or if no database configuration exists for the named database.
+     *
+     * @return An open connection to the database
+     * @throws DatabaseNotFoundException Attempted to open a database
+     *  that does not exist
+     * @throws PersistenceException Database access failed
+     */
     public Database getDatabase()
-        throws DatabaseNotFoundException
+        throws DatabaseNotFoundException, PersistenceException
     {
-        DatabaseImpl db;
-        
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
         if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
@@ -175,8 +346,7 @@ public class JDO
                 throw new DatabaseNotFoundException( Messages.format( "persist.nested", except.toString() ) );
             }
         }
-        db = new DatabaseImpl( _dbName, _logWriter );
-        return db;
+        return new DatabaseImpl( _dbName, _lockTimeout, _logWriter );
     }
 
 
@@ -189,7 +359,7 @@ public class JDO
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadDatabase( String url )
+    public static void loadConfiguration( String url )
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, null );
@@ -208,7 +378,7 @@ public class JDO
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadDatabase( String url, ClassLoader loader, PrintWriter logWriter )
+    public static void loadConfiguration( String url, ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( new InputSource( url ), null, logWriter, loader );
@@ -230,8 +400,8 @@ public class JDO
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public static void loadDatabase( InputSource source, EntityResolver resolver,
-                                     ClassLoader loader, PrintWriter logWriter )
+    public static void loadConfiguration( InputSource source, EntityResolver resolver,
+                                          ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( source, resolver, logWriter, loader );
@@ -248,9 +418,10 @@ public class JDO
         if ( _description != null )
             ref.add( new StringRefAddr( "description", _description ) );
         if ( _dbName != null )
-            ref.add( new StringRefAddr( "dbName", _dbName ) );
+            ref.add( new StringRefAddr( "databaseName", _dbName ) );
         if ( _dbConf != null )
-            ref.add( new StringRefAddr( "dbConf", _dbConf ) );
+            ref.add( new StringRefAddr( "configuration", _dbConf ) );
+        ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
  	return ref;
     }
 
@@ -277,16 +448,19 @@ public class JDO
 		addr = ref.get( "description" );
 		if ( addr != null )
 		    ds._description = (String) addr.getContent();
-		addr = ref.get( "dbName" );
+		addr = ref.get( "databaseName" );
 		if ( addr != null )
 		    ds._dbName = (String) addr.getContent();
-		addr = ref.get( "dbConf" );
+		addr = ref.get( "configuration" );
 		if ( addr != null )
 		    ds._dbConf = (String) addr.getContent();
+		addr = ref.get( "lockTimeout" );
+		if ( addr != null )
+                    ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
 		return ds;
 
 	    } else
-		throw new NamingException( "JDOSource: Reference not constructed from class " + getClass().getName() );
+		throw new NamingException( "JDO: Reference not constructed from class " + getClass().getName() );
 	} else if ( refObj instanceof Remote )
 	    return refObj;
 	else
@@ -294,4 +468,5 @@ public class JDO
     }
 
 }
+
 
