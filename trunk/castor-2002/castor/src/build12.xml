@@ -189,8 +189,8 @@
         <delete file="${dist}/${archive}.jar"/>
         <delete file="${classes}/MANIFEST.MF"/>
         
-        <copy todir="${classes}/MANIFEST.MF">
-        	<fileset dir="${source}/etc/MANIFEST.MF" />
+        <copy todir="${classes}">
+        	<fileset dir="${source}/etc" includes="MANIFEST.MF" />
        	</copy>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
         <copy todir="${classes}">
