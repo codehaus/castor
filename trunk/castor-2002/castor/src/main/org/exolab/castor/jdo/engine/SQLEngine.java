@@ -1013,11 +1013,15 @@ public final class SQLEngine implements Persistence {
                             }
                             count++;
                         }
-                        if ( notNull && !res.contains( temp ) ) {
-                            if ( _fields[i].columns.length == 1 )
-                                res.add( temp[0] );
-                            else
-                                res.add( new Complex( _fields[i].columns.length, temp ) );
+                        if ( notNull ) {
+                            if ( _fields[i].columns.length == 1 ) {
+                                if ( !res.contains( temp[0] ) )
+                                    res.add( temp[0] );
+                            } else {
+                                Complex com = new Complex( _fields[i].columns.length, temp );
+                                if ( !res.contains( com ) )
+                                    res.add( new Complex( _fields[i].columns.length, temp ) );
+                            }
                         }
                     } else {
                         count += _fields[i].columns.length;
@@ -1760,10 +1764,14 @@ public final class SQLEngine implements Persistence {
                                 count++;
                                 }
                                 if ( notNull ) {
-                                    if ( _engine._fields[i].columns.length == 1 )
-                                        res.add( temp[0] );
-                                    else
-                                        res.add( new Complex( _engine._fields[i].columns.length, temp ) );
+                                    if ( _engine._fields[i].columns.length == 1 ) {
+                                        if ( !res.contains( temp[0] ) )
+                                            res.add( temp[0] );
+                                    } else {
+                                        Complex com = new Complex( _engine._fields[i].columns.length, temp );
+                                        if ( !res.contains( com ) )
+                                            res.add( new Complex( _engine._fields[i].columns.length, temp ) );
+                                    }
                                 }
                             } else {
                                 // non-multi fields have to be done one only
