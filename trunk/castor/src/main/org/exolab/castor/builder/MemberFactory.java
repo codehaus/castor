@@ -109,6 +109,17 @@ public class MemberFactory {
             _infoFactory = new FieldInfoFactory();
         else
             _infoFactory = infoFactory;
+            
+        if (_config.generateExtraCollectionMethods()) {
+            _infoFactory.setCreateExtraMethods(true);
+        }
+        String suffix = _config.getProperty(CollectionInfo.REFERENCE_SUFFIX_PROPERTY, null);
+        _infoFactory.setReferenceMethodSuffix(suffix);
+        
+        if (_config.boundPropertiesEnabled()) {
+            _infoFactory.setBoundProperties(true);
+        }
+
     } //-- MemberFactory
 
 
