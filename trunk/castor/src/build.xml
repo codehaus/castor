@@ -27,6 +27,7 @@
         <property name="lib" value="lib"/>
         <property name="doc" value="${source}/doc"/>
         <property name="schema" value="${build}/schema"/>
+        <property name="tests" value="${build}/tests"/>
         <property name="gen.src" value="gen-src"/>
         <property name="project.eclipse" value="${source}/tools/ide/eclipse" />
         <property file="${etc}/VERSION"/>
@@ -52,6 +53,7 @@
         <path id="build.classpath">
             <pathelement location="${classes}"/>
             <pathelement location="tests"/>
+            <pathelement location="${tests}" />
             <fileset dir="${lib}">
                 <include name="*.jar"/>
             </fileset>
@@ -107,8 +109,9 @@
             main             Builds the main packages (including debugging info)
             compile.xml      Compile the Castor XML packages
             compile.jdo      Compile the Castor JDO packages
-            examples         Builds the example packages (including debugging info)
-            tests            Builds the test packages (including debugging info)
+            compile.examples Builds the example packages (including debugging info)
+            compile.tests    Builds the test packages (including debugging info)
+            jdo.tests        Executes the JUnit tests for Castor JDO (CTF-JDO)
             jar              Builds the binary JAR in the dist directory
             CTFjar           Builds the JAR of the Castor Testing Framework in the dist directory
             doc              Builds the documentation
@@ -156,7 +159,7 @@
     </target>
 
     <target name="-castor-build.check"
-            description="Echo a message if a castor-build.properties exists."
+            description="An internal target to echo a message if a castor-build.properties exists in the user's home dir"
             if="castor-build.present">
         <echo message="Using ${user.home}/castor-build.properties" />
     </target>
@@ -207,8 +210,8 @@
         </replace>
     </target>
 
-    <target name="all" depends="clean,compile,examples,tests"
-            description="Same as the default target, but also calls clean, compile, examples and tests targets"/>
+    <target name="all" depends="clean,compile,compile.examples,compile.tests"
+            description="Same as the default target, but also calls clean, compile, compile.examples and compile.tests targets"/>
 
     <target name="main.opt" depends="prepare"
             description="Same as the default target, but with optimization, no debug and no deprecation">
@@ -222,7 +225,7 @@
         </copy>
     </target>
 
-    <target name="examples" depends="prepare, compile"
+    <target name="compile.examples" depends="prepare, compile"
             description="Builds the example packages (including debugging info) and creates the webapp war file for the servlet example">
         <mkdir dir="${build}/examples"/>
         <javac srcdir="${source}/examples" destdir="${build}/examples" debug="on" deprecation="${deprecation}" excludes="${exampleexcludes}">
@@ -266,7 +269,7 @@
 
     </target>
 
-    <target name="tests" depends="prepare,compile" description="Build the tests packages">
+    <target name="compile.tests" depends="prepare,compile" description="Build the tests packages">
         <mkdir dir="${build}/tests"/>
         <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" debug="on" deprecation="${deprecation}">
         <classpath refid="build.classpath"/>
@@ -277,13 +280,43 @@
                 <patternset refid="support.files" />
             </fileset>
         </copy>
+    </target>
 
+    <target name="-test.category.test"
+        description="An internal target to test if the test.category property is set">
+        <condition property="test.category.present">
+            <isset property="test.category" />
+        </condition>
+    </target>
+
+    <target name="-test.category.isset" depends="-test.category.test" 
+        if="test.category.present" description="An internal target to check the state of the test.category.present property">
+        <echo>Executing test category: ${test.category}</echo>
+    </target>
+
+    <target name="-test.category.isnotset" depends="-test.category.test" 
+        unless="test.category.present" description="An internal target to check the state of the test.category.present property">
+        <fail>
+        -
+        +-------------------------------------------------------------------------------
+        | FAILURE CAUSE: Please set the test.category property to the test(s) to execute.
+        |                (examples: -Dtest.category=castor.mysql 
+        |                        or -Dtest.category=castor.mysql.TC01)
+        +-------------------------------------------------------------------------------
+        </fail>
+    </target>
+
+    <target name="jdo.tests" depends="compile.tests, -test.category.isset, -test.category.isnotset" 
+        description="Executes the JUnit tests for Castor JDO">
+        <java classname="Main" classpathref="build.classpath" fork="true">
+            <arg line="-verbose ${test.category}" />
+        </java>
     </target>
 
     <target name="jar.all" depends="release,srcgen.anttask.jar,jar.jdotests"
             description="An alias to call the release and jar.jdotests targets"/>
 
-    <target name="jar.jdotests" depends="tests" description="Creates a JAR file of the JDO tests">
+    <target name="jar.jdotests" depends="compile.tests" description="Creates a JAR file of the JDO tests">
         <delete file="${dist}/${archive.name}-tests.jar"/>
 
         <copy todir="${build}/tests">
@@ -339,7 +372,7 @@
         -->
     </target>
 
-    <target name="CTFjar" depends="tests" description="Build the CTF.jar file">
+    <target name="CTFjar" depends="compile.tests" description="Build the CTF.jar file">
         <delete file="${dist}/CTF-${version}.jar"/>
         <copy todir="${classes}">
             <fileset dir="${source}/etc" includes="MANIFEST.MF" />
@@ -489,7 +522,7 @@
         </ant>
     </target>
 
-   <target name="automated_build" depends="jar,tests">
+   <target name="automated_build" depends="jar,compile.tests">
       <!-- this mimics the CTFRun.sh script -->
          <delete includeEmptyDirs="true">
             <fileset dir="build/tests" includes="output/**"/>
