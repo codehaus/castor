@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document url="http://castor.exolab.org/lists.xml">
   <body>
-    <title>Castor-Dev: Developers' Mailing List</title>
+    <title>Castor Mailing Lists</title>
     <header>
+    </header>
       <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated to the developers of Castor.</p>
 
       <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
                        server="exolab.org" manager="minimalist"
                        archive="http://castor.exolab.org/list-archive/"/></p>
 
-    </header>
+      <p>Low volume (possibly more than 1 message per week)
+         mailing list for special announcements about Castor, such as
+         new releases.
+      </p>
+
+      <p><mailing-list name="castor-announce" description="The Castor Announcement Mailing List"
+                       server="exolab.org" manager="minimalist"
+                       archive="http://castor.exolab.org/list-archive/"/></p>
+
+
   </body>
 </document>
