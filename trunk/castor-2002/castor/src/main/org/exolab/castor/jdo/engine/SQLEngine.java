@@ -194,11 +194,10 @@ public final class SQLEngine
     public Object getObject( ResultSet rs, int index, int sqlType )
             throws SQLException
     {
-        if ( sqlType == java.sql.Types.INTEGER ) {
+        if ( sqlType == java.sql.Types.INTEGER )
             return new Integer( rs.getInt( index ) );
-        } else {
+        else
             return rs.getObject( index );
-        }
     }
 
 
@@ -977,7 +976,7 @@ public final class SQLEngine
                             if ( _engine._fields[ i ].multi ) {
                                 Object value;
 
-                                value = _engine.getObject( _rs, i + 1, _engine._fields[ i ].sqlType );
+                                value = _engine.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
                                 if ( ! _rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
                                     ( (Vector) fields[ i ] ).addElement( value );
                             }
