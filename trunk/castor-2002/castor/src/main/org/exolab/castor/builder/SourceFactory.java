@@ -1429,7 +1429,11 @@ public class SourceFactory  {
                     //get the contentModel and proccess it
                     if (tmp.getContentModelGroup() != null) {
                           if (tmp.getName() != null) {
-                              fieldInfo = memberFactory.createFieldInfo(tmp,
+                              modelgroup.setName(tmp.getName());
+                              //create the field info for the element
+                              //that is referring to a model group in order
+                              //not to loose the Particle information
+                              fieldInfo = memberFactory.createFieldInfo(modelgroup,
                                 state.getSGStateInfo());
                               handleField(fieldInfo, state);
                               break;
