@@ -127,6 +127,13 @@
                 </td>
                <td>Optional</td>
              </tr>
+			 <tr>
+               <td align="center">test</td><td><br/></td>
+               <td>
+                  Generate the specific methods used by the Castor Marshalling Framework
+                </td>
+               <td>Optional</td>
+             </tr>
 
           </table>
 
@@ -250,6 +257,25 @@
     # generated classes
     #
     #org.exolab.castor.builder.superclass=com.xyz.BaseObject
+            </code>
+            </p>
+        </section>
+        
+       
+        <section title="Generate equals() method">
+            <p>Since version: 0.9.1</p>
+            <p>
+                The Source Generator can override the 'equals()' method for the 
+                generated objects.
+            </p>
+            <p>Note: hashcode() is not currently overriden.</p>
+            <p> To generate the equals() method , edit the castorbuilder.properties file :
+            <code>
+	# Set to true if you want to generate the equals method
+	# for each generated class.
+	# false by default
+	#org.exolab.castor.builder.equalsmethod=true
+
             </code>
             </p>
         </section>
