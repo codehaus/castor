@@ -64,6 +64,18 @@ import org.exolab.castor.xml.schema.reader.*;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
 
+/* This is more of a ClassHolder or a
+ * PleaseStoreThisClassInfoForMeThing.  It's useful for going quickly
+ * between column names in a result set and fields in a class.
+ * 
+ * The methods are kind of self-explanatory -- they map column names
+ * to FieldMappings. The attributes, simple elements, contained
+ * objects and text are stored separately for easy access.
+ *
+ * @author <a href="0@exoffice.com">Evan Prodromou</a> 
+ * @version $Revision$ $Date$
+ */
+
 /* package-level class */
 
 class DTXClassDescriptor {
