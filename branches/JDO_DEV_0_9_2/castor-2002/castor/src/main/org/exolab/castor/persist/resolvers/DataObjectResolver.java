@@ -44,6 +44,7 @@
  */
 package org.exolab.castor.persist.resolvers;
 
+import java.util.Map;
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.Collection;
@@ -120,7 +121,7 @@ public class DataObjectResolver extends Resolver {
      * The map of entityClass and data object class
      * Keyed by entityInfo and valued by java.lang.Class
      */
-    protected SortedMap      classMap;
+    protected Map            classMap;
 
     /**
      * Constructor
@@ -364,40 +365,29 @@ public class DataObjectResolver extends Resolver {
      * @param OID the object identity of the object
      * @param Entity the entity loaded from the data store
      */
-    protected Object getNewInstance( TransactionContext tx, OID oid, Entity entity ) {
-        Class subClass = oid.getJavaClass();
+    protected Object getNewInstance( TransactionContext tx, OID oid, Entity entity ) 
+            throws PersistenceException {
 
-        Iterator itor = classMap.keySet().iterator();
-        while (itor.hasNext()) {
-            EntityInfo info = (EntityInfo) itor.next();
-            
-            iterateEntityClasses:
-            for ( int i = 0; i <= entity.entityClasses.length; i++ ) {
-                if ( entity.entityClasses[i].equals( info ) ) {
-                    subClass = (Class) classMap.get( info );
-                    break iterateEntityClasses;
-                }
-            }
-        }
+        // yip: need to provides a way to support multiple ClassLoader enviorment.
+        // (eg, put back 0.9.2 ReflectionService code)
+        Class requestedClass = oid.getJavaClass();
 
-        if ( subClass == oid.getJavaClass() ) {
-        } else if ( oid.getJavaClass().isAssignableFrom(subClass) ) {
-        } else if ( subClass.isAssignableFrom( oid.getJavaClass() ) ) {
-            subClass = oid.getJavaClass();
-        } else {
-            subClass = oid.getJavaClass();
-        }
+        Class determinedClass = (Class) classMap.get( entity.actual );
+
+        if ( !requestedClass.isAssignableFrom( determinedClass ) )
+            throw new PersistenceException( 
+            Messages.format("persist.objectEntityNotCompatible", entity, requestedClass) );
 
         try {
-            Object result = subClass.newInstance();
-            oid.setJavaClass( subClass );
+            Object result = determinedClass.newInstance();
+            oid.setJavaClass( determinedClass );
             return result;
         } catch ( InstantiationException ie ) {
             throw new DataObjectAccessException( 
-            Messages.format("dataaccess.instantiationFailed", subClass.getName() ) );
+            Messages.format("dataaccess.instantiationFailed", determinedClass.getName() ) );
         } catch ( IllegalAccessException iae ) {
             throw new DataObjectAccessException(
-            Messages.format("dataaccess.constructorNotAccessible", subClass.getName()) );
+            Messages.format("dataaccess.constructorNotAccessible", determinedClass.getName()) );
         }
     }
 
