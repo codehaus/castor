@@ -58,8 +58,11 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  * SEQUENCE key generator factory.
  * The short name of this key generator is "SEQUENCE".
  * It uses Oracle/PostrgeSQL SEQUENCEs
- * There is one optional parameter for this key generator,
- * which name is "sequence" and the default value is "{0}_seq".
+ * There are two optional parameters for this key generator:
+ * 1) name is "sequence" and the default value is "{0}_seq";
+ * 2) name is "returning", values: "true"/"false", default is "false".
+ * The latter parameter should be used only with Oracle8i, "true" value 
+ * turns on more efficient RETURNING syntax.
  * It is possible to use naming patterns like this for obtaining
  * SEQUENCE name by table name. This gives the possibility to use
  * one global key generator declaration rather than one per table.
