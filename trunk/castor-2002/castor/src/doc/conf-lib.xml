@@ -50,6 +50,14 @@
   # True if should produce verbose messages
   #
   org.exolab.castor.debug=false
+
+  # List of persistence factories for the supported database servers
+  #
+  org.exolab.castor.jdo.engines=\
+    org.exolab.castor.jdo.engine.OracleFactory,\
+    org.exolab.castor.jdo.engine.PostgreSQLFactory,\
+    org.exolab.castor.jdo.engine.SybaseFactory,\
+    org.exolab.castor.jdo.engine.SQLServerFactory
 </pre>
     </section>
 

@@ -16,22 +16,13 @@ create table prod_group (
 create unique index prod_group_pk on prod_group ( id );
 
 
-create table prod_inv (
-  prod_id  int not null,
-  quant    int not null
-);
-
-create unique index prod_inv_pk on prod_inv ( prod_id );
-
-
 create table prod_detail (
-  prod_id    int not null,
-  detail_id  int not null,
-  name       varchar(200) not null,
-  available  char(1) not null
+  id      int not null,
+  prod_id int not null,
+  name    varchar(200) not null,
 );
 
-create unique index prod_detail_pk on prod_detail ( prod_id, detail_id );
+create unique index prod_detail_pk on prod_detail ( id );
 
 
 /*

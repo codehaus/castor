@@ -69,7 +69,7 @@
          <tt>java.lang.Integer</tt>) or using a short name. The following table lists all
          the acceptable short names and the Java types they represent:</p>
 
-      <table border="0" cellpadding="4">
+      <table border="1" cellpadding="4">
         <tr><td><b>Short Name</b></td><td><b>Java Type</b></td></tr>
         <tr><td>big-decimal</td><td>java.math.BigDecimal</td></tr>
         <tr><td>big-integer</td><td>java.math.BigInteger</td></tr>
@@ -111,7 +111,7 @@
          or the proper SQL type name (without precision). The following table lists
          the supported SQL type names and the corresponding Java types:</p>
 
-      <table border="0" cellpadding="4">
+      <table border="1" cellpadding="4">
         <tr><td><b>SQL Type</b></td><td><b>Java Type</b></td></tr>
         <tr><td>bigint</td><td>java.lang.Long</td></tr>
         <tr><td>binary</td><td>byte[]</td></tr>

@@ -188,7 +188,7 @@
 
 
   <!-- Build the tarball including JAR and all dependent packages -->
-  <target name="tarball" depends="prepare,jar">
+  <target name="tarball" depends="prepare,jar,docs">
     <delete  file="${dist}/${archive}.tgz" />
     <delete  file="${dist}/${archive}.zip" />
     <deltree dir="${build}/${archive}" />

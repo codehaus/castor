@@ -8,10 +8,10 @@
     <description>Product group</description>
     <identity field-ref="id"/>
     <field name="id">
-      <sql-info name="id" />
+      <sql-info name="id"/>
     </field>
     <field name="name">
-      <sql-info name="name" />
+      <sql-info name="name" dirty="check" />
     </field>
   </class>
 
@@ -37,23 +37,10 @@
       <sql-info name="group_id" />
     </field>
 
-    <!-- Product has reference to ProductInventory
-         one inventory per product  -->
-    <field name="inventory" type="myapp.ProductInventory"/>
-
-  </class>
-
-
-  <class class-name="myapp.ProductInventory">
-    <sql-table table-name="prod_inv" fore-key="id"/>
-    <description>Inventory for product</description>
-    <identity field-ref="product" />
-    <field name="quantity">
-      <sql-info name="quant" />
-    </field>
-    <field name="product" type="myapp.Product" >
-      <sql-info name="prod_id"/>
-    </field>
+    <!-- Product has reference to ProductDetail
+         many details per product  -->
+    <field name="detail" type="myapp.ProductDetail" required="true"
+           collection="vector" />
   </class>
 
 
@@ -63,6 +50,23 @@
     <description>Computer definition, extends generic product</description>
     <field name="cpu">
       <sql-info name="cpu"/>
+    </field>
+  </class>
+
+
+  <!--  Mapping for Product Detail -->
+  <class class-name="myapp.ProductDetail">
+    <sql-table table-name="prod_detail"/>
+    <description>Product detail</description>
+    <identity field-ref="id"/>
+    <field name="id">
+      <sql-info name="id"/>
+    </field>
+    <field name="product" type="myapp.Product">
+      <sql-info name="prod_id"/>
+    </field>
+    <field name="name">
+      <sql-info name="name"/>
     </field>
   </class>
 

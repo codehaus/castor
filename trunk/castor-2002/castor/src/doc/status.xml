@@ -110,24 +110,19 @@
 
     <section title="TODO List">
 <pre>
-  JDO: Add SQL capabilities mechanism to address different databases.
-
   JDO: Need to think up a better alternative to the ODMG API.
 
-  JDO: Implement dirty checking, define SPI for key generation, support
-       stored procedures.
+  JDO: Implement key generation, support stored procedures.
 
   JDO: Support for many-many relations.
 
-  JDO: More type convertors (serialize, BLOB, etc)
+  JDO: More type convertors (serialize, BLOB, CLOB, XML)
 
   DAX: Type convertors to/from String, support for Vectors.
 
   DAX: Better query parser with support for parameters.
 
-  Persist: Implement AccessMode.Signular
-
-  Persist: Implement option for blocking identity change (?)
+  Persist: Implement AccessMode.ReadOnly and AccessMode.Singular
 </pre>
     </section>
 
