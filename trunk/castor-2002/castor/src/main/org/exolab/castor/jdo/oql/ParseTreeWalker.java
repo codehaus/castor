@@ -828,8 +828,9 @@ public class ParseTreeWalker implements TokenTypes
    *
    * @param tableName The name of the table to add to the select clause
    * @param tableAlias The path info vector to build the alias with
+   * @param pathIndex Field index in the path info
    */
-  public String buildTableAlias( String tableName, Vector path )
+  public String buildTableAlias( String tableName, Vector path, int pathIndex )
   {
       /* FIXME This aliasing will cause problems if a (different) table
       with the same name as our alias already exists (or will be added
@@ -854,7 +855,7 @@ public class ParseTreeWalker implements TokenTypes
               index = i.intValue();
           }
           // If table name contains '.', it should be replaced, since such names aren't allowed for aliases
-          tableAlias = tableAlias.replace('.', '_') + "_" + index;
+          tableAlias = tableAlias.replace('.', '_') + "_" + index + "_" + pathIndex;
       }
       //System.out.println( "TableAlias: " + tableAlias );
       return tableAlias;
@@ -884,27 +885,58 @@ public class ParseTreeWalker implements TokenTypes
             }
         }
         JDOClassDescriptor clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
-        if ( clsDesc != null && clsDesc != sourceClass ) {
+        if ( clsDesc != null /*&& clsDesc != sourceClass*/ ) {
             //we must add this table as a join
             if ( fieldDesc.getManyKey() == null ) {
                 //a many -> one relationship
                 JDOFieldDescriptor foreignKey = (JDOFieldDescriptor) clsDesc.getIdentity();
+                String sourceTableAlias = sourceClass.getTableName();
+                if ( i > 1 )
+                    sourceTableAlias = buildTableAlias( sourceTableAlias, path, i - 1 );
 
                 _queryExpr.addInnerJoin( sourceClass.getTableName(),
                                          fieldDesc.getSQLName(),
+                                         sourceTableAlias,
                                          clsDesc.getTableName(),
                                          foreignKey.getSQLName(),
-                                         buildTableAlias( clsDesc.getTableName(), path ) );
-            } else {
+                                         buildTableAlias( clsDesc.getTableName(), path, i ) );
+            } else if ( fieldDesc.getManyTable() == null ) {
                 //a one -> many relationship
                 JDOFieldDescriptor identity = (JDOFieldDescriptor) sourceClass.getIdentity();
-                String identityColumn = identity.getSQLName()[0];
+                String sourceTableAlias = sourceClass.getTableName();
+                if ( i > 1 )
+                    sourceTableAlias = buildTableAlias( sourceTableAlias, path, i - 1 );
 
                 _queryExpr.addInnerJoin( sourceClass.getTableName(),
-                                         identityColumn,
+                                         identity.getSQLName(),
+                                         sourceTableAlias,
                                          clsDesc.getTableName(),
-                                         fieldDesc.getManyKey()[0],
-                                         buildTableAlias( clsDesc.getTableName(), path ) );
+                                         fieldDesc.getManyKey(),
+                                         buildTableAlias( clsDesc.getTableName(), path, i ) );
+            } else {
+                //a many -> many relationship
+                JDOFieldDescriptor identity = (JDOFieldDescriptor) sourceClass.getIdentity();
+                JDOFieldDescriptor foreignKey = (JDOFieldDescriptor) clsDesc.getIdentity();
+                String manyTableAlias = fieldDesc.getManyTable();
+                String sourceTableAlias = sourceClass.getTableName();
+                if ( i > 1 ) {
+                    manyTableAlias = buildTableAlias( manyTableAlias, path, i - 1 );
+                    sourceTableAlias = buildTableAlias( sourceTableAlias, path, i - 1 );
+		}
+
+                _queryExpr.addInnerJoin( sourceClass.getTableName(),
+                                         identity.getSQLName(),
+                                         sourceTableAlias,
+                                         fieldDesc.getManyTable(),
+                                         fieldDesc.getManyKey(),
+                                         manyTableAlias);
+
+                _queryExpr.addInnerJoin( fieldDesc.getManyTable(),
+                                         fieldDesc.getSQLName(),
+                                         manyTableAlias,
+                                         clsDesc.getTableName(),
+                                         foreignKey.getSQLName(),
+                                         buildTableAlias( clsDesc.getTableName(), path, i ) );
             }
             sourceClass = clsDesc;
         }
@@ -1085,8 +1117,8 @@ public class ParseTreeWalker implements TokenTypes
         } else {
 
             //a field
+            Vector path = (Vector) _pathInfo.get(exprTree);
             if ( tokenType == DOT ) {
-                Vector path = (Vector) _pathInfo.get(exprTree);
                 if ( path == null ) {
                     System.err.println( "exprTree=" + exprTree.toStringEx() + "\npathInfo = {" );
                     Enumeration enum = _pathInfo.keys();
@@ -1104,14 +1136,46 @@ public class ParseTreeWalker implements TokenTypes
             if ( field == null ) {
                 throw new IllegalStateException( "fieldInfo for " + exprTree.toStringEx() + " not found" );
             }
-            JDOClassDescriptor clsDesc = (JDOClassDescriptor) field.getContainingClassDescriptor();
 
+            JDOClassDescriptor clsDesc = (JDOClassDescriptor) field.getContainingClassDescriptor();
             if ( clsDesc == null ) {
                 throw new IllegalStateException( "ContainingClass of "+ field.toString()+" is null !" );
             }
-            String tableAlias = buildTableAlias( clsDesc.getTableName(), (Vector) _pathInfo.get(exprTree) );
-            _queryExpr.addTable( clsDesc.getTableName(), tableAlias );
-            return _queryExpr.encodeColumn( tableAlias, field.getSQLName()[0] );
+
+            String clsTableAlias;
+            if ( tokenType == DOT && path != null && path.size() > 2 ) {
+                clsTableAlias = buildTableAlias( clsDesc.getTableName(), path, path.size() - 2 );
+                JDOClassDescriptor srcDesc = _clsDesc;
+                for ( int i = 1; i < path.size() - 1; i++ ) {
+                    JDOFieldDescriptor fieldDesc = null;
+                    while ( fieldDesc == null ) {
+                        fieldDesc = srcDesc.getField( (String) path.elementAt(i) );
+                        if ( fieldDesc == null ) {
+                            srcDesc = (JDOClassDescriptor) srcDesc.getExtends();
+                        }
+                    }
+                    srcDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
+                }
+
+                if ( !clsDesc.getJavaClass().getName().equals(srcDesc.getJavaClass().getName()) ) {
+
+                    JDOFieldDescriptor clsIdentity = (JDOFieldDescriptor) clsDesc.getIdentity();
+                    JDOFieldDescriptor srcIdentity = (JDOFieldDescriptor) srcDesc.getIdentity();
+                    String srcTableAlias = buildTableAlias( srcDesc.getTableName(), path, path.size() - 2 );
+
+                    _queryExpr.addInnerJoin( srcDesc.getTableName(),
+                                             srcIdentity.getSQLName(),
+                                             srcTableAlias,
+                                             clsDesc.getTableName(),
+                                             clsIdentity.getSQLName(),
+                                             clsTableAlias );
+                }
+            } else {
+                clsTableAlias = buildTableAlias( clsDesc.getTableName(), path, 9999 );
+            }
+            _queryExpr.addTable( clsDesc.getTableName(), clsTableAlias );
+
+            return _queryExpr.encodeColumn( clsTableAlias, field.getSQLName()[0] );
         }
 
       //parameters

@@ -146,19 +146,19 @@ public class JDBCQueryExpression
     public void addInnerJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
     {
-        addInnerJoin(leftTable, leftColumn, rightTable, rightColumn, rightTable);
+        addInnerJoin(leftTable, leftColumn, leftTable, rightTable, rightColumn, rightTable);
     }
 
 
-    public void addInnerJoin( String leftTable, String leftColumn,
+    public void addInnerJoin( String leftTable, String leftColumn, String leftTableAlias,
                               String rightTable, String rightColumn, String rightTableAlias )
     {
         int index;
         Join join;
 
-        _tables.put( leftTable, leftTable );
+        _tables.put( leftTableAlias, leftTable );
         _tables.put( rightTableAlias, rightTable );
-        join = new Join( leftTable, leftColumn, rightTableAlias, rightColumn, false );
+        join = new Join( leftTableAlias, leftColumn, rightTableAlias, rightColumn, false );
         index = _joins.indexOf(join);
         if (index < 0) {
             _joins.add(join);
@@ -172,19 +172,19 @@ public class JDBCQueryExpression
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn )
     {
-        addInnerJoin(leftTable, leftColumn, rightTable, rightColumn, rightTable);
+        addInnerJoin(leftTable, leftColumn, leftTable, rightTable, rightColumn, rightTable);
     }
 
 
-    public void addInnerJoin( String leftTable, String[] leftColumn,
+    public void addInnerJoin( String leftTable, String[] leftColumn, String leftTableAlias,
                               String rightTable, String[] rightColumn, String rightTableAlias )
     {
         int index;
         Join join;
 
-        _tables.put( leftTable, leftTable );
+        _tables.put( leftTableAlias, leftTable );
         _tables.put( rightTableAlias, rightTable );
-        join = new Join( leftTable, leftColumn, rightTableAlias, rightColumn, false );
+        join = new Join( leftTableAlias, leftColumn, rightTableAlias, rightColumn, false );
         index = _joins.indexOf(join);
         if (index < 0) {
             _joins.add(join);
@@ -392,10 +392,11 @@ public class JDBCQueryExpression
                 Join join2;
 
                 join2 = (Join) _joins.elementAt( k );
-                if ( ! join.leftTable.equals( join2.leftTable ) )
+                if ( ! join2.outer || ! join.leftTable.equals( join2.leftTable ) )
                     continue;
                 sql.append( JDBCSyntax.LeftJoin );
                 tableName = (String) tables.get( join2.rightTable );
+
                 if( join2.rightTable.equals( tableName ) ) {
                     sql.append( _factory.quoteName( tableName ) );
                 } else {
