@@ -522,7 +522,7 @@ public class ClassMolder {
      *                       removed from the object
      * @param related        the object to be removed
      */
-    private boolean removeRelation( TransactionContext tx, Object object, 
+    private boolean removeRelation( TransactionContext tx, Object object,
             ClassMolder relatedMolder, Object relatedObject )  {
 
         boolean removed = false;
@@ -2591,7 +2591,7 @@ public class ClassMolder {
      * Return true if a key generator is used for the base type of this ClassMolder
      */
     public boolean isKeyGeneratorUsed() {
-        return _isKeyGenUsed;
+        return _isKeyGenUsed || (_extends != null && _extends. isKeyGeneratorUsed());
     }
 
 }
