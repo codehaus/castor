@@ -103,7 +103,7 @@ public class TypeLOB extends CastorTestCase {
         Enumeration   enumeration;
 
         // Open transaction in order to perform JDO operations
-        db = _category.getDatabase( verbose );
+        db = _category.getDatabase();
 
         // Determine if test object exists, if not create it.
         // If it exists, set the name to some predefined value

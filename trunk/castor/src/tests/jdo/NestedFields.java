@@ -86,7 +86,7 @@ public class NestedFields extends CastorTestCase {
 
     public void setUp()
             throws PersistenceException {
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
     }
 
     public void runTest() 

@@ -110,7 +110,7 @@ public class TypeConversion extends CastorTestCase {
         Enumeration         enumeration;
 
         // Open transaction in order to perform JDO operations
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
         // Determine if test object exists, if not create it.
         // If it exists, set the name to some predefined value

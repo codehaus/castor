@@ -95,7 +95,7 @@ public class DuplicateKey extends CastorTestCase {
         QueryResults  enumeration;
         
         // Open transaction in order to perform JDO operations
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
         _db.begin();
         
         // Determine if test object exists, if not create it.

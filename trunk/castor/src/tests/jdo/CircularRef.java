@@ -87,7 +87,7 @@ public class CircularRef extends CastorTestCase
     public void setUp() 
         throws PersistenceException, SQLException
     {
-        _db = _category.getDatabase(verbose);
+        _db = _category.getDatabase();
         _conn = _category.getJDBCConnection();
         _conn.setAutoCommit(false);
 

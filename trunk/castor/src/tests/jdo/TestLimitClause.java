@@ -90,14 +90,14 @@ public class TestLimitClause extends CastorTestCase
 
     	TestObject object = null;
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
         _db.begin();
 
         Connection connection = (Connection) ((DatabaseImpl) _db).getConnection();
 
         Statement statement = connection.createStatement();
-        int retValue = statement.executeUpdate ("DELETE FROM test_table");
+        statement.executeUpdate ("DELETE FROM test_table");
 
         statement.close();
 
@@ -178,9 +178,8 @@ public class TestLimitClause extends CastorTestCase
 		throws PersistenceException
     {
         _db.begin();
-        OQLQuery query = null;
         try {
-			query = _db.getOQLQuery("select t from jdo.TestObject t offset $1");
+			_db.getOQLQuery("select t from jdo.TestObject t offset $1");
 		} catch (OQLSyntaxException e) {
 			assertEquals ("org.exolab.castor.jdo.oql.OQLSyntaxException", e.getClass().getName());
 			return;

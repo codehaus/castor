@@ -46,13 +46,13 @@ package jdo;
 
 import harness.CastorTestCase;
 import harness.TestHarness;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -67,6 +67,12 @@ import org.exolab.castor.jdo.engine.DatabaseImpl;
  */
 public class ExpireManyToMany extends CastorTestCase {
     
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (ExpireManyToMany.class);
+
     private static final boolean BY_TYPE_OR_CLASS   = true;
     private static final boolean BY_OBJECT_IDENTITY = false;
 
@@ -100,9 +106,10 @@ public class ExpireManyToMany extends CastorTestCase {
             throws SQLException {
 
         try {
-            _db   = _category.getDatabase(verbose);
+            _db   = _category.getDatabase();
         }
         catch(Exception e) {
+        	_log.warn ("Problem opening a Database instance.", e);
         }
         _conn = _category.getJDBCConnection();
 
@@ -232,7 +239,7 @@ public class ExpireManyToMany extends CastorTestCase {
         ArrayList al, bl, c1, d1;
         Database db = null;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
 
             //
@@ -361,7 +368,7 @@ public class ExpireManyToMany extends CastorTestCase {
     /**
      * Update an object outside of JDO using a JDBC connection.
      *
-     * @param masterId primary key of object to be updated
+     * @param groupId primary key of object to be updated
      */
     private void updateGroupUsingJDBC( int groupId ) {
         log("updating group "+groupId+" using JDBC...");
@@ -384,7 +391,7 @@ public class ExpireManyToMany extends CastorTestCase {
     /**
      * Update an object outside of JDO using a JDBC connection.
      *
-     * @param masterId primary key of object to be updated
+     * @param personId primary key of object to be updated
      */
     private void updatePersonUsingJDBC( int personId ) {
         log("updating person "+personId+" using JDBC...");
@@ -407,7 +414,7 @@ public class ExpireManyToMany extends CastorTestCase {
     /**
      * Setup and execute a database expire cache request.
      *
-     * @param expireByType when <code>true</code> this method will request that
+     * @param byType when <code>true</code> this method will request that
      *      objects be expired from the cache by specifying a single type or
      *      class of objects to be expired; when <code>false</code> this method
      *      will request that objects be expired from the cache using individual
@@ -449,7 +456,7 @@ public class ExpireManyToMany extends CastorTestCase {
         Database db = null;
         boolean valid = true;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             TestManyGroup group = (TestManyGroup)db.load(TestManyGroup.class, new Integer(groupId));
             if (group.getValue1().compareTo(expectedValue) != 0) {
@@ -479,6 +486,7 @@ public class ExpireManyToMany extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn("Problem closing Database instance.", se);
                 }
             }
             log("validReadTransaction: exception caught while validating read for group "+groupId+" : "+e.getMessage());
@@ -492,13 +500,13 @@ public class ExpireManyToMany extends CastorTestCase {
      * Modify fields of an object and validate that the transaction completes
      * successfully.
      *
-     * @param masterId primary key of object to be updated
+     * @param groupId primary key of object to be updated
      */
     private boolean validWriteTransaction( int groupId ) {
         log("validating write transaction for group "+groupId+"...");
         Database db = null;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             TestManyGroup group = (TestManyGroup)db.load(TestManyGroup.class, new Integer(groupId));
             group.setValue1(JDO_UPDATED_VALUE);
@@ -516,6 +524,7 @@ public class ExpireManyToMany extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn("Problem closing Database instance.", se);
                 }
             }
             log("validWriteTransaction: exception caught while validating write for group "+groupId+" : "+e.getMessage());
@@ -536,7 +545,7 @@ public class ExpireManyToMany extends CastorTestCase {
         Database db = null;
         try {
             // select an group and delete it, if it exist!
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             OQLQuery oqlclean = db.getOQLQuery( "SELECT object FROM jdo.TestManyGroup object WHERE object.id < $1" );
             oqlclean.bind( Integer.MAX_VALUE );
@@ -567,6 +576,7 @@ public class ExpireManyToMany extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn("Problem closing Database instance.", se);
                 }
             }
             log("deleteTestDataSet: exception caught: "+e.getMessage());

@@ -58,6 +58,7 @@ import java.io.IOException;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDO;
+import org.exolab.castor.jdo.JDO2;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DuplicateIdentityException;
@@ -104,7 +105,7 @@ public class CustomInstanceFactory extends CastorTestCase {
 
         _jdo.setInstanceFactory(_i);
 
-        _db  = _category.getDatabase( verbose );
+        _db  = _category.getDatabase();
 
         OQLQuery      oql;
         TestObjectTimeStampable object;

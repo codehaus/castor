@@ -47,19 +47,14 @@
 package jdo;
 
 
-import java.util.Vector;
-import java.util.Enumeration;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.DriverManager;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
-import org.exolab.castor.util.Logger;
 import java.net.URL;
 import java.net.MalformedURLException;
-import junit.framework.TestSuite;
 import harness.TestHarness;
 
 
@@ -80,11 +75,9 @@ public class JDOCategory extends TestHarness {
     }
 
 
-    public Database getDatabase( boolean verbose )
+    public Database getDatabase()
         throws PersistenceException
     {
-        if ( verbose )
-            _jdo.setLogWriter( Logger.getSystemLogger() );
         return _jdo.getDatabase();
     }
 

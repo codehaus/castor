@@ -101,9 +101,9 @@ public class Race extends CastorTestCase {
 
         _dbForRace = new Database[NUM_OF_RACING_THREADS];
         for ( int i = 0; i < NUM_OF_RACING_THREADS; i++ ) {
-            _dbForRace[i] = _category.getDatabase(verbose);
+            _dbForRace[i] = _category.getDatabase();
         }
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
         _conn = _category.getJDBCConnection();
         _conn.setAutoCommit( false );
     }

@@ -97,7 +97,7 @@ public class DependentKeyGen extends CastorTestCase {
     public void setUp()
             throws PersistenceException {
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
     }
 
     public void runTest()
@@ -116,7 +116,7 @@ public class DependentKeyGen extends CastorTestCase {
         TestMasterKeyGen    master2;
         int                 cnt;
         
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
         stream.println( "Delete everything" );
         _db.begin();

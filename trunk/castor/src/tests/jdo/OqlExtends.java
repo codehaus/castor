@@ -74,8 +74,10 @@ public class OqlExtends extends CastorTestCase {
         _category = (JDOCategory) category;
     }
 
-    public void setUp() throws PersistenceException {
-        _db = _category.getDatabase(verbose);
+    public void setUp()
+    	throws PersistenceException 
+	{
+        _db = _category.getDatabase();
         
         // XXX [SMH]: We need to clear some tables because "TC23 ManyToMany" is doing something unwise, see bug 1445. 
         Connection conn = null;

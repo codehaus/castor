@@ -142,9 +142,9 @@ public class Deadlock extends CastorTestCase {
     public void setUp()
             throws PersistenceException {
 
-        _db = _category.getDatabase( verbose );
-        _firstDb = _category.getDatabase( verbose );
-        _secondDb = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
+        _firstDb = _category.getDatabase();
+        _secondDb = _category.getDatabase();
 
         OQLQuery      oql;
         TestObject    object;
