@@ -92,6 +92,12 @@
   </contributor>
 
   <contributor type="Committer">
+    <name surname="Wolpert" given="Ned"/>
+    <email>wolpert@yahoo.com</email>
+    <description>JDO enhancements and PostgreSQL integration.</description>
+  </contributor>
+
+  <contributor type="Committer">
     <name surname="Maucherat" given="Remy"/>
     <email>remm@apache.org</email>
     <company id="sun"/>
@@ -488,18 +494,6 @@
     <description>
           Reported bug in CollectionInfoJ2 with respect to unbounded collections
     </description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Wolpert" given="Edward"/>
-    <email>wolpert@methodsystems.com</email>
-    <description>Testing for PostgreSQL.</description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Wolpert" given="Ned"/>
-    <email>ned.wolpert@knowledgenet.com</email>
-    <description>Proposed "trigger" mode of SEQUENCE key generator for PostgreSQL</description>
   </contributor>
 
   <contributor type="Feedback">
