@@ -277,7 +277,7 @@ public class DatabaseRegistry
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );
                 }
-                dbs = new DatabaseRegistry( database.getName(), mapping.getJDOMapping(), factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
                                             database.getDriver().getUrl(), props, logWriter );
             } else if ( database.getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
@@ -288,7 +288,7 @@ public class DatabaseRegistry
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
-                dbs = new DatabaseRegistry( database.getName(), mapping.getJDOMapping(), factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
                                             ds, logWriter );
             } else if ( database.getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
@@ -305,7 +305,7 @@ public class DatabaseRegistry
                 if ( ! ( ds instanceof DataSource ) )
                     throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
 
-                dbs = new DatabaseRegistry( database.getName(), mapping.getJDOMapping(), factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
                                             (DataSource) ds, logWriter );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
