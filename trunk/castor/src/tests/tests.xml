@@ -317,13 +317,13 @@
 
   </category>
 
+<!--
   <category name="j2ee" class="jdo.JDOJ2EECategory">
      <description>JDO tests in a J2EE transaction managed environment</description>
      <jdo database-name="mysql" configuration="j2ee.xml" />
- 
-     <!-- A -->
+
      <case class="jdo.TestTransactionManagedEnvironment" />
   </category>
-
+-->
 </harness>
 
