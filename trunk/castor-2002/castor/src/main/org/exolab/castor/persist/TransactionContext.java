@@ -619,11 +619,11 @@ public abstract class TransactionContext
         
         // Instantiate a temporary object and fill it from the cache
         tmp = handler.newInstance();
-        addObjectEntry( tmp, oid, engine );
         try {
             engine.copyObject( this, oid, tmp );
             // Now overwrite the values that was either loaded from the cache or
             // from the database with the new values
+            addObjectEntry( tmp, oid, engine );
             handler.fillFromCopy( object, this, engine );
             removeObjectEntry( tmp );
             // Replace the temporary object by the orignal
