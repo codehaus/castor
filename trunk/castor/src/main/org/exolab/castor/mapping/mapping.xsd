@@ -168,6 +168,10 @@
     </xsd:annotation>
     <xsd:complexType>
 
+      <xsd:sequence>
+         <xsd:element ref="class" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+
       <!--
          An optional attribute used for specifying the XML name for the
          field associated with the 'bind-xml' element.
