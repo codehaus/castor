@@ -468,6 +468,7 @@ public class OQLQueryImpl
 
                     SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
                     _results =  sqe.execute( _expr, _bindValues);
+                    _fieldNum = 0;
 
             }
         } catch ( PersistenceException except ) {
