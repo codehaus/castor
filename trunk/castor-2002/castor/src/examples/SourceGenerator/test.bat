@@ -35,3 +35,9 @@ java -cp %CP% org.exolab.castor.builder.SourceGenerator -i invoice.xsd -f -packa
 @echo Ready to run test...
 @pause
 %JDK_BIN%\java -cp %CP% InvoiceTest
+
+@echo.
+@echo Clean the directory
+@pause
+del *.class
+deltree test
