@@ -1548,8 +1548,8 @@ public class SourceFactory {
         boolean useValuesAsName = true;
         while (enum.hasMoreElements()) {
             Facet facet = (Facet)enum.nextElement();
-            String value = facet.getValue().toUpperCase();
-            if (!JavaNaming.isValidJavaIdentifier(value)) {
+            String possibleId = translateEnumValueToIdentifier(facet.getValue());
+            if (!JavaNaming.isValidJavaIdentifier(possibleId)) {
                 useValuesAsName = false;
                 break;
             }
@@ -1650,7 +1650,7 @@ public class SourceFactory {
             String typeName = null;
             String objName = null;
 
-            if (useValuesAsName) objName = value.toUpperCase();
+            if (useValuesAsName) objName = translateEnumValueToIdentifier(value);
             else objName = "VALUE_" + count;
 
             //-- create typeName
@@ -1747,7 +1747,7 @@ public class SourceFactory {
 
 
 
-    } //-- processEnumeration
+    } //-- processEnumerationAsNewObject
 
     /**
      * Creates all the necessary enumeration code from the given
@@ -1864,6 +1864,47 @@ public class SourceFactory {
         jsc.append(": \" + string + \".\");");
 
     } //-- processEnumerationAsBaseType
+    
+
+    /**
+     * Attempts to translate a simpleType enumeration value into a legal
+     * java identifier.  Translation is through a couple of simple rules:
+     *   - if the value parses as a non-negative int, the string 'VALUE_' is
+     *     prepended to it
+     *   - if the value parses as a negative int, the string 'VALUE_NEG_' is
+     *     prepended to it
+     *   - the value is uppercased
+     *   - the characters <code>[](){}<>'`"</code> are removed
+     *   - the characters <code>|\/?~!@#$%^&*-+=:;.,</code> and any whitespace are replaced with <code>_</code>
+     * @author rhett-sutphin@uiowa.edu 
+     */
+    private String translateEnumValueToIdentifier(String enumValue) 
+    {
+        
+        try {
+            int intVal = Integer.parseInt(enumValue);
+            if (intVal >= 0)
+                return "VALUE_" + intVal;
+            else
+                return "VALUE_NEG_" + Math.abs(intVal);
+        } catch (NumberFormatException e) {
+            // just keep going
+        }
+        StringBuffer sb = new StringBuffer(enumValue.toUpperCase());
+        char c;
+        for (int i = 0 ; i < sb.length() ; i++) {
+            c = sb.charAt(i);
+            if ("[](){}<>'`\"".indexOf(c) >= 0) {
+                sb.deleteCharAt(i);
+                i--;
+            }
+            else if (Character.isWhitespace(c) || "\\/?~!@#$%^&*-+=:;.,".indexOf(c) >= 0) {
+                sb.setCharAt(i, '_');
+            }
+        }
+        return sb.toString();   
+    } //-- translateEnumValueToIdentifier    
+    
 
     /**
      * Adds a given FieldInfo to the JClass and ClassInfo
