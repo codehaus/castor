@@ -54,6 +54,16 @@ import org.exolab.castor.persist.sql.KeyGeneratorDescriptor;
  */
 public final class EntityInfo {
 
+    private static EntityFieldInfo[] emptyEntityFieldInfo = new EntityFieldInfo[0];
+
+    private static EntityInfo[]      emptyEntityInfo      = new EntityInfo[0];
+
+    // -- Implementation Notes:
+    //
+    // Developer! Let's agree that all array used in this class should 
+    // never be null. We uses zero length array instead
+    //
+
     /**
      * The entity class which this object represent.
      */
@@ -80,23 +90,45 @@ public final class EntityInfo {
     public final EntityInfo superEntity;
 
     /**
-     *
+     * The discriminator the Bridge Layer should be used to determines
+     * the actual entity type
      */
     public final Object discriminator;
 
+    /**
+     * The key generator descriptor used to generate the identity for
+     * the entity
+     */
     public final KeyGeneratorDescriptor keyGen;
 
+    /**
+     * Constructor
+     */
     public EntityInfo( String entityClass, EntityFieldInfo[] idInfo,
                        EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, 
                        EntityInfo superEntity, Object discriminator, 
                        KeyGeneratorDescriptor keyGen ) {
         this.entityClass   = entityClass;
-        this.fieldInfo     = fieldInfo;
-        this.idInfo        = idInfo;
-        this.subEntities   = subEntities;
-        this.superEntity   = superEntity;
-        this.discriminator = discriminator;
-        this.keyGen        = keyGen;
+        this.superEntity    = superEntity;
+        this.discriminator  = discriminator;
+        this.keyGen         = keyGen;
+
+        // uses empty arrays to avoid null pointer
+        if ( fieldInfo == null || fieldInfo.length <= 0 )
+            this.fieldInfo  = emptyEntityFieldInfo;
+        else
+            this.fieldInfo     = fieldInfo;
+
+        if ( idInfo == null || idInfo.length <= 0 )
+            this.idInfo     = emptyEntityFieldInfo;
+        else
+            this.idInfo         = idInfo;
+
+        if ( subEntities == null || subEntities.length <= 0 ) 
+            this.subEntities    = emptyEntityInfo;
+        else
+            this.subEntities    = subEntities;
+
     } // -- EntityInfo
 
     /**
