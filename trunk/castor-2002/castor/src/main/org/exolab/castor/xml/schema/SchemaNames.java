@@ -84,6 +84,7 @@ public class SchemaNames {
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
+    public static final String REDEFINE         = "redefine";
     public static final String RESTRICTION      = "restriction";
     public static final String SCHEMA           = "schema";
     public static final String SELECTOR         = "selector";
@@ -99,10 +100,13 @@ public class SchemaNames {
     public static final String ATTR_FORM_DEFAULT_ATTR = "attributeFormDefault";
     public static final String BASE_ATTR           = "base";
     public static final String BLOCK_ATTR          = "block";
+    public static final String BLOCK_DEFAULT_ATTR  = "blockDefault";
     public static final String DEFAULT_ATTR        = "default";
     public static final String ELEM_FORM_DEFAULT_ATTR = "elementFormDefault";
     public static final String ID_ATTR             = "id";
     public static final String ITEM_TYPE_ATTR      = "itemType";
+    public static final String FINAL_ATTR          = "final";
+    public static final String FINAL_DEFAULT_ATTR  = "finalDefault";
     public static final String FIXED_ATTR          = "fixed";
     public static final String FORM                = "form";
     public static final String MAX_OCCURS_ATTR     = "maxOccurs";
@@ -117,6 +121,7 @@ public class SchemaNames {
     public static final String REFER_ATTR          = "refer";
     public static final String SCHEMALOCATION_ATTR = "schemaLocation";
     public static final String SOURCE_ATTR         = "source";
+    public static final String SUBSTITUTION_GROUP_ATTR = "substitutionGroup";
     public static final String TARGET_NS_ATTR      = "targetNamespace";
     public static final String TYPE_ATTR           = "type";
     public static final String USE_ATTR            = "use";
