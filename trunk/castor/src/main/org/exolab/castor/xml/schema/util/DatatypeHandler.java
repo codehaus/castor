@@ -138,6 +138,10 @@ public class DatatypeHandler {
     **/
     public static String guessType(String value) {
         if (value == null) return null;
+        
+        //-- If string is empty...not much we
+        //-- can do...
+        if (value.length() == 0) return STRING_TYPE;
 
         //-- check for integer, must be done before check for long
         try {
