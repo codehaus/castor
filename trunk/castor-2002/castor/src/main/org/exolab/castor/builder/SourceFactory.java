@@ -47,10 +47,13 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.builder.util.*;
-import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.mapping.*;
+import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.util.*;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.types.BuiltInType;
 import org.exolab.javasource.*;
+
 
 import java.util.Enumeration;
 
@@ -62,20 +65,7 @@ import java.util.Enumeration;
 **/
 public class SourceFactory  {
     
-    
-    private static final String NULL_RESOLVER_ERR 
-        = "A null Resolver was passed as an argument to the constructor.";
         
-    private static final String REFERABLE_INTERFACE
-        = "org.exolab.castor.xml.Referable";
-
-    private static final String RESOLVER_INTERFACE 
-        = "org.exolab.castor.xml.Resolver";
-        
-    private static final String RESOLVER_CLASS 
-        = "org.exolab.castor.xml.IdResolver";
-    
-    
     //------------------/
     //- Public Methods -/
     //------------------/
@@ -275,6 +265,50 @@ public class SourceFactory  {
     
     
     /**
+     *
+    **
+    public static JClass createSourceCode(ClassDescriptor descriptor) 
+    {
+        
+        //-- handle null arguments
+        if (descriptor == null) {
+            String err = "ClassDescriptor passed as an argument to "+
+                " SourceFactory#createSourceCode cannot be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        ClassDescriptor classDesc = descriptor;
+        /*
+        if (descriptor instanceof XMLClassDescriptor)
+            classDesc = (XMLClassDescriptor) descriptor;
+        else {
+            try {
+                classDesc = new XMLClassDescriptorAdapter(descriptor, null);
+            }
+            catch(org.exolab.castor.mapping.MappingException mx) {
+                throw new IllegalStateException(mx.toString());
+            }
+        }
+        *  
+         
+        Class type = classDesc.getJavaClass();
+        JClass jClass = new JClass(type.getName());
+        
+        //-- Loop through fields and add members
+        JMember field = null;
+        FieldDescriptor[] fields = classDesc.getFields();
+        for (int i = 0; i < fields.size(); i++) {
+        }
+        
+        return jClass;
+        
+    } //-- createSourceCode
+    
+    //-------------------/        
+    //- Private Methods -/        
+    //-------------------/        
+    
+    /**
      * Initializes the given JClass
     **/
     private static void initialize(JClass jClass) {
@@ -292,10 +326,6 @@ public class SourceFactory  {
         jClass.addImport("java.io.Serializable");
         
     } //-- initialize
-    
-    //-------------------/        
-    //- Private Methods -/        
-    //-------------------/        
     
     /**
      * Creates the #marshal methods for the given JClass
@@ -350,27 +380,6 @@ public class SourceFactory  {
         jsc.append(".class, reader);");
         
     } //-- createUnmarshalMethods
-    
-    /**
-     * Creates the useResolver method for an SGClass
-    **/
-    private static JMethod createUseResolverMethod() {
-        
-        JMethod jMethod = new JMethod(null, "useResolver");
-        
-        //String comment = "Sets the IdResolver to use when resolving ";
-        //comment += " Id references or when registering Ids.";
-        //jMethod.setComment(comment);
-        
-        JClass jClass = new JClass(RESOLVER_INTERFACE);
-        JParameter jParam = new JParameter(jClass, "resolver");
-        jMethod.addParameter(jParam);
-        
-        JSourceCode jsc = jMethod.getSourceCode();
-        jsc.add("idResolver = resolver;");
-        return jMethod;
-        
-    } //-- createUseResolverMethod
     
     /**
      * Creates the Validate methods for the given JClass
