@@ -107,7 +107,4 @@ public final class PostgreSQLQueryExpression
     	return true;
     }
 
-
 }
-
-
