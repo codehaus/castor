@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
+<document id="EXOLAB-2000-01-24-AA01-DR" project="../project.xml">
+  <properties>
+    <title>Transaction And Locking Modes</title>
+    <abstract>Describes the Castor transaction and locking modes, the semantics of optimistic and pessimistic locking, and the operations performed by Castor to assure transactional ACID-ity</abstract>
+    <authors>
+      <author email="arkin@exoffice.com">
+        <firstname>Assaf</firstname>
+        <lastname>Arkin</lastname>
+      </author>
+    </authors>
+    <status>Preliminary Draft</status>
+  </properties>
+  <body>
+    <section title="Transaction And Locking">
+
+
+      <section title="Optimistic Locking">
+
+        <p>Optimistic locking mode assumes that concurrent access to objects is rare and
+           that objects are frequently accessed but not modified. It does not attempt to
+           prevent concurrent update from two transactions.</p>
+
+        <p>In this mode if two transactions attempt to access the same object, they will succeed
+           and both will acquire a read lock on the object. When the first transaction commits,
+           Castor will check whether the object was modified. If the object was not modified, no
+           update will occur.</p>
+
+        <p>If the object was modified in the first transaction, this transaction must acquire
+           a write lock in order to update it in persistent storage. Since the second transaction
+           is holding a read lock on the object, the first transaction will block until the second
+           transaction commits and releases the read lock.</p>
+
+        <p>Typically the second transaction will not attempt to modify the object, pessimistic
+           locks are used when such cases are rather rare. However, if the second transaction does
+           attempt to modify the object, it will require a write lock on the object in order to
+           complete the transaction. Since the first transaction has the write lock, a deadlock
+           situation will be detected and the second transaction will rollback. The first transaction
+           will succeed.</p>
+
+      </section>
+
+
+    </section>
+  </body>
+</document>
