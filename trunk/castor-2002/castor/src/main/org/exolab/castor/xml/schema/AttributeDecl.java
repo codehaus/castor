@@ -86,30 +86,53 @@ public final class AttributeDecl extends Annotated {
            AttributeDecl.class.getName();
 
     /**
+     * A flag to indicate a default value
+    **/
+    private boolean _default = false;
+
+    /**
+     * A flag to indicate a fixed value
+    **/
+    private boolean _fixed = false;
+    
+    /**
+     * The default namespace form for this AttributeDecl (optional).
+    **/
+    private Form _form = null;
+    
+    /**
      * The id for this AttributeDecl
     **/
-    private String id = null;
+    private String _id = null;
 
     /**
      * The name of attributes defined by this AttributeDecl
     **/
-    private String name = null;
-
-    /**
-     * The simple type for this AttributeDecl.
-    **/
-    private SimpleType simpleType = null;
+    private String _name = null;
 
     /**
      * The Schema to which this AttributeDecl belongs
     **/
-    private Schema schema = null;
+    private Schema _schema = null;
+    
+    /**
+     * The simple type for this AttributeDecl.
+    **/
+    private SimpleType _simpleType = null;
 
-    private String value = null;
 
-    private boolean _fixed = false;
-    private boolean _default = false;
-    private short useFlag = OPTIONAL;
+    /**
+     * The current value of the 'use' property. The value
+     * is OPTIONAL by default.
+    **/
+    private short _useFlag = OPTIONAL;
+    
+    /**
+     * The default or fixed value for attributes instances of this
+     * attribute declaration.
+    **/
+    private String _value = null;
+
 
     /**
      * A reference to a top-level attribute
@@ -127,42 +150,57 @@ public final class AttributeDecl extends Annotated {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        this.schema  = schema;
+        _schema  = schema;
         setName(name);
     } //-- AttributeDecl
 
     /**
      * Creates a new AttrDecl in the given schema.
      * @param schema the schema that contains the new attrDecl
-     */
-      public AttributeDecl(Schema schema) {
+    **/
+    public AttributeDecl(Schema schema) {
 
         if (schema == null) {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        this.schema  = schema;
-      }
+        _schema  = schema;
+    } //-- AttributeDecl
 
+    
+    /**
+     * Returns the Form for this attribute declaration. The Form object species
+     * whether or not names are qualified or unqualified for instances of
+     * this attribute declaration. If null, the Form should be obtained from the 
+     * parent Schema.
+     *
+     * @return the Form for this attribute declaration, or null if not set.
+    **/
+    public Form getForm() {
+        return _form;
+    } //-- getForm
+    
     /**
      * Returns the Id for this attribute declaration
      *
      * @return the Id for this attribute declaration
     **/
     public String getId() {
-        return id;
+        return _id;
     } //-- getId
 
     /**
-     * Returns the name of attributes defined by this AttributeDecl
-     * @return the name of attributes defined by this AttributeDecl
+     * Returns the name of attributes defined by this AttributeDecl.
+     *
+     * @return the name of attributes defined by this AttributeDecl.
     **/
     public String getName() {
-        return name;
+        return _name;
     } //-- getName
 
     /**
-     * Returns the name of this Attribute declaration
+     * Returns the name of this Attribute declaration.
+     *
      * @param ingoreRef If True the name of the referenced
      * attribute (if specified) is returned
      * @return the name of this attribute declaration
@@ -171,25 +209,27 @@ public final class AttributeDecl extends Annotated {
         if (isReference() && ignoreRef == false) {
             return _attributeRef;
         }
-		else return name;
+		else return _name;
     } //-- getName
+    
     /**
-     * Returns the data type associated with this AttributeDecl
-     * @return the data type associated with this AttributeDecl
+     * Returns the data type associated with this AttributeDecl.
+     *
+     * @return the data type associated with this AttributeDecl.
     **/
     public SimpleType getSimpleType() {
-        if (simpleType == null)
+        if (_simpleType == null)
             return null;
-        return (SimpleType)simpleType.getType();
+        return (SimpleType)_simpleType.getType();
     } //-- getSimpleType
 
     /**
      * Returns the Schema that this AttributeGroupDecl belongs to.
      *
-     * @return the Schema that this AttributeGroupDecl belongs to
+     * @return the Schema that this AttributeGroupDecl belongs to.
     **/
     public Schema getSchema() {
-        return schema;
+        return _schema;
     } //-- getSchema
 
     /**
@@ -200,7 +240,7 @@ public final class AttributeDecl extends Annotated {
      * declaration
     **/
     public String getUse() {
-        switch (useFlag) {
+        switch (_useFlag) {
             case PROHIBITED:
                 return USE_PROHIBITED;
             case REQUIRED:
@@ -216,7 +256,7 @@ public final class AttributeDecl extends Annotated {
      * @return the default value of this attribute declaration
     **/
     public String getValue() {
-        return value;
+        return _value;
     } //-- getValue
 
     /**
@@ -244,7 +284,7 @@ public final class AttributeDecl extends Annotated {
      * @return true if the use attribute is equal to "optional".
     **/
     public boolean isOptional() {
-        return (useFlag == OPTIONAL);
+        return (_useFlag == OPTIONAL);
     } //-- isProhibited
 
     /**
@@ -253,7 +293,7 @@ public final class AttributeDecl extends Annotated {
      * @return true if the use attribute is equal to "prohibited".
     **/
     public boolean isProhibited() {
-        return (useFlag == PROHIBITED);
+        return (_useFlag == PROHIBITED);
     } //-- isProhibited
 
     /**
@@ -267,7 +307,7 @@ public final class AttributeDecl extends Annotated {
      * no default value has been specified, otherwise false
     **/
     public boolean isRequired() {
-        return ((value == null) && (useFlag == REQUIRED));
+        return ((_value == null) && (_useFlag == REQUIRED));
     } //-- getRequired
 
     /**
@@ -280,12 +320,24 @@ public final class AttributeDecl extends Annotated {
     } //-- isReference
 
     /**
+     * Sets the Form for this attribute declaration. The Form object species
+     * whether or not names are qualified or unqualified for instances of
+     * this attribute declaration. If null, the Form is to be obtained from
+     * the parent Schema.
+     *
+     * @param form the Form type for this attribute declaration.
+    **/
+    public void setForm(Form form) {
+        _form = form;
+    } //-- setForm
+    
+    /**
      * Sets the Id for this attribute declaration
      *
      * @param id the Id for this attribute declaration
     **/
     public void setId(String id) {
-        this.id = id;
+        _id = id;
     } //-- setId
 
     /**
@@ -315,7 +367,7 @@ public final class AttributeDecl extends Annotated {
             throw new IllegalArgumentException(err);
         }
 
-        this.name = name;
+        _name = name;
     } //-- setName
 
     /**
@@ -343,7 +395,7 @@ public final class AttributeDecl extends Annotated {
      * declaration
     **/
     public void setSimpleType(SimpleType simpleType) {
-        this.simpleType = simpleType;
+        _simpleType = simpleType;
         if (simpleType != null) {
             simpleType.setParent(this);
         }
@@ -356,7 +408,7 @@ public final class AttributeDecl extends Annotated {
     {
         SimpleTypeReference reference= new SimpleTypeReference();
         reference.setName(name);
-        reference.setSchema(schema);
+        reference.setSchema(_schema);
         setSimpleType(reference);
     }
 
@@ -366,6 +418,7 @@ public final class AttributeDecl extends Annotated {
      * Note: this should not be used to set the flag to FIXED or DEFAULT
      * @param value one of the following:
      * ("prohibited" | "optional" | "required")
+     *
      * @see #USE_PROHIBITED
      * @see #USE_OPTIONAL
      * @see #USE_REQUIRED
@@ -373,16 +426,16 @@ public final class AttributeDecl extends Annotated {
     public void setUse(String value) {
 
         if (value == null) {
-            useFlag = OPTIONAL;
+            _useFlag = OPTIONAL;
             return;
         }
 
         if (value.equals(USE_REQUIRED))
-            useFlag = REQUIRED;
+            _useFlag = REQUIRED;
         else if (value.equals(USE_OPTIONAL))
-            useFlag = OPTIONAL;
+            _useFlag = OPTIONAL;
         else if (value.equals(USE_PROHIBITED))
-            useFlag = PROHIBITED;
+            _useFlag = PROHIBITED;
         else {
             throw new IllegalArgumentException("Invalid value for 'use': " +
                 value);
@@ -410,7 +463,7 @@ public final class AttributeDecl extends Annotated {
      * @param value the default value
     **/
     public void setValue(String value) {
-        this.value = value;
+        _value = value;
     } //-- setValue
 
 
@@ -435,7 +488,7 @@ public final class AttributeDecl extends Annotated {
     public void validate()
         throws ValidationException
     {
-        if (name == null)  {
+        if ((_attributeRef == null) && (_name == null))  {
             String err = "<attribute> is missing required 'name' attribute.";
             throw new ValidationException(err);
         }
