@@ -45,6 +45,9 @@
 
 package org.exolab.castor.util;
 
+import java.util.Enumeration;
+import java.util.Properties;
+
 import org.exolab.castor.jdo.conf.DataSource;
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.DatabaseChoice;
@@ -157,7 +160,7 @@ public class JdoConfFactory
 
 	/**
 	 * create a JDO configuration
-	 * @param jdoDbConf Database configuration
+	 * @param jdoDbConfArray Database configuration
 	 * @param transConf TransactionDemarcation configuration 
 	 * @return JDO configuration
 	 */
@@ -184,7 +187,7 @@ public class JdoConfFactory
 
 	/**
 	 * create a JDO configuration with simple local transaction demarcation
-	 * @param jdoDbConf Database configuration
+	 * @param jdoDbConfArray Database configuration
 	 * @return JDO configuration
 	 */
 	public static JdoConf createJdoConf(Database[] jdoDbConfArray)
@@ -236,7 +239,30 @@ public class JdoConfFactory
 
 	/**
 	 * create a JDO DataSource configuration from a JDBC DataSource instance
-	 * @param String dsClassName JDBC DataSource class name
+	 * and apply the supplied property entries
+	 * @param dsClassName JDBC DataSource class name
+	 * @param props properties to be used for the DataSource
+	 * @return JDO Datasource configuration 
+	 */
+	public static DataSource createJdoDSConf(String dsClassName, Properties props)
+	{
+		DataSource dsConf = new DataSource();
+
+		dsConf.setClassName(dsClassName);
+
+		for (Enumeration e=props.keys(); e.hasMoreElements(); ) {
+		    Object key = e.nextElement();
+		    Object value = props.get(key);
+
+		    dsConf.addParam(createJdoConfParam(key.toString(), value.toString()));
+		}
+
+		return dsConf;
+	}
+
+	/**
+	 * create a JDO DataSource configuration from a JDBC DataSource instance
+	 * @param dsClassName JDBC DataSource class name
 	 * @return JDO Datasource configuration 
 	 */
 	public static DataSource createJdoDSConf(String dsClassName)
@@ -248,6 +274,7 @@ public class JdoConfFactory
 		return dsConf;
 	}
 
+	
 
 	/**
 	 * create a JDO mapping configuration
