@@ -77,6 +77,11 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The prefix for an "add" method
+    **/
+    private static final String ADD_PREFIX = "add";
+    
+    /**
      * The underlying field handler used by this handler.
      */
     private final FieldHandler _handler;
@@ -290,8 +295,18 @@ public final class FieldHandlerImpl
         
         _getSequence = getSequence;
         _setSequence = setSequence;
-        if ( setMethod != null )
-            setWriteMethod( setMethod );
+        if ( setMethod != null ) {
+            
+            //-- might be an "add" method
+            if ( setMethod.getName().startsWith(ADD_PREFIX) ) {
+                Class pType = setMethod.getParameterTypes()[0];
+                if (pType != typeInfo.getFieldType() )
+                    setAddMethod (setMethod);
+                else 
+                    setWriteMethod(setMethod);
+            }
+            else setWriteMethod( setMethod );
+        }
         if ( getMethod != null )
             setReadMethod(getMethod);
         
@@ -626,6 +641,9 @@ public final class FieldHandlerImpl
                                         method, method.getDeclaringClass().getName() );
         _addMethod = method;
         
+        //-- make sure add method is not the same as the set method
+        if (_addMethod == _setMethod) _setMethod = null;
+        
     } //-- setAddMethod
     
 
@@ -709,6 +727,7 @@ public final class FieldHandlerImpl
     public void setWriteMethod( Method method )
         throws MappingException
     {
+        
         if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
              ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
             throw new MappingException( "mapping.accessorNotAccessible",

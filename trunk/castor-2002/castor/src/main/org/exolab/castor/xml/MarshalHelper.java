@@ -281,6 +281,8 @@ public class MarshalHelper {
                                                        null,
                                                        method, 
                                                        typeInfo);
+                        //-- clean up
+                        if (isAdd) handler.setAddMethod(method);
                     }
                     catch (MappingException mx) {
                         throw new MarshalException(mx);
