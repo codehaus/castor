@@ -69,7 +69,7 @@ public class ParseTreeWalker implements TokenTypes
 {
 
   private LockEngine _dbEngine;
-  
+
   private ParseTreeNode _parseTree;
 
   private String _projectionName;
@@ -82,7 +82,7 @@ public class ParseTreeWalker implements TokenTypes
   private ClassLoader _classLoader;
   private Class _objClass;
   private QueryExpression _queryExpr;
-  
+
   private int _SQLParamIndex; //Alex
   private Hashtable _paramInfo;
   private Hashtable _fieldInfo;
@@ -428,12 +428,12 @@ public class ParseTreeWalker implements TokenTypes
               curField = getFieldDesc(curName, curClassDesc);
             }
             if ( curField == null )
-              throw new QueryException( "An unknown field was requested: " + curName );
+              throw new QueryException( "An unknown field was requested: " + curName + " (" + curClassDesc + ")" );
             projectionName.append(".").append(curName);
             projectionInfo.addElement(curName);
             curClassDesc = (JDOClassDescriptor) curField.getClassDescriptor();
             if ( curClassDesc == null && e.hasMoreElements() )
-                throw new QueryException( "An non-reference field was requested: " + curName );
+                throw new QueryException( "An non-reference field was requested: " + curName + " (" + curClassDesc + ")" );
             count++;
           }
           field = curField;
@@ -783,10 +783,10 @@ public class ParseTreeWalker implements TokenTypes
 
     _queryExpr.addTable( _clsDesc.getTableName() );
     _queryExpr.addSelect( getSQLExpr( selectPart ) );
-   
+
   }
-  
-  
+
+
   /**
    * Adds joins to the queryExpr for path expressions in the OQL.
    *
@@ -795,43 +795,44 @@ public class ParseTreeWalker implements TokenTypes
     if ( path == null )
       throw new IllegalStateException( "path = null !" );
 
-    JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
-    String identityColumn = identity.getSQLName()[0];
-
-
     // the class for the join is even this class
     // or one of the base classes
     JDOClassDescriptor sourceClass = _clsDesc;
 
-    JDOFieldDescriptor fieldDesc = null;
     for ( int i = 1; i < path.size() - 1; i++ ) {
+        JDOFieldDescriptor fieldDesc = null;
+
         // Find the sorceclass and the fielsddescriptor
         // in the class hierachie
-         while(fieldDesc == null){
-              fieldDesc = sourceClass.getField( (String) path.elementAt(i) );
-              if(fieldDesc ==null){
-                  sourceClass=(JDOClassDescriptor)sourceClass.getExtends();
-              }
+        while(fieldDesc == null){
+            fieldDesc = sourceClass.getField( (String) path.elementAt(i) );
+            if(fieldDesc ==null){
+                sourceClass=(JDOClassDescriptor) sourceClass.getExtends();
+            }
         }
-      JDOClassDescriptor clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
-      if ( clsDesc != null && clsDesc != sourceClass )
-        //we must add this table as a join
-        if ( fieldDesc.getManyTable() == null ) {
-          //a many -> one relationship
-          JDOFieldDescriptor foreignKey =
-                          (JDOFieldDescriptor) clsDesc.getIdentity();
-          _queryExpr.addInnerJoin( sourceClass.getTableName(),
-                                   fieldDesc.getSQLName(),
-                                   clsDesc.getTableName(),
-                                   foreignKey.getSQLName() );
-        }
-        else
-          //a one -> many relationship
-          _queryExpr.addInnerJoin( _clsDesc.getTableName(),
-                                   identityColumn,
-                                   fieldDesc.getManyTable(),
-                                   fieldDesc.getManyKey()[0] );
+        JDOClassDescriptor clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
+        if ( clsDesc != null && clsDesc != sourceClass ) {
+            //we must add this table as a join
+            if ( fieldDesc.getManyKey() == null ) {
+                //a many -> one relationship
+                JDOFieldDescriptor foreignKey = (JDOFieldDescriptor) clsDesc.getIdentity();
 
+                _queryExpr.addInnerJoin( sourceClass.getTableName(),
+                                         fieldDesc.getSQLName(),
+                                         clsDesc.getTableName(),
+                                         foreignKey.getSQLName() );
+            } else {
+                //a one -> many relationship
+                JDOFieldDescriptor identity = (JDOFieldDescriptor) sourceClass.getIdentity();
+                String identityColumn = identity.getSQLName()[0];
+
+                _queryExpr.addInnerJoin( sourceClass.getTableName(),
+                                         identityColumn,
+                                         clsDesc.getTableName(),
+                                         fieldDesc.getManyKey()[0] );
+            }
+            sourceClass = clsDesc;
+        }
     }
   }
 
