@@ -268,7 +268,12 @@ public class FieldValidator extends Validator {
                 //-- required, so no error.
                 if ((size != 0) || (_descriptor.isRequired())) {
                     String err = "A minimum of " + minOccurs + " ";
-                    err += _descriptor.getXMLName() + " object(s) are required.";
+                    err += _descriptor.getFieldName() + " object(s) ";
+                    if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
+                        err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
+                    }
+                    err += "are required.";
+                    
                     throw new ValidationException(err);
                 }
             }
@@ -276,7 +281,11 @@ public class FieldValidator extends Validator {
             //-- check maximum
             if ((maxOccurs >= 0) && (size > maxOccurs)) {
                 String err = "A maximum of " + maxOccurs + " ";
-                err += _descriptor.getXMLName() + " object(s) are required.";
+                err += _descriptor.getFieldName() + " object(s) ";
+                if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
+                    err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
+                }
+                err += "are required.";
                 throw new ValidationException(err);
             }
         }
