@@ -65,6 +65,12 @@ public class ElementDecl extends ContentModelType {
            ElementDecl.class.getName();
     
     /**
+     * Flag indicating whether or not this Element declaration is
+     * abstract
+    **/
+    private boolean isAbstract = false;
+
+    /**
      * The maximum number of occurances of that elements of this type
      * may appear as children of it's context
     **/
@@ -104,7 +110,7 @@ public class ElementDecl extends ContentModelType {
     private String schemaAbbrev = null;
     
     /**
-     * The ComplexType of this ElementDecl
+     * The "anonymous" ComplexType of this ElementDecl
     **/
     private ComplexType complexType = null;
     
@@ -255,6 +261,14 @@ public class ElementDecl extends ContentModelType {
     } //-- getSchemaName
     
     /**
+     * Returns true if this element definition is abstract
+     * @return true if this element definition is abstract
+    **/
+    public boolean isAbstract() {
+        return isAbstract;
+    } //-- isAbstract
+
+    /**
      * Returns true if this element definition simply references another
      * element Definition
      * @return true if this element definition is a reference
@@ -262,6 +276,15 @@ public class ElementDecl extends ContentModelType {
     public boolean isReference() {
         return (elementRef != null);
     } //-- isReference
+    
+    /**
+     * Sets whether or not this element definition is abstract
+     * @param isAbstract, a boolean when true indicates that this
+     * element definition should be abstract
+    **/
+    public void setAbstract(boolean isAbstract) {
+        this.isAbstract = isAbstract;
+    } //-- isAbstract
     
     /** 
      * Sets the maximum number of occurances that this element must
@@ -331,6 +354,11 @@ public class ElementDecl extends ContentModelType {
     } //-- setSchemaName
     
     
+    /*
+    public void setSimpleType() {
+    } //-- setSimpleType
+    */
+
     /**
      * Sets the type reference for this element (either complextype or
      * simpletype)
