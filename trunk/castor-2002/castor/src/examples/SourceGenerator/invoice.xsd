@@ -103,8 +103,10 @@
    </simpleType> 
 
    <!-- Cool price type -->
-   <simpleType name="PriceType" base="integer">
-   		<minInclusive value="1"/>
-   		<maxInclusive value="10"/>
+   <simpleType name="PriceType" base="decimal">
+   		<scale value="2"/>
+    	<precision value="5"/>
+    	<minInclusive value="1"/>
+   		<maxInclusive value="100"/>
    </simpleType>
 </schema>
