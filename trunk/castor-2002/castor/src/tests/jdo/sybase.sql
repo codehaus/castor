@@ -104,6 +104,20 @@ go
 grant all on test_pks_payroll to test
 go
 
+drop table test_pks_project
+go
+create table test_pks_project (
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  id    int             not null,
+  name  varchar(100)
+)
+go
+create unique index test_pks_project_pk on test_pks_project( id )
+go
+grant all on test_pks_payroll to test
+go
+
 drop table test_pks_address
 go
 create table test_pks_address (
