@@ -332,18 +332,25 @@ public class JClass extends JType {
 
         String filename = getLocalName() + ".java";
 
+		//-- Convert Java package to path string
+		String javaPackagePath = "";
         if ((packageName != null) && (packageName.length() > 0)) {
-            String path = packageName.replace('.',File.separatorChar);
-            File pathFile;
-            if (destDir==null)
-                pathFile=new File(path);
-            else
-                pathFile=new File(destDir,path);
-            if (!pathFile.exists()) {
-                pathFile.mkdirs();
-            }
-            filename = pathFile.toString()+File.separator+filename;
+            javaPackagePath = packageName.replace('.',File.separatorChar);
+		}
+		
+		//-- Create fully qualified path (including 'destDir') to file
+        File pathFile;
+        if (destDir==null)
+            pathFile=new File(javaPackagePath);
+        else
+            pathFile=new File(destDir,javaPackagePath);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
         }
+		
+		//-- Prefix filename with path
+		if (pathFile.toString().length()>0)
+			filename = pathFile.toString()+File.separator+filename;
 
         return filename;
     } //-- getFilename
@@ -415,6 +422,25 @@ public class JClass extends JType {
         return this.packageName;
     } //-- getPackageName
 
+
+    /**
+     * Returns the name of the class.
+     * @param stripPackage True if you want the package name striped of the name
+     * @return the name of the class.
+     * or null if there is no current package name defined
+    **/
+	public String getName(boolean stripPackage)
+	{
+		String name = super.getName();
+		if (stripPackage)
+		{
+			int period = name.lastIndexOf(".");
+			if (period>0)
+				name = name.substring(period+1);
+		}
+		return name;
+	}
+	
     public static boolean isValidClassName(String name) {
         //** add class name validation */
         return true;
@@ -647,6 +673,14 @@ public class JClass extends JType {
     public void setSuperClass(String superClass) {
         this.superClass = superClass;
     } //-- setSuperClass
+
+    /**
+     * Gets the super Class that this class extends
+     * @return superClass the super Class that this Class extends
+    **/
+    public String getSuperClass() {
+        return this.superClass;
+    } //-- getSuperClass
 
     //-------------------/
     //- Private Methods -/
