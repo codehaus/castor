@@ -8,5 +8,14 @@
     </driver>
   <mapping href="mapping.xml" />
 </database>
+<!--
+<database name="oracle" engine="oracle" >
+    <driver url="jdbc:oracle:oci8:@YIP"	
+            class-name="oracle.jdbc.driver.OracleDriver">
 
-
+      <param name="user" value="SYSTEM"/>
+      <param name="password" value="manager"/>
+    </driver>
+  <mapping href="mapping.xml" />
+</database>
+-->

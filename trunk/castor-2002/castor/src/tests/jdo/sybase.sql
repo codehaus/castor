@@ -12,6 +12,33 @@ go
 grant all on test_table to test
 go
 
+-- test_table_ex
+drop table test_table_ex
+go
+create table test_table_ex (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+)
+go
+create unique index test_table_ex_pk on test_table_ex ( id )
+go
+grant all on test_table_ex to test
+go
+
+-- test_race
+drop table test_race
+go
+create table test_race (
+  id      int          not null,
+  value1  int	       not null
+)
+go
+create unique index test_race_pk on test_race ( id )
+go
+grant all on test_race to test
+go
+
 
 -- test_master
 drop table test_master

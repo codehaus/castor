@@ -40,7 +40,6 @@
  *
  * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
- * $Id$
  */
 
 
@@ -51,60 +50,161 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.LockNotGrantedException;
 
+// for CacheTest
 
-/**
- * A cache for holding objects of a particular type. The cache has a
- * finite size and can be optimized for a particular class based on
- * the application behavior.
- *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
- * @version $Revision$ $Date$
- */
-final class Cache
-    extends Thread
-{
+import org.exolab.castor.mapping.*;
+
+
+public final class Cache {
 
     /**
-     * Mapping of object locks to OIDs. The {@link OID} is used as the
-     * key, and {@link ObjectLock} is the value. There is one lock per OID.
+     * Mapping of object locks in "transcation state" to OIDs. The {@link OID} 
+	 * is used as the key, and {@link ObjectLock} is the value. There is one 
+	 * lock per OID.
      */
     private final Hashtable _locks = new Hashtable();
 
+	/**
+	 * Mapping of cache object (not hold by any transcation) to OIDs. 
+	 * The {@link OID} is used as the key, and {@link ObjectLock} is the value. 
+	 * There is one lock per OID.
+	 */
+	private LRU _cache;
 
-    private long  _counter;
+	// private static TransactionContext _cacheTx = new CacheTransaction();
+
+    // private static final long StampInUse   = 0;
+
+    // private long  _counter;
 
 
-    private static TransactionContext _cacheTx = new CacheTransaction();
+	/**
+	 * Specify no caching as the caching mechanism of this Cache. All released object
+	 * will be discarded.
+	 */
+	public final static int CACHE_NONE = 0;
+
+	/**
+	 * Specify Count-Limited Least Recently Used is used as caching mechanism of this Cache.
+	 * Object Lock which is not hold by any transcation will be put in the cache, until
+	 * the cache is full and other object overwritten it.
+	 */
+	public final static int CACHE_COUNT_LIMITED = 1;
+
+	/**
+	 * Specify Time-Limited Least Recently Used is used as caching mechanism of this Cache.
+	 * Object Lock which is not hold by any transcation will be put in the cache, until
+	 * timeout is reached.
+	 */
+	public final static int CACHE_TIME_LIMITED = 2;
+
+	/**
+	 * Specify unlimited cache as caching mechanism of this Cache.
+	 * Object Lock which is not hold by any transcation will be put in the cache 
+	 * for later use.
+	 */
+	public final static int CACHE_UNLIMITED = 3;
 
 
-    private static final long StampInUse   = 0;
-
-
-    Cache()
-    {
+	/**
+	 * Four type of cache can be used: CACHE_NONE, CACHE_COUNT_LIMITED, CACHE_TIME_LIMITED, 
+	 * and CACHE_UNLIMITED.
+	 * {@param param} no effect for CACHE_NONE, CACHE_UNLIMITED.
+	 * for CACHE_COUNT_LIMITED, it is the max number of {@link ObjectLock} kept in cache at any
+	 * given time.
+	 * for CACHE_TIME_LIMITED, it is the time in second for a {@link ObjectLock} kept in cache
+	 * before it is removed.
+	 */
+    Cache( int type, int param ) {
+		switch ( type ) {
+		case CACHE_COUNT_LIMITED :
+			if ( param > 0 ) 
+				_cache = new CountLimitedLRU( param );
+			else 
+				_cache = new NoCache();
+			break;
+		case CACHE_TIME_LIMITED :
+			if ( param > 0 ) 
+				_cache = new TimeLimitedLRU( param );
+			else 
+				_cache = new NoCache();
+			break;
+		case CACHE_UNLIMITED :
+			_cache = new UnlimitedLRU();
+			break;
+		case CACHE_NONE :
+			_cache = new NoCache();
+			break;
+		default :
+			_cache = new CountLimitedLRU( 100 );
+		}
     }
 
+	synchronized ObjectLock getLockForAquire( OID oid ) {
+		//System.out.println("getLockForAquire: "+oid);
+		CacheEntry entry = (CacheEntry) _locks.get( oid );
 
-    synchronized ObjectLock getLock( OID oid )
-    {
-        CacheEntry entry;
+		// try cache if not in _locks
+		if ( entry == null ) {
+			//System.out.println("trying cache, cus it's not in lock");
+			entry = (CacheEntry) _cache.remove( oid );
+		}
 
-        entry = (CacheEntry) _locks.get( oid ); 
-        if ( entry == null )
-            return null;
-        entry.stamp = StampInUse;
-        return entry.lock;
-    }
+		if ( entry != null ) {
+//			synchronized ( entry ) {
+				// counter is needed to avoid an entry removed
+				// while CacheEngine acquring a lock
+				entry.aquireCounter++;
 
+				_locks.put( oid, entry );
+
+				return entry.lock;
+//			}
+		}
+
+		return null;
+	}
+
+	synchronized void finishLockForAquire( OID oid ) {
+		//System.out.println("finishLockForAquire: "+oid);
+		CacheEntry entry = (CacheEntry) _locks.get( oid );
+
+		if ( entry != null ) {
+//			synchronized ( entry ) {
+				entry.aquireCounter--;
+				if ( entry.aquireCounter < 0 ) {
+					throw new RuntimeException("unmatch aquirelock and finishlock");
+				}
+				synchronized ( entry.lock ) {
+					//System.out.println("finishLock " + "aquire counter: "+entry.aquireCounter+" entry.lock.isFree(): "+entry.lock.isFree());
+					if ( entry.aquireCounter <= 0 && entry.lock.isFree() ) {
+						// move entry to cache
+						_locks.remove( oid );
+						_cache.put( oid, entry );
+					}
+				}
+//			}
+		}
+
+	}
 
     synchronized ObjectLock releaseLock( OID oid )
     {
-        CacheEntry entry;
+        CacheEntry entry = (CacheEntry) _locks.get( oid ); 
 
-        entry = (CacheEntry) _locks.get( oid ); 
         if ( entry == null )
             return null;
-        entry.stamp = System.currentTimeMillis();
+
+		if ( entry != null ) {
+			synchronized ( entry.lock ) {
+				//System.out.println("releaseLock " + "aquire counter: "+entry.aquireCounter+" entry.lock.isFree(): "+entry.lock.isFree());
+				if ( entry.aquireCounter <= 0 && entry.lock.isFree() ) {
+					// move entry to cache
+					_locks.remove( oid );
+					_cache.put( oid, entry );
+				}
+			}
+		}
         return entry.lock;
     }
 
@@ -114,41 +214,15 @@ final class Cache
         CacheEntry entry;
 
         entry = new CacheEntry( oid, lock );
-        entry.stamp = StampInUse;
+
         _locks.put( oid, entry );
     }
 
 
-    void removeLock( OID oid )
+    synchronized void removeLock( OID oid )
     {
         _locks.remove( oid );
-    }
-
-
-    public void run()
-    {
-        Enumeration enum;
-        CacheEntry  entry;
-        OID         oid;
-
-        while ( true ) {
-            enum = _locks.keys();
-            while ( enum.hasMoreElements() ) {
-                oid = (OID) enum.nextElement();
-                entry = (CacheEntry) _locks.get( oid );
-                synchronized ( this ) {
-                    if ( entry.stamp != StampInUse ) {
-                        try {
-                            Object obj;
-                            
-                            obj = entry.lock.acquire( _cacheTx, true, 0 );
-                            _locks.remove( oid );
-                            entry.lock.release( _cacheTx );
-                        } catch ( LockNotGrantedException except ) { }
-                    }
-                }
-            }
-        }
+		_cache.remove( oid );
     }
 
 
@@ -157,7 +231,9 @@ final class Cache
 
         final ObjectLock lock;
         
-        long             stamp;
+		long aquireCounter;
+
+		long stamp;
 
         CacheEntry( OID oid, ObjectLock lock )
         {
@@ -165,31 +241,5 @@ final class Cache
         }
 
     }
-
-
-    static class CacheTransaction
-        extends TransactionContext
-    {
-
-        CacheTransaction()
-        {
-            super( null );
-        }
-
-        public Object getConnection( PersistenceEngine engine )
-        {
-            return null;
-        }
-
-        protected void commitConnections()
-        {
-        }
-
-        protected void rollbackConnections()
-        {
-        }
-
-    }
-
-
 }
+

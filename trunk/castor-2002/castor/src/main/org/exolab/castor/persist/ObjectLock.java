@@ -191,6 +191,17 @@ final class ObjectLock
         return false;
     }
 
+    /**
+     * Return true if and only if there is no transcation holding 
+     * this lock, nor any transcation is waiting this lock.
+     *
+     * @return True if no lock and no waiting
+     */
+    synchronized boolean isFree() {
+		return ( _writeLock == null && _readLock == null &&
+			_writeWaiting == null && _readWaiting == null );
+    }
+
 
     /**
      * Acquires a lock on the object on behalf of the specified
