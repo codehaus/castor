@@ -1012,14 +1012,14 @@ public final class SQLEngine implements Persistence {
         PreparedStatement stmt;
         ResultSet         rs;
         Object            stamp = null;
-        Object[]          sqlIdentities;
+        //Object[]          sqlIdentities;
         //Object[]          sqlFields;
         //Object[]          tempFields;
         int               count;
         boolean           notNull;
 
         try {
-            sqlIdentities = idToSql( identities );
+            //sqlIdentities = idToSql( identities );
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             //System.out.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
 
