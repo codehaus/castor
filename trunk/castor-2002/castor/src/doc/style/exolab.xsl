@@ -274,9 +274,7 @@
 
   <xsl:template match="ul/li">
     <tr>
-      <td align="left" valign="top" width="15">
-        &#149;
-     </td>
+      <td align="left" valign="top" width="10">-</td>
       <td align="left" valign="top"><span class="bodyGrey"><xsl:apply-templates/></span></td>
     </tr>
   </xsl:template>
