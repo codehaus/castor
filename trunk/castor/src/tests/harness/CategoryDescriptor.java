@@ -278,6 +278,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
         (String name, String namespace, NodeType nodeType) 
     {
         
+        
         boolean wild = (nodeType == null);
         
         if (wild || (nodeType == NodeType.Element)) {
@@ -285,7 +286,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             for (int i = 0; i < elements.length; i++) {
                 desc = elements[i];
                 if (desc == null) continue;
-                if (desc.matches(name, namespace)) return desc;
+                if (desc.matches(name)) return desc;
             }
         }
         
@@ -294,7 +295,7 @@ public class CategoryDescriptor implements org.exolab.castor.xml.XMLClassDescrip
             for (int i = 0; i < attributes.length; i++) {
                 desc = attributes[i];
                 if (desc == null) continue;
-                if (desc.matches(name, namespace)) return desc;
+                if (desc.matches(name)) return desc;
             }
         }
         
