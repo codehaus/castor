@@ -387,7 +387,10 @@ public class CollectionInfo extends FieldInfo {
 
         jsc.add(compType.toString());
         jsc.append("[] mArray = new ");
-        jsc.append(compType.toString());
+        if (compType.isArray()) {
+            jsc.append(compType.getComponentType().toString());
+        }
+        else jsc.append(compType.toString());
         jsc.append("[size]");
         //-- if component is an array, we must add [] after setting
         //-- size
