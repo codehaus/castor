@@ -255,8 +255,10 @@ public class MemberFactory {
     } //-- createFieldInfo
 
     /**
-     * Creates a member based on the given ElementDecl
-     * @param element the ElementDecl to create the member from
+     * Creates a new FieldInfo based on the given ElementDecl
+     *
+     * @param element the ElementDecl to create the FieldInfo for
+     * @return the new FieldInfo
     **/
     public FieldInfo createFieldInfo
         (ElementDecl element, ClassInfoResolver resolver)
@@ -391,6 +393,78 @@ public class MemberFactory {
 
         return fieldInfo;
     } //-- createFieldInfo(ElementDecl)
+
+    /**
+     * Creates a new FieldInfo based on the given Group
+     *
+     * @param group the Group to create the FieldInfo for
+     * @return a new FieldInfo for the given Group
+    **/
+    public FieldInfo createFieldInfo
+        (Group group, ClassInfoResolver resolver)
+    {
+        
+        if (group.getName() == null)
+            throw new IllegalArgumentException("Only named groups are currently by the MemberFactory");
+
+        //-- check whether this should be a Vector or not
+        int maxOccurs = group.getMaxOccurs();
+        int minOccurs = group.getMinOccurs();
+
+		//-- determine type
+
+        JSourceCode jsc     = null;
+        FieldInfo fieldInfo = null;
+        XSType xsType       = null;
+
+        JClass groupClass = null;
+		String className = null;
+        
+        ClassInfo classInfo = resolver.resolve(group);
+        if (classInfo != null) {
+            groupClass = classInfo.getJClass();
+            xsType = classInfo.getSchemaType();
+        }
+        
+		
+		if (groupClass == null) {
+		    // Java class name is group name or.
+		    className = JavaNaming.toJavaClassName(group.getName());
+		    xsType = new XSClass(new JClass(className));
+		}
+		else {
+		    className = groupClass.getName();
+        }
+
+        String fieldName = JavaNaming.toJavaMemberName(className);
+        if (fieldName.charAt(0) != '_')
+            fieldName = "_"+fieldName;
+
+        if (maxOccurs != 1) {
+            String vName = fieldName+"List";
+            CollectionInfo cInfo
+                = infoFactory.createCollection(xsType, vName, group.getName());
+
+            XSList xsList = cInfo.getXSList();
+            xsList.setMaximumSize(maxOccurs);
+            xsList.setMinimumSize(minOccurs);
+            fieldInfo = cInfo;
+
+        }
+        else {
+             fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
+        }
+
+        fieldInfo.setRequired(minOccurs > 0);
+        fieldInfo.setNodeName("-error-if-this-is-used-");
+
+        //-- add annotated comments
+        String comment = null;
+        comment = createComment(group);
+        if (comment != null) fieldInfo.setComment(comment);
+
+        return fieldInfo;
+    } //-- createFieldInfo(Group)
 
 	/**
 	 * Returns the actual element type (handles 'ref' attribute and anonymous complextypes)
