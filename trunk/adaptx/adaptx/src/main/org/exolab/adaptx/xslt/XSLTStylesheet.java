@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -1135,10 +1135,16 @@ public class XSLTStylesheet extends XSLObject {
         //-- merge output objects
         String property = null;
                     
+        //-- encoding
+        property = xslOutput.getEncoding();
+        if (property != null)
+            output.setEncoding(property);
+        
         //-- indent
         if (xslOutput.getAttribute(Names.INDENT_ATTR) != null)
             output.setIndent(xslOutput.getIndent());
                     
+        
         //-- method
         property = xslOutput.getMethod();
         if (property != null) output.setMethod(xslOutput.getMethod());
@@ -1154,6 +1160,8 @@ public class XSLTStylesheet extends XSLObject {
         //-- Version
         property = xslOutput.getVersion();
         if (property != null) output.setVersion(property);
+        
+        
     } //-- method: mergeOutput
     
     /* */

@@ -47,6 +47,14 @@ public interface OutputFormat {
     public String getDoctypeSystemId();
     
     /**
+     * Returns the specified encoding, or null if no encoding
+     * was specified.
+     * 
+     * @return the encoding, or null if no encoding specified.
+     */
+    public String getEncoding();
+    
+    /**
      * Returns whether or not indenting the result is allowed
      * @return true if whitespace may be added to the output result
      * for indentation and readability, otherwise returns false
@@ -77,6 +85,15 @@ public interface OutputFormat {
      * of the result tree
     **/
     public String getVersion();
+    
+    /**
+     * Sets the character encoding.
+     * 
+     * @param encoding the character encoding
+     * @see #getEncoding
+     */
+    public void setEncoding(String encoding);
+        
     
     /**
      * Returns whether or not indenting the result is allowed
