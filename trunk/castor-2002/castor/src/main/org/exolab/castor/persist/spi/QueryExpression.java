@@ -139,6 +139,14 @@ public interface QueryExpression
 
 
     /**
+     * Set the query to be distinct.  No two rows which are the same will be returned.
+     *
+     * @param distinct If the query should include DISTINCT in the SQL select.
+     */
+    public void setDistinct( boolean distinct );
+
+
+    /**
      * Add a query paramater.
      *
      * @param tableName The table name
