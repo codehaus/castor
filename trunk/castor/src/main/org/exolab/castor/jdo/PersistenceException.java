@@ -49,6 +49,8 @@ package org.exolab.castor.jdo;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import org.exolab.castor.core.exceptions.CastorException;
+
 
 /**
  * An exception representing another exception (an SQL exception, a JNDI
@@ -59,7 +61,7 @@ import java.io.PrintWriter;
  * @version $Revision$ $Date$
  */
 public class PersistenceException
-    extends Exception
+    extends CastorException
 {
 
 
