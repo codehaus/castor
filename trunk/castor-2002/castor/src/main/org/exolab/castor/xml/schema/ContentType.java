@@ -51,40 +51,41 @@ package org.exolab.castor.xml.schema;
  * @version $Revision$ $Date$
 **/
 public class ContentType {
-    
-    
+
+
     public static final short ELEMENT_ONLY = 0;
-    public static final short TEXT_ONLY    = 1;
-    public static final short MIXED        = 2;
-    public static final short EMPTY        = 3;
-    public static final short ANY          = 4;
-    
-    
+    public static final short MIXED        = 1;
+    public static final short EMPTY        = 2;
+    public static final short ANY          = 3;
+	//need to keep it for the dtd package
+	public static final short TEXT_ONLY     = 4;
+
     public static final ContentType elemOnly  = new ContentType(ELEMENT_ONLY);
-        
-    public static final ContentType textOnly  = new ContentType(TEXT_ONLY);
-    
+
     public static final ContentType mixed     = new ContentType(MIXED);
-    
+
     public static final ContentType empty     = new ContentType(EMPTY);
-   
+
     public static final ContentType any       = new ContentType(ANY);
-    
-    
+
+	//need to keep it for the dtd package
+	public static final ContentType textOnly     = new ContentType(TEXT_ONLY);
+
+
     /* Private Members */
-    
-    private static final String[] names = 
-    { "elementOnly", "textOnly", "mixed", "empty", "any" };
-    
-    private short type = TEXT_ONLY;
-    
+
+    private static final String[] names =
+    { "elementOnly", "mixed", "empty", "any", "textOnly" };
+
+    private short type = ELEMENT_ONLY;
+
     /**
      * Creates a new ContentType.
     **/
     private ContentType(short type) {
         this.type = type;
     } //-- ContentType
-    
+
     /**
      * Returns the type of this ContentType
      * @return the type of this ContentType
@@ -92,7 +93,7 @@ public class ContentType {
     public short getType() {
         return this.type;
     } //-- getType
-    
+
     /**
      * Returns the String representation of this ContentType
      * @return the String representation of this ContentType
@@ -100,7 +101,7 @@ public class ContentType {
     public String toString() {
         return names[type];
     } //-- toString
-    
+
     /**
      * Creates a new ContentType based on the given String
      * @param contentType the type of the ContentType to create.
@@ -112,11 +113,10 @@ public class ContentType {
      * @exception IllegalArgumentException when the given type is
      * not one of the possible valid values
     **/
-    public static ContentType valueOf(String contentType) 
-        throws IllegalArgumentException 
+    public static ContentType valueOf(String contentType)
+        throws IllegalArgumentException
     {
         if (contentType.equals(names[ELEMENT_ONLY])) return elemOnly;
-        else if (contentType.equals(names[TEXT_ONLY])) return textOnly;
         else if (contentType.equals(names[MIXED])) return mixed;
         else if (contentType.equals(names[EMPTY])) return empty;
         else if (contentType.equals(names[ANY])) return any;
@@ -126,5 +126,5 @@ public class ContentType {
             throw new IllegalArgumentException(err);
         }
     } //-- valueOf
-    
+
 } //-- ContentType
