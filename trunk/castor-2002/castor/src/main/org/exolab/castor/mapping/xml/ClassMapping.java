@@ -22,7 +22,7 @@ import org.xml.sax.DocumentHandler;
 /**
  * @version $Revision$ $Date$
 **/
-public class ObjectMapping implements java.io.Serializable {
+public class ClassMapping implements java.io.Serializable {
 
 
       //--------------------/
@@ -37,7 +37,7 @@ public class ObjectMapping implements java.io.Serializable {
     /**
      * 
     **/
-    private java.lang.String vType;
+    private java.lang.String vClassName;
 
     /**
      * 
@@ -79,11 +79,11 @@ public class ObjectMapping implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public ObjectMapping() {
+    public ClassMapping() {
         super();
         vFieldList = new Vector();
         vContainerList = new Vector();
-    } //-- ObjectMapping()
+    } //-- ClassMapping()
 
 
       //-----------/
@@ -105,21 +105,21 @@ public class ObjectMapping implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getType() {
-        return this.vType;
-    } //-- java.lang.String getType() 
+    public java.lang.String getClassName() {
+        return this.vClassName;
+    } //-- java.lang.String getClassName() 
 
     /**
-     * @param vType
+     * @param vClassNAme
     **/
-    public void setType(java.lang.String vType) {
-        this.vType = vType;
-    } //-- void setType(java.lang.String) 
+    public void setClassName(java.lang.String vClassName) {
+        this.vClassName = vClassName;
+    } //-- void setClassName(java.lang.String) 
 
     /**
     **/
     public java.lang.String getReferenceId() {
-        return this.vType;
+        return this.vClassName;
     } //-- java.lang.String getReferenceId() 
 
     /**
@@ -384,10 +384,10 @@ public class ObjectMapping implements java.io.Serializable {
     /**
      * @param reader
     **/
-    public static ObjectMapping unmarshal(java.io.Reader reader) 
+    public static ClassMapping unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (ObjectMapping) Unmarshaller.unmarshal(ObjectMapping.class, reader);
-    } //-- ObjectMapping unmarshal(java.io.Reader) 
+        return (ClassMapping) Unmarshaller.unmarshal(ClassMapping.class, reader);
+    } //-- ClassMapping unmarshal(java.io.Reader) 
 
 }

@@ -19,7 +19,7 @@ import org.exolab.castor.xml.ValidationRule;
 /**
  * @version $Revision$ $Date$
 **/
-public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
+public class ClassMappingMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
 
 
       //--------------------/
@@ -56,7 +56,7 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
      //- Constructors -/
     //----------------/
 
-    public ObjectMappingMarshalInfo() {
+    public ClassMappingMarshalInfo() {
         SimpleMarshalDescriptor desc = null;
         Class[] emptyClassArgs = new Class[0];
         Class[] classArgs = new Class[1];
@@ -70,9 +70,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(String.class, "vExtends", "extends");
         desc.setDescriptorType(DescriptorType.attribute);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getExtends", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getExtends", emptyClassArgs));
             classArgs[0] = String.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setExtends", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setExtends", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -82,19 +82,19 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         bvr.setAsAttributeRule();
         bvr.setMaxOccurs(1);
         rules[0] = bvr;
-        //-- vType
-        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vType", "type");
+        //-- vClassName
+        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vClassName", "class-name");
         desc.setDescriptorType(DescriptorType.attribute);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getType", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getClassName", emptyClassArgs));
             classArgs[0] = java.lang.String.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setType", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setClassName", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
         attributes[1] = desc;
         
-        bvr = new BasicValidationRule("type");
+        bvr = new BasicValidationRule("class-name");
         bvr.setAsAttributeRule();
         bvr.setMaxOccurs(1);
         rules[1] = bvr;
@@ -106,9 +106,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(java.lang.String.class, "vDescription", "description");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getDescription", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getDescription", emptyClassArgs));
             classArgs[0] = java.lang.String.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setDescription", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setDescription", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -123,9 +123,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(SqlTable.class, "vSqlTable", "sql-table");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getSqlTable", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getSqlTable", emptyClassArgs));
             classArgs[0] = SqlTable.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setSqlTable", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setSqlTable", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -139,9 +139,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(XmlSchema.class, "vXmlSchema", "xml-schema");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getXmlSchema", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getXmlSchema", emptyClassArgs));
             classArgs[0] = XmlSchema.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setXmlSchema", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setXmlSchema", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -155,9 +155,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(LdapEntry.class, "vLdapEntry", "ldap-entry");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getLdapEntry", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getLdapEntry", emptyClassArgs));
             classArgs[0] = LdapEntry.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setLdapEntry", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setLdapEntry", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -171,9 +171,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(Identity.class, "vIdentity", "identity");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getIdentity", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getIdentity", emptyClassArgs));
             classArgs[0] = Identity.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("setIdentity", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("setIdentity", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -187,9 +187,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(FieldMapping.class, "vFieldList", "field");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getFieldMapping", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getFieldMapping", emptyClassArgs));
             classArgs[0] = FieldMapping.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("addFieldMapping", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("addFieldMapping", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -204,9 +204,9 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         desc = new SimpleMarshalDescriptor(ContainerMapping.class, "vContainerList", "container");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(ObjectMapping.class.getMethod("getContainerMapping", emptyClassArgs));
+            desc.setReadMethod(ClassMapping.class.getMethod("getContainerMapping", emptyClassArgs));
             classArgs[0] = ContainerMapping.class;
-            desc.setWriteMethod(ObjectMapping.class.getMethod("addContainerMapping", classArgs));
+            desc.setWriteMethod(ClassMapping.class.getMethod("addContainerMapping", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -217,7 +217,7 @@ public class ObjectMappingMarshalInfo implements org.exolab.castor.xml.MarshalIn
         bvr = new BasicValidationRule("container");
         bvr.setMinOccurs(0);
         gvr.addValidationRule(bvr);
-    } //-- ObjectMappingMarshalInfo()
+    } //-- ClassMappingMarshalInfo()
 
 
       //-----------/
