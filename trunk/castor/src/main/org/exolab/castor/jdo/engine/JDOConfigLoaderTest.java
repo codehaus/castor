@@ -45,16 +45,15 @@
 
 package org.exolab.castor.jdo.engine;
 
-import java.io.FileWriter;
-import java.io.PrintWriter;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 /**
  * <Add your own comment here>

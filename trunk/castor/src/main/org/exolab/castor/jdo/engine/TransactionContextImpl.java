@@ -47,17 +47,17 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.Messages;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 
 /**

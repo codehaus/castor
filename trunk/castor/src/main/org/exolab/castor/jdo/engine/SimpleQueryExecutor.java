@@ -46,16 +46,16 @@
 
 package org.exolab.castor.jdo.engine;
 
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.persist.spi.QueryExpression;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
-
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.persist.spi.QueryExpression;
 
 /**
  * A class to execute simple SQL queries generated from OQL.  If the query

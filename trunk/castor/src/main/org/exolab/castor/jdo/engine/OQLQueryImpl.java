@@ -47,24 +47,8 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.NoSuchElementException;
-import java.util.Vector;
-
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.Query;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.oql.Lexer;
-import org.exolab.castor.jdo.oql.ParamInfo;
-import org.exolab.castor.jdo.oql.ParseTreeNode;
-import org.exolab.castor.jdo.oql.ParseTreeWalker;
-import org.exolab.castor.jdo.oql.Parser;
+import org.exolab.castor.jdo.*;
+import org.exolab.castor.jdo.oql.*;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
@@ -73,6 +57,11 @@ import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.NoSuchElementException;
+import java.util.Vector;
 
 /**
  *
