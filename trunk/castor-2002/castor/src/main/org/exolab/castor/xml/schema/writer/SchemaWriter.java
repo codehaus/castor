@@ -81,6 +81,11 @@ public class SchemaWriter {
     private static final String ATTRIBUTE     =  "attribute";
 
     /**
+     * AttributeGroup element name.
+     */
+    private static final String ATTRIBUTE_GROUP = "attributeGroup";
+    
+    /**
      * ComplexType element name.
      */
     private static final String COMPLEX_TYPE  =  "complexType";
@@ -347,6 +352,62 @@ public class SchemaWriter {
 
 
     } //-- processAttribute
+
+    /**
+     * Processes the given attributeGroup declaration
+     *
+     * @param attGroup the attributeGroup declaration to process into events
+     * @param schemaPrefix the namespace prefix to use for schema elements
+    **/
+    private void processAttributeGroup
+        (AttributeGroup attGroup, String schemaPrefix)
+        throws SAXException
+    {
+        String ELEM_ATTRIBUTE_GROUP = schemaPrefix + ATTRIBUTE_GROUP;
+
+        _atts.clear();
+
+        boolean isReference = (attGroup instanceof AttributeGroupReference);
+
+        //-- name
+        if (!isReference) {
+            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA,
+                ((AttributeGroupDecl)attGroup).getName());
+        }
+        else {
+            _atts.addAttribute(SchemaNames.REF_ATTR, CDATA,
+                ((AttributeGroupReference)attGroup).getReference());
+        }
+
+        //-- @id (optional)
+        if (attGroup.getId() != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
+                attGroup.getId());
+        }
+
+        _handler.startElement(ELEM_ATTRIBUTE_GROUP, _atts);
+
+        //-- process annotations
+        processAnnotated(attGroup, schemaPrefix);
+
+        if (!isReference) {
+            AttributeGroupDecl group = (AttributeGroupDecl)attGroup;
+            Enumeration enum = group.getMyAttributes();
+            while (enum.hasMoreElements()) {
+                processAttribute((AttributeDecl)enum.nextElement(), 
+                    schemaPrefix);
+            }
+            enum = group.getMyAttributeGroupReferences();
+            while (enum.hasMoreElements()) {
+                processAttributeGroup((AttributeGroup)enum.nextElement(),
+                    schemaPrefix);
+            }
+        } 
+
+        _handler.endElement(ELEM_ATTRIBUTE_GROUP);
+
+
+    } //-- processAttributeGroup
 
     /**
      * Processes the given complex type definition
@@ -876,6 +937,13 @@ public class SchemaWriter {
             processImport((Schema)enum.nextElement(), schemaPrefix);
         }
 
+        //-- process all top level attributeGroup declarations
+        enum = schema.getAttributeGroups();
+        while (enum.hasMoreElements()) {
+            processAttributeGroup((AttributeGroup) enum.nextElement(),
+                schemaPrefix);
+        }
+        
         //-- process all top level attribute declarations
         enum = schema.getAttributes();
         while (enum.hasMoreElements()) {
