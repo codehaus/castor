@@ -149,6 +149,10 @@
         <display>Test Framework - JDO</display>
       </navLink>
       <navLink>
+        <url>ctf.xml</url>
+        <display>Castor Testing Framework - XML</display>
+      </navLink>
+      <navLink>
         <url>conf-lib.xml</url>
         <display>Configuration</display>
       </navLink>
