@@ -123,9 +123,15 @@
   JDO: Implement dirty checking, define SPI for key generation, support
        Sybase HOLDLOCK
 
+  JDO: Add mechanism to close result set.
+
   DAX: Type convertors to/from String, support for Vectors.
 
   DAX: Better query parser with support for parameters.
+
+  Persist: Implement AccessMode.Signular
+
+  Persist: Implement option for blocking identity change (?)
 </pre>
     </section>
 

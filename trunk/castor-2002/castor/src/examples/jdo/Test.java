@@ -50,6 +50,15 @@ public class Test
             db.open( "test", db.OPEN_READ_WRITE );
             odmgTest( odmg, db, logger );
             db.close();
+
+            /* (Future mechanism for SQL -> XML)
+            org.exolab.castor.jdo.engine.QueryParser   qp;
+            org.apache.xml.serialize.XMLSerializer ser;
+
+            qp = new org.exolab.castor.jdo.engine.QueryParser( org.exolab.castor.jdo.engine.DatabaseSource.getDatabaseSource( "test" ), Product.class );
+            ser = new org.apache.xml.serialize.XMLSerializer( System.out, null );
+            qp.execute( ser.asDocumentHandler() );
+            */
             
         } catch ( Exception except ) {
             logger.println( except );

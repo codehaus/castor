@@ -59,7 +59,7 @@
     <xsl:for-each select=".//section">
       <small>
       <xsl:if test="@title">
-        <xsl:variable name="level" select="count(from-ancestors(*))"/>
+        <xsl:variable name="level" select="count(ancestor::*)"/>
         <xsl:choose>
           <xsl:when test='$level=2'>
             <a href="#{@title}"><xsl:value-of select="@title"/></a><br/>
@@ -84,7 +84,7 @@
 
   <!-- Process a section in the document. Nested sections are supported -->
   <xsl:template match="document//section">
-    <xsl:variable name="level" select="count(from-ancestors(*))"/>
+    <xsl:variable name="level" select="count(ancestor::*)"/>
     <xsl:choose>
       <xsl:when test='$level=2'>
         <a name="{@title}"><h2>
