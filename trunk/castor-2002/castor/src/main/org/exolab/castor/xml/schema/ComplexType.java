@@ -91,6 +91,11 @@ public class ComplexType extends XMLType
     **/
     private ContentModelGroup _contentModel = null;
 
+	/**
+	 * The value of the 'block' attribute for this ComplexType
+	 */
+	private String block;
+	
     /**
      * Creates a new Complextype, with no name
      * @param schema the owning Schema document
@@ -344,6 +349,22 @@ public class ComplexType extends XMLType
     public int getParticleCount() {
         return _contentModel.getParticleCount();
     } //-- getParticleCount
+
+	/**
+	 * Returns the value of the 'block' attribute for this element
+	 */
+	public String getBlock()
+	{
+		return block;
+	}
+	
+	/**
+	 * Sets the value of the 'block' attribute for this element
+	 */
+	public void setBlock(String block)
+	{
+		this.block = block;
+	}
 
     //-------------------------------/
     //- Implementation of Structure -/

@@ -99,6 +99,8 @@ public class ElementDecl extends Particle {
     private boolean nullable = false;
     
     private String _default = null;
+	
+	private String _block;
     
     /**
      * Creates a new default element definition
@@ -322,6 +324,22 @@ public class ElementDecl extends Particle {
         return hasTypeReference;
     }
 
+	/**
+	 * Returns the value of the 'block' attribute for this element
+	 */
+	public String getBlock()
+	{
+		return _block;
+	}
+	
+	/**
+	 * Sets the value of the 'block' attribute for this element
+	 */
+	public void setBlock(String block)
+	{
+		_block = block;
+	}
+	
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
