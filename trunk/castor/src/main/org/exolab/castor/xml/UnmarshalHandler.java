@@ -736,7 +736,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     state.object = decoder.getByteArray();
                 }
             }
-            else state.object = toPrimitiveObject(type,str);
+            else state.object = toPrimitiveObject(type,str,state.fieldDesc);
         }
         else if (ArrayHandler.class.isAssignableFrom(state.type)) {
             state.object = ((ArrayHandler)state.object).getObject();
@@ -752,7 +752,7 @@ public final class UnmarshalHandler extends MarshalFramework
             if (cdesc != null) {
                 Object value = state.buffer.toString();
                 if (isPrimitive(cdesc.getFieldType()))
-                    value = toPrimitiveObject(cdesc.getFieldType(), (String)value);
+                    value = toPrimitiveObject(cdesc.getFieldType(), (String)value, state.fieldDesc);
                 else {
                     Class valueType = cdesc.getFieldType();
                     //-- handle base64
@@ -1651,7 +1651,7 @@ public final class UnmarshalHandler extends MarshalFramework
         
         
         //-- loop through stack and find correct descriptor
-        int pIdx = _stateInfo.size() - 2; //-- index of parentState
+        //int pIdx = _stateInfo.size() - 2; //-- index of parentState
         UnmarshalState targetState = parentState;
         String path = "";
         StringBuffer pathBuf = null;
@@ -1716,7 +1716,8 @@ public final class UnmarshalHandler extends MarshalFramework
             
             //-- Make sure there are more parent classes on stack
             //-- otherwise break, since there is nothing to do
-            if (pIdx == 0) break;
+            //if (pIdx == 0) break;
+            if (targetState == _topState) break;
             
             //-- adjust name and try parent
             if (count == 0)
@@ -1733,8 +1734,9 @@ public final class UnmarshalHandler extends MarshalFramework
             }
                 
             //-- get 
-            --pIdx;
-            targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
+            //--pIdx;
+            //targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
+            targetState = targetState.parent;
             classDesc = targetState.classDesc;
             count++;
         }
@@ -2021,10 +2023,11 @@ public final class UnmarshalHandler extends MarshalFramework
                      return;
                 }
             }
-
+            
             boolean byteArray = false;
             if (_class.isArray())
                 byteArray = (_class.getComponentType() == Byte.TYPE);
+
 
             //-- check for immutable
             if (isPrimitive(_class) ||
@@ -2767,7 +2770,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- conversion
         Class type = descriptor.getFieldType();
         if (isPrimitive(type))
-            value = toPrimitiveObject(type, attValue);
+            value = toPrimitiveObject(type, attValue, descriptor);
         //check if the value is a QName that needs to
         //be resolved (ns:value -> {URI}value)
         String valueType = descriptor.getSchemaType();
@@ -2841,7 +2844,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- check for proper type and do type
                 //-- conversion
                 if (isPrimitive(args.types[argIndex]))
-                    value = toPrimitiveObject(args.types[argIndex], (String)value);
+                    value = toPrimitiveObject(args.types[argIndex], (String)value, descriptor);
                 //check if the value is a QName that needs to
                 //be resolved (ns:value -> {URI}value)
                 String valueType = descriptor.getSchemaType();
@@ -3274,11 +3277,45 @@ public final class UnmarshalHandler extends MarshalFramework
 
     /**
      * Converts a String to the given primitive object type
+     *
      * @param type the class type of the primitive in which
      * to convert the String to
      * @param value the String to convert to a primitive
      * @return the new primitive Object
-    **/
+     */
+    private Object toPrimitiveObject
+        (Class type, String value, XMLFieldDescriptor fieldDesc) 
+        throws SAXException
+    {
+        try {
+            return toPrimitiveObject(type, value);
+        }
+        catch(Exception ex) {
+            String err = "The following error occured while trying to ";
+            err += "unmarshal field " + fieldDesc.getFieldName();
+            UnmarshalState state = (UnmarshalState)_stateInfo.peek();
+            if (state != null) {
+                if (state.object != null) {
+                    err += " of class " + state.object.getClass().getName();
+                }
+            }
+            err += "\n";
+            err += ex.getMessage();
+            
+            
+            throw new SAXException(err);
+        }
+    } //-- toPrimitiveObject
+
+
+    /**
+     * Converts a String to the given primitive object type
+     *
+     * @param type the class type of the primitive in which
+     * to convert the String to
+     * @param value the String to convert to a primitive
+     * @return the new primitive Object
+     */
     public static Object toPrimitiveObject(Class type, String value) {
 
         Object primitive = value;
