@@ -415,11 +415,15 @@ public class FieldInfo extends XMLInfo {
             if (value == null)
                 value = getFixedValue();
             if (value != null) {
-                 StringBuffer buffer = new StringBuffer(50);
-                 buffer.append("set");
-                 buffer.append(methodSuffix());
-                 buffer.append('(');
-                 buffer.append(value);
+                StringBuffer buffer = new StringBuffer(50);
+                buffer.append("set");
+                buffer.append(methodSuffix());
+                buffer.append('(');
+                buffer.append(value);
+                //special case for enumeration
+                //not really beautiful
+                if (getSchemaType().isEnumerated())
+                    buffer.deleteCharAt(buffer.length()-1);
                  buffer.append(");");
                  jsc.add(buffer.toString());
             }
