@@ -212,7 +212,10 @@ public class MemberFactory {
             //-- XXX need to validate the value.
 
             //-- clean up value
-            if (xsType.getType() == XSType.STRING) {
+            //--the value can't be an empty string
+            if ( (xsType.getType() == XSType.STRING) &&
+                 (value.length() != 0) )
+            {
                 char ch = value.charAt(0);
                 switch (ch) {
                     case '\'':
