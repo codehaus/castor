@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -50,28 +50,34 @@ package org.exolab.castor.xml.schema;
 import org.exolab.castor.xml.ValidationException;
 
 /**
- * The base class for all XML Schema stuctures
+ * The base class for all XML Schema stuctures.
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public abstract class Structure implements java.io.Serializable {
 
-    public static final short ANNOTATION        = 0;
-    public static final short APPINFO           = 1;
-    public static final short ATTRIBUTE         = 2;
-    public static final short ATTRIBUTE_GROUP   = 3;
-    public static final short COMPLEX_CONTENT   = 4;
-    public static final short COMPLEX_TYPE      = 5;
-    public static final short DOCUMENTATION     = 6;
-    public static final short ELEMENT           = 7;
-    public static final short FACET             = 8;
-    public static final short GROUP             = 9;
-    public static final short MODELGROUP        = 10;
-    public static final short MODELGROUP_REF    = 11;
-    public static final short SCHEMA            = 12;
-    public static final short SIMPLE_CONTENT    = 13;
-    public static final short SIMPLE_TYPE       = 14;
-    public static final short WILDCARD          = 15;
+    public static final short ANNOTATION          =  0;
+    public static final short APPINFO             =  1;
+    public static final short ATTRIBUTE           =  2;
+    public static final short ATTRIBUTE_GROUP     =  3;
+    public static final short COMPLEX_CONTENT     =  4;
+    public static final short COMPLEX_TYPE        =  5;
+    public static final short DOCUMENTATION       =  6;
+    public static final short ELEMENT             =  7;
+    public static final short FACET               =  8;
+    public static final short GROUP               =  9;
+    public static final short IDENTITY_FIELD      = 10;
+    public static final short IDENTITY_SELECTOR   = 11;
+    public static final short KEY                 = 12;
+    public static final short KEYREF              = 13;
+    public static final short MODELGROUP          = 14;
+    public static final short MODELGROUP_REF      = 15;
+    public static final short SCHEMA              = 16;
+    public static final short SIMPLE_CONTENT      = 17;
+    public static final short SIMPLE_TYPE         = 18;
+    public static final short UNIQUE              = 19;
+    public static final short WILDCARD            = 20;
 
     //-- should be removed eventually
     public static final short UNKNOWN         = -1;
@@ -87,6 +93,7 @@ public abstract class Structure implements java.io.Serializable {
     /**
      * Calls validate() to determine if this Schema Definition
      * is valid.
+     *
      * @return true if this Schema definition is valid, otherwise false.
     **/
     public boolean isValid() {
@@ -100,13 +107,15 @@ public abstract class Structure implements java.io.Serializable {
     } //-- isValid
 
     /**
-     * Returns the type of this Schema Structure
-     * @return the type of this Schema Structure
+     * Returns the type of this Schema Structure.
+     *
+     * @return the type of this Schema Structure.
     **/
     public abstract short getStructureType();
 
     /**
      * Checks the validity of this Schema defintion.
+     *
      * @exception ValidationException when this Schema definition
      * is invalid.
     **/
