@@ -89,11 +89,48 @@
             </section>
 
             <section title="My XML output looks incorrect, what could be wrong?">
+            <p>Also: I used the source code generator, but all my xml element names are getting
+               marshalled as lowercase with hyphens, what's up with that?
+            </p>
             <p>
+               <b>Solution:</b><br/>
                Are the generated class descriptors compiled? Make sure they
                get compiled along with the source code for the object model.
             </p>
             </section>
+
+            <section title="The generated source code has incorrect or missing imports for imported schema types">
+            <p>
+               <b>Example:</b>
+               <br/>
+               Castor generates the following:
+               <br/>
+               <code>import types.Foo;</code>
+                 instead of:
+                <code>import com.acme.types.Foo;</code>
+                This usually happens when the namespaces for the imported schemas have not been mapped
+                to appropriate java packages in the <i>castorbuilder.properties</i> file.
+            </p>
+            <p>
+               <ul><b>Solution:</b>
+                  <li>
+                      Make sure the castorbuilder.properties is in your classpath when you run the SourceGenerator.
+                   </li>
+                  <li>
+                      Uncomment and edit the org.exolab.castor.builder.nspackages property.
+                      Make sure to copy the value of the imported namespace exactly as it's referred to
+                      in the schema (i.e. trailing slashes and case-sensitivity matter!).
+                  </li>
+               </ul>
+            </p>
+            <p>
+               For those using 0.9.5.1, you'll need to upgrade due to the following bug:
+               <a href="http://bugzilla.exolab.org/show_bug.cgi?id=1407">
+                  http://bugzilla.exolab.org/show_bug.cgi?id=1407</a>
+            </p>
+
+            </section>
+
             <section title="How can I make the generated source code more JDO friendly?">
             <p>For Castor 0.9.4 and above:</p>
             <p>
@@ -111,6 +148,7 @@
                method names.
              </p>
             </section>
+
 
         </section>
     </section>
