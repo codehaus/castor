@@ -191,8 +191,8 @@ public class DateFieldHandler extends XMLFieldHandler {
         throws java.lang.IllegalStateException
     {
         Date date = null;
-
-        if (! (value instanceof Date) ) {
+        
+        if ( (value != null) && ! (value instanceof Date) ) {
 
             try {
                 date = parse(value.toString());
