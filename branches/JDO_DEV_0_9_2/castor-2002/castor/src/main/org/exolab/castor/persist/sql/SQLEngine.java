@@ -356,12 +356,13 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
         BitSet dirtyCheckNulls;
         SQLQueryExecutor executor;
 
-        if (original == null) {
+        if (original.locked) {
+            // The object was loaded with a database lock, so dirty checking isn't needed.
             if (_sqlStore == null) {
                 _sqlStore = SQLQueryBuilder.getStoreExecutor(_factory, _connector, _log,
                                                              _info, null);
             }
-            _sqlStore.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+            executor = _sqlStore;
         } else {
             dirtyCheckNulls = getDirtyCheckNulls(original);
             if (_sqlStoreDirtyCheckMap == null) {
@@ -373,8 +374,8 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
                                                             _info, dirtyCheckNulls);
                 _sqlStoreDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
-            executor.executeEntity(key, _lockEngine, (Connection) conn, entity, original);
         }
+        executor.executeEntity(key, _lockEngine, (Connection) conn, entity, original);
     }
 
 
@@ -387,22 +388,22 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
      *
      * @param key The transaction context
      * @param conn An open connection
-     * @param entity The entity to delete
+     * @param original The entity to delete
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Key key, Object conn, Entity entity /*, Entity original */)
+    public void delete( Key key, Object conn, Entity original)
         throws PersistenceException {
 
-        Entity original = null; /* TOTO: should be a parameter */
         BitSet dirtyCheckNulls;
         SQLQueryExecutor executor;
 
-        if (original == null) {
+        if (original.locked) {
+            // The object was loaded with a database lock, so dirty checking isn't needed.
             if (_sqlRemove == null) {
                 _sqlRemove = SQLQueryBuilder.getDeleteExecutor(_factory, _connector, _log,
                                                                _info, null);
             }
-            _sqlRemove.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+            executor = _sqlRemove;
         } else {
             dirtyCheckNulls = getDirtyCheckNulls(original);
             if (_sqlRemoveDirtyCheckMap == null) {
@@ -414,8 +415,8 @@ public final class SQLEngine implements Persistence, SQLQueryKinds {
                                                              _info, dirtyCheckNulls);
                 _sqlRemoveDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
-            executor.executeEntity(key, _lockEngine, (Connection) conn, entity, original);
         }
+        executor.executeEntity(key, _lockEngine, (Connection) conn, original, original);
     }
 
 

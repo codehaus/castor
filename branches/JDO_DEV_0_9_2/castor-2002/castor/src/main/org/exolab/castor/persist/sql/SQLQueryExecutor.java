@@ -202,9 +202,9 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
      * This method is used by SQLEngine in create(), update(), delete() and load().
      * @param lockEngine The lock engine, used to addCache and addRelated.
      * @param entity The main Entity (input or output).
-     * @param entity2 An additional input Entity, it is used for UPDATE and DELETE with dirty checking.
+     * @param original An original value of Entity, it is used for UPDATE and DELETE with dirty checking.
      */
-    public void executeEntity(Key key, LockEngine lockEngine, Connection conn, Entity entity, Entity entity2)
+    public void executeEntity(Key key, LockEngine lockEngine, Connection conn, Entity entity, Entity original)
             throws PersistenceException {
         boolean useBatch;
         PreparedStatement stmt = null;
@@ -279,14 +279,14 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
 
             // Dirty checking
             if ((_kind == UPDATE || _kind == DELETE) && _dirtyCheckNulls != null) {
-                for (int sub = 0; sub < entity2.entityClasses.length; sub++) {
-                    if (!entity2.entityClasses[sub].equals(_info.info.entityClass)) {
+                for (int sub = 0; sub < original.entityClasses.length; sub++) {
+                    if (!original.entityClasses[sub].equals(_info.info.entityClass)) {
                         continue;
                     }
                     for (int i = 0; i < _info.fieldInfo.length; i++) {
                         if (_info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck
                                 && !_dirtyCheckNulls.get(i)) {
-                            count = bindField(entity2.values[sub][i], stmt, count, _info.fieldInfo[i]);
+                            count = bindField(original.values[sub][i], stmt, count, _info.fieldInfo[i]);
                         }
                     }
                     break;
