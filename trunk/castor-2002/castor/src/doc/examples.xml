@@ -6,17 +6,17 @@
     <section title="Running The Examples">
 
       <p>
-      In order to run the examples located in <tt>src/examples</tt>, there are 
-      number of steps that must first take place. these steps are outlined below: 
-      
+      In order to run the examples located in <tt>src/examples</tt>, there are
+      number of steps that must first take place. these steps are outlined below:
+
       <ol type="1">
           <li>Download the Castor source via either <a href="download.html">FTP</a>
-          or <a href="cvs.html">CVS</a>. If the source has been downloaded via FTP, 
-          it must be decompressed. This is dependent on whether a gzipped tarball 
+          or <a href="cvs.html">CVS</a>. If the source has been downloaded via FTP,
+          it must be decompressed. This is dependent on whether a gzipped tarball
           has been downloaded or a zip file has been downloaded.<br /><br />
 
           Steps for a gzipped tarball:
-          
+
           <br /><br />
 
           <tt>tar zxvf castor-0.9.3.9-src.tgz</tt><br />
@@ -28,7 +28,7 @@
           <br /><br />
 
           Steps for a zip file:
-          
+
           <br /><br />
 
           <tt>unzip castor-0.9.3.9-src.zip</tt><br />
@@ -36,20 +36,20 @@
           or<br />
 
           <tt>jar xvf castor-0.9.3.9-src.zip</tt><br />
-          
+
           or<br />
 
           Get a copy of <a href="http://www.powerarchiver.com/">PowerArchiver</a><br /><br />
 
           </li>
-          <li>If you're using Unix/Linux, the shell scripts must be made executable 
+          <li>If you're using Unix/Linux, the shell scripts must be made executable
           and the line endings must be changed. Use the following directions:
 
           <br /><br />
 
-          <ol type="a"> 
+          <ol type="a">
               <li>
-              Make the shell scripts executable: 
+              Make the shell scripts executable:
 
               <br /><br />
 
@@ -64,7 +64,7 @@
               <tt>for i in *.sh; do dos2unix $i $i; done</tt><br /><br />
               </li>
           </ol>
-          
+
           </li>
 
           <li>
@@ -85,7 +85,7 @@
 
           <br /><br />
 
-          This will not only build the examples, but will also build the Castor classes. 
+          This will not only build the examples, but will also build the Castor classes.
           </li>
 
           <li>
@@ -170,6 +170,22 @@
   example.sh dsml mozilla ldap.intalio.com dc=intalio,dc=com secret
          </code></p>
 
+    </section>
+
+    <section title="External Examples">
+      <p>
+         This sections provides a place link external examples of using
+         Castor. If you have an example that you feel would be useful
+         please send us the URL. Also notify us if any links are
+         broken.
+      </p>
+      <section title="ebXMLsoft">
+         <p>Goran Zugic and Duka Krunic of ebXMLsoft Inc. have some samples
+            using Castor XML and Castor JDO. The examples use Castor 0.9.2
+            and offer good insight in using XML and JDO together.<br />
+         <url>http://www.ebxmlsoft.com/pilots/samples.html</url>
+         </p>
+      </section>
     </section>
 
   </body>
