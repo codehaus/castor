@@ -207,6 +207,8 @@ public interface Database
 
 
     /**
+     * <b>Experimental</b>
+     * <p>
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
      * the same identity in the same transaction will return the same
@@ -274,6 +276,31 @@ public interface Database
      */
     public void remove( Object object )
         throws ObjectNotPersistentException, LockNotGrantedException, 
+               TransactionNotInProgressException, PersistenceException;
+
+
+    /**
+     * <b>Experimental</b>
+     * <p>
+     * Creates a new object in persistent storage. The object will be
+     * persisted only if the transaction commits.
+     * <p>
+     * If the object has an identity then duplicate identity check happens
+     * in this method, and the object is visible to queries in this
+     * transaction. If the identity is null, duplicate identity check
+     * occurs when the transaction completes and the object is not
+     * visible to queries until the transaction commits.
+     *
+     * @param object The object to create
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws ClassNotPersistenceCapableException The class is not
+     *  persistent capable
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public void update( Object object )
+        throws ClassNotPersistenceCapableException,
                TransactionNotInProgressException, PersistenceException;
 
 
@@ -368,6 +395,14 @@ public interface Database
      */
     public void rollback()
         throws TransactionNotInProgressException;
+
+
+    /**
+     * Returns true if a transaction is currently active.
+     *
+     * @return True if a transaction is active
+     */
+    public boolean isActive();
 
 
     /**
