@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed a cyclic include bug with the IncludeUnmarshaller, added
+       some code to make sure the main schema couldn't include itself.
+       (kvisco - 20040624)
+
 JDO:   Fixed bug 1445 using contribution from Stein M. Hugubakken [dulci@start.no]
        Fixed various small problems with SQL DDLs in src/tests/jdo.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1445
