@@ -88,6 +88,12 @@ public class Unmarshaller {
     **/
     private boolean debug = false;
     
+    /**
+     * The flag indicating whether or not to validate during
+     * unmarshalling
+    **/
+    private boolean validate = true;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -99,7 +105,7 @@ public class Unmarshaller {
     public Unmarshaller(Class c) {
         super();
         this._class = c;
-	this.debug = Configuration.debug();
+	    this.debug = Configuration.debug();
     } //-- Unmarshaller(Class)
     
     
@@ -132,6 +138,16 @@ public class Unmarshaller {
         this.pw = printWriter;
     } //-- setLogWriter
 
+    /**
+     * Sets the flag for validation
+     * @param validate, a boolean to indicate whether or not 
+     * validation should be done during umarshalling. <br />
+     * By default validation will be performed.
+    **/
+    public void setValidation(boolean validate) {
+        this.validate = validate;
+    } //-- setValidation
+    
     /**
      * Unmarshals Objects of this Unmarshaller's Class type. 
      * The Class must specify the proper access methods 

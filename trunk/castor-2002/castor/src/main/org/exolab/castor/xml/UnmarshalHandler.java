@@ -85,18 +85,12 @@ public class UnmarshalHandler implements DocumentHandler {
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
     private Class            _topClass     = null;
-    private Hashtable        _infoHash     = null;
     
     /**
-     * The SAX Document Locator
+     * A StringBuffer used to created Debug/Log messages
     **/
-    private Locator          _locator      = null;
+    private StringBuffer     buf           = null;
     
-    /**
-     * The PrintWriter to print log information to
-    **/
-    private PrintWriter      _logWriter    = null;
-
     /**
      * A flag to indicate whether or not to generate debug information
     **/
@@ -109,10 +103,25 @@ public class UnmarshalHandler implements DocumentHandler {
     private boolean          killWriter    = false;
     
     /**
-     * A StringBuffer used to created Debug/Log messages
+     * The SAX Document Locator
     **/
-    private StringBuffer     buf           = null;
+    private Locator          _locator      = null;
     
+    /**
+     * The PrintWriter to print log information to
+    **/
+    private PrintWriter      _logWriter    = null;
+
+    /**
+     * The MarshalInfoResolver which is used to "resolve"
+     * or find MarshalInfo classes
+    **/
+    private MarshalInfoResolver _mResolver = null;
+    
+    /**
+     * A flag indicating whether or not to perform validation
+    **/
+    private boolean          _validate     = true;
     
     //----------------/
     //- Constructors -/
@@ -125,7 +134,6 @@ public class UnmarshalHandler implements DocumentHandler {
     protected UnmarshalHandler(Class _class) {
         super();
         _stateInfo = new Stack();
-        _infoHash = new Hashtable();
         _topClass = _class;
         buf = new StringBuffer();
     } //-- UnmarshalHandler(Class)
@@ -166,6 +174,16 @@ public class UnmarshalHandler implements DocumentHandler {
         killWriter = false;
     } //-- setLogWriter
     
+    /**
+     * Sets the flag for validation
+     * @param validate, a boolean to indicate whether or not 
+     * validation should be done during umarshalling. <br />
+     * By default validation will be performed.
+    **/
+    public void setValidation(boolean validate) {
+        this._validate = validate;
+    } //-- setValidation
+    
     //-----------------------------------/
     //- SAX Methods for DocumentHandler -/
     //-----------------------------------/
@@ -188,7 +206,10 @@ public class UnmarshalHandler implements DocumentHandler {
     public void endDocument() 
         throws org.xml.sax.SAXException
     {
-        //-- do nothing for now
+        //-- I've found many application don't always call
+        //-- #endDocument, so I usually never put any 
+        //-- important logic here
+        
     } //-- endDocument
     
     
@@ -255,7 +276,20 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         
         //-- Add to parent Object if necessary
-        if (_stateInfo.empty()) return;
+        
+        if (_stateInfo.empty()) {
+            //-- we are at the end of the root element
+            if (_validate) {
+                try {
+                    Validator.validate(state.object, _mResolver);
+                }
+                catch(ValidationException vEx) {
+                    throw new SAXException(vEx);
+                }
+            }
+            return;
+        }
+        
         
         //-- check for character content
         if ((state.buffer != null) && 
@@ -288,6 +322,21 @@ public class UnmarshalHandler implements DocumentHandler {
         
         //-- get target object
         state = (UnmarshalState) _stateInfo.peek();
+        
+        //-- check to see if we have already read in
+        //-- an element of this type
+        if (!descriptor.isMultivalued()) {
+            if (state.isUsed(descriptor)) {
+                
+                String err = descriptor.getXMLName();
+                err += " occurs more than once.";
+                ValidationException vx = 
+                    new ValidationException(err);
+                throw new SAXException(vx);
+            }
+            state.markAsUsed(descriptor);
+        }
+        
         try {
             descriptor.setValue(state.object, val);
         }
@@ -331,7 +380,11 @@ public class UnmarshalHandler implements DocumentHandler {
     public void startDocument() 
         throws org.xml.sax.SAXException 
     {
-        //-- do nothing for now
+        
+        //-- I've found many application don't always call
+        //-- #startDocument, so I usually never put any 
+        //-- important logic here
+        
     } //-- startDocument
     
     public void startElement(String name, AttributeList atts) 
@@ -350,6 +403,10 @@ public class UnmarshalHandler implements DocumentHandler {
         
         if (_stateInfo.empty()) {
             //-- Initialize since this is the first element
+            
+            if (_mResolver == null) {
+                _mResolver = new CachingMarshalInfoResolver();
+            }
             _topState = new UnmarshalState();
             _topState.elementName = name;
             
@@ -759,15 +816,19 @@ public class UnmarshalHandler implements DocumentHandler {
         if (_class == null) return null;
         if (_class.isArray()) return null;
         
-        MarshalInfo mInfo = (MarshalInfo)_infoHash.get(_class);
+        if (_mResolver == null) 
+            _mResolver = new CachingMarshalInfoResolver();
+            
+            
+        MarshalInfo mInfo = _mResolver.resolve(_class);
+        
         if (mInfo != null) return mInfo;
-        try {
-            mInfo = MarshalHelper.getMarshalInfo(_class, _logWriter);
+        
+        //-- we couldn't create a MarshalInfo, check for
+        //-- error message
+        if (_mResolver.error()) {
+            message(_mResolver.getErrorMessage());
         }
-        catch(java.io.IOException ioe) {
-            throw new SAXException(ioe.getMessage());
-        }
-        if (mInfo != null) _infoHash.put(_class, mInfo);
         else {
             buf.setLength(0);
             buf.append("unable to find or create a MarshalInfo for class: ");

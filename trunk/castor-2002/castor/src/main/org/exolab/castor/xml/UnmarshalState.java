@@ -45,9 +45,13 @@
 
 package org.exolab.castor.xml;
 
+import java.util.Vector;
 
 class UnmarshalState {
     
+    /**
+     * The xml element name of the current object
+    **/
     String elementName = null;
     
     /**
@@ -76,8 +80,23 @@ class UnmarshalState {
     **/
     MarshalInfo mInfo = null;
 
+    private Vector markedList = null;
     
     UnmarshalState() {
         super();
+        markedList = new Vector(5);
     }
+    
+    /**
+     * Marks the given MarshalDescriptor as having been used
+     * @param descriptor the MarshalDescriptor to mark
+    **/
+    void markAsUsed(MarshalDescriptor descriptor) {
+        markedList.addElement(descriptor);
+    } //-- markAsUsed
+    
+    boolean isUsed(MarshalDescriptor descriptor) {
+        return markedList.contains(descriptor);
+    } //-- isUsed
+    
 } //-- UnmarshalState
