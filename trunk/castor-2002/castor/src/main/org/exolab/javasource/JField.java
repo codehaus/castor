@@ -77,8 +77,8 @@ public class JField implements JMember {
 
     public JField(JType type, String name) {
         
+        setName(name);
         this.type = type;
-        this.name = name;
         this.modifiers = new JModifiers();
         this.modifiers.makePrivate();
         
@@ -177,6 +177,15 @@ public class JField implements JMember {
     public void setName(String name) throws 
         IllegalArgumentException
     {
+        if (!JNaming.isValidJavaIdentifier(name)) {
+            String err = "'" + name + "' is ";
+            if (JNaming.isKeyword(name))
+                err += "a reserved word and may not be used as "
+                    + " a field name.";
+            else 
+                err += "not a valid Java identifier.";
+            throw new IllegalArgumentException(err);
+        }
         this.name = name;
     } //-- setName
 
