@@ -85,6 +85,8 @@ public class KeyGenGeneric extends CastorTestCase {
 
         testOneKeyGen( TestHighLowObject.class, TestHighLowExtends.class );
 
+        testOneKeyGen( TestHighLowObjectSameConnection.class, TestHighLowExtendsSameConnection.class );
+
     }
 
     public void tearDown()
