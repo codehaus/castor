@@ -352,6 +352,39 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
 
+        //-- _handler
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_handler", "handler", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object )
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return target.getHandler();
+            }
+            public void setValue( Object object, Object value)
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setHandler( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+
+        //-- validation code for: _handler
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        desc.setValidator(fieldValidator);
+        
         //-- _setMethod
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_setMethod", "set-method", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
