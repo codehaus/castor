@@ -10,7 +10,8 @@
         <section title="News">
             <p><b>Release 0.9.6</b>:<br/>
                <ul>
-                  <li>Added support for a limit clause and an offset clause.</li>
+                  <li>Added support for a limit clause and an offset clause. Currently, only
+                      HSQL, mySQL and postgreSQL are supported.</li>
                   <li>Added an <a href="#Examples">example section</a>.</li>
                </ul>
             </p>
