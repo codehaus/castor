@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1677 using contribution from Matrin Fuchs [martin-fuchs@gmx.net]
+       Updated list of available mapping types.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1677
+       (Werner - 20040811)
+
 JDO:   Fixed bug 1700 using contribution from unknown [weitz@zimmerverpackungen.com]
        Fixed problem with 'select count(*) ...' statement with HSQL.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1700
