@@ -122,7 +122,7 @@ public final class ClassHandler
 
     /**
      * Constructs a new handler. The handler cannot be used until it
-     * is normalized (see {@link #normalize}).
+     * is normalized.
      */
     ClassHandler( ClassDescriptor clsDesc )
     {
@@ -162,7 +162,7 @@ public final class ClassHandler
 
 
     /**
-     * Used by {@link #normalize} to add fields to this handler.
+     * Used by <tt>normalize</tt> to add fields to this handler.
      * Recursive function that flattens the field of this class
      * and the parent class into one set.
      */
