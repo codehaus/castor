@@ -49,14 +49,11 @@ package org.exolab.castor.jdo.drivers;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
-import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
 import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -630,24 +627,4 @@ public class JDBCQueryExpression
 	{
 		return false;
 	}
-
-    protected Map reorderParamInfo(Map paramInfo, int idx1From, int idx1To, int idx2From, int idx2To)
-    {
-        Map newInfo = new Hashtable(paramInfo.size());
-
-        for(Iterator it=paramInfo.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry e = (Map.Entry) it.next();
-            ParamInfo info = (ParamInfo) e.getValue();
-            int idx = ((Integer)e.getKey()).intValue();
-
-            if (idx>=idx1From && idx<=idx1To)
-                idx += idx2From - idx1From;
-            else if (idx>=idx2From && idx<=idx2To)
-                idx += idx1From - idx2To;
-
-            newInfo.put(new Integer(idx), info);
-        }
-
-        return newInfo;
-    }
 }
