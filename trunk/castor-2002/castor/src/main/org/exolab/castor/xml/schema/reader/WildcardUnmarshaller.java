@@ -249,7 +249,7 @@ public class WildcardUnmarshaller extends SaxUnmarshaller {
             return;
         }
          //-- <annotation>
-        if (name == SchemaNames.ANNOTATION) {
+        if (SchemaNames.ANNOTATION.equals(name)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
 
