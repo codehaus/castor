@@ -47,17 +47,12 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.binding.XMLBindingComponent;
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.simpletypes.ListType;
-import org.exolab.castor.util.Configuration;
-
 import org.exolab.javasource.JClass;
-import org.exolab.javasource.JSourceCode;
 import org.exolab.javasource.JType;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
 
 /**
  * The "Factory" responsible for creating fields for
