@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author              Changes
+ * 04/18/2002   Arnaud              String constructor
  * 05/24/2001   Arnaud Blandin      Created
  */
 
@@ -94,6 +95,14 @@ public class GDay extends GMonthDay {
         setDay((short)day);
     }
 
+   /**
+    * Constructs a GDay from a string value.
+    * @param gday the string representation of the GDay to instantiate
+    */
+    public GDay(String gday) throws ParseException {
+        this();
+        parseGDayInternal(gday, this);
+    }
 
 
     /**
@@ -192,11 +201,18 @@ public class GDay extends GMonthDay {
      *                        of this class)
      */
     public static GDay parseGDay(String str) throws ParseException {
+        GDay result = new GDay();
+        return parseGDayInternal(str, result);
+    }
+
+    private static GDay parseGDayInternal(String str, GDay result) throws ParseException
+    {
 
         if (str == null)
              throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
-        GDay result = new GDay();
+        if (result == null)
+            result = new GDay();
         char[] chars = str.toCharArray();
         int idx = 0;
 

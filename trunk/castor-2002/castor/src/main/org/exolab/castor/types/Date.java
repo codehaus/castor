@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author              Changes
+ * 04/18/2002   Arnaud              String constructor
  * 05/23/2001   Arnaud Blandin      Update to be compliant with XML Schema Recommendation
  * 11/16/2000   Arnaud Blandin      Constructor Date(java.util.Date)
  * 11/01/2000   Arnaud Blandin      Enhancements (constructor, methods access...)
@@ -83,6 +84,7 @@ public class Date extends DateTimeBase{
         setValues(values);
     }
 
+
     /**
      * This constructor is used to convert a java.util.Date into
      * a new org.exolab.castor.types.Date
@@ -102,6 +104,14 @@ public class Date extends DateTimeBase{
         setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
     } //Date(java.util.Date)
 
+    /**
+     * Constructs a date from a string
+     * @param date the string representing the date
+     */
+    public Date(String date) throws java.text.ParseException {
+        this();
+        parseDateInternal(date, this);
+    }
     /**
      * Sets all the fields by reading the values in an array
      * <p>if a Time Zone is specificied it has to be set by using
@@ -245,20 +255,26 @@ public class Date extends DateTimeBase{
         return parseDate(str);
     }
 
-    /**
-     * parse a String and convert it into a Date.
-     * @param str the string to parse
-     * @return the Date represented by the string
-     * @throws ParseException a parse exception is thrown if the string to parse
-     *                        does not follow the rigth format (see the description
-     *                        of this class)
-     */
+   /**
+    * parse a String and convert it into a Date.
+    * @param str the string to parse
+    * @return the Date represented by the string
+    * @throws ParseException a parse exception is thrown if the string to parse
+    *                        does not follow the rigth format (see the description
+    *                        of this class)
+    */
     public static Date parseDate(String str) throws ParseException {
+        Date result = new Date();
+        return parseDateInternal(str, result);
+     }
+
+    private static Date parseDateInternal(String str, Date result) throws ParseException {
 
         if (str == null)
              throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
-        Date result = new Date();
+        if (result == null)
+            result = new Date();
         char[] chars = str.toCharArray();
         int idx = 0;
 

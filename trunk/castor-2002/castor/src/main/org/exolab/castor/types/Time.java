@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author          Changes
+ * 04/18/2002   Arnaud          String Constructor
  * 05/22/2001   Arnaud Blandin  Created
  */
 package org.exolab.castor.types;
@@ -94,6 +95,15 @@ public class Time extends DateTimeBase {
         this.setMinute((short)(l/60000));
         l = l % 6000;
         this.setSecond((short)(l / 100), (short)(l%100));
+    }
+
+   /**
+    * Constructs a Time given a string representation.
+    * @param time the string representation of the Time to instantiate
+    */
+    public Time(String time) throws ParseException {
+       this();
+       parseTimeInternal(time, this);
     }
 
     /**
@@ -243,11 +253,17 @@ public class Time extends DateTimeBase {
      *                        of this class)
      */
      public static Time parseTime(String str) throws ParseException {
+         Time result = new Time();
+         return parseTimeInternal(str, result);
+     }
+
+     private static Time parseTimeInternal(String str, Time result) throws ParseException {
 
         if (str == null)
              throw new IllegalArgumentException("The string to be parsed must not"
                                                 +"be null.");
-        Time result = new Time();
+        if (result == null)
+            result = new Time();
         char[] chars = str.toCharArray();
         int idx = 0;
 
