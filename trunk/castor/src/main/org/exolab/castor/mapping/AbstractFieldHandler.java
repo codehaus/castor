@@ -45,7 +45,6 @@
  
 package org.exolab.castor.mapping;
 
-import org.exolab.castor.mapping.loader.ExtendedFieldHandler;
 
 /**
  * An extended version of the FieldHandler interface which is
