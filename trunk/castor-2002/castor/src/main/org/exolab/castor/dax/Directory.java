@@ -139,8 +139,7 @@ public interface Directory
      * or stored within the context of a tranasaction are considered
      * persistent. When the transaction commits, all changes made to
      * these objects during the transaction will be persisted to the
-     * directory. If the transaction rolls back, these objects will be
-     * reverted to their original state.
+     * directory.
      * <p>
      * This method cannot be called if the directory has been
      * obtained from an application server using the JNDI environment
@@ -168,8 +167,7 @@ public interface Directory
      * <p>
      * If an error occured while attempting to commit the
      * transaction, the transaction will be rolledback before
-     * returning an exception to the application. All persistent
-     * objects will be reverted to their original state.
+     * returning an exception to the application.
      * <p>
      * This method cannot be called if the directory has been
      * obtained from an application server using the JNDI environment
@@ -186,8 +184,7 @@ public interface Directory
     /**
      * Commits a transaction against this directory. Objects retrieved
      * or stored within the context of a tranasaction are considered
-     * persistent. When the transaction rollsback, these objects will
-     * be reverted to their original state.
+     * persistent.
      * <p>
      * This method cannot be called if the directory has been
      * obtained from an application server using the JNDI environment

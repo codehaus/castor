@@ -54,7 +54,7 @@ public class DuplicateKey
             object.id = TestObject.DefaultId;
             object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
-            _db.makePersistent( object );
+            _db.create( object );
         } else {
             object.name = TestObject.DefaultName;
             _logger.println( "Updating object: " + object );
@@ -75,7 +75,7 @@ public class DuplicateKey
         _logger.println( "Creating new object: " + object );
         _logger.println( "Will report duplicate identity from cache engine" );
         try {
-            _db.makePersistent( object );
+            _db.create( object );
             _logger.println( "Error: DuplicateIdentityException not thrown" );
         } catch ( DuplicateIdentityException except ) {
             _logger.println( "OK: DuplicateIdentityException thrown" );
@@ -93,7 +93,7 @@ public class DuplicateKey
         _logger.println( "Creating new object: " + object );
         _logger.println( "Will report duplicate identity from SQL engine" );
         try {
-            _db.makePersistent( object );
+            _db.create( object );
             _logger.println( "Error: DuplicateIdentityException not thrown" );
         } catch ( DuplicateIdentityException except ) {
             _logger.println( "OK: DuplicateIdentityException thrown" );

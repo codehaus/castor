@@ -84,7 +84,7 @@ public class Test
         product = (Product) productOql.execute();
         if ( product != null ) {
             logger.println( "Deleting existing product: " + product );
-            db.deletePersistent(  product );
+            db.remove(  product );
         }
         
         // Look up the computer and if found in the database,
@@ -93,7 +93,7 @@ public class Test
         computer = (Computer) computerOql.execute();
         if ( computer != null ) {
             logger.println( "Deleting existing computer: " + computer );
-            db.deletePersistent( computer );
+            db.remove( computer );
         }
         
         // Look up the group and if found in the database,
@@ -102,7 +102,7 @@ public class Test
         group = (ProductGroup) groupOql.execute();
         if ( group != null ) {
             logger.println( "Deleting existing group: " + group );
-            db.deletePersistent( group );
+            db.remove( group );
         }
         
         
@@ -149,7 +149,7 @@ public class Test
             detail.product = product;
             product.detail.addElement( detail );
             logger.println( "Creating new product: " + product );
-            db.makePersistent( product );
+            db.create( product );
         } else {
             logger.println( "Query result: " + product );
         }
@@ -179,7 +179,7 @@ public class Test
             detail.product = computer;
             computer.detail.addElement( detail );
             logger.println( "Creating new computer: " + computer );
-            db.makePersistent( computer );
+            db.create( computer );
         } else {
             logger.println( "Query result: " + computer );
         }

@@ -59,7 +59,7 @@ public class Deadlock
             object.id = TestObject.DefaultId;
             object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
-            _db.makePersistent( object );
+            _db.create( object );
         } else {
             _logger.println( "Found object: " + object );
         }
@@ -70,7 +70,7 @@ public class Deadlock
             object.id = TestObject.DefaultId + 1;
             object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
-            _db.makePersistent( object );
+            _db.create( object );
         } else {
             _logger.println( "Found object: " + object );
         }
@@ -138,7 +138,7 @@ public class Deadlock
                 _logger.println( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
-                sleep( start + Wait - System.currentTimeMillis() );
+                sleep( Math.max( start + Wait - System.currentTimeMillis(), 0 ) );
 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
@@ -148,6 +148,7 @@ public class Deadlock
                 db.close();
             } catch ( Exception except ) {
                 _logger.println( "First: " + except );
+                except.printStackTrace( _logger );
                 try {
                     if ( db != null )
                         db.close();
@@ -220,6 +221,7 @@ public class Deadlock
                     _logger.println( "Error: " + except );
                 _logger.println( "Second: aborting" );
             } catch ( Exception except ) {
+                except.printStackTrace( _logger );
                 _logger.println( "Error: " + except );
             } finally {
                 try {
