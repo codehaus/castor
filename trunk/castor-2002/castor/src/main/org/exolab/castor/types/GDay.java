@@ -80,8 +80,7 @@ public class GDay extends GMonthDay {
      */
 
     public GDay(short day) {
-        this();
-        this.setDay(day);
+       setDay(day);
     }
 
     /**
@@ -92,8 +91,7 @@ public class GDay extends GMonthDay {
      */
 
     public GDay(int day) {
-        this();
-        this.setDay((short)day);
+        setDay((short)day);
     }
 
 
@@ -196,7 +194,7 @@ public class GDay extends GMonthDay {
     public static GDay parseGDay(String str) throws ParseException {
 
         if (str == null)
-             throw new IllegalArgumentException("The string to be parsed must not"
+             throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
         GDay result = new GDay();
         char[] chars = str.toCharArray();
@@ -223,43 +221,45 @@ public class GDay extends GMonthDay {
                           flags = 7;
                        else if ((flags == 7)  && (number == -1))
                           flags = 3;
-                       else if ( (flags == 3) && (has2Digits) ) {
-                           result.setDay(number);
-                           flags = 1;
-                           result.setUTC();
-                           result.setZoneNegative();
-                           number = -1;
+                       else if (flags == 3) {
+                           if (has2Digits) {
+                               result.setDay(number);
+                               flags = 1;
+                               result.setUTC();
+                               result.setZoneNegative();
+                               number = -1;
+                           } else throw new ParseException("Bad gDay Format:"+str+"\nThe day field must have 2 digits.",idx);
                        }
-                       else throw new ParseException("Bad GDay Format",idx);
+                       else throw new ParseException("Bad gDay Format:"+str+"\nA gDay must follow the pattern ---DD(Z|((+|-)hh:mm)).",idx);
                        hasNumber = false;
                        has2Digits = false;
                        break;
 
                  case 'Z' :
                       if (flags != 3)
-                         throw new ParseException("'Z' is wrongly placed",idx);
-                      else if (has2Digits) {
+                         throw new ParseException("Bad gDay Format:"+str+"\n'Z' is wrongly placed",idx);
+                      else
                           result.setUTC();
-                          result.setDay(number);
-                          hasNumber = false;
-                          has2Digits = false;
-                      } else throw new ParseException("Bad GDay Format",idx);
                       break;
 
                  case '+' :
                     if (flags != 3)
-                        throw new ParseException("'+' is wrongly placed",idx);
-                    else if (has2Digits) {
-                          result.setUTC();
+                        throw new ParseException("Bad gDay Format:"+str+"\n'+' is wrongly placed",idx);
+                    else {
+                        if (has2Digits) {
                           result.setDay(number);
+                          result.setUTC();
+                          flags = 1;
                           hasNumber = false;
                           has2Digits = false;
-                          flags = 1;
-                    } else throw new ParseException("Bad GDay Format",idx);
+                      }
+                      else throw new ParseException("Bad gDay Format:"+str+"\nThe day field must have 2 digits.",idx);
+                    }
                     break;
+
                  case ':' :
                      if (flags != 1)
-                        throw new ParseException("':' is wrongly placed",idx);
+                        throw new ParseException("Bad gDay Format:"+str+"\n':' is wrongly placed",idx);
                      number2 = number;
                      number = -1;
                      flags = 0;
@@ -284,21 +284,20 @@ public class GDay extends GMonthDay {
              }//switch
         }//while
 
-        if ( (flags == 3) && (has2Digits) )
-              result.setDay(number);
-
-        if ( (flags == 3) && !(has2Digits) )
-             throw new ParseException("Bad GDay format", idx);
-        if ( (flags != 3) && (number != -1) )
-             throw new ParseException("Bad GDay format", idx);
-
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) ) {
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
+         if (flags!=3 && flags != 0)
+            throw new ParseException("Bad gDay Format: "+str+"\nA gDay must follow the pattern ---DD(Z|((+|-)hh:mm)).",idx);
+        else if (flags == 3) {
+            if (has2Digits)
+                result.setDay(number);
+            else
+               throw new ParseException("Bad gDay Format:"+str+"\nThe day field must have 2 digits.",idx);
         }
-        if (flags == 0)
-            result.setZone(number2,number);
 
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
+        }
         return result;
 
     }//parse

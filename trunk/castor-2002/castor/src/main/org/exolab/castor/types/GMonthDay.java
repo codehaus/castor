@@ -79,9 +79,8 @@ public class GMonthDay extends Date {
      * @param day the day value
      */
     public GMonthDay(short month,  short day) {
-         this();
-         this.setMonth(month);
-         this.setDay(day);
+         setMonth(month);
+         setDay(day);
     }
 
      /**
@@ -91,9 +90,8 @@ public class GMonthDay extends Date {
      * @param day the day value
      */
     public GMonthDay(int month, int day) {
-         this();
-         this.setMonth((short)month);
-         this.setDay((short)day);
+         setMonth((short)month);
+         setDay((short)day);
     }
 
     /**
@@ -189,8 +187,8 @@ public class GMonthDay extends Date {
         result.append('-');
 
         result.append(this.getMonth());
-        if (result.length() == 1)
-            result.insert(0,0);
+        if (result.length() == 3)
+            result.insert(2,0);
 
         result.append('-');
         if ((this.getDay()/10) == 0)
@@ -248,7 +246,7 @@ public class GMonthDay extends Date {
     public static GMonthDay parseGMonthDay(String str) throws ParseException {
 
         if (str == null)
-             throw new IllegalArgumentException("The string to be parsed must not"
+             throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
         GMonthDay result = new GMonthDay();
         char[] chars = str.toCharArray();
@@ -272,43 +270,51 @@ public class GMonthDay extends Date {
                           flags = 15;
                        else if ((flags == 15)  && (number == -1))
                           flags = 7;
-                       else if ( (flags == 7) && (has2Digits) ) {
-                           result.setMonth(number);
-                           flags = 3;
+                       else if  ((flags == 7) && (number != -1) ) {
+                           if (has2Digits) {
+                               result.setMonth(number);
+                               flags = 3;
+                           } else throw new ParseException("Bad gMonthDay Format:"+str+"\nThe month field must have 2 digits.", idx);
                        }
-                       else if ( (flags == 3) && (has2Digits)) {
-                           result.setDay(number);
-                           result.setUTC();
-                           result.setZoneNegative();
-                           flags = 1;
+                       else if (flags == 3) {
+                           if (has2Digits) {
+                               result.setDay(number);
+                               result.setUTC();
+                               result.setZoneNegative();
+                               flags = 1;
+                           } else throw new ParseException("Bad gMonthDay Format:"+str+"\nThe day field must have 2 digits.",idx);
                        }
-                       else throw new ParseException("Bad gMonthDay Format",idx);
+                       else throw new ParseException("Bad gMonthDay Format: "+str+"\nA gMonthDay must follow the pattern --MM-DD(Z|((+|-)hh:mm)).",idx);
+
                        hasNumber = false;
                        has2Digits = false;
                        break;
 
                  case 'Z' :
                       if (flags != 3)
-                         throw new ParseException("'Z' is wrongly placed",idx);
-                      else result.setUTC();
-                      hasNumber = false;
-                      has2Digits = false;
+                          throw new ParseException("Bad gMonthDay Format: "+str+"\n'Z' is wrongly placed",idx);
+                      else
+                          result.setUTC();
                       break;
 
-                 case '+' :
+                case '+' :
                     if (flags != 3)
-                        throw new ParseException("'+' is wrongly placed",idx);
+                        throw new ParseException("Bad gMonthDay Format: "+str+"\n'+' is wrongly placed",idx);
                     else {
-                       result.setDay(number);
-                       result.setUTC();
-                       flags = 1;
+                        if (has2Digits) {
+                          result.setDay(number);
+                          result.setUTC();
+                          flags = 1;
+                          hasNumber = false;
+                          has2Digits = false;
+                      }
+                      else throw new ParseException("Bad gMonthDay Format:"+str+"\nTthe day field must have 2 digits.",idx);
                     }
-                    hasNumber = false;
-                    has2Digits = false;
                     break;
+
                  case ':' :
                      if (flags != 1)
-                        throw new ParseException("':' is wrongly placed",idx);
+                        throw new ParseException("Bad gMonthDay Format: "+str+"\n':' is wrongly placed",idx);
                      number2 = number;
                      number = -1;
                      flags = 0;
@@ -332,16 +338,20 @@ public class GMonthDay extends Date {
                     break;
              }//switch
         }//while
-        if (flags == 3)
-             result.setDay(number);
-
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) ) {
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
+          if (flags!=3 && flags != 0)
+            throw new ParseException("Bad gMonthDay Format: "+str+"\nA gMonthDay must follow the pattern --MM-DD(Z|((+|-)hh:mm)).",idx);
+        else if (flags == 3) {
+            if (has2Digits)
+                result.setDay(number);
+            else
+               throw new ParseException("Bad gMonthDay Format:"+str+"\nThe day field must have 2 digits.",idx);
         }
-        if (flags == 0)
-            result.setZone(number2,number);
 
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
+        }
         return result;
 
     }//parse
