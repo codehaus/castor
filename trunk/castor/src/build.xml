@@ -163,12 +163,13 @@
         <delete dir="${gen.src}"/>
     </target>
 
-    <target name="compile" depends="prepare"
+    <target name="compile"
             description="The default target for compilation; includes debug and deprecation info">
         <antcall target="compile.jdo" />
     </target>
 
-    <target name="compile.xml" description="Compile the Castor XML packages">
+    <target name="compile.xml" depends="prepare"
+            description="Compile the Castor XML packages">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" 
                debug="on" deprecation="${deprecation}"
                includes="${castor.xml.files}">
@@ -181,7 +182,8 @@
         </copy>
     </target>
 
-    <target name="compile.jdo" depends="compile.xml,gen.jdo.conf" description="Compile the Castor JDO packages">
+    <target name="compile.jdo" depends="prepare,compile.xml,gen.jdo.conf" 
+            description="Compile the Castor JDO packages">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" 
                debug="on" deprecation="${deprecation}"
                includes="${castor.jdo.files}">
