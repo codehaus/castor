@@ -112,12 +112,13 @@ public class DescriptorJClass extends JClass {
         JMethod     method = null;
         JSourceCode jsc    = null;
         boolean extended = false;
-
+		
         //Make sure that the Descriptor is extended XMLClassDescriptor
         //even when the user has specified a super class for all the generated
         //classes
         String superClass = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
-        if ( (_type.getSuperClass()==null) || (superClass != null) )
+        if ( (_type.getSuperClass()==null) || 
+			 (_type.getSuperClass().equals(superClass)) )
 			setSuperClass("org.exolab.castor.xml.util.XMLClassDescriptorImpl");
 		else {
                 extended = true;
