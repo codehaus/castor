@@ -71,6 +71,7 @@ public class FieldMapping implements java.io.Serializable {
     **/
     private boolean _has_container;
 
+    private java.lang.String _handler = null;
 
     private java.lang.String _getMethod;
 
@@ -179,6 +180,13 @@ public class FieldMapping implements java.io.Serializable {
         return this._getMethod;
     } //-- java.lang.String getGetMethod() 
 
+    /**
+    **/
+    public java.lang.String getHandler()
+    {
+        return this._handler;
+    } //-- java.lang.String getHandler() 
+    
     /**
     **/
     public boolean getLazy()
@@ -366,6 +374,15 @@ public class FieldMapping implements java.io.Serializable {
     {
         this._getMethod = _getMethod;
     } //-- void setGetMethod(java.lang.String) 
+
+    /**
+     * 
+     * @param _handler
+    **/
+    public void setHandler(java.lang.String _handler)
+    {
+        this._handler = _handler;
+    } //-- void setHandler(java.lang.String) 
 
     /**
      * 
