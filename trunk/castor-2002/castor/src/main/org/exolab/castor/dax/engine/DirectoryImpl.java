@@ -47,7 +47,6 @@
 package org.exolab.castor.dax.engine;
 
 
-import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -78,6 +77,7 @@ import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.LogInterceptor;
 
 
 /**
@@ -99,9 +99,6 @@ public class DirectoryImpl
     private PersistenceEngine  _dirEngine;
 
 
-    private PrintWriter        _logWriter;
-
-
     private MappingResolver    _mapResolver;
 
 
@@ -112,7 +109,7 @@ public class DirectoryImpl
 
 
     DirectoryImpl( LDAPConnection conn, LDAPUrl url, 
-                   MappingResolver mapResolver, PrintWriter logWriter )
+                   MappingResolver mapResolver, LogInterceptor logInterceptor )
         throws DirectoryException
     {
         ClassDescriptor clsDesc;
@@ -122,12 +119,11 @@ public class DirectoryImpl
         _mapResolver = mapResolver;
         clsDesc = (ClassDescriptor) _mapResolver.listDescriptors().nextElement();
         try {
-            _dirEngine = getEngine( url, clsDesc, logWriter );
+            _dirEngine = getEngine( url, clsDesc, logInterceptor );
         } catch ( MappingException except ) {
             throw new DirectoryException( except );
         }
         _handler = _dirEngine.getClassHandler( clsDesc.getJavaClass() );
-        _logWriter = logWriter;
     }
 
 
@@ -390,7 +386,7 @@ public class DirectoryImpl
     private static Hashtable  _engines = new Hashtable();
     
     
-    public static PersistenceEngine getEngine( LDAPUrl url, ClassDescriptor clsDesc, PrintWriter logWriter )
+    public static PersistenceEngine getEngine( LDAPUrl url, ClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException
     {
         PersistenceEngine engine;
@@ -399,7 +395,7 @@ public class DirectoryImpl
             engine = (PersistenceEngine) _engines.get( url );
             if ( engine == null ) {
                 engine = new PersistenceEngineFactory().createEngine( new SingleMapping( clsDesc ),
-                                                                      new MozillaFactory( url.getDN() ), logWriter );
+                                                                      new MozillaFactory( url.getDN() ), logInterceptor );
                 _engines.put( url, engine );
             }
             return engine;

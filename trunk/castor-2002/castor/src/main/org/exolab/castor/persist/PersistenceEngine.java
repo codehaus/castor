@@ -47,7 +47,6 @@
 package org.exolab.castor.persist;
 
 
-import java.io.PrintWriter;
 import java.util.Hashtable;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -111,7 +110,7 @@ public interface PersistenceEngine
      *
      * @param logWriter The log writer, or null
      */
-    public void setLogWriter( PrintWriter logWriter );
+    // public void setLogWriter( PrintWriter logWriter );
 
 
     /**
@@ -119,7 +118,7 @@ public interface PersistenceEngine
      *
      * @return The log writer, or null
      */
-    public PrintWriter getLogWriter();
+    // public PrintWriter getLogWriter();
 
 
     /**

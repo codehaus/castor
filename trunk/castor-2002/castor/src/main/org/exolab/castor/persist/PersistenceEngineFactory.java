@@ -51,6 +51,7 @@ import java.io.PrintWriter;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.LogInterceptor;
 
 
 /**
@@ -71,15 +72,15 @@ public class PersistenceEngineFactory
      *
      * @param mapResolver All the descriptors supported by this engine
      * @param factory Persistence SPI factory
-     * @param logWriter Optional log/trace writer
+     * @param logInterceptor Optional log/trace interceptor
      * @throws MappingException The SPI factory could not support one of
      *  object types due to a mapping errot
      */
     public PersistenceEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
-                                           PrintWriter logWriter )
+                                           LogInterceptor logInterceptor )
         throws MappingException
     {
-        return new CacheEngine( mapResolver, factory, logWriter );
+        return new CacheEngine( mapResolver, factory, logInterceptor );
     }
 
 

@@ -47,12 +47,12 @@
 package org.exolab.castor.dax.engine;
 
 
-import java.io.PrintWriter;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.LogInterceptor;
 
 
 /**
@@ -93,7 +93,7 @@ public final class MozillaFactory
     }
 
 
-    public Persistence getPersistence( ClassDescriptor clsDesc, PrintWriter logWriter )
+    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException
     {
 	if ( ! ( clsDesc instanceof DAXClassDescriptor ) )
@@ -101,7 +101,8 @@ public final class MozillaFactory
         try {
             return new MozillaEngine( (DAXClassDescriptor) clsDesc, _rootDN );
         } catch ( MappingException except ) {
-            logWriter.println( except.toString() );
+            if ( logInterceptor != null )
+                logInterceptor.exception( except );
             return null;
         }
     }
