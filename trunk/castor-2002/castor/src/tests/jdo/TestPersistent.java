@@ -47,6 +47,7 @@
 package jdo;
 
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -94,7 +95,11 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     private Vector         _origChildren;
 
 
+    private TestGroup      _group;
+
+
     private transient Database _db;
+
 
     private long           _timeStamp;
 
@@ -110,7 +115,6 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         _id = id;
         _value = DefaultValue;
         _children = new Vector();
-        _creationTime = new Date();
     }
 
 
@@ -191,6 +195,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     {
         _children.addElement( child );
         child.setParent( this );
+        child.setGroup( _group );
     }
 
 
@@ -216,6 +221,27 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }
 
 
+    public void setGroup( TestGroup group )
+    {
+        TestPersistent child;
+
+        if (_group == group) {
+            return;
+        }
+        _group = group;
+        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) {
+            child = (TestPersistent) enum.nextElement();
+            child.setGroup( _group );
+        }
+    }
+
+
+    public TestGroup getGroup()
+    {
+        return _group;
+    }
+
+
     public void jdoPersistent( Database db )
     {
         _db = db;
@@ -224,6 +250,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
 
     public void jdoTransient() 
     {
+        _db = null;
     }                        
 
 
@@ -289,6 +316,26 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }
 
 
+    public void jdoBeforeCreate( Database db )
+        throws Exception
+    {
+        Object grp = null;
+
+        if ( _group == null ) {
+            throw new Exception("Incorrect object state: group is not set in " + this);
+        }
+        try {
+            grp = db.load( TestGroup.class, new BigDecimal( _group.getId() ) );
+        } catch ( Exception ex ) {
+        }
+        if ( grp == null ) {
+            db.create( _group );
+        }
+        _creationTime = new Date();
+
+    }
+
+
     public void jdoCreate() 
         throws Exception
     {
@@ -327,7 +374,9 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
                 children = children + ", ";
             children = children + _children.elementAt( i ).toString();
         }
-        return _id + " / " + _value + " / " + _modificationTime + " (" + _parentId + ") { " + children + " }";
+        return _id + " / " + _value + " / " + _modificationTime + " (" + _parentId + 
+                ":" + ( _group != null ? new Integer( _group.getId() ) : null ) + 
+                ") { " + children + " }";
     }
 
 

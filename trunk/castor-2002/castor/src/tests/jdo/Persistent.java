@@ -118,11 +118,17 @@ public class Persistent
             while ( qres.hasMore() ) {
                 db.remove( qres.next() );
             }
+            oql = db.getOQLQuery( "SELECT g FROM jdo.TestGroup g" );
+            qres = oql.execute();
+            while ( qres.hasMore() ) {
+                db.remove( qres.next() );
+            }
             db.commit();
             
             stream.writeVerbose( "Attempt to create parent with children" );
             db.begin();
             parent = new TestPersistent();
+            parent.setGroup( new TestGroup() );
             parent.addChild( new TestPersistent( 71 ) );
             parent.addChild( new TestPersistent( 72 ) );
             child = new TestPersistent( 73 );
@@ -134,6 +140,11 @@ public class Persistent
             db.begin();
             parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
             if ( parent != null ) {
+                if ( parent.getGroup() == null || 
+                        parent.getGroup().getId() != TestGroup.DefaultId ) {
+                    stream.writeVerbose( "Error: loaded parent without group: " + parent );
+                    result  = false;
+                }
                 if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
                      parent.findChild( 71 ) == null ||
                      parent.findChild( 72 ) == null ||

@@ -235,7 +235,8 @@ create table test_persistent (
   ctime    datetime        not null,
   mtime    datetime        null,
   value    varchar(200)    not null,
-  parent_id integer        null
+  parent_id integer        null,
+  group_id numeric(10,0)   not null
 )
 go
 create unique index test_persistent_pk on test_persistent ( id )

@@ -351,6 +351,9 @@
     <field name="parentId" type="integer" required="false">
       <sql name="parent_id" dirty="ignore" />
     </field>
+    <field name="group" type="jdo.TestGroup" required="true">
+      <sql name="group_id" />
+    </field>
   </class>
 
 
