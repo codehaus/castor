@@ -98,12 +98,12 @@
                <td>Optional</td>
              </tr>
              <tr>
-               <td align="center">h</td><td></td>
+               <td align="center">h</td><td><br/></td>
                <td>Shows the help/usage screen</td>
                <td>Optional</td>
              </tr>
              <tr>
-               <td align="center">f</td><td></td>
+               <td align="center">f</td><td><br/></td>
                <td>
                   Forces the source generator to supress all non-fatal errors, such
                   as overwriting of pre-existing files.
@@ -111,6 +111,19 @@
                <td>Optional</td>
              </tr>
           </table>
+
+         <section title="Collection Types">
+         <p>
+            The source code generator has the ability to use the following
+            types of collections when generating source code:
+            <ul>
+               <li>Java 1.1 (default): java.util.Vector</li>
+               <li>Java 1.2: use the option <tt>types -j2</tt>, collection type is java.util.Collection</li>
+               <li>ODMG 3.0: use the option <tt>types -odmg</tt>, collection tyoe is odmg.DArray</li>
+            </ul>
+         </p>
+         </section>
+
        </section>
 
        <!-- Builder.propteries -->
@@ -203,97 +216,155 @@
        </section>
     </section>
 
-    <section title="Supported XML Schema Built-In Datatypes" ref-id="types">
+    <section title="XML Schema">
 
-      <p>
-         The following is a list of supported XML Schema types and their
-         supported facets.
-     </p>
+       <p>
+          The input file to the source code generator is an XML Schema<sup>2</sup>.
+          The current supported version is the
+            <b>W3C XML Schema draft 20000407</b><sup>1</sup>. The support
+          for XML Schema is not complete, and is currently a work in progress.
+          Below you find a partial list of what is currently supported.
+      </p>
 
-      <p>Base (primitive) datatypes
+      <section title="Supported XML Schema Built-In Datatypes" ref-id="types">
+
+         <p>
+            The following is a list of supported XML Schema types and their
+            supported facets.
+      </p>
+
+         <section title="Primitive Datatypes">
+
+            <table>
+               <tr><th>Type</th><th>Supported Facets</th></tr>
+               <tr>
+                  <td valign="top">ID</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">IDREF</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">binary</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">boolean</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">decimal</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">double</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">string</td>
+                  <td>
+                     enumeration<br/>
+                     length<br/>
+                     pattern<br/>
+                  </td>
+               </tr>
+               <tr>
+                  <td valign="top">timeDuration</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">uriReference</td><td></td>
+               </tr>
+            </table>
+         </section>
+
+         <section title="Derived Datatypes">
+            <table>
+               <tr><th>Type</th><th>Supported Facets</th></tr>
+               <tr>
+                  <td valign="top">IDREFS</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">NCName</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">NMToken</td><td></td>
+               </tr>
+
+               <tr>
+                  <td valign="top">date</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">integer</td>
+                  <td>
+                     maxExclusive<br/>
+                     minExclusive<br/>
+                     maxInclusive<br/>
+                     minInclusive<br/>
+                     pattern<br/>
+                  </td>
+               </tr>
+               <tr>
+                  <td valign="top">long</td>
+                  <td>
+                     maxExclusive<br/>
+                     minExclusive<br/>
+                     maxInclusive<br/>
+                     minInclusive<br/>
+                     pattern<br/>
+                  </td>
+               </tr>
+               <tr>
+                  <td valign="top">negativeInteger</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">positiveInteger</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">short</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">time</td><td></td>
+               </tr>
+               <tr>
+                  <td valign="top">timeInstant</td><td></td>
+               </tr>
+            </table>
+         </section>
+
+      </section>
+
+      <section title="Supported XML Schema Structures">
+
+         <p>The supported structures for XML Schema is currently limited to:</p>
+
+         <p>Structural elements:
+
          <ul>
-            <li>binary</li>
-            <li>boolean</li>
-            <li>integer
-               <p>
-                  <ul>facets:
-                     <li>minExclusive</li>
-                     <li>maxExclusive</li>
-                     <li>minInclusive</li>
-                     <li>maxInclusive</li>
-                     <li>pattern</li>
-                  </ul>
-               </p>
+            <li>annotation
+               <ul>
+                  <li>appinfo</li>
+                  <li>documentation</li>
+               </ul>
             </li>
-            <li>double</li>
-            <li>long</li>
-            <li>short</li>
-            <li>string
-               <p>
-                  <ul>facets:
-                     <li>enumeration</li>
-                     <li>pattern</li>
-                  </ul>
-               </p>
+            <li>simpleType
+               - not complete (see <a href="#types">Supported Datatypes</a>)
             </li>
-            <li>timeInstant</li>
+            <li>complexType</li>
+            <li>element</li>
+            <li>attribute</li>
          </ul>
-      </p>
+         </p>
 
-      <p>Generated datatypes
-         <ul>
-            <li>ID</li>
-            <li>IDREF</li>
-            <li>NCName</li>
-            <li>NMToken</li>
-            <li>positiveInteger</li>
-            <li>negativeInteger</li>
+         <p>
+            Supported facets (see <a href="#types">Supported Datatypes</a>)
+         </p>
 
-         </ul>
-      </p>
-
-      <p>Collection types <a name="Collection Types"/>
-        <ul>
-          <li>Java 1.1 (default): java.util.Vector</li>
-          <li>Java 1.2: use the option <tt>types -j2</tt>, collection type is java.util.Collection</li>
-          <li>ODMG 3.0: use the option <tt>types -odmg</tt>, collection tyoe is odmg.DArray</li>
-        </ul>
-      </p>
+   </section>
 
   </section>
 
-  <section title="Supported XML Schema Structures">
+   <section>
+      <body-note><sup>1</sup>Castor 0.8.8 uses XML Schema draft 19991217</body-note>
+      <body-note>
+         <sup>2</sup>XML Schema is a <a href="http://www.w3.org">W3C</a> Working Draft
+      </body-note>
+   </section>
 
-    <p>The supported structures for XML Schema is currently limited to:</p>
-
-    <p>Structural elements:
-
-    <ul>
-      <li>annotation
-         <ul>
-            <li>appinfo</li>
-            <li>info</li>
-         </ul>
-      </li>
-      <li>simpleType
-          - not complete (see <a href="#types">Supported Datatypes</a>)
-      </li>
-      <li>complexType</li>
-      <li>element</li>
-      <li>attribute</li>
-    </ul>
-   </p>
-
-    <p>
-       Supported facets (see <a href="#types">Supported Datatypes</a>)
-    </p>
-
-
-
-    <body-note><sup>1</sup>Castor 0.8.8 uses XML Schema draft 19991217</body-note>
-    <body-note>Grouping support will be added soon</body-note>
-
-    </section>
   </body>
 
 </document>
