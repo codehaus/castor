@@ -205,6 +205,7 @@ public abstract class XSType {
     
     public boolean isPrimitive() {
         switch (type) {
+            case BOOLEAN:
             case DOUBLE:
             case INTEGER:
             case LONG:
