@@ -43,73 +43,54 @@
  * $Id$
  */
 
-package org.exolab.castor.xml.schema.reader;
+package org.exolab.castor.builder.types;
 
-//-- imported classes and packages
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.util.Configuration;
-import org.xml.sax.*;
+import org.exolab.javasource.*;
 
-import java.net.URL;
-import java.util.Vector;
-
-public class IncludeUnmarshaller extends SaxUnmarshaller
+/**
+ * The decimal XML Schema datatype
+ * @author <a href="mailto:andrew.fawcett@coda.com">Andrew Fawcett</a>
+**/
+public class XSDecimal extends XSType
 {
-    public IncludeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver, Vector includes) 
-		throws SAXException
-    {
-        super();
-        setResolver(resolver);
+    /**
+     * The JType represented by this XSType
+    **/
+    private static final JType jType 
+        = new JClass("java.math.BigDecimal");
+        
+    private String value = null;
+    
+    public XSDecimal() {
+        super(XSType.DECIMAL);
+    } //-- XSNMToken
+    
+    /**
+     * Returns the String necessary to convert an Object to
+     * an instance of this XSType. This method is really only useful 
+     * for primitive types
+     * @param variableName the name of the Object
+     * @return the String necessary to convert an Object to an 
+     * instance of this XSType
+    **/
+    public String createFromJavaObjectCode(String variableName) {
+        return "(java.math.BigDecimal)"+variableName;
+    } //-- fromJavaObject
+    
+    /**
+     * Returns the JType that this XSType represents
+     * @return the JType that this XSType represents
+    **/
+    public JType getJType() {
+        return this.jType;
+    }		
 	
-		String include = atts.getValue("schemaLocation");
-		if (include==null)
-			throw new SAXException("'schemaLocation' attribute missing on 'include'");
-	
-		if (includes.contains(include))
-			return;
-		includes.addElement(include);
-		
-		Parser parser = null;
-		try {
-		parser = Configuration.getParser();
-		}
-		catch(RuntimeException rte) {}
-		if (parser == null) {
-		    throw new SAXException("Error failed to create parser for include");
-		}
-		else
-		{
-			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(includes);
-			schemaUnmarshaller.setSchema(schema);
-			parser.setDocumentHandler(schemaUnmarshaller);
-			parser.setErrorHandler(schemaUnmarshaller);
-		}			
-			
-		try {
-		    parser.parse(new InputSource(new URL(include).openStream()));
-		}
-		catch(java.io.IOException ioe) {
-		    throw new SAXException("Error reading include file '"+include+"'");
-		}	
+	/**
+	 * Returns the Java code neccessary to create a new instance of the 
+	 * JType associated with this XSType
+	 */
+	public String newInstanceCode()
+	{
+		return "new java.math.BigDecimal(0);";
 	}	
-	
-
-    /**
-     * Sets the name of the element that this UnknownUnmarshaller handles
-     * @param name the name of the element that this unmarshaller handles
-    **/
-    public String elementName() {
-        return SchemaNames.INCLUDE;
-    } //-- elementName
-	
-    /**
-     * Returns the Object created by this SaxUnmarshaller
-     * @return the Object created by this SaxUnmarshaller
-    **/
-    public Object getObject() {
-        return null;
-    } //-- getObject
-	
 }

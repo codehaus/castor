@@ -214,6 +214,9 @@ public class TypeConversion {
                 //-- timeInstant
                 case BuiltInType.TIME_INSTANT_TYPE:
                     return new XSTimeInstant();
+                //-- decimal
+                case BuiltInType.DECIMAL_TYPE:
+                    return new XSDecimal();
                 default:
                     //-- error
                     String className 
@@ -320,6 +323,7 @@ public class TypeConversion {
         nameMap.put("real",                "double");
         nameMap.put("string",              "java.lang.String");
         nameMap.put("timeInstant",         "java.util.Date");
+        nameMap.put("decimal",             "java.util.BigDecimal");
         
         return nameMap;
     } //-- iCreateNameMap

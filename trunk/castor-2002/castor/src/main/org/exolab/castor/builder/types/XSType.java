@@ -192,6 +192,14 @@ public abstract class XSType {
     } //-- toJavaObject
 
     /**
+     * Returns the Java code neccessary to create a new instance of the 
+     * JType associated with this XSType
+     */
+    public String newInstanceCode() {
+        return "new "+getJType().getName()+"();";
+    } //-- newInstanceCode
+
+    /**
      * Returns the String necessary to convert an Object to
      * an instance of this XSType. This method is really only useful 
      * for primitive types

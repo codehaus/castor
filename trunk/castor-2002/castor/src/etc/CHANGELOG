@@ -52,12 +52,15 @@ XML:    Update of the XML Schema syntax to the April 7th draft
             the attribute "use" has to be used instead. "use" can have the
             following values : default, optional, required, fixed and
             prohibited
-      - Info element is now Documentation
-      - maxOccurs = "*" is replaced by maxOccurs="unbounded"
-        (Andrew Fawcett)
-      - <include> element support (Andrew Fawcett)
+          - Info element is now Documentation
+          - maxOccurs = "*" is replaced by maxOccurs="unbounded"
+            (Andrew Fawcett)
 
 XML:	Java 2 types compatibility (Patrick Higgins)
+
+XML:	<include> element support (Andrew Fawcett)
+
+XML:	decimal type support (Andrew Fawcett)
 
 
 Version 0.8.8  June 20, 2000
