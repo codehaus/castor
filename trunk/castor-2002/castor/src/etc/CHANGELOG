@@ -31,7 +31,10 @@ JDO:    Improved support for BLOB and CLOB values. Now you can get them as
         java.io.InputStream and java.sql.Clob, respectively, see "types.html"
 	for details (oleg). 
 
-JDO:    Solved problem of NULL dirty checking with Oracle (oleg).          
+JDO:    Solved problem of NULL dirty checking with Oracle (oleg).         
+ 
+JDO:    Bug fix in the handling of classloader in the mapping loader (reported 
+        by brian rogers <brian@freya.bianca.com>).
 
 
 Version 0.8.11 December, 15 2000
