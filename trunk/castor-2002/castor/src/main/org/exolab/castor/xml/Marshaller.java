@@ -130,7 +130,7 @@ public class Marshaller {
     /**
      * The validation flag
     **/
-    static private boolean _validate = false;
+    private boolean _validate = false;
 
     
     /**
