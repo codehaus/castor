@@ -56,7 +56,6 @@ import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.engine.LongTransactionSupport;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -106,7 +105,6 @@ public class Join
             TestDetail    detail;
             QueryResults   enum;
             TestMaster    master2;
-            LongTransactionSupport lts;
             
             db = _category.getDatabase( stream.verbose() );
             db.begin();
