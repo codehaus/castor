@@ -130,24 +130,32 @@ public class ModelGroupUnmarshaller extends SaxUnmarshaller {
          */
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
         if (attValue != null) {
+            if (_group.getName() != null)
+                 throw new IllegalArgumentException("In <group>: "+_group.getName()+"'maxOccurs' cannot appear in a named <group>");
             if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
             int maxOccurs = toInt(attValue);
             _group.setMaxOccurs(maxOccurs);
         }
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
-        if (attValue != null)
+        if (attValue != null) {
+            if (_group.getName() != null)
+                 throw new IllegalArgumentException("In <group>: "+_group.getName()+", 'minOccurs' cannot appear in a named <group>");
             _group.setMinOccurs(toInt(attValue));
+        }
 
+        //-- @ref
+        attValue = atts.getValue("ref");
+        if (attValue != null) {
+             if (_group.getName() != null)
+                 throw new IllegalArgumentException("In <group>: "+_group.getName()+", 'ref' cannot appear in a named <group>");
+            _group.setReference(attValue);
+        }
         //-- id
         attValue = atts.getValue("id");
         _group.setId(attValue);
         //-- not yet supported
 
-        //-- @ref
-        attValue = atts.getValue("ref");
-        if (attValue != null)
-            _group.setReference(attValue);
 
     } //-- ModelGroupUnmarshaller
 
