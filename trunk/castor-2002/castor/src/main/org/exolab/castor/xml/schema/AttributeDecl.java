@@ -57,34 +57,23 @@ import java.util.Vector;
 **/
 public final class AttributeDecl extends Annotated {
 
-    /**
-     * The use attribute value for default
-    **/
-    public static final String USE_DEFAULT = "default";
-    
-    /**
-     * The use attribute value for fixed
-    **/
-    public static final String USE_FIXED = "fixed";
-    
+
     /**
      * The use attribute value for optional
     **/
     public static final String USE_OPTIONAL = "optional";
-    
+
     /**
      * The use attribute value for prohibited
     **/
     public static final String USE_PROHIBITED = "prohibited";
-    
+
     /**
      * The use attribute value for required
     **/
     public static final String USE_REQUIRED = "required";
-    
-    
-    private static final short DEFAULT    = 1;
-    private static final short FIXED      = 2; 
+
+
     private static final short OPTIONAL   = 3;
     private static final short PROHIBITED = 4;
     private static final short REQUIRED   = 5;
@@ -100,7 +89,7 @@ public final class AttributeDecl extends Annotated {
      * The id for this AttributeDecl
     **/
     private String id = null;
-    
+
     /**
      * The name of attributes defined by this AttributeDecl
     **/
@@ -118,6 +107,8 @@ public final class AttributeDecl extends Annotated {
 
     private String value = null;
 
+    private boolean _fixed = false;
+    private boolean _default = false;
     private short useFlag = OPTIONAL;
 
     /**
@@ -127,7 +118,7 @@ public final class AttributeDecl extends Annotated {
      * defined by this definition must appear
     **/
     public AttributeDecl(Schema schema, String name) {
-        
+
         if (schema == null) {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
@@ -144,7 +135,7 @@ public final class AttributeDecl extends Annotated {
     public String getId() {
         return id;
     } //-- getId
-    
+
     /**
      * Returns the name of attributes defined by this AttributeDecl
      * @return the name of attributes defined by this AttributeDecl
@@ -169,7 +160,7 @@ public final class AttributeDecl extends Annotated {
     public Schema getSchema() {
         return schema;
     } //-- getSchema
-    
+
     /**
      * Returns the value of the use attribute for this attribute
      * declaration.
@@ -179,10 +170,6 @@ public final class AttributeDecl extends Annotated {
     **/
     public String getUse() {
         switch (useFlag) {
-            case DEFAULT:
-                return USE_DEFAULT;
-            case FIXED:
-                return USE_FIXED;
             case PROHIBITED:
                 return USE_PROHIBITED;
             case REQUIRED:
@@ -191,7 +178,7 @@ public final class AttributeDecl extends Annotated {
                 return USE_OPTIONAL;
         }
     } //-- getUse
-    
+
     /**
      * Returns the default (or fixed) value of this Attribute declaration
      *
@@ -202,14 +189,24 @@ public final class AttributeDecl extends Annotated {
     } //-- getValue
 
     /**
+     * Returns true if the "default" flag is set.
+     *
+     * @return true if the "default" flag is set.
+     */
+    public boolean isDefault() {
+        return (_default);
+    } //-- isFixed
+
+
+    /**
      * Returns true if the use attribute is equal to "optional".
      *
      * @return true if the use attribute is equal to "optional".
     **/
     public boolean isFixed() {
-        return (useFlag == FIXED);
+        return (_fixed);
     } //-- isFixed
-    
+
     /**
      * Returns true if the use attribute is equal to "optional".
      *
@@ -218,7 +215,7 @@ public final class AttributeDecl extends Annotated {
     public boolean isOptional() {
         return (useFlag == OPTIONAL);
     } //-- isProhibited
-    
+
     /**
      * Returns true if the use attribute is equal to "prohibited".
      *
@@ -227,7 +224,7 @@ public final class AttributeDecl extends Annotated {
     public boolean isProhibited() {
         return (useFlag == PROHIBITED);
     } //-- isProhibited
-    
+
     /**
      * Returns true if the 'use' attribute is equal to REQUIRED and
      * there is no specified value. If a value is specifed and the
@@ -241,7 +238,7 @@ public final class AttributeDecl extends Annotated {
     public boolean isRequired() {
         return ((value == null) && (useFlag == REQUIRED));
     } //-- getRequired
-    
+
     /**
      * Sets the Id for this attribute declaration
      *
@@ -261,26 +258,26 @@ public final class AttributeDecl extends Annotated {
             String err = "AttributeDecl#setName: 'name' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        
+
         //-- handle namespace if necessary
         int idx = name.indexOf(':');
         if (idx >= 0) {
             String nsPrefix = name.substring(0,idx);
             //-- we should resolve nsPrefix...just ignore for now
-            
+
             //-- use local name
             name = name.substring(idx+1);
         }
-        
+
         if (name.length() == 0) {
             String err = "AttributeDecl#setName: 'name' must not be "+
                 "zero-length.";
             throw new IllegalArgumentException(err);
         }
-        
+
         this.name = name;
     } //-- setName
-    
+
     /**
      * Sets the SimpleType for this attribute declaration
      * @param simpleType the SimpleType for this attribute
@@ -307,37 +304,45 @@ public final class AttributeDecl extends Annotated {
 
     /**
      * Sets the 'use' attribute of this attribute declaration
-     *
-     * @param value one of the following: 
-     * ("prohibited" | "optional" | "required" | "default" | "fixed")
+     * Note: this should not be used to set the flag to FIXED or DEFAULT
+     * @param value one of the following:
+     * ("prohibited" | "optional" | "required")
      * @see #USE_PROHIBITED
      * @see #USE_OPTIONAL
      * @see #USE_REQUIRED
-     * @see #USE_DEFAULT
-     * @see #USE_FIXED
     **/
     public void setUse(String value) {
-        
+
         if (value == null) {
             useFlag = OPTIONAL;
             return;
         }
-        
+
         if (value.equals(USE_REQUIRED))
             useFlag = REQUIRED;
         else if (value.equals(USE_OPTIONAL))
             useFlag = OPTIONAL;
-        else if (value.equals(USE_DEFAULT))
-            useFlag = DEFAULT;
-        else if (value.equals(USE_FIXED)) 
-            useFlag = FIXED;
         else if (value.equals(USE_PROHIBITED))
             useFlag = PROHIBITED;
         else {
-            throw new IllegalArgumentException("Invalid value for 'use': " + 
+            throw new IllegalArgumentException("Invalid value for 'use': " +
                 value);
         }
     } //-- setUse
+
+    /**
+     * Sets the DEFAULT flag to true
+     */
+    public void setDefault() {
+        _default = true;
+    }
+
+    /**
+     * Sets the FIXED flag to true.
+     */
+    public void setFixed() {
+        _fixed = true;
+    }
 
     /**
      * Sets the default value (or fixed depending on the 'use' option) for
@@ -348,7 +353,7 @@ public final class AttributeDecl extends Annotated {
     public void setValue(String value) {
         this.value = value;
     } //-- setValue
-    
+
 
 
     //-------------------------------/
