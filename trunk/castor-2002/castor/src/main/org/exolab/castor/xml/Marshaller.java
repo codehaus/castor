@@ -808,8 +808,12 @@ public class Marshaller extends MarshalFramework {
                 classDesc = _StringClassDescriptor;
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
-                if (_class != descriptor.getFieldType()) {
-                    saveType = (!descriptor.getFieldType().isPrimitive());
+                Class fieldType = descriptor.getFieldType();
+                if (_class != fieldType) {
+                    while (fieldType.isArray()) {
+                        fieldType = fieldType.getComponentType();
+                    }
+                    saveType = (!fieldType.isPrimitive());
                 }
             }
             else {
