@@ -58,6 +58,8 @@ import org.exolab.castor.tests.framework.testDescriptor.RootObject;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 
 import org.xml.sax.InputSource;
 
@@ -93,7 +95,7 @@ public abstract class XMLTestCase extends TestCase {
     /**
      * The jarTest in which this test is specified
      */
-    protected CastorJarTestCase _jarTest;
+    protected CastorTestCase _test;
 
     /**
      * The unit test case this class represent
@@ -178,10 +180,10 @@ public abstract class XMLTestCase extends TestCase {
     /**
      * Create a new test case for the given setup.
      */
-    public XMLTestCase(CastorJarTestCase jarTest, UnitTestCase unit, File outputRoot) {
+    public XMLTestCase(CastorTestCase test, UnitTestCase unit, File outputRoot) {
         super(unit.getName());
         _name            = unit.getName();
-        _jarTest         = jarTest;
+        _test            = test;
         _unitTest        = unit;
         _outputRootFile  = outputRoot;
     }
@@ -192,9 +194,9 @@ public abstract class XMLTestCase extends TestCase {
      */
     public XMLTestCase(String name, XMLTestCase tc) {
         super(name);
-        _name            = tc._name;
-        _jarTest         = tc._jarTest;
-        _unitTest        = tc._unitTest;
+        _name         = tc._name;
+        _test         = tc._test;
+        _unitTest     = tc._unitTest;
         _outputRootFile  = tc._outputRootFile;
     }
 
@@ -269,71 +271,82 @@ public abstract class XMLTestCase extends TestCase {
         throws java.lang.Exception {
 
         verbose("Test with reference document");
-
         String outputName = _name.replace(' ', '_') + "-testWithReferenceDocument.xml";
-
-        // 1. Unmarshall Input file if any
-        Object out = null;
-        if (_input != null) {
-            verbose("Umarshall '" + _inputName  + "'");
-            out = testUnmarshal(_input);
-            assertNotNull("The output of the unmrashalled input file is null", out);
-        }
-
-        // 2. Compare with ObjectModelInstanceBuilder if any
-        String builderClassName = _unitTest.getObjectModelInstanceBuilder();
-        Object generated = null;
-        if (builderClassName != null) {
-            generated = buildObjectModelInstance(builderClassName);
-            assertNotNull("The generated object with '" + builderClassName + "' is null", generated);
-        }
-
-        if (out != null) {
-            if (generated != null) {
-                boolean result = generated.equals(out);
-                verbose("Compare to reference object: " + ((result)?"OK":"Failed"));
-
-                if (result == false) {
-                    // try to dump the unmarshalled object and the reference object
-                    FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-ref.dump"));
-                    writer.write(((CastorTestable)generated).dumpFields());
-                    writer.close();
-
-                    writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
-                    writer.write(((CastorTestable)out).dumpFields());
-                    writer.close();
-                }
-
-                assert("The hardcoded reference object and unmarshalled document differ", result);
+        try {
+            // 1. Unmarshall Input file if any
+            Object out = null;
+            if (_input != null) {
+                verbose("Umarshall '" + _inputName  + "'");
+                out = testUnmarshal(_input);
+                assertNotNull("The output of the unmarshalled input file is null", out);
             }
-        } else if (generated != null) {
-            // We don't have an input file, but we can use the hardcoded object for the next steps
-            out = generated;
-        } else {
-            // we have to input file and no hardcoded object, we can't test nothing
-            throw new Exception("Unable to have a valid input file or a hardcoded object in '" + _name + "'");
-        }
 
-        // 3. Marshall the object
-        verbose("Marshal the object into '" + outputName +"'");
-        File marshal_output = testMarshal(out, outputName);
+            // 2. Compare with ObjectModelInstanceBuilder if any
+            String builderClassName = _unitTest.getObjectBuilder();
+            Object generated = null;
+            if (builderClassName != null) {
+                generated = buildObjectModelInstance(builderClassName);
+                assertNotNull("The generated object with '" + builderClassName + "' is null", generated);
+            }
 
-        // 4. Compare with output file if any
-        if (_output != null) {
-            boolean result = XMLDiff.compareInputSource(new InputSource(_output),
+            if (out != null) {
+                if (generated != null) {
+                    boolean result = generated.equals(out);
+                    verbose("Compare to reference object: " + ((result)?"OK":"Failed"));
+
+                    if (result == false) {
+                        // try to dump the unmarshalled object and the reference object
+                        FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-ref.dump"));
+                        writer.write(((CastorTestable)generated).dumpFields());
+                        writer.close();
+
+                        writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
+                        writer.write(((CastorTestable)out).dumpFields());
+                        writer.close();
+                    }
+
+                    assert("The hardcoded reference object and unmarshalled document differ", result);
+                }
+            } else if (generated != null) {
+                // We don't have an input file, but we can use the hardcoded object for the next steps
+                out = generated;
+            } else {
+                // we have to input file and no hardcoded object, we can't test nothing
+                throw new Exception("Unable to have a valid input file or a hardcoded object in '" + _name + "'");
+            }
+
+            // 3. Marshall the object
+            verbose("Marshal the object into '" + outputName +"'");
+            File marshal_output = testMarshal(out, outputName);
+
+            // 4. Compare with output file if any
+            if (_output != null) {
+                boolean result = XMLDiff.compareInputSource(new InputSource(_output),
                                                         new InputSource(new FileInputStream(marshal_output)));
-            verbose("Compare to reference file '" + _outputName + "': " + ((result)?"OK":"Failed"));
-            assert("Marshalled object differ from the reference file", result);
-        }
+                verbose("Compare to reference file '" + _outputName + "': " + ((result)?"OK":"Failed"));
+                assert("Marshalled object differ from the reference file", result);
+            }
 
-        // 5. umarshall outpur file and compare to ObjectModelInstanceBuilder if any
-        Object outAgain = testUnmarshal(marshal_output);
-        assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", outAgain);
+            // 5. umarshall outpur file and compare to ObjectModelInstanceBuilder if any
+            Object outAgain = testUnmarshal(marshal_output);
+            assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", outAgain);
 
-        if (builderClassName != null) {
-            boolean result  = outAgain.equals(out);
-            verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
-            assert("The unmarshalled object differ from the referene object", result);
+            if (builderClassName != null) {
+                boolean result  = outAgain.equals(out);
+                verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
+                assert("The unmarshalled object differ from the referene object", result);
+            }
+
+        } catch (MarshalException e) {
+            if (_unitTest.hasFailure())
+                assert(true);
+            else
+                throw new Exception(e.getMessage());
+        } catch (ValidationException ve) {
+            if (_unitTest.hasFailure())
+               assert(true);
+            else
+                throw new Exception(ve.getMessage());
         }
     }
 
@@ -373,7 +386,7 @@ public abstract class XMLTestCase extends TestCase {
 
         Unmarshaller unmar;
         if (_mapping == null)
-            unmar = new Unmarshaller(_rootClass, _jarTest.getClassLoader());
+            unmar = new Unmarshaller(_rootClass, _test.getClassLoader());
         else
             unmar = new Unmarshaller(_mapping);
 
@@ -387,7 +400,7 @@ public abstract class XMLTestCase extends TestCase {
      */
     protected Object buildObjectModelInstance(String builderName)
         throws java.lang.Exception {
-        Class builderClass = _jarTest.getClassLoader().loadClass(builderName);
+        Class builderClass = _test.getClassLoader().loadClass(builderName);
         ObjectModelInstanceBuilder builder = (ObjectModelInstanceBuilder)builderClass.newInstance();
         return builder.buildInstance();
     }

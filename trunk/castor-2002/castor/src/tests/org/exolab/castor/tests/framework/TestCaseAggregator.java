@@ -63,6 +63,11 @@ import java.io.File;
 public class TestCaseAggregator extends TestCase {
 
     /**
+     * Name of the ressource for the test descriptor XML document.
+     */
+    private final static String TEST_DESCRIPTOR = "TestDescriptor.xml";
+
+    /**
      * The directory to look for jar test case and subdirectory
      */
     private File _directory = null;
@@ -80,7 +85,7 @@ public class TestCaseAggregator extends TestCase {
     /**
      * File separator for this system.
      */
-    private final static String FILE_SEPARATOR = System.getProperty("file.separator"); 
+    private final static String FILE_SEPARATOR = System.getProperty("file.separator");
 
     /**
      * Name of the system property to set up the verbose mode.
@@ -97,18 +102,19 @@ public class TestCaseAggregator extends TestCase {
         if (v!=null && v.equals("true"))
             _verbose = true;
         else
-            _verbose = false; 
+            _verbose = false;
     }
 
 
     /**
      * Create a new TestCaseAggregator with the given name.
+     * @param name the name of this TestCaseAggregator
      */
     public TestCaseAggregator(String name) {
         super(name);
     }
 
-    
+
     /**
      * Create a new TestCaseAggregator which will inspect the directory given in
      * parameter.
@@ -134,37 +140,45 @@ public class TestCaseAggregator extends TestCase {
         TestSuite suite = new TestSuite(_testName);
 
         if (!_directory.isDirectory()) {
-            // Maybe it is a jar file, it happen if we run the
+            // Maybe it is a jar file, it happens if we run the
             // CastorTestSuiteRunner with just one jar in param
             if (_directory.getName().endsWith(".jar")) {
-                CastorJarTestCase tc = new CastorJarTestCase(_directory, _testOutputRoot);
+                CastorTestCase tc = new CastorTestCase(_directory, _testOutputRoot);
                 return tc.suite();
-            } else 
+            } else
                 // Nothing to do
                 return suite;
         }
-        
+
+        String outputRoot = _testOutputRoot + FILE_SEPARATOR + _testName;
         verbose("Creating '" + _testName + "' test suite");
 
         File[] list = _directory.listFiles();
-
-        String outputRoot = _testOutputRoot + FILE_SEPARATOR + _testName;
-
+        CastorTestCase tc = null;
         for (int i=0; i<list.length; ++i) {
+            String name = list[i].getName();
+
             if (list[i].isDirectory()) {
+                //look for jars or testDescriptor files inside the directory
                 TestCaseAggregator recurse = new TestCaseAggregator(list[i], outputRoot);
                 suite.addTest(recurse.suite());
-            } else if (list[i].getName().endsWith(".jar")) {
-                CastorJarTestCase tc = new CastorJarTestCase(list[i], outputRoot);
+            } else if (name.endsWith(".jar")) {
+                tc = new CastorTestCase(list[i], outputRoot);
+
+            } else if (name.endsWith(TEST_DESCRIPTOR)) {
+                tc = new CastorTestCase(_directory, outputRoot);
+            }
+            if (tc != null && tc.suite() != null)
                 suite.addTest(tc.suite());
-            } // else ignore...
-        }
+        }//for
+
         return suite;
     }
 
 
     /**
      * print the message if in verbose mode.
+     * @param message the message to print
      */
     private void verbose(String message) {
         if (_verbose)
