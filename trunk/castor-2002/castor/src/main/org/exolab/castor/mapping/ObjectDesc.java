@@ -113,17 +113,11 @@ public class ObjectDesc
 	_fields = fields;
 	_identity = identity;
 	if ( extend != null ) {
-	    FieldDesc[] allFields;
-
 	    if ( ! extend.getObjectType().isAssignableFrom( objType ) )
 		throw new MappingException( "The class " + objType.getName() +
 					    " does not extend the class " + extend.getObjectType().getName() +
 					    " supplied as the extended descriptor" );
 	    _extends = extend;
-	    allFields = new FieldDesc[ _fields.length + _extends._fields.length ];
-	    System.arraycopy( _fields, 0, allFields, 0, _fields.length );
-	    System.arraycopy( _extends._fields, 0, allFields, _fields.length, _extends._fields.length );
-	    _fields = allFields;
 	}
     }
 
