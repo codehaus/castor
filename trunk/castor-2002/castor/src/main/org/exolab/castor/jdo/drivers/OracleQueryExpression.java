@@ -99,7 +99,7 @@ public final class OracleQueryExpression
                     sql.append( JDBCSyntax.And );
                 sql.append( join.leftTable + JDBCSyntax.TableColumnSeparator + join.leftColumns[ j ] );
                 if ( join.outer )
-                    sql.append( "*=" );
+                    sql.append( "(+)=" );
                 else
                     sql.append( OpEquals );
                 sql.append( join.rightTable + JDBCSyntax.TableColumnSeparator + join.rightColumns[ j ] );
