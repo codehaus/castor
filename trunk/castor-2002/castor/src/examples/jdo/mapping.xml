@@ -39,11 +39,10 @@
 
     <!-- Product has reference to ProductInventory
          one inventory per product  -->
-<!--
     <field name="inventory" type="myapp.ProductInventory"/>
- -->
 
   </class>
+
 
   <class class-name="myapp.ProductInventory">
     <sql-table table-name="prod_inv" fore-key="id"/>
