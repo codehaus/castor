@@ -532,7 +532,7 @@ public class Types
         new TypeInfo( "sqldate",        null,
                       java.sql.Date.class,       true,     null ),
         new TypeInfo( "sqltime",        null,
-                      java.sql.Date.class,       true,     null ),
+                      java.sql.Time.class,       true,     null ),
         new TypeInfo( "short",       java.lang.Short.TYPE,
                       java.lang.Short.class,      true,     new Short( (short) 0 ) ),
         new TypeInfo( "char",        java.lang.Character.TYPE,
