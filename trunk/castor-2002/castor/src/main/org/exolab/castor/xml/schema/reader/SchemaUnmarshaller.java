@@ -187,8 +187,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         if (atts == null) return;
 
         String attValue = null;
-        
+
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
+        if (nsURI.length() == 0)
+           throw new SAXException("empty string is not a legal namespace.");
         if ((nsURI != null) && (nsURI.length() > 0)) {
             //if we are including a schema we must take care
             //that the namespaces are the same
@@ -203,19 +205,19 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //set the default locator of this schema
         _schema.setSchemaLocation(getDocumentLocator().getSystemId());
-        
+
         //-- attributeFormDefault
         String form = atts.getValue(SchemaNames.ATTR_FORM_DEFAULT_ATTR);
         if (form != null) {
             _schema.setAttributeFormDefault(Form.valueOf(form));
         }
-        
+
         //-- elementFormDefault
         form = atts.getValue(SchemaNames.ELEM_FORM_DEFAULT_ATTR);
         if (form != null) {
             _schema.setElementFormDefault(Form.valueOf(form));
         }
-        
+
         //-- @blockDefault
         attValue = atts.getValue(SchemaNames.BLOCK_DEFAULT_ATTR);
         if (attValue != null) {
