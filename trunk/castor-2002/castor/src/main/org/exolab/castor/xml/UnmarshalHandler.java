@@ -58,6 +58,7 @@ import org.xml.sax.helpers.ParserFactory;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringWriter;
 
 import java.lang.reflect.*;
 
@@ -375,9 +376,16 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         */
         catch(Exception ex) {
+            StringWriter sw = new StringWriter();
+            PrintWriter  pw = new PrintWriter(sw); 
+            ex.printStackTrace(pw);
+            pw.flush();
             String err = "unable to add '" + name + "' to <";
             err += state.fieldDesc.getXMLName();
-            err += "> due to the following exception: " + ex;
+            err += "> due to the following exception: \n";
+            err += ">>>--- Begin Exception ---<<< \n";
+            err += sw.toString();
+            err += ">>>---- End Exception ----<<< \n";
             throw new SAXException(err);
         }
         
