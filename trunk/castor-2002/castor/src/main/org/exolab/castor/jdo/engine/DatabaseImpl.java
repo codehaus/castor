@@ -73,6 +73,7 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
 import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.util.Messages;
 import java.util.HashMap;
@@ -98,13 +99,14 @@ public class DatabaseImpl
      * The database engine used to access the underlying SQL database.
      */
     //protected LockEngine   _dbEngine;
-    protected PersistenceInfoGroup  _scope;
+    protected PersistenceInfoGroup     _scope;
+
 
     /**
      * The transaction context is this database was accessed with an
      * {@link XAResource}.
      */
-    protected TransactionContext  _ctx;
+    protected TransactionContext       _ctx;
 
 
     /**
@@ -112,41 +114,51 @@ public class DatabaseImpl
      * timeout, an infinite value for no timeout. The timeout is
      * specified in seconds.
      */
-    private int                _lockTimeout;
+    private int                        _lockTimeout;
 
 
     /**
      * The log interceptor to which all logging and tracing messages will be sent.
      */
-    private LogInterceptor    _logInterceptor;
+    private LogInterceptor             _logInterceptor;
+
+
+    /**
+     * The default callback interceptor for transaction
+     */
+    private CallbackInterceptor        _callback;
 
 
     /**
      * The name of this database.
      */
-    private String             _dbName;
+    private String                     _dbName;
 
 
     /**
      * True if the transaction is listed as synchronized and
      * subordinate to this transaction.
      */
-    private Transaction         _transaction;
+    private Transaction                _transaction;
 
 
     /*
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
      */
-    private boolean _autoStore;
+    private boolean                    _autoStore;
+
 
     /**
      * The class loader for application classes (may be null).
      */
-    private ClassLoader _classLoader;
+    private ClassLoader                _classLoader;
 
-    public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
-                         Transaction transaction, ClassLoader classLoader )
+
+
+    public DatabaseImpl( String dbName, int lockTimeout, 
+            LogInterceptor logInterceptor, CallbackInterceptor callback,
+            Transaction transaction, ClassLoader classLoader )
             throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
@@ -160,6 +172,7 @@ public class DatabaseImpl
         LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
         _scope = new PersistenceInfoGroup( pe );
         _logInterceptor = logInterceptor;
+        _callback = callback;
         _dbName = dbName;
         _lockTimeout = lockTimeout;
 
@@ -176,6 +189,7 @@ public class DatabaseImpl
     {
         return _scope.getLockEngine();
     }
+
     public PersistenceInfoGroup getScope() {
         return _scope;
     }
@@ -451,6 +465,7 @@ public class DatabaseImpl
         _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
         _ctx.setAutoStore( _autoStore );
+        _ctx.setCallback( _callback );
     }
 
 
