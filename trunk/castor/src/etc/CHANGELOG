@@ -3,6 +3,12 @@ Version (CVS)
 -------------
 
 
+JDO:   Fixed bug 1317 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Fixed problem in properly dealing with postgreSQL quotations, preventing
+       users of postgreSQL to use the product with schemas.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1317
+       (Werner - 20041208)
+
 JDO:   Fixed bug 1789 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Fixed various problems with the HTML docs (typos, structure, content, etc.).
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1789
