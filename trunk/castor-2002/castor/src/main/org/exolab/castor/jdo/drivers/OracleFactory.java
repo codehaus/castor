@@ -73,6 +73,12 @@ public final class OracleFactory
     }
 
 
+    public String quoteName( String name )
+    {
+        return doubleQuoteName( name );
+    }
+
+
 }
 
 
