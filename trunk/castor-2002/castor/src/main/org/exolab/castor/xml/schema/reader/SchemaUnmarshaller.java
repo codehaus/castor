@@ -189,6 +189,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             unmarshaller = new UnknownUnmarshaller(name);
         }
         
+        unmarshaller.setDocumentLocator(getDocumentLocator());
+        
     } //-- startElement
 
     public void endElement(String name) throws SAXException {

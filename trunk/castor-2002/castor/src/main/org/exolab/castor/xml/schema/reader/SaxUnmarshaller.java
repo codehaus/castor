@@ -68,7 +68,7 @@ public abstract class SaxUnmarshaller
     /**
      * The document locator
     **/
-    private Locator _locator = null;
+    protected Locator _locator = null;
     
     /**
      * The resolver to be used for resolving id references
@@ -106,6 +106,10 @@ public abstract class SaxUnmarshaller
      * be overridden to perform any necessary clean up by an unmarshaller
     **/
     public void finish() {};
+    
+    public Locator getDocumentLocator() {
+        return _locator;
+    } //-- getLocator
     
     /**
      * Returns the resolver used for resolving id references.
