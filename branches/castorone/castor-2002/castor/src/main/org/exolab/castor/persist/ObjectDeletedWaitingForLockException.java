@@ -69,5 +69,9 @@ public class ObjectDeletedWaitingForLockException
     }
 
 
+    ObjectDeletedWaitingForLockException( String msg ) {
+        super( msg );
+    }
+
 }
 
