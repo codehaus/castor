@@ -13,12 +13,9 @@ package org.exolab.castor.jdo.conf;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.validators.*;
-import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
 
@@ -154,7 +151,7 @@ public class JndiDescriptor implements org.exolab.castor.xml.XMLClassDescriptor 
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
+        (String name, String namespace, NodeType nodeType)
     {
 
         boolean wild = (nodeType == null);
@@ -240,7 +237,7 @@ public class JndiDescriptor implements org.exolab.castor.xml.XMLClassDescriptor 
    /**
      * false
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
          return false;
     }
 

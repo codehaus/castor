@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -48,15 +48,13 @@ package org.exolab.castor.xml.descriptors;
 
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.xml.validators.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
 /**
  * The default java.util.Vector class descriptor
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class VectorClassDescriptor
@@ -216,6 +214,7 @@ public class VectorClassDescriptor
      * descriptor is available.
      *
      * @param name the xml name to match against
+     * @param namespace the namespace uri
      * @param nodeType, the NodeType to match against, or null if
      * the node type is not known.
      * @return the matching descriptor, or null if no matching
@@ -223,13 +222,13 @@ public class VectorClassDescriptor
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
+        (String name, String namespace, NodeType nodeType)
     {
         if ((nodeType == null) || (nodeType == NodeType.Element)) {
             for (int i = 0; i < _elements.length; i++) {
                 XMLFieldDescriptor desc = _elements[i];
                 if (desc == null) continue;
-                if (desc.matches(name)) return desc;
+                if (desc.matches(name, namespace)) return desc;
             }
         }
         return null;
@@ -318,20 +317,18 @@ public class VectorClassDescriptor
      * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
      * the given name and if the given object can hold this field (i.e a value is not already set for
      * this field).
-     * @param fieldName the name of the field to check
+     * @param name the xml name of the field to check
+     * @param namespace the namespace uri
      * @param object the object represented by this XMLCLassDescriptor
      * @return true if the given object represented by this XMLClassDescriptor
      * can accept a member whose name is given.
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
         //-- ListClassDescriptor only contains one FieldDescriptor
         //-- that matches with a wild-card '*', just return true
         //-- since it can accept any object
         return true;
-    }
+    } //-- canAccept
 
 
-
-
-
-} //-- StringMarshalInfo
+}

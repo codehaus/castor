@@ -1652,11 +1652,11 @@ public final class UnmarshalHandler extends MarshalFramework
                   tempClassDesc = getClassDescriptor(parentState.object.getClass());
             }
             
-            canAccept = tempClassDesc.canAccept(name, parentState.object);
+            canAccept = tempClassDesc.canAccept(name, namespace, parentState.object);
 
             if (!canAccept) {
                 //-- Does container class even handle this field?
-                if (tempClassDesc.getFieldDescriptor(name, NodeType.Element) != null) {
+                if (tempClassDesc.getFieldDescriptor(name, namespace, NodeType.Element) != null) {
                     if (!parentState.fieldDesc.isMultivalued()) { 
                         String error = "The container object (" + tempClassDesc.getJavaClass().getName();
                         error += ") cannot accept the child object associated with the element '" + name + "'";
@@ -1725,7 +1725,7 @@ public final class UnmarshalHandler extends MarshalFramework
         XMLClassDescriptor oldClassDesc = classDesc;
         while (descriptor == null) {
             
-            descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
+            descriptor = classDesc.getFieldDescriptor(name, namespace, NodeType.Element);
             
             //-- Namespace patch, should be moved to XMLClassDescriptor, but
             //-- this is the least intrusive patch at the moment. kv - 20030423
@@ -1896,7 +1896,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 containerObject = handler.getValue(object);
                 if (containerObject != null){
                     if (state.classDesc != null) {
-                    	if (state.classDesc.canAccept(name, containerObject)) {
+                    	if (state.classDesc.canAccept(name, namespace, containerObject)) {
                             //remove the descriptor from the used list
                             parentState.markAsNotUsed(descriptor);
                         }
@@ -2600,7 +2600,7 @@ public final class UnmarshalHandler extends MarshalFramework
             else continue;
 
             try {
-                processAttribute(name, atts.getValue(index), descriptor, classDesc, object);
+                processAttribute(name, namespace, atts.getValue(index), descriptor, classDesc, object);
             }
             catch(java.lang.IllegalStateException ise) {
                 String err = "unable to add attribute \"" + name + "\" to '";
@@ -2653,7 +2653,7 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- doesn't. Ignoring namespaces also helps with the
             //-- backward compatibility issue mentioned above.
             XMLFieldDescriptor descriptor =
-                classDesc.getFieldDescriptor(name, NodeType.Attribute);
+                classDesc.getFieldDescriptor(name, namespace, NodeType.Attribute);
                 
             if (descriptor == null) {
                 //-- check for nested attribute...loop through
@@ -2677,7 +2677,7 @@ public final class UnmarshalHandler extends MarshalFramework
                         continue;
                     }
                     classDesc = targetState.classDesc;
-                    descriptor = classDesc.getFieldDescriptor(name, NodeType.Attribute);
+                    descriptor = classDesc.getFieldDescriptor(name, namespace, NodeType.Attribute);
                 
                     if (descriptor != null) {
                         String tmpPath = descriptor.getLocationPath();
@@ -2712,7 +2712,7 @@ public final class UnmarshalHandler extends MarshalFramework
             }
 
             try {
-                processAttribute(name, atts.getValue(i), descriptor, classDesc, object);
+                processAttribute(name, namespace, atts.getValue(i), descriptor, classDesc, object);
             }
             catch(java.lang.IllegalStateException ise) {
                 String err = "unable to add attribute \"" + name + "\" to '";
@@ -2804,6 +2804,7 @@ public final class UnmarshalHandler extends MarshalFramework
             if (descriptor != null) {
                 try {
                     processAttribute(name, 
+                                     namespace,
                                      atts.getValue(i), 
                                      descriptor, 
                                      classDesc, 
@@ -2824,7 +2825,7 @@ public final class UnmarshalHandler extends MarshalFramework
      * Processes the given Attribute
     **/
     private void processAttribute
-        (String attName, String attValue,
+        (String attName, String attNamespace, String attValue,
          XMLFieldDescriptor descriptor,
          XMLClassDescriptor classDesc,
          Object parent) throws org.xml.sax.SAXException
@@ -2841,7 +2842,8 @@ public final class UnmarshalHandler extends MarshalFramework
             }
 
             ClassDescriptor containerClassDesc = ((XMLFieldDescriptorImpl)descriptor).getClassDescriptor();
-            descriptor = ((XMLClassDescriptor)containerClassDesc).getFieldDescriptor(attName, NodeType.Attribute);
+            descriptor = ((XMLClassDescriptor)containerClassDesc).getFieldDescriptor(
+            		attName, attNamespace, NodeType.Attribute);
             parent = containerObject;
         }
 
@@ -3087,7 +3089,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- process namespace nodes
         XMLFieldDescriptor nsDescriptor =
-            classDesc.getFieldDescriptor(null, NodeType.Namespace);
+            classDesc.getFieldDescriptor(null, null, NodeType.Namespace);
 
         if (nsDescriptor != null) {
             UnmarshalState state = (UnmarshalState) _stateInfo.peek();

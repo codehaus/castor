@@ -46,7 +46,6 @@
 
 package org.exolab.castor.xml.descriptors;
 
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
@@ -57,14 +56,13 @@ import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.XMLFieldHandler;
 import org.exolab.castor.xml.TypeValidator;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-import org.exolab.castor.mapping.ValidityException;
 
 import java.util.Date;
 
 /**
  * A ClassDescriptor for java.util.Date
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class DateClassDescriptor
@@ -188,7 +186,7 @@ public class DateClassDescriptor
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
+        (String name, String namespace, NodeType nodeType)
     {
         return null;
 
@@ -312,7 +310,7 @@ public class DateClassDescriptor
      * @return true if the given object represented by this XMLClassDescriptor
      * can accept a member whose name is given.
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
          return false;
     }
 
