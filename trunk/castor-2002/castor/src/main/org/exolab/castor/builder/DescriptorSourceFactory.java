@@ -83,6 +83,8 @@ public class DescriptorSourceFactory {
     private static JClass vrClass
         = new JClass("org.exolab.castor.xml.ValidationRule");
 
+    private static final String DESCRIPTOR_NAME = "Descriptor";
+
 
     /**
      * Creates the Source code of a MarshalInfo for a given XML Schema
@@ -104,7 +106,7 @@ public class DescriptorSourceFactory {
         String variableName = "_"+className;
 
         DescriptorJClass classDesc
-            = new DescriptorJClass(className+"Descriptor", jClass);
+            = new DescriptorJClass(className+DESCRIPTOR_NAME, jClass);
 
         //-- get handle to default constuctor
 
@@ -231,7 +233,7 @@ public class DescriptorSourceFactory {
 		if ((nodeName!=null) && (!isText)) {
             //-- By default the node name parameter is a literal string
 		    nodeNameParam = "\""+nodeName+"\"";
-			if (SourceGenerator.classDescFieldNames()) {
+            if (SourceGenerator.classDescFieldNames()) {
                 //-- The node name parameter is a reference to a public static final
 				nodeNameParam = member.getNodeName().toUpperCase();
 				//-- Expose node name as public static final (reused by XMLFieldDescriptorImpl)
@@ -458,6 +460,13 @@ public class DescriptorSourceFactory {
         //-- container
         if (member.isContainer()) {
             jsc.add("desc.setContainer(true);");
+            //set the class descriptor
+            String className = xsType.getName()+DESCRIPTOR_NAME;
+            //prevent endless loop
+            if (className.equals(classDesc.getName()))
+                jsc.add("desc.setClassDescriptor(this);");
+            else
+                jsc.add("desc.setClassDescriptor(new "+className+"());");
         }
 
         //-- Handle namespaces
