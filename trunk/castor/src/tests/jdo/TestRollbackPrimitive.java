@@ -100,7 +100,7 @@ public class TestRollbackPrimitive extends CastorTestCase
     public void runTest() 
         throws PersistenceException, SQLException
     {
-        TestObject3 object;
+        TestObject3 object = null;
         boolean runAgain = false;
 
         _db.begin();
@@ -123,7 +123,8 @@ public class TestRollbackPrimitive extends CastorTestCase
 
         if ( ! runAgain )
         {
-            object.setId( 7 );
+            // object.setId( 7 );
+            object.setNumber( 9 );
             stream.println( "Changed: " + object );
             _db.rollback();
             stream.println( "Rolled back: " + object );

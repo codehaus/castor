@@ -2,6 +2,9 @@
 Version (CVS) 
 -------------
 
+JDO:    Fixed bug 1290: Possible bug in object value rollback of primitive types. 
+        (Bruce 20030413)
+
 JDO:    Fixed Bug 1106 : JDO mapping with collection="array" does not work
         (Mickael - 20030325)
 

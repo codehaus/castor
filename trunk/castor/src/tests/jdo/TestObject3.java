@@ -63,6 +63,9 @@ public class TestObject3
     private String _value2;
 
 
+    private long   _number;
+
+
     static final long      DefaultId = 3;
 
 
@@ -72,11 +75,15 @@ public class TestObject3
     static final String    DefaultValue2 = "two";
 
 
+    static final long      DefaultNumber = 5;
+
+
     public TestObject3()
     {
         _id = DefaultId;
         _value1 = DefaultValue1;
         _value2 = DefaultValue2;
+        _number = DefaultNumber;
     }
 
 
@@ -116,9 +123,21 @@ public class TestObject3
     }
 
 
+    public long getNumber()
+    {
+        return _number;
+    }
+
+
+    public void setNumber( long number )
+    {
+        _number = number;
+    }
+
+
     public String toString()
     {
-        return _id + " / " + _value1 + " / " + _value2;
+        return _id + " / " + _value1 + " / " + _value2 + " / " + _number;
     }
 
 

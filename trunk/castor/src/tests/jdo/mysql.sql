@@ -27,7 +27,8 @@ drop table if exists test_table3;
 create table test_table3 (
   id      numeric(10,0) not null,
   value1  varchar(200)  not null,
-  value2  varchar(200)
+  value2  varchar(200),
+  number  numeric(10,0)
 );
 
 create unique index test_table3_pk

@@ -344,6 +344,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Matz" given="Oliver"/>
+    <email>oliver.matz@ppi.de</email>
+    <description>Fix for rollback of fields of type primitive long.</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Mauch" given="Thorsten"/>
     <email>mauch@imkenberg.de</email>
     <description>OQL Query tool, bug fixing for OQL.</description>

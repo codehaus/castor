@@ -320,6 +320,22 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
+  <class name="jdo.TestObject3" access="shared" identity="id">
+    <description>Table used for primitive rollback testing</description>
+    <map-to table="test_table3" />
+    <field name="id" type="long">
+      <sql name="id" type="numeric" />
+    </field>
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar"/>
+    </field>
+    <field name="value2" type="string">
+      <sql name="value2" type="varchar" dirty="ignore"/>
+    </field>
+    <field name="number" type="long">
+      <sql name="number" type="numeric" />
+    </field>
+  </class>
   <class name="jdo.TestObjectExtends" access="shared" extends="jdo.TestObject">
     <description>Table used for cache testing</description>
     <map-to table="test_table_extends" />
