@@ -141,6 +141,7 @@ public class DependentUpdate extends CastorTestCase {
         detail = new TestDetail( 6 );
         detail.addDetail2( new TestDetail2() );
         detail.addDetail2( new TestDetail2() );
+        detail.setDetail3( new TestDetail3( 101 ) );
         master.addDetail( detail );
         detail = new TestDetail( 7 );
         detail.addDetail2( new TestDetail2() );
@@ -179,6 +180,10 @@ public class DependentUpdate extends CastorTestCase {
                 stream.println( "Error: loaded detail 6 without two details: " + detail );
                 fail("details' size mismatch");
             }
+            if ( detail.getDetail3() == null || detail.getDetail3().getId() != 101 ) {
+                stream.println( "Error: loaded detail 6 with wrong detail3: " + detail );
+                fail("loaded detail 6 with wrong detail3: " + detail);
+            }
             detail = master.findDetail( 7 );
             if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                 stream.println( "Error: loaded detail 7 without two details: " + detail );
@@ -205,6 +210,9 @@ public class DependentUpdate extends CastorTestCase {
         // add new detail and create it explicitely
         detail = new TestDetail( 9 );
         master.addDetail( detail );
+        detail = (TestDetail) master.findDetail( 6 );
+        // change 1:1 dependent relationship
+        detail.setDetail3( new TestDetail3( 102 ) );
         // delete, then create detail with id == 7 explicitly
         detail = (TestDetail) master.findDetail( 7 );
         master.getDetails().remove( master.getDetails().indexOf( detail ) );
@@ -219,6 +227,8 @@ public class DependentUpdate extends CastorTestCase {
                  ! master.getDetails().contains( new TestDetail( 6 ) ) ||
                  master.findDetail( 6 ).getDetails2() == null ||
                  master.findDetail( 6 ).getDetails2().size() != 2 ||
+                 master.findDetail( 6 ).getDetail3() == null ||
+                 master.findDetail( 6 ).getDetail3().getId() != 102 ||
                  ! master.getDetails().contains( new TestDetail( 7 ) ) ||
                  ! master.getDetails().contains( new TestDetail( 8 ) ) ||
                  ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
