@@ -21,6 +21,7 @@
         <property name="main" value="${source}/main"/>
         <property name="etc" value="${source}/etc"/>
         <property name="build" value="build"/>
+        <property name="build-doc" value="build/doc"/>
         <property name="classes" value="${build}/classes"/>
         <property name="dist" value="dist"/>
         <property name="lib" value="lib"/>
@@ -378,11 +379,15 @@
             <fileset dir="${doc}/style" includes="*.css"/>
          </copy>
 
-        <replace file="${build}/doc/index.html">
-           <replacefilter token="$$VERSION$$" value="${version}"/>
-           <replacefilter token="$$RELEASE_DATE$$" value="${release_date}"/>
-        </replace>
-        <replace file="${build}/doc/download.html" token="$$VERSION$$" value="${version}"/>
+        <replace dir="${build-doc}" token="$$VERSION$$" value="${version}">
+           <include name="index.html"/>   
+           <include name="download.html" />   
+        </replace>   
+
+        <replace dir="${build-doc}" token="$$RELEASE_DATE$$" value="${release_date}">
+           <include name="index.html"/>   
+        </replace>   
+   
         <mkdir dir="${build}/doc/ora-mar-2k"/>
 
         <copy todir="${build}/doc/ora-mar-2k">
