@@ -12,6 +12,49 @@ go
 grant all on test_table to test
 go
 
+-- test many to many
+drop table test_group_person
+go
+create table test_group_person (
+  gid int         not null,
+  pid int        not null 
+)
+go
+create index test_group_person_p_pk on test_group_person ( pid )
+go
+create index test_group_person_g_pk on test_group_person ( gid )
+go
+grant all on test_group_person to test
+go
+
+drop table test_many_group
+go
+create table test_many_group (
+  gid       int           not null,
+  value    varchar(100)  not null
+)
+go
+create unique index test_many_group_pk on test_many_group ( gid )
+go
+grant all on test_many_group to test
+go
+
+drop table test_many_person
+go
+create table test_many_person (
+   pid      int          not null,
+   value   varchar(100) not null,
+   helloworld varchar(100) null,
+   sthelse varchar(100) null
+)
+go
+
+create unique index test_many_person_pk on test_many_person ( pid )
+go
+grant all on test_many_person to test
+go
+
+
 -- test_table_ex
 drop table test_table_ex
 go
@@ -25,6 +68,21 @@ create unique index test_table_ex_pk on test_table_ex ( id )
 go
 grant all on test_table_ex to test
 go
+
+-- test_table_extends
+drop table test_table_extends
+go
+create table test_table_extends (
+  id      int          not null,
+  value3  varchar(200) null,
+  value4  varchar(200) null
+)
+go
+create unique index test_table_extends_pk on test_table_extends ( id )
+go
+grant all on test_table_extends to test
+go
+
 
 -- test_race
 drop table test_race

@@ -54,11 +54,12 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
-
+import org.exolab.castor.persist.OID;
 
 /**
  * Tests for duplicate key detection. Tests both duplicate key detection
@@ -101,7 +102,7 @@ public class DuplicateKey
         try {
             OQLQuery      oql;
             TestObject    object;
-            Enumeration   enum;
+            QueryResults   enum;
             
             // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
@@ -113,8 +114,8 @@ public class DuplicateKey
             oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
+            if ( enum.hasMore() ) {
+                object = (TestObject) enum.next();
                 stream.writeVerbose( "Updating object: " + object );
             } else {
                 object = new TestObject();
@@ -130,8 +131,8 @@ public class DuplicateKey
             db.begin();
             oql.bind( new Integer( TestObject.DefaultId ) );
             enum = oql.execute();
-            while ( enum.hasMoreElements() )
-                enum.nextElement();
+            while ( enum.hasMore() )
+                enum.next();
             
             object = new TestObject();
             stream.writeVerbose( "Creating new object: " + object );
@@ -148,6 +149,7 @@ public class DuplicateKey
             }
             db.commit();
 
+            System.out.println("Second commit done!");
 	    
             // Attempt to create a new object with the same identity,
             // in the database. Will report duplicate key from SQL engine.

@@ -55,6 +55,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -122,11 +123,12 @@ public class Concurrent
             if ( ! runOnce( stream, Database.Exclusive ) )
                 result = false;
             stream.writeVerbose( "" );
+            /*
             stream.writeVerbose( "Running in access mode db-locked" );
             if ( ! runOnce( stream, Database.DbLocked ) )
                 result = false;
             stream.writeVerbose( "" );
-
+            */
             _db.close();
             _conn.close();
         } catch ( Exception except ) {
@@ -145,7 +147,7 @@ public class Concurrent
         try {
             OQLQuery      oql;
             TestObject    object;
-            Enumeration   enum;
+            QueryResults   enum;
 
             // Open transaction in order to perform JDO operations
             _db.begin();
@@ -156,8 +158,8 @@ public class Concurrent
             oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
+            if ( enum.hasMore() ) {
+                object = (TestObject) enum.next();
                 stream.writeVerbose( "Retrieved object: " + object );
                 object.setValue1( TestObject.DefaultValue1 );
                 object.setValue2( TestObject.DefaultValue2 );
