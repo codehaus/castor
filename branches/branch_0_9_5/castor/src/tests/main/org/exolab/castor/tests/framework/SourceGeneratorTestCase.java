@@ -48,12 +48,8 @@ package org.exolab.castor.tests.framework;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.jar.*;
-import java.util.zip.*;
 import junit.framework.*;
 import org.apache.tools.ant.*;
-import org.apache.tools.ant.taskdefs.*;
-import org.apache.tools.ant.types.*;
 import org.exolab.castor.builder.*;
 import org.exolab.castor.tests.framework.testDescriptor.*;
 import org.xml.sax.InputSource;
@@ -147,7 +143,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
         throws java.lang.Exception {
 
             verbose("\n================================================");
-            verbose("Test suite '"+_test.name()+"': setting up test '" + _name+"'");
+            verbose("Test suite '"+_test.getName()+"': setting up test '" + _name+"'");
             verbose("================================================\n");
 
         // 0. Get information to run the test
@@ -249,7 +245,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
         throws java.lang.Exception {
 
        verbose("\n================================================");
-       verbose("Test suite '"+_test.name()+"': test '" + _name+"' complete.");
+       verbose("Test suite '"+_test.getName()+"': test '" + _name+"' complete.");
        verbose("================================================\n");
     }
 

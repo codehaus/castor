@@ -86,7 +86,9 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
     public MarshallingFrameworkTestCase(CastorTestCase test, UnitTestCase unit, MarshallingTest marshalling, File outputRoot) {
         super(test, unit, outputRoot);
         _marshallingConf = marshalling;
-        _hasRandom       = _marshallingConf.getRoot_Object().getRandom();
+        if (_marshallingConf.getRoot_Object() != null) {
+        	_hasRandom       = _marshallingConf.getRoot_Object().getRandom();
+        }
     }
 
     /**
@@ -135,7 +137,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         throws java.lang.Exception {
 
         verbose("\n================================================");
-        verbose("Test suite '"+_test.name()+"': setting up test '" + _name+"'");
+        verbose("Test suite '"+_test.getName()+"': setting up test '" + _name+"'");
         verbose("================================================\n");
         //copy the support files--> needed for AdaptX XML Diff
         FileServices.copySupportFiles(_test.getTestFile(),_outputRootFile);
@@ -146,12 +148,14 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         if (_inputName != null)
             _input  = _test.getClassLoader().getResourceAsStream(_inputName);
 
-        assert("The input file specified:"+_inputName+" cannot be found.", _input != null);
+        assertNotNull("The input file specified:"+_inputName+" cannot be found.", _input);
 
         RootType rootType = _marshallingConf.getRoot_Object();
-        _rootClassName = rootType.getContent();
-        _hasDump =   rootType.getDump();
-        _hasRandom = rootType.getRandom();
+        if (rootType != null) {
+        	_rootClassName = rootType.getContent();
+            _hasDump =   rootType.getDump();
+            _hasRandom = rootType.getRandom();
+        }
         
         if (!_test.isDirectoryCompiled()) {
             verbose("-->Compiling any necessary source files");
@@ -167,12 +171,20 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         
         //-- Add outputRoot to classpath
         ClassLoader loader = _test.getClassLoader();
-        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);     
+        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);
+        _test.setClassLoader(loader);
 
-        if (_rootClassName == null)
-            throw new Exception("No Root Object found in test descriptor");
+        //if (_rootClassName == null)
+        //    throw new Exception("No Root Object found in test descriptor");
 
-        _rootClass =  loader.loadClass(_rootClassName);
+        if (_rootClassName != null) {
+            verbose("Root class specified in TestDescriptor...");
+            verbose("Loading class: " + _rootClassName);
+            _rootClass =  loader.loadClass(_rootClassName);
+        }
+        else {
+            verbose("No root class specified in TestDescriptor");
+        }
 
         // Try to load the mapping file if any, else we will use the introspector
 
@@ -189,7 +201,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
             InputStream mappingFile = loader.getResourceAsStream(mappingFilePath);
 
             if (mappingFile == null)
-                throw new Exception("Unable to locate the mapping file '" + mappingFilePath + "' for the test '" + _test.name() + "'");
+                throw new Exception("Unable to locate the mapping file '" + mappingFilePath + "' for the test '" + _test.getName() + "'");
 
             _mapping = new Mapping(loader);
             InputSource source = new InputSource(mappingFile);
@@ -205,7 +217,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
                        try {
                            Class expected = Class.forName(exceptionName);
                            if (expected.isAssignableFrom(ex.getClass())) {
-                               assert(_failure.getContent() == true);
+                               assertTrue(_failure.getContent());
                                return;
                            }
                         } catch (ClassNotFoundException cnfex) {
@@ -215,7 +227,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
                     }
                     //2--No exception specified --> the test is a success.
                     else {
-                        assert(_failure.getContent() == true);
+                        assertTrue(_failure.getContent());
                         return;
                     }
                 }
@@ -250,7 +262,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
     protected void tearDown()
         throws java.lang.Exception {
         verbose("\n================================================");
-        verbose("Test suite '"+_test.name()+"': test '" + _name+"' complete.");
+        verbose("Test suite '"+_test.getName()+"': test '" + _name+"' complete.");
         verbose("================================================\n");
     }
 

@@ -51,27 +51,18 @@
 
 package org.exolab.castor.tests.framework;
 
-//-- CTF imports
-import org.exolab.castor.tests.framework.testDescriptor.SchemaTest;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
-import org.exolab.castor.tests.framework.testDescriptor.TestDescriptor;
-
 //-- JUnit imports
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 //-- Castor imports (to test SOM)
-import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.xml.schema.reader.SchemaReader;
 import org.exolab.castor.xml.schema.writer.SchemaWriter;
 import org.exolab.castor.util.NestedIOException;
 
 //-- Adaptx imports (for using XMLDiff)
-import org.exolab.adaptx.xslt.dom.XPNReader;
 import org.exolab.adaptx.xslt.dom.XPNBuilder;
 import org.exolab.adaptx.xpath.XPathNode;
 import org.exolab.adaptx.xml.XMLDiff;
@@ -79,10 +70,7 @@ import org.exolab.adaptx.xml.XMLDiff;
 //-- Java imports
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Vector;
 
 
 /**
@@ -112,7 +100,6 @@ public class SchemaTestCase extends XMLTestCase {
     /**
      * Creates a new SchemaTest with the given name
      *
-     * @param name the name of the test.
     **/
 	public SchemaTestCase( CastorTestCase castorTc, UnitTestCase tc, File outputFile) {
 		super(castorTc, tc, outputFile);
@@ -134,7 +121,7 @@ public class SchemaTestCase extends XMLTestCase {
     protected void runTest() throws Throwable {
        
        verbose("\n================================================");
-       verbose("Test suite '"+_test.name()+"': setting up test '" + _name+"'");
+       verbose("Test suite '"+_test.getName()+"': setting up test '" + _name+"'");
        verbose("================================================\n");
        
         if (_skip) {
@@ -156,10 +143,10 @@ public class SchemaTestCase extends XMLTestCase {
 	        XMLDiff diff = new XMLDiff();
 	        int result = diff.compare(node1, schemaURL, node2, "In-Memory-Result");
 	        if ((_failure != null) && (_failure.getContent() == true))
-                assert(result != 0);
+                assertTrue(result != 0);
             else {
-                 assert(result == 0);
-                 assert("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
+                 assertEquals(result, 0);
+                 assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
             }
         }
     } //-- runTest
@@ -190,17 +177,18 @@ public class SchemaTestCase extends XMLTestCase {
                     try {
                         Class expected = Class.forName(exceptionName);
                         if (expected.isAssignableFrom(exception) ) {
-                            assert(_failure.getContent() == true);
+                            assertTrue(_failure.getContent());
                             return null;
                         }
-                        else fail("Received: '"+exception+"' but expected:'"+exceptionName+"'.");
+                        else 
+                        	fail("Received: '"+exception+"' but expected:'"+exceptionName+"'.");
                     } catch (ClassNotFoundException ex) {
                         //Class#forName
                         fail("The exception specified:"+exceptionName+" cannot be found in the CLASSPATH");
                     }
                 }
                 else {
-                    assert(_failure.getContent() == true);
+                    assertTrue(_failure.getContent());
                     return null;
                 }
             }
@@ -241,10 +229,11 @@ public class SchemaTestCase extends XMLTestCase {
                    try {
                        Class expected = Class.forName(exceptionName);
                        if (expected.isAssignableFrom(sx.getClass())) {
-                           assert(_failure.getContent() == true);
+                           assertTrue(_failure.getContent());
                            return null;
                        }
-                       else fail("Received:'"+sx+"' but expected:'"+exceptionName+"'.");
+                       else 
+                       	fail("Received:'"+sx+"' but expected:'"+exceptionName+"'.");
                    } catch (ClassNotFoundException ex) {
                         //Class#forName
                         fail("The exception specified:"+exceptionName+" cannot be found in the CLASSPATH");
@@ -253,7 +242,7 @@ public class SchemaTestCase extends XMLTestCase {
                 }
                 //2--No exception specified --> the test is a success.
                 else {
-                    assert(_failure.getContent() == true);
+                    assertTrue(_failure.getContent());
                     return null;
                 }
              }
@@ -273,7 +262,7 @@ public class SchemaTestCase extends XMLTestCase {
         throws java.lang.Exception {
 
         verbose("\n================================================");
-        verbose("Test suite '"+_test.name()+"': test '" + _name+"' complete.");
+        verbose("Test suite '"+_test.getName()+"': test '" + _name+"' complete.");
         verbose("================================================\n");
 
     }
