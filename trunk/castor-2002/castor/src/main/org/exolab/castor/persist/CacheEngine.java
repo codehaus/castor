@@ -308,6 +308,7 @@ public final class CacheEngine
         OID        oid;
         ObjectLock lock;
         TypeInfo   typeInfo;
+        boolean    writeLock;
 
         typeInfo = (TypeInfo) _typeInfo.get( type );
         if ( typeInfo == null )
@@ -317,26 +318,26 @@ public final class CacheEngine
         // have a lock (i.e. object is cached).
         oid = new OID( typeInfo.handler, identity );
         lock = typeInfo.cache.getLock( oid );
+        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.Locked );
 
         if ( lock != null ) {
-
             // Object has been loaded before, must acquire lock
             // on it (write in exclusive mode)
             try {
-                fields = (Object[]) lock.acquire( tx, accessMode == AccessMode.Exclusive, timeout );
+                fields = (Object[]) lock.acquire( tx, writeLock, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
                 throw new ObjectNotFoundExceptionImpl( type, identity );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
-            oid = typeInfo.cache.getOID( fields );
+            oid = lock.getOID();
 
             // XXX Problem, obj might be parent class but attempting
             //     to load derived class, will still return parent class
             //     Need to solve by swapping to a new object
 
-            if ( accessMode == AccessMode.Exclusive && ! oid.isExclusive() ) {
+            if ( writeLock && ! oid.isExclusive() ) {
                 // Exclusive mode we always synchronize the object with
                 // the database and obtain a lock on the object.
                 try {
@@ -350,13 +351,11 @@ public final class CacheEngine
                     // Object was not found in persistent storge, must dump
                     // it from the cache
                     typeInfo.cache.removeLock( oid );
-                    typeInfo.cache.removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 } catch ( PersistenceException except ) {
                     // Report any error talking to the persistence engine
                     typeInfo.cache.removeLock( oid );
-                    typeInfo.cache.removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 }
@@ -390,16 +389,15 @@ public final class CacheEngine
             // Create a lock for the object, register the lock and OID.
             // The lock is created for read or write depending on the
             // mode.
-            lock = new ObjectLock( fields );
+            lock = new ObjectLock( fields, oid );
             try {
-                lock.acquire( tx, accessMode == AccessMode.Exclusive, 0 );
+                lock.acquire( tx, writeLock, 0 );
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            if ( accessMode == AccessMode.Exclusive )
+            if ( writeLock )
                 oid.setExclusive( true );
-            typeInfo.cache.setLock( oid, lock );
-            typeInfo.cache.setOID( fields, oid );
+            typeInfo.cache.addLock( oid, lock );
             return oid;
         }
     }
@@ -438,31 +436,33 @@ public final class CacheEngine
         OID        oid;
         ObjectLock lock;
         TypeInfo   typeInfo;
+        boolean    writeLock;
 
         typeInfo = (TypeInfo) _typeInfo.get( query.getResultType() );
         // Create an OID to represent the object and see if we
         // have a lock (i.e. object is cached).
         oid = new OID( typeInfo.handler, identity );
         lock = typeInfo.cache.getLock( oid );
+        writeLock = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.Locked );
 
         if ( lock != null ) {
 
             // Object has been loaded before, must acquire lock on it
             try {
-                fields = (Object[]) lock.acquire( tx, false, timeout );
+                fields = (Object[]) lock.acquire( tx, writeLock, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
                 throw new ObjectNotFoundExceptionImpl( query.getResultType(), identity );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
-            oid = typeInfo.cache.getOID( fields );
+            oid = lock.getOID();
 
             // XXX Problem, obj might be parent class but attempting
             //     to load derived class, will still return parent class
             //     Need to solve by swapping to a new object
 
-            if ( accessMode == AccessMode.Exclusive && ! oid.isExclusive() ) {
+            if ( writeLock && ! oid.isExclusive() ) {
                 // Exclusive mode we always synchronize the object with
                 // the database and obtain a lock on the object.
                 try {
@@ -475,13 +475,11 @@ public final class CacheEngine
                     // Object was not found in persistent storge, must dump
                     // it from the cache
                     typeInfo.cache.removeLock( oid );
-                    typeInfo.cache.removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 } catch ( PersistenceException except ) {
                     // Report any error talking to the persistence engine
                     typeInfo.cache.removeLock( oid );
-                    typeInfo.cache.removeOID( fields );
                     lock.delete( tx );
                     throw except;
                 }
@@ -514,16 +512,15 @@ public final class CacheEngine
             // Create a lock for the object, register the lock and OID.
             // The lock is created for read or write depending on the
             // mode.
-            lock = new ObjectLock( fields );
+            lock = new ObjectLock( fields, oid );
             try {
-                lock.acquire( tx, accessMode == AccessMode.Exclusive, 0 );
+                lock.acquire( tx, writeLock, 0 );
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            if ( accessMode == AccessMode.Exclusive )
+            if ( writeLock )
                 oid.setExclusive( true );
-            typeInfo.cache.setLock( oid, lock );
-            typeInfo.cache.setOID( fields, oid );
+            typeInfo.cache.addLock( oid, lock );
             return oid;
         }
     }
@@ -586,7 +583,6 @@ public final class CacheEngine
                     // Dump the memory image of the object, it might have been deleted
                     // from persistent storage
                     typeInfo.cache.removeLock( oid );
-                    typeInfo.cache.removeOID( fields );
                     lock.delete( tx );
                 }
                 if ( _logWriter != null )
@@ -642,15 +638,14 @@ public final class CacheEngine
 
             // Copy the contents of the object we just created into the
             // cache engine.
-            lock = new ObjectLock( fields );
+            lock = new ObjectLock( fields, oid );
             try {
                 lock.acquire( tx, true, 0 );
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
             oid.setExclusive( true );
-            typeInfo.cache.setLock( oid, lock );
-            typeInfo.cache.setOID( fields, oid );
+            typeInfo.cache.addLock( oid, lock );
         }
         return oid;
     }
@@ -783,7 +778,7 @@ public final class CacheEngine
         // do we need a write lock.
         original = (Object[]) lock.acquire( tx, false, 0 );
         // Get the real OID with the exclusive and stamp info.
-        oid = typeInfo.cache.getOID( original );
+        oid = lock.getOID();
 
         // Store/create/delete all the dependent objects first. Must perform that
         // operation on all descendent classes.
@@ -915,7 +910,6 @@ public final class CacheEngine
                 } catch ( ObjectModifiedException except ) {
                     // If object modified in database, remove it from cache
                     typeInfo.cache.removeLock( oid );
-                    typeInfo.cache.removeOID( original );
                     lock.delete( tx );
                     throw except;
                 }
@@ -951,7 +945,6 @@ public final class CacheEngine
     {
         ObjectLock lock;
         TypeInfo   typeInfo;
-        Object[]   fields;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = typeInfo.cache.getLock( oid );
@@ -961,17 +954,15 @@ public final class CacheEngine
 
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
-        fields = (Object[]) lock.acquire( tx, true, timeout );
+        lock.acquire( tx, true, timeout );
         try {
             typeInfo.persist.writeLock( tx.getConnection( this ), oid.getIdentity() );
         } catch ( ObjectDeletedException except ) {
             typeInfo.cache.removeLock( oid );
-            typeInfo.cache.removeOID( fields );
             lock.delete( tx );
             throw except;
         } catch ( PersistenceException except ) {
             typeInfo.cache.removeLock( oid );
-            typeInfo.cache.removeOID( fields );
             lock.delete( tx );
             throw except;
         }
@@ -1081,7 +1072,7 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         oid.setExclusive( false );
-        lock = typeInfo.cache.getLock( oid );
+        lock = typeInfo.cache.releaseLock( oid );
         lock.release( tx );
     }
 
@@ -1107,7 +1098,6 @@ public final class CacheEngine
         try {
             fields = (Object[]) lock.acquire( tx, true, 0 );
             typeInfo.cache.removeLock( oid );
-            typeInfo.cache.removeOID( fields );
             lock.delete( tx );
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
