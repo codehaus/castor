@@ -1,6 +1,8 @@
 
 Version (CVS)
 -------------
+XML:	Added new supports for XML Schema Recommendation datatypes and remove old references to
+        the Candidate Recommendation document (Arnaud).
 
 XML:    Added push behavior for the unmarshaller with SAX producer. Made some functions public 
         and UnmarshalHandler final.
