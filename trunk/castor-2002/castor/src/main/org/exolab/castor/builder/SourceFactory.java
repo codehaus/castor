@@ -124,7 +124,7 @@ public class SourceFactory  {
         
         className = resolveClassName(className, packageName);
         
-        state = new FactoryState(className, resolver);
+        state = new FactoryState(className, resolver, packageName);
         
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
@@ -157,6 +157,10 @@ public class SourceFactory  {
                 classInfo.setSchemaType(TypeConversion.convertType(datatype));
             else
                 classInfo.setSchemaType(new XSClass(state.jClass));
+                
+            if (!(datatype instanceof BuiltInType)) {
+                createSourceCode(datatype, state, state.packageName);
+            }
         }
         
         //-- add imports required by the marshal methods
@@ -170,8 +174,10 @@ public class SourceFactory  {
         //-- #unmarshal()
         createUnmarshalMethods(jClass);
         
-        if (resolver != null)
+        if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
+            resolver.bindReference(element, classInfo);
+        }
         
         return jClass;
     } //-- createSourceCode
@@ -197,7 +203,8 @@ public class SourceFactory  {
         String className = JavaXMLNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
         
-        FactoryState state = new FactoryState(className, resolver);
+        FactoryState state 
+            = new FactoryState(className, resolver, packageName);
         
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
@@ -258,12 +265,25 @@ public class SourceFactory  {
             throw new IllegalArgumentException(err);
         }
         
+        boolean enumeration = false;
         
         //-- class name information
         String className = JavaXMLNaming.toJavaClassName(datatype.getName());
+        
+        if (datatype.hasFacet(Facet.ENUMERATION)) {
+            enumeration = true;
+            //-- XXXX Fix packageName...this is a hack I know,
+            //-- XXXX we should change this
+            if ((packageName != null) && (packageName.length() > 0))
+                packageName = packageName + ".types";
+            else
+                packageName = "types";
+        }
+        
         className = resolveClassName(className, packageName);
         
-        FactoryState state = new FactoryState(className, resolver);
+        FactoryState state 
+            = new FactoryState(className, resolver, packageName);
         
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
@@ -281,11 +301,13 @@ public class SourceFactory  {
         if (comment != null) 
             jClass.getJDocComment().setComment(comment);
             
-        classInfo.setSchemaType(new XSClass(jClass, datatype.getName()));
+        XSClass xsClass = new XSClass(jClass, datatype.getName());
+        
+        classInfo.setSchemaType(xsClass);
         
         //-- handle enumerated types
-        
-        if (datatype.hasFacet("enumeration")) {
+        if (enumeration) {
+            xsClass.setAsEnumertated(true);
             processEnumeration(datatype, state);
         }
         
@@ -529,7 +551,7 @@ public class SourceFactory  {
         Enumeration enum = archetype.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
-            FieldInfo fieldInfo = memberFactory.createFieldInfo(attr);
+            FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
             handleField(fieldInfo, state);
         }
         
@@ -600,8 +622,18 @@ public class SourceFactory  {
             Structure struct = (Structure)enum.nextElement();
             switch(struct.getStructureType()) {
                 case Structure.ELEMENT:
+                
+                    ElementDecl eDecl = (ElementDecl)struct;
+                    
+                    //-- make sure we process the element first
+                    //-- so that it's available to the MemberFactory
+                    if (state.resolve(struct) == null) 
+                        createSourceCode((ElementDecl)struct,
+                                          state,
+                                          state.packageName);
                     fieldInfo 
-                        = memberFactory.createFieldInfo((ElementDecl)struct);
+                        = memberFactory.createFieldInfo((ElementDecl)struct, 
+                                                         state);
                     handleField(fieldInfo, state);
                     break;
                 case Structure.GROUP:
@@ -789,15 +821,25 @@ class FactoryState implements ClassInfoResolver {
     JClass    jClass           = null;
     ClassInfo classInfo        = null;
     
+    String packageName         = null;
+    
     private ClassInfoResolver _resolver = null;
     
     protected FactoryState(String className, ClassInfoResolver resolver) {
+        this(className, resolver, null);
+    } //-- FactoryState
+
+    protected FactoryState
+        (String className, ClassInfoResolver resolver, String packageName) 
+    {
         jClass    = new JClass(className);
         classInfo = new ClassInfo(jClass);
         if (resolver == null)
             _resolver = new ClassInfoResolverImpl();
         else
             _resolver = resolver;
+            
+        this.packageName = packageName;
     } //-- FactoryState
     
     /**

@@ -80,12 +80,18 @@ public class MemberFactory {
      * Creates a new MemberFactory using the given FieldInfo factory.
      * @param infoFactory the FieldInfoFactory to use
     **/
-    public MemberFactory(FieldInfoFactory infoFactory) {
+    public MemberFactory(FieldInfoFactory infoFactory) 
+    {
         super();    
+        
+        //this.resolver = resolver;
+        
         if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
             this.infoFactory = infoFactory;
+            
+            
     } //-- MemberFactory
     
 
@@ -125,6 +131,7 @@ public class MemberFactory {
         
     } //-- createFieldInfoForText
     
+    
     /**
      * Creates a FieldInfo object for the given attribute
      * declaration
@@ -132,7 +139,9 @@ public class MemberFactory {
      * FieldInfo for
      * @return the FieldInfo for the given attribute declaration
     **/
-    public FieldInfo createFieldInfo(AttributeDecl attribute) {
+    public FieldInfo createFieldInfo
+        (AttributeDecl attribute, ClassInfoResolver resolver) 
+    {
         
         String memberName 
             = JavaXMLNaming.toJavaMemberName(attribute.getName());
@@ -149,22 +158,19 @@ public class MemberFactory {
         
         if (datatype != null) {
             
-            xsType = TypeConversion.convertType(datatype);
-            
             if (datatype.hasFacet(Facet.ENUMERATION)) 
                 enumeration = true;
             
-            //-- This is NOT clean...we need a different approach
-            //-- here...
-            //-- modify package name if necessary
-            if (enumeration) {
-                JClass jClass = (JClass) xsType.getJType();
-                String packageName = jClass.getPackageName();
-                if ((packageName != null) && (packageName.length() > 0))
-                    jClass.setPackageName(packageName + ".types");
-                else
-                    jClass.setPackageName("types");
+            //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
+            ClassInfo cInfo = null;
+            if (resolver != null) {
+                cInfo = resolver.resolve(datatype);
             }
+            
+            if (cInfo != null)
+                xsType = cInfo.getSchemaType();
+            else
+                xsType = TypeConversion.convertType(datatype);
         }
         else
             xsType = new XSString();
@@ -219,7 +225,9 @@ public class MemberFactory {
      * Creates a member based on the given ElementDecl
      * @param element the ElementDecl to create the member from
     **/
-    public FieldInfo createFieldInfo(ElementDecl element) {
+    public FieldInfo createFieldInfo
+        (ElementDecl element, ClassInfoResolver resolver) 
+    {
         
         //-- check whether this should be a Vector or not
         int maxOccurs = element.getMaximumOccurance();
@@ -245,22 +253,17 @@ public class MemberFactory {
         
         Datatype datatype = eDecl.getDatatype();
         if (datatype != null) {
-            xsType = TypeConversion.convertType(datatype);
             
-            JType jType = xsType.getJType();
-            
-            //-- This is NOT clean...we need a different approach
-            //-- here...
-            //-- modify package name if necessary
-            if (datatype.hasFacet(Facet.ENUMERATION)) {
-                
-                JClass jClass = (JClass) xsType.getJType();
-                String packageName = jClass.getPackageName();
-                if ((packageName != null) && (packageName.length() > 0))
-                    jClass.setPackageName(packageName + ".types");
-                else
-                    jClass.setPackageName("types");
+            //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
+            ClassInfo cInfo = null;
+            if (resolver != null) {
+                cInfo = resolver.resolve(datatype);
             }
+            
+            if (cInfo != null)
+                xsType = cInfo.getSchemaType();
+            else 
+                xsType = TypeConversion.convertType(datatype);
         }
         else {
             String className = JavaXMLNaming.toJavaClassName(eDecl.getName());
