@@ -352,6 +352,12 @@
     <description>Fixed JDO bug: non-null columns sometimes were returned as null</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Wolpert" given="Ned"/>
+    <email>ned.wolpert@knowledgenet.com</email>
+    <description>Proposed "trigger" mode of SEQUENCE key generator for PostgreSQL</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
