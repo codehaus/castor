@@ -597,6 +597,7 @@ public class StylesheetHandler extends ErrorObserverAdapter
             }
         }
         else {
+            //-- local name is valid...but we may also have a valid qName            
             if (qName != null) {
                 int idx = qName.indexOf(':');
                 if (idx >= 0) {
@@ -605,11 +606,9 @@ public class StylesheetHandler extends ErrorObserverAdapter
             }
         }
         
+        
         if ((namespaceURI == null) || (namespaceURI.length() == 0))
             namespaceURI = _namespaces.getNamespaceURI(prefix);
-        
-        
-        
         
         
         String     tagName   = localName;
@@ -957,8 +956,15 @@ public class StylesheetHandler extends ErrorObserverAdapter
                     xslObject = new XSLObject(xslType);
                     break;
                 default: //-- LITERAL or unsupported XSL element
+                
                     xslObject = new XSLObject(XSLObject.LITERAL);
-                    xslObject.setTypeName(tagName);
+                    if ((qName == null) || (qName.length() == 0))
+                        xslObject.setTypeName(localName);
+                    else 
+                        xslObject.setTypeName(qName);
+                        
+                    //-- setNamespace
+                    xslObject.setNamespace(namespaceURI);
                     break;
             }
             //-- add xslObject to stack
@@ -992,7 +998,6 @@ public class StylesheetHandler extends ErrorObserverAdapter
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException
     {
-        
         if (_createNewNamespace) {
             _namespaces = _namespaces.createNamespaces();
             _createNewNamespace = false;
