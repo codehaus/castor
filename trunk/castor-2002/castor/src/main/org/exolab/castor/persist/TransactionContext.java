@@ -525,7 +525,7 @@ public abstract class TransactionContext
 
         if ( objectToBeLoaded != null 
             && !molder.getJavaClass( _db.getClassLoader() ).isAssignableFrom( objectToBeLoaded.getClass() ) )
-            throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), entry.object.getClass() ) );
+            throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), objectToBeLoaded.getClass() ) );
         AccessMode accessMode = molder.getAccessMode( suggestedAccessMode );
         if ( accessMode == AccessMode.ReadOnly )
             entry = getReadOnlyObjectEntry( oid );
