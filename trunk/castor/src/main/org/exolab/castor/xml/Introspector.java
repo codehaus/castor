@@ -54,6 +54,8 @@ import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.FieldHandlerFactory;
+import org.exolab.castor.mapping.GeneralizedFieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
@@ -185,6 +187,21 @@ public final class Introspector {
      */
     private boolean _wrapCollectionsInContainer = WRAP_COLLECTIONS_DEFAULT;
     
+    
+    /**
+     * The set of registered FieldHandlerFactory instances
+     */
+    private Vector _handlerFactoryList = null;
+    
+    /**
+     * The set of registered FieldHandlerFactory instances
+     * associated with their supported types
+     */
+    private Hashtable _handlerFactoryMap =  null;
+    
+    /**
+     * Creates a new instance of the Introspector
+     */
     public Introspector() {
         super();
         init();
@@ -207,6 +224,27 @@ public final class Introspector {
         }
         
     }
+    
+    /**
+     * Registers the given "generalized" FieldHandlerFactory with this
+     * Introspector. 
+     *
+     * @param factory the FieldHandlerFactory to add to this 
+     * introspector
+     * @throws IllegalArgumentException if the given factory is null
+     */
+    public synchronized void addFieldHandlerFactory(FieldHandlerFactory factory) {
+        if (factory == null) {
+            String err = "The argument 'factory' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        if (_handlerFactoryList == null) {
+            _handlerFactoryList = new Vector();
+        }        
+        _handlerFactoryList.addElement(factory);
+        registerHandlerFactory(factory);
+    } //-- addFieldHandlerFactory
+    
     /**
      * Returns the NodeType for java primitives
      *
@@ -462,7 +500,8 @@ public final class Introspector {
                 fieldDesc.setNodeType(NodeType.Element);
             }
             
-            FieldHandlerImpl handler = null;
+            FieldHandler handler = null;
+            boolean customHandler = false;
             try {
                 handler = new FieldHandlerImpl(methodSet.fieldName,
                                                 null,
@@ -472,11 +511,22 @@ public final class Introspector {
                                                 typeInfo);
                 //-- clean up
                 if (methodSet.add != null) 
-                    handler.setAddMethod(methodSet.add);
+                    ((FieldHandlerImpl)handler).setAddMethod(methodSet.add);
                                                 
                 if (methodSet.create != null) 
-                    handler.setCreateMethod(methodSet.create);
+                    ((FieldHandlerImpl)handler).setCreateMethod(methodSet.create);
                     
+                //-- look for GeneralizedFieldHandler
+                FieldHandlerFactory factory = getHandlerFactory(type);
+                if (factory != null) {
+                    GeneralizedFieldHandler gfh = factory.createFieldHandler(type);
+                    if (gfh != null) {
+                        gfh.setFieldHandler(handler);
+                        handler = gfh;
+                        customHandler = true;
+                    }
+                } 
+                
             }
             catch (MappingException mx) {
                 throw new MarshalException(mx);
@@ -485,7 +535,9 @@ public final class Introspector {
             //-- check for instances of java.util.Date
             if (java.util.Date.class.isAssignableFrom(type)) {
                 //handler = new DateFieldHandler(handler);
-                dateDescriptors.add(fieldDesc);
+                if (!customHandler) {
+                    dateDescriptors.add(fieldDesc);
+                }
             }
                         
             fieldDesc.setHandler(handler);
@@ -625,6 +677,38 @@ public final class Introspector {
         
         return classDesc;
     } //-- generateClassDescriptor
+    
+    /**
+     * Removes the given FieldHandlerFactory from this Introspector
+     *
+     * @param factory the FieldHandlerFactory to remove 
+     * @return true if the given FieldHandlerFactory was removed, or
+     * false otherwise.
+     * @throws IllegalArgumentException if the given factory is null
+     */
+    public synchronized boolean removeFieldHandlerFactory(FieldHandlerFactory factory) 
+    {
+        if (factory == null) {
+            String err = "The argument 'factory' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        //-- if list is null, just return
+        if (_handlerFactoryList == null) return false;
+        
+        if (_handlerFactoryList.removeElement(factory)) {
+            //-- re-register remaining handlers
+            _handlerFactoryMap.clear();
+            for (int i = 0; i < _handlerFactoryList.size(); i++) {
+                FieldHandlerFactory tmp = 
+                    (FieldHandlerFactory)_handlerFactoryList.elementAt(i);
+                registerHandlerFactory(tmp);
+            }
+            return true;
+        }
+        return false;
+    } //-- removeFieldHandlerFactory
+    
     
     /**
      * Sets whether or not collections (arrays, vectors, etc) 
@@ -790,6 +874,43 @@ public final class Introspector {
         
         return fieldDesc;
     } //-- createFieldDescriptor
+
+
+    /**
+     * Returns the registered FieldHandlerFactory for the
+     * given Class type.
+     *
+     * @param type the Class type to return the registered
+     * FieldHandlerFactory for
+     */
+    private FieldHandlerFactory getHandlerFactory(Class type) {
+        if (_handlerFactoryMap != null) {               
+            Class tmp = type;
+            while (tmp != null) {
+                Object obj = _handlerFactoryMap.get(tmp);
+                if (obj != null) {
+                    return (FieldHandlerFactory)obj;
+                }
+                tmp = tmp.getSuperclass();
+            }
+        }
+        return null;
+    } //-- getHandlerFactory
+    
+    /**
+     * Registers the supported class types for the given
+     * FieldHandlerFactory into the map (for faster lookups)
+     */
+    private void registerHandlerFactory(FieldHandlerFactory factory) {
+        if (_handlerFactoryMap == null)
+            _handlerFactoryMap = new Hashtable();
+            
+        Class[] types = factory.getSupportedTypes();
+        for (int i = 0; i < types.length; i++) {
+            _handlerFactoryMap.put(types[i], factory);
+        }
+    } //-- registerHandlerFactory
+
 
     /**
      * Returns true if the given Class is an instance of a
