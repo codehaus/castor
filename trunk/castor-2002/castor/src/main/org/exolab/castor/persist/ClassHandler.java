@@ -162,7 +162,7 @@ public final class ClassHandler
     ClassHandler( ClassDescriptor clsDesc )
     {
         _clsDesc = clsDesc;
-        if ( Persistent.class.isAssignableFrom( _clsDesc.getJavaClass() )  )
+        if ( Persistent.class.isAssignableFrom( _clsDesc.getJavaClass() ) )
             _callback = new JDOCallback();
     }
 
