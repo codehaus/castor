@@ -500,6 +500,12 @@ public class Types
             public String toString() { return "String->Boolean"; }
         } ),
         // Convertors to integer
+        new TypeConvertorInfo( java.lang.Byte.class, java.lang.Integer.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new Integer( ( (Byte) obj ).intValue() );
+            }
+            public String toString() { return "Byte->Integer"; }
+        } ),
         new TypeConvertorInfo( java.lang.Short.class, java.lang.Integer.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 return new Integer( ( (Short) obj ).intValue() );
@@ -581,6 +587,12 @@ public class Types
             public String toString() { return "String->Long"; }
         } ),
         // Convertors to short
+        new TypeConvertorInfo( java.lang.Byte.class, java.lang.Short.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new Short( ( (Byte) obj ).shortValue() );
+            }
+            public String toString() { return "Byte->Short"; }
+        } ),
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Short.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 return new Short( ( (Integer) obj ).shortValue() );
@@ -598,6 +610,19 @@ public class Types
                 return Short.valueOf( (String) obj );
             }
             public String toString() { return "String->Short"; }
+        } ),
+        // Convertors to byte
+        new TypeConvertorInfo( java.lang.Short.class, java.lang.Byte.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new Byte( ( (Short) obj ).byteValue() );
+            }
+            public String toString() { return "Short->Byte"; }
+        } ),
+        new TypeConvertorInfo( java.lang.Integer.class, java.lang.Byte.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new Byte( ( (Integer) obj ).byteValue() );
+            }
+            public String toString() { return "Integer->Byte"; }
         } ),
         // Convertors to double
         new TypeConvertorInfo( java.lang.Float.class, java.lang.Double.class, new TypeConvertor() {
