@@ -631,6 +631,13 @@ public abstract class MappingLoader
             
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             
+            //-- Fix for Castor JDO from Steve Vaughan, Castor JDO
+            //-- requires FieldHandlerImpl or a ClassCastException
+            //-- will be thrown...
+            userDefinedHandler 
+                = new FieldHandlerImpl(userDefinedHandler, typeInfo);
+            //-- End Castor JDO fix
+                
             FieldDescriptorImpl fieldDesc =
                 new FieldDescriptorImpl( fieldName, 
                                          typeInfo, 
