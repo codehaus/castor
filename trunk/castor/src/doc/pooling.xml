@@ -26,11 +26,14 @@
          Here, I'll go over the various usage of the PostgreSQL driver
          with Castor.  We start with the most basic configurations
          that do not use any pooling, to those with pooling via
-         PoolMan.  Finally, I'll include how to configure the upcoming
+         PoolMan. I'll include how to configure the upcoming
          pooling version of the PostgreSQL JDBC driver ths will be
-         usable with PostgreSQL 7.3, and how to setup a Tomcat JNDI
+         usable with PostgreSQL 7.3 and later, how to setup a Tomcat JNDI
          context that Castor can use to get a pooled JDBC
          connection.</p>
+         
+      <p>Finally, I'll explain how to configure a BasicDataSource from the
+         DBCP package using the &lt;data-source&gt; element.</p>
 
       </section>
 
@@ -204,5 +207,36 @@
 ]]></code></p>
 
      </section>
+     
+     <section title="Jakarta Commons DBCP - BasicDataSource">
+
+       <p>Commons-DBCP provides database connection pooling services, and together 
+          with <a href="http://jakarta.apache.org/commons/pool/">Commons-Pool</a>
+          it is the default JNDI datasource provider for Tomcat.</p>
+        
+       <p>With release 1.1 of the Jakarta Commons DBCP component, one of the major 
+          new features of the JDBC 3.0 API has (finally) been added to 
+          BasicDataSource, support for prepared statement pooling.</p>
+                
+       <p>To configure Castor for the use of DBCP, we provide the following 
+          &lt;data-source&gt; entry in the database.xml file.
+        
+<code><![CDATA[
+  <data-source class-name="org.apache.commons.dbcp.BasicDataSource">
+    <params driver-class-name="com.mysql.jdbc.Driver" 
+            username="test" 
+            password="test" 
+            url="jdbc:mysql://localhost/test" 
+            max-active="10" />
+  </data-source>
+]]></code></p>
+
+         <p>There's plenty of information on 
+            <a href="http://jakarta.apache.org/commons/dbcp/configuration.html">configuration </a>
+            of BasicDataSource, and examples are provided 
+            <a href="http://cvs.apache.org/viewcvs/jakarta-commons/dbcp/doc/">here</a>.</p>
+
+     </section>
+     
   </body>
 </document>
