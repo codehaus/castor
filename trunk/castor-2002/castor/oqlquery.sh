@@ -23,4 +23,4 @@ if [ -z "$2" ] ; then
   exit 1
 fi
 
-$JAVA -cp $CLASSPATH org.exolab.castor.tools.QueryAnalyser $1 $2
+$JAVA -cp $CLASSPATH org.exolab.castor.gui.QueryAnalyser $1 $2
