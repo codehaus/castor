@@ -547,7 +547,7 @@ public abstract class XSType {
      * @param enumerated a boolean indicating whether or not this XSClass
      * represents an enumerated type
     **/
-    public void setAsEnumertated(boolean enumerated) {
+    public void setAsEnumerated(boolean enumerated) {
         this.enumerated = enumerated;
     } //-- setAsEnumerated
     
