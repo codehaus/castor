@@ -62,26 +62,30 @@ class SGStateInfo extends ClassInfoResolverImpl {
     /** 
      * The package used when creating new classes.
     **/
-    protected String  packageName = null;
+    protected String    packageName = null;
         
-    private Hashtable _classTypes  = null;
+    private Hashtable   _classTypes  = null;
     
-    private Vector    _processed   = null;
+    private Vector      _processed   = null;
     
-    private boolean   _promptForOverwrite = true;
+    private boolean     _promptForOverwrite = true;
     
-    private boolean   _verbose     = false;
+    private boolean     _verbose     = false;
     
-    private int       _groupCount  = 0;
+    /**
+     * The helper class for naming unnamed groups
+    **/
+    private GroupNaming _groupNaming = null;
     
     /**
      * Creates a new SGStateInfo
     **/
     protected SGStateInfo() {        
         super();
-        packageName   = "";
+        packageName    = "";
         _classTypes    = new Hashtable();
         _processed     = new Vector();
+        _groupNaming   = new GroupNaming();
     } //-- SGStateInfo
     
     
@@ -112,12 +116,13 @@ class SGStateInfo extends ClassInfoResolverImpl {
     } //-- setPromptForOverwrite
     
     /**
-     * Returns the next available group number for generating
-     * automatic group names
+     * Returns the helper class used for naming groups
+     *
+     * @return the GroupNaming instance
     **/
-    int getNextGroupNumber() {
-        return ++_groupCount;
-    } //-- getNextGroupNumber
+    GroupNaming getGroupNaming() {
+        return _groupNaming;
+    } //-- getGroupNaming
     
     /**
      * Sets whether or not the source code generator prints
