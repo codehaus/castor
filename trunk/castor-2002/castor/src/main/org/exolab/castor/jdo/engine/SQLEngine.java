@@ -246,7 +246,7 @@ Will be adding this later.
                     ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType() );
             if ( !pkClass.isAssignableFrom( idClass ) ) {
                 conv = Types.getConvertor( idClass, pkClass );
-                identity = conv.convert( identity );
+                identity = conv.convert( identity, null );
             }
         } catch ( Exception except ) {
             throw new PersistenceExceptionImpl( "persist.keyGenNoConvertor" );
@@ -299,14 +299,16 @@ Will be adding this later.
 
             // Generate key during INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
-                stmt.execute();
+                CallableStatement cstmt = (CallableStatement) stmt;
+                cstmt.registerOutParameter( count, java.sql.Types.INTEGER );
+                cstmt.execute();
 
                 // First skip all results "for maximum portability"
                 // as proposed in CallableStatement javadocs.
-                while ( stmt.getMoreResults() || stmt.getUpdateCount() != -1 );
+                while ( cstmt.getMoreResults() || cstmt.getUpdateCount() != -1 );
 
                 // Identity is returned in the last parameter
-                identity = ( (CallableStatement) stmt ).getObject( count );
+                identity = cstmt.getObject( count );
 
                 // Convert type if needed
                 identity = fixIdentityType( identity );
@@ -603,6 +605,8 @@ Will be adding this later.
                 buildSql( clsDesc, logInterceptor );
                 return;
             }
+            if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
+                _sqlCreate = "{call " + _sqlCreate + "}";
         }
         if ( logInterceptor != null )
             logInterceptor.storeStatement( "SQL for creating " + clsDesc.getJavaClass().getName() +

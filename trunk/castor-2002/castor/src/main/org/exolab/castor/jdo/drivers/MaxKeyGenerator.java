@@ -128,7 +128,7 @@ public final class MaxKeyGenerator implements KeyGenerator
                 if ( !(identity instanceof BigDecimal) ) {
                     try {
                         identity = Types.getConvertor( identity.getClass(),
-                                BigDecimal.class ).convert( identity );
+                                BigDecimal.class ).convert( identity, null );
                     } catch ( Exception except ) {
                         throw new PersistenceException(
                                 Messages.format( "mapping.keyGenWrongType",

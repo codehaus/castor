@@ -185,18 +185,22 @@ public class JDOMappingLoader
     {
         TypeConvertor convertorTo = null;
         TypeConvertor convertorFrom = null;
+        String        convertorParam = null;
 
         if ( fieldMap.getSql() != null && fieldMap.getSql().getType() != null ) {
+            String typeName;
             Class sqlType;
 
             fieldType = Types.typeFromPrimitive( fieldType );
-            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
+            typeName = fieldMap.getSql().getType();
+            sqlType = SQLTypes.typeFromName( typeName );
             if ( fieldType != sqlType ) {
                 convertorTo = Types.getConvertor( sqlType, fieldType );
                 convertorFrom = Types.getConvertor( fieldType, sqlType );
+                convertorParam = SQLTypes.paramFromName( typeName );
             }
         }
-        return new TypeInfo( fieldType, convertorTo, convertorFrom,
+        return new TypeInfo( fieldType, convertorTo, convertorFrom, convertorParam,
                              fieldMap.getRequired(), null, colHandler );
     }
 

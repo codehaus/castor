@@ -83,6 +83,9 @@
     <field name="charValue" type="char" required="false" >
       <sql name="char_val" type="char" />
     </field>
+    <field name="boolValue" type="boolean" required="true" >
+      <sql name="bool_val" type="char.01" />
+    </field>
   </class>
 
 
@@ -166,6 +169,25 @@
   <class name="jdo.TestIdentityExtends" extends="jdo.TestIdentityObject">
     <description>Table used for IDENTITY key generator testing</description>
     <map-to table="test_identity_ext" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestReturningObject" identity="id" key-generator="RETURNING">
+    <description>Table used for RETURNING key generator testing</description>
+    <map-to table="test_keygen" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestReturningExtends" extends="jdo.TestReturningObject">
+    <description>Table used for RETURNING key generator testing</description>
+    <map-to table="test_keygen_ext" />
     <field name="ext" type="string" required="true">
       <sql name="ext" type="varchar"/>
     </field>

@@ -164,7 +164,7 @@ public class OQLQueryImpl
                     
                     try {
                         TypeConvertor tc = Types.getConvertor( valueClass, paramClass );
-                        value = tc.convert(value);
+                        value = tc.convert( value, null );
                     }
                     catch ( MappingException e ) {
                         throw new IllegalArgumentException( "Query parameter " 

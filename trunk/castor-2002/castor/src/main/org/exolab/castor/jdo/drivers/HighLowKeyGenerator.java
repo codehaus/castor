@@ -163,11 +163,17 @@ public class HighLowKeyGenerator implements KeyGenerator
                 sql = JDBCSyntax.Select + _seqValue + JDBCSyntax.From + _seqTable +
                     JDBCSyntax.Where + _seqKey + QueryExpression.OpEquals +
                     JDBCSyntax.Parameter;
-                if ( conn.getMetaData().supportsResultSetConcurrency(
-                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE) ) {
-                    stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
-                                                       ResultSet.CONCUR_UPDATABLE );
-                } else {
+
+                stmt = null;
+                try {
+                    if ( conn.getMetaData().supportsResultSetConcurrency(
+                            ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE) ) {
+                        stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
+                                                           ResultSet.CONCUR_UPDATABLE );
+                    }
+                } catch ( Throwable ex ) {
+                }
+                if ( stmt == null ) {
                     stmt = conn.prepareStatement( sql );
                 }
                 stmt.setString(1, tableName);
@@ -183,7 +189,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                     valClass = value.getClass();
                     if ( !valClass.equals(BigDecimal.class) ) {
                         try {
-                            value = Types.getConvertor(valClass, BigDecimal.class ).convert( value );
+                            value = Types.getConvertor(valClass, BigDecimal.class ).convert( value, null );
                             back = Types.getConvertor( BigDecimal.class, valClass );
                         } catch ( Exception except ) {
                             throw new PersistenceException(
@@ -194,7 +200,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                     last = (BigDecimal) value;
                     max = last.add( _grabSize );
                     if ( back != null ) {
-                        rs.updateObject( 1, back.convert( max ) );
+                        rs.updateObject( 1, back.convert( max, null ) );
                     } else {
                         rs.updateBigDecimal( 1, max );
                     }

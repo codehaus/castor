@@ -74,6 +74,12 @@ public final class SQLTypes
 
 
     /**
+     * Separator between type name and parameter, e.g. "char.01"
+     */
+    private static final char ParamSeparator = '.';
+
+
+    /**
      * Returns the Java type from the SQL type name.
      *
      * @param sqlTypeName SQL type name (e.g. numeric)
@@ -83,6 +89,12 @@ public final class SQLTypes
     public static Class typeFromName( String sqlTypeName )
         throws MappingException
     {
+        int sep;
+
+        sep = sqlTypeName.indexOf( ParamSeparator );
+        if ( sep >= 0 ) 
+            sqlTypeName = sqlTypeName.substring( 0, sep );
+        
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
                 return _typeInfos[ i ].javaType;
@@ -90,7 +102,27 @@ public final class SQLTypes
         throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
     }
     
-    
+
+    /**
+     * Extracts parameter for type convertor from the name of the SQL type
+     * of the form "SQL_type.domain".
+     * If the type is not parameterized, returns null.
+     *
+     * @param sqlTypeName SQL type name (e.g. char.01)
+     * @return Parameter (e.g. "01") or null
+     */
+    public static String paramFromName( String sqlTypeName )
+    {
+        int sep;
+
+        sep = sqlTypeName.indexOf( ParamSeparator );
+        if ( sep >= 0 )
+            return sqlTypeName.substring( sep + 1 );
+        else
+            return null;
+    }
+
+
     /**
      * Returns the Java type from the SQL type.
      *

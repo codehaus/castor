@@ -54,6 +54,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
@@ -114,10 +115,28 @@ public final class ReturningKeyGenerator implements KeyGenerator
      */
     public String patchSQL( String insert, String primKeyName )
             throws MappingException {
+        StringTokenizer st;
+        String tableName;
         StringBuffer sb;
         int lp1;  // the first left parenthesis, which starts fields list
         int lp2;  // the second left parenthesis, which starts values list
         char c;
+
+        // First find the table name
+        st = new StringTokenizer( insert );
+        if ( !st.hasMoreTokens() || !st.nextToken().equalsIgnoreCase("INSERT") ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        if ( !st.hasMoreTokens() || !st.nextToken().equalsIgnoreCase("INTO") ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        if ( !st.hasMoreTokens() ) {
+            throw new MappingException( Messages.format( "mapping.keyGenCannotParse",
+                                                         insert ) );
+        }
+        tableName = st.nextToken();
 
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );
@@ -127,7 +146,7 @@ public final class ReturningKeyGenerator implements KeyGenerator
         }
         sb = new StringBuffer( insert );
         // don't change insert order, otherwise index becomes invalid
-        sb.insert( lp2 + 1, seqName + ".nextval" + ",");
+        sb.insert( lp2 + 1, MessageFormat.format( seqName, new String[] {tableName}) + ".nextval" + ",");
         sb.insert( lp1 + 1, primKeyName + "," );
         sb.append( " RETURNING " );
         sb.append( primKeyName );

@@ -63,11 +63,12 @@ public interface TypeConvertor
      * Convert the object from one type to another.
      *
      * @param object The object to convert
+     * @param param The parameter for the convertor (null if is not specified)
      * @return The converted object
      * @throws ClassCastException The object is not of the type
      *  supported by this convertor
      */
-    public Object convert( Object object )
+    public Object convert( Object object, String param )
         throws ClassCastException;
 
 }
