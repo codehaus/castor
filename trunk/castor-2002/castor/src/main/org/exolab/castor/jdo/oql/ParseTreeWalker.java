@@ -523,8 +523,11 @@ public class ParseTreeWalker implements TokenTypes
          ( ! fieldPrefix.equals(_fromClassAlias) ) )
       throw new QueryException( "Invalid prefix identifier used in where clause: " + fieldPrefix);
 
-    field = _clsDesc.getField(fieldSuffix);
-
+    for ( JDOClassDescriptor cd = _clsDesc; cd != null; cd = (JDOClassDescriptor) cd.getExtends() ) {
+        field = cd.getField(fieldSuffix);
+        if ( field != null )
+            break;
+    }
     if (field == null)
       throw new QueryException( "The field " + fieldSuffix + " was not found." );
       
