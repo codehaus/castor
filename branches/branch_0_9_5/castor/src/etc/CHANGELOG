@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed java.util.Set support in the introspector.
+       (kvisco - 20040713)
+       
+
 XML:   Fixed a cyclic include bug with the IncludeUnmarshaller, added
        some code to make sure the main schema couldn't include itself.
        (kvisco - 20040624)
