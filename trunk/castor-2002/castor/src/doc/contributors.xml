@@ -308,6 +308,12 @@
     <description>Some patches for Castor XML + Castor JDO</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Low" given="Heng Sin"/>
+    <email>lowhs@comline.com.my</email>
+    <description>Gives helps fellow users on the mailing list</description>
+  </contributor>
+
   <!-- ******** -->
   <!-- FEEDBACK -->
   <!-- ******** -->
