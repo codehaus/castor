@@ -55,8 +55,9 @@ import org.exolab.castor.xml.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class IntegerValidator implements TypeValidator {
-    
+public class IntegerValidator extends PatternValidator
+    implements TypeValidator    
+{    
     
     private boolean useMin   = false;
     private boolean useMax   = false;
@@ -181,6 +182,10 @@ public class IntegerValidator implements TypeValidator {
                 throw new ValidationException(err);
             }
         }
+        
+        if (hasPattern())
+            super.validate(Integer.toString(i));
+        
     } //-- validate
     
     /**

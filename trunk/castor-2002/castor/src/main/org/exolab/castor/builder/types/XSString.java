@@ -52,7 +52,7 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSString extends XSType {
+public class XSString extends XSPatternBase {
     
     /**
      * The JType represented by this XSType
@@ -71,11 +71,6 @@ public class XSString extends XSType {
      * The min length facet
     **/
     private int minLength =  0;
-    
-    /**
-     * The pattern facet
-    **/
-    private String pattern = null;
     
     /**
      * Creates a new XSString
@@ -122,15 +117,6 @@ public class XSString extends XSType {
     } //-- getMinLength
     
     /**
-     * Returns the pattern facet for this XSString
-     *
-     * @return the pattern facet for this XSString
-    **/
-    public String getPattern() {
-        return pattern;
-    } //-- setPattern
-    
-    /**
      * Returns true if a maximum length has been set
      * @return true if a maximum length has been set
     **/
@@ -162,15 +148,6 @@ public class XSString extends XSType {
     public void setMinLength(int minLength) {
         this.minLength = minLength;
     } //-- setMinLength
-    
-    /**
-     * Sets the pattern facet for this XSString
-     *
-     * @param pattern the regular expression for this XSString
-    **/
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
-    } //-- setPattern
     
     /**
      * Returns the String value of this XSString
