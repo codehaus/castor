@@ -2,18 +2,18 @@
 <!--
     Castor Testing Framework Test Descriptor XML Schema
     Namespace: http://castor.exolab.org/Test
-    
+
     This schema is used to generate the
     org.exolab.castor.tests.framework.testdescriptor package
     *Note*: This schema is under evolution and subject to change.
  	This schema is under the Exolab license
  -->
 <!-- $Id$ -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2000/10/XMLSchema"
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   			targetNamespace="http://castor.exolab.org/Test"
   			elementFormDefault="qualified">
-  	
-  	<!-- The root element which contains an header and a test element-->	
+
+  	<!-- The root element which contains an header and a test element-->
 	<xsd:element name="TestDescriptor">
 		<xsd:complexType>
 			<xsd:sequence>
@@ -33,32 +33,32 @@
 					<xsd:element ref="MarshallingTest" minOccurs="0" maxOccurs="1"/>
 				</xsd:choice>
 			</xsd:sequence>
-		</xsd:complexType>		
+		</xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:element name="BugFix">
 		<xsd:complexType>
 			<xsd:sequence>
 				<!-- the reporter name -->
 				<xsd:element name="Reporter" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 				<!-- date of the report-->
-				<xsd:element name="Date_Report" type="xsd:timeInstant" minOccurs="1" maxOccurs="1"/>		
+				<xsd:element name="Date_Report" type="xsd:date" minOccurs="1" maxOccurs="1"/>
 				<!-- the 'fixer' name -->
 				<xsd:element name="Fixer" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 				<!-- date of the fix-->
-				<xsd:element name="Date_Fix" type="xsd:timeInstant" minOccurs="1" maxOccurs="1"/>		
+				<xsd:element name="Date_Fix" type="xsd:date" minOccurs="1" maxOccurs="1"/>
 				<!-- Some comments on the fix or the bug -->
 				<xsd:element name="Comment" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:element name="SourceGeneratorTest">
 		<xsd:complexType>
 			<xsd:sequence>
 					<!-- the name of the schema file -->
 					<!-- assume that the Testing Framework will try to match the name -->
-					<!-- by looking in all the JAR -->
+					<!-- by looking in all the JARs - directories -->
 					<xsd:element name="Schema" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 					<!-- The name of the properties file used with this SourceGenerator test case-->
 					<xsd:element name="Property_File" type="xsd:string" minOccurs="0" maxOccurs="1"/>
@@ -73,7 +73,7 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-		
+
 	<xsd:element name="MarshallingTest">
 		<xsd:complexType>
 			<xsd:sequence>
@@ -89,7 +89,7 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:element name="UnitTestCase">
 		<xsd:complexType>
 			<xsd:sequence>
@@ -99,28 +99,30 @@
 				<xsd:element name="Input" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 				<!-- the output file for marshalling -->
 				<xsd:element name="Output" type="xsd:string" minOccurs="0" maxOccurs="1"/>
-				<!-- the ObjectModelInstanceBuilder class used for this test case -->
-				<xsd:element name="ObjectModelInstanceBuilder" type="xsd:string" minOccurs="0" maxOccurs="1"/>
-			</xsd:sequence>
+				<!-- the ObjectBuilder class used for this test case -->
+				<xsd:element name="ObjectBuilder" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			    <!-- a boolean that indicates if the test case intents to fail (Exception thrown)-->
+                <xsd:element name="Failure" type="xsd:boolean" default="false" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-				
+
 	<xsd:simpleType name="CategoryType">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="basic capability"/>
 			<xsd:enumeration value="special case"/>
 			<!-- Extensible-->
 		</xsd:restriction>
-	</xsd:simpleType>		
-	
+	</xsd:simpleType>
+
 	<!--A root object in an object model-->
 	<xsd:complexType name="RootType">
 		<xsd:complexContent>
 			<xsd:extension base="StringType">
 				<!--set to true to generate randomly the given Object Model-->
-				<xsd:attribute name="random" type="boolean" use="default" value="false"/>
+				<xsd:attribute name="random" type="xsd:boolean" default="false"/>
 				<!--set to true to dump the given Object Model states in specific files-->
-				<xsd:attribute name="dump"   type="boolean" use="default" value="false"/>
+				<xsd:attribute name="dump"   type="xsd:boolean" default="false"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
