@@ -425,7 +425,7 @@ public final class Entity implements Cloneable {
         /**
          * Returns the EntityInfo of the current position
          *
-         * @throws IllegalStateException if next() is not called
+         * @throws IllegalStateException if next() has not been called
          */
         public EntityInfo getEntityInfo() 
                 throws IllegalStateException {
@@ -440,9 +440,23 @@ public final class Entity implements Cloneable {
         //  Entity Field level
         //=====================
         /**
+         * Get the number of field of the sub entity in the current position
+         *
+         * @throws IllegalStateException if entity base is not set
+         */
+        public int getEntityFieldSize() 
+                throws IllegalStateException {
+
+            if ( cur == null )
+                throw new IllegalStateException("next() should be called first!");
+
+            return cur.fieldInfo.length;
+        } // -- getEntityFieldSize
+
+        /**
          * Get the specified field info of the current entity
          *
-         * @throws IllegalStateException if next() is not called
+         * @throws IllegalStateException if next() has not been called
          * @throws ArrayIndexOutOfBoundsException if there is no field
          *         matches to the specified fieldNumber
          */
@@ -458,7 +472,7 @@ public final class Entity implements Cloneable {
         /**
          * Get the specified field value of the current entity
          *
-         * @throws IllegalStateException if next() is not called
+         * @throws IllegalStateException if next() has not been called
          * @throws ArrayIndexOutOfBoundsException if there is no field
          *         matches to the specified fieldNumber
          */
@@ -481,7 +495,7 @@ public final class Entity implements Cloneable {
         /**
          * Get the specified field value of the current entity
          *
-         * @throws IllegalStateException if next is not called
+         * @throws IllegalStateException if next has not been called
          * @throws ArrayIndexOutOfBoundsException if there is no field
          *         matches to the specified fieldNumber
          */
@@ -653,6 +667,25 @@ public final class Entity implements Cloneable {
         //  Entity Field level
         //=====================
         /**
+         * Get the number of field of the sub entity in the current position
+         *
+         * @throws IllegalStateException if entity base is not set
+         */
+        public int getEntityFieldSize() 
+                throws IllegalStateException {
+
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur= entity.base;
+                valuesOffset = 0;
+            }
+
+            return cur.fieldInfo.length;
+        } // -- getEntityFieldSize
+
+        /**
          * Get the specified field info of the current entity
          *
          * @throws IllegalStateException if entity base is not set
@@ -661,6 +694,7 @@ public final class Entity implements Cloneable {
          */
         public EntityFieldInfo getEntityFieldInfo( int fieldNumber ) 
                 throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
             if ( entity.base == null )
                 throw new IllegalStateException("entity base is not defined");
 
