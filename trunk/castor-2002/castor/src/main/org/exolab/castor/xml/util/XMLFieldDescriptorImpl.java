@@ -196,10 +196,12 @@ public class XMLFieldDescriptorImpl
         this.multivalued      = fieldDesc.isMultivalued();
         
         ClassDescriptor cd    = fieldDesc.getClassDescriptor();
-        if (cd instanceof XMLClassDescriptor)
-            this._classDescriptor = (XMLClassDescriptor)cd;
-        else
-            this._classDescriptor = new XMLClassDescriptorAdapter(cd, null);
+        if (cd != null) {
+            if (cd instanceof XMLClassDescriptor)
+                this._classDescriptor = (XMLClassDescriptor)cd;
+            else
+                this._classDescriptor = new XMLClassDescriptorAdapter(cd, null);
+        }
         
         //-- check for instances of java.util.Date
         if (java.util.Date.class.isAssignableFrom(_fieldType)) {
