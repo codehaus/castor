@@ -830,7 +830,7 @@ public class ParseTreeWalker implements TokenTypes
    * @param tableAlias The path info vector to build the alias with
    * @param pathIndex Field index in the path info
    */
-  public String buildTableAlias( String tableName, Vector path, int pathIndex )
+  public String buildTableAlias( String tableName, Vector path, int tableIndex )
   {
       /* FIXME This aliasing will cause problems if a (different) table
       with the same name as our alias already exists (or will be added
@@ -847,15 +847,16 @@ public class ParseTreeWalker implements TokenTypes
        as I am rather tired; I'll write some better explanation later -
        I promise! :-) */
       if( path != null && path.size() > 2 ) {
-          i = (Integer) _allPaths.get( path );
+          Vector tablePath = new Vector( path.subList( 0, tableIndex + 1 ) );
+          i = (Integer) _allPaths.get( tablePath );
           if ( i == null ) {
               index = _allPaths.size();
-              _allPaths.put( path, new Integer( index ) );
+              _allPaths.put( tablePath, new Integer( index ) );
           } else {
               index = i.intValue();
           }
           // If table name contains '.', it should be replaced, since such names aren't allowed for aliases
-          tableAlias = tableAlias.replace('.', '_') + "_" + index + "_" + pathIndex;
+          tableAlias = tableAlias.replace('.', '_') + "_" + index;
       }
       //System.out.println( "TableAlias: " + tableAlias );
       return tableAlias;
