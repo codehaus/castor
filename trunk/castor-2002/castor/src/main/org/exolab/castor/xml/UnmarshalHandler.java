@@ -118,7 +118,7 @@ public final class UnmarshalHandler extends MarshalFramework
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
     private Class            _topClass     = null;
-    
+
     /**
      * The top-level instance object, this may be set by the user
      * by calling #setRootObject();
@@ -259,7 +259,7 @@ public final class UnmarshalHandler extends MarshalFramework
     public void setRootObject(Object root) {
         _topObject = root;
     } //-- setRootObject
-    
+
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
      * System.out will be used to display debug information
@@ -742,7 +742,7 @@ public final class UnmarshalHandler extends MarshalFramework
                             throw new SAXException(err);
                         }
 
-                    } 
+                    }
                     catch(Exception ex) {
                         String msg = "unable to instantiate " +
                             instanceClassname + "; ";
@@ -759,7 +759,7 @@ public final class UnmarshalHandler extends MarshalFramework
                         throw new SAXException(msg + ex);
                     }
 
-                } 
+                }
                 //-- no xsi type information present
                 else {
                     //-- try to create instance of the given Class
@@ -807,7 +807,6 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- Find FieldDescriptor for the element
         //-- we wish to unmarshal
         XMLFieldDescriptor descriptor = null;
-            descriptor = searchContainers(name, classDesc);
         descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
 
         /*
@@ -835,7 +834,6 @@ public final class UnmarshalHandler extends MarshalFramework
                  cdInherited = match.inheritedClassDesc;
              }
         }
-
 
         //the field descriptor is still null -> problem
         if (descriptor == null) {
