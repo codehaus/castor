@@ -151,6 +151,16 @@ public class ParamInfo {
   }
 
   /**
+   * Specifies whether this parameter was specified in the OQL with a User 
+   * defined type, like $(int)1.
+   *
+   * @return True if this parameter whas a user defined type otherwise false
+   */
+  public boolean isUserDefined() {
+    return ! _userDefinedType.equals("");
+  }
+
+  /**
    * Maps this numbered parameter to the numbered SQL parameter.
    *
    * @param sqlParamIndex The SQL parameter number.

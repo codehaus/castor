@@ -76,6 +76,9 @@ import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
@@ -129,6 +132,7 @@ public class OQLQueryImpl
 
    public void bind( Object value )
     {
+
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         if ( _fieldNum == _paramInfo.size() )
@@ -137,9 +141,40 @@ public class OQLQueryImpl
         try {
             ParamInfo info = (ParamInfo) _paramInfo.get(new Integer( _fieldNum + 1 ));
             
-            if ( value != null && ! info.getTheClass().isAssignableFrom( value.getClass() ) )
-                throw new IllegalArgumentException( "Query paramter " + ( _fieldNum + 1 ) + " is not of the expected type " + 
-                                                    info.getTheClass() );
+            //do type checking and conversion
+            Class paramClass = info.getTheClass();
+            Class valueClass = value.getClass();
+            Class numberClass = null;
+            try { numberClass = Class.forName("java.lang.Number"); }
+            catch ( ClassNotFoundException e ) {}
+            
+            if ( value != null && ! paramClass.isAssignableFrom( valueClass ) )
+                if ( info.isUserDefined() )
+                    //If the user specified a type they must pass that exact type.
+                    
+                    throw new IllegalArgumentException( "Query paramter " + 
+                                                        ( _fieldNum + 1 ) + 
+                                                        " is not of the expected type " + 
+                                                        paramClass + 
+                                                        " it is an instance of the class " 
+                                                        + valueClass );
+                else if ( numberClass.isAssignableFrom( paramClass ) ) {
+                    //if the user did not specify a type, we'll get a converter for numeric types.
+                    
+                    try {
+                        TypeConvertor tc = Types.getConvertor( valueClass, paramClass );
+                        value = tc.convert(value);
+                    }
+                    catch ( MappingException e ) {
+                        throw new IllegalArgumentException( "Query parameter " 
+                                                            + ( _fieldNum + 1 )
+                                                            + " cannot be converted from "
+                                                            + valueClass + " to "
+                                                            + paramClass 
+                                                            + ", because no convertor can be found." );
+                    }
+                }
+
             if ( _bindValues == null )
                 _bindValues = new Object[ _bindTypes.length ];
 
@@ -395,7 +430,7 @@ public class OQLQueryImpl
             throw except;
         }
     }
-
+        
 
     static class OQLEnumeration
         implements Enumeration
