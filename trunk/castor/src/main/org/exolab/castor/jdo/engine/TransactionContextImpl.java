@@ -113,7 +113,8 @@ final class TransactionContextImpl
     }
 	
 	public TransactionContextImpl( Database db, boolean globalTx , javax.transaction.Transaction transaction )
-    {
+    	throws javax.transaction.SystemException
+	{
         super( db , transaction );
         _globalTx = globalTx;
     }
