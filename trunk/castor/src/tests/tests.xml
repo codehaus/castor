@@ -253,7 +253,7 @@
     <case class="jdo.TestLimitClause" id="TC62" />
   </category>
 
-<category name="mssql" class="jdo.JDOCategory">
+  <category name="mssql" class="jdo.JDOCategory">
     <description>JDO tests for MS SQLServer 7</description>
     <jdo database-name="mssql" configuration="mssql.xml" />
 
@@ -298,7 +298,15 @@
     <!-- jdo.ListTypes is a helper class for
     writing castor jdo driver      -->
     <!-- <case class="jdo.ListTypes" /> -->
-</category>
+  </category>
+
+  <category name="hsql" class="jdo.JDOCategory">
+    <description>JDO tests for Hypersonic SQL</description>
+    <jdo database-name="hsql" configuration="hsql.xml" />
+
+    <case class="jdo.TestLimitClause" id="TC62" />
+
+  </category>
 
 </harness>
 
