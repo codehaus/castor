@@ -105,6 +105,11 @@ public final class J2CollectionHandlers
                     return 0;
                 return ( (Collection) collection ).size();
             }
+            public Object clear( Object collection ) {
+                if ( collection != null )
+                    ( (Collection) collection ).clear();
+                return null;
+            }
             public String toString() {
                 return "Collection";
             }
@@ -133,6 +138,11 @@ public final class J2CollectionHandlers
                     return 0;
                 return ( (Set) collection ).size();
             }
+            public Object clear( Object collection ) {
+                if ( collection != null )
+                    ( (Set) collection ).clear();
+                return null;
+            }
             public String toString() {
                 return "Set";
             }
@@ -160,6 +170,11 @@ public final class J2CollectionHandlers
                 if ( collection == null )
                     return 0;
                 return ( (HashMap) collection ).size();
+            }
+            public Object clear( Object collection ) {
+                if ( collection != null )
+                    ( (Map) collection ).clear();
+                return null;
             }
             public String toString() {
                 return "Map";
