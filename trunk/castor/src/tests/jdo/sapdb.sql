@@ -104,6 +104,22 @@ create unique index test_pks_payroll_pk on test_pks_payroll( id )
 //
 
 
+
+drop table test_pks_project
+//
+
+create table test_pks_project (
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  id    int             not null,
+  name  varchar(100)
+)
+//
+
+create unique index test_pks_project_pk on test_pks_project( id )
+//
+
+
 drop table test_pks_address
 //
 
@@ -249,6 +265,19 @@ create table test_detail2 (
 create unique index test_detail2_pk on test_detail2 ( detail2_id )
 //
 
+drop table test_detail3
+//
+
+create table test_detail3
+(
+  detail3_id  fixed(10,0)  not null,
+  detail_id  fixed(10,0)  not null,
+  value1      varchar(200 )  not null
+)
+//
+
+create unique index test_detail3_pk on test_detail3 ( detail3_id )
+//
 
 drop table   test_group
 //
@@ -272,6 +301,8 @@ create table test_types (
   tdt      timestamp           not null,
   ttm      timestamp           not null,
   int_val  integer        null,
+  float_val float null,
+  real_val float null,
   long_val fixed(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
@@ -282,7 +313,8 @@ create table test_types (
   clob_val long           null,
   blob_val2 long byte     null,
   clob_val2 long          null,
-  date_str  timestamp     null
+  date_str  timestamp     null,
+  long_date fixed(20,0) null
 )
 //
 
@@ -477,6 +509,33 @@ create table test_oqlext (
 create unique index test_oqlext_pk on test_oqlext( ident )
 //
 
+drop table test_oqlext2
+//
+
+create table test_oqlext2 (
+  id      integer         not null,
+  ext     integer         not null
+)
+//
+
+create unique index test_oqlext2_pk on test_oqlext2( id )
+//
+
+drop table test_oqltag
+//
+
+create table test_oqltag (
+  id1   integer         not null,
+  id2   integer         not null
+)
+//
+
+create index test_oqltag_fk1 on test_oqltag( id1 )
+//
+
+create index test_oqltag_fk2 on test_oqltag( id2 )
+//
+
 
 drop table test_nton_a
 //
@@ -497,4 +556,33 @@ create table test_nton_b (
 )
 //
 
+drop table master
+//
+drop table depend1
+//
+drop table depend2 cascade
+//
+
+create table depend1(
+  id int,
+  primary key (id)
+)
+//
+
+create table master(
+  depend1_id        int,
+  id               int,
+  primary key (id),
+  foreign key fk_master_depend1(depend1_id) references depend1(id) on delete cascade
+)
+//
+
+create table depend2
+(
+	master_id        int,
+	id               int,
+	primary key (id),
+	foreign key fk_depend2_master(master_id) references master(id) on delete cascade
+)
+//
 
