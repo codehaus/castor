@@ -88,7 +88,7 @@ public class SourceFactory  {
 	 * A flag indicating whether or not to generate XML marshalling
 	 * framework specific methods.
 	 */
-	private boolean _createMarshall = true;
+	private boolean _createMarshalMethods = true;
 
     /**
 	 * A flag indicating whether or not to implement CastorTestable
@@ -123,13 +123,13 @@ public class SourceFactory  {
      * methods (marshall, unmarshall, validate) in the generated classes.
 	 * By default, these methods are generated.
 	 *
-     * @param createMarshall a boolean, when true indicates
+     * @param createMarshalMethods a boolean, when true indicates
      * to generated the marshalling framework methods
      *
     **/
-    public void setMarshallCreation(boolean createMarshall) {
-        _createMarshall = createMarshall;
-    } //-- setDescriptorCreation
+    public void setCreateMarshalMethods(boolean createMarshalMethods) {
+        _createMarshalMethods = createMarshalMethods;
+    } //-- setCreateMarshalMethpds
 
     /**
      * Sets whether or not to create the XML marshalling framework specific
@@ -238,7 +238,7 @@ public class SourceFactory  {
         jClass.addImport("java.io.Writer");
         jClass.addImport("java.io.Reader");
 
-		if (_createMarshall) {
+		if (_createMarshalMethods) {
            //-- #validate()
            createValidateMethods(jClass);
            //-- #marshal()
@@ -330,7 +330,7 @@ public class SourceFactory  {
         jClass.addImport("java.io.Writer");
         jClass.addImport("java.io.Reader");
 
-		if (_createMarshall) {
+		if (_createMarshalMethods) {
            //-- #validate()
            createValidateMethods(jClass);
 		   //-- Output Marshalling methods for non abstract classes
@@ -491,7 +491,7 @@ public class SourceFactory  {
         processContentModel(group, state);
 
 
-		if (_createMarshall) {
+		if (_createMarshalMethods) {
             //-- add imports required by the marshal methods
             jClass.addImport("java.io.Writer");
             jClass.addImport("java.io.Reader");
@@ -578,7 +578,7 @@ public class SourceFactory  {
         con.getSourceCode().add("super();");
 
         //-- add default import list
-        if (_createMarshall)
+        if (_createMarshalMethods)
            jClass.addImport("org.exolab.castor.xml.*");
         jClass.addImport("java.io.Serializable");
 
