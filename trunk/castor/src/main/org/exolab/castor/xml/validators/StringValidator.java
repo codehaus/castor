@@ -173,6 +173,8 @@ public class StringValidator extends PatternValidator
 
         if (value == null) return null;
 
+        if (value.length() == 0) return value;
+        
         char[] chars = value.toCharArray();
         int length = chars.length;
 
