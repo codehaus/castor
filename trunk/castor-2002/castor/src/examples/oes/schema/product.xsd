@@ -27,6 +27,8 @@
           <xsd:element name="msrp" type="double" minOccurs="1" maxOccurs="1" />
           <xsd:element name="cost" type="double" minOccurs="0" maxOccurs="1" />
 
+          <xsd:element name="unit" type="double" minOccurs="0" />
+
           <!-- ProductPrice.Discount -->
           <xsd:element name="Discount">
             <xsd:type content="elemOnly" order="seq">
