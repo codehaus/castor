@@ -221,7 +221,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     {
         _character = false;
         //if it is the starting element just returns
-        if (_startingNode.getLocalName().equals(localName))
+        if (_startingNode.getLocalName().equals(localName) && _nodeStack.empty())
            return;
 
         //else just add the node we have built to the previous node
