@@ -371,10 +371,10 @@ public class Types
             this.immutable  = immutable;
             this.defValue   = defValue;
         }
-        
+
     }
 
-    
+
     /**
      * List of all the simple types supported by Castor.
      */
@@ -420,8 +420,8 @@ public class Types
           new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
         */
     };
-    
-    
+
+
     /**
      * Information used to locate a type convertor.
      */
@@ -810,7 +810,8 @@ public class Types
         // Convertors to character/byte array
         new TypeConvertorInfo( java.lang.String.class, java.lang.Character.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return ( new Character( ( (String ) obj ).charAt( 0 ) ) );
+                String str = (String ) obj;
+                return ( new Character( str.length() == 0 ? 0 : str.charAt( 0 ) ) );
             }
             public String toString() { return "String->Character"; }
         } ),
