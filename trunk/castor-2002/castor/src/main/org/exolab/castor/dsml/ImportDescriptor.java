@@ -73,10 +73,31 @@ public class ImportDescriptor
 
     public static class Policy
     {
-	public static final int DeleteEmpty   = 0x01;
-	public static final int ReplaceAttr   = 0x02;
-	public static final int RefreshOnly   = 0x04;
-	public static final int DefaultPolicy = 0x00;
+        /**
+         * Under the <code>DeleteEmpty</code> policy, entries without attributes in the DSML are deleted from the Ldap.
+         */
+        public static final int DeleteEmpty   = 0x01;
+        /**
+         * Under the <code>ReplaceAttr</code> policy, attributes in the Ldap that are not specified in the DSML are deleted.
+         */
+        public static final int ReplaceAttr   = 0x02;
+        /**
+         * Under the <code>RefreshOnly</code> policy, DSML entries that do not already exist in the Ldap are not created.
+         */
+        public static final int RefreshOnly   = 0x04;
+        /**
+         * Under the <code>NewAttrOnly</code> policy, new attributes are created according to the DSML, 
+         but attributes that already have a value in the ldap are not updated.
+         */
+        public static final int NewAttrOnly   = 0x08;
+        /**
+         * Under the <code>UpdateOnly</code> policy, DSML attributes that do not already exist in the Ldap are not created.
+         */
+        public static final int UpdateOnly    = 0x10;
+        /**
+         * Under the <code>DefaultPolicy</code> policy, 
+         */
+        public static final int DefaultPolicy = 0x00;
     }
 
 
@@ -92,7 +113,9 @@ public class ImportDescriptor
 	    public static final String DN            = "dn";
 	    public static final String DeleteEmpty   = "delete-empty";
 	    public static final String ReplaceAttr   = "replace-attr";
-	    public static final String RefreshOnly   = "replace-only";
+	    public static final String RefreshOnly   = "refresh-only";
+	    public static final String UpdateOnly    = "update-only";
+	    public static final String NewAttrOnly   = "new-attr-only";
 	}
     }
 
@@ -180,6 +203,10 @@ public class ImportDescriptor
 		attrList.addAttribute( Names.Attribute.ReplaceAttr, null, "true" );
 	    if ( ( policy & Policy.RefreshOnly ) != 0 )
 		attrList.addAttribute( Names.Attribute.RefreshOnly, null, "true" );
+	    if ( ( policy & Policy.UpdateOnly ) != 0 )
+		attrList.addAttribute( Names.Attribute.UpdateOnly, null, "true" );
+	    if ( ( policy & Policy.NewAttrOnly ) != 0 )
+		attrList.addAttribute( Names.Attribute.NewAttrOnly, null, "true" );
 	    docHandler.startElement( Names.Element.Policy, attrList );
 	    docHandler.endElement( Names.Element.Policy );
 	}
@@ -220,6 +247,10 @@ public class ImportDescriptor
 		    policy = policy | Policy.RefreshOnly;
 		if ( "true".equals( attr.getValue( Names.Attribute.ReplaceAttr ) ) )
 		    policy = policy | Policy.ReplaceAttr;
+		if ( "true".equals( attr.getValue( Names.Attribute.NewAttrOnly ) ) )
+		    policy = policy | Policy.NewAttrOnly;
+		if ( "true".equals( attr.getValue( Names.Attribute.UpdateOnly ) ) )
+		    policy = policy | Policy.UpdateOnly;
 		addPolicy( dn, policy );
 	    } else {
 		throw new SAXException( Messages.format( "dsml.expectingOpeningTag",
