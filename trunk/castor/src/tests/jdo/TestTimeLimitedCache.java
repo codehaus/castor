@@ -166,7 +166,8 @@ public class TestTimeLimitedCache
 	 class TestTimeLimited extends TimeLimited {
 	 	
 	 	public TestTimeLimited(int count) {
-	 		super(count);
+	 		super();
+            setCapacity(count);
 	 	}
 	 	
 	 	protected void dispose(Object o) {
