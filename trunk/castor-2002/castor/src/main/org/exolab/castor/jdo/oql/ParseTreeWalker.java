@@ -327,6 +327,21 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
+   * Search for the field in the given class descriptor and descriptors of the superclasses,
+   * return null if not found.
+   */
+  private JDOFieldDescriptor getFieldDesc( String fieldName, JDOClassDescriptor clsDesc ) {
+    JDOFieldDescriptor field;
+
+    for ( JDOClassDescriptor cd = clsDesc; cd != null; cd = (JDOClassDescriptor) cd.getExtends() ) {
+        field = cd.getField(fieldName);
+        if ( field != null )
+            return field;
+    }
+    return null;
+  }
+
+  /**
    * Checks a projection (one of the items selected).  Determines the 
    * _projectionType.
    *
@@ -337,11 +352,13 @@ public class ParseTreeWalker implements TokenTypes
    *    object passed as the ParseTreeNode is not a simple type (use this
    *    when recursing on the arguments passed to Aggregate and SQL functions).
    * @throws QueryException if there is an error.
+   * @return a JDOFieldDescriptor representation of the field, if it represents a field.
    */
-  private void checkProjection( ParseTreeNode projection, 
+  private JDOFieldDescriptor checkProjection( ParseTreeNode projection,
                                 boolean topLevel, 
                                 boolean onlySimple )
           throws QueryException {
+    JDOFieldDescriptor field = null;
     
     if ( projection.getChildCount() == 0 ) {
       if ( topLevel ) {
@@ -354,7 +371,7 @@ public class ParseTreeWalker implements TokenTypes
         if ( onlySimple )
           throw new QueryException( "Only primitive values are allowed to be passed as parameters to Aggregate and SQL functions." );
         else
-          return;
+          return null;
     }
     else {
       int tokenType = projection.getToken().getTokenType();
@@ -379,37 +396,51 @@ public class ParseTreeWalker implements TokenTypes
           if ( e.hasMoreElements() ) {
             curNode = (ParseTreeNode) e.nextElement();
             curName = curNode.getToken().getTokenValue();
+            if ( ( ! curName.equals(_projectionName) ) &&
+                 ( ! curName.equals(_projectionAlias) ) &&
+                 ( ! curName.equals(_fromClassName) ) &&
+                 ( ! curName.equals(_fromClassAlias) ) ) {
+              // reset the enumeration
+              e = projection.children();
+              curName = _fromClassAlias;
+            }
             projectionName.append(curName);
             projectionInfo.addElement(curName);
-            if ( ! curName.equals(_fromClassAlias ) )
-              throw new QueryException( "Object name not the same in SELECT and FROM." );
           }
               
           //use the ClassDescriptor to check that the rest of the path is valid.
           JDOClassDescriptor curClassDesc = _clsDesc;
           JDOFieldDescriptor curField = null;
           int count = 0;
+          String curToken;
           while ( e.hasMoreElements() ) {
-            curNode = (ParseTreeNode) e.nextElement();
-            curName = curNode.getToken().getTokenValue();
+            // there may be nested attribute name
+            curField = null;
+            curName = null;
+            while ( curField == null && e.hasMoreElements() ) {
+              curNode = (ParseTreeNode) e.nextElement();
+              curToken = curNode.getToken().getTokenValue();
+              if ( curName == null ) {
+                curName = curToken;
+              } else {
+                curName = curName + "." + curToken;
+              }
+              curField = getFieldDesc(curName, curClassDesc);
+            }
+            if ( curField == null )
+              throw new QueryException( "An unknown field was requested: " + curName );
             projectionName.append(".").append(curName);
             projectionInfo.addElement(curName);
-            curField = curClassDesc.getField(curName);
-            if ( curField == null )
-              throw new QueryException( "An unknown field was requested in the select part of the query: " + curName );
             curClassDesc = (JDOClassDescriptor) curField.getClassDescriptor();
-        if ( curClassDesc == null && e.hasMoreElements() )
-        throw new QueryException( "An non-reference field was requested in the select part of the query: " + curName );
+            if ( curClassDesc == null && e.hasMoreElements() )
+              throw new QueryException( "An non-reference field was requested: " + curName );
             count++;
           }
+          field = curField;
 
           _pathInfo.put( projection, projectionInfo );
           _fieldInfo.put( projection, curField );
 
-      // simple projection == Field => remember it
-      if ( projectionInfo.size() == 2 )
-          checkField( curNode );
-          
           Class theClass = curField.getFieldType();
           // is it actually a Java primitive, or String, 
           // or a subclass of Number
@@ -428,8 +459,6 @@ public class ParseTreeWalker implements TokenTypes
           else
             if ( ! isSimple && onlySimple )
               throw new QueryException( "Only primitive values are allowed to be passed as parameters to Aggregate and SQL functions." );
-            else
-              return;
           break;
           
         case KEYWORD_COUNT:
@@ -437,7 +466,7 @@ public class ParseTreeWalker implements TokenTypes
           _projectionType = AGGREGATE;
           if ( projection.getChild(0).getToken().getTokenType() == TIMES )
             //count(*)
-            return;
+            break;
           else
             //can call count on object types -- recurse over child
             checkProjection( projection.getChild(0), false, false );
@@ -460,6 +489,7 @@ public class ParseTreeWalker implements TokenTypes
             checkProjection( (ParseTreeNode) e.nextElement(), false, false );
       }
     }
+    return field;
   }
 
   /**
@@ -524,46 +554,31 @@ public class ParseTreeWalker implements TokenTypes
    * Checks whether the field passed in is valid within this object.  Also
    * adds this field to a Hashtable.
    *
-   * @param fieldTree A leaf node containing an identifier, or a tree with DOT 
-   *    root, and two IDENTIFIER children (for fields that look like 
+   * @param fieldTree A leaf node containing an identifier, or a tree with DOT
+   *    root, and two IDENTIFIER children (for fields that look like
    *    Person.name or Person-&gt;name)
    * @return a JDOFieldDescriptor representation of this field.
    * @throws QueryException if the field does not exist.
    */
-  private JDOFieldDescriptor checkField(ParseTreeNode fieldTree) 
+  private JDOFieldDescriptor checkField(ParseTreeNode fieldTree)
         throws QueryException {
 
     //see if we've checked this field before.
     JDOFieldDescriptor field = (JDOFieldDescriptor)_fieldInfo.get(fieldTree);
     if ( field != null )
       return field;
-  
-    String fieldPrefix = _fromClassName;
-    String fieldSuffix = fieldTree.getToken().getTokenValue();
-    
-    if ( fieldTree.getToken().getTokenType() == DOT ) {
-      fieldPrefix = fieldTree.getChild(0).getToken().getTokenValue();
-      fieldSuffix = fieldTree.getChild(1).getToken().getTokenValue();
-    }
-        
-    if ( ( ! fieldPrefix.equals(_projectionName) ) &&
-         ( ! fieldPrefix.equals(_projectionAlias) ) &&
-         ( ! fieldPrefix.equals(_fromClassName) ) &&
-         ( ! fieldPrefix.equals(_fromClassAlias) ) )
-      throw new QueryException( "Invalid prefix identifier used in where clause: " + fieldPrefix);
 
-    for ( JDOClassDescriptor cd = _clsDesc; cd != null; cd = (JDOClassDescriptor) cd.getExtends() ) {
-        field = cd.getField(fieldSuffix);
-        if ( field != null )
-            break;
+    if ( fieldTree.getToken().getTokenType() == DOT ) {
+        field = checkProjection( fieldTree, false, false );
+    } else {
+        field = getFieldDesc( fieldTree.getToken().getTokenValue(), _clsDesc );
+        if (field != null)
+            _fieldInfo.put(fieldTree, field);
     }
     if (field == null)
-      throw new QueryException( "The field " + fieldSuffix + " was not found." );
-      
-    _fieldInfo.put(fieldTree, field);
-
+        throw new QueryException( "The field " + fieldTree.getToken().getTokenValue() + " was not found." );
     return field;
-        
+
   }
 
   /**
