@@ -67,10 +67,10 @@ public class KeyGenSequence
         super( "TC42", "Key generator: SEQUENCE", category );
     }
 
-    protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 
+    protected boolean testAllKeyGens( CWVerboseStream stream, Database db)
             throws Exception
     {
-        return TestOneKeyGen( stream, db, TestSequenceObject.class, TestSequenceExtends.class );
+        return testOneKeyGen( stream, db, TestSequenceObject.class, TestSequenceExtends.class );
     }
 
 }

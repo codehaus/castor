@@ -65,7 +65,7 @@ import org.exolab.exceptions.CWClassConstructorException;
 /**
  * Test for generic key generators (MAX and HIGH/LOW).
  */
-public class KeyGenGeneric
+public class KeyGenUuid
     extends CWTestCase
 {
 
@@ -73,14 +73,14 @@ public class KeyGenGeneric
     private JDOCategory    _category;
 
 
-    public KeyGenGeneric( CWTestCategory category )
+    public KeyGenUuid( CWTestCategory category )
         throws CWClassConstructorException
     {
-        this( "TC41", "Key generators: MAX, HIGH/LOW", category );
+        this( "TC45", "Key generator: UUID", category );
     }
 
 
-    public KeyGenGeneric( String name, String description, CWTestCategory category )
+    public KeyGenUuid( String name, String description, CWTestCategory category )
         throws CWClassConstructorException
     {
         super( name, description );
@@ -120,8 +120,7 @@ public class KeyGenGeneric
     protected boolean testAllKeyGens( CWVerboseStream stream, Database db)
             throws Exception
     {
-        return testOneKeyGen( stream, db, TestMaxObject.class, TestMaxExtends.class )
-                && testOneKeyGen( stream, db, TestHighLowObject.class, TestHighLowExtends.class );
+        return testOneKeyGen( stream, db, TestUuidObject.class, TestUuidExtends.class );
     }
 
 
@@ -136,8 +135,8 @@ public class KeyGenGeneric
             throws Exception
     {
         OQLQuery            oql;
-        TestKeyGenObject    object;
-        TestKeyGenObject    ext;
+        TestUuidObject      object;
+        TestUuidObject      ext;
         QueryResults        enum;
         boolean             result;
 
@@ -147,13 +146,13 @@ public class KeyGenGeneric
         db.begin();
 
         // Create first object
-        object = (TestKeyGenObject) objClass.newInstance();
+        object = (TestUuidObject) objClass.newInstance();
         stream.writeVerbose( "Creating first object: " + object );
         db.create( object );
         stream.writeVerbose( "Created first object: " + object );
 
         // Create second object
-        ext = (TestKeyGenObject) extClass.newInstance();
+        ext = (TestUuidObject) extClass.newInstance();
         stream.writeVerbose( "Creating second object: " + ext );
         db.create( ext );
         stream.writeVerbose( "Created second object: " + ext );
@@ -162,8 +161,8 @@ public class KeyGenGeneric
 
         db.begin();
 
-        // Find the first object and remove it 
-        //object = (TestKeyGenObject) db.load( objClass, object.getId() );
+        // Find the first object and remove it
+        //object = (TestUuidObject) db.load( objClass, object.getId() );
         oql = db.getOQLQuery();
         oql.create( "SELECT object FROM " + objClass.getName() +
                        " object WHERE id = $1" );
@@ -171,7 +170,7 @@ public class KeyGenGeneric
         enum = oql.execute();
         stream.writeVerbose( "Removing first object: " + object );
         if ( enum.hasMore() ) {
-            object = (TestKeyGenObject) enum.next();
+            object = (TestUuidObject) enum.next();
             db.remove( object );
             stream.writeVerbose( "OK: Removed" );
         } else {
@@ -180,7 +179,7 @@ public class KeyGenGeneric
         }
 
         // Find the second object and remove it
-        //ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
+        //ext = (TestUuidObject) db.load( extClass, ext.getId() );
         oql = db.getOQLQuery();
         oql.create( "SELECT ext FROM " + extClass.getName() +
                        " ext WHERE id = $1" );
@@ -188,7 +187,7 @@ public class KeyGenGeneric
         enum = oql.execute();
         stream.writeVerbose( "Removing second object: " + ext );
         if ( enum.hasMore() ) {
-            ext = (TestKeyGenObject) enum.next();
+            ext = (TestUuidObject) enum.next();
             db.remove( ext );
             stream.writeVerbose( "OK: Removed" );
         } else {

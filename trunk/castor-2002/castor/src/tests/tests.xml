@@ -36,8 +36,9 @@
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
-    <case class="jdo.KeyGenIdentity" />
+    <case class="jdo.KeyGenUuid" />
     <!-- -->
+    <case class="jdo.KeyGenIdentity" />
     <!-- -->
     <!-- -->
     <case class="jdo.Persistent" />
@@ -52,13 +53,13 @@
     <jdo database-name="oracle" configuration="oracle.xml" />
     <!-- A -->
     <case class="jdo.DuplicateKey" />
-    <case class="jdo.Concurrent" /> 
+    <case class="jdo.Concurrent" />
     <!-- <case class="jdo.DatabaseLockOracle" /> -->
     <case class="jdo.ReadOnly" />
     <case class="jdo.Deadlock" />
-    <case class="jdo.Race" />  
+    <case class="jdo.Race" />
     <case class="jdo.CacheLeakage" />
-    
+
     <!-- B -->
     <case class="jdo.TypeHandling" />
     <!-- <case class="jdo.Join" /> -->
@@ -75,6 +76,7 @@
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenUuid" />
     <!-- -->
     <case class="jdo.KeyGenSequence" />
     <case class="jdo.KeyGenReturning" />
@@ -113,6 +115,8 @@
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenUuid" />
+    <!-- -->
     <case class="jdo.KeyGenIdentity" />
     <!-- -->
     <case class="jdo.Persistent" />
@@ -149,8 +153,9 @@
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.KeyGenUuid" />
+    <!-- -->
     <case class="jdo.KeyGenSequence" />
-    <!--case class="jdo.KeyGenIdentity" /-->
     <!-- -->
     <case class="jdo.Persistent" />
 

@@ -68,10 +68,10 @@ public class KeyGenIdentity
     }
 
 
-    protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 
+    protected boolean testAllKeyGens( CWVerboseStream stream, Database db)
             throws Exception
     {
-        return TestOneKeyGen( stream, db, TestIdentityObject.class, TestIdentityExtends.class );
+        return testOneKeyGen( stream, db, TestIdentityObject.class, TestIdentityExtends.class );
     }
 
 }

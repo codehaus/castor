@@ -566,6 +566,25 @@
     </field>
   </class>
 
+  <class name="jdo.TestUuidObject" identity="id" key-generator="UUID">
+    <description>Table used for UUID key generator testing</description>
+    <map-to table="test_uuid" />
+    <field name="id" type="string">
+      <sql name="id" type="char" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestUuidExtends" extends="jdo.TestUuidObject">
+    <description>Table used for UUID key generator testing</description>
+    <map-to table="test_uuid_ext" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
+
 
   <class name="jdo.TestPersistent" access="shared" identity="id">
     <description>Test Persistent interface handling</description>
