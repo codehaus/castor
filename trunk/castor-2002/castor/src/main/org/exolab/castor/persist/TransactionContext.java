@@ -100,7 +100,7 @@ public class TransactionContext
      * Defines the types of access allowed on an object. Determines
      * what locks to use when retrieving the object in a transaction.
      */
-    public interface AccessMode
+    public static class AccessMode
     {
 	
 	/**
@@ -149,7 +149,7 @@ public class TransactionContext
     private int         _status;
 
 
-    private int         _lockTimeout;
+    private int         _lockTimeout = 30;
 
 
     private Xid         _xid;
@@ -198,14 +198,23 @@ public class TransactionContext
      * considered persistent and may be deleted or upgraded to write
      * lock. If the object is loaded for exclusive access then a write
      * lock is acquired and the object is synchronized with the
-     * persistent copy. This method may be called multiple times for
-     * an object in the same transaction and will always behave as if
-     * called on the object for the first time.
+     * persistent copy.
+     * <p>
+     * This method may be called multiple times for an object in the
+     * same transaction and will always behave as if called on the
+     * object for the first time. On the first call within a transaction
+     * the object will be loaded and true returned. On subsequent calls
+     * the object will not be loaded and false returned.
+     * <p>
+     * Attempting to load the object twice in the same transaction, once
+     * with exclusive lock and once with read-write lock will result in
+     * an exception.
      *
      * @param cache The cache engine
      * @param obj The object to load
      * @param identity The object's identity
      * @param accessMode The access mode (see {@link AccessMode})
+     * @return True if the object contents has been modified
      * @throws TransactionNotInProgressException Method called while
      *   transaction is not in progress
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -215,7 +224,7 @@ public class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized void load( CacheEngine cache, Object obj,
+    public synchronized boolean load( CacheEngine cache, Object obj,
 				   Object identity, int accessMode )
 	throws TransactionNotInProgressException, ObjectNotFoundException,
 	       LockNotGrantedException, PersistenceException
@@ -241,8 +250,10 @@ public class TransactionContext
 		throw new PersistenceException( "persist.multipleLoad", obj.getClass(), identity );
 	    if ( entry.deleted )
 		throw new ObjectNotFoundException( obj.getClass(), identity );
+	    if ( obj.getClass() != entry.obj.getClass() )
+		throw new PersistenceException( "persist.typeMismatch", obj.getClass(), entry.obj.getClass() );
 	    if ( entry.created )
-		return;
+		return false;
 	    if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
 		// If we are in exclusive mode and object has not been
 		// loaded in exclusive mode before, then we have a
@@ -252,7 +263,7 @@ public class TransactionContext
 		throw new PersistenceException( "persist.lockConflict",
 						obj.getClass(), identity );
 	    }
-	    return;
+	    return false;
 	}
 
 	// Load (or reload) the object through the cache engine with the
@@ -285,9 +296,27 @@ public class TransactionContext
 		entry = addObjectEntry( obj, oid, cache );
 	    }
 	}
+	return true;
     }
 
 
+    /**
+     * Perform a query using the query mechanism and in the specified
+     * access mode. The query is performed in this transaction, and
+     * the returned query results can only be used while this
+     * transaction is open. It is assumed that the query mechanism is
+     * compatible with the cache engine.
+     * 
+     * @param cache The cache engine
+     * @param query A query against the cache engine
+     * @param accessMode The access mode
+     * @return A query result iterator
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws QueryException Could not process the query
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
     public synchronized QueryResults query( CacheEngine cache, Query query, int accessMode )
 	throws TransactionNotInProgressException, QueryException,
 	       PersistenceException
@@ -299,7 +328,6 @@ public class TransactionContext
 	query.execute( getConnection( cache ), ( accessMode == AccessMode.Exclusive ) );
 	return new QueryResults( this, cache, query, accessMode );
     }
-
 
 
     /**
@@ -330,15 +358,22 @@ public class TransactionContext
     {
 	OID         oid;
 	ObjectEntry entry;
+	ObjectDesc  objDesc;
 
 	if ( _status != Status.STATUS_ACTIVE )
 	    throw new TransactionNotInProgressException();
 	// Make sure the object has not beed persisted in this transaction.
 	if ( getObjectEntry( obj ) != null )
 	    throw new PersistenceException( "persist.objectAlreadyPersistent", obj, identity );
+	objDesc = cache.getObjectDesc( obj.getClass() );
+	if ( objDesc == null )
+	    throw new ClassNotPersistenceCapableException( obj.getClass() );
+
 	// Create the object. This can only happen once for each object in
 	// all transactions running on the same engine, so after creation
 	// add a new entry for this object and use this object as the view
+	if ( identity != null && getObjectEntry( cache, new OID( objDesc, identity ) ) != null )
+	    throw new DuplicateIdentityException( obj.getClass(), identity );
 	oid = cache.create( this, obj, identity );
 	entry = addObjectEntry( obj, oid, cache );
 	entry.created = true;
@@ -523,8 +558,10 @@ public class TransactionContext
 	}
 
 	// No objects in this transaction -- this is a read only transaction
-	if ( _objects.size() == 0 )
+	if ( _objects.size() == 0 ) {
+	    _status = Status.STATUS_PREPARED;
 	    return false;
+	}
 
 	try {
 	    _status = Status.STATUS_PREPARING;
@@ -818,7 +855,7 @@ public class TransactionContext
      * @param oid The object's OID
      * @param cache The cache engine used to create this object
      */
-    private ObjectEntry addObjectEntry( Object obj, OID oid, CacheEngine cache )
+    ObjectEntry addObjectEntry( Object obj, OID oid, CacheEngine cache )
     {
 	ObjectEntry entry;
 	Hashtable   cacheOids;
@@ -858,7 +895,7 @@ public class TransactionContext
      * @param obj The object to locate
      * @return The object's entry or null if not persistent
      */
-    private ObjectEntry getObjectEntry( Object obj )
+    ObjectEntry getObjectEntry( Object obj )
     {
 	return (ObjectEntry) _objects.get( obj );
     }
@@ -894,7 +931,7 @@ public class TransactionContext
      * identified as read only are not update when the transaction
      * commits.
      */
-    private static class ObjectEntry
+    static class ObjectEntry
     {
 
 	CacheEngine  cache;
@@ -909,127 +946,5 @@ public class TransactionContext
 
     }
 
-
-    public static class QueryResults
-    {
-
-	/**
-	 * The transaction context in which this query was executed.
-	 */
-	private TransactionContext _tx;
-
-
-	/**
-	 * The cache engine against which this query was executed.
-	 */
-	private CacheEngine         _cache;
-
-
-	/**
-	 * The executed query.
-	 */
-	private Query               _query;
-
-
-	/**
-	 * The mode in which this query is running (read-only, read/write,
-	 * exclusive).
-	 */
-	private int                 _accessMode;
-
-
-	QueryResults( TransactionContext tx, CacheEngine cache, Query query, int accessMode )
-	{
-	    _tx = tx;
-	    _cache = cache;
-	    _query = query;
-	    _accessMode = accessMode;
-	}
-
-
-	public Object nextResult()
-	    throws TransactionNotInProgressException, PersistenceException
-	{
-	    OID         oid;
-	    ObjectEntry entry;
-	    Object      obj;
-	    Object      identity;
-
-	    // Make sure transaction is still open.
-	    if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-		throw new TransactionNotInProgressException();
-
-	    synchronized ( _tx ) {
-		// Get the next OID from the query engine. The object is
-		// already loaded into the cache engine at this point and
-		// has a lock based on the original query (i.e. read write
-		// or exclusive). If no next record return null.
-		identity = _query.nextIdentity();
-		if ( identity == null )
-		    return null;
-		oid = new OID( _query.getObjectDesc(), identity );
-		
-		// Did we already load (or created) this object in this
-		// transaction.
-		entry = _tx.getObjectEntry( _cache, oid );
-		if ( entry != null ) {
-		    // The object has already been loaded in this transaction
-		    // and is available from the cache engine.
-		    if ( entry.deleted )
-			// Object has been deleted in this transaction, so skip
-			// to next object.
-			return nextResult();
-		    else {
-			if ( _accessMode == AccessMode.Exclusive && ! oid.isExclusive() ) {
-			    // If we are in exclusive mode and object has not been
-			    // loaded in exclusive mode before, then we have a
-			    // problem. We cannot return an object that is not
-			    // synchronized with the database, but we cannot
-			    // synchronize a live object.
-			    throw new PersistenceException( "persist.lockConflict",
-							    _query.getObjectDesc().getObjectType(), identity );
-			} else if ( _accessMode == AccessMode.ReadOnly ) {
-			    // If we are in read only mode then we return a new
-			    // instance of the object.
-			    obj = _query.getObjectDesc().createNew();
-			    _cache.copyObject( _tx, oid, obj );
-			    return obj;
-			} else {
-			    // Either read only or exclusive mode, and we
-			    // already have an object in that mode, so we
-			    // return that object.
-			    return entry.obj;
-			}
-		    }
-		} else {
-		    // First time we see the object in this transaction,
-		    // must create a new record for this object. We only
-		    // record the object in the transaction if in read-write
-		    // or exclusive mode.
-		    try {
-			_cache.fetch( _tx, _query, identity, ( _accessMode == AccessMode.Exclusive ),
-				      _tx.getLockTimeout() );
-			obj = _query.getObjectDesc().createNew();
-			_cache.copyObject( _tx, oid, obj );
-			if ( _accessMode == AccessMode.ReadOnly )
-			    _cache.releaseLock( _tx, oid );
-			else
-			    _tx.addObjectEntry( obj, oid, _cache );
-			return obj;
-		    } catch ( ObjectNotFoundException except ) {
-			// Object might have been deleted while query was
-			// looking at it. Simply jump to next object.
-			return nextResult();
-		    } catch ( LockNotGrantedException except ) {
-			// XXX Not sure this is the smartest response
-			return nextResult();
-		    }
-		}
-	    }
-	}
-
-	
-    }
-    
     
 }
