@@ -1,0 +1,35 @@
+<jtf:harness name="castor">
+
+  <jtf:category name="sybase" class="jdo.JDOCategory">
+    <jtf:description>JDO tests for Sybase 11</jtf:description>
+    <jdo:jdo database-name="sybase" configuration="sybase.xml" />
+    <jtf:case class="jdo.Concurrent" />
+    <jtf:case class="jdo.Deadlock" />
+    <jtf:case class="jdo.DuplicateKey" />
+    <jtf:case class="jdo.ReadOnly" />
+    <jtf:case class="jdo.TypeHandling"/>
+    <jtf:case class="jdo.Join" />
+    <jtf:case class="jdo.KeyGenGeneric" />
+    <jtf:case class="jdo.KeyGenIdentity" />
+    <jtf:case class="jdo.StoredProcedure" />
+  </jtf:category>
+
+  <jtf:category name="postgres" class="jdo.JDOCategory">
+    <jtf:description>JDO tests for PostgreSQL 6.5/7</jtf:description>
+    <jdo:jdo database-name="postgres" configuration="postgres.xml" />
+    <jtf:case class="jdo.Concurrent" />
+    <jtf:case class="jdo.Deadlock" />
+    <jtf:case class="jdo.DuplicateKey" />
+    <jtf:case class="jdo.ReadOnly" />
+    <jtf:case class="jdo.TypeHandling" />
+    <jtf:case class="jdo.KeyGenGeneric" />
+    <jtf:case class="jdo.KeyGenSequence" />
+  </jtf:category>
+
+  <jtf:category name="xml" class="xml.XMLCategory">
+    <jtf:description>Tests for XML marshalling framework</jtf:description>
+    <jtf:case class="xml.Mapping" />
+  </jtf:category>
+
+</jtf:harness>
+
