@@ -5,6 +5,100 @@
 
     <section title="Running The Examples">
 
+      <p>
+      In order to run the examples located in <tt>src/examples</tt>, there are 
+      number of steps that must first take place. these steps are outlined below: 
+      
+      <ol type="1">
+          <li>Download the Castor source via either <a href="download.html">FTP</a>
+          or <a href="cvs.html">CVS</a>. If the source has been downloaded via FTP, 
+          it must be decompressed. This is dependent on whether a gzipped tarball 
+          has been downloaded or a zip file has been downloaded.<br /><br />
+
+          Steps for a gzipped tarball:
+          
+          <br /><br />
+
+          <tt>tar zxvf castor-0.9.3.9-src.tgz</tt><br />
+
+          or<br />
+
+          <tt>gunzip &lt; castor-0.9.3.9-src.tgz | tar xvf -</tt>
+
+          <br /><br />
+
+          Steps for a zip file:
+          
+          <br /><br />
+
+          <tt>unzip castor-0.9.3.9-src.zip</tt><br />
+
+          or<br />
+
+          <tt>jar xvf castor-0.9.3.9-src.zip</tt><br />
+          
+          or<br />
+
+          Get a copy of <a href="http://www.powerarchiver.com/">PowerArchiver</a><br /><br />
+
+          </li>
+          <li>If you're using Unix/Linux, the shell scripts must be made executable 
+          and the line endings must be changed. Use the following directions:
+
+          <br /><br />
+
+          <ol type="a"> 
+              <li>
+              Make the shell scripts executable: 
+
+              <br /><br />
+
+              <tt>chmod +x *.sh</tt><br /><br />
+              </li>
+
+              <li>
+              Change the line endings on the shell scripts:
+
+              <br /><br />
+
+              <tt>for i in *.sh; do dos2unix $i $i; done</tt><br /><br />
+              </li>
+          </ol>
+          
+          </li>
+
+          <li>
+          If it is not set yet, please set the <tt>JAVA_HOME</tt> environment variable.
+          </li>
+
+          <li>
+          Edit <tt>src/examples/jdo/database.xml</tt> for the database being used.
+          (There are examples for all supported databases in <tt>src/tests/jdo</tt>.)
+          </li>
+
+          <li>
+          Build the examples like so:
+
+          <br /><br />
+
+          <tt>build.[sh|bat] examples</tt>
+
+          <br /><br />
+
+          This will not only build the examples, but will also build the Castor classes. 
+          </li>
+
+          <li>
+          Add the appropriate classes for the database driver to the <tt>CLASSPATH</tt>.
+          </li>
+
+          <li>
+          Run the examples using the directions in the next section.
+          </li>
+      </ol>
+
+      </p>
+
       <p>The script files <tt>example.sh</tt> and <tt>example.bat</tt> can
          be used to run the provided examples. The first argument is the example
          package name. For example, to build and run the JDO example:
