@@ -845,6 +845,12 @@ public final class CacheEngine
         TypeInfo   typeInfo;
         boolean    writeLock;
 
+        // If the object is new, don't try to load it from the cache
+        if ( ( object instanceof TimeStampable ) &&
+                ( ( TimeStampable ) object ).jdoGetTimeStamp() == 0 ) {
+            return null;
+        }
+
         typeInfo = (TypeInfo) _typeInfo.get( type );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
