@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -49,13 +49,12 @@ import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
 
-import java.util.Vector;
 
 /**
  * A class for representing field members of a Class. FieldInfo objects
  * hold all the information required about a member in order
  * to be able to produce marshal/unmarshal and validation code.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class FieldInfo extends XMLInfo {
@@ -112,6 +111,12 @@ public class FieldInfo extends XMLInfo {
      *
      */
      private String _fieldHandler;
+     
+     /**
+      * A boolean to indicate that this field represents
+      * a "nillable" field 
+      */
+     private boolean _nillable = false;
 
     /**
      * The fully qualified name of the Validator (if any)
@@ -537,6 +542,18 @@ public class FieldInfo extends XMLInfo {
     } //-- isContainer
 
     /**
+     * Returns true if this field represents a nillable field.
+     * A nillable field is a field that can have null content
+     * (see XML Schema 1.0 definition of nillable).
+     * 
+     * @return true if nillable, otherwise false.
+     * @see #setNillable(boolean)
+     */
+     public boolean isNillable() {
+     	return _nillable;
+     } //-- isNillable
+     
+    /**
      * Returns true if this FieldInfo is a transient member. Transient
      * members are members which should be ignored by the
      * Marshalling framework
@@ -619,6 +636,16 @@ public class FieldInfo extends XMLInfo {
         this._fixed = fixedValue;
     } //-- setFixedValue
 
+    /**
+     * Sets whether or not this field can be nillable.
+     * 
+     * @param nillable a boolean that when true means the
+     * field may be nil.
+     * @see #isNillable()
+     */
+    public void setNillable(boolean nillable) {
+    	_nillable = nillable;
+    } //-- setNillable
 
     /**
      * Sets the "static" status of this FieldInfo. Static
