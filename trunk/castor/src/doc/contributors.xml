@@ -776,6 +776,13 @@
     <description>Castor XML feedback</description>
   </contributor>
 
+
+  <contributor type="Feedback">
+    <name surname="Goldstein" given="Peter"/>
+    <email>pgoldstein@triu.com</email>
+    <description>Suggested improvement in generated source for booleans (bug 1527)</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Haghani" given="Sasha"/>
     <email>shaghani@activience.com</email>
