@@ -45,6 +45,8 @@
 
 package org.exolab.castor.xml.handlers;
 
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.xml.XMLFieldHandler;
@@ -61,7 +63,7 @@ import java.lang.reflect.Array;
 public class CollectionFieldHandler extends XMLFieldHandler {
 
     private FieldHandler _handler = null;
-
+    private TypeValidator _validator = null;
 
     //----------------/
     //- Constructors -/
@@ -82,6 +84,16 @@ public class CollectionFieldHandler extends XMLFieldHandler {
         this._handler = fieldHandler;
     } //-- CollectionFieldHandler
 
+    public CollectionFieldHandler(FieldHandler fieldHandler, TypeValidator validator) {
+
+        if (fieldHandler == null) {
+            String err = "The FieldHandler argument passed to " +
+                "the constructor of CollectionFieldHandler must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        this._handler = fieldHandler;
+        _validator = validator;
+    } //-- CollectionFieldHandler
 
     //------------------/
     //- Public Methods -/
@@ -102,7 +114,14 @@ public class CollectionFieldHandler extends XMLFieldHandler {
             StringTokenizer temp = new StringTokenizer((java.lang.String)value," ");
             int size = temp.countTokens();
             for (int i=0; i<size; i++) {
-                _handler.setValue(target, temp.nextToken());
+                 String tempValue = temp.nextToken();
+                 try {
+                     if (_validator != null)
+                        _validator.validate(tempValue);
+                  } catch (ValidationException e) {
+                      throw new IllegalStateException(e.getMessage());
+                  }
+                _handler.setValue(target, tempValue);
             }
         }
         else _handler.setValue(target, value);
@@ -119,9 +138,9 @@ public class CollectionFieldHandler extends XMLFieldHandler {
     {
         // Needs to return the proper object
         Object temp = _handler.getValue(target);
-        
+
         if (temp == null) return temp;
-        
+
         String result = null;
         if (temp.getClass().isArray()) {
             int size = Array.getLength(temp);
