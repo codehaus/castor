@@ -125,31 +125,22 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         String attValue = null;
 
 
-        //-- MODEL GROUP
-        if (SchemaNames.GROUP.equals(element)) {
-            //-- set name
-            _group.setName(atts.getValue("name"));
-            _group.setIsModelGroupDefinition(true);
+        if (SchemaNames.SEQUENCE.equals(element)) {
+                _group.setOrder(Order.seq);
+        }
+        else if (SchemaNames.CHOICE.equals(element)) {
+             _group.setOrder(Order.choice);
+        }
+        else if (SchemaNames.ALL.equals(element)) {
+               foundAll = true;
+             _group.setOrder(Order.all);
         }
         else {
-            _group.setIsModelGroupDefinition(false);
-
-            if (SchemaNames.SEQUENCE.equals(element)) {
-                _group.setOrder(Order.seq);
-            }
-            else if (SchemaNames.CHOICE.equals(element)) {
-                _group.setOrder(Order.choice);
-            }
-            else if (SchemaNames.ALL.equals(element)) {
-                foundAll = true;
-                _group.setOrder(Order.all);
-            }
-            else {
                 String err = "Invalid group element name: '" +
                     element + "'";
                 throw new IllegalArgumentException(err);
             }
-        }
+
 
         _element = element;
 
