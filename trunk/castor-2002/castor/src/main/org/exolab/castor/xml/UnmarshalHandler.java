@@ -482,7 +482,6 @@ public class UnmarshalHandler implements DocumentHandler {
         if (parentState.object == null) return;
         
         Class _class = null;
-        boolean byteArray = false;
             
         XMLClassDescriptor classDesc 
             = (XMLClassDescriptor)parentState.fieldDesc.getClassDescriptor();
@@ -592,10 +591,18 @@ public class UnmarshalHandler implements DocumentHandler {
                 try {
                     
                     _class = descriptor.getFieldType();
+                    boolean byteArray = false;
+                    if (_class.isArray())
+                        byteArray = (_class.getComponentType() == Byte.TYPE);
                     
                     //-- check for immutable
-                    if (isPrimitive(_class) || descriptor.isImmutable())
+                    if (isPrimitive(_class) || 
+                        descriptor.isImmutable() || 
+                        byteArray) 
+                    {
                         state.object = null; 
+                        state.primitiveOrImmutable = true;
+                    }
                     else {
                         state.object = handler.newInstance(parentState.object);
                         //-- reassign class in case there is a conflict
@@ -626,9 +633,7 @@ public class UnmarshalHandler implements DocumentHandler {
             }
             state.classDesc = classDesc;
             
-            if ((state.object == null) && 
-                (!state.type.isPrimitive()) &&
-                (!byteArray))
+            if ((state.object == null) && (!state.primitiveOrImmutable))
             {
                 StringBuffer err = new StringBuffer("unable to unmarshal: ");
                 err.append(name);
