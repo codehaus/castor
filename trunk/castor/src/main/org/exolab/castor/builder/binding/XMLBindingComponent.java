@@ -368,6 +368,7 @@ public class XMLBindingComponent implements BindingComponent {
                 maxOccurs = group.getMaxOccurs();
                 if ((maxOccurs > 1) || (maxOccurs < 0))
                     result = true;
+
                 break;
             case Structure.ATTRIBUTE:
             default:
@@ -671,14 +672,14 @@ public class XMLBindingComponent implements BindingComponent {
                             throw new IllegalStateException(err);
                         }
                      }
+                   if (_prefix != null)
+                       result = _prefix + result;
+                   if (_suffix != null)
+                       result = result + _suffix;
                  }
                  
             }
 
-            if (_prefix != null)
-                result = _prefix + result;
-            if (_suffix != null)
-                result = result + _suffix;
             _javaClassName = JavaNaming.toJavaClassName(result);
         }
         /**
@@ -756,12 +757,14 @@ public class XMLBindingComponent implements BindingComponent {
                             throw new IllegalStateException(err);
                         }
                     }
+                   
+		            if (_prefix != null)
+		                result = _prefix + result;
+		            if (_suffix != null)
+		                result = result + _suffix;
+            
                 }
             }
-            if (_prefix != null)
-                result = _prefix + result;
-            if (_suffix != null)
-                result = result + _suffix;
             _javaMemberName = JavaNaming.toJavaMemberName(result);
         }
         /**
@@ -824,7 +827,6 @@ public class XMLBindingComponent implements BindingComponent {
             String packageName = null;
             String schemaLocation = getSchemaLocation();
             String targetNamespace = getTargetNamespace();
-            
             //-- adjust targetNamespace null -> ""
             if (targetNamespace == null) targetNamespace = "";
             
