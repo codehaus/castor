@@ -216,6 +216,15 @@
     </description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Hogge" given="Rick"/>
+    <email>rhogge@austin.rr.com</email>
+    <description>
+       Added patch to source generator to prevent conflicts with java.lang.Object
+       when the XML Schema contains an element name of "object" or "Object".
+    </description>
+  </contributor>
+
   <!-- Last names begin with I-L -->
 
   <contributor type="Contributor">
