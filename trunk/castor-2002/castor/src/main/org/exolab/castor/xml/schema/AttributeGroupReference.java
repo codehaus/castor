@@ -56,7 +56,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public final class AttributeGroupReference 
+public final class AttributeGroupReference
     extends AttributeGroup
 {
 
@@ -73,7 +73,7 @@ public final class AttributeGroupReference
     private Schema _schema = null;
 
     private String _reference = null;
-    
+
     /**
      * Creates a new AttributeGroup definition
      * @param schema the Schema that this AttributeGroup
@@ -89,26 +89,38 @@ public final class AttributeGroupReference
             throw new IllegalArgumentException(err);
         }
         _schema    = schema;
-        _reference = reference;        
+        _reference = reference;
     } //-- AttributeGroup
 
-    
+
+    /**
+     * Gets the name of the attribute group this class refers to.
+     */
+    public String getReference() { return _reference; }
+
+    /**
+     * Resolves the attribute group reference
+     * @return the attribute group defined at the schema level that is refered to by this class.
+     */
+    public AttributeGroup resolveReference() {
+        AttributeGroup attrGroup = _schema.getAttributeGroup(_reference);
+        if (attrGroup == null) {
+            throw new IllegalStateException("Invalid AttributeGroupReference");
+        }
+        return attrGroup;
+    }
+
     /**
      * Returns the AttributeDecl associated with the given name
      * @return the AttributeDecl associated with the given name, or
      *  null if no AttributeDecl with the given name was found.
     **/
     public AttributeDecl getAttribute(String name) {
-        
-        AttributeGroup attrGroup = _schema.getAttributeGroup(_reference);
-        if (attrGroup == null) {
-            throw new IllegalStateException("Invalid AttributeGroupReference");
-        }
-        
-        return attrGroup.getAttribute(name);
-        
+        return resolveReference().getAttribute(name);
+
     } //-- getAttribute
-    
+
+
     /**
      * Returns an enumeration of the AttributeDecls and AttributeGroups
      * of this AttributeGroup
@@ -117,11 +129,7 @@ public final class AttributeGroupReference
      * of this AttributeGroup
     **/
     public Enumeration getAttributes() {
-        AttributeGroup attrGroup = _schema.getAttributeGroup(_reference);
-        if (attrGroup == null) {
-            throw new IllegalStateException("Invalid AttributeGroupReference");
-        }
-        return attrGroup.getAttributes();
+        return resolveReference().getAttributes();
     } //-- getAttributes
 
     /**
@@ -132,14 +140,8 @@ public final class AttributeGroupReference
      * AttributeDecls or any non-empty AttributeGroups
     **/
     public boolean isEmpty() {
-        
-        AttributeGroup attrGroup = _schema.getAttributeGroup(_reference);
-        if (attrGroup == null) {
-            throw new IllegalStateException("Invalid AttributeGroupReference");
-        }
-        
-        return attrGroup.isEmpty();
-        
+        return resolveReference().isEmpty();
+
     } //-- isEmpty
-    
+
 } //-- AttributeGroupReference
