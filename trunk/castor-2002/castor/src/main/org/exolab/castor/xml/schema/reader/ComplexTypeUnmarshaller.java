@@ -154,8 +154,21 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 
         }
 
+        //-- @abstract
+        attValue = atts.getValue(SchemaNames.ABSTRACT);
+        if (attValue != null) {
+            Boolean bool = Boolean.valueOf(attValue);
+            _complexType.setAbstract(bool.booleanValue());
+        }
+        
 		//-- @block
         _complexType.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));
+        
+        //-- @final
+        _complexType.setFinal(atts.getValue(SchemaNames.FINAL_ATTR));
+        
+        //-- @id
+        _complexType.setId(atts.getValue(SchemaNames.ID_ATTR));
 
     } //-- ComplexTypeUnmarshaller
 
