@@ -261,8 +261,8 @@ public class DatabaseRegistry
 
                 if ( database.getDriver().getClassName() != null ) {
                     try {
-                        Class.forName( database.getDriver().getClassName() );
-                    } catch ( ClassNotFoundException except ) {
+                        Class.forName( database.getDriver().getClassName() ).newInstance();
+                    } catch ( Exception except ) {
                         throw new MappingException( except );
                     }
                 }
