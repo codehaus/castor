@@ -53,6 +53,9 @@
           <li>Support for JTA transaction demarcation, inclusion as resource
               in transactional environment, and JDBC connection pooling
               (release 0.9 integrated with Tyrex)</li>
+
+          <li>Cache control at JDO configuration and mapping file specification - no-cache option,
+              cache object limit, cache time limit, LRU removal deamon</li>
         </ul>
       </section>
 
@@ -104,9 +107,6 @@
         <li>Remove excessive methods in source code generator</li>
 
         <li>Support for read-only fields</li>
-
-        <li>Cache control at JDO configuration and mapping file specification - no-cache option,
-            cache object limit, cache time limit, LRU removal deamon</li>
 
         <li>Serializable, SQLData, DOM field types</li>
 
