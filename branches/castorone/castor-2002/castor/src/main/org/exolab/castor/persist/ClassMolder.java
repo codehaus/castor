@@ -676,6 +676,10 @@ public class ClassMolder {
         locker.setObject( tx, fields );
         oid.setDbLock( true );
 
+        if ( object instanceof TimeStampable ) {
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+        }
+
         for ( int i=0; i<_ids.length; i++ ) {
             _ids[i].setValue( object, createdId[i] );        
         }
@@ -1351,6 +1355,8 @@ public class ClassMolder {
         long timestamp;
         Object o;
 
+        if ( isDependent() )
+            return;
 
         fields = (Object[]) locker.getObject( tx );
 
@@ -1366,11 +1372,62 @@ public class ClassMolder {
         if ( object instanceof TimeStampable ) {
             TimeStampable ts = (TimeStampable) object;
             if ( ts.jdoGetTimeStamp() != timestamp ) {
-                throw new ObjectModifiedException( Messages.format( "persist.objectModified", object.getClass(), 
-                                                    OID.flatten( ids ) ) );
+                System.out.println("object timestamp: "+ts.jdoGetTimeStamp()+" timeStamp: "+timestamp);
+                throw new ObjectModifiedException( "Time stamp mismatched!" );
+                    /*Messages.format( "persist.objectModified", object.getClass(), OID.flatten( ids ) ) ); */
             } 
         }
 
+        // load the original field into the transaction. so, store will
+        // have something to compare later.
+        try {
+            for ( int i=0; i <_fhs.length; i++ ) {
+                fieldType = _fhs[i].getFieldType();
+                switch (fieldType) {
+                case FieldMolder.PRIMITIVE:
+                    break;
+                case FieldMolder.PERSISTANCECAPABLE:
+                    if ( _fhs[i].isLazy() )
+                        System.err.println( "Warning: Lazy loading of object is not yet support!" );
+
+                    // depedent class won't have persistenceInfo in LockEngine
+                    // must look at fieldMolder for it
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+
+                    value = tx.load( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
+                    break;
+                case FieldMolder.ONE_TO_MANY:
+                    if ( !_fhs[i].isLazy() ) {
+                        ArrayList col = new ArrayList();
+                        //(ArrayList)_fhs[i].getCollectionType().newInstance();
+                        fieldClassMolder = _fhs[i].getFieldClassMolder();
+                        fieldEngine = _fhs[i].getFieldLockEngine();
+
+                        ArrayVector v = (ArrayVector)fields[i];
+                        if ( v != null ) {
+                            for ( int j=0,l=v.size(); j<l; j++ ) {
+                                //System.out.println("LockEninge: "+oid.getLockEngine()+" Object: "+v.elementAt(j));
+                                col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
+                            }
+                        } 
+                    } else {
+                        ArrayVector avlist = (ArrayVector) fields[i];
+                        fieldClassMolder = _fhs[i].getFieldClassMolder();
+                        fieldEngine = _fhs[i].getFieldLockEngine();
+                        RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, avlist );
+                    }
+                    break;                
+                case FieldMolder.MANY_TO_MANY:
+                    break;
+                }
+            }
+        } catch ( ObjectNotFoundException e ) {
+            throw new ObjectModifiedException("dependent object deleted concurrently");
+        }
+
+
+        /*
         for ( int i=0; i<_fhs.length; i++ ) {
             //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+(_fhs[i]==null?null:_fhs[i].getJavaClass())+">  ");
         }
@@ -1388,13 +1445,15 @@ public class ClassMolder {
                 if ( o != null ) {
                     // need multi-pk
                     if ( _fhs[i].isDependent() ) {
-                        if ( !tx.isPersistent( o ) ) 
-                            tx.update( fieldEngine, fieldClassMolder, o, oid );
-                        else 
+                        if ( !tx.isPersistent( o ) ) {
+                            //tx.update( fieldEngine, fieldClassMolder, o, oid );
+                        } else {
                             // fail-fast principle: if the object depend on another object,
                             // throw exception
-                            if ( !tx.isDepended( oid, o ) )
-                                throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
+                        }
+                            
+                            //if ( !tx.isDepended( oid, o ) )
+                            //    throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
                     } else {
                         //if ( !tx.isPersistent( o ) ) 
                         //    tx.create( fieldEngine, fieldClassMolder, o, null );
@@ -1420,12 +1479,12 @@ public class ClassMolder {
                                 // otherwise objects that should be deleted won't be deleted
                                 for ( int j=0; j<orgFields.size(); j++ ) {
                                     if ( !list.contains( orgFields.get(j) ) ) {
-                                        tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                        //tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
                                     }
                                 }
                                 // update all dependent objects
                                 for ( int j=0; j<list.size(); j++ ) {
-                                    tx.update( fieldEngine, fieldClassMolder, v.get(j), oid );
+                                    //tx.update( fieldEngine, fieldClassMolder, v.get(j), oid );
                                 }
                             }
                         }
@@ -1440,7 +1499,7 @@ public class ClassMolder {
             default:
                 throw new IllegalArgumentException("Field type invalid!");
             }
-        }
+        }*/
     }
 
     public void updateCache( TransactionContext tx, OID oid, DepositBox locker, Object object )
@@ -1553,6 +1612,10 @@ public class ClassMolder {
         }
 
         locker.setObject( tx, fields );
+        if ( object instanceof TimeStampable ) {
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+        }
+
     }
 
     private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object[] identities ) 

@@ -654,14 +654,17 @@ public abstract class TransactionContext
         if ( entry != null ) {
             if ( entry.deleted )
                 throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass(), OID.flatten(identities) ) );
+            else
+                throw new DuplicateIdentityException( "update object which is already in the transaction" );
+
             // to prevent circular references
-            if ( entry.object == object ) 
-                return oid;
+            //if ( entry.object == object ) 
+            //    return oid;
             //[Oleg] in some cases (deletion of dependent objects) objects
             //that were previously loaded in this transaction by the same 
             //update() call must be replaced. Thus, we must allow this.
             //I don't see other way.
-            release( entry.object );
+            //release( entry.object );
             //[Yip] Hum, i don't understand why
             //[Oleg] Assume that one object B is referenced by object A
             // in two ways (indirectly). Then during update(A) update(B) would  
@@ -674,14 +677,15 @@ public abstract class TransactionContext
 
         // If the object isn't found in the cache, then attempt to create it.
         try {
+            addObjectEntry( oid, object );
+
             oid = engine.update( this, oid, object, accessMode, _lockTimeout );
 
-            if ( oid == null ) {
-                oid = create( engine, molder, object, depended );
-            }
+            //if ( oid == null ) {
+            //    oid = create( engine, molder, object, depended );
+            //}
 
             // rehash the object with new oid
-            removeObjectEntry( object );
             addObjectEntry( oid, object );
         } catch ( ObjectModifiedException e ) {
             removeObjectEntry( object );
