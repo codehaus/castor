@@ -21,14 +21,11 @@
   </xsl:template>
 
   <xsl:template match="mailing-list">
-    <h1><xsl:apply-templates select="title"/></h1>
-    <div><xsl:apply-templates select="description"/></div>
-    <br/>
     <div>
       [
-      <a href="mailto:{@manager}?subject={@subscribe}">Subscribe</a> |
-      <a href="mailto:{@manager}?subject={@unsubscribe}">Unsubscribe</a> |
-      <a href="mailto:{@post}">Post</a>
+      <a href="mailto:{@manager}@{@server}?subject=subscribe {@name}">Subscribe</a> |
+      <a href="mailto:{@manager}@{@server}?subject=unsubscribe {@name}">Unsubscribe</a> |
+      <a href="mailto:{@name}@{@server}">Post</a>
       ]
     </div>
   </xsl:template>

@@ -13,6 +13,9 @@ Mapping: The mapping package has been upgraded to the new mapping DTD,
 Mapping: Added type strings (array of String) and big-integer
       (java.math.BigInteger).
 
+Docs: Contents of readme file and changelog are now available from the
+      HTML documentation.
+
 
 Version 0.7.5  January 28, 2000
 -------------------------------

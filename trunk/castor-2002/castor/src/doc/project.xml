@@ -13,7 +13,7 @@
           image="style/images/links/cvs.gif" height="19" width="30"/>
     <link name="Download" href="download.xml"
           image="style/images/links/download.gif" height="19" width="64"/>
-    <link name="Lists" href="http://castor.exolab.org/lists.xml"
+    <link name="Lists" href="lists.xml"
           image="style/images/links/lists.gif" height="19" width="35"/>
     <link name="Library" href="library.xml"
           image="style/images/links/library.gif" height="19" width="47"/>

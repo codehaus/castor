@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <document url="http://castor.exolab.org/design-persist.xml">
   <body>
-    <title>Castor</title>
+    <title>The Castor Project</title>
 
     <header>
       <p>Castor is the shortest path between Java[tm] objects, XML documents, SQL tables and LDAP
          directories. It provides Java to XML binding, Java to SQL/LDAP persistence, and then
          some more.</p>
+
+      <p><a href="origins.xml">About the origins of the name</a></p>
 
     </header>
 
