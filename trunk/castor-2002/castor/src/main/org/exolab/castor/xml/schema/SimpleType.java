@@ -60,12 +60,40 @@ public abstract class SimpleType extends XMLType
 {
 
     /**
+     * The value of the final attribute used for 
+     * blocking all types of derivation
+    **/
+    public static final String FINAL_ALL         = "#all";
+    
+    /**
+     * The value of the final attribute used for 
+     * blocking list derivation
+    **/
+    public static final String FINAL_LIST        = "list";
+    
+    /**
+     * The value of the final attribute used for 
+     * blocking union derivation
+    **/
+    public static final String FINAL_UNION       = "union";
+    
+    /**
+     * The value of the final attribute used for 
+     * blocking restriction derivation
+    **/
+    public static final String FINAL_RESTRICTION = "restriction";
+    
+    /**
      * The constraining facets of this type
     **/
     private FacetList facets     = null;
 
-
-   /**
+    /**
+     * The value of the final attribute (optional)
+    **/
+    private String _final = null;
+    
+    /**
      * The parent structure of this SimpleType
      * (Schema, AttributeDecl or ElementDecl)
     **/
@@ -147,6 +175,18 @@ public abstract class SimpleType extends XMLType
     } //-- getFacets
 
 
+    /**
+     * Returns the value of the 'final' property, indicating which
+     * types of derivation are not allowed, or null if the final property
+     * has not been set.
+     *
+     * @return the value of the final property or null if no value has
+     * been set
+    **/
+    public String getFinal() {
+        return _final;
+    } //-- getFinal
+    
     /**
      * Returns the facets of this type (without the parent's facets)
      */
@@ -289,6 +329,29 @@ public abstract class SimpleType extends XMLType
         }
     }
 
+    /**
+     * Sets the value of the 'final' property, indicating which
+     * types of derivation are not allowed. A null value will indicate
+     * all types of derivation (list, restriction, union) are allowed.
+     *
+     * @param finalValue the value of the final property.
+     * @exception IllegalArgumentException when the value is not a valid value.
+    **/
+    public void setFinal(String finalValue) {
+        if ((finalValue == null) ||
+            finalValue.equals(FINAL_ALL) ||
+            finalValue.equals(FINAL_UNION) ||
+            finalValue.equals(FINAL_LIST) ||
+            finalValue.equals(FINAL_RESTRICTION)) 
+        {
+            _final = finalValue;
+        }
+        else {
+            String err = "The value '" + finalValue + "' is not a valid"
+                + "value of the final property.";
+            throw new IllegalArgumentException(err);
+        }
+    } //-- setFinal
 
 
     //-------------------------------/
@@ -302,7 +365,6 @@ public abstract class SimpleType extends XMLType
     public short getStructureType() {
         return Structure.SIMPLE_TYPE;
     } //-- getStructureType
-
 
     //-- protected Methods -/
 
