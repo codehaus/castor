@@ -695,8 +695,9 @@ public class SourceFactory  {
             Facet facet = (Facet) enum.nextElement();
             
             String value = facet.getValue();
-            String typeName = "_" + value.toUpperCase();
-            String objName = JavaXMLNaming.toJavaMemberName(value);
+            String typeName = value.toUpperCase() + "_TYPE";
+            String objName = JavaXMLNaming.toJavaMemberName(value, false);
+            objName = objName.toUpperCase();
             
             
             //-- handle int type
