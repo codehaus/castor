@@ -597,7 +597,7 @@ public class DTXQuery {
 	    throw new DTXException("no identity SQL info in class: " + clsMapping.getName());
 	}
 
-	String identitySQL = identitySQLElement.getName();
+	String identitySQL = identitySQLElement.getName()[0];
 
 	_ids.add(table + "." + identitySQL);
 
@@ -654,7 +654,7 @@ public class DTXQuery {
                         if (relSql != null) {
 			    String type = relFields[k].getType();
 			    if (type != null && type.equals(clsMapping.getName())) {
-				foreKey = relSql.getName();
+				foreKey = relSql.getName()[0];
 			    }
 			}
                     }
@@ -667,7 +667,7 @@ public class DTXQuery {
 			    FieldMapping relField = relFields[n];
 			    Sql relSql = relFields[n].getSql();
 			    if (relSql != null) {
-				String relFieldName = relSql.getName();
+				String relFieldName = relSql.getName()[0];
 				if (relFieldName == null) {
 				    relFieldName = relFields[n].getName();
 				}
@@ -703,7 +703,7 @@ public class DTXQuery {
 
 	    } else {
 
-		String fieldName = fieldSql.getName();
+		String fieldName = fieldSql.getName()[0];
 		if (fieldName == null) {
 		    fieldName = fields[i].getName();
 		}
@@ -732,7 +732,7 @@ public class DTXQuery {
 		    _cols.put(fullName, new Integer(++_lastCol));
 		    expr.addOuterJoin(table, identitySQL,
 				      fieldSql.getManyTable(),
-				      fieldSql.getManyKey());
+				      fieldSql.getManyKey()[0]);
 		}
 	    }
         }
@@ -778,9 +778,9 @@ public class DTXQuery {
 	String table = clsMapping.getMapTo().getTable();
 
         if (value.startsWith("$")) {
-            expr.addParameter(table, fieldSql.getName(), op);
+            expr.addParameter(table, fieldSql.getName()[0], op);
         } else {
-            expr.addCondition(table, fieldSql.getName(), op, value);
+            expr.addCondition(table, fieldSql.getName()[0], op, value);
         }
     }
 }
