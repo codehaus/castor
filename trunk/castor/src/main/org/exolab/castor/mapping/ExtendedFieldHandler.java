@@ -93,7 +93,7 @@ public abstract class ExtendedFieldHandler
     /**
      * @deprecated No longer supported
      */
-    public final void checkValidity( Object object )
+    public void checkValidity( Object object )
         throws ValidityException, IllegalStateException
     {
         //-- do nothing...deprecated method
