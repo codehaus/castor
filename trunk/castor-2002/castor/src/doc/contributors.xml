@@ -81,6 +81,7 @@
   <contributor type="Committer">
     <name surname="Sahuc" given="Sebastien"/>
     <email>ssahuc@intalio.com</email>
+    <company id="intalio"/>
     <description>Testing for Oracle and Castor XML.</description>
   </contributor>
 
