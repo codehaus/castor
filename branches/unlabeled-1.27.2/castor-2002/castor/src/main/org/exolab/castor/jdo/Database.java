@@ -47,8 +47,8 @@
 package org.exolab.castor.jdo;
 
 
-import org.exolab.castor.persist.PersistenceInfoGroup;
-import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.types.Complex;
+import org.exolab.castor.persist.DatabaseRegistry;
 
 /**
  * An open connection to the database. This object represents an open
@@ -191,10 +191,6 @@ public interface Database
      * @return A query
      */
     public Query getQuery();
-
-
-
-    public PersistenceInfoGroup getScope();
 
 
     /**
@@ -555,6 +551,11 @@ public interface Database
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException;
 
+    /**
+     * 092: temporary solution. Should be removed soon
+     *
+     */
+    public DatabaseRegistry getDatabaseRegistry();
 
 }
 

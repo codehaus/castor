@@ -47,7 +47,7 @@
 package org.exolab.castor.persist.spi;
 
 
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
