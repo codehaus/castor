@@ -79,14 +79,14 @@ public class JDOFieldDescriptor
     /**
      * The SQL name of the field.
      */
-    private String         _sqlName;
+    private String[]       _sqlName;
 
 
     private String         _manyTable;
 
-    private String         _manyKey;
+    private String[]       _manyKey;
 
-    private int            _sqlType;
+    private int[]          _sqlType;
 
 
     /**
@@ -97,8 +97,8 @@ public class JDOFieldDescriptor
      * @param fieldDesc The field descriptor
      * @throws MappingException Invalid mapping information
      */
-    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, /*Class sqlType*/int sqlType,
-                               boolean dirtyCheck, String manyTable, String manyKey )
+    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String[] sqlName, int[] sqlType,
+                               boolean dirtyCheck, String manyTable, String[] manyKey )
         throws MappingException
     {
         super( fieldDesc );
@@ -106,12 +106,11 @@ public class JDOFieldDescriptor
             throw new IllegalArgumentException( "Argument 'fieldDesc' is a transient field or has no handler" );
         //if ( sqlName == null )
         //    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
-        _sqlName = sqlName;
+        _sqlName = (sqlName.length>0? sqlName : null);
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;
-        _manyKey = manyKey;
-        _sqlType = sqlType;
-        //SQLTypes.getSQLType( sqlType );
+        _manyKey = (manyKey.length>0? manyKey : null);
+        _sqlType = (sqlType.length>0? sqlType : null);
     }
 
 
@@ -121,7 +120,7 @@ public class JDOFieldDescriptor
     }
 
 
-    public String getManyKey()
+    public String[] getManyKey()
     {
         return _manyKey;
     }
@@ -132,7 +131,7 @@ public class JDOFieldDescriptor
      *
      * @return The SQL name of this field
      */
-    public String getSQLName()
+    public String[] getSQLName()
     {
         return _sqlName;
     }
@@ -154,7 +153,7 @@ public class JDOFieldDescriptor
      *
      * @return The SQL type of this field
      */
-    public int getSQLType()
+    public int[] getSQLType()
     {
         return _sqlType;
     }
@@ -162,7 +161,7 @@ public class JDOFieldDescriptor
 
     public String toString()
     {
-        return super.toString() + " AS " + _sqlName;
+        return super.toString() + " AS " + _sqlName[0];
     }
 
 

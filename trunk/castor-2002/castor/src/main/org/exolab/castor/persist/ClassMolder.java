@@ -269,7 +269,8 @@ public class ClassMolder {
                     idSQL[j] = fmId[j].getSql().getName()[0];
 
                     if ( fd[j] instanceof JDOFieldDescriptor ) {
-                        idType[j] = ((JDOFieldDescriptor)fd[j]).getSQLType();
+                        int[] type = ((JDOFieldDescriptor)fd[j]).getSQLType();
+                        idType[j] = type==null? 0: type[0];
                     } else {
                         throw new MappingException("Identity type must contains sql information: "+ _name );
                     }
@@ -284,8 +285,10 @@ public class ClassMolder {
                     relatedIdType = new int[relatedIds.length];
                     for ( int j=0; j < relatedIdSQL.length; j++ ) {
                         if ( relatedIds[j] instanceof JDOFieldDescriptor ) {
-                            relatedIdSQL[j] = ((JDOFieldDescriptor)relatedIds[j]).getSQLName();
-                            relatedIdType[j] = ((JDOFieldDescriptor)relatedIds[j]).getSQLType();
+                            String[] tempId = ((JDOFieldDescriptor)relatedIds[j]).getSQLName();
+                            relatedIdSQL[j] = tempId==null? null: tempId[0];
+                            int[] tempType = ((JDOFieldDescriptor)relatedIds[j]).getSQLType();
+                            relatedIdType[j] = tempType==null? 0: tempType[0];
                         } else {
                             throw new MappingException("Field type is not persistence-capable: "+ relatedIds[j].getFieldName() );
                         }
