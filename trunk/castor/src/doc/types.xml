@@ -96,6 +96,34 @@
 
     </section>
 
+    <section title="SQL Dates and Default Timezones">
+      <p>Castor will use the JDBC <tt>ResultSet.getDate(int, Calendar)</tt> and
+         related methods which take a Calendar object to specify the timezone of
+         the data retrieved from the database when the timezone information is not
+         already specified in the data; this ensures that the &quot;current&quot;
+         timezone is applied.</p>
+
+      <p>The default time zone can be configured in the castor.properties file;
+         see the <a href="conf-lib.html">configuration section</a> for details on how to configure Castor with
+         information about your default time zone.</p>
+         
+      <p>To change the timezone to a different timezone than the default, please
+         set a (different) value on the <tt>org.exolab.castor.jdo.defaultTimeZone</tt>
+         property:</p>
+         
+      <code-block caption="castor.properties">
+         <code>
+# Default time zone to apply to dates/times fetched from database fields, 
+# if not already part of the data.  Specify same format as in 
+# java.util.TimeZone.getTimeZone, or an empty string to use the computer's 
+# local time zone.
+org.exolab.castor.jdo.defaultTimeZone=
+#org.exolab.castor.jdo.defaultTimeZone=GMT+8:00
+         </code>
+      </code-block>
+         
+    </section>
+
     <section title="SQL Type Conversion">
 
       <p>Castor JDO uses the JDBC <tt>getObject/setObject</tt> methods in order to
