@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,7 +47,9 @@ package org.exolab.castor.xml.schema;
 
 
 /**
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * A class which holds the names for many of the Schema
+ * related components
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class SchemaNames {
@@ -59,10 +61,10 @@ public class SchemaNames {
     //-- element definitions
     public static final String ANNOTATION       = "annotation";
     public static final String APPINFO          = "appinfo";
-    public static final String COMPLEXTYPE      = "complexType";
+    public static final String COMPLEX_TYPE     = "complexType";
     public static final String ATTRIBUTE        = "attribute";
     public static final String SIMPLETYPE_REF   = "simpletypeRef";
-    public static final String SIMPLETYPE       = "simpleType";
+    public static final String SIMPLE_TYPE      = "simpleType";
     public static final String ELEMENT          = "element";
     public static final String ENUMERATION      = "enumeration";
     public static final String GROUP            = "group";
@@ -74,12 +76,12 @@ public class SchemaNames {
     public static final String MIN_INCLUSIVE    = "minInclusive";
     
     //-- Attr name definitions
+    public static final String BASE_ATTR        = "base";
     public static final String CONTENT_ATTR     = "content";
     public static final String MAX_OCCURS_ATTR  = "maxOccurs";
     public static final String MIN_OCCURS_ATTR  = "minOccurs";
     public static final String NAME_ATTR        = "name";
     public static final String ORDER_ATTR       = "order";
-    public static final String BASE_ATTR        = "base";
     public static final String TARGET_NS_ATTR   = "targetNamespace";
     public static final String ID_ATTR          = "id";
     public static final String REF_ATTR         = "ref";

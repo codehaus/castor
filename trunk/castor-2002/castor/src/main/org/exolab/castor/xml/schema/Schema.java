@@ -76,13 +76,13 @@ public class Schema extends Structure {
     /**
      * A list of defined architypes
     **/
-    private Hashtable complextypes = null;
+    private Hashtable complexTypes = null;
     
     
     /**
-     * A list of defined simpletypes
+     * A list of defined SimpleTypes
     **/
-    private Hashtable simpletypes = null;
+    private Hashtable simpleTypes = null;
 
     /**
      * A list of defined elements
@@ -102,8 +102,8 @@ public class Schema extends Structure {
     **/
     public Schema(String schemaNS) {
         super();
-        complextypes = new Hashtable();
-        simpletypes  = new Hashtable();
+        complexTypes = new Hashtable();
+        simpleTypes  = new Hashtable();
         elements   = new Hashtable();
         this.schemaNS = schemaNS;
         init();
@@ -115,36 +115,36 @@ public class Schema extends Structure {
        
         try {
             //-- ID
-            addSimpletype(new IDType(this));
+            addSimpleType(new IDType(this));
             //-- IDREF
-            addSimpletype(new IDREFType(this));
+            addSimpleType(new IDREFType(this));
             //-- NCName
-            addSimpletype(new NCNameType(this));
+            addSimpleType(new NCNameType(this));
             //-- NMTOKEN
-            addSimpletype(new NMTokenType(this));
+            addSimpleType(new NMTokenType(this));
             
             //-- binary
-            addSimpletype(new BinaryType(this));
+            addSimpleType(new BinaryType(this));
             //-- boooean
-            addSimpletype(new BooleanType(this));
+            addSimpleType(new BooleanType(this));
             //-- double
-            addSimpletype(new DoubleType(this));
+            addSimpleType(new DoubleType(this));
             //-- integer
-            addSimpletype(new IntegerType(this));
+            addSimpleType(new IntegerType(this));
             //-- long
-            addSimpletype(new LongType(this));
+            addSimpleType(new LongType(this));
             //-- negative-integer
-            addSimpletype(new NegativeIntegerType(this));
+            addSimpleType(new NegativeIntegerType(this));
             //-- positive-integer
-            addSimpletype(new PositiveIntegerType(this));
+            addSimpleType(new PositiveIntegerType(this));
             //-- string
-            addSimpletype(new StringType(this));
+            addSimpleType(new StringType(this));
             //-- timeInstant
-            addSimpletype(new TimeInstantType(this));
+            addSimpleType(new TimeInstantType(this));
         }
         catch (SchemaException sx) {
             //-- will never be thrown here since we
-            //-- are not adding invalid simpletypes
+            //-- are not adding invalid SimpleTypes
         }
     } //-- init
     
@@ -154,51 +154,51 @@ public class Schema extends Structure {
      * @exception SchemaException if the Complextype does not have
      * a name or if another Complextype already exists with the same name
     **/
-    public synchronized void addComplextype(Complextype complextype) 
+    public synchronized void addComplexType(ComplexType complexType) 
         throws SchemaException 
     {
         
-        String name = complextype.getName();
+        String name = complexType.getName();
         
         if (name == null) {
-            String err = "a global complextype must contain a name.";
+            String err = "a global ComplexType must contain a name.";
             throw new SchemaException(err);
         }
-        if (complextype.getSchema() != this) {
-            String err = "invalid attempt to add an complextype which ";
+        if (complexType.getSchema() != this) {
+            String err = "invalid attempt to add an ComplexType which ";
             err += "belongs to a different Schema; type name: " + name;
         }
-        if (complextypes.get(name) != null) {
-            String err = "an complextype already exists with the given name: ";
+        if (complexTypes.get(name) != null) {
+            String err = "a ComplexType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        complextypes.put(name, complextype);
+        complexTypes.put(name, complexType);
         
     } //-- addComplextype
 
     /**
-     * Adds the given Simpletype definition to this Schema defintion
-     * @param simpletype the Simpletype to add to this Schema
-     * @exception SchemaException if the Complextype does not have
-     * a name or if another Complextype already exists with the same name
+     * Adds the given SimpletType definition to this Schema defintion
+     * @param simpletype the SimpleType to add to this Schema
+     * @exception SchemaException if the ComplexType does not have
+     * a name or if another ComplexType already exists with the same name
     **/
-    public synchronized void addSimpletype(Simpletype simpletype) 
+    public synchronized void addSimpleType(SimpleType simpleType) 
         throws SchemaException 
     {
         
-        String name = simpletype.getName();
+        String name = simpleType.getName();
         
-        if (simpletype.getSchema() != this) {
-            String err = "invalid attempt to add a simpletype which ";
+        if (simpleType.getSchema() != this) {
+            String err = "invalid attempt to add a SimpleType which ";
             err += "belongs to a different Schema; type name: " + name;
         }
-        if (simpletypes.get(name) != null) {
-            String err = "a simpletype already exists with the given name: ";
+        if (simpleTypes.get(name) != null) {
+            String err = "a SimpleType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        simpletypes.put(name, simpletype);
+        simpleTypes.put(name, simpleType);
         
-    } //-- addSimpletype
+    } //-- addSimpleType
 
     /**
      * Adds the given Element declaration to this Schema defintion
@@ -228,45 +228,45 @@ public class Schema extends Structure {
     
     
     /**
-     * Creates a new Complextype using this Schema as the owning Schema
-     * document. A call to #addComplextype must still be made in order
-     * to add the complextype to this Schema.
-     * @return the new Complextype
+     * Creates a new ComplexType using this Schema as the owning Schema
+     * document. A call to #addComplexType must still be made in order
+     * to add the complexType to this Schema.
+     * @return the new ComplexType
     **/
-    public Complextype createComplextype() {
-        return new Complextype(this);
-    } //-- createComplextype
+    public ComplexType createComplexType() {
+        return new ComplexType(this);
+    } //-- createComplexType
     
     /**
-     * Creates a new Complextype using this Schema as the owning Schema
-     * document. A call to #addComplextype must still be made in order
-     * to add the complextype to this Schema.
-     * @param name the name of the Complextype 
-     * @return the new Complextype
+     * Creates a new ComplexType using this Schema as the owning Schema
+     * document. A call to #addComplexType must still be made in order
+     * to add the complexType to this Schema.
+     * @param name the name of the ComplexType 
+     * @return the new ComplexType
     **/
-    public Complextype createComplextype(String name) {
-        return new Complextype(this, name);
-    } //-- createComplextype
+    public ComplexType createComplexType(String name) {
+        return new ComplexType(this, name);
+    } //-- createComplexType
     
     /**
-     * Creates a new Simpletype using this Schema as the owning Schema
-     * document. A call to #addSimpletype must till be made in order
-     * to add the Simpletype to this Schema.
-     * @param name the name of the Simpletype
-     * @return the new Simpletype.
+     * Creates a new SimpleType using this Schema as the owning Schema
+     * document. A call to #addSimpleType must till be made in order
+     * to add the SimpleType to this Schema.
+     * @param name the name of the SimpleType
+     * @return the new SimpleType.
     **/
-    public Simpletype createSimpletype(String name) {
-        return new Simpletype(this, name);
-    } //-- createSimpletype(String)
+    public SimpleType createSimpleType(String name) {
+        return new SimpleType(this, name);
+    } //-- createSimpleType(String)
     
     /**
-     * Returns the Complextype of associated with the given name
-     * @return the Complextypel of associated with the given name, or
-     *  null if no Complextype with the given name was found.
+     * Returns the ComplexType of associated with the given name
+     * @return the ComplexType of associated with the given name, or
+     *  null if no ComplexType with the given name was found.
     **/
-    public Complextype getComplextype(String name) {
+    public ComplexType getComplexType(String name) {
         if (name == null)  {
-            String err = NULL_ARGUMENT + "getComplextype: ";
+            String err = NULL_ARGUMENT + "getComplexType: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
@@ -275,26 +275,26 @@ public class Schema extends Structure {
         int colon = name.indexOf(':');
         if (colon != -1)
             canonicalName = name.substring(colon + 1);
-        return (Complextype)complextypes.get(canonicalName);
-    } //-- getComplextype
+        return (ComplexType)complexTypes.get(canonicalName);
+    } //-- getComplexType
     
     /**
-     * Returns an Enumeration of all top-level Complextype declarations
-     * @return an Enumeration of all top-level Complextype declarations
+     * Returns an Enumeration of all top-level ComplexType declarations
+     * @return an Enumeration of all top-level ComplexType declarations
     **/
-    public Enumeration getComplextypes() {
-        return complextypes.elements();
+    public Enumeration getComplexTypes() {
+        return complexTypes.elements();
     } //-- getComplextypes
     
     /**
-     * Returns the Simpletype associated with the given name,
-     * or null if no such Simpletype exists.
-     * @return the Simpletype associated with the given name,
-     * or null if no such Simpletype exists.
+     * Returns the SimpleType associated with the given name,
+     * or null if no such SimpleType exists.
+     * @return the SimpleType associated with the given name,
+     * or null if no such SimpleType exists.
     **/
-    public Simpletype getSimpletype(String name) {
+    public SimpleType getSimpleType(String name) {
         if (name == null)  {
-            String err = NULL_ARGUMENT + "getSimpletype: ";
+            String err = NULL_ARGUMENT + "getSimpleType: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
@@ -303,16 +303,16 @@ public class Schema extends Structure {
         int colon = name.indexOf(':');
         if (colon != -1)
             canonicalName = name.substring(colon + 1);
-        return (Simpletype)simpletypes.get(canonicalName);
-    } //-- getSimpletype
+        return (SimpleType)simpleTypes.get(canonicalName);
+    } //-- getSimpleType
     
     /**
-     * Returns an Enumeration of all Simpletype declarations
-     * @return an Enumeration of all Simpletype declarations
+     * Returns an Enumeration of all SimpleType declarations
+     * @return an Enumeration of all SimpleType declarations
     **/
-    public Enumeration getSimpletypes() {
-        return simpletypes.elements();
-    } //-- getSimpletypes
+    public Enumeration getSimpleTypes() {
+        return simpleTypes.elements();
+    } //-- getSimpleTypes
     
     /**
      * Returns the ElementDecl of associated with the given name
@@ -342,21 +342,21 @@ public class Schema extends Structure {
     } //-- getTargetNamespace
     
     /**
-     * Removes the given top level Complextype from this Schema
-     * @param complextype the Complextype to remove
-     * @return true if the complextype has been removed, or
-     * false if the complextype wasn't top level or
+     * Removes the given top level ComplexType from this Schema
+     * @param complexType the ComplexType to remove
+     * @return true if the complexType has been removed, or
+     * false if the complexType wasn't top level or
      * didn't exist in this Schema
     **/
-    public boolean removeComplextype(Complextype complextype) {
-        if (complextype.isTopLevel()) {
-            if (complextypes.contains(complextype)) {
-                complextypes.remove(complextype);
+    public boolean removeComplexType(ComplexType complexType) {
+        if (complexType.isTopLevel()) {
+            if (complexTypes.contains(complexType)) {
+                complexTypes.remove(complexType);
                 return true;
             }
         }
         return false;
-    } //-- removeComplextype
+    } //-- removeComplexType
     
     /**
      * Sets the name of this Schema definition
