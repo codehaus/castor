@@ -5,6 +5,12 @@ JDO:     Added support for null fields by calling the relevant setNull() method
          when setting a null field. Does not apply to query parameters yet, does
          not apply to identity fields.
 
+JDO:     Added key generators support. Implemented four algorithms:
+         "MAX" - generic "MAX(pk) + 1" algorithm;
+         "HIGH/LOW" - generic "HIGH/LOW" algorithm (extendible);
+         "IDENTITY" - "SELECT @@identity" for Sybase and SQL Server;
+         "SEQUENCE" - "SELECT nextval('..._seq')" for Oracle and PosgreSQL;
+
 JDO:     Added package org.exolab.castor.jdo.drivers which includes RDBMS specific
          factories, query expressions and key generators. Added factories for DB2,
          and SQL Server.
@@ -129,8 +135,8 @@ JDO:     Upgraded to use QueryExpression to construct SQL query statements
          in database specific syntax.
 
 JDO:     Implemented dirty checking on objects loaded with a shared lock.
-	 Dirty checking performed on fields within UPDATE statement requiring
-	 a single SQL operation to update/check dirtyness.
+     Dirty checking performed on fields within UPDATE statement requiring
+     a single SQL operation to update/check dirtyness.
 
 SPI:     Added QueryExpression and KeyGenerator to the SPI. QueryExpression
          is generated from PersistenceFactory. Added way to load factories
