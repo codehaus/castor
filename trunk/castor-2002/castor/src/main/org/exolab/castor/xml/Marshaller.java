@@ -773,43 +773,23 @@ public class Marshaller extends MarshalFramework {
                 continue;
             }
 
-            //-- handle IDREFs
+            //-- handle IDREF(S)
             if (attDescriptor.isReference() && (value != null)) {
-                XMLClassDescriptor cd = getClassDescriptor(value.getClass());
-                String err = null;
-                if (cd != null) {
-                    XMLFieldDescriptor fieldDesc
-                        = (XMLFieldDescriptor) cd.getIdentity();
-                    if (fieldDesc != null) {
-                        FieldHandler fieldHandler = fieldDesc.getHandler();
-                        if (fieldHandler != null) {
-                            try {
-                                value = fieldHandler.getValue(value);
-                            }
-                            catch(IllegalStateException ise) {
-                                err = ise.toString();
-                            }
-                        }//fieldHandler != null
-                        else {
-                            err = "FieldHandler for Identity descriptor is null.";
-                        }
-                    }//fieldDesc != null
-                    else err = "No identity descriptor available";
-                }//cd!=null
-                else  {
-                    err = "Unable to resolve ClassDescriptor for: " +
-                        value.getClass().getName();
+                if (attDescriptor.isMultivalued()) {
+                    Object[] objects = (Object[])value;
+                    if (objects.length == 0) continue;
+                    StringBuffer sb = new StringBuffer();
+                    for (int v = 0; v < objects.length; v++) {
+                        if (v > 0) sb.append(' ');
+                        sb.append(getObjectID(objects[v]).toString());
+                    }
+                    value = sb;
                 }
-
-                if (err != null) {
-                    String errMsg = "Unable to save reference to: " +
-                        cd.getXMLName() + " from element: " +
-                        classDesc.getXMLName() +
-                        " due to the following error: "+ err;
-                    throw new MarshalException(errMsg);
+                else {
+                    value = getObjectID(value);
                 }
             }
-
+            
             if (value == null) continue;
 
             atts.addAttribute(xmlName, CDATA, value.toString());
@@ -995,6 +975,51 @@ public class Marshaller extends MarshalFramework {
 
     } //-- void marshal(DocumentHandler)
 
+    /**
+     * Retrieves the ID for the given Object
+     * 
+     * @param object the Object to retrieve the ID for
+     * @return the ID for the given Object
+    **/
+    private Object getObjectID(Object object) 
+        throws MarshalException
+    {
+        if (object == null) return null;
+        
+        Object id = null;
+        XMLClassDescriptor cd = getClassDescriptor(object.getClass());
+        String err = null;
+        if (cd != null) {
+            XMLFieldDescriptor fieldDesc
+                = (XMLFieldDescriptor) cd.getIdentity();
+            if (fieldDesc != null) {
+                FieldHandler fieldHandler = fieldDesc.getHandler();
+                if (fieldHandler != null) {
+                    try {
+                        id = fieldHandler.getValue(object);
+                    }
+                    catch(IllegalStateException ise) {
+                        err = ise.toString();
+                    }
+                }//fieldHandler != null
+                else {
+                    err = "FieldHandler for Identity descriptor is null.";
+                }
+            }//fieldDesc != null
+            else err = "No identity descriptor available";
+        }//cd!=null
+        else  {
+            err = "Unable to resolve ClassDescriptor.";
+        }
+        if (err != null) {
+            String errMsg = "Unable to resolve ID for instance of class '"; 
+            errMsg += object.getClass().getName();
+            errMsg += "' due to the following error: ";
+            throw new MarshalException(errMsg + err);
+        }
+        return id;        
+    } //-- getID
+        
 
     /**
      * Declares the given namespace, if not already in scope
