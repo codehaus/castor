@@ -56,7 +56,7 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
 
     public CacheTypeMappingDescriptor() {
         nsURI = "http://castor.exolab.org/";
-        xmlName = "cache-type-mapping";
+        xmlName = "cache-type";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
