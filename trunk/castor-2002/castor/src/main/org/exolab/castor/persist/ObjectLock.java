@@ -246,8 +246,8 @@ final class ObjectLock
 	    } else {
 		// Don't wait if timeout is zero
 		if ( timeout == 0 )
-		    throw new LockNotGrantedException( write ? "persist.writeLockTimeout" :
-						       "persist.readLockTimeout" );
+		    throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
+                                                           "persist.readLockTimeout" );
 		
 		try {
 		    // Detect possibility of dead-lock. Must remain in wait-on-lock
@@ -270,7 +270,7 @@ final class ObjectLock
 			wait( timeout * 1000 );
 		    } catch ( InterruptedException except ) {
 			// If the thread is interrupted, come out with the proper message
-			throw new LockNotGrantedException( write ? "persist.writeLockTimeout" :
+			throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
 							   "persist.readLockTimeout" );
 		    }
 		    if ( _object == null ) {
@@ -404,12 +404,12 @@ final class ObjectLock
                 // Is the blocked transaction blocked by the transaction locking
                 // this object? This is a deadlock.
                 if ( waitOn._writeLock == waitingTx ) {
-                    throw new LockNotGrantedException( "persist.deadlock" );
+                    throw new LockNotGrantedExceptionImpl( "persist.deadlock" );
                 }
                 read = waitOn._readLock;
                 while ( read != null ) {
                     if ( read.tx == waitingTx )
-                        throw new LockNotGrantedException( "persist.deadlock" );
+                        throw new LockNotGrantedExceptionImpl( "persist.deadlock" );
                     read = read.next;
                 }
                 waitOn.detectDeadlock( waitingTx );
@@ -430,12 +430,12 @@ final class ObjectLock
                     LinkedTx read;
 
                     if ( waitOn._writeLock == waitingTx ) {
-                        throw new LockNotGrantedException( "persist.deadlock" );
+                        throw new LockNotGrantedExceptionImpl( "persist.deadlock" );
                     }
                     read = waitOn._readLock;
                     while ( read != null ) {
                         if ( read.tx == waitingTx )
-                            throw new LockNotGrantedException( "persist.deadlock" );
+                            throw new LockNotGrantedExceptionImpl( "persist.deadlock" );
                         read = read.next;
                     }
                     waitOn.detectDeadlock( waitingTx );
