@@ -78,7 +78,7 @@ public final class SQLTypes
 	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
 	 * Commons Logging</a> instance used for all logging.
 	 */
-	private static Log log = LogFactory.getFactory().getInstance(SQLTypes.class);
+	private static Log log = LogFactory.getFactory().getInstance(Class.class);
 	
     /**
      * Separator between words in SQL name.
@@ -1217,6 +1217,16 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( byte[].class, java.io.Serializable.class ) {
             public Object convert( Object obj, String param ) {
                 return obj;
+            }
+        } ),
+        new TypeConvertorInfo (new SQLTypeConvertor (org.exolab.castor.types.Duration.class, java.lang.Long.class) {
+            public Object convert (Object obj, String param) {
+                return new Long (((org.exolab.castor.types.Duration) obj).toLong());
+            }
+        } ),
+        new TypeConvertorInfo (new SQLTypeConvertor (java.lang.Long.class, org.exolab.castor.types.Duration.class) {
+            public Object convert (Object obj, String param) {
+                return new org.exolab.castor.types.Duration ((( Long) obj).longValue());
             }
         } )
     };
