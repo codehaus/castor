@@ -71,7 +71,7 @@ public class Person implements java.io.Serializable {
    }
 
    <comment>/**
-     * @return name of the person
+     * @return date of birth of the person
      */</comment>
    public Date getDateOfBirth() {
       return dob;

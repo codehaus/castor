@@ -256,7 +256,15 @@
                   <td valign="top">boolean</td><td></td>
                </tr>
                <tr>
-                  <td valign="top">decimal</td><td></td>
+                  <td valign="top">decimal</td>
+                  <td>
+                  	 maxExclusive
+                  	 minExclusive
+                  	 maxInclusive
+                  	 minInclusive
+                  	 precision
+                  	 scale
+                  </td>
                </tr>
                <tr>
                   <td valign="top">double</td><td></td>
@@ -270,7 +278,13 @@
                   </td>
                </tr>
                <tr>
-                  <td valign="top">timeDuration</td><td></td>
+                  <td valign="top">timeDuration</td>
+                  <td>
+                  	  maxExclusive
+                  	  minExclusive
+                  	  maxInclusive
+                  	  minInclusive
+                  </td>
                </tr>
                <tr>
                   <td valign="top">uriReference</td><td></td>

@@ -80,7 +80,7 @@ public class InvoiceTest implements PropertyChangeListener {
 	    System.out.println("Unmarshalling Invoice");
 
 	    Invoice invoice = null;
-	    invoice = Invoice.unmarshal(new FileReader("invoice1.xml"));
+	    invoice = Invoice.unmarshal(new FileReader("c:\\travail\\intalio\\tests\\castortest\\sourcegenerator\\invoice1.xml"));
 
 
 	    System.out.println();
@@ -111,11 +111,12 @@ public class InvoiceTest implements PropertyChangeListener {
 
 	    System.out.println();
         System.out.println("Item:");
-        Item item = invoice.getItem();
-        System.out.println("  ID:"+item.getId());
-        System.out.println("  Quantity:"+item.getQuantity());
-        System.out.println("  Price:"+item.getPrice());
-
+        Item[] item = invoice.getItem();
+        for (int i=0; i<item.length; i++) {
+                System.out.println("  ID:"+item[i].getId());
+                System.out.println("  Quantity:"+item[i].getQuantity());
+                System.out.println("  Price:"+item[i].getPrice());
+        }
         System.out.println();
 	    System.out.println("Shipping Method:");
 
