@@ -3,12 +3,11 @@
   <body>
     <title>Castor-Dev: Developers' Mailing List</title>
     <header>
-      <p>Moderate volume (possibly more than 10 messages a day) mailing list dedicated to the developers of Castor.</p>
-
-      <p><a href="http://castor.exolab.org/list-archive/">List archive</a></p>
+      <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated to the developers of Castor.</p>
 
       <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
-                       server="exolab.org" manager="minimalist"/></p>
+                       server="exolab.org" manager="minimalist"
+                       archive="http://castor.exolab.org/list-archive/"/></p>
 
     </header>
   </body>

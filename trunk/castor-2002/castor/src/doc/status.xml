@@ -56,12 +56,6 @@
         </ul>
       </section>
 
-      <section title="Castor DAX">
-        <ul>
-          <li>Still work in progress</li>
-        </ul>
-      </section>
-
       <section title="Castor DSML">
         <ul>
           <li>Import/export an LDAP directory or search results to/from XML
@@ -80,19 +74,16 @@
         <li>Work is under way on a direct SQL->XML bridge which uses the same
             mapping file but does not involve any Java objects in the process.</li>
 
-        <li>This release of Castor JDO provides only preliminary support for OQL
-            queries with simple syntax and single object retrieval. A project
-            to extend the OQL engine is underway.</li>
-
         <li>The EJB CMP implementation is now developed in the scope of the
             OpenEJB project.</li>
 
-        <li>This release of Castor JDO supports JTA transactional environments,
-            but lacks support for JTA factories. Integration with transaction
-            managers and Tomcat/OpenEJB will be introduced in release 0.9.</li>
+        <li>Consolidation between the SQL and LDAP engine through a shared
+            DataStore API, potentially supporting other relational back-ends.</li>
 
-        <li>Key generation, engines for Oracle/Sybase, stored procedures,
-            BLOBs, XML content, read-only queries, XML defined finders.</li>
+        <li>Mapping file supporting object dependency and relations. More generic
+            mapping API and mapping tools.</li>
+
+        <li>Stored procedures, BLOBs, XML content.</li>
       </ul>
     </section>
 

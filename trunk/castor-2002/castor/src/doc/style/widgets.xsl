@@ -71,7 +71,8 @@
       [
       <a href="mailto:{@manager}@{@server}?subject=subscribe {@name}">Subscribe</a> |
       <a href="mailto:{@manager}@{@server}?subject=unsubscribe {@name}">Unsubscribe</a> |
-      <a href="mailto:{@name}@{@server}">Post</a>
+      <a href="mailto:{@name}@{@server}">Post Message</a> |
+      <a href="{@archive}">Archive</a>
       ]
     </div>
   </xsl:template>

@@ -43,7 +43,7 @@
     <company id="poet"/>
     <description>
        Submitted code for allowing subclassing of the special types used
-       by the Source Generator, for customization.
+       by the Source Generator, and for supporting ODMG 3.0 collections.
     </description>
   </contributor>
 
