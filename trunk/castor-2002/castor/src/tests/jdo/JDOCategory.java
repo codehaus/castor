@@ -57,7 +57,8 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.util.Logger;
-
+import java.net.URL;
+import java.net.MalformedURLException;
 import junit.framework.TestSuite;
 import harness.TestHarness;
 
@@ -71,7 +72,11 @@ public class JDOCategory extends TestHarness {
     public JDOCategory( TestHarness superTest, String name, String description, Object jdo ) {
         super( superTest, name, description );
         _jdo = (JDO) jdo;
-        _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
+        try {
+            new URL( _jdo.getConfiguration() );
+        } catch ( MalformedURLException e ) {
+            _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
+        }
     }
 
 
