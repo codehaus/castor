@@ -77,10 +77,10 @@ public class ContainerFieldDesc
 
     public ContainerFieldDesc( FieldDesc fieldDesc, FieldDesc[] contained )
     {
-	super( fieldDesc );
-	if ( contained == null )
-	    throw new IllegalArgumentException( "Argument 'contained' is null" );
-	_contained = contained;
+        super( fieldDesc );
+        if ( contained == null )
+            throw new IllegalArgumentException( "Argument 'contained' is null" );
+        _contained = contained;
     }
 
 
@@ -91,7 +91,7 @@ public class ContainerFieldDesc
      */
     public FieldDesc[] getFields()
     {
-	return _contained;
+        return _contained;
     }
 
 
@@ -102,45 +102,45 @@ public class ContainerFieldDesc
      */
     public Object newInstance()
     {
-	return Types.newInstance( getFieldType() );
+        return Types.newInstance( getFieldType() );
     }
 
 
     public void copyInto( Object source, Object target )
     {
-	source = getValue( source );
-	if ( source == null )
-	    setValue( target, null );
-	else {
-	    Object value;
-
-	    value = Types.newInstance( getFieldType() );
-	    setValue( target, value );
-	    for ( int i = 0 ; i < _contained.length ; ++i )
-		_contained[ i ].copyInto( source, value );
-	}
+        source = getValue( source );
+        if ( source == null )
+            setValue( target, null );
+        else {
+            Object value;
+            
+            value = Types.newInstance( getFieldType() );
+            setValue( target, value );
+            for ( int i = 0 ; i < _contained.length ; ++i )
+                _contained[ i ].copyInto( source, value );
+        }
     }
-
-
+    
+    
     public String canStore( Object obj )
     {
-	String reason;
-
-	for ( int i = 0 ; i < _contained.length ; ++i ) {
-	    reason = _contained[ i ].canStore( obj );
-	    if ( reason != null )
-		return reason;
-	}
-	return null;
+        String reason;
+        
+        for ( int i = 0 ; i < _contained.length ; ++i ) {
+            reason = _contained[ i ].canStore( obj );
+            if ( reason != null )
+                return reason;
+        }
+        return null;
     }
 
 
     public boolean isModified( Object obj, Object cached )
     {
-	for ( int i = 0 ; i < _contained.length ; ++i )
-	    if ( _contained[ i ].isModified( obj, cached ) )
-		return true;
-	return false;
+        for ( int i = 0 ; i < _contained.length ; ++i )
+            if ( _contained[ i ].isModified( obj, cached ) )
+                return true;
+        return false;
     }
 	
 

@@ -76,10 +76,10 @@ public class PersistenceEngineFactory
      *  object types due to a mapping errot
      */
     public PersistenceEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
-					   PrintWriter logWriter )
-	throws MappingException
+                                           PrintWriter logWriter )
+        throws MappingException
     {
-	return new CacheEngine( mapResolver, factory, logWriter );
+        return new CacheEngine( mapResolver, factory, logWriter );
     }
 
 

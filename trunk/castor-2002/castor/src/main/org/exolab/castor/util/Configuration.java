@@ -97,88 +97,88 @@ public abstract class Configuration
 
         /**
          * Property specifying the class name of the XML serializer to use.
-	 * <pre>
-	 * org.exolab.castor.serializer
-	 * </pre>
-	 */
-	public static final String Serializer = "org.exolab.castor.serializer";
-
-	/**
-	 * Property specifying the class name of the XML parser to use.
-	 * <pre>
-	 * org.exolab.castor.parser
-	 * </pre>
-	 */
-	public static final String Parser = "org.exolab.castor.parser";
-
-	/**
-	 * Property specifying whether to perform document validation by default.
-	 * <pre>
-	 * org.exolab.castor.validation
-	 * </pre>
-	 */
-	public static final String Validation = "org.exolab.castor.validation";
-
-	/**
-	 * Property specifying whether to support Propertypaces by default.
-	 * <pre>
-	 * org.exolab.castor.Propertypaces
-	 * </pre>
-	 */
-	public static final String Propertypaces = "org.exolab.castor.Propertypaces";
-
-	/**
-	 * Property specifying whether XML documents should be indented by default.
-	 * <pre>
-	 * org.exolab.castor.indent
-	 * </pre>
-	 */
-	public static final String Indent = "org.exolab.castor.indent";
-
-	/**
-	 * Property specifying additional features for the parser.
-	 * This value contains a comma separated list of features that
-	 * might or might not be supported by the specified parser.
-	 * <pre>
-	 * org.exolab.castor.sax.features
-	 * </pre>
-	 */
-	public static final String ParserFeatures = "org.exolab.castor.sax.features";
-
-	public static final String ParserFeatureSeparator = ",";
-
-	/**
-	 * Property specifying whether to run in debug mode.
-	 * <pre>
-	 * org.exolab.castor.debug
-	 * </pre>
-	 */
-	public static final String Debug = "org.exolab.castor.debug";
-
-	/**
-	 * The name of the configuration file.
-	 * <pre>
-	 * castor.properties
-	 * </pre>
-	 */
-	public static final String FileName = "castor.properties";
-
-	static final String ResourceName = "/org/exolab/castor/castor.properties";
+         * <pre>
+         * org.exolab.castor.serializer
+         * </pre>
+         */
+        public static final String Serializer = "org.exolab.castor.serializer";
+        
+        /**
+         * Property specifying the class name of the XML parser to use.
+         * <pre>
+         * org.exolab.castor.parser
+         * </pre>
+         */
+        public static final String Parser = "org.exolab.castor.parser";
+        
+        /**
+         * Property specifying whether to perform document validation by default.
+         * <pre>
+         * org.exolab.castor.validation
+         * </pre>
+         */
+        public static final String Validation = "org.exolab.castor.validation";
+        
+        /**
+         * Property specifying whether to support Propertypaces by default.
+         * <pre>
+         * org.exolab.castor.Propertypaces
+         * </pre>
+         */
+        public static final String Propertypaces = "org.exolab.castor.Propertypaces";
+        
+        /**
+         * Property specifying whether XML documents should be indented by default.
+         * <pre>
+         * org.exolab.castor.indent
+         * </pre>
+         */
+        public static final String Indent = "org.exolab.castor.indent";
+        
+        /**
+         * Property specifying additional features for the parser.
+         * This value contains a comma separated list of features that
+         * might or might not be supported by the specified parser.
+         * <pre>
+         * org.exolab.castor.sax.features
+         * </pre>
+         */
+        public static final String ParserFeatures = "org.exolab.castor.sax.features";
+        
+        public static final String ParserFeatureSeparator = ",";
+        
+        /**
+         * Property specifying whether to run in debug mode.
+         * <pre>
+         * org.exolab.castor.debug
+         * </pre>
+         */
+        public static final String Debug = "org.exolab.castor.debug";
+        
+        /**
+         * The name of the configuration file.
+         * <pre>
+         * castor.properties
+         * </pre>
+         */
+        public static final String FileName = "castor.properties";
+        
+        static final String ResourceName = "/org/exolab/castor/castor.properties";
     }
-
-
+    
+    
     private static class Features
     {
-	public static final String Validation = "http://xml.org/sax/features/validation";
-	public static final String Propertypaces = "http://xml.org/sax/features/Propertypaces";
+        public static final String Validation = "http://xml.org/sax/features/validation";
+        public static final String Propertypaces = "http://xml.org/sax/features/Propertypaces";
     }
-
-
+    
+    
     /**
      * The default properties loaded from the configuration file.
      */
     private static Properties _default;
-
+    
 
     /**
      * True if the default configuration specified debugging.
@@ -191,7 +191,7 @@ public abstract class Configuration
      */
     public static boolean debug()
     {
-	return _debug;
+        return _debug;
     }
 
 
@@ -204,10 +204,10 @@ public abstract class Configuration
      */
     public static synchronized Properties getDefault()
     {
-	if ( _default == null ) {
-	    load();
-	}
-	return _default;
+        if ( _default == null ) {
+            load();
+        }
+        return _default;
     }
 
 
@@ -219,7 +219,7 @@ public abstract class Configuration
      */
     public static Parser getParser()
     {
-	return getParser( "" );
+        return getParser( "" );
     }
 
 
@@ -237,59 +237,59 @@ public abstract class Configuration
      */
     public static Parser getParser( String features )
     {
-	String prop;
-	Parser parser;
-
-	prop = getDefault().getProperty( Property.Parser );
-	if ( prop == null || prop.equals( "Xerces" ) ) {
-	    // If no parser class was specified, we default to Xerces.
-	    parser = new org.apache.xerces.parsers.SAXParser();
-	} else {
-	    // If a parser class was specified, we try to create it and
-	    // complain about creation error.
-	    try {
-		Class cls;
-
-		cls = Class.forName( prop );
-		parser = (Parser) cls.newInstance();
-	    } catch ( Exception except ) {
-		throw new RuntimeException( Messages.format( "conf.failedInstantiateParser",
-							     prop, except ) );
-	    }
-	}
-
-	if ( parser instanceof XMLReader ) {
-	    StringTokenizer token;
-	    boolean         flag;
-
-	    if ( features == null ) {
-		prop = getDefault().getProperty( Property.Validation, "false" );
-		flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
-		try {
-		    ( (XMLReader) parser ).setFeature( Features.Validation, flag );
-		} catch ( SAXException except ) {
-		    // Ignore if feature not supported
-		}
-		prop = getDefault().getProperty( Property.Propertypaces, "false" );
-		flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
-		try {
-		    ( (XMLReader) parser ).setFeature( Features.Propertypaces, flag );
-		} catch ( SAXException except ) {
-		    // Ignore if feature not supported
-		}
-		
-		features = getDefault().getProperty( Property.ParserFeatures, features );
-	    }
-	    token = new StringTokenizer( features, ", " );
-	    while ( token.hasMoreTokens() ) {
-		try {
-		    ( (XMLReader) parser ).setFeature( token.nextToken(), true );
-		} catch ( SAXException except ) {
-		    // Ignore if feature not supported
-		}
-	    }
-	}
-	return parser;
+        String prop;
+        Parser parser;
+        
+        prop = getDefault().getProperty( Property.Parser );
+        if ( prop == null || prop.equals( "Xerces" ) ) {
+            // If no parser class was specified, we default to Xerces.
+            parser = new org.apache.xerces.parsers.SAXParser();
+        } else {
+            // If a parser class was specified, we try to create it and
+            // complain about creation error.
+            try {
+                Class cls;
+                
+                cls = Class.forName( prop );
+                parser = (Parser) cls.newInstance();
+            } catch ( Exception except ) {
+                throw new RuntimeException( Messages.format( "conf.failedInstantiateParser",
+                                                             prop, except ) );
+            }
+        }
+        
+        if ( parser instanceof XMLReader ) {
+            StringTokenizer token;
+            boolean         flag;
+            
+            if ( features == null ) {
+                prop = getDefault().getProperty( Property.Validation, "false" );
+                flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
+                try {
+                    ( (XMLReader) parser ).setFeature( Features.Validation, flag );
+                } catch ( SAXException except ) {
+                    // Ignore if feature not supported
+                }
+                prop = getDefault().getProperty( Property.Propertypaces, "false" );
+                flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
+                try {
+                    ( (XMLReader) parser ).setFeature( Features.Propertypaces, flag );
+                } catch ( SAXException except ) {
+                    // Ignore if feature not supported
+                }
+                
+                features = getDefault().getProperty( Property.ParserFeatures, features );
+            }
+            token = new StringTokenizer( features, ", " );
+            while ( token.hasMoreTokens() ) {
+                try {
+                    ( (XMLReader) parser ).setFeature( token.nextToken(), true );
+                } catch ( SAXException except ) {
+                    // Ignore if feature not supported
+                }
+            }
+        }
+        return parser;
     }
 
 
@@ -305,27 +305,27 @@ public abstract class Configuration
      */
     public static Serializer getSerializer()
     {
-	String     prop;
-	Serializer serializer;
-
-	prop = getDefault().getProperty( Property.Serializer );
-	if ( prop == null )
-	    throw new RuntimeException( Messages.format( "conf.missingProperty",
-							 Property.Serializer ) );
-	try {
-  	    serializer = (Serializer) Class.forName( prop ).newInstance();
-	    prop = getDefault().getProperty( Property.Indent, "" );
-	    if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) ) {
-		serializer.setOutputFormat( new OutputFormat( Method.XML, null, true ) );
-	    }
-	    return serializer;
-	} catch ( Exception except ) {
-	    throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
-							 prop, except ) );
-	}
+        String     prop;
+        Serializer serializer;
+        
+        prop = getDefault().getProperty( Property.Serializer );
+        if ( prop == null )
+            throw new RuntimeException( Messages.format( "conf.missingProperty",
+                                                         Property.Serializer ) );
+        try {
+            serializer = (Serializer) Class.forName( prop ).newInstance();
+            prop = getDefault().getProperty( Property.Indent, "" );
+            if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) ) {
+                serializer.setOutputFormat( new OutputFormat( Method.XML, null, true ) );
+            }
+            return serializer;
+        } catch ( Exception except ) {
+            throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
+                                                         prop, except ) );
+        }
     }
-
-
+    
+    
     /**
      * Returns a default serializer for producing an XML document to
      * the designated output stream using the default serialization
@@ -336,22 +336,22 @@ public abstract class Configuration
      */
     public static DocumentHandler getSerializer( OutputStream output )
     {
-	Serializer      serializer;
-	DocumentHandler docHandler;
-
-	serializer = getSerializer();
-	try {
-	    serializer.setOutputByteStream( output );
-	} catch ( IOException except ) {
-	    // This should never happen
-	}
-	docHandler = serializer.asDocumentHandler();
-	if ( docHandler == null )
-	    throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
-							 serializer.getClass().getName() ) );
-	return docHandler;
+        Serializer      serializer;
+        DocumentHandler docHandler;
+        
+        serializer = getSerializer();
+        try {
+            serializer.setOutputByteStream( output );
+        } catch ( IOException except ) {
+            // This should never happen
+        }
+        docHandler = serializer.asDocumentHandler();
+        if ( docHandler == null )
+            throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
+                                                         serializer.getClass().getName() ) );
+        return docHandler;
     }
-
+    
 
     /**
      * Returns a default serializer for producing an XML document to
@@ -363,16 +363,16 @@ public abstract class Configuration
      */
     public static DocumentHandler getSerializer( Writer output )
     {
-	Serializer      serializer;
-	DocumentHandler docHandler;
-
-	serializer = getSerializer();
-	serializer.setOutputCharStream( output );
-	docHandler = serializer.asDocumentHandler();
-	if ( docHandler == null )
-	    throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
-							 serializer.getClass().getName() ) );
-	return docHandler;
+        Serializer      serializer;
+        DocumentHandler docHandler;
+        
+        serializer = getSerializer();
+        serializer.setOutputCharStream( output );
+        docHandler = serializer.asDocumentHandler();
+        if ( docHandler == null )
+            throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
+                                                         serializer.getClass().getName() ) );
+        return docHandler;
     }
 
 
@@ -385,51 +385,51 @@ public abstract class Configuration
      */
     protected static void load()
     {
-	File        file;
-	InputStream is;
-
-	// Get detault configuration from the Castor JAR.
-	// Complain if not found.
-	_default = new Properties();
-	try {
-	    _default.load( Configuration.class.getResourceAsStream( Property.ResourceName ) );
-	} catch ( Exception except ) {
-	    // This should never happen
-	    throw new RuntimeException( Messages.format( "conf.notDefaultConfigurationFile",
-							 Property.FileName ) );
-	}
-
-	// Get overriding configuration from the Java
-	// library directory, ignore if not found.
-	file = new File( System.getProperty( "java.home" ), "lib" );
-	file = new File( file, Property.FileName );
-	if ( file.exists() ) {
-	    _default = new Properties( _default );
-	    try {
-		_default.load( new FileInputStream( file ) );
-	    } catch ( IOException except ) {
-		// Do nothing
-	    }
-	}
-
-	// Get overriding configuration from the classpath,
-	// ignore if not found.
-	try {
-	    is = Configuration.class.getResourceAsStream( "/" + Property.FileName );
-	    if ( is != null ) {
-		_default = new Properties( _default );
-		_default.load( is );
-	    }
-	} catch ( Exception except ) {
-	    // Do nothing
-	}
-
-	String     prop;
-
-	prop = _default.getProperty( Property.Debug, "" );
-	if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
-	    _debug = true;
+        File        file;
+        InputStream is;
+        
+        // Get detault configuration from the Castor JAR.
+        // Complain if not found.
+        _default = new Properties();
+        try {
+            _default.load( Configuration.class.getResourceAsStream( Property.ResourceName ) );
+        } catch ( Exception except ) {
+            // This should never happen
+            throw new RuntimeException( Messages.format( "conf.notDefaultConfigurationFile",
+                                                         Property.FileName ) );
+        }
+        
+        // Get overriding configuration from the Java
+        // library directory, ignore if not found.
+        file = new File( System.getProperty( "java.home" ), "lib" );
+        file = new File( file, Property.FileName );
+        if ( file.exists() ) {
+            _default = new Properties( _default );
+            try {
+                _default.load( new FileInputStream( file ) );
+            } catch ( IOException except ) {
+                // Do nothing
+            }
+        }
+        
+        // Get overriding configuration from the classpath,
+        // ignore if not found.
+        try {
+            is = Configuration.class.getResourceAsStream( "/" + Property.FileName );
+            if ( is != null ) {
+                _default = new Properties( _default );
+                _default.load( is );
+            }
+        } catch ( Exception except ) {
+            // Do nothing
+        }
+        
+        String     prop;
+        
+        prop = _default.getProperty( Property.Debug, "" );
+        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
+            _debug = true;
     }
-
-
+    
+    
 }

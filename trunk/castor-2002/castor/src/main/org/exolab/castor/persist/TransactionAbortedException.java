@@ -69,53 +69,53 @@ public class TransactionAbortedException
     
     public TransactionAbortedException( Exception except )
     {
-	super( "persist.transactionAborted", except.toString() );
-	_except = except;
+        super( "persist.transactionAborted", except.toString() );
+        _except = except;
     }
 
 
     public TransactionAbortedException( String message )
     {
-	super( message );
+        super( message );
     }
 
 
     protected TransactionAbortedException( String message, Object arg1, Object arg2 )
     {
-	super( message, arg1, arg2 );
+        super( message, arg1, arg2 );
     }
-
-
+    
+    
     public Exception getException()
     {
-	return _except;
+        return _except;
     }
-
-
+    
+    
     public void printStackTrace()
     {
-	if ( _except == null )
-	    super.printStackTrace();
-	else
-	    _except.printStackTrace();
+        if ( _except == null )
+            super.printStackTrace();
+        else
+            _except.printStackTrace();
     }
-
-
+    
+    
     public void printStackTrace( PrintStream print )
     {
-	if ( _except == null )
-	    super.printStackTrace( print );
-	else
-	    _except.printStackTrace( print );
+        if ( _except == null )
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
-
-
+    
+    
     public void printStackTrace( PrintWriter print )
     {
-	if ( _except == null )
-	    super.printStackTrace( print );
-	else
-	    _except.printStackTrace( print );
+        if ( _except == null )
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
 
 

@@ -63,7 +63,7 @@ public class ObjectDeletedException
 
     public ObjectDeletedException( Class type, Object identity )
     {
-	super( "persist.objectDeleted", type, identity );
+        super( "persist.objectDeleted", type, identity );
     }
 
 

@@ -64,13 +64,13 @@ public class TransactionNotInProgressException
 
     public TransactionNotInProgressException()
     {
-	super( "persist.noTransaction" );
+        super( "persist.noTransaction" );
     }
 
 
     public TransactionNotInProgressException( String message )
     {
-	super( message );
+        super( message );
     }
 
 

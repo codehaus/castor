@@ -64,7 +64,7 @@ public class QueryException
 
     public QueryException( String message )
     {
-	super( message );
+        super( message );
     }
 
 

@@ -103,32 +103,32 @@ public class ClassDesc
      *   a parent class of this type
      */
     public ClassDesc( Class javaClass, FieldDesc[] fields,
-		      FieldDesc identity, ClassDesc extend )
-	throws MappingException
+                      FieldDesc identity, ClassDesc extend )
+        throws MappingException
     {
-	if ( ! Types.isConstructable( javaClass ) )
-	    throw new MappingException( "mapping.classNotConstructable", javaClass.getName() );
-	_javaClass = javaClass;
-	if ( fields == null )
-	    throw new IllegalArgumentException( "Argument 'fields' is null" );
-	_fields = fields;
-	if ( extend != null ) {
-	    if ( ! extend.getJavaClass().isAssignableFrom( javaClass ) )
-		throw new MappingException( "mapping.classDoesNotExtend",
-					    _javaClass.getName(), extend._javaClass.getName() );
-	    _extends = extend;
-	    _identity = ( identity == null ? _extends._identity : identity );
-	} else
-	    _identity = identity;
+        if ( ! Types.isConstructable( javaClass ) )
+            throw new MappingException( "mapping.classNotConstructable", javaClass.getName() );
+        _javaClass = javaClass;
+        if ( fields == null )
+            throw new IllegalArgumentException( "Argument 'fields' is null" );
+        _fields = fields;
+        if ( extend != null ) {
+            if ( ! extend.getJavaClass().isAssignableFrom( javaClass ) )
+                throw new MappingException( "mapping.classDoesNotExtend",
+                                            _javaClass.getName(), extend._javaClass.getName() );
+            _extends = extend;
+            _identity = ( identity == null ? _extends._identity : identity );
+        } else
+            _identity = identity;
     }
-
-
+    
+    
     protected ClassDesc( ClassDesc clsDesc )
     {
-	_javaClass = clsDesc._javaClass;
-	_fields = clsDesc._fields;
-	_extends = clsDesc._extends;
-	_identity = clsDesc._identity;
+        _javaClass = clsDesc._javaClass;
+        _fields = clsDesc._fields;
+        _extends = clsDesc._extends;
+        _identity = clsDesc._identity;
     }
 
 
@@ -139,7 +139,7 @@ public class ClassDesc
      */
     public Class getJavaClass()
     {
-	return _javaClass;
+        return _javaClass;
     }
 
 
@@ -153,7 +153,7 @@ public class ClassDesc
      */
     public FieldDesc[] getFields()
     {
-	return _fields;
+        return _fields;
     }
 
 
@@ -165,7 +165,7 @@ public class ClassDesc
      */
     public ClassDesc getExtends()
     {
-	return _extends;
+        return _extends;
     }
 
 
@@ -178,7 +178,7 @@ public class ClassDesc
      */
     public Object newInstance()
     {
-	return Types.newInstance( _javaClass );
+        return Types.newInstance( _javaClass );
     }
 
     
@@ -191,7 +191,7 @@ public class ClassDesc
      */
     public FieldDesc getIdentity()
     {
-	return _identity;
+        return _identity;
     }
 
 
@@ -206,10 +206,10 @@ public class ClassDesc
     public void copyInto( Object source, Object target )
     {
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-	    _fields[ i ].copyInto( source, target );
+            _fields[ i ].copyInto( source, target );
         }
-	if ( _identity != null )
-	    _identity.copyInto( source, target );
+        if ( _identity != null )
+            _identity.copyInto( source, target );
         if ( _extends != null )
             _extends.copyInto( source, target );
     } 
@@ -229,25 +229,25 @@ public class ClassDesc
      */
     public String canStore( Object obj )
     {
-	String reason;
-
-	// Object cannot be saved if one of the required fields is null
+        String reason;
+        
+        // Object cannot be saved if one of the required fields is null
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-	    reason = _fields[ i ].canStore( obj );
-	    if ( reason != null )
-		return reason;
+            reason = _fields[ i ].canStore( obj );
+            if ( reason != null )
+                return reason;
         }
-	// Object cannot be saves without identity
-	if ( _identity == null ) {
-	    return "mapping.noIdentity";
-	} else {
-	    reason = _identity.canStore( obj );
-	    if ( reason != null )
-		return reason;
-	}
-	if ( _extends != null )
-	    return _extends.canStore( obj );
-	return null;
+        // Object cannot be saves without identity
+        if ( _identity == null ) {
+            return "mapping.noIdentity";
+        } else {
+            reason = _identity.canStore( obj );
+            if ( reason != null )
+                return reason;
+        }
+        if ( _extends != null )
+            return _extends.canStore( obj );
+        return null;
     }
 
 
@@ -262,20 +262,20 @@ public class ClassDesc
     public boolean isModified( Object obj, Object cached )
     {
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-	    if ( _fields[ i ].isModified( obj, cached ) )
-		return true;
+            if ( _fields[ i ].isModified( obj, cached ) )
+                return true;
         }
-	if ( _identity != null )
-	    _identity.isModified( obj, cached );
-	if ( _extends != null )
-	    return _extends.isModified( obj, cached );
-	return false;
+        if ( _identity != null )
+            _identity.isModified( obj, cached );
+        if ( _extends != null )
+            return _extends.isModified( obj, cached );
+        return false;
     }
-
-
+    
+    
     public String toString()
     {
-	return "Mapping for class " + _javaClass.getName();
+        return "Mapping for class " + _javaClass.getName();
     }
 
 

@@ -88,288 +88,288 @@ public final class XAResourceImpl
 
     public XAResourceImpl( CacheEngine engine, XAResourceSource xaSource )
     {
-	if ( engine == null || xaSource == null )
-	    throw new IllegalArgumentException( "Argument 'engine' or xaSource' is null" );
-	_xaSource = xaSource;
-	_engine = engine;
+        if ( engine == null || xaSource == null )
+            throw new IllegalArgumentException( "Argument 'engine' or xaSource' is null" );
+        _xaSource = xaSource;
+        _engine = engine;
     }
     
     
     public synchronized void start( Xid xid, int flags )
         throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-	
-	switch ( flags ) {
-	case TMNOFLAGS: {
-	    TransactionContext tx;
-	    
-	    // Must assure transaction context is created only once
-	    // for a given Xid
-	    synchronized ( _engine.getXATransactions() ) {
-		tx = (TransactionContext) _engine.getXATransactions().get( xid );
-		if ( tx == null ) {
-		    tx = _xaSource.createTransactionContext( xid );
-		    _engine.getXATransactions().put( xid, tx );
-		}
-	    }
-	    // Associate XAResource with transaction
-	    _xaSource.setTransactionContext( tx );
-	    break;
-	}
-	case TMJOIN:
-	case TMRESUME: {
-	    TransactionContext tx;
-	    
-	    tx = (TransactionContext) _engine.getXATransactions().get( xid );
-	    if ( tx == null || ! tx.isOpen() )
-		throw new XAException( XAException.XAER_NOTA );
-	    // Associate XAResource with transaction
-	    _xaSource.setTransactionContext( tx );
-	    break;
-	}
-	default:
-	    // No other flags supported in start().
-	    throw new XAException( XAException.XAER_INVAL );
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        switch ( flags ) {
+        case TMNOFLAGS: {
+            TransactionContext tx;
+            
+            // Must assure transaction context is created only once
+            // for a given Xid
+            synchronized ( _engine.getXATransactions() ) {
+                tx = (TransactionContext) _engine.getXATransactions().get( xid );
+                if ( tx == null ) {
+                    tx = _xaSource.createTransactionContext( xid );
+                    _engine.getXATransactions().put( xid, tx );
+                }
+            }
+            // Associate XAResource with transaction
+            _xaSource.setTransactionContext( tx );
+            break;
+        }
+        case TMJOIN:
+        case TMRESUME: {
+            TransactionContext tx;
+            
+            tx = (TransactionContext) _engine.getXATransactions().get( xid );
+            if ( tx == null || ! tx.isOpen() )
+                throw new XAException( XAException.XAER_NOTA );
+            // Associate XAResource with transaction
+            _xaSource.setTransactionContext( tx );
+            break;
+        }
+        default:
+            // No other flags supported in start().
+            throw new XAException( XAException.XAER_INVAL );
+        }
     }
 	
 	
     public synchronized void end( Xid xid, int flags )
         throws XAException
     {
-	// General checks.
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	TransactionContext tx;
-
-	tx = (TransactionContext) _engine.getXATransactions().get( xid );
-	if ( tx == null )
-	    throw new XAException( XAException.XAER_NOTA );
-
-	// Make sure the XA source is associated with any
-	// transaction otherwise this is an invalid Xid
-	if ( _xaSource.getTransactionContext() == null )
-	    throw new XAException( XAException.XAER_INVAL );
-	switch ( flags ) {
-	case TMSUCCESS:
-	    // Expect prepare/rollback next
-	    break;
-	case TMFAIL:
-	    // Failure implies rolling back transaction,
-	    // and terminating XA source
-	    _xaSource.xaFailed();
-	    _xaSource.setTransactionContext( null );
-	    if ( tx.isOpen() ) {
-		try {
-		    tx.rollback();
-		} catch ( Exception except ) { }
-	    }
-	    break;
-	case TMSUSPEND:
-	    // Dissociate source from transaction
-	    _xaSource.setTransactionContext( null );
-	    break;
-	default:
-	    throw new XAException( XAException.XAER_INVAL );
-	}
+        // General checks.
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        TransactionContext tx;
+        
+        tx = (TransactionContext) _engine.getXATransactions().get( xid );
+        if ( tx == null )
+            throw new XAException( XAException.XAER_NOTA );
+        
+        // Make sure the XA source is associated with any
+        // transaction otherwise this is an invalid Xid
+        if ( _xaSource.getTransactionContext() == null )
+            throw new XAException( XAException.XAER_INVAL );
+        switch ( flags ) {
+        case TMSUCCESS:
+            // Expect prepare/rollback next
+            break;
+        case TMFAIL:
+            // Failure implies rolling back transaction,
+            // and terminating XA source
+            _xaSource.xaFailed();
+            _xaSource.setTransactionContext( null );
+            if ( tx.isOpen() ) {
+                try {
+                    tx.rollback();
+                } catch ( Exception except ) { }
+            }
+            break;
+        case TMSUSPEND:
+            // Dissociate source from transaction
+            _xaSource.setTransactionContext( null );
+            break;
+        default:
+            throw new XAException( XAException.XAER_INVAL );
+        }
     }
 
 
     public synchronized void forget( Xid xid )
-	throws XAException
+        throws XAException
     {
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	synchronized ( _engine.getXATransactions() ) {
-	    TransactionContext tx;
-
-	    tx = (TransactionContext) _engine.getXATransactions().remove( xid );
-	    if ( tx == null )
-		throw new XAException( XAException.XAER_NOTA );
-	    // Dissociate XA source from transaction
-	    if ( _xaSource.getTransactionContext() == tx )
-		_xaSource.setTransactionContext( null );
-
-	    // Forget is never called on an open transaction, but one
-	    // can never tell.
-	    if ( tx.isOpen() ) {
-		try {
-		    tx.rollback();
-		} catch ( Exception except ) { }
-		throw new XAException( XAException.XAER_PROTO );
-	    }
-	}
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        synchronized ( _engine.getXATransactions() ) {
+            TransactionContext tx;
+            
+            tx = (TransactionContext) _engine.getXATransactions().remove( xid );
+            if ( tx == null )
+                throw new XAException( XAException.XAER_NOTA );
+            // Dissociate XA source from transaction
+            if ( _xaSource.getTransactionContext() == tx )
+                _xaSource.setTransactionContext( null );
+            
+            // Forget is never called on an open transaction, but one
+            // can never tell.
+            if ( tx.isOpen() ) {
+                try {
+                    tx.rollback();
+                } catch ( Exception except ) { }
+                throw new XAException( XAException.XAER_PROTO );
+            }
+        }
     }
 
 
     public synchronized int prepare( Xid xid )
-	throws XAException
+        throws XAException
     {
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	TransactionContext tx;
-	
-	tx = (TransactionContext) _engine.getXATransactions().get( xid );
-	if ( tx == null )
-	    throw new XAException( XAException.XAER_NOTA );
-	
-	switch ( tx.getStatus() ) {
-	case Status.STATUS_PREPARED:
-	case Status.STATUS_ACTIVE:
-	    // Can only prepare an active transaction. And error
-	    // is reported as vote to rollback the transaction.
-	    try {
-		if ( tx.prepare() ) {
-		    return XA_OK;
-		} else {
-		    return XA_RDONLY;
-		}
-	    } catch ( TransactionNotInProgressException except ) {
-		// This should not happen since transaction will
-		// not be closed if we got active status
-		throw new XAException( XAException.XAER_RMFAIL );
-	    } catch ( TransactionAbortedException except ) {
-		throw new XAException( XAException.XA_RBROLLBACK );
-	    }
-	case Status.STATUS_MARKED_ROLLBACK:
-	    // Report transaction marked for rollback.
-	    throw new XAException( XAException.XA_RBROLLBACK );
-	default:
-	    throw new XAException( XAException.XAER_PROTO );
-	}
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        TransactionContext tx;
+        
+        tx = (TransactionContext) _engine.getXATransactions().get( xid );
+        if ( tx == null )
+            throw new XAException( XAException.XAER_NOTA );
+        
+        switch ( tx.getStatus() ) {
+        case Status.STATUS_PREPARED:
+        case Status.STATUS_ACTIVE:
+            // Can only prepare an active transaction. And error
+            // is reported as vote to rollback the transaction.
+            try {
+                if ( tx.prepare() ) {
+                    return XA_OK;
+                } else {
+                    return XA_RDONLY;
+                }
+            } catch ( TransactionNotInProgressException except ) {
+                // This should not happen since transaction will
+                // not be closed if we got active status
+                throw new XAException( XAException.XAER_RMFAIL );
+            } catch ( TransactionAbortedException except ) {
+                throw new XAException( XAException.XA_RBROLLBACK );
+            }
+        case Status.STATUS_MARKED_ROLLBACK:
+            // Report transaction marked for rollback.
+            throw new XAException( XAException.XA_RBROLLBACK );
+        default:
+            throw new XAException( XAException.XAER_PROTO );
+        }
     }
 
 
     public synchronized void commit( Xid xid, boolean onePhase )
         throws XAException
     {
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	TransactionContext tx;
-	
-	tx = (TransactionContext) _engine.getXATransactions().get( xid );
-	if ( tx == null )
-	    throw new XAException( XAException.XAER_NOTA );
-	switch ( tx.getStatus() ) {
-	case Status.STATUS_COMMITTED:
-	    // Allowed to make multiple commit attempts.
-	    return;
-	case Status.STATUS_ROLLEDBACK:
-	    // This should not happen unless someone interfered
-	    // by calling rollback directly or failing a commit,
-	    // but is still a valid heuristic condition on our behalf.
-	    throw new XAException( XAException.XA_HEURRB );
-	case Status.STATUS_PREPARED:
-	    // Commit can only occur after a prepare, so must be
-	    // in prepared state first. Any ODMG error is reported
-	    // as a heuristic decision to rollback.
-	    try {
-		tx.commit();
-	    } catch ( TransactionNotInProgressException except ) {
-		// This should not happen since transaction will
-		// not be closed if we got prepared status
-		throw new XAException( XAException.XAER_PROTO );
-	    } catch ( TransactionAbortedException except ) {
-		// Transaction cannot commit and was rolledback
-		throw new XAException( XAException.XA_HEURRB );
-	    }
-	default:
-	    throw new XAException( XAException.XAER_PROTO );
-	}
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        TransactionContext tx;
+        
+        tx = (TransactionContext) _engine.getXATransactions().get( xid );
+        if ( tx == null )
+            throw new XAException( XAException.XAER_NOTA );
+        switch ( tx.getStatus() ) {
+        case Status.STATUS_COMMITTED:
+            // Allowed to make multiple commit attempts.
+            return;
+        case Status.STATUS_ROLLEDBACK:
+            // This should not happen unless someone interfered
+            // by calling rollback directly or failing a commit,
+            // but is still a valid heuristic condition on our behalf.
+            throw new XAException( XAException.XA_HEURRB );
+        case Status.STATUS_PREPARED:
+            // Commit can only occur after a prepare, so must be
+            // in prepared state first. Any ODMG error is reported
+            // as a heuristic decision to rollback.
+            try {
+                tx.commit();
+            } catch ( TransactionNotInProgressException except ) {
+                // This should not happen since transaction will
+                // not be closed if we got prepared status
+                throw new XAException( XAException.XAER_PROTO );
+            } catch ( TransactionAbortedException except ) {
+                // Transaction cannot commit and was rolledback
+                throw new XAException( XAException.XA_HEURRB );
+            }
+        default:
+            throw new XAException( XAException.XAER_PROTO );
+        }
     }
-
+    
 
     public synchronized void rollback( Xid xid )
         throws XAException
     {
-	if ( xid == null )
-	    throw new XAException( XAException.XAER_INVAL );
-
-	TransactionContext tx;
-	
-	tx = (TransactionContext) _engine.getXATransactions().get( xid );
-	if ( tx == null )
-	    throw new XAException( XAException.XAER_NOTA );
-	switch ( tx.getStatus() ) {
-	case Status.STATUS_COMMITTED:
-	    // This should not happen unless someone interfered
-	    // by calling commit directly, but is still a valid
-	    // heuristic condition on our behalf.
-	    throw new XAException( XAException.XA_HEURCOM );
-	case Status.STATUS_ROLLEDBACK:
-	    // Allowed to make multiple rollback attempts.
-	    return;
-	case Status.STATUS_ACTIVE:
-	case Status.STATUS_MARKED_ROLLBACK:
-	    // Rollback never fails with an application exception.
-	    try {
-		tx.rollback();
-	    } catch ( TransactionNotInProgressException except ) {
-		// This should not happen since transaction will
-		// not be closed if we got active/marked status
-		throw new XAException( XAException.XAER_RMFAIL );
-	    }
-	    return;
-	default:
-	    throw new XAException( XAException.XAER_PROTO );
-	}
+        if ( xid == null )
+            throw new XAException( XAException.XAER_INVAL );
+        
+        TransactionContext tx;
+        
+        tx = (TransactionContext) _engine.getXATransactions().get( xid );
+        if ( tx == null )
+            throw new XAException( XAException.XAER_NOTA );
+        switch ( tx.getStatus() ) {
+        case Status.STATUS_COMMITTED:
+            // This should not happen unless someone interfered
+            // by calling commit directly, but is still a valid
+            // heuristic condition on our behalf.
+            throw new XAException( XAException.XA_HEURCOM );
+        case Status.STATUS_ROLLEDBACK:
+            // Allowed to make multiple rollback attempts.
+            return;
+        case Status.STATUS_ACTIVE:
+        case Status.STATUS_MARKED_ROLLBACK:
+            // Rollback never fails with an application exception.
+            try {
+                tx.rollback();
+            } catch ( TransactionNotInProgressException except ) {
+                // This should not happen since transaction will
+                // not be closed if we got active/marked status
+                throw new XAException( XAException.XAER_RMFAIL );
+            }
+            return;
+        default:
+            throw new XAException( XAException.XAER_PROTO );
+        }
     }
 
 
     public Xid[] recover( int flags )
         throws XAException
     {
-	// Recovery is not implemented. This XAResource only deals
-	// with in-memory objects, so recovery has no meaning.
-	// Actual recovery is provided by underlying persistence
-	// mechanism (i.e. XADataSource, etc).
-	return null;
+        // Recovery is not implemented. This XAResource only deals
+        // with in-memory objects, so recovery has no meaning.
+        // Actual recovery is provided by underlying persistence
+        // mechanism (i.e. XADataSource, etc).
+        return null;
     }
 
 
     public synchronized boolean isSameRM( XAResource xaRes )
-	throws XAException
+        throws XAException
     {
-	// Two resource managers are equal if they produce equivalent
-	// connection (i.e. same database, same user). If the two are
-	// equivalent they would share a transaction by joining.
-	if ( xaRes == null || ! ( xaRes instanceof XAResourceImpl ) )
-	    return false;
-	if ( _engine == ( (XAResourceImpl) xaRes )._engine )
-	    return true;
-	return false;
+        // Two resource managers are equal if they produce equivalent
+        // connection (i.e. same database, same user). If the two are
+        // equivalent they would share a transaction by joining.
+        if ( xaRes == null || ! ( xaRes instanceof XAResourceImpl ) )
+            return false;
+        if ( _engine == ( (XAResourceImpl) xaRes )._engine )
+            return true;
+        return false;
     }
-
-
+    
+    
     public boolean setTransactionTimeout( int timeout )
     {
-	TransactionContext tx;
-
-	tx = _xaSource.getTransactionContext();
-	if ( tx != null && tx.isOpen() ) {
-	    tx.setTransactionTimeout( timeout );
-	    return true;
-	} else
-	    return false;
+        TransactionContext tx;
+        
+        tx = _xaSource.getTransactionContext();
+        if ( tx != null && tx.isOpen() ) {
+            tx.setTransactionTimeout( timeout );
+            return true;
+        } else
+            return false;
     }
 
 
     public int getTransactionTimeout()
     {
-	TransactionContext tx;
-
-	tx = _xaSource.getTransactionContext();
-	if ( tx != null && tx.isOpen() )
-	    return tx.getTransactionTimeout();
-	else
-	    return 0;
+        TransactionContext tx;
+        
+        tx = _xaSource.getTransactionContext();
+        if ( tx != null && tx.isOpen() )
+            return tx.getTransactionTimeout();
+        else
+            return 0;
     }
 
 

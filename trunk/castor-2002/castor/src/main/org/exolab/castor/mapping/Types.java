@@ -81,13 +81,13 @@ public abstract class Types
      * @throws ClassNotFoundException The specified class could not be found
      */
     public static Class typeFromName( ClassLoader loader, String typeName )
-	throws ClassNotFoundException
+        throws ClassNotFoundException
     {
-	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-	    if ( typeName.equals( _typeInfos[ i ].shortName ) )
-		return _typeInfos[ i ].javaType;
-	}
-	return loader.loadClass( typeName );
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( typeName.equals( _typeInfos[ i ].shortName ) )
+                return _typeInfos[ i ].javaType;
+        }
+        return loader.loadClass( typeName );
     }
 
 
@@ -112,11 +112,11 @@ public abstract class Types
      */
     public static Class typeFromPrimitive( Class type )
     {
-	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-	    if ( _typeInfos[ i ].primitive == type )
-		return _typeInfos[ i ].javaType;
-	}
-	return type;
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( _typeInfos[ i ].primitive == type )
+                return _typeInfos[ i ].javaType;
+        }
+        return type;
     }
 
 
@@ -138,11 +138,11 @@ public abstract class Types
      */
     public static boolean isSimpleType( Class type )
     {
-	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-	    if ( _typeInfos[ i ].javaType == type )
-		return _typeInfos[ i ].simpleType;
-	}
-	return false;
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( _typeInfos[ i ].javaType == type )
+                return _typeInfos[ i ].simpleType;
+        }
+        return false;
     }
 
 
@@ -153,15 +153,15 @@ public abstract class Types
      */
     public static Object newInstance( Class type )
     {
-	try {
-	    return type.newInstance();
-	} catch ( IllegalAccessException except ) {
-	    // This should never happen unless  bytecode changed all of a sudden
-	    throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
-	} catch ( InstantiationException except ) {
-	    // This should never happen unless  bytecode changed all of a sudden
-	    throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
-	}
+        try {
+            return type.newInstance();
+        } catch ( IllegalAccessException except ) {
+            // This should never happen unless  bytecode changed all of a sudden
+            throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
+        } catch ( InstantiationException except ) {
+            // This should never happen unless  bytecode changed all of a sudden
+            throw new RuntimeException( Messages.format( "mapping.schemaNotConstructable", type.getName() ) );
+        }
     }
 
 
@@ -175,17 +175,17 @@ public abstract class Types
      */
     public static boolean isConstructable( Class type )
     {
-	try {
-	    if ( ( type.getModifiers() & Modifier.PUBLIC ) == 0 )
-		return false;
-	    if ( ( type.getModifiers() & ( Modifier.ABSTRACT | Modifier.INTERFACE ) ) != 0 )
-		return false;
-	    if ( ( type.getConstructor( new Class[0] ).getModifiers() & Modifier.PUBLIC ) != 0 )
-	       return true;
-	} catch ( NoSuchMethodException except ) {
-	} catch ( SecurityException except ) {
-	}
-	return false;
+        try {
+            if ( ( type.getModifiers() & Modifier.PUBLIC ) == 0 )
+                return false;
+            if ( ( type.getModifiers() & ( Modifier.ABSTRACT | Modifier.INTERFACE ) ) != 0 )
+                return false;
+            if ( ( type.getConstructor( new Class[0] ).getModifiers() & Modifier.PUBLIC ) != 0 )
+                return true;
+        } catch ( NoSuchMethodException except ) {
+        } catch ( SecurityException except ) {
+        }
+        return false;
     }
 
 
@@ -198,7 +198,7 @@ public abstract class Types
      */
     public static boolean isSerializable( Class type )
     {
-	return ( Serializable.class.isAssignableFrom( type ) );
+        return ( Serializable.class.isAssignableFrom( type ) );
     }
 
 
@@ -211,11 +211,11 @@ public abstract class Types
      */
     public static boolean isImmutable( Class type )
     {
-	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-	    if ( _typeInfos[ i ].javaType == type )
-		return _typeInfos[ i ].immutable;
-	}
-	return false;
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( _typeInfos[ i ].javaType == type )
+                return _typeInfos[ i ].immutable;
+        }
+        return false;
     }
 
 
@@ -228,40 +228,40 @@ public abstract class Types
      */
     public static Object getDefault( Class type )
     {
-	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-	    if ( _typeInfos[ i ].javaType == type )
-		return _typeInfos[ i ].defValue;
-	}
-	return null;
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( _typeInfos[ i ].javaType == type )
+                return _typeInfos[ i ].defValue;
+        }
+        return null;
     }
 
 
     static class TypeInfo
     {
 
-	public final String  shortName;
-
-	public final Class   primitive;
-
-	public final boolean simpleType;
-
-	public final Class   javaType;
-
-	public final boolean immutable;
-
-	public final Object  defValue;
-
-	TypeInfo( String shortName, Class primitive, boolean simpleType,
-		  Class javaType, boolean immutable, Object defValue )
-	{
-	    this.shortName  = shortName;
-	    this.primitive  = primitive;
-	    this.simpleType = simpleType;
-	    this.javaType   = javaType;
-	    this.immutable  = immutable;
-	    this.defValue   = defValue;
-	}
-
+        public final String  shortName;
+        
+        public final Class   primitive;
+        
+        public final boolean simpleType;
+        
+        public final Class   javaType;
+        
+        public final boolean immutable;
+        
+        public final Object  defValue;
+        
+        TypeInfo( String shortName, Class primitive, boolean simpleType,
+                  Class javaType, boolean immutable, Object defValue )
+        {
+            this.shortName  = shortName;
+            this.primitive  = primitive;
+            this.simpleType = simpleType;
+            this.javaType   = javaType;
+            this.immutable  = immutable;
+            this.defValue   = defValue;
+        }
+        
     }
 
     
@@ -269,46 +269,46 @@ public abstract class Types
      * List of all the simple types supported by Castor.
      */
     static TypeInfo[] _typeInfos = new TypeInfo[] {
-	new TypeInfo( "other",       null,                     false,
+        new TypeInfo( "other",       null,                     false,
                       java.lang.Object.class,     false, null ),
-	new TypeInfo( "string",      null,                     true,
+        new TypeInfo( "string",      null,                     true,
                       java.lang.String.class,     true, "" ),
-	new TypeInfo( "integer",     java.lang.Integer.TYPE,   true,
-		      java.lang.Integer.class,    true, new Integer( 0 ) ),
-	new TypeInfo( "long",        java.lang.Long.TYPE,      true,
-		      java.lang.Long.class,       true, new Long( 0 ) ),
-	new TypeInfo( "boolean",     java.lang.Boolean.TYPE,   true,
-		      java.lang.Boolean.class,    true, Boolean.FALSE ),
-	new TypeInfo( "double",      java.lang.Double.TYPE,    true,
-		      java.lang.Double.class,     true, new Double( 0 ) ),
-	new TypeInfo( "float",       java.lang.Float.TYPE,     true,
-		      java.lang.Float.class,      true, new Float( 0 ) ),
-	new TypeInfo( "big-decimal", null,                     true,
+        new TypeInfo( "integer",     java.lang.Integer.TYPE,   true,
+                      java.lang.Integer.class,    true, new Integer( 0 ) ),
+        new TypeInfo( "long",        java.lang.Long.TYPE,      true,
+                      java.lang.Long.class,       true, new Long( 0 ) ),
+        new TypeInfo( "boolean",     java.lang.Boolean.TYPE,   true,
+                      java.lang.Boolean.class,    true, Boolean.FALSE ),
+        new TypeInfo( "double",      java.lang.Double.TYPE,    true,
+                      java.lang.Double.class,     true, new Double( 0 ) ),
+        new TypeInfo( "float",       java.lang.Float.TYPE,     true,
+                      java.lang.Float.class,      true, new Float( 0 ) ),
+        new TypeInfo( "big-decimal", null,                     true,
                       java.math.BigDecimal.class, true, new BigDecimal( 0 ) ),
-	new TypeInfo( "big-integer", null,                     true,
+        new TypeInfo( "big-integer", null,                     true,
                       java.math.BigInteger.class, true, BigInteger.ZERO ),
-	new TypeInfo( "byte",        java.lang.Byte.TYPE,      true,
-		      java.lang.Byte.class,       true, new Byte( (byte) 0 ) ),
-	new TypeInfo( "date",        null,                     true,
+        new TypeInfo( "byte",        java.lang.Byte.TYPE,      true,
+                      java.lang.Byte.class,       true, new Byte( (byte) 0 ) ),
+        new TypeInfo( "date",        null,                     true,
                       java.util.Date.class,       true, new Date() ),
-	new TypeInfo( "short",       java.lang.Short.TYPE,     true,
-		      java.lang.Short.class,      true, new Short( (short) 0 ) ),
-	new TypeInfo( "char",        java.lang.Character.TYPE, true,
-		      java.lang.Character.class,  true, new Character( (char) 0 ) ),
-	new TypeInfo( "bytes",       null,                     true,
+        new TypeInfo( "short",       java.lang.Short.TYPE,     true,
+                      java.lang.Short.class,      true, new Short( (short) 0 ) ),
+        new TypeInfo( "char",        java.lang.Character.TYPE, true,
+                      java.lang.Character.class,  true, new Character( (char) 0 ) ),
+        new TypeInfo( "bytes",       null,                     true,
                       byte[].class,               false, new byte[ 0 ] ),
-	new TypeInfo( "chars",       null,                     true,
+        new TypeInfo( "chars",       null,                     true,
                       char[].class,               false, new char[ 0 ] ),
-	new TypeInfo( "strings",     null,                     false,
+        new TypeInfo( "strings",     null,                     false,
                       String[].class,             false, new String[ 0 ] ),
-	/*
-	new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
-	new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
-	new TypeInfo( XML,        "xml",         org.w3c.dom.Document.class, org.w3c.dom.Element.class ),
-	new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
-	*/
+        /*
+          new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
+          new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
+          new TypeInfo( XML,        "xml",         org.w3c.dom.Document.class, org.w3c.dom.Element.class ),
+          new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
+        */
     };
-
+    
     
 }
 

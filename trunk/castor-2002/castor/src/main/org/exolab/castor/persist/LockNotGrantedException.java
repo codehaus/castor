@@ -63,7 +63,7 @@ public class LockNotGrantedException
 
     public LockNotGrantedException( String message )
     {
-	super ( message );
+        super ( message );
     }
 
 

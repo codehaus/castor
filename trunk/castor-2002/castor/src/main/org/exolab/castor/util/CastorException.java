@@ -71,34 +71,34 @@ public class CastorException
 
     protected CastorException( String message )
     {
-	super( Messages.message( message ) );
-	_errorCode = message;
+        super( Messages.message( message ) );
+        _errorCode = message;
     }
 
 
     protected CastorException( String message, Object arg1 )
     {
-	super( Messages.format( message, arg1 ) );
-	_errorCode = message;
+        super( Messages.format( message, arg1 ) );
+        _errorCode = message;
     }
 
 
     protected CastorException( String message, Object arg1, Object arg2 )
     {
-	super( Messages.format( message, arg1, arg2 ) );
-	_errorCode = message;
+        super( Messages.format( message, arg1, arg2 ) );
+        _errorCode = message;
     }
 
 
     public final String getErrorCode()
     {
-	return _errorCode;
+        return _errorCode;
     }
 
 
     public String toString()
     {
-	return _errorCode + ": " + getMessage();
+        return _errorCode + ": " + getMessage();
     }
 
 
