@@ -117,7 +117,7 @@ public class CountLimitedLRU implements LRU {
 	 * Override this method if you interested in the disposed object.
 	 */
 	protected void dispose( Object o ) {
-		System.out.println("diposed: "+o+" by CountLimitedLRU");
+		//System.out.println("diposed: "+o+" by CountLimitedLRU");
 	}
 	private int walkStatus() {
 		int s = status[cur];

@@ -146,7 +146,7 @@ public class TimeLimitedLRU implements LRU {
 	 * Override this method if you interested in the disposed object.
 	 */
 	protected void dispose( Object o ) {
-		System.out.println("dispose: "+o+" by TimeLimiteLRU.");
+		//System.out.println("dispose: "+o+" by TimeLimiteLRU.");
 	}
 
 	private void remove(QueueItem item) {

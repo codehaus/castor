@@ -219,18 +219,23 @@ public class Race extends CWTestCase {
 					while ( !isOk ) {
 						try {
 							db.begin();
-				            OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
-				            oql.bind( i );
-				            Enumeration enum = oql.execute();
-				            if ( enum.hasMoreElements() ) {
-				                TestRace tr = (TestRace) enum.nextElement();
-								tr.incValue1();
-								db.commit();
-								isOk = true;
+
+							if ( (i % 2) == 0  ) {
+					            OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
+					            oql.bind( i );
+					            Enumeration enum = oql.execute();
+					            if ( enum.hasMoreElements() ) {
+					                TestRace tr = (TestRace) enum.nextElement();
+									tr.incValue1();
+									db.commit();
+									isOk = true;
+								} else {
+									System.out.println("Error: "+" element not found!! missed in cache????");
+									if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
+									break little;
+								}
 							} else {
-								System.out.println("Error: "+" element not found!! missed in cache????");
-								if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
-								break little;
+								db.load( 
 							}
 						} catch ( TransactionAbortedException e ) {
 							// this exception should happen one in a while.
