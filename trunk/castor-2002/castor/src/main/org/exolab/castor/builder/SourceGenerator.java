@@ -314,7 +314,15 @@ public class SourceGenerator {
             return;
         }
 
-        SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller();
+        SchemaUnmarshaller schemaUnmarshaller = null;
+        try {
+           schemaUnmarshaller = new SchemaUnmarshaller();
+        } catch (SAXException e) {
+          // can never happen since a SAXException is thrown
+          // when we are dealing with an included schema
+          e.printStackTrace();
+        }
+
         parser.setDocumentHandler(schemaUnmarshaller);
         parser.setErrorHandler(schemaUnmarshaller);
 
