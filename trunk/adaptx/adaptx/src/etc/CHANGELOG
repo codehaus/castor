@@ -3,6 +3,19 @@ Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 
 The following are changes from different versions of Adaptx
 
+Version 0.9.7, September 29, 2003
+---------------------------------
+
+-- Fixed document-base bug with document() function
+   (kvisco - 2003-09-28)
+
+-- Updated to support JAXP. The user must first configure
+   their environment by setting within the system properties
+   the JAXP property: javax.xml.transform.TransformerFactory
+   to the value of: 
+   org.exolab.adaptx.jaxp.transform.TransformerFactoryImpl
+   (kvisco - 2003-09-09)
+
 
 Version 0.9.6, June 16, 2003
 ----------------------------
