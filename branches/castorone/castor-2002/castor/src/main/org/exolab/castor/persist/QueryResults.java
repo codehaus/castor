@@ -82,7 +82,7 @@ public final class QueryResults
     /**
      * The persistence engine against which this query was executed.
      */
-    private final PersistenceEngine   _engine;
+    private final LockEngine   _engine;
     
     
     /**
@@ -100,7 +100,7 @@ public final class QueryResults
     /**
      * The last identity retrieved with a call to {@link #nextIdentity}.
      */
-    private Object              _lastIdentity;
+    private Object[]              _lastIdentities;
 
 
     /*
@@ -109,13 +109,13 @@ public final class QueryResults
     private Database            _db;
 
 
-    QueryResults( TransactionContext tx, PersistenceEngine engine,
+    QueryResults( TransactionContext tx, LockEngine engine,
                   PersistenceQuery query, AccessMode accessMode, Database db )
     {
         _tx = tx;
         _engine = engine;
         _query = query;
-        _accessMode =  engine.getClassHandler( _query.getResultType() ).getAccessMode( accessMode );
+        _accessMode =  engine.getClassMolder( _query.getResultType() ).getAccessMode( accessMode );
         _db = db;
     }
 
@@ -155,19 +155,19 @@ public final class QueryResults
      * @throws TransactionNotInProgressException The transaction
      *  has been closed
      */
-    public Object nextIdentity()
+    public Object[] nextIdentities()
         throws TransactionNotInProgressException, PersistenceException
     {
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
         try {
-            _lastIdentity = _query.nextIdentity( _lastIdentity );
+            _lastIdentities = _query.nextIdentities( _lastIdentities );
         } catch ( PersistenceException except ) {
-            _lastIdentity = null;
+            _lastIdentities = null;
             throw except;
         }
-        return _lastIdentity;
+        return _lastIdentities;
     }
 
 
@@ -206,22 +206,32 @@ public final class QueryResults
     {
         TransactionContext.ObjectEntry entry;
         OID              oid;
-        ClassHandler     handler;
+        ClassMolder     handler;
         Object           object;
         
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
-        if ( _lastIdentity == null )
+        if ( _lastIdentities == null )
             throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
 
+        handler = _engine.getClassMolder( _query.getResultType() );
+
+        object = _tx.load( _engine, handler, _lastIdentities, _accessMode );
+        if ( object == null )
+            System.out.println("queryresult.fetch().Object is null");
+        else 
+            System.out.println("queryresult.fetch().Object: "+object);
+        return object;
+
+        /*
         synchronized ( _tx ) {
             // Get the next OID from the query engine. The object is
             // already loaded into the persistence engine at this point and
             // has a lock based on the original query (i.e. read write
             // or exclusive). If no next record return null.
-            handler = _engine.getClassHandler( _query.getResultType() );
-            oid = new OID( handler, _lastIdentity );
+            handler = _engine.getClassMolder( _query.getResultType() );
+            oid = new OID( _engine, handler, _lastIdentity );
             
             // Did we already load (or created) this object in this
             // transaction.
@@ -257,12 +267,14 @@ public final class QueryResults
                 // must create a new record for this object. We only
                 // record the object in the transaction if in read-write
                 // or exclusive mode.
-                oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-                handler = _engine.getClassHandler( oid.getJavaClass() );
+                ObjectBin bin;
+                bin = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
+                //oid = bin.oid;
+                handler = _engine.getClassMolder( oid.getJavaClass() );
                 object = handler.newInstance();
-                entry = _tx.addObjectEntry( object, oid, _engine );
+                entry = _tx.addObjectEntry( _engine, handler, oid, object );
                 try {
-                    _engine.copyObject( _tx, oid, object );
+                    //_engine.copyObject( _tx, oid, object );
                     if ( handler.getCallback() != null ) {
                         handler.getCallback().using( object, _db );
                         handler.getCallback().loaded( object );
@@ -283,7 +295,7 @@ public final class QueryResults
                 }
                 return object;
             }
-        }
+        } */
     }
 
 

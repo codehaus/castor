@@ -23,31 +23,25 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class Sql implements java.io.Serializable {
+public class TypeMapping implements java.io.Serializable {
 
 
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _name;
+    private java.lang.Object _type;
 
-    private java.lang.String _dirty = "check";
-
-    private java.lang.String _type;
-
-    private java.lang.String _manyKey;
-
-    private java.lang.String _manyTable;
+    private java.lang.String _sql;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public Sql() {
+    public TypeMapping() {
         super();
-    } //-- org.exolab.castor.mapping.xml.Sql()
+    } //-- org.exolab.castor.mapping.xml.TypeMapping()
 
 
       //-----------/
@@ -56,33 +50,21 @@ public class Sql implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getDirty() {
-        return this._dirty;
-    } //-- java.lang.String getDirty() 
+    public java.lang.String getReferenceId() {
+        return this._sql;
+    } //-- java.lang.String getReferenceId() 
 
     /**
     **/
-    public java.lang.String getManyKey() {
-        return this._manyKey;
-    } //-- java.lang.String getManyKey() 
+    public java.lang.String getSql() {
+        return this._sql;
+    } //-- java.lang.String getSql() 
 
     /**
     **/
-    public java.lang.String getManyTable() {
-        return this._manyTable;
-    } //-- java.lang.String getManyTable() 
-
-    /**
-    **/
-    public java.lang.String getName() {
-        return this._name;
-    } //-- java.lang.String getName() 
-
-    /**
-    **/
-    public java.lang.String getType() {
+    public java.lang.Object getType() {
         return this._type;
-    } //-- java.lang.String getType() 
+    } //-- java.lang.Object getType() 
 
     /**
     **/
@@ -124,53 +106,29 @@ public class Sql implements java.io.Serializable {
 
     /**
      * 
-     * @param _dirty
+     * @param _sql
     **/
-    public void setDirty(java.lang.String _dirty) {
-        this._dirty = _dirty;
-    } //-- void setDirty(java.lang.String) 
-
-    /**
-     * 
-     * @param _manyKey
-    **/
-    public void setManyKey(java.lang.String _manyKey) {
-        this._manyKey = _manyKey;
-    } //-- void setManyKey(java.lang.String) 
-
-    /**
-     * 
-     * @param _manyTable
-    **/
-    public void setManyTable(java.lang.String _manyTable) {
-        this._manyTable = _manyTable;
-    } //-- void setManyTable(java.lang.String) 
-
-    /**
-     * 
-     * @param _name
-    **/
-    public void setName(java.lang.String _name) {
-        this._name = _name;
-    } //-- void setName(java.lang.String) 
+    public void setSql(java.lang.String _sql) {
+        this._sql = _sql;
+    } //-- void setSql(java.lang.String) 
 
     /**
      * 
      * @param _type
     **/
-    public void setType(java.lang.String _type) {
+    public void setType(java.lang.Object _type) {
         this._type = _type;
-    } //-- void setType(java.lang.String) 
+    } //-- void setType(java.lang.Object) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.Sql unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.TypeMapping unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.Sql) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Sql.class, reader);
-    } //-- org.exolab.castor.mapping.xml.Sql unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.TypeMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.TypeMapping.class, reader);
+    } //-- org.exolab.castor.mapping.xml.TypeMapping unmarshal(java.io.Reader) 
 
     /**
     **/

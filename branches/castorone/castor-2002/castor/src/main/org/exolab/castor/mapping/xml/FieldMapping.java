@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -30,23 +30,27 @@ public class FieldMapping implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
+    private java.lang.String _name;
+
+    private boolean _lazy = false;
+
+    private boolean _direct = false;
+
+    private boolean _transient = false;
+
     private java.lang.String _collection;
 
     private java.lang.String _setMethod;
 
-    private java.lang.String _createMethod;
-
     private java.lang.String _getMethod;
-
-    private boolean _transient = false;
-
-    private java.lang.String _type;
 
     private boolean _required = false;
 
-    private boolean _direct = false;
+    private java.lang.String _createMethod;
 
-    private java.lang.String _name;
+    private java.lang.String _type;
+
+    private java.lang.Object _manyToMany;
 
     private java.lang.String _description;
 
@@ -90,15 +94,33 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
+    public boolean getDirect() {
+        return this._direct;
+    } //-- boolean getDirect() 
+
+    /**
+    **/
     public java.lang.String getGetMethod() {
         return this._getMethod;
     } //-- java.lang.String getGetMethod() 
 
     /**
     **/
+    public boolean getLazy() {
+        return this._lazy;
+    } //-- boolean getLazy() 
+
+    /**
+    **/
     public Ldap getLdap() {
         return this._ldap;
     } //-- Ldap getLdap() 
+
+    /**
+    **/
+    public java.lang.Object getManyToMany() {
+        return this._manyToMany;
+    } //-- java.lang.Object getManyToMany() 
 
     /**
     **/
@@ -111,12 +133,6 @@ public class FieldMapping implements java.io.Serializable {
     public boolean getRequired() {
         return this._required;
     } //-- boolean getRequired() 
-
-    /**
-    **/
-    public boolean getDirect() {
-        return this._direct;
-    } //-- boolean getDirect() 
 
     /**
     **/
@@ -212,6 +228,14 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
      * 
+     * @param _direct
+    **/
+    public void setDirect(boolean _direct) {
+        this._direct = _direct;
+    } //-- void setDirect(boolean) 
+
+    /**
+     * 
      * @param _getMethod
     **/
     public void setGetMethod(java.lang.String _getMethod) {
@@ -220,11 +244,27 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
      * 
+     * @param _lazy
+    **/
+    public void setLazy(boolean _lazy) {
+        this._lazy = _lazy;
+    } //-- void setLazy(boolean) 
+
+    /**
+     * 
      * @param _ldap
     **/
     public void setLdap(Ldap _ldap) {
         this._ldap = _ldap;
     } //-- void setLdap(Ldap) 
+
+    /**
+     * 
+     * @param _manyToMany
+    **/
+    public void setManyToMany(java.lang.Object _manyToMany) {
+        this._manyToMany = _manyToMany;
+    } //-- void setManyToMany(java.lang.Object) 
 
     /**
      * 
@@ -241,14 +281,6 @@ public class FieldMapping implements java.io.Serializable {
     public void setRequired(boolean _required) {
         this._required = _required;
     } //-- void setRequired(boolean) 
-
-    /**
-     * 
-     * @param _direct
-    **/
-    public void setDirect(boolean _direct) {
-        this._direct = _direct;
-    } //-- void setDirect(boolean) 
 
     /**
      * 

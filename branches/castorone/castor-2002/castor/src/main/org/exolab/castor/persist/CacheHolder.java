@@ -40,48 +40,15 @@
  *
  * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
- * $Id$
  */
 
 
 package org.exolab.castor.persist;
 
+public interface CacheHolder {
+    public void hold( OID oid );
 
-import java.io.PrintWriter;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
+    public void release( OID oid );
 
-
-/**
- * Factory for constructing new persistence engines. Used by the APIs
- * to obtain a new persistence engine using an SPI factory and mapping
- * resolver. The returned object implements the {@link PersistenceEngine}
- * interface.
- *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
- * @version $Revision$ $Date$
- */
-public class PersistenceEngineFactory
-{
-
-
-    /**
-     * Creates and returns a new persistence engine.
-     *
-     * @param mapResolver All the descriptors supported by this engine
-     * @param factory Persistence SPI factory
-     * @param logInterceptor Optional log/trace interceptor
-     * @throws MappingException The SPI factory could not support one of
-     *  object types due to a mapping errot
-     */
-    public LockEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
-                                           LogInterceptor logInterceptor )
-        throws MappingException
-    {
-        return new LockEngine( mapResolver, factory, logInterceptor );
-    }
-
-
+    public void destory( OID oid );
 }

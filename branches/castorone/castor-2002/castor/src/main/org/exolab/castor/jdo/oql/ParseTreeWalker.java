@@ -49,7 +49,7 @@ package org.exolab.castor.jdo.oql;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Vector;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.SQLEngine;
@@ -67,7 +67,7 @@ import org.exolab.castor.mapping.loader.Types;
 public class ParseTreeWalker implements TokenTypes
 {
 
-  private PersistenceEngine _dbEngine;
+  private LockEngine _dbEngine;
   
   private ParseTreeNode _parseTree;
 
@@ -105,7 +105,7 @@ public class ParseTreeWalker implements TokenTypes
    * @param parseTree The parse tree to walk
    * @throws QueryException Thrown by checkErrors.
    */
-  public ParseTreeWalker(PersistenceEngine dbEngine, ParseTreeNode parseTree) 
+  public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree) 
       throws QueryException 
   {
     _dbEngine = dbEngine;

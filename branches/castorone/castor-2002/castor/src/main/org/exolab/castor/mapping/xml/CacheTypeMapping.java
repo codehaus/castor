@@ -32,7 +32,7 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     private int _capacity;
 
-    private java.lang.String _type;
+    private java.lang.String _type = "count-limited";
 
 
       //----------------/

@@ -66,8 +66,8 @@ import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.persist.ClassHandler;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.ClassMolder;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.Persistence;
@@ -125,7 +125,7 @@ public class DatabaseRegistry
     /**
      * The presistence engine for this database source.
      */
-    private PersistenceEngine _engine;
+    private LockEngine _engine;
 
 
     /**
@@ -328,7 +328,7 @@ public class DatabaseRegistry
     }
 
 
-    static PersistenceEngine getPersistenceEngine( Class objType )
+    static LockEngine getLockEngine( Class objType )
     {
         Enumeration      enum;
         DatabaseRegistry dbs;
@@ -343,7 +343,7 @@ public class DatabaseRegistry
     }
 
 
-    static PersistenceEngine getPersistenceEngine( DatabaseRegistry dbs )
+    static LockEngine getLockEngine( DatabaseRegistry dbs )
     {
         return dbs._engine;
     }
@@ -373,7 +373,7 @@ public class DatabaseRegistry
     }
 
 
-    static Connection createConnection( PersistenceEngine engine )
+    static Connection createConnection( LockEngine engine )
         throws SQLException
     {
         DatabaseRegistry dbs;

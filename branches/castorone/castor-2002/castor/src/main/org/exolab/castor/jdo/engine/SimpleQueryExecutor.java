@@ -99,9 +99,9 @@ public class SimpleQueryExecutor
     
     try {
     
-      _conn = DatabaseRegistry.createConnection( _dbImpl.getPersistenceEngine() );
+      _conn = DatabaseRegistry.createConnection( _dbImpl.getLockEngine() );
 
-      System.out.println( expr.getStatement(false) );
+      //System.out.println( expr.getStatement(false) );
 
       _stmt = _conn.prepareStatement( expr.getStatement(false) );
       if ( bindValues != null ) {

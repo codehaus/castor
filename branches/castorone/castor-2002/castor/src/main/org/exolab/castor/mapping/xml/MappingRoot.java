@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -36,6 +36,8 @@ public class MappingRoot implements java.io.Serializable {
 
     private java.util.Vector _includeList;
 
+    private java.util.Vector _manyToManyList;
+
     private java.util.Vector _classMappingList;
 
     private java.util.Vector _keyGeneratorDefList;
@@ -48,6 +50,7 @@ public class MappingRoot implements java.io.Serializable {
     public MappingRoot() {
         super();
         _includeList = new Vector();
+        _manyToManyList = new Vector();
         _classMappingList = new Vector();
         _keyGeneratorDefList = new Vector();
     } //-- org.exolab.castor.mapping.xml.MappingRoot()
@@ -88,6 +91,16 @@ public class MappingRoot implements java.io.Serializable {
     } //-- void addKeyGeneratorDef(KeyGeneratorDef) 
 
     /**
+     * 
+     * @param vManyToMany
+    **/
+    public void addManyToMany(ManyToMany vManyToMany) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _manyToManyList.addElement(vManyToMany);
+    } //-- void addManyToMany(ManyToMany) 
+
+    /**
     **/
     public java.util.Enumeration enumerateClassMapping() {
         return _classMappingList.elements();
@@ -104,6 +117,12 @@ public class MappingRoot implements java.io.Serializable {
     public java.util.Enumeration enumerateKeyGeneratorDef() {
         return _keyGeneratorDefList.elements();
     } //-- java.util.Enumeration enumerateKeyGeneratorDef() 
+
+    /**
+    **/
+    public java.util.Enumeration enumerateManyToMany() {
+        return _manyToManyList.elements();
+    } //-- java.util.Enumeration enumerateManyToMany() 
 
     /**
      * 
@@ -208,6 +227,38 @@ public class MappingRoot implements java.io.Serializable {
     } //-- int getKeyGeneratorDefCount() 
 
     /**
+     * 
+     * @param index
+    **/
+    public ManyToMany getManyToMany(int index) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _manyToManyList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        return (ManyToMany) _manyToManyList.elementAt(index);
+    } //-- ManyToMany getManyToMany(int) 
+
+    /**
+    **/
+    public ManyToMany[] getManyToMany() {
+        int size = _manyToManyList.size();
+        ManyToMany[] mArray = new ManyToMany[size];
+        for (int index = 0; index < size; index++) {
+            mArray[index] = (ManyToMany) _manyToManyList.elementAt(index);
+        }
+        return mArray;
+    } //-- ManyToMany[] getManyToMany() 
+
+    /**
+    **/
+    public int getManyToManyCount() {
+        return _manyToManyList.size();
+    } //-- int getManyToManyCount() 
+
+    /**
     **/
     public boolean isValid() {
         try {
@@ -264,6 +315,12 @@ public class MappingRoot implements java.io.Serializable {
     } //-- void removeAllKeyGeneratorDef() 
 
     /**
+    **/
+    public void removeAllManyToMany() {
+        _manyToManyList.removeAllElements();
+    } //-- void removeAllManyToMany() 
+
+    /**
      * 
      * @param index
     **/
@@ -292,6 +349,16 @@ public class MappingRoot implements java.io.Serializable {
         _keyGeneratorDefList.removeElementAt(index);
         return (KeyGeneratorDef) obj;
     } //-- KeyGeneratorDef removeKeyGeneratorDef(int) 
+
+    /**
+     * 
+     * @param index
+    **/
+    public ManyToMany removeManyToMany(int index) {
+        Object obj = _manyToManyList.elementAt(index);
+        _manyToManyList.removeElementAt(index);
+        return (ManyToMany) obj;
+    } //-- ManyToMany removeManyToMany(int) 
 
     /**
      * 
@@ -345,6 +412,21 @@ public class MappingRoot implements java.io.Serializable {
         }
         _keyGeneratorDefList.setElementAt(vKeyGeneratorDef, index);
     } //-- void setKeyGeneratorDef(KeyGeneratorDef, int) 
+
+    /**
+     * 
+     * @param vManyToMany
+     * @param index
+    **/
+    public void setManyToMany(ManyToMany vManyToMany, int index) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _manyToManyList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        _manyToManyList.setElementAt(vManyToMany, index);
+    } //-- void setManyToMany(ManyToMany, int) 
 
     /**
      * 

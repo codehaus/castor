@@ -64,9 +64,12 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.mapping.xml.ManyToMany;
+import org.exolab.castor.mapping.xml.TypeMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.Container;
 import org.exolab.castor.mapping.xml.Include;
+import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.util.Messages;
 
 
@@ -95,6 +98,7 @@ public abstract class MappingLoader
     private Hashtable  _clsDescs = new Hashtable();
 
 
+    private Hashtable _relDescs = new Hashtable();
     /**
      * All Java classes in the original order.
      */
@@ -111,6 +115,7 @@ public abstract class MappingLoader
      * The class loader to use.
      */
     private ClassLoader _loader;
+
 
 
     public static final ClassDescriptor NoDescriptor = new ClassDescriptorImpl( Class.class );
@@ -142,6 +147,10 @@ public abstract class MappingLoader
         return _clsDescs.elements();
     }
 
+
+    public Enumeration listRelations() {
+        return _relDescs.elements();
+    }
 
     public Enumeration listJavaClasses()
     {
@@ -194,10 +203,41 @@ public abstract class MappingLoader
     {
         Enumeration   enum;
 
+        Enumeration   enumClass, enumField;
+
+        //System.out.println("getClassMapping count: "+mapping.getClassMappingCount());
+
+        //System.out.println("getKeyGeneratorDef count: "+mapping.getKeyGeneratorDefCount());
+
+        //System.out.println("getManyToMany count: "+mapping.getManyToManyCount());
+
+
+        // flatten relation, it is not fast, but it work....
+        enum = mapping.enumerateManyToMany();
+        while ( enum.hasMoreElements() ) {
+            ManyToMany  mnMap;
+            TypeMapping[] typeMap;
+
+            mnMap = (ManyToMany) enum.nextElement();
+            typeMap = mnMap.getTypeMapping();
+
+            String relationName = mnMap.getName();
+            String tableName = mnMap.getMapTo().getTable();
+            
+            String type1 = ((ClassMapping)typeMap[0].getType()).getName();
+            String sql1  = typeMap[0].getSql();
+            String type2 = ((ClassMapping)typeMap[1].getType()).getName();
+            String sql2  = typeMap[1].getSql();
+            //System.out.println("Add realtion: "+relationName+" "+tableName+" "+type1+" "
+            //        +sql1+" "+type2+" "+sql2);
+            addRelation( new RelationDescriptor( relationName, tableName, type1, sql1, type2, sql2 ) );
+        }
+
         // Load the mapping for all the classes. This is always returned
         // in the same order as it appeared in the mapping file.
         enum = mapping.enumerateClassMapping();
         while ( enum.hasMoreElements() ) {
+            //System.out.println("enumerating class mapping!");
             ClassMapping    clsMap;
             ClassDescriptor clsDesc;
 
@@ -216,11 +256,14 @@ public abstract class MappingLoader
             ClassDescriptor clsDesc;
 
             clsDesc = (ClassDescriptor) enum.nextElement();
-            if ( clsDesc != NoDescriptor  )
+            if ( clsDesc != NoDescriptor  ) {
+                //System.out.println("start resolve relation");
                 resolveRelations( clsDesc );
+            }
         }
-    }
+        //System.out.println("load mapping is done");
 
+    }
 
     /**
      * Adds a class descriptor. Will throw a mapping exception if a
@@ -239,6 +282,13 @@ public abstract class MappingLoader
         _javaClasses.addElement( clsDesc.getJavaClass() );
     }
 
+    protected void addRelation( RelationDescriptor relDesc ) 
+            throws MappingException {
+        String left = relDesc.type1;
+        String right = relDesc.type2;
+        _relDescs.put( left+"+"+right, relDesc );        
+        _relDescs.put( right+"+"+left, relDesc );        
+    }
 
     protected void resolveRelations( ClassDescriptor clsDesc )
         throws MappingException
@@ -258,7 +308,12 @@ public abstract class MappingLoader
         }
     }
 
+    public RelationDescriptor getRelation( String type1, String type2 ) {
+        return (RelationDescriptor)_relDescs.get( type1 + "+" + type2 );
+    }
 
+
+    
     /**
      * Creates a new descriptor. The class mapping information is used
      * to create a new stock {@link ClassDescriptor}. Implementations may
@@ -272,10 +327,12 @@ public abstract class MappingLoader
         throws MappingException
     {
         FieldDescriptor[] fields;
-        FieldDescriptor   identity;
+        FieldDescriptor[] newFields;
+        FieldDescriptor[] identities;
         Enumeration       enum;
         Class             javaClass;
         ClassDescriptor   extend;
+        ClassDescriptor   depend;
         Container         contMaps[];
         Vector            relations;
         ClassDescriptor   clsDesc;
@@ -308,11 +365,30 @@ public abstract class MappingLoader
             }
         } else
             extend = null;
+
         
+        // If this class depends another class, need to obtain the depended class
+        if ( clsMap.getDepends() != null ) {
+            try {
+                depend = getDescriptor( resolveType( ( (ClassMapping)  clsMap.getDepends() ).getName() ) );
+                if ( depend == null )
+                    throw new MappingException( "Depends not found" +
+                                                clsMap.getDepends() + " " + javaClass.getName() );
+                if ( depend == NoDescriptor )
+                    throw new MappingException( "Depends not found" +
+                                                clsMap.getDepends() + " " + javaClass.getName() );
+            } catch ( ClassNotFoundException except ) {
+                throw new MappingException( except );
+            }
+        } else
+            depend = null;
+
+
         // Get field descriptors first. Note: order must be preserved for fields,
         // but not for relations or container fields. Add all the container fields
         // in there.
-        fields = createFieldDescs( javaClass, clsMap.getFieldMapping() );
+        FieldMapping[] fm = clsMap.getFieldMapping();
+        fields = createFieldDescs( javaClass, fm );
         /*
         contMaps = clsMap.getContainer();
         if ( contMaps != null && contMaps.length > 0 ) {
@@ -340,39 +416,84 @@ public abstract class MappingLoader
         
         // Obtain the identity field from one of the above fields.
         // The identity field is removed from the list of fields.
-        identity = null;
+        identities = null;
+        boolean idfield = false;
         if ( clsMap.getIdentity() != null ) {
-            for ( int i = 0 ; i < fields.length ; ++i ) {
-                if ( fields[ i ].getFieldName().equals( clsMap.getIdentity() ) ) {
-                    identity = fields[ i ];
-                    if ( identity instanceof FieldDescriptorImpl )
-                        ( (FieldDescriptorImpl) identity ).setRequired( true );
-                    if ( identity.getHandler() instanceof FieldHandlerImpl )
-                        ( (FieldHandlerImpl) identity.getHandler() ).setRequired( true );
-
-                    // Remove identity field from list of fields.
-                    FieldDescriptor[] newFields;
-
-                    newFields = new FieldDescriptor[ fields.length - 1 ];
-                    for ( int j = 0 ; j < i ; ++j )
-                        newFields[ j ] = fields[ j ];
-                    for ( int j = i + 1 ; j < fields.length ; ++j )
-                        newFields[ j - 1 ] = fields[ j ];
-                    fields = newFields;
-                    break;
+            //System.out.println("getId....");
+            String[] ids = breakApart( clsMap.getIdentity(), ' ' );
+            newFields = new FieldDescriptor[fields.length - ids.length];
+            //System.out.println("field.length: "+fields.length+" id.length: "+ids.length);
+            identities = new FieldDescriptor[ids.length];
+            for ( int i=0,x=0,y=0; i < fields.length ; i++ ) {
+                //System.out.println("MappingLoader.createClassDesc.for:id: " + i );
+                idfield = false;
+                IDSEARCH:
+                for ( int k=0; k<ids.length; k++ ) {
+                    //System.out.println(fields[i].getFieldName() + " " + ids[k] );
+                    if ( fields[i].getFieldName().equals( ids[k] ) ) {
+                        idfield = true;
+                        break IDSEARCH;
+                    }
+                }
+                if ( idfield ) {
+                    //System.out.println("Field["+i+"] is an id field");
+                    identities[x] = fields[ i ];
+                    if ( identities[x] instanceof FieldDescriptorImpl )
+                        ( (FieldDescriptorImpl) identities[x] ).setRequired( true );
+                    if ( identities[x].getHandler() instanceof FieldHandlerImpl )
+                        ( (FieldHandlerImpl) identities[x].getHandler() ).setRequired( true );
+                    x++;
+                } else {
+                    // copy non identity field from list of fields.
+                    newFields[y] = fields[i];
+                    y++;
                 }
             }
-            if ( identity == null )
+            fields = newFields;
+
+            if ( identities == null || identities[0] == null )
                 throw new MappingException( "mapping.identityMissing", clsMap.getIdentity(),
                                             javaClass.getName() );
         }
 
+        
+
         // Create the class descriptor.
-        clsDesc = new ClassDescriptorImpl( javaClass, fields, identity, extend,
+        clsDesc = new ClassDescriptorImpl( javaClass, fields, identities, extend, depend,
                                            AccessMode.getAccessMode( clsMap.getAccess() ) );
+
+        ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
         return clsDesc;
     }
 
+    // expect a string which seperated by normalized delimitator
+    private String[] breakApart( String strings, char delimit ) {
+        if ( strings == null ) 
+            return new String[0];
+        Vector v = new Vector();
+        int start = 0;
+        int count = 0;
+        while ( count < strings.length() ) {
+            if ( strings.charAt( count ) == delimit ) {
+                if ( start < (count - 1) ) {
+                    //System.out.println( "("+strings.substring( start, count )+")" );
+                    v.add( strings.substring( start, count ) );
+                    count++;
+                    start = count;
+                    continue;
+                }
+            } 
+            count++;
+        }
+        if ( start < (count - 1) ) {
+            //System.out.println( "("+strings.substring( start, count )+")" );
+            v.add( strings.substring( start, count ) );
+        }
+
+        String[] result = new String[v.size()];
+        v.copyInto( result );
+        return result;
+    }
 
     /**
      * Create field descriptors. The class mapping information is used
@@ -387,14 +508,13 @@ public abstract class MappingLoader
      *  the class cannot be created
      */
     protected FieldDescriptor[] createFieldDescs( Class javaClass, FieldMapping[] fieldMaps )
-        throws MappingException
-    {
+            throws MappingException {
         FieldDescriptor[] fields;
         
         if ( fieldMaps == null || fieldMaps.length == 0 )
             return new FieldDescriptor[ 0 ];
         fields = new FieldDescriptor[ fieldMaps.length ];
-        for ( int i = 0 ; i < fieldMaps.length ; ++i )
+        for ( int i = 0 ; i < fieldMaps.length ; ++i ) 
             fields[ i ] = createFieldDesc( javaClass, fieldMaps[ i ] );
         return fields;
     }
@@ -448,6 +568,10 @@ public abstract class MappingLoader
         Method            getMethod = null;
         Method            setMethod = null;
 
+
+        // Set RelationDescriptor for the field
+
+        RelationDescriptor rd = getRelation( javaClass.getName(), fieldMap.getType() );
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. 
         if ( fieldMap.getType() != null ) {
@@ -475,7 +599,7 @@ public abstract class MappingLoader
         // If get/set methods not specified, use field names to determine them.
         if ( fieldMap.getDirect() ) {
             // No accessor, map field directly.
-            Field field;
+            Field field; 
             
             fieldName = fieldMap.getName();
             field = findField( javaClass, fieldName, ( colType == null ? fieldType : colType ) );
@@ -486,28 +610,27 @@ public abstract class MappingLoader
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
         } else {
-
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                 
                 if ( fieldMap.getName() == null )
                     throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
                 getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
                                           ( colType == null ? fieldType : colType ), true );
-                if ( getMethod == null )
-                    throw new MappingException( "mapping.accessorNotFound",
-                                                "get" + capitalize( fieldMap.getName() ),
-                                                ( colType == null ? fieldType : colType ),
-                                                javaClass.getName() );
+                if ( getMethod == null );
+                    //throw new MappingException( "mapping.accessorNotFound",
+                    //                            "get" + capitalize( fieldMap.getName() ),
+                    //                           ( colType == null ? fieldType : colType ),
+                    //                            javaClass.getName() );
                 if ( fieldType == null && colType == null )
                     fieldType = getMethod.getReturnType();
                 if ( colType == null || getSetCollection ) {
                     setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
                                               ( colType == null ? fieldType : colType ), false );
-                    if ( setMethod == null )
-                        throw new MappingException( "mapping.accessorNotFound",
-                                                    "set" + capitalize( fieldMap.getName() ),
-                                                    ( colType == null ? fieldType : colType ),
-                                                    javaClass.getName() );
+                    if ( setMethod == null );
+                        //throw new MappingException( "mapping.accessorNotFound",
+                        //                            "set" + capitalize( fieldMap.getName() ),
+                        //                            ( colType == null ? fieldType : colType ),
+                        //                            javaClass.getName() );
                 }
             } else {
                 // First look up the get accessors
@@ -534,6 +657,7 @@ public abstract class MappingLoader
                         fieldType = setMethod.getParameterTypes()[ 0 ];
                 }
             }
+
             
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             
@@ -583,7 +707,7 @@ public abstract class MappingLoader
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
+        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false, rd );
     }
 
 

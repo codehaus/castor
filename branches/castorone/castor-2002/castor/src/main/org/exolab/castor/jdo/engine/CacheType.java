@@ -48,14 +48,19 @@ package org.exolab.castor.jdo.engine;
 
 
 import org.exolab.castor.persist.Cache;
-import org.exolab.castor.persist.CacheEngine;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.mapping.xml.CacheTypeMapping;
 
 
 public class CacheType {
-    int _cacheType = CacheEngine.DEFAULT_CACHE_TYPE;
+    int _cacheType = 1;
+    //CacheEngine.DEFAULT_CACHE_TYPE;
 
-    int _capacity = CacheEngine.DEFAULT_CACHE_VALUE;
+    int _capacity = 30;
+    //CacheEngine.DEFAULT_CACHE_VALUE;
+
+    int DEFAULT_TIME_LIMIT = 30;
+    int DEFAULT_COUNT_LIMIT = 30;
 
     public CacheType( CacheTypeMapping cache ) {
         if ( cache == null ) return;
@@ -68,14 +73,14 @@ public class CacheType {
             _cacheType = Cache.CACHE_COUNT_LIMITED;
             _capacity = cache.getCapacity();
             if ( _capacity == 0 ) {
-                _capacity = CacheEngine.DEFAULT_COUNT_LIMIT;
+                _capacity = DEFAULT_COUNT_LIMIT;
             }
 
         } else if ( cache.getType().equals("time-limited") ) {
             _cacheType = Cache.CACHE_TIME_LIMITED;
             _capacity = cache.getCapacity();
             if ( _capacity == 0 ) {
-                _capacity = CacheEngine.DEFAULT_TIME_LIMIT;
+                _capacity = DEFAULT_TIME_LIMIT;
             }
 
         } else if ( cache.getType().equals("unlimited") ) {

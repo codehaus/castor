@@ -265,8 +265,8 @@ public final class FieldHandlerImpl
         _field = null;
         if ( fieldName == null )
             throw new IllegalArgumentException( "Argument 'fieldName' is null" );
-        if ( getMethod == null && setMethod == null )
-            throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
+        if ( getMethod == null && setMethod == null );
+            //throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
         if ( setMethod != null )
             setWriteMethod( setMethod );
@@ -287,6 +287,16 @@ public final class FieldHandlerImpl
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
         _colHandler = typeInfo.getCollectionHandler();
+    }
+
+    public TypeConvertor getConvertFrom() {
+        return _convertFrom;
+    }
+    public TypeConvertor getConvertTo() {
+        return _convertTo;
+    }
+    public String getConvertParam() {
+        return _convertParam;
     }
 
 
@@ -362,6 +372,8 @@ public final class FieldHandlerImpl
                         _deleteMethod.invoke( object, null );
                     else
                         _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
+                } else {
+                    throw new RuntimeException("no way to set value");
                 }
                 // If the field has no set method, ignore it.
                 // If this is a problem, identity it someplace else.
@@ -427,7 +439,6 @@ public final class FieldHandlerImpl
                 else if ( _field != null )
                     _field.set( object, _default );
                 else if ( _setMethod != null ) {
-System.out.println(_setMethod);
                     if ( _deleteMethod != null )
                         _deleteMethod.invoke( object, null );
                     else

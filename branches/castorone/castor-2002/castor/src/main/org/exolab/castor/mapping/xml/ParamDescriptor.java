@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -15,10 +15,12 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-
+import org.exolab.castor.xml.validators.*;
 
 /**
  * 
@@ -58,45 +60,6 @@ public class ParamDescriptor implements org.exolab.castor.xml.XMLClassDescriptor
         //-- initialize attribute descriptors
         
         attributes = new XMLFieldDescriptorImpl[2];
-        //-- _value
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_value", "value", NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Param target = (Param) object;
-                return target.getValue();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Param target = (Param) object;
-                    target.setValue( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        attributes[0] = desc;
-        
-        //-- validation code for: _value
-        fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        fieldValidator.setValidator(new StringValidator());
-        desc.setValidator(fieldValidator);
-        
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         desc.setImmutable(true);
@@ -118,9 +81,43 @@ public class ParamDescriptor implements org.exolab.castor.xml.XMLClassDescriptor
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        attributes[0] = desc;
+        
+        //-- validation code for: _name
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _value
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_value", "value", NodeType.Attribute);
+        desc.setImmutable(true);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
             {
-                setValue( object, null );
+                Param target = (Param) object;
+                return target.getValue();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Param target = (Param) object;
+                    target.setValue( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
             }
             public Object newInstance( Object parent ) {
                 return null;
@@ -130,10 +127,13 @@ public class ParamDescriptor implements org.exolab.castor.xml.XMLClassDescriptor
         desc.setRequired(true);
         attributes[1] = desc;
         
-        //-- validation code for: _name
+        //-- validation code for: _value
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors

@@ -26,7 +26,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
+public class TypeMappingDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
 
 
       //--------------------/
@@ -52,30 +52,62 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
      //- Constructors -/
     //----------------/
 
-    public KeyGeneratorDefDescriptor() {
-        xmlName = "key-generator";
+    public TypeMappingDescriptor() {
+        xmlName = "type";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
         attributes = new XMLFieldDescriptorImpl[2];
-        //-- _name
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
-        this.identity = desc;
+        //-- _type
+        desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_type", "type", NodeType.Attribute);
+        desc.setReference(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
-                KeyGeneratorDef target = (KeyGeneratorDef) object;
-                return target.getName();
+                TypeMapping target = (TypeMapping) object;
+                return target.getType();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    KeyGeneratorDef target = (KeyGeneratorDef) object;
-                    target.setName( (java.lang.String) value);
+                    TypeMapping target = (TypeMapping) object;
+                    target.setType( (java.lang.Object) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.Object();
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[0] = desc;
+        
+        //-- validation code for: _type
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
+        //-- _sql
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_sql", "sql", NodeType.Attribute);
+        this.identity = desc;
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                TypeMapping target = (TypeMapping) object;
+                return target.getSql();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    TypeMapping target = (TypeMapping) object;
+                    target.setSql( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -86,87 +118,16 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
             }
         } );
         desc.setHandler(handler);
-        desc.setRequired(true);
-        attributes[0] = desc;
-        
-        //-- validation code for: _name
-        fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        desc.setValidator(fieldValidator);
-        
-        //-- _alias
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_alias", "alias", NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                KeyGeneratorDef target = (KeyGeneratorDef) object;
-                return target.getAlias();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    KeyGeneratorDef target = (KeyGeneratorDef) object;
-                    target.setAlias( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
         attributes[1] = desc;
         
-        //-- validation code for: _alias
+        //-- validation code for: _sql
         fieldValidator = new FieldValidator();
-        { //-- local scope
-            StringValidator sv = new StringValidator();
-            fieldValidator.setValidator(sv);
-        }
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
         
-        elements = new XMLFieldDescriptorImpl[1];
-        //-- _paramList
-        desc = new XMLFieldDescriptorImpl(Param.class, "_paramList", "param", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                KeyGeneratorDef target = (KeyGeneratorDef) object;
-                return target.getParam();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    KeyGeneratorDef target = (KeyGeneratorDef) object;
-                    target.addParam( (Param) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return new Param();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(true);
-        elements[0] = desc;
-        
-        //-- validation code for: _paramList
-        fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(0);
-        desc.setValidator(fieldValidator);
-        
-    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDefDescriptor()
+        elements = new XMLFieldDescriptorImpl[0];
+    } //-- org.exolab.castor.mapping.xml.TypeMappingDescriptor()
 
 
       //-----------/
@@ -231,7 +192,7 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
     /**
     **/
     public java.lang.Class getJavaClass() {
-        return org.exolab.castor.mapping.xml.KeyGeneratorDef.class;
+        return org.exolab.castor.mapping.xml.TypeMapping.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**

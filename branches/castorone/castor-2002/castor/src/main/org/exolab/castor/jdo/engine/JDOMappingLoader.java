@@ -176,8 +176,10 @@ public class JDOMappingLoader
         }
 
         cacheType = new CacheType( clsMap.getCacheTypeMapping() );
-
-        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), keyGenDesc, cacheType );
+        JDOClassDescriptor jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+            keyGenDesc, cacheType );
+        jd.setMapping( clsMap );
+        return jd;
     }
 
 
@@ -211,7 +213,7 @@ public class JDOMappingLoader
     {
         FieldDescriptor fieldDesc;
         String          sqlName;
-        Class           sqlType;
+        //Class           sqlType;
         
         // If not an SQL field, return a stock field descriptor.
         if ( fieldMap.getSql() == null )
@@ -223,11 +225,24 @@ public class JDOMappingLoader
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
         else
             sqlName = fieldMap.getSql().getName();
+        /*
         if ( fieldMap.getSql().getType() == null  )
             sqlType = fieldDesc.getFieldType();
         else
-            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
-        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sqlType,
+            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() ); */
+        int sqlType;
+        if ( fieldMap.getSql().getType() != null  ) {
+            sqlType = SQLTypes.sqlTypeFromName( fieldMap.getSql().getType() );
+        } else {
+            try {
+                sqlType = SQLTypes.getSQLType( 
+                Types.typeFromName( this.getClass().getClassLoader(), fieldMap.getType() ) );
+            } catch ( ClassNotFoundException e ) {
+                throw new MappingException( "SQLType not found, nor field type of, "+fieldMap.getType()+" convertable to sql type!" );
+            }
+        }
+
+        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, /*sqlType*/sqlType,
             ! IgnoreDirty.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
     }

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
  * $Id
  */
 
@@ -30,14 +30,15 @@ public class Xml implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _node;
-
-    private java.lang.String _type;
+    private java.lang.String _match;
 
     private java.lang.String _name;
 
-    private java.lang.String _match;
-    
+    private java.lang.String _type;
+
+    private java.lang.String _node;
+
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -53,6 +54,12 @@ public class Xml implements java.io.Serializable {
 
     /**
     **/
+    public java.lang.String getMatch() {
+        return this._match;
+    } //-- java.lang.String getMatch() 
+
+    /**
+    **/
     public java.lang.String getName() {
         return this._name;
     } //-- java.lang.String getName() 
@@ -63,12 +70,6 @@ public class Xml implements java.io.Serializable {
         return this._node;
     } //-- java.lang.String getNode() 
 
-    public java.lang.String getMatch() {
-        if (_match != null) 
-            return _match;
-        return _name;
-    } //-- getMatch
-    
     /**
     **/
     public java.lang.String getType() {
@@ -113,15 +114,14 @@ public class Xml implements java.io.Serializable {
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
-    
     /**
      * 
-     * @param _name
+     * @param _match
     **/
     public void setMatch(java.lang.String _match) {
         this._match = _match;
     } //-- void setMatch(java.lang.String) 
-    
+
     /**
      * 
      * @param _name
@@ -130,7 +130,6 @@ public class Xml implements java.io.Serializable {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
-    
     /**
      * 
      * @param _node

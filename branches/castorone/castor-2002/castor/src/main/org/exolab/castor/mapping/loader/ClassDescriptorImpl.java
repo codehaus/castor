@@ -52,6 +52,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.util.Messages;
 
 
@@ -68,11 +69,11 @@ public class ClassDescriptorImpl
 {
 
 
+    private ClassMapping         _map;
     /**
      * The Java class for this descriptor.
      */
     private final Class                _javaClass;
-
 
     /**    
      * The fields described for this class.
@@ -87,10 +88,13 @@ public class ClassDescriptorImpl
     private final ClassDescriptor     _extends;
 
 
+    private final ClassDescriptor     _depends;
+
+
     /**
      * The field of the identity for this class.
      */
-    private final FieldDescriptor    _identity;
+    private final FieldDescriptor[]    _identities;
 
 
     /**
@@ -115,7 +119,7 @@ public class ClassDescriptorImpl
      *   a parent class of this type
      */
     public ClassDescriptorImpl( Class javaClass, FieldDescriptor[] fields,
-                                FieldDescriptor identity, ClassDescriptor extend,
+                                FieldDescriptor[] identities, ClassDescriptor extend, ClassDescriptor depend,
                                 AccessMode accessMode )
         throws MappingException
     {
@@ -125,20 +129,32 @@ public class ClassDescriptorImpl
         if ( fields == null )
             throw new IllegalArgumentException( "Argument 'fields' is null" );
         _fields = (FieldDescriptor[]) fields.clone();
+        _accessMode = accessMode;
+        _depends = depend;
+
+        if ( extend != null && depend != null ) 
+            throw new MappingException( "Class must either extends or depends on other classes, but not both!" );
 
         if ( extend != null ) {
             if ( ! extend.getJavaClass().isAssignableFrom( javaClass ) )
                 throw new MappingException( "mapping.classDoesNotExtend",
                                             _javaClass.getName(), extend.getJavaClass().getName() );
             _extends = extend;
-            _identity = ( identity == null ? _extends.getIdentity() : identity );
+            _identities = ( identities == null ? ((ClassDescriptorImpl)_extends).getIdentities() : identities );
         } else {
             _extends = null;
-            _identity = identity;
+            _identities = identities;
         }
-        _accessMode = accessMode;
+
     }
-    
+
+    public ClassMapping getMapping() {
+        return _map;
+    }
+
+    public void setMapping( ClassMapping map ) {
+        _map = map;
+    }
     
     /**
      * Constructor used by derived classes.
@@ -148,8 +164,10 @@ public class ClassDescriptorImpl
         _javaClass = javaClass;
         _extends = null;
         _fields = null;
-        _identity = null;
+        _identities = null;
+        _depends = null;
         _accessMode = null;
+
     }
 
 
@@ -170,10 +188,16 @@ public class ClassDescriptorImpl
         return _extends;
     }
 
+    public ClassDescriptor getDepends() {
+        return _depends;
+    }
 
-    public FieldDescriptor getIdentity()
-    {
-        return _identity;
+    public FieldDescriptor getIdentity() {
+        return _identities == null? null : _identities[0];
+    }
+
+    public FieldDescriptor[] getIdentities() {
+        return _identities;
     }
 
 
