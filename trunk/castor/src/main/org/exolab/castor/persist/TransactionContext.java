@@ -1759,9 +1759,6 @@ public abstract class TransactionContext
     public synchronized void close()
         throws TransactionAbortedException
     {
-        Enumeration enum;
-        ObjectEntry entry;
-
         if ( _status != Status.STATUS_ACTIVE &&
              _status != Status.STATUS_MARKED_ROLLBACK ) {
             throw new IllegalStateException( Messages.message( "persist.missingEnd" ) );
