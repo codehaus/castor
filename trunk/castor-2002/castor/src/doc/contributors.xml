@@ -151,21 +151,6 @@
     <description>Mapping GUI</description>
   </contributor>
 
-  <contributor type="Feedback">
-    <name surname="Skolnik" given="Radovan"/>
-    <email>rskolnik@inmail.sk</email>
-    <description>
-       Testing/Feedback on mapping file usage related to Castor XML
-    </description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Soysa" given="Manjuka"/>
-    <email>manjuka@visto.com</email>
-    <description>Feedback on generated enumerations,
-         suggested adding the "enumerate" method.
-    </description>
-  </contributor>
 
   <contributor type="Contributor">
     <name surname="Stewart" given="George"/>
@@ -173,30 +158,6 @@
     <description>
        Enhancement to give mapping loader higher priority than compiled descriptors
     </description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Sundaranatha" given="Venkatakrishnan"/>
-    <email>ssvk@msn.com</email>
-    <description>Testing for Oracle and type conversion for Oracle JDBC driver.</description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Eitan" given="Suez"/>
-    <email>eitan@uptodata.com</email>
-    <description>Responsible for uncovering bugs that no one else noticed.</description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Zamler" given="Eldad"/>
-    <email>eldad314@netvision.net.il</email>
-    <description>Found and reported bugs in ClassMolder, ObjectLock and SQLEngine</description>
-  </contributor>
-
-  <contributor type="Feedback">
-    <name surname="Arias" given="Luis"/>
-    <email>luis@elysia.com</email>
-    <description>XML Schema related issues</description>
   </contributor>
 
   <contributor type="Contributor">
@@ -255,6 +216,12 @@
   </contributor>
 
   <contributor type="Feedback">
+    <name surname="Goetter" given="Stephan"/>
+    <email>stephan.goetter@newtron.net</email>
+    <description>Castor XML feedback</description>
+  </contributor>
+
+  <contributor type="Feedback">
     <name surname="Vaughan" given="Steve"/>
     <email>snmvaughan92@yahoo.com</email>
     <description>Castor XML feedback</description>
@@ -270,6 +237,47 @@
     <name surname="Rimac" given="Ivica"/>
     <email>ivica.rimac@KOM.tu-darmstadt.de</email>
     <description>A lot of bug reports, feature requrests, feedbacks and testing for Castor JDO</description>
+  </contributor>
+
+
+  <contributor type="Feedback">
+    <name surname="Skolnik" given="Radovan"/>
+    <email>rskolnik@inmail.sk</email>
+    <description>
+       Testing/Feedback on mapping file usage related to Castor XML
+    </description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Soysa" given="Manjuka"/>
+    <email>manjuka@visto.com</email>
+    <description>Feedback on generated enumerations,
+         suggested adding the "enumerate" method.
+    </description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Sundaranatha" given="Venkatakrishnan"/>
+    <email>ssvk@msn.com</email>
+    <description>Testing for Oracle and type conversion for Oracle JDBC driver.</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Eitan" given="Suez"/>
+    <email>eitan@uptodata.com</email>
+    <description>Responsible for uncovering bugs that no one else noticed.</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Zamler" given="Eldad"/>
+    <email>eldad314@netvision.net.il</email>
+    <description>Found and reported bugs in ClassMolder, ObjectLock and SQLEngine</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Arias" given="Luis"/>
+    <email>luis@elysia.com</email>
+    <description>XML Schema related issues</description>
   </contributor>
 
   <contributor type="Documentor">
