@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -48,26 +48,26 @@ package org.exolab.castor.xml.schema.types;
 import org.exolab.castor.xml.schema.Schema;
 
 /**
- * An implementation of the XML Schema built-in double SimpleType.
+ * An implementation of the XML Schema built-in short SimpleType.
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class DoubleType extends BuiltInType {
+public class ShortType extends BuiltInType {
 
     /**
-     * Creates a new DoubleType with the given Schema reference
+     * Creates a new Short Type with the given Schema reference
      * @param schema the schema reference
     **/
-    public DoubleType(Schema schema) {
-        super(schema, BuiltInType.DOUBLE_NAME);
-    } //-- DoubleType
+    public ShortType(Schema schema) {
+        super(schema, BuiltInType.SHORT_NAME);
+    } //-- ShortType
     
     /**
      * Returns the type of this BuiltInType
      * @return the type of this BuiltInType
     **/
     public short getType() {
-        return BuiltInType.DOUBLE_TYPE;
+        return BuiltInType.SHORT_TYPE;
     } //-- getType
-    
-} //-- DoubleType
+        
+} //-- ShortType

@@ -38,19 +38,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.xml.schema.types;
 
-import org.exolab.castor.xml.schema.Simpletype;
 import org.exolab.castor.xml.schema.Schema;
 
 /**
  * An implementation of the XML Schema built-in string simpletype.
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
 public class StringType extends BuiltInType {

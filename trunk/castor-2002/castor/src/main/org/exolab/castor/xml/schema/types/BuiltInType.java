@@ -49,10 +49,10 @@ import org.exolab.castor.xml.schema.*;
 
 /**
  * The base class for built-in Schema types
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public abstract class BuiltInType extends Simpletype {
+public abstract class BuiltInType extends SimpleType {
 
     /**
      * The name of the binary type
@@ -177,6 +177,16 @@ public abstract class BuiltInType extends Simpletype {
     **/
     public static final short  POSITIVE_INTEGER_TYPE    = 11;
     
+
+    /**
+     * The name of the short type
+    **/
+    public static final String SHORT_NAME              = "short";
+    
+    /**
+     * The type associated with short
+    **/
+    public static final short  SHORT_TYPE              = 12;
     
     /**
      * The name of the string type
@@ -186,8 +196,7 @@ public abstract class BuiltInType extends Simpletype {
     /**
      * The type associated with string
     **/
-    public static final short  STRING_TYPE              = 12;
-            
+    public static final short  STRING_TYPE              = 13;
 
     /**
      * The name of the timeInstant type
@@ -197,7 +206,7 @@ public abstract class BuiltInType extends Simpletype {
     /**
      * The type associated with timeInstant
     **/
-    public static final short  TIME_INSTANT_TYPE        = 13;
+    public static final short  TIME_INSTANT_TYPE        = 14;
     
     
     //----------------/

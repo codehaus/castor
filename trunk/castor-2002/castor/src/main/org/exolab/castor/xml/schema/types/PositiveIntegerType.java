@@ -38,19 +38,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.xml.schema.types;
 
-import org.exolab.castor.xml.schema.Simpletype;
 import org.exolab.castor.xml.schema.Schema;
 
 /**
- * An implementation of the XML Schema built-in integer simpletype.
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * An implementation of the XML Schema built-in positive-integer 
+ * SimpleType.
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
 public class PositiveIntegerType extends BuiltInType {
