@@ -46,8 +46,6 @@
 
 package org.exolab.castor.jdo.oql;
 
-import java.lang.String;
-import java.lang.StringBuffer;
 import java.util.Hashtable;
 
 /**

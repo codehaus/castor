@@ -46,19 +46,17 @@
 
 package org.exolab.castor.jdo.oql;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Iterator;
-import org.exolab.castor.persist.LockEngine;
-import org.exolab.castor.persist.spi.QueryExpression;
+
 import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
+import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.jdo.engine.JDBCSyntax;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.spi.QueryExpression;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
