@@ -73,10 +73,14 @@ public final class DB2QueryExpression
 
     public String getStatement( boolean lock )
     {
-        // Do not use FOR UPDATE to lock query.
-        return getStandardStatement( lock, false ).toString();
-    }
+        StringBuffer sql;
 
+        sql = getStandardStatement( lock, false );
+        if (lock) {
+            sql.append( " FOR UPDATE" );
+        }
+        return sql.toString();
+    }
 
 }
 

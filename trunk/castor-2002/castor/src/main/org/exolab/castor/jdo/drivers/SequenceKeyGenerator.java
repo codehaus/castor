@@ -111,7 +111,8 @@ public final class SequenceKeyGenerator implements KeyGenerator
 
 
         if ( ! _factoryName.equals( "oracle" ) && ! _factoryName.equals( "postgresql" ) &&
-                ! _factoryName.equals( "interbase" ) && ! _factoryName.equals( "sapdb" ) ) {
+                ! _factoryName.equals( "interbase" ) && ! _factoryName.equals( "sapdb" ) &&
+                ! _factoryName.equals( "db2" ) ) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), _factoryName ) );
         }
@@ -159,18 +160,24 @@ public final class SequenceKeyGenerator implements KeyGenerator
         PreparedStatement stmt = null;
         ResultSet rs;
         int value;
+        String seqName;
+        String currval;
 
+        seqName = MessageFormat.format( _seqName, new String[] {tableName});
+        if (_factoryName.equals("db2")) {
+            currval = "(currval for " + seqName + ")";
+        } else {
+            currval = _factory.quoteName(seqName + ".currval");
+        }
         try {
             if (_factory.getFactoryName().equals("interbase")) {
                 //interbase only does before_insert, and does it its own way
-                stmt = conn.prepareStatement("select gen_id(" +
-                        MessageFormat.format(_seqName, new String[] {tableName}) +
+                stmt = conn.prepareStatement("select gen_id(" + seqName +
                         "," + _increment + ") from rdb$database");
                 rs = stmt.executeQuery();
             } else {
                 if ( _style == BEFORE_INSERT ) {
-                    stmt = conn.prepareStatement("SELECT nextval('" +
-                            MessageFormat.format( _seqName, new String[] {tableName}) + "')" );
+                    stmt = conn.prepareStatement("SELECT nextval('" + seqName + "')" );
                     rs = stmt.executeQuery();
                 } else if (_triggerPresent && _factoryName.equals( "postgresql" )) {
                     Object insStmt = props.get("insertStatement");
@@ -184,9 +191,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
                     rs = stmt.executeQuery();
 
                 } else {
-                    stmt = conn.prepareStatement("SELECT " + _factory.quoteName(
-                            MessageFormat.format( _seqName, new String[] {tableName} ) +
-                            ".currval") + " FROM " + _factory.quoteName( tableName ) );
+                    stmt = conn.prepareStatement("SELECT " + currval + " FROM " + _factory.quoteName(tableName));
                     rs = stmt.executeQuery();
                 }
             }
@@ -233,6 +238,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         StringTokenizer st;
         String tableName;
         String seqName;
+        String nextval;
         StringBuffer sb;
         int lp1;  // the first left parenthesis, which starts fields list
         int lp2;  // the second left parenthesis, which starts values list
@@ -263,6 +269,11 @@ public final class SequenceKeyGenerator implements KeyGenerator
             tableName = tableName.substring( 1, tableName.length() - 1 );
         }
         seqName = MessageFormat.format( _seqName, new String[] {tableName});
+        if (_factoryName.equals("db2")) {
+            nextval = "(nextval for " + seqName + ")";
+        } else {
+            nextval = _factory.quoteName(seqName + ".nextval");
+        }
 
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );
@@ -279,12 +290,12 @@ public final class SequenceKeyGenerator implements KeyGenerator
                 lp1 = insert.indexOf( " VALUES " );
                 // don't change the order of lines below,
                 // otherwise index becomes invalid
-                sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ));
+                sb.insert( lp2 + 1, nextval);
                 sb.insert( lp1 + 1, "(" + _factory.quoteName( primKeyName ) + ") " );
             } else {
                 // don't change the order of lines below,
                 // otherwise index becomes invalid
-                sb.insert( lp2 + 1, _factory.quoteName( seqName + ".nextval" ) + ",");
+                sb.insert( lp2 + 1, nextval + ",");
                 sb.insert( lp1 + 1, _factory.quoteName( primKeyName ) + "," );
             }
         }
