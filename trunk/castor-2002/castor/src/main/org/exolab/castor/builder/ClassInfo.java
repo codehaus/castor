@@ -61,6 +61,7 @@ public class ClassInfo extends XMLInfo {
     private Vector    _atts      = null;
     private Vector    _elements  = null;
     private FieldInfo _textField = null;
+    private ClassInfo _baseClass = null;
 
     /**
      * A reference to the JClass that this ClassInfo describes
@@ -71,9 +72,9 @@ public class ClassInfo extends XMLInfo {
      * The group information for this ClassInfo
     **/
     private GroupInfo _groupInfo = null;
-    
+
     private boolean _isContainer = false;
-    
+
     /**
      * Creates a new ClassInfo
      * @param jClass the JClass which this ClassInfo describes
@@ -86,11 +87,11 @@ public class ClassInfo extends XMLInfo {
             throw new IllegalArgumentException(err);
         }
         this._class = jClass;
-        
+
         _groupInfo = new GroupInfo();
-        
+
     } //-- ClassInfo
-    
+
 
 
     //------------------/
@@ -183,6 +184,32 @@ public class ClassInfo extends XMLInfo {
     } //-- getAttributeFields
 
     /**
+     * Returns a fieldInfo that corresponds to an attribute with the given node name.
+     * A ClassInfo cannot have 2 attributes with the same xml name.
+     *
+     * @param nodeName the NodeName of the field to get.
+     * @return a fieldInfo that corresponds to an attribute with the given node name.
+     */
+    public FieldInfo getAttributeField(String nodeName) {
+        for (int i = 0; i < _atts.size(); i++) {
+            FieldInfo temp = (FieldInfo)_atts.get(i);
+            if (temp.getNodeName().equals(nodeName))
+                 return temp;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the base class of this classInfo if any.
+     * A classInfo can indeed extend another classInfo to reflect the extension
+     * mechanism used in the XML Schema
+     * @return the base class of this classInfo if any.
+     */
+    public ClassInfo getBaseClass() {
+        return _baseClass;
+    }
+
+    /**
      * Returns an array of XML element associated fields
      * @return an array of XML element associated fields
     **/
@@ -196,6 +223,24 @@ public class ClassInfo extends XMLInfo {
         return members;
     } //-- getElementFields
 
+
+    /**
+     * Returns a fieldInfo that corresponds to an element with the given node name.
+     * A ClassInfo cannot have 2 elements with the same xml name.
+     *
+     * @param nodeName the NodeName of the field to get.
+     * @return a fieldInfo that corresponds to an element with the given node name.
+     */
+    public FieldInfo getElementField(String nodeName) {
+
+        for (int i = 0; i < _atts.size(); i++) {
+            FieldInfo temp = (FieldInfo)_atts.get(i);
+            if (temp.getNodeName().equals(nodeName))
+                 return temp;
+        }
+        return null;
+    }
+
     /**
      * Returns the GroupInfo for this ClassInfo
      *
@@ -204,7 +249,7 @@ public class ClassInfo extends XMLInfo {
     public GroupInfo getGroupInfo() {
         return _groupInfo;
     } //-- getGroupInfo
-    
+
     /**
      * Returns the JClass described by this ClassInfo
      * @return the JClass which is described by this ClassInfo
@@ -232,7 +277,7 @@ public class ClassInfo extends XMLInfo {
 
     /**
      * Returns true if this ClassInfo describes a container
-     * class. A container class is a class which should not be 
+     * class. A container class is a class which should not be
      * marshalled as XML, but whose members should be.
      *
      * @return true if this ClassInfo describes a container class.
@@ -250,8 +295,18 @@ public class ClassInfo extends XMLInfo {
     } //-- isSequence
 
     /**
+     * Sets the base class of this classInfo.
+     * A classInfo can indeed extend another classInfo to reflect the extension
+     * mechanism used in the XML Schema
+     * @param the base class of this classInfo.
+     */
+    public void setBaseClass(ClassInfo base) {
+        _baseClass = base;
+    }
+
+    /**
      * Sets whether or not this ClassInfo describes a container
-     * class. A container class is a class which should not be 
+     * class. A container class is a class which should not be
      * marshalled as XML, but whose members should be. By default
      * this is false.
      *
@@ -261,6 +316,6 @@ public class ClassInfo extends XMLInfo {
     public void setContainer(boolean isContainer) {
         _isContainer = isContainer;
     } //-- setContainer
-    
+
 
 } //-- ClassInfo
