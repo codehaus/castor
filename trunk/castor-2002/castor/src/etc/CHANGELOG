@@ -83,10 +83,10 @@ JDO:    Fixed a problem that Castor JDO is trying to creates an related object
         (Kim Madsen <kim.madsen@inceptor.com>)
 
 JDO:    Added SQL Direct Interface. Syntax: 
-        CALL SQL <sql expression> AS classname The fields that are returned 
+        "CALL SQL <sql expression> AS classname". The fields that are returned 
         with you sql query must be the same, as the equivalent OQL Query would do.
         Tip: you may turn on Castor logging and study the generated SQL
-        statemnents. (Thorsten Mauch <mauch@imkenberg.de>)
+        statements. (Thorsten Mauch <mauch@imkenberg.de>)
 
 JDO:    Added the overdued <sql many-key="??"/> and <sql many-table="??"/> 
         attributes into the mapping.dtd file.
