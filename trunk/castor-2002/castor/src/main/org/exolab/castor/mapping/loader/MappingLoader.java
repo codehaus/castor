@@ -187,7 +187,8 @@ public abstract class MappingLoader
     {
         Enumeration   enum;
 
-        // Load the mapping for all the classes.
+        // Load the mapping for all the classes. This is always returned
+        // in the same order as it appeared in the mapping file.
         enum = mapping.enumerateClassMapping();
         while ( enum.hasMoreElements() ) {
             ClassMapping    clsMap;
@@ -245,7 +246,7 @@ public abstract class MappingLoader
             if ( relDesc == NoDescriptor ) {
                 // XXX Error message should come here
             } else if ( relDesc != null && fields[ i ] instanceof FieldDescriptorImpl ) {
-        ( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
+                ( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
             }
         }
     }
@@ -437,6 +438,7 @@ public abstract class MappingLoader
         String           fieldName;
         Method           getMethod = null;
         Method           setMethod = null;
+        ClassDescriptor  relDesc;
 
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. If the field is declared as a collection, grab
@@ -449,7 +451,15 @@ public abstract class MappingLoader
             } catch ( ClassNotFoundException except ) {
                 throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
             }
-        }
+
+            relDesc = getDescriptor( fieldType );
+            if ( relDesc == NoDescriptor ) {
+                // XXX Error message should come here
+            } else if ( relDesc != null ) {
+                fieldType = relDesc.getIdentity().getFieldType();
+            }
+        } else
+            relDesc = null;
         if ( fieldMap.getCollection() != null )
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
 
@@ -564,7 +574,12 @@ public abstract class MappingLoader
             } catch ( Exception except ) { }
         }
 
-        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
+        FieldDescriptorImpl fieldDesc;
+
+        fieldDesc = new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
+        if ( relDesc != null )
+            fieldDesc.setClassDescriptor( relDesc );
+        return fieldDesc;
     }
 
 
