@@ -465,7 +465,7 @@ public abstract class MappingLoader
             getSetCollection = CollectionHandlers.isGetSetCollection( colType );
             if ( colType == Object[].class ) {
                 try {
-                    colType = resolveType( "[L" + fieldType.getName() + ";" );
+                    colType = resolveType( "[L" + fieldType.getName().replace( '.', '/' ) + ";" );
                 } catch ( ClassNotFoundException except ) {
                     throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
                 }
