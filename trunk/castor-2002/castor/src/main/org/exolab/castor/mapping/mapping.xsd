@@ -45,7 +45,7 @@
         <enumeration value="read-only"/>
         <enumeration value="shared"/>
         <enumeration value="exclusive"/>
-        <enumeration value="locked"/>
+        <enumeration value="db-locked"/>
       </attribute>
     </type>
   </element>

@@ -48,13 +48,16 @@ package org.exolab.castor.mapping;
 
 
 /**
- * The access mode for a class. In persistent storage each class is
- * defined as having one of three access modes:
+ * The access mode for a class. This object is used by class
+ * descriptors to specify the access mode for a class.
+ * <p>
+ * In persistent storage each class is defined as having one of three
+ * access modes:
  * <ul>
  * <li>Read only
  * <li>Shared (aka optimistic locking)
  * <li>Exclusive (aka pessimistic locking)
- * <li>Locked (database lock)
+ * <li>DbLocked (database lock)
  * </ul>
  * Transactions typically access objects based on the specified access
  * mode. A transaction may be requested to access any object as read
@@ -92,11 +95,11 @@ public class AccessMode
         = new AccessMode( "exclusive" );
 
     /**
-     * Locked access. Objects can be access by a single transaction
+     * DbLocked access. Objects can be access by a single transaction
      * at any given time, and a lock is acquired in the database.
      */
-    public static final AccessMode Locked 
-        = new AccessMode( "locked" );
+    public static final AccessMode DbLocked 
+        = new AccessMode( "db-locked" );
 
 
     /**
@@ -117,8 +120,8 @@ public class AccessMode
             return Exclusive;
         if ( accessMode.equals( ReadOnly._name ) )
             return ReadOnly;
-        if ( accessMode.equals( Locked._name ) )
-            return Locked;
+        if ( accessMode.equals( DbLocked._name ) )
+            return DbLocked;
         throw new IllegalArgumentException( "Unrecognized access mode" );
     }
 
