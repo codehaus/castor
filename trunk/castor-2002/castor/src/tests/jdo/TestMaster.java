@@ -49,12 +49,13 @@ package jdo;
 
 import java.util.Vector;
 import java.util.Enumeration;
+import org.exolab.castor.jdo.TimeStampable;
 
 
 /**
  * Test object mapping to test_master used to conduct relation tests.
  */
-public class TestMaster
+public class TestMaster implements TimeStampable
 {
 
 
@@ -68,6 +69,9 @@ public class TestMaster
 
 
     private Vector     _details;
+
+
+    private long       _timeStamp;
 
 
     static final int       DefaultId = 3;
@@ -172,6 +176,18 @@ public class TestMaster
             details = details + _details.elementAt( i ).toString();
         }
         return _id + " / " + _value + " (" + _group + ") { " + details + " }";
+    }
+
+
+    public void jdoSetTimeStamp( long timeStamp )
+    {
+        _timeStamp = timeStamp;
+    }
+
+
+    public long jdoGetTimeStamp()
+    {
+        return _timeStamp;
     }
 
 
