@@ -2,6 +2,276 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.9.4 December 10, 2001"><pre>
+XML:    Added support for the extremely powerful 'handler' attribute on
+        the field element for the mapping (kvisco - 20011205)
+
+XML:    Patch to XMLMappingLoader to fix dropped multiple id fields. This is a
+        actually a patch to fix bugs which occur in MappingLoader and an errant
+        implementation of ClassDescriptor (ClassDescriptorImpl). This fix should
+        be moved once we have consensus from both JDO + XML teams (kvisco - 20011204).
+
+XML:    Support for Identity-Constraints in the Schema Object Model and 
+        SchemaWriter. Not yet supported in SourceGenerator (kvisco) 20011120
+
+XML:    Applied Nathan Green's patch to allow "all" option when prompting
+        to overwrite files during source code generation. (kvisco) 20011113
+
+XML:    A number of improvements to SchemaWriter (kvisco) 20011112
+
+XML:    Applied Glenn Nielsen's patch to allow double qoutes in default/fixed 
+        schema values (kvisco) 20011111.
+
+XML:    Fixed bug that prevented elements that reference each other to generate 
+        classes. It removes the StackOverFlow Exception. (Arnaud)
+
+XML:    Added code from Matt Small [msmall@clickability.com] that improves the SchemaWriter support (Arnaud)
+
+XML:    Fixed bug in the generated descriptors to correctly generate validation code when collections are used.
+        (Reported by Dr. Louis Coetzee [lcoetzee@subversion.icomtek.csir.co.za]) (Arnaud)
+
+XML:    Added QName support in the marshalling framework (when used via the mapping or via
+        the Source Code Generator) (Arnaud)
+
+
+XML:    Added special code to prevent creating a default XML name when using the "matches"
+        attribute for bind-xml element in the mapping file. (kvisco) 20010815
+
+XML:    Fixed bug with introspector...first character of field name was not being
+        decapitalized. This caused a bug in the "auto-complete" feature.
+        (kvisco) 20010815
+
+XML:    Fixed bug with "auto-complete" when specifying an identity field, the field
+        descriptor was not being set. (kvisco) 20010814
+
+XML:    Added support for specifying that a field is a reference using the mapping file.
+        (kvisco) 20010814
+
+XML:    Fixed bug in the generated classes: the attributes of complexTypes which contained
+        nested groups were wrongly located.
+        (Reported by Joseph Campolongo [jvc@cascadeworks.com]) (Arnaud)
+
+XML:    Fixed bug that prevented string-to-primitive conversion code from being
+        executed for identity fields (kvisco) 20010808
+         - Bug reported by Patric Bechtel
+
+XML:    Fixed bug which prevented IDREFS from working properly (kvisco) 20010807
+         - Applied patches sent in from Steve Vaughan
+
+XML:    Added code to Source Code Generator to create 'add(index, object)' method for list fields.
+        (andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML:    Fixed bug with 'equals' implementation not being generated for classes representing &lt;xsd:complexType&gt;'s
+        (andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML:    Fixed bug in 'equals' implementation, not calling super.equals(...) when approprite
+        (andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML:    Fixed problem in Schema unmarshalling (when using both xsd:include and xsd:import),
+        allowing a given schema to be  parsed a second time, resulting in duplicate type errors.
+        (andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML:    Added an option (default is off) to expose the names of each attribute and element described in the class descriptor.
+        Use org.exolab.castor.builder.classdescfieldnames=true in castorbuilder.properties to enable
+        (andrew.fawcett@coda.com, Andrew Fawcett)
+
+XML:    Fix a bug in SimpleTypeFactory.
+        (Reported by Risheng Lin [rlin@eng.utoledo.edu]) (Arnaud)
+
+XML:    Add an option in the Source Generator that allows to use wrapper objects instead of primitives
+        (Eg java.lang.Double instead of double) (Arnaud)
+
+XML:    Fix a bug when handling attibutes in the UnMarshallerHandler (bug reported and
+        patch submitted by Marcin Chalotowski [Marcin.Chalotowski@3dart.com]) (Arnaud)
+
+JDO:    Fixed a old values appears in new result problem.
+        (reported by Jim Branecki [Jim_Branecki@sparta.com]
+         and Steven Lee [steven@lee-home.com])
+
+JDO:    Added setAutoStore to JDO and DataObjects (necessary for use in EJB environment). (oleg)
+
+JDO:    Fixed the rs.next() called more than one problem. (yip)
+
+JDO:    Fixed IllegalStateException when TransactionManager calls
+        afterComplete( Status.ROLLEDBACK ), without calling
+        beforeComplete() first. According to the JTA specification,
+        rollback can be one-phase.
+        (reported by Richard Monson-Haefel [Richard@intalio.com]
+         and Matthew Jensen [mmj@ceg.net])
+
+JDO:    Made the BatchUpdateSQL utility to take small letter "go" as end
+        tokens of a statements. (yip)
+
+JDO:    Added special care for Double/Float type to workaround a oracle's problem. (yip)
+
+JDO:    Splitted create() phase into two phases: markCreate() and create().
+        In the markCreate() phase, the object to be created is walked and all
+        objects that should be created are marked. Then, the marked object is
+        created in the order that is determined by getPriority(). After the
+        creation, object cache that related to other is updated.
+        (similar changes was made to update())
+        - The change is introduced to solve several problems related object creation.
+          (The old apporach try to delay the creation of dependent object to preStore
+          state, so that the master object is always created first. The master generated
+          key would be ready when dependent object are created at transaction prepare.)
+          bug 1: dependent's related object is not automatically created,
+                 even if autStore set true. (with key gen used both side)
+          bug 2: 1:1 dependent relationship is not always done right, depends on which
+                 side is the foreign key placed. (with key gen used both side)
+          bug 3: in some tricky suituation, created object cache is not updated. (yip)
+
+JDO:    Fixed a bug in the FieldMolder.isStored() method. (yip)
+
+JDO:    Fixed the problem with two 1:N relations between the same two tables (reported
+        by CORMONT Cedric [cedric.cormont@softeam.fr]). The solution is to use aliases
+        (when needed) in outer joins generated by SQLEngine. (oleg)
+
+JDO:    Restricted JDO to eat only ObjectNotFoundException now to workaround
+        inconsistent reference in database. (yip)
+
+JDO:    Fixed a NPE in TransactionContext.load().
+        (reported by Naveen Sharma [sharmn@sdd.comsat.com])
+
+JDO:    Fixed bug in JDBCQueryExpression.getSelect() that previously
+        was hidden in ancestors. (oleg)
+
+JDO:    Fixed a bug that caused PersistenceException("persis.typeMismatch")
+        to be thrown in ClassMolder.
+        (Bug reported by (Naveen Sharma [sharmn@sdd.comsat.com]))
+
+JDO:    Added type convertor of BigDecimal&lt;--&gt;Short and BigDecimal&lt;--&gt;Byte. (yip)
+
+JDO:    Fixed a deadlock problem.
+        (Reported and submitted by Holger Krug [hkrug@rationalizer.com])
+
+JDO:    Treated an SQL generation issue temporarily. When users write an OQL
+        contains two or more conditions on the same one-to-many relation,
+        s/he expects OQL to return the union of the two conditions, but it
+        is returning the intersection now.
+        (Patch submitted by Rehor Petr [petr.rehor@decros.cz])
+
+JDO:    Fixed a StackOverflowException. The Exception was caused by an infinite
+        loop in getPrority().
+        (Submitted by Mark Lamb [Mark.Lamb@spirent.com])
+
+JDO:    Fixed a problem causing unexpected ObjectModifiedException being thrown
+        when an object in one side of 1:1 relationship is being added via a long 
+        transaction. (yip)
+        (Reported by Sharma, Naveen [Naveen.Sharma@lmco.com])
+
+JDO:    Fixed the default value not being used for primitives bug. (yip) 20011025
+
+JDO:    Fixed the 1:1 dependent object not being created when the it is newly
+        link, or replaced to the master object in both long and short 
+        transaction. (yip) 20011025
+
+JDO:    Added support of read-only field for Castor JDO. Read only can be
+        enable setting read-only attribute to true inside sql element in
+        the mapping file. (eg. &lt;field&gt;&lt;sql read-only="true".../&gt;&lt;/field&gt; )
+        20011029
+        (Patch submitted by Jakob Braeuchi [jbraeuchi@hotmail.com])
+
+JDO:    Enabled sql function in the "Order By" clause of an OQL. 20011029
+        (Patch submitted by Low Heng Sin [lowhs@comline.com.my])
+
+JDO:    Made compilable with javac 1.2.
+        [reported by BEDNARIK,LASLO laslo_bednarik@hp.com]
+
+JDO:    Fixed a problem that causes Castor JDO always requesting writeLock for a
+        data object with a lazy-loaded collection. (yip) 20011126
+        (bug reported by Dominik Baranowski [dbaranowski@saltare.com] and
+        Ned Wolpert [ned.wolpert@knowledgenet.com])
+
+JDO:    Fixed a problem that causes &lt;field set-method="..."/&gt; doesn't work.
+        20011130
+        (reported by Matthew Baird [matthew_baird@againtech.com]
+        patch submitted by Jakob Braeuchi [jbraeuchi@hotmail.com])
+
+JDO:    Fixed the integrity problem with many-to-many relationship.
+        (reported by many users...) (yip) 20011130
+
+JDO:    Made TxDatbaseMap implementing Serializable.
+        TxDatabaseMap must implement Serializable.
+        TxDatabaseMap is a member of JDO. (bug 792) 20011203
+        (Reported by Guenter Gartner[guenter.gartner@gillardon.de])
+
+JDO:    Fixed bug 801(b): bugs in RelationCollection.clear().
+        (yip) 20011203
+        (Bug reported by tysonsinger@metatv.com) 
+
+
+JDO:    Fixed bug 801(a): bugs in RelationCollection.addAll() 20011203
+        (Bug reported and fixed by tysonsinger@metatv.com) 
+
+JDO:    Fixed Bug 579: dirty="ignore" on sql fields in the mapping
+        file does not work. 20011203
+        (Bug reported and fix submitted by ryoder@q-markets.com)
+
+JDO:    Fixed a potential problem with lazy collection consistency.
+  
+        If an object is removed from database, and the lazy collection
+        still link to it at the end of transaction, the cache would
+        still "think" the object is in the database in the next
+        transaction.
+
+        Although the test can detect that in some case, it is not
+        recommended to depends on this behavior. Always dis-link it,
+        before calling db.remove(). (yip) 20011204
+
+JDO:    Added sqldate and sqltime as supported field type. (yip) 20011204
+
+JDO:    Added timestamp as supported java field type. 20011204
+        (submitted by Markus Fritz [mfritz@justis.de])
+
+JDO:    Added try/catch to clear the _creating flag, which conserves the
+        internal consistency when exception was thrown. 20011204
+        (bug reported and fixed by Todd Rader [trader@saltare.com]
+        and Dominik Baranowski [dbaranowski@saltare.com])
+
+JDO:    Fixed a NPE which occurs when removing an data object with empty many-many
+        relationship. (yip) 20011205
+        (bug reported Jan Kanzleiter [mailto:idefix@tfh-berlin.de])
+
+JDO:    Fixed a problem which occurs when two long-transactional objects
+        are linked together in a many-many relationship. (yip) 20011205
+        (bug reported by Toni Charlot [toni@fdplus.com]) 
+
+JDO:    (doc) Added FAQs for OQL and data model issues.
+
+JDO:    (doc) Corrected the PostgreSQL configuration example.
+        (Submitted by Todd V. Jonker [tjonker@inpathsol.com])
+
+JDO:    (doc) Added a FAQ for pass-thru SQL.
+
+
+JDO:    (test) Added a 2 second sleep in between the creation of the first
+        and second object. This is needed to make the test case run properly.
+        Because, some database stored time in less precision, and it causes
+        the test to fail. (yip)
+
+JDO:    (test) Used a new SQL connection in the inner class of the test to
+        workaround a problem in Solaris. (yip)
+
+JDO:    (test) Added test cases for dependent relationship where each of the data object
+        identity is key-generated. (yip)
+
+JDO:    (test) Enhanced error reporting for the Deadlock test case. (yip)
+
+JDO:    (test) Added test cases for more TypeConvertor. (yip)
+
+JDO:    (test) Added a test for 1:1 dependent relationship. (yip)
+
+JDO:    (test) Added a soak test for Castor JDO. (todo: adds build.xml entry) (yip)
+
+JDO:    (test) Added a test case for depedent objects with 
+        key-generator used in long transaction. (yip)
+
+XML and JDO:  (doc) Fixed most of the javadoc warnings. (yip)
+
+DSML:   Fixed a NPE. 20011205
+        (bug reported and fixed by Gilbert Pilz [gilbert.pilz@e2open.com])
+
+    </pre></section>
     <section title="Version 0.9.3 June 27, 2001"><pre>
 
 XML:    Added fix to CollectionInfoJ2 for unbounded collections. (kvisco)
