@@ -14,7 +14,7 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=`echo lib/*.jar | tr ' ' ':'`
 CLASSPATH=build/classes/:$CLASSPATH:$JAVA_HOME/lib/tools.jar
 
 
