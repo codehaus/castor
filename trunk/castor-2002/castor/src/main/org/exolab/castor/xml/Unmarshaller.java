@@ -110,7 +110,9 @@ public class Unmarshaller {
     
     /**
      * Creates a new Unmarshaller with the given Class
-     * @param c the Class to create the Unmarshaller for
+     * @param c the Class to create the Unmarshaller for, this
+     * may be null, if the Unmarshaller#setMapping is called
+     * to load a mapping for the root element of xml document.
     **/
     public Unmarshaller(Class c) {
         this(c, null);
@@ -118,7 +120,10 @@ public class Unmarshaller {
 
     /**
      * Creates a new Unmarshaller with the given Class
-     * @param c the Class to create the Unmarshaller for
+     * @param c the Class to create the Unmarshaller for, this
+     * may be null, if the Unmarshaller#setMapping is called
+     * to load a mapping for the root element of xml document.
+     * @param loader, the ClassLoader to use.
     **/
     public Unmarshaller(Class c, ClassLoader loader) {
         super();
@@ -167,8 +172,12 @@ public class Unmarshaller {
     } //-- setLogWriter
 
     /**
-     * Sets the Mapping to use during unmarshalling
-     * @param mapping the Mapping to use during unmarshalling
+     * Sets the Mapping to use during unmarshalling.
+     * @param mapping the Mapping to use during unmarshalling.
+     * @see setResolver
+     * <BR />     
+     * <B>Note:</B> This method will nullify any ClassDescriptorResolver
+     * currently being used by this Unmarshaller
     **/
     public void setMapping( Mapping mapping )
         throws MappingException
@@ -176,6 +185,23 @@ public class Unmarshaller {
         _cdResolver = new ClassDescriptorResolverImpl(loader);
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
+    
+    /**
+     * Sets the ClassDescriptorResolver to use during unmarshalling
+     * @param cdr the ClassDescriptorResolver to use
+     * @see setMapping
+     * <BR />     
+     * <B>Note:</B> This method will nullify any Mapping
+     * currently being used by this Unmarshaller
+    **/
+    public void setResolver( ClassDescriptorResolver cdr ) {
+        
+        if (cdr != null)
+            _cdResolver = cdr;
+        else
+            _cdResolver = new ClassDescriptorResolverImpl(loader);
+            
+    } //-- setResolver
     
     /**
      * Sets the flag for validation

@@ -135,15 +135,24 @@ public class UnmarshalHandler implements DocumentHandler {
     
     /**
      * Creates a new UnmarshalHandler
+     * The "root" class will be obtained by looking into the mapping
+     * for a descriptor that matches the root element.
+    **/
+    protected UnmarshalHandler() {
+        this(null);
+    } //-- UnmarshalHandler
+    
+    /**
+     * Creates a new UnmarshalHandler
      * @param _class the Class to create the UnmarshalHandler for
     **/
     protected UnmarshalHandler(Class _class) {
         super();
-        _stateInfo = new Stack();
-        _topClass = _class;
-        buf = new StringBuffer();
+        _stateInfo    = new Stack();
         _idReferences = new Hashtable();
         _resolveTable = new Hashtable();
+        buf           = new StringBuffer();
+        _topClass     = _class;
     } //-- UnmarshalHandler(Class)
     
     protected Object getObject() {
@@ -421,18 +430,49 @@ public class UnmarshalHandler implements DocumentHandler {
             //-- Initialize since this is the first element
             
             if (_cdResolver == null) {
-                _cdResolver = new ClassDescriptorResolverImpl();
+                
+                if (_topClass == null) {
+                    String err = "The class for the root element '" +
+                        name + "' could not be found.";
+                    throw new SAXException(err);
+                }
+                else _cdResolver = new ClassDescriptorResolverImpl();
             }
+            
             _topState = new UnmarshalState();
             _topState.elementName = name;
             
+            
+            XMLClassDescriptor classDesc = null;
+            
+            //-- If _topClass is null, then we need to search
+            //-- the resolver for one
+            if (_topClass == null) {
+                classDesc = _cdResolver.resolveByXMLName(name, null);
+                
+                if (classDesc != null) 
+                    _topClass = classDesc.getJavaClass();
+                    
+                if (_topClass == null) {
+                    String err = "The class for the root element '" +
+                        name + "' could not be found.";
+                    throw new SAXException(err);
+                }
+            }
+            
+            //-- create a "fake" FieldDescriptor for the root element
             XMLFieldDescriptorImpl fieldDesc
-                = new XMLFieldDescriptorImpl(_topClass, name, name, null);
+                = new XMLFieldDescriptorImpl(_topClass, 
+                                             name, 
+                                             name, 
+                                             NodeType.Element);
             
             _topState.fieldDesc = fieldDesc;
             
-            //-- look for XMLClassDescriptor
-            XMLClassDescriptor classDesc = getClassDescriptor(_topClass);
+            //-- look for XMLClassDescriptor if null
+            if (classDesc == null)
+                classDesc = getClassDescriptor(_topClass);
+                
             fieldDesc.setClassDescriptor(classDesc);
             
             if (classDesc == null) {
