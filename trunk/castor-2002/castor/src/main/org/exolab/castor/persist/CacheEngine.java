@@ -566,8 +566,11 @@ public final class CacheEngine
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
-            oid = new OID( typeInfo.handler, identity );
             // XXX If identity is null need to fine a way to determine it
+            if ( identity == null )
+                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+
+            oid = new OID( typeInfo.handler, identity );
 
             if ( identity != null ) {
                 // If the object has a known identity at creation time, perform
@@ -873,7 +876,7 @@ public final class CacheEngine
             // Identity change not supported
             if ( ! identity.equals( oldIdentity ) )
                 throw new PersistenceExceptionImpl( "persist.changedIdentity",
-                                                typeInfo.javaClass.getName(), identity );
+                                                    typeInfo.javaClass.getName(), identity );
 
             // Check if object has been modified, and whether it can be stored.
             if ( ! typeInfo.handler.isModified( object, original ) )
@@ -907,10 +910,6 @@ public final class CacheEngine
             else
                 oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                       fields, identity, original, oid.getStamp() ) );
-            /* XXX Is this necessary?
-            for ( int i = 0 ; i < fields.length ; ++i )
-                original[ i ] = fields[ i ];
-            */
             oid.setExclusive( false );
         }
         return oid;
