@@ -45,16 +45,12 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.xml.schema.Schema;
 
-import java.util.Enumeration;
-import java.util.Vector;
 
 /**
  * The ur-type definition
- * @author <a href="mailto:berry@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class UrType extends SimpleType {
