@@ -56,6 +56,7 @@ package org.exolab.castor.jdo;
 public interface TimeStampable
 {
 
+    public static final long NO_TIMESTAMP = 0;
 
     /**
      * Set the timestamp.
