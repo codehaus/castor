@@ -78,10 +78,10 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     private AttributeDecl _attribute = null;
 
     private Schema _schema = null;
-    
+
     private boolean foundAnnotation = false;
     private boolean foundSimpleType = false;
-    
+
 
       //----------------/
      //- Constructors -/
@@ -99,24 +99,44 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             String err = "Attribute references are currently not supported.";
             throw new IllegalStateException(err);
         }
-        
+
         String name = atts.getValue(SchemaNames.NAME_ATTR);
-        
+
         _attribute = new AttributeDecl(schema, name);
 
         //-- form (Not yet supported)
         //_attribute.setForm(...);
-        
+
         //-- id
         _attribute.setId(atts.getValue(SchemaNames.ID_ATTR));
-        
-        //-- value
-        _attribute.setValue(atts.getValue(SchemaNames.VALUE_ATTR));
+
+        //-- fixed
+        String temp = atts.getValue(SchemaNames.FIXED_ATTR);
+        if (temp != null) {
+            if (_attribute.isDefault())
+                throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
+            _attribute.setValue(temp);
+            _attribute.setFixed();
+        }
+
+        //-- default
+        temp = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        if (temp != null) {
+            if (_attribute.isFixed())
+                throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
+            _attribute.setValue(temp);
+            _attribute.setDefault();
+        }
+        temp = null;
 
         //-- use
         String use = atts.getValue(SchemaNames.USE_ATTR);
-        if (use != null) _attribute.setUse(use);
-        
+        if (use != null) {
+            if (_attribute.isDefault() && (use != AttributeDecl.USE_OPTIONAL) )
+                throw new IllegalArgumentException("When 'default' is present, the 'use' attribute must have the value 'optional'.");
+           _attribute.setUse(use);
+        }
+
         //-- type
         String type = atts.getValue("type");
         if (type != null) {
@@ -171,15 +191,15 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         }
 
         if (SchemaNames.ANNOTATION.equals(name)) {
-            
+
             if (foundAnnotation)
                 error("Only one (1) annotation is allowed as a child of " +
                     "an attribute declaration.");
-                    
+
             if (foundSimpleType)
                 error("An annotation may only appear as the first child of "+
                     "an attribute declaration.");
-            
+
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
@@ -187,7 +207,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             if (foundSimpleType)
                 error("Only one (1) simpleType is allowed as a child of " +
                     "an attribute declaration.");
-            
+
             foundSimpleType = true;
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
