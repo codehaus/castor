@@ -65,6 +65,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 
+
 //-- DOM
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -102,7 +103,7 @@ public class TransformerFactoryImpl
     /**
      * The URIResolver to be used by the transformer.
      */
-    private URIResolver _uriResolver = null;
+    private URIResolverWrapper _uriResolver = null;
 
 
     /**
@@ -199,7 +200,9 @@ public class TransformerFactoryImpl
      * @return The URIResolver that was set with setURIResolver.
      */
     public URIResolver getURIResolver() {
-        return _uriResolver;
+        if (_uriResolver != null)
+            return _uriResolver.getResolver();
+        return null;
     } //-- getURIResolver
     
     
@@ -223,7 +226,12 @@ public class TransformerFactoryImpl
         throws TransformerConfigurationException 
     {
         
-        XSLTReader reader = new XSLTReader();
+        XSLTReader reader = null;
+        if (_uriResolver != null)
+            reader = new XSLTReader(_uriResolver);
+        else
+            reader = new XSLTReader();
+            
         XSLTStylesheet stylesheet = null;
         
         if (source instanceof SAXSource) {
@@ -385,7 +393,10 @@ public class TransformerFactoryImpl
      * or null.
      */
     public void setURIResolver(URIResolver resolver) {
-        _uriResolver = resolver;
+        if (resolver == null)
+            _uriResolver = null;
+            
+        _uriResolver = new URIResolverWrapper(resolver);
     }
 
     //-------------------------------------------/
@@ -500,5 +511,7 @@ public class TransformerFactoryImpl
         return xmlFilter;
     } //-- newXMLFilter
 
+
+    
     
 } //-- TransformerFactoryImpl
