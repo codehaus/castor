@@ -159,7 +159,6 @@ public class JMember {
         sb.append(modifiers.toString());
         sb.append(' ');
         sb.append(type);
-        if (type.isArray()) sb.append("[]");
         sb.append(' ');
         sb.append(name);
         return sb.toString();

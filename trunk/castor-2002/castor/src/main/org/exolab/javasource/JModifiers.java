@@ -54,38 +54,46 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class JModifiers {
+
     
     /* static members */
-    
+
+    private static final String sAbstract   = "abstract";
     private static final String sFinal      = "final";
     private static final String sPrivate    = "private";
     private static final String sProtected  = "protected";
     private static final String sPublic     = "public";
     private static final String sStatic     = "static";
-    
-    
+
     private static final short vPrivate   = 1;
     private static final short vProtected = 2;
     private static final short vPublic    = 3;
     
+
     /* local members */
-    
+
     /**
      * The visibility
     **/
     private short visibility = vPublic;
-    
+
     /**
-     * A flag indicating the whether the object associated
+     * A flag indicating whether or not the object associated
      * with this JModifiers is static
     **/
-    boolean isStatic = false;
+    private boolean isStatic = false;
     
     /**
-     * A flag indicating the whether the object associated
+     * A flag indicating whether or not the object associated
      * with this JModifiers is final
     **/
-    boolean isFinal  = false;
+    private boolean isFinal  = false;
+    
+    /**
+     * A flag indicating whether or not the object associated
+     * with this JModifiers is abstract
+    **/
+    private boolean isAbstract = false;
     
     /**
      * Creates a new JModifiers class, by default the
@@ -139,6 +147,15 @@ public class JModifiers {
     } //-- makePublic
     
     /**
+     * Returns true if the abstract qualifier is present.
+     * <BR /> This is only applicable to methods and classes.
+     * @return true if the abstract qualifier is present
+    **/
+    public boolean isAbstract() {
+        return isAbstract;
+    } //-- isAbstract
+    
+    /**
      * Returns true if the modifier represented is private.
      * @return true if the modifier represented is private.
     **/
@@ -161,6 +178,16 @@ public class JModifiers {
     public boolean isPublic() {
         return (visibility == vPublic);
     } //-- isPublic
+    
+    /**
+     * Sets whether or not the "abstract" qualifier is present
+     * <BR /> This applies only to methods or classes.
+     * @param isAbstract is a boolean which when true will indicate
+     * that the abstract qualifier should be present
+    **/
+    public void setAbstract(boolean isAbstract) {
+        this.isAbstract = isAbstract;
+    } //-- setAbstract
     
     /**
      * Sets whether or not the "final" qualifier is present
@@ -205,7 +232,7 @@ public class JModifiers {
             sb.append(' ');
             sb.append(sFinal);
         }
-        
+
         //-- static
         if (isStatic) {
             sb.append(' ');
@@ -215,4 +242,5 @@ public class JModifiers {
         return sb.toString();
     } //-- toString
     
-} //-- JMember
+} //-- JModifiers
+
