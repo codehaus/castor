@@ -245,27 +245,32 @@ public final class AnyNode {
     }
 
     /**
-     * adds a child AnyNode to this node.
+     * <p>Adds a child AnyNode to this node.
      * A 'child' can be either an ELEMENT node, a COMMENT node,
      * a TEXT node or a PROCESSING INSTRUCTION.
      * If the current node already has a child then
      * the node to add will be append as a sibling.
+     * <p>Note: you cannot add a child to a TEXT node.
      * @param node the node to add.
      */
     public void addChild(AnyNode node) {
         if (node == null)
            throw new IllegalArgumentException("null argument in appendChild");
+
         if ( (node.getNodeType() == ATTRIBUTE) ||
              (node.getNodeType() == NAMESPACE) )
             throw new IllegalArgumentException("An Attribute or an Namespace can't be added as a child");
 
+       if (this.getNodeType() == TEXT)
+           throw new IllegalArgumentException("a TEXT node can't have children.");
+
        if (_firstChildNode == null)
             _firstChildNode = node;
+
        else if ( (_firstChildNode.getNodeType() == ATTRIBUTE) ||
                  (_firstChildNode.getNodeType() == NAMESPACE) )
             _firstChildNode.addChild(node);
-       else if (_firstChildNode.getNodeType()==TEXT)
-           mergeTextNode(_firstChildNode,node);
+
        else _firstChildNode.appendSibling(node);
     }
 
@@ -564,14 +569,20 @@ public final class AnyNode {
                       //close the tag
                       sb.append("</"+getLocalName()+">");
                   } else sb.append("/>");
-                  //process any sibling node
+                  //process any sibling ELEMENT node
                   if (siblingNode != null)
                       sb.append(siblingNode.toString());
 
              }//ELEMENT
-             else
-                return this.getStringValue();
-
+             else {
+                sb.append(this.getStringValue());
+                AnyNode tempNode = this.getNextSibling();
+                while (tempNode != null) {
+                     sb.append(tempNode.toString());
+                     tempNode = tempNode.getNextSibling();
+                }
+                tempNode = null;
+             }
             return sb.toString();
           }
           return sb.toString();
@@ -587,13 +598,18 @@ public final class AnyNode {
         if (node == null)
            throw new IllegalArgumentException();
 
-        if ( this.getNodeType() != node.getNodeType()) {
-            String err = "You can only add sibling to a node of same type";
+        if ( ((node.getNodeType() == ATTRIBUTE) || (node.getNodeType()== NAMESPACE))&&
+              (this.getNodeType() != node.getNodeType())) {
+            String err = "a NAMESPACE or an ATTRIBUTE can only be add as a sibling to a node of the same type";
             throw new OperationNotSupportedException(err);
         }
 
-        if (_nextSiblingNode == null)
-            _nextSiblingNode = node;
+        if (_nextSiblingNode == null) {
+            //if we already have a TEXT node -> merge
+            if ((node.getNodeType() == TEXT) && (this.getNodeType() == TEXT))
+                mergeTextNode(this,node);
+            else _nextSiblingNode = node;
+        }
 
         else _nextSiblingNode.appendSibling(node);
     }
