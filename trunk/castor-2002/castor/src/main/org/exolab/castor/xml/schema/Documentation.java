@@ -146,7 +146,7 @@ public class Documentation extends Structure {
      * @return the type of this Schema Structure
     **/
     public short getStructureType() {
-        return Structure.INFO;
+        return Structure.DOCUMENTATION;
     } //-- getStructureType
     
     /**
