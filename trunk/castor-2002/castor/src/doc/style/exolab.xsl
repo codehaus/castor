@@ -383,8 +383,10 @@
       [
       <a href="mailto:{@manager}@{@server}?subject=subscribe {@name}">Subscribe</a> |
       <a href="mailto:{@manager}@{@server}?subject=unsubscribe {@name}">Unsubscribe</a> |
-      <a href="mailto:{@name}@{@server}">Post Message</a> |
-      <a href="{@archive}">Archive</a>
+      <a href="mailto:{@name}@{@server}">Post Message</a>
+      <xsl:if test="@archive">
+         | <a href="{@archive}">Archive</a>
+	</xsl:if>
       ]
     </div>
   </xsl:template>
