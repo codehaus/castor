@@ -50,6 +50,7 @@ import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.List;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 
 //-- xml related imports
 import org.xml.sax.*;
@@ -66,6 +67,8 @@ import java.lang.reflect.*;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.Enumeration;
+
 
 /**
  * An unmarshaller to allowing unmarshalling of XML documents to
@@ -382,9 +385,23 @@ public class UnmarshalHandler implements DocumentHandler {
                     throw new SAXException(vEx);
                 }
             }
+
+
+            // As we are at the root, we check that we have no unresolved
+            // references left.
+//             if ( ! _resolveTable.isEmpty()) {
+//                 String unresolvedRefs = new String();
+//                 for (Enumeration e = _resolveTable.elements(); e.hasMoreElements() ;) {
+//                     ReferenceInfo unresolved = (ReferenceInfo)e.nextElement();
+//                     unresolvedRefs += unresolved.descriptor.getXMLName() + "=\"" + 
+//                                       unresolved.id + "\" in element <" +  
+//                                       ((XMLClassDescriptor)unresolved.descriptor.getContainingClassDescriptor()).getXMLName() + " ...>\n";
+//                 }
+//                 throw new SAXException("Unable to resolve the following IDREF(s) during unmarshalling:\n" + unresolvedRefs);
+//             }
+            
             return;
         }
-        
         
         //-- Add object to parent if necessary
         
@@ -707,7 +724,7 @@ public class UnmarshalHandler implements DocumentHandler {
             }
             else
                 _class = descriptor.getFieldType();
-                
+
             // Retrieving the xsi:type attribute, if present
             String instanceType = getInstanceType(atts);
             if (instanceType != null) {
@@ -723,8 +740,9 @@ public class UnmarshalHandler implements DocumentHandler {
                     }
                     else
                         instanceClass = loadClass(instanceType, null);
-                            
-                    if (!_class.isAssignableFrom(instanceClass)) {
+
+                    if (( ! ((FieldHandlerImpl)descriptor.getHandler()).isCollection() ) && 
+                         ! _class.isAssignableFrom(instanceClass)) {
                         String err = instanceClass 
                             + " is not a subclass of " + _class;
                         throw new SAXException(err);
@@ -820,8 +838,8 @@ public class UnmarshalHandler implements DocumentHandler {
             message(ise.toString());
             throw new SAXException(ise);
         }
-            
-            
+           
+
         //-- At this point we should have a new object, unless
         //-- we are dealing with a primitive type, or a special
         //-- case such as byte[]

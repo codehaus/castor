@@ -162,6 +162,22 @@ public class TypeInfo
                      String convertorParam, boolean required, Object defaultValue,
                      CollectionHandler colHandler )
     {
+        if (fieldType.isArray()) {
+            try {
+                colHandler = CollectionHandlers.getHandler(Object[].class);
+            } catch (Exception e) {
+                throw new NullPointerException("Impossible to locate CollectionHandler for array.");
+            }
+            
+        } else {
+            try {
+                colHandler = CollectionHandlers.getHandler(fieldType);
+            } catch (Exception e) {
+            // NOOP : It just mean that there is not handler for the collection
+            // and that this fieldType is not a collection
+            }
+        }
+
         _fieldType = Types.typeFromPrimitive( fieldType );
         _convertorTo = convertorTo;
         _convertorFrom = convertorFrom;

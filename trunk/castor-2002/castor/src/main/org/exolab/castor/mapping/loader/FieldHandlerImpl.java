@@ -787,8 +787,12 @@ public final class FieldHandlerImpl
           
      } //-- selectWriteMethod 
   
-    
-
+    /**
+     * Return true if the field is a collection.
+     */
+    public boolean isCollection() {
+        return (_colHandler != null); 
+    }
 
     public String toString()
     {
