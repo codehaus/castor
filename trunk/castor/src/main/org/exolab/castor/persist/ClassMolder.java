@@ -270,6 +270,10 @@ public class ClassMolder
                 _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheParam();
             }
             _isKeyGenUsed = ( ( (JDOClassDescriptor) clsDesc ).getKeyGeneratorDescriptor() != null );
+            
+            if ((_timeStampable) && (_cachetype.equalsIgnoreCase ("none"))) {
+                throw new MappingException (Messages.format("persist.wrongCacheTypeSpecified", _name));
+            }
         }
 
         // construct <tt>FieldModler</tt>s for each of the identity fields of
@@ -1796,20 +1800,26 @@ public class ClassMolder
 
         fields = (Object[]) locker.getObject( tx );
 
-        if ( !isDependent() && !_timeStampable )
+        if ((!isDependent()) && (!_timeStampable)) {
             throw new IllegalArgumentException("A master object that involves in a long transaction must be a TimeStampable!");
+        }
 
         long lockTimestamp = locker.getTimeStamp();
-        long objectTimestamp = _timeStampable? ((TimeStampable)object).jdoGetTimeStamp(): 1;
+        long objectTimestamp = _timeStampable ? ((TimeStampable) object).jdoGetTimeStamp() : 1;
 
         /*
-        System.out.println( "++++++++++++++++++ locker: " + locker.toString() );
-        System.out.println( "++++++++++++++++++ lockTimestamp: " + lockTimestamp );
-        System.out.println( "++++++++++++++++++ objectTimestamp: " + objectTimestamp );
+        _log.debug ( "++++++++++++++++++ locker: " + locker.toString() );
+        _log.debug ( "++++++++++++++++++ lockTimestamp: " + lockTimestamp );
+        _log.debug ( "++++++++++++++++++ objectTimestamp: " + objectTimestamp );
         */
 
         if ( objectTimestamp > 0 && oid.getIdentity() != null ) {
             // valid range of timestamp
+            
+            if ((_timeStampable) && (lockTimestamp == TimeStampable.NO_TIMESTAMP)) {
+                _log.warn (Messages.format("persist.objectNotInCache", _name, oid.getIdentity()));
+                throw new PersistenceException (Messages.format("persist.objectNotInCache", _name, oid.getIdentity())); 
+            }
 
             if ( _timeStampable && objectTimestamp != lockTimestamp )
                 throw new ObjectModifiedException("Timestamp mismatched!");
@@ -2090,8 +2100,8 @@ public class ClassMolder
             tx.markModified( object, false, updateCache );
             return true;
         } else {
-            System.err.println( "object: "+object+" timestamp: "+objectTimestamp+"lockertimestamp: "+lockTimestamp );
-            throw new ObjectModifiedException("Invalid object timestamp detected.");
+            _log.warn ("object: " + object + " timestamp: " + objectTimestamp + " lockertimestamp: " + lockTimestamp);
+            throw new ObjectModifiedException ("Invalid object timestamp detected.");
         }
     }
 
