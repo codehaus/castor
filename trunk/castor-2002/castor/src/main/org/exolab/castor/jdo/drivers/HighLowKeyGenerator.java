@@ -128,7 +128,7 @@ public class HighLowKeyGenerator implements KeyGenerator
 
         _factory = factory;
         _sqlType = sqlType;
-        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL) 
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
 
@@ -186,6 +186,8 @@ public class HighLowKeyGenerator implements KeyGenerator
         if ( last != null ) {    
             if ( _sqlType == Types.INTEGER )
                 last = new Integer( ( (Integer) last ).intValue() + 1 );
+            else if ( _sqlType == Types.BIGINT )
+                last = new Long( ( (Long) last ).longValue() + 1 );
             else
                 last = ((BigDecimal) last).add( ONE );
         } else {
@@ -244,6 +246,16 @@ public class HighLowKeyGenerator implements KeyGenerator
                             maxVal = value + _grabSizeI;
                             max = new Integer( maxVal );
                             stmt2.setInt(1, maxVal);
+                        } else if ( _sqlType == Types.BIGINT ) {
+                            long value;
+                            long maxVal;
+
+                            value = rs.getLong( 1 );
+                            stmt2.setLong(3, value);
+                            last = new Long( value + 1 );
+                            maxVal = value + _grabSizeI;
+                            max = new Long( maxVal );
+                            stmt2.setLong(1, maxVal);
                         } else {
                             BigDecimal value;
                             BigDecimal maxVal;
@@ -276,8 +288,16 @@ public class HighLowKeyGenerator implements KeyGenerator
                             }
                             last = new Integer( maxPK + 1 );
                             max = new Integer( maxPK + _grabSizeI );
+                        } else if ( _sqlType == Types.BIGINT ) {
+                            long maxPK = 0;
+
+                            if ( ! _global && rs.next() ) {
+                                maxPK = rs.getLong(1);
+                            }
+                            last = new Long( maxPK + 1 );
+                            max = new Long( maxPK + _grabSizeI );
                         } else {
-                            BigDecimal maxPK = null; 
+                            BigDecimal maxPK = null;
 
                             if ( ! _global && rs.next() ) {
                                 maxPK = rs.getBigDecimal(1);
@@ -299,7 +319,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                     }
                 }
                 if ( ! _sameConnection ) {
-                    if ( success ) 
+                    if ( success )
                         conn.commit();
                     else {
                         conn.rollback();
@@ -332,8 +352,10 @@ public class HighLowKeyGenerator implements KeyGenerator
             }
         }
 
-        if ( _sqlType == Types.INTEGER ) 
+        if ( _sqlType == Types.INTEGER )
             inRange = ( ( (Integer) last ).intValue() < ( (Integer) max ).intValue() );
+        else if ( _sqlType == Types.BIGINT )
+            inRange = ( ( (Long) last ).longValue() < ( (Long) max ).longValue() );
         else
             inRange = ( ( (BigDecimal) last ).compareTo( (BigDecimal) max ) < 0 );
 

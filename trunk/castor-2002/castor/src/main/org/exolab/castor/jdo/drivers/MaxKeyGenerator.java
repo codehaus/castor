@@ -85,7 +85,7 @@ public final class MaxKeyGenerator implements KeyGenerator
     {
         _factory = factory;
         _sqlType = sqlType;
-        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
     }
@@ -140,14 +140,18 @@ public final class MaxKeyGenerator implements KeyGenerator
             rs = stmt.executeQuery( sql );
 
             if ( rs.next() ) {
-                if ( _sqlType == Types.INTEGER ) 
-                    identity = new Integer( rs.getInt( 1 ) + 1 ); 
-                else 
+                if ( _sqlType == Types.INTEGER )
+                    identity = new Integer( rs.getInt( 1 ) + 1 );
+                else if ( _sqlType == Types.BIGINT )
+                    identity = new Long( rs.getLong( 1 ) + 1 );
+                else
                     identity = rs.getBigDecimal( 1 ).add( ONE );
             } else {
                 if ( _sqlType == Types.INTEGER )
                     identity = new Integer( 1 );
-                else 
+                else if ( _sqlType == Types.BIGINT )
+                    identity = new Long( 1 );
+                else
                     identity = ONE;
             }
         } catch ( SQLException ex ) {

@@ -90,7 +90,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
         }
         _fName = fName;
         _sqlType = sqlType;
-        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
         if ( sqlType != Types.INTEGER && _fName.equals("hsql") )
@@ -135,6 +135,8 @@ public final class IdentityKeyGenerator implements KeyGenerator
                 value = rs.getInt( 1 );
                 if ( _sqlType == Types.INTEGER )
                     return new Integer( value );
+                else if ( _sqlType == Types.BIGINT )
+                    return new Long( value );
                 else
                     return new BigDecimal( value );
             } else {
