@@ -172,7 +172,6 @@ public interface Database
      */
     public OQLQuery getOQLQuery();
 
-
     /**
      * Creates an OQL query from the supplied statement.
      * @param oql An OQL query statement
@@ -181,7 +180,6 @@ public interface Database
      */
     public OQLQuery getOQLQuery( String oql )
         throws PersistenceException;
-
 
     /**
      * Creates an empty query. The query must be created before
