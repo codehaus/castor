@@ -125,7 +125,6 @@ import org.xml.sax.InputSource;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
- * @deprecated Please consider using {@link JDO2} instead.
  * @version $Revision$ $Date$
  */
 public class JDO
@@ -145,14 +144,14 @@ public class JDO
     public static final int DefaultLockTimeout = 10;
 
     /**
-     * Tthe URL of the database configuration file. If the URL is
+     * The URL of the database configuration file. If the URL is
      * specified, the first attempt to load a database of this type
      * will use the specified configuration file.
      */
-    private String          _jdoConfURI;
+    private String _jdoConfURI;
     
     /**
-     * A JDO configuration instance.
+     * An in-memory JDO configuration instance.
      */
     private JdoConf _jdoConf;
 
@@ -174,26 +173,26 @@ public class JDO
     /**
      * The instance factory to which create a new instance of data object
      */
-    private InstanceFactory     _instanceFactory;
+    private InstanceFactory _instanceFactory;
 
     /**
      * The lock timeout for this database. Zero for immediate
      * timeout, an infinite value for no timeout. The timeout is
      * specified in seconds.
      */
-    private int            _lockTimeout = DefaultLockTimeout;
+    private int _lockTimeout = DefaultLockTimeout;
 
 
     /**
      * The name of this database.
      */
-    private String         _dbName;
+    private String _dbName;
 
 
     /**
      * Description of this database.
      */
-    private String         _description = "Castor JDO";
+    private String _description = "Castor JDO";
 
     /**
      * The transaction manager factory to be used to obtain a
@@ -206,12 +205,10 @@ public class JDO
      */
     private TransactionManager _transactionManager = null;
 
-
     /**
      * The application class loader.
      */
-    private ClassLoader    _classLoader;
-
+    private ClassLoader _classLoader;
 
     /**
      * The resolver can be used to resolve cached entities, e.g.
@@ -219,17 +216,16 @@ public class JDO
      */
     private EntityResolver _entityResolver;
 
-
     /**
      * The transactions to databases map for database pooling
      */
     private TxDatabaseMap  _txDbPool;
 
-    /*
+    /**
      * True if user prefer all reachable object to be stored automatically.
      * False (default) if user want only dependent object to be stored.
      */
-    private boolean        _autoStore = false;
+    private boolean _autoStore = false;
 
     /**
      * Constructs a new JDO database factory. Must call {@link
@@ -239,7 +235,6 @@ public class JDO
     {
     	// default constructor, no code
     }
-
 
     /**
      * Constructs a new JDO database factory for databases with
@@ -251,7 +246,6 @@ public class JDO
     {
         _dbName = name;
     }
-
 
     /**
      * Returns the log writer for this database source.
@@ -271,7 +265,6 @@ public class JDO
             _logInterceptor = new OutputLogInterceptor( logWriter );
     }
 
-
     /**
      * Sets the log interceptor for this database source.
      * <p>
@@ -286,7 +279,6 @@ public class JDO
     {
         _logInterceptor = logInterceptor;
     }
-
 
     /**
      * Overrides the default callback interceptor by a custom 
@@ -336,7 +328,6 @@ public class JDO
         return _logInterceptor;
     }
 
-
     /**
      * Sets the application class loader.
      * This method should be used with application servers that use multiple
@@ -351,7 +342,6 @@ public class JDO
         _classLoader = classLoader;
     }
 
-
     /**
      * Returns the application classloader.
      */
@@ -359,7 +349,6 @@ public class JDO
     {
         return _classLoader;
     }
-
 
     /**
      * Sets the entity resolver.
@@ -373,7 +362,6 @@ public class JDO
         _entityResolver = entityResolver;
     }
 
-
     /**
      * Returns the entity resolver.
      */
@@ -381,7 +369,6 @@ public class JDO
     {
         return _entityResolver;
     }
-
 
     /**
      * Sets the description of this database.
@@ -392,11 +379,10 @@ public class JDO
      */
     public void setDescription( String description )
     {
-    if ( description == null )
-        throw new NullPointerException( "DataSource: Argument 'description' is null" );
-    _description = description;
+    	if ( description == null )
+    		throw new NullPointerException( "DataSource: Argument 'description' is null" );
+    	_description = description;
     }
-
 
     /**
      * Returns the description of this database.
@@ -407,9 +393,8 @@ public class JDO
      */
     public String getDescription()
     {
-    return _description;
+    	return _description;
     }
-
 
     /**
      * Sets the name of this database. This attribute is required
@@ -424,7 +409,6 @@ public class JDO
         _dbName = name;
     }
 
-
     /**
      * Returns the name of this database.
      * <p>
@@ -436,7 +420,6 @@ public class JDO
     {
         return _dbName;
     }
-
 
     /**
      * Sets the lock timeout for this database. Use zero for immediate
@@ -452,7 +435,6 @@ public class JDO
         _lockTimeout = seconds;
     }
 
-
     /**
      * Returns the lock timeout for this database.
      * <p>
@@ -464,7 +446,6 @@ public class JDO
     {
         return _lockTimeout;
     }
-
 
     /**
      * Sets the URL of the database configuration file. If the URL is
@@ -490,7 +471,6 @@ public class JDO
     {
         _jdoConf = jdoConfiguration;
     }
-
 
     /**
      * Return the URL of the database configuration file.
@@ -545,7 +525,7 @@ public class JDO
         return _txDbPool != null;
     }
 
-    /*
+    /**
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
      * See also, {@link JDO#setAutoStore(boolean)}
@@ -554,7 +534,7 @@ public class JDO
         _autoStore = autoStore;
     }
 
-    /*
+    /**
      * Return if the next Database instance will be set to autoStore.
      */
     public boolean isAutoStore() {
@@ -706,7 +686,6 @@ public class JDO
                 _callback, _instanceFactory, null, _classLoader, _autoStore );
     }
 
-
     /**
      * Load database configuration from the specified URL. <tt>url</tt>
      * must point to a JDO configuration file describing the database
@@ -740,7 +719,6 @@ public class JDO
         DatabaseRegistry.loadDatabase( new InputSource( url ), null, loader );
     }
     
-    
     /**
      * Load database configuration from the specified input source.
      * <tt>source</tt> must point to a JDO configuration file describing
@@ -762,14 +740,20 @@ public class JDO
         DatabaseRegistry.loadDatabase( source, resolver, loader );
     }
 
-
     /**
      * Creates a JNDI reference from the current JDO instance, to be bound to a JNDI tree.
+     * @return valid A JNDI Reference.
+     * @exception NamingException If the Reference cannot be created. 
      * @see javax.naming.Referenceable#getReference()
      */
     public synchronized Reference getReference()
+    	throws NamingException
     {
     	Reference ref;
+    	
+    	if (_jdoConfURI == null) {
+    		throw new NamingException ("JDO instance does not have a valid configuration URI set.");
+    	}
     	
     	// We use same object as factory.
     	ref = new Reference( getClass().getName(), getClass().getName(), null );
@@ -778,7 +762,7 @@ public class JDO
     		ref.add( new StringRefAddr( "description", _description ) );
     	if ( _dbName != null )
     		ref.add( new StringRefAddr( "databaseName", _dbName ) );
-    	if ( _jdoConf != null )
+    	if ( _jdoConfURI != null )
     		ref.add( new StringRefAddr( "configuration", _jdoConfURI ) );
     	ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
     	
@@ -800,30 +784,30 @@ public class JDO
     		ref = (Reference) refObj;
     		// Make sure reference is of datasource class.
     		if (!ref.getClassName().equals( getClass().getName() ) ) {
-    			throw new NamingException( "JDO: Reference not constructed from class " + getClass().getName() );
+    			throw new NamingException( "Reference not constructed from class " + getClass().getName() );
     		}    			
     		
-    		JDO     ds;
+    		JDO     jdo;
     		RefAddr addr;
     		
     		try {
-    			ds = (JDO) Class.forName( ref.getClassName() ).newInstance();
+    			jdo = (JDO) Class.forName( ref.getClassName() ).newInstance();
     		} catch ( Exception except ) {
     			throw new NamingException( except.toString() );
     		}
     		addr = ref.get( "description" );
     		if ( addr != null )
-    			ds._description = (String) addr.getContent();
+    			jdo._description = (String) addr.getContent();
     		addr = ref.get( "databaseName" );
     		if ( addr != null )
-    			ds._dbName = (String) addr.getContent();
+    			jdo._dbName = (String) addr.getContent();
     		addr = ref.get( "configuration" );
     		if ( addr != null )
-    			ds._jdoConfURI = (String) addr.getContent();
+    			jdo._jdoConfURI = (String) addr.getContent();
     		addr = ref.get( "lockTimeout" );
     		if ( addr != null )
-    			ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
-    		return ds;
+    			jdo._lockTimeout = Integer.parseInt( (String) addr.getContent() );
+    		return jdo;
     			
     		
     	} else if ( refObj instanceof Remote )
