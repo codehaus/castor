@@ -339,8 +339,40 @@ public class SchemaWriter {
 
         _atts.clear();
 
+        //-- handle top-level only attributes
         if (complexType.isTopLevel()) {
-            _atts.addAttribute("name", null, complexType.getName());
+            
+            //-- @name
+            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, 
+                complexType.getName());
+            
+            //-- @abstract
+            if (complexType.isAbstract()) {
+                _atts.addAttribute(SchemaNames.ABSTRACT, CDATA, VALUE_TRUE);
+            }
+            
+            //-- @block
+            if (complexType.getBlock() != null) {
+                _atts.addAttribute(SchemaNames.BLOCK_ATTR, CDATA,
+                    complexType.getBlock().toString());
+            }
+            
+            //-- @final
+            if (complexType.getFinal() != null) {
+                _atts.addAttribute(SchemaNames.FINAL_ATTR, CDATA,
+                    complexType.getFinal().toString());
+            } 
+        } //-- isTopLevel
+        
+        //-- @id
+        if (complexType.getId() != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
+                complexType.getId());
+        }
+        
+        //-- @mixed
+        if (complexType.getContentType() == ContentType.mixed) {
+            _atts.addAttribute(SchemaNames.MIXED, CDATA, VALUE_TRUE);
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
