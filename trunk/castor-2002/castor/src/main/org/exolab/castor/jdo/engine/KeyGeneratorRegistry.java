@@ -104,7 +104,7 @@ final class KeyGeneratorRegistry
                 if ( keyGen != null && logInterceptor != null ) {
                     logInterceptor.message( "Key generator " +
                             desc.getKeyGeneratorFactoryName() +
-                            " have been instantiated, parameters: " +
+                            " has been instantiated, parameters: " +
                             desc.getParams() );
                 }
             }

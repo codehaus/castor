@@ -209,8 +209,12 @@ public final class ClassHandler
     {
         FieldDescriptor[] descs;
 
-        if ( clsDesc.getExtends() != null )
+        if ( clsDesc.getExtends() != null ) {
+            // [Bill Reynolds] Make sure ClassHandler has been installed for extends.
+            cache.addClassHandler( clsDesc.getExtends().getJavaClass() );
             addFields( cache, clsDesc.getExtends(), fields, rels );
+        }
+
         descs = clsDesc.getFields();
         for ( int i = 0 ; i < descs.length ; ++i ) {
             ClassHandler clsHandler;
