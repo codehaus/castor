@@ -105,6 +105,28 @@ public abstract class AbstractFieldHandler
         _descriptor = fieldDesc;
     } //-- setFieldDescriptor
 
+
+    /**
+     * Returns true if the "handled" field has a value within the 
+     * given object.
+     * <p>
+     * By default this just checks for null. Normally this method
+     * is needed for checking if a value has been set via a call
+     * to the setValue method, or if the primitive value has
+     * been initialized by the JVM. 
+     * </p>
+     * <p>
+     * This method should be overloaded for improved value
+     * checking.
+     * </p>
+     *
+     * @return true if the given object has a value for the handled field
+     */
+    public boolean hasValue( Object object ) {
+        return (getValue( object ) != null);
+    } //-- hasValue
+    
+    
     //---------------------------------------/
     //- Methods inherited from FieldHandler -/
     //---------------------------------------/
