@@ -96,56 +96,84 @@ public class XMLClassDescriptorAdapter
             throw new IllegalArgumentException(err);
         }
         
+        process(classDesc);
+        setJavaClass(classDesc.getJavaClass());
+        
+        if (xmlName == null) {
+            if (classDesc instanceof XMLClassDescriptor) {
+                xmlName = ((XMLClassDescriptor)classDesc).getXMLName();
+            }
+            else {
+                XMLNaming naming = XMLNaming.getInstance();
+                String name = classDesc.getJavaClass().getName();
+                //-- strip package
+                int idx = name.lastIndexOf('.');
+                if (idx >= 0) {
+                    name = name.substring(idx+1);
+                }
+                xmlName = naming.toXMLName(name);
+            }
+        }
+        setXMLName(xmlName);
+
+    } //-- XMLClassDescriptorAdapter
+
+    /**
+     * Copies the fieldDescriptors of the given XMLClassDesctiptor
+     * into this XMLClassDescriptor.
+     *
+     * @param classDesc the XMLClassDescriptor to process
+    **/
+    private void process(ClassDescriptor classDesc) 
+        throws org.exolab.castor.mapping.MappingException
+    {
+        
         if (classDesc instanceof XMLClassDescriptor) {
             //-- hopefully this won't happen, but we can't prevent it.
-            XMLClassDescriptor xmlClassDesc = (XMLClassDescriptor)classDesc;
-            FieldDescriptor[] fields = classDesc.getFields();
-            for (int i = 0; i < fields.length; i++)
-                addFieldDescriptor((XMLFieldDescriptor)fields[i]);
-            
-            setXMLName(xmlClassDesc.getXMLName());
-            setExtendsWithoutFlatten((XMLClassDescriptor)
-                xmlClassDesc.getExtends());
-            
+            process((XMLClassDescriptor)classDesc);
+            return;
         }
-        else {
-            FieldDescriptor[] fields = classDesc.getFields();
-            for (int i = 0; i < fields.length; i++) {
-                FieldDescriptor fieldDesc = fields[i];
-                if ( fieldDesc instanceof XMLFieldDescriptorImpl )
-                    addFieldDescriptor( (XMLFieldDescriptorImpl) fieldDesc );
+        
+        FieldDescriptor   identity = classDesc.getIdentity();
+        FieldDescriptor[] fields   = classDesc.getFields();
+        
+        for (int i = 0; i < fields.length; i++) {
+            FieldDescriptor fieldDesc = fields[i];
+            if (fieldDesc == null) continue;
+            if ( fieldDesc instanceof XMLFieldDescriptorImpl ) {
+                if (identity == fieldDesc) {
+                    setIdentity((XMLFieldDescriptorImpl)fieldDesc);
+                    identity = null; //-- clear identity
+                }
                 else {
-                    String name = fieldDesc.getFieldName();
-                    XMLNaming naming = XMLNaming.getInstance();
-                    String xmlFieldName = naming.toXMLName(name);
+                    addFieldDescriptor((XMLFieldDescriptorImpl)fieldDesc);
+                }
+            }
+            else {
+                String name = fieldDesc.getFieldName();
+                XMLNaming naming = XMLNaming.getInstance();
+                String xmlFieldName = naming.toXMLName(name);
                     
+                if (identity == fieldDesc) {
+                    setIdentity(new XMLFieldDescriptorImpl(fieldDesc,
+                                                          xmlFieldName,
+                                                         NodeType.Attribute));
+                    identity = null; //-- clear identity
+                }
+                else {
                     NodeType nodeType = NodeType.Element;
                     if (isPrimitive(fieldDesc.getFieldType()))
                         nodeType = _primitiveNodeType;
                         
                     addFieldDescriptor(new XMLFieldDescriptorImpl(fieldDesc,
-                                                                  xmlFieldName, 
-                                                                  nodeType));
+                                                                xmlFieldName, 
+                                                                nodeType));
                 }
             }
-            
-            XMLClassDescriptor xmlClassDesc = null;
-            ClassDescriptor extendsDesc = classDesc.getExtends();
-            if (extendsDesc != null) {
-                if (extendsDesc instanceof XMLClassDescriptor)
-                    xmlClassDesc = (XMLClassDescriptor) extendsDesc;
-                else {
-                    xmlClassDesc = new XMLClassDescriptorAdapter(extendsDesc, null);
-                }
-            }
-            setExtends(xmlClassDesc);
         }
-        
-        if ( classDesc.getIdentity() != null ) {
-            FieldDescriptor identity;
-            String          xmlFieldName;
-
-            identity = classDesc.getIdentity();
+        //-- handle Identity if it wasn't already handled
+        if ( identity != null ) {
+            String  xmlFieldName;
             if ( identity instanceof XMLFieldDescriptor )
                 xmlFieldName = ((XMLFieldDescriptor)identity).getXMLName();
             else {
@@ -154,11 +182,49 @@ public class XMLClassDescriptorAdapter
             }
             setIdentity(new XMLFieldDescriptorImpl(identity,xmlFieldName,NodeType.Attribute));
         }
-
-        setJavaClass(classDesc.getJavaClass());
-        setXMLName(xmlName);
-
-    } //-- XMLClassDescriptorAdapter
+        //-- handle inheritence
+        XMLClassDescriptor xmlClassDesc = null;
+        ClassDescriptor extendsDesc = classDesc.getExtends();
+        if (extendsDesc != null) {
+            if (extendsDesc instanceof XMLClassDescriptor)
+                xmlClassDesc = (XMLClassDescriptor) extendsDesc;
+            else {
+                xmlClassDesc = new XMLClassDescriptorAdapter(extendsDesc, null);
+            }
+        }
+        setExtends(xmlClassDesc);
+        
+    } //-- process
+    
+    /**
+     * Copies the fieldDescriptors of the given XMLClassDesctiptor
+     * into this XMLClassDescriptor.
+     *
+     * @param classDesc the XMLClassDescriptor to process
+    **/
+    private void process(XMLClassDescriptor classDesc) 
+        throws org.exolab.castor.mapping.MappingException
+    {
+        FieldDescriptor identity = classDesc.getIdentity();
+        FieldDescriptor[] fields = classDesc.getFields();
+        for (int i = 0; i < fields.length; i++) {
+            if (identity == fields[i]) {
+                setIdentity((XMLFieldDescriptor)fields[i]);
+                identity = null; //-- clear identity
+            }
+            else {
+                addFieldDescriptor((XMLFieldDescriptor)fields[i]);
+            }
+        }
+        
+        //-- handle identity if not already processed
+        if (identity != null) {
+            setIdentity((XMLFieldDescriptor)identity);
+        }
+        setXMLName(classDesc.getXMLName());
+        setExtendsWithoutFlatten((XMLClassDescriptor)classDesc.getExtends());
+        
+    } //-- process
     
     /**
      * Returns true if the given class should be treated as a primitive
