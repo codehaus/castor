@@ -219,8 +219,8 @@ public class JDOMappingLoader
             sqlType = _factory.adjustSqlType( sqlType );
         }
         if ( fieldType != sqlType ) {
-            convertorTo = Types.getConvertor( sqlType, fieldType );
-            convertorFrom = Types.getConvertor( fieldType, sqlType );
+            convertorTo = SQLTypes.getConvertor( sqlType, fieldType );
+            convertorFrom = SQLTypes.getConvertor( fieldType, sqlType );
             if ( typeName != null ) {
                 convertorParam = SQLTypes.paramFromName( typeName );
             }

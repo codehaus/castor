@@ -169,7 +169,7 @@ public class OQLQueryImpl
                                                         + valueClass );
                 else {
                     try {
-                        TypeConvertor tc = Types.getConvertor( valueClass, paramClass );
+                        TypeConvertor tc = SQLTypes.getConvertor( valueClass, paramClass );
                         value = tc.convert( value, null );
                     }
                     catch ( MappingException e ) {
