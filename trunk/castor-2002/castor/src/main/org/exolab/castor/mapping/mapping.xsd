@@ -113,7 +113,7 @@
       <xsd:attribute name="name" type="NMTOKENS" minOccurs="0"/>
       <xsd:attribute name="type" type="NMTOKENS" minOccurs="0"/>
       <xsd:attribute name="many-table" type="NMTOKEN" minOccurs="0"/>
-      <xsd:attribute name="many-key" type="NMTOKEN" minOccurs="0"/>
+      <xsd:attribute name="many-key" type="NMTOKENS" minOccurs="0"/>
       <xsd:attribute name="dirty" type="string" minOccurs="0" default="check">
         <xsd:enumeration value="check"/>
         <xsd:enumeration value="ignore"/>
