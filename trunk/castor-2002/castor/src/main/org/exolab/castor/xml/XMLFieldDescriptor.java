@@ -129,6 +129,12 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     public boolean isReference();
     
     /**
+     * Returns true if the field described by this descriptor is a container
+     * field.
+     */
+    public boolean isContainer();
+
+    /**
      * Returns true if this descriptor can be used to handle elements
      * or attributes with the given XML name. By default this method
      * simply compares the given XML name with the internal XML name.

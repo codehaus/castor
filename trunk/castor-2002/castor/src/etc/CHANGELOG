@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+XML:    Added object container support. Handle element and attributes, as well
+        as container in container. Object container are object that exist in the
+        object model, but will not appear directly in the XML document. There
+        will be no element associated to this object, but its child will appear
+        in its parent element.
+        (Sebastien Gignoux <gignoux@intalio.com>)
 
 Version 0.9.2 March 28, 2001 - also includes version 0.9.1
 ----------------------------------------------------------
@@ -28,7 +34,7 @@ JDO:    Fixed some problems when two key generated related (or dependent) object
         the same transaction. (Thomas)
 
 JDO:    Relaxed the restriction so that a data object class can now extends one class and
-	depends another. (Suggested by Rimac, Ivica <ivica.rimac@KOM.tu-darmstadt.de>)
+        depends another. (Suggested by Rimac, Ivica <ivica.rimac@KOM.tu-darmstadt.de>)
 
 JDO:	Fixed NPEs in TransactionContext, and ClassMolder in update(...). (Thomas)
 
@@ -37,13 +43,13 @@ JDO:	Edited the New features document for Castor JDO. (Submited by Rick Horowitz
 JDO:	Updated the oqlQuery tools. (Submited by Thorsten Mauch <mauch@imkenberg.de>)
 
 JDO:	Encapsulated and nested runtime exceptions generated while accessing the data object
-	into DataObjectAccessException. (suggested by Christian Sell <christian.sell@netcologne.de>)
+        into DataObjectAccessException. (suggested by Christian Sell <christian.sell@netcologne.de>)
 
 JDO:	Fixed a few bugs which some variables are mixed up in ClassMolder.
-	(submitted by Eldad Zamler<eldad314@netvision.net.il>)
+        (submitted by Eldad Zamler<eldad314@netvision.net.il>)
 
 JDO:    Fixed NPEs introduced by autoStore. (reported by Steve Vaughan <snmvaughan92@yahoo.com>
-	and Patric Bechtel <bechtel@ipcon.de>)
+        and Patric Bechtel <bechtel@ipcon.de>)
 
 JDO:    Fixed bug: 1:1-dependent objects with key generator were not created on creation of master object.
         (oleg)
@@ -101,7 +107,6 @@ XML:   Added setPolymorph method to Marshaller.java. This can be used to force a
 XML:    Changed the default behavior of the Xerces Serializer to preserve space
         by default.
         (Sebastien Gignoux <gignoux@intalio.com>)
-
 
 XML:	Added support for restriction in simpleContent and enhanced complexType support
 	(Arnaud <blandin@intalio.com>)	

@@ -240,6 +240,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
 
+
         //-- _lazy
         desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_lazy", "lazy", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
@@ -276,6 +277,45 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         addFieldDescriptor(desc);
 
         //-- validation code for: _lazy
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+
+        //-- _container
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_container", "container", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object )
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                if(!target.hasContainer())
+                    return null;
+                return new Boolean(target.getContainer());
+            }
+            public void setValue( Object object, Object value)
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    // if null, use delete method for optional primitives
+                    if (value == null) {
+                        target.deleteContainer();
+                        return;
+                    }
+                    target.setContainer( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+
+        //-- validation code for: _container
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
 

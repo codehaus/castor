@@ -49,6 +49,7 @@ package org.exolab.castor.xml;
 import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.List;
 import org.exolab.castor.xml.util.*;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 
@@ -437,7 +438,14 @@ public class UnmarshalHandler extends MarshalFramework
 
         try {
             FieldHandler handler = descriptor.getHandler();
-            handler.setValue(state.object, val);
+
+            if (state.container == null)
+                handler.setValue(state.object, val);
+            else {
+                state.ContainerFieldDesc.getHandler().setValue(state.container, val);
+                state.container = null;
+                state.ContainerFieldDesc = null;
+            }
         }
         /*
         catch(java.lang.reflect.InvocationTargetException itx) {
@@ -687,6 +695,29 @@ public class UnmarshalHandler extends MarshalFramework
             }
         } /* end of additional inheritance logic */
 
+
+        //-- Handler container field (handle container in container too)
+        Object object = parentState.object;
+        while (descriptor.isContainer()) {
+
+            // Check if the container object has already been instantiated
+            FieldHandler handler = descriptor.getHandler();
+            Object containerObject = handler.getValue(object);
+
+            if (containerObject == null) {
+                containerObject = handler.newInstance(object);
+                handler.setValue(object, containerObject);
+            }
+
+            ClassDescriptor containerClassDesc = ((XMLFieldDescriptorImpl)descriptor).getClassDescriptor();
+            descriptor = ((XMLClassDescriptor)containerClassDesc).getFieldDescriptor(name, NodeType.Element);
+
+            parentState.container = containerObject;
+            parentState.ContainerFieldDesc = descriptor;
+            object = containerObject;
+        }
+
+
         if (descriptor == null) {
             String msg = "unable to find FieldDescriptor for '" + name;
             msg += "' in ClassDescriptor of " + classDesc.getXMLName();
@@ -703,6 +734,7 @@ public class UnmarshalHandler extends MarshalFramework
             //it means that we try to unmarshal a 'not allowed' element
                  throw new SAXException(msg);
         }
+
 
         //-- Find object type and create new Object of that type
 
@@ -1024,18 +1056,6 @@ public class UnmarshalHandler extends MarshalFramework
         for (int i = 0; i < descriptors.length; i++) {
 
             XMLFieldDescriptor descriptor = descriptors[i];
-            /* <update>
-            if (!descriptor.getAccessRights().isWritable()) {
-                if (debug) {
-                    buf.setLength(0);
-                    buf.append("Attribute '");
-                    buf.append(descriptor.getXMLName());
-                    buf.append("' is read-only - skipping.");
-                    message(buf.toString());
-                }
-                continue;
-            }
-            */
 
             String attName = descriptor.getXMLName();
 
@@ -1058,9 +1078,11 @@ public class UnmarshalHandler extends MarshalFramework
         if (len != processedAtts.size()) {
             for (int i = 0; i < len; i++) {
                 String attName = atts.getName(i);
+
                 if (processedAtts.contains(attName)) continue;
                 XMLFieldDescriptor descriptor =
                     classDesc.getFieldDescriptor(attName, NodeType.Attribute);
+
                 if (descriptor == null) continue;
                 String attValue = atts.getValue(i);
                 try {
@@ -1089,20 +1111,21 @@ public class UnmarshalHandler extends MarshalFramework
 
         Object value = attValue;
 
-        if (attValue == null) {
-
-            //-- error handling
-            /*
-            if (debug) {
-                buf.setLength(0);
-                buf.append("no attribute value with name \'");
-                buf.append(attName);
-                buf.append("\' exists in element \'");
-                buf.append(state.elementName);
-                buf.append("\'");
-                message(buf.toString());
+        while (descriptor.isContainer()) {
+            FieldHandler handler = descriptor.getHandler();
+            Object containerObject = handler.getValue(parent);
+            
+            if (containerObject == null) {
+                containerObject = handler.newInstance(parent);
+                handler.setValue(parent, containerObject);
             }
-            */
+
+            ClassDescriptor containerClassDesc = ((XMLFieldDescriptorImpl)descriptor).getClassDescriptor();
+            descriptor = ((XMLClassDescriptor)containerClassDesc).getFieldDescriptor(attName, NodeType.Attribute);
+            parent = containerObject;
+        }
+
+        if (attValue == null) {
 
             if (descriptor.isRequired()) {
                 String err = classDesc.getXMLName() + " is missing " +

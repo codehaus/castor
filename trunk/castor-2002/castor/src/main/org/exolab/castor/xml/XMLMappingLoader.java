@@ -212,6 +212,8 @@ public class XMLMappingLoader
         //-- matches
         if (match != null) xmlDesc.setMatches(match);
             
+        xmlDesc.setContainer(fieldMap.getContainer());
+
         return xmlDesc; 
     }
 
