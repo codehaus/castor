@@ -455,7 +455,11 @@ public abstract class MappingLoader
             if ( fieldType == null && colType == null )
                 fieldType = getMethod.getReturnType();
         } else if ( fieldMap.getName() != null ) {
-            getMethod = findAccessor( javaClass, "get" + fieldMap.getName(), ( colType == null ? fieldType : colType ), true );
+            if ( colType != null && CollectionHandlers.isEnumerate( colType ) )
+                getMethod = findAccessor( javaClass, "list" + capitalize( fieldMap.getName() ), Enumeration.class, true );
+            if ( getMethod == null )
+                getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
+                                          ( colType == null ? fieldType : colType ), true );
             if ( getMethod != null && fieldType == null && colType == null )
                 fieldType = getMethod.getReturnType();
         }
@@ -479,9 +483,9 @@ public abstract class MappingLoader
                 fieldType = setMethod.getParameterTypes()[ 0 ];
         } else if ( fieldMap.getName() != null ) {
             if ( colType != null && CollectionHandlers.isEnumerate( colType ) )
-                setMethod = findAccessor( javaClass, "add" + fieldMap.getName(), fieldType, false );
+                setMethod = findAccessor( javaClass, "add" + capitalize( fieldMap.getName() ), fieldType, false );
             if ( setMethod == null )
-                setMethod = findAccessor( javaClass, "set" + fieldMap.getName(),
+                setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
                                           ( colType == null ? fieldType : colType ), false );
             if ( setMethod != null && fieldType == null )
                 fieldType = setMethod.getParameterTypes()[ 0 ];
@@ -522,6 +526,13 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.createMethodNotFound",
                                             fieldMap.getCreateMethod(), javaClass.getName() );
             }
+        } else if ( fieldMap.getName() != null ) {
+            try {
+                Method method;
+
+                method = javaClass.getMethod( "create" + capitalize( fieldMap.getName() ), null );
+                handler.setCreateMethod( method );
+            } catch ( Exception except ) { }
         }
 
         return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
@@ -661,6 +672,17 @@ public abstract class MappingLoader
         } catch ( Exception except ) {
             return null;
         }
+    }
+
+
+    private String capitalize( String name )
+    {
+        char first;
+
+        first = name.charAt( 0 );
+        if ( Character.isUpperCase( first  ) )
+            return name;
+        return Character.toUpperCase( first ) + name.substring( 1 );
     }
 
 
