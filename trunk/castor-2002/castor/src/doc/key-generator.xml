@@ -27,7 +27,7 @@
            <tr><td>HIGH/LOW</td><td>HIGH/LOW generic algorithm</td></tr>
            <tr><td>UUID</td><td>UUID generic algorithm</td></tr>
            <tr><td>IDENTITY</td><td>Supports autoincrement identity fields in
-                                  Sybase ASE/ASA, MS SQL Server and Hypersonic SQL</td></tr>
+                                  Sybase ASE/ASA, MS SQL Server, MySQL and Hypersonic SQL</td></tr>
            <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle, PostgreSQL, Interbase and SAP
 DB</td></tr>
          </table></p>
@@ -161,13 +161,13 @@ table, values:
 
     <section title="IDENTITY key generator">
       <p>IDENTITY key generator can be used only with autoincrement primary
-         key columns (identities) with Sybase ASE/ASA, MS SQL Server and
+         key columns (identities) with Sybase ASE/ASA, MS SQL Server, MySQL and
          Hypersonic SQL.
          After the insert the key generator selects system variable
-         <tt>@@identity</tt> which contains the last identity value for 
+         <tt>@@identity</tt> which contains the last identity value for
          the current database connection.
-         In the case of Hypersonic SQL the system function <tt>IDENTITY()</tt>
-         is called.
+         In the case of MySQL and Hypersonic SQL the system functions
+         <tt>LAST_INSERT_ID()</tt> and <tt>IDENTITY()</tt> are called, respectively.
          </p>
       <p>This algorithm has no parameters.</p>
     </section>
@@ -175,7 +175,7 @@ table, values:
     <section title="SEQUENCE key generator">
       <p>SEQUENCE key generator can be used only with Oracle, PostgreSQL,
          Interbase and SAP DB.
-         It generates keys using sequences.</p>    
+         It generates keys using sequences.</p>
       <p>The key generator has the following parameters:
          <table border="1" cellpadding="4">
            <tr><td>sequence</td><td>The name of the sequence</td>
