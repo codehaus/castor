@@ -639,6 +639,7 @@ public class Marshaller extends MarshalFramework {
 
         if (descriptor != null && descriptor.isContainer()) {
             containerField = true;
+
         }
 
         //-- add object to stack so we don't potentially get into
@@ -768,17 +769,16 @@ public class Marshaller extends MarshalFramework {
              // with the XML name of this class
              XMLClassDescriptor xmlElementNameClassDesc = _cdResolver.resolveByXMLName(xmlElementName, null, null);
 
-             if ((xmlElementName == null) || (xmlElementNameClassDesc == null)) {
-                 // We can do nothing in this case (source generated vector)
-                 saveType = true;
-             } else {
-
+             // Test if we are not dealing with a source generated vector
+             if ((xmlElementName != null) && (xmlElementNameClassDesc != null)) {
                  // More than one class can map to a given element name
                  ClassDescriptorEnumeration cdEnum= _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
                  for (; cdEnum.hasNext();) {
                      xmlElementNameClassDesc = cdEnum.getNext();
                      if (_class == xmlElementNameClassDesc.getJavaClass())
                          break;
+                      //reset the classDescriptor --> none has been found
+                      xmlElementNameClassDesc = null;
                  }
 
                  //make sure we only run into this logic if the classDescriptor
