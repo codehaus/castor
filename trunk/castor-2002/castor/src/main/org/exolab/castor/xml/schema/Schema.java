@@ -864,6 +864,21 @@ public class Schema extends Annotated {
      * @return an Enumeration of all SimpleType declarations
     **/
     public Enumeration getSimpleTypes() {
+        
+        //-- clean up "deferred types" if necessary
+        Enumeration enum = _simpleTypes.elements();
+        while(enum.hasMoreElements()) {
+            SimpleType type = (SimpleType)enum.nextElement();
+            if (type != type.getType()) {
+                //-- resolve deferred type if necessary
+                if (type.getType() != null) {
+                    String name = type.getName();
+                    type = (SimpleType)type.getType();
+                    type.setParent(this);
+                    _simpleTypes.put(name, type);
+                }
+            }
+        }
         return _simpleTypes.elements();
     } //-- getSimpleTypes
 
