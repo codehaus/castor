@@ -127,7 +127,7 @@ public final class EntityFieldInfo {
     /**
      * The Entity in which this field belongs to.
      */
-    public Entity entityClass;
+    public EntityInfo entityClass;
 
     /**
      * The native field name(s) of this entity.
@@ -137,7 +137,7 @@ public final class EntityFieldInfo {
     /**
      * The foreign entity that this field corresponds to.
      */
-    public Entity relatedEntityClass;
+    public EntityInfo relatedEntityClass;
 
     /**
      * The foreign key which this field correspond to (for one-to-many and one-to-one relations).
