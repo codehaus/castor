@@ -158,8 +158,9 @@ public class ClassDescriptorImpl
         // So complicated condition is needed since for JDO fields first a pure
         // ClassDescriptorImpl is created, and then JDOClassDescriptorImpl for
         // the same class
-        if ( (_identities != null) && (_identities.length >0) && ( _identities[0].getContainingClassDescriptor() == null ||
-                                      _identities[0].getContainingClassDescriptor().getJavaClass() == _javaClass ) ) {
+        if ( (_identities != null) && (_identities.length >0) && _identities[0] != null 
+                && ( _identities[0].getContainingClassDescriptor() == null 
+                     || _identities[0].getContainingClassDescriptor().getJavaClass() == _javaClass ) ) {
             for ( int i = 0; i < _identities.length; i++ )
                 _identities[i].setContainingClassDescriptor( this );
         }
