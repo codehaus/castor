@@ -99,18 +99,19 @@ public class OQLQueryImpl
 {
 
 
-    private LockEngine  _dbEngine;
+    private LockEngine          _dbEngine;
 
 
-    private DatabaseImpl       _dbImpl;
+    private DatabaseImpl        _dbImpl;
 
 
-    private Class              _objClass;
-
-    private JDOClassDescriptor _clsDesc;
+    private Class               _objClass;
 
 
-    private QueryExpression    _expr;
+    private JDOClassDescriptor  _clsDesc;
+
+
+    private QueryExpression     _expr;
 
 
     /**
