@@ -19,6 +19,25 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
         <news>
+            <title>The CastorLive Book in the Works</title>
+            <author>Bruce Snyder</author>
+            <date>20 Jun 2004</date>
+            <time>08:15:44</time>
+            <summary>
+            Bruce Snyder is now authoring <a href="http://www.sourcebeat.com/TitleAction.do?id=8">Castor
+            Live</a> for <a href="http://www.sourcebeat.com/">SourceBeat
+            Publishing</a>. The first cut of the book will be out by the end
+            of the July containing the first few chapters. 
+            <br />
+            <br />
+            The SourceBeat model is very different from traditional publishing because books 
+            are published online and <i>updated every month</i> by the author! Subscribers to 
+            a book receive a one year subscription and receive all updates to the title for that 
+            year. Also check out the <a href="http://jroller.org/page/CastorLive">Castor Live blog</a> 
+            additional information.
+            </summary>
+        </news>
+        <news>
             <release />
             <title>Current Release</title>
             <author>Keith Visco</author>
