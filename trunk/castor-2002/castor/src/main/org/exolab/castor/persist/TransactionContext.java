@@ -54,6 +54,7 @@ import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
@@ -69,6 +70,7 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
 
@@ -447,6 +449,12 @@ public abstract class TransactionContext
                 throw (PersistenceException) except;
             throw new PersistenceExceptionImpl( except );
         }
+        // [oleg] complicated scenarios of object reloading may
+        // replace the instance of dependent object.
+        // Looks bad, but works. Need to do this better in castorone...
+        entry = getObjectEntry( engine, oid );
+        if ( entry != null ) 
+            object = entry.object;
 
         if ( accessMode == AccessMode.ReadOnly ) {
             makeReadOnly( object );
@@ -509,6 +517,7 @@ public abstract class TransactionContext
         OID          oid;
         ObjectEntry  entry;
         ClassHandler handler;
+        ClassDescriptor clsDesc;
 
         // Make sure the object has not beed persisted in this transaction.
         entry = getObjectEntry( object );
@@ -518,6 +527,13 @@ public abstract class TransactionContext
         handler = engine.getClassHandler( object.getClass() );
         if ( handler == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName() ) );
+
+        // [oleg] In the case where key generator is used the value of 
+        // identity is dummy, set it to null
+        clsDesc = handler.getDescriptor();
+        if ( ( clsDesc instanceof JDOClassDescriptor ) &&
+                ( ( (JDOClassDescriptor) clsDesc ).getKeyGeneratorDescriptor() != null ) )
+            identity = null;
 
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
@@ -555,7 +571,7 @@ public abstract class TransactionContext
             }
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
-            if ( entry == null) 
+            if ( entry == null ) 
                 entry = addObjectEntry( object, oid, engine );
             oid = engine.create( this, object, identity );
             removeObjectEntry( object );
