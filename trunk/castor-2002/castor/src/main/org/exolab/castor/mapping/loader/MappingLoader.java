@@ -228,7 +228,7 @@ public abstract class MappingLoader
         if ( _clsDescs.contains( clsDesc.getJavaClass() ) )
             throw new MappingException( "mapping.duplicateDescriptors", clsDesc.getJavaClass().getName() );
         _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
-        _javaClasses.add( clsDesc.getJavaClass() );
+        _javaClasses.addElement( clsDesc.getJavaClass() );
     }
 
 
