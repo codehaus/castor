@@ -144,7 +144,7 @@
 
   <xsd:element name="bind-xml">
     <xsd:complexType>
-      <xsd:attribute name="name" type="NMTOKEN"  use="optional"/>
+      <xsd:attribute name="name" type="QName"  use="optional"/>
       <xsd:attribute name="type" type="NMTOKEN"  use="optional"/>
 
       <!-- Allows overriding the matching rule -->
