@@ -112,21 +112,7 @@ public final class HsqlQueryExpression
         addWhereClause( sql, aliasInfo, first );
         addOrderByClause(sql);
         addForUpdateClause(sql, lock);
-        
-        if ( _limit != null )
-        {
-            if (_offset != null)
-            {
-                sql.append(JDBCSyntax.Limit);
-                sql.append(_offset).append(" "); // hsqldb doesn't use comma
-                sql.append(_limit);
-            }
-            else
-            {
-                sql.append(" TOP ").append(_limit);
-            }
-        }
- 
+
         return sql.toString();
     }
 
@@ -138,6 +124,21 @@ public final class HsqlQueryExpression
     private void addSelectClause(StringBuffer buffer, HsqlAliasInfo aliasInfo)
     {
         buffer.append( JDBCSyntax.Select );
+
+        if ( _limit != null )
+        {
+            if (_offset != null)
+            {
+                buffer.append(JDBCSyntax.Limit);
+                buffer.append(_offset).append(" "); // hsqldb doesn't use comma
+                buffer.append(_limit).append(" ");
+            }
+            else
+            {
+                buffer.append(" TOP ").append(_limit).append(" ");
+            }
+        }
+
         if ( _distinct )
           buffer.append( JDBCSyntax.Distinct );
 
@@ -587,8 +588,26 @@ public final class HsqlQueryExpression
      return false;
    }
 
-//////////////////////////////////////////////////////////////////////////////
-// CLASS DELIMITER
+   /** 
+    * Provides an implementation of {@link QueryExpression#isLimitClauseSupported()}.
+    * @return true to indicate that this feature is supported by HSQL. 
+    * @see org.exolab.castor.persist.spi.QueryExpression#isLimitClauseSupported()
+    */
+   public boolean isLimitClauseSupported()
+   {
+   	return true;
+   }
+
+   /** 
+    * Provides an default implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
+    * @return true to indicate that this feature is supported by HSQL. 
+    * @see org.exolab.castor.persist.spi.QueryExpression#isOffsetClauseSupported()
+    */
+   public boolean isOffsetClauseSupported()
+   {
+   	return true;
+   }
+
 //////////////////////////////////////////////////////////////////////////////
 // CLASS DELIMITER
 //////////////////////////////////////////////////////////////////////////////
@@ -769,8 +788,6 @@ final class HsqlAliasInfo
 //////////////////////////////////////////////////////////////////////////////
 // CLASS DELIMITER
 //////////////////////////////////////////////////////////////////////////////
-// CLASS DELIMITER
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Simple abstraction of a column. Note that this class is immutable so
@@ -801,8 +818,6 @@ final class HsqlColumn
 
   }
 
-//////////////////////////////////////////////////////////////////////////////
-// CLASS DELIMITER
 //////////////////////////////////////////////////////////////////////////////
 // CLASS DELIMITER
 //////////////////////////////////////////////////////////////////////////////
@@ -841,23 +856,5 @@ final class HsqlCondition
   public final String getValue()
     { return _value; }
   
-  /** 
-   * Provides an implementation of {@link QueryExpression#isLimitClauseSupported()}.
-   * @return true to indicate that this feature is supported by HSQL. 
-   * @see org.exolab.castor.persist.spi.QueryExpression#isLimitClauseSupported()
-   */
-  public boolean isLimitClauseSupported() {
-  	return true;
-  }
-  
-  /** 
-   * Provides an default implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
-   * @return true to indicate that this feature is supported by HSQL. 
-   * @see org.exolab.castor.persist.spi.QueryExpression#isOffsetClauseSupported()
-   */
-  public boolean isOffsetClauseSupported() {
-  	return true;
-  }
-
 }
 
