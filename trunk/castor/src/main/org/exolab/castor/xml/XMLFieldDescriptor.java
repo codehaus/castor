@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -61,13 +61,26 @@ import org.exolab.castor.mapping.FieldDescriptor;
  */
 public interface XMLFieldDescriptor extends FieldDescriptor {
 
+    /**
+     * Returns the index within the constructor argument array where the 
+     * value of this field should be. A value less than zero indicates
+     * that the value of this field is set via a normal setter method
+     * and not via the constructor.
+     *
+     * Note: This only applies to attribute mapped fields at this time.
+     *
+     * @return the index within the constructor argument array for 
+     * this field.
+     * @see isConstructorArgument
+     */
+    public int getConstructorArgumentIndex();
 
     /**
      * Return the "suggested" namespace prefix to use when marshalling
      * as XML.
      *
      * @return the "suggested" namespace prefix.
-    **/
+     */
     public String getNameSpacePrefix();
 
     /**
@@ -75,7 +88,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * unmarshalling as XML.
      *
      * @return the namespace URI.
-    **/
+     */
     public String getNameSpaceURI();
 
     /**
@@ -84,7 +97,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * be marshalled into XML as.
      *
      * @return the NodeType of the Field being described.
-    **/
+     */
     public NodeType getNodeType();
 
     
@@ -94,14 +107,14 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * if no specific validator exists.
      *
      * @return the field validator for the described field
-    **/
+     */
     public FieldValidator getValidator();
 
     /**
      * Returns the XML Name for the field being described.
      *
      * @return the XML name.
-    **/
+     */
     public String getXMLName();
 
     /**
@@ -148,11 +161,23 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      */
     public String getLocationPath();
     
-    /**
-     * Returns the XML Schema type of the XML field being described.
-     */
-     public String getSchemaType();
+   /**
+    * Returns the XML Schema type of the XML field being described.
+    *
+    * @return the XML Schema type of the XML field being described.
+    */
+    public String getSchemaType();
 
+    /**
+     * Returns true if the value of the field represented by this 
+     * descriptor should be set via the constructor of the containing
+     * class. This is only valid for attribute mapped fields.
+     *
+     * @return true if the value of the field represented by this 
+     * descriptor should be set via the constructor of the containing
+     * class.
+     */
+    public boolean isConstructorArgument();
 
     /**
      * Returns the incremental flag which when true indicates that this
@@ -160,7 +185,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * unmarshalling it.
      * @return true if the Object can safely be added before the unmarshaller
      * is finished unmarshalling the Object.
-    **/
+     */
     public boolean isIncremental();
 
     /**
@@ -168,7 +193,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * contain more than one value
      * @return true if the field described by this descriptor can
      * contain more than one value
-    **/
+     */
     public boolean isMultivalued();
 
     /**
@@ -178,14 +203,14 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * 
      * @return true if the field described by this desciptor is
      * a Map or Hashtable, otherwise false.
-    **/
+     */
     public boolean isMapped();
     
     /**
      * Returns true if the field described by this descriptor is
      * a reference (ie. IDREF) to another object in the
      * "Object Model" (XML tree)
-    **/
+     */
     public boolean isReference();
 
     /**
@@ -205,7 +230,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * @param xmlName the XML name to compare
      * @return true if this descriptor can be used to handle elements
      * or attributes with the given XML name.
-    **/
+     */
     public boolean matches(String xmlName);
 
 
