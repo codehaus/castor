@@ -79,7 +79,6 @@ implements Cache
 	 */
     public NoCache () {
     	super();
-    	_log.debug ("Successfulyl initialized instance of " + getClass().getName());
     }
     
 	/**
