@@ -442,6 +442,11 @@
     <description>Reported bug with 1-1 Related Objects and autoStore</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Petr" given="Rehor" />
+    <email>petr.rehor@decros.cz</email>
+    <description>Patches to Castor OQL. Includes the support of 1:M N:M query.</description>
+  </contributor>
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
