@@ -91,7 +91,7 @@ public class ElementDecl extends Particle {
     **/
     private Schema schema = null;
 
-    private boolean nullable = false;
+    private boolean nillable = false;
 
     private String _default = null;
 	private String _fixed = null;
@@ -220,8 +220,8 @@ public class ElementDecl extends Particle {
      * @return true if instances of this element definition
      * may appear with no content, otherwise false.
     **/
-    public boolean isNullable() {
-        return nullable;
+    public boolean isNillable() {
+        return nillable;
     } //-- isNullable
 
     /**
@@ -272,11 +272,11 @@ public class ElementDecl extends Particle {
      * Sets whether or not instances of this element definition may
      * contain empty content
      *
-     * @param nullable the flag when true indicates that instances
+     * @param nillable the flag when true indicates that instances
      * of this element definition may appear with empty content
     **/
-    public void setNullable(boolean nullable) {
-        this.nullable = nullable;
+    public void setNillable(boolean nillable) {
+        this.nillable = nillable;
     } //-- setNullable
 
     /**
