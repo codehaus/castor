@@ -234,7 +234,9 @@ public class SchemaUnmarshaller extends ComponentReader {
         _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
 
         //set the default locator of this schema
-        _schema.setSchemaLocation(getDocumentLocator().getSystemId());
+        if (!_include) {
+            _schema.setSchemaLocation(getDocumentLocator().getSystemId());
+        }
 
         //-- attributeFormDefault
         String form = atts.getValue(SchemaNames.ATTR_FORM_DEFAULT_ATTR);
