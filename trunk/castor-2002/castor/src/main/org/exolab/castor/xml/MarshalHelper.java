@@ -303,6 +303,7 @@ public class MarshalHelper {
 			    //-- collection
 			    if (methodName.startsWith(ADD)) {
                     fieldDesc.setNodeType(NodeType.Element);
+                    fieldDesc.setMultivalued(true);
                 }
 			    
 			    FieldHandlerImpl handler 
