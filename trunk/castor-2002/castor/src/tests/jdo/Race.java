@@ -56,6 +56,7 @@ import java.lang.Math;
 import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -76,18 +77,18 @@ import org.exolab.exceptions.CWClassConstructorException;
  */
 public class Race extends CWTestCase {
 
-	private final static int NUM_OF_RACING_THREADS = 4;
+    private final static int NUM_OF_RACING_THREADS = 8;
 
-	private final static int NUM_OF_VALUE_PAIRS = 2;
+    private final static int NUM_OF_VALUE_PAIRS = 4;
 
-	private final static int NUM_OF_TRIALS = 20;
+    private final static int NUM_OF_TRIALS = 5;
 
     private JDOCategory    _category;
 
     public Race( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC12", "Race" );
+        super( "TC18", "Race" );
         _category = (JDOCategory) category;
     }
 
@@ -108,187 +109,226 @@ public class Race extends CWTestCase {
         OQLQuery      oql;
         TestObjectEx    object;
         Enumeration   enum;
-		Database db2;
+        Database db2;
 
         boolean result = true;
 
         try {
             Database _db = _category.getDatabase( stream.verbose() );
-            Connection _conn = _category.getJDBCConnection(); 
+            Connection _conn = _category.getJDBCConnection();
 
-			// clear the table
+            // clear the table
             int del = _conn.createStatement().executeUpdate( "DELETE FROM test_race" );
-			stream.writeVerbose( "row deleted in table test_race: " + del );
+            stream.writeVerbose( "row deleted in table test_race: " + del );
             _conn.commit();
 
-			// create pairs of number
-			_db.begin();
-			TestRace[] jdos = new TestRace[NUM_OF_VALUE_PAIRS];
-			TestRaceSyn[] controls = new TestRaceSyn[NUM_OF_VALUE_PAIRS];
-			for ( int i=0; i<jdos.length; i++ ) {
-				controls[i] = new TestRaceSyn();
-				jdos[i] = new TestRace();
-				_db.create( jdos[i] );
-			}
-			_db.commit();
+            // create pairs of number
+            _db.begin();
+            TestRace[] jdos = new TestRace[NUM_OF_VALUE_PAIRS];
+            TestRaceSyn[] controls = new TestRaceSyn[NUM_OF_VALUE_PAIRS];
+            for ( int i=0; i<jdos.length; i++ ) {
+                controls[i] = new TestRaceSyn();
+                jdos[i] = new TestRace();
+                _db.create( jdos[i] );
+            }
+            _db.commit();
 
-			// create threads, make a race so each thread 
-			// keeping increment to the pairs of number.
-			RaceThread[] ts = new RaceThread[NUM_OF_RACING_THREADS];
-			
-			for ( int i=0; i<ts.length; i++ ) {
-				ts[i] = new RaceThread( stream, _category, controls, NUM_OF_TRIALS );
-				ts[i].start();
-			}
+            // create threads, make a race so each thread
+            // keeping increment to the pairs of number.
+            RaceThread[] ts = new RaceThread[NUM_OF_RACING_THREADS];
 
-			// wait till everybody done
-			boolean isAllDone = false;
-			int num;
-			while ( !isAllDone ) {
-				Thread.currentThread().sleep( 1000 );				
-				num = 0;
-				for ( int i=0; i<ts.length; i++ ) {
-					if ( ts[i].isDone() ) {
-						num++;
-					}
-				}
-				if ( num == ts.length ) 
-					isAllDone = true;
-			}
+            for ( int i=0; i<ts.length; i++ ) {
+                ts[i] = new RaceThread( stream, _category, controls, NUM_OF_TRIALS );
+                ts[i].start();
+            }
 
-			// see if their sum agree
-			_db.begin();
-			num = 0;
-			for ( int i=0; i<jdos.length; i++ ) {
-	            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
-	            oql.bind( i );
-	            enum = oql.execute();
-	            if ( enum.hasMoreElements() ) {
-	                TestRace tr = (TestRace) enum.nextElement();
-					if ( tr.getValue1() == controls[i].getValue1() && controls[i].getValue1() == (ts.length * NUM_OF_TRIALS) ) 
-						num++;
-					stream.writeVerbose( "Number Pair "+i+" -- JDO: "+tr.getValue1()+" control: "+controls[i].getValue1());	
-				}
-			}
-			_db.commit();
+            // wait till everybody done
+            boolean isAllDone = false;
+            int num;
+            while ( !isAllDone ) {
+                Thread.currentThread().sleep( 1000 );
+                num = 0;
+                for ( int i=0; i<ts.length; i++ ) {
+                    if ( ts[i].isDone() ) {
+                        num++;
+                    }
+                }
+                if ( num == ts.length )
+                    isAllDone = true;
+            }
 
-			// report result
-			if ( num != jdos.length ) {
-				result = false;
-				stream.writeVerbose("Error: Racing condition occurs!");
-			} else {
-				stream.writeVerbose("Racing condition passed! :)");
-			}
+            // see if their sum agree
+            _db.begin();
+            num = 0;
+            for ( int i=0; i<jdos.length; i++ ) {
+                oql = _db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
+                oql.bind( i );
+                enum = oql.execute();
+                if ( enum.hasMoreElements() ) {
+                    TestRace tr = (TestRace) enum.nextElement();
+                    if ( tr.getValue1() == controls[i].getValue1() )
+                        num++;
+                    stream.writeVerbose( "Number Pair "+i+" -- JDO: "+tr.getValue1()+" control: "
+                        + controls[i].getValue1() + " total trials: " + NUM_OF_TRIALS * NUM_OF_RACING_THREADS );
+                    stream.writeVerbose( "If Number Pair agree with control, then the test pass" );
+                    stream.writeVerbose( "total trails is often not agree with the control. " +
+                        "The reason is that if two thread interseted on the same object. only one will " +
+                        "get the lock. and, the other abort." );
+                }
+            }
+            _db.commit();
+
+            // report result
+            if ( num != jdos.length ) {
+                result = false;
+                stream.writeVerbose("Error: Racing condition occurs!");
+            } else {
+                stream.writeVerbose("Racing condition passed! :)");
+            }
 
             _db.close();
             _conn.close();
 
-		} catch ( Exception except ) {
+        } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }
         return result;
     }
-	class RaceThread extends Thread {
-		Database db;
-		TestRaceSyn[] tr;
-		int trial;
-		boolean isDone;
-		Random ran;
-		CWVerboseStream stream;
-		RaceThread( CWVerboseStream stream, JDOCategory c, TestRaceSyn[] tr, int n ) throws Exception {
-			this.db = c.getDatabase( stream.verbose() );
-			this.tr = tr;
-			this.trial = n;
-			this.stream = stream;
-			this.ran = new Random();
-		}
-		public void run() {
-			int num = 0;
-			stream.writeVerbose("start testing");
-			out:
-			for ( int j=0; j<trial; j++ ) {
-				some:
-				for ( int i=0; i<tr.length; i++ ) {
-					boolean isOk = false;
+    class RaceThread extends Thread {
+        Database db;
+        TestRaceSyn[] tr;
+        int trial;
+        boolean isDone;
+        Random ran;
+        CWVerboseStream stream;
+        RaceThread( CWVerboseStream stream, JDOCategory c, TestRaceSyn[] tr, int n ) throws Exception {
+            this.db = c.getDatabase( stream.verbose() );
+            this.tr = tr;
+            this.trial = n;
+            this.stream = stream;
+            this.ran = new Random();
+        }
+        public void run() {
+            try {
+                int num = 0;
+                stream.writeVerbose("start testing");
+                out:
+                for ( int j=0; j<trial; j++ ) {
+                    some:
+                    for ( int i=0; i<tr.length; i++ ) {
+                        boolean isOk = false;
+                        int count = 0;
 
-					// select and inc the jdo object.
-					little:
-					while ( !isOk ) {
-						try {
-							db.begin();
+                        // select and inc the jdo object.
+                        little:
+                        while ( !isOk ) {
+                            try {
+                                db.begin();
 
-							if ( (i % 2) == 0  ) {
-					            OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
-					            oql.bind( i );
-					            Enumeration enum = oql.execute();
-					            if ( enum.hasMoreElements() ) {
-					                TestRace tr = (TestRace) enum.nextElement();
-									tr.incValue1();
-									db.commit();
-									isOk = true;
-								} else {
-									stream.writeVerbose("Error: "+" element not found!! missed in cache????");
-									if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
-									break little;
-								}
-							} else {
-								stream.writeVerbose( "trying Database.load()" );
-								TestRace tr = (TestRace) db.load( TestRace.class, new Integer(i) );
-								tr.incValue1();
-								db.commit();
-								isOk = true;
-							}
-						} catch ( TransactionAbortedException e ) {
-							// this exception should happen one in a while.
-							stream.writeVerbose( "Excepted exception: "+e );
-							stream.writeVerbose( "Excepted exception: "+e );
-							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-							break some;
-						} catch ( LockNotGrantedException e ) {
-							stream.writeVerbose( "Excepted exception: "+e );
-							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-							break some;
-						} catch ( QueryException e ) {
-							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
-							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-							break out;
-						} catch ( TransactionNotInProgressException e ) {
-							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
-							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-							break out;
-						} catch ( PersistenceException e ) {
-							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
-							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-							break out;
-						} catch ( Exception e ) {
-							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
-							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-							break out;
-						}
-					}
+                                if ( (i % 4) == 0  ) {
+                                    OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
+                                    oql.bind( i );
+                                    Enumeration enum = oql.execute();
+                                    if ( enum.hasMoreElements() ) {
+                                        TestRace tr = (TestRace) enum.nextElement();
+                                        tr.incValue1();
+                                        db.commit();
+                                        isOk = true;
+                                    } else {
+                                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
+                                        break some;
+                                    }
+                                } else if ( (i % 4) == 1  ) {
+                                    OQLQuery oql = db.getOQLQuery( "SELECT object FROM jdo.TestRace object WHERE id = $1" );
+                                    oql.bind( i );
+                                    QueryResults enum = oql.execute();
+                                    if ( enum.hasMore() ) {
+                                        TestRace tr = (TestRace) enum.next();
+                                        tr.incValue1();
+                                        db.commit();
+                                        isOk = true;
+                                    } else {
+                                        stream.writeVerbose("Error: "+" element not found!! missed in cache????\n");
+                                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
+                                        break little;
+                                    }
+                                } else if ( (i % 3) == 2 ) {
+                                    stream.writeVerbose( "trying Database.load()" );
+                                    TestRace tr = (TestRace) db.load( TestRace.class, new Integer(i) );
+                                    tr.incValue1();
+                                    db.commit();
+                                    isOk = true;
+                                } else {
+                                    stream.writeVerbose( "trying Database.load() access mode" );
+                                    TestRace tr = (TestRace) db.load( TestRace.class, new Integer(i), Database.Exclusive );
+                                    tr.incValue1();
+                                    db.commit();
+                                    isOk = true;
+                                }
+                            } catch ( TransactionAbortedException e ) {
+                                count++;
+                                // this exception should happen one in a while.
+                                stream.writeVerbose( "Excepted exception: " + e );
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                if ( count > 3 ) {
+                                    break some;
+                                }
+                            } catch ( LockNotGrantedException e ) {
+                                count++;
+                                stream.writeVerbose( "Excepted exception: " + e);
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                if ( count > 3 ) {
+                                    break some;
+                                }
+                            } catch ( QueryException e ) {
+                                stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
+                                e.printStackTrace();
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                break out;
+                            } catch ( TransactionNotInProgressException e ) {
+                                stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
+                                e.printStackTrace();
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                break out;
+                            } catch ( PersistenceException e ) {
+                                stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
+                                e.printStackTrace();
+                                if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+                                break out;
+    //                        } catch ( Exception e ) {
+    //                            stream.writeVerbose( "Thread will be killed. Unexcepted exception: " );
+    //                            e.printStackTrace();
+    //                            if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+      //                          break out;
+                            }
+                        }
 
-					// inc the control value. (these objects are thread safe)
-					tr[i].incValue1();
+                        // inc the control value. (these objects are thread safe)
+                        tr[i].incValue1();
 
-					// make some non-deterministicity. otherwise, we are just lining up
-					// thread and won't discover problem.
-					if ( ran.nextDouble() < 0.3 ) {
-						try {
-							Thread.currentThread().sleep( 100 );
-						} catch ( InterruptedException e ) {
-							System.out.println(e);
-							break out;
-						}
-					}
-				}
-			}
-			isDone = true;
-		}
-		boolean isDone() {
-			return isDone;
-		}
-	}
+
+
+                        // make some non-deterministicity. otherwise, we are just lining up
+                        // thread and won't discover problem.
+                        if ( ran.nextDouble() < 0.3 ) {
+                            try {
+                                Thread.currentThread().sleep( 100 );
+                            } catch ( InterruptedException e ) {
+                                System.out.println(e);
+                                break out;
+                            }
+                        }
+                    }
+                }
+            } finally {
+                isDone = true;
+            }
+        }
+        boolean isDone() {
+            return isDone;
+        }
+    }
 }
 

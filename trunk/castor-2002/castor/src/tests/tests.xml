@@ -1,18 +1,4 @@
 <harness name="castor">
-
-  <category name="leak" class="jdo.JDOCategory">
-    <description>JDO test for cache leakage</description>
-    <jdo database-name="sybase" configuration="sybase.xml" />
-    <case class="jdo.CacheLeakage"/>
-  </category>
-
-  <category name="race" class="jdo.JDOCategory">
-    <description>JDO test for race condition</description>
-    <jdo database-name="sybase" configuration="sybase.xml" />
-    <case class="jdo.Race"/>
-  </category>
-
-
   <category name="sybase" class="jdo.JDOCategory">
     <description>JDO tests for Sybase 11</description>
     <jdo database-name="sybase" configuration="sybase.xml" />
@@ -25,8 +11,9 @@
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenIdentity" />
     <case class="jdo.StoredProcedure" />
+    <case class="jdo.CacheLeakage" />
+    <case class="jdo.Race" />
   </category>
-
 <!--
   <category name="postgres" class="jdo.JDOCategory">
     <description>JDO tests for PostgreSQL 6.5/7</description>
@@ -38,6 +25,23 @@
     <case class="jdo.TypeHandling" />
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenSequence" />
+    <case class="jdo.CacheLeakage" />
+    <case class="jdo.Race" />
+  </category>
+-->
+  <category name="access" class="jdo.JDOCategory">
+    <description>JDO tests for MS Access</description>
+    <jdo database-name="test" configuration="access.xml" />
+    <case class="jdo.Concurrent" />
+    <!--
+    <case class="jdo.Deadlock" /> -->
+    <case class="jdo.DuplicateKey" />
+    <case class="jdo.ReadOnly" />
+    <!-- need numeric(X,0) 
+    <case class="jdo.TypeHandling" /> -->
+    <case class="jdo.KeyGenGeneric" />
+    <case class="jdo.CacheLeakage" />
+    <case class="jdo.Race" />
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -52,8 +56,23 @@
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenSequence" />
     <case class="jdo.KeyGenReturning" />
+    <case class="jdo.CacheLeakage" />
+    <case class="jdo.Race" />
   </category>
--->
+
+  <category name="oleak" class="jdo.JDOCategory">
+    <description>JDO tests for Oracle8i</description>
+    <jdo database-name="oracle" configuration="oracle.xml" />
+    <case class="jdo.CacheLeakage" />
+  </category>
+
+  <category name="aleak" class="jdo.JDOCategory">
+    <description>JDO tests for MS Access</description>
+    <jdo database-name="test" configuration="access.xml" />
+    <case class="jdo.Concurrent" />
+    <case class="jdo.CacheLeakage" />
+  </category>
+
 
   <category name="xml" class="xml.XMLCategory">
     <description>Tests for XML marshalling framework</description>
