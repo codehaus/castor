@@ -47,15 +47,21 @@
 package org.exolab.castor.persist.spi;
 
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.persist.Key;
 
 public interface Connector {
 
-    public Object createConnection() throws PersistenceException;
+    public void start( Key key ) throws PersistenceException;
 
-    public void commitConnection( Object conn ) throws PersistenceException;
+    public void prepare( Key key ) throws PersistenceException;
 
-    public void rollbackConnection( Object conn ) throws PersistenceException;
+    public void commit( Key key ) throws PersistenceException;
 
-    public void closeConnection( Object conn ) throws PersistenceException;
+    public void rollback( Key key ) throws PersistenceException;
+
+    public void close( Key key ) throws PersistenceException;
+
+    public void release( Key key ) throws PersistenceException;
+
 }
 

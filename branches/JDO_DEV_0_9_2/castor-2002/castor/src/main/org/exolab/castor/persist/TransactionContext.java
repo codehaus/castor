@@ -356,11 +356,11 @@ public class TransactionContext implements Key.KeyHolder {
         } else {
             try {
                 // Go through all the lockEngine in the DatabaseRegistry,
-                // commit and close them one by one.
+                // commit them one by one.
 
                 // in this version, only one lockEngine is returned
                 LockEngine le = _dbReg.getLockEngine();
-                le.commitConnection( this );
+                le.commitConnection( _key );
             } catch ( PersistenceException except ) {
                 throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
             } finally {
@@ -368,6 +368,29 @@ public class TransactionContext implements Key.KeyHolder {
         }
     }
 
+    /**
+     * This method call the LockEngine and prepare the connections used 
+     * in this transaction. If the transaction could not prepared fully or 
+     * partially, this method will throw an {@link TransactionAbortedException}, 
+     * causing a rollback to occur as the next step.
+     *
+     * @throws TransactionAbortedException The transaction could not
+     *  prepared and should be rolled back
+     */
+    protected void prepareConnections()
+            throws TransactionAbortedException {
+
+        try {
+            // Go through all the lockEngine in the DatabaseRegistry,
+            // prepare them one by one.
+
+            // in this version, only one lockEngine is returned
+            LockEngine le = _dbReg.getLockEngine();
+            le.prepareConnection( _key );
+        } catch ( PersistenceException except ) {
+            throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
+        }
+    }
 
     /**
      * This method call the LockEngine to close all the connections 
@@ -391,7 +414,7 @@ public class TransactionContext implements Key.KeyHolder {
         // will return one lock engine per data store.
         try {
             LockEngine le = _dbReg.getLockEngine();
-            le.closeConnection( this );
+            le.closeConnection( _key );
         } catch ( Exception error ) {
             throw new TransactionAbortedException( Messages.format("persist.nested", error ), error );
         }
@@ -413,8 +436,12 @@ public class TransactionContext implements Key.KeyHolder {
             // in this version, only one LockEngine per DatabaseRegistry is returned.
             // multiple data store support will be added. (and DatabaseRegistry
             // will return one lock engine per data store.
-            LockEngine le = _dbReg.getLockEngine();
-            le.rollbackConnection( this );
+            try {
+                LockEngine le = _dbReg.getLockEngine();
+                le.rollbackConnection( _key );
+            } catch ( PersistenceException e ) {
+                // eat all exceptions during rollback
+            }
         }
     }
 

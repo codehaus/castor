@@ -51,8 +51,11 @@ import java.sql.DriverManager;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Enumeration;
+import java.util.WeakHashMap;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.NameNotFoundException;
@@ -62,6 +65,7 @@ import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.persist.Key;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
@@ -80,19 +84,19 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public abstract class BaseFactory
-    implements PersistenceFactory
-{
+        implements PersistenceFactory {
 
+    protected Map _connectors = new WeakHashMap();
 
     public Persistence getPersistence( EntityInfo entity, LockEngine lockEngine, LogInterceptor log )
-        throws MappingException
-    {
+            throws MappingException {
 
         // 092: if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
         //    return null;
 
         try {
-            return new SQLEngine( entity, lockEngine, log, this, null );
+            SQLConnector connector = (SQLConnector) _connectors.get( lockEngine );
+            return new SQLEngine( entity, lockEngine, log, this, connector, null );
         } catch ( MappingException except ) {
             if ( log != null )
                 log.exception( except );
@@ -100,8 +104,11 @@ public abstract class BaseFactory
         }
     }
 
-    public Connector getConnector( Database database )
+    public Connector getConnector( LockEngine lockEngine, Database database )
             throws MappingException, PersistenceException {
+    
+        if ( _connectors.containsKey( lockEngine ) )
+            return (Connector) _connectors.get( lockEngine );
 
         try {
             if ( database.getDriver() != null ) {
@@ -127,7 +134,9 @@ public abstract class BaseFactory
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );
                 }
-                return new SQLConnector( database.getName(), database.getDriver().getUrl(), props );
+                Connector c = new SQLConnector( database.getName(), database.getDriver().getUrl(), props );
+                _connectors.put( lockEngine, c );
+                return c;
             } else if ( database.getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
                 // DataSource which was configured from the JDO configuration file
@@ -137,7 +146,9 @@ public abstract class BaseFactory
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
-                return new SQLConnector( database.getName(), ds );
+                Connector c = new SQLConnector( database.getName(), ds );
+                _connectors.put( lockEngine, c );
+                return c;
             } else if ( database.getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
                 // locate the DataSource object frome the JNDI namespace and use it.
@@ -152,7 +163,9 @@ public abstract class BaseFactory
                 }
                 if ( ! ( ds instanceof DataSource ) )
                     throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
-                return new SQLConnector( database.getName(), (DataSource) ds );
+                Connector c = new SQLConnector( database.getName(), (DataSource) ds );
+                _connectors.put( lockEngine, c );
+                return c;
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
             }
@@ -195,59 +208,6 @@ public abstract class BaseFactory
     public boolean supportsSetNullInWhere()
     {
         return false;
-    }
-
-    private class SQLConnector implements Connector {
-        private String          _name;
-        private String          _url;
-        private Properties      _pros;
-        private LogInterceptor  _log;
-        private DataSource      _ds;
-
-        private SQLConnector( String name, String url, Properties pros ) {
-            _name  = name;
-            _url   = url;
-            _pros  = pros;
-        }
-
-        private SQLConnector( String name, DataSource ds ) {
-            _name  = name;
-            _ds    = ds;
-        }
-
-        public Object createConnection() throws PersistenceException {
-            try {
-                if ( _ds != null )
-                    return _ds.getConnection();
-                else
-                    return DriverManager.getConnection( _url, _pros );
-            } catch (SQLException except) {
-                throw new PersistenceException( Messages.format("persist.nested", except), except );
-            }
-        }
-
-        public void commitConnection( Object conn ) throws PersistenceException {
-            try {
-                ((Connection)conn).commit();
-            } catch ( SQLException e ) {
-                throw new PersistenceException( "SQLException during commit", e );
-            }
-        }
-
-        public void rollbackConnection( Object conn ) throws PersistenceException {
-            try {
-                ((Connection)conn).rollback();
-            } catch ( SQLException e ) {
-                throw new PersistenceException( "SQLException during commit", e );
-            }
-        }
-
-        public void closeConnection( Object conn ) throws PersistenceException {
-            try {
-                ((Connection)conn).close();
-            } catch ( SQLException e ) {
-            }
-        }
     }
 }
 

@@ -63,6 +63,7 @@ import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.Connector;
 import org.exolab.castor.persist.types.Complex;
 import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.persist.Entity;
@@ -72,6 +73,7 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.Key;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.TransactionContextListener;
+//import org.exolab.castor.persist.sql.SQLConnector;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -82,8 +84,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
  */
-public class SQLQueryExecutor implements TransactionContextListener
-{
+public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
 
     private final static boolean DEBUG = true;
 
@@ -106,6 +107,9 @@ public class SQLQueryExecutor implements TransactionContextListener
 
 
     private LockEngine _lockEngine;
+
+
+    private SQLConnector _connector;
 
     /**
      * Is it a SELECT statement?
@@ -156,8 +160,9 @@ public class SQLQueryExecutor implements TransactionContextListener
      *            of fields in the result set, the second index means the path from the main Entity
      *            to the target related Entity, the last element in the path describes the value field.
      */
-    public SQLQueryExecutor(LockEngine lockEngine, String sql, EntityFieldInfo[] in, EntityFieldInfo[] id,
-                            EntityFieldInfo[] in2, EntityFieldInfo[][] out)
+    public SQLQueryExecutor( LockEngine lockEngine, SQLConnector connector, 
+                             String sql, EntityFieldInfo[] in, EntityFieldInfo[] id,
+                             EntityFieldInfo[] in2, EntityFieldInfo[][] out )
             throws MappingException {
         _lockEngine = lockEngine;
         _sql = sql;
@@ -167,6 +172,7 @@ public class SQLQueryExecutor implements TransactionContextListener
         _id = SQLFieldInfo.newArray(id);
         _in2 = SQLFieldInfo.newArray(in2);
         _out = SQLFieldInfo.newPathArray(out);
+        _connector = _connector;
     }
 
     /**
@@ -193,7 +199,7 @@ public class SQLQueryExecutor implements TransactionContextListener
                     stmt = conn.prepareStatement(_sql);
                     _batchStmt.put(key, stmt);
                     // TODO: uncomment when this method becomes available
-                    //tx.addListener(this);
+                    _connector.addListener(key, this);
                 }
             } else {
                 if (_ordinaryStmt == null) {
@@ -439,27 +445,25 @@ public class SQLQueryExecutor implements TransactionContextListener
         return count;
     }
 
-
-
-    public void txStarted(TransactionContext tx) {
+    public void connectionPrepare( Key key ) 
+            throws PersistenceException {
     }
 
-    public void txClosed(TransactionContext tx) {
+    public void connectionRelease( Key key ) 
+            throws PersistenceException {
+
         PreparedStatement stmt;
 
-        // TODO: uncomment when this method becomes available
-        // tx.removeListener(this);
-        stmt = (PreparedStatement) _ordinaryStmt.remove(tx);
+        stmt = (PreparedStatement) _ordinaryStmt.remove(key);
         try {
             stmt.close();
         } catch(SQLException except) {
-            // TODO: uncomment when possible to throw exceptions
-            // throw new PersistenceException(Messages.format("persist.nested", except), except);
+            throw new PersistenceException(Messages.format("persist.nested", except), except);
         }
         if (!_canUseBatch || stmt != null) {
             return;
         }
-        stmt = (PreparedStatement) _batchStmt.remove(tx);
+        stmt = (PreparedStatement) _batchStmt.remove(key);
         if (stmt == null) {
             throw new IllegalStateException("The statement for the transaction not found");
         }
@@ -467,14 +471,11 @@ public class SQLQueryExecutor implements TransactionContextListener
             stmt.executeBatch();
             stmt.close();
         } catch(SQLException except) {
-            // TODO: uncomment when possible to throw exceptions
-            // throw new PersistenceException(Messages.format("persist.nested", except), except);
+            throw new PersistenceException(Messages.format("persist.nested", except), except);
         }
     }
 
-    public void txPrepared(TransactionContext tx) {
+    public void prepared( Key key ) {
     }
 
-    public void txCompleted(TransactionContext tx, int status) {
-    }
 }
