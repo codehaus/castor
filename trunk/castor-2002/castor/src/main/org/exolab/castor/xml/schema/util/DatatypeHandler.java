@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -66,7 +66,7 @@ public class DatatypeHandler {
      * The name of the XML Schema boolean type
     **/
     public static final String BOOLEAN_TYPE = "boolean";
-    
+
     /**
      * The name of the XML Schema date type
     **/
@@ -76,17 +76,17 @@ public class DatatypeHandler {
      * The name of the XML Schema dateTime type
     **/
     public static final String DATETIME_TYPE    = "dateTime";
-    
+
     /**
      * The name of the XML Schema double type
     **/
     public static final String DOUBLE_TYPE  = "double";
-    
+
     /**
      * The name of the XML Schema float type
     **/
     public static final String FLOAT_TYPE  = "float";
-    
+
     /**
      * The name of the XML Schema integer type
     **/
@@ -96,28 +96,28 @@ public class DatatypeHandler {
      * The name of the XML Schema long type
     **/
     public static final String LONG_TYPE    = "long";
-    
+
     /**
      * The name of the XML Schema string type
     **/
     public static final String STRING_TYPE = "string";
-    
+
     /**
      * The name of the XML Schema time type
     **/
     public static final String TIME_TYPE    = "time";
 
-    
-    
+
+
     private static final String TRUE    = "true";
     private static final String FALSE   = "false";
-    
+
     private static final String DATE_FORMAT =
         "yyyy-MM-dd'T'HH:mm:ss.SSS";
     private static final String DATE_FORMAT_2 =
         "yyyy-MM-dd'T'HH:mm:ss";
-    
-    
+
+
     /**
      * Creates a new DatatypeHandler
      *
@@ -128,7 +128,7 @@ public class DatatypeHandler {
 
     /**
      * Guesses the datatype for the given value. When the type
-     * cannot be determined, it simply defaults to 
+     * cannot be determined, it simply defaults to
      * DatatypeHandler.STRING_TYPE.
      * <BR />
      * <B>Note:</B> This may be a slow process.
@@ -145,7 +145,7 @@ public class DatatypeHandler {
             return INTEGER_TYPE;
         }
         catch(NumberFormatException nfe) {};
-        
+
         //-- check for long
         try {
             Long.parseLong(value);
@@ -155,42 +155,42 @@ public class DatatypeHandler {
 
         //-- check for float, must be done before check for double
         try {
-            Float.parseFloat(value);
+            Float.valueOf(value);
             return FLOAT_TYPE;
         }
         catch(NumberFormatException nfe) {};
-        
+
         //-- check for double
         try {
-            Double.parseDouble(value);
+            Double.valueOf(value);
             return DOUBLE_TYPE;
         }
         catch(NumberFormatException nfe) {};
-        
+
         //-- check for boolean
         if (value.equals(TRUE) || value.equals(FALSE)) {
             return BOOLEAN_TYPE;
         }
-            
+
         //-- check for date
         try {
             Date.parseDate(value);
             return DATE_TYPE;
         }
         catch(ParseException px) {};
-        
+
         //-- check for time
         try {
             Time.parseTime(value);
             return TIME_TYPE;
         }
         catch(ParseException px) {};
-        
+
         //-- check for dateTime
         DateFormat df = null;
         if (value.indexOf('.') < 0)
             df = new SimpleDateFormat(DATE_FORMAT);
-        else 
+        else
             df = new SimpleDateFormat(DATE_FORMAT_2);
 
         try {
@@ -198,11 +198,11 @@ public class DatatypeHandler {
             return DATETIME_TYPE;
         }
         catch (java.text.ParseException ex) {}
-        
-        
+
+
         //-- when all else fails :-)
         return STRING_TYPE;
     } //-- guessType
-    
-    
+
+
 } //-- DatatypeHandler
