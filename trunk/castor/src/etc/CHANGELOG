@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1573 using contribution from Stein M. Hugubakken [dulci@start.no]
+       This improves code quality for the complete jdo package (except conf.*)
+       by removing unused import statements and local variables.
+       (Werner - 20040330)
+       
 ALL:   Fixed bug 1568 using contribution from jpinto@inescporto.pt [João Luis Pinto].
        Streamlines Eclipse related project files.
        (Werner - 20040319)
