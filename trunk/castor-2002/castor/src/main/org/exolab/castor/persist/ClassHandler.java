@@ -56,7 +56,7 @@ import java.io.IOException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.IntegrityException;
+import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
@@ -90,9 +90,6 @@ public class ClassHandler
     private FieldHandler      _relIdentity;
 
 
-    private int               _firstField;
-
-
     private RelationHandler[] _relations;
 
 
@@ -107,26 +104,40 @@ public class ClassHandler
     {
         Vector            rels;
         Vector            fields;
-        FieldDescriptor[] descs;
 
         if ( _clsDesc.getExtends() != null ) {
             _extends = new ClassHandler( _clsDesc.getExtends() );
             _extends.normalize( cache );
-            _firstField = _extends.getFieldCount();
-        } else
-            _firstField = 0;
+        }
 
         if ( _clsDesc.getIdentity() != null )
             _identity = new FieldInfo( _clsDesc.getIdentity(), null );
         rels = new Vector();
         fields = new Vector();
-        descs = _clsDesc.getFields();
+        addFields( cache, _clsDesc, fields, rels );
+
+        _fields = new FieldInfo[ fields.size() ];
+        fields.copyInto( _fields );
+        _relations = new RelationHandler[ rels.size() ];
+        rels.copyInto( _relations );
+    }
+
+
+    private void addFields( CacheEngine cache, ClassDescriptor clsDesc, Vector fields, Vector rels )
+        throws MappingException
+    {
+        FieldDescriptor[] descs;
+
+        if ( clsDesc.getExtends() != null )
+            addFields( cache, clsDesc.getExtends(), fields, rels );
+        descs = clsDesc.getFields();
         for ( int i = 0 ; i < descs.length ; ++i ) {
             ClassHandler clsHandler;
 
             clsHandler = cache.addClassHandler( descs[ i ].getFieldType() );
             if ( clsHandler == null ) {
                 fields.addElement( new FieldInfo( descs[ i ], null ) );
+                rels.addElement( null );
             } else {
                 FieldHandler    handler;
                 RelationHandler relHandler;
@@ -140,16 +151,12 @@ public class ClassHandler
                 rels.addElement( relHandler );
             }
         }
-        _fields = new FieldInfo[ fields.size() ];
-        fields.copyInto( _fields );
-        _relations = new RelationHandler[ rels.size() ];
-        rels.copyInto( _relations );
     }
 
 
     public int getFieldCount()
     {
-        return _fields.length + ( _extends == null ? 0 : _extends._fields.length );
+        return _fields.length;
     }
 
                       
@@ -288,25 +295,21 @@ public class ClassHandler
     public void copyInto( Object[] fields, Object target, FetchContext ctx )
         throws PersistenceException
     {
-        // Copy/clone all the fields.
-        if ( _extends != null )
-            _extends.copyInto( fields, target, ctx );
-
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].relation == null )
-                _fields[ i ].handler.setValue( target, copyValue( _fields[ i ], fields[ _firstField + i ] ) );
+                _fields[ i ].handler.setValue( target, copyValue( _fields[ i ], fields[ i ] ) );
             else {
                 Object relSource;
                 Object relTarget;
             
-                if ( fields[ _firstField + i ] == null )
+                if ( fields[ i ] == null )
                     _fields[ i ].relation.setRelated( target, null );
                 else {
                     relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(),
-                                           fields[ _firstField + i ] );
+                                           fields[ i ] );
                     if ( relTarget == null )
                         throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedHandler().getJavaClass(),
-                                                           fields[ _firstField + i ] );
+                                                           fields[ i ] );
                     _fields[ i ].relation.setRelated( target, relTarget );
                 }
             }
@@ -317,15 +320,11 @@ public class ClassHandler
     public void copyInto( Object source, Object[] fields )
         throws PersistenceException
     {
-        // Copy/clone all the fields.
-        if ( _extends != null )
-            _extends.copyInto( source, fields );
-
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].relation == null )
-                fields[ _firstField + i ] = copyValue( _fields[ i ], _fields[ i ].handler.getValue( source ) );
+                fields[ i ] = copyValue( _fields[ i ], _fields[ i ].handler.getValue( source ) );
             else {
-                fields[ _firstField + i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity, 
+                fields[ i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity, 
                                                        _fields[ i ].relation.getIdentity( _fields[ i ].relation.getRelated( source ) ) );
             }
         }
@@ -376,11 +375,8 @@ public class ClassHandler
      */
     public boolean isModified( Object object, Object[] original )
     {
-        if ( _extends != null && _extends.isModified( object, original ) )
-            return true;
-
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( isModified( _fields[ i ], object, original[ _firstField + i ] ) )
+            if ( isModified( _fields[ i ], object, original[ i ] ) )
                 return true;
         }
         return false;
@@ -388,7 +384,7 @@ public class ClassHandler
 
 
     /**
-     * Used by {@link #isModified(Object,Object)} to check a single field.
+     * Used by {@link #isModified(Object,Object[])} to check a single field.
      */
     public boolean isModified( FieldInfo field, Object object, Object original )
     {
@@ -402,18 +398,12 @@ public class ClassHandler
     }
 
 
-    public void checkIntegrity( Object object )
-        throws IntegrityException
+    public void checkValidity( Object object )
+        throws ValidityException
     {
-        // Handle fields in the parent class.
-        if ( _extends != null )
-            _extends.checkIntegrity( object );
-
         // Object cannot be saved if one of the required fields is null
         for ( int i = 0 ; i < _fields.length ; ++i )
-            _fields[ i ].handler.checkIntegrity( object );
-
-        // XXX Check integrity on relations here
+            _fields[ i ].handler.checkValidity( object );
     }
 
 
