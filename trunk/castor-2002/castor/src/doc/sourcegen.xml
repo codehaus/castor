@@ -138,22 +138,26 @@
             <p>To enable bound properties uncomment the appropriate line in the
                "org/exolab/castor/builder/castorbuilder.properties" file:
                <code>
+                  <comment>
                   # To enable bound properties uncomment the following line. Please
                   # note that currently *all* fields will be treated as bound properties
                   # when enabled. This will change in the future when we introduce
                   # fine grained control over each class and it's properties.
                   #
                   #org.exolab.castor.builder.boundproperties=true
+                  </comment>
                </code>
                <p>
                   When enabled, <b>all</b> properties will be treated as bound properties.
                   For each class that is generated a <b>setPropertyChangeListener</b>
                   method is created as follows:
                  <code>
+                    <comment>
                     /**
                      * Registers a PropertyChangeListener with this class.
                      * @param pcl The PropertyChangeListener to register.
                     **/
+                    </comment>
                     public void addPropertyChangeListener(java.beans.PropertyChangeListener pcl)
                     {
                         propertyChangeListeners.addElement(pcl);
@@ -162,10 +166,12 @@
                  Whenever a property of the class is changed, a <b>PropertyChangeEvent</b>
                  will be sent to all registered listeners. The property name, the old
                  value, and the new value will be set in the <b>PropertyChangeEvent</b>.
-
-                 <b>Note: To prevent unnecessary overhead, if the property is a collection,
-                    the old value will be null.
-                 </b>
+                 <p>
+                    <b>
+                       Note: To prevent unnecessary overhead, if the property is a
+                       collection, the old value will be <i>null</i>.
+                    </b>
+                 </p>
 
                </p>
             </p>
@@ -353,7 +359,17 @@
          <p>
             Supported facets (see <a href="#types">Supported Datatypes</a>)
          </p>
-
+         <section title="Groups">
+            <p>
+               The source code generator <i>currently</i> does not support
+               groups (choice, sequence, all). If it finds a group, it
+               flattens the group and treats the children of the group
+               as if they were children of the containing structure.
+            </p>
+            <p>
+              Grouping support is a work in progress.
+            </p>
+         </section>
    </section>
 
   </section>
