@@ -47,7 +47,7 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.String _keyGenerator;
 
-    private boolean _autoComplete = true;
+    private boolean _autoComplete = false;
 
     /**
      * keeps track of state for field: _autoComplete

@@ -59,7 +59,7 @@
 	   </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="key-generator" type="string"   use="optional"/>
-        <xsd:attribute name="auto-complete" type="boolean" use="optional" value="true"/>
+        <xsd:attribute name="auto-complete" type="boolean" use="optional" value="false"/>
     </xsd:complexType>
   </xsd:element>
 

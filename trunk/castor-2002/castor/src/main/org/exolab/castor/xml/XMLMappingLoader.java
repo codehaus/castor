@@ -160,6 +160,44 @@ public class XMLMappingLoader
             
         XMLClassDescriptorImpl xmlClassDesc
             = new XMLClassDescriptorAdapter( clsDesc, xmlName );
+
+        if (clsMap.getAutoComplete()) {
+
+            Introspector introspector = new Introspector();
+
+            XMLClassDescriptor introspectedDesc;
+
+            try {
+                introspectedDesc = introspector.generateClassDescriptor(xmlClassDesc.getJavaClass());
+            } catch (MarshalException mx) {
+                throw new MappingException("Unable to introspect class for auto-complete: " + mx);
+            }
+
+            FieldDescriptor[] fields = xmlClassDesc.getFields();
+
+            // Attributes
+            XMLFieldDescriptor[] introFields = introspectedDesc.getAttributeDescriptors();
+            for (int i = 0; i<introFields.length; ++i)
+                if (!isMatchFieldName(fields, introFields[i].getFieldName()))
+                    // If there is no field with this name, we can add it
+                    xmlClassDesc.addFieldDescriptor(introFields[i]);
+            
+            // Elements
+            introFields = introspectedDesc.getElementDescriptors();
+            for (int i = 0; i<introFields.length; ++i)
+                if (!isMatchFieldName(fields, introFields[i].getFieldName()))
+                    // If there is no field with this name, we can add it
+                    xmlClassDesc.addFieldDescriptor(introFields[i]);
+
+            // Content
+            XMLFieldDescriptor field = introspectedDesc.getContentDescriptor();
+            if (field!= null)
+                if (isMatchFieldName(fields, field.getFieldName()))
+                    // If there is no field with this name, we can add
+                    xmlClassDesc.addFieldDescriptor(field);
+
+        } //-- End of auto-complete
+        
          
         //-- copy ns-uri + ns-prefix
         if (mapTo != null) {
@@ -168,6 +206,20 @@ public class XMLMappingLoader
         }
         return xmlClassDesc;
     } //-- createDescriptor
+
+    
+    /**
+     * Match if a field named <code>fieldName</code> is in fields
+     */
+    private boolean isMatchFieldName(FieldDescriptor[] fields, String fieldName) {
+
+        for (int i=0; i< fields.length; ++i)
+            if (fields[i].getFieldName().equals(fieldName))
+                return true;
+
+        return false;
+    }
+
 
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
