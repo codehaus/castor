@@ -6,6 +6,9 @@ XML:	  Refactored the handling of wildcard in the Schema Object Model and
 
 XML:	  Added support in the Schema Object Model for 'remove' methods (Arnaud)
 
+Version 0.9.3.9, December 12th
+-------------------------------
+
 XML:    Added support to the Schema Object Model for a number of XML Schema
         attributes / properties such as elementFormDefault, form, 
         attributeFormDefault, abstract, id...etc that were previously not
