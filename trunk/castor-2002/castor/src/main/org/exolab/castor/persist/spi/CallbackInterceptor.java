@@ -44,7 +44,11 @@
  */
 
 
+
 package org.exolab.castor.persist.spi;
+
+
+import org.exolab.castor.jdo.Database;
 
 
 /**
@@ -99,8 +103,19 @@ public interface CallbackInterceptor
      * that were presistent during the life time of the transaction.
      *
      * @param object The object
+     * @param committed True if the object has been commited, false
+     *  if rollback or otherwise cancelled 
      */
-    public void releasing( Object object );
+    public void releasing( Object object, boolean committed );
+
+
+    /**
+     * Called to indicate that an object has been made persistent.
+     *
+     * @param object The object
+     * @param db The database to which this object belongs
+     */
+    public void using( Object object, Database db );
 
 
 }

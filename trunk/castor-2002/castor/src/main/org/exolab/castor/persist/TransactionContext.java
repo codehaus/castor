@@ -52,6 +52,7 @@ import java.util.Enumeration;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
@@ -168,13 +169,20 @@ public abstract class TransactionContext
 
 
     /**
+     * The database to which this transaction belongs.
+     */
+    private Database     _db;
+
+
+    /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
      */
-    public TransactionContext()
+    public TransactionContext( Database db )
     {
         _xid = null;
         _status = Status.STATUS_ACTIVE;
+        _db = db;
     }
 
 
@@ -182,10 +190,11 @@ public abstract class TransactionContext
      * Create a new transaction context. This method is used by the
      * XA transaction model, see {@link XAResourceImpl}.
      */
-    public TransactionContext( Xid xid )
+    public TransactionContext( Database db, Xid xid )
     {
         _xid = xid;
         _status = Status.STATUS_ACTIVE;
+        _db = db;
     }
 
 
@@ -401,17 +410,20 @@ public abstract class TransactionContext
         entry = addObjectEntry( object, oid, engine );
         try {
             engine.copyObject( this, oid, object );
-            if ( handler.getCallback() != null )
+            if ( handler.getCallback() != null ) {
+                handler.getCallback().using( object, _db );
                 handler.getCallback().loaded( object );
-        } catch ( PersistenceException except ) {
-            removeObjectEntry( object );
-            engine.forgetObject( this, oid );
-            throw except;
+            }
         } catch ( Exception except ) {
             removeObjectEntry( object );
             engine.forgetObject( this, oid );
+            if ( handler.getCallback() != null )
+                handler.getCallback().releasing( object, false );
+            if ( except instanceof PersistenceException )
+                throw (PersistenceException) except;
             throw new PersistenceExceptionImpl( except );
         }
+
         if ( accessMode == AccessMode.ReadOnly ) {
             removeObjectEntry( object );
             engine.releaseLock( this, oid );
@@ -429,6 +441,7 @@ public abstract class TransactionContext
      * @param engine The persistence engine
      * @param query A query against the persistence engine
      * @param accessMode The access mode
+     * @param db The database loading this object
      * @return A query result iterator
      * @throws QueryException An invalid query
      * @throws PersistenceException An error reported by the
@@ -441,7 +454,7 @@ public abstract class TransactionContext
         // Need to execute query at this point. This will result in a
         // new result set from the query, or an exception.
         query.execute( getConnection( engine ), accessMode );
-        return new QueryResults( this, engine, query, accessMode );
+        return new QueryResults( this, engine, query, accessMode, _db );
     }
 
 
@@ -465,7 +478,8 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized OID create( PersistenceEngine engine, Object object, Object identity )
+    public synchronized OID create( PersistenceEngine engine, Object object,
+                                    Object identity )
         throws DuplicateIdentityException, ClassNotPersistenceCapableException, PersistenceException
     {
         OID          oid;
@@ -494,19 +508,23 @@ public abstract class TransactionContext
             // to prevent circular references.
             oid = new OID( handler, identity );
             entry = addObjectEntry( object, oid, engine );
+            if ( handler.getCallback() != null ) {
+                handler.getCallback().using( object, _db );
+                handler.getCallback().storing( object );
+            }
             oid = engine.create( this, object, identity );
             removeObjectEntry( object );
             entry = addObjectEntry( object, oid, engine );
             entry.created = true;
             return oid;
-        } catch ( DuplicateIdentityException except ) {
-            removeObjectEntry( object );
-            throw except;
-        } catch ( PersistenceException except ) {
-            removeObjectEntry( object );
-            throw except;
         } catch ( Exception except ) {
+            if ( handler.getCallback() != null )
+                handler.getCallback().releasing( object, false );
             removeObjectEntry( object );
+            if ( except instanceof DuplicateIdentityException )
+                throw (DuplicateIdentityException) except;
+            if ( except instanceof PersistenceException )
+                throw (PersistenceException) except;
             throw new PersistenceExceptionImpl( except );
         }
     }
@@ -532,7 +550,8 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized OID update( PersistenceEngine engine, Object object, Object identity )
+    public synchronized OID update( PersistenceEngine engine, Object object,
+                                    Object identity )
         throws DuplicateIdentityException, ClassNotPersistenceCapableException, PersistenceException
     {
         OID          oid;
@@ -560,6 +579,8 @@ public abstract class TransactionContext
             throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
         oid = new OID( handler, identity );
         entry = addObjectEntry( object, oid, engine );
+        if ( handler.getCallback() != null )
+            handler.getCallback().using( object, _db );
         return oid;
     }
 
@@ -593,14 +614,6 @@ public abstract class TransactionContext
         // Cannot delete same object twice
         if ( entry.deleted )
             throw new ObjectDeletedExceptionImpl( object.getClass(), entry.oid.getIdentity() );
-
-        // If the object has been created in this transaction and had no
-        // identity we don't need to remove it from persistent storage
-        if ( entry.oid.getIdentity() == null ) {
-            entry.engine.releaseLock( this, entry.oid );
-            removeObjectEntry( object );
-            return;
-        }
 
         // Must acquire a write lock on the object in order to delete it,
         // prevents object form being deleted while someone else is
@@ -747,7 +760,8 @@ public abstract class TransactionContext
     public synchronized void release( Object object )
         throws ObjectNotPersistentException, PersistenceException
     {
-        ObjectEntry entry;
+        ObjectEntry  entry;
+        ClassHandler handler;
 
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
@@ -757,6 +771,9 @@ public abstract class TransactionContext
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
         removeObjectEntry( object );
+        handler = entry.engine.getClassHandler( object.getClass() );
+        if ( handler.getCallback() != null )
+            handler.getCallback().releasing( object, false );
     }
 
 
@@ -825,6 +842,8 @@ public abstract class TransactionContext
                 entry = _deletedList;
                 _deletedList = _deletedList.nextDeleted;
                 handler = entry.engine.getClassHandler( entry.object.getClass() );
+                if ( handler.getCallback() != null )
+                    handler.getCallback().removing( entry.object );
                 entry.engine.delete( this, entry.object.getClass(), entry.oid.getIdentity() );
             }
 
@@ -890,11 +909,6 @@ public abstract class TransactionContext
                 // Object has been deleted inside transaction,
                 // engine must forget about it.
                 entry.engine.forgetObject( this, entry.oid );
-                if ( handler.getCallback() != null ) {
-                    try {
-                        handler.getCallback().removing( entry.object );
-                    } catch ( Throwable thrw ) { }
-                }
                 entry.engine.getClassHandler( entry.object.getClass() ).setFieldsNull( entry.object );
             } else {
                 // Object has been created/accessed inside the
@@ -903,11 +917,8 @@ public abstract class TransactionContext
                     entry.engine.updateObject( this, entry.oid, entry.object );
                 entry.engine.releaseLock( this, entry.oid );
             }
-            if ( handler.getCallback() != null ) {
-                try {
-                    handler.getCallback().releasing( entry.object );
-                } catch ( Throwable thrw ) { }
-            }
+            if ( handler.getCallback() != null )
+                handler.getCallback().releasing( entry.object, true );
         }
         // Forget about all the objects in this transaction,
         // and mark it as completed.
@@ -951,20 +962,17 @@ public abstract class TransactionContext
                 if ( entry.created ) {
                     // Object has been created in this transaction,
                     // it no longer exists, forget about it in the engine.
-                    entry.engine.copyObject( this, entry.oid, entry.object );
+                    entry.engine.revertObject( this, entry.oid, entry.object );
                     entry.engine.forgetObject( this, entry.oid );
                 } else {
                     // Object has been queried (possibly) deleted in this
                     // transaction and release the lock.
                     if ( entry.modified )
-                        entry.engine.copyObject( this, entry.oid, entry.object );
+                        entry.engine.revertObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
-                if ( handler.getCallback() != null ) {
-                    try {
-                        handler.getCallback().releasing( entry.object );
-                    } catch ( Throwable thrw ) { }
-                }
+                if ( handler.getCallback() != null )
+                    handler.getCallback().releasing( entry.object, false );
             } catch ( Exception except ) { }
         }
 

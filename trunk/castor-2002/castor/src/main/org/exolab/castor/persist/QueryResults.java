@@ -48,6 +48,7 @@ package org.exolab.castor.persist;
 
 
 import javax.transaction.Status;
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -102,13 +103,20 @@ public final class QueryResults
     private Object              _lastIdentity;
 
 
+    /*
+     * The database loading this object.
+     */
+    private Database            _db;
+
+
     QueryResults( TransactionContext tx, PersistenceEngine engine,
-                  PersistenceQuery query, AccessMode accessMode )
+                  PersistenceQuery query, AccessMode accessMode, Database db )
     {
         _tx = tx;
         _engine = engine;
         _query = query;
         _accessMode =  engine.getClassHandler( _query.getResultType() ).getAccessMode( accessMode );
+        _db = db;
     }
 
 
@@ -255,17 +263,20 @@ public final class QueryResults
                 entry = _tx.addObjectEntry( object, oid, _engine );
                 try {
                     _engine.copyObject( _tx, oid, object );
-                    if ( handler.getCallback() != null )
+                    if ( handler.getCallback() != null ) {
+                        handler.getCallback().using( object, _db );
                         handler.getCallback().loaded( object );
-                } catch ( PersistenceException except ) {
-                    _tx.removeObjectEntry( object );
-                    _engine.forgetObject( _tx, oid );
-                    throw except;
+                    }
                 } catch ( Exception except ) {
                     _tx.removeObjectEntry( object );
                     _engine.forgetObject( _tx, oid );
+                    if ( handler.getCallback() != null )
+                        handler.getCallback().releasing( object, false );
+                    if ( except instanceof PersistenceException )
+                        throw (PersistenceException) except;
                     throw new PersistenceExceptionImpl( except );
-                }                    
+                }         
+           
                 if ( _accessMode == AccessMode.ReadOnly ) {
                     _tx.removeObjectEntry( object );
                     _engine.releaseLock( _tx, oid );

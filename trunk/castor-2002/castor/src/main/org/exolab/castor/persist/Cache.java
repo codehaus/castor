@@ -171,6 +171,11 @@ final class Cache
         extends TransactionContext
     {
 
+        CacheTransaction()
+        {
+            super( null );
+        }
+
         public Object getConnection( PersistenceEngine engine )
         {
             return null;

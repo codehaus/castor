@@ -52,6 +52,7 @@ import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Properties;
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -750,6 +751,7 @@ public final class CacheEngine
      * @param tx The transaction context
      * @param object The object to update
      * @param identity The identity of the object, or null
+     * @param db The database in which the object was created
      * @return The object's OID
      * @throws PersistenceException An error reported by the
      *  persistence engine
@@ -967,9 +969,8 @@ public final class CacheEngine
                     }
                     if ( relations[ i ].isAttached() ) {
                         for ( int j = 0 ; j < origIdentity.length ; ++j )
-                            if ( origIdentity[ j ] != null ) {
+                            if ( origIdentity[ j ] != null )
                                 tx.markDelete( this, relations[ i ].getRelatedClass(), origIdentity[ j ] );
-                            }
                     }
                     
                 }
@@ -1140,6 +1141,7 @@ public final class CacheEngine
      * @param tx The transaction context
      * @param oid The object's oid
      * @param object The object into which to copy
+     * @param db The database in which the object was created
      * @throws PersistenceException An error reported by the
      *  persistence engine obtaining a dependent object
      */
@@ -1214,6 +1216,51 @@ public final class CacheEngine
             throw new IllegalStateException( except.toString() );
         } catch ( PersistenceException except ) {
             // This should never happen
+        }
+    }
+
+
+    /**
+     * Reverts an object to the cached copy given the object's OID.
+     * The cached object is copied into the supplied object without
+     * affecting the locks, loading relations or emitting errors.
+     * This method is used during the rollback phase.
+     *
+     * @param tx The transaction context
+     * @param oid The object's oid
+     * @param object The object into which to copy
+     * @throws PersistenceException An error reported by the
+     *  persistence engine obtaining a dependent object
+     */
+    public void revertObject( TransactionContext tx, OID oid, Object object )
+        throws PersistenceException
+    {
+        ObjectLock lock;
+        TypeInfo   typeInfo;
+        Object[]   fields;
+
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
+        lock = typeInfo.cache.getLock( oid );
+        if ( lock == null )
+            return;
+
+        // Acquire a read lock on the object. This method is generarlly
+        // called after a successful return from load(), so we don't
+        // want to wait for the lock.
+        try {
+            fields = (Object[]) lock.acquire( tx, false, 0 );
+            /* XXX How do we handle this
+            if ( ! obj.getClass().isAssignableFrom( locked.getClass() ) )
+                throw new IllegalArgumentException( Messages.format( "persist.typeMismatch",
+                                                                     object.getClass(), locked.getClass() ) );
+            */
+            typeInfo.handler.setIdentity( object, oid.getIdentity() );
+            typeInfo.handler.copyInto( fields, object, null );
+        } catch ( LockNotGrantedException except ) {
+            // If this transaction has no write lock on the object,
+            // ignore it as to not break the rollback.
+            if ( _logInterceptor != null )
+                _logInterceptor.message( Messages.format( "persist.internal", "copyObject: " + except.toString() ) );
         }
     }
 

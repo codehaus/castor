@@ -49,6 +49,7 @@ package org.exolab.castor.persist;
 
 import java.util.Hashtable;
 import javax.transaction.xa.Xid;
+import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -206,6 +207,26 @@ public interface PersistenceEngine
         throws DuplicateIdentityException, PersistenceException,
                ClassNotPersistenceCapableException;
     
+
+    /**
+     * Updates an existing object to this engine. The object must not be
+     * persistent and must not have the identity of a persistent object.
+     * The object's OID is returned. The OID is guaranteed to be unique
+     * for this engine even if no identity was specified.
+     *
+     * @param tx The transaction context
+     * @param object The object to update
+     * @param identity The identity of the object, or null
+     * @return The object's OID
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     * @throws ClassNotPersistenceCapableException The class is not
+     *  persistent capable
+     */
+    public OID update( TransactionContext tx, Object object, Object identity )
+        throws DuplicateIdentityException, PersistenceException,
+               ClassNotPersistenceCapableException;
+
 
     /**
      * Called at transaction commit time to delete the object. Object

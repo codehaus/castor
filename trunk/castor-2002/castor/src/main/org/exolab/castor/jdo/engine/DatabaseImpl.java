@@ -147,7 +147,7 @@ public class DatabaseImpl
 
         _transaction = transaction;
         if ( _transaction != null ) {
-            _ctx = new TransactionContextImpl( true );
+            _ctx = new TransactionContextImpl( this, true );
             _ctx.setLockTimeout( _lockTimeout );
         }
     }
@@ -392,7 +392,7 @@ public class DatabaseImpl
 
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
-        _ctx = new TransactionContextImpl( false );
+        _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
     }
 
