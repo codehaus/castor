@@ -71,7 +71,7 @@ import org.exolab.castor.persist.TransactionContext;
  * of a transaction. The type of the connection depends on the
  * persistence engine (JDBC, JNDI, etc).
  * <p>
- * All method calls provide the object itself and the object identity.
+ * All method calls provide the object fields and the object identity.
  * The engine must always use the identity passed in the method call
  * and never the identity contained in the object itself.
  * <p>
@@ -114,11 +114,9 @@ public interface Persistence
 
 
     /**
-     * Loads the object from persistence storage. The object has been
-     * created prior to calling this method and its fields might have
-     * undetermined values. This method will load the object from
-     * persistence storage based on the object's identity and set all
-     * fields. This method may return a stamp which can be used at a
+     * Loads the object from persistence storage. This method will load
+     * the object fields from persistence storage based on the object's
+     * identity. This method may return a stamp which can be used at a
      * later point to determine whether the copy of the object in
      * persistence storage is newer than the cached copy (see {@link
      * #store}). If <tt>lock</tt> is true the object must be
@@ -139,8 +137,8 @@ public interface Persistence
 
 
     /**
-     * Stores the object in persistent storage, given the object and
-     * its identity. The object has been loaded before or has been
+     * Stores the object in persistent storage, given the object fields
+     * and its identity. The object has been loaded before or has been
      * created through a call to {@link #create}. This method should
      * detect whether the object has been modified in persistent storage
      * since it was loaded. After this method returns all locks on the
@@ -151,7 +149,7 @@ public interface Persistence
      * If the object was not retrieved for exclusive access, this
      * method will be asked to perform dirty checking prior to storing
      * the object. The <tt>original</tt> argument will contains the
-     * object's original value as retrieved in the transaction, and
+     * object's original fields as retrieved in the transaction, and
      * <tt>stamp</tt> the object's stamp returned from a successful
      * call to {@link #load}. These arguments are null for objects
      * retrieved with an exclusive lock.
@@ -174,11 +172,11 @@ public interface Persistence
 
 
     /**
-     * Deletes the object from persistent storage, given the object
-     * and its identity. The object has been loaded before or has been
-     * created through a call to {@link #create}. After this method
-     * returns all locks on the object must be retained until the
-     * transaction has completed.
+     * Deletes the object from persistent storage, given the object'
+     * identity. The object has been loaded before or has been created
+     * through a call to {@link #create}. After this method returns all
+     * locks on the object must be retained until the transaction has
+     * completed.
      *
      * @param conn An open connection
      * @param identity The object's identity
@@ -208,26 +206,6 @@ public interface Persistence
     
 
     /**
-     * Called to change the identity of an object. If possible, the
-     * persistence engine will change the object's identity from the
-     * old one to the new one in any manner it sees fit. After this
-     * method returns all locks on the object must be retained until
-     * the transaction has completed.
-     *
-     * @param conn An open connection
-     * @param oldIdentity The object's old identity
-     * @param newIdentity The object's new identity
-     * @throws DuplicateIdentityException An object with the same
-     *   identity already exists in persistent storage
-     * @throws ObjectDeletedException Indicates the object has been
-     *  deleted from persistence storage
-     * @throws PersistenceException A persistence error occured
-     */
-    public void changeIdentity( Object conn, Object oldIdentity, Object newIdentity )
-        throws ObjectDeletedException, DuplicateIdentityException, PersistenceException;
-
-
-    /**
      * Creates and returns a new query object. The query object is
      * used to execute a query against persistent storage and fetch
      * the results of the query. The query parameter types are
@@ -235,12 +213,12 @@ public interface Persistence
      * null may be used and type checking will defer to query
      * execution.
      *
-     * @param query The query statement
+     * @param query The query expression
      * @param type List of all parameter types, or null
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
-    public PersistenceQuery createQuery( String query, Class[] types )
+    public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException;
 
 
