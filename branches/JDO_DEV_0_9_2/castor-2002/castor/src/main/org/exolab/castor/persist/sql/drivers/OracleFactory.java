@@ -75,15 +75,6 @@ public class OracleFactory
     }
 
 
-    public Boolean isDuplicateKeyException( Exception except )
-    {
-        // Sometime gives wrong results
-        //if ( except instanceof SQLException )
-        //    return ( (SQLException) except ).getErrorCode() == 1 ? Boolean.TRUE : Boolean.FALSE;
-        return null;
-    }
-
-
     public String quoteName( String name )
     {
         return doubleQuoteName( name ).toUpperCase();

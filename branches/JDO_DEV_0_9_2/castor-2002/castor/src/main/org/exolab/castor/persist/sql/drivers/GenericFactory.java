@@ -81,18 +81,6 @@ public class GenericFactory
     }
 
 
-    /**
-     * Determine if the given SQLException is DuplicateKeyException
-     * @return Boolean.TRUE means "yes",
-     *         Boolean.FALSE means "no",
-     *         null means "cannot determine"
-     */
-    public Boolean isDuplicateKeyException( Exception ex )
-    {
-        return null;
-    }
-
-
     public String quoteName( String name )
     {
         return name;
