@@ -142,7 +142,12 @@ public class Wildcard extends Particle {
     public boolean removeNamespace(String namespace) {
        if (namespace == null)
            return false;
-       return _namespaces.remove(namespace);
+       int position = _namespaces.indexOf(namespace);
+	   if (position >= 0) {
+	        _namespaces.removeElementAt(position);
+	         return true;
+	   }
+       return false;
     }
 
     /**

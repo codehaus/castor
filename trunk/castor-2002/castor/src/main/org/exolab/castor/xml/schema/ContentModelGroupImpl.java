@@ -121,7 +121,12 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         if (elementDecl == null)
             return false;
         //remove the resolvable reference???
-        return _contentModel.remove(elementDecl);
+        int position = _contentModel.indexOf(elementDecl);
+	    if (position >= 0) {
+	        _contentModel.removeElementAt(position);
+	         return true;
+	   }
+       return false;
      }
 
 
@@ -161,8 +166,12 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
      public boolean removeGroup(Group group) {
        if (group == null)
             return false;
-        //remove the resolvable reference???
-        return _contentModel.remove(group);
+        int position = _contentModel.indexOf(group);
+        if (position >= 0) {
+	        _contentModel.removeElementAt(position);
+	         return true;
+	   }
+       return false;
      }
 
 
@@ -203,8 +212,13 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
      public boolean removeGroup(ModelGroup group){
        if (group == null)
             return false;
+        int position = _contentModel.indexOf(group);
+        if (position >= 0) {
+	        _contentModel.removeElementAt(position);
+	         return true;
+	   }
+       return false;
         //remove the resolvable reference???
-        return _contentModel.remove(group);
      }
 
     /**
@@ -215,7 +229,12 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
      public boolean removeWildcard(Wildcard wildcard) {
          if (wildcard == null)
             return false;
-         return _contentModel.remove(wildcard);
+        int position = _contentModel.indexOf(wildcard);
+        if (position >= 0) {
+	        _contentModel.removeElementAt(position);
+	         return true;
+	   }
+       return false;
      }
 
 
