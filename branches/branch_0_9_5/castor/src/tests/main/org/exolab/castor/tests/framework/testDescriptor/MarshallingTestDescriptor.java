@@ -94,13 +94,13 @@ public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLCla
         } );
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
-        desc.setRequired(true);
+        desc.setRequired(false);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _root_Object
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
+        fieldValidator.setMinOccurs(0);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
