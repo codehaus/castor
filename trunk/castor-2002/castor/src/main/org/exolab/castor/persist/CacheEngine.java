@@ -370,7 +370,7 @@ public final class CacheEngine
             } finally {
                 // signal cache that it's now safe to release the object
                 // from transcation state to cache state.
-                typeInfo.cache.finishLockForAquire( oid );
+                typeInfo.cache.finishLockForAquire( oid, lock );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
@@ -500,7 +500,7 @@ public final class CacheEngine
 
                 // signal cache that it's now safe to release the object
                 // from transcation state to cache state.
-                typeInfo.cache.finishLockForAquire( oid );
+                typeInfo.cache.finishLockForAquire( oid, lock );
 
             }
             // Get the actual OID of the object, this one contains the
@@ -628,7 +628,7 @@ public final class CacheEngine
 
                         // signal cache that it's now safe to release the object
                         // from transcation state to cache state.
-                        typeInfo.cache.finishLockForAquire( oid );
+                        typeInfo.cache.finishLockForAquire( oid, lock );
 
                     }
                     // Dump the memory image of the object, it might have been deleted
@@ -763,7 +763,7 @@ public final class CacheEngine
     void markDelete( TransactionContext tx, OID oid, int timeout )
         throws PersistenceException
     {
-        ObjectLock lock;
+        ObjectLock lock = null;
         TypeInfo   typeInfo;
         Object[]   fields;
 
@@ -771,7 +771,7 @@ public final class CacheEngine
         try {   
             lock = typeInfo.cache.getLockForAquire( oid );
         } finally {
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
 
         if ( lock == null || ! lock.hasLock( tx, false ) )
@@ -888,7 +888,7 @@ public final class CacheEngine
             } finally {
                 // signal cache that it's now safe to release the object
                 // from transcation state to cache state.
-                typeInfo.cache.finishLockForAquire( oid );
+                typeInfo.cache.finishLockForAquire( oid, lock );
             }
 
             // update all dependent and related objects
@@ -1034,7 +1034,7 @@ public final class CacheEngine
         oid = new OID( typeInfo.handler, identity );
         lock = typeInfo.cache.getLockForAquire( oid );
         if ( lock == null || ! lock.hasLock( tx, false ) ) {
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to store object for which no lock was acquired" ) );
         }                                                           
@@ -1189,7 +1189,7 @@ public final class CacheEngine
         } finally {
             // signal cache that it's now safe to release the object
             // from transcation state to cache state.
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
 
         return oid;
@@ -1236,7 +1236,7 @@ public final class CacheEngine
 
             // signal cache that it's now safe to release the object
             // from transcation state to cache state.
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
         try {
             typeInfo.persist.writeLock( tx.getConnection( this ), oid.getIdentity() );
@@ -1285,7 +1285,7 @@ public final class CacheEngine
         } finally {
             // signal cache that it's now safe to release the object
             // from transcation state to cache state.
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
 
     }
@@ -1338,7 +1338,7 @@ public final class CacheEngine
 
             // signal cache that it's now safe to release the object
             // from transcation state to cache state.
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
         typeInfo.handler.setIdentity( object, oid.getIdentity() );
         typeInfo.handler.copyInto( fields, object, new FetchContext( tx, this, accessMode ) );
@@ -1436,7 +1436,7 @@ public final class CacheEngine
 
             // signal cache that it's now safe to release the object
             // from transcation state to cache state.
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
     }
 
@@ -1456,7 +1456,7 @@ public final class CacheEngine
     public void revertObject( TransactionContext tx, OID oid, Object object )
         throws PersistenceException
     {
-        ObjectLock lock;
+        ObjectLock lock = null;
         TypeInfo   typeInfo;
         Object[]   fields;
 
@@ -1464,7 +1464,7 @@ public final class CacheEngine
         try {
             lock = typeInfo.cache.getLockForAquire( oid );      
         } finally {
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
         if ( lock == null )
             return;
@@ -1508,7 +1508,7 @@ public final class CacheEngine
         lock = typeInfo.cache.getLockForAquire( oid );
         if ( lock != null && lock.hasLock( tx, false ) )
             lock.release( tx );
-        typeInfo.cache.finishLockForAquire( oid );
+        typeInfo.cache.finishLockForAquire( oid, lock );
     }
 
 
@@ -1541,7 +1541,7 @@ public final class CacheEngine
                 // from transcation state to cache state.
                 if ( lock.hasLock( tx, false ) )
                     lock.release( tx );
-                typeInfo.cache.finishLockForAquire( oid );
+                typeInfo.cache.finishLockForAquire( oid, lock );
             }
         }
     }
@@ -1581,7 +1581,7 @@ public final class CacheEngine
             } finally {
                 // signal cache that it's now safe to release the object
                 // from transcation state to cache state.
-                typeInfo.cache.finishLockForAquire( oid );
+                typeInfo.cache.finishLockForAquire( oid, lock );
             }
         }
     }
@@ -1602,14 +1602,14 @@ public final class CacheEngine
     boolean hasLock( TransactionContext tx, OID oid, boolean write )
         throws PersistenceException
     {
-        ObjectLock lock;
+        ObjectLock lock = null;
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         try {
             lock = typeInfo.cache.getLockForAquire( oid );
         } finally {
-            typeInfo.cache.finishLockForAquire( oid );
+            typeInfo.cache.finishLockForAquire( oid, lock );
         }
 
         return ( lock != null && lock.hasLock( tx, write ) );
