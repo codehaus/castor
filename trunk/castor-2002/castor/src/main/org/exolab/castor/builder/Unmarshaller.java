@@ -47,12 +47,12 @@ package org.exolab.castor.builder;
 
 // imported classes and packages
 import org.xml.sax.*;
-import org.xml.sax.helpers.ParserFactory;
 
 import java.io.Reader;
 import org.xml.sax.HandlerBase;
 import org.exolab.castor.xml.Resolver;
 import org.xml.sax.AttributeList;
+import org.exolab.castor.util.Configuration;
 
 /**
  * The base class for unmarshallers
@@ -85,24 +85,12 @@ public abstract class Unmarshaller extends org.xml.sax.HandlerBase {
     //-----------/
 
     public static Parser getDefaultParser() {
-        Parser parser = null;
-        String parserClass = System.getProperty("org.xml.sax.parser");
-        try {
-            if ((parserClass == null) || (parserClass.length() == 0))
-                parserClass = DEFAULT_PARSER_CLASS;
-                
-            parser = ParserFactory.makeParser(parserClass);
-        }
-        catch(java.lang.IllegalAccessException iae) {}
-        catch(java.lang.ClassNotFoundException cnfe) {}
-        catch(java.lang.InstantiationException ie) {};
-        if (parser == null) {
+	try {
+	    return Configuration.getParser();
+	} catch ( RuntimeException except ) {
             System.out.print("unable to create SAX parser: ");
-            System.out.println(parserClass);
             return null;
         }
-        
-        return parser;
     } //-- getDefaultParser
     
     /**
