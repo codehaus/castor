@@ -134,8 +134,8 @@
   <target name="source" depends="prepare">
     <delete file="${dist}/${archive}-src.tgz" />
     <delete file="${dist}/${archive}-src.zip" />
-    <tar includes="*.sh, *.bat ${source}/** ${lib}/**"
-         output="${dist}/${archive}-src.tar" defaultexcludes="true" />	  
+    <tar includes="*.sh, *.bat ${source}/** ${lib}/**" basedir="."
+         tarfile="${dist}/${archive}-src.tar" defaultexcludes="true" />	  
     <gzip src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
     <delete file="${dist}/${archive}-src.tar" />
     <zip zipfile="${dist}/${archive}-src.zip" basedir="." includes="*.sh *.bat ${source}/** ${lib}/**"
@@ -173,19 +173,20 @@
               dest="${bin}/jta1.0.1.jar" />
     <copydir  src="${source}/schema" dest="${bin}/schema" />
 
-    <tar includes="examples/**" chdir="${source}"
-         output="${bin}/examples.tar" defaultexcludes="true" />	  
+    <tar includes="examples/**" basedir="${source}"
+         tarfile="${bin}/examples.tar" defaultexcludes="true" />	  
     <gzip src="${bin}/examples.tar" zipfile="${bin}/examples.tgz"/>
     <delete file="${bin}/examples.tar" />
-    <tar includes="${archive}/**" chdir="${build}"
-         output="${dist}/${archive}.tar" defaultexcludes="true" />	  
+
+    <tar includes="${archive}/**" basedir="${build}"
+         tarfile="${dist}/${archive}.tar" defaultexcludes="true" />	  
     <gzip src="${dist}/${archive}.tar" zipfile="${dist}/${archive}.tgz"/>
     <delete file="${dist}/${archive}.tar" />
 
-    <delete file="${bin}/examples.tgz" />
     <zip zipfile="${bin}/examples.zip" basedir="${source}" includes="examples/**"
          defaultexcludes="true" />
-    <zip zipfile="${dist}/${archive}.zip" basedir="${build}" includes="${archive}/**" />
+    <zip zipfile="${dist}/${archive}.zip" basedir="${build}" includes="${archive}/**"
+         excludes="*/examples.tgz" />
   </target>
 
 
