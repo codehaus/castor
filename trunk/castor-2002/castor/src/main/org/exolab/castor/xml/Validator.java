@@ -200,7 +200,7 @@ public class Validator {
             }
             
             //-- check type
-            if (type.isPrimitive() || (type == String.class)) {
+            if (isPrimitive(type) || (type == String.class)) {
                 TypeValidator typeValidator = vRule.getTypeValidator();
                 if (typeValidator != null) {
                     typeValidator.validate(val);
@@ -247,5 +247,36 @@ public class Validator {
         validator.setResolver(mResolver);
         validator.validate(object);
     } //-- validate
+    
+    //-------------------/
+    //- Private Methods -/
+    //-------------------/
+    
+    /**
+     * Returns true if the given class type should be
+     * treated as a primitive. Wrapper objects such
+     * as java.lang.Integer, and java.lang.Float, will
+     * be treated as primitives.
+     * @param type the Class to check
+     * @return true if the given class should be treated
+     * as a primitive type.
+    **/
+    private boolean isPrimitive(Class type) {
+        
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class)   ||
+            (type == Byte.class)      ||
+            (type == Character.class) ||
+            (type == Double.class)    ||
+            (type == Float.class)     ||
+            (type == Integer.class)   ||
+            (type == Long.class)      ||
+            (type == Short.class)) 
+            return true;
+            
+       return false;
+       
+    } //-- isPrimitive
     
 } //-- Validator

@@ -159,8 +159,6 @@ public class Marshaller {
         (Object obj, Writer out, PrintWriter logger, boolean debug) 
         throws java.io.IOException, org.xml.sax.SAXException
     {
-        //-- we must have a valid element before marshalling
-        //validate(false);
         marshal(obj, Configuration.getSerializer( out ), logger, debug);
         out.flush();
     } //-- void marshal(Writer) 
@@ -201,7 +199,7 @@ public class Marshaller {
         throws java.io.IOException, org.xml.sax.SAXException
     {
         Marshaller marshaller = new Marshaller();
-        //marshaller.validate(object);
+        marshaller.validate(object);
         marshaller.setLogWriter(logger);
         marshaller.setDebug(debug);
         marshaller.marshal(object, null, handler);

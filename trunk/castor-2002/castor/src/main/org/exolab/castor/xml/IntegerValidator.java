@@ -47,7 +47,9 @@
 package org.exolab.castor.xml;
 
 /**
- * The basic Validation interface class
+ * The Integer Validation class. This class handles validation
+ * for the integer type as well as all integer derived types 
+ * such as positive-integer and negative-integer
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -68,12 +70,28 @@ public class IntegerValidator implements TypeValidator {
     } //-- IntegerValidator
     
     /**
+     * Clears the maximum value for this IntegerValidator
+    **/
+    public void clearMax() {
+        useMax = false;
+    } //-- clearMax
+    
+    /**
+     * Clears the minimum value for this IntegerValidator
+    **/
+    public void clearMin() {
+        useMin = false;
+    } //-- clearMin
+    
+    
+    /**
      * Sets the minimum value that integers validated with this
      * validator must be greater than
      * @param minValue the minimum value an integer validated with this
      * validator must be greater than
     **/
     public void setMinExclusive(int minValue) {
+        useMin = true;
         min = minValue+1;
     } //-- setMinExclusive
     
@@ -84,6 +102,7 @@ public class IntegerValidator implements TypeValidator {
      * validator may be
     **/
     public void setMinInclusive(int minValue) {
+        useMin = true;
         min = minValue;
     } //-- setMinInclusive
 
@@ -94,6 +113,7 @@ public class IntegerValidator implements TypeValidator {
      * validator must be less than
     **/
     public void setMaxExclusive(int maxValue) {
+        useMax = true;
         max = maxValue-1;
     } //-- setMaxExclusive
     
@@ -104,6 +124,7 @@ public class IntegerValidator implements TypeValidator {
      * validator may be
     **/
     public void setMaxInclusive(int maxValue) {
+        useMax = true;
         max = maxValue;
     } //-- setMaxInclusive
     

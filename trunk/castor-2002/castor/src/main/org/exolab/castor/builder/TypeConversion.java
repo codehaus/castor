@@ -94,6 +94,14 @@ public class TypeConversion {
         else if ("boolean".equals(schemaType)) {
             xsType = new XSBoolean();
         }
+        //-- positive-integer
+        else if ("negative-integer".equals(schemaType)) {
+            xsType = new XSNegativeInteger();
+        }
+        //-- positive-integer
+        else if ("positive-integer".equals(schemaType)) {
+            xsType = new XSPositiveInteger();
+        }
         //-- real
         else if ("real".equals(schemaType)) {
             xsType = new XSReal();
@@ -142,15 +150,17 @@ public class TypeConversion {
         nameMap.put("IDREF",        "java.lang.String");
         
         //-- type mappings
-        nameMap.put("ID",           "java.lang.String");
-        nameMap.put("NCName",       "java.lang.String");
-        nameMap.put("NMTOKEN",      "java.lang.String");
-        nameMap.put("binary",       "byte[]");
-        nameMap.put("boolean",      "boolean");
-        nameMap.put("integer",      "int");
-        nameMap.put("real",         "double");
-        nameMap.put("string",       "java.lang.String");
-        nameMap.put("timeInstant",  "java.util.Date");
+        nameMap.put("ID",                  "java.lang.String");
+        nameMap.put("NCName",              "java.lang.String");
+        nameMap.put("NMTOKEN",             "java.lang.String");
+        nameMap.put("binary",              "byte[]");
+        nameMap.put("boolean",             "boolean");
+        nameMap.put("integer",             "int");
+        nameMap.put("negative-integer",    "int");
+        nameMap.put("positive-integer",    "int");
+        nameMap.put("real",                "double");
+        nameMap.put("string",              "java.lang.String");
+        nameMap.put("timeInstant",         "java.util.Date");
         
         return nameMap;
     } //-- iCreateNameMap

@@ -144,6 +144,7 @@ public class XSInteger extends XSType {
     **/
     public void setMaxExclusive(int max) {
         maxExclusive = new Integer(max);
+        maxInclusive = null;
     } //-- setMaxExclusive
 
     /**
@@ -153,6 +154,7 @@ public class XSInteger extends XSType {
     **/
     public void setMaxExclusive(Integer max) {
         maxExclusive = max;
+        maxInclusive = null;
     } //-- setMaxExclusive
     
     /**
@@ -162,6 +164,7 @@ public class XSInteger extends XSType {
     **/
     public void setMaxInclusive(int max) {
         maxInclusive = new Integer(max);
+        maxExclusive = null; 
     } //-- setMaxInclusive
     
     /**
@@ -171,6 +174,7 @@ public class XSInteger extends XSType {
     **/
     public void setMaxInclusive(Integer max) {
         maxInclusive = max;
+        maxExclusive = null;
     } //-- setMaxInclusive
     
     
@@ -181,6 +185,7 @@ public class XSInteger extends XSType {
     **/
     public void setMinExclusive(int min) {
         minExclusive = new Integer(min);
+        minInclusive = null;
     } //-- setMinExclusive
 
     /**
@@ -190,6 +195,7 @@ public class XSInteger extends XSType {
     **/
     public void setMinExclusive(Integer min) {
         minExclusive = min;
+        minInclusive = null;
     } //-- setMinExclusive
     
     /**
@@ -199,6 +205,7 @@ public class XSInteger extends XSType {
     **/
     public void setMinInclusive(int min) {
         minInclusive = new Integer(min);
+        minExclusive = null;
     } //-- setMinInclusive
     
     /**
@@ -208,6 +215,7 @@ public class XSInteger extends XSType {
     **/
     public void setMinInclusive(Integer min) {
         minInclusive = min;
+        minExclusive = null;
     } //-- setMinInclusive
     
     /**
