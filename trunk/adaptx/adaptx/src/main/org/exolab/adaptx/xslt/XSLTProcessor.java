@@ -1391,11 +1391,13 @@ public class XSLTProcessor
 		XPNBuilder builder = new XPNBuilder(location.getAbsoluteURI());
 		
         try {
+            Reader reader = location.getReader();
             InputSource source = new InputSource();
             source.setSystemId(location.getAbsoluteURI());
-            source.setCharacterStream(location.getReader());
+            source.setCharacterStream(reader);
             parser.setDocumentHandler(builder);
             parser.parse(source);
+            if (reader != null) reader.close();
         }
         catch(SAXException sx) {
                     
