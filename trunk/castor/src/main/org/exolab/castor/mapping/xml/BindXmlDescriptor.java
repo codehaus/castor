@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -246,7 +246,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                 BindXml target = (BindXml) object;
                 if(!target.hasReference())
                     return null;
-                return new Boolean(target.getReference());
+                return (target.getReference() ? java.lang.Boolean.TRUE : java.lang.Boolean.FALSE);
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
@@ -258,7 +258,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                         target.deleteReference();
                         return;
                     }
-                    target.setReference( ((Boolean)value).booleanValue());
+                    target.setReference( ((java.lang.Boolean)value).booleanValue());
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -354,7 +354,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                 BindXml target = (BindXml) object;
                 if(!target.hasTransient())
                     return null;
-                return new Boolean(target.getTransient());
+                return (target.getTransient() ? java.lang.Boolean.TRUE : java.lang.Boolean.FALSE);
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
@@ -366,7 +366,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
                         target.deleteTransient();
                         return;
                     }
-                    target.setTransient( ((Boolean)value).booleanValue());
+                    target.setTransient( ((java.lang.Boolean)value).booleanValue());
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -418,6 +418,40 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         
         //-- validation code for: _classMapping
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
+        //-- _propertyList
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(Property.class, "_propertyList", "property", org.exolab.castor.xml.NodeType.Element);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                BindXml target = (BindXml) object;
+                return target.getProperty();
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    BindXml target = (BindXml) object;
+                    target.addProperty( (Property) value);
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new Property();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setMultivalued(true);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _propertyList
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(0);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
