@@ -195,6 +195,13 @@ public abstract class XMLType extends Annotated
     }
 
     /**
+     * Sets the parent for this XMLType
+     *
+     * @param parent the parent Structure for this XMLType
+    **/
+    protected abstract void setParent(Structure parent);
+        
+    /**
      * Returns the type this type "really" represents
      * ("this" in most cases), provides the indirection needed by references
      * and forward declarations.
