@@ -68,7 +68,6 @@ import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.LockNotGrantedException;
 import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.FetchContext;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 
@@ -176,8 +175,7 @@ public class OQLQueryImpl
         array = new Class[ types.size() ];
         types.copyInto( array );
         try {
-            _query = engine.createQuery( new FetchContext( TransactionImpl.getCurrentContext(), _dbEngine ),
-                                         expr.getQuery( false ), array );
+            _query = engine.createQuery( expr.getQuery( false ), array );
         } catch ( QueryException except ) {
             throw new QueryInvalidException( except.getMessage() );
         }
