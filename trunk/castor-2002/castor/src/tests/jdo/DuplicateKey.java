@@ -101,6 +101,7 @@ public class DuplicateKey
             _logger.println( "Error: " + except );
         }
         _db.commit();
+        _db.close();
     }
 
 

@@ -76,6 +76,7 @@ public class Deadlock
         }
         _db.commit();
 
+        _logger.println( "Note: this test uses a 2 second delay between threads. CPU and database load might cause the test to not perform synchronously, resulting in erroneous results. Make sure that execution is not hampered by CPU/datebase load." );
 
         // Run two threads in parallel attempting to update the
         // two objects in a different order, with the first
@@ -123,9 +124,8 @@ public class Deadlock
                 _logger.println( "First: Loading object " + TestObject.DefaultId );
                 oql.bind( new Integer( TestObject.DefaultId ) );
                 object = (TestObject) oql.execute();
-                _logger.println( "First: Loaded " + object );
-                object.name = object.name + ":1";
-                // db.lock( group );
+                object.name = TestObject.DefaultName + ":1";
+                _logger.println( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
@@ -134,9 +134,8 @@ public class Deadlock
                 _logger.println( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 oql.bind( new Integer( TestObject.DefaultId + 1 ) );
                 object = (TestObject) oql.execute();
-                _logger.println( "First: Loaded " + object );
-                object.name = object.name + ":1";
-                // db.lock( group );
+                object.name = TestObject.DefaultName + ":1";
+                _logger.println( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
@@ -190,9 +189,8 @@ public class Deadlock
                 _logger.println( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
                 oql.bind( new Integer( TestObject.DefaultId + 1 ) );
                 object = (TestObject) oql.execute();
-                _logger.println( "Second: Loaded " + object );
-                object.name = object.name + ":2";
-                // db.lock( group );
+                object.name = TestObject.DefaultName + ":2";
+                _logger.println( "Second: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
@@ -201,9 +199,8 @@ public class Deadlock
                 _logger.println( "Second: Loading object " + TestObject.DefaultId );
                 oql.bind( new Integer( TestObject.DefaultId ) );
                 object = (TestObject) oql.execute();
-                _logger.println( "Second: Loaded " + object );
-                object.name = object.name + ":2";
-                // db.lock( group );
+                object.name = TestObject.DefaultName + ":2";
+                _logger.println( "Second: Modified to " + object );
 
                 // Give the other thread a 2 second opportunity.
                 sleep( start + Wait - System.currentTimeMillis() );
