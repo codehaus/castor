@@ -78,7 +78,13 @@ public class SybaseFactory
     public Boolean isDuplicateKeyException( Exception except )
     {
         if ( except instanceof SQLException )
-            return ( (SQLException) except ).getErrorCode() == 2601 ? Boolean.TRUE : Boolean.FALSE;
+            switch ( ( (SQLException) except ).getErrorCode() ) {
+                case 2601: 
+                case 548:  // sometimes Sybase ASA generates this code instead of 2601
+                    return Boolean.TRUE;
+                default:
+                    return Boolean.FALSE;
+            }
         return null;
     }
 
