@@ -217,7 +217,7 @@ public interface Persistence
      * execution.
      *
      * @param query The query expression
-     * @param type List of all parameter types, or null
+     * @param types List of all parameter types, or null
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
