@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -25,14 +25,23 @@ package org.exolab.adaptx.xpath.engine;
 
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathExpression;
+import org.exolab.adaptx.xpath.expressions.EqualityExpr;
+import org.exolab.adaptx.xpath.expressions.FunctionCall;
+import org.exolab.adaptx.xpath.expressions.LocationStep;
+import org.exolab.adaptx.xpath.expressions.MatchExpression;
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
+import org.exolab.adaptx.xpath.expressions.PathExpr;
+import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
+import org.exolab.adaptx.xpath.expressions.UnionExpr;
 import org.exolab.adaptx.xpath.functions.*;
 import java.util.Stack;
 
 /**
  * A class for parsing expression strings
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class Parser {
 
     private static final String PATTERN_SEP         = "|";
@@ -128,9 +137,9 @@ public class Parser {
                         String err = "'|' cannot start an expr";
                         throw new XPathException(err);
                     }
-                    else if (expr instanceof PathExpr ) {
-                        UnionExpr unionExpr = new UnionExpr((PathExpr)expr);
-                        unionExpr.setUnionExpr(createUnionExpr(lexer));
+                    else if (expr instanceof PathExprImpl ) {
+                        UnionExprImpl unionExpr = new UnionExprImpl((PathExprImpl)expr);
+                        unionExpr.setUnionExpr((UnionExprImpl)createUnionExpr(lexer));
                         expr = unionExpr;
                     }
                     else {
@@ -155,7 +164,7 @@ public class Parser {
                             case PrimaryExpr.FUNCTION_CALL:
                                 FilterExpr fx = new FilterExpr( px );
                                 lexer.pushBack();
-                                expr = new PathExpr(fx, createPathExpr(lexer));
+                                expr = new PathExprImpl(fx, createPathExpr(lexer));
                                 break;
                             default:
                                 String err = "Primary expr used as part of "+
@@ -165,7 +174,7 @@ public class Parser {
                     }
                     else if (expr instanceof PathExpr) {
                         lexer.pushBack();
-                        ((PathExpr)expr).setSubPath(createPathExpr(lexer));
+                        ((PathExprImpl)expr).setSubPath(createPathExpr(lexer));
                     }
                     else {
                         String err = "Invalid path expression: ";
@@ -183,7 +192,7 @@ public class Parser {
                             expr = createPathExpr(lexer);
                         }
                         else if (expr instanceof PathExpr) {
-                            ((PathExpr)expr).setSubPath(createPathExpr(lexer));
+                            ((PathExprImpl)expr).setSubPath(createPathExpr(lexer));
                         }
                         else {
                             throw new XPathException("invalid expr: "+
@@ -201,7 +210,7 @@ public class Parser {
                         PathExpr pathExpr = null;
                         FilterExpr filter = new FilterExpr( primaryExpr );
                         parsePredicates(filter, lexer);
-                        pathExpr = new PathExpr(filter);
+                        pathExpr = new PathExprImpl(filter);
                         expr = pathExpr;
                     }
                     else expr = primaryExpr;
@@ -268,17 +277,17 @@ public class Parser {
             case Token.AND_OPNAME:
                 return new AndExpr(left, right);
             case Token.NOT_EQUALS_OP:
-                return new EqualityExpr(left, right, EqualityExpr.NOT_EQUAL);
+                return new EqualityExprImpl(left, right, EqualityExpr.NOT_EQUAL);
             case Token.EQUALS_OP:
-                return new EqualityExpr(left, right, EqualityExpr.EQUAL);
+                return new EqualityExprImpl(left, right, EqualityExpr.EQUAL);
             case Token.LESS_THAN_OP:
-                return new EqualityExpr(left, right, EqualityExpr.LESS_THAN);
+                return new EqualityExprImpl(left, right, EqualityExpr.LESS_THAN);
             case Token.GREATER_THAN_OP:
-                return new EqualityExpr(left, right, EqualityExpr.GREATER_THAN);
+                return new EqualityExprImpl(left, right, EqualityExpr.GREATER_THAN);
             case Token.LESS_OR_EQ_OP:
-                return new EqualityExpr(left, right, EqualityExpr.LT_OR_EQUAL);
+                return new EqualityExprImpl(left, right, EqualityExpr.LT_OR_EQUAL);
             case Token.GREATER_OR_EQ_OP:
-                return new EqualityExpr(left, right, EqualityExpr.GT_OR_EQUAL);
+                return new EqualityExprImpl(left, right, EqualityExpr.GT_OR_EQUAL);
             case Token.ADDITION_OP:
                 return new AdditionExpr(left, right);
             case Token.SUBTRACTION_OP:
@@ -344,7 +353,7 @@ public class Parser {
                 break;
             case Token.FUNCTION_NAME:
                 String name = tok.value;
-                FunctionCall fnCall = createFunctionCall(name);
+                FunctionCallImpl fnCall = (FunctionCallImpl)createFunctionCall(name);
                 parseParams(fnCall, lexer);
                 pExpr = fnCall;
                 break;
@@ -451,10 +460,10 @@ public class Parser {
      * @returns the new LocationStep
      * @exception InvalidExprException
     **/
-    private static LocationStep createLocationStep( Lexer lexer, int ancestryOp ) 
+    private static LocationStepImpl createLocationStep( Lexer lexer, int ancestryOp ) 
         throws XPathException
     {
-        LocationStep locationStep = new LocationStep( ancestryOp );
+        LocationStepImpl locationStep = new LocationStepImpl( ancestryOp );
         Token cTok = lexer.lookAhead(0);
         
         short axisIdentifier = LocationStep.CHILDREN_AXIS;
@@ -842,7 +851,7 @@ public class Parser {
             lexer = new Lexer(pattern);
         }
         catch(ParseException px) {
-            return new PathExpr(new ErrorExpr(px.getMessage()));
+            return new PathExprImpl(new ErrorExpr(px.getMessage()));
         }
         
         return createPathExpr(lexer);
@@ -854,12 +863,12 @@ public class Parser {
      * @return the new PathExpr
      * @exception InvalidExprException
     **/
-    private static PathExpr createPathExpr(Lexer lexer) 
+    private static PathExprImpl createPathExpr(Lexer lexer) 
         throws XPathException 
     {
-        PathExpr pathExpr = new PathExpr();
+        PathExprImpl pathExpr = new PathExprImpl();
         
-        PathExpr tempExpr = null;
+        PathExprImpl tempExpr = null;
         //-- look for empty PathExpr
         if (!lexer.hasMoreTokens()) return pathExpr;
         
@@ -953,7 +962,7 @@ public class Parser {
             lexer = new Lexer(pattern);
         }
         catch(ParseException px) {
-            return new UnionExpr(new ErrorExpr(px.getMessage()));
+            return new UnionExprImpl(new ErrorExpr(px.getMessage()));
         }
         return createUnionExpr(lexer);
     } //-- createUnionExpr
@@ -965,11 +974,11 @@ public class Parser {
      *
      * @return the new descendant-or-self PathExpr.
     **/
-    private static PathExpr createDescendantOrSelf() {
-        LocationStep locationStep = new LocationStep(LocationStep.PARENT_OP);
+    private static PathExprImpl createDescendantOrSelf() {
+        LocationStepImpl locationStep = new LocationStepImpl(FilterBase.PARENT_OP);
         locationStep.setAxisIdentifier(LocationStep.DESCENDANTS_OR_SELF_AXIS);
         locationStep.setNodeExpr(new AnyNodeExpr());        
-        PathExpr pathExpr = new PathExpr();
+        PathExprImpl pathExpr = new PathExprImpl();
         pathExpr.setFilter(locationStep);
         return pathExpr;
     } //-- createDescendantOrSelf
@@ -980,10 +989,10 @@ public class Parser {
      * @return the new UnionExpr
      * @exception InvalidExprException
     **/
-    private static UnionExpr createUnionExpr(Lexer lexer) 
+    private static UnionExprImpl createUnionExpr(Lexer lexer) 
         throws XPathException
     {
-        UnionExpr unionExpr = new UnionExpr(createPathExpr(lexer));
+        UnionExprImpl unionExpr = new UnionExprImpl(createPathExpr(lexer));
         
         //-- look for '|'
         if (lexer.hasMoreTokens()) {
@@ -1008,7 +1017,7 @@ public class Parser {
     /**
      * Parses a list of parameters 
     **/
-    private static void parseParams (FunctionCall fnCall, Lexer lexer) 
+    private static void parseParams (FunctionCallImpl fnCall, Lexer lexer) 
         throws XPathException
     {
         Token tok = lexer.nextToken();
@@ -1085,7 +1094,7 @@ public class Parser {
     
     
     /* For Debugging */
-    /* 
+    /* */
     public static void main(String[] args) 
         throws XPathException
     {
@@ -1121,7 +1130,6 @@ public class Parser {
             "$foo mod 4",
             "cname mod 4",
             "(9)*(7)"
-            
         };
         
         //-- UnionExpr tests

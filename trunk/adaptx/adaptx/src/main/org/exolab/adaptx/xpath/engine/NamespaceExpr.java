@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,15 +29,15 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 /**
  * Represents a Namespace Expression
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @author <a href="mailto:blondeau@intalio.com">David Blondeau</a>
-**/
-class NamespaceExpr extends NodeExpression {
+ */
+class NamespaceExpr extends NodeExpressionImpl {
 
     
     // Match is done on the prefix. The namespace axis does not seems to be used
@@ -87,7 +87,7 @@ class NamespaceExpr extends NodeExpression {
     
     /**
      * Returns the String representation of this NamespaceExpr
-    **/
+     */
     public String toString() {
         return _prefix;
     } //-- toString
@@ -100,7 +100,7 @@ class NamespaceExpr extends NodeExpression {
      * @return The XPathResult (not null).
      * @exception XPathException if an error occured while 
      * evaluating this expression.
-    **/
+     */
     public XPathResult evaluate(XPathContext context)
         throws XPathException 
     {
@@ -119,7 +119,7 @@ class NamespaceExpr extends NodeExpression {
      *
      * @param node the XPathNode to obtain namespaces for
      * @param nodeSet the NodeSet to add namespace nodes to
-    **/
+     */
     private void addNamespaces(XPathNode node, NodeSet nodeSet) {
         if (node == null) return;
         XPathNode namespace = node.getFirstNamespace();
@@ -140,7 +140,7 @@ class NamespaceExpr extends NodeExpression {
      *
      * @param node the XPathNode to obtain namespaces for
      * @param nodeSet the NodeSet to add namespace nodes to
-    **/
+     */
     private void addNamespacesWild(XPathNode node, NodeSet nodeSet) {
         if (node == null) return;
         XPathNode namespace = node.getFirstNamespace();
@@ -157,7 +157,7 @@ class NamespaceExpr extends NodeExpression {
     /**
      * Returns the type of this NodeExpr
      * @return the type of this NodeExpr
-    **/
+     */
     public short getNodeExprType() { return NodeExpression.NAMESPACE_EXPR; }
     
     
@@ -169,7 +169,7 @@ class NamespaceExpr extends NodeExpression {
      * @return true if the given node is matched by this MatchExpr
      * @exception XPathException when an error occurs during
      * evaluation
-    **/
+     */
     public boolean matches(XPathNode node, XPathContext context)
         throws XPathException
     {

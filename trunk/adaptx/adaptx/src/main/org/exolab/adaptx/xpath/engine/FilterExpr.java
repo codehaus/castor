@@ -30,6 +30,7 @@ import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
 
+import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
 
 /**
  * This class represents a FilterExpr as defined by the

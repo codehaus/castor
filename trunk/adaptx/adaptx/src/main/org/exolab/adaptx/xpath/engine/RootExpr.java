@@ -36,7 +36,7 @@ import org.exolab.adaptx.xpath.NodeSet;
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class RootExpr extends PathExpr {
+class RootExpr extends PathExprImpl {
     
       //----------------/
      //- Constructors -/

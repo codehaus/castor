@@ -36,7 +36,7 @@ import org.exolab.adaptx.xpath.XPathException;
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class AdditionExpr extends BinaryExpr {
+class AdditionExpr extends BinaryExprImpl {
 
     
       //---------------/

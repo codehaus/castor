@@ -27,7 +27,7 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 /**
  * Represents an XPath Attribute expression
@@ -36,7 +36,7 @@ import org.exolab.adaptx.xpath.NodeSet;
  * @version $Revision$ $Date$
  */
 class AttributeExpr
-    extends NodeExpression
+    extends NodeExpressionImpl
 {
 
     
