@@ -50,8 +50,8 @@ public class Comment extends BaseNode {
      * @param value the text value of this Comment
     **/
     public Comment(String value) {
-        super(null, null);        
-        _value = value;
+        super(null, null);
+        setValue(value);
     } //-- Comment
     
     /* Methods defined by XPathNode */
@@ -86,7 +86,14 @@ public class Comment extends BaseNode {
      * Sets the value for this XPathNode
     **/
     public void setValue(String value) {
-        this._value = value;
+        if (value != null) {
+            if (value.indexOf("--") >= 0) {
+                String err = "error: the value of an XML comment cannot "+
+                    "contain the substring \"--\".";
+                throw new IllegalArgumentException(err);
+            }
+        }
+        _value = value;
     } //-- setValue
 
 } //-- Comment
