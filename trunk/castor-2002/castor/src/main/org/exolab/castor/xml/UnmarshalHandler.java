@@ -1286,7 +1286,7 @@ public final class UnmarshalHandler extends MarshalFramework
              //-- Since many attributes represent primitive
              //-- fields, we add an extra validation check here
              //-- in case the class doesn't have a "has-method".
-             if (descriptor.isRequired()) {
+             if (descriptor.isRequired() && _validate) {
                 String err = classDesc.getXMLName() + " is missing " +
                     "required attribute: " + attName;
                 if (_locator != null) {
