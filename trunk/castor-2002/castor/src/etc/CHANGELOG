@@ -1,6 +1,8 @@
 
 Version (CVS)
 -------------
+XML:	Allowed to set the encoding of the serializer via the Marshaller (Arnaud - 20020301)
+
 XML: 	Fix bug# 886 (Arnaud - 20020219)
 
 XML:	Fix namespaces issue in the marhalling process (Arnaud - 20020211)
