@@ -1116,6 +1116,14 @@ public class SourceFactory  {
         jsc.append(className);
         jsc.append(") obj;");
 
+        //-- #enumerate method
+        JMethod mEnumerate = new JMethod(SGTypes.Enumeration, "enumerate");
+        jClass.addMethod(mEnumerate);
+        jdc = mEnumerate.getJDocComment();
+        jdc.appendComment("Returns an enumeration of all possible instances of ");
+        jdc.appendComment(className);
+        mEnumerate.getSourceCode().add("return _memberTable.elements();");
+        
         //-- #toString method
         JMethod mToString = new JMethod(SGTypes.String, "toString");
         jClass.addMethod(mToString);
