@@ -175,13 +175,12 @@ public interface Database
 
     /**
      * Creates an OQL query from the supplied statement.
-     *
      * @param oql An OQL query statement
      * @return An OQL query
-     * @throws QueryException The query syntax is invalid
+     * @throws PersistenceException
      */
     public OQLQuery getOQLQuery( String oql )
-        throws QueryException;
+        throws PersistenceException;
 
 
     /**
