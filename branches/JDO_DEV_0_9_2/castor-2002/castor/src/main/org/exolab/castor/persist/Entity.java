@@ -128,7 +128,7 @@ public final class Entity {
          * The values of the entity that is stored in the same order
          * and indicated in the fieldInfo.
          */
-        Object[] values;
+        public Object[] values;
 
 	}
 }
