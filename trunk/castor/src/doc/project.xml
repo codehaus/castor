@@ -45,6 +45,14 @@
         <display>Home</display>
       </navLink>
       <navLink>
+        <url>about.xml</url>
+        <display>About</display>
+      </navLink>
+      <navLink>
+        <url>features.xml</url>
+        <display>Features</display>
+      </navLink>
+      <navLink>
         <url>download.xml</url>
         <display>Download</display>
       </navLink>
@@ -70,7 +78,7 @@
       </navLink>
       <navLink>
          <url>http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main</url>
-         <display>CastorWiki (offsite)</display>
+         <display>CastorWiki</display>
       </navLink>
     </section>
 
@@ -79,7 +87,7 @@
         <url>xml-framework.xml</url>
         <display>Using XML</display>
       </navLink>
-	  <navLink>
+      <navLink>
         <url>sourcegen.xml</url>
         <display>Source Generator</display>
       </navLink>
@@ -98,12 +106,12 @@
 
     </section>
 
-	<section name="JDO">
+    <section name="JDO">
       <navLink>
         <url>jdo.xml</url>
         <display>Using JDO</display>
       </navLink>
-	  <navLink>
+      <navLink>
         <url>database-conf.xml</url>
         <display>JDO Config</display>
       </navLink>
@@ -130,7 +138,7 @@
         <url>oql.xml</url>
         <display>OQL</display>
       </navLink>
-	  <navLink>
+      <navLink>
         <url>locking.xml</url>
         <display>Trans. &amp; Locks</display>
       </navLink>
@@ -156,11 +164,11 @@
       </navLink>
       <navLink>
         <url>postgresql-blobs.xml</url>
-        <display>Blobs and PostgreSQL</display>
+        <display>LOBs</display>
       </navLink>
     </section>
 
-	<section name="More">
+    <section name="More">
       <navLink>
         <url>presentations.xml</url>
         <display>Presentations</display>
@@ -171,16 +179,16 @@
       </navLink>
       <navLink>
         <url>extras.xml</url>
-        <display>Extras and 3rd Party Tools</display>
+        <display>3rd Party Tools</display>
       </navLink>
 
       <navLink>
         <url>test-framework.xml</url>
-        <display>Test Framework -- JDO</display>
+        <display>JDO Tests</display>
       </navLink>
       <navLink>
         <url>ctf.xml</url>
-        <display>Test Framework -- XML</display>
+        <display>XML Tests</display>
       </navLink>
       <navLink>
         <url>conf-lib.xml</url>
@@ -196,9 +204,15 @@
       </navLink>
       <navLink>
          <url>http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main</url>
-         <display>CastorWiki (offsite)</display>
+         <display>CastorWiki</display>
       </navLink>
-	</section>
+      <navLink>
+      </navLink>
+      <navLink>
+        <image>images/javanet_button_90.gif</image>
+        <url>http://www.java.net/</url>
+      </navLink>
+    </section>
 
     <section name="About">
       <navLink>
@@ -224,6 +238,10 @@
       <navLink>
         <url>contacts.xml</url>
         <display>Contact</display>
+      </navLink>
+      <navLink>
+        <url>origins.xml</url>
+        <display>Project Name</display>
       </navLink>
     </section>
 

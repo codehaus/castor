@@ -6,6 +6,12 @@
     </header>
     <section title="Mailing Lists">
 
+      <p><b>Note:</b> Presently we are hosting two mailing lists. Traffic is not too high,
+         so if you are interested in keeping up to date with new releases, or have problems,
+         questions or feedback please <a href="lists.xml">subscribe
+         to the appropriate list</a>.
+      </p>
+
       <p>
          <b>Note:</b> You can use a <b><font size="+1">searchable</font></b> archive of the castor-dev list at <a href="http://www.mail-archive.com/castor-dev%40exolab.org">
          http://www.mail-archive.com/castor-dev%40exolab.org</a>  It appears there is a delay of one (1) or two (2) days for messages
