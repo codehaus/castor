@@ -44,6 +44,7 @@ class RootExpr extends PathExprImpl {
     
     public RootExpr() {
         super();
+        setAbsolute(true);
     }
     
     /**
