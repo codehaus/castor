@@ -449,7 +449,7 @@ public class ParseTreeWalker implements TokenTypes
           if ( topLevel ) {
             _projectionName = projectionName.toString();
             if ( isSimple )
-              if ( count > 1 )
+              if ( count > 1 || field.getContainingClassDescriptor() != _clsDesc)
                 _projectionType = DEPENDANT_OBJECT_VALUE;
               else
                 _projectionType = DEPENDANT_VALUE;
