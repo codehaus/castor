@@ -94,12 +94,7 @@ public class GenericFactory
 
     public String quoteName( String name )
     {
-        int index;
-
-        index = name.indexOf( '.' );
-        if ( index > 0 )
-            return "\"" + name.substring( 0, index ) + "\".\"" + name.substring( index + 1 ) + "\"";
-        return '"' + name + '"';
+        return name;
     }
 
 
