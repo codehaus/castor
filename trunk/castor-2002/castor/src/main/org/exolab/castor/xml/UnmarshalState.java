@@ -48,59 +48,50 @@ package org.exolab.castor.xml;
 import java.util.Vector;
 
 class UnmarshalState {
-    
+
     /**
      * The xml element name of the current object
     **/
     String elementName = null;
-    
+
     /**
      * Characters read in during unmarshalling
     **/
     StringBuffer buffer = null;
-    
+
     /**
      * The current that we are unmarshalling to
     **/
     Object object = null;
-    
-    /**
-     * The current container in the object that we are unmarshalling to
-    **/
-    Object container = null;
 
     /**
      * The class of the object, mainly used for primitives
     **/
     Class type = null;
-    
+
     /**
      * The field descriptor for the Object
     **/
     XMLFieldDescriptor fieldDesc = null;
-        
+
+
     /**
-     * The field descriptor for the container object
-    **/
-    XMLFieldDescriptor ContainerFieldDesc = null;
-    
-    /**
-     * The class descriptor for the Object, in case 
+     * The class descriptor for the Object, in case
      * FieldDescriptor#getClassDescriptor returns null
     **/
     XMLClassDescriptor classDesc = null;
 
     boolean primitiveOrImmutable = false;
-    
+
     private Vector markedList = null;
-    
+
     boolean derived = false;
-    
+
     UnmarshalState() {
         super();
         markedList = new Vector(5);
     }
-    
+
     /**
      * Marks the given XMLFieldDescriptor as having been used
      * @param descriptor the XMLFieldDescriptor to mark
@@ -108,9 +99,14 @@ class UnmarshalState {
     void markAsUsed(XMLFieldDescriptor descriptor) {
         markedList.addElement(descriptor);
     } //-- markAsUsed
-    
+
+    void markAsNotUsed(XMLFieldDescriptor descriptor) {
+        markedList.remove(descriptor);
+    }
+
     boolean isUsed(XMLFieldDescriptor descriptor) {
         return markedList.contains(descriptor);
     } //-- isUsed
-    
+
+
 } //-- UnmarshalState
