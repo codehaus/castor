@@ -3,6 +3,72 @@
   <body>
     <title>Change log</title>
 
+    <section title="Version 0.9.2 March 28, 2001 - also includes version 0.9.1"><pre>
+
+XML:    Added fix for collections, reported by Ozgur Balsoy. This bug was introduced
+        on March 8th, in the version 1.45 of DescriptorSourceFactory. (kvisco)
+
+XML:    Added fix for enumerated simpleTypes. When a simpleType restricted another
+        simpleType, if both types defined an enumertion facet with the same value
+        Castor wouldn't handle this properly. Bug reported by Stephan Goetter.
+        (kvisco)
+
+XML:    Added fix for generating source code using the element-method. Classes
+        were no longer extending their abstract type definitions. (kvisco)
+
+XML: 	Add a command line property for the Source Generator to use the generated files in
+        the Castor Testing Framework(Arnaud)
+
+XML: 	Add a property in castorbuilder.properties to generate a clean 'equals' method (Arnaud)
+
+XML:	Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
+
+JDO:    Fixed some problems when two key generated related (or dependent) object creating in
+        the same transaction. (Thomas)
+
+JDO:    Relaxed the restriction so that a data object class can now extends one class and
+        depends another. (Suggested by Rimac, Ivica &lt;ivica.rimac@KOM.tu-darmstadt.de>)
+
+JDO:	Fixed NPEs in TransactionContext, and ClassMolder in update(...). (Thomas)
+
+JDO:	Edited the New features document for Castor JDO. (Submited by Rick Horowitz &lt;rickhoro@yahoo.com>)
+
+JDO:	Updated the oqlQuery tools. (Submited by Thorsten Mauch &lt;mauch@imkenberg.de>)
+
+JDO:	Encapsulated and nested runtime exceptions generated while accessing the data object
+        into DataObjectAccessException. (suggested by Christian Sell &lt;christian.sell@netcologne.de>)
+
+JDO:	Fixed a few bugs which some variables are mixed up in ClassMolder.
+        (submitted by Eldad Zamler&lt;eldad314@netvision.net.il>)
+
+JDO:    Fixed NPEs introduced by autoStore. (reported by Steve Vaughan &lt;snmvaughan92@yahoo.com>
+        and Patric Bechtel &lt;bechtel@ipcon.de>)
+
+JDO:    Fixed bug: 1:1-dependent objects with key generator were not created on creation of master object.
+        (oleg)
+
+JDO:    Fixed bug: dependent collections with key generator where updated incorrectly
+        (reported by Ivica Rimac &lt;ivica.rimac@KOM.tu-darmstadt.de>)
+
+JDO:    Added possibility to use in a query condition object references that correspond to sql field.
+        In this case the object of a persistence capable class should be bound as a parameter. (oleg)
+
+JDO:    Fixed bug: SQL types and order of fields in multi-column identities were handled incorrectly
+        (reported by Geoff Jacobsen &lt;geoffj@casquet.inet.net.nz>)
+
+JDO:    Fixed bugs: readonly locking mode didn't work properly in some cases
+        (Damon Maria &lt;damon@mahu-ika.com>, David J Snowsill &lt;david.snowsill@calibreft.com.au>)
+
+JDO:    Fixed bug: conversions defined in a mapping configuration were not applied to OQL query parameters.
+        (oleg)
+
+JDO:    Added support for table names such as "user.tablename".
+        (Andrew Ballanger &lt;AWBALLAN@smumn.edu>)
+
+JDO:    Fixed bug: object modifications were determined incorrectly in some cases.
+        (David J Snowsill &lt;david.snowsill@calibreft.com.au>, oleg)
+    </pre></section>
+
     <section title="Version 0.9 February, 15 2001"><pre>
 
 XML:   Adding a new feature for handling all types of content and not only TEXT content (Arnaud)  
