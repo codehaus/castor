@@ -112,7 +112,8 @@ public class Persistent
 
             stream.writeVerbose( "Delete everything" );
             db.begin();
-            oql = db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p" );
+            oql = db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE id=$1" );
+            oql.bind( TestPersistent.DefaultId );
             qres = oql.execute();
             while ( qres.hasMore() ) {
                 db.remove( qres.next() );
