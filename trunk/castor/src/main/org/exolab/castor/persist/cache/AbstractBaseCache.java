@@ -48,6 +48,9 @@ package org.exolab.castor.persist.cache;
 
 import java.util.Enumeration;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Base implementation of all LRU cache types. 
  *
@@ -67,6 +70,11 @@ implements Cache
      * Cache capacity.
      */
     private int _capacity;
+    
+    /**
+     * Class name of object cached in this cache instance
+     */
+    private String _className;
     
     /**
      * Maps the specified <code>key</code> to the specified 
@@ -160,4 +168,23 @@ implements Cache
     public void setCapacity(int capacity) {
         this._capacity = capacity;
     }
+    
+    /**
+     * Indicates the class name of objects stored in this cache.
+     * @return The class name.
+     * @see Cache#getClassName()
+     */
+    public String getClassName() {
+        return _className;
+    }
+    
+    /**
+     * Sets the class name of objects cached here.
+     * @param className The class name.
+     * @see Cache#setClassName(String)
+     */
+    public void setClassName (String className) {
+        _className = className;
+    }
+    
 }
