@@ -653,7 +653,6 @@ public final class LockEngine /*implements TransactionContextListener*/ {
      *  report that the object was modified in the database during the long
      *  transaction.
      */
-     /*
     public void update( Key key, Entity entity, AccessMode suggestedAccessMode, int timeout )
             throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
                    PersistenceException, ClassNotPersistenceCapableException,
@@ -668,7 +667,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         //AccessMode accessMode;
 
         // If the object is new, don't try to load it from the cache
-
+        /*
         typeInfo = (TypeInfo) _typeInfo.get( entity.identity );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( 
@@ -676,6 +675,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
 
         //accessMode = typeInfo.molder.getAccessMode( suggestedAccessMode );
         //write = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
+        /*
         succeed = false;
         lock = null;
         try {
@@ -716,8 +716,8 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             /*
             if ( accessMode == AccessMode.ReadOnly )
                 typeInfo.release( oid, key );
-            */
-            /*
+            *//*
+
             //return oid;
         } catch ( ObjectModifiedException e ) {
             throw e;
@@ -727,8 +727,8 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         } finally {
             if ( lock != null )
                 lock.confirm( key, succeed );
-        }
-    }*/
+        }*/
+    }
 
 
     /**
@@ -861,18 +861,19 @@ public final class LockEngine /*implements TransactionContextListener*/ {
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void writeLock( Key key, OID oid, int timeout )
+    public void writeLock( Key key, Entity entity, int timeout )
             throws ObjectDeletedException, LockNotGrantedException, PersistenceException {
 
         ObjectLock lock;
         TypeInfo   typeInfo;
 
-        typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
+        /*
+        typeInfo = (TypeInfo) _typeInfo.get( entity.getName() );
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
 
         try {
-            typeInfo.upgrade( oid, key, timeout );
+            typeInfo.upgrade( entity.identity, key, timeout );
 
             //typeInfo.persist.writeLock( key, lock...);
         } catch ( IllegalStateException e ) {
@@ -881,9 +882,20 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             throw new IllegalStateException("Object deleted waiting for lock?????????");
         } catch ( LockNotGrantedException e ) {
             throw e;
-        }
+        }*/
     }
 
+
+    /**
+     * Reload an object which is already being loaded/created/update
+     * this the lock engine
+     *
+     * @param key The Key that is holding lock to the entity
+     * @param entity The entity instance to be filled. The entity should
+     *        contains the {@ EntityInfo} and identity of the interested object
+     */
+    public void reload( Key key, Entity entity ) {
+    }
 
     /**
      * Acquire a write lock on the object in memory. A soft lock prevents
@@ -899,13 +911,16 @@ public final class LockEngine /*implements TransactionContextListener*/ {
      * @throws ObjectDeletedException The object has been deleted from
      *  persistent storage
      */
-    public void softLock( Key key, OID oid, int timeout )
+    public void softLock( Key key, Entity entity, int timeout )
             throws LockNotGrantedException {
+
+        /*
         ObjectLock lock;
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
         typeInfo.upgrade( oid, key, timeout );
+        */
     }
 
     /**
@@ -974,11 +989,13 @@ public final class LockEngine /*implements TransactionContextListener*/ {
      * @param key The transaction context
      * @param oid The object OID
      */
-    public void releaseLock( Key key, OID oid ) {
+    public void releaseLock( Key key, Entity entity ) {
+        /*
         ObjectLock lock;
         TypeInfo   typeInfo;
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
         lock = typeInfo.release( oid, key );
+        */
         // 092: lock.getOID().setDbLock( false );
     } 
 
