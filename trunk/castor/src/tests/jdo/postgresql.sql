@@ -256,7 +256,7 @@ create table test_types (
   char_val char(1)        null,
   bool_val char(1)        null,
   int_date integer        null,
-  str_time char(12)       null,
+  str_time varchar(40)    null,
   num_date numeric(17,0)         null,
   float_val float         null,
   real_val real         null,
