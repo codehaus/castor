@@ -3,6 +3,13 @@ Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 
 The following are changes from different versions of Adaptx
 
+Version 0.9.8, October 1, 2003
+---------------------------------
+
+-- Added support for URIResolver in the JAXP implementation
+   (kvisco - 2003-10-1)
+
+
 Version 0.9.7, September 29, 2003
 ---------------------------------
 
