@@ -92,7 +92,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.8.9 (CVS)";
+    static final String version = "0.8.9b (CVS)";
 
     /**
      * The application URI
@@ -149,6 +149,16 @@ public class SourceGenerator {
          */
          public static final String BOUND_PROPERTIES =
             "org.exolab.castor.builder.boundproperties";
+
+        /**
+         * Property specifying the super class for
+         * all generated classes
+         * <pre>
+         * org.exolab.castor.builder.superclass
+         * </pre>
+         */
+         public static final String SUPER_CLASS =
+            "org.exolab.castor.builder.superclass";
 
 		/**
          * Property specifying how element's and type's are mapped into a Java
@@ -718,10 +728,19 @@ public class SourceGenerator {
 
         //-- print class
         if (allowPrinting) {
+            
             //hack for the moment
             //to avoid the compiler complaining with java.util.Date
             jClass.removeImport("org.exolab.castor.types.Date");
             jClass.setHeader(header);
+            
+            //-- set super class if necessary
+            if (jClass.getSuperClass() == null) {
+                String base = this.getProperty(Property.SUPER_CLASS, null);
+                if (base != null)
+                    jClass.setSuperClass(base);
+            }
+                
             jClass.print(destDir,lineSeparator);
         }
 
