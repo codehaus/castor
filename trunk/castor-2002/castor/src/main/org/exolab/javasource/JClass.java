@@ -389,7 +389,7 @@ public class JClass extends JType {
     } //-- isValidClassName
 
     public void print() {
-        print(null);
+        print(null,null);
     } //-- printSrouce
     
     /**
@@ -398,7 +398,7 @@ public class JClass extends JType {
      * If null, then the default line separator for the runtime platform will
      * be used.
     **/
-    public void print(String lineSeparator) {
+    public void print(String destDir, String lineSeparator) {
 
         //-- open output file
         String name = getLocalName();
@@ -406,7 +406,11 @@ public class JClass extends JType {
         
         if ((packageName != null) && (packageName.length() > 0)) {
             String path = packageName.replace('.',File.separatorChar);
-            File pathFile = new File(path);
+            File pathFile;
+            if (destDir==null)
+                pathFile=new File(path);
+            else
+                pathFile=new File(destDir,path);
             if (!pathFile.exists()) {
                 pathFile.mkdirs();
             }
