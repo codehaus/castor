@@ -84,6 +84,16 @@ abstract class MarshalFramework {
     **/
     public static final String XSI_NO_NAMESPACE_SCHEMA_LOCATION 
         = "noNamespaceSchemaLocation";
+   
+    /**
+     * The xml:lang attribute name
+     */
+    public static final String XML_LANG_ATTR = "xml:lang";
+    
+    /**
+     * The xml:space attribute name
+     */    
+    public static final String XML_SPACE_ATTR = "xml:space";
     
     //-----------------------------/
     //- Protected class variables -/
