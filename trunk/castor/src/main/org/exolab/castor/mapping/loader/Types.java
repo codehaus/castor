@@ -578,6 +578,10 @@ public class Types
         */
         new TypeInfo( "duration",   null,
                       org.exolab.castor.types.Duration.class,     false,     new Duration (0) ),
+        new TypeInfo( "xml-date",   null,
+                      org.exolab.castor.types.Date.class,     false,     new org.exolab.castor.types.Date (0) ),
+        new TypeInfo( "xml-time",   null,
+                      org.exolab.castor.types.Time.class,     false,     new org.exolab.castor.types.Time (0) )
                               
     };
 
