@@ -80,8 +80,7 @@ public class Date extends DateTimeBase{
      */
 
     public Date(short[] values) {
-        this();
-        this.setValues(values);
+        setValues(values);
     }
 
     /**
@@ -92,16 +91,15 @@ public class Date extends DateTimeBase{
      * CCYY-MM-YY
      */
     public Date(java.util.Date dateRef) {
-        this();
         GregorianCalendar tempCalendar = new GregorianCalendar();
         tempCalendar.setTime(dateRef);
-        this.setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
-        this.setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
+        setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
+        setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
 
         //we need to add 1 to the Month value returned by GregorianCalendar
         //because 0<MONTH<11 (i.e January is 0)
-        this.setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
-        this.setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
+        setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
+        setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
     } //Date(java.util.Date)
 
     /**
@@ -258,7 +256,7 @@ public class Date extends DateTimeBase{
     public static Date parseDate(String str) throws ParseException {
 
         if (str == null)
-             throw new IllegalArgumentException("The string to be parsed must not"
+             throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
         Date result = new Date();
         char[] chars = str.toCharArray();
@@ -283,25 +281,36 @@ public class Date extends DateTimeBase{
              switch (ch) {
 
                  case '-' :
+                       //year
                        if (flags == 15) {
-                          result.setCentury(number);
-                          result.setYear(number2);
-                          number2 = 0;
-                          flags =  11;
+                          if ((number != 0) || (number2 != 0)) {
+                              if (has2Digits)
+                                 result.setCentury(number);
+                              else throw new ParseException("Bad Date Format: "+str+"\nThe Century field must have 2 digits.",idx);
+                              //must test number2
+                              result.setYear(number2);
+                              number2 = -1;
+                              flags =  11;
+                          } else throw new ParseException("Bad Date Format: "+str+"\n'0000' is not allowed as a year.",idx);
                        }
+                       //month
                        else if (flags == 11) {
-                          result.setMonth(number);
-                          flags = 3;
+                          if ( (has2Digits) && (number2 == -1) ) {
+                              result.setMonth(number);
+                              flags = 3;
+                          } else throw new ParseException("Bad Date Format: "+str+"\nThe month field must have 2 digits.",idx);
                        }
-                       else if (flags == 3) {
-                           result.setDay(number);
-                           flags = 1;
+                       //time zone
+                       else if ( (flags == 3) && (number2 == -1) ) {
+                           if (has2Digits) {
+                               result.setUTC();
+                               result.setZoneNegative();
+                               result.setDay(number);
+                               flags = 1;
+                           }else throw new ParseException("Bad Date Format: "+str+"\nThe day field must have 2 digits.",idx);
                        }
-                       else if (flags == 1) {
-                           result.setUTC();
-                           result.setZoneNegative();
-                       }
-                       else   throw new ParseException("Bad Date Format",idx);
+                       else throw new ParseException("Bad Date Format: "+str+"\n '-' is wrongly placed",idx);
+
                        hasNumber = false;
                        has2Digits = false;
                        break;
@@ -309,25 +318,28 @@ public class Date extends DateTimeBase{
                  case 'Z' :
                       if (flags != 3)
                          throw new ParseException("'Z' is wrongly placed",idx);
-                      else result.setUTC();
-                      hasNumber = false;
-                      has2Digits = false;
+                      else
+                          result.setUTC();
                       break;
 
                  case '+' :
                     if (flags != 3)
                         throw new ParseException("'+' is wrongly placed",idx);
                     else {
-                       result.setDay(number);
-                       result.setUTC();
-                       flags = 1;
+                        if ((has2Digits)&& (number2 == -1) ) {
+                          result.setDay(number);
+                          result.setUTC();
+                          flags = 1;
+                          hasNumber = false;
+                          has2Digits = false;
+                      }
+                      else throw new ParseException("Bad Date Format:"+str+"\nThe day field must have 2 digits.",idx);
                     }
-                    hasNumber = false;
-                    has2Digits = false;
                     break;
+
                  case ':' :
                      if (flags != 1)
-                        throw new ParseException("':' is wrongly placed",idx);
+                        throw new ParseException("Bad Date Format:"+str+"\n':' is wrongly placed",idx);
                      number2 = number;
                      number = -1;
                      flags = 0;
@@ -338,9 +350,8 @@ public class Date extends DateTimeBase{
                     //make sure we have a digit
                     if ( ('0' <= ch) && (ch <= '9')) {
                         if (hasNumber) {
-                            if (has2Digits) {
+                            if (has2Digits)
                                  number2 = (short) ((number2*10)+(ch-48));
-                            }
                             else {
                                 number = (short)((number*10)+(ch-48));
                                 has2Digits = true;
@@ -356,15 +367,20 @@ public class Date extends DateTimeBase{
                     break;
              }//switch
         }//while
-        if (flags == 3)
-             result.setDay(number);
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) ) {
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
+        if (flags!=3 && flags != 0)
+            throw new ParseException("Bad Date Format: "+str+"\nA date must follow the pattern CCYY-MM-DD(Z|((+|-)hh:mm)).",idx);
+        else if (flags == 3) {
+            if  ( (has2Digits) && (number2 == -1) )
+                result.setDay(number);
+            else
+               throw new ParseException("Bad Date Format:"+str+"\nThe day field must have 2 digits.",idx);
         }
-        if (flags == 0)
-            result.setZone(number2,number);
 
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
+        }
         return result;
 
     }//parse

@@ -94,12 +94,11 @@ public class GYearMonth extends Date {
      * @param month the month value
      */
     public GYearMonth(int year, int month) {
-         this();
          short century = (short) (year/100);
          year = year % 100;
-         this.setCentury((short)century);
-         this.setYear((short)year);
-         this.setMonth((short)month);
+         setCentury((short)century);
+         setYear((short)year);
+         setMonth((short)month);
     }
 
     /**
@@ -110,8 +109,7 @@ public class GYearMonth extends Date {
      */
 
     public GYearMonth(short[] values) {
-        this();
-        this.setValues(values);
+        setValues(values);
     }
 
     /**
@@ -261,7 +259,7 @@ public class GYearMonth extends Date {
     public static GYearMonth parseGYearMonth(String str) throws ParseException {
 
         if (str == null)
-             throw new IllegalArgumentException("The string to be parsed must not"
+             throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
         GYearMonth result = new GYearMonth();
         char[] chars = str.toCharArray();
@@ -287,44 +285,52 @@ public class GYearMonth extends Date {
 
                  case '-' :
                        if (flags == 7) {
-                          result.setCentury(number);
-                          result.setYear(number2);
-                          number2 = 0;
-                          flags =  3;
+                           if ((number != 0) || (number2 != 0)) {
+                               if (has2Digits)
+                                   result.setCentury(number);
+                               else throw new ParseException("Bad gYearMonth Format: "+str+"\nThe Century field must have 2 digits.",idx);
+                               //must test number2
+                               result.setYear(number2);
+                               flags = 3;
+                               number2 = -1;
+                           } else throw new ParseException("Bad gYearMonth Format: "+str+"\n'0000' is not allowed as a year.",idx);
                        }
-                       else if ( (flags == 3) && (has2Digits) ){
-                           result.setMonth(number);
-                           flags = 1;
-                           result.setUTC();
-                           result.setZoneNegative();
+                       else if (flags == 3) {
+                           if ((has2Digits) && (number2 == -1)){
+                               result.setMonth(number);
+                               flags = 1;
+                               result.setUTC();
+                               result.setZoneNegative();
+                           } else throw new ParseException("Bad gYearMonth Format:"+str+"\nThe month field must have 2 digits.",idx);
                        }
-                       else   throw new ParseException("Bad gYearMonth Format",idx);
+                       else   throw new ParseException("Bad gYearMonth Format:"+str+"\nA gYearMonth must follow the pattern CCYY-MM-DD(Z|((+|-)hh:mm)).",idx);
                        hasNumber = false;
                        has2Digits = false;
                        break;
 
                  case 'Z' :
                       if (flags != 3)
-                         throw new ParseException("'Z' is wrongly placed",idx);
+                         throw new ParseException("Bad gYearMonth Format:"+str+"'Z' is wrongly placed",idx);
                       else result.setUTC();
-                      hasNumber = false;
-                      has2Digits = false;
                       break;
 
                  case '+' :
                     if (flags != 3)
-                        throw new ParseException("'+' is wrongly placed",idx);
+                        throw new ParseException("Bad gYearMonth Format:"+str+"'+' is wrongly placed",idx);
                     else {
-                       result.setMonth(number);
-                       result.setUTC();
-                       flags = 1;
+                          if ((has2Digits) && (number2 == -1)){
+                               result.setMonth(number);
+                               flags = 1;
+                               result.setUTC();
+                           } else throw new ParseException("Bad gYearMonth Format:"+str+"\nThe month field must have 2 digits.",idx);
+                          hasNumber = false;
+                          has2Digits = false;
                     }
-                    hasNumber = false;
-                    has2Digits = false;
                     break;
+
                  case ':' :
                      if (flags != 1)
-                        throw new ParseException("':' is wrongly placed",idx);
+                        throw new ParseException("Bad gYearMonth Format:"+str+"':' is wrongly placed",idx);
                      number2 = number;
                      number = -1;
                      flags = 0;
@@ -353,15 +359,20 @@ public class GYearMonth extends Date {
                     break;
              }//switch
         }//while
-        if (flags == 3)
-             result.setMonth(number);
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) ) {
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
-        }
-        if (flags == 0)
-            result.setZone(number2,number);
+        if (flags!=3 && flags != 0)
+            throw new ParseException("Bad gYearMonth Format: "+str+"\nA gYearMonth must follow the pattern CCYY-MM(Z|((+|-)hh:mm)).",idx);
+        else if (flags == 3) {
+            if ((has2Digits) && (number2 == -1))
+                result.setMonth(number);
+            else throw new ParseException("Bad gYearMonth Format:"+str+"\nThe month field must have 2 digits.",idx);
 
+        }
+
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
+        }
         return result;
 
     }//parse

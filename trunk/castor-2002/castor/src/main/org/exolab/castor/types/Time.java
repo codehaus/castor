@@ -77,19 +77,22 @@ public class Time extends DateTimeBase {
      * @param values an array of shorts that represent the different fields of Time.
      */
     public Time(short[] values) {
-        this();
-        this.setValues(values);
+        setValues(values);
     }
 
     /**
-     * Constructs a XML Schema Time instance given a long representing the time.
+     * Constructs a XML Schema Time instance given a long representing the time in milliseconds.
      * By default a Time is not UTC and is local.
      * @param the long value that represents the time instance.
      */
     public Time (long l) {
-        /**
-         *@todo
-         */
+        if (l>8640000L)
+            throw new IllegalArgumentException("Bad Time: the long value can't represent more than 24h.");
+        this.setHour((short)(l/360000));
+        l = l % 360000;
+        this.setMinute((short)(l/6000));
+        l = l % 6000;
+        this.setSecond((short)(l / 100), (short)(l%100));
     }
 
     /**
@@ -268,7 +271,7 @@ public class Time extends DateTimeBase {
                  case ':' :
                        //the string representation must have 2 digits
                        if (!has2Digits)
-                           throw new ParseException("a time field must have 2 digits.",idx);
+                           throw new ParseException("Bad Time format:"+str+"\nA time field must have 2 digits.",idx);
                        if (flags == 15) {
                           result.setHour(number);
                           flags =  7;
@@ -285,28 +288,29 @@ public class Time extends DateTimeBase {
                            number = -1;
                            flags = 0;
                        }
-                       else   throw new ParseException("Bad Time Format",idx);
+                       else throw new ParseException("Bad Time Format:"+str+"\nA Time must follow the pattern hh:mm:ss.s(Z|((+|-)hh:mm)).",idx);
                        hasNumber = false;
                        has2Digits = false;
                        break;
 
                  case '.' :
+                      if (flags != 3)
+                         throw new ParseException("Bad Time Format:"+str+"\n'.' is wrong placed",idx);
                       number2 = number;
                       hasNumber = false;
                       has2Digits = false;
                       break;
                  case 'Z' :
                       if (flags != 3)
-                         throw new ParseException("'Z' is wrong placed",idx);
+                         throw new ParseException("Bad Time Format:"+str+"\n'Z' is wrong placed",idx);
                       else result.setUTC();
-                      hasNumber = false;
-                      has2Digits = false;
                       break;
 
                  case '-' :
                     if (flags != 3)
-                        throw new ParseException("'-' is wrong placed",idx);
+                        throw new ParseException("Bad Time Format:"+str+"\n'-' is wrong placed",idx);
                     else {
+                       result.setSecond(number2, number);
                        result.setUTC();
                        result.setZoneNegative();
                        flags = 1;
@@ -316,8 +320,9 @@ public class Time extends DateTimeBase {
                     break;
                  case '+' :
                     if (flags != 3)
-                        throw new ParseException("'+' is wrong placed",idx);
+                        throw new ParseException("Bad Time Format:"+str+"\n'+' is wrong placed",idx);
                     else {
+                       result.setSecond(number2, number);
                        result.setUTC();
                        flags = 1;
                     }
@@ -342,14 +347,17 @@ public class Time extends DateTimeBase {
              }//switch
         }//while
         //we have to set the seconds or the time zone
-        if (flags == 3)
-            result.setSecond(number, number2);
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) )
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
-        if (flags == 0)
-            result.setZone(number2,number);
+         if (flags!=3 && flags != 0)
+            throw new ParseException("Bad Time Format: "+str+"\nA Time must follow the pattern hh:mm:ss.s(Z|((+|-)hh:mm)).",idx);
+        else if (flags == 3) {
+                result.setSecond(number, number2);
+        }
 
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
+        }
         return result;
     }//parse
 

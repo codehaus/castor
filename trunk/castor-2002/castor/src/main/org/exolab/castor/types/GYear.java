@@ -79,9 +79,8 @@ public class GYear extends GYearMonth {
      * @param year the year value
      */
     public GYear(short century,  short year) {
-         this();
-         this.setCentury(century);
-         this.setYear(year);
+         setCentury(century);
+         setYear(year);
     }
 
     /**
@@ -91,11 +90,10 @@ public class GYear extends GYearMonth {
      * @param year the year value
      */
     public GYear(int year) {
-         this();
          short century = (short) (year/100);
          year = year % 100;
-         this.setCentury((short)century);
-         this.setYear((short)year);
+         setCentury((short)century);
+         setYear((short)year);
     }
 
     /**
@@ -250,7 +248,7 @@ public class GYear extends GYearMonth {
     public static GYear parseGYear(String str) throws ParseException {
 
         if (str == null)
-             throw new IllegalArgumentException("The string to be parsed must not"
+             throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
         GYear result = new GYear();
         char[] chars = str.toCharArray();
@@ -276,41 +274,50 @@ public class GYear extends GYearMonth {
 
                  case '-' :
                        if (flags == 3) {
-                          result.setCentury(number);
-                          result.setYear(number2);
-                          number2 = 0;
-                          flags = 1;
-                          result.setUTC();
-                          result.setZoneNegative();
+                           if ((number != 0) || (number2 != 0)) {
+                              if (has2Digits)
+                                 result.setCentury(number);
+                              else throw new ParseException("Bad gYear Format: "+str+"\nThe Century field must have 2 digits.",idx);
+                              //must test number2
+                              result.setYear(number2);
+                              flags = 1;
+                              number2 = -1;
+                              result.setUTC();
+                              result.setZoneNegative();
+                           } else throw new ParseException("Bad gYear Format: "+str+"\n'0000' is not allowed as a year.",idx);
                        }
-                       else   throw new ParseException("Bad gYear Format",idx);
+                       else throw new ParseException("Bad gYear Format:"+str+"\nA gYear must follow the pattern CCYY(Z|((+|-)hh:mm)).",idx);
                        hasNumber = false;
                        has2Digits = false;
                        break;
 
                  case 'Z' :
                       if (flags != 3)
-                         throw new ParseException("'Z' is wrongly placed",idx);
+                         throw new ParseException("Bad gYear Format: "+str+"'Z' is wrongly placed",idx);
                       else result.setUTC();
-                      hasNumber = false;
-                      has2Digits = false;
                       break;
 
-                 case '+' :
+                case '+' :
                     if (flags != 3)
-                        throw new ParseException("'+' is wrongly placed",idx);
+                        throw new ParseException("Bad gYear Format: "+str+"'+' is wrongly placed",idx);
                     else {
-                       result.setCentury(number);
-                       result.setYear(number2);
-                       result.setUTC();
-                       flags = 1;
-                    }
-                    hasNumber = false;
-                    has2Digits = false;
+                        if ((number != 0) || (number2 != 0)) {
+                            if (has2Digits)
+                                result.setCentury(number);
+                            else throw new ParseException("Bad gYear Format: "+str+"\nThe Century field must have 2 digits.",idx);
+                            //must test number2
+                            result.setYear(number2);
+                        } else throw new ParseException("Bad gYear Format: "+str+"\n'0000' is not allowed as a year.",idx);
+                        result.setUTC();
+                        flags = 1;
+                        hasNumber = false;
+                        has2Digits = false;
+                      }
                     break;
+
                  case ':' :
                      if (flags != 1)
-                        throw new ParseException("':' is wrongly placed",idx);
+                        throw new ParseException("Bad gYear Format: "+str+"':' is wrongly placed",idx);
                      number2 = number;
                      number = -1;
                      flags = 0;
@@ -339,17 +346,23 @@ public class GYear extends GYearMonth {
                     break;
              }//switch
         }//while
-        if (flags == 3) {
-             result.setCentury(number);
-             result.setYear(number2);
+        if (flags!=3 && flags != 0)
+            throw new ParseException("Bad gYear Format: "+str+"\nA gYear must follow the pattern CCYY(Z|((+|-)hh:mm)).",idx);
+        else if (flags == 3) {
+             if ((number != 0) || (number2 != 0)) {
+                 if (has2Digits)
+                     result.setCentury(number);
+                 else throw new ParseException("Bad gYear Format: "+str+"\nThe Century field must have 2 digits.",idx);
+                 //must test number2
+                 result.setYear(number2);
+             } else throw new ParseException("Bad gYear Format: "+str+"\n'0000' is not allowed as a year.",idx);
         }
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) ) {
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
-        }
-        if (flags == 0)
-            result.setZone(number2,number);
 
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
+        }
         return result;
 
     }//parse

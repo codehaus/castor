@@ -80,8 +80,7 @@ public class GMonth extends GMonthDay {
      */
 
     public GMonth(short month) {
-        this();
-        this.setMonth(month);
+        setMonth(month);
     }
 
      /**
@@ -92,8 +91,7 @@ public class GMonth extends GMonthDay {
      */
 
     public GMonth(int month) {
-        this();
-        this.setMonth((short)month);
+        setMonth((short)month);
     }
 
 
@@ -199,7 +197,7 @@ public class GMonth extends GMonthDay {
     public static GMonth parseGMonth(String str) throws ParseException {
 
         if (str == null)
-             throw new IllegalArgumentException("The string to be parsed must not"
+             throw new IllegalArgumentException("The string to be parsed must not "
                                                 +"be null.");
         GMonth result = new GMonth();
         char[] chars = str.toCharArray();
@@ -223,10 +221,12 @@ public class GMonth extends GMonthDay {
                           flags = 31;
                        else if ((flags == 31)  && (number == -1))
                           flags = 15;
-                       else if ( (flags == 15) && (has2Digits) ) {
-                           result.setMonth(number);
-                           flags = 7;
-                           number = -1;
+                       else if (flags == 15) {
+                           if (has2Digits) {
+                               result.setMonth(number);
+                               flags = 7;
+                               number = -1;
+                           } else throw new ParseException("Bad gMonth Format:"+str+"\nThe month field must have 2 digits.",idx);
                        }
                        else if ( (flags == 7) && (number == -1))
                            flags = 3;
@@ -235,38 +235,39 @@ public class GMonth extends GMonthDay {
                            result.setZoneNegative();
                            flags = 1;
                        }
-                       else throw new ParseException("Bad GMonth Format",idx);
+                       else throw new ParseException("Bad gMonth Format:"+str+"\nA gMonth must follow the pattern --MM--(Z|((+|-)hh:mm)).",idx);
                        hasNumber = false;
                        has2Digits = false;
                        break;
 
                  case 'Z' :
-                      if (flags != 3)
-                         throw new ParseException("'Z' is wrongly placed",idx);
-                      else result.setUTC();
-                      hasNumber = false;
-                      has2Digits = false;
+                        if (flags != 3)
+                         throw new ParseException("Bad gMonth Format:"+str+"\n'Z' is wrongly placed",idx);
+                      else
+                          result.setUTC();
                       break;
 
-                 case '+' :
+                case '+' :
                     if (flags != 3)
-                        throw new ParseException("'+' is wrongly placed",idx);
+                        throw new ParseException("Bad gMonth Format:"+str+"\n'+' is wrongly placed",idx);
                     else {
-                       result.setUTC();
-                       flags = 1;
+                          result.setUTC();
+                          flags = 1;
                     }
                     hasNumber = false;
                     has2Digits = false;
                     break;
+
                  case ':' :
                      if (flags != 1)
-                        throw new ParseException("':' is wrongly placed",idx);
+                        throw new ParseException("Bad gMonth Format:"+str+"\n':' is wrongly placed",idx);
                      number2 = number;
                      number = -1;
                      flags = 0;
                      hasNumber = false;
                      has2Digits = false;
                      break;
+
                  default:
                     //make sure we have a digit
                     if ( ('0' <= ch) && (ch <= '9')) {
@@ -284,12 +285,14 @@ public class GMonth extends GMonthDay {
                     break;
              }//switch
         }//while
-        if ( ((flags == 0) && (number == -1)) ||
-             ( (flags == 1) && result.isUTC()) ) {
-            throw new ParseException("In a time zone, the minute field must always be present.",idx);
+        if (flags!=3 && flags != 0)
+            throw new ParseException("Bad gMonth Format: "+str+"\nA gMonth must follow the pattern --MM--(Z|((+|-)hh:mm)).",idx);
+
+        else if (flags == 0) {
+            if (number != -1)
+                result.setZone(number2,number);
+            else throw new ParseException(str+"\n In a time zone, the minute field must always be present.",idx);
         }
-        if (flags == 0)
-            result.setZone(number2,number);
 
         return result;
 
