@@ -687,6 +687,12 @@ public class Marshaller extends MarshalFramework {
                 return;
             }
         }
+         //-- Suppress 'xsi:type' attributes when Castor is able to infer the
+         //-- information from the mapping file
+         //-- XXXX Date fix
+         if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
+             saveType = false;
+         //-- XXXX end Date fix
 
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();
