@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -63,7 +63,7 @@ import java.util.Hashtable;
  * The "Factory" responsible for creating fields for
  * the given schema components
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class MemberFactory {
@@ -248,16 +248,18 @@ public class MemberFactory {
                     if (resolver != null) {
                         classInfo = resolver.resolve(simpleType);
                     }
-                    if (classInfo != null)
+                    if (classInfo != null) {
                         xsType = classInfo.getSchemaType();
+                    }
                 }
                 else if (simpleType instanceof ListType) {
                     if (!simpleType.isBuiltInType())
                         simpleTypeCollection = true;
                 }
                 
-                if (xsType == null)
+                if (xsType == null) {
                     xsType = component.getJavaType();
+                }
             }//--simpleType
             else if (xmlType.isAnyType()) {
                 //-- Just treat as java.lang.Object.
@@ -298,7 +300,6 @@ public class MemberFactory {
 
         //--is the XSType found?
         if (xsType == null) {
-            
             String className = component.getQualifiedName();
             xsType = new XSClass(new JClass(className));
             className = null;
@@ -440,6 +441,12 @@ public class MemberFactory {
             else
                 fieldInfo.setDefaultValue(value);
         }
+        
+        //-- handle nillable values
+        if (component.isNillable())
+            fieldInfo.setNillable(true);
+        
+        
 
         //-- add annotated comments
         String comment = createComment(component.getAnnotated());
