@@ -1,9 +1,11 @@
 
 Version (CVS)
 -------------
+XML:	Fix the Marshaller to handle correctly Vector by keeping the xsi:type information 
+	(Bug reported by Eric Kaplan (eric.kaplan@armanta.com) (Arnaud)
 
 XML: 	Fix the SourceGenerator to handle correctly the 'types' package when a Date/Time
-	type is used as an attribute.(thanks to Maria Gray <maria.gray@datalex.ie>, Christopher P. van 		Buskirk <Chris.vanBuskirk@vanderbilt.edu> and Dean Thompson <dthompson@medebiz.net> for their 			proposed solutions) (Arnaud)
+	type is used as an attribute.(thanks to Maria Gray <maria.gray@datalex.ie>, Christopher P. van 		        Buskirk <Chris.vanBuskirk@vanderbilt.edu> and Dean Thompson <dthompson@medebiz.net> for their 			proposed solutions) (Arnaud)
 
 XML:    Removed a dependency to xerces jar in Configuration.java (Patch submitted by
         Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM> and committed by

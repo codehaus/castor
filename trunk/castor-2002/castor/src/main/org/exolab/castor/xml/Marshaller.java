@@ -520,10 +520,10 @@ public class Marshaller extends MarshalFramework {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
 
-		boolean atRoot = false;
+	boolean atRoot = false;
         if (descriptor == null) {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
-			atRoot = true;
+	    atRoot = true;
         }
 
         //-- calculate Object's name
@@ -552,16 +552,14 @@ public class Marshaller extends MarshalFramework {
             //-- the special #isPrimitive method of this class
             //-- so that we can check for the primitive wrapper
             //-- classes
-            if (isPrimitive(_class) || byteArray)
-            {
+            if (isPrimitive(_class) || byteArray) {
 
                 classDesc = _StringClassDescriptor;
 
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
-                saveType = (descriptor.getFieldType() == Object.class);
-            }
-            else {
+                saveType = (_class != descriptor.getFieldType());
+            } else {
                 //-- save package information for use when searching
                 //-- for MarshalInfo classes
                 String className = _class.getName();
@@ -573,18 +571,15 @@ public class Marshaller extends MarshalFramework {
                 }
 
 
-				if (_marshalExtendedType)
-				{
-					//  marshall as the actual value
-					classDesc = getClassDescriptor(_class);
-					saveType = (_class != descriptor.getFieldType());
-				}
-				else
-				{
-					// marshall as the base field type
-					_class = descriptor.getFieldType();
-					classDesc = getClassDescriptor(_class);
-				}
+		if (_marshalExtendedType) {
+		    //  marshall as the actual value
+		    classDesc = getClassDescriptor(_class);
+		    saveType = (_class != descriptor.getFieldType());
+		} else {
+		      // marshall as the base field type
+		      _class = descriptor.getFieldType();
+		      classDesc = getClassDescriptor(_class);
+		}
 
                 if (descriptor.getXMLName()==null)
                     name = classDesc.getXMLName();
