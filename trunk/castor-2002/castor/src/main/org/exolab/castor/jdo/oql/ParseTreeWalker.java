@@ -208,8 +208,15 @@ public class ParseTreeWalker implements TokenTypes
     if ( _clsDesc == null )
       throw new QueryException( "Could not get a descriptor for class " + _fromClassName );
 
-    if ( _parseTree.getChildCount() > 2 )
-      checkWhereClause( _parseTree.getChild(2) );
+    for ( int curChild = 2; curChild < _parseTree.getChildCount() - 1; curChild++ ) {
+      int tokenType = _parseTree.getChild(curChild).getToken().getTokenType();
+      switch ( tokenType ) {
+        case KEYWORD_WHERE:
+          checkWhereClause( _parseTree.getChild(curChild) );
+        case KEYWORD_ORDER:
+          checkOrderClause( _parseTree.getChild(curChild) );
+      }
+    }
   }
 
   /**
@@ -232,6 +239,9 @@ public class ParseTreeWalker implements TokenTypes
       case DOLLAR:
         checkParameter(whereClause);
         break;
+      case KEYWORD_IN:
+        checkField(whereClause.getChild(0));
+        checkInClauseRightSide(whereClause.getChild(1));
         
       default:
         for (Enumeration e = whereClause.children(); e.hasMoreElements(); ) {
@@ -357,6 +367,65 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
+   * Checks the right side of an IN clause.  it must be a LIST, and
+   * the children must all be literals.
+   *
+   * @param theList the ParseTreeNode containing the list which is the 
+   *    right side argument to IN.
+   * @throws QueryException if theList is not a list, or the list 
+   *    contains non literals.
+   */
+  private void checkInClauseRightSide(ParseTreeNode theList) 
+        throws QueryException {
+    
+    if ( theList.getToken().getTokenType() != KEYWORD_LIST )
+      throw new QueryException( "The right side of the IN operator must be a LIST." );
+
+    for ( Enumeration e = theList.children(); e.hasMoreElements(); ) {
+      switch (( (ParseTreeNode) e.nextElement() ).getToken().getTokenType()) {
+        case KEYWORD_NIL: case KEYWORD_UNDEFINED:
+        case BOOLEAN_LITERAL: case LONG_LITERAL:
+        case DOUBLE_LITERAL: case CHAR_LITERAL:
+        case STRING_LITERAL: case DATE_LITERAL:
+        case TIME_LITERAL: case TIMESTAMP_LITERAL:
+          break;
+        default:
+          throw new QueryException( "The LIST can only contain literals and Keywords nil and undefined." );
+      }
+    }
+    
+  }
+
+  /**
+   * Traverses the order by clause sub-tree and checks for errors.  
+   *
+   * @throws QueryException if an error is detected.
+   */
+  private void checkOrderClause(ParseTreeNode orderClause) 
+        throws QueryException {
+    
+    if ( orderClause.getToken().getTokenType() != KEYWORD_ORDER )
+      throw new QueryException( "checkOrderClause was called on a subtree which is not an order clause.");
+      
+    for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
+      ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
+
+      int tokenType = curChild.getToken().getTokenType();
+      switch (tokenType) {
+        case KEYWORD_ASC:
+        case KEYWORD_DESC:
+          checkField(curChild.getChild(0));
+          break;
+        case DOT: case IDENTIFIER:
+          checkField(curChild);
+          break;
+        default:
+          throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
+      }
+    }
+  }
+
+  /**
    * Generates the QueryExpression which is an SQL representation or the OQL
    * parse tree.
    *
@@ -369,12 +438,16 @@ public class ParseTreeWalker implements TokenTypes
     if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
       _queryExpr.setDistinct(true);
       
-    //process where clause
+    //process where clause and order clause
     for ( Enumeration e = _parseTree.children(); e.hasMoreElements(); ) {
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
-      if ( curChild.getToken().getTokenType() == KEYWORD_WHERE ) {
-        _queryExpr.addWhereClause( getWhereClause( _parseTree.getChild(2) ) );    
-        break;
+      int tokenType = curChild.getToken().getTokenType();
+      switch ( tokenType ) {
+        case KEYWORD_WHERE:
+          _queryExpr.addWhereClause( getWhereClause( curChild ) );    
+          break;
+        case KEYWORD_ORDER:
+          _queryExpr.addOrderClause( getOrderClause( curChild ) );
       }
     }
   }
@@ -422,7 +495,8 @@ public class ParseTreeWalker implements TokenTypes
    * @return The SQL translation of the expr.
    */
   private String getSQLExpr(ParseTreeNode exprTree) {
-  
+ 
+    StringBuffer sb = null;
     int tokenType =  exprTree.getToken().getTokenType();
 
     switch (tokenType) {
@@ -446,7 +520,8 @@ public class ParseTreeWalker implements TokenTypes
       case KEYWORD_AND: case KEYWORD_OR: 
       case EQUAL: case NOT_EQUAL: case CONCAT: 
       case GT: case GTE: case LT: case LTE: 
-      case TIMES: case DIVIDE: case KEYWORD_MOD: case KEYWORD_LIKE:
+      case TIMES: case DIVIDE: case KEYWORD_MOD: 
+      case KEYWORD_LIKE: case KEYWORD_IN:
         return getSQLExpr( exprTree.getChild(0) ) + " " 
                + exprTree.getToken().getTokenValue() + " "
                + getSQLExpr( exprTree.getChild(1) );
@@ -463,6 +538,18 @@ public class ParseTreeWalker implements TokenTypes
         return getSQLExpr( exprTree.getChild(0) ) + " IS NOT NULL ";
       case KEYWORD_IS_UNDEFINED:
         return getSQLExpr( exprTree.getChild(0) ) + " IS NULL ";
+
+      //List creation
+      case KEYWORD_LIST:
+        sb = new StringBuffer("( ");
+        
+        for (Enumeration e = exprTree.children(); e.hasMoreElements(); ) 
+          sb.append( getSQLExpr( (ParseTreeNode) e.nextElement() ) )
+            .append(" , ");
+            
+        //replace final comma space with close paren.
+        sb.replace(sb.length() - 2, sb.length() - 1, " )");
+        return sb.toString();
 
       //fields
       case IDENTIFIER: case DOT:
@@ -484,7 +571,7 @@ public class ParseTreeWalker implements TokenTypes
       //String literals: change \" to ""
       case STRING_LITERAL:
         //char replace function should really be somewhere else
-        StringBuffer sb = new StringBuffer();
+        sb = new StringBuffer();
         String copy = new String(exprTree.getToken().getTokenValue());
         
         int pos = copy.indexOf("\\\"");
@@ -515,4 +602,38 @@ public class ParseTreeWalker implements TokenTypes
     
   }
   
+  /**
+   * Returns a SQL version of an OQL order by clause.
+   *
+   * @param orderClause the parse tree node with the order by clause
+   * @return The SQL translation of the order by clause.
+   */
+  private String getOrderClause(ParseTreeNode orderClause) {
+
+    StringBuffer sb = new StringBuffer();
+
+    for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
+      sb.append(", ");
+      ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
+      int tokenType = curChild.getToken().getTokenType();
+      switch ( tokenType ) {
+        case KEYWORD_ASC: 
+          sb.append( getSQLExpr( curChild.getChild(0) ) ).append( " ASC " );
+          break;
+        case KEYWORD_DESC:
+          sb.append( getSQLExpr( curChild.getChild(0) ) ).append( " DESC " );
+          break;
+        case DOT: case IDENTIFIER:
+          sb.append( getSQLExpr( curChild ) ).append( " " );
+          break;
+      }
+    }
+
+    //remove the additional comma space at the beginning
+    sb.deleteCharAt(0).deleteCharAt(0);
+    
+    return sb.toString();
+  }
+
+
 }

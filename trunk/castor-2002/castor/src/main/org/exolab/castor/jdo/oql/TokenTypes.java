@@ -97,4 +97,10 @@ public interface TokenTypes {
   int KEYWORD_DISTINCT = 41;
   int KEYWORD_IS_DEFINED = 42;
   int KEYWORD_IS_UNDEFINED = 43;
+  int KEYWORD_LIST = 44;
+  int COMMA = 45;
+  int KEYWORD_ORDER = 46;
+  int KEYWORD_BY = 47;
+  int KEYWORD_ASC = 48;
+  int KEYWORD_DESC = 49;
 }

@@ -91,8 +91,12 @@ public class Parser implements TokenTypes {
     _treeRoot.addChild(projectionAttributes());
     _treeRoot.addChild(fromClause());
     
-    if ( (_curToken.getTokenType() == KEYWORD_WHERE) ) {
+    if ( _curToken.getTokenType() == KEYWORD_WHERE ) {
       _treeRoot.addChild(whereClause());
+    }
+
+    if ( _curToken.getTokenType() == KEYWORD_ORDER ) {
+      _treeRoot.addChild(orderClause());
     }
     
     match(END_OF_QUERY);
@@ -479,7 +483,7 @@ public class Parser implements TokenTypes {
             throws InvalidCharException, OQLSyntaxException {
     
     ParseTreeNode retNode = null;
-    ParseTreeNode leftSide = unaryExpr();
+    ParseTreeNode leftSide = inExpr();
 
     int tokenType = _curToken.getTokenType();
     switch (tokenType) {
@@ -488,7 +492,7 @@ public class Parser implements TokenTypes {
       case KEYWORD_MOD:
         retNode = match(tokenType);
         retNode.addChild(leftSide);
-        retNode.addChild(unaryExpr());
+        retNode.addChild(inExpr());
     }
     
     if (retNode == null)
@@ -496,6 +500,34 @@ public class Parser implements TokenTypes {
     else
       return retNode;
   }
+
+  /**
+   * Consumes tokens of inExpr clause. 
+   *
+   * @return a Parse tree containing a single unaryExpr tree, or a 
+   *    root containing KEYWORD_IN, with two unaryExpr 
+   *    tree children.
+   * @throws InvalidCharException passed through from match().
+   * @throws OQLSyntaxException passed through from match().
+   */
+  private ParseTreeNode inExpr() 
+            throws InvalidCharException, OQLSyntaxException {
+    
+    ParseTreeNode retNode = null;
+    ParseTreeNode leftSide = unaryExpr();
+
+    if ( _curToken.getTokenType() == KEYWORD_IN ) {
+      retNode = match(KEYWORD_IN);
+      retNode.addChild(leftSide);
+      retNode.addChild(unaryExpr());
+    }
+    
+    if (retNode == null)
+      return leftSide;
+    else
+      return retNode;
+  }
+  
 
   /**
    * Consumes tokens of unaryExpr clause. 
@@ -585,6 +617,8 @@ public class Parser implements TokenTypes {
       case KEYWORD_IS_DEFINED:
       case KEYWORD_IS_UNDEFINED:
         retNode = undefinedExpr();
+      case KEYWORD_LIST:
+        retNode = collectionExpr();
       case DOLLAR:
         retNode = queryParam();
         break;
@@ -609,6 +643,39 @@ public class Parser implements TokenTypes {
       return primaryExpr();
     else
       return retNode;
+  }
+
+  /**
+   * Consumes tokens of collectionExpr.
+   *
+   * @return Parse Tree with the root containing the function call and 
+   *    the children containing the parameters
+   * @throws InvalidCharException passed through from match()
+   * @throws OQLSyntaxException passed through from match() or if an
+   *    unexpected token is encountered here.
+   */
+  private ParseTreeNode collectionExpr()
+            throws InvalidCharException, OQLSyntaxException {
+    
+    if ( _curToken.getTokenType() == KEYWORD_LIST ) 
+    {
+      ParseTreeNode retNode = match( KEYWORD_LIST );
+      
+      match( LPAREN );
+      
+      retNode.addChild(expr());
+      
+      while ( _curToken.getTokenType() == COMMA ) {
+        match( COMMA );
+        retNode.addChild( expr() );
+      }
+
+      match( RPAREN );
+      
+      return( retNode );
+    }
+
+    throw new OQLSyntaxException( "Expected collectionExpr and didn't find it at or near: " + _curToken.getTokenValue() );
   }
 
   /**
@@ -675,6 +742,56 @@ public class Parser implements TokenTypes {
         break;
       default:
         throw (new OQLSyntaxException("An inapropriate token was encountered in a query parameter."));
+    }
+    
+    return retNode;
+  }
+
+  /**
+   * Consumes tokens of orderClause. 
+   *
+   * @return a Parse tree containing ORDER as the root, with children 
+   *    as order parameters.
+   * @throws InvalidCharException passed through from match().
+   * @throws OQLSyntaxException passed through from match(), or if an 
+   *    unknown token is encountered here.
+   */
+  private ParseTreeNode orderClause() 
+            throws InvalidCharException, OQLSyntaxException {
+            
+    ParseTreeNode retNode = match(KEYWORD_ORDER);
+    match(KEYWORD_BY);
+
+    ParseTreeNode curExpression = null;
+    ParseTreeNode curOrder = null;
+
+    curExpression = expr();
+
+    int tokenType = _curToken.getTokenType();
+    if ( tokenType == KEYWORD_ASC || tokenType == KEYWORD_DESC ) {
+      curOrder = match( tokenType );
+      curOrder.addChild( curExpression );
+      retNode.addChild( curOrder );
+    }
+    else {
+      retNode.addChild( curExpression );
+    }
+
+    while ( _curToken.getTokenType() == COMMA ) {
+      match( COMMA );
+      
+      curExpression = expr();
+
+      tokenType = _curToken.getTokenType();
+      if ( tokenType == KEYWORD_ASC || tokenType == KEYWORD_DESC ) {
+        curOrder = match( tokenType );
+        curOrder.addChild( curExpression );
+        retNode.addChild( curOrder );
+      }
+      else {
+        retNode.addChild( curExpression );
+      }
+
     }
     
     return retNode;

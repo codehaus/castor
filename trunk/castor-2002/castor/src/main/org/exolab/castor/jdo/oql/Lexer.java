@@ -91,6 +91,11 @@ public class Lexer implements TokenTypes {
     keywords.put("distinct", new Integer(KEYWORD_DISTINCT));
     keywords.put("is_defined", new Integer(KEYWORD_IS_DEFINED));
     keywords.put("is_undefined", new Integer(KEYWORD_IS_UNDEFINED));
+    keywords.put("list", new Integer(KEYWORD_LIST));
+    keywords.put("order", new Integer(KEYWORD_ORDER));
+    keywords.put("by", new Integer(KEYWORD_BY));
+    keywords.put("asc", new Integer(KEYWORD_ASC));
+    keywords.put("desc", new Integer(KEYWORD_DESC));
         
   }
 
@@ -213,6 +218,9 @@ public class Lexer implements TokenTypes {
         break;
       case '$':
         retToken = new Token( DOLLAR, "$" );
+        break;
+      case ',':
+        retToken = new Token( COMMA, "," );
         break;
     }
     if ( retToken == null ) 
