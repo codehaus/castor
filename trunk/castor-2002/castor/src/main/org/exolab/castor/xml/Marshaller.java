@@ -78,6 +78,12 @@ public class Marshaller {
     
     
     /**
+     * A flag indicating whether or not to 
+     * marshal as an XML document, or just a fragment
+    **/
+    private boolean _asDocument = false;
+    
+    /**
      * A flag indicating whether or not to generate 
      * debug information
     **/
@@ -154,6 +160,19 @@ public class Marshaller {
     } //-- Marshaller
 
 
+    /**
+     * Sets whether or not to marshal as a document which includes
+     * the XML declaration, and if necessary the DOCTYPE declaration.
+     * By default the Marshaller will marshal as a well formed 
+     * XML fragment (no XML declaration or DOCTYPE).
+     *
+     * @param asDocument a boolean, when true, indicating to marshal
+     * as a complete XML document.
+    **/
+    public void setMarshalAsDocument(boolean asDocument) {
+        this._asDocument = asDocument;
+    } //-- setMarshalAsDocument
+    
     public void setMapping( Mapping mapping )
         throws MappingException
     {
@@ -231,7 +250,19 @@ public class Marshaller {
         throws MarshalException, ValidationException
     {
         validate(object);
-        marshal(object, null, _handler);
+        
+        if (_asDocument) {
+            try {
+                _handler.startDocument();
+                marshal(object, null, _handler);
+                _handler.endDocument();
+            }
+            catch(org.xml.sax.SAXException sx) {
+                throw new MarshalException(sx);
+            }
+        }
+        else marshal(object, null, _handler);
+        
     } //-- marshal
     
     /**
