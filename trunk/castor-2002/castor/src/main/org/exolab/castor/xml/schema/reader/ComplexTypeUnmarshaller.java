@@ -78,6 +78,7 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
     private ComplexType _complexType = null;
 	private boolean allowAnnotation     = true;
     private boolean foundAnnotation     = false;
+    private boolean foundAnyAttribute   = false;
     private boolean foundAttributes     = false;
     private boolean foundSimpleContent  = false;
     private boolean foundComplexContent = false;
@@ -202,6 +203,21 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
+
+        //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+
+            if (foundComplexContent)
+                error("an anyAttribute element cannot appear as a child "+
+                    "of 'complexType' if 'complexContent' also exists");
+            if (foundSimpleContent)
+                error("an anyAttribute element cannot appear as a child "+
+                    "of 'complexType' if 'simpleContent' also exists");
+            foundAnyAttribute = true;
+            allowAnnotation = true;
+            unmarshaller
+                 = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
+        }
 
         //-- attribute declarations
         if (SchemaNames.ATTRIBUTE.equals(name)) {
@@ -367,6 +383,16 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
+        //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+           Wildcard wildcard =
+                 ((WildcardUnmarshaller)unmarshaller).getWildcard();
+            try {
+                _complexType.setAnyAttribute(wildcard);
+            } catch (SchemaException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
+        }
         //-- attribute declarations
         if (SchemaNames.ATTRIBUTE.equals(name)) {
             AttributeDecl attrDecl =

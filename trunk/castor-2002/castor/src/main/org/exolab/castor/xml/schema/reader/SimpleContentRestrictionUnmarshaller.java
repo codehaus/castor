@@ -82,6 +82,7 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
     private boolean     foundAnnotation   = false;
     private boolean     foundSimpleType   = false;
 	private boolean     foundFacets       = false;
+    private boolean     foundAnyAttribute = false;
 	private boolean     foundAttribute    = false;
     private boolean     foundAttributeGroup = false;
 
@@ -249,10 +250,13 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
 			 foundAttributeGroup = true;
 			 unmarshaller = new AttributeGroupUnmarshaller(_schema,atts);
 		}
-		else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
-            //-- not yet supported....
-            error("anyAttribute is not yet supported.");
-		}
+        //-- <anyAttribute>
+        else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+           foundAnyAttribute = true;
+            unmarshaller
+                 = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
+        }
+
 		else illegalElement(name);
 
         unmarshaller.setDocumentLocator(getDocumentLocator());
@@ -280,6 +284,16 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
             _complexType.addAnnotation(ann);
+        }
+        //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+            Wildcard wildcard =
+                 ((WildcardUnmarshaller)unmarshaller).getWildcard();
+            try {
+                _complexType.setAnyAttribute(wildcard);
+            } catch (SchemaException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
         }
         //Note: the attributes are added to the complexType
         //since a simpleType does not contain attributes at all

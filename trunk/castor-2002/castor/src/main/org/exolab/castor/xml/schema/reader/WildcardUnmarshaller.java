@@ -43,33 +43,26 @@
  * $Id$
  */
 
-package org.exolab.castor.xml.schema.reader;
+ package org.exolab.castor.xml.schema.reader;
 
-//-- imported classes and packages
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
+import java.util.StringTokenizer;
 /**
- * A class for Unmarshalling ModelGroups
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * A class for Unmarshalling WildCard
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public class GroupUnmarshaller extends SaxUnmarshaller {
+public class WildcardUnmarshaller extends SaxUnmarshaller {
 
-      //--------------------------/
-     //- Static Class Variables -/
-    //--------------------------/
-
-    private static final int ALL         = 1;
-    private static final int CHOICE      = 2;
-    private static final int MODEL_GROUP = 3;
-    private static final int SEQUENCE    = 4;
 
     /**
      * The value of the maximum occurance wild card
      */
     private static final String MAX_OCCURS_WILDCARD = "unbounded";
+
 
       //--------------------/
      //- Member Variables -/
@@ -86,10 +79,9 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     private int depth = 0;
 
     /**
-     * The ModelGroup reference for the ModelGroup we are constructing
-    **/
-    private Group _group = null;
-
+     * The wildcard we are constructing
+     */
+     private Wildcard _wildcard = null;
     /**
      * The Schema being "unmarshalled"
     **/
@@ -97,60 +89,82 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
 
     /**
      * The element name of the Group to be unmarshalled.
-    **/
-    private String _element = SchemaNames.GROUP;
+     */
+    private String _element = SchemaNames.ANY;
 
-    private boolean foundAll        = false;
 
       //----------------/
      //- Constructors -/
     //----------------/
+    public WildcardUnmarshaller
+        (ComplexType complexType, Schema schema, String element, AttributeList atts, Resolver resolver)
+    {
+        super();
+        _wildcard = new Wildcard(complexType);
+        init(schema, element, atts, resolver);
+    }
+
+    public WildcardUnmarshaller
+        (Group group, Schema schema, String element, AttributeList atts, Resolver resolver)
+    {
+        super();
+        _wildcard = new Wildcard(group);
+        init(schema, element, atts, resolver);
+    }
 
     /**
-     * Creates a new GroupUnmarshaller
-     * @param schema the Schema to which the Group belongs
-     * @param the element name for this type of group
+     * Creates a new WildcardUnmarshaller
+     * @param schema the Schema to which the Wildcard belongs
+     * @param element the name of the element
      * @param atts the AttributeList
      * @param resolver the resolver being used for reference resolving
     **/
-    public GroupUnmarshaller
+    public void init
         (Schema schema, String element, AttributeList atts, Resolver resolver)
     {
-        super();
         setResolver(resolver);
         this._schema = schema;
+        this._element = element;
 
-        _group = new Group();
         //-- handle attributes
         String attValue = null;
 
-
-        //-- MODEL GROUP
-        if (SchemaNames.GROUP.equals(element)) {
-            //-- set name
-            _group.setName(atts.getValue("name"));
-            _group.setIsModelGroupDefinition(true);
-        }
-        else {
-            _group.setIsModelGroupDefinition(false);
-
-            if (SchemaNames.SEQUENCE.equals(element)) {
-                _group.setOrder(Order.seq);
-            }
-            else if (SchemaNames.CHOICE.equals(element)) {
-                _group.setOrder(Order.choice);
-            }
-            else if (SchemaNames.ALL.equals(element)) {
-                _group.setOrder(Order.all);
-            }
-            else {
-                String err = "Invalid group element name: '" +
-                    element + "'";
-                throw new IllegalArgumentException(err);
-            }
-        }
-
+        if (SchemaNames.ANY_ATTRIBUTE.equals(element))
+           _wildcard.setAttributeWildcard();
         _element = element;
+
+        //--namespace
+        attValue = atts.getValue(SchemaNames.NAMESPACE);
+
+        if (attValue != null) {
+           // check if there is more than one namespace
+           StringTokenizer tokenizer = new StringTokenizer(attValue);
+           while (tokenizer.hasMoreTokens()) {
+               //need to retrieve all the namespaces
+               String temp = tokenizer.nextToken();
+               //if there is more than one namespace ##any or ##other should not
+               //appear
+               /**@todo optimize the following?*/
+               if (tokenizer.countTokens() >1 )
+                   if ( (SchemaNames.NAMESPACE_ANY.equals(temp)) ||
+                        (SchemaNames.NAMESPACE_OTHER.equals(temp)) )
+                        throw new IllegalArgumentException(temp+" is not valid when multiple namespaces are listed.");
+
+               /**
+                *@todo validation on the value of the attribute
+                * we need a way to check the validity of an URI.
+                * A temporary solution if to assume that the URI are URL.
+                * @see SchemaNames#isNamespaceName()
+                */
+                if (SchemaNames.isNamespaceName(temp))
+                   _wildcard.addNamespace(temp);
+                else {
+                     String err = "Invalid 'namespace' value: "+temp;
+                     throw new IllegalArgumentException(err);
+                }
+           }
+         }//if
+         else _wildcard.addNamespace(SchemaNames.ANY);
 
         /*
          * @maxOccurs
@@ -162,23 +176,35 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         if (attValue != null) {
             if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
             int maxOccurs = toInt(attValue);
-            _group.setMaxOccurs(maxOccurs);
+            _wildcard.setMaxOccurs(maxOccurs);
         }
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
         if (attValue != null)
-            _group.setMinOccurs(toInt(attValue));
+            _wildcard.setMinOccurs(toInt(attValue));
+
+        //-- processContents
+        attValue = atts.getValue("processContents");
+
+        if (attValue != null) {
+           try {
+               _wildcard.setProcessContents(attValue);
+           } catch (SchemaException e) {
+               throw new IllegalArgumentException(e.getMessage());
+           }
+        }
+
 
         //-- id
-        _group.setId(atts.getValue("id"));
+        _wildcard.setId(atts.getValue("id"));
 
-    } //-- GroupUnmarshaller
+    } //-- WildCardUnmarshaller
 
       //-----------/
      //- Methods -/
     //-----------/
 
-    /**
+     /**
      * Returns the name of the element that this SaxUnmarshaller
      * handles
      * @return the name of the element that this SaxUnmarshaller
@@ -190,22 +216,18 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
 
 
     /**
-     * Returns the Group that was unmarshalled by this Unmarshaller.
-     * This method should only be called after unmarshalling
-     * has been completed.
-     *
-     * @return the unmarshalled Group
-    **/
-    public Group getGroup() {
-        return _group;
-    } //-- getGroup
-
+     * Returns the Wildcard unmarshalled by this Unmarshaller.
+     * @return the unmarshalled Wildcard
+     */
+    public Wildcard getWildcard() {
+        return _wildcard;
+    }
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
     **/
     public Object getObject() {
-        return getGroup();
+        return getWildcard();
     } //-- getObject
 
     /**
@@ -222,38 +244,17 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-
-        if (SchemaNames.ELEMENT.equals(name)) {
-            unmarshaller
-                = new ElementUnmarshaller(_schema, atts, getResolver());
-        }
-        //--group
-        else if (name.equals(SchemaNames.GROUP))
-        {
-            unmarshaller
-                = new ModelGroupUnmarshaller(_schema, atts, getResolver());
-        }
-
-        //--all, sequence, choice
-        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
-        {
-            if (SchemaNames.ALL.equals(name))
-               foundAll = true;
-            unmarshaller
-                = new GroupUnmarshaller(_schema, name, atts, getResolver());
-        }
-        //--any
-        else if (SchemaNames.ANY.equals(name)) {
-             if (foundAll)
-                error("<any> can not appear as a child of a <all> element");
-             unmarshaller
-                 = new WildcardUnmarshaller(_group, _schema, name, atts, getResolver());
+         //-- <annotation>
+        if (name == SchemaNames.ANNOTATION) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
         }
 
         else {
             StringBuffer err = new StringBuffer("illegal element <");
             err.append(name);
-            err.append("> found in <group>.");
+            err.append("> found in <");
+            err.append(_element);
+            err.append(">");
             throw new SAXException(err.toString());
         }
 
@@ -273,6 +274,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             --depth;
             return;
         }
+
         //-- check for name mismatches
         if (unmarshaller != null) {
             if (!name.equals(unmarshaller.elementName())) {
@@ -285,32 +287,10 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
-         //-- <any>
-        if (SchemaNames.ANY.equals(name)) {
-           Wildcard wildcard =
-                 ((WildcardUnmarshaller)unmarshaller).getWildcard();
-            try {
-                _group.addWildcard(wildcard);
-            } catch (SchemaException e) {
-                throw new IllegalArgumentException(e.getMessage());
-            }
+        //-- <annotation>
+        if (name == SchemaNames.ANNOTATION) {
+            _schema.addAnnotation((Annotation)unmarshaller.getObject());
         }
-
-        if (SchemaNames.ELEMENT.equals(name)) {
-            ElementDecl element =
-                ((ElementUnmarshaller)unmarshaller).getElement();
-            _group.addElementDecl(element);
-        }
-        else if (name.equals(SchemaNames.GROUP)) {
-            ModelGroup group = ((ModelGroupUnmarshaller)unmarshaller).getGroup();
-            _group.addGroup(group);
-        }
-        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
-        {
-            Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
-            _group.addGroup(group);
-        }
-
         unmarshaller = null;
     } //-- endElement
 
@@ -323,4 +303,4 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         }
     } //-- characters
 
-} //-- GroupUnmarshaller
+}
