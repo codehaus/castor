@@ -637,8 +637,9 @@ public class Marshaller extends MarshalFramework {
 
         boolean containerField = false;
 
-        if (descriptor != null && descriptor.isContainer())
+        if (descriptor != null && descriptor.isContainer()) {
             containerField = true;
+        }
 
         //-- add object to stack so we don't potentially get into
         //-- an endlessloop
@@ -794,19 +795,22 @@ public class Marshaller extends MarshalFramework {
                      MarshalFramework.InheritanceMatch[] matches =
                            MarshalFramework.searchInheritance(xmlElementName, null, tempContaining, _cdResolver);
 
-                     MarshalFramework.InheritanceMatch match = matches[0];
+                     if (matches.length == 1) {
 
-                     boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
+                          MarshalFramework.InheritanceMatch match = matches[0];
 
-                     boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) ||
-                                                          ( (matches.length == 1) &&
-                                                          (match.parentFieldDesc == descriptor)));
+                          boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
 
-                     // Can we remove the xsi:type ?
-                     if (foundTheRightClass && oneAndOnlyOneMatchedField) {
-                         saveType = false;
-                        //no name swapping for now
-                     }
+                          boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) ||
+                                                              ( (matches.length == 1) &&
+                                                              (match.parentFieldDesc == descriptor)));
+
+                         // Can we remove the xsi:type ?
+                         if (foundTheRightClass && oneAndOnlyOneMatchedField) {
+                              saveType = false;
+                             //no name swapping for now
+                         }
+                     }//lengh is one
                  }//the classDesc comes from a mapping file
              }
          }//--- End of "if (saveType)"
