@@ -203,14 +203,14 @@ public interface PersistenceQuery
      * know cache engine, identity and lock and acts on the query
      * results rather than issuing a new query to load the object.
      *
-     * @param obj The object to load into
+     * @param object The object to load into
      * @return The object's stamp, or null
      * @throws ObjectNotFoundException The object was not found in
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      * @see Persistence#load
      */
-    public Object fetch( Object obj )
+    public Object fetch( Object object )
         throws ObjectNotFoundException, PersistenceException;
     
 
