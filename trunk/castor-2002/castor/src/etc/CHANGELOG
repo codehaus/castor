@@ -1,6 +1,9 @@
 
 Version (CVS)
 -------------
+XML:	Fixed bug 916 and other problems in the Validation code related to generated classes.
+         (Arnaud - 20020418)
+
 XML:	Fixed bug 879: The generated classes now reflect the 'Restriction' inheritence
         model for complexType as defined by W3C XML Schema (Arnaud - 20020405)
 
