@@ -44,76 +44,105 @@
  */
 
 
-package jdo;
+package harness;
 
 
 import java.util.Vector;
 import java.util.Enumeration;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
-import org.exolab.castor.jdo.JDO;
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
-import org.exolab.castor.util.Logger;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.jtf.CWTestCase;
+import org.exolab.jtf.CWBaseApplication;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
-
-public class TestBase
-    extends CWTestCategory
+public class Harness
 {
 
 
-    public static final String DatabaseName = "test";
+    private String  _name;
 
 
-    private String    _databaseFile;
+    private String  _description;
 
 
-    public TestBase( String database, String databaseFile )
+    private Vector  _categories = new Vector();
+
+
+    public void setName( String name )
+    {
+        _name = name;
+    }
+
+
+    public String getName()
+    {
+        return _name;
+    }
+
+
+    public void setDescription( String description )
+    {
+        _description = description;
+    }
+
+
+    public String getDescription()
+    {
+        return _description;
+    }
+
+
+    public void setCategory( Category category )
+    {
+        _categories.addElement( category );
+    }
+
+
+    public Enumeration getCategory()
+    {
+        return _categories.elements();
+    }
+
+
+    public CWBaseApplication createTestHarness( boolean verbose )
         throws CWClassConstructorException
     {
-        super( database, "JDO Tests for " + database );
-        
-        CWTestCase tc;
-        
-        _databaseFile = databaseFile;
-        tc = new Concurrent( this );
-        add( tc.name(), tc, true );
-        tc = new Deadlock( this );
-        add( tc.name(), tc, true );
-        tc = new DuplicateKey( this );
-        add( tc.name(), tc, true );
-        tc = new ReadOnly( this );
-        add( tc.name(), tc, true );
-        tc = new TypeHandling( this );
-        add( tc.name(), tc, true );
+        TestHarness harness;
+
+        harness = new TestHarness( _name );
+        for ( int i = 0 ; i < _categories.size() ; ++i )
+            harness.add( ( (Category) _categories.elementAt( i ) ).createTestCategory( verbose ) );
+        return harness;
     }
 
 
-    public Database getDatabase()
-        throws PersistenceException
+    public static class TestHarness
+        extends CWBaseApplication
     {
-        JDO jdo;
 
-        jdo = new JDO();
-        jdo.setConfiguration( TestBase.class.getResource( _databaseFile ).toString() );
-        jdo.setDatabaseName( DatabaseName );
-        jdo.setLogWriter( Logger.getSystemLogger() );
-        return jdo.getDatabase();
+        private Vector _categories = new Vector();
+
+        TestHarness( String name )
+            throws CWClassConstructorException
+        {
+            super( name );
+        }
+
+        void addCategory( CWTestCategory category )
+        {
+            _categories.addElement( category );
+        }
+
+        protected Enumeration getCategoryClassNames()
+        {
+            return _categories.elements();
+        }
+        
+        protected String getApplicationName()
+        {
+            return getClass().getName();
+        }
+
     }
-
-
-    public Connection getJDBCConnection()
-        throws SQLException
-    {
-        return DatabaseRegistry.getDatabaseRegistry( DatabaseName ).createConnection();
-    }
-
-
 
 }

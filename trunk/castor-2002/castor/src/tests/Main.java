@@ -44,23 +44,36 @@
  */
 
 
-package jdo;
+import java.util.Vector;
+import java.util.Enumeration;
+import java.io.InputStreamReader;
+import org.exolab.jtf.CWBaseApplication;
+import org.exolab.castor.xml.Unmarshaller;
+import org.exolab.castor.mapping.Mapping;
+import harness.Harness;
 
 
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.exceptions.CWClassConstructorException;
-
-
-public class Postgres
-    extends TestBase
+public class Main
 {
 
-
-    public Postgres()
-        throws CWClassConstructorException
+    static public void main( String args[] )
     {
-        super( "postgres", "postgres.xml" );
+        try {
+            Unmarshaller      unm;
+            Harness           harness;
+            CWBaseApplication testApp;
+            Mapping           mapping;
+            
+            unm = new Unmarshaller( Harness.class );
+            mapping = new Mapping();
+            mapping.loadMapping( Main.class.getResource( "harness/mapping.xml" ) );
+            unm.setMapping( mapping );
+            harness = (Harness) unm.unmarshal( new InputStreamReader( Main.class.getResourceAsStream( "tests.xml" ) ) );
+            testApp = harness.createTestHarness( false );
+            testApp.run( args );
+        } catch ( Exception except ) {
+            except.printStackTrace();
+        }
     }
 
 

@@ -44,63 +44,124 @@
  */
 
 
+package harness;
+
+
 import java.util.Vector;
 import java.util.Enumeration;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Constructor;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWBaseApplication;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
-/**
- * Test harness for Castor.
- */
-public class TestHarness
-    extends CWBaseApplication
+public class Category
 {
 
 
-    static Vector _categories = new Vector();
+    private String  _name;
 
 
-    static
+    private String  _description;
+
+
+    private String  _className;
+
+
+    private Vector  _cases = new Vector();
+
+
+    private Object  _object;
+
+
+    public void setName( String name )
     {
-        _categories.addElement( jdo.Postgres.class.getName() );
-        _categories.addElement( jdo.Sybase.class.getName() );
-        _categories.addElement( xml.XMLTests.class.getName() );
+        _name = name;
     }
 
 
-
-    static public void main( String args[] )
+    public String getName()
     {
-        try {
-            TestHarness harness;
-
-            harness = new TestHarness();
-            harness.run( args );
-        } catch ( Exception except ) {
-            except.printStackTrace();
-        }
+        return _name;
     }
 
 
-    public TestHarness()
+    public void setDescription( String description )
+    {
+        _description = description;
+    }
+
+
+    public String getDescription()
+    {
+        return _description;
+    }
+
+
+    public void setClassName( String className )
+    {
+        _className = className;
+    }
+
+
+    public String getClassName()
+    {
+        return _className;
+    }
+
+
+    public void addCase( Case tc )
+    {
+        _cases.addElement( tc );
+    }
+
+
+    public Enumeration getCase()
+    {
+        return _cases.elements();
+    }
+
+
+    public void setObject( Object object )
+    {
+        _object = object;
+    }
+
+
+    public Object getObject()
+    {
+        return _object;
+    }
+
+
+    public CWTestCategory createTestCategory( boolean verbose )
         throws CWClassConstructorException
     {
-        super( "Castor" );
-    }
+        Class          catClass;
+        Constructor    cnst;
+        CWTestCategory category;
+        CWTestCase     tc;
 
-
-    protected Enumeration getCategoryClassNames()
-    {
-        return _categories.elements();
-    }
-
-
-    protected String getApplicationName()
-    {
-        return getClass().getName();
+        try {
+            catClass = getClass().getClassLoader().loadClass( _className );
+            cnst = catClass.getConstructor( new Class[] { String.class, String.class,
+                                                          Boolean.TYPE, Object.class } );
+            category = (CWTestCategory) cnst.newInstance( new Object[] { _name, _description,
+                                                                         new Boolean( verbose), _object } );
+            for ( int i = 0 ; i < _cases.size() ; ++i ) {
+                tc = ( (Case) _cases.elementAt( i ) ).createTestCase( category );
+                category.add( tc.name(), tc, true );
+            }
+            return category;
+        } catch ( CWClassConstructorException except ) {
+            throw except;
+        } catch ( InvocationTargetException except ) {
+            throw new CWClassConstructorException( (Exception) except.getTargetException() );
+        } catch ( Exception except ) {
+            throw new CWClassConstructorException( except );
+        }
     }
 
 

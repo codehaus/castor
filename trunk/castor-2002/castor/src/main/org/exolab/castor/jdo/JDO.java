@@ -389,6 +389,8 @@ public class JDO
     public Database getDatabase()
         throws DatabaseNotFoundException, PersistenceException
     {
+        InputStream  is;
+
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
         if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {

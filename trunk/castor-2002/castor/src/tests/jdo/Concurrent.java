@@ -57,6 +57,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
+import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
@@ -82,13 +83,13 @@ public class Concurrent
     static final String    JDOValue = "jdo value";
 
 
-    public Concurrent( TestBase testBase )
+    public Concurrent( String name, String description, CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC01", "Test dirty checking" );
+        super( name, description );
         try {
-            _db = testBase.getDatabase();
-            _conn = testBase.getJDBCConnection(); 
+            _db = ( (JDOCategory) category ).getDatabase();
+            _conn = ( (JDOCategory) category ).getJDBCConnection(); 
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }
@@ -127,9 +128,7 @@ public class Concurrent
             _db.close();
             _conn.close();
         } catch ( Exception except ) {
-            try {
-                stream.writeVerbose( "Error: " + except );
-            } catch ( IOException except2 ) { }
+            stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }
@@ -226,9 +225,7 @@ public class Concurrent
                 stream.writeVerbose( "Error: ObjectModifiedException thrown" );
             }
         } catch ( Exception except ) {
-            try {
-                stream.writeVerbose( "Error: " + except );
-            } catch ( IOException except2 ) { }
+            stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }

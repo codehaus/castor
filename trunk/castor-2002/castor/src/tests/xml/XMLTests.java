@@ -15,10 +15,10 @@ public class XMLTests
     public static final String MappingFile = "mapping.xml";
 
 
-    public XMLTests()
+    public XMLTests( String name, String description )
         throws CWClassConstructorException
     {
-        super( "xml", "XML Tests");
+        super( name, description );
         
         CWTestCase tc;
         

@@ -56,6 +56,7 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
+import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
@@ -81,14 +82,14 @@ public class Deadlock
     public static final long  Wait = 1000;
 
 
-    public Deadlock( TestBase testBase )
+    public Deadlock( String name, String description, CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC02", "Test deadlock detection" );
+        super( name, description );
         try {
-            _db = testBase.getDatabase();
-            _first = testBase.getDatabase();
-            _second = testBase.getDatabase();
+            _db = ( (JDOCategory) category ).getDatabase();
+            _first = ( (JDOCategory) category ).getDatabase();
+            _second = ( (JDOCategory) category ).getDatabase();
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }
@@ -128,9 +129,7 @@ public class Deadlock
             _first.close();
             _second.close();
         } catch ( Exception except ) {
-            try {
-                stream.writeVerbose( "Error: " + except );
-            } catch ( IOException except2 ) { }
+            stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }
@@ -203,9 +202,7 @@ public class Deadlock
             result = first._result & second._result;
 
         } catch ( Exception except ) {
-            try {
-                stream.writeVerbose( "Error: " + except );
-            } catch ( IOException except2 ) { }
+            stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }
@@ -266,9 +263,7 @@ public class Deadlock
                 _stream.writeVerbose( "First: Committed" );
             } catch ( Exception except ) {
                 _result = false;
-                try {
-                    _stream.writeVerbose( "First: " + except );
-                } catch ( IOException e2 ) { }
+                _stream.writeVerbose( "First: " + except );
                 except.printStackTrace();
                 _result = false;
             }
@@ -348,20 +343,16 @@ public class Deadlock
                 _stream.writeVerbose( "Error: deadlock not detected" );
                 _stream.writeVerbose( "Second: Committed" );
             } catch ( TransactionAbortedException except ) {
-                try {
-                    if ( except.getException() instanceof LockNotGrantedException )
-                        _stream.writeVerbose( "OK: Deadlock detected" );
-                    else {
-                        _result = false;
-                        _stream.writeVerbose( "Error: " + except );
-                    }
-                    _stream.writeVerbose( "Second: aborting" );
-                } catch ( IOException e2 ) { }
+                if ( except.getException() instanceof LockNotGrantedException )
+                    _stream.writeVerbose( "OK: Deadlock detected" );
+                else {
+                    _result = false;
+                    _stream.writeVerbose( "Error: " + except );
+                }
+                _stream.writeVerbose( "Second: aborting" );
             } catch ( Exception except ) {
                 _result = false;
-                try {
-                    _stream.writeVerbose( "Error: " + except );
-                } catch ( IOException e2 ) { }
+                _stream.writeVerbose( "Error: " + except );
                 except.printStackTrace();
             }
         }

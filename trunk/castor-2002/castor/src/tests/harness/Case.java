@@ -44,23 +44,83 @@
  */
 
 
-package jdo;
+package harness;
 
 
+import java.util.Vector;
+import java.util.Enumeration;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.jtf.CWTestCase;
+import org.exolab.jtf.CWBaseApplication;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
-public class Sybase
-    extends TestBase
+public class Case
 {
 
 
-    public Sybase()
+    private String  _name;
+
+
+    private String  _description;
+
+
+    private String  _className;
+
+
+    public void setName( String name )
+    {
+        _name = name;
+    }
+
+
+    public String getName()
+    {
+        return _name;
+    }
+
+
+    public void setDescription( String description )
+    {
+        _description = description;
+    }
+
+
+    public String getDescription()
+    {
+        return _description;
+    }
+
+
+    public void setClassName( String className )
+    {
+        _className = className;
+    }
+
+
+    public String getClassName()
+    {
+        return _className;
+    }
+
+
+    public CWTestCase createTestCase( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "sybase", "sybase.xml" );
+        Class       catClass;
+        Constructor cnst;
+
+        try {
+            catClass = getClass().getClassLoader().loadClass( _className );
+            cnst = catClass.getConstructor( new Class[] { String.class, String.class, CWTestCategory.class } );
+            return (CWTestCase) cnst.newInstance( new Object[] { _name, _description, category } );
+        } catch ( InvocationTargetException except ) {
+            throw new CWClassConstructorException( (Exception) except.getTargetException() );
+        } catch ( Exception except ) {
+            throw new CWClassConstructorException( except );
+        }
     }
 
 
