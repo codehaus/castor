@@ -635,7 +635,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
 
