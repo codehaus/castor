@@ -80,7 +80,7 @@
     <target name="examples" depends="prepare">
         <mkdir dir="${build}/examples"/>
         <javac srcdir="${source}/examples" destdir="${build}/examples" classpath="${classpath}" debug="on" deprecation="${deprecation}"
-               excludes="SourceGenerator/*"/>
+               excludes="SourceGenerator/*,dax/*"/>
     </target>
     <!-- Build the test packages -->
     <target name="tests" depends="prepare">
