@@ -120,12 +120,12 @@ public abstract class Configuration
         public static final String Validation = "org.exolab.castor.validation";
         
         /**
-         * Property specifying whether to support Propertypaces by default.
+         * Property specifying whether to support Namespaces by default.
          * <pre>
-         * org.exolab.castor.Propertypaces
+         * org.exolab.castor.Namespaces
          * </pre>
          */
-        public static final String Propertypaces = "org.exolab.castor.Propertypaces";
+        public static final String Namespaces = "org.exolab.castor.Namespaces";
         
         /**
          * Property specifying whether XML documents should be indented by default.
@@ -170,7 +170,7 @@ public abstract class Configuration
     private static class Features
     {
         public static final String Validation = "http://xml.org/sax/features/validation";
-        public static final String Propertypaces = "http://xml.org/sax/features/propertypaces";
+        public static final String Namespaces = "http://xml.org/sax/features/namespaces";
     }
     
     
@@ -244,7 +244,7 @@ public abstract class Configuration
      * of features that parser may or may not support. No errors are
      * generated for unsupported features. If the feature list is not
      * null, it overrides the default feature list specified in the
-     * configuration file, including validation and Propertypaces.
+     * configuration file, including validation and Namespaces.
      *
      * @param features The requested feature list, null for the
      *   defaults
@@ -284,10 +284,10 @@ public abstract class Configuration
             } catch ( SAXException except ) {
                 Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
             }
-            prop = getDefault().getProperty( Property.Propertypaces, "false" );
+            prop = getDefault().getProperty( Property.Namespaces, "false" );
             flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
             try {
-                ( (XMLReader) parser ).setFeature( Features.Propertypaces, flag );
+                ( (XMLReader) parser ).setFeature( Features.Namespaces, flag );
             } catch ( SAXException except ) {
                 Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
             }
