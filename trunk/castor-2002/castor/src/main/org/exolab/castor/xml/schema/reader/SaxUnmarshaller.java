@@ -154,6 +154,22 @@ public abstract class SaxUnmarshaller
     } //-- isWhiteSpace
    
     /**
+     * This method is called for a general error.
+     * @param err the error message to report
+     * @exception org.xml.sax.SAXException always thrown.
+    **/
+    public void error(String err) 
+        throws org.xml.sax.SAXException
+    {
+            
+        if (_locator != null) {
+            err += "\n   line: " + _locator.getLineNumber();
+        }
+        
+        throw new SAXException(err);
+    } //-- error
+    
+    /**
      * This method is called when an illegal Attribute is encountered.
      * @param attName the name of the illegal attribute.
      * @exception org.xml.sax.SAXException always thrown.
@@ -188,6 +204,7 @@ public abstract class SaxUnmarshaller
         
         throw new SAXException(err);
     } //-- illegalElement
+   
    
     /**
      * This method is called when an element which may only
