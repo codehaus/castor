@@ -50,19 +50,24 @@ package org.exolab.castor.jdo.transactionmanager.spi;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import org.exolab.castor.util.Messages;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
+import javax.naming.NoInitialContextException;
 import javax.transaction.TransactionManager;
 
 /**
-  * An IBM Websphere 4 and prior specific factory for acquiring transactions
-  * from this particular J2EE container.
-  *
-  * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
-  * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
-  */
-public class WebSphereTransactionManagerFactory 
+ * Transaction manager factory instance to be used with J2EE containers
+ * where the transaction manager is bound to the JNDI ENC of the container.
+ * 
+ * Implements {link org.exolab.castor.jdo.transactionmanager.
+ * TransactionManagerFactory}.
+ *
+ * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>, <a href=" mailto:
+ * werner.guttmann@gmx.net">Werner Guttmann</a>
+ */
+public class JNDIENCTransactionManagerFactory 
     extends BaseTransactionManagerFactory
 {
     
@@ -75,7 +80,13 @@ public class WebSphereTransactionManagerFactory
     /**
      * The name of the factory
      */
-    private final String _name = "websphere";
+    private final String _name = "jndi";
+    
+    /**
+     * Default JNDI binding for <tt>javax.transaction.TransactionManager</tt>
+     * instance.
+     */
+    private final String TRANSACTION_MANAGER_NAME = "java:comp/TransactionManager";
 
 
     /**
@@ -84,39 +95,31 @@ public class WebSphereTransactionManagerFactory
     public TransactionManager getTransactionManager() 
         throws TransactionManagerAcquireException
     {
-        Class              webSphereTxMgr = null;
-        Method             method = null;
+        Context context = null;
 
         try 
         {
-            webSphereTxMgr = Class.forName( "com.ibm.ejcs.jts.jta.JTSXA" );
-            method = webSphereTxMgr.getMethod( "getTransactionManager", null );
-            _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, null );
+ 			context = new InitialContext();
+ 			
+ 			String jndiENC = params.getProperty("jndiEnc", TRANSACTION_MANAGER_NAME );
+			_transactionManager = (TransactionManager) context.lookup(jndiENC);
+		} 
+		catch (NoInitialContextException e) {
+			throw new TransactionManagerAcquireException( Messages.format( 
+				"jdo.transaction.unableToAcquireTransactionManager", e.getMessage()));
+		} 
+		catch (NameNotFoundException e) {
+			throw new TransactionManagerAcquireException( Messages.format( 
+				"jdo.transaction.unableToAcquireTransactionManager", e.getMessage()));
         }
-        catch( ClassNotFoundException cnfe )
+        catch (Exception e)
         {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage() ) );
-        }
-        catch( IllegalAccessException iae )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage() ) );
-        }
-        catch( InvocationTargetException ite )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", ite.getMessage() ) );
-        }
-        catch( NoSuchMethodException nsme )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", nsme.getMessage() ) );
+                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()));
         }
 
         return _transactionManager;
     }
-
 
     public String getName()
     {

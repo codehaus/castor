@@ -56,14 +56,14 @@ import java.lang.reflect.Method;
 import javax.transaction.TransactionManager;
 
 /**
-  * An IBM Websphere 4 and prior specific factory for acquiring transactions
-  * from this particular J2EE container.
-  *
-  * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
-  * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
-  */
-public class WebSphereTransactionManagerFactory 
-    extends BaseTransactionManagerFactory
+ * An IBM Websphere 5 specific factory for acquiring transactions from 
+ * this J2EE container.
+ *
+ * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
+ */
+public class WebSphere5TransactionManagerFactory 
+   extends BaseTransactionManagerFactory
 {
     
     /**
@@ -75,7 +75,7 @@ public class WebSphereTransactionManagerFactory
     /**
      * The name of the factory
      */
-    private final String _name = "websphere";
+    private final String _name = "websphere5";
 
 
     /**
@@ -90,7 +90,7 @@ public class WebSphereTransactionManagerFactory
         try 
         {
             webSphereTxMgr = Class.forName( "com.ibm.ejcs.jts.jta.JTSXA" );
-            method = webSphereTxMgr.getMethod( "getTransactionManager", null );
+            method = webSphereTxMgr.getMethod( "instance", null );
             _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, null );
         }
         catch( ClassNotFoundException cnfe )

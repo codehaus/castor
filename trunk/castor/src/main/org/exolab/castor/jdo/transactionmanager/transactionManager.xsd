@@ -17,13 +17,13 @@
 
   <xsd:element name="transactionManager">
     <xsd:complexType>
-      <xsd:sequence>
        <xsd:documentation>
             The 'factory' attribute is used to specify the
             org.exolab.castor.jdo.spi.TransactionManagerFactory to use for
             acquiring a javax.transaction.TransactionManager from a J2EE
             container. 
        </xsd:documentation>
+      <xsd:sequence>
         <xsd:attribute name="factory" type="xsd:string" use="required" />
       </xsd:sequence>
     </xsd:complexType>
