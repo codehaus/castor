@@ -452,7 +452,7 @@ public final class LockEngine {
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
                 if (_log.isDebugEnabled()) {
-                	_log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
+                	_log.debug( Messages.format( "jdo.creating.with.id", typeInfo.molder.getName(), oid.getIdentity() ) );
                 }
 
                 oid = lock.getOID();
@@ -485,7 +485,7 @@ public final class LockEngine {
 
             try {
                 if (_log.isDebugEnabled()) {
-                	_log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
+                	_log.debug( Messages.format( "jdo.creating.with.id", typeInfo.molder.getName(), oid.getIdentity() ) );
                 }
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
