@@ -11,9 +11,6 @@
     </section>
 
     <section title="Release Candidates">
-      <ul><b>Castor 0.9.5.4 RC2</b>
-         <p>For FTP access use <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.5.4/</url></p>
-      </ul>
       <ul><b>Castor 0.9.6 RC1</b>
          <p>For FTP access use <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.6/</url></p>
       </ul>
@@ -82,7 +79,7 @@
     </section>
 
       <section title="Past Releases">
-         You may be able some past releases on the FTP Server:
+         You may be able to find some past releases on the FTP Server:
          <p><url>ftp://ftp.exolab.org/pub/castor/</url></p>
       </section>
 
