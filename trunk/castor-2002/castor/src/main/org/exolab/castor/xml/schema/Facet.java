@@ -54,11 +54,14 @@ import org.exolab.castor.xml.ValidationException;
 **/
 public abstract class Facet extends Annotated {
     
+    public static final String ENUMERATION      = "enumeration";
+    public static final String LENGTH           = "length";
     public static final String MAX_EXCLUSIVE    = "maxExclusive";
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
-    public static final String ENUMERATION      = "enumeration";
+    public static final String MAX_LENGTH       = "maxlength";
+    public static final String MIN_LENGTH       = "minlength";
     
     /**
      * The character value of this Facet

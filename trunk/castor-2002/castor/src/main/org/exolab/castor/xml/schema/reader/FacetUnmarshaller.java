@@ -100,7 +100,7 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
         
         if (!isFacet(name)) {
             String err = "'" + name + "' is not a valid or supported facet.";
-            throw new IllegalArgumentException(name);
+            throw new IllegalArgumentException(err);
         }
         
         //-- handle attributes
@@ -196,11 +196,15 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
 
     private boolean isFacet(String name) {
         
-        if (SchemaNames.ENUMERATION.equals(name)) return true;
-        if (SchemaNames.MAX_EXCLUSIVE.equals(name)) return true;
-        if (SchemaNames.MIN_EXCLUSIVE.equals(name)) return true;
-        if (SchemaNames.MAX_INCLUSIVE.equals(name)) return true;
-        if (SchemaNames.MIN_INCLUSIVE.equals(name)) return true;
+        if (Facet.ENUMERATION.equals(name))   return true;
+        if (Facet.LENGTH.equals(name))        return true;
+        if (Facet.MAX_EXCLUSIVE.equals(name)) return true;
+        if (Facet.MIN_EXCLUSIVE.equals(name)) return true;
+        if (Facet.MAX_INCLUSIVE.equals(name)) return true;
+        if (Facet.MIN_INCLUSIVE.equals(name)) return true;
+        if (Facet.MAX_LENGTH.equals(name))    return true;
+        if (Facet.MIN_LENGTH.equals(name))    return true;
+        
         return false;
     } //-- isFacet
     
