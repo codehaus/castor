@@ -118,7 +118,9 @@ public class DescriptorJClass extends JClass {
         addInterface("org.exolab.castor.xml.XMLClassDescriptor");
         
         addImport("org.exolab.castor.xml.*");
+        addImport("org.exolab.castor.xml.handlers.*");
         addImport("org.exolab.castor.xml.util.XMLFieldDescriptorImpl");
+        addImport("org.exolab.castor.xml.validators.*");
         addImport("org.exolab.castor.xml.FieldValidator");
         
         addMember(new JMember(xfdArrayClass,   "elements") );
