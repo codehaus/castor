@@ -810,6 +810,7 @@ public class Marshaller extends MarshalFramework {
         }
         else {
              validate(object);
+             MarshalState mstate = new MarshalState(object, "root");
              if (_asDocument) {
                 try {
                     _handler.startDocument();
@@ -820,14 +821,14 @@ public class Marshaller extends MarshalFramework {
                         _handler.processingInstruction(pi.getTarget(),
                             pi.getData());
                     }
-                    marshal(object, null, _handler);
+                    marshal(object, null, _handler, mstate);
                     _handler.endDocument();
                 } catch (SAXException sx) {
                     throw new MarshalException(sx);
                 }
              }
              else {
-                marshal(object, null, _handler);
+                marshal(object, null, _handler, mstate);
              }
         }
 
@@ -852,7 +853,8 @@ public class Marshaller extends MarshalFramework {
     private void marshal
         (Object object,
          XMLFieldDescriptor descriptor,
-         ContentHandler handler)
+         ContentHandler handler,
+         final MarshalState mstate)
         throws MarshalException, ValidationException
     {
         
@@ -1091,6 +1093,11 @@ public class Marshaller extends MarshalFramework {
             }
         }
         
+        //-- at this point naming should be done, update
+        //-- MarshalState.xmlName if root element
+        if (atRoot) {
+            mstate._xmlName = name;
+        }
         
         //------------------------------------------------/
         //- Next few sections of code deal with xsi:type -/
@@ -1319,7 +1326,21 @@ public class Marshaller extends MarshalFramework {
             }
             processAttribute(object, descriptors[i], atts);
         }
-
+        
+        //-- handle ancestor nested attributes
+        if (mstate.nestedAttCount > 0) {
+            for (int i = 0; i < mstate.nestedAtts.length; i++) {
+                XMLFieldDescriptor attDesc = mstate.nestedAtts[i];
+                if (attDesc == null) continue;
+                String path = attDesc.getLocationPath();
+                if (name.equals(path)) {
+                    mstate.nestedAtts[i] = null;
+                    mstate.nestedAttCount = 0;
+                    processAttribute(mstate.getOwner(), attDesc, atts);
+                }
+            }
+        }
+        
 
         //-- Look for attributes in container fields,
         //-- (also handle container in container)
@@ -1711,9 +1732,14 @@ public class Marshaller extends MarshalFramework {
 
             final Class type = obj.getClass();
             
+            MarshalState myState = mstate.createMarshalState(object, name);
+            myState.nestedAtts = nestedAtts;
+            myState.nestedAttCount = nestedAttCount;
+            
+            
             //-- handle byte arrays
             if (type.isArray() && (type.getComponentType() == Byte.TYPE)) {
-                marshal(obj, elemDescriptor, handler);
+                marshal(obj, elemDescriptor, handler, myState);
             }
             //-- handle all other collection types
             else if (isCollection(type)) {
@@ -1727,7 +1753,7 @@ public class Marshaller extends MarshalFramework {
                         while (keys.hasMoreElements()) {
                             item.setKey(keys.nextElement());
                             item.setValue(mapHandler.get(obj, item.getKey()));
-                            marshal(item, elemDescriptor, handler);
+                            marshal(item, elemDescriptor, handler, myState);
                         }                        
                     }
                     
@@ -1738,15 +1764,20 @@ public class Marshaller extends MarshalFramework {
                     while (enumeration.hasMoreElements()) {
                         Object item = enumeration.nextElement();
                         if (item != null) {
-                            marshal(item, elemDescriptor, handler);
+                            marshal(item, elemDescriptor, handler, myState);
                         }
                     }
                 }
             }
             //-- otherwise just marshal object as is
-            else marshal(obj, elemDescriptor, handler);
+            else marshal(obj, elemDescriptor, handler, myState);
+            
+            if (nestedAttCount > 0) {
+                nestedAttCount = myState.nestedAttCount;
+            }
             
         }
+        
         
         //-- Wrapper/Location cleanup for elements
         if (wrappers != null) {
@@ -1760,6 +1791,8 @@ public class Marshaller extends MarshalFramework {
                 throw new MarshalException(sx);
             }
         }
+        
+        
         
         //-- Handle any additional attribute locations that were
         //-- not handled when dealing with wrapper elements
@@ -2385,6 +2418,58 @@ public class Marshaller extends MarshalFramework {
             this.localName = localName;
             this.qName = qName;
             this.location = location;
+        }
+    }
+    
+    
+    static class MarshalState {
+        
+        String xpath = null;
+        XMLFieldDescriptor[] nestedAtts = null;
+        int nestedAttCount = 0;
+        
+        private MarshalState _parent = null;        
+        private Object _owner        = null;
+        private String _xmlName      = null;
+        
+        MarshalState(Object owner, String xmlName) {
+            if (owner == null) {
+                String err = "The argument 'owner' must not be null";
+                throw new IllegalArgumentException(err);
+            }
+            if (xmlName == null) {
+                String err = "The argument 'xmlName' must not be null";
+                throw new IllegalArgumentException(err);
+            }
+            _owner = owner;
+            _xmlName = xmlName;
+        }
+        
+        
+        MarshalState createMarshalState(Object owner, String xmlName) {
+            MarshalState ms = new MarshalState(owner, xmlName);
+            ms._parent = this;
+            return ms;
+        }
+        
+        String getXPath() {
+            if (xpath == null) {
+                if (_parent != null) {
+                    xpath = _parent.getXPath() + "/" + _xmlName;
+                }
+                else {
+                    xpath = _xmlName;
+                }
+            }
+            return xpath;
+        }
+        
+        Object getOwner() {
+            return _owner;
+        }        
+        
+        MarshalState getParent() {
+            return _parent;
         }
     }
     
