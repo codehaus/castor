@@ -47,6 +47,31 @@
 package org.exolab.castor.tools;
 
 
+//-- Castor Imports
+import org.exolab.castor.builder.util.ConsoleDialog;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.loader.MappingLoader;
+import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.xml.BindXml;
+import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.mapping.xml.FieldMapping;
+import org.exolab.castor.mapping.xml.MappingRoot;
+import org.exolab.castor.mapping.xml.MapTo;
+import org.exolab.castor.mapping.xml.types.CollectionType;
+import org.exolab.castor.mapping.xml.types.NodeType;
+import org.exolab.castor.util.Messages;
+import org.exolab.castor.util.CommandLineOptions;
+import org.exolab.castor.xml.JavaNaming;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Introspector;
+import org.exolab.castor.xml.XMLFieldDescriptor;
+import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.xml.util.ClassDescriptorResolverImpl;
+
+//-- Java Imports
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -56,26 +81,6 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.Introspector;
-import org.exolab.castor.xml.XMLFieldDescriptor;
-import org.exolab.castor.xml.XMLClassDescriptor;
-import org.exolab.castor.xml.util.ClassDescriptorResolverImpl;
-import org.exolab.castor.mapping.xml.types.NodeType;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.xml.MappingRoot;
-import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.MapTo;
-import org.exolab.castor.mapping.xml.types.CollectionType;
-import org.exolab.castor.mapping.xml.BindXml;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.CommandLineOptions;
-import org.exolab.castor.builder.util.ConsoleDialog;
 
 /**
  * A tool which uses the introspector to automatically
@@ -87,7 +92,13 @@ import org.exolab.castor.builder.util.ConsoleDialog;
 **/
 public class MappingTool
 {
-
+    
+    /**
+     * Used for checking field names to see if they
+     * begin with an underscore '_'
+    **/
+    private static final String UNDERSCORE = "_";
+    
     /**
      * Hashtable of already generated mappings
     **/
@@ -105,6 +116,12 @@ public class MappingTool
     private Introspector _introspector = null;
     
     /**
+     * The internal MappingLoader to use for checking
+     * whether or not we can find the proper accessor methods.
+    **/
+    private InternalLoader _mappingLoader = null;
+    
+    /**
      * Boolean to indicate that we should always
      * perform introspection for each class
      * even if a ClassDescriptor may exist.
@@ -112,8 +129,9 @@ public class MappingTool
     private boolean _forceIntrospection = false;
     
     public MappingTool() {
-        _mappings     = new Hashtable();
-        _resolver     = new ClassDescriptorResolverImpl();
+        _mappings      = new Hashtable();
+        _resolver      = new ClassDescriptorResolverImpl();
+        _mappingLoader = new InternalLoader();
     } //--MappingTool
 
     /**
@@ -279,15 +297,18 @@ public class MappingTool
         ClassMapping       classMap;
         FieldMapping       fieldMap;
 
+        boolean introspected = false;
         try {
-            
-            if (_forceIntrospection)
+            if (_forceIntrospection) {
                 xmlClass = _introspector.generateClassDescriptor( cls );
-            else
+                introspected = true;
+            }
+            else {
                 xmlClass = _resolver.resolve( cls );
+                introspected = _introspector.introspected(xmlClass);
+            }
         } 
         catch ( MarshalException except ) {
-            
             throw new MappingException( except );
         }
         classMap = new ClassMapping();
@@ -310,10 +331,19 @@ public class MappingTool
             
             FieldDescriptor fdesc = fields[ i ];
             
-            fieldMap = new FieldMapping();
-            fieldMap.setName( fdesc.getFieldName() );
             
+            String fieldName = fdesc.getFieldName();
             Class fieldType = fdesc.getFieldType();
+            
+            if ((!introspected) && fieldName.startsWith(UNDERSCORE)) {
+                //-- check to see if we need to remove underscore
+                if (!_mappingLoader.canFindAccessors(cls, fieldName, fieldType))
+                    fieldName = fieldName.substring(1);
+            }
+            
+            fieldMap = new FieldMapping();
+            fieldMap.setName( fieldName );
+            
             
             //-- unwrap arrays of objects
             boolean isArray = fieldType.isArray();
@@ -392,7 +422,43 @@ public class MappingTool
         }
     } //-- write
 
-
+    //-- Extend mapping loader to give us access to the
+    //-- findAccessor method.
+    class InternalLoader extends MappingLoader {
+        
+        private static final String GET = "get";
+        private static final String SET = "set";
+        private static final String ADD = "add";
+        
+        InternalLoader() {
+            super(null, null);
+        }
+        
+        
+        boolean canFindAccessors(Class claz, String fieldName, Class type) {
+            
+            try {
+                //-- getMethod
+                String prefix = JavaNaming.toJavaMemberName(fieldName, true);
+                String method = GET + prefix;
+                boolean isGet = true;
+                if (findAccessor(claz, method, type, isGet) != null)
+                    return true;
+                    
+                //-- setMethod and/or addMethod
+                isGet = false;
+                method = SET + prefix;
+                if (findAccessor(claz, method, type, isGet) != null)
+                    return true;
+                method = ADD + prefix;
+                if (findAccessor(claz, method, type, isGet) != null)
+                    return true;                
+            }
+            catch(Exception ex) {}
+            return false;
+        }
+    } 
+    
 } //-- MappingTool
 
 
