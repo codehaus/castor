@@ -47,8 +47,6 @@
 package org.exolab.castor.dsml;
 
 
-import java.io.IOException;
-import java.util.Enumeration;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributeListImpl;

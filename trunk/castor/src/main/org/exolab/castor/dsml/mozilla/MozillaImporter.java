@@ -47,7 +47,6 @@
 package org.exolab.castor.dsml.mozilla;
 
 
-import java.util.Hashtable;
 import java.util.Enumeration;
 import netscape.ldap.LDAPConnection;
 import netscape.ldap.LDAPEntry;
@@ -56,8 +55,6 @@ import netscape.ldap.LDAPModification;
 import netscape.ldap.LDAPModificationSet;
 import netscape.ldap.LDAPAttribute;
 import netscape.ldap.LDAPAttributeSet;
-import netscape.ldap.LDAPDN;
-import org.exolab.castor.dsml.XML;
 import org.exolab.castor.dsml.Consumer;
 import org.exolab.castor.dsml.ImportEventListener;
 import org.exolab.castor.dsml.Importer;

@@ -47,14 +47,11 @@
 package org.exolab.castor.dsml.jndi;
 
 
-import java.util.Enumeration;
-import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
-import javax.naming.directory.SearchControls;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributeListImpl;
