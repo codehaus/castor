@@ -323,16 +323,23 @@
   </contributor>
 
   <contributor type="Contributor">
-    <name given="Kesha" />
+    <name surname="Sibilev" given="Kesha"/>
     <email>ksibilev@powernetinc.com</email>
     <description>Patches to JDO</description>
   </contributor>
 
   <contributor type="Contributor">
-    <name give="Ralf" surname="Purnhagen" />
+    <name surname="Purnhagen" given="Ralf" />
     <email>purnhar@gmx.net</email>
     <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>
   </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Bechtel" given="Patric" />
+    <email>bechtel@ipcon.de</email>
+    <description>A patch to JDO: the same-connection="false" mode of HIGH/LOW key generator didn't work</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
