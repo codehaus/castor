@@ -69,6 +69,7 @@ import java.io.StringWriter;
 import java.lang.reflect.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Enumeration;
@@ -80,9 +81,10 @@ import java.util.StringTokenizer;
  * Java Objects. The Class must specify
  * the proper access methods (setters/getters) in order for instances
  * of the Class to be properly unmarshalled.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public final class UnmarshalHandler extends MarshalFramework
     implements ContentHandler, DocumentHandler, ErrorHandler
 {
@@ -202,7 +204,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
     private Hashtable _resolveTable = null;
     
-	private Hashtable _javaPackages = null;    
+	private HashMap _javaPackages = null;    
 
     private ClassLoader _loader = null;
 
@@ -229,7 +231,10 @@ public final class UnmarshalHandler extends MarshalFramework
      */
     private Namespaces _namespaces = null;
 
-    private Hashtable _nsPackageMappings = null;
+    /**
+     * A map of namespace URIs to Package Names
+     */
+    private HashMap _namespaceToPackage = null;
 
     /**
      * A reference to the ObjectFactory used to create instances
@@ -311,13 +316,30 @@ public final class UnmarshalHandler extends MarshalFramework
         super();
         _stateInfo          = new Stack();
         _idResolver         = new IDResolverImpl();
-		_javaPackages 		= new Hashtable();        
+		_javaPackages 		= new HashMap();        
         buf                 = new StringBuffer();
         _topClass           = _class;
         _namespaces         = new Namespaces();
-        _nsPackageMappings  = new Hashtable();
         _statePool          = new ArrayList();
     } //-- UnmarshalHandler(Class)
+    
+    /**
+     * Adds a mapping from the given namespace URI to the given
+     * package name
+     * 
+     * @param nsURI the namespace URI to map from
+     * @param packageName the package name to map to
+     */
+    public void addNamespaceToPackageMapping(String nsURI, String packageName) {
+        
+        if (_namespaceToPackage == null) {
+        	_namespaceToPackage = new HashMap();
+        }
+        if (nsURI == null) nsURI = "";
+        if (packageName == null) packageName = "";
+    	_namespaceToPackage.put(nsURI, packageName);
+        
+    } //-- addNamespaceToPackageMapping
 
     /**
      * Returns the Object that the UnmarshalHandler is currently
@@ -833,9 +855,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 
                 //-- check unresolved references
                 if (_resolveTable != null) {
-                    Enumeration enum = _resolveTable.keys();
-                    while (enum.hasMoreElements()) {
-                        String msg = "unable to resolve reference: " + enum.nextElement();                        
+                    Enumeration enumeration = _resolveTable.keys();
+                    while (enumeration.hasMoreElements()) {
+                        String msg = "unable to resolve reference: " + enumeration.nextElement();                        
                         if (first == null) {
                             first = new ValidationException(msg);
                             last = first;
@@ -1455,6 +1477,12 @@ public final class UnmarshalHandler extends MarshalFramework
                 }
                 else {
                     classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
+                    if (classDesc == null) {
+                        classDesc = getClassDescriptor(name, _loader);
+                        if (classDesc == null) {
+                            classDesc = getClassDescriptor(JavaNaming.toJavaClassName(name));
+                        }
+                    }
                     if (classDesc != null) {
                         _topClass = classDesc.getJavaClass();
                     }
@@ -2424,17 +2452,31 @@ public final class UnmarshalHandler extends MarshalFramework
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
 
+
             //-- if class descriptor is not found here, then no descriptors
             //-- existed in memory...try to load one based on name of
             //-- Schema type
-            String className = JavaNaming.toJavaClassName(type);
-            classDesc = _cdResolver.resolve(className, _loader);
+            final String className = JavaNaming.toJavaClassName(type);
+            
+            String adjClassName = className;
+            String mappedPackage = null;
+            if (_namespaceToPackage != null) {
+                String lookUpKey = (typeNamespaceURI != null) ? typeNamespaceURI : "";
+                mappedPackage = (String)_namespaceToPackage.get(lookUpKey);
+            }
+            
+            if ((mappedPackage != null) && (mappedPackage.length() > 0)) {
+                adjClassName = mappedPackage + "." + className;
+            }
+        	classDesc = _cdResolver.resolve(adjClassName, _loader);
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
 
             //-- try to use "current Package"
-            className = currentPackage + '.' + className;
-            classDesc = _cdResolver.resolve(className, _loader);
+            if ((currentPackage != null) && currentPackage.length() > 0) {
+            	adjClassName = currentPackage + '.' + className;
+            }
+            classDesc = _cdResolver.resolve(adjClassName, _loader);
             if (classDesc != null)
                 return classDesc.getJavaClass().getName();
                 
@@ -3020,9 +3062,9 @@ public final class UnmarshalHandler extends MarshalFramework
             UnmarshalState state = (UnmarshalState) _stateInfo.peek();
             FieldHandler handler = nsDescriptor.getHandler();
             if (handler != null) {
-                Enumeration enum = _namespaces.getLocalNamespacePrefixes();
-                while (enum.hasMoreElements()) {
-                    String nsPrefix = (String)enum.nextElement();
+                Enumeration enumeration = _namespaces.getLocalNamespacePrefixes();
+                while (enumeration.hasMoreElements()) {
+                    String nsPrefix = (String)enumeration.nextElement();
                     if (nsPrefix == null) nsPrefix = "";
                     String nsURI = _namespaces.getNamespaceURI(nsPrefix);
                     if (nsURI == null) nsURI = "";
