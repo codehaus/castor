@@ -44,7 +44,7 @@
            </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="name"     type="ID"        use="required"/>
-        <xsd:attribute name="extends"  type="IDREF"     use="optional"/>
+        <xsd:attribute name="extends"  type="string"     use="optional"/>
         <xsd:attribute name="depends"  type="IDREF"     use="optional"/>
         <xsd:attribute name="identity" type="stringS"  use="optional"/>
         <xsd:attribute name="access"   default="shared" use="optional">
@@ -58,7 +58,7 @@
 	   </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="key-generator" type="IDREF"   use="optional"/>
-        <xsd:attribute name="auto-complete"     type="boolean" use="optional"   default="true"/>
+        <xsd:attribute name="auto-complete" type="boolean" use="optional" default="true"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -87,7 +87,7 @@
       <xsd:attribute name="required"      type="boolean"  use="optional"   default="false"/>
       <xsd:attribute name="transient"     type="boolean"  use="optional"   default="false"/>
       <xsd:attribute name="direct"        type="boolean"  use="optional"   default="false"/>
-      <xsd:attribute name="lazy"          type="boolean"  use="optional"   default="false"/>      
+      <xsd:attribute name="lazy"          type="boolean"  use="optional"   default="false"/>
       <xsd:attribute name="get-method"    type="string"  use="optional"/>
       <xsd:attribute name="set-method"    type="string"  use="optional"/>
       <xsd:attribute name="create-method" type="string"  use="optional"/>
@@ -104,7 +104,7 @@
                <xsd:enumeration value="enumerate"/>
             </xsd:restriction>
 	 </xsd:simpleType>
-      </xsd:attribute>      
+      </xsd:attribute>
     </xsd:complexType>
   </xsd:element>
 
@@ -129,7 +129,7 @@
       <xsd:attribute name="name"       type="stringS"   use="optional"/>
       <xsd:attribute name="type"       type="stringS"   use="optional"/>
       <xsd:attribute name="many-table" type="string"    use="optional"/>
-      <xsd:attribute name="many-key"   type="stringS"   use="optional"/> 
+      <xsd:attribute name="many-key"   type="stringS"   use="optional"/>
       <xsd:attribute name="dirty"      default="check"   use="optional">
         <xsd:simpleType>
 	   <xsd:restriction base="string">

@@ -40,7 +40,7 @@
         <xsd:element ref="container" minOccurs="0"/>
       </xsd:group>
       <xsd:attribute name="name" type="ID" minOccurs="1"/>
-      <xsd:attribute name="extends" type="IDREF" minOccurs="0"/>
+      <xsd:attribute name="extends" type="string" minOccurs="0"/>
       <xsd:attribute name="depends" type="IDREF" minOccurs="0"/>
       <xsd:attribute name="identity" type="NMTOKENS" minOccurs="0"/>
       <xsd:attribute name="access" type="string" minOccurs="0" default="shared">
@@ -76,7 +76,7 @@
       <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="transient" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
-      <xsd:attribute name="lazy" type="boolean" minOccurs="0" default="false"/>      
+      <xsd:attribute name="lazy" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
