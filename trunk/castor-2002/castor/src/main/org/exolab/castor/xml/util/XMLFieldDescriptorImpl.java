@@ -165,7 +165,7 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
         this._fieldName  = fieldName;
         this._xmlName    = xmlName;
         this._nodeType   = nodeType;
-        
+        this._nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
     } //-- XMLFieldDescriptorImpl
     
     
@@ -444,7 +444,7 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
     
     public String toString()
     {
-        return super.toString() + " AS " + _xmlName;
+        return _fieldName + " AS " + _xmlName;
     }
 
 
