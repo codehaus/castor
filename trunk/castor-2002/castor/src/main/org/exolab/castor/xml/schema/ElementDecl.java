@@ -70,7 +70,6 @@ public class ElementDecl extends ContentModelType
     **/
     private int minOccurs = 1;
     
-    
     /**
      * The element name
     **/

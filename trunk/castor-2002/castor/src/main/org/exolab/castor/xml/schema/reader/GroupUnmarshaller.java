@@ -77,13 +77,26 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     **/
     private Group _group = null;
     
+    /**
+     * The Schema being "unmarshalled"
+    **/
+    private Schema _schema = null;
+    
       //----------------/
      //- Constructors -/
     //----------------/
-
-    public GroupUnmarshaller(AttributeList atts, Resolver resolver) {
+    /**
+     * Creates a new ArchetypeUnmarshaller
+     * @param schema the Schema to which the Archetype belongs
+     * @param atts the AttributeList
+     * @param resolver the resolver being used for reference resolving
+    **/
+    public GroupUnmarshaller
+        (Schema schema, AttributeList atts, Resolver resolver) 
+    {
         super();
         setResolver(resolver);
+        this._schema = schema;
         
         _group = new Group();
         //_group.useResolver(resolver);
@@ -157,10 +170,12 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         name = name.intern();
                 
         if (name == SchemaNames.ELEMENT) {
-            unmarshaller = new ElementUnmarshaller(atts, getResolver());
+            unmarshaller 
+                = new ElementUnmarshaller(_schema, atts, getResolver());
         }
         else if (name == SchemaNames.GROUP) {
-            unmarshaller = new GroupUnmarshaller(atts, getResolver());
+            unmarshaller 
+                = new GroupUnmarshaller(_schema, atts, getResolver());
         }
         else {
             StringBuffer err = new StringBuffer("illegal element <");

@@ -52,7 +52,7 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 
 /**
- * An XML Schema Archetype 
+ * The XML Schema Archetype class
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -69,22 +69,32 @@ public class Archetype extends ContentModelGroup
     
     private String type = null;
     
+    /**
+     * The owning schema document
+    **/
+    private Schema schema = null;
     
-    // private SchemaDef parent = null;
+    /**
+     * The source type
+    **/
+    private String source = null;
     
     /**
      * Creates a new Archetype, with no name
+     * @param schema the owning Schema document
     **/
-    public Archetype() {
-        this(null);
+    public Archetype(Schema schema) {
+        this(schema,null);
     } //-- Archetype
     
     /**
      * Creates a new Archetype with the given name
+     * @param schema the owning Schema
      * @param name of the Archetype
     **/
-    public Archetype(String name) {
+    public Archetype(Schema schema, String name) {
         super();
+        this.schema = schema;
         this.name = name;
         attributes   = new Hashtable();
     } //-- Archetype
@@ -163,6 +173,35 @@ public class Archetype extends ContentModelGroup
         return "archetype:"+name;
     } //-- getReferenceId
 
+
+    /**
+     * Returns the Schema with which this Archetype belongs
+     * @return the Schema with which this Archetype belongs
+    **/
+    public Schema getSchema() {
+        return this.schema;
+    } //-- getSchema
+    
+    /**
+     * Returns the source type with which this type extends,
+     * or null if this type is not a derived type.
+     * @return the source type with which this type extends,
+     * or null if this type is not a derived type.
+    **/
+    public String getSource() {
+        return source;
+    } //-- getSource
+    
+    /**
+     * Returns true if this is a top level Archetype
+     * @return true if this is a top level Archetype
+    **/
+    public boolean isTopLevel() {
+        if (name == null) return false;
+        if (schema == null) return false;
+        return (schema.getArchetype(name) == this);
+    } //-- isTopLevel
+    
     /**
      * Sets the content type of this archetype
      * @param contentType the ContentType for this archetype
@@ -181,6 +220,14 @@ public class Archetype extends ContentModelGroup
         this.name = name;
     } //--setName
     
+    /**
+     * Sets the source type that this type is derived from
+     * @param source the type that this type is derived from
+    **/
+    public void setSource(String source) {
+        this.source = source;
+    } //-- setSource
+    
     public void useResolver(Resolver resolver) {
         // do nothing for now
     }
@@ -193,5 +240,5 @@ public class Archetype extends ContentModelGroup
     public void validate() throws ValidationException {
         // -- add later
     } //-- validate
-    
+        
 } //-- Archetype

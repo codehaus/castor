@@ -79,31 +79,65 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
     
     private CharacterUnmarshaller charUnmarshaller = null;
     
-    boolean allowRefines = true;
+    private boolean allowRefines = true;
     
-    boolean allowContentModel = true;
+    private boolean allowContentModel = true;
     
+    private Schema _schema = null;
     
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public ArchetypeUnmarshaller(AttributeList atts, Resolver resolver) {
+    /**
+     * Creates a new ArchetypeUnmarshaller
+     * @param schema the Schema to which the Archetype belongs
+     * @param atts the AttributeList
+     * @param resolver the resolver being used for reference resolving
+    **/
+    public ArchetypeUnmarshaller
+        (Schema schema, AttributeList atts, Resolver resolver) 
+        throws SAXException
+    {
         super();
         setResolver(resolver);
+        this._schema = schema;
         
-        _archetype = new Archetype();
+        _archetype = schema.createArchetype();
+        
         _archetype.useResolver(resolver);
         
         //-- handle attributes
         String attValue = null;
             
         _archetype.setName(atts.getValue("name"));
-            
         //-- read contentType
         String content = atts.getValue(SchemaNames.CONTENT_ATTR);
         if (content != null) {
             _archetype.setContent(ContentType.valueOf(content));
+        }
+        
+        //-- source and derivedBy
+        String source = atts.getValue("source");
+        if ((source != null) && (source.length() > 0)) {
+            
+            String derivedBy = atts.getValue("derivedBy");
+            if ((derivedBy == null) || 
+                (derivedBy.length() == 0) ||
+                (derivedBy.equals("extension"))) 
+            {
+                _archetype.setSource(atts.getValue("source"));
+            }
+            else if (derivedBy.equals("restrictions")) {
+                String err = "restrictions not yet supported for <type>.";
+                throw new SAXException(err);
+            }
+            else {
+                String err = "invalid value for derivedBy attribute of ";
+                err += "<type>: " + derivedBy;
+                throw new SAXException(err);
+            }
+        
         }
         
         charUnmarshaller = new CharacterUnmarshaller();
@@ -156,16 +190,22 @@ public class ArchetypeUnmarshaller extends SaxUnmarshaller {
         else if (name == SchemaNames.ELEMENT) {
             allowRefines = false;
             if (allowContentModel)
-                unmarshaller = new ElementUnmarshaller(atts, getResolver());
+                unmarshaller 
+                    = new ElementUnmarshaller(_schema, atts, getResolver());
             else 
                 outOfOrder(name);
         }
         else if (name == SchemaNames.GROUP) {
             allowRefines = false;
             if (allowContentModel)
-                unmarshaller = new GroupUnmarshaller(atts, getResolver());
+                unmarshaller 
+                    = new GroupUnmarshaller(_schema, atts, getResolver());
             else
                 outOfOrder(name);
+        }
+        else if (name.equals("restrictions")) {
+            String err = "<restrictions> element not yet supported.";
+            throw new SAXException(err);
         }
         else {
             StringBuffer err = new StringBuffer("illegal element <");

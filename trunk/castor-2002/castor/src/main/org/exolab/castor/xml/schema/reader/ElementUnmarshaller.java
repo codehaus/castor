@@ -80,13 +80,25 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     
     private CharacterUnmarshaller charUnmarshaller = null;
     
+    private Schema _schema = null;
+    
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public ElementUnmarshaller(AttributeList atts, Resolver resolver) {
+    /**
+     * Creates a new ElementUnmarshaller
+     * @param schema the Schema to which the Element belongs
+     * @param atts the AttributeList
+     * @param resolver the resolver being used for reference resolving
+    **/
+    public ElementUnmarshaller
+        (Schema schema, AttributeList atts, Resolver resolver) 
+    {
         super();
         setResolver(resolver);
+        
+        this._schema = schema;
         
         _element = new ElementDecl();
         _element.useResolver(resolver);
@@ -172,7 +184,8 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         //-- Use JVM internal String
         name = name.intern();
         if (name == SchemaNames.ARCHETYPE) {
-            unmarshaller = new ArchetypeUnmarshaller(atts, getResolver());
+            unmarshaller 
+                = new ArchetypeUnmarshaller(_schema, atts, getResolver());
         }
         else if (name == SchemaNames.DATATYPE) {
             throw new SAXException("<datatype> not yet supported for <element>.");

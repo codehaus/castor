@@ -138,10 +138,12 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         
         if (name == SchemaNames.ARCHETYPE) {
-            unmarshaller = new ArchetypeUnmarshaller(atts, _resolver);
+            unmarshaller 
+                = new ArchetypeUnmarshaller(_schema, atts, _resolver);
         } 
         else if (name == SchemaNames.ELEMENT) {
-            unmarshaller = new ElementUnmarshaller(atts, _resolver);
+            unmarshaller 
+                = new ElementUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here
