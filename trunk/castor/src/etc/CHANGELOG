@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1402 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added code to handle extend relationships where no additional fields are added. For such cases,
+       no STORE SQL statement will be generated (and used).
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1402
+       (Werner - 20040607)
+
 JDO:   Fixed bug 1641 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Upgraded JUnit to version 3.8.1.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1641
