@@ -93,7 +93,9 @@ class SQLEngine
     PrimaryKeyDesc           _primKey;
 
 
-    private boolean         _createRequiresPK = true;
+    private boolean         _checkKeyOnCreate = false;
+
+    private boolean         _specifyKeyForCreate = true;
 
 
     private String          _pkLookup;
@@ -166,7 +168,7 @@ class SQLEngine
     }
 
 
-    JDOObjectDesc getObjectDesc()
+    public JDOObjectDesc getObjectDesc()
     {
 	return _objDesc;
     }
@@ -203,7 +205,7 @@ class SQLEngine
 	    // that no such primary key exists in the table. This call will
 	    // also lock the table against creation of an object with such
 	    // a primary key.
-	    if ( _createRequiresPK ) {
+	    if ( _checkKeyOnCreate ) {
 		if ( identity == null )
 		    throw new PersistenceException( "This implementation requires a primary key to be set prior to object creation" );
 
@@ -225,7 +227,7 @@ class SQLEngine
 	    // Must remember that SQL column index is base one
 	    count = 1;
 	    stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
-	    if ( _createRequiresPK ) {
+	    if ( _specifyKeyForCreate ) {
 		if ( _primKey.isPrimitive() ) {
 		    stmt.setObject( count, identity );
 		    count += 1;
@@ -275,6 +277,7 @@ class SQLEngine
 	    stmt.close();
 	    return null;
 	} catch ( SQLException except ) {
+	    //	    if ( 
 	    throw new PersistenceException( except );
 	}
     }
@@ -500,7 +503,7 @@ class SQLEngine
 
 	// Create statement to lookup primary key and determine
 	// if object with same primary key already exists
-	if ( _createRequiresPK ) {
+	if ( _specifyKeyForCreate ) {
 	    sql = new StringBuffer( "SELECT 1 FROM " );
 	    sql.append( _objDesc.getSQLName() ).append( " WHERE " );
 	    if ( _primKey.isPrimitive() ) {
@@ -523,7 +526,7 @@ class SQLEngine
 	// using the specified primary key if one is required
 	sql = new StringBuffer( "INSERT INTO " );
 	sql.append( _objDesc.getSQLName() ).append( " (" );
-	if ( _createRequiresPK ) {
+	if ( _specifyKeyForCreate ) {
 	    if ( _primKey.isPrimitive() ) {
 		sql.append( _primKey.getSQLName() );
 		count = 1;
