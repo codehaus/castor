@@ -606,6 +606,7 @@ public class ClassMolder implements CacheHolder {
         Object[] fid;
         Object[] createdId;
         Object[] ids;
+		Object[] oids;
         Object[] newids;
         Object[] temp;
         Object o;
@@ -624,6 +625,8 @@ public class ClassMolder implements CacheHolder {
 
         ci.fields = new Object[_fhs.length];
         ids = oid.getIdentities();
+		oids = new Object[ids.length];
+		System.arraycopy( ids, 0, oids, 0, ids.length );
 
         if ( !OID.isEquals( ids, getIdentities(object) ) )
             throw new PersistenceException("Object identity change is not allowed! original id: "+OID.flatten(ids)+" changed id: "+OID.flatten(getIdentities(object)));
@@ -674,6 +677,7 @@ public class ClassMolder implements CacheHolder {
             }
         }
 
+		System.out.println("before create id: "+OID.flatten( ids ));
         createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()), 
                 ci.fields, ids );
 
@@ -682,10 +686,11 @@ public class ClassMolder implements CacheHolder {
         }
         System.out.println(" will be created");
 
-        if ( createdId == null ) 
+        if ( createdId == null )
             throw new PersistenceException("Identity can't be created!");
 
         if ( !OID.isEquals( createdId, ids ) ) {
+			_cache.remove( oid );
             for ( int i=0; i<_ids.length; i++ ) {
                 _ids[i].setValue( object, createdId[i] );
             }
@@ -694,7 +699,9 @@ public class ClassMolder implements CacheHolder {
             oid.setDbLock( false );
             _cache.put( oid, ci );
             // set id in cache.......
-        }
+        } else {
+			System.out.println("Id not changed!!!!!!!!!!!!!!1");
+		}
 
 
         // ================================================
@@ -781,7 +788,7 @@ public class ClassMolder implements CacheHolder {
         // update oid and setStamp
 
         System.out.println("ClassMolder.create() done: returning, oid=" +oid+" id="+OID.flatten( oid.getIdentities() ));
-
+		System.out.println("return oid from LockEngine.create() "+ oid);
         return oid;
     }
 

@@ -527,7 +527,7 @@ public abstract class TransactionContext
                 entry = addObjectEntry( oid, object );
             oid = engine.create( this, oid, object );
 
-            if ( oid.getIdentities() == null ) {
+            if ( OID.isIdsNull( oid.getIdentities() ) ) {
                 if ( OID.isIdsNull( molder.getIdentities( object ) ) ) {
                     throw new IllegalStateException("both oid.getIdentity() and molder.getId( object ) is null after create!");
                 } else {
@@ -537,6 +537,7 @@ public abstract class TransactionContext
 
             removeObjectEntry( object );
             entry = addObjectEntry( oid, object );
+
             entry.created = true;
             if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
