@@ -352,7 +352,7 @@ public class MarshalInfoSourceFactory {
             
             JType jType = xsType.getJType();
                 
-            jsc.append(jType.getName());
+            jsc.append(jType.toString());
             jsc.append(".class;");
             
             jsc.add("desc.setWriteMethod(");
@@ -458,7 +458,7 @@ public class MarshalInfoSourceFactory {
             case XSType.TIME_INSTANT:
             case XSType.CLASS:
             default:
-                return xsType.getJType().getName() + ".class";
+                return xsType.getJType().toString() + ".class";
         }
     } //-- classType
     

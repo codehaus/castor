@@ -88,6 +88,12 @@ public class TypeConversion {
         else if ("integer".equals(schemaType)) {
             xsType = new XSInteger();
         }
+        else if ("binary".equals(schemaType)) {
+            xsType = new XSBinary();
+        }
+        else if ("boolean".equals(schemaType)) {
+            xsType = new XSBoolean();
+        }
         //-- real
         else if ("real".equals(schemaType)) {
             xsType = new XSReal();
@@ -129,11 +135,18 @@ public class TypeConversion {
     **/
     private static OrderedMap iCreateNameMap() {
         
-        OrderedMap nameMap = new OrderedMap(7);
+        OrderedMap nameMap = new OrderedMap(10);
         
+        //-- #IDREF...temporary this will be changed, once
+        //-- I add in the Resolver code
+        nameMap.put("IDREF",        "java.lang.String");
+        
+        //-- type mappings
         nameMap.put("ID",           "java.lang.String");
         nameMap.put("NCName",       "java.lang.String");
         nameMap.put("NMTOKEN",      "java.lang.String");
+        nameMap.put("binary",       "byte[]");
+        nameMap.put("boolean",      "boolean");
         nameMap.put("integer",      "int");
         nameMap.put("real",         "double");
         nameMap.put("string",       "java.lang.String");
