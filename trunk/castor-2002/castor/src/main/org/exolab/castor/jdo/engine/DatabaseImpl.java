@@ -48,9 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.Enumeration;
+import javax.transaction.Status;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
@@ -63,10 +61,6 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.QueryException;
-import javax.transaction.Status;
-import javax.transaction.xa.XAResource;
-import javax.transaction.xa.XAException;
-import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassHandler;
@@ -78,49 +72,52 @@ import org.exolab.castor.util.Messages;
 
 
 /**
- * An implementation of the ODMG {@link Database} interface. Provides
- * access to a single persistent storage. Type of access depends on
- * the mode in which this database is opened. The SQL database being
- * accessed as well as the mapping supported are defined through
- * {@link DatabaseRegistry}. Operations are not allowed unless the
- * current thread is associated with a transaction.
+ * An implementation of the JDO database supporting explicit transaction
+ * demaracation.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see DatabaseRegistry
  */
-public final class DatabaseImpl
-    implements Database, XAResource
+public class DatabaseImpl
+    implements Database
 {
 
 
     /**
      * The database engine used to access the underlying SQL database.
      */
-    private PersistenceEngine   _dbEngine;
+    protected PersistenceEngine   _dbEngine;
 
 
     /**
      * The transaction context is this database was accessed with an
      * {@link XAResource}.
      */
-    private TransactionContext _ctx;
+    protected TransactionContext  _ctx;
 
 
-    private int                DefaultWaitLockTimeout = 10;
+    /**
+     * The lock timeout for this database. Zero for immediate
+     * timeout, an infinite value for no timeout. The timeout is
+     * specified in seconds.
+     */
+    private int                _lockTimeout;
 
 
-    // XXX Need accessors to set this and way to pass it to transaction
-    private int                _lockTimeout = DefaultWaitLockTimeout;
-
-
+    /**
+     * The log writer is a character output stream to which all
+     * logging and tracing messages will be printed.
+     */
     private PrintWriter        _logWriter;
 
 
+    /**
+     * The name of this database.
+     */
     private String             _dbName;
 
 
-    public DatabaseImpl( String dbName, PrintWriter logWriter )
+    public DatabaseImpl( String dbName, int lockTimeout, PrintWriter logWriter )
         throws DatabaseNotFoundException
     {
         // Locate a suitable datasource and database engine
@@ -138,6 +135,7 @@ public final class DatabaseImpl
             _dbEngine.setLogWriter( _logWriter );
         }
         _dbName = dbName;
+        _lockTimeout = lockTimeout;
     }
 
 
@@ -152,13 +150,32 @@ public final class DatabaseImpl
     {
         try {
             if ( _ctx != null && _ctx.isOpen() ) {
-                _ctx.rollback();
+                try {
+                    _ctx.rollback();
+                } catch ( Exception except ) {
+                }
                 throw new PersistenceExceptionImpl( "jdo.dbClosedTxRolledback" );
             }
         } finally {
             _ctx = null;
             _dbEngine = null;
         }
+    }
+
+
+
+    public Object load( Class type, Object identity )
+        throws TransactionNotInProgressException, ObjectNotFoundException,
+               LockNotGrantedException, PersistenceException
+    {
+        TransactionContext tx;
+        ClassHandler       handler;
+
+        tx = getTransaction();
+        handler = _dbEngine.getClassHandler( type );
+        if ( handler == null )
+            throw new ClassNotPersistenceCapableExceptionImpl( type );
+        return tx.fetch( _dbEngine, handler, identity, null );
     }
 
 
@@ -238,19 +255,16 @@ public final class DatabaseImpl
     {
         TransactionContext tx;
         ClassHandler       handler;
-        Object             obj;
         
         tx = getTransaction();
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        obj = handler.newInstance();
         try {
-            tx.load( _dbEngine, obj, primKey, AccessMode.ReadOnly );
+            return tx.fetch( _dbEngine, handler, primKey, AccessMode.ReadOnly );
         } catch ( ObjectNotFoundException except ) {
             return null;
         }
-        return obj;
     }
     
 
@@ -274,13 +288,12 @@ public final class DatabaseImpl
         throws ObjectNotFoundException, PersistenceException
     {
         TransactionContext tx;
-        NameBinding binding;
+        ClassHandler       handler;
         
         tx = getTransaction();
         try {
-            binding = new NameBinding();
-            tx.load( _dbEngine, binding, name, AccessMode.Exclusive );
-            tx.delete( binding );
+            handler = _dbEngine.getClassHandler( NameBinding.class );
+            tx.fetch( _dbEngine, handler, name, AccessMode.Exclusive );
         } catch ( ObjectNotPersistentException except ) {
             throw new PersistenceExceptionImpl( except );
         } catch ( LockNotGrantedException except ) {
@@ -294,19 +307,16 @@ public final class DatabaseImpl
     {
         TransactionContext tx;
         NameBinding        binding;
-        Object             obj;
         ClassHandler       handler;
         
         tx = getTransaction();
         try {
-            binding = new NameBinding();
-            tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
+            handler = _dbEngine.getClassHandler( NameBinding.class );
+            binding = (NameBinding) tx.fetch( _dbEngine, handler, name, AccessMode.ReadOnly );
             handler = _dbEngine.getClassHandler( binding.getType() );
             if ( handler == null )
                 throw new ClassNotPersistenceCapableExceptionImpl( handler.getJavaClass() );
-            obj = handler.newInstance();
-            tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
-            return obj;
+            return tx.fetch( _dbEngine, handler, binding.objectId, AccessMode.ReadOnly );
         } catch ( LockNotGrantedException except ) {
             throw new PersistenceExceptionImpl( except );
         }
@@ -352,17 +362,18 @@ public final class DatabaseImpl
 
 
     public void begin()
+        throws PersistenceException
     {
         // If inside XA transation throw IllegalStateException
         if ( _ctx != null && _ctx.isOpen() )
-            throw new IllegalStateException( Messages.message( "jdo.txInProgress" ) );
+            throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
         _ctx = new TransactionContextImpl( null );
         _ctx.setLockTimeout( _lockTimeout );
     }
 
 
     public void commit()
-        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
+        throws TransactionNotInProgressException, TransactionAbortedException
     {
         // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
@@ -386,7 +397,7 @@ public final class DatabaseImpl
 
 
     public void rollback()
-        throws TransactionNotInProgressException, PersistenceException
+        throws TransactionNotInProgressException
     {
         // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
@@ -400,7 +411,7 @@ public final class DatabaseImpl
 
 
     public void checkpoint()
-        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
+        throws TransactionNotInProgressException, TransactionAbortedException
     {
         // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
@@ -419,258 +430,6 @@ public final class DatabaseImpl
             throw except;
         }
 
-    }
-
-
-
-
-
-
-
-
-    public XAResource getXAResource()
-    {
-        return this;
-    }
-
-
-    private Hashtable _resManager = new Hashtable();
-
-    
-    public synchronized void start( Xid xid, int flags )
-        throws XAException
-    {
-        // General checks.
-        if ( xid == null )
-            throw new XAException( XAException.XAER_INVAL );
-        
-        synchronized ( _resManager ) {
-            switch ( flags ) {
-            case TMNOFLAGS:
-                _ctx = (TransactionContext) _resManager.get( xid );
-                if ( _ctx == null ) {
-                    _ctx = new TransactionContextImpl( xid );
-                    _resManager.put( xid, _ctx );
-                }
-                break;
-            case TMJOIN:
-            case TMRESUME:
-                _ctx = (TransactionContext) _resManager.get( xid );
-                if ( _ctx == null )
-                    throw new XAException( XAException.XAER_NOTA );
-                if ( ! _ctx.isOpen() )
-                    throw new XAException( XAException.XAER_NOTA );
-                break;
-            default:
-                // No other flags supported in start().
-                throw new XAException( XAException.XAER_INVAL );
-            }
-        }
-    }
-
-
-    public synchronized void end( Xid xid, int flags )
-        throws XAException
-    {
-        // General checks.
-        if ( xid == null )
-            throw new XAException( XAException.XAER_INVAL );
-        
-        synchronized ( _resManager ) {
-            if ( _ctx == null )
-                throw new XAException( XAException.XAER_INVAL );
-            switch ( flags ) {
-            case TMSUCCESS:
-                break;
-            case TMFAIL:
-                try {
-                    _ctx.rollback();
-                } catch ( Exception except ) { }
-                break;
-            case TMSUSPEND:
-                break;
-            default:
-                throw new XAException( XAException.XAER_INVAL );
-            }
-            _ctx = null;
-        }
-    }
-
-
-    public synchronized void forget( Xid xid )
-        throws XAException
-    {
-        // General checks.
-        if ( xid == null )
-            throw new XAException( XAException.XAER_INVAL );
-        
-        synchronized ( _resManager ) {
-            TransactionContext ctx;
-            
-            ctx = (TransactionContext) _resManager.remove( xid );
-            if ( ctx == null )
-                throw new XAException( XAException.XAER_NOTA );
-            
-            // Forget is never called on an open transaction, but one
-            // can never tell.
-            if ( ctx.isOpen() ) {
-                try {
-                    ctx.rollback();
-                } catch ( Exception except ) { }
-                throw new XAException( XAException.XAER_PROTO );
-            }
-        }
-    }
-
-
-    public synchronized int prepare( Xid xid )
-        throws XAException
-    {
-        // General checks.
-        if ( xid == null )
-            throw new XAException( XAException.XAER_INVAL );
-        
-        synchronized ( _resManager ) {
-            TransactionContext ctx;
-            
-            ctx = (TransactionContext) _resManager.get( xid );
-            if ( ctx == null )
-                throw new XAException( XAException.XAER_NOTA );
-            
-            switch ( ctx.getStatus() ) {
-            case Status.STATUS_PREPARED:
-            case Status.STATUS_ACTIVE:
-                // Can only prepare an active transaction. And error
-                // is reported as vote to rollback the transaction.
-                try {
-                    if ( ctx.prepare() ) {
-                        return XA_OK;
-                    } else {
-                        return XA_RDONLY;
-                    }
-                } catch ( TransactionNotInProgressException except ) {
-                    throw new XAException( XAException.XAER_PROTO );
-                } catch ( TransactionAbortedException except ) {
-                    throw new XAException( XAException.XA_RBROLLBACK );
-                }
-            case Status.STATUS_MARKED_ROLLBACK:
-                // Report transaction marked for rollback.
-                throw new XAException( XAException.XA_RBROLLBACK );
-            default:
-                throw new XAException( XAException.XAER_PROTO );
-            }
-        }
-    }
-
-
-    public Xid[] recover( int flags )
-        throws XAException
-    {
-        return null;
-    }
-
-    
-    public synchronized void commit( Xid xid, boolean onePhase )
-        throws XAException
-    {
-        // General checks.
-        if ( xid == null )
-            throw new XAException( XAException.XAER_INVAL );
-        
-        synchronized ( _resManager ) {
-            TransactionContext ctx;
-            
-            ctx = (TransactionContext) _resManager.get( xid );
-            if ( ctx == null )
-                throw new XAException( XAException.XAER_NOTA );
-            switch ( ctx.getStatus() ) {
-            case Status.STATUS_COMMITTED:
-                // Allowed to make multiple commit attempts.
-                return;
-            case Status.STATUS_ROLLEDBACK:
-                // This should not happen unless someone interfered
-                // by calling rollback directly or failing a commit,
-                // but is still a valid heuristic condition on our behalf.
-                throw new XAException( XAException.XA_HEURRB );
-            case Status.STATUS_PREPARED:
-                // Commit can only occur after a prepare, so must be
-                // in prepared state first. Any ODMG error is reported
-                // as a heuristic decision to rollback.
-                try {
-                    ctx.commit();
-                } catch ( TransactionNotInProgressException except ) {
-                    throw new XAException( XAException.XAER_PROTO );
-                } catch ( TransactionAbortedException except ) {
-                    throw new XAException( XAException.XA_HEURRB );
-                }
-            default:
-                throw new XAException( XAException.XAER_PROTO );
-            }
-        }
-    }
-    
-
-    public synchronized void rollback( Xid xid )
-        throws XAException
-    {
-        // General checks.
-        if ( xid == null )
-            throw new XAException( XAException.XAER_INVAL );
-        
-        synchronized ( _resManager ) {
-            TransactionContext ctx;
-            
-            ctx = (TransactionContext) _resManager.get( xid );
-            if ( ctx == null )
-                throw new XAException( XAException.XAER_NOTA );
-            switch ( ctx.getStatus() ) {
-            case Status.STATUS_COMMITTED:
-                // This should not happen unless someone interfered
-                // by calling commit directly, but is still a valid
-                // heuristic condition on our behalf.
-                throw new XAException( XAException.XA_HEURCOM );
-            case Status.STATUS_ROLLEDBACK:
-                // Allowed to make multiple rollback attempts.
-                return;
-            case Status.STATUS_ACTIVE:
-            case Status.STATUS_MARKED_ROLLBACK:
-                // Rollback never fails with an application exception.
-                try {
-                    ctx.rollback();
-                } catch ( Exception except ) {
-                    throw new XAException( XAException.XAER_RMFAIL );
-                }
-                return;
-            default:
-                throw new XAException( XAException.XAER_PROTO );
-            }
-        }
-    }
-
-
-    public synchronized boolean isSameRM( XAResource xaRes )
-        throws XAException
-    {
-        // Two resource managers are equal if they produce equivalent
-        // connection (i.e. same database, same user). If the two are
-        // equivalent they would share a transaction by joining.
-        if ( xaRes == null || ! ( xaRes instanceof DatabaseImpl ) )
-            return false;
-        if ( _resManager.equals( ( (DatabaseImpl) xaRes )._resManager ) )
-            return true;
-        return false;
-    }
-
-
-    public boolean setTransactionTimeout( int timeout )
-    {
-        return false;
-    }
-
-
-    public int getTransactionTimeout()
-    {
-        return 0;
     }
 
 
