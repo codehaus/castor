@@ -245,7 +245,12 @@ public class ModelGroupUnmarshaller extends SaxUnmarshaller {
             }
         }
 
-         if (SchemaNames.isGroupName(name)) {
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            Annotation ann = (Annotation)unmarshaller.getObject();
+            _group.addAnnotation(ann);
+        }
+
+         else if (SchemaNames.isGroupName(name)) {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _group.addGroup(group);
         }
