@@ -2,6 +2,74 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.8.6  May 24, 2000"><pre>
+XML:     Added support in the Marshaller to specify whether or not to marshal
+         as an XML document, or just an XML fragment (default). Currently
+         the only difference is the XML declaration is printed when marshalling
+         as a document. I will add support for specifying the DOCTYPE. Of course
+         since a SAX 1.0 DocumentHandler doesn't allow this, DOCTYPE and
+         XML declarations will only be printed when a Writer is used.
+
+XML:     Added support in the unmarshaller for better inheritence checking.
+         If a FieldDescriptor is not found for an element, an attempt to
+         obtain ClassDescriptor will occur for the given element. If found,
+         another check will be performed to find a FieldDescriptor that
+         describes a field which is a superclass of type described by the
+         class descriptor. (see src/tests/xml/Inheritence.java)
+
+JDO:     Added support for paramaterized type convertors. Currently supported is boolean
+         to char convertor using T/F character values (e.g. char.01 or char.TF). More
+         convertors and parameter specification will be added in 0.8.7. (Oleg Nitz
+         &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Fixed bug when related object is null and SQL_OTHER type is passed to JDBC
+         driver; now properly passes type of identity field. (Reported by
+         Eitan Suez &lt;eitan@uptodata.com&gt;).
+
+JDO:     Fixed bug with dirty checking that caused lock to not be acquired and object
+         to be deleted if modified, and now properly reporting modified value of object.
+
+JDO:     Fixed the way in which null fields are handled, so has/delete methods are called
+         if available, default value is used otherwise, setNull/wasNull are used on the
+         JDBC record.
+
+JDO:     Changed callback sequence. jdoRemove is now called on deleted objects,
+         unsetDatabase on objects that become transient (including those removes).
+         setDatabase is called whenever the object becomes persistent (that is,
+         used in a transaction) and passes the database to support lazy loading.
+
+JDO:     Fixed SQLTypes to pick up proper SQL type form field of type java.util.Date.
+         Fixed SQLEngine to use SQL type in some calls to setObject.
+         (Contributed by Donald Ball &lt;balld@webslingerz.com&gt;)
+
+JDO:     Added quoting to column and table names to support white spaces and keywords
+         (Only Postgres, Sybase and SQL Server).
+
+Mapping: Added a match attribute for the xml element, this is used for allowing
+         better inheritence support. Setting this match attribute will restrict,
+         or extend the xml names matched by a given XMLFieldDescriptor.
+
+Mapping: Added resetValue() method to field handler. This generally resets a field to
+         it's default value or empties a collection field.
+
+Mapping: Date type no longer defaults to new date() when field is null, field is no
+         longer set to default when null. (Reported by Lincoln Spiteri
+         &lt;Lincoln.Spiteri@mobisle.com&gt;)
+
+Mapping: Fixed mapping loader to complain if get/set methods are not found. Both are
+         required to be present, unless a collection field is used which only requires
+         a get method. (Reported by Lincoln Spiteri &lt;Lincoln.Spiteri@mobisle.com&gt;)
+
+Mapping: Added convertor between String and character. (Reported by Donald Ball
+         &lt;balld@webslingerz.com&gt;)
+
+Mapping: To fix problem with compiled class descriptors for XML and mapping file for
+         JDO not working together, mapping loading will not attempt to load class
+         descriptors. A permanent fix will be included in 0.9 or 1.0.
+         (Patiently reported by Andrew Ikon &lt;aikon@niku.com&gt;).
+
+Mapping: Fixed collection handler to work with arrays of any object type (e.g. strings).
+    </pre></section>
     <section title="Version 0.8.5  May 12, 2000"><pre>
 JDO:     Remove enumerate collection type. Only get method is required to support
          java.util collections, get/set methods to support arrays. Extended the
