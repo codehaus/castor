@@ -1627,6 +1627,16 @@ public class SourceFactory {
         mInit.getModifiers().setStatic(true);
         mInit.getSourceCode().add("Hashtable members = new Hashtable();");
 
+        //-- #readResolve method
+        JMethod mReadResolve = new JMethod(SGTypes.Object,"readResolve");
+        mReadResolve.getModifiers().makePrivate();        
+        jClass.addMethod(mReadResolve);
+        jdc = mReadResolve.getJDocComment();
+        jdc.appendComment(" will be called during deserialization to replace ");
+        jdc.appendComment("the deserialized object with the correct constant ");
+        jdc.appendComment("instance. <br/>");
+        jsc = mReadResolve.getSourceCode();
+        jsc.add("return valueOf(this.stringValue);");
 
         //-- Loop through "enumeration" facets
         int count = 0;
