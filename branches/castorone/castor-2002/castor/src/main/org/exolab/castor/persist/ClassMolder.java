@@ -439,6 +439,10 @@ public class ClassMolder {
             //}
         }
 
+        if ( object instanceof TimeStampable ) {
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+        }
+
         ids = oid.getIdentities();
         for ( int i=0; i<_ids.length; i++ ) {
             System.out.println("Ids.length: "+ids.length);
@@ -623,6 +627,7 @@ public class ClassMolder {
 
         createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()), 
                 fields, ids );
+
         locker.setObject( tx, fields );
         oid.setDbLock( true );
 
@@ -1167,7 +1172,7 @@ public class ClassMolder {
             if ( ts.jdoGetTimeStamp() != timestamp ) {
                 throw new ObjectModifiedException( Messages.format( "persist.objectModified", object.getClass(), 
                                                     OID.flatten( ids ) ) );
-            }
+            } 
         }
 
         for ( int i=0; i<_fhs.length; i++ ) {
@@ -1512,7 +1517,13 @@ public class ClassMolder {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
-                _fhs[i].setValue( object, fields[i] );
+                Object[] temp = (Object[]) fields[i];
+                if ( temp[0] != null ) 
+                    _fhs[i].setValue( object, temp[0] );
+                else
+                    _fhs[i].setValue( object, null );
+
+                //_fhs[i].setValue( object, fields[i] );
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
 
