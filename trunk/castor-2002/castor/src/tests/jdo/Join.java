@@ -101,6 +101,7 @@ public class Join
             OQLQuery      groupOql;
             TestMaster    master;
             TestGroup     group;
+            TestDetail    detail;
             Enumeration   enum;
             
             db = _category.getDatabase( stream.verbose() );
@@ -110,6 +111,11 @@ public class Join
             enum = oql.execute();
             while ( enum.hasMoreElements() ) {
                 master = (TestMaster) enum.nextElement();
+                group = master.getGroup();
+                if ( group != null ) {
+                    master.setGroup( null );
+                    db.remove( group );
+                }
                 db.remove( master );
                 stream.writeVerbose( "Deleting old master" );
             }
@@ -165,6 +171,8 @@ public class Join
                     stream.writeVerbose( "Error: loaded master without any group: " + master );
                     result  = false;
                 } else {
+                    db.remove( master.getGroup() );
+                    master.setGroup( null );
                     db.remove( master );
                     stream.writeVerbose( "Created master with group: " + master );
                 }
@@ -197,13 +205,70 @@ public class Join
                     stream.writeVerbose( "Error: loaded master without three details: " + master );
                     result  = false;
                 } else {
-                    db.remove( master );
+                    // don't remove: it is used in the next test
+                    //db.remove( master );
                     stream.writeVerbose( "Created master with details: " + master );
                 }
             } else {
                 stream.writeVerbose( "Error: failed to create master with details group" );
                 result = false;
             }
+            db.commit();
+            if ( ! result )
+                return false;
+
+
+            stream.writeVerbose( "Attempt to change details" );
+            db.begin();
+            oql.bind( TestMaster.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                master = (TestMaster) enum.nextElement();
+            } else {
+                stream.writeVerbose( "Error: failed to find master with details group" );
+                return false;
+            }
+            // remove detail with id == TestDetail.DefaultId
+            master.getDetails().removeElementAt( 0 );
+            // remove detail with id == TestDetail.DefaultId + 1 explicitly
+            detail = (TestDetail) master.getDetails().elementAt( 0 );
+            master.getDetails().removeElementAt( 0 );
+            db.remove( detail );
+            // add new detail
+            master.addDetail( new TestDetail( TestDetail.DefaultId + 3 ) );
+            // add new detail and create it explicitely
+            detail = new TestDetail( TestDetail.DefaultId + 4 );
+            master.addDetail( detail );
+            db.create( detail );
+            // delete, then create detail with id == TestDetail.DefaultId + 2 explicitly
+            detail = (TestDetail) master.getDetails().elementAt( 0 );
+            master.getDetails().removeElementAt( 0 );
+            db.remove( detail );
+            detail = new TestDetail( TestDetail.DefaultId + 2 );
+            master.addDetail( detail );
+            db.create( detail );
+            db.commit();
+            db.begin();
+            oql.bind( TestMaster.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                master = (TestMaster) enum.nextElement();
+                if ( master.getDetails().size() == 0 ||
+                     master.getDetails().contains( new TestDetail( TestDetail.DefaultId ) ) ||
+                     master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 1 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 2 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 3 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 4 ) ) ) {
+                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
+                    result  = false;
+                } else {
+                    stream.writeVerbose( "Details changed correctly: " + master );
+                }
+            } else {
+                stream.writeVerbose( "Error: master not found" );
+                result = false;
+            }
+            db.remove( master );
             db.commit();
             if ( ! result )
                 return false;
