@@ -44,6 +44,7 @@
     <item name="Design: OQL Parser" href="design-oql-parser.xml"/>
   </menu>
   <menu name="Misc">
+    <item name="Contributors" href="contributors.xml"/>
     <item name="JavaDoc" href="javadoc/overview-summary.html"/>
     <item name="Presentation" href="ora-mar-2k/castor.htm"/>
     <item name="Status, Todo" href="status.xml"/>

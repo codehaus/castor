@@ -230,7 +230,7 @@ public class OQLQueryImpl
 
         _objClass = walker.getObjClass();
         _expr = walker.getQueryExpression();
-        _newBindTypes = walker.getBindTypes();
+        //        _newBindTypes = walker.getBindTypes();
 
 
         //port new bind types back to the format of old bind types.
