@@ -822,7 +822,7 @@ public class Schema extends Annotated {
 
 
     /**
-     * Indicates that the given XML Schema file has been processed via an <xsd:include>
+     * Indicates that the given XML Schema file has been processed via an <xs:include>
      */
     public void addInclude(String include)
     {
@@ -830,7 +830,7 @@ public class Schema extends Annotated {
     } //-- addInclude
 
     /**
-     * Returns True if the given XML Schema has already been included via <xsd:include>
+     * Returns True if the given XML Schema has already been included via <xs:include>
      * @return True if the file specified has already been processed
      */
     public boolean includeProcessed(String includeFile)
