@@ -19,7 +19,7 @@
     same collection.
 
  -->
-<!ELEMENT mapping ( description?, include*, class+, key-generator* )>
+<!ELEMENT mapping ( description?, include*, class+, key-generator*, relation* )>
 
 
 <!--
@@ -65,11 +65,34 @@
  -->
 <!ELEMENT class ( description?, cache-type?, map-to?, ( field | container )+ )>
 <!ATTLIST class
-    name            ID     #REQUIRED
-    extends         IDREF  #IMPLIED
-    identity        CDATA  #IMPLIED
+    name            ID       #REQUIRED
+    extends         IDREF    #IMPLIED
+    depends         NMTOKEN  #IMPLIED
+    identity        CDATA    #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
-    key-generator   IDREF  #IMPLIED>
+    key-generator   IDREF    #IMPLIED >
+
+
+
+<!--
+    Specifies a many-to-many relation between two Java type. Each relation
+    contains exactly two related element. 
+ -->
+<!ELEMENT relation ( description?, map-to?, related, related ) >
+<!ATTLIST relation 
+    name           NMTOKEN  #REQUIRED>
+
+
+<!--
+    Specifies an entity of a many-to-many relation. See <relation/>.
+ -->
+<!ELEMENT related ( description?, sql?, xml?, ldap? ) >
+<!ATTLIST related
+    name           NMTOKEN  #REQUIRED
+    type           NMTOKEN  #IMPLIED>
+
+
+
 
 <!--
     Specifies the cache type and capacity used for this class
@@ -131,6 +154,7 @@
     type           NMTOKEN  #IMPLIED
     required       ( true | false )  "false"
     direct         ( true | false )  "false"
+    lazy	   ( true | false )  "false"
     get-method     NMTOKEN  #IMPLIED
     set-method     NMTOKEN  #IMPLIED
     create-method  NMTOKEN  #IMPLIED
@@ -151,9 +175,9 @@
  -->
 <!ELEMENT sql EMPTY>
 <!ATTLIST sql
-    name   NMTOKEN  #IMPLIED
-    type   CDATA    #IMPLIED
-    dirty  ( check | ignore )  "check">
+    name	    NMTOKEN  #IMPLIED
+    type	    CDATA    #IMPLIED
+    dirty  ( check | ignore )  "check"> 
 
 
 <!--
@@ -203,13 +227,6 @@
 
 
 <!--
-    A textual description.
-
- -->
-<!ELEMENT description ( #PCDATA )>
-
-
-<!--
     Specifies parameters for the KeyGenerator (if needed).
     For example, to obtain sequential values from table SEQTAB use
 
@@ -242,4 +259,10 @@
 <!ATTLIST param
           name   CDATA  #REQUIRED
           value  CDATA  #REQUIRED>
+
+<!--
+    A textual description.
+
+ -->
+<!ELEMENT description ( #PCDATA )>
 
