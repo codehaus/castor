@@ -81,14 +81,22 @@ public abstract class Exporter
     public void export( OutputStream output, boolean serverSchema, boolean importPolicy )
 	throws ImportExportException
     {
-	export( Configuration.getSerializer( output ), serverSchema, importPolicy );
+        try {
+            export( Configuration.getSerializer( output ), serverSchema, importPolicy );
+        } catch ( IOException except ) {
+            throw new ImportExportException( except );
+        }
     }
 
 
     public void export( Writer output, boolean serverSchema, boolean importPolicy )
 	throws ImportExportException
     {
-	export( Configuration.getSerializer( output ), serverSchema, importPolicy );
+        try {
+            export( Configuration.getSerializer( output ), serverSchema, importPolicy );
+        } catch ( IOException except ) {
+            throw new ImportExportException( except );
+        }
     }
 
 
