@@ -178,8 +178,11 @@ public class ModelGroup extends Group {
       * @returns true if this ModelGroup is referencing another one
       */
      public boolean hasReference() {
-         return (groupRef.length() !=0);
+         if (groupRef != null)
+             return (groupRef.length() !=0);
+         else return false;
      }
+
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
