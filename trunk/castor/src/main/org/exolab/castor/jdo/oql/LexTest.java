@@ -48,6 +48,9 @@ package org.exolab.castor.jdo.oql;
 
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Test class for {@link Lexer}. 
  *
@@ -55,6 +58,12 @@ import java.util.Hashtable;
  * @version $Revision$ $Date$
  */
 public class LexTest implements TokenTypes {
+
+  /**
+   * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+   * Commons Logging</a> instance used for all logging.
+   */
+  private static Log _log = LogFactory.getFactory().getInstance( LexTest.class );
 
   /**
    * Main function.  Takes OQL query string as command line parameter
@@ -107,16 +116,15 @@ public class LexTest implements TokenTypes {
 
     Lexer lexer = new Lexer(args[0]);
     while (lexer.hasMoreTokens()) {
-			try {
-	      Token theToken = lexer.nextToken();
-  	    String tokenType = (String)tokenTypes.get(new Integer(theToken.getTokenType()));
-    	  System.out.println(tokenType + " : " + theToken.getTokenValue());
-			}
-			catch (Exception e) {
-				System.out.println(e.toString());
-				e.printStackTrace(System.out);
-				break;
-			}
+    	try {
+    		Token theToken = lexer.nextToken();
+    		String tokenType = (String)tokenTypes.get(new Integer(theToken.getTokenType()));
+    		_log.debug (tokenType + " : " + theToken.getTokenValue());
+    	}
+    	catch (Exception e) {
+    		_log.error (e.getClass().getName(), e);
+    		break;
+    	}
     }
     
   }
