@@ -66,20 +66,39 @@
       </navLink>
     </section>
 
-    <section name="Using">
+    <section name="XML">
       <navLink>
         <url>xml-framework.xml</url>
         <display>Using XML</display>
       </navLink>
+	  <navLink>
+        <url>sourcegen.xml</url>
+        <display>SourceGen</display>
+      </navLink>
+      <navLink>
+        <url>xmlschema.xml</url>
+        <display>XSD Support</display>
+      </navLink>
+      <navLink>
+        <url>xml-mapping.xml</url>
+        <display>XML Mapping</display>
+      </navLink>
+    </section>
+
+	<section name="JDO">
       <navLink>
         <url>jdo.xml</url>
         <display>Using JDO</display>
       </navLink>
       <navLink>
-        <url>tips-tricks.xml</url>
-        <display>Tips &amp; Tricks</display>
+        <url>examples.xml</url>
+        <display>The Examples</display>
       </navLink>
       <navLink>
+        <url>castor-one.xml</url>
+        <display>New features</display>
+      </navLink>
+	  <navLink>
         <url>database-conf.xml</url>
         <display>JDO Config</display>
       </navLink>
@@ -88,63 +107,58 @@
         <display>Types</display>
       </navLink>
       <navLink>
-        <url>oql.xml</url>
-        <display>OQL</display>
+        <url>jdo-faq.xml</url>
+        <display>FAQs</display>
       </navLink>
 	  <navLink>
-        <url>sourcegen.xml</url>
-        <display>Source generator</display>
-      </navLink>
-      <navLink>
-        <url>xmlschema.xml</url>
-        <display>XML Schema Support</display>
-      </navLink>
-      <navLink>
-        <url>xml-mapping.xml</url>
-        <display>XML Mapping</display>
-      </navLink>
-      <navLink>
-        <url>examples.xml</url>
-        <display>Running The Examples</display>
-      </navLink>
-      <navLink>
         <url>ora-mar-2k/castor.htm</url>
         <display>Presentation</display>
       </navLink>
     </section>
 
-    <section name="advanced">
+    <section name="Advanced JDO">
+      <navLink>
+        <url>oql.xml</url>
+        <display>OQL</display>
+      </navLink>
+	  <navLink>
+        <url>locking.xml</url>
+        <display>Trans. &amp; Locks</display>
+      </navLink>
+      <navLink>
+        <url>design-persist.xml</url>
+        <display>Design</display>
+      </navLink>
+      <navLink>
+        <url>key-generator.xml</url>
+        <display>KeyGen</display>
+      </navLink>
+      <navLink>
+        <url>long-transact.xml</url>
+        <display>Long Trans.</display>
+      </navLink>
+      <navLink>
+        <url>nested-attr.xml</url>
+        <display>Nested Attrs.</display>
+      </navLink>
+    </section>
+
+	<section name="More">
+      <navLink>
+        <url>conf-lib.xml</url>
+        <display>Configuration</display>
+      </navLink>
+      <navLink>
+        <url>tips-tricks.xml</url>
+        <display>Tips &amp; Tricks</display>
+      </navLink>
       <navLink>
         <url>javadoc/overview-summary.html</url>
         <display>Full JavaDoc</display>
       </navLink>
-      <navLink>
-        <url>conf-lib.xml</url>
-        <display>Configuration, Libs, Building</display>
-      </navLink>
-      <navLink>
-        <url>locking.xml</url>
-        <display>Transactions &amp; Locks</display>
-      </navLink>
-      <navLink>
-        <url>design-persist.xml</url>
-        <display>Design: Persistence</display>
-      </navLink>
-      <navLink>
-        <url>key-generator.xml</url>
-        <display>Key Generators</display>
-      </navLink>
-      <navLink>
-        <url>long-transact.xml</url>
-        <display>Long Transactions</display>
-      </navLink>
-      <navLink>
-        <url>nested-attr.xml</url>
-        <display>Nested Attributes</display>
-      </navLink>
-    </section>
+	</section>
 
-    <section name="misc">
+    <section name="About">
       <navLink>
         <url>license.xml</url>
         <display>License</display>
