@@ -54,7 +54,9 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ElementDecl extends Particle {
+public class ElementDecl extends Particle
+    implements Referable 
+{
 
 
     /**
@@ -195,6 +197,17 @@ public class ElementDecl extends Particle {
             return schema.getElementDecl(elementRef);
         return null;
     } //-- getReference
+
+    /**
+     * Returns the Id used to Refer to this Object
+     *
+     * @return the Id used to Refer to this Object
+     * @see Referable
+    **/
+    public String getReferenceId() {
+        if (name != null) return "element:"+name;
+        return null;
+    } //-- getReferenceId
 
     /**
      * Returns the XML Schema to which this element declaration belongs.
