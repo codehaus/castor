@@ -50,6 +50,7 @@ package org.exolab.castor.dax.engine;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 import java.net.MalformedURLException;
 import netscape.ldap.LDAPUrl;
 import netscape.ldap.LDAPConnection;
@@ -69,13 +70,14 @@ import org.exolab.castor.persist.TransactionAbortedException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectNotPersistentException;
 import org.exolab.castor.persist.TransactionNotInProgressException;
 import org.exolab.castor.persist.TransactionAbortedException;
 import org.exolab.castor.persist.ClassNotPersistenceCapableException;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
@@ -135,10 +137,52 @@ public class DirectoryImpl
     public Search createSearch( String expr )
 	throws InvalidSearchException, DirectoryException
     {
+	Persistence   per;
+	int           next;
+	int           pos;
+	StringBuffer  query;
+	Vector        types;
+	Class[]       array;
+
 	if ( _dirEngine == null )
 	    throw new DirectoryException( "Directory closed" );
 
-	return null;
+	try {
+	    next = expr.indexOf( '$' );
+	    if ( next <= 0 ) {
+		return new SearchImpl( this, _dirEngine.getPersistence( _objDesc.getObjectType() ).createQuery( expr, new Class[ 0 ] ) );
+	    } else {
+		pos = 0;
+		query = new StringBuffer();
+		types = new Vector();
+		while ( next > 0 ) {
+		    if ( next == expr.length() - 1 ) {
+			query.append( expr.substring( pos, next + 1 ) );
+			pos = next;
+			break;
+		    }
+		    if ( expr.charAt( next + 1 ) == '$' ) {
+			query.append( expr.substring( pos, next + 1 ) );
+			pos = next + 2;
+			next = expr.indexOf( '$', next );
+		    }
+		    query.append( expr.substring( pos, next + 1 ) );
+		    query.append( "\0" );
+		    pos = next + 1;
+		    next = expr.indexOf( '$', next );
+		    types.addElement( null );
+		}
+		query.append( expr.substring( pos, next ) );
+		array = new Class[ types.size() ];
+		types.copyInto( array );
+		System.out.println( query.toString() );
+		return new SearchImpl( this, _dirEngine.getPersistence( _objDesc.getObjectType() ).createQuery( query.toString(), array ) );
+	    }
+	} catch ( QueryException except ) {
+	    throw new InvalidSearchException( except.getMessage() );
+	} catch ( PersistenceException except ) {
+	    throw new DirectoryException( except );
+	}
     }
 
 
@@ -343,7 +387,28 @@ public class DirectoryImpl
     }
 
 
+    synchronized TransactionContext getTransactionContext()
+	throws DirectoryException
+    {
+	if ( _dirEngine == null )
+	    throw new DirectoryException( "Directory closed" );
+	return _tx;
+    }
 
+
+    synchronized TransactionContext newTransactionContext()
+	throws DirectoryException
+    {
+	if ( _dirEngine == null )
+	    throw new DirectoryException( "Directory closed" );
+	return new TransactionContextImpl( _conn );
+    }
+
+
+    PersistenceEngine getPersistenceEngine()
+    {
+	return _dirEngine;
+    }
 
 
     private static Hashtable  _engines = new Hashtable();

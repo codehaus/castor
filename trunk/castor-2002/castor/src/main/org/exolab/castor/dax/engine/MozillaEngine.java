@@ -49,6 +49,7 @@ package org.exolab.castor.dax.engine;
 
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.StringTokenizer;
 import java.util.Hashtable;
 import netscape.ldap.LDAPConnection;
 import netscape.ldap.LDAPException;
@@ -57,6 +58,10 @@ import netscape.ldap.LDAPAttribute;
 import netscape.ldap.LDAPAttributeSet;
 import netscape.ldap.LDAPModification;
 import netscape.ldap.LDAPModificationSet;
+import netscape.ldap.LDAPSearchResults;
+import netscape.ldap.LDAPReferralException;
+import netscape.ldap.LDAPv2;
+import netscape.ldap.LDAPDN;
 import netscape.ldap.util.DN;
 import netscape.ldap.util.RDN;
 import org.exolab.castor.dax.engine.DAXFieldDesc;
@@ -64,6 +69,7 @@ import org.exolab.castor.dax.engine.DAXObjectDesc;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.Types;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.QueryException;
@@ -389,7 +395,7 @@ public class MozillaEngine
     public PersistenceQuery createQuery( String query, Class[] types )
 	throws QueryException
     {
-	return null;
+	return new MozillaQuery( query, types );
     }
 
 
@@ -422,6 +428,222 @@ public class MozillaEngine
 	if ( withRootDN && _rootDN != null )
 	    dn.append( ',' ).append( _rootDN );
 	return dn.toString();
+    }
+
+
+    private Object getIdentityFromDN( String dn )
+    {
+	String[] rdns;
+
+	if ( _rootDN == null )
+	    rdns = LDAPDN.explodeDN( dn, true );
+	else
+	    rdns = LDAPDN.explodeRDN( dn.substring( 0, dn.length() - _rootDN.length() ), true );
+	if ( _dnFields != null ) {
+	    Object identity;
+
+	    identity = Types.createNew( _objDesc.getIdentityField().getFieldType() );
+	    for ( int i = _dnFields.length ; i-- > 0 ; )
+		_dnFields[ i ].setValue( identity, rdns[ i ] );
+	    return identity;
+	} else {
+	    return rdns[ 0 ];
+	}
+    }
+
+
+    class MozillaQuery
+	implements PersistenceQuery
+    {
+
+	private final Class[]     _paramTypes;
+
+
+	private Object[]          _paramValues;
+
+
+	private LDAPEntry         _lastResult;
+
+
+	private LDAPSearchResults _results;
+
+
+	private int               _position;
+
+
+	private final String[]    _query;
+
+
+	MozillaQuery( String query, Class[] types )
+	{
+	    StringTokenizer token;
+ 
+	    if ( types == null )
+		throw new IllegalArgumentException( "Argument 'types' is null" );
+	    _paramTypes = types;
+	    _paramValues = new Object[ _paramTypes.length ];
+	    if ( query == null )
+		throw new IllegalArgumentException( "Argument 'query' is null" );
+	    token = new StringTokenizer( query, "\0" );
+	    _query = new String[ token.countTokens() ];
+	    for ( int i = 0 ; i < _query.length ; ++i )
+		_query[ i ] = token.nextToken();
+	    if ( _query.length != _paramTypes.length + 1 )
+		throw new IllegalArgumentException( "Argument 'query' and 'paramTypes' do not match in number of parameters" );
+	}
+
+
+	public int getParameterCount()
+	{
+	    return _paramTypes.length;
+	}
+
+
+	public Class getParameterType( int index )
+	{
+	    return _paramTypes[ index ];
+	}
+
+
+	public void setParameter( int index, Object value )
+	{
+	    if ( value != null && _paramTypes[ index ] != null )
+		if ( ! _paramTypes[ index ].isAssignableFrom( value.getClass() ) )
+		    throw new IllegalArgumentException( "Parameter " + index + " must be of type " +
+							_paramTypes[ index ].getName() + " instead recieved type " +
+							value.getClass().getName() );
+	    _paramValues[ index ] = value;
+	}
+
+
+	public Class getResultType()
+	{
+	    return _objDesc.getObjectType();
+	}
+
+
+	public void execute( Object conn, boolean lock )
+	    throws QueryException, PersistenceException
+	{
+	    try {
+		StringBuffer filter;
+
+		filter = new StringBuffer();
+		for ( int i = 0 ; i < _query.length - 1 ; ++i ) {
+		    filter.append( _query[ i ] );
+		    if ( _paramValues[ i ] != null )
+			filter.append( _paramValues[ i ].toString() );
+		}
+		filter.append( _query[ _query.length - 1 ] );
+		_position = 0;
+		_lastResult = null;
+		_paramValues = new Object[ _paramTypes.length ];
+		_results = ( (LDAPConnection) conn ).search( _rootDN, LDAPv2.SCOPE_ONE, filter.toString(), null, false );
+	    } catch ( LDAPException except ) {
+		if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
+		     except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
+		    throw new FatalPersistenceException( except );
+		throw new PersistenceException( except );
+	    }
+	}
+
+
+	public Object nextIdentity()
+	    throws PersistenceException
+	{
+	    _lastResult = null;
+	    if ( _results.hasMoreElements() ) {
+		Object result;
+
+		result = _results.nextElement();
+		if ( result instanceof LDAPEntry ) {
+		    _lastResult = (LDAPEntry) result;
+		    return getIdentityFromDN( _lastResult.getDN() );
+		} else if ( result instanceof LDAPReferralException ) {
+		    // No support for referrals in this release
+		    throw new PersistenceException( (LDAPReferralException) result );
+		} else if ( result instanceof LDAPException ) {
+		    throw new PersistenceException( (LDAPException) result );
+		}
+		++_position;
+	    }
+	    return null;
+	}
+
+
+	public Object getIdentity( int index )
+	    throws PersistenceException
+	{
+	    // If just retrieved this record, return it.
+	    if ( index == _position )
+		return getIdentityFromDN( _lastResult.getDN() );
+	    // No going back in LDAP search results
+	    if ( index < _position )
+		throw new PersistenceException( "Cannot obtain result at index " + index +
+						" after obtaining result at index " + _position );
+	    // Traverse as much as needed until you reach new position
+	    Object identity = null;
+
+	    while ( index < _position ) {
+		identity = nextIdentity();
+		if ( identity == null )
+		    return null;
+	    }
+	    return identity;
+	}
+
+
+	public int getPosition()
+	    throws PersistenceException
+	{
+	    return _position;
+	}
+
+
+	public boolean isForwardOnly()
+	{
+	    return true;
+	}
+
+
+	public Object fetch( Object obj )
+	    throws ObjectNotFoundException, PersistenceException
+	{
+	    LDAPAttributeSet ldapSet;
+	    LDAPAttribute    ldapAttr;
+	    DAXFieldDesc     field;
+	    Enumeration      enum;
+
+	    if ( _lastResult == null )
+		throw new PersistenceException( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
+	    
+	    ldapSet = _lastResult.getAttributeSet();
+	    for ( int i = 0 ; i < ldapSet.size() ; ++i ) {
+		ldapAttr = ldapSet.elementAt( i );
+		if ( ldapAttr.getName().equals( "objectclass" ) ) {
+		    // No need to load or match objectclass, query took care of that
+		} else {
+		    field = (DAXFieldDesc) _fields.get( ldapAttr.getName() );
+		    if ( field != null ) {
+			field.setValue( obj, _lastResult );
+		    } else if ( _attrField != null ) {
+			Hashtable     attrSet;
+			
+			attrSet = (Hashtable) _attrField.getValue( obj );
+			if ( attrSet == null ) {
+			    attrSet = new Hashtable();
+			    _attrField.setValue( obj, attrSet );
+			}
+			attrSet.put( ldapAttr.getName(), ldapAttr.getStringValueArray() );
+		    }
+		}
+	    }
+	    _lastResult = null;
+	    return null;
+	}
+
+
+
     }
 
 
