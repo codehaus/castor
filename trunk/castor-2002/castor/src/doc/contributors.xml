@@ -54,7 +54,7 @@
     <name surname="Blandin" given="Arnaud"/>
     <email>blandin@intalio.com</email>
     <company id="intalio"/>
-    <description>XML enhancements/Bug Fixes</description>
+    <description>XML enhancements - Bug Fixes - Documentation on Source Generator</description>
   </contributor>
 
   <contributor type="Committer">
