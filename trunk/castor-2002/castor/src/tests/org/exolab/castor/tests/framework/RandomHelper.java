@@ -175,6 +175,19 @@ public class RandomHelper {
                                      new TimeDuration(_rand.nextLong()));
     }
 
+
+    public static Object getRandom(Object obj, Class c) {
+        try {
+            obj = c.newInstance();
+            if (obj.getClass().isAssignableFrom(CastorTestable.class))
+              ((CastorTestable)obj).randomizeFields();
+        } catch (Exception e) {
+          //TODO: find a better handling
+          e.printStackTrace();
+        }
+        return obj;
+    }
+    
     /**
      * Returns a random Castor recurringDuration
      * @returns a random Castor recurringDuration
