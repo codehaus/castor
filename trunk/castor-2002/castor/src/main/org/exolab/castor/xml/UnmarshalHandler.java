@@ -737,7 +737,9 @@ public final class UnmarshalHandler extends MarshalFramework
                         if (descriptors[i] == null) continue;
                         //-- check for inheritence
                         Class superclass = descriptors[i].getFieldType();
-                        if (superclass.isAssignableFrom(subclass)) {
+
+                        // It is possible that the superclass is of type object if we use any node.
+                        if (superclass.isAssignableFrom(subclass) && (superclass != Object.class)) {
                             descriptor = descriptors[i];
                             break;
                         }
