@@ -102,7 +102,7 @@ public interface QueryResults
     /**
      * moves the result of the query to the absolute position in the
      * resultset
-     * @param int The row to move to
+     * @param row The row to move to
      * @throws PersistenceException A persistence error occured
      */
     public boolean absolute(int row)

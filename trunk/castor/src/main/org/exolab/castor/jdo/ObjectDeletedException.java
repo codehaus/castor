@@ -15,7 +15,7 @@ public class ObjectDeletedException
     /**
      * Construct an instance of the exception.
      *
-     * @param msg A string providing a description of the exception.
+     * @param message A string providing a description of the exception.
      */
     public ObjectDeletedException( String message )
     {
