@@ -253,14 +253,10 @@ public class DatabaseImpl
         return ( _scope == null );
     }
 
-    public Object load( Class type, Complex identity )
+    public Object load( Class type, Object identity, Object object ) 
             throws TransactionNotInProgressException, ObjectNotFoundException,
             LockNotGrantedException, PersistenceException {
-    
-        return load( type, (Object)identity );
-    }
 
-    public Object load( Class type, Object identity) throws ObjectNotFoundException, LockNotGrantedException, TransactionNotInProgressException, PersistenceException {
         TransactionContext tx;
         PersistenceInfo    info;
 
@@ -269,7 +265,20 @@ public class DatabaseImpl
         if ( info == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", type.getName() ) );
 
-        return tx.load( info.engine, info.molder, identity, null );
+        return tx.load( info.engine, info.molder, identity, object, null );
+    }
+    public Object load( Class type, Complex identity )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
+    
+        return load( type, (Object)identity, null );
+    }
+
+    public Object load( Class type, Object identity ) 
+            throws ObjectNotFoundException, LockNotGrantedException, 
+            TransactionNotInProgressException, PersistenceException {
+
+        return load( type, identity, null );
     }
 
     public Object load( Class type, Complex identity, short accessMode )
@@ -306,7 +315,7 @@ public class DatabaseImpl
         if ( info == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
         
-        return tx.load( info.engine, info.molder, identity, mode );
+        return tx.load( info.engine, info.molder, identity, null, mode );
     }
 
     public void create( Object object )
