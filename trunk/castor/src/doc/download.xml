@@ -22,22 +22,22 @@
       <ul><b>Lastest Released Version: Castor $VERSION$</b>
         <li><a href="release-notes.xml">What changed?</a></li>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.jar</url>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JAR (XML only)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-xml.jar</url>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$-xml.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JARs, docs, DTDs, command line tools and examples<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.tgz</url><br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.zip</url>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$.tgz</url><br/>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$.zip</url>
             <br/>&#xA0;</li>
         <li>Full documentation including all JavaDocs and specs (big)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-doc.tgz</url><br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-doc.zip</url>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$-doc.tgz</url><br/>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$-doc.zip</url>
             <br/>&#xA0;</li>
         <li>Full CVS snapshot: all sources, docs, libraries (big)<br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-src.tgz</url><br/>
-            <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-src.zip</url>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$-src.tgz</url><br/>
+            <url>http://dist.codehaus.org/castor/castor_$VERSION$/castor-$VERSION$-src.zip</url>
             <br/>&#xA0;</li>
       </ul>
 
@@ -65,24 +65,19 @@
 
       </section>
 
-
-      <section title="FTP Access">
-         <p>For FTP access use <url>ftp://ftp.exolab.org/pub/castor/</url></p>
-      </section>
-
       <section title="Daily CVS Snapshot">
          <p>
             For Latest CVS version use our CVS server
             (<a href="cvs.xml">CVS Information</a>) or
             for those of you behind a firewall with the CVS port non-accessible, feel free to
             use the daily-snapshot here:
-         <url>ftp://ftp.exolab.org/pub/castor/castor_daily_snapshot.tgz</url>
+         <url>http://dist.codehaus.org/castor/castor_daily_snapshot.tgz</url>
          </p>
     </section>
 
       <section title="Past Releases">
-         You may be able to find some past releases on the FTP Server:
-         <p><url>ftp://ftp.exolab.org/pub/castor/</url></p>
+         You may be able to find some past releases on the HTTP Server:
+         <p><url>http://dist.codehaus.org/castor/</url></p>
       </section>
 
   </body>
