@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1372: Mapping.loadMapping(String) duplicates directory 
+       path. Fixed problem by making the given url a relative URL 
+       so that the document base isn't duplicated.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1372
+       (kvisco - 20041217)
+
 JDO:   Fixed bug 1827 using contribution from Stein M. Hugubakken [dulci@start.no]
        Fixed a problem related to dropping a tbale that does not exist in src/tests(jdo/mysql.sql.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1827
