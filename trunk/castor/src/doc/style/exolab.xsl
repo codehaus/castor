@@ -491,10 +491,19 @@
           <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
             <b>Company</b></span>
           </td>
+          <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
+            <b>Project</b></span>
+          </td>
+          <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
+            <b>Status</b></span>
+          </td>
+          <td bgcolor="{$color-epsilon}"><span class="bodyGrey">
+            <b>Since</b></span>
+          </td>
         </tr>
         <xsl:for-each select="../contributor[@type=$type]">
-          <tr>
-            <td valign="top"><span class="bodyGrey">
+          <tr valign="top">
+            <td><span class="bodyGrey">
               <!-- a href="mailto:{email}" -->
               <a>
                   <xsl:attribute name="href">mailto:<xsl:apply-templates select="email"/></xsl:attribute>
@@ -510,6 +519,23 @@
                <a href="http://{$company/url}"><xsl:value-of select="$company/name"/></a>
                &#xA0;</span>
             </td>
+            <td><span class="bodyGrey">
+               <xsl:value-of select="project"/></span>
+            </td>
+            <td><span class="bodyGrey">
+               <xsl:choose>
+                 <xsl:when test="status='active'">
+                    Active
+                 </xsl:when>
+                 <xsl:otherwise>
+                    Inactive
+                 </xsl:otherwise>
+               </xsl:choose>
+               </span>
+            </td>
+            <td><span class="bodyGrey">
+               <xsl:value-of select="since/date"/></span>
+            </td>
           </tr>
         </xsl:for-each>
       </table>
@@ -521,7 +547,7 @@
   </xsl:template>
 
   <xsl:template match="news">
-      <br />
+    <br />
     <!--xsl:variable name="border" />
     <xsl:variable name="fill" />
     <xsl:when test="release">
@@ -546,6 +572,55 @@
       </td></tr></table>
   </xsl:template>
 
+  <xsl:template match="release">
+    <br/>
+    <h2>Release <xsl:value-of select="@version" /></h2>
+    <table width="100%" border="0" cellspacing="1" cellpadding="2">
+      <tr>
+        <td>Description:</td><td><xsl:value-of select="description"/></td>
+      </tr><tr>
+        <td>released:</td><td><xsl:value-of select="date"/></td>
+      </tr><tr>
+        <td>managed by:</td><td><xsl:value-of select="managed-by"/></td>
+      </tr>
+    </table><br/>
+  	<xsl:apply-templates select="summary"/><br/>
+  	<xsl:apply-templates select="bugs"/><br/>
+  </xsl:template>
+
+  <xsl:template match="bugs">
+    <table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2"><tr><td>
+      <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
+	  	 <tr bgcolor="#7270c2">
+           <th align="left">Id</th>
+           <th align="left">Fixed by</th>
+           <th align="left">Committed by </th>
+           <th align="left">Description</th>
+           <th align="left">Type</th>
+           <th align="left">Project</th>
+           <th align="left">Module</th>
+         </tr>
+         <xsl:apply-templates select="bug"/>
+      </table></td></tr>
+    </table>
+  </xsl:template>
+
+  <xsl:template match="bug">
+    <xsl:variable name="contributor-name"><xsl:value-of select="contributor/name"/></xsl:variable>
+    <xsl:variable name="contributor-email"><xsl:value-of select="contributor/email"/></xsl:variable>
+    <xsl:variable name="submitter-name"><xsl:value-of select="submitter/name"/></xsl:variable>
+    <xsl:variable name="submitter-email"><xsl:value-of select="submitter/email"/></xsl:variable>
+  	<tr valign="top">
+  		<td><a href="{id}"><xsl:value-of select="@id" /></a></td>
+  		<td><a href="mailto:{$contributor-email}"><xsl:value-of select="$contributor-name" /></a></td>
+  		<td><a href="mailto:{$submitter-email}"><xsl:value-of select="$submitter-name" /></a></td>
+  		<td><xsl:value-of select="description"/></td>
+  		<td><xsl:value-of select="type"/></td>
+  		<td><xsl:value-of select="project"/></td>
+  		<td><xsl:value-of select="module"/></td>
+  	</tr>
+  </xsl:template>
+
   <xsl:template match="tip">
       <br />
       <table width="100%" border="0" cellspacing="1" cellpadding="1" bgcolor="#7270c2">
@@ -561,7 +636,6 @@
         </tr>
       </table>
   </xsl:template>
-
 
 </xsl:stylesheet>
 
