@@ -9,15 +9,15 @@
 
   <contributor type="Committer">
     <name surname="Arkin" given="Assaf"/>
-    <email>arkin@exoffice.com</email>
-    <company id="exoffice"/>
+    <email>arkin@intalio.com</email>
+    <company id="intalio"/>
     <description>Responsible for all things wrong in JDO</description>
   </contributor>
 
   <contributor type="Committer">
     <name surname="Visco" given="Keith"/>
-    <email>kvisco@exoffice.com</email>
-    <company id="exoffice"/>
+    <email>kvisco@intalio.com</email>
+    <company id="intalio"/>
     <description>Eliminated angle brackets on XML side</description>
   </contributor>
 
@@ -36,6 +36,33 @@
     <description>Develops the new OQL query parser.</description>
   </contributor>
 
+  <contributor type="Committer">
+    <name surname="Fritz" given="Markus"/>
+    <email>mfritz@justis.de</email>
+    <company id="justis"/>
+    <description>JDO bugfixes, enhancements.</description>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Yip" given="Thomas"/>
+    <email>yip@intalio.com</email>
+    <company id="intalio"/>
+    <description>JDO enhancements.</description>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Maucherat" given="Remy"/>
+    <email>remm@apache.org</email>
+    <company id="intalio"/>
+    <description>XML enhancements, lots of testing.</description>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Fawcett" given="Andrew"/>
+    <email>Andrew.Fawcett@coda.com</email>
+    <company id="coda"/>
+    <description>XML enhancements.</description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Thelen" given="Frank"/>
@@ -53,10 +80,33 @@
     <description>Submitted code for generating mapping file from existing SQL database.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Arriaga" given="Santiago"/>
+    <email>santiago@catnet.com.mx</email>
+    <description>Added Informix and Hypersonic SQL to the list of supported databases.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Higgins" given="Patrick"/>
+    <email>phiggins@transzap.com</email>
+    <description>
+        Enhancements to the javasource classes to fix support for abstract
+        methods. Some changes for Java 2 types compatibiliy.
+    </description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Sahuc" given="Sebastien"/>
     <email>ssahuc@imediation.com</email>
     <description>Testing for Oracle and Castor XML.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Stewart" given="George"/>
+    <email>georgestewartiv@yahoo.com</email>
+    <description>
+       Enhancement to give mapping loader higher priority than compiled descriptors
+    </description>
   </contributor>
 
   <contributor type="Feedback">
@@ -71,13 +121,30 @@
     <description>Responsible for uncovering bugs that no one else noticed.</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Arias" given="Luis"/>
+    <email>luis@elysia.com</email>
+    <description>XML Schema related issues</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Ozyurt" given="Burak"/>
+    <email>bozyurt@san.rr.com</email>
+    <description>Added InstantDB to the list of supported databases.</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
   -->
-  <company id="exoffice">
-    <name>Exoffice Technologies</name>
-    <url>www.exoffice.com</url>
+  <company id="intalio">
+    <name>Intalio Inc</name>
+    <url>www.intalio.com</url>
+  </company>
+
+  <company id="coda">
+    <name>CODA</name>
+    <url>www.coda.com</url>
   </company>
 
   <company id="poet">
@@ -86,7 +153,7 @@
   </company>
 
   <company id="ibis">
-    <name>IBIS</name>
+    <name>Integrated Banking Information Systems</name>
     <url></url>
   </company>
 
@@ -119,7 +186,7 @@
   </type>
 
   <type name="Feedback">
-    The following have offered valuable feedback that has been beneficial
+    The following have offered valuable feedback (including bug reports) that has been beneficial
     to the development and stability.
   </type>
 
