@@ -115,6 +115,37 @@ public final class EntityInfo {
     }
 
     /**
+     * Determines if the entity represented by this EntityInfo 
+     * object is either the same as, or is a superentity of, 
+     * the entity represented by the specified EntityInfo parameter. 
+     * It returns true if so; otherwise it returns false. 
+     */ 
+    public boolean isSuper( EntityInfo info ) {
+        if ( this.equals(info) )
+            return true;
+
+        while ( !this.equals( info ) ) {
+            if ( info == null )
+                return false;
+
+            info = info.superEntity;
+        }
+        return true;
+    }
+
+    /**
+     * Return the base entityInfo of this entity
+     */
+    public EntityInfo getBase() {
+        
+        EntityInfo cur = this;
+        while ( cur.superEntity != null ) {
+            cur = cur.superEntity;
+        }
+        return cur;
+    }
+
+    /**
      * Return the maximium number of field possible
      * (aka, the sum of the number of fields of this and all sub entities)
      */
@@ -130,7 +161,6 @@ public final class EntityInfo {
         }
         return max+fieldLen;
     }
-
 
     public boolean equals( Object object ) {
         if ( !( object instanceof EntityInfo ) || object == null )

@@ -148,6 +148,14 @@ public final class EntityFieldInfo {
         // implements it....
     }
 
+    public int getFieldPos() {
+        for ( int i = 0; i < entityClass.fieldInfo.length; i++ ) {
+            if ( entityClass.fieldInfo[i] == this )
+                return i;
+        }
+        throw new IllegalStateException("FieldInfo, "+this+", is corrupted. It doesn't not contained in an entity it belongs");
+    }
+
     public boolean equals( Object object ) {
         EntityFieldInfo info;
 
