@@ -105,15 +105,19 @@
   <!-- Build the documentation -->
   <target name="doc" depends="prepare">
     <mkdir dir="${build}/doc" />
-    <style srcdir="${source}/doc" destdir="${build}/doc"
-           exclude="project.xml" style="style/exolab.xsl"/>
+    <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
+           includes="**.xml" excludes="style/**,project.xml"/>
+    <copydir  src="${doc}/images" dest="${build}/doc/images"/>
+    <copydir  src="${doc}/style/images" dest="${build}/doc/style/images"/>
+    <copyfile src="${doc}/license.txt" dest="${build}/doc/license.txt"/>
     <mkdir dir="${build}/doc/print" />
-    <style srcdir="${source}/doc" destdir="${build}/doc/print"
-           exclude="project.xml,style,images" style="style/print.xsl"/>
+    <style basedir="${doc}" destdir="${build}/doc/print" style="style/print.xsl"
+           includes="**.xml" excludes="style/**,project.xml"/>
+    <copydir src="${doc}/images" dest="${build}/doc/print/images"/>
+    <copyfile src="${doc}/license.txt" dest="${build}/doc/print/license.txt"/>
   </target>
 
   <!-- Build the API JavaDoc -->
-  <!-- Note: you need the proper permission to get it running -->
   <target name="javadoc" depends="prepare">
     <mkdir   dir="${build}/doc" />
     <deltree dir="${build}/doc/javadoc" />
@@ -130,13 +134,13 @@
   <target name="source" depends="prepare">
     <delete file="${dist}/${archive}-src.tgz" />
     <delete file="${dist}/${archive}-src.zip" />
-    <exec command="tar --create --compress --exclude-from ${source}/etc/exclude
-                   *.sh *.bat ${source} ${lib}"
-          dir="." output="${dist}/${archive}-src.tgz" />
+    <tar includes="*.sh, *.bat ${source}/** ${lib}/**"
+         output="${dist}/${archive}-src.tar" defaultexcludes="true" />	  
+    <gzip src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
+    <delete file="${dist}/${archive}-src.tar" />
     <zip zipfile="${dist}/${archive}-src.zip" basedir="." includes="*.sh *.bat ${source}/** ${lib}/**"
          defaultexcludes="true" />         
   </target>
-
 
   <!-- Build the tarball including JAR and all dependent packages -->
   <target name="tarball" depends="prepare,jar,examples">
@@ -168,11 +172,16 @@
     <copyfile src="${lib}/jta1.0.1.jar"
               dest="${bin}/jta1.0.1.jar" />
     <copydir  src="${source}/schema" dest="${bin}/schema" />
-    <exec command="tar --create --compress --directory ${source}
-                       --exclude-from ${source}/etc/exclude examples"
-          dir="." output="${bin}/examples.tgz" />
-    <exec command="tar --create --compress --directory ${build} ${archive}"
-          dir="." output="${dist}/${archive}.tgz" />
+
+    <tar includes="examples/**" chdir="${source}"
+         output="${bin}/examples.tar" defaultexcludes="true" />	  
+    <gzip src="${bin}/examples.tar" zipfile="${bin}/examples.tgz"/>
+    <delete file="${bin}/examples.tar" />
+    <tar includes="${archive}/**" chdir="${build}"
+         output="${dist}/${archive}.tar" defaultexcludes="true" />	  
+    <gzip src="${dist}/${archive}.tar" zipfile="${dist}/${archive}.tgz"/>
+    <delete file="${dist}/${archive}.tar" />
+
     <delete file="${bin}/examples.tgz" />
     <zip zipfile="${bin}/examples.zip" basedir="${source}" includes="examples/**"
          defaultexcludes="true" />
@@ -182,7 +191,7 @@
 
   <!-- Update the sources from the CVS -->
   <target name="cvs" depends="clean">
-    <cvs cvsroot=":pserver:arkin@virtuals.exoffice.com:/cvs/${project}"
+    <cvs cvsRoot=":pserver:arkin@virtuals.exoffice.com:/cvs/${project}"
          dest="." package="${project}" />
   </target>
 
