@@ -89,8 +89,26 @@ public final class ClassHandler
 {
 
 
+    /**
+     * Indicates the object has not been modified in memory since it
+     * was loaded and need not be stored.
+     */
     public static final short Unmodified = 0;
+
+
+    /**
+     * Indicates the object has been modified in memory since it was
+     * loaded, but all modified fields are marked as ignore dirty ignore,
+     * the object should be stored but not write lock is required.
+     */
     public static final short Modified = 1;
+
+
+    /**
+     * Indicates the object has been modified in memory since it was
+     * loaded, at least one of the modified fields is marked as dirty
+     * check, the object must be write locked before it can be stored.
+     */
     public static final short LockRequired = 2;
 
 
@@ -540,11 +558,17 @@ public final class ClassHandler
      */
     short isModified( Object object, Object[] original )
     {
+        short modified = Unmodified;
+
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( isModified( _fields[ i ], object, original[ i ] ) )
-                return ( _fields[ i ].dirty ? LockRequired : Modified );
+            if ( isModified( _fields[ i ], object, original[ i ] ) ) {
+                if ( _fields[ i ].dirty )
+                    modified = LockRequired;
+                else if ( modified == Unmodified )
+                    modified = Modified;
+            }
         }
-        return Unmodified;
+        return modified;
     }
 
 
