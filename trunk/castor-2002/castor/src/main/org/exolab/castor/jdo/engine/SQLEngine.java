@@ -628,13 +628,33 @@ public final class SQLEngine implements Persistence {
 
 
     /**
+     * if isNull, replace next "=?" with " IS NULL",
+     * otherwise skip next "=?",
+     * move "pos" to the left.
+     */
+    private int nextParameter(boolean isNull, StringBuffer sb, int pos) {
+        for ( ; pos > 0; pos--) {
+            if (sb.charAt(pos - 1) == '=' && sb.charAt(pos) == '?') {
+                break;
+            }
+        }
+        if (pos > 0) {
+            pos--;
+            if (isNull) {
+                sb.delete(pos, pos + 2);
+                sb.insert(pos, " IS NULL");
+            }
+        }
+        return pos;
+    }
+
+    /**
      * If the RDBMS doesn't support setNull for "WHERE fld=?" and requires "WHERE fld IS NULL",
      * we need to modify the statement.
      */
-    private String getStoreStatement( Object[] original ) {
+    private String getStoreStatement( Object[] original ) throws PersistenceException {
         StringBuffer sb = null;
         int pos = 0;
-        int last_replacement;
 
         if (original == null) {
             return _sqlStore;
@@ -642,33 +662,32 @@ public final class SQLEngine implements Persistence {
         if (((BaseFactory) _factory).supportsSetNullInWhere()) {
             return _sqlStoreDirty;
         }
-        last_replacement = original.length;
-        for (int i = original.length - 1; i >= 0; i--) {
-            if ( ! _fields[ i ].store || ! _fields[i].dirtyCheck ) {
-                last_replacement--;
-                continue;
-            }
-
-            if (original[i] != null) {
-                continue;
-            }
-            if (sb == null) {
-                pos = _sqlStoreDirty.length();
-                sb = new StringBuffer(pos * 4);
-                sb.append(_sqlStoreDirty);
-            }
-            for ( ; last_replacement > i; last_replacement--) {
-                for (pos--; pos > 0; pos--) {
-                    if (sb.charAt(pos - 1) == '=' && sb.charAt(pos) == '?') {
-                        pos--;
-                        break;
+        pos = _sqlStoreDirty.length() - 1;
+        sb = new StringBuffer(pos * 4);
+        sb.append(_sqlStoreDirty);
+        for (int i = _fields.length - 1; i >= 0; i--) {
+            if (_fields[i].store && _fields[i].dirtyCheck) {
+                if (original[i] == null) {
+                    for (int j = _fields[i].columns.length - 1; j >= 0; j--) {
+                        pos = nextParameter(true, sb, pos);
                     }
+                } else if ( original[i] instanceof Complex ) {
+                    Complex complex = (Complex) original[i];
+                    if ( complex.size() != _fields[i].columns.length )
+                        throw new PersistenceException( "Size of complex field mismatch!" );
+
+                    for (int j = _fields[i].columns.length - 1; j >= 0; j--) {
+                        pos = nextParameter((complex.get(j) == null), sb, pos);
+                    }
+                } else {
+                    if (_fields[i].columns.length != 1)
+                        throw new PersistenceException( "Complex field expected! ");
+
+                    pos = nextParameter(false, sb, pos);
                 }
             }
-            sb.delete(pos, pos + 2);
-            sb.insert(pos, " IS NULL");
         }
-        return (sb == null ? _sqlStoreDirty : sb.toString());
+        return sb.toString();
     }
 
     public Object store( Object conn, Object[] fields, Object identity,
@@ -698,13 +717,12 @@ public final class SQLEngine implements Persistence {
                             stmt.setNull( count++, _fields[i].columns[j].sqlType );
 
                     } else if ( fields[i] instanceof Complex ) {
-                        Complex complex = (Complex)fields[i];
+                        Complex complex = (Complex) fields[i];
                         if ( complex.size() != _fields[i].columns.length )
                             throw new PersistenceException( "Size of complex field mismatch!" );
 
                         for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = ( complex == null ? null : complex.get(j) );
-                            SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
+                            SQLTypes.setObject( stmt, count++, toSQL( i, j, complex.get(j)), _fields[i].columns[j].sqlType );
                         }
                     } else {
                         if ( _fields[i].columns.length != 1 )
@@ -743,13 +761,12 @@ public final class SQLEngine implements Persistence {
                                     stmt.setNull( count++, _fields[i].columns[j].sqlType );
                             }
                         } else if ( original[i] instanceof Complex ) {
-                            Complex complex = (Complex)original[i];
+                            Complex complex = (Complex) original[i];
                             if ( complex.size() != _fields[i].columns.length )
                                 throw new PersistenceException( "Size of complex field mismatch!" );
 
                             for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                                Object value = ( complex == null ? null : complex.get(j) );
-                                SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
+                                SQLTypes.setObject( stmt, count++, toSQL( i, j, complex.get(j)), _fields[i].columns[j].sqlType );
                             }
                         } else {
                             if ( _fields[i].columns.length != 1 )
