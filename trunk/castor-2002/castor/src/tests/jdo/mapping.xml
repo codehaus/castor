@@ -283,7 +283,7 @@
   <class name="jdo.TestRace" access="shared" identity="id">
     <description>Table used for cache testing</description>
     <map-to table="test_race" />
-    <cache-type type="count-limited" value="30"/>
+    <cache-type type="count-limited" capacity="30"/>
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -295,7 +295,7 @@
   <class name="jdo.TestRaceCount" access="shared" identity="id">
     <description>Table used for cache testing</description>
     <map-to table="test_race" />
-    <cache-type type="count-limited" value="10"/>
+    <cache-type type="count-limited" capacity="10"/>
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -307,7 +307,7 @@
   <class name="jdo.TestRaceTime" access="shared" identity="id">
     <description>Table used for cache testing</description>
     <map-to table="test_race" />
-    <cache-type type="time-limited" value="5"/>
+    <cache-type type="time-limited" capacity="5"/>
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
