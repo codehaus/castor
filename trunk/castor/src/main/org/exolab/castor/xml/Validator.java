@@ -40,27 +40,26 @@
  *
  * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
 
 package org.exolab.castor.xml;
 
-import org.exolab.castor.xml.util.*;
-
+import org.exolab.castor.xml.util.ClassDescriptorResolverImpl;
 import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.ValidityException;
-
-import java.lang.reflect.*;
-
 
 /**
  * A class which can perform Validation on an Object model.
  * This class uses the ClassDescriptors and FieldDescriptors
  * to perform the validation.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class Validator implements ClassValidator {
@@ -107,8 +106,14 @@ public class Validator implements ClassValidator {
 
         XMLClassDescriptor classDesc = null;
 
-        if (! MarshalFramework.isPrimitive(object.getClass()))
-            classDesc = context.getResolver().resolve(object.getClass());
+        if (! MarshalFramework.isPrimitive(object.getClass())) {
+            try {
+                classDesc = context.getResolver().resolve(object.getClass());
+            }
+            catch(ResolverException rx) {
+                throw new ValidationException(rx);
+            }
+        }
 
         //-- we cannot validate an object if ClassDescriptor is null
         if (classDesc == null) return;
