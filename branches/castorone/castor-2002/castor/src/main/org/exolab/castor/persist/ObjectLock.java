@@ -100,6 +100,7 @@ final class ObjectLock implements DepositBox {
 
     final static short ACTION_CREATE = 3;
 
+    final static short ACTION_UPDATE = 4;
 
     static int idcount = 0;
 
