@@ -106,18 +106,28 @@ public class ImportUnmarshaller extends SaxUnmarshaller
         if (namespace.equals(schema.getTargetNamespace()) )
             throw new SAXException("the 'namespace' attribute in the <import> element cannot be the same of the targetNamespace of the global schema");
 		//-- Have we already imported this XML Schema file?
-		if (state.processed(schemaLocation))
+		if (state.processed(schemaLocation)) {
+           schema.addImportedSchema(state.getSchema(schemaLocation));
            return;
-        state.markAsProcessed(schemaLocation);
-
-
+		}
         //-- Schema object to hold import schema
 		boolean addSchema = false;
 		Schema importedSchema = schema.getImportedSchema(namespace);
+
+        //-- Have we already imported this XML Schema file?
+		if (state.processed(schemaLocation)) {
+           if (importedSchema == null)
+               schema.addImportedSchema(state.getSchema(schemaLocation));
+           return;
+		}
+
+
         if (importedSchema == null) {
 			importedSchema = new Schema();
 			addSchema = true;
 		}
+
+        state.markAsProcessed(schemaLocation, importedSchema);
 
         //-- Parser Schema
 		Parser parser = null;
@@ -128,14 +138,13 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 		if (parser == null) {
 		    throw new SAXException("Error failed to create parser for import");
 		}
-		else
-		{
+		else {
 			//-- Create Schema object and setup unmarshaller
 			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(state);
 			schemaUnmarshaller.setSchema(importedSchema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
-        }
+		}
 
 		try {
 		    parser.parse(new InputSource(schemaLocation));

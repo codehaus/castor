@@ -97,7 +97,8 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
         if (state.processed(include))
             return;
 
-        state.markAsProcessed(include);
+        //just keep track of the schemaLocation
+        state.markAsProcessed(include, null);
 
 		Parser parser = null;
 		try {
