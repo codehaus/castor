@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999, 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -63,7 +63,9 @@ public interface XMLClassDescriptor extends ClassDescriptor {
 
     /**
      * Returns the set of XMLFieldDescriptors for all members
-     * that should be marshalled as XML attributes.
+     * that should be marshalled as XML attributes. This
+     * includes namespace nodes.
+     *
      * @return an array of XMLFieldDescriptors for all members
      * that should be marshalled as XML attributes.
     **/

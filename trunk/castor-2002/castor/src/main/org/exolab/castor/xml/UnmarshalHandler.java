@@ -884,6 +884,7 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             _stateInfo.push(_topState);
             processAttributes(atts, classDesc);
+            processNamespaces(classDesc);
             return;
         } //--rootElement
 
@@ -1259,8 +1260,10 @@ public final class UnmarshalHandler extends MarshalFramework
             }
         }
 
-        if (state.object != null)
+        if (state.object != null) {
             processAttributes(atts, classDesc);
+            processNamespaces(classDesc);
+        }
         else if ((state.type != null) && (!state.primitiveOrImmutable)) {
             buf.setLength(0);
             buf.append("The current object for element '");
@@ -1667,8 +1670,37 @@ public final class UnmarshalHandler extends MarshalFramework
 
         return attSet;
 
-    } //-- method: processNamespaces
+    } //-- method: processAttributeList
 
+    /**
+     * Saves local namespace declarations to the object
+     * model if necessary.
+     *
+     * @param classDesc the current ClassDescriptor.
+    **/
+    private void processNamespaces(XMLClassDescriptor classDesc) {
+        
+        
+        //-- process namespace nodes
+        XMLFieldDescriptor nsDescriptor =
+            classDesc.getFieldDescriptor(null, NodeType.Namespace);
+                
+        if (nsDescriptor != null) {
+            UnmarshalState state = (UnmarshalState) _stateInfo.peek();
+            FieldHandler handler = nsDescriptor.getHandler();
+            if (handler != null) {
+                Enumeration enum = _namespaces.getLocalNamespaces();
+                while (enum.hasMoreElements()) {
+                    String nsURI = (String)enum.nextElement();
+                    String nsPrefix = _namespaces.getNamespacePrefix(nsURI);
+                    if (nsPrefix == null) nsPrefix = "";
+                    MapItem mapItem = new MapItem(nsPrefix, nsURI);
+                    handler.setValue(state.object, mapItem);
+                }
+            }
+        }
+    } //-- processNamespaces
+    
     /**
      * Extracts the prefix and resolves it.
      * The resolution will change the prefix:value as {NamespaceURI}value

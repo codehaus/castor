@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -239,6 +239,7 @@ public class XMLClassDescriptorImpl extends Validator
 
         NodeType nodeType = descriptor.getNodeType();
         switch(nodeType.getType()) {
+            case NodeType.NAMESPACE:
             case NodeType.ATTRIBUTE:
                 if (!attributeDescriptors.contains(descriptor)) {
                     attributeDescriptors.add(descriptor);
@@ -351,14 +352,30 @@ public class XMLClassDescriptorImpl extends Validator
                 return result;
         }
 
-        if (wild || (nodeType == NodeType.Attribute)) {
+        //-- handle attributes
+        if (wild || (nodeType == NodeType.Attribute))
+        {
             XMLFieldDescriptor desc = null;
             for (int i = 0; i < attributeDescriptors.size(); i++) {
 
                 desc = (XMLFieldDescriptor)attributeDescriptors.get(i);
                 if (desc == null)
                     continue;
+                    
                 if (desc.matches(name)) {
+                    return desc;
+                }
+            }
+        }
+        
+        //-- handle namespace node
+        if (nodeType == NodeType.Namespace) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < attributeDescriptors.size(); i++) {
+                desc = (XMLFieldDescriptor)attributeDescriptors.get(i);
+                if (desc == null)
+                    continue;
+                if (desc.getNodeType() == NodeType.Namespace) {
                     return desc;
                 }
             }
@@ -435,7 +452,7 @@ public class XMLClassDescriptorImpl extends Validator
 
         NodeType nodeType = descriptor.getNodeType();
         switch(nodeType.getType()) {
-
+            case NodeType.NAMESPACE:
             case NodeType.ATTRIBUTE:
                 attributeDescriptors.remove(descriptor);
                 break;
@@ -596,6 +613,7 @@ public class XMLClassDescriptorImpl extends Validator
         for (int i = 0; i < elementDescriptors.size(); i++) {
             fieldDesc = (XMLFieldDescriptor)elementDescriptors.get(i);
             switch (fieldDesc.getNodeType().getType()) {
+                case NodeType.NAMESPACE:
                 case NodeType.ATTRIBUTE:
                     attributeDescriptors.add(fieldDesc);
                     remove.add(fieldDesc);
