@@ -1036,13 +1036,14 @@ public abstract class TransactionContext
         if ( _status != Status.STATUS_ACTIVE )
             throw new IllegalStateException( Messages.message( "persist.noTransaction" ) );
 
-        // No objects in this transaction -- this is a read only transaction
-        if ( _objects.size() == 0 ) {
-            _status = Status.STATUS_PREPARED;
-            return false;
-        }
-
         try {
+            // No objects in this transaction -- this is a read only transaction
+            // Put it into the try block to close connections
+            if ( _objects.size() == 0 ) {
+                _status = Status.STATUS_PREPARED;
+                return false;
+            }
+
             done = new Vector();
             while ( _objects.size() != done.size() ) {
                 todo = new Vector();
