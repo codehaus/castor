@@ -214,7 +214,7 @@ public class Marshaller {
         _cdResolver      = new ClassDescriptorResolverImpl();
         _cdCache         = new Hashtable(3);
         _parents         = new Stack();
-        _validate        = Configuration.validation();
+        _validate        = Configuration.marshallingValidation();
     } //-- initialize();
 
     /**
