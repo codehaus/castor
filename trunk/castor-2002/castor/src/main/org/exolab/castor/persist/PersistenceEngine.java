@@ -107,6 +107,14 @@ public interface PersistenceEngine
 
 
     /**
+     * Sets the log writer used to trace persistence operations.
+     *
+     * @param logWriter The log writer, or null
+     */
+    public void setLogWriter( PrintWriter logWriter );
+
+
+    /**
      * Returns the log writer used to trace persistence operations.
      *
      * @return The log writer, or null
