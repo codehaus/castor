@@ -349,7 +349,7 @@ public final class DatabaseImpl
     }
 
 
-    public void abort()
+    public void rollback()
         throws TransactionNotInProgressException, PersistenceException
     {
         if ( _ctx == null || ! _ctx.isOpen() )

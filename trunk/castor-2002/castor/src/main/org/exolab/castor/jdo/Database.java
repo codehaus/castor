@@ -153,7 +153,7 @@ public interface Database
      * associated locks.
      * Aborting a transaction does not restore the state of modified transient objects
      */
-    public void abort()
+    public void rollback()
         throws TransactionNotInProgressException, PersistenceException;
 
 
