@@ -4,7 +4,14 @@
     <title>Castor Presentations and Articles</title>
 
     <section title="Articles">
-      <p><b>Presentations about Castor...</b></p>
+      
+      <p>
+         <b>IBM developerWorks (April 2002)</b>
+         <p/>
+         Dennis M. Sosnoski gives an overview of the data-binding solution using Castor XML.
+         <a href="http://www-106.ibm.com/developerworks/xml/library/x-bindcastor/index.html">Read</a>
+      </p>
+      
       <p>
          <b>Javaworld (April 2002)</b>
          <p/>
