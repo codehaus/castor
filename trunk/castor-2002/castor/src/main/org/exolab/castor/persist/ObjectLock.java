@@ -474,7 +474,7 @@ final class ObjectLock implements DepositBox {
             throws LockNotGrantedException, ObjectDeletedException,
             ObjectDeletedWaitingForLockException {
 
-        long endtime = timeout<0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
+        long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
         while ( true ) {
             try {
                 // case to consider:
@@ -689,7 +689,7 @@ final class ObjectLock implements DepositBox {
             throw e;
         }
 
-        long endtime = timeout<0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
+        long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
         while ( true ) {
             // Repeat forever until lock is acquired or timeout
             try {
