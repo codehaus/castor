@@ -1021,6 +1021,46 @@ public void setDetails( Collection details )
 	    
     </section>
     
+    <section title="Changing database configurations">
 
+        <p>Some applications need to change the database connection or
+           switch between different mapping files on the fly. Because Castor
+           caches database configurations per name, you would have to register
+           a new JDO configuration using a distinct name for any other of the
+           different configuraions.</p> 
+
+		<p>Instead you can call <api class="org.exolab.castor.jdo.engine.DatabaseRegistry">clear()</api> to 
+		   reset the database registry before registering the new configuration as follows:</p>
+
+		<code>
+JDO jdo;
+org.exolab.castor.jdo.conf.Database jdoDbConf;
+
+String db_url = "jdbc:oracle:thin:localhost:1521:SID";
+String username = "scott"
+String password = "tiger";
+
+String db_name = "mydb";  <comment>// "mydb#" + username + "#" + map_file;</comment>
+
+<comment>// Reset database registry</comment>
+org.exolab.castor.jdo.engine.DatabaseRegistry.clear();
+
+<comment>// Use the mapping file located in the current Java package</comment>
+URL map_url = class.getResource(map_file);
+
+<comment>// Create the JDO object</comment>
+jdo = new JDO();
+jdo.setDatabaseName("mydb");
+
+<comment>// Set up JDO the configuration with the specified database driver and connection information</comment>
+jdoDbConf = JdoConfFactory.createJdoDbConf(db_name, "oracle", 
+	JdoConfFactory.createJdoDriverConf("oracle.jdbc.driver.OracleDriver",
+					   db_url, username, password));
+
+<comment>// Store mapping file location in the configuration</comment>
+jdoDbConf.addMapping(JdoConfFactory.createJdoMappingConf(map_url.toString()));
+		</code>
+    </section>
+    
   </body>
 </document>
