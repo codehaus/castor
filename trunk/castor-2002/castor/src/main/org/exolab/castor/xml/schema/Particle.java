@@ -42,7 +42,7 @@
  *
  * $Id$
 */
- 
+
 package org.exolab.castor.xml.schema;
 
 
@@ -54,20 +54,20 @@ package org.exolab.castor.xml.schema;
  * choice, sequence, group, any) but rather the "term"
  * extends this class.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a> 
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
 **/
 public abstract class Particle extends Annotated {
-    
+
     /**
      * The maximum occurance
     **/
-    private int _maxOccurs = -1;
-    
+    private int _maxOccurs = 1; //aberry: was -1 (unbounded) but its not consistent with the spec.
+
     /**
      * The minimum occurance
     **/
     private int _minOccurs  = 1;
-    
+
     /**
      * Default Constructor, uses a default minimum occurance
      * of 1, and a default unbounded maximum occurance
@@ -81,20 +81,20 @@ public abstract class Particle extends Annotated {
      * maximum and minimum occurances
      *
      * @param minOccurs the minimum occurance
-     * @param maxOccurs the maximum occurance
+     * @param maxOccurs the maximum occurance ( -1 for unbounded)
     **/
     protected Particle(int minOccurs, int maxOccurs) {
         super();
         setMinOccurs(minOccurs);
         setMaxOccurs(maxOccurs);
     } //-- Particle
-    
+
     /**
-     * Returns the maximum number of occurances that this CMParticle 
+     * Returns the maximum number of occurances that this CMParticle
      * may appear
      * @return the maximum number of occurances that this CMParticle
      * may appear.
-     * A non positive (n < 1) value indicates that the 
+     * A non positive (n < 1) value indicates that the
      * value is unspecified (ie. unbounded).
     **/
     public final int getMaxOccurs() {
@@ -111,12 +111,12 @@ public abstract class Particle extends Annotated {
     public final int getMinOccurs() {
         return _minOccurs;
     } //-- getMinOccurs
-    
+
     /**
      * Sets the maximum number of occurances that this CMParticle must
      * appear within it's parent context
      * @param maxOccurs the maximum number of occurances that this
-     * CMParticle may appear within it's parent context
+     * CMParticle may appear within it's parent context (-1 for unbounded)
     **/
     public final void setMaxOccurs(int maxOccurs) {
         _maxOccurs = maxOccurs;
@@ -125,12 +125,12 @@ public abstract class Particle extends Annotated {
     /**
      * Sets the minimum number of occurances that this CMParticle must
      * appear within it's parent context
-     * @param minOccurs the number of occurances that this 
+     * @param minOccurs the number of occurances that this
      * CMParticle must
      * appeae within it's parent context
     **/
     public final void setMinOccurs(int minOccurs) {
         _minOccurs = minOccurs;
     } //-- setMinOccurs
-    
+
 } //-- CMParticle
