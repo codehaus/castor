@@ -92,7 +92,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.8.12";
+    static final String version = "0.9";
 
     /**
      * The application URI
@@ -296,13 +296,12 @@ public class SourceGenerator {
         createClasses(schema, sInfo);
     } //-- generateSource
 
-    /**
+     /**
      * Creates Java Source code (Object model) for the given XML Schema
-     * @param reader the Reader with which to read the XML Schema definition.
-     * The caller should close the reader, since thie method will not do so.
+     * @param InputSource - the InputSource representing the XML schema.
      * @param packageName the package for the generated source files
     **/
-    public void generateSource(Reader reader, String packageName) {
+    public void generateSource(InputSource source, String packageName) {
 
         //-- get default parser from Configuration
         Parser parser = null;
@@ -320,7 +319,7 @@ public class SourceGenerator {
         parser.setErrorHandler(schemaUnmarshaller);
 
         try {
-            parser.parse(new InputSource(reader));
+            parser.parse(source);
         }
         catch(java.io.IOException ioe) {
             System.out.println("error reading XML Schema file");
@@ -350,6 +349,18 @@ public class SourceGenerator {
 
     /**
      * Creates Java Source code (Object model) for the given XML Schema
+     * @param reader the Reader with which to read the XML Schema definition.
+     * The caller should close the reader, since thie method will not do so.
+     * @param packageName the package for the generated source files
+    **/
+    public void generateSource(Reader reader, String packageName) {
+
+        InputSource source = new InputSource(reader);
+        generateSource(source, packageName);
+    } //-- generateSource
+
+    /**
+     * Creates Java Source code (Object model) for the given XML Schema
      * @param filename the full path to the XML Schema definition
      * @param packageName the package for the generated source files
     **/
@@ -358,7 +369,9 @@ public class SourceGenerator {
     {
 
         FileReader reader = new FileReader(new File(filename));
-        generateSource(reader, packageName);
+        InputSource source = new InputSource(reader);
+        source.setSystemId(toURIRepresentation(filename));
+        generateSource(source, packageName);
         try {
             reader.close();
         }
@@ -777,8 +790,7 @@ public class SourceGenerator {
                     createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
-                    //-- 
-                    
+                    //--
                     processContentModel((Group)struct, sInfo);
                     break;
                 default:
@@ -992,5 +1004,31 @@ public class SourceGenerator {
 		    _bindingType = TYPE_BINDING;
     } //-- initBindingType
 
+    /**
+     * <p>Returns a string which is the URI of a file.
+     * <ul>
+     *  <li>file:///DOSpath</li>
+     *  <li>file://UnixPath</li>
+     * </ul>
+     * No validation is done to check wether the file exists or not.
+     * This method will be no longer used when the JDK URL.toString() is
+     * fixed.
+     * @param path the absolute path of the file.
+     * @returns a string representing the URI of the file
+     *
+     */
+    public static String toURIRepresentation( String path ) {
+        String result = path;
+        if (!new File(result).isAbsolute())
+           throw new IllegalArgumentException("The parameter must represent an absolute path.");
+        if (File.separatorChar != '/')
+            result = result.replace(File.separatorChar, '/');
+        if (result.startsWith("/"))
+            /*Unix platform*/
+            result = "file://" + result;
+        else result = "file://" + "/" + result;   /*DOS platform*/
+
+        return result;
+    }
 } //-- SourceGenerator
 
