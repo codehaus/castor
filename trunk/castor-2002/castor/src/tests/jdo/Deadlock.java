@@ -73,16 +73,28 @@ public class Deadlock
     private Database       _db;
 
 
-    private Database       _first;
+    private Database       _firstDb;
 
 
-    private Database       _second;
+    private Database       _secondDb;
 
 
     private JDOCategory    _category;
 
 
     public static final long  Wait = 1000;
+
+
+    private short            _accessMode;
+
+
+    private Object           _lock;
+
+
+    private Thread           _first;
+
+
+    private Thread           _second;
 
 
     public Deadlock( CWTestCategory category )
@@ -111,8 +123,8 @@ public class Deadlock
 
         try {
             _db = _category.getDatabase( stream.verbose() );
-            _first = _category.getDatabase( stream.verbose() );
-            _second = _category.getDatabase( stream.verbose() );
+            _firstDb = _category.getDatabase( stream.verbose() );
+            _secondDb = _category.getDatabase( stream.verbose() );
 
             stream.writeVerbose( "Running in access mode shared" );
             if ( ! runOnce( stream, Database.Shared ) )
@@ -127,8 +139,8 @@ public class Deadlock
                 result = false;
             stream.writeVerbose( "" );
             _db.close();
-            _first.close();
-            _second.close();
+            _firstDb.close();
+            _secondDb.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
@@ -184,27 +196,17 @@ public class Deadlock
             // Run two threads in parallel attempting to update the
             // two objects in a different order, with the first
             // suceeding and second failing
-            FirstThread  first;
-            SecondThread second;
-            Object       lock = new Object();
-            
-            first = new FirstThread();
-            first._db = _first;
-            first._stream = stream;
-            first._accessMode = accessMode;
-            first._lock = lock;
-            second = new SecondThread();
-            second._db = _second;
-            second._stream = stream;
-            second._accessMode = accessMode;
-            second._lock = lock;
+            _accessMode = accessMode;
+            _lock = new Object();
+            _first = new FirstThread( _firstDb, stream );
+            _second = new SecondThread( _secondDb, stream );
 
-            second.start();
-            first.start();
+            _second.start();
+            _first.start();
 
-            first.join();
-            second.join();
-            result = first._result & second._result;
+            _first.join();
+            _second.join();
+            result = ( (FirstThread) _first ).result() & ( (SecondThread) _second ).result();
 
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
@@ -216,7 +218,7 @@ public class Deadlock
     }
     
     
-    static class FirstThread
+    class FirstThread
         extends Thread
     {
         
@@ -229,10 +231,17 @@ public class Deadlock
         private boolean          _result = true;
 
 
-        private short            _accessMode;
+        FirstThread( Database db, CWVerboseStream stream )
+        {
+            _db = db;
+            _stream = stream;
+        }
 
 
-        private Object           _lock;
+        boolean result()
+        {
+            return _result;
+        }
 
 
         public void run()
@@ -245,11 +254,11 @@ public class Deadlock
                 start = System.currentTimeMillis();
 
                 // Load first object and change something about it (otherwise will not write)
-                _stream.writeVerbose( "First: Loading object " + TestObject.DefaultId );
+                _stream.writeVerbose( "1.1: Loading object " + TestObject.DefaultId );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId ), _accessMode );
                 object.setValue1( TestObject.DefaultValue1 + ":1" );
-                _stream.writeVerbose( "First: Modified to " + object );
+                _stream.writeVerbose( "1.2: Modified to " + object );
                 
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
@@ -260,28 +269,30 @@ public class Deadlock
                 // sleep( start + Wait - System.currentTimeMillis() );
                 //start = System.currentTimeMillis();
                 
-                _stream.writeVerbose( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
+                _stream.writeVerbose( "1.3: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ), _accessMode );
                 object.setValue2( TestObject.DefaultValue2 + ":1" );
-                _stream.writeVerbose( "First: Modified to " + object );
+                _stream.writeVerbose( "1.4: Modified to " + object );
                 
                 // Notify the other thread that it may proceed and suspend
-                synchronized ( _lock ) {
-                    _lock.notify();
-                    _lock.wait();
+                if ( _second.isAlive() ) {
+                    synchronized ( _lock ) {
+                        _lock.notify();
+                        _lock.wait();
+                    }
                 }
                 // Give the other thread a 2 second opportunity.
                 //sleep( Math.max( start + Wait - System.currentTimeMillis(), 0 ) );
 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                _stream.writeVerbose( "First: Committing" );
+                _stream.writeVerbose( "1.5: Committing" );
                 _db.commit();
-                _stream.writeVerbose( "First: Committed" );
+                _stream.writeVerbose( "1.6: Committed" );
             } catch ( Exception except ) {
                 _result = false;
-                _stream.writeVerbose( "First: " + except );
+                _stream.writeVerbose( "1.X: " + except );
                 except.printStackTrace();
                 _result = false;
             }
@@ -290,7 +301,7 @@ public class Deadlock
     }
     
     
-    static class SecondThread
+    class SecondThread
         extends Thread
     {
 
@@ -304,10 +315,17 @@ public class Deadlock
         private boolean          _result = true;
 
 
-        private short            _accessMode;
+        SecondThread( Database db, CWVerboseStream stream )
+        {
+            _db = db;
+            _stream = stream;
+        }
 
 
-        private Object           _lock;
+        boolean result()
+        {
+            return _result;
+        }
 
 
         public void run()
@@ -328,11 +346,11 @@ public class Deadlock
                 //start = System.currentTimeMillis();
                 
                 // Load first object and change something about it (otherwise will not write)
-                _stream.writeVerbose( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
+                _stream.writeVerbose( "2.1: Loading object " + ( TestObject.DefaultId + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ), _accessMode );
                 object.setValue2( TestObject.DefaultValue2 + ":2" );
-                _stream.writeVerbose( "Second: Modified to " + object );
+                _stream.writeVerbose( "2.2: Modified to " + object );
                 
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
@@ -343,28 +361,28 @@ public class Deadlock
                 // sleep( start + Wait - System.currentTimeMillis() );
                 // start = System.currentTimeMillis();
                 
-                _stream.writeVerbose( "Second: Loading object " + TestObject.DefaultId );
+                _stream.writeVerbose( "2.3: Loading object " + TestObject.DefaultId );
                 try {
                     object = (TestObject) _db.load( TestObject.class,
                                                     new Integer( TestObject.DefaultId ), _accessMode );
                 } catch ( LockNotGrantedException except ) {
                     if ( _accessMode == Database.Exclusive ||
                          _accessMode == Database.DbLocked ) {
-                        _stream.writeVerbose( "OK: Deadlock detected" );
+                        _stream.writeVerbose( "2.X OK: Deadlock detected" );
                     } else {
                         _result = false;
-                        _stream.writeVerbose( "Error: " + except );
+                        _stream.writeVerbose( "2.X Error: " + except );
                     }
                     _db.rollback();
                     return;
                 }
                 object.setValue1( TestObject.DefaultValue1 + ":2" );
-                _stream.writeVerbose( "Second: Modified to " + object );
+                _stream.writeVerbose( "2.4: Modified to " + object );
 
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
                     _lock.notify();
-                    _lock.wait( 3000 );
+                    _lock.wait();
                 }
                 // Give the other thread a 2 second opportunity.
                 //sleep( start + Wait - System.currentTimeMillis() );
@@ -372,22 +390,22 @@ public class Deadlock
                 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                _stream.writeVerbose( "Second: Committing" );
+                _stream.writeVerbose( "2.5: Committing" );
                 _db.commit();
                 _result = false;
-                _stream.writeVerbose( "Error: deadlock not detected" );
-                _stream.writeVerbose( "Second: Committed" );
+                _stream.writeVerbose( "2.6 Error: deadlock not detected" );
+                _stream.writeVerbose( "2.6 Second: Committed" );
             } catch ( TransactionAbortedException except ) {
                 if ( except.getException() instanceof LockNotGrantedException )
-                    _stream.writeVerbose( "OK: Deadlock detected" );
+                    _stream.writeVerbose( "2.X OK: Deadlock detected" );
                 else {
                     _result = false;
-                    _stream.writeVerbose( "Error: " + except );
+                    _stream.writeVerbose( "2.X Error: " + except );
                 }
-                _stream.writeVerbose( "Second: aborting" );
+                _stream.writeVerbose( "2.X Second: aborting" );
             } catch ( Exception except ) {
                 _result = false;
-                _stream.writeVerbose( "Error: " + except );
+                _stream.writeVerbose( "2.X Error: " + except );
                 except.printStackTrace();
             }
         }
