@@ -337,10 +337,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
      * transaction or any other transaciton, calling this method 
      * results in no effect.
      */
-    public void addRelated( TransactionContext tx, EntityInfo info, 
-            Object foreignId, EntityFieldInfo fieldInfo, List list ) {
-        // should I group foreignId, fieldInfo, info and list into
-        // an object? And, call it "ManyRelation"?
+    public void addRelated( TransactionContext tx, Relation relation) {
     }
 
 
