@@ -512,7 +512,10 @@ public abstract class Configuration
 
         OutputFormat format = new OutputFormat( Method.XML, null, indent );
         
-        format.setPreserveSpace(true); 
+        // There is a bad interaction between the indentation and the
+        // setPreserveSpace option. The indentated output is strangely indented.
+        if (!indent)
+            format.setPreserveSpace(true); 
 
         return format;
     } //-- getOutputFormat
