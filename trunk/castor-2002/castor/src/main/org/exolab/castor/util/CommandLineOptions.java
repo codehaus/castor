@@ -60,7 +60,7 @@ public class CommandLineOptions {
      * @param comment a comment for the flag
     **/
     public void addFlag(String flag, String comment) {
-        addFlag(flag, null, comment);
+        addFlag(flag, null, comment, false);
     } //-- addFlag
     
     /**
@@ -71,12 +71,27 @@ public class CommandLineOptions {
      * usage string
     **/
     public void addFlag(String flag, String usageText, String comment) {
+        addFlag(flag, usageText, comment, false);
+    } //-- addFlag
+
+    /**
+     * Adds the flag to list of available command line options
+     * @param flag the flag to add as an available command line option
+     * @param comment a comment for the flag
+     * @param usageText the text that appears after the flag in the
+     *   usage string
+     * @param optional, when true, indicates that this flag is optional
+    **/
+    public void addFlag
+        (String flag, String usageText, String comment, boolean optional) 
+    {
         if (flag == null) return;
         flags.addElement(flag);
         
         CmdLineOption opt = new CmdLineOption(flag);
         opt.setComment(comment);
         opt.setUsageText(usageText);
+        opt.setOptional(optional);
         optionInfo.put(flag, opt);
     } //-- addFlag
     
