@@ -113,9 +113,9 @@ public class DelegateFieldDescriptor
     }
 
 
-    public CollectionHandler getCollectionHandler()
+    public boolean isMulti()
     {
-        return _desc.getCollectionHandler();
+        return _desc.isMulti();
     }
 
 
