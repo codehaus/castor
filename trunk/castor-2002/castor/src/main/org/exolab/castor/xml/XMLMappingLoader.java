@@ -54,6 +54,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
@@ -154,7 +155,7 @@ public class XMLMappingLoader
     }
 
 
-    protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
+    protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
     {
         TypeConvertor convertorTo;
@@ -167,7 +168,7 @@ public class XMLMappingLoader
         } else
             convertorTo = convertorFrom = null;
         return new TypeInfo( fieldType, convertorTo, convertorFrom,
-                             fieldMap.getRequired(), null, colType );
+                             fieldMap.getRequired(), null, colHandler );
     }
 
 
