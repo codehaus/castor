@@ -109,6 +109,7 @@ public class SchemaNames {
     public static final String ORDER_ATTR       = "order";
     public static final String PROCESS_CONTENTS = "processContents";
     public static final String REF_ATTR         = "ref";
+    public static final String SCHEMALOCATION_ATTR = "schemaLocation";
     public static final String SOURCE_ATTR      = "source";
     public static final String TARGET_NS_ATTR   = "targetNamespace";
     public static final String TYPE_ATTR        = "type";
