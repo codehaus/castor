@@ -160,18 +160,6 @@ final class CollectionHandlers
      * List of all the default collection handlers.
      */
     private static CollectionHandlerInfo[] _colHandlers = new CollectionHandlerInfo[] {
-        // For enumerate (any)
-        new CollectionHandlerInfo( "enumerate", Enumeration.class, new CollectionHandler() {
-            public Object add( Object collection, Object object ) {
-                return null;
-            }
-            public Enumeration elements( Object collection ) {
-                return (Enumeration) collection;
-            }
-            public String toString() {
-                return "Enumerate CollectionHandler";
-            }
-        } ),
         // For array (any)
         new CollectionHandlerInfo( "array", Object[].class, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
@@ -194,8 +182,16 @@ final class CollectionHandlers
                     return new EmptyEnumerator();
                 return new ArrayEnumerator( (Object[]) collection );
             }
+            public int size( Object collection ) {
+                if ( collection == null )
+                    return 0;
+                return ( (Object[]) collection ).length;
+            }
+            public boolean isGetSetCollection() {
+                return true;
+            }
             public String toString() {
-                return "Array CollectionHandler";
+                return "Object[]";
             }
         } ),
         // For Vector (1.1)
@@ -216,8 +212,16 @@ final class CollectionHandlers
                     return new EmptyEnumerator();
                 return ( (Vector) collection ).elements();
             }
+            public int size( Object collection ) {
+                if ( collection == null )
+                    return 0;
+                return ( (Vector) collection ).size();
+            }
+            public boolean isGetSetCollection() {
+                return true;
+            }
             public String toString() {
-                return "Vector CollectionHandler";
+                return "Vector";
             }
         } ),
         // For Hashtable (1.1)
@@ -238,8 +242,16 @@ final class CollectionHandlers
                     return new EmptyEnumerator();
                 return ( (Hashtable) collection ).elements();
             }
+            public int size( Object collection ) {
+                if ( collection == null )
+                    return 0;
+                return ( (Hashtable) collection ).size();
+            }
+            public boolean isGetSetCollection() {
+                return true;
+            }
             public String toString() {
-                return "Hashtable CollectionHandler";
+                return "Hashtable";
             }
         } )
     };
