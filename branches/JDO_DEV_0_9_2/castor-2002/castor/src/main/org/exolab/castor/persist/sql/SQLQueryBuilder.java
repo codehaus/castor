@@ -93,18 +93,22 @@ public class SQLQueryBuilder implements SQLQueryKinds {
 
     /**
      * The factory method for creating instances of this class.
+     * @param oneToManyPath The sequence of one-to-many relations.
+     * The executor must load all child records for the given parent identity.
      */
     public static SQLQueryExecutor getExecutor(BaseFactory factory, SQLConnector connector,
-            LogInterceptor log, SQLEntityInfo info, byte kind, BitSet dirtyCheckNulls, boolean withLock)
+            LogInterceptor log, SQLEntityInfo info, byte kind, BitSet dirtyCheckNulls, boolean withLock,
+            SQLRelationInfo[] oneToManyPath)
             throws PersistenceException {
         QueryExpression query;
         String sql;
         KeyGenerator keyGen = null;
+        SQLFieldInfo[] idInfo;
 
         if (kind == LOOKUP || kind == SELECT) {
             try {
                 query = factory.getQueryExpression();
-                buildLookup(query, info);
+                buildLookup(query, info, oneToManyPath);
                 if (kind == SELECT) {
                     buildSelect(query, info);
                 }
@@ -149,7 +153,8 @@ public class SQLQueryBuilder implements SQLQueryKinds {
                 throw new IllegalStateException("Unknown kind of SQL query: " + kind);
             }
         }
-        return new SQLQueryExecutor(factory, connector, log, info, sql, kind, dirtyCheckNulls, keyGen);
+        idInfo = (oneToManyPath == null ? info.idInfo : oneToManyPath[0].oneInfo.idInfo);
+        return new SQLQueryExecutor(factory, connector, log, info, idInfo, sql, kind, dirtyCheckNulls, keyGen);
     }
 
     /**
@@ -158,16 +163,16 @@ public class SQLQueryBuilder implements SQLQueryKinds {
     public static SQLQueryExecutor getLookupExecutor(BaseFactory factory, SQLConnector connector,
             LogInterceptor log,  SQLEntityInfo info, boolean withLock)
             throws PersistenceException {
-        return getExecutor(factory, connector, log, info, LOOKUP, null, withLock);
+        return getExecutor(factory, connector, log, info, LOOKUP, null, withLock, null);
     }
 
     /**
      * This is a convenience method for SELECT.
      */
     public static SQLQueryExecutor getSelectExecutor(BaseFactory factory, SQLConnector connector,
-            LogInterceptor log,  SQLEntityInfo info, boolean withLock)
+            LogInterceptor log,  SQLEntityInfo info, boolean withLock, SQLRelationInfo[] oneToManyPath)
             throws PersistenceException {
-        return getExecutor(factory, connector, log, info, SELECT, null, withLock);
+        return getExecutor(factory, connector, log, info, SELECT, null, withLock, oneToManyPath);
     }
 
     /**
@@ -176,7 +181,7 @@ public class SQLQueryBuilder implements SQLQueryKinds {
     public static SQLQueryExecutor getCreateExecutor(BaseFactory factory, SQLConnector connector,
             LogInterceptor log, SQLEntityInfo info)
             throws PersistenceException {
-        return getExecutor(factory, connector, log, info, INSERT, null, false);
+        return getExecutor(factory, connector, log, info, INSERT, null, false, null);
     }
 
     /**
@@ -185,7 +190,7 @@ public class SQLQueryBuilder implements SQLQueryKinds {
     public static SQLQueryExecutor getStoreExecutor(BaseFactory factory, SQLConnector connector,
             LogInterceptor log, SQLEntityInfo info, BitSet dirtyCheckNulls)
             throws PersistenceException {
-        return getExecutor(factory, connector, log, info, UPDATE, dirtyCheckNulls, false);
+        return getExecutor(factory, connector, log, info, UPDATE, dirtyCheckNulls, false, null);
     }
 
     /**
@@ -194,19 +199,29 @@ public class SQLQueryBuilder implements SQLQueryKinds {
     public static SQLQueryExecutor getDeleteExecutor(BaseFactory factory, SQLConnector connector,
             LogInterceptor log, SQLEntityInfo info, BitSet dirtyCheckNulls)
             throws PersistenceException {
-        return getExecutor(factory, connector, log, info, DELETE, dirtyCheckNulls, false);
+        return getExecutor(factory, connector, log, info, DELETE, dirtyCheckNulls, false, null);
     }
 
-    private static void buildLookup(QueryExpression query, SQLEntityInfo info)
+    private static void buildLookup(QueryExpression query, SQLEntityInfo info,
+                                    SQLRelationInfo[] oneToManyPath)
             throws QueryException {
-        EntityFieldInfo idInfo;
         String entityClass;
+        String[] names;
 
-        entityClass = info.info.entityClass;
-        for (int i = 0; i < info.idInfo.length; i++) {
-            idInfo = info.idInfo[i].info;
-            for (int j = 0; j < idInfo.fieldNames.length; j++) {
-                query.addParameter(entityClass, idInfo.fieldNames[j], QueryExpression.OpEquals);
+        if (oneToManyPath == null) {
+            entityClass = info.info.entityClass;
+            names = info.idNames;
+        } else {
+            entityClass = oneToManyPath[0].manyTable;
+            names = oneToManyPath[0].manyForeignKey.fieldNames;
+        }
+        for (int i = 0; i < names.length; i++) {
+            query.addParameter(entityClass, names[i], QueryExpression.OpEquals);
+        }
+        if (oneToManyPath != null) {
+            for (int i = 1; i < oneToManyPath.length; i++) {
+                query.addInnerJoin(oneToManyPath[i].oneInfo.info.entityClass, oneToManyPath[i].oneInfo.idNames,
+                                   oneToManyPath[i].manyTable, oneToManyPath[i].manyForeignKey.fieldNames);
             }
         }
     }

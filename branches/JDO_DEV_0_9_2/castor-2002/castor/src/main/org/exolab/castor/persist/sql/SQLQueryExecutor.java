@@ -49,6 +49,7 @@ package org.exolab.castor.persist.sql;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.NoSuchElementException;
 import java.sql.Connection;
@@ -134,6 +135,8 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
 
     private final SQLEntityInfo _info;
 
+    private final SQLFieldInfo[] _idInfo;
+
     private final SQLConnector _connector;
 
     private final BaseFactory _factory;
@@ -168,19 +171,21 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
      * @param connector The SQL connection to add listener.
      * @param log The log interceptor
      * @param info The description of the main Entity of this query.
+     * @param idInfo The description of the identity for this query (for Relations it will differ from info.idInfo).
      * @param sql The SQL statement to execute.
      * @param kind The kind of the SQL statement: LOOKUP (select without loading), SELECT, INSERT, UPDATE or DELETE
      * @param checkDirty Does the query checks for dirtiness (only UPDATE or DELETE)?
      * @param keyGen The key generator, is used for INSERT statements only.
      */
     SQLQueryExecutor(BaseFactory factory, SQLConnector connector, LogInterceptor log,
-                     SQLEntityInfo info, String sql, byte kind, BitSet dirtyCheckNulls,
-                     KeyGenerator keyGen) {
+                     SQLEntityInfo info, SQLFieldInfo[] idInfo, String sql, byte kind,
+                     BitSet dirtyCheckNulls, KeyGenerator keyGen) {
         _factory = factory;
         _connector = connector;
         _log = log;
         _sql = sql;
         _info = info;
+        _idInfo = idInfo;
         _kind = kind;
         _dirtyCheckNulls = dirtyCheckNulls;
         _canUseBatch = (_kind == UPDATE || _kind == DELETE);
@@ -188,37 +193,21 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     }
 
     /**
-     * This method is used by SQLEngine in create(), update(), delete() and load()
-     * when dirty checking is not performed.
-     * @param lockEngine The lock engine, used to addCache and addRelated.
-     * @param entity The main Entity (input or output).
-     */
-    public void executeEntity(Key key, LockEngine lockEngine, Connection conn, Entity entity)
-            throws PersistenceException {
-        executeEntity(key, lockEngine, conn, entity, null);
-    }
-
-    /**
      * This method is used by SQLEngine in create(), update(), delete() and load().
      * @param lockEngine The lock engine, used to addCache and addRelated.
      * @param entity The main Entity (input or output).
-     * @param original An original value of Entity, it is used for UPDATE and DELETE with dirty checking.
+     * @param original The original value of Entity, it is used for UPDATE and DELETE with dirty checking.
+     * @param relation The relation to load.
      */
-    public void executeEntity(Key key, LockEngine lockEngine, Connection conn, Entity entity, Entity original)
+    public void execute(Key key, LockEngine lockEngine, Connection conn, Entity entity, Entity original,
+                        Relation relation)
             throws PersistenceException {
         boolean useBatch;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         int count;
-        HashMap entityMap; // additional loaded entities, maps EntityKey -> Entity
+        Object identity;
         Entity tmpEntity;
-        EntityKey entityKey;
-        String[] entityClasses;
-        Object[][] values;
-        SQLEntityInfo curInfo;
-        Object[] temp = new Object[MAX_COMPLEX];
-        Object[] temp2 = new Object[MAX_COMPLEX];
-        int level;
 
         try {
             useBatch = (_canUseBatch && conn.getMetaData().supportsBatchUpdates());
@@ -272,9 +261,9 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
                 entity.identity = generateKey(conn); // Generate key before INSERT
             }
 
-
-            if (entity.identity != null) {
-                count = bindIdentity(entity.identity, stmt, count, _info.idInfo);
+            identity = (entity != null ? entity.identity : relation.identity);
+            if (identity != null) {
+                count = bindIdentity(identity, stmt, count, _idInfo);
             }
 
             // Dirty checking
@@ -296,8 +285,10 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             // execute the query
             if (_kind == SELECT || _kind == LOOKUP) {
                 rs = stmt.executeQuery();
-                if (!rs.next()) {
-                    throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _info, entity.identity) );
+                if (entity != null) { // loding one entity => must exist
+                    if (!rs.next()) {
+                        throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _info, identity) );
+                    }
                 }
             } else {
                 if (useBatch) {
@@ -322,53 +313,19 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
                 return;
             }
 
-            // prepare the entity for loading
-            if (_info.subEntities == null) {
-                entityClasses = new String[_info.superEntities.length];
-                values = new Object[_info.superEntities.length][];
+            if (entity != null) {
+                loadEntity(entity, rs);
             } else {
-                entityClasses = new String[MAX_DEPTH];
-                values = new Object[MAX_DEPTH][];
-            }
-
-            count = 1;
-
-            // load super-entities first, then this class, then sub-entities
-            // the following loop process super-entities and this class
-            for (level = 0; level < _info.superEntities.length; level++) {
-                curInfo = _info.superEntities[level];
-                entityClasses[level] = curInfo.info.entityClass;
-                values[level] = new Object[curInfo.fieldInfo.length];
-
-                // Fill all fields that are a part of identity (it's possible for top level only)
-                if (level == 0) {
-                    if (curInfo.idPos.length == 1) {
-                        values[0][curInfo.idPos[0]] = entity.identity;
-                    } else {
-                        Complex complex = (Complex) entity.identity;
-                        for (int i = 0; i < curInfo.idPos.length; i++) {
-                            values[0][curInfo.idPos[i]] = complex.get(i);
-                        }
-                    }
+                if (relation.list == null) {
+                    relation.list = new ArrayList();
                 }
-
-                // Skip identity fields
-                count += _info.idNames.length;
-
-                // Load other fields
-                count = readEntity(values[level], rs, count, curInfo, temp);
-            }
-
-            // Now load sub-entities
-            if (_info.subEntities == null) {
-                entity.entityClasses = entityClasses;
-                entity.values = values;
-            } else {
-                level = loadSubEntityLevel(_info, level, entityClasses, values, rs, count, temp, temp2);
-                entity.entityClasses = new String[level];
-                entity.values = new Object[level][];
-                System.arraycopy(entityClasses, 0, entity.entityClasses, 0, level);
-                System.arraycopy(values, 0, entity.values, 0, level);
+                while (rs.next()) {
+                    entity = new Entity();
+                    entity.info = _info.superEntities[0].info;
+                    loadEntity(entity, rs);
+                    relation.list.add(entity.identity);
+                    lockEngine.addEntity(key, entity);
+                }
             }
         } catch (SQLException except) {
             throw new PersistenceException(Messages.format("persist.nested", except), except);
@@ -376,11 +333,67 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     }
 
     /**
-     * This method is used by SQLEngine in loadRelated().
-     * @param relation The Relation to load
+     * Loads one entity.
      */
-    public void executeRelation(Key key, Connection conn, Relation relation)
+    private void loadEntity(Entity entity, ResultSet rs)
             throws PersistenceException {
+        String[] entityClasses;
+        Object[][] values;
+        SQLEntityInfo curInfo;
+        Object[] temp = new Object[MAX_COMPLEX];
+        Object[] temp2 = new Object[MAX_COMPLEX];
+        int level;
+        int count;
+
+        // prepare the entity for loading
+        if (_info.subEntities == null) {
+            entityClasses = new String[_info.superEntities.length];
+            values = new Object[_info.superEntities.length][];
+        } else {
+            entityClasses = new String[MAX_DEPTH];
+            values = new Object[MAX_DEPTH][];
+        }
+
+        count = 1;
+
+        // load super-entities first, then this class, then sub-entities
+        // the following loop process super-entities and this class
+        for (level = 0; level < _info.superEntities.length; level++) {
+            curInfo = _info.superEntities[level];
+            entityClasses[level] = curInfo.info.entityClass;
+            values[level] = new Object[curInfo.fieldInfo.length];
+
+            // identity fields
+            entity.identity = readIdentity(rs, count, curInfo, temp, temp2);
+            count += _info.idNames.length;
+
+            // Fill all fields that are a part of identity (it's possible for top level only)
+            if (level == 0) {
+                if (curInfo.idPos.length == 1) {
+                    values[0][curInfo.idPos[0]] = entity.identity;
+                } else {
+                    Complex complex = (Complex) entity.identity;
+                    for (int i = 0; i < curInfo.idPos.length; i++) {
+                        values[0][curInfo.idPos[i]] = complex.get(i);
+                    }
+                }
+            }
+
+            // Load other fields
+            count = readEntity(values[level], rs, count, curInfo, temp);
+        }
+
+        // Now load sub-entities
+        if (_info.subEntities == null) {
+            entity.entityClasses = entityClasses;
+            entity.values = values;
+        } else {
+            level = loadSubEntityLevel(_info, level, entityClasses, values, rs, count, temp, temp2);
+            entity.entityClasses = new String[level];
+            entity.values = new Object[level][];
+            System.arraycopy(entityClasses, 0, entity.entityClasses, 0, level);
+            System.arraycopy(values, 0, entity.values, 0, level);
+        }
     }
 
     /**
@@ -476,7 +489,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             _pkLookup = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, false);
         }
         try {
-            _pkLookup.executeEntity(key, lockEngine, conn, entity);
+            _pkLookup.execute(key, lockEngine, conn, entity, null, null);
 
             // The entity exists in the database
             if (_kind == INSERT) {
@@ -727,34 +740,6 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             stmt.close();
         } catch(SQLException except) {
             throw new PersistenceException(Messages.format("persist.nested", except), except);
-        }
-    }
-
-
-    //------------------------------ Inner classes -------------------------------------------
-
-
-    static class EntityKey {
-        final EntityFieldInfo[] path;
-
-        EntityKey(EntityFieldInfo[] path) {
-            this.path = path;
-        }
-
-        public boolean equals(Object obj) {
-            if (obj == null || !(obj instanceof EntityKey)) {
-                return false;
-            }
-            return Arrays.equals(path, ((EntityKey) obj).path);
-        }
-
-        public int hashCode() {
-            int hash = 0;
-
-            for (int i = 0; i < path.length; i++) {
-                hash += path[i].hashCode();
-            }
-            return hash;
         }
     }
 }
