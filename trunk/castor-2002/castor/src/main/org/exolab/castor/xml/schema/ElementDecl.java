@@ -55,7 +55,7 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class ElementDecl extends Particle
-    implements Referable 
+    implements Referable
 {
 
 
@@ -256,6 +256,32 @@ public class ElementDecl extends Particle
     } //-- isAbstract
 
     /**
+     * Returns true if this element has children (i.e if it
+     * holds attributes or elements).
+     */
+    public boolean isComplexContent() {
+        XMLType type = getType();
+        if (type instanceof SimpleType)
+           return false;
+
+        if (type instanceof ComplexType) {
+            //complexContent ->sure to have children
+            if (((ComplexType)type).isComplexContent())
+                 return true;
+            //else check for contentModel group
+            else if ( ((ComplexType)type).getParticleCount() != 0 )
+               return true;
+            //else check for attributes
+            else {
+                java.util.Enumeration temp = ((ComplexType)type).getAttributeDecls();
+                return temp.hasMoreElements();
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Sets the default value for this element definition.
      *
      * @param value the default value for this element definition.
@@ -326,9 +352,10 @@ public class ElementDecl extends Particle
         if (this.xmlType != null) {
             this.xmlType.setParent(null);
         }
-        if (type != null) 
+        if (type != null) {
             type.setParent(this);
-            
+        }
+
         this.xmlType = type;
     } //-- setType
 
