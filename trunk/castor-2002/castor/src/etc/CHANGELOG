@@ -14,8 +14,15 @@ JDO:  Added dirty check attribute to field mapping. Fields that are
       lock at the beginning of the transaction no dirty checking
       occurs.
 
+XML:  Added support for positive-integer and negative-integer
+      (Source Generator)
+
 XML:  Added support for Validation during Unmarshalling. Enabled by
-      default.
+      default.  (Marshalling Framework)
+
+XML: Changed Exceptions from SAXException and IOException to
+     MarshalException and ValidationException (Framework + Source Generator)
+     -- Sorry for the inconvenience.
 
 Misc: ObjectDesc, FieldDesc and related classed have no been
       consolidated from the three modules and placed in a single
