@@ -86,12 +86,12 @@
       <attribute name="type" type="NMTOKEN" minOccurs="0"/>
       <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="required" type="boolean" minOccurs="0" default="false"/>
       <attribute name="collection" type="string" minOccurs="0">
+        <enumeration value="array"/>
         <enumeration value="vector"/>
-        <enumeration value="list"/>
-        <enumeration value="collection"/>
-        <enumeration value="bag"/>
+        <enumeration value="enumerate"/>
       </attribute>
     </type>
   </element>

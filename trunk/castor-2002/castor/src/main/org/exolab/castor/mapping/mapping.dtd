@@ -148,7 +148,8 @@
     required (true|false) "false"
     get-method NMTOKEN #IMPLIED
     set-method NMTOKEN #IMPLIED
-    collection (vector|list|collection|bag) #IMPLIED>
+    create-method NMTOKEN #IMPLIED
+    collection (array|vector|enumerate) #IMPLIED>
 
 
 <!--
