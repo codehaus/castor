@@ -177,14 +177,16 @@ create table test_types (
   tdt      datetime           not null,
   ttm      datetime           not null,
   int_val  integer        null,
-  long_val numeric(18,0)  null,
+  long_val bigint         null,
   char_val char(1)        null,
   bool_val char(1)        null,
   int_date integer        null,
   str_time char(12)       null,
-  num_date numeric(17,0)  null,
+  num_date bigint         null,
   blob_val longblob       null,
-  clob_val longtext       null
+  clob_val longtext       null,
+  blob_val2 longblob      null,
+  clob_val2 longtext      null
 );
 
 create unique index test_types_pk
@@ -244,3 +246,14 @@ create table test_persistent (
 
 create unique index test_persistent_pk on test_persistent ( id );
 
+create table test_identity (
+  id integer not null primary key auto_increment,
+  attr varchar(200) not null
+);
+
+create table test_identity_ext (
+  id integer not null,
+  ext varchar(200) not null
+);
+
+create unique index test_ident_ext_pk on test_identity_ext ( id );

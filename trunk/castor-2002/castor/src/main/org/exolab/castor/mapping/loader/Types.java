@@ -60,6 +60,7 @@ import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.util.MimeBase64Decoder;
+import org.exolab.castor.util.ClobImpl;
 
 
 /**
@@ -437,6 +438,10 @@ public class Types
                       String[].class,             false,    null ),
         new TypeInfo( "locale",      null,
                       java.util.Locale.class,     true,     null ),
+        new TypeInfo( "stream",      null,
+                      java.io.InputStream.class,  true,     null ),
+        new TypeInfo( "clob",      null,
+                      java.sql.Clob.class,        true,     null ),
 
 
         /* Mapping for the java array of primitive type so they use the same
@@ -460,8 +465,6 @@ public class Types
                       int[].class,     false,     null ),
 
         /*
-          new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
-          new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
           new TypeInfo( XML,        "xml",         org.w3c.dom.Document.class, org.w3c.dom.Element.class ),
           new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
         */
@@ -478,7 +481,7 @@ public class Types
          *  The type being converted to.
          */
         final Class toType;
-        
+
         /**
          * The type being converted from.
          */
@@ -517,8 +520,6 @@ public class Types
     private static DecimalFormat _decimalFormat = new DecimalFormat("#################0");
 
 
-
-    
     /**
      * List of all the default convertors between Java types.
      */
@@ -976,16 +977,94 @@ public class Types
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Timestamp.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return new java.sql.Timestamp( ( (java.util.Date) obj ).getTime() );
+                long time = ( (java.util.Date) obj ).getTime();
+                java.sql.Timestamp timestamp = new java.sql.Timestamp(time);
+                timestamp.setNanos((int) ((time % 1000) * 1000000));
+                //timestamp.setNanos(0);  // this can workaround the bug in SAP DB
+                return timestamp;
             }
             public String toString() { return "util.Date->sql.Timestamp"; }
         } ),
 
         new TypeConvertorInfo( java.sql.Timestamp.class, java.util.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return obj;
+                java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
+                return new Date(timestamp.getTime() + timestamp.getNanos() / 1000000);
             }
             public String toString() { return "sql.Timestamp->util.Date"; }
+        } ),
+        // InputStream convertors
+        new TypeConvertorInfo( byte[].class, java.io.InputStream.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new java.io.ByteArrayInputStream((byte[]) obj);
+            }
+            public String toString() { return "bytes->io.InputStream"; }
+        } ),
+        new TypeConvertorInfo( java.io.InputStream.class, byte[].class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    java.io.InputStream is = (java.io.InputStream) obj;
+                    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                    byte[] buffer = new byte[256];
+                    int len = 0;
+                    int b;
+                    while ( (len = is.read(buffer)) > 0 )
+                        bos.write( buffer, 0, len );
+                    return bos.toByteArray();
+                } catch ( java.io.IOException except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "io.InputStream->bytes"; }
+        } ),
+        // Reader convertors
+        new TypeConvertorInfo( java.lang.String.class, java.sql.Clob.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                String str = (java.lang.String) obj;
+                return new ClobImpl(new java.io.StringReader(str), str.length());
+            }
+            public String toString() { return "String->sql.Clob"; }
+        } ),
+        new TypeConvertorInfo( char[].class, java.sql.Clob.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                char[] chars = (char[]) obj;
+                return new ClobImpl(new java.io.CharArrayReader(chars), chars.length);
+            }
+            public String toString() { return "chars->sql.Clob"; }
+        } ),
+        new TypeConvertorInfo( java.sql.Clob.class, java.lang.String.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    java.io.Reader reader = ((java.sql.Clob) obj).getCharacterStream();
+                    java.io.CharArrayWriter writer = new java.io.CharArrayWriter();
+                    char[] buffer = new char[256];
+                    int len = 0;
+                    int b;
+                    while ( (len = reader.read(buffer)) > 0 )
+                        writer.write( buffer, 0, len );
+                    return writer.toString();
+                } catch ( Exception except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "sql.Clob->String"; }
+        } ),
+        new TypeConvertorInfo( java.sql.Clob.class, char[].class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    java.io.Reader reader = ((java.sql.Clob) obj).getCharacterStream();
+                    java.io.CharArrayWriter writer = new java.io.CharArrayWriter();
+                    char[] buffer = new char[256];
+                    int len = 0;
+                    int b;
+                    while ( (len = reader.read(buffer)) > 0 )
+                        writer.write( buffer, 0, len );
+                    return writer.toCharArray();
+                } catch ( Exception except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "sql.Clob->String"; }
         } ),
 
         new TypeConvertorInfo( java.util.Date.class, org.exolab.castor.types.Date.class, new TypeConvertor() {

@@ -49,9 +49,6 @@ package org.exolab.castor.jdo.engine;
 import java.io.Reader;
 import java.io.Writer;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.ResultSet;
@@ -59,6 +56,7 @@ import java.sql.Types;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -200,8 +198,8 @@ public final class SQLTypes
         }
         return java.sql.Types.OTHER;
     }
-    
-    
+
+
     /**
      * Convert from Java name to SQL name. Performs trivial conversion
      * by lowering case of all letters and adding underscore between
@@ -224,13 +222,13 @@ public final class SQLTypes
         int          i;
         char         ch;
         boolean      wasLower;
-        
+
         // Get only the last part of the Java name (whether it's
         // class name with package, or field name with parent)
         if ( javaName.indexOf( '.' ) > 0 ) {
             javaName = javaName.substring( javaName.lastIndexOf( '.' ) + 1 );
         }
-        
+
         sql = new StringBuffer( javaName.length() );
         wasLower = false;
         for ( i = 0 ; i < javaName.length() ; ++i ) {
@@ -323,7 +321,7 @@ public final class SQLTypes
         case Types.DATE:
             return rs.getDate( index );
         case Types.TIMESTAMP:
-            return rs.getTimestamp( index ); 
+            return rs.getTimestamp( index );
         case Types.FLOAT:
         case Types.DOUBLE:
             doubleVal = rs.getDouble( index );
@@ -342,44 +340,50 @@ public final class SQLTypes
         case Types.BINARY:
             return rs.getBytes(index);
         case Types.BLOB:
-            try {
-                Blob blob = rs.getBlob( index );
-                InputStream blobIs = blob.getBinaryStream();
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[256];
-                int len = 0;
-                int b;
-                while ( (len = blobIs.read(buffer)) > 0 )
-                    bos.write( buffer, 0, len );
-
-                return bos.toByteArray();
-            } catch ( IOException e ) {
-                throw new SQLException("IOException thrown while reading BLOB into a byte array!");
-            }
+            Blob blob = rs.getBlob( index );
+            return (blob == null ? null :  blob.getBinaryStream());
         case Types.CLOB:
-            try {
-                Clob blob = rs.getClob( index );
-                Reader blobIs = blob.getCharacterStream();
-                CharArrayWriter bos = new CharArrayWriter();
-                char[] buffer = new char[256];
-                int len = 0;
-                int b;
-                while ( (len = blobIs.read(buffer)) > 0 )
-                    bos.write( buffer, 0, len );
-
-                return bos.toString();
-            } catch ( IOException e ) {
-                throw new SQLException("IOException thrown while reading CLOB into a string!");
-            }
+            return rs.getClob( index );
         case Types.BIGINT:
             longVal = rs.getLong( index );
             return ( rs.wasNull() ? null : new Long( longVal ) );
         case Types.BIT:
             boolVal = rs.getBoolean( index );
             return ( rs.wasNull() ? null : new Boolean( boolVal ) );
-        default:               
+        default:
             value = rs.getObject( index );
             return ( rs.wasNull()? null : value );
+        }
+    }
+
+
+    public static void setObject( PreparedStatement stmt, int index, Object value, int sqlType )
+            throws SQLException
+    {
+        if (value == null) {
+            stmt.setNull( index, sqlType );
+        } else {
+            // Special processing for BLOB and CLOB types, because they are mapped by Castor to
+            // java.io.InputStream and java.io.Reader, respectively,
+            // while JDBC driver expects java.sql.Blob and java.sql.Clob.
+            switch ( sqlType ) {
+            case Types.BLOB:
+                try {
+                    InputStream stream = (InputStream) value;
+                    stmt.setBinaryStream(index, stream, stream.available());
+                } catch (IOException ex) {
+                    throw new SQLException(ex.toString());
+                }
+                break;
+            case Types.CLOB:
+                Clob clob = (Clob) value;
+                stmt.setCharacterStream(index, clob.getCharacterStream(),
+                        (int) Math.min(clob.length(), Integer.MAX_VALUE));
+                break;
+            default:
+                stmt.setObject(index, value, sqlType);
+                break;
+            }
         }
     }
 
@@ -387,11 +391,11 @@ public final class SQLTypes
     static class TypeInfo
     {
         final int    sqlType;
-        
+
         final String sqlTypeName;
-        
+
         final Class  javaType;
-        
+
         TypeInfo( int sqlType, String sqlTypeName, Class javaType )
         {
             this.sqlType     = sqlType;
@@ -401,7 +405,7 @@ public final class SQLTypes
 
     }
 
-    
+
     /**
      * List of all the SQL types supported by Castor JDO.
      */
@@ -427,8 +431,8 @@ public final class SQLTypes
         new TypeInfo( java.sql.Types.LONGVARBINARY, "longvarbinary", byte[].class ),
         new TypeInfo( java.sql.Types.OTHER,         "other",         java.lang.Object.class ),
         new TypeInfo( java.sql.Types.JAVA_OBJECT,   "javaobject",    java.lang.Object.class ),
-        new TypeInfo( java.sql.Types.BLOB,          "blob",          byte[].class ),
-        new TypeInfo( java.sql.Types.CLOB,          "clob",          java.lang.String.class ),
+        new TypeInfo( java.sql.Types.BLOB,          "blob",          java.io.InputStream.class ),
+        new TypeInfo( java.sql.Types.CLOB,          "clob",          java.sql.Clob.class ),
     };
 
 

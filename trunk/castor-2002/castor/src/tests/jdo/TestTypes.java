@@ -48,6 +48,8 @@ package jdo;
 
 
 import java.math.BigDecimal;
+import java.sql.Clob;
+import java.io.InputStream;
 
 
 /**
@@ -96,19 +98,27 @@ public class TestTypes
 
     private String _clob;
 
+    private InputStream _blob2;
+
+    private Clob _clob2;
+
 
     static final int       DefaultId = 3;
 
 
     public TestTypes()
     {
+        long time = System.currentTimeMillis();
+        // ignore milliseconds. Comment the following line out to see SAP DB bug :-(
+        time = time / 1000 * 1000;
+        java.util.Date date = new java.util.Date(time);
         _id = DefaultId;
-        _date = new java.util.Date();
-        _time = new java.util.Date();
-        _timestamp = new java.util.Date();
-        _date2 = new java.util.Date();
-        _time2 = new java.util.Date();
-        _timestamp2 = new java.util.Date();
+        _date = date;
+        _time = date;
+        _timestamp = date;
+        _date2 = date;
+        _time2 = date;
+        _timestamp2 = date;
     }
 
 
@@ -278,6 +288,30 @@ public class TestTypes
     public String getClob()
     {
         return _clob;
+    }
+
+
+    public void setBlob2( InputStream blob2 )
+    {
+        _blob2 = blob2;
+    }
+
+
+    public InputStream getBlob2()
+    {
+        return _blob2;
+    }
+
+
+    public void setClob2( Clob clob2 )
+    {
+        _clob2 = clob2;
+    }
+
+
+    public Clob getClob2()
+    {
+        return _clob2;
     }
 
 

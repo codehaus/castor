@@ -264,7 +264,9 @@ create table test_types (
   str_time char(12)       null,
   num_date numeric(17,0)  null,
   blob_val blob           null,
-  clob_val clob           null
+  clob_val clob           null,
+  blob_val2 blob          null,
+  clob_val2 clob          null
 );
 create unique index test_types_pk
   on test_types ( id );
@@ -338,7 +340,7 @@ create table test_persistent (
   id       integer         not null,
   ctime    date            not null,
   mtime    date            null,
-  value1    varchar(200)    not null,
+  value1   varchar(200)    not null,
   parent_id integer        null,
   group_id numeric(10,0)   not null
 );

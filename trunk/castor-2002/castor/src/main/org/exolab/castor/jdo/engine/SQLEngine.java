@@ -402,7 +402,7 @@ public final class SQLEngine implements Persistence {
         return (QueryExpression) _sqlFinder.clone();
     }
 
-	private Object idToSQL( int index, Object object ) 
+	private Object idToSQL( int index, Object object )
 			throws PersistenceException {
 
 		if ( object == null || _ids[index].convertFrom == null )
@@ -410,7 +410,7 @@ public final class SQLEngine implements Persistence {
 		return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
 	}
 
-    private Object toSQL( int field, int column, Object object ) 
+    private Object toSQL( int field, int column, Object object )
             throws PersistenceException {
 
         ColumnInfo col = _fields[field].columns[column];
@@ -419,7 +419,7 @@ public final class SQLEngine implements Persistence {
         return col.convertFrom.convert( object, col.convertParam );
     }
 
-	private Object idToJava( int index, Object object ) 
+	private Object idToJava( int index, Object object )
 			throws PersistenceException {
 
 		if ( object == null || _ids[index].convertTo == null )
@@ -427,7 +427,7 @@ public final class SQLEngine implements Persistence {
 		return _ids[index].convertTo.convert( object, _ids[index].convertParam );
 	}
 
-    private Object toJava( int field, int column, Object object ) 
+    private Object toJava( int field, int column, Object object )
             throws PersistenceException {
 
         ColumnInfo col = _fields[field].columns[column];
@@ -506,28 +506,23 @@ public final class SQLEngine implements Persistence {
             for ( int i = 0 ; i < _fields.length ; ++i ) {
                 if ( _fields[ i ].store ) {
                     if ( fields[i] == null ) {
-                        for ( int j=0; j < _fields[i].columns.length; j++ ) 
+                        for ( int j=0; j < _fields[i].columns.length; j++ )
                             stmt.setNull( count++, _fields[i].columns[j].sqlType );
 
                     } else if ( fields[i] instanceof Complex ) {
-                        Complex inner = (Complex)fields[i];
-                        if ( inner.size() != _fields[i].columns.length )
+                        Complex complex = (Complex)fields[i];
+                        if ( complex.size() != _fields[i].columns.length )
                             throw new PersistenceException( "Size of complex field mismatch!" );
-                            
-                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            if ( inner == null || inner.get(j) == null ) 
-                                stmt.setNull( count++, _fields[i].columns[j].sqlType );
-                            else 
-                                stmt.setObject( count++, toSQL( i, j, inner.get(j)), _fields[i].columns[j].sqlType );
+
+                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                            Object value = ( complex == null ? null : complex.get(j) );
+                            SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
                         }
-                        } else {
+                    } else {
                         if ( _fields[i].columns.length != 1 )
                             throw new PersistenceException( "Complex field expected! ");
 
-                        if ( fields[i] == null ) 
-                            stmt.setNull( count++, _fields[i].columns[0].sqlType );
-                        else 
-                            stmt.setObject( count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
+                        SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
                     }
                 }
             }
@@ -551,7 +546,7 @@ public final class SQLEngine implements Persistence {
                     identity = new Integer( cstmt.getInt( count ) );
                 else
                     identity = cstmt.getObject( count );
-
+                identity = idToJava( 0, identity );
             } else
                 stmt.executeUpdate();
 
@@ -632,7 +627,7 @@ public final class SQLEngine implements Persistence {
     public Object store( Object conn, Object[] fields, Object identity, 
                          Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
-                
+
         PreparedStatement stmt = null;
         int               count;
 
@@ -650,29 +645,23 @@ public final class SQLEngine implements Persistence {
             for ( int i = 0 ; i < _fields.length ; ++i ) {
                 if ( _fields[ i ].store ) {
                     if ( fields[i] == null ) {
-                        for ( int j=0; j < _fields[i].columns.length; j++ ) 
+                        for ( int j=0; j < _fields[i].columns.length; j++ )
                             stmt.setNull( count++, _fields[i].columns[j].sqlType );
 
                     } else if ( fields[i] instanceof Complex ) {
-                        Complex inner = (Complex)fields[i];
-                        if ( inner.size() != _fields[i].columns.length )
+                        Complex complex = (Complex)fields[i];
+                        if ( complex.size() != _fields[i].columns.length )
                             throw new PersistenceException( "Size of complex field mismatch!" );
-                            
-                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            if ( inner == null || inner.get(j) == null ) 
-                                stmt.setNull( count++, _fields[i].columns[j].sqlType );
-                            else 
-                                stmt.setObject( count++, toSQL( i, j, inner.get(j)), _fields[i].columns[j].sqlType );
+
+                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                            Object value = ( complex == null ? null : complex.get(j) );
+                            SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
                         }
-                        } else {
+                    } else {
                         if ( _fields[i].columns.length != 1 )
                             throw new PersistenceException( "Complex field expected! ");
 
-                        if ( fields[i] == null ) 
-                            stmt.setNull( count++, _fields[i].columns[0].sqlType );
-                        else 
-                            stmt.setObject( count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
-
+                        SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
                     }
                 }
             }
@@ -698,29 +687,23 @@ public final class SQLEngine implements Persistence {
                 for ( int i = 0 ; i < _fields.length ; ++i ) {
                     if ( _fields[ i ].store && _fields[i].dirtyCheck ) {
                         if ( original[i] == null ) {
-                            for ( int j=0; j < _fields[i].columns.length; j++ ) 
+                            for ( int j=0; j < _fields[i].columns.length; j++ )
                                 stmt.setNull( count++, _fields[i].columns[j].sqlType );
 
                         } else if ( original[i] instanceof Complex ) {
-                            Complex inner = (Complex)original[i];
-                            if ( inner.size() != _fields[i].columns.length )
+                            Complex complex = (Complex)original[i];
+                            if ( complex.size() != _fields[i].columns.length )
                                 throw new PersistenceException( "Size of complex field mismatch!" );
-                                
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                                if ( inner == null || inner.get(j) == null ) 
-                                    stmt.setNull( count++, _fields[i].columns[j].sqlType );
-                                else 
-                                    stmt.setObject( count++, toSQL( i, j, inner.get(j)), _fields[i].columns[j].sqlType );
+
+                            for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                                Object value = ( complex == null ? null : complex.get(j) );
+                                SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
                             }
-                            } else {
+                        } else {
                             if ( _fields[i].columns.length != 1 )
                                 throw new PersistenceException( "Complex field expected! ");
 
-                            if ( original[i] == null ) 
-                                stmt.setNull( count++, _fields[i].columns[0].sqlType );
-                            else 
-                                stmt.setObject( count++, toSQL( i, 0, original[i]), _fields[i].columns[0].sqlType );
-
+                            SQLTypes.setObject( stmt, count++, toSQL( i, 0, original[i]), _fields[i].columns[0].sqlType );
                         }
                     }
                 }
@@ -1279,7 +1262,7 @@ public final class SQLEngine implements Persistence {
                         throw new MappingException("Related class identities field does not contains sql information!");
                 }
                 String[] joins = null;
-                if ( fieldDesc instanceof JDOFieldDescriptor ) 
+                if ( fieldDesc instanceof JDOFieldDescriptor )
                     joins = ((JDOFieldDescriptor)fieldDesc).getManyKey();
                 String[] classnames = new String[classids.length];
                 for ( int i=0; i<classids.length; i++ ) {
@@ -1371,7 +1354,7 @@ public final class SQLEngine implements Persistence {
 			return jdoName;
 		}
         public String toString() {
-            return tableName;
+            return tableName + "." + jdoName;
         }
     }
 

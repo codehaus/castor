@@ -23,6 +23,14 @@ XML:    Solved a performance bug for unmarshalling of primitive type. We don't
 JDO:    Added "trigger" mode for SEQUENCE key generator. 
         (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
 
+JDO:    Added support for MySQL auto_increment columns in IDENTITY key generator
+        (Oleg Nitz, thanks to Alain RAVET <aravet@cirb.irisnet.be> for idea
+	and to George Stewart <georgestewartiv@yahoo.com> for help).
+
+JDO:    Improved support for BLOB and CLOB values. Now you can get them as 
+        java.io.InputStream and java.sql.Clob, respectively, see "types.html"
+	for details (oleg). 
+
 
 Version 0.8.11 December, 15 2000
 --------------------------------
