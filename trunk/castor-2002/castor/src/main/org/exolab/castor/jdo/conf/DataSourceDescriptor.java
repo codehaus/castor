@@ -198,4 +198,9 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }

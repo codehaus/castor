@@ -359,4 +359,9 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }

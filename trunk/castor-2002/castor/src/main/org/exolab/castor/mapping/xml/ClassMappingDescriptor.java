@@ -395,4 +395,11 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }
+
+

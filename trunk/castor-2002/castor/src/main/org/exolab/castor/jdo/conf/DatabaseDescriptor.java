@@ -311,4 +311,9 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
+    public TypeValidator getValidator()
+    {
+        return null;
+    }
+
 }
