@@ -48,27 +48,26 @@ package org.exolab.castor.builder.types;
 import org.exolab.javasource.*;
 
 /**
- * The XML Schema Real type
+ * The XML Schema long type
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSReal extends XSType {
+public class XSLong extends XSType {
     
-    //- Constraints for integer type
-    Double maxInclusive = null;
-    Double maxExclusive = null;
-    Double minInclusive = null;
-    Double minExclusive = null;
+    //- Constraints for long type
+    Long maxInclusive = null;
+    Long maxExclusive = null;
+    Long minInclusive = null;
+    Long minExclusive = null;
     
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType = JType.Double;
+    private static final JType jType = JType.Long;
         
-    
-    public XSReal() {
-        super(XSType.DOUBLE);
-    } //-- XSReal
+    public XSLong() {
+        super(XSType.LONG);
+    } //-- XSLong
     
     
     /**
@@ -80,44 +79,44 @@ public class XSReal extends XSType {
     }
     
     /**
-     * Returns the maximum exclusive value that this XSReal can hold.
-     * @return the maximum exclusive value that this XSReal can hold. If
+     * Returns the maximum exclusive value that this XSLong can hold.
+     * @return the maximum exclusive value that this XSLong can hold. If
      * no maximum exclusive value has been set, Null will be returned
      * @see getMaxInclusive
     **/
-    public Double getMaxExclusive() {
+    public Long getMaxExclusive() {
         return maxExclusive;
     } //-- getMaxExclusive
     
     /**
-     * Returns the maximum inclusive value that this XSReal can hold.
-     * @return the maximum inclusive value that this XSReal can hold. If
+     * Returns the maximum inclusive value that this XSLong can hold.
+     * @return the maximum inclusive value that this XSLong can hold. If
      * no maximum inclusive value has been set, Null will be returned
      * @see getMaxExclusive
     **/
-    public Double getMaxInclusive() {
+    public Long getMaxInclusive() {
         return maxInclusive;
     } //-- getMaxInclusive
     
     
     /**
-     * Returns the minimum exclusive value that this XSReal can hold.
-     * @return the minimum exclusive value that this XSReal can hold. If
+     * Returns the minimum exclusive value that this XSLong can hold.
+     * @return the minimum exclusive value that this XSLong can hold. If
      * no minimum exclusive value has been set, Null will be returned
      * @see getMinInclusive
      * @see setMaxInclusive
     **/
-    public Double getMinExclusive() {
+    public Long getMinExclusive() {
         return minExclusive;
     } //-- getMinExclusive
     
     /**
-     * Returns the minimum inclusive value that this XSReal can hold.
-     * @return the minimum inclusive value that this XSReal can hold. If
+     * Returns the minimum inclusive value that this XSLong can hold.
+     * @return the minimum inclusive value that this XSLong can hold. If
      * no minimum inclusive value has been set, Null will be returned
      * @see getMinExclusive
     **/
-    public Double getMinInclusive() {
+    public Long getMinInclusive() {
         return minInclusive;
     } //-- getMinInclusive
     
@@ -136,76 +135,84 @@ public class XSReal extends XSType {
     
     
     /**
-     * Sets the maximum exclusive value that this XSReal can hold.
-     * @param max the maximum exclusive value this XSReal can be
+     * Sets the maximum exclusive value that this XSLong can hold.
+     * @param max the maximum exclusive value this XSLong can be
      * @see setMaxInclusive
     **/
-    public void setMaxExclusive(double max) {
-        maxExclusive = new Double(max);
+    public void setMaxExclusive(long max) {
+        maxExclusive = new Long(max);
+        maxInclusive = null;
     } //-- setMaxExclusive
 
     /**
-     * Sets the maximum exclusive value that this XSReal can hold.
-     * @param max the maximum exclusive value this XSReal can be
+     * Sets the maximum exclusive value that this XSLong can hold.
+     * @param max the maximum exclusive value this XSLong can be
      * @see setMaxInclusive
     **/
-    public void setMaxExclusive(Double max) {
+    public void setMaxExclusive(Long max) {
         maxExclusive = max;
+        maxInclusive = null;
     } //-- setMaxExclusive
     
     /**
-     * Sets the maximum inclusive value that this XSReal can hold.
-     * @param max the maximum inclusive value this XSReal can be
+     * Sets the maximum inclusive value that this XSLong can hold.
+     * @param max the maximum inclusive value this XSLong can be
      * @see setMaxExclusive
     **/
-    public void setMaxInclusive(double max) {
-        maxInclusive = new Double(max);
+    public void setMaxInclusive(long max) {
+        maxInclusive = new Long(max);
+        maxExclusive = null; 
     } //-- setMaxInclusive
     
     /**
-     * Sets the maximum inclusive value that this XSReal can hold.
-     * @param max the maximum inclusive value this XSReal can be
+     * Sets the maximum inclusive value that this XSLong can hold.
+     * @param max the maximum inclusive value this XSLong can be
      * @see setMaxExclusive
     **/
-    public void setMaxInclusive(Double max) {
+    public void setMaxInclusive(Long max) {
         maxInclusive = max;
+        maxExclusive = null;
     } //-- setMaxInclusive
     
     
     /**
-     * Sets the minimum exclusive value that this XSReal can hold.
-     * @param max the minimum exclusive value this XSReal can be
+     * Sets the minimum exclusive value that this XSLong can hold.
+     * @param max the minimum exclusive value this XSLong can be
      * @see setMinInclusive
     **/
-    public void setMinExclusive(double min) {
-        minExclusive = new Double(min);
+    public void setMinExclusive(long min) {
+        minExclusive = new Long(min);
+        minInclusive = null;
     } //-- setMinExclusive
 
     /**
-     * Sets the minimum exclusive value that this XSReal can hold.
-     * @param max the minimum exclusive value this XSReal can be
+     * Sets the minimum exclusive value that this XSLong can hold.
+     * @param max the minimum exclusive value this XSLong can be
      * @see setMinInclusive
     **/
-    public void setMinExclusive(Double min) {
+    public void setMinExclusive(Long min) {
         minExclusive = min;
+        minInclusive = null;
     } //-- setMinExclusive
     
     /**
-     * Sets the minimum inclusive value that this XSReal can hold.
-     * @param max the minimum inclusive value this XSReal can be
+     * Sets the minimum inclusive value that this XSLong can hold.
+     * @param max the minimum inclusive value this XSLong can be
      * @see setMinExclusive
     **/
-    public void setMinInclusive(double min) {
-        minInclusive = new Double(min);
+    public void setMinInclusive(long min) {
+        minInclusive = new Long(min);
+        minExclusive = null;
     } //-- setMinInclusive
     
     /**
-     * Sets the minimum inclusive value that this XSReal can hold.
-     * @param max the minimum inclusive value this XSReal can be
+     * Sets the minimum inclusive value that this XSLong can hold.
+     * @param max the minimum inclusive value this XSLong can be
      * @see setMinExclusive
     **/
-    public void setMinInclusive(Double min) {
+    public void setMinInclusive(Long min) {
         minInclusive = min;
+        minExclusive = null;
     } //-- setMinInclusive
     
     /**
@@ -216,7 +223,7 @@ public class XSReal extends XSType {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("new Double(");
+        StringBuffer sb = new StringBuffer("new Integer(");
         sb.append(variableName);
         sb.append(")");
         return sb.toString();
@@ -231,10 +238,10 @@ public class XSReal extends XSType {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer("((Double)");
+        StringBuffer sb = new StringBuffer("((Long)");
         sb.append(variableName);
-        sb.append(").doubleValue()");
+        sb.append(").longValue()");
         return sb.toString();
     } //-- fromJavaObject
     
-} //-- XSReal
+} //-- XSLong

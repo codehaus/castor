@@ -125,6 +125,17 @@ public abstract class BuiltInType extends Datatype {
     **/
     public static final short  INTEGER_TYPE        = 6;
     
+    
+    /**
+     * The name of the long type
+    **/
+    public static final String LONG_NAME           = "long";
+    
+    /**
+     * The type associated with long
+    **/
+    public static final short  LONG_TYPE           = 7;
+    
     /**
      * The name of the NCName type
     **/
@@ -133,7 +144,7 @@ public abstract class BuiltInType extends Datatype {
     /**
      * The type associated with NCName
     **/
-    public static final short  NCNAME_TYPE         = 7;
+    public static final short  NCNAME_TYPE         = 8;
     
     
     /**
@@ -144,7 +155,7 @@ public abstract class BuiltInType extends Datatype {
     /**
      * The type associated with NMTOKEN
     **/
-    public static final short  NMTOKEN_TYPE        = 8;
+    public static final short  NMTOKEN_TYPE        = 9;
     
     /**
      * The name of the string type
@@ -154,7 +165,7 @@ public abstract class BuiltInType extends Datatype {
     /**
      * The type associated with string
     **/
-    public static final short  STRING_TYPE         = 9;
+    public static final short  STRING_TYPE         = 10;
             
 
     /**
@@ -165,7 +176,7 @@ public abstract class BuiltInType extends Datatype {
     /**
      * The type associated with timeInstant
     **/
-    public static final short  TIME_INSTANT_TYPE   = 10;
+    public static final short  TIME_INSTANT_TYPE   = 11;
     
     
     //----------------/

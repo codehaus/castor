@@ -182,12 +182,14 @@ public class TypeConversion {
                 //-- boolean
                 case BuiltInType.BOOLEAN_TYPE:
                     return new XSBoolean();
-                //-- integer
-                case BuiltInType.INTEGER_TYPE:
-                    return toXSInteger(datatype);
                 //-- double
                 case BuiltInType.DOUBLE_TYPE:
                     return new XSReal();
+                //-- integer
+                case BuiltInType.INTEGER_TYPE:
+                    return toXSInteger(datatype);
+                case BuiltInType.LONG_TYPE:
+                    return new XSLong();
                 //-- string
                 case BuiltInType.STRING_TYPE:
                     return toXSString(datatype);
