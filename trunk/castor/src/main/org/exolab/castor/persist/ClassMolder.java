@@ -512,16 +512,16 @@ public class ClassMolder
     {
 
         Vector result = new Vector();
-        Enumeration enum;
+        Enumeration enumeration;
         ClassMolder mold;
         Persistence persist;
         ClassDescriptor desc;
 
         DatingService ds = new DatingService( loader.getClassLoader() );
 
-        enum = loader.listJavaClasses();
-        while ( enum.hasMoreElements() ) {
-            desc = (ClassDescriptor) loader.getDescriptor((Class)enum.nextElement());
+        enumeration = loader.listJavaClasses();
+        while ( enumeration.hasMoreElements() ) {
+            desc = (ClassDescriptor) loader.getDescriptor((Class)enumeration.nextElement());
             persist = factory.getPersistence( desc );
             mold = new ClassMolder( ds, loader, lock, desc, persist );
             result.add( mold );

@@ -92,7 +92,7 @@ public final class OracleQueryExpression
     {
         StringBuffer sql;
         boolean      first;
-        Enumeration  enum;
+        Enumeration  enumeration;
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
@@ -115,9 +115,9 @@ public final class OracleQueryExpression
 
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
-        enum = _tables.keys();
-        while ( enum.hasMoreElements() ) {
-            String tableAlias = (String) enum.nextElement();
+        enumeration = _tables.keys();
+        while ( enumeration.hasMoreElements() ) {
+            String tableAlias = (String) enumeration.nextElement();
             String tableName = (String) _tables.get( tableAlias );
             if( tableAlias.equals( tableName ) ) {
                 sql.append( _factory.quoteName( tableName ) );
@@ -125,7 +125,7 @@ public final class OracleQueryExpression
                 sql.append( _factory.quoteName( tableName ) + " " +
                             _factory.quoteName( tableAlias ) );
             }
-            if ( enum.hasMoreElements() )
+            if ( enumeration.hasMoreElements() )
                 sql.append( JDBCSyntax.TableSeparator );
         }
         first = true;

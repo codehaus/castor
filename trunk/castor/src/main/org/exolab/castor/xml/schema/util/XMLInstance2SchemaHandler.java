@@ -126,9 +126,9 @@ public final class XMLInstance2SchemaHandler
         else {
             _nsPrefix = null;
             Namespaces namespaces = _schema.getNamespaces();
-            Enumeration enum = namespaces.getLocalNamespacePrefixes();
-            while (enum.hasMoreElements()) {
-                String key = (String) enum.nextElement();
+            Enumeration enumeration = namespaces.getLocalNamespacePrefixes();
+            while (enumeration.hasMoreElements()) {
+                String key = (String) enumeration.nextElement();
                 if (namespaces.getNamespaceURI(key).equals(Schema.DEFAULT_SCHEMA_NS)) {
                     _nsPrefix = key;
                     break;
@@ -604,9 +604,9 @@ public final class XMLInstance2SchemaHandler
             
         }
         
-        Enumeration enum = e2Group.enumerate();
-        while (enum.hasMoreElements()) {
-            Particle particle = (Particle)enum.nextElement();
+        Enumeration enumeration = e2Group.enumerate();
+        while (enumeration.hasMoreElements()) {
+            Particle particle = (Particle)enumeration.nextElement();
             if (particle.getStructureType() == Structure.ELEMENT) {
                 ElementDecl element = (ElementDecl)particle;
                 ElementDecl main = e1Group.getElementDecl(element.getName());
@@ -620,11 +620,11 @@ public final class XMLInstance2SchemaHandler
             }
         }
         //-- add all attributes from type2
-        enum = cType2.getAttributeDecls();
+        enumeration = cType2.getAttributeDecls();
         
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
             //-- check for attribute with same name
-            AttributeDecl attNew =  (AttributeDecl)enum.nextElement();
+            AttributeDecl attNew =  (AttributeDecl)enumeration.nextElement();
                     
             String attName = attNew.getName();
             AttributeDecl attPrev = cType1.getAttributeDecl(attName);
@@ -645,9 +645,9 @@ public final class XMLInstance2SchemaHandler
         //-- loop through all element/attribute declarations
         //-- of e1 and if they do not exist in e2, simply
         //-- mark them as optional
-        enum = e1Group.enumerate();
-        while (enum.hasMoreElements()) {
-            Particle particle = (Particle)enum.nextElement();
+        enumeration = e1Group.enumerate();
+        while (enumeration.hasMoreElements()) {
+            Particle particle = (Particle)enumeration.nextElement();
             if (particle.getStructureType() == Structure.ELEMENT) {
                 ElementDecl element = (ElementDecl)particle;
                 if (e2Group.getElementDecl(element.getName()) == null) {

@@ -170,9 +170,9 @@ public class DocumentationUnmarshaller extends ComponentReader {
         
         //-- process namespace nodes
         if (nsDecls != null) {
-            Enumeration enum = nsDecls.getLocalNamespaces();
-            while (enum.hasMoreElements()) {
-                namespace = (String)enum.nextElement();
+            Enumeration enumeration = nsDecls.getLocalNamespaces();
+            while (enumeration.hasMoreElements()) {
+                namespace = (String)enumeration.nextElement();
                 prefix = nsDecls.getNamespacePrefix(namespace);
                 node.addNamespace ( new AnyNode(AnyNode.NAMESPACE, 
                                                 null,  //-- no local name for a ns decl.

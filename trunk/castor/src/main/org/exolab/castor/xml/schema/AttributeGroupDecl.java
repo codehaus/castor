@@ -368,17 +368,17 @@ class AttributeGroupEnumeration implements Enumeration {
     private Vector references = null;
     int index = 0;
 
-    private Enumeration enum = null;
+    private Enumeration enumeration = null;
 
 
     AttributeGroupEnumeration(Vector definitions, Vector references) {
-        enum = definitions.elements();
-        if (!enum.hasMoreElements()) enum = null;
+        enumeration = definitions.elements();
+        if (!enumeration.hasMoreElements()) enumeration = null;
         this.references = references;
     } //-- AttributeGroupEnumeration
 
     public boolean hasMoreElements() {
-        if (enum != null) return true;
+        if (enumeration != null) return true;
 
         int i = index;
         while (i < references.size()) {
@@ -393,9 +393,9 @@ class AttributeGroupEnumeration implements Enumeration {
 
     public Object nextElement() {
 
-        if (enum != null) {
-            Object obj = enum.nextElement();
-            if (!enum.hasMoreElements()) enum = null;
+        if (enumeration != null) {
+            Object obj = enumeration.nextElement();
+            if (!enumeration.hasMoreElements()) enumeration = null;
             return obj;
         }
 
@@ -405,10 +405,10 @@ class AttributeGroupEnumeration implements Enumeration {
 
             ++index;
 
-            enum = ref.getAttributes();
-            if (enum.hasMoreElements()) {
-                Object obj = enum.nextElement();
-                if (!enum.hasMoreElements()) enum = null;
+            enumeration = ref.getAttributes();
+            if (enumeration.hasMoreElements()) {
+                Object obj = enumeration.nextElement();
+                if (!enumeration.hasMoreElements()) enumeration = null;
                 return obj;
             }
         }

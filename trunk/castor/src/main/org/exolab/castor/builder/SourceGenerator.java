@@ -830,9 +830,9 @@ public class SourceGenerator
         //-- ** print warnings for imported schemas **
 		if (!_suppressNonFatalWarnings || _generateImported)
 		{
-            Enumeration enum = schema.getImportedSchema();
-			while (enum.hasMoreElements()) {
-				Schema importedSchema = (Schema)enum.nextElement();
+            Enumeration enumeration = schema.getImportedSchema();
+			while (enumeration.hasMoreElements()) {
+				Schema importedSchema = (Schema)enumeration.nextElement();
                 if (!_generateImported) {
                     System.out.println();
                     System.out.println(IMPORT_WARNING +
@@ -1074,9 +1074,9 @@ public class SourceGenerator
         if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS) return;
 
         if (complexType == null) return;
-        Enumeration enum = complexType.getAttributeDecls();
-        while (enum.hasMoreElements()) {
-            AttributeDecl attribute = (AttributeDecl)enum.nextElement();
+        Enumeration enumeration = complexType.getAttributeDecls();
+        while (enumeration.hasMoreElements()) {
+            AttributeDecl attribute = (AttributeDecl)enumeration.nextElement();
             processSimpleType(attribute.getSimpleType(), sInfo);
         }
 
@@ -1097,11 +1097,11 @@ public class SourceGenerator
         //Some special code to handle the fact that the enumerate method will simply skip 
         //the first group is the number of particle is one
     
-        Enumeration enum = cmGroup.enumerate();
+        Enumeration enumeration = cmGroup.enumerate();
 
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
 
-            Structure struct = (Structure)enum.nextElement();
+            Structure struct = (Structure)enumeration.nextElement();
             switch(struct.getStructureType()) {
                 case Structure.ELEMENT:
                     ElementDecl eDecl = (ElementDecl)struct;
@@ -1222,9 +1222,9 @@ public class SourceGenerator
             Annotated a1 = null;
             Annotated a2 = null;
             
-            Enumeration enum = state.keys();
-            while (enum.hasMoreElements()) {
-                Object key = enum.nextElement();
+            Enumeration enumeration = state.keys();
+            while (enumeration.hasMoreElements()) {
+                Object key = enumeration.nextElement();
                 if (!(key instanceof Annotated)) continue; 
                 ClassInfo cInfo = state.resolve(key);
                 if (classInfo == cInfo) a1 = (Annotated)key;

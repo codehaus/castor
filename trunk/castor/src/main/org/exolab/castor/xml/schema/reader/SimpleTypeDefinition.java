@@ -109,9 +109,9 @@ class SimpleTypeDefinition {
         simpleType.setFinal(_final);
         
         //-- copy Facets
-        Enumeration enum = _facets.enumerate();
-        while (enum.hasMoreElements())
-            simpleType.addFacet((Facet)enum.nextElement());
+        Enumeration enumeration = _facets.enumerate();
+        while (enumeration.hasMoreElements())
+            simpleType.addFacet((Facet)enumeration.nextElement());
             
         if (_annotation != null)
             simpleType.addAnnotation(_annotation);
@@ -144,9 +144,9 @@ class SimpleTypeDefinition {
         simpleType.setFinal(_final);
         
         //-- copy Facets
-        Enumeration enum = _facets.enumerate();
-        while (enum.hasMoreElements())
-            simpleType.addFacet((Facet)enum.nextElement());
+        Enumeration enumeration = _facets.enumerate();
+        while (enumeration.hasMoreElements())
+            simpleType.addFacet((Facet)enumeration.nextElement());
             
         if (_annotation != null)
             simpleType.addAnnotation(_annotation);

@@ -148,7 +148,7 @@ public class Deadlock extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        Enumeration   enum;
+        Enumeration   enumeration;
         
         // Open transaction in order to perform JDO operations
         _db.begin();
@@ -156,9 +156,9 @@ public class Deadlock extends CastorTestCase {
         // Create two objects in the database -- need something to lock
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
+        enumeration = oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            object = (TestObject) enumeration.nextElement();
             stream.println( "Retrieved object: " + object );
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );
@@ -168,9 +168,9 @@ public class Deadlock extends CastorTestCase {
             _db.create( object );
         }
         oql.bind( TestObject.DefaultId + 1 );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
+        enumeration = oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            object = (TestObject) enumeration.nextElement();
             stream.println( "Retrieved object: " + object );
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );

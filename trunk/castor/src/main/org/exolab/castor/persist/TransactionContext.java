@@ -895,10 +895,10 @@ public abstract class TransactionContext
         int         priority  = 0;
         int         nextPrior = 0;
         for ( boolean nextCreate=walk; nextCreate; priority=nextPrior ) {
-            Enumeration enum = _objects.elements();
+            Enumeration enumeration = _objects.elements();
             nextCreate = false;
-            while ( enum.hasMoreElements() ) {
-                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+            while ( enumeration.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enumeration.nextElement();
                 try {
                     if ( enumEntry.creating && !enumEntry.deleted ) {
                         if ( enumEntry.molder.getPriority() <= priority ) {
@@ -953,9 +953,9 @@ public abstract class TransactionContext
             // after we create the objects, some cache may invalid because the
             // relation are cached on both side. So, we updateCache if it is
             // marked to be update from the markCreate state
-            Enumeration enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+            Enumeration enumeration = _objects.elements();
+            while ( enumeration.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enumeration.nextElement();
                 if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
                     enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
                     enumEntry.updateCacheNeeded = false;
@@ -1114,10 +1114,10 @@ public abstract class TransactionContext
         int         priority  = 0;
         int         nextPrior = 0;
         for ( boolean nextCreate=walk; nextCreate; priority=nextPrior ) {
-            Enumeration enum = _objects.elements();
+            Enumeration enumeration = _objects.elements();
             nextCreate = false;
-            while ( enum.hasMoreElements() ) {
-                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+            while ( enumeration.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enumeration.nextElement();
                 try {
                     if ( enumEntry.creating && !enumEntry.deleted ) {
                         if ( enumEntry.molder.getPriority() <= priority ) {
@@ -1172,9 +1172,9 @@ public abstract class TransactionContext
             // after we create the objects, some cache may invalid because the
             // relation are cached on both side. So, we updateCache if it is
             // marked to be update from the markCreate state
-            Enumeration enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+            Enumeration enumeration = _objects.elements();
+            while ( enumeration.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enumeration.nextElement();
                 if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
                     enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
                     enumEntry.updateCacheNeeded = false;
@@ -1450,7 +1450,7 @@ public abstract class TransactionContext
     {
         Vector todo;
         Vector done;
-        Enumeration enum;
+        Enumeration enumeration;
         ObjectEntry entry;
 
         if ( _status == Status.STATUS_MARKED_ROLLBACK )
@@ -1469,16 +1469,16 @@ public abstract class TransactionContext
             done = new Vector();
             while ( _objects.size() != done.size() ) {
                 todo = new Vector();
-                enum = _objects.elements();
-                while ( enum.hasMoreElements() ) {
-                    entry = (ObjectEntry) enum.nextElement();
+                enumeration = _objects.elements();
+                while ( enumeration.hasMoreElements() ) {
+                    entry = (ObjectEntry) enumeration.nextElement();
                     if ( ! done.contains( entry ) ) {
                         todo.addElement( entry );
                     }
                 }
-                enum = todo.elements();
-                while ( enum.hasMoreElements() ) {
-                    entry = (ObjectEntry) enum.nextElement();
+                enumeration = todo.elements();
+                while ( enumeration.hasMoreElements() ) {
+                    entry = (ObjectEntry) enumeration.nextElement();
                     if ( !entry.deleted && !entry.creating ) {
                         ClassMolder  molder;
                         Object       identities;
@@ -1502,10 +1502,10 @@ public abstract class TransactionContext
             int         priority  = 0;
             int         nextPrior = 0;
             for ( boolean nextCreate=true; nextCreate; priority=nextPrior ) {
-                enum = _objects.elements();
+                enumeration = _objects.elements();
                 nextCreate = false;
-                while ( enum.hasMoreElements() ) {
-                    ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+                while ( enumeration.hasMoreElements() ) {
+                    ObjectEntry enumEntry = (ObjectEntry) enumeration.nextElement();
                     try {
                         if ( enumEntry.creating && !enumEntry.deleted && !enumEntry.created ) {
                             if ( enumEntry.molder.getPriority() <= priority ) {
@@ -1558,9 +1558,9 @@ public abstract class TransactionContext
             }
 
             // Process all modified objects
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
+            enumeration = _objects.elements();
+            while ( enumeration.hasMoreElements() ) {
+                entry = (ObjectEntry) enumeration.nextElement();
                 if ( !entry.deleted && !entry.creating && entry.updatePersistNeeded )
                     entry.engine.store( this, entry.oid, entry.object );
                 if ( !entry.deleted && !entry.creating && entry.updateCacheNeeded )
@@ -1636,7 +1636,7 @@ public abstract class TransactionContext
     public synchronized void commit()
         throws TransactionAbortedException
     {
-        Enumeration enum;
+        Enumeration enumeration;
         ObjectEntry entry;
 
         // Never commit transaction that has been marked for rollback
@@ -1660,10 +1660,10 @@ public abstract class TransactionContext
         // Assuming all went well in the connection department,
         // no deadlocks, etc. clean all the transaction locks with
         // regards to the persistence engine.
-        enum = _objects.elements();
-        while ( enum.hasMoreElements() ) {
+        enumeration = _objects.elements();
+        while ( enumeration.hasMoreElements() ) {
 
-            entry = (ObjectEntry) enum.nextElement();
+            entry = (ObjectEntry) enumeration.nextElement();
             if ( entry.deleted ) {
 
                 // Object has been deleted inside transaction,
@@ -1721,7 +1721,7 @@ public abstract class TransactionContext
      */
     public synchronized void rollback()
     {
-        Enumeration enum;
+        Enumeration enumeration;
         ObjectEntry entry;
 
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_PREPARED &&
@@ -1733,19 +1733,19 @@ public abstract class TransactionContext
         rollbackConnections();
 
         // un-delete object first
-        enum = _objects.elements();
-        while ( enum.hasMoreElements() ) {
-            entry = (ObjectEntry) enum.nextElement();
+        enumeration = _objects.elements();
+        while ( enumeration.hasMoreElements() ) {
+            entry = (ObjectEntry) enumeration.nextElement();
             if ( entry.deleted )
                 entry.deleted = false;
         }
 
         // Clean the transaction locks with regards to the
         // database engine
-        enum = _objects.elements();
-        while ( enum.hasMoreElements() ) {
+        enumeration = _objects.elements();
+        while ( enumeration.hasMoreElements() ) {
 
-            entry = (ObjectEntry) enum.nextElement();
+            entry = (ObjectEntry) enumeration.nextElement();
             try {
                 if ( entry.creating ) {
                 } else if ( entry.created ) {
@@ -2127,8 +2127,8 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        for ( Enumeration enum = _objects.elements(); enum.hasMoreElements(); ) {
-            entry = (ObjectEntry) enum.nextElement();
+        for ( Enumeration enumeration = _objects.elements(); enumeration.hasMoreElements(); ) {
+            entry = (ObjectEntry) enumeration.nextElement();
             if ( entry.object == object )
                 return entry;
         }

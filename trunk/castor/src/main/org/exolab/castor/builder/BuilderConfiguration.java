@@ -428,9 +428,9 @@ public class BuilderConfiguration {
         }
         else {
             defaults = new Properties(_defaultProps);
-            Enumeration enum = properties.keys();
-            while (enum.hasMoreElements()) {
-                String name = (String)enum.nextElement();
+            Enumeration enumeration = properties.keys();
+            while (enumeration.hasMoreElements()) {
+                String name = (String)enumeration.nextElement();
                 defaults.setProperty(name, properties.getProperty(name));
             }
         }

@@ -99,7 +99,7 @@ public class MozillaImporter
 	LDAPAttributeSet    attrSet;
 	LDAPAttribute       attr;
 	int                 i;
-	Enumeration         enum;
+	Enumeration         enumeration;
 
 	if ( entry.getAttributeSet() == null ||
 	     entry.getAttributeSet().size() == 0 ) {
@@ -146,9 +146,9 @@ public class MozillaImporter
                     }
                 }
                 if ( ( policy & ImportDescriptor.Policy.ReplaceAttr ) != 0 ) {
-		    enum = existing.getAttributeSet().getAttributes();
-		    while ( enum.hasMoreElements() ) {
-			attr = (LDAPAttribute) enum.nextElement();
+		    enumeration = existing.getAttributeSet().getAttributes();
+		    while ( enumeration.hasMoreElements() ) {
+			attr = (LDAPAttribute) enumeration.nextElement();
 			if ( entry.getAttribute( attr.getName() ) == null ) {
 			    modifs.add( LDAPModification.DELETE, attr );
 			}

@@ -621,10 +621,10 @@ abstract class JStructure extends JType {
             jsw.writeln(" //- Imported classes and packages -/");
             jsw.writeln("//---------------------------------/");
             jsw.writeln();
-            Enumeration enum = imports.elements();
-            while (enum.hasMoreElements()) {
+            Enumeration enumeration = imports.elements();
+            while (enumeration.hasMoreElements()) {
                 jsw.write("import ");
-                jsw.write(enum.nextElement());
+                jsw.write(enumeration.nextElement());
                 jsw.writeln(';');
             }
             jsw.writeln();

@@ -25,7 +25,7 @@ public final class InterbaseQueryExpression
 
     public String getStatement( boolean lock )
     {
-        Enumeration  enum;
+        Enumeration  enumeration;
         boolean      first;
         Hashtable    tables;
         Vector       done = new Vector();
@@ -69,14 +69,14 @@ public final class InterbaseQueryExpression
             }
             done.addElement( join.leftTable );
         }
-        enum = tables.keys();
-        while ( enum.hasMoreElements() ) {
+        enumeration = tables.keys();
+        while ( enumeration.hasMoreElements() ) {
             if ( first ) {
                 first = false;
             } else {
                 sql.append( JDBCSyntax.TableSeparator );
             }
-            String tableAlias = (String) enum.nextElement();
+            String tableAlias = (String) enumeration.nextElement();
             String tableName = (String) tables.get( tableAlias );
             if( tableAlias.equals( tableName ) ) {
                 sql.append( _factory.quoteName( tableName ) );

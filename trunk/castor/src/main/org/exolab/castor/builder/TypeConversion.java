@@ -544,9 +544,9 @@ public class TypeConversion {
      */
     private static SimpleType findCommonType(Union union) {
         SimpleType common = null;
-        Enumeration enum = union.getMemberTypes();
-        while (enum.hasMoreElements()) {
-            SimpleType type = (SimpleType)enum.nextElement();
+        Enumeration enumeration = union.getMemberTypes();
+        while (enumeration.hasMoreElements()) {
+            SimpleType type = (SimpleType)enumeration.nextElement();
             type = type.getBuiltInBaseType();
             if (common == null) common = type;
             else {

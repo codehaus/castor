@@ -192,10 +192,10 @@ public class XSGDay extends XSType {
     public void setFacets(SimpleType simpleType)
     {
         //-- copy valid facets
-        Enumeration enum = getFacets(simpleType);
-        while (enum.hasMoreElements()) {
+        Enumeration enumeration = getFacets(simpleType);
+        while (enumeration.hasMoreElements()) {
 
-            Facet facet = (Facet)enum.nextElement();
+            Facet facet = (Facet)enumeration.nextElement();
             String name = facet.getName();
 
             try {

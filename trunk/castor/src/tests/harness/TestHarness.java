@@ -124,9 +124,9 @@ public class TestHarness extends TestSuite {
             sb.append( description );
             sb.append( '\n' );
             ps.print( sb.toString() );
-            Enumeration enum = tests();
-            while ( enum.hasMoreElements() ) {
-                Object obj = enum.nextElement();
+            Enumeration enumeration = tests();
+            while ( enumeration.hasMoreElements() ) {
+                Object obj = enumeration.nextElement();
                 if ( obj instanceof TestHarness )
                     ((TestHarness)obj).printInfo( ps, sub );
                 else if ( obj instanceof CastorTestCase ) 
@@ -168,9 +168,9 @@ public class TestHarness extends TestSuite {
         sb.append( description );
         sb.append( '\n' );
 
-        Enumeration enum = tests();
-        while ( enum.hasMoreElements() ) {
-            sb.append((TestHarness)enum.nextElement()).toString();
+        Enumeration enumeration = tests();
+        while ( enumeration.hasMoreElements() ) {
+            sb.append((TestHarness)enumeration.nextElement()).toString();
         }
         return sb.toString();
     }

@@ -501,11 +501,11 @@ public final class Introspector {
         
         //-- Loop Through MethodSets and create
         //-- descriptors
-        Enumeration enum = methodSets.elements();
+        Enumeration enumeration = methodSets.elements();
         
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
             
-            MethodSet methodSet = (MethodSet) enum.nextElement();
+            MethodSet methodSet = (MethodSet) enumeration.nextElement();
             
             //-- create XMLFieldDescriptor
             String xmlName = _naming.toXMLName(methodSet.fieldName);

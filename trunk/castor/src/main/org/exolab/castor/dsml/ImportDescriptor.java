@@ -183,7 +183,7 @@ public class ImportDescriptor
     {
 	AttributeListImpl attrList;
 	int               policy;
-	Enumeration       enum;
+	Enumeration       enumeration;
 	String            name;
 
 	attrList = new AttributeListImpl();
@@ -191,9 +191,9 @@ public class ImportDescriptor
 	attrList = new AttributeListImpl();
 	docHandler.startElement( Names.Element.Policies, attrList );
 
-	enum = listDNs();
-	while ( enum.hasMoreElements() ) {
-	    name = (String) enum.nextElement();
+	enumeration = listDNs();
+	while ( enumeration.hasMoreElements() ) {
+	    name = (String) enumeration.nextElement();
 	    policy = getDirectPolicy( name );
 	    attrList = new AttributeListImpl();
 	    attrList.addAttribute( Names.Attribute.DN, "ID", name );

@@ -172,16 +172,16 @@ public class TestDetail
 
     public TestDetail2 findDetail2( int id )
     {
-        Iterator enum;
+        Iterator enumeration;
         TestDetail2 detail2;
 
         if ( _details2 == null ) {
             return null;
         }
 
-        enum = _details2.iterator();
-        while ( enum.hasNext() ) {
-            detail2 = (TestDetail2) enum.next();
+        enumeration = _details2.iterator();
+        while ( enumeration.hasNext() ) {
+            detail2 = (TestDetail2) enumeration.next();
             if ( detail2.getId() == id ) {
                 return detail2;
             }

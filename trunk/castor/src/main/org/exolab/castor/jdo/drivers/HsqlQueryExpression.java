@@ -279,15 +279,15 @@ public final class HsqlQueryExpression
      */
     private void addTables(StringBuffer buffer, Hashtable tables, boolean first)
     {
-      Enumeration enum = tables.elements();
-      while ( enum.hasMoreElements() )
+      Enumeration enumeration = tables.elements();
+      while ( enumeration.hasMoreElements() )
       {
         if ( first )
           first = false;
         else
           buffer.append( JDBCSyntax.TableSeparator );
 
-        buffer.append( _factory.quoteName( (String) enum.nextElement() ) );
+        buffer.append( _factory.quoteName( (String) enumeration.nextElement() ) );
       }
     }
 
@@ -447,9 +447,9 @@ public final class HsqlQueryExpression
         first = addWhereOrAnd(buffer, first);
         String where = _where;
 
-        for(Enumeration enum = aliasInfo.getTables(); enum.hasMoreElements();)
+        for(Enumeration enumeration = aliasInfo.getTables(); enumeration.hasMoreElements();)
           {
-          String table = (String)enum.nextElement();
+          String table = (String)enumeration.nextElement();
           String alias = (String)aliasInfo.getAnAliasFor(table);
 
           where = substituteAlias(where, table + '.', alias + '.');

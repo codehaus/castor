@@ -230,10 +230,10 @@ public  class XSDecimal extends XSType
 
 
     public void setFacets(SimpleType simpleType) {
-     Enumeration enum = getFacets(simpleType);
-            while (enum.hasMoreElements()) {
+     Enumeration enumeration = getFacets(simpleType);
+            while (enumeration.hasMoreElements()) {
 
-                Facet facet = (Facet)enum.nextElement();
+                Facet facet = (Facet)enumeration.nextElement();
                 String name = facet.getName();
 
                 //-- maxExclusive

@@ -94,12 +94,12 @@ public class Size extends CastorTestCase
     public void removeRecords() throws PersistenceException 
     {
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        while (enum.hasMore())
+        enumeration = oqlquery.execute(true);
+        while (enumeration.hasMore())
         {
-            _db.remove(enum.next());
+            _db.remove(enumeration.next());
         }
         _db.commit();
 
@@ -122,10 +122,10 @@ public class Size extends CastorTestCase
     public void testSizeA() throws PersistenceException 
     {
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
          OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        assertTrue ("size should be > 0",enum.size() > 0);
+        enumeration = oqlquery.execute(true);
+        assertTrue ("size should be > 0",enumeration.size() > 0);
         _db.commit();
     }
 
@@ -137,14 +137,14 @@ public class Size extends CastorTestCase
     public void testSizeB() throws PersistenceException 
     {
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        while (enum.hasMore())
+        enumeration = oqlquery.execute(true);
+        while (enumeration.hasMore())
         {
-            enum.next();
-            assertTrue("size should be > 0", enum.size() > 0);
-            assertEquals("size should be ==25", enum.size(), 25);
+            enumeration.next();
+            assertTrue("size should be > 0", enumeration.size() > 0);
+            assertEquals("size should be ==25", enumeration.size(), 25);
         }
         _db.commit();
     }
@@ -155,14 +155,14 @@ public class Size extends CastorTestCase
     public void testSizeC() throws PersistenceException 
     {
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        int expectedSize = enum.size();
+        enumeration = oqlquery.execute(true);
+        int expectedSize = enumeration.size();
         int realSize = 0;
-        while (enum.hasMore())
+        while (enumeration.hasMore())
         {
-            enum.next();
+            enumeration.next();
             realSize ++;
         }
         _db.commit();
@@ -178,7 +178,7 @@ public class Size extends CastorTestCase
         {
             _db.begin();
             OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-            QueryResults enum = oqlquery.execute(false);
+            QueryResults enumeration = oqlquery.execute(false);
             _db.commit();
             // This test fails when executed against PostgreSQL. 
             fail ("Calling size() on a non-scrollable ResultSet should fail (unless using PostgreSQL).");

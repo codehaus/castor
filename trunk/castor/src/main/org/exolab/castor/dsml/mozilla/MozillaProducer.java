@@ -88,7 +88,7 @@ public class MozillaProducer
 	AttributeListImpl attrList;
 	LDAPAttributeSet  attrSet;
 	LDAPAttribute     attr;
-	Enumeration       enum;
+	Enumeration       enumeration;
 	Enumeration       values;
 	byte[]            value;
 
@@ -123,10 +123,10 @@ public class MozillaProducer
 		_docHandler.endElement( prefix( XML.Entries.Elements.ObjectClass ) );
 	    }
 	    
-	    enum = attrSet.getAttributes();
-	    while ( enum.hasMoreElements() ) {
+	    enumeration = attrSet.getAttributes();
+	    while ( enumeration.hasMoreElements() ) {
 		// dsml:attr
-		attr = (LDAPAttribute) enum.nextElement();
+		attr = (LDAPAttribute) enumeration.nextElement();
 		if ( attr.getName().equals( "objectclass" ) )
 		    continue;
 		attrList = new AttributeListImpl();
@@ -201,15 +201,15 @@ public class MozillaProducer
     public void produce( LDAPSchema schema )
 	throws SAXException
     {
-	Enumeration       enum;
+	Enumeration       enumeration;
 
-	enum = schema.getObjectClasses();
-	while ( enum.hasMoreElements() ) {
-	    produce( (LDAPObjectClassSchema) enum.nextElement() );
+	enumeration = schema.getObjectClasses();
+	while ( enumeration.hasMoreElements() ) {
+	    produce( (LDAPObjectClassSchema) enumeration.nextElement() );
 	}
-	enum = schema.getAttributes();
-	while ( enum.hasMoreElements() ) {
-	    produce( (LDAPAttributeSchema) enum.nextElement() );
+	enumeration = schema.getAttributes();
+	while ( enumeration.hasMoreElements() ) {
+	    produce( (LDAPAttributeSchema) enumeration.nextElement() );
 	}
     }
 
@@ -221,7 +221,7 @@ public class MozillaProducer
 	String            superiors[];
 	String            superior;
 	int               i;
-	Enumeration       enum;
+	Enumeration       enumeration;
 
 	leaveDirectory();
 	enterSchema();
@@ -288,21 +288,21 @@ public class MozillaProducer
 	}
 
 	// dsml:class attribute required=false
-	enum = schema.getOptionalAttributes();
-	while ( enum.hasMoreElements() ) {
+	enumeration = schema.getOptionalAttributes();
+	while ( enumeration.hasMoreElements() ) {
 	    attrList = new AttributeListImpl();
 	    attrList.addAttribute( XML.Schema.Attributes.Ref, "CDATA",
-				   "#" + (String) enum.nextElement() );
+				   "#" + (String) enumeration.nextElement() );
 	    attrList.addAttribute( XML.Schema.Attributes.Required, null, "false" );
 	    _docHandler.startElement( prefix( XML.Schema.Elements.Attribute) , attrList );
 	    _docHandler.endElement( prefix( XML.Schema.Elements.Attribute ) );
 	}
 	// dsml:class attribute required=true
-	enum = schema.getRequiredAttributes();
-	while ( enum.hasMoreElements() ) {
+	enumeration = schema.getRequiredAttributes();
+	while ( enumeration.hasMoreElements() ) {
 	    attrList = new AttributeListImpl();
 	    attrList.addAttribute( XML.Schema.Attributes.Ref, "CDATA",
-				   "#" + (String) enum.nextElement() );
+				   "#" + (String) enumeration.nextElement() );
 	    attrList.addAttribute( XML.Schema.Attributes.Required, null, "true" );
 	    _docHandler.startElement( prefix( XML.Schema.Elements.Attribute) , attrList );
 	    _docHandler.endElement( prefix( XML.Schema.Elements.Attribute ) );

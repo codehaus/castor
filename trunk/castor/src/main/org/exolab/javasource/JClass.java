@@ -530,9 +530,9 @@ public class JClass extends JStructure {
                 removeImports = new Vector();
                 for (int i = 0; i < _innerClasses.size(); i++) {
                     JClass iClass = (JClass)_innerClasses.elementAt(i);
-                    Enumeration enum = iClass.getImports();
-                    while (enum.hasMoreElements()) {
-                        String classname = (String)enum.nextElement();
+                    Enumeration enumeration = iClass.getImports();
+                    while (enumeration.hasMoreElements()) {
+                        String classname = (String)enumeration.nextElement();
                         if (!hasImport(classname)) {
                             addImport(classname);
                             removeImports.addElement(classname);
@@ -591,10 +591,10 @@ public class JClass extends JStructure {
             }
             buffer.append("implements ");
             
-            Enumeration enum = getInterfaces();
-            while (enum.hasMoreElements()) {
-                buffer.append(enum.nextElement());
-                if (enum.hasMoreElements()) buffer.append(", ");
+            Enumeration enumeration = getInterfaces();
+            while (enumeration.hasMoreElements()) {
+                buffer.append(enumeration.nextElement());
+                if (enumeration.hasMoreElements()) buffer.append(", ");
             }
             if (endl) {
                 jsw.writeln(buffer.toString());

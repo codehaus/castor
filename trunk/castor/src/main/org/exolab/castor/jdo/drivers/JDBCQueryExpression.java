@@ -378,7 +378,7 @@ public class JDBCQueryExpression
     protected StringBuffer getStandardStatement( boolean lock, boolean oj )  
 	{
         StringBuffer sql;
-        Enumeration  enum;
+        Enumeration  enumeration;
         boolean      first;
         Hashtable    tables;
         Vector       done = new Vector();
@@ -465,13 +465,13 @@ public class JDBCQueryExpression
                 sql.append( "}" );
             done.addElement( join.leftTable );
         }
-        enum = tables.keys();
-        while ( enum.hasMoreElements() ) {
+        enumeration = tables.keys();
+        while ( enumeration.hasMoreElements() ) {
             if ( first )
                 first = false;
             else
                 sql.append( JDBCSyntax.TableSeparator );
-            tableAlias = (String) enum.nextElement();
+            tableAlias = (String) enumeration.nextElement();
             tableName = (String) tables.get( tableAlias );
             if( tableAlias.equals( tableName ) ) {
                 sql.append( _factory.quoteName( tableName ) );

@@ -466,10 +466,10 @@ public class MemberFactory {
     private String createComment(Annotated annotated) {
 
         //-- process annotations
-        Enumeration enum = annotated.getAnnotations();
-        if (enum.hasMoreElements()) {
+        Enumeration enumeration = annotated.getAnnotations();
+        if (enumeration.hasMoreElements()) {
             //-- just use first annotation
-            return createComment((Annotation) enum.nextElement());
+            return createComment((Annotation) enumeration.nextElement());
         }
         else {
             //-- there were no annotations...try possible references
@@ -500,10 +500,10 @@ public class MemberFactory {
     **/
     private String createComment(Annotation annotation) {
         if (annotation == null) return null;
-        Enumeration enum = annotation.getDocumentation();
-        if (enum.hasMoreElements()) {
+        Enumeration enumeration = annotation.getDocumentation();
+        if (enumeration.hasMoreElements()) {
             //-- just use first <info>
-            Documentation documentation = (Documentation) enum.nextElement();
+            Documentation documentation = (Documentation) enumeration.nextElement();
             return normalize(documentation.getContent());
         }
         return null;

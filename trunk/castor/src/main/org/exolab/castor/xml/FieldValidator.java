@@ -235,11 +235,11 @@ public class FieldValidator extends Validator {
             //-- to use CollectionHandler
             //-- </NOTE>
             else if (value instanceof Enumeration) {
-                Enumeration enum = (Enumeration)value;
+                Enumeration enumeration = (Enumeration)value;
                 size = 0;
-                while (enum.hasMoreElements()) {
+                while (enumeration.hasMoreElements()) {
                     ++size;
-                    Object obj = enum.nextElement();
+                    Object obj = enumeration.nextElement();
                     if (_validator != null) 
                         _validator.validate(obj, context);
                     else

@@ -278,11 +278,11 @@ public class SchemaUnmarshaller extends ComponentReader {
 
         if (namespaces == null) return;
 
-        Enumeration enum = namespaces.getLocalNamespaces();
+        Enumeration enumeration = namespaces.getLocalNamespaces();
 
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
 
-            String ns = (String) enum.nextElement();
+            String ns = (String) enumeration.nextElement();
             String[] prefixes = namespaces.getNamespacePrefixes(ns, true);
 
             if (prefixes.length == 0) {

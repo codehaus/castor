@@ -58,7 +58,7 @@ import java.lang.reflect.Modifier;
 /**
  * An implementation of GeneralizedFieldHandler for
  * classes that have a built-in valueOf(String) factory 
- * method, such as type-safe enum classes, java.sql.Timestamp,
+ * method, such as type-safe enumeration classes, java.sql.Timestamp,
  * etc.
  *
  * @author <a href="kvisco@intalio.com">Keith Visco</a>

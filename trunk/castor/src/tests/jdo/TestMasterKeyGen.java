@@ -152,12 +152,12 @@ public class TestMasterKeyGen implements TimeStampable
 
     public TestDetailKeyGen findDetail(int id)
     {
-        Iterator enum;
+        Iterator enumeration;
         TestDetailKeyGen detail;
 
-        enum = _details.iterator();
-        while ( enum.hasNext() ) {
-            detail = (TestDetailKeyGen) enum.next();
+        enumeration = _details.iterator();
+        while ( enumeration.hasNext() ) {
+            detail = (TestDetailKeyGen) enumeration.next();
             if ( detail.getId() == id ) {
                 return detail;
             }

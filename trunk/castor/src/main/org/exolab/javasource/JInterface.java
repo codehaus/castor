@@ -370,7 +370,7 @@ public final class JInterface extends JStructure {
         buffer.append(getLocalName());
         buffer.append(' ');
         if (getInterfaceCount() > 0) {
-            Enumeration enum = getInterfaces();
+            Enumeration enumeration = getInterfaces();
             boolean endl = false;
             if (getInterfaceCount() > 1) {
                 jsw.writeln(buffer.toString());
@@ -378,9 +378,9 @@ public final class JInterface extends JStructure {
                 endl = true;
             }
             buffer.append("extends ");
-            while (enum.hasMoreElements()) {
-                buffer.append(enum.nextElement());
-                if (enum.hasMoreElements()) buffer.append(", ");
+            while (enumeration.hasMoreElements()) {
+                buffer.append(enumeration.nextElement());
+                if (enumeration.hasMoreElements()) buffer.append(", ");
             }
             if (endl) {
                 jsw.writeln(buffer.toString());

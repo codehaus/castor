@@ -92,7 +92,7 @@ public class DuplicateKey extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        QueryResults  enum;
+        QueryResults  enumeration;
         
         // Open transaction in order to perform JDO operations
         _db = _category.getDatabase( verbose );
@@ -103,9 +103,9 @@ public class DuplicateKey extends CastorTestCase {
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            object = (TestObject) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            object = (TestObject) enumeration.next();
             stream.println( "Updating object: " + object );
         } else {
             object = new TestObject();
@@ -134,7 +134,7 @@ public class DuplicateKey extends CastorTestCase {
 
         TestObject    object;
         OQLQuery      oql;
-        QueryResults  enum;
+        QueryResults  enumeration;
 
         // Attempt to create a new object with the same identity,
         // while one is in memory. Will report duplicate key from
@@ -142,9 +142,9 @@ public class DuplicateKey extends CastorTestCase {
         _db.begin();
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( new Integer( TestObject.DefaultId ) );
-        enum = oql.execute();
-        while ( enum.hasMore() )
-            enum.next();
+        enumeration = oql.execute();
+        while ( enumeration.hasMore() )
+            enumeration.next();
         
         object = new TestObject();
         stream.println( "Creating new object: " + object );

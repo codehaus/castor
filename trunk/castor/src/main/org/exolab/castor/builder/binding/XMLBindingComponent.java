@@ -769,9 +769,9 @@ public class XMLBindingComponent implements BindingComponent {
                             Structure structure = element.getParent();
                             if (structure instanceof ContentModelGroup) {
                                 ContentModelGroup cmg = (ContentModelGroup)structure;
-                                Enumeration enum = cmg.enumerate();
-                                while (enum.hasMoreElements()) {
-                                    Structure tmpStruct = (Structure)enum.nextElement();
+                                Enumeration enumeration = cmg.enumerate();
+                                while (enumeration.hasMoreElements()) {
+                                    Structure tmpStruct = (Structure)enumeration.nextElement();
                                     if (tmpStruct.getStructureType() == Structure.ELEMENT) {
                                         ElementDecl tmpDecl = (ElementDecl)tmpStruct;
                                         if (tmpDecl.isReference()) {
@@ -1270,9 +1270,9 @@ public class XMLBindingComponent implements BindingComponent {
                 //-- if all elements inside group are 
                 //-- optional, if so, we return 0, not 1.
                 if (minOccurs == 1) {
-                    Enumeration enum = group.enumerate();                    
-                    while (enum.hasMoreElements()) {
-                        if (getLowerBound((Annotated)enum.nextElement()) != 0)
+                    Enumeration enumeration = group.enumerate();                    
+                    while (enumeration.hasMoreElements()) {
+                        if (getLowerBound((Annotated)enumeration.nextElement()) != 0)
                             return 1;
                     }
                     //-- if we make it here, all items in group have a

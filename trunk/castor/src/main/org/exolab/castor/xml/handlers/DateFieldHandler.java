@@ -199,10 +199,10 @@ public class DateFieldHandler extends XMLFieldHandler {
             formatted = values;
         }
         else if (java.util.Enumeration.class.isAssignableFrom(type)) {
-            Enumeration enum = (Enumeration)val;
+            Enumeration enumeration = (Enumeration)val;
             Vector values = new Vector();
-            while (enum.hasMoreElements()) {
-                values.addElement(format(enum.nextElement()));
+            while (enumeration.hasMoreElements()) {
+                values.addElement(format(enumeration.nextElement()));
             }
             String[] valuesArray = new String[values.size()];
             values.copyInto(valuesArray);

@@ -171,9 +171,9 @@ public class SimpleTypeValidator implements TypeValidator {
                 }
             }
             else if (object instanceof java.util.Enumeration) {
-                Enumeration enum = (Enumeration)object;
-                while (enum.hasMoreElements())
-                    validator.validate(enum.nextElement(), context);
+                Enumeration enumeration = (Enumeration)object;
+                while (enumeration.hasMoreElements())
+                    validator.validate(enumeration.nextElement(), context);
             }
             else if (object instanceof java.util.Vector) {
                 Vector vector = (Vector)object;

@@ -499,7 +499,7 @@ public class Mapping
     {
         MappingRoot  loaded;
         Unmarshaller unm;
-        Enumeration  enum;
+        Enumeration  enumeration;
 
         // Clear all the cached resolvers, so they can be reconstructed a
         // second time based on the new mappings loaded
@@ -551,14 +551,14 @@ public class Mapping
             }
             
             // gather "class" tags
-            enum = loaded.enumerateClassMapping();
-            while ( enum.hasMoreElements() )
-                _mapping.addClassMapping( (ClassMapping) enum.nextElement() );
+            enumeration = loaded.enumerateClassMapping();
+            while ( enumeration.hasMoreElements() )
+                _mapping.addClassMapping( (ClassMapping) enumeration.nextElement() );
 
             // gather "key-generator" tags
-            enum = loaded.enumerateKeyGeneratorDef();
-            while ( enum.hasMoreElements() ) {
-                _mapping.addKeyGeneratorDef( (KeyGeneratorDef) enum.nextElement() );
+            enumeration = loaded.enumerateKeyGeneratorDef();
+            while ( enumeration.hasMoreElements() ) {
+                _mapping.addKeyGeneratorDef( (KeyGeneratorDef) enumeration.nextElement() );
             }
         } 
         catch ( MarshalException except ) {

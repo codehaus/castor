@@ -114,9 +114,9 @@ public final class InformixQueryExpression
         Vector vector = new Vector();
         Vector outerTables = getOuterTables();
 
-        for ( Enumeration enum = _tables.keys(); enum.hasMoreElements(); )
+        for ( Enumeration enumeration = _tables.keys(); enumeration.hasMoreElements(); )
         {
-            String tableAlias = (String) enum.nextElement();
+            String tableAlias = (String) enumeration.nextElement();
             String tableName = (String) _tables.get( tableAlias );
             StringBuffer tmp;
             if ( outerTables.contains( tableAlias ) ) {
