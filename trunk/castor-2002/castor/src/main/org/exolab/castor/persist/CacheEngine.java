@@ -630,7 +630,7 @@ public final class CacheEngine
                                 count--;
                                 if ( count <= 0 )
                                     throw e;
-                            }                            
+                            }
                         }
                     } catch ( LockNotGrantedException except ) {
                         // Someone else is using the object, definite duplicate key
@@ -670,7 +670,7 @@ public final class CacheEngine
                 identity = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
             }
             if ( identity == null )
-                throw new PersistenceExceptionImpl( "persist.noIdentity" );
+                throw new PersistenceExceptionImpl( "persist.noIdentity", object.getClass().getName() );
             typeInfo.handler.setIdentity( object, identity );
             oid = new OID( typeInfo.handler, identity );
             oid.setDbLock( true );

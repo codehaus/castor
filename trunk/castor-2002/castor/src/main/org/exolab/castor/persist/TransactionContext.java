@@ -633,7 +633,7 @@ public abstract class TransactionContext
         if ( handler == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName() ) );
         if ( identity == null )
-            throw new PersistenceExceptionImpl( "persist.noIdentity" );
+            throw new PersistenceExceptionImpl( "persist.noIdentity", object.getClass().getName() );
 
         // Make sure that nobody is looking at the object
         oid = new OID( handler, identity );
