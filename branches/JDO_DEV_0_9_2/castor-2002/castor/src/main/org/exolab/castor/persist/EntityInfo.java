@@ -85,16 +85,12 @@ public final class EntityInfo {
     }
 
     public boolean equals( Object object ) {
-        if ( !( object instanceof EntityInfo ) )
+        if ( !( object instanceof EntityInfo ) || object == null )
             return false;
 
         EntityInfo info = (EntityInfo) object;
 
-        return 
-          ( this.entityClass   == entityClass &&
-            this.discriminator == discriminator &&
-            java.util.Arrays.equals( this.fieldInfo, fieldInfo ) && 
-            java.util.Arrays.equals( this.subEntities, subEntities ) );
+        return entityClass.equals(info.entityClass);
     }
 
     public int hashCode() {
