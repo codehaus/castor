@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.util.Hashtable;
 import java.util.Vector;
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -60,6 +61,7 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.DuplicateIdentityExceptionImpl;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
@@ -96,6 +98,13 @@ import org.exolab.castor.util.Messages;
 public final class SQLEngine
     implements Persistence
 {
+
+
+    /**
+     * In order to support key generators using separate connections, 
+     * we must hold a set of the Connections (keys - CacheEngines, values - Connections).
+     */
+    static private Hashtable    _separateConnections = new Hashtable();
 
 
     private String              _pkLookup;
@@ -175,6 +184,29 @@ public final class SQLEngine
     }
 
 
+    private synchronized Connection getSeparateConnection()
+        throws PersistenceException
+    {
+        PersistenceEngine engine;
+        Connection conn;
+
+        engine = DatabaseRegistry.getPersistenceEngine( _clsDesc.getJavaClass() );
+        if ( engine == null ) {
+            throw new PersistenceExceptionImpl( "persist.cannotCreateSeparateConn" );
+        }
+
+        conn = (Connection) _separateConnections.get( engine );
+        if ( conn == null ) {
+            try {
+                conn = DatabaseRegistry.createConnection( engine );
+            } catch ( SQLException except ) {
+                throw new PersistenceExceptionImpl( "persist.cannotCreateSeparateConn" );
+            }
+        }
+        return conn;        
+    }
+
+
     /**
      * Used by {@link OQLQuery} to retrieve the class descriptor.
      */
@@ -244,9 +276,16 @@ public final class SQLEngine
     private Object generateKey( Object conn ) throws PersistenceException
     {
         Object identity;
+        Connection connection;
 
-        identity = _keyGen.generateKey( (Connection) conn, _clsDesc.getTableName(),
-                ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName(), null );
+        if ( _keyGen.isInSameConnection() )
+            connection = (Connection) conn;
+        else 
+            connection = getSeparateConnection();
+        synchronized ( connection ) {
+            identity = _keyGen.generateKey( connection, _clsDesc.getTableName(),
+                    ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName(), null );
+        }
 
         if ( identity == null ) 
             throw new PersistenceExceptionImpl( "persist.noIdentity" );

@@ -182,6 +182,9 @@ public class HighLowKeyGenerator implements KeyGenerator
             boolean success;
 
             try {
+                // the separate connection should be committed/rolled back at this point
+                conn.rollback();
+
                 // Create SQL sentence of the form
                 // "SELECT seq_val FROM seq_table WHERE seq_key='table'"
                 // with database-dependent keyword for lock
@@ -275,10 +278,17 @@ public class HighLowKeyGenerator implements KeyGenerator
                         success = true;
                     }
                 }
-                if ( ! success ) {
+                if ( success ) 
+                    conn.commit();
+                else {
+                    conn.rollback();
                     throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
                 }
             } catch ( SQLException ex ) {
+                try {
+                    conn.rollback();
+                } catch ( SQLException ex2 ) {
+                }
                 throw new PersistenceException( Messages.format(
                         "persist.keyGenSQL", ex.toString() ), ex );
             } finally {
@@ -335,7 +345,7 @@ public class HighLowKeyGenerator implements KeyGenerator
      * Is key generated in the same connection as INSERT?
      */
     public final boolean isInSameConnection() {
-        return true;
+        return false;
     }
 
 }
