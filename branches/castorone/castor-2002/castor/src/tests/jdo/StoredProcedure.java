@@ -78,7 +78,7 @@ public class StoredProcedure
     public StoredProcedure( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC10", "Stored procedure query" );
+        super( "TC11", "Stored procedure query" );
         _category = (JDOCategory) category;
     }
 

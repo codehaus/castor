@@ -677,7 +677,6 @@ public class ClassMolder implements CacheHolder {
             }
         }
 
-		System.out.println("before create id: "+OID.flatten( ids ));
         createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()), 
                 ci.fields, ids );
 
@@ -699,9 +698,7 @@ public class ClassMolder implements CacheHolder {
             oid.setDbLock( false );
             _cache.put( oid, ci );
             // set id in cache.......
-        } else {
-			System.out.println("Id not changed!!!!!!!!!!!!!!1");
-		}
+        } 
 
 
         // ================================================
