@@ -26,7 +26,7 @@
          Since logging is used for warning messages and simple tracing, Castor does not require
          a sophisticated logging mechanism.</p>
 
-      <p>Interested to integrate Castor's logging with Log4J? Then see 
+      <p>Interested to integrate Castor's logging with Log4J? Then see
       <a href="jdo-faq.html#Integrating-Castor's-logging-with-Log4J">this question</a> in the FAQ.</p>
 
     </section>
@@ -171,7 +171,64 @@ org.exolab.castor.marshalling.validation=true
     </section>
 
     <section title="XML/JDO: Create method">
-       <p>Section to be added</p>
+      <p>
+         Castor requires that classes have a public, no-argument constructor
+         in order to provide the ability marshal &amp; unmarshal objects of that type.
+      </p>
+
+      <p>
+         create-method is an optional attribute to the &lt;field&gt; mapping
+         element that can be used to overcome this restriction in cases where you
+         have an existing object model that constists of, say, singleton classes,
+         where public, no-argument constructors must not be present by definition.
+      </p>
+
+      <p>
+         Assume for example that a class "A" that you want to be able to
+         unmarshal uses a singleton class as one of its properties.
+         When attempting to unmarshal class "A", you should get an exception,
+         because the singleton property has no public constructor.
+         Assume a reference to the singleton can be obtained via a static
+         getInstance() method, you can add a "create method" to class A like so:
+      </p>
+
+      <code>
+         <![CDATA[
+            public MySingleton getSingletonProperty()
+            {
+               return MySingleton.getInstance();
+            }
+         ]]>
+      </code>
+
+      <p>
+         and in the mapping file for class A, you can define the singleton
+         property like so:
+      </p>
+
+      <code>
+         <![CDATA[
+            <field name="mySingletonProperty"
+                  type="com.u2d.MySingleton"
+                  create-method="getSingletonProperty">
+               <bind-xml name="my-singleton-property" node="element" />
+            </field>
+         ]]>
+      </code>
+
+      <p>
+         This illustrates how the create-method attribute is quite a useful
+         mechanism for dealing with exception situations where you might
+         want to take advantage of marshaling even when some classes do not
+         have no-argument public constructors.
+      </p>
+
+      <p>
+        <b>Note:</b> As of this writing, the specified create-method must
+        exist as a method in the current class (i.e. the class being described
+        by the current &lt;class&gt; element). In the future it may be possible
+        to use external static factory methods.
+      </p>
     </section>
 
 
