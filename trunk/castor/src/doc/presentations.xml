@@ -12,6 +12,15 @@
 
     <section title="Articles">
       <p><b>Castor in the press...</b></p>
+
+      <p>
+          <b>Castor Cures Your Data Binding Ills (developer.com, March 2003)</b>
+          <p/>
+          Thomas Hammell discusses both Castor XML and Castor J/DO as he walks
+          the reader through a real world XML and RDB data binding example.
+          <a href="http://www.developer.com/java/data/article.php/1730911">Read</a>
+      </p>
+
       <p>
           <b>IBM developerWorks (January 2003)</b>
           <p/>
@@ -19,7 +28,7 @@
           at the performance of the different data-binding frameworks.
           <a href="http://www-106.ibm.com/developerworks/library/x-databdopt2/">Read</a>
       </p>
-      
+
       <p>
           <b>IBM developerWorks (January 2003)</b>
           <p/>
