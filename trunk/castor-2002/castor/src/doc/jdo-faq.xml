@@ -5,9 +5,7 @@
 <document url="http://castor.exolab.org/jdo-faq.html">
   <body>
     <title>Castor JDO FAQ</title>
-    <section title="Draft">
-        <p><b><big>First Draft</big></b></p>
-    </section>
+
     <section title="Castor's relation to other specifications">
 	<p><b>Does Castor JDO comply with the SUN JSR-000012 specification?</b></p>
 
@@ -70,11 +68,6 @@
   }
          </code>
     </p>
-
-	<p><b>What features are supported in Castor's OQL?</b></p>
-
-	<p>Due to some accident, we lost the xml source of the OQL document. Before we recover it, please click
-	<a href="http://www.karpenstein.com/nissim/design-oql-parser.html">here</a> for the document</p>
 
 	<p><b>Should my JDO classes implement some special interface?</b></p>
 
@@ -181,11 +174,11 @@
 
     <p>Most probably the object that is being updated has more than 100 related objects of one class
     and the cache size for this class is not enough. You should either increase the size of the cache
-    or change the cache type to time-limited (the default cache type is size-limited, the default size is 100),
+    or change the cache type to time-limited (the default cache type is count-limited, the default size is 100),
     for example:
         <code><![CDATA[
   <class ...>
-    <cache-type type="size-limited" capacity="1000"/>
+    <cache-type type="count-limited" capacity="1000"/>
     ...
   </class>
         ]]></code>
@@ -198,16 +191,21 @@
     </section>
 
     <section title="Features requests">
-        <p><b>When will castor support multiple columns primary keys, lazy loading, dependent/related relationship and many to many relationship?</b></p>
+        <p><b>Can a foreign key be part of multiple primary keys?</b></p>
 
-	<p>Those features are implemented and available in development branch of the cvs.</p>
-	<p><code>
-	$ cvs -d :pserver:anoncvs@castor.exolab.org:/cvs/castor login
-	password: anoncvs
-	$ cvs -d :pserver:anoncvs@castor.exolab.org:/cvs/castor checkout -r castorone castor
-	</code>
-	</p>
-	<p>Please type "build doc" in castor directory and see the document under build\doc\castor-one.html for features and limitations</p>
+        <p>Unfortunately, the answer is no. We're awared that many users request it. It is now very high prority in our Todo list.</p>
+
+        <p>If foreign key is the primary key, then user may consider to work around it using extend relationship.</p>
+
+        <p><b>Is polymorphic collection supported?</b></p>
+
+        <p>Unfortunaely, the answer is no</p>
+        
+        <p>In version 0.8.11, we tried to enable polymorphic collection by introducing the notation of Object Reloading. Object Reloading delegates the determination of the class to a data object. However, it is proved that reloading can only be done before any instance of the target object is returned to user, and we have no way to determine that. Outer-join all extending tables. As a result, we removed the support in version 0.9.x.</p>
+        
+        <p>In the near future, we are going to use a new mechanism to provide extends. The new mechanism loads a table with an SQL statement that outer-joins all of the extending tables with the base. The existence of an extended table row can be used to determine the class of a data object. Notice that all extended table rows of the same entity should always be stored in the same data-store. </p>
+
+        <p>In the further future, we also want to let users to define a discriminator column (or determinance field). Basing on the value of discriminator columns in the base table, the bridge layer fetches the additional information and returns the combined entity with the appropriate list of entity classes. More about discriminator field is discussed in Part II of this document.</p>
 
      </section>
 
