@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -55,7 +55,6 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.*;
 
 
@@ -64,7 +63,7 @@ import org.exolab.castor.xml.*;
  * class is used by both generated source code as well
  * as the XMLMappingLoader.
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class XMLClassDescriptorImpl extends Validator
@@ -254,34 +253,8 @@ public class XMLClassDescriptorImpl extends Validator
      * @param descriptor the XMLFieldDescriptor to add
      */
     public void addFieldDescriptor(XMLFieldDescriptor descriptor) {
-
-        if (descriptor == null) return;
         
-	    boolean added = false;
-
-        NodeType nodeType = descriptor.getNodeType();
-        switch(nodeType.getType()) {
-            case NodeType.NAMESPACE:
-            case NodeType.ATTRIBUTE:
-                if ((added = _attributes.add(descriptor))) {
-                    _attArray = null;
-                }
-                break;
-            case NodeType.TEXT:
-                contentDescriptor = descriptor;
-                added = true;
-                break;
-            default:
-                if (added = _elements.add(descriptor)) {
-                    _elemArray = null;
-                    if (descriptor.isContainer()) ++_containerCount;
-                }
-                break;
-        }
-        
-        if (added) {
-	        descriptor.setContainingClassDescriptor( this );
-	    }
+        addFieldDescriptor(descriptor, true);
 
     } //-- addFieldDescriptor
 
@@ -585,7 +558,7 @@ public class XMLClassDescriptorImpl extends Validator
         if (_extends != null) {
             fields = classDesc.getFields();
             for (int i = 0; i < fields.length; i++) {
-                addFieldDescriptor((XMLFieldDescriptor)fields[i]);
+                addFieldDescriptor((XMLFieldDescriptor)fields[i], false);
             }
         }
 
@@ -854,7 +827,7 @@ public class XMLClassDescriptorImpl extends Validator
                     String sep = " | ";
                     for (int i = 0; i < localElements.length; i++) {
                         XMLFieldDescriptor  desc = localElements[i];                        
-                        if (desc != null) continue;
+                        if (desc == null) continue;
                         
                         FieldValidator fieldValidator = desc.getValidator();
                         if (fieldValidator.getMinOccurs() > 0) {
@@ -1208,6 +1181,49 @@ public class XMLClassDescriptorImpl extends Validator
         if (idx >= 0) name = name.substring(idx+1);
         return _naming.toXMLName(name);
     }
+    
+    //-------------------/
+    //- Private Methods -/
+    //-------------------/
+    
+    /**
+     * Adds the given XMLFieldDescriptor to the list of descriptors. The
+     * descriptor will be added to the appropriate list by calling
+     * XMLFieldDescriptor#getNodeType() to determine it's type.
+     *
+     * @param descriptor the XMLFieldDescriptor to add
+     */
+    private void addFieldDescriptor(XMLFieldDescriptor descriptor, boolean relink) {
+
+        if (descriptor == null) return;
+        
+	    boolean added = false;
+
+        NodeType nodeType = descriptor.getNodeType();
+        switch(nodeType.getType()) {
+            case NodeType.NAMESPACE:
+            case NodeType.ATTRIBUTE:
+                if ((added = _attributes.add(descriptor))) {
+                    _attArray = null;
+                }
+                break;
+            case NodeType.TEXT:
+                contentDescriptor = descriptor;
+                added = true;
+                break;
+            default:
+                if (added = _elements.add(descriptor)) {
+                    _elemArray = null;
+                    if (descriptor.isContainer()) ++_containerCount;
+                }
+                break;
+        }
+        
+        if ((added) && (relink)) {
+	        descriptor.setContainingClassDescriptor( this );
+	    }
+
+    } //-- addFieldDescriptor
     
     
     private XMLFieldDescriptor[] getAttributeArray() {
