@@ -54,15 +54,21 @@ import org.exolab.castor.persist.sql.KeyGeneratorDescriptor;
  */
 public final class EntityInfo {
 
-    private static EntityFieldInfo[] emptyEntityFieldInfo = new EntityFieldInfo[0];
-
-    private static EntityInfo[]      emptyEntityInfo      = new EntityInfo[0];
-
     // -- Implementation Notes:
     //
     // Developer! Let's agree that all array used in this class should 
     // never be null. We uses zero length array instead
     //
+
+    /**
+     * Object saver final static variable
+     */
+    private final static EntityFieldInfo[] emptyEntityFieldInfo = new EntityFieldInfo[0];
+
+    /**
+     * Object saver final static variable
+     */
+    private final static EntityInfo[]      emptyEntityInfo      = new EntityInfo[0];
 
     /**
      * The entity class which this object represent.
