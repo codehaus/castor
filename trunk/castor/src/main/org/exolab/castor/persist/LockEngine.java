@@ -55,19 +55,13 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.Persistent;
-import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
-import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.AccessMode;
@@ -301,7 +295,7 @@ public final class LockEngine {
      * @param tx The transaction context
      * @param oid The identity of the object to load
      * @param object The type of the object to load
-     * @param accessMode The desired access mode
+     * @param suggestedAccessMode The desired access mode
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
      * @return The object's OID
@@ -327,8 +321,6 @@ public final class LockEngine {
         OID        lockedOid;
         ObjectLock lock;
         TypeInfo   typeInfo;
-        Object[]   fields;
-        boolean    write;
         boolean    succeed;
         short      action;
 
@@ -367,7 +359,9 @@ public final class LockEngine {
             if ( lockedOid != null )
                 oid = lockedOid;
 
-            _log.debug( Messages.format( "jdo.loading", typeInfo.molder.getName(), oid.getIdentity() ) );
+            if (_log.isDebugEnabled()) {
+            	_log.debug( Messages.format( "jdo.loading.with.id", typeInfo.molder.getName(), oid.getIdentity() ) );
+            }
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object does not exist
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", oid.getName(), oid.getIdentity()));
@@ -383,7 +377,6 @@ public final class LockEngine {
      * @param tx The transaction context
      * @param oid The identity of the object, or null
      * @param object The newly created object
-     * @return The object's OID
      */
     public void markCreate( TransactionContext tx, OID oid, Object object )
             throws PersistenceException, LockNotGrantedException {
@@ -424,8 +417,6 @@ public final class LockEngine {
 
         TypeInfo typeInfo;
         ObjectLock lock;
-        Object[] fields;
-        OID lockedOid;
         OID newoid;
         boolean succeed;
 
@@ -447,7 +438,9 @@ public final class LockEngine {
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
-                _log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
+                if (_log.isDebugEnabled()) {
+                	_log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
+                }
 
                 oid = lock.getOID();
 
@@ -478,7 +471,9 @@ public final class LockEngine {
             succeed = false;
 
             try {
-                _log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
+                if (_log.isDebugEnabled()) {
+                	_log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
+                }
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
@@ -525,16 +520,15 @@ public final class LockEngine {
      */
     public void delete( TransactionContext tx, OID oid, Object object )
             throws PersistenceException {
-        ObjectLock lock;
         TypeInfo   typeInfo;
-        Object[]   fields;
-
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
 
         try {
-            lock = typeInfo.assure( oid, tx, true );
+            typeInfo.assure( oid, tx, true );
 
-            _log.debug( Messages.format( "jdo.removing", typeInfo.molder.getName(), oid.getIdentity() ) );
+            if (_log.isDebugEnabled()) {
+            	_log.debug( Messages.format( "jdo.removing", typeInfo.molder.getName(), oid.getIdentity() ) );
+            }
 
             typeInfo.molder.delete( tx, oid );
 
@@ -549,8 +543,6 @@ public final class LockEngine {
 
         ObjectLock lock;
         TypeInfo   typeInfo;
-        Object[]   fields;
-
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
 
         lock = typeInfo.upgrade( oid, tx, timeout );
@@ -570,7 +562,7 @@ public final class LockEngine {
      * @param tx The transaction context
      * @param oid The object's identity
      * @param object The object
-     * @param accessMode The desired access mode
+     * @param suggestedAccessMode The desired access mode
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
      * @return The object's OID
@@ -592,7 +584,6 @@ public final class LockEngine {
                    ObjectDeletedWaitingForLockException {
 
         TypeInfo   typeInfo;
-        Object   identity;
         ObjectLock lock;
         boolean    succeed;
         // [oleg] these variables are not used
@@ -745,7 +736,9 @@ public final class LockEngine {
         try {
             lock = typeInfo.assure( oid, tx, false );
 
-            _log.debug( Messages.format( "jdo.storing", typeInfo.molder.getName(), oid.getIdentity() ) );
+            if (_log.isDebugEnabled ()) {
+            	_log.debug( Messages.format( "jdo.storing.with.id", typeInfo.molder.getName(), oid.getIdentity() ) );
+            }
 
             typeInfo.molder.store( tx, oid, lock, object );
         } catch ( ObjectModifiedException e ) {
@@ -786,7 +779,6 @@ public final class LockEngine {
     public void writeLock( TransactionContext tx, OID oid, int timeout )
             throws ObjectDeletedException, LockNotGrantedException, PersistenceException {
 
-        ObjectLock lock;
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
@@ -822,7 +814,6 @@ public final class LockEngine {
      */
     public void softLock( TransactionContext tx, OID oid, int timeout )
             throws LockNotGrantedException {
-        ObjectLock lock;
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
@@ -871,7 +862,6 @@ public final class LockEngine {
      */
     public void updateCache( TransactionContext tx, OID oid, Object object ) {
         TypeInfo   typeInfo;
-        Object[]   fields;
         ObjectLock lock;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
@@ -914,8 +904,6 @@ public final class LockEngine {
      * @param oid The object OID
      */
     public void forgetObject( TransactionContext tx, OID oid ) {
-        ObjectLock lock;
-        Object[]   fields;
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
@@ -988,9 +976,6 @@ public final class LockEngine {
      * Forces the cache to be expired for the object represented by
      * ClassMolder and identity.  If identity is null then expire
      * all objects of the type represented by ClassMolder.
-     *
-     * @param type An array of class types.
-     * @param identity An array of object identifiers.
      */
     public void expireCache( Class cls ) {
         TypeInfo typeInfo = (TypeInfo) _typeInfo.get( cls.getName() );
@@ -1154,7 +1139,6 @@ public final class LockEngine {
                 int timeout ) throws ObjectDeletedWaitingForLockException,
                 LockNotGrantedException, ObjectDeletedException {
             ObjectLock entry = null;
-            boolean newentry = false;
             boolean failed = true;
             // sync on "locks" is, unfortunately, necessary if we employ
             // some LRU mechanism, especially if we allow NoCache, to avoid
@@ -1175,7 +1159,6 @@ public final class LockEngine {
                     }
                 }
                 if ( entry == null ) {
-                    newentry = true;
                     entry = new ObjectLock( oid );
                     locks.put( oid, entry );
                 } else {
@@ -1275,8 +1258,6 @@ public final class LockEngine {
          * @param  tx   the transaction in action
          * @param  write  true if we want to upgrade or reassure a write lock
          *                false for read lock
-         * @param  timeout  time limit
-         *
          */
         private ObjectLock assure( OID oid, TransactionContext tx, boolean write )
                 throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
@@ -1306,8 +1287,6 @@ public final class LockEngine {
 
             synchronized( locks ) {
                 ObjectLock entry, newentry;
-                boolean write;
-
                 entry = (ObjectLock) locks.get( orgoid );
                 newentry = (ObjectLock) locks.get( newoid );
 
@@ -1378,7 +1357,6 @@ public final class LockEngine {
          *
          */
         private ObjectLock release( OID oid, TransactionContext tx ) {
-            boolean failed = true;
             ObjectLock entry = null;
             synchronized( locks ) {
                 entry = (ObjectLock) locks.get( oid );
@@ -1390,7 +1368,6 @@ public final class LockEngine {
             }
             try {
                 entry.release(tx);
-                failed = false;
                 return entry;
             } finally {
                 synchronized( locks ) {
