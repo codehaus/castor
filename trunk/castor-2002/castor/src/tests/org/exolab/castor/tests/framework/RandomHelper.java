@@ -146,14 +146,14 @@ public class RandomHelper {
     /**
      * Return a random int.
      */
-    public static int getRandom(int i, Class c) {
+    public static int getRandom(int i) {
         return _rand.nextInt();
     }
 
     /**
      * Return a random float.
      */
-    public static float getRandom(float f, Class c) {
+    public static float getRandom(float f) {
         return _rand.nextFloat();
     }
 
@@ -161,21 +161,21 @@ public class RandomHelper {
     /**
      * Return a random boolean.
      */
-    public static boolean getRandom(boolean b, Class c) {
+    public static boolean getRandom(boolean b) {
         return _rand.nextBoolean();
     }
 
     /**
      * Return a random long.
      */
-    public static long getRandom(long l, Class c) {
+    public static long getRandom(long l) {
         return _rand.nextLong();
     }
 
     /**
      * Return a random double.
      */
-    public static double getRandom(double d, Class c) {
+    public static double getRandom(double d) {
         return _rand.nextDouble();
     }
 
