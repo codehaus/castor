@@ -232,6 +232,7 @@ public final class SQLEngine implements Persistence {
         JDOClassDescriptor base = clsDesc;
 
         // make sure there is no forbidded cases
+		/*
         while ( base.getDepends() != null ) {
             if ( base.getExtends() != null )
                 throw new MappingException("Class should not both depends on and extended other classes");
@@ -240,7 +241,7 @@ public final class SQLEngine implements Persistence {
             if ( base.getExtends() != null )
                 throw new MappingException("Class should not depends on an extended class");
             // do we need to add loop detection?
-        }
+        }*/
 
         // walk until the base class which this class extends
         base = clsDesc;
@@ -1020,11 +1021,9 @@ public final class SQLEngine implements Persistence {
         try {
             sqlIdentities = idToSql( identities );
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
-            System.out.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
+            //System.out.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
 
             for ( int i=0; i<_ids.length; i++ ) {
-                System.out.println("set id: "+identities[i]+"/"+identities[i].getClass().getName());
-				System.out.println("after convert: "+idToSQL(i,identities[i]).getClass().getName());
                 stmt.setObject( i+1, idToSQL(i,identities[i]), _ids[i].sqlType );
             }
 

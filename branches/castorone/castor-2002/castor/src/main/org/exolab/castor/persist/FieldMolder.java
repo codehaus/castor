@@ -109,7 +109,14 @@ public class FieldMolder {
 
     private Class _fClass;
 
-    //private String _manyTable;
+    private Field         _field;
+    private Method        _getMethod;
+    private Method        _setMethod;
+    private Method        _hasMethod;
+    private Method        _deleteMethod;
+    private Method        _createMethod;
+    private String        _fieldName;
+    private Object        _default;
 
     private SQLRelationLoader _manyToManyLoader;
 
@@ -117,7 +124,7 @@ public class FieldMolder {
         return "FieldMolder: "+_fClass+" inside "+_eMold.getJavaClass();
     }
     public Class getJavaClass() {
-        return _fClass; 
+        return _fClass!=null?_fClass:(_fMold!=null?_fMold.getJavaClass():null); 
     }
     /*
     void setRelationDescriptor( RelationDescriptor rd ) throws MappingException {
@@ -153,7 +160,19 @@ public class FieldMolder {
     }
 
     public boolean isDependent() {
-        return _fMold != null && (_fMold.getDepends() == _eMold);
+		if ( _fMold == null )
+			return false;
+		System.out.println(_fType+"~~~~~~~~~~eMold: "+_eMold.getJavaClass().getName()+" field: "+_fType+" Path: "+_fMold.getJavaClass().getName()+" depend: "+_fMold.getDepends());	
+		ClassMolder extendPath = _eMold;
+		ClassMolder depends = _fMold.getDepends();
+		while ( extendPath != null ) {
+			if ( extendPath == depends ) {
+				System.out.println("~~~~~true~~~~~~eMold: "+_eMold.getJavaClass().getName()+" field: "+_fType+" Path: "+_fMold.getJavaClass().getName());	
+				return true;
+			} else 
+				extendPath = extendPath.getExtends();
+		}
+		return false;
     }
 
     public boolean isMulti() {
@@ -222,18 +241,18 @@ public class FieldMolder {
     
     public void setValue( Object object, Object value ) {
         // If there is a convertor, apply conversion here.
-        System.out.print("FieldMolder.setValue(");
-        System.out.print((value!=null?value.getClass().toString():"null")+"/"+value
-                +") using ");
+        //System.out.print("FieldMolder.setValue(");
+        //System.out.print((value!=null?value.getClass().toString():"null")+"/"+value
+        //        +") using ");
         try {
             //if ( _handler != null )
             //    _handler.setValue( object, value );
             //else 
             if ( _field != null ) {
-                System.out.println("_field: "+_field+"/"+object);
+                //System.out.println("_field: "+_field+"/"+object);
                 _field.set( object, value == null ? _default : value );
             } else if ( _setMethod != null ) {
-                System.out.println("_setMethod: "+_setMethod+" "+object);
+                //System.out.println("_setMethod: "+_setMethod+" "+object);
                 if ( value == null && _deleteMethod != null )
                     _deleteMethod.invoke( object, null );
                 else {
@@ -330,14 +349,6 @@ public class FieldMolder {
      *  found, not accessible, not of the specified type, etc
      */
 
-    private Field         _field;
-    private Method        _getMethod;
-    private Method        _setMethod;
-    private Method        _hasMethod;
-    private Method        _deleteMethod;
-    private Method        _createMethod;
-    private String        _fieldName;
-    private Object        _default;
 
 
     public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap, 
@@ -386,48 +397,7 @@ public class FieldMolder {
             // Set field name, if it is null, we try to discover it with
             // return type of set/get method.
             _fType = fieldMap.getType();
-            
-            // Field is in many-to-many relation with enclosing class
-            /*
-            if ( fieldMap.getSql() != null && fieldMap.getSql().getManyTable() != null ) {
-                _manyTable = fieldMap.getSql().getManyTable();
-            }*/
-            /*
-            if ( fieldMap.getManyToMany() != null ) {
-                ManyToMany mm = (ManyToMany) fieldMap.getManyToMany();
-                TypeMapping[] typeMap = mm.getTypeMapping();
-                String relationName = mm.getName();
-                String tableName = mm.getMapTo().getTable();
-                String type1 = ((ClassMapping)typeMap[0].getType()).getName();
-                String sql1  = typeMap[0].getSql();
-                String type2 = ((ClassMapping)typeMap[1].getType()).getName();
-                String sql2  = typeMap[1].getSql();
-                setRelationDescriptor( new RelationDescriptor( relationName, tableName, type1, sql1, type2, sql2 ) );
-
-                _rTable = mm.getMapTo().getTable();
-
-                TypeMapping tm1 = mm.getTypeMapping()[0];
-                TypeMapping tm2 = mm.getTypeMapping()[1];
-                String sType1 = ((ClassMapping)tm1.getType()).getName();
-                String sType2 = ((ClassMapping)tm2.getType()).getName();
-                System.out.println(_eMold.getName() + " " + sType1 + " " + sType2 + " " +_fType );
-                if ( _eMold.getName().equals( sType1 ) ) {
-                    System.out.println("Class type equal type 1");
-                    if ( _fType == null ) 
-                        _fType = sType2;
-                    if ( ! _fType.equals( sType2 ) )
-                        throw new MappingException("Relation and field type doesn't match!");
-                } else {
-                    
-                    if ( _fType == null )
-                        _fType = sType1;
-                    else if ( ! _fType.equals( sType1 ) )
-                        throw new MappingException("Relation and field type doesn't match!");
-                }
-                if ( _colClass == null )
-                    throw new MappingException("attribute \"collection\" expected!");
-            }*/
-           
+                       
             Class             javaClass = eMold.getJavaClass();
             Class             fieldType = null;
             String            fieldName;
@@ -546,16 +516,6 @@ public class FieldMolder {
         }
     }
 
-
-    /*
-    protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
-        throws MappingException
-    {
-        return new TypeInfo( Types.typeFromPrimitive( fieldType ), null, null,
-                             fieldMap.getRequired(), null, colHandler );
-    }*/
-
-
     /**
      * Returns the named field. Uses reflection to return the named
      * field and check the field type, if specified.
@@ -660,12 +620,6 @@ public class FieldMolder {
         }
         return null;
     }
-
-
-    /*
-    Class resolve( String className ) throws ClassNotFoundException {
-        return Types.typeFromName( loader, className );
-    }*/
 
     private String capitalize( String name )
     {
