@@ -1724,7 +1724,7 @@ public class ClassMolder {
                             if ( v != null ) {
                                 while ( itor.hasNext() ) {
                                     Object element = itor.next();
-                                    if ( v.contains( fieldClassMolder.getIdentity( tx, element ) ) ) {
+                                    if ( v.contains( fieldClassMolder.getActualIdentity( tx, element ) ) ) {
                                         tx.update( fieldEngine, fieldClassMolder, element, oid );
                                     } else {
                                         tx.create( fieldEngine, fieldClassMolder, element, oid );
@@ -1733,7 +1733,7 @@ public class ClassMolder {
                             }
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
-                                    // load all the dependent object in cache for modification 
+                                    // load all the dependent object in cache for modification
                                     // check at commit time.
                                     tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
                                 }
