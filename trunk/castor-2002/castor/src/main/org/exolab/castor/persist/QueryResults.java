@@ -49,6 +49,7 @@ package org.exolab.castor.persist;
 
 import javax.transaction.Status;
 import org.exolab.castor.mapping.ClassDesc;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
@@ -84,10 +85,9 @@ public final class QueryResults
     
     
     /**
-     * The mode in which this query is running (read-only, read/write,
-     * exclusive).
+     * The mode in which this query is running.
      */
-    private int                 _accessMode;
+    private AccessMode             _accessMode;
     
     
     /**
@@ -97,7 +97,7 @@ public final class QueryResults
     
     
     QueryResults( TransactionContext tx, PersistenceEngine engine,
-                  PersistenceQuery query, int accessMode )
+                  PersistenceQuery query, AccessMode accessMode )
     {
         _tx = tx;
         _engine = engine;
@@ -280,7 +280,7 @@ public final class QueryResults
                     throw new PersistenceException( "persist.typeMismatch", obj.getClass(), entry.obj.getClass() );
                 if ( entry.created )
                     return false;
-                if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
+                if ( _accessMode == AccessMode.Exclusive &&
                      ! entry.oid.isExclusive() ) {
                     // If we are in exclusive mode and object has not been
                     // loaded in exclusive mode before, then we have a
@@ -311,7 +311,7 @@ public final class QueryResults
                     // to next object.
                     throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
                 else {
-                    if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
+                    if ( _accessMode == AccessMode.Exclusive &&
                          ! oid.isExclusive() ) {
                         // If we are in exclusive mode and object has not been
                         // loaded in exclusive mode before, then we have a
@@ -334,11 +334,9 @@ public final class QueryResults
                 // record the object in the transaction if in read-write
                 // or exclusive mode.
                 try {
-                    _engine.fetch( _tx, _query, _lastIdentity,
-                                   ( _accessMode == TransactionContext.AccessMode.Exclusive ),
-                                   _tx.getLockTimeout() );
+                    _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
                     _engine.copyObject( _tx, oid, obj );
-                    if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
+                    if ( _accessMode == AccessMode.ReadOnly )
                         _engine.releaseLock( _tx, oid );
                     else
                         _tx.addObjectEntry( obj, oid, _engine );
