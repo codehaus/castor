@@ -95,6 +95,16 @@ public interface ContentModelGroup {
     public Enumeration enumerate();
 
     /**
+     * Returns the element declaration with the given name, or null if no
+     * element declaration with that name exists in this ContentModelGroup.
+     *
+     * @param name the name of the element.
+     * @return the ElementDecl with the given name, or null if no
+     * ElementDecl exists in this ContentModelGroup.
+    **/
+    public ElementDecl getElementDecl(String name);
+
+    /**
      * Returns the maximum number of occurances that this ContentModelGroup
      * may appear
      * @return the maximum number of occurances that this ContentModelGroup
@@ -127,7 +137,6 @@ public interface ContentModelGroup {
      * @returns the CMParticle at the specified index
     **/
     public Particle getParticle(int index);
-
 
 
 } //-- ContentModelGroup
