@@ -87,7 +87,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
 
         //-- _type
@@ -120,7 +120,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
 
         //-- _required
@@ -349,7 +349,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _getMethod
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
 
         //-- _handler
@@ -382,7 +382,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _handler
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
         
         //-- _hasMethod
@@ -415,7 +415,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _hasMethod
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
         
         //-- _setMethod
@@ -448,7 +448,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _setMethod
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
 
         //-- _createMethod
@@ -481,7 +481,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
         //-- validation code for: _createMethod
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new NameValidator(NameValidator.CDATA));
         desc.setValidator(fieldValidator);
 
         //-- _collection
