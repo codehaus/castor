@@ -40,24 +40,29 @@
       <section title="Standard Database Connections">
 
         <p>A standard database.xml entry for using PostgreSQL without pooling
-           looks like this:
+           looks like this:</p>
+           
+<code-panel>
 <code><![CDATA[
   <driver class-name="org.postgresql.Driver"
           url="jdbc:postgresql://localhost/app">
     <param name="user" value="smith"/>
     <param name="password" value="secret" />
   </driver>
-]]></code></p>
+]]></code>
+</code-panel>
 
      <p>On the other hand, if you wanted to use the PostgresqlDataSource, you
         would use the data-source tag instead, and the connection entry would
-        look like this:
+        look like this:</p>
+<code-panel>        
 <code><![CDATA[
   <data-source class-name="org.postgresql.PostgresqlDataSource">
    <params server-name="localhost" database-name="app"
            user="smith" password="secret"/>
   </data-source>
-]]></code></p>
+]]></code>
+</code-panel>
 
       <p>(Note that only versions before 7.3 of the PostgreSQL JDBC driver
          include this class)</p>
@@ -70,7 +75,9 @@
        source, so it doesn't provide us much use here.  Instead, we'll
        install poolman, and create a poolman.xml entry for our database
        connection to get the pooling behavior.  In the poolman.xml, our
-       connection information would look like this:
+       connection information would look like this:</p>
+       
+<code-panel>
 <code><![CDATA[
     <datasource>
       <dbname>appPool</dbname>
@@ -83,25 +90,32 @@
       <maximumSize>10</maximumSize>
       <cacheEnabled>false</cacheEnabled>
     </datasource>
-]]></code></p>
+]]></code>
+</code-panel>
 
      <p>In this sample, poolman will have a datasource called appPool,
         that will have a min of 2 connections for the database, and will
         max out at 10 connections.  Now, can use poolman with Castor in
         two ways.  The first is as a driver, and the second is as a data
         source.  Here are the two possible entries for the database.xml
-        file... first, the driver version:
+        file... first, the driver version:</p>
+        
+<code-panel>
 <code><![CDATA[
   <driver class-name="com.codestudio.sql.PoolMan"
           url="jdbc:poolman://appPool"/>
-]]></code></p>
+]]></code>
+</code-panel>
 
-     <p>and now the data-source version:
+     <p>and now the data-source version:</p>
+     
+<code-panel>
 <code><![CDATA[
   <data-source class-name="com.codestudio.sql.PoolManDataSource">
    <params database-name="appPool"/>
   </data-source>
-]]></code></p>
+]]></code>
+</code-panel>
 
      <p>As you can see, we have placed all of the connection
         information in the poolman.xml configuration file, so Castor just
@@ -109,26 +123,53 @@
         Castor does not care from where it gets the connection from.</p>
 
      </section>
-     <section title="Pooling with PostgreSQL 7.3">
+     
+     <section title="Pooling and JDBC DataSources">
+     
+     	<section title="PostgreSQL 7.3 and later">
 
-     <p>In the 7.3 release of PostgreSQL, they will start providing a
-        pooling mechanism with their driver.  The Castor CVS repository
-        includes a beta version of the driver with this functionality.
-        Here is the 'current' configuration needed for the upcoming 7.3
-        release of PostgreSQL. (Unless they change it.) Note that in this
-        pooling mechanism currently lacks some features of PoolMan, such
-        as timing out idle connections and removing failed connections
-        from the pool.  In this case, we can create the following
-        data-source entry in the database.xml file to provide for our
-        connections with Castor.
+     		<p>In the 7.3 release of PostgreSQL, they will start providing a
+        	   pooling mechanism with their driver.  The Castor CVS repository
+        	   includes a beta version of the driver with this functionality.
+               Here is the 'current' configuration needed for the upcoming 7.3
+               release of PostgreSQL. (Unless they change it.) Note that in this
+               pooling mechanism currently lacks some features of PoolMan, such
+               as timing out idle connections and removing failed connections
+               from the pool.  In this case, we can create the following
+               data-source entry in the database.xml file to provide for our
+               connections with Castor.</p>
+
+<code-panel>        
 <code><![CDATA[
   <data-source class-name="org.postgresql.jdbc2.optional.PoolingDataSource">
-   <params server-name="localhost" database-name="app"
-           initial-connections="2" max-connections="10"
-           user="smith" password="secret"/>
+     <params server-name="localhost" database-name="app"
+             initial-connections="2" max-connections="10"
+             user="smith" password="secret"
+     />
   </data-source>
-]]></code></p>
+]]></code>
+</code-panel>
 
+	     </section>
+
+        <section title="Oracle">
+     
+           <p>Here is the configuration needed for using a connection pool
+              with the Oracle JDBC DataSource implementations.</p>
+
+<code-panel>        
+<code><![CDATA[
+   <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
+      <params url="jdbc:oracle:thin:@localhost:1521:TEST"
+              user="scott" 
+              password="tiger"
+      />
+   </data-source>
+]]></code>
+</code-panel>
+
+        </section>
+	
      </section>
 
      <section title="PostgreSQL 7.3, JNDI and Tomcat">
@@ -218,9 +259,10 @@
           new features of the JDBC 3.0 API has (finally) been added to 
           BasicDataSource, support for prepared statement pooling.</p>
                 
-       <p>To configure Castor for the use of DBCP, we provide the following 
-          &lt;data-source&gt; entry in the database.xml file.
+       <p>To configure Castor for the use of DBCP, please provide the following 
+          &lt;data-source&gt; entry in the database.xml file.</p>
         
+<code-panel>        
 <code><![CDATA[
   <data-source class-name="org.apache.commons.dbcp.BasicDataSource">
     <params driver-class-name="com.mysql.jdbc.Driver" 
@@ -229,7 +271,8 @@
             url="jdbc:mysql://localhost/test" 
             max-active="10" />
   </data-source>
-]]></code></p>
+]]></code>
+</code-panel>        
 
          <p>There's plenty of information on 
             <a href="http://jakarta.apache.org/commons/dbcp/configuration.html">configuration </a>
