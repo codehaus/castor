@@ -1,12 +1,21 @@
-Version 0.7.9  February 16, 2000
--------------------------------
+Version 0.7.9  February 25, 2000
+--------------------------------
 
-JDO:    Supports the new mapping API, new mapping DTD.
+JDO:     Now loads JDO configuration file from ODMG.loadDatabase() which in
+         turn loads all the required mapping files. Added jdo-conf DTD which
+         has been separated from the mapping DTD. For more info see the JDO
+         example.
 
-JDO:    Added jdo-conf DTD for configuring the database connection.
+JDO:     Supports the new mapping API, new mapping DTD. See the JDO example
+         for using the new mapping file.
 
-JDO:    Cleaned up SQLEngine query composer using QueryExpr. Will be able to
-        support different join and locking syntaxes.
+JDO:     Cleaned up SQLEngine query composer using QueryExpr. Will be able to
+         support different join and locking syntaxes in the future.
+
+JDO:     Access mode (shared, exclusive, read-only) is now specified at the
+         class level in the mapping file and not in the database level as
+         before. This allows one transaction to support multiple type of
+         locks depending on the object being used.
 
 XML:     A Castor JAR with just the XML module will be created from the
          'jar' target (less than half the size) and also available from
@@ -14,10 +23,12 @@ XML:     A Castor JAR with just the XML module will be created from the
 
 XML:     Better error reporting in exceptions.
 
-Mapping: The API for the mapping package has been finalized.
+Mapping: The API for the mapping package has been finalized. Both JDO and DAX
+         use the new API, XML support is in the works.
 
 Persist: Added support for relations (one-one, one-many) in loading,
-         creating and deleting of objects.
+         creating and deleting of objects. Related objects are now loaded
+         from the cache, reloaded only when necessary, locked appropriately.
 
 Misc:    New Ant and build.xml include 100% Java Tar task, improved Javadoc
          task, now also generates zips for binary and source distribution,
@@ -25,7 +36,7 @@ Misc:    New Ant and build.xml include 100% Java Tar task, improved Javadoc
 
 
 Version 0.7.8  February 10, 2000
--------------------------------
+--------------------------------
 
 XML:    If annotations are used within elements, or attributes, I add
         these to the Javadoc comments of the generated source.
@@ -50,7 +61,7 @@ XML:     Added support for "annotation" as a child for most of the structures.
 XML:     Added more support for "datatype"
 
 
-Version 0.7.7  February 2, 2000
+Version 0.7.7  February 4, 2000
 -------------------------------
 
 XML:     Changed "archetype" to "type" in accordance with the 19991217

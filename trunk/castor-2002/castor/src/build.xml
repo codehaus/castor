@@ -125,7 +125,7 @@
     <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
            includes="**.xml" excludes="style/**,project.xml"/>
     <copydir  src="${doc}/images" dest="${build}/doc/images"/>
-    <copydir  src="${doc}/style/images" dest="${build}/doc/style/images"/>
+    <copydir  src="${doc}/style" dest="${build}/doc/style" includes="images/**,*.css"/>
     <copyfile src="${doc}/license.txt" dest="${build}/doc/license.txt"/>
     <mkdir dir="${build}/doc/print" />
     <style basedir="${doc}" destdir="${build}/doc/print" style="style/print.xsl"
@@ -175,6 +175,8 @@
               dest="${bin}/CHANGELOG" />
     <copyfile src="${dist}/${archive}.jar"
               dest="${bin}/${archive}.jar" />
+    <copyfile src="${dist}/${archive}-xml.jar"
+              dest="${bin}/${archive}-xml.jar" />
     <copyfile src="${lib}/jdbc-se2.0.jar"
               dest="${bin}/jdbc-se2.0.jar" />
     <copyfile src="${lib}/jndi.jar"
