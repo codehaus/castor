@@ -49,6 +49,7 @@ package org.exolab.castor.xml;
 //-- castor imports
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.MapItem;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
@@ -266,6 +267,12 @@ public class Marshaller extends MarshalFramework {
 	private String _rootElement  = null;
 
     /**
+     * A boolean to indicate keys from a map
+     * should be saved when necessary
+     */
+    private boolean _saveMapKeys = true;
+    
+    /**
      * The serializer that is being used for marshalling.
      * This may be null if the user passed in a DocumentHandler.
     **/
@@ -293,6 +300,7 @@ public class Marshaller extends MarshalFramework {
     **/
     private boolean _validate = false;
 
+    
     /**
      * Creates a new Marshaller with the given DocumentHandler.
      *
@@ -401,6 +409,13 @@ public class Marshaller extends MarshalFramework {
         _processingInstructions = new List(3);
         _attributes      = new AttributeListImpl();
         _topLevelAtts    = new AttributeSetImpl();
+        
+        //-- saveMapKeys
+        String val = _config.getProperty(Configuration.Property.SaveMapKeys, "true");
+        if ("false".equalsIgnoreCase(val) || "off".equalsIgnoreCase(val)) {
+            _saveMapKeys = false;
+        }
+        
     } //-- initialize();
 
     /**
@@ -1466,12 +1481,29 @@ public class Marshaller extends MarshalFramework {
             }
             //-- handle all other collection types
             else if (isCollection(type)) {
-                CollectionHandler colHandler = getCollectionHandler(type);
-                Enumeration enum = colHandler.elements(obj);
-                while (enum.hasMoreElements()) {
-                    Object item = enum.nextElement();
-                    if (item != null) {
-                        marshal(item, elemDescriptor, handler);
+                boolean processCollection = true;
+                if (_saveMapKeys) {
+                    MapHandler mapHandler = MapHandlers.getHandler(type);
+                    if (mapHandler != null) {
+                        processCollection = false;
+                        MapItem item = new MapItem();
+                        Enumeration keys = mapHandler.keys(obj);
+                        while (keys.hasMoreElements()) {
+                            item.setKey(keys.nextElement());
+                            item.setValue(mapHandler.get(obj, item.getKey()));
+                            marshal(item, elemDescriptor, handler);
+                        }                        
+                    }
+                    
+                }
+                if (processCollection) {
+                    CollectionHandler colHandler = getCollectionHandler(type);
+                    Enumeration enum = colHandler.elements(obj);
+                    while (enum.hasMoreElements()) {
+                        Object item = enum.nextElement();
+                        if (item != null) {
+                            marshal(item, elemDescriptor, handler);
+                        }
                     }
                 }
             }
@@ -1638,7 +1670,7 @@ public class Marshaller extends MarshalFramework {
     private boolean declareNamespace(String nsPrefix, String nsURI)
     {
         boolean declared = false;
-
+        
         //-- make sure it's not already declared...
         if ( (nsURI != null) && (nsURI.length() != 0)) {
 
