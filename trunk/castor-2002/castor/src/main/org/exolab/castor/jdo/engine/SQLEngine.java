@@ -205,26 +205,21 @@ Will be adding this later.
     private Object generateKey( Object conn ) throws PersistenceException
     {
         Object identity;
+        JDOFieldDescriptor pkDesc;
         String primKey;
-        Class idClass;
-        Class pkClass;
 
-        primKey = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLName();
+        pkDesc = (JDOFieldDescriptor) _clsDesc.getIdentity();
+        primKey = pkDesc.getSQLName();
 
         identity = _keyGen.generateKey( (Connection) conn,
                                         _clsDesc.getTableName(), primKey, null );
         if ( identity == null ) {
             throw new PersistenceExceptionImpl( "persist.noIdentity" );
         }
-
-        idClass = identity.getClass();
-        pkClass = _clsDesc.getIdentity().getFieldType();
-        if ( !idClass.equals( pkClass ) ) {
-            // Conversion is needed
-            if ( idClass.equals( java.math.BigDecimal.class ) &&
-                    pkClass.equals( Integer.class ) ) {
-                identity = new Integer( ( (java.math.BigDecimal) identity ).intValue() );
-            }
+        // Conversion 
+        if ( identity.getClass().equals( java.math.BigDecimal.class )
+                && pkDesc.getSQLType() == Types.INTEGER ) {
+            identity = new Integer( ( (java.math.BigDecimal) identity ).intValue() );
         }
 
         return identity;

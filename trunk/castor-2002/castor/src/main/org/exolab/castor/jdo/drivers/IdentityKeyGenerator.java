@@ -102,7 +102,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
             rs = stmt.executeQuery( "SELECT @@identity" );
 
             if ( rs.next() ) {
-                return rs.getObject( 1 );
+                return rs.getBigDecimal( 1 );
             } else {
                 throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
             }
