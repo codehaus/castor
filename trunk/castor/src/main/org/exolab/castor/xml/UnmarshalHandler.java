@@ -2563,13 +2563,20 @@ public final class UnmarshalHandler extends MarshalFramework
     **/
     public static Object toPrimitiveObject(Class type, String value) {
 
-        Object primitive = null;
+        Object primitive = value;
 
-        //-- I tried to order these in the order in which
-        //-- (I think) types are used more frequently
-
+        if (value != null) {
+            //-- trim any numeric values
+            if ((type != Character.TYPE) && (type != Character.class))
+                value = value.trim();
+        }
+        
         boolean isNull = ((value == null) || (value.length() == 0));
 
+        
+        //-- I tried to order these in the order in which
+        //-- (I think) types are used more frequently
+        
         // int
         if ((type == Integer.TYPE) || (type == Integer.class)) {
             if (isNull)
@@ -2640,9 +2647,6 @@ public final class UnmarshalHandler extends MarshalFramework
                primitive = java.math.BigInteger.valueOf(0);
             else primitive = new java.math.BigInteger(value);
         }
-        // otherwise do nothing
-        else
-            primitive = value;
 
         return primitive;
     } //-- toPrimitiveObject
