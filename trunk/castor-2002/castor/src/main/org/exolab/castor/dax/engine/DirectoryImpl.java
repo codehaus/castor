@@ -66,6 +66,7 @@ import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.TransactionAbortedException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.ObjectNotFoundException;
+import org.exolab.castor.persist.ObjectNotPersistentException;
 import org.exolab.castor.persist.TransactionNotInProgressException;
 import org.exolab.castor.persist.TransactionAbortedException;
 import org.exolab.castor.persist.ClassNotPersistenceCapableException;
@@ -84,10 +85,7 @@ public class DirectoryImpl
     private LDAPConnection  _conn;
 
 
-    private LDAPUrl         _url;
-
-
-    private String          _rdn;
+    private String          _dn;
 
 
     private DirectoryEngine _dirEngine;
@@ -107,11 +105,10 @@ public class DirectoryImpl
 	throws DirectoryException
     {
 	_conn = conn;
-	_url = url;
-	_rdn = _url.getDN();
+	_dn = url.getDN();
 	_mapResolver = mapResolver;
 	try {
-	    _dirEngine = DirectoryEngine.getEngine( _url, (ObjectDesc) _mapResolver.listDescriptors().nextElement() );
+	    _dirEngine = DirectoryEngine.getEngine( url, (ObjectDesc) _mapResolver.listDescriptors().nextElement() , logWriter );
 	} catch ( MappingException except ) {
 	    throw new DirectoryException( except );
 	}
@@ -119,29 +116,13 @@ public class DirectoryImpl
     }
 
 
-    DirectoryImpl( DirectoryImpl source, String rdn )
-	throws DirectoryException
+    public String getDN()
     {
-	_conn = source._conn;
-	_rdn = rdn;
-	_url = new LDAPUrl( source._url.getHost(), source._url.getPort(),
-			    _rdn + "," + source._url.getDN() );
-	try {
-	    _dirEngine = DirectoryEngine.getEngine( _url, (ObjectDesc) source._mapResolver.listDescriptors().nextElement() );
-	} catch ( MappingException except ) {
-	    throw new DirectoryException( except );
-	}
-	_logWriter = source._logWriter;
+	return _dn;
     }
 
 
-    public String getRDN()
-    {
-	return _rdn;
-    }
-
-
-    public Search newSearch( String expr )
+    public Search createSearch( String expr )
 	throws InvalidSearchException, DirectoryException
     {
 	if ( _dirEngine == null )
@@ -229,16 +210,38 @@ public class DirectoryImpl
     public synchronized void delete( Object obj )
 	throws DirectoryException
     {
+	ObjectDesc objDesc;
+
 	if ( _dirEngine == null )
 	    throw new DirectoryException( "Directory closed" );
-    }
 
+	objDesc = _dirEngine.getObjectDesc();
+	while ( objDesc != null ) {
+	    if ( objDesc.getObjectType().isAssignableFrom( obj.getClass() ) )
+		break;
+	    objDesc = objDesc.getExtends();
+	}
+	if ( objDesc == null )
+	    throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
 
-    public synchronized void store( Object obj )
-	throws DirectoryException
-    {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
+	try {
+	    if ( _tx != null ) {
+		_tx.delete( obj );
+	    } else {
+		TransactionContext tx;
+
+		tx = new TransactionContextImpl( _conn );
+		tx.delete( obj );
+		tx.commit();
+	    }
+	} catch ( ObjectNotPersistentException except ) {
+	    throw new DuplicateRDNException( "Object not persistent" );
+	} catch ( PersistenceException except ) {
+	    if ( except.getException() != null )
+		throw new DirectoryException( except.getException() );
+	    else
+		throw new DirectoryException( except );
+	}
     }
 
 
@@ -292,18 +295,12 @@ public class DirectoryImpl
     }
 
 
-    public boolean isPersistent( Object obj )
+    public synchronized boolean isPersistent( Object obj )
     {
-	return false;
-    }
-
-
-    public Directory getDirectory( String rdn )
-	throws DirectoryException
-    {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	return new DirectoryImpl( this, rdn );
+	// If directory is closed or not inside transaction, return null.
+	if ( _dirEngine == null || _tx == null )
+	    return false;
+	return _tx.isPersistent( obj );
     }
 
 
@@ -313,7 +310,23 @@ public class DirectoryImpl
 	if ( _dirEngine == null )
 	    throw new DirectoryException( "Directory closed" );
 	_dirEngine = null;
-	_conn = null;
+	try {
+	    _conn.disconnect();
+	} catch ( LDAPException except ) {
+	    throw new DirectoryException( except );
+	} finally {
+	    _conn = null;
+	}
+    }
+
+
+    public void finalizer()
+    {
+	try {
+	    if ( _conn != null )
+		_conn.disconnect();
+	} catch ( LDAPException except ) {
+	}
     }
 
 
