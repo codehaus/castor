@@ -213,6 +213,27 @@ public class Mapping
      * subsequent method calls.
      *
      * @param engine The mapping engine
+     * @return A mapping resolver
+     * @throws MappingException A mapping error occured preventing
+     *  descriptors from being generated from the loaded mapping
+     * @see #JDO
+     * @see #XML
+     * @see #DAX
+     */
+    public MappingResolver getResolver( EngineMapping engine )
+        throws MappingException
+    {
+        return getResolver( engine, null );
+    }
+
+    /**
+     * Returns a mapping resolver for the suitable engine. The engine's
+     * specific mapping loader is created and used to create engine
+     * specific descriptors, returning a suitable mapping resolver.
+     * The mapping resolver is cached in memory and returned in
+     * subsequent method calls.
+     *
+     * @param engine The mapping engine
      * @param param Arbitrary parameter that is to be passed to resolver.loadMapping()
      * @return A mapping resolver
      * @throws MappingException A mapping error occured preventing
