@@ -88,6 +88,9 @@ public class JDOCategory extends TestHarness {
         return _jdo.getDatabase();
     }
 
+    public JDO getJDO() {
+        return _jdo;
+    }
 
     public Connection getJDBCConnection()
         throws SQLException
