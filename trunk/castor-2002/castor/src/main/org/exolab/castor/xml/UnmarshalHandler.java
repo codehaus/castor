@@ -1030,22 +1030,37 @@ public final class UnmarshalHandler extends MarshalFramework
                     XMLClassDescriptor instanceDesc
                         = getClassDescriptor(instanceType, _loader);
 
+                    boolean loadClass = true;
+                    
                     if (instanceDesc != null) {
                         instanceClass = instanceDesc.getJavaClass();
                         classDesc = instanceDesc;
+                        if (instanceClass != null) {
+                            loadClass = (!instanceClass.getName().equals(instanceType));
+                        }
                     }
-                    else
+                    
+                    if (loadClass) {
                         instanceClass = loadClass(instanceType, null);
                         //the FieldHandler can be either an XMLFieldHandler
                         //or a FieldHandlerImpl
                         FieldHandler tempHandler = descriptor.getHandler();
-                        boolean collection = (tempHandler instanceof FieldHandlerImpl)?
-                                             ((FieldHandlerImpl)tempHandler).isCollection():false;
+                        
+                        boolean collection = false;
+                        if (tempHandler instanceof FieldHandlerImpl) {
+                            collection = ((FieldHandlerImpl)tempHandler).isCollection();
+                        }
+                        else {
+                            collection = Introspector.isCollection(instanceClass);
+                        }                                           
+                               
                         if ( (! collection ) &&
-                         ! _class.isAssignableFrom(instanceClass)) {
-                        String err = instanceClass
-                            + " is not a subclass of " + _class;
-                        throw new SAXException(err);
+                         ! _class.isAssignableFrom(instanceClass)) 
+                        {
+                            String err = instanceClass
+                                + " is not a subclass of " + _class;
+                            throw new SAXException(err);
+                        }
                     }
                     _class = instanceClass;
                     useHandler = false;
