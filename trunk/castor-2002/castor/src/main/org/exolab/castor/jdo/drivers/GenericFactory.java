@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.sql.SQLException;
+import java.util.StringTokenizer;
 import org.exolab.castor.jdo.engine.BaseFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
@@ -98,15 +99,32 @@ public class GenericFactory
     }
 
 
-    protected final String doubleQuoteName( String name )
-    {
-        int index;
+ 	/**
+ 	 * Updated to handle input such as user.tablename.column
+ 	 *
+	 * @author Andrew Ballanger
+	 * @date 3/15/2001
+	 */
+	protected final String doubleQuoteName(String name)
+	{
+		StringBuffer buffer = new StringBuffer();
+		StringTokenizer tokens = new StringTokenizer(name, ".");
 
-        index = name.indexOf( '.' );
-        if ( index > 0 )
-            return "\"" + name.substring( 0, index ) + "\".\"" + name.substring( index + 1 ) + "\"";
-        return '"' + name + '"';
-    }
+		// Note:
+		//
+		// I am assuming this method always recieves a non null,
+		// and non empty string.
+
+		buffer.append('\"');
+		buffer.append(tokens.nextToken());
+		while(tokens.hasMoreTokens()) {
+			buffer.append("\".\"");
+			buffer.append(tokens.nextToken());
+		}
+		buffer.append('\"');
+
+		return buffer.toString();
+	}
 
 
 }
