@@ -93,25 +93,21 @@ public class WebSphere5TransactionManagerFactory
             method = webSphereTxMgr.getMethod( "instance", null );
             _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, null );
         }
-        catch( ClassNotFoundException cnfe )
-        {
+        catch( ClassNotFoundException cnfe ) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage() ) );
+                "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage()), cnfe);
         }
-        catch( IllegalAccessException iae )
-        {
+        catch( IllegalAccessException iae ) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage() ) );
+                "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage()), iae );
         }
-        catch( InvocationTargetException ite )
-        {
+        catch( InvocationTargetException ite ) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", ite.getMessage() ) );
+                "jdo.transaction.unableToAcquireTransactionManager", ite.getMessage()), ite );
         }
-        catch( NoSuchMethodException nsme )
-        {
+        catch( NoSuchMethodException nsme ) {
             throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", nsme.getMessage() ) );
+                "jdo.transaction.unableToAcquireTransactionManager", nsme.getMessage()), nsme );
         }
 
         return _transactionManager;
