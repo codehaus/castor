@@ -81,6 +81,7 @@ public class SchemaNames {
     public static final String NAME_ATTR        = "name";
     public static final String ORDER_ATTR       = "order";
     public static final String SOURCE_ATTR      = "source";
+    public static final String TARGET_NS_ATTR   = "targetNamespace";
     public static final String TYPE_ATTR        = "type";
     public static final String VALUE_ATTR       = "value";
     
