@@ -481,7 +481,9 @@ public class SourceGenerator {
             XMLType baseType= complexType.getBaseType();
             if (baseType != null &&
 				baseType.getSchema() == complexType.getSchema()) {
-                processComplexType((ComplexType)baseType, sInfo); //This is wrong: a complex type can extend a simple type.
+				    
+				if (baseType.isComplexType())
+                    processComplexType((ComplexType)baseType, sInfo);
             }
 
             //-- process AttributeDecl
