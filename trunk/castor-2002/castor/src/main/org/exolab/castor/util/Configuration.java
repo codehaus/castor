@@ -65,6 +65,9 @@ import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.xml.XMLNaming;
+import org.exolab.castor.xml.util.DefaultNaming;
+
 
 
 /**
@@ -129,6 +132,17 @@ public abstract class Configuration
          */
         public static final String Namespaces = "org.exolab.castor.parser.namespaces";
 
+        /**
+         * Property specifying the implementation of the naming conventions
+         * to use. Values of this property must be either "mixed", "lower", or
+         * the name of a class which extends org.exolab.castor.xml.XMLNaming.
+         * <pre>
+         * org.exolab.castor.xml.naming
+         * </pre>
+         *
+         */
+        public static final String Naming = "org.exolab.castor.xml.naming";
+        
         /**
          * Property specifying whether to use validation in the Marshalling Framework
          * <pre>
@@ -217,6 +231,12 @@ public abstract class Configuration
      private static boolean  _MarshallingValidation = true;
 
     /**
+     * The naming conventions for the XML Framework
+    **/
+    private static XMLNaming _naming = null;
+    
+    
+    /**
      * Returns true if the default configuration specified debugging.
      */
     public static boolean debug()
@@ -265,6 +285,36 @@ public abstract class Configuration
     }
 
 
+    /**
+     * Returns the naming conventions to use for the XML framework
+     * @return the naming conventions to use for the XML framework     
+    **/
+    public static XMLNaming getXMLNaming() {
+        
+        if (_naming != null) return _naming;
+        
+        String prop = getProperty( Property.Naming, null);
+        if ((prop == null) || (prop.equalsIgnoreCase("lower"))) {
+            _naming = new DefaultNaming();
+        }
+        else if (prop.equalsIgnoreCase("mixed")) {
+            DefaultNaming dn = new DefaultNaming();
+            dn.setStyle(DefaultNaming.MIXED_CASE_STYLE);
+            _naming = dn;
+        }
+        else {
+            try {
+                Class cls = Class.forName(prop);
+                _naming = (XMLNaming) cls.newInstance();
+            }
+            catch (Exception except) {
+                throw new RuntimeException("Failed to load XMLNaming: " + 
+                    except);
+            }
+        }
+        return _naming;
+    } //-- getNaming
+    
     /**
      * Return an XML document parser implementing the feature list
      * specified in the configuration file.
