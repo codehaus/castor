@@ -15,27 +15,18 @@ public class Test
     public static void main( String[] args )
     {
 	try {
+	    DirectorySourceImpl dirs;
+	    Directory           dir;
 
 	    DirectorySourceImpl.loadMapping( new InputSource( Test.class.getResource( "mapping.xml" ).toString() ) );
 
-	    DirectorySourceImpl dirs;
-	    Directory           dir;
-	    User                user;
-	    Record              rec;
-
-	    dirs = new DirectorySourceImpl();
-	    dirs.setURL( "ldap://localhost/dc=exoffice,dc=com" );
-	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
-	    dir.begin();
-	    rec = (Record) dir.read( new RDN( "people", "kvisco" ) );
-	    System.out.println( rec );
-	    dir.commit();
-
-	    /*
 	    dirs = new DirectorySourceImpl();
 	    dirs.setURL( "ldap://localhost/ou=people,dc=exoffice,dc=com" );
 	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
 	    dir.begin();
+
+	    User                user;
+
 	    user = (User) dir.read( "kvisco" );
 	    if ( user == null || user != null ) {
 		user = new User();
@@ -51,7 +42,20 @@ public class Test
 		dir.delete( user );
 	    }
 	    dir.commit();
+
+
+	    /*
+	    Record              rec;
+
+	    dirs = new DirectorySourceImpl();
+	    dirs.setURL( "ldap://localhost/dc=exoffice,dc=com" );
+	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
+	    dir.begin();
+	    rec = (Record) dir.read( new RDN( "people", "kvisco" ) );
+	    System.out.println( rec );
+	    dir.commit();
 	    */
+
 
 	} catch ( Exception except ) {
 	    System.out.println( except );
