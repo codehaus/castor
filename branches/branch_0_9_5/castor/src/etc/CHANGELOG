@@ -2,10 +2,15 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug with FieldHandlerFactory support in introspector by
+       making sure the the type specified by the FieldHandler 
+       replaces that of the introspection. This allows primitives
+       to be correctly handled by the custom FieldHandler.
+       (kvisco - 20040720)
+
 XML:   Fixed java.util.Set support in the introspector.
        (kvisco - 20040713)
        
-
 XML:   Fixed a cyclic include bug with the IncludeUnmarshaller, added
        some code to make sure the main schema couldn't include itself.
        (kvisco - 20040624)
