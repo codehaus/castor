@@ -64,9 +64,9 @@ import org.xml.sax.EntityResolver;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
-import org.exolab.castor.jdo.conf.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
@@ -205,58 +205,13 @@ public class DatabaseRegistry
     }
 
 
-    static synchronized DatabaseRegistry registerDatabase( String name, String engine, PrintWriter logWriter )
-        throws MappingException
-    {
-        DatabaseRegistry   dbs;
-        PersistenceFactory factory;
-
-        if ( _defaultMapping == null ) {
-            JDOMappingLoader mapping;
-
-            try {
-                mapping = new JDOMappingLoader( null );
-                mapping.loadMapping( new InputSource( DatabaseRegistry.class.getClassLoader().getResourceAsStream( DefaultMapping ) ) );
-                _defaultMapping = mapping;
-            } catch ( IOException except ) {
-                throw new MappingException( except );
-            }
-        }
-        factory = PersistenceFactoryRegistry.getPersistenceFactory( engine );
-        if ( factory == null )
-            throw new MappingException( "jdo.noSuchEngine", engine );
-
-        if ( name.startsWith( "jdbc:" ) ) {
-            dbs = new DatabaseRegistry( name, _defaultMapping, factory,
-                                        name, null, logWriter );
-        } else if ( name.startsWith( "java:" ) ) {
-            Object obj;
-
-            try {
-                obj = new InitialContext().lookup( name );
-            } catch ( NameNotFoundException except ) {
-                throw new MappingException( "jdo.jndiNameNotFound", name );
-            } catch ( NamingException except ) {
-                throw new MappingException( except );
-            }
-            if ( obj instanceof DataSource )
-                dbs = new DatabaseRegistry( name, _defaultMapping, factory,
-                                            (DataSource) obj, logWriter );
-            else
-                throw new MappingException( "jdo.jndiNameNotFound", name );
-            _databases.put( name, dbs );
-        }
-        return null;
-    }
-
-
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver,
                                                   PrintWriter logWriter, ClassLoader loader )
         throws MappingException
     {
         Unmarshaller       unm;
-        JDOMappingLoader   mapping;
-        Mapping[]          mappings;
+        Mapping            mapping;
+        Enumeration        mappings;
         Database           database;
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
@@ -288,17 +243,16 @@ public class DatabaseRegistry
             // Load the mapping file from the URL specified in the database
             // configuration file, relative to the configuration file.
             // Fail if cannot load the mapping for whatever reason.
-            mapping = new JDOMappingLoader( loader );
+            mapping = new Mapping( loader );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
             if ( logWriter != null )
                 mapping.setLogWriter( logWriter );
             if ( source.getSystemId() != null )
                 mapping.setBaseURL( source.getSystemId() );
-            mappings = database.getMapping();
-            for ( int i = 0 ; i < mappings.length ; ++i ) {
-                mapping.loadMapping( mappings[ i ].getHref() );
-            }
+            mappings = database.enumerateMapping();
+            while ( mappings.hasMoreElements() )
+                mapping.loadMapping( ( (org.exolab.castor.jdo.conf.Mapping) mappings.nextElement() ).getHref() );
 
             if ( database.getDriver() != null ) {
                 // JDO configuration file specifies a driver, use the driver
@@ -323,7 +277,7 @@ public class DatabaseRegistry
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );
                 }
-                dbs = new DatabaseRegistry( database.getName(), mapping, factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getJDOMapping(), factory,
                                             database.getDriver().getUrl(), props, logWriter );
             } else if ( database.getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
@@ -334,7 +288,7 @@ public class DatabaseRegistry
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
-                dbs = new DatabaseRegistry( database.getName(), mapping, factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getJDOMapping(), factory,
                                             ds, logWriter );
             } else if ( database.getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
@@ -351,7 +305,7 @@ public class DatabaseRegistry
                 if ( ! ( ds instanceof DataSource ) )
                     throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
 
-                dbs = new DatabaseRegistry( database.getName(), mapping, factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getJDOMapping(), factory,
                                             (DataSource) ds, logWriter );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
