@@ -67,8 +67,7 @@ import java.net.MalformedURLException;
  * This class is responsible for loading a binding document into an in-memory
  * representation that is meant to be used by the SourceGenerator.
  *
- * @todo:  ADD LOGIC VALIDATION AND JAVADOC -- NOT READY TO BE RELEASED
- * @todo:   ADD A WAY TO PASS IN THE CLASS LOADER
+ * @todo:  Implement the enumeration handling
  *
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
@@ -85,7 +84,7 @@ public class BindingLoader {
     /**
      * The binding resolver used for resolving entities
      */
-    private BindingResolver _resolver;
+    private BindingResolver _resolver = new BindingResolver();
 
 
     public BindingLoader() {
@@ -184,7 +183,7 @@ public class BindingLoader {
             }*/
 
             //--included schemas
-            Enumeration includes = _binding.enumerateInclude();
+            Enumeration includes = loaded.enumerateInclude();
             while ( includes.hasMoreElements() ) {
                 IncludeType tempInclude = (IncludeType)includes.nextElement();
                 try {

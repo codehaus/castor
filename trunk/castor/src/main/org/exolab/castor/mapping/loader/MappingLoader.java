@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -666,8 +666,14 @@ public abstract class MappingLoader
             
             //-- Fix for Castor JDO from Steve Vaughan, Castor JDO
             //-- requires FieldHandlerImpl or a ClassCastException
-            //-- will be thrown...
+            //-- will be thrown... [KV 20030131 - also make sure this new handler 
+            //-- doesn't use it's own CollectionHandler otherwise
+            //-- it'll cause unwanted calls to the getValue method during
+            //-- unmarshalling]
+            colHandler = typeInfo.getCollectionHandler();
+            typeInfo.setCollectionHandler(null);
             handler = new FieldHandlerImpl(handler, typeInfo);
+            typeInfo.setCollectionHandler(colHandler);
             //-- End Castor JDO fix
             
         } 
@@ -985,8 +991,8 @@ public abstract class MappingLoader
     protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
     {
-        return new TypeInfo( Types.typeFromPrimitive( fieldType ), null, null,
-                             fieldMap.getRequired(), null, colHandler );
+        return new TypeInfo( Types.typeFromPrimitive( fieldType ), null, null, null,
+                             fieldMap.getRequired(), null, colHandler, false );
     } //-- getTypeInfo
 
 

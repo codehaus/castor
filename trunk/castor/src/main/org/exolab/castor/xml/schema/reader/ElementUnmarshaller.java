@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -62,8 +62,9 @@ import org.exolab.castor.xml.schema.XMLType;
 /**
  * A class for Unmarshalling element definitions
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ *
  * @version $Revision$ $Date$
-**/
+ */
 public class ElementUnmarshaller extends ComponentReader {
 
     /**
@@ -99,6 +100,7 @@ public class ElementUnmarshaller extends ComponentReader {
     private boolean foundIdentityConstraint = false;
     private boolean foundSimpleType         = false;
     private boolean foundComplexType        = false;
+    private boolean foundTypeReference      = false;
 
       //----------------/
      //- Constructors -/
@@ -112,6 +114,7 @@ public class ElementUnmarshaller extends ComponentReader {
     **/
     public ElementUnmarshaller
         (Schema schema, AttributeSet atts, Resolver resolver)
+        throws XMLException
     {
         super();
         setResolver(resolver);
@@ -126,10 +129,17 @@ public class ElementUnmarshaller extends ComponentReader {
         attValue = atts.getValue(SchemaNames.REF_ATTR);
         if (attValue != null) {
             _element.setReference(attValue);
+            //-- report error if name attr exists also
+            if (atts.getValue(SchemaNames.NAME_ATTR) != null) {
+                error("The attributes 'ref' and 'name' appearing on " +
+                    "element declarations are mutually exclusive.");
+            }
+            validateRefAtts(atts);
         }
-
         //-- @name
-        _element.setName(atts.getValue(SchemaNames.NAME_ATTR));
+        else {
+            _element.setName(atts.getValue(SchemaNames.NAME_ATTR));
+        }
 
         //-- @abstract
         attValue = atts.getValue(SchemaNames.ABSTRACT);
@@ -144,7 +154,7 @@ public class ElementUnmarshaller extends ComponentReader {
         attValue = atts.getValue(SchemaNames.DEFAULT_ATTR);
         if (attValue != null) {
             if (_element.getFixedValue() != null)
-                throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
+                error("'default' and 'fixed' must not both be present.");
             _element.setDefaultValue(attValue);
         }
 
@@ -174,7 +184,11 @@ public class ElementUnmarshaller extends ComponentReader {
         
         //-- @type
         attValue = atts.getValue(SchemaNames.TYPE_ATTR);
-        if (attValue != null) _element.setTypeReference(attValue);
+        if (attValue != null) {
+            foundTypeReference = true;
+            _element.setTypeReference(attValue);
+        }
+        
 
         //-- @nillable
         attValue = atts.getValue(SchemaNames.NILLABLE_ATTR);
@@ -294,6 +308,10 @@ public class ElementUnmarshaller extends ComponentReader {
             if (foundSimpleType)
                 error("Both 'simpleType' and 'complexType' cannot appear "+
                     "in the same element definition.");
+            if (foundTypeReference)
+                error("Both 'type' attribute and 'complexType' element "+
+                    "cannot appear in the same element definition.");
+                
 
             if (foundIdentityConstraint)
                 error("A 'complexType' must appear before 'key', "+
@@ -311,6 +329,9 @@ public class ElementUnmarshaller extends ComponentReader {
             if (foundComplexType)
                 error("Both 'simpleType' and 'complexType' cannot appear "+
                     "in the same element definition.");
+            if (foundTypeReference)
+                error("Both 'type' attribute and 'simpleType' element "+
+                    "cannot appear in the same element definition.");
 
             if (foundIdentityConstraint)
                 error("A 'simpleType' must appear before 'key', "+
@@ -401,5 +422,59 @@ public class ElementUnmarshaller extends ComponentReader {
             unmarshaller.characters(ch, start, length);
         }
     } //-- characters
+
+    /**
+     * Makes sure only minOccurs, maxOccurs, id, and ref occur
+     * for element references.
+     *
+     * @param atts the AttributeSet to process
+     */
+    private static void validateRefAtts(AttributeSet atts) 
+        throws XMLException
+    {
+        
+        StringBuffer errors = null;
+        
+        for (int i = 0; i < atts.getSize(); i++) {
+            String name = atts.getName(i);
+            if (SchemaNames.REF_ATTR.equals(name)) 
+                continue;
+            else if (SchemaNames.MAX_OCCURS_ATTR.equals(name)) 
+                continue;
+            else if (SchemaNames.MIN_OCCURS_ATTR.equals(name)) 
+                continue;
+            else if (SchemaNames.ID_ATTR.equals(name)) 
+                continue;
+            else {
+                //-- check namespace
+                String namespace = atts.getNamespace(i);
+                
+                //-- If we have no namespace (ie no prefix) or we
+                //-- have the XSD Namespace then throw error
+                if ((namespace == null) || 
+                    (namespace.length() == 0) ||
+                     namespace.equals(SchemaUnmarshaller.XSD_NAMESPACE))
+                {
+                    //-- unprefixed attribute...assume XML Schema namespace
+                    String error = "The attribute '" + name + 
+                        "' must not appear on an element reference.";
+                    if (errors == null)
+                        errors = new StringBuffer(error);
+                    else
+                        errors.append(error);
+                        
+                    errors.append(System.getProperty("line.separator"));
+                    
+                    
+                }
+                //-- otherwise we have a namespaced attribute from a different
+                //-- namespace..this is valid...continue
+            }
+        }
+        
+        if (errors != null)
+            throw new XMLException(errors.toString());
+            
+    } //-- validateRefAtts
 
 } //-- ElementUnmarshaller

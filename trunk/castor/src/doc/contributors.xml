@@ -207,6 +207,11 @@
     <description>Contributed MySQL driver.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Bygrave" given="Graham"/>
+    <email>Graham.Bygrave@BarclaysGlobal.com</email>
+    <description>Offered a fix an unprotected call on a potentially null object in <tt>OQLQueryImpl#bind()</tt></description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Child" given="Terry"/>

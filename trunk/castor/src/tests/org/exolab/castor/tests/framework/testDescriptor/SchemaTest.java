@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -17,16 +17,17 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Vector;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.ContentHandler;
 
 /**
- * 
+ * Class SchemaTest.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class SchemaTest implements java.io.Serializable {
 
 
@@ -34,6 +35,9 @@ public class SchemaTest implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _unitTestCaseList
+     */
     private java.util.Vector _unitTestCaseList;
 
 
@@ -52,41 +56,42 @@ public class SchemaTest implements java.io.Serializable {
     //-----------/
 
     /**
-     * 
+     * Method addUnitTestCase
      * 
      * @param vUnitTestCase
-    **/
-    public void addUnitTestCase(UnitTestCase vUnitTestCase)
+     */
+    public void addUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase vUnitTestCase)
         throws java.lang.IndexOutOfBoundsException
     {
         _unitTestCaseList.addElement(vUnitTestCase);
-    } //-- void addUnitTestCase(UnitTestCase) 
+    } //-- void addUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-     * 
+     * Method addUnitTestCase
      * 
      * @param index
      * @param vUnitTestCase
-    **/
-    public void addUnitTestCase(int index, UnitTestCase vUnitTestCase)
+     */
+    public void addUnitTestCase(int index, org.exolab.castor.tests.framework.testDescriptor.UnitTestCase vUnitTestCase)
         throws java.lang.IndexOutOfBoundsException
     {
         _unitTestCaseList.insertElementAt(vUnitTestCase, index);
-    } //-- void addUnitTestCase(int, UnitTestCase) 
+    } //-- void addUnitTestCase(int, org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-    **/
+     * Method enumerateUnitTestCase
+     */
     public java.util.Enumeration enumerateUnitTestCase()
     {
         return _unitTestCaseList.elements();
     } //-- java.util.Enumeration enumerateUnitTestCase() 
 
     /**
-     * 
+     * Method getUnitTestCase
      * 
      * @param index
-    **/
-    public UnitTestCase getUnitTestCase(int index)
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.UnitTestCase getUnitTestCase(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -94,30 +99,33 @@ public class SchemaTest implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (UnitTestCase) _unitTestCaseList.elementAt(index);
-    } //-- UnitTestCase getUnitTestCase(int) 
+        return (org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) _unitTestCaseList.elementAt(index);
+    } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCase getUnitTestCase(int) 
 
     /**
-    **/
-    public UnitTestCase[] getUnitTestCase()
+     * Method getUnitTestCase
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.UnitTestCase[] getUnitTestCase()
     {
         int size = _unitTestCaseList.size();
-        UnitTestCase[] mArray = new UnitTestCase[size];
+        org.exolab.castor.tests.framework.testDescriptor.UnitTestCase[] mArray = new org.exolab.castor.tests.framework.testDescriptor.UnitTestCase[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (UnitTestCase) _unitTestCaseList.elementAt(index);
+            mArray[index] = (org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) _unitTestCaseList.elementAt(index);
         }
         return mArray;
-    } //-- UnitTestCase[] getUnitTestCase() 
+    } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCase[] getUnitTestCase() 
 
     /**
-    **/
+     * Method getUnitTestCaseCount
+     */
     public int getUnitTestCaseCount()
     {
         return _unitTestCaseList.size();
     } //-- int getUnitTestCaseCount() 
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -130,10 +138,10 @@ public class SchemaTest implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -142,10 +150,10 @@ public class SchemaTest implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param handler
-    **/
+     */
     public void marshal(org.xml.sax.ContentHandler handler)
         throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -154,31 +162,32 @@ public class SchemaTest implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-    **/
+     * Method removeAllUnitTestCase
+     */
     public void removeAllUnitTestCase()
     {
         _unitTestCaseList.removeAllElements();
     } //-- void removeAllUnitTestCase() 
 
     /**
-     * 
+     * Method removeUnitTestCase
      * 
      * @param index
-    **/
-    public UnitTestCase removeUnitTestCase(int index)
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.UnitTestCase removeUnitTestCase(int index)
     {
         java.lang.Object obj = _unitTestCaseList.elementAt(index);
         _unitTestCaseList.removeElementAt(index);
-        return (UnitTestCase) obj;
-    } //-- UnitTestCase removeUnitTestCase(int) 
+        return (org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) obj;
+    } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCase removeUnitTestCase(int) 
 
     /**
-     * 
+     * Method setUnitTestCase
      * 
      * @param index
      * @param vUnitTestCase
-    **/
-    public void setUnitTestCase(int index, UnitTestCase vUnitTestCase)
+     */
+    public void setUnitTestCase(int index, org.exolab.castor.tests.framework.testDescriptor.UnitTestCase vUnitTestCase)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -186,27 +195,27 @@ public class SchemaTest implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _unitTestCaseList.setElementAt(vUnitTestCase, index);
-    } //-- void setUnitTestCase(int, UnitTestCase) 
+    } //-- void setUnitTestCase(int, org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-     * 
+     * Method setUnitTestCase
      * 
      * @param unitTestCaseArray
-    **/
-    public void setUnitTestCase(UnitTestCase[] unitTestCaseArray)
+     */
+    public void setUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase[] unitTestCaseArray)
     {
         //-- copy array
         _unitTestCaseList.removeAllElements();
         for (int i = 0; i < unitTestCaseArray.length; i++) {
             _unitTestCaseList.addElement(unitTestCaseArray[i]);
         }
-    } //-- void setUnitTestCase(UnitTestCase) 
+    } //-- void setUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-     * 
+     * Method unmarshal
      * 
      * @param reader
-    **/
+     */
     public static org.exolab.castor.tests.framework.testDescriptor.SchemaTest unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -214,7 +223,8 @@ public class SchemaTest implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.SchemaTest unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {

@@ -68,7 +68,7 @@ public class Complex {
         _all = null;
         _hashCode = _first.hashCode();
     }
-    
+
     public Complex( int length, Object[] o ) {
         _size = length;
         if ( length == 1 ) {
@@ -78,7 +78,7 @@ public class Complex {
             _hashCode = _first==null?0:_first.hashCode();
         } else if ( length == 2 ) {
             _first = o[0];
-            _second = o[1]; 
+            _second = o[1];
             _all = null;
             _hashCode = _first==null?0:_first.hashCode();
             _hashCode += _second==null?0:_second.hashCode();
@@ -106,7 +106,7 @@ public class Complex {
 
     public Complex( Object[] o ) {
         // try to avoid creation of another object
-        if ( o == null || o.length == 0 ) 
+        if ( o == null || o.length == 0 )
             throw new NullPointerException();
 
         if ( o.length == 1  ) {
@@ -137,7 +137,7 @@ public class Complex {
 
     public Complex( Complex complex ) {
         // try to avoid creation of another object
-        if ( complex == null || complex.size() == 0 ) 
+        if ( complex == null || complex.size() == 0 )
             throw new NullPointerException();
 
         int dim = complex.size();
@@ -175,16 +175,19 @@ public class Complex {
         if ( !(other instanceof Complex) ) {
             return false;
         }
-        
+
         Complex comp = (Complex) other;
         if ( comp.size() != _size ) {
             return false;
         }
 
-        for ( int i=0; i < _size; i++ ) 
-            if ( !get(i).equals( comp.get(i) ) ) {
-                return false;
-            }
+        for ( int i=0; i < _size; i++ ) {
+          if (get(i) == null) {
+            if (comp.get(i) != null) { return false; }
+          } else if (!get(i).equals(comp.get(i))) {
+            return false;
+          }
+        }
         return true;
     }
 
@@ -193,7 +196,7 @@ public class Complex {
     }
 
     public boolean hasSomePartsNull() {
-        
+
         for ( int i=0; i < _size; i++ ) {
             if ( get(i) == null )
                 return true;
@@ -204,13 +207,13 @@ public class Complex {
         return _hashCode;
     }
     public Object get( int i ) {
-        
+
         if ( i >= _size && i < 0 )
             throw new ArrayIndexOutOfBoundsException();
         if ( _size <= 2 )
             if ( i == 0 )
                 return _first;
-            else 
+            else
                 return _second;
         else
             return _all[i];

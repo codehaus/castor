@@ -45,8 +45,9 @@
 
 package org.exolab.castor.builder;
 
-import org.exolab.castor.builder.binding.XMLBindingComponent;
 import org.exolab.castor.builder.binding.BindingException;
+import org.exolab.castor.builder.binding.ExtendedBinding;
+import org.exolab.castor.builder.binding.XMLBindingComponent;
 
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.builder.util.*;
@@ -86,9 +87,9 @@ public class SourceFactory  {
     private FieldInfoFactory infoFactory = null;
 
     /**
-     * The current XMLBindingComponent for which we are creating classes
+     * The current Binding for which we are creating classes
      */
-    private XMLBindingComponent _bindingComponent = null;
+    private ExtendedBinding _binding = null;
 
 
     /**
@@ -194,9 +195,10 @@ public class SourceFactory  {
             throw new IllegalStateException("SGStateInfo may not be null.");
         }
         
-        _bindingComponent = component;
+        _binding = component.getBinding();
+        
         if (sgState.verbose()) {
-             String name = _bindingComponent.getXMLName();
+             String name = component.getXMLName();
              if (name == null)
                  name = component.getJavaClassName();
              String msg = "Creating classes for: "+name;
@@ -207,22 +209,22 @@ public class SourceFactory  {
         JClass[] classes = null;
 
         //0-- set the packageName
-        String packageName = _bindingComponent.getJavaPackage();
-        if ((packageName != null) && (packageName.length() > 0))
-            sgState.packageName = packageName;
+        String packageName = component.getJavaPackage();
+        if ((packageName == null) || (packageName.length() == 0))
+            packageName = sgState.packageName;
         
         //1-- get the name
-        String className = _bindingComponent.getQualifiedName();
+        String className = component.getQualifiedName();
         //--if no package used then try to append the default package
         //--used in the SourceGenerator
         if (className.indexOf('.') == -1) {
             //--be sure it is a valid className
             className = JavaNaming.toJavaClassName(className);
-            className = resolveClassName(className, sgState.packageName);
+            className = resolveClassName(className, packageName);
         }
 
         //2-- check if we have to create an Item class
-        boolean createGroupItem = _bindingComponent.createGroupItem();
+        boolean createGroupItem = component.createGroupItem();
         if (createGroupItem) {
             className += ITEM_NAME;
             classes = new JClass[2];
@@ -232,7 +234,7 @@ public class SourceFactory  {
 
         //3-- Create factoryState and chains it to sgState
         //-- to prevent endless loop
-        state = new FactoryState(className, sgState);
+        state = new FactoryState(className, sgState, packageName);
         state.setCreateGroupItem(createGroupItem);
         if (sgState.getCurrentFactoryState() == null)
            sgState.setCurrentFactoryState(state);
@@ -260,13 +262,13 @@ public class SourceFactory  {
         initialize(jClass);
 
         //-- name information
-        classInfo.setNodeName(_bindingComponent.getXMLName());
+        classInfo.setNodeName(component.getXMLName());
 
         //-- namespace information
-        classInfo.setNamespaceURI(_bindingComponent.getTargetNamespace());
+        classInfo.setNamespaceURI(component.getTargetNamespace());
 
         //5--processing the type
-        XMLType type = _bindingComponent.getXMLType();
+        XMLType type = component.getXMLType();
         boolean createForGroup = false;
         boolean creatingForAnElement = false;
         if (type != null) {
@@ -280,9 +282,10 @@ public class SourceFactory  {
 
                 if (complexType.isTopLevel() && creatingForAnElement) {
                      //--move the view and keep the structure
-                     Annotated saved = _bindingComponent.getAnnotated();
-                     String previousPackage = _bindingComponent.getJavaPackage();
-                     XMLBindingComponent baseComponent = _bindingComponent;
+                     Annotated saved = component.getAnnotated();
+                     String previousPackage = component.getJavaPackage();
+                     XMLBindingComponent baseComponent = new XMLBindingComponent();
+                     baseComponent.setBinding(component.getBinding());
                      baseComponent.setView(complexType);
                      String baseClassName = null;
                      String basePackage = baseComponent.getJavaPackage();
@@ -319,9 +322,9 @@ public class SourceFactory  {
                             }
                         }
                     }
-                    Annotated saved = _bindingComponent.getAnnotated();
+                    Annotated saved = component.getAnnotated();
                     processComplexType(complexType, state);
-                    _bindingComponent.setView(saved);
+                    component.setView(saved);
                     saved = null;
                 }
             }
@@ -333,8 +336,13 @@ public class SourceFactory  {
                 if (simpleType.hasFacet(Facet.ENUMERATION)) {
 				    //-- Don't create source code for simple types that
 				    //-- don't belong in the elements target namespace
-				    String targetNamespace = simpleType.getSchema().getTargetNamespace();
-                    if (targetNamespace.equals(_bindingComponent.getTargetNamespace())) {
+				    String tns = simpleType.getSchema().getTargetNamespace();
+				    boolean create = false;
+				    if (tns == null)
+				        create = (component.getTargetNamespace() == null);
+				    else
+                        create = tns.equals(component.getTargetNamespace());
+                    if (create) {
 					    JClass tmpClass = createSourceCode(simpleType, sgState);
 					    classInfo.setSchemaType(new XSClass(tmpClass));
 				    }
@@ -358,9 +366,9 @@ public class SourceFactory  {
             //--MODEL GROUP OR GROUP
             try{
                 createForGroup = true;
-                Group group = (Group)_bindingComponent.getAnnotated();
+                Group group = (Group)component.getAnnotated();
                 processContentModel(group, state);
-                _bindingComponent.setView(group);
+                component.setView(group);
                 //-- Check Group Type
                 Order order = group.getOrder();
                 if (order == Order.choice)
@@ -378,7 +386,7 @@ public class SourceFactory  {
         //6--createGroupItem
         if (createGroupItem) {
 		    //-- create Bound Properties code
-		    if (_bindingComponent.hasBoundProperties())
+		    if (component.hasBoundProperties())
 		        createPropertyChangeMethods(jClass);
 
             sgState.bindReference(jClass, classInfo);
@@ -386,7 +394,7 @@ public class SourceFactory  {
             classes[1] = jClass;
 
             //-- create main group class
-            String fname = _bindingComponent.getJavaClassName() + ITEM_NAME;
+            String fname = component.getJavaClassName() + ITEM_NAME;
             fname  = JavaNaming.toJavaMemberName(fname, false);
 
             FieldInfo fInfo = null;
@@ -400,25 +408,26 @@ public class SourceFactory  {
             }
             fInfo.setContainer(true);
             className = className.substring(0,className.length()-4);
-            state     = new FactoryState(className, sgState);
+            state     = new FactoryState(className, sgState, packageName);
 		    classInfo = state.classInfo;
             jClass    = state.jClass;
 		    initialize(jClass);
             if (type != null && type.isComplexType()) {
+                
                 ComplexType complexType = (ComplexType)type;
                 if (complexType.isTopLevel() ^ creatingForAnElement) {
                     //process attributes and content type
                     //since it has not be performed before
-                    Annotated saved = _bindingComponent.getAnnotated();
+                    Annotated saved = component.getAnnotated();
                     processAttributes(complexType, state);
-                    _bindingComponent.setView(saved);
+                    component.setView(saved);
                     if (complexType.getContentType() == ContentType.mixed) {
                         FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
                         handleField(fieldInfo, state);
                     }
                     else if (complexType.getContentType().getType() == ContentType.SIMPLETYPE) {
                         SimpleType temp = complexType.getContentType().getSimpleType();
-                        XSType xsType = TypeConversion.convertType(temp, state.packageName);
+                        XSType xsType = TypeConversion.convertType(temp, packageName);
                         FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
 		                handleField(fieldInfo,state);
 		                temp = null;
@@ -433,7 +442,7 @@ public class SourceFactory  {
             fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
 
 		    //-- name information
-            classInfo.setNodeName(_bindingComponent.getXMLName());
+            classInfo.setNodeName(component.getXMLName());
 
             //-- mark as a container
             classInfo.setContainer(true);
@@ -442,7 +451,7 @@ public class SourceFactory  {
 
         //7--set the class information given the component information
         //--base class
-        String baseClass = _bindingComponent.getExtends();
+        String baseClass = component.getExtends();
         if ( (baseClass != null) && (baseClass.length() >0) ) {
             //-- at this point if a base class has been set
             //-- it means that it is a class generated for an element
@@ -453,7 +462,7 @@ public class SourceFactory  {
         }
 
         //--interface implemented
-        String[] implemented = _bindingComponent.getImplements();
+        String[] implemented = component.getImplements();
         if (implemented != null) {
             for (int i=0 ; i<implemented.length; i++) {
                 String interfaceName = implemented[i];
@@ -463,15 +472,15 @@ public class SourceFactory  {
         }
 
         //--final
-        jClass.getModifiers().setFinal(_bindingComponent.isFinal());
+        jClass.getModifiers().setFinal(component.isFinal());
 
         //--abstract
-        if (_bindingComponent.isAbstract()) {
+        if (component.isAbstract()) {
              jClass.getModifiers().setAbstract(true);
              classInfo.setAbstract(true);
         }
         //-- process annotation
-        String comment  = processAnnotations(_bindingComponent.getAnnotated());
+        String comment  = processAnnotations(component.getAnnotated());
         if (comment != null)
             jClass.getJDocComment().setComment(comment);
 
@@ -486,7 +495,7 @@ public class SourceFactory  {
            createValidateMethods(jClass);
            //--don't generate marshal/unmarshal methods
            //--for abstract classes
-           if (!_bindingComponent.isAbstract()) {
+           if (!component.isAbstract()) {
                //-- #marshal()
                createMarshalMethods(jClass);
                //-- #unmarshal()
@@ -495,7 +504,7 @@ public class SourceFactory  {
 		}
 
         //create equals() method?
-        if (_bindingComponent.hasEquals())
+        if (component.hasEquals())
             createEqualsMethod(jClass);
         //implements CastorTestable?
         if (_testable)
@@ -507,17 +516,17 @@ public class SourceFactory  {
         if (jClass.getSuperClass() != null) {
             userDerived = (jClass.getSuperClass().equals(baseClass));
             //-- create Bound Properties code
-		    if (_bindingComponent.hasBoundProperties() && (userDerived))
+		    if (component.hasBoundProperties() && (userDerived))
 		        createPropertyChangeMethods(jClass);
 		}
 		else {
 		    //-- no super-class, create notify method if necessary
-		    if (_bindingComponent.hasBoundProperties()) 
+		    if (component.hasBoundProperties()) 
 		        createPropertyChangeMethods(jClass);
 		}
 
         sgState.bindReference(jClass, classInfo);
-        sgState.bindReference(_bindingComponent.getAnnotated(), classInfo);
+        sgState.bindReference(component.getAnnotated(), classInfo);
 
         classes[0] = jClass;
         return classes;
@@ -584,8 +593,8 @@ public class SourceFactory  {
         String className   = JavaNaming.toJavaClassName(typeName);
         
         XMLBindingComponent comp = new XMLBindingComponent();
-        if (_bindingComponent != null) {
-            comp.setBinding(_bindingComponent.getBinding());
+        if (_binding != null) {
+            comp.setBinding(_binding);
         }
         comp.setView(simpleType);
         String packageName = comp.getJavaPackage();
@@ -605,10 +614,7 @@ public class SourceFactory  {
 
         className = resolveClassName(className, packageName);
 
-        FactoryState state = new FactoryState(className, sgState);
-        //-- reset package name
-        state.packageName = packageName;
-
+        FactoryState state = new FactoryState(className, sgState, packageName);
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
 
@@ -1171,7 +1177,7 @@ public class SourceFactory  {
                     if ( content != null) comment.append(content);
                 }
             }
-            return comment.toString();
+            return normalize(comment.toString());
         }
         return null;
     } //-- processAnnotations
@@ -1187,22 +1193,24 @@ public class SourceFactory  {
             return;
 
         Enumeration enum = complexType.getAttributeDecls();
+        XMLBindingComponent component = new XMLBindingComponent();
+        if (_binding != null) component.setBinding(_binding);
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
             
-            _bindingComponent.setView(attr);
+            component.setView(attr);
      
             //-- if we have a new SimpleType...generate ClassInfo
             SimpleType sType = attr.getSimpleType();
             if (sType != null) {
                 if ( ! (SimpleTypesFactory.isBuiltInType(sType.getTypeCode())) )
                 
-                if (sType.getSchema() == _bindingComponent.getSchema())
+                if (sType.getSchema() == component.getSchema())
                 {
                     createSourceCode(sType, state.getSGStateInfo());
                 }
             }
-            FieldInfo fieldInfo = memberFactory.createFieldInfo(_bindingComponent, state);
+            FieldInfo fieldInfo = memberFactory.createFieldInfo(component, state);
             handleField(fieldInfo, state);
         }
         return;
@@ -1215,13 +1223,16 @@ public class SourceFactory  {
     private void processComplexType
         (ComplexType complexType, FactoryState state)
     {
-        _bindingComponent.setView(complexType);
-        String typeName = _bindingComponent.getXMLName();
+        XMLBindingComponent component = new XMLBindingComponent();
+        if (_binding != null) component.setBinding(_binding);
+        component.setView(complexType);
+        
+        String typeName = component.getXMLName();
 
         ClassInfo classInfo = state.classInfo;
         classInfo.setSchemaType(new XSClass(state.jClass, typeName));
 
-        classInfo.setNamespaceURI(_bindingComponent.getTargetNamespace());
+        classInfo.setNamespaceURI(component.getTargetNamespace());
 
         //- Handle derived types
         XMLType base = complexType.getBaseType();
@@ -1231,7 +1242,7 @@ public class SourceFactory  {
             if (base.isComplexType()) {
                 String baseClassName = null;
                 
-                _bindingComponent.setView(base);                        
+                component.setView(base);                        
                 //-- Is this base type from the schema we are currently generating source for?
 			    //////////////////////////////////////////////////////////
                 //NOTE: generate sources if the flag for generating sources
@@ -1242,8 +1253,8 @@ public class SourceFactory  {
 	    			//--no classInfo yet so no source code available
                     //--for the base type: we need to generate it
                     if (cInfo == null) {
-                        JClass[] classes = createSourceCode(_bindingComponent, state.getSGStateInfo());
-					    cInfo = state.resolve(_bindingComponent.getAnnotated());
+                        JClass[] classes = createSourceCode(component, state.getSGStateInfo());
+					    cInfo = state.resolve(base);
 					    baseClassName = classes[0].getName();
 				    } else {
                         baseClassName = cInfo.getJClass().getName();
@@ -1253,11 +1264,11 @@ public class SourceFactory  {
                 } else {
 				    //-- Create qualified class name for a base type class
                     //-- from another package
-				    baseClassName = _bindingComponent.getQualifiedName();
+				    baseClassName = component.getQualifiedName();
 			     }
 			    //-- Set super class
                 //-- and reset the view on the current ComplexType
-				_bindingComponent.setView(complexType);
+				component.setView(complexType);
                 //--only set a super class name if the current complexType
                 //--is not a restriction of a simpleContent (--> no object hierarchy, only content hierarchy)
                 if (!(complexType.isSimpleContent() && complexType.isRestricted()) )
@@ -1267,7 +1278,6 @@ public class SourceFactory  {
             //--if the content type is a simpleType create a field info for it.
             if (complexType.getContentType().getType() == ContentType.SIMPLETYPE) {
                 SimpleType temp = complexType.getContentType().getSimpleType();
-                
                 XSType xsType = TypeConversion.convertType(temp, state.packageName);
                 FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
 		        handleField(fieldInfo,state);
@@ -1284,7 +1294,7 @@ public class SourceFactory  {
         if (!state.isCreateGroupItem()) {
             processAttributes(complexType, state);
             //--reset the view on the current ComplexType
-            _bindingComponent.setView(complexType);
+            component.setView(complexType);
             if (complexType.getContentType() == ContentType.mixed) {
                 FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
                 handleField(fieldInfo, state);
@@ -1313,16 +1323,19 @@ public class SourceFactory  {
         Enumeration enum = contentModel.enumerate();
 
         FieldInfo fieldInfo = null;
+        XMLBindingComponent component = new XMLBindingComponent();
+        if (_binding != null) component.setBinding(_binding);
+        
         while (enum.hasMoreElements()) {
 
             Annotated annotated = (Annotated)enum.nextElement();
-            _bindingComponent.setView(annotated);
+            component.setView(annotated);
 
             switch(annotated.getStructureType()) {
 
                 //-- handle element declarations
                 case Structure.ELEMENT:
-                    fieldInfo = memberFactory.createFieldInfo(_bindingComponent, state);
+                    fieldInfo = memberFactory.createFieldInfo(component, state);
                     //-- Fix for element declarations being used in 
                     //-- a group with minOccurs = 0;  
                     //-- (kvisco - 20021007) 
@@ -1352,7 +1365,7 @@ public class SourceFactory  {
                     if (!( (contentModel instanceof ComplexType)||
                             (contentModel instanceof ModelGroup)) )
                     {
-                        fieldInfo = memberFactory.createFieldInfo(_bindingComponent,
+                        fieldInfo = memberFactory.createFieldInfo(component,
                                                                    state.getSGStateInfo());
                         handleField(fieldInfo, state);
                     } else {
@@ -1370,7 +1383,7 @@ public class SourceFactory  {
                         //create the field info for the element
                         //that is referring to a model group in order
                         //not to loose the Particle information
-                        fieldInfo = memberFactory.createFieldInfo(_bindingComponent,
+                        fieldInfo = memberFactory.createFieldInfo(component,
                                                   state.getSGStateInfo());
                         handleField(fieldInfo, state);
                         break;
@@ -1838,6 +1851,43 @@ public class SourceFactory  {
     } //-- escapeValue
 
 
+    /**
+     * Normalizes the given string for use in comments
+     *
+     * @param value the String to normalize
+    **/
+    private static String normalize (String value) {
+
+        if (value == null) return null;
+
+        char[] chars = value.toCharArray();
+        char[] newChars = new char[chars.length];
+        int count = 0;
+        int i = 0;
+        boolean skip = false;
+
+        while (i < chars.length) {
+            char ch = chars[i++];
+
+            if ((ch == ' ') || (ch == '\t')) {
+                if ((!skip) && (count != 0)) {
+                    newChars[count++] = ' ';
+                }
+                skip = true;
+            }
+            else {
+                if (count == 0) {
+                    //-- ignore new lines only if count == 0
+                    if ((ch == '\r') || (ch == '\n')) {
+                        continue;
+                    }
+                }
+                newChars[count++] = ch;
+                skip = false;
+            }
+        }
+        return new String(newChars,0,count);
+    }
 
 } //-- SourceFactory
 
@@ -1881,7 +1931,7 @@ class FactoryState implements ClassInfoResolver {
     **/
 
     protected FactoryState
-        (String className, SGStateInfo sgState)
+        (String className, SGStateInfo sgState, String packageName)
     {
        if (sgState == null)
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
@@ -1898,7 +1948,7 @@ class FactoryState implements ClassInfoResolver {
 
         _resolver = sgState;
 
-        this.packageName = sgState.packageName;
+        this.packageName = packageName;
 
         //-- boundProperties
         _bound = SourceGenerator.boundPropertiesEnabled();

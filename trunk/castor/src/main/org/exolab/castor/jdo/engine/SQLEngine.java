@@ -175,8 +175,8 @@ public final class SQLEngine implements Persistence {
 
     private ClassMolder          _mold;
 
-
-
+    // Uncomment to activate SQL statements trace
+    private static Logger        _logger ;//= new Logger( System.out ).setPrefix( "SQL" );
 
     SQLEngine( JDOClassDescriptor clsDesc,
                LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
@@ -189,7 +189,7 @@ public final class SQLEngine implements Persistence {
         _keyGen = null;
         _type = clsDesc.getJavaClass().getName();
         _mapTo = clsDesc.getTableName();
-
+        
         if ( _clsDesc.getExtends() == null ) {
             KeyGeneratorDescriptor keyGenDesc = clsDesc.getKeyGeneratorDescriptor();
             if ( keyGenDesc != null ) {
@@ -504,7 +504,7 @@ public final class SQLEngine implements Persistence {
         if ( _keyGen.isInSameConnection() ) {
             connection = (Connection) conn;
         } else {
-            connection = getSeparateConnection(database);
+            connection = getSeparateConnection( database );
         }
 
         if (stmt != null) {
@@ -551,7 +551,9 @@ public final class SQLEngine implements Persistence {
                 stmt = ( (Connection) conn ).prepareCall( _sqlCreate );
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
-
+                
+            if (_logger != null) _logger.println(_sqlCreate);
+            
             // Must remember that SQL column index is base one
             count = 1;
             if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
@@ -659,6 +661,7 @@ public final class SQLEngine implements Persistence {
                     stmt.close();
 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+                if (_logger != null) _logger.println(_pkLookup);
 
                 // bind the identity to the preparedStatement
                 count = 1;
@@ -778,6 +781,7 @@ public final class SQLEngine implements Persistence {
 
             storeStatement = getStoreStatement( original );
             stmt = ( (Connection) conn ).prepareStatement( storeStatement );
+            if (_logger != null) _logger.println(storeStatement);
 
             count = 1;
 
@@ -857,6 +861,7 @@ public final class SQLEngine implements Persistence {
                 stmt.close();
                 if ( original != null ) {
                     stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
+                    if (_logger != null) _logger.println(_sqlLoad);
 
                     // bind the identity to the prepareStatement
                     count = 1;
@@ -903,6 +908,9 @@ public final class SQLEngine implements Persistence {
 
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
+            
+            if (_logger != null) _logger.println(_sqlRemove);
+            
             int count = 1;
             // bind the identity of the preparedStatement
             if ( identity instanceof Complex ) {
@@ -928,10 +936,10 @@ public final class SQLEngine implements Persistence {
             if ( _extends != null )
                 _extends.delete( conn, identity );
         } catch ( SQLException except ) {
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
-        } finally {
             if ( _logInterceptor != null )
                 _logInterceptor.storeStatement( "Error deleting " + _type + ", SQL : " + _sqlRemove );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
+        } finally {
             try {
                 if ( stmt != null ) {
                     stmt.close();
@@ -951,6 +959,7 @@ public final class SQLEngine implements Persistence {
                 _extends.writeLock( conn, identity );
 
             stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+            if (_logger != null) _logger.println(_pkLookup);
 
             int count = 1;
             // bind the identity of the preparedStatement
@@ -995,6 +1004,9 @@ public final class SQLEngine implements Persistence {
 
         try {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
+            
+            if (_logger != null) _logger.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
+            
             int count = 1;
             // bind the identity of the preparedStatement
             if ( identity instanceof Complex ) {
@@ -1668,6 +1680,9 @@ public final class SQLEngine implements Persistence {
                 {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
                 }
+
+                if (_logger != null) _logger.println(_sql);
+
                 for ( int i = 0 ; i < _values.length ; ++i ) {
                     _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;

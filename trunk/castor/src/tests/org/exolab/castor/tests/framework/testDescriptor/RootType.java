@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,20 +11,18 @@ package org.exolab.castor.tests.framework.testDescriptor;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.ContentHandler;
 
 /**
- * 
+ * Class RootType.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public abstract class RootType extends org.exolab.castor.tests.framework.testDescriptor.StringType 
 implements java.io.Serializable
 {
@@ -34,18 +32,24 @@ implements java.io.Serializable
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _random
+     */
     private boolean _random = false;
 
     /**
      * keeps track of state for field: _random
-    **/
+     */
     private boolean _has_random;
 
+    /**
+     * Field _dump
+     */
     private boolean _dump = false;
 
     /**
      * keeps track of state for field: _dump
-    **/
+     */
     private boolean _has_dump;
 
 
@@ -63,55 +67,60 @@ implements java.io.Serializable
     //-----------/
 
     /**
-    **/
+     * Method deleteDump
+     */
     public void deleteDump()
     {
         this._has_dump= false;
     } //-- void deleteDump() 
 
     /**
-    **/
+     * Method deleteRandom
+     */
     public void deleteRandom()
     {
         this._has_random= false;
     } //-- void deleteRandom() 
 
     /**
-     * Returns the value of field 'dump'.
+     * Method getDumpReturns the value of field 'dump'.
      * 
      * @return the value of field 'dump'.
-    **/
+     */
     public boolean getDump()
     {
         return this._dump;
     } //-- boolean getDump() 
 
     /**
-     * Returns the value of field 'random'.
+     * Method getRandomReturns the value of field 'random'.
      * 
      * @return the value of field 'random'.
-    **/
+     */
     public boolean getRandom()
     {
         return this._random;
     } //-- boolean getRandom() 
 
     /**
-    **/
+     * Method hasDump
+     */
     public boolean hasDump()
     {
         return this._has_dump;
     } //-- boolean hasDump() 
 
     /**
-    **/
+     * Method hasRandom
+     */
     public boolean hasRandom()
     {
         return this._has_random;
     } //-- boolean hasRandom() 
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -124,26 +133,10 @@ implements java.io.Serializable
     } //-- boolean isValid() 
 
     /**
-     * 
-     * 
-     * @param out
-    **/
-    public abstract void marshal(java.io.Writer out)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
-
-    /**
-     * 
-     * 
-     * @param handler
-    **/
-    public abstract void marshal(org.xml.sax.ContentHandler handler)
-        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
-
-    /**
-     * Sets the value of field 'dump'.
+     * Method setDumpSets the value of field 'dump'.
      * 
      * @param dump the value of field 'dump'.
-    **/
+     */
     public void setDump(boolean dump)
     {
         this._dump = dump;
@@ -151,10 +144,10 @@ implements java.io.Serializable
     } //-- void setDump(boolean) 
 
     /**
-     * Sets the value of field 'random'.
+     * Method setRandomSets the value of field 'random'.
      * 
      * @param random the value of field 'random'.
-    **/
+     */
     public void setRandom(boolean random)
     {
         this._random = random;
@@ -162,7 +155,8 @@ implements java.io.Serializable
     } //-- void setRandom(boolean) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {

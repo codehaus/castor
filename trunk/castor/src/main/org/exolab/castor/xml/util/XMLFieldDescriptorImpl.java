@@ -243,6 +243,23 @@ public class XMLFieldDescriptorImpl
      * @throws MappingException Invalid mapping information
      */
     public XMLFieldDescriptorImpl
+        ( FieldDescriptor fieldDesc, String xmlName, NodeType nodeType )
+        throws MappingException
+    {
+        this(fieldDesc, xmlName, nodeType, null);
+    } //-- XMLFieldDescriptorImpl
+
+    /**
+     * Construct a new field descriptor for the specified field. This is
+     * an XML field descriptor wrapping a field descriptor and adding XML
+     * related properties and methods.
+     *
+     * @param fieldDesc The field descriptor
+     * @param xmlName The XML name of the field
+     * @param nodeType The node type of this field
+     * @throws MappingException Invalid mapping information
+     */
+    public XMLFieldDescriptorImpl
         ( FieldDescriptor fieldDesc, String xmlName, NodeType nodeType, NodeType primitiveNodeType )
         throws MappingException
     {

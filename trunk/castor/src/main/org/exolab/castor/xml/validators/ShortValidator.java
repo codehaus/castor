@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2001-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  */
 
@@ -96,6 +96,59 @@ public class ShortValidator extends PatternValidator
         useMin = false;
     } //-- clearMin
 
+    /**
+     * Returns the fixed value that shorts validated with this
+     * validator must be equal to. A null value is returned
+     * if no fixed value has been specified.
+     *
+     * @return the fixed value to validate against.
+     */
+    public Short getFixed() {
+        if (useFixed) {
+            return new Short(fixed);
+        }
+        return null;
+    } //-- getFixed
+
+    /**
+     * Returns the maximum value that shorts validated with this
+     * validator must be equal to or less than. A null value 
+     * is returned if no maximum value has been specified.
+     *
+     * @return the maximum inclusive value to validate against.
+     */
+    public Short getMaxInclusive() {
+        if (useMax) {
+            return new Short(max);
+        }
+        return null;
+    } //-- getMaxInclusive
+    
+    /**
+     * Returns the minimum value that shorts validated with this
+     * validator must be equal to or greater than. A null value 
+     * is returned if no minimum value has been specified.
+     *
+     * @return the minimum inclusive value to validate against.
+     */
+    public Short getMinInclusive() {
+        if (useMin) {
+            return new Short(min);
+        }
+        return null;
+    } //-- getMinInclusive
+
+    
+    /**
+     * Returns true if a fixed value, to validate against, has been
+     * set.
+     *
+     * @return true if a fixed value has been set.
+     */
+    public boolean hasFixed() {
+        return useFixed;
+    } //-- hasFixed
+    
     /**
      * Sets the fixed value that shorts validated with this
      * validated must be equal to
@@ -188,6 +241,17 @@ public class ShortValidator extends PatternValidator
 
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

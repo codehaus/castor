@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2001-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,10 +51,11 @@ import org.exolab.castor.xml.*;
 /**
  * The Byte Validation class. This class handles validation
  * for the byte type.
+ *
  * @author <a href="mailto:visco@intalio.com">Keith Visco</a>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class ByteValidator extends PatternValidator
     implements TypeValidator
 {
@@ -96,6 +97,59 @@ public class ByteValidator extends PatternValidator
         useMin = false;
     } //-- clearMin
 
+    /**
+     * Returns the fixed value that bytes validated with this
+     * validator must be equal to. A null value is returned
+     * if no fixed value has been specified.
+     *
+     * @return the fixed value to validate against.
+     */
+    public Byte getFixed() {
+        if (useFixed) {
+            return new Byte(fixed);
+        }
+        return null;
+    } //-- getFixed
+
+    /**
+     * Returns the maximum value that bytes validated with this
+     * validator must be equal to or less than. A null value 
+     * is returned if no maximum value has been specified.
+     *
+     * @return the maximum inclusive value to validate against.
+     */
+    public Byte getMaxInclusive() {
+        if (useMax) {
+            return new Byte(max);
+        }
+        return null;
+    } //-- getMaxInclusive
+    
+    /**
+     * Returns the minimum value that bytes validated with this
+     * validator must be equal to or greater than. A null value 
+     * is returned if no minimum value has been specified.
+     *
+     * @return the minimum inclusive value to validate against.
+     */
+    public Byte getMinInclusive() {
+        if (useMin) {
+            return new Byte(min);
+        }
+        return null;
+    } //-- getMinInclusive
+
+
+    /**
+     * Returns true if a fixed value, to validate against, has been
+     * set.
+     *
+     * @return true if a fixed value has been set.
+     */
+    public boolean hasFixed() {
+        return useFixed;
+    } //-- hasFixed
+    
     /**
      * Sets the fixed value that bytes validated with this
      * validated must be equal to
@@ -186,6 +240,17 @@ public class ByteValidator extends PatternValidator
         if (hasPattern())
             super.validate(Byte.toString(b), context);
 
+    } //-- validate
+    
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
     } //-- validate
 
     /**

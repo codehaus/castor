@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,7 +52,9 @@ import org.exolab.castor.xml.XMLException;
 import org.exolab.castor.xml.schema.Documentation;
 import org.exolab.castor.xml.schema.SchemaNames;
 import org.exolab.castor.types.AnyNode;
-import org.exolab.castor.xml.util.SAX2ANY;
+
+import java.util.Enumeration;
+import java.util.Stack;
 
 /**
  * A class for Unmarshalling XML Schema <documentation> elements
@@ -67,22 +69,14 @@ public class DocumentationUnmarshaller extends ComponentReader {
     //--------------------/
 
     /**
-     * The current ComponentReader
-    **/
-    private ComponentReader unmarshaller;
-
-    /**
-     * The current branch depth
-    **/
-    private int depth = 0;
-
-    /**
      * The Attribute reference for the Attribute we are constructing
-    **/
+     */
     private Documentation _documentation = null;
 
-    private StringBuffer sb = null;
-
+    /**
+     * Stack of AnyNodes being unmarshalled
+     */
+    private Stack _nodes = null;
 
       //----------------/
      //- Constructors -/
@@ -105,6 +99,7 @@ public class DocumentationUnmarshaller extends ComponentReader {
         //-- @source
         _documentation.setSource(atts.getValue(SchemaNames.SOURCE_ATTR));
 
+        _nodes = new Stack();
 
     } //-- DocumentationUnmarshaller
 
@@ -127,17 +122,13 @@ public class DocumentationUnmarshaller extends ComponentReader {
      * be overridden to perform any necessary clean up by an unmarshaller
     **/
     public void finish() {
-        if (sb != null) {
-            _documentation.setContent(sb.toString());
-            sb = null;
-        }
+        //-- do nothing
     } //-- finish
 
     /**
      *
     **/
     public Documentation getDocumentation() {
-        if (sb != null) finish();
         return _documentation;
     } //-- getDocumentation
 
@@ -166,14 +157,45 @@ public class DocumentationUnmarshaller extends ComponentReader {
         Namespaces nsDecls)
         throws XMLException
     {
-        //-- Do delagation if necessary
-        if (unmarshaller != null) {
-            unmarshaller.startElement(name, namespace, atts, nsDecls);
-            ++depth;
-            return;
+        
+        String prefix = null;
+        if (nsDecls != null) {
+            //-- find prefix (elements use default namespace if null)
+            if (namespace == null) namespace = "";
+            prefix = nsDecls.getNamespacePrefix(namespace);
+        }
+        
+        AnyNode node = new AnyNode(AnyNode.ELEMENT, name, prefix, namespace, null);
+        _nodes.push(node);
+        
+        //-- process namespace nodes
+        if (nsDecls != null) {
+            Enumeration enum = nsDecls.getLocalNamespaces();
+            while (enum.hasMoreElements()) {
+                namespace = (String)enum.nextElement();
+                prefix = nsDecls.getNamespacePrefix(namespace);
+                node.addNamespace ( new AnyNode(AnyNode.NAMESPACE, 
+                                                null,  //-- no local name for a ns decl.
+                                                prefix, 
+                                                namespace,
+                                                null)); //-- no value
+            }
+        }
+        //-- process attributes
+        if (atts != null) {
+            for (int i = 0; i < atts.getSize(); i++) {
+                namespace = atts.getNamespace(i);
+                if ((nsDecls != null) && (namespace != null)) {
+                    prefix = nsDecls.getNamespacePrefix(namespace);
+                }
+                else prefix = null;
+                node.addAttribute( new AnyNode(AnyNode.ATTRIBUTE, 
+                                           atts.getName(i), 
+                                           prefix, namespace, 
+                                           atts.getValue(i)) );
+            }
         }
 
-        unmarshaller = new AnyNodeUnmarshaller(name, atts);
     } //-- startElement
 
     /**
@@ -186,129 +208,36 @@ public class DocumentationUnmarshaller extends ComponentReader {
     public void endElement(String name, String namespace)
         throws XMLException
     {
-        //-- Do delagation if necessary
-        if ((unmarshaller != null) && (depth > 0)) {
-            unmarshaller.endElement(name, namespace);
-            --depth;
-            return;
+        AnyNode node = (AnyNode)_nodes.pop();
+        if (_nodes.isEmpty()) {
+            //-- add to appInfo
+            _documentation.add(node);
         }
-
-        Object obj = unmarshaller.getObject();
-        _documentation.add(obj);
+        else {
+            //-- add to parent AnyNode
+            ((AnyNode)_nodes.peek()).addChild(node);
+        }
     } //-- endElement
 
     public void characters(char[] ch, int start, int length)
         throws XMLException
     {
         //-- Do delagation if necessary
-        if (unmarshaller != null) {
-            unmarshaller.characters(ch, start, length);
+        AnyNode text = new AnyNode(AnyNode.TEXT, 
+                                   null,  //-- no local name for text nodes 
+                                   null,  //-- no prefix
+                                   null,  //-- no namespace
+                                   new String(ch, start, length));
+                                   
+        if (!_nodes.isEmpty()) {
+            AnyNode parent = (AnyNode)_nodes.peek();
+            parent.addChild(text);
         }
-
-        if (sb == null) sb = new StringBuffer();
-        sb.append(ch, start, length);
-
+        else {
+            _documentation.add(text);
+        }
+        
     } //-- characters
 
 } //-- DocumentationUnmarshaller
 
-class AnyNodeUnmarshaller extends ComponentReader {
-
-      //--------------------/
-     //- Member Variables -/
-    //--------------------/
-
-    /**
-     * The current ComponentReader
-    **/
-    private SAX2ANY _sax2Any = null;
-
-    private String _name = null;
-
-      //----------------/
-     //- Constructors -/
-    //----------------/
-
-    /**
-     * Creates a new DocumentationUnmarshaller
-     * @param atts the AttributeList
-    **/
-    AnyNodeUnmarshaller(String name, AttributeSet atts)
-        throws XMLException
-    {
-        super();
-        _sax2Any = new SAX2ANY();
-        _name = name;
-
-        //_sax2Any.startElement(name, atts);
-    } //-- DocumentationUnmarshaller
-
-      //-----------/
-     //- Methods -/
-    //-----------/
-
-    /**
-     * Returns the name of the element that this ComponentReader
-     * handles
-     * @return the name of the element that this ComponentReader
-     * handles
-    **/
-    public String elementName() {
-        return _name;
-    } //-- elementName
-
-    /**
-     * Called to signal an end of unmarshalling. This method should
-     * be overridden to perform any necessary clean up by an unmarshaller
-    **/
-    public void finish() {
-    } //-- finish
-
-    /**
-     * Returns the Object created by this ComponentReader
-     * @return the Object created by this ComponentReader
-    **/
-    public Object getObject() {
-        return _sax2Any.getStartingNode();
-    } //-- getObject
-
-    /**
-     * Signals the start of an element with the given name.
-     *
-     * @param name the NCName of the element. It is an error
-     * if the name is a QName (ie. contains a prefix).
-     * @param namespace the namespace of the element. This may be null.
-     * Note: A null namespace is not the same as the default namespace unless
-     * the default namespace is also null.
-     * @param atts the AttributeSet containing the attributes associated
-     * with the element.
-     * @param nsDecls the namespace declarations being declared for this 
-     * element. This may be null.
-    **/
-    public void startElement(String name, String namespace, AttributeSet atts,
-        Namespaces nsDecls)
-        throws XMLException
-    {
-        //_sax2Any.startElement(name, atts);
-    } //-- startElement
-
-    /**
-     * Signals to end of the element with the given name.
-     *
-     * @param name the NCName of the element. It is an error
-     * if the name is a QName (ie. contains a prefix).
-     * @param namespace the namespace of the element.
-    **/
-    public void endElement(String name, String namespace)
-        throws XMLException
-    {
-        //_sax2Any.endElement(name);
-    } //-- endElement
-
-    public void characters(char[] ch, int start, int length)
-        throws XMLException
-    {
-        //_sax2Any.characters(ch, start, length);
-    } //-- characters
-
-} //-- AnyNodeUnmarshaller

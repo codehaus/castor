@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,9 +51,10 @@ import org.exolab.castor.xml.*;
 
 /**
  * The String Validation class
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class StringValidator extends PatternValidator
     implements TypeValidator
 {
@@ -159,8 +160,13 @@ public class StringValidator extends PatternValidator
      }//-- setWhiteSpace
 
     /**
+     * NOTE: THIS METHOD SHOULD NOT BE HERE..SHOULD BE MOVED
+     * TO A FieldHandler or to the Unmarshaller...but not
+     * here!!! (kvisco 20030125)
+     *
      * Normalizes the given string according to the whiteSpace
      * facet used
+     *
      * @param value the String to normalize
      */
     public String normalize (String value) {
@@ -255,6 +261,17 @@ public class StringValidator extends PatternValidator
         }
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

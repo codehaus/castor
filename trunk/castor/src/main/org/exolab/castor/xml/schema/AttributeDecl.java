@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -190,7 +190,11 @@ public final class AttributeDecl extends Annotated {
 
     /**
      * Returns the name of attributes defined by this AttributeDecl.
-     *
+     * If this AttributeDecl is a reference to another AttributeDecl,
+     * the reference will be resolved and the name of the referenced
+     * AttributeDecl will be returned. The name will always be
+     * an NCName, no namespace prefix will be included.
+     * 
      * @return the name of attributes defined by this AttributeDecl.
     **/
     public String getName() {
@@ -198,17 +202,28 @@ public final class AttributeDecl extends Annotated {
     } //-- getName
 
     /**
-     * Returns the name of this Attribute declaration.
+     * Returns the name of this Attribute declaration. The name will 
+     * always be an NCName, no namespace prefix will be included.     
      *
-     * @param ingoreRef If True the name of the referenced
-     * attribute (if specified) is returned
+     * @param ingoreRef a boolean that when false, indicates
+     * that if this is an attribute reference to return the 
+     * reference name. Otherwise the only the local name is used.
+     *
      * @return the name of this attribute declaration
     **/
     public String getName(boolean ignoreRef) {
         if (isReference() && ignoreRef == false) {
-            return _attributeRef;
+            //-- strip prefix we can only return
+            //-- an NCName from this method
+            String ncname = _attributeRef;
+            //-- check for namespace prefix
+            int idx = ncname.indexOf(':');
+            if (idx > 0) {
+                ncname = ncname.substring(idx+1);
+            }
+            return ncname;
         }
-		else return _name;
+		return _name;
     } //-- getName
 
     /**
@@ -252,13 +267,25 @@ public final class AttributeDecl extends Annotated {
             result = _schema.getAttribute(_attributeRef);
              if (result == null) {
                 String err = "Unable to find attribute referenced :\" ";
-                err += getName();
+                err += _attributeRef;
                 err +="\"";
                 throw new IllegalStateException(err);
             }
         }
         return result;
     } //-- getReference
+    
+    /**
+     * Returns the actual reference name of this AttributeDecl, or null
+     * if this AttributeDecl is not a reference. The name returned, if not
+     * null, will be a QName, possibly containing the namespace prefix.
+     * 
+     * @return the reference name
+     */
+    public String getReferenceName() {
+        return _attributeRef;
+    } //-- getReference
+    
     /**
      * Returns the Schema that this AttributeGroupDecl belongs to.
      *
@@ -270,19 +297,18 @@ public final class AttributeDecl extends Annotated {
 
     /**
      * Returns the value of the use attribute for this attribute
-     * declaration.
+     * declaration or attribute reference. If this is a reference
+     * the value of the use attribute will *not* be obtained
+     * from the referenced attribute declaration as top-level
+     * attributes do not take into account the use attribute.
      *
      * @return the value of the use attribute for this attribute
      * declaration
-    **/
+     */
     public String getUse() {
 
-        if (isReference()) {
-            AttributeDecl attribute = getReference();
-            if (attribute != null)
-                return attribute.getUse();
-            return null;
-        }
+        //-- Note: Do not resolve reference, since top-level
+        //-- atts do not specify the "use" attribute.
 
         switch (_useFlag) {
             case PROHIBITED:
@@ -292,6 +318,7 @@ public final class AttributeDecl extends Annotated {
             default:
                 return USE_OPTIONAL;
         }
+        
     } //-- getUse
 
     /**
@@ -400,7 +427,7 @@ public final class AttributeDecl extends Annotated {
 
     /**
      * Sets the name of attributes defined by this attribute definition
-     * @param name the name of the this AttributeDecl
+     * @param name the name of the this AttributeDecl. Must be a valid NCName.
      * @exception IllegalArgumentException when the name is not valid
     **/
     public void setName(String name) {

@@ -528,7 +528,7 @@ public class Converter {
 
              text = "General Entity Declaration";
 
-             documentation.setContent(text);
+             documentation.add(text);
 
              documentation.add(ge);
 

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author           Changes
@@ -49,28 +49,28 @@
 package org.exolab.castor.xml.validators;
 
 import org.exolab.castor.xml.*;
-
 import java.math.BigDecimal;
+
 /**
  * The Decimal Validation class. This class handles validation
  * for the Decimal type.
+ *
  * TODO : pattern, enumeration
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class DecimalValidator implements TypeValidator
 {
 
-    private boolean _isFixed = false;
     private BigDecimal _fixed = null;
-    private boolean useMin   = false;
-    private boolean useMax   = false;
-
-
-    private BigDecimal min = null;
-    private BigDecimal max = null;
+    private BigDecimal _min = null;
+    private BigDecimal _max = null;
     private int _totalDigits = -1 ;
     private int _fractionDigits = -1;
+    
+    private boolean _hasMinExclusive = false;
+    private boolean _hasMaxExclusive = false;
+    
     /**
      * Creates a new DecimalValidator with no restrictions
     **/
@@ -82,16 +82,61 @@ public class DecimalValidator implements TypeValidator
      * Clears the maximum value for this DecimalValidator
     **/
     public void clearMax() {
-        useMax = false;
+        _max = null;
+        _hasMaxExclusive = false;
     } //-- clearMax
 
     /**
      * Clears the minimum value for this DecimalValidator
     **/
     public void clearMin() {
-        useMin = false;
+        _min = null;
+        _hasMinExclusive = false;
     } //-- clearMin
 
+    /**
+     * Returns the fixed value that decimals validated with this
+     * validator must be equal to. A null value is returned
+     * if no fixed value has been specified.
+     *
+     * @return the fixed value to validate against.
+     */
+    public BigDecimal getFixed() {
+        return _fixed;
+    } //-- getFixed
+
+    /**
+     * Returns the maximum value that decimals validated with this
+     * validator must be equal to or less than. A null value 
+     * is returned if no maximum value has been specified.
+     *
+     * @return the maximum inclusive value to validate against.
+     */
+    public BigDecimal getMaxInclusive() {
+        return _max;
+    } //-- getMaxInclusive
+    
+    /**
+     * Returns the minimum value that decimals validated with this
+     * validator must be equal to or greater than. A null value 
+     * is returned if no minimum value has been specified.
+     *
+     * @return the minimum inclusive value to validate against.
+     */
+    public BigDecimal getMinInclusive() {
+        return _min;
+    } //-- getMinInclusive
+
+
+    /**
+     * Returns true if a fixed value, to validate against, has been
+     * set.
+     *
+     * @return true if a fixed value has been set.
+     */
+    public boolean hasFixed() {
+        return (_fixed != null);
+    } //-- hasFixed
 
     /**
      * Sets the minimum value that decimals validated with this
@@ -100,8 +145,10 @@ public class DecimalValidator implements TypeValidator
      * validator must be greater than
     **/
     public void setMinExclusive(BigDecimal minValue) {
-        useMin = true;
-        min = minValue.add(new BigDecimal(1));
+        if (minValue == null)
+            throw new IllegalArgumentException("argument 'minValue' must not be null.");
+        _min = minValue;
+        _hasMinExclusive = true;
     } //-- setMinExclusive
 
     /**
@@ -111,8 +158,8 @@ public class DecimalValidator implements TypeValidator
      * validator may be
     **/
     public void setMinInclusive(BigDecimal minValue) {
-        useMin = true;
-        min = minValue;
+        _min = minValue;
+        _hasMinExclusive = true;
     } //-- setMinInclusive
 
     /**
@@ -122,8 +169,10 @@ public class DecimalValidator implements TypeValidator
      * validator must be less than
     **/
     public void setMaxExclusive(BigDecimal maxValue) {
-        useMax = true;
-        max = maxValue.subtract(new BigDecimal(1));
+        if (maxValue == null)
+            throw new IllegalArgumentException("argument 'maxValue' must not be null.");
+        _max = maxValue;
+        _hasMaxExclusive = true;
    } //-- setMaxExclusive
 
     /**
@@ -133,12 +182,12 @@ public class DecimalValidator implements TypeValidator
      * validator may be
     **/
     public void setMaxInclusive(BigDecimal maxValue) {
-        useMax = true;
-        max = maxValue;
+        _max = maxValue;
+        _hasMaxExclusive = false;
     } //-- setMaxInclusive
 
     /**
-     * Sets the totalDigits facet for this XSInteger.
+     * Sets the totalDigits facet for this decimal validator.
      * @param totalDig the value of totalDigits (must be >0)
      */
      public void setTotalDigits(int totalDig) {
@@ -148,7 +197,8 @@ public class DecimalValidator implements TypeValidator
      }
 
     /**
-     * Sets the fractionDigits facet for this XSInteger.
+     * Sets the fractionDigits facet for this decimal validator.
+     *
      * @param fractionDig the value of fractionDigits (must be >=0)
      */
      public void setFractionDigits(int fractionDig) {
@@ -160,16 +210,16 @@ public class DecimalValidator implements TypeValidator
     /**
      * Sets the fixed value the decimal to validate must
      * be equal to.
+     *
      * @param fixed the fixed value
      */
     public void setFixed(BigDecimal fixed) {
         _fixed = fixed;
-        _isFixed = true;
     } //-- setMinExclusive
 
     public void validate(BigDecimal bd) throws ValidationException {
 
-        if (_isFixed) {
+        if (_fixed != null) {
             if (!bd.equals(_fixed)) {
                 String err = bd + " is not equal to the fixed value of ";
                 err += _fixed;
@@ -177,18 +227,26 @@ public class DecimalValidator implements TypeValidator
             }
         }
 
-        if (useMin) {
-            if (bd.compareTo(min)==-1) {
+        if (_min != null) {
+            if (bd.compareTo(_min)==-1) {
                 String err = bd + " is less than the minimum allowable ";
-                err += "value of " + min;
+                err += "value of " + _min;
+                throw new ValidationException(err);
+            } else if ( (bd.compareTo(_min) == 0) && (_hasMinExclusive)) {
+                String err = bd + " cannot be equal to the minimum allowable ";
+                err += "value of " + _min;
                 throw new ValidationException(err);
             }
         }
 
-        if (useMax) {
-            if (bd .compareTo(max)==1) {
+        if (_max != null) {
+            if (bd .compareTo(_max)==1) {
                 String err = bd + " is greater than the maximum allowable ";
-                err += "value of " + max;
+                err += "value of " + _max;
+                throw new ValidationException(err);           
+            } else if ( (bd.compareTo(_max) == 0) && (_hasMaxExclusive)) {
+                String err = bd + " cannot be equal to the maximum allowable ";
+                err += "value of " + _max;
                 throw new ValidationException(err);
             }
         }
@@ -215,6 +273,17 @@ public class DecimalValidator implements TypeValidator
 
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

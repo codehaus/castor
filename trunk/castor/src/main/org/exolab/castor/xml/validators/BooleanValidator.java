@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,9 +51,10 @@ import org.exolab.castor.xml.*;
 /**
  * The Boolean Validation class. This class handles validation
  * for the boolean type. This will only check that a boolean has the proper fixed value.
+ *
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class BooleanValidator implements TypeValidator
 {
 
@@ -74,23 +75,53 @@ public class BooleanValidator implements TypeValidator
     public void clearFixed() {
         _useFixed = false;
     } //-- clearFixed
+    
+    /**
+     * Returns the fixed value that boolean validated with this
+     * validator must be equal to. A null value is returned
+     * if no fixed value has been specified.
+     *
+     * @return the fixed value to validate against.
+     */
+    public Boolean getFixed() {
+        if (_useFixed) {
+            return new Boolean(_fixed);
+        }
+        return null;
+    } //-- getFixed
 
+
+    /**
+     * Returns true if a fixed value, to validate against, has been
+     * set.
+     *
+     * @return true if a fixed value has been set.
+     */
+    public boolean hasFixed() {
+        return _useFixed;
+    } //-- hasFixed
+    
     /**
      * Sets the fixed value that boolean validated with this
      * validator must be equal to.
      * @param fixedValue the fixed value a boolean validated with
      * this validator must be equal to.
-     * <BR>
      */
     public void setFixed(boolean fixedValue) {
         _useFixed = true;
         _fixed = fixedValue;
     } //-- setFixed
 
-   public void setFixed(Boolean fixedValue) {
-       _useFixed = true;
-       _fixed = fixedValue.booleanValue();
-   }
+    /**
+     * Sets the fixed value that boolean validated with this
+     * validator must be equal to.
+     * @param fixedValue the fixed value a boolean validated with
+     * this validator must be equal to.
+     */
+    public void setFixed(Boolean fixedValue) {
+        _useFixed = true;
+        _fixed = fixedValue.booleanValue();
+    }
 
     public void validate(boolean b)
         throws ValidationException
@@ -107,6 +138,17 @@ public class BooleanValidator implements TypeValidator
 
     } //-- validate
 
+    /**
+     * Validates the given Object.
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

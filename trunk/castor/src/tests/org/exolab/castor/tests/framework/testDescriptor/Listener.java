@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.21+</a>, using
- * an XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -15,16 +15,17 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.ContentHandler;
 
 /**
- * 
+ * Class Listener.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class Listener extends ListenerType 
 implements java.io.Serializable
 {
@@ -44,7 +45,8 @@ implements java.io.Serializable
     //-----------/
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -57,10 +59,10 @@ implements java.io.Serializable
     } //-- boolean isValid() 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -69,10 +71,10 @@ implements java.io.Serializable
     } //-- void marshal(java.io.Writer) 
 
     /**
-     * 
+     * Method marshal
      * 
      * @param handler
-    **/
+     */
     public void marshal(org.xml.sax.ContentHandler handler)
         throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -81,10 +83,10 @@ implements java.io.Serializable
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * 
+     * Method unmarshal
      * 
      * @param reader
-    **/
+     */
     public static org.exolab.castor.tests.framework.testDescriptor.Listener unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -92,7 +94,8 @@ implements java.io.Serializable
     } //-- org.exolab.castor.tests.framework.testDescriptor.Listener unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {

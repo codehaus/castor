@@ -15,6 +15,14 @@
       <p>
           <b>IBM developerWorks (January 2003)</b>
           <p/>
+          Dennis Sonoski concludes its data-binding serie on developerWorks by taking a look
+          at the performance of the different data-binding frameworks.
+          <a href="http://www-106.ibm.com/developerworks/library/x-databdopt2/">Read</a>
+      </p>
+      
+      <p>
+          <b>IBM developerWorks (January 2003)</b>
+          <p/>
           Dennis Sonoski continues his series on the data binding approach by giving a global overview
           of 5 data binding frameworks including Castor and JAXB.
           <a href="http://www-106.ibm.com/developerworks/library/x-databdopt/">Read</a>
@@ -160,53 +168,6 @@
          A tutorial explaining how to use JBuilder's XML databinding features using XML schema and
          Castor XML to generate Java classes.
          <a href="http://info.borland.com/techpubs/jbuilder/jbuilder6/xml/xml_data_castor.html">Read</a>
-      </p>
-    </section>
-
-    <section title="Products Complementing or Using Castor">
-
-      <p><i>See also: <a href="extras.xml">Extras and 3rd Party Tools</a></i></p>
-
-      <p>
-         <b>Castor Doclet</b>
-         <p/>
-         The purpose of the castor doclet is to generate this mapping file from simple Javadoc
-         tags added in the source code.
-         <a href="http://castordoclet.sourceforge.net/">Read</a>
-      </p>
-
-      <p>
-         <b>XDoclet</b>
-         <p/>
-          XDoclet is a code generation engine. It enables Attribute-Oriented Programming for
-          Java. It provides tags for Castor under the @exolab moniker.
-         <a href="http://xdoclet.sourceforge.net/1.2beta/index.html">Read</a>
-      </p>
-
-      <p>
-         <b>Castor OIL</b>
-         <p/>
-         A GUI application to assist in the creation and maintenance of the mapping files used
-         by Castor.
-         <a href="http://vintech.no-ip.org:8181/oss/castor_oil.jsp">Read</a>
-      </p>
-
-      <p>
-         <b>Raccoon</b>
-         <p/>
-          An Open Source project aimed to complement TIBCO products in order to help us, the
-          people on the ground, to use TIBCO at it's best and make life easy. Most
-          integration between components in this project is achieved via Castor XML.
-         <a href="http://raccoon.sourceforge.net/">Read</a>
-      </p>
-
-      <p>
-         <b>Xtreme Space</b>
-         <p/>
-          Xtreme Space is a JavaSpaces implementation using a RDBMS or a native XML
-          database as a backend. It is based on Castor for mapping between Java objects
-          and the tables.
-         <a href="http://www.kalixia.com/projects/XtremeSpace/">Read</a>
       </p>
     </section>
 

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -268,16 +268,23 @@ public class ElementDecl extends Particle
     /**
      * Returns the name of this Element declaration. The name of the
      * referenced element is returned if the 'ref' attribute was used.
+     * The name returned will be an NCName (no namespace prefix will
+     * be included with the name).
+     *
      * @return the name of this element declaration
-    **/
+     */
     public String getName() {
 		return getName(false);
-	}
+	} //-- getName
 
     /**
-     * Returns the name of this Element declaration
-     * @param ingoreRef If True the name of the referenced
-     * element (if specified) is returned
+     * Returns the name of this Element declaration. The name
+     * returned, if not null, will be an NCName.
+     *
+     * @param ingoreRef if false the name of the referenced
+     * element (if specified) is returned, otherwise the
+     * localname (may be null).
+     *
      * @return the name of this element declaration
     **/
     public String getName(boolean ignoreRef) {
@@ -340,6 +347,17 @@ public class ElementDecl extends Particle
         return result;
     } //-- getReference
 
+    /**
+     * Returns the actual reference name of this AttributeDecl, or null
+     * if this AttributeDecl is not a reference. The name returned, if not
+     * null, will be a QName, possibly containing the namespace prefix.
+     * 
+     * @return the reference name
+     */
+    public String getReferenceName() {
+        return _elementRef;
+    } //-- getReference
+    
     /**
      * Returns the Id used to Refer to this Object
      *
@@ -541,11 +559,11 @@ public class ElementDecl extends Particle
     **/
     public void setName(String name) {
 
-        if ((name == null) || (ValidationUtils.isQName(name))) {
+        if ((name == null) || (ValidationUtils.isNCName(name))) {
             _name = name;
         }
         else {
-            String err = "error: '" + name + "' is not a valid QName.";
+            String err = "error: '" + name + "' is not a valid NCName.";
             throw new IllegalArgumentException(err);
         }
     } //-- setName
@@ -587,8 +605,21 @@ public class ElementDecl extends Particle
     public void setReference(ElementDecl reference) {
         if (reference == null)
             _elementRef = null;
-        else
-            _elementRef = reference.getName();
+        else {
+            if (reference.getSchema() == this.getSchema()) {
+                _elementRef = reference.getName();
+            }
+            else {
+                String qName = reference.getName();
+                String nsURI = reference.getSchema().getTargetNamespace();
+                if (nsURI != null) {
+                    String prefix = getSchema().getNamespacePrefix(nsURI);
+                    if ((prefix != null) && (prefix.length() > 0))
+                        qName = prefix + ":" + qName;
+                }
+                _elementRef = qName;
+            }
+        }
     } //-- setReference
 
     /**
@@ -597,7 +628,13 @@ public class ElementDecl extends Particle
      * definition references
     **/
     public void setReference(String reference) {
-        _elementRef = reference;
+        if ((reference == null) || (ValidationUtils.isQName(reference))) {
+            _elementRef = reference;
+        }
+        else {
+            String err = "error: '" + reference + "' is not a valid QName.";
+            throw new IllegalArgumentException(err);
+        }
     } //-- setReference
 
     /**

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -147,13 +147,13 @@ public final class AttributeGroupDecl extends AttributeGroup {
      * Returns the attributes of THIS attribute group.
      * (not those of the nested groups)
      */
-    public Enumeration getMyAttributes() { return _attributes.elements(); }
+    public Enumeration getLocalAttributes() { return _attributes.elements(); }
 
     /**
      * Returns the AttributeGroupReference of THIS attribute group.
      * (not those of the nested groups)
      */
-    public Enumeration getMyAttributeGroupReferences() { return _references.elements(); }
+    public Enumeration getLocalAttributeGroupReferences() { return _references.elements(); }
 
     /**
      * Returns the wilcard used in this complexType (can be null)

@@ -166,6 +166,75 @@
             </table>
          </p>
        </section>
+
+       <section title="Castor Doclet">
+        <p>
+            <table border="0">
+                <tr>
+                    <td align="top">Description:</td>
+                    <td>
+                     The purpose of the castor doclet is to generate this mapping 
+                     file from simple Javadoc tags added in the source code.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="top">Author:</td>
+                    <td>Mickael Guessant</td>
+                </tr>
+                <tr>
+                    <td align="top">URL:</td>
+                    <td><url>http://castordoclet.sourceforge.net/</url></td>
+                </tr>
+            </table>
+        </p>
+       </section>
+
+       <section title="XDoclet">
+        <p>
+            <table border="0">
+                <tr>
+                    <td align="top">Description:</td>
+                    <td>
+                     XDoclet is a code generation engine. It enables 
+                     Attribute-Oriented Programming for Java. It provides 
+                     tags for Castor under the @exolab moniker.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="top">Author:</td>
+                    <td>See the <a href="http://xdoclet.sourceforge.net/1.2beta/team-list.html">Team List</a></td>
+                </tr>
+                <tr>
+                    <td align="top">URL:</td>
+                    <td><url>http://xdoclet.sourceforge.net/1.2beta/index.html</url></td>
+                </tr>
+            </table>
+        </p>
+       </section>
+
+        <section title="Xtreme Space">
+            <p>
+                <table border="0">
+                    <tr>
+                        <td align="top">Description:</td>
+                        <td>
+                          Xtreme Space is a JavaSpaces implementation using a RDBMS or a native XML
+                          database as a backend. It is based on Castor for mapping between Java objects
+                          and the tables.
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="top">Author:</td>
+                        <td>Jerome Bernard</td>
+                     </tr>
+                     <tr>
+                        <td align="top">URL:</td>
+                        <td><url>http://www.kalixia.com/projects/XtremeSpace/</url></td>
+                     </tr>
+                  </table>
+               </p>
+        </section>
+
     </section>
   </body>
 </document>

@@ -819,6 +819,9 @@ public class XMLBindingComponent implements BindingComponent {
             String schemaLocation = getSchemaLocation();
             String targetNamespace = getTargetNamespace();
             
+            //-- adjust targetNamespace null -> ""
+            if (targetNamespace == null) targetNamespace = "";
+            
             if (_compBinding != null) {
                 switch (getType()) {
                     case CLASS:
@@ -833,8 +836,7 @@ public class XMLBindingComponent implements BindingComponent {
                 if (schemaLocation != null) {
                     packageName = SourceGenerator.lookupPackageLocation(schemaLocation);
                 }
-                if ( (targetNamespace != null) &&
-                    ( packageName == null || packageName.length() ==0))
+                if (( packageName == null || packageName.length() ==0))
                 {
                     //--look for a namespace mapping
                     packageName = SourceGenerator.lookupPackageNamespace(targetNamespace);
@@ -1064,7 +1066,7 @@ public class XMLBindingComponent implements BindingComponent {
     * @return an XSType
     */
     public XSType getJavaType() {
-
+        
         //--no need for caching it is called only once
         XSType result = null;
         boolean useWrapper = useWrapper();
@@ -1092,6 +1094,12 @@ public class XMLBindingComponent implements BindingComponent {
                     packageName = comp.getJavaPackage();
                 }
                 else packageName = getJavaPackage();
+                
+                if ((packageName == null) || (packageName.length() == 0)) {
+                    String ns = ((SimpleType)type).getSchema().getTargetNamespace();
+                    packageName = SourceGenerator.lookupPackageNamespace(ns);
+                }
+                    
                 result = TypeConversion.convertType((SimpleType)type, useWrapper, packageName);
             }
         }

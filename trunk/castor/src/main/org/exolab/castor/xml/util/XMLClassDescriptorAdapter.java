@@ -53,7 +53,7 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 
-import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.LocalConfiguration;
 
 import org.exolab.castor.xml.*;
 
@@ -77,8 +77,21 @@ public class XMLClassDescriptorAdapter
      *
      * @param classDesc the ClassDescriptor to "adapt"
      * @param xmlName the XML name for the class
+     */
+    public XMLClassDescriptorAdapter(ClassDescriptor classDesc, String xmlName) 
+        throws org.exolab.castor.mapping.MappingException 
+    {
+        this(classDesc, xmlName, null);
+    } //-- XMLClassDescriptor
+    
+    /**
+     * Creates a new XMLClassDescriptorAdapter using the
+     * given ClassDescriptor
+     *
+     * @param classDesc the ClassDescriptor to "adapt"
+     * @param xmlName the XML name for the class
      * @param primitiveNodeType the NodeType to use for primitives
-    **/
+     */
     public XMLClassDescriptorAdapter(ClassDescriptor classDesc, String xmlName, NodeType primitiveNodeType) 
         throws org.exolab.castor.mapping.MappingException 
     {
@@ -92,6 +105,9 @@ public class XMLClassDescriptorAdapter
         }
         
         if (primitiveNodeType == null) 
+            primitiveNodeType = LocalConfiguration.getInstance().getPrimitiveNodeType();
+            
+        if (primitiveNodeType == null)
             primitiveNodeType = NodeType.Attribute;
         
         process(classDesc, primitiveNodeType);
@@ -131,6 +147,19 @@ public class XMLClassDescriptorAdapter
             process((XMLClassDescriptor)classDesc);
             return;
         }
+        
+        
+        //-- handle inheritence
+        XMLClassDescriptor xmlClassDesc = null;
+        ClassDescriptor extendsDesc = classDesc.getExtends();
+        if (extendsDesc != null) {
+            if (extendsDesc instanceof XMLClassDescriptor)
+                xmlClassDesc = (XMLClassDescriptor) extendsDesc;
+            else {
+                xmlClassDesc = new XMLClassDescriptorAdapter(extendsDesc, null, primitiveNodeType);
+            }
+        }
+        setExtends(xmlClassDesc);
         
         FieldDescriptor   identity = classDesc.getIdentity();
         FieldDescriptor[] fields   = classDesc.getFields();
@@ -216,17 +245,6 @@ public class XMLClassDescriptorAdapter
             }
         }
         
-        //-- handle inheritence
-        XMLClassDescriptor xmlClassDesc = null;
-        ClassDescriptor extendsDesc = classDesc.getExtends();
-        if (extendsDesc != null) {
-            if (extendsDesc instanceof XMLClassDescriptor)
-                xmlClassDesc = (XMLClassDescriptor) extendsDesc;
-            else {
-                xmlClassDesc = new XMLClassDescriptorAdapter(extendsDesc, null, primitiveNodeType);
-            }
-        }
-        setExtends(xmlClassDesc);
         
     } //-- process
     

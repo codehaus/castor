@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -52,6 +52,7 @@ import org.exolab.castor.builder.util.ConsoleDialog;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.BindXml;
@@ -316,6 +317,9 @@ public class MappingTool
         classMap.setName( cls.getName() );
         classMap.setDescription( "Default mapping for class " + cls.getName() );
         
+        //-- prevent default access from showing up in the mapping
+        classMap.setAccess(null); 
+        
         //-- map-to
         MapTo mapTo = new MapTo();
         mapTo.setXml( xmlClass.getXMLName() );
@@ -332,9 +336,19 @@ public class MappingTool
             
             FieldDescriptor fdesc = fields[ i ];
             
-            
             String fieldName = fdesc.getFieldName();
+            
+            boolean isContainer = false;
+            //-- check for collection wrapper
+            if (introspected && fieldName.startsWith("##container")) {
+                fdesc = fdesc.getClassDescriptor().getFields()[0];
+                fieldName = fdesc.getFieldName();
+                isContainer = true;
+            }
+            
+            
             Class fieldType = fdesc.getFieldType();
+            
             
             //-- check to make sure we can find the accessors...
             //-- if we used introspection we don't need to
@@ -369,7 +383,6 @@ public class MappingTool
             while (fieldType.isArray())
                 fieldType = fieldType.getComponentType();
                 
-            fieldMap.setType( fieldType.getName() );
             
             //-- To prevent outputing of optional fields...check
             //-- for value first before setting
@@ -377,17 +390,41 @@ public class MappingTool
             if (fdesc.isTransient()) fieldMap.setTransient( true );
             if ( fdesc.isMultivalued() ) {
                 
-                //-- try to guess collection type
+                //-- special case for collections
+                if (isContainer) {
+                    //-- backwards than what you'd expect, but
+                    //-- if the collection had a "container" wrapper
+                    //-- then we specify container="false" in the
+                    //-- mapping file.
+                    fieldMap.setContainer(false);
+                }
                 
-                if (isArray || 
-                    _mappingLoader.returnsArray(cls, fieldName, fieldType)) 
-                {
-                    fieldMap.setCollection( CollectionType.ARRAY );
+                //-- try to guess collection type
+                if (isArray) {
+                    fieldMap.setCollection(CollectionType.ARRAY);
                 }
                 else {
-                    fieldMap.setCollection( CollectionType.ENUMERATE );
+                    //-- if the fieldType is the collection, then set appropriate
+                    //-- collection type 
+                    String colName = CollectionHandlers.getCollectionName(fieldType);
+                    if (colName != null) {
+                        fieldMap.setCollection(CollectionType.valueOf(colName));
+                        fieldType = Object.class;
+                    }
+                    //-- help maintain compatibility with generated
+                    //-- descriptors
+                    else if (_mappingLoader.returnsArray(cls, fieldName, fieldType)) {
+                        fieldMap.setCollection( CollectionType.ARRAY );
+                    }
+                    else {
+                        fieldMap.setCollection( CollectionType.ENUMERATE );
+                    }
                 }
             }
+            
+            //-- fieldType
+            fieldMap.setType( fieldType.getName() );
+            
                 
             //-- handle XML Specific information
             fieldMap.setBindXml( new BindXml() );

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -270,7 +270,7 @@ public final class J1CollectionHandlers
 
         public Object nextElement()
         {
-            if ( _index >  Array.getLength(_array) )
+            if ( _index >=  Array.getLength(_array) )
                 throw new NoSuchElementException();
             return Array.get(_array, _index++ );
         }

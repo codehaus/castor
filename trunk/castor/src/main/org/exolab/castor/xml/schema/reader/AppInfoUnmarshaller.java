@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,6 +51,10 @@ import org.exolab.castor.xml.Namespaces;
 import org.exolab.castor.xml.XMLException;
 import org.exolab.castor.xml.schema.AppInfo;
 import org.exolab.castor.xml.schema.SchemaNames;
+
+import org.exolab.castor.types.AnyNode;
+import java.util.Enumeration;
+import java.util.Stack;
 
 /**
  * A class for Unmarshalling XML Schema <appinfo> elements
@@ -65,21 +69,14 @@ public class AppInfoUnmarshaller extends ComponentReader {
     //--------------------/
 
     /**
-     * The current ComponentReader
-    **/
-    private ComponentReader unmarshaller;
-
-    /**
-     * The current branch depth
-    **/
-    private int depth = 0;
-
-    /**
      * The Attribute reference for the Attribute we are constructing
-    **/
+     */
     private AppInfo _appInfo = null;
 
-    private StringBuffer sb = null;
+    /**
+     * Stack of AnyNodes being unmarshalled
+     */
+    private Stack _nodes = null;
 
 
       //----------------/
@@ -96,11 +93,9 @@ public class AppInfoUnmarshaller extends ComponentReader {
         super();
 
         _appInfo = new AppInfo();
-
-        //-- handle attributes
-        String attValue = null;
-
         _appInfo.setSource(atts.getValue(SchemaNames.SOURCE_ATTR));
+        
+        _nodes = new Stack();
 
     } //-- AppInfoUnmarshaller
 
@@ -112,7 +107,6 @@ public class AppInfoUnmarshaller extends ComponentReader {
      *
     **/
     public AppInfo getAppInfo() {
-        if (sb != null) finish();
         return _appInfo;
     } //-- getArchetype
 
@@ -131,10 +125,7 @@ public class AppInfoUnmarshaller extends ComponentReader {
      * be overridden to perform any necessary clean up by an unmarshaller
     **/
     public void finish() {
-        if (sb != null) {
-            _appInfo.setContent(sb.toString());
-            sb = null;
-        }
+        //-- do nothing
     } //-- finish
 
     /**
@@ -162,8 +153,44 @@ public class AppInfoUnmarshaller extends ComponentReader {
         Namespaces nsDecls)
         throws XMLException
     {
-        //-- ignore all daughter elements for now
-        ++depth;
+        
+        String prefix = null;
+        if (nsDecls != null) {
+            //-- find prefix (elements use default namespace if null)
+            if (namespace == null) namespace = "";
+            prefix = nsDecls.getNamespacePrefix(namespace);
+        }
+        
+        AnyNode node = new AnyNode(AnyNode.ELEMENT, name, prefix, namespace, null);
+        _nodes.push(node);
+        
+        //-- process namespace nodes
+        if (nsDecls != null) {
+            Enumeration enum = nsDecls.getLocalNamespaces();
+            while (enum.hasMoreElements()) {
+                namespace = (String)enum.nextElement();
+                prefix = nsDecls.getNamespacePrefix(namespace);
+                node.addNamespace ( new AnyNode(AnyNode.NAMESPACE, 
+                                                null,  //-- no local name for a ns decl.
+                                                prefix, 
+                                                namespace,
+                                                null)); //-- no value
+            }
+        }
+        //-- process attributes
+        if (atts != null) {
+            for (int i = 0; i < atts.getSize(); i++) {
+                namespace = atts.getNamespace(i);
+                if ((nsDecls != null) && (namespace != null)) {
+                    prefix = nsDecls.getNamespacePrefix(namespace);
+                }
+                else prefix = null;
+                node.addAttribute( new AnyNode(AnyNode.ATTRIBUTE, 
+                                           atts.getName(i), 
+                                           prefix, namespace, 
+                                           atts.getValue(i)) );
+            }
+        }
 
     } //-- startElement
 
@@ -177,20 +204,35 @@ public class AppInfoUnmarshaller extends ComponentReader {
     public void endElement(String name, String namespace)
         throws XMLException
     {
-        --depth;
+        AnyNode node = (AnyNode)_nodes.pop();
+        if (_nodes.isEmpty()) {
+            //-- add to appInfo
+            _appInfo.add(node);
+        }
+        else {
+            //-- add to parent AnyNode
+            ((AnyNode)_nodes.peek()).addChild(node);
+        }
     } //-- endElement
 
     public void characters(char[] ch, int start, int length)
         throws XMLException
     {
         //-- Do delagation if necessary
-        if (unmarshaller != null) {
-            unmarshaller.characters(ch, start, length);
+        AnyNode text = new AnyNode(AnyNode.TEXT, 
+                                   null,  //-- no local name for text nodes 
+                                   null,  //-- no prefix
+                                   null,  //-- no namespace
+                                   new String(ch, start, length));
+                                   
+        if (!_nodes.isEmpty()) {
+            AnyNode parent = (AnyNode)_nodes.peek();
+            parent.addChild(text);
         }
-
-        if (sb == null) sb = new StringBuffer();
-        sb.append(ch, start, length);
-
+        else {
+            _appInfo.add(text);
+        }
+        
     } //-- characters
 
 } //-- AppInfoUnmarshaller

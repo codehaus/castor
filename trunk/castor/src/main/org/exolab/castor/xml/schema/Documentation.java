@@ -38,104 +38,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.ValidationException;
-
-import java.util.Enumeration;
-import java.util.Vector;
-
 /**
  * A class which represents the XML Schema Documentation element
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
-public class Documentation extends Structure {
+ * @see AnnotationItem
+ */
+public class Documentation extends AnnotationItem {
 
 
-    /**
-     * The text content of this Documentation
-    **/
-    private String content = null;
-
-    /**
-     * List of any elements
-    **/
-    private Vector objects = null;
-
-    /**
-     * The source attribute
-    **/
-    private String _source = null;
 
     /**
      * Creates a new Documentation
-    **/
+     */
     public Documentation() {
-        objects = new Vector(3);
-    } //-- Annotation
+        super();
+    } //-- Documentation
 
-    /**
-     * Adds the given Object to this Documentation
-     * @param object the Object to add
-    **/
-    public void add(Object object) {
-        if (object != null)
-            objects.addElement(object);
-    } //-- add
-
-    /**
-     * Returns the String content of this Documentation
-     * @return the String content of this Documentation
-    **/
-    public String getContent() {
-        return content;
-    } //-- getContent
-
-    /**
-     * Returns an Enumeration of all objects contained by this Documentation.
-     * @return an Enumeration of all objects contained by this Documentation.
-    **/
-    public Enumeration getObjects() {
-        return objects.elements();
-    } //-- getObjects
-
-    /**
-     * Returns the source property of this Documentation
-     * @return the source property of this Documentation
-    **/
-    public String getSource() {
-        return _source;
-    } //-- getBase
-
-    /**
-     * Removes the given Object from this Documentation
-     * @param object the Object to remove
-    **/
-    public void remove(Object object) {
-        if (object != null) objects.removeElement(object);
-    } //-- remove
-
-    /**
-     * Sets the String content for this Documentation
-     * @param content the String content for this Documentation
-    **/
-    public void setContent(String content) {
-        this.content = content;
-    } //-- setContent
-
-    /**
-     * Sets the base property for this Documentation
-     * @param base the value of the base property
-    **/
-    public void setSource(String source) {
-        _source = source;
-    } //-- setBase
 
     //-------------------------------/
     //- Implementation of Structure -/
@@ -148,16 +75,5 @@ public class Documentation extends Structure {
     public short getStructureType() {
         return Structure.DOCUMENTATION;
     } //-- getStructureType
-
-    /**
-     * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
-     * is invalid.
-    **/
-    public void validate()
-        throws ValidationException
-    {
-        //-- do nothing
-    } //-- validate
 
 } //-- Documentation

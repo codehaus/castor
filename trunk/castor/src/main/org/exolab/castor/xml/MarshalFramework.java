@@ -45,6 +45,10 @@
 
 package org.exolab.castor.xml;
 
+import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.loader.CollectionHandlers;
+
 import java.util.Vector;
 
 
@@ -93,6 +97,34 @@ abstract class MarshalFramework {
     **/
     static final String QNAME_NAME = "QName";
 
+    /**
+     * Returns true if the given Class is a considered a
+     * collection by the marshalling framework.
+     *
+     * @return true if the given Class is considered a collection.
+     */
+    public static boolean isCollection(Class clazz) {
+        return CollectionHandlers.hasHandler(clazz);
+    } //-- isCollection
+    
+    /**
+     * Returns the CollectionHandler associated with the
+     * given collection, or null if no such handler exists.
+     *
+     * @return the CollectionHandler for the associated type.
+     */
+    public CollectionHandler getCollectionHandler(Class clazz) {
+        CollectionHandler handler = null;
+        try {
+            handler = CollectionHandlers.getHandler(clazz);
+        }
+        catch(MappingException mx) {
+            //-- Not a collection, or no handler exists, return null.
+        }
+        return handler;
+    } //-- getCollectionHandler
+    
+    
     /**
      * Returns true if the given class should be treated as a primitive
      * type. This method will return true for all Java primitive

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2001-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  * Date         Author           Changes
@@ -168,6 +168,17 @@ public class DateTimeValidator implements TypeValidator {
 
     } //-- validate
 
+    /**
+     * Validates the given Object
+     *
+     * @param object the Object to validate
+     */
+    public void validate(Object object) 
+        throws ValidationException
+    {
+        validate(object, (ValidationContext)null);
+    } //-- validate
+    
     /**
      * Validates the given Object
      *

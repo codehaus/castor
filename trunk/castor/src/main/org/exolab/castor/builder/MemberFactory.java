@@ -151,7 +151,17 @@ public class MemberFactory {
     public FieldInfo createFieldInfoForContent(XSType xsType) {
 
         String fieldName = "_content";               //new xsType()???
-        FieldInfo fInfo = _infoFactory.createFieldInfo(xsType,fieldName);
+        FieldInfo fInfo = null;
+        if (xsType.getType() == XSType.COLLECTION) {
+            fInfo = _infoFactory.createCollection( ((XSList) xsType).getContentType(),
+                                                     fieldName,
+                                                     null);
+                    
+        }
+        
+        else {
+            fInfo = _infoFactory.createFieldInfo(xsType,fieldName);
+        }
         fInfo.setNodeType(XMLInfo.TEXT_TYPE);
         fInfo.setComment("internal content storage");
         fInfo.setRequired(false);
@@ -419,6 +429,25 @@ public class MemberFactory {
             //-- just use first annotation
             return createComment((Annotation) enum.nextElement());
         }
+        else {
+            //-- there were no annotations...try possible references
+            switch(annotated.getStructureType()) {
+                case Structure.ELEMENT:
+                    ElementDecl elem = (ElementDecl)annotated;
+                    if (elem.isReference()) {
+                        return createComment(elem.getReference());
+                    }
+                    break;
+                case Structure.ATTRIBUTE:
+                    AttributeDecl att = (AttributeDecl)annotated;
+                    if (att.isReference()) {
+                        return createComment(att.getReference());
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
         return null;
     } //-- createComment
 
@@ -443,7 +472,7 @@ public class MemberFactory {
      *
      * @param value the String to normalize
     **/
-    private String normalize (String value) {
+    private static String normalize (String value) {
 
         if (value == null) return null;
 

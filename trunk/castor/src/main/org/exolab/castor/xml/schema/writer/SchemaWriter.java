@@ -260,13 +260,7 @@ public class SchemaWriter {
             if (source != null)
                 _atts.addAttribute(SchemaNames.SOURCE_ATTR, CDATA,source);
 
-            String content = app.getContent();
-            if ((content != null) && (content.length() > 0)) {
-                char[] chars = content.toCharArray();
-                _handler.startElement(ELEM_APPINFO, _atts);
-                _handler.characters(chars, 0, chars.length);
-                _handler.endElement(ELEM_APPINFO);
-            }
+            _handler.startElement(ELEM_APPINFO, _atts);
             Enumeration anyNodes = app.getObjects();
             while (anyNodes.hasMoreElements()) {
                 Object obj = anyNodes.nextElement();
@@ -275,7 +269,13 @@ public class SchemaWriter {
                     anyNode2SAX.setDocumentHandler(_handler);
                     anyNode2SAX.start();
                 }
+                else {
+                    char[] chars = obj.toString().toCharArray();
+                    _handler.characters(chars, 0, chars.length);
+                    
+                }
             }
+            _handler.endElement(ELEM_APPINFO);
         }
         
         //-- process documentation elements
@@ -287,13 +287,7 @@ public class SchemaWriter {
             if (source != null)
                 _atts.addAttribute(SchemaNames.SOURCE_ATTR, CDATA,source);
 
-            String content = doc.getContent();
-            if ((content != null) && (content.length() > 0)) {
-                char[] chars = content.toCharArray();
-                _handler.startElement(ELEM_DOCUMENTATION, _atts);
-                _handler.characters(chars, 0, chars.length);
-                _handler.endElement(ELEM_DOCUMENTATION);
-            }
+            _handler.startElement(ELEM_DOCUMENTATION, _atts);
             Enumeration anyNodes = doc.getObjects();
             while (anyNodes.hasMoreElements()) {
                 Object obj = anyNodes.nextElement();
@@ -302,7 +296,13 @@ public class SchemaWriter {
                     anyNode2SAX.setDocumentHandler(_handler);
                     anyNode2SAX.start();
                 }
+                else {
+                    char[] chars = obj.toString().toCharArray();
+                    _handler.characters(chars, 0, chars.length);
+                    
+                }
             }
+            _handler.endElement(ELEM_DOCUMENTATION);
         }
         
 
@@ -332,7 +332,7 @@ public class SchemaWriter {
         }
         else {
             _atts.addAttribute(SchemaNames.REF_ATTR, CDATA,
-                attribute.getName(false));
+                attribute.getReferenceName());
         }
 
 
@@ -345,9 +345,19 @@ public class SchemaWriter {
 
                 String typeName = type.getName();
 
-                //-- add "xsd" prefix if necessary
-                if ((typeName.indexOf(':') < 0) && type.isBuiltInType()) {
-                    typeName = schemaPrefix + typeName;
+                //-- add prefix if necessary
+                if (typeName.indexOf(':') < 0) {
+                    if (type.isBuiltInType()) {
+                        typeName = schemaPrefix + typeName;  // xsd prefix
+                    }
+                    else {
+                        // resolve prefix
+                        String namespace = type.getSchema().getTargetNamespace();
+                        if (namespace == null) namespace = "";
+                        String prefix = getNSPrefix(attribute.getSchema(), namespace);
+                        if ((prefix != null) && (prefix.length() > 0))
+                            typeName = prefix + ":" + typeName;
+                    }
                 }
                 _atts.addAttribute(ATTR_TYPE, CDATA, typeName);
             }
@@ -443,15 +453,19 @@ public class SchemaWriter {
 
         if (!isReference) {
             AttributeGroupDecl group = (AttributeGroupDecl)attGroup;
-            Enumeration enum = group.getMyAttributes();
+            Enumeration enum = group.getLocalAttributes();
             while (enum.hasMoreElements()) {
                 processAttribute((AttributeDecl)enum.nextElement(),
                     schemaPrefix);
             }
-            enum = group.getMyAttributeGroupReferences();
+            enum = group.getLocalAttributeGroupReferences();
             while (enum.hasMoreElements()) {
                 processAttributeGroup((AttributeGroup)enum.nextElement(),
                     schemaPrefix);
+            }
+            
+            if (group.getAnyAttribute() != null) {
+                processWildcard(group.getAnyAttribute(), schemaPrefix);
             }
         }
 
@@ -606,9 +620,13 @@ public class SchemaWriter {
         processContentModelGroup(complexType, schemaPrefix);
 
         //-- process Attributes, must appear last in a complex type
-        Enumeration enum = complexType.getAttributeDecls();
+        Enumeration enum = complexType.getLocalAttributeDecls();
         while (enum.hasMoreElements()) {
             processAttribute((AttributeDecl)enum.nextElement(), schemaPrefix);
+        }
+        enum = complexType.getAttributeGroupReferences();
+        while (enum.hasMoreElements()) {
+            processAttributeGroup((AttributeGroup)enum.nextElement(), schemaPrefix);
         }
 
         if (baseType != null) {
@@ -640,6 +658,9 @@ public class SchemaWriter {
                 case Structure.MODELGROUP:
                 case Structure.GROUP:
                     processGroup((Group)structure, schemaPrefix);
+                    break;
+                case Structure.WILDCARD:
+                    processWildcard((Wildcard)structure, schemaPrefix);
                     break;
                 default:
                     break;
@@ -843,6 +864,13 @@ public class SchemaWriter {
                 ModelGroup refGroup = mGroup.getReference();
                 if (refGroup != null) {
                     reference = refGroup.getName();
+                    //-- prefix
+                    String namespace = refGroup.getSchema().getTargetNamespace();
+                    if (namespace == null) namespace = "";
+                    String prefix = getNSPrefix(mGroup.getSchema(), namespace);
+                    if ((prefix != null) && (prefix.length() > 0))
+                        reference = prefix + ':' + reference;
+                    
                 }
             }
         }
@@ -859,14 +887,12 @@ public class SchemaWriter {
                 group.getId());
         }
 
-
-        String groupName = group.getName();
-        if (groupName != null) {
-            _atts.addAttribute(ATTR_NAME, CDATA, groupName);
-        }
         //-- reference
-        else if (reference != null) {
+        if (reference != null) {
             _atts.addAttribute("ref", CDATA, reference);
+        }
+        else if (group.getName() != null) {
+            _atts.addAttribute(ATTR_NAME, CDATA, group.getName());
         }
 
         //-- minOccurs/maxOccurs
@@ -894,7 +920,9 @@ public class SchemaWriter {
         processAnnotated(group, schemaPrefix);
 
         //-- process content model
-        processContentModelGroup(group, schemaPrefix);
+        if (reference == null) {
+            processContentModelGroup(group, schemaPrefix);
+        }
 
         _handler.endElement(ELEMENT_NAME);
 
@@ -1136,6 +1164,64 @@ public class SchemaWriter {
 
     } //-- processSchema
 
+    /**
+     * Process a Wildcard (xsd:any) component
+     *
+     * @param wildcard the Wildcard to process
+     * @param schemaPrefix the namespace prefix to use for schema elements
+     */
+    private void processWildcard(Wildcard wildcard, String schemaPrefix) 
+        throws SAXException
+    {
+        
+        String ELEMENT_NAME = null;
+        if (wildcard.isAttributeWildcard())
+            ELEMENT_NAME = schemaPrefix + SchemaNames.ANY_ATTRIBUTE;
+        else 
+            ELEMENT_NAME = schemaPrefix + SchemaNames.ANY;
+            
+        _atts.clear();
+        
+        //-- @namespace
+        StringBuffer namespace = new StringBuffer();
+        Enumeration enum = wildcard.getNamespaces();
+        while (enum.hasMoreElements()) {
+            if (namespace.length() > 0) namespace.append(' ');
+            namespace.append(enum.nextElement().toString());
+        }
+        if (namespace.length() > 0) {
+            _atts.addAttribute(SchemaNames.NAMESPACE, CDATA, namespace.toString());
+        }
+        
+        //-- minOccurs/maxOccurs
+        int max = wildcard.getMaxOccurs();
+        int min = wildcard.getMinOccurs();
+
+        if (min != 1) {
+            _atts.addAttribute(SchemaNames.MIN_OCCURS_ATTR, CDATA,
+                Integer.toString(min));
+        }
+
+        if (max < 0) {
+            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA,
+                "unbounded");
+        }
+        else if (max != 1) {
+            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA,
+                Integer.toString(max));
+        }
+        
+        //-- @processContents
+        String value = wildcard.getProcessContent();
+        if (value != null) {
+            _atts.addAttribute(SchemaNames.PROCESS_CONTENTS, CDATA, value);
+        }
+        _handler.startElement(ELEMENT_NAME, _atts);
+        processAnnotated(wildcard, schemaPrefix);
+        _handler.endElement(ELEMENT_NAME);
+        
+    } //-- processWildcard
+    
     /**
      * Process an imported schema
      *

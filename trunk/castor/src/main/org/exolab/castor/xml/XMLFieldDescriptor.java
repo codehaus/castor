@@ -145,7 +145,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
 
     /**
      * Returns true if the field described by this descriptor is a container
-     * field. A container is a field that should is not a first-class object,
+     * field. A container is a field that is not a first-class object,
      * and should therefore have no XML representation. 
      *
      * @return true if the field is a container

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -346,7 +346,7 @@ public final class Namespaces {
             ns = ns.next;
         }
 
-        if ((_parent != null) && local) {
+        if ((_parent != null) && (!local)) {
             _parent.getNamespacePrefixes(nsURI, local, prefixes);
         }
 

@@ -38,104 +38,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.ValidationException;
-
-import java.util.Enumeration;
-import java.util.Vector;
 
 /**
  * A class which represents the AppInfo element
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
-**/
-public class AppInfo extends Structure {
+ * @see AnnotationItem
+ */
+public class AppInfo extends AnnotationItem {
     
-    
-    /**
-     * The text content of this AppInfo
-    **/
-    private String content = null;
-    
-    /**
-     * List of any elements
-    **/
-    private Vector objects = null;
-    
-    /**
-     * The source attribute
-    **/
-    private String source = null;
     
     /**
      * Creates a new AppInfo
-    **/
+     */
     public AppInfo() {
-        objects = new Vector(3);
-    } //-- Annotation
-    
-    /**
-     * Adds the given Object to this AppInfo
-     * @param object the Object to add
-    **/
-    public void add(Object object) {
-        if (object != null)
-            objects.addElement(object);
-    } //-- add
-    
-    /**
-     * Returns the String content of this AppInfo
-     * @return the String content of this AppInfo
-    **/
-    public String getContent() {
-        return content;
-    } //-- getContent
-    
-    /**
-     * Returns an Enumeration of all objects contained by this AppInfo.
-     * @return an Enumeration of all objects contained by this AppInfo.
-    **/
-    public Enumeration getObjects() {
-        return objects.elements();
-    } //-- getObjects
-    
-    /**
-     * Returns the source property of this AppInfo
-     * @return the source property of this AppInfo
-    **/
-    public String getSource() {
-        return source;
-    } //-- getSource
-    
-    /**
-     * Removes the given Object from this AppInfo
-     * @param object the Object to remove
-    **/
-    public void remove(Object object) {
-        if (object != null) objects.removeElement(object);
-    } //-- remove
-
-    /**
-     * Sets the String content for this AppInfo
-     * @param content the String content for this AppInfo
-    **/
-    public void setContent(String content) {
-        this.content = content;
-    } //-- setContent
-    
-    /**
-     * Sets the source property for this AppInfo
-     * @param source the value of the source property
-    **/
-    public void setSource(String source) {
-        this.source = source;
-    } //-- setSource
+        super();
+    } //-- AppInfo
     
     //-------------------------------/
     //- Implementation of Structure -/
@@ -143,21 +69,11 @@ public class AppInfo extends Structure {
     
     /**
      * Returns the type of this Schema Structure
+     *
      * @return the type of this Schema Structure
-    **/
+     */
     public short getStructureType() {
         return Structure.APPINFO;
     } //-- getStructureType
     
-    /**
-     * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
-     * is invalid.
-    **/
-    public void validate()
-        throws ValidationException 
-    {
-        //-- do nothing
-    } //-- validate
-    
-} //-- AppInfo
+} //-- class: AppInfo
