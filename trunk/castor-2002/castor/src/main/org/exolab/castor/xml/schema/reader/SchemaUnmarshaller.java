@@ -50,16 +50,25 @@ import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
+import java.util.Hashtable;
+
 /**
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class SchemaUnmarshaller extends SaxUnmarshaller {
     
+    public static final String XSD_NAMESPACE 
+        = "http://www.w3.org/1999/XMLSchema";
+        
+        
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
+    private static final String XMLNS        = "xmlns";
+    private static final String XMLNS_PREFIX = "xmlns:";
+    
     /**
      * The current SaxUnmarshaller
     **/
@@ -81,20 +90,26 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     
     private boolean foundSchemaDef = false;
     
+    
+    private String defaultNS = null;
+    
+    private Hashtable namespaces = null;
+    
       //----------------/
      //- Constructors -/
     //----------------/
 
     public SchemaUnmarshaller() {
-        _schema = new Schema();
-        _resolver = new ScopableResolver();
-    }
+        this(null, null);
+        foundSchemaDef = false;
+    } //-- SchemaUnmarshaller
     
     public SchemaUnmarshaller(AttributeList atts, Resolver resolver) {
         super();
-        setResolver(resolver);        
         _schema = new Schema();
+        setResolver(resolver);        
         foundSchemaDef = true;
+        namespaces = new Hashtable();
         init(atts);
     } //-- SchemaUnmarshaller
     
@@ -127,10 +142,54 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     **/
     private void init(AttributeList atts) {
         if (atts == null) return;
-        String nsURI = atts.getValue("targetNamespace");
+        
+        String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
         if ((nsURI != null) && (nsURI.length() > 0))
             _schema.setTargetNamespace(nsURI);
+            
     } //-- init
+    
+    /**
+     * Handles namespace attributes
+    **/
+    private void handleXMLNS(String attName, String attValue) {
+        
+        if ((attName == null) || (!attName.startsWith(XMLNS))) {
+            throw new IllegalArgumentException(attName + 
+                " is not a namespace attribute.");
+        }
+        if ((attValue == null) || (attValue.length() == 0))
+            throw new IllegalArgumentException("error null or empty " + 
+                "namespace value");
+        
+        if (attName.equals(XMLNS)) {
+            defaultNS = attValue;
+            return;
+        }
+        
+        String prefix = attName.substring(XMLNS_PREFIX.length());
+        
+        //-- register namespace
+        namespaces.put(prefix, attValue);
+
+    } //-- handleXMLNS
+    
+    private void processNamespaces(AttributeList atts) {
+        if (atts == null) return;
+        //-- loop through atts
+        for (int i = 0; i < atts.getLength(); i++) {
+            String attName = atts.getName(i);
+            if (attName.equals(XMLNS) || attName.startsWith(XMLNS_PREFIX))
+                handleXMLNS(attName, atts.getValue(i));
+        }
+    } //-- processNamespaces
+    
+    
+    public void setResolver(Resolver resolver) {
+        if (resolver == null) resolver = new ScopableResolver();
+        super.setResolver(resolver);
+        _resolver = resolver;
+    } //-- setResolver
     
     //-------------------------------------------------/
     //- implementation of org.xml.sax.DocumentHandler -/
@@ -142,6 +201,40 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         
         if (skipAll) return;
         
+        String rawName = name;
+        
+        //-- handle namespaces
+        processNamespaces(atts);
+        String namespace = null;
+        int idx = name.indexOf(':');
+        if (idx >= 0 ) {
+            String prefix = name.substring(0,idx);
+            name = name.substring(idx+1);
+            namespace = (String)namespaces.get(prefix);
+        }
+        else namespace = defaultNS;
+        
+        
+        //-- backward compatibility, we'll need to 
+        //-- remove this at some point
+        if ((!foundSchemaDef) && (idx < 0)) {
+            if (defaultNS == null) {
+                defaultNS = XSD_NAMESPACE;
+                namespace = XSD_NAMESPACE;
+                System.out.println("No namespace declaration has been " +
+                    "found for " + name);
+                System.out.print("   * assuming default namespace of ");
+                System.out.println(XSD_NAMESPACE);
+            }
+        }
+        //-- end of backward compatibility
+        
+        //-- check namespace
+        if (!XSD_NAMESPACE.equals(namespace)) {
+            throw new SAXException(rawName + 
+                " has not been declared in the XML Schema namespace");
+        }
+        
         //-- Do delagation if necessary
         if (unmarshaller != null) {
             unmarshaller.startElement(name, atts);
@@ -150,10 +243,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         
         
+        
         //-- use VM internal String of name
         name = name.intern();
                 
-        
         if (name == SchemaNames.SCHEMA) {
             
             if (foundSchemaDef)
@@ -196,6 +289,18 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     public void endElement(String name) throws SAXException {
                 
         if (skipAll) return;
+        
+        String rawName = name;
+        
+        //-- handle namespaces
+        String namespace = null;
+        int idx = name.indexOf(':');
+        if (idx >= 0 ) {
+            String prefix = name.substring(0,idx);
+            name = name.substring(idx+1);
+            namespace = (String)namespaces.get(prefix);
+        }
+        else namespace = defaultNS;
         
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
