@@ -77,7 +77,7 @@ public final class Order {
             case CHOICE:
                 return "choice";
             case SEQUENCE:
-                return "seq";
+                return "sequence";
             default:
                 return "all";
         }
@@ -92,7 +92,7 @@ public final class Order {
         else if ("choice".equals(value)) {
             return Order.choice;
         }
-        else if ("seq".equals(value)) {
+        else if ("sequence".equals(value)) {
             return Order.seq;
         }
         else {
