@@ -866,16 +866,17 @@ public abstract class MappingLoader
                 else {
                     fieldType = Types.typeFromPrimitive(fieldType);
                     Class returnType = Types.typeFromPrimitive( method.getReturnType());
+                    
+                    //-- First check against whether the declared type is
+                    //-- an interface or abstract class. We also check
+                    //-- type as Serializable for CMP 1.1 compatibility.
                     if (fieldType.isInterface() ||
-                        (fieldType.getModifiers() & Modifier.ABSTRACT) != 0) {
+                        ((fieldType.getModifiers() & Modifier.ABSTRACT) != 0) ||
+                        (fieldType == java.io.Serializable.class))
+                    {
                         if ( ! fieldType.isAssignableFrom( returnType ) )
                         throw new MappingException("mapping.accessorReturnTypeMismatch",
                                                     method, fieldType.getName() );
-                    }
-                    else if ( fieldType == java.io.Serializable.class && java.io.Serializable.class.isAssignableFrom( method.getReturnType() ) ) {
-                        // Since user declared type as Serializable we
-                        // simply let it slip passed this code. This is
-                        // needed for CMP 1.1 compatibility. 
                     }
                     else {
                         if ( ! returnType.isAssignableFrom( fieldType ) )
