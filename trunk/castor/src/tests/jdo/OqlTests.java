@@ -85,7 +85,7 @@ public class OqlTests extends CastorTestCase {
 
     private QueryResults   _results;
 
-    public OqlExtends( TestHarness category ) 
+    public OqlTests( TestHarness category ) 
     {
         super( category, "TC61", "OQL-supported syntax" );
         _category = (JDOCategory) category;
