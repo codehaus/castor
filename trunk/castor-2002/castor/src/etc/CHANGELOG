@@ -14,8 +14,7 @@ XML:     We are now one step closer to using the mapping files with Castor XML.
            and XMLFieldDescriptor respectively, and the interfaces have changed so
            be careful.
          - We added the XMLFieldHandler
-         - Changed MarshalInfoResolver to ClassDescriptorResolver and moved
-           the automatic ClassDescriptor creation from MarshalHelper to this class
+         - Changed MarshalInfoResolver to ClassDescriptorResolver
 
 Version 0.7.12  March 15, 2000
 ------------------------------
