@@ -853,13 +853,17 @@ public class Lexer {
         if (str == null) return new Token(null, Token.NULL);
         for (int i = 0; i < tokenSet.length; i++) {
             Token token = tokenSet[i];
-            if (token.value.equals(str)) return token;
+            if (token.value.equals(str)) {
+                //-- important to return a new Token...so that
+                //-- the set of *static* tokens don't get changed.
+                return new Token(token.value, token.type);
+            }
         }
         return null;
     } //-- match
         
     /*  For Debugging */
-    /* 
+    /*
     public static void main(String[] args) {
 
         String pattern = null;
