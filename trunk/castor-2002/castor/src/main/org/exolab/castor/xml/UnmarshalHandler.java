@@ -273,23 +273,7 @@ public class UnmarshalHandler implements DocumentHandler {
             else
                 state.object = MarshalHelper.toPrimitiveObject(type,str);
         }
-        
-        //-- Add to parent Object if necessary
-        
-        if (_stateInfo.empty()) {
-            //-- we are at the end of the root element
-            if (_validate) {
-                try {
-                    Validator.validate(state.object, _mResolver);
-                }
-                catch(ValidationException vEx) {
-                    throw new SAXException(vEx);
-                }
-            }
-            return;
-        }
-        
-        
+               
         //-- check for character content
         if ((state.buffer != null) && 
             (state.buffer.length() > 0) &&
@@ -313,9 +297,23 @@ public class UnmarshalHandler implements DocumentHandler {
             }
         }
         
-        //-- we can return if we already set the Object
-        //-- in it's parent
-        if (descriptor.isIncremental()) return;
+        //-- if we are at root....just validate and we are done
+        if (_stateInfo.empty()) {
+            if (_validate) {
+                try {
+                    Validator.validate(state.object, _mResolver);
+                }
+                catch(ValidationException vEx) {
+                    throw new SAXException(vEx);
+                }
+            }
+            return;
+        }
+        
+        
+        //-- Add object to parent if necessary
+        
+        if (descriptor.isIncremental()) return; //-- already added
         
         Object val = state.object;
         
