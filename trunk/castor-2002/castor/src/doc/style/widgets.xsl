@@ -112,4 +112,30 @@
     </xsl:copy>
   </xsl:template>
 
+
+  <xsl:template match="contributors">
+    <xsl:for-each select="type">
+      <xsl:variable name="type" select="@name"/>
+      <p><b><xsl:value-of select="@name"/></b></p>
+      <p><xsl:value-of select="."/></p>
+      <table cellpadding="4" cellspacing="2">
+        <xsl:for-each select="../contributor[@type=$type]">
+           <tr>
+             <td bgcolor="{$color-epsilon}">
+               <a href="mailto:{email}"><xsl:value-of select="name@given"/>&#xA0;<xsl:value-of select="name@surname"/></a>
+             </td>
+             <td bgcolor="{$color-epsilon}">
+               <xsl:value-of select="description"/>
+             </td>
+             <td bgcolor="{$color-epsilon}">
+               <xsl:variable name="company-id" select="company/@id"/>
+               <xsl:variable name="company" select="../company[@id=$company-id]"/>
+               <a href="http://{$company/url}"><xsl:value-of select="$company/name"/></a>
+             </td>
+           </tr>
+        </xsl:for-each>
+      </table>
+    </xsl:for-each>
+  </xsl:template>
+
 </xsl:stylesheet>

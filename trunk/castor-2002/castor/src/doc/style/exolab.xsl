@@ -13,7 +13,7 @@
   <xsl:include href="widgets.xsl"/>
 
 
-  <xsl:output method="html" indent="yes"/>
+  <xsl:output method="html" indent="no"/>
 
 
   <!-- Color -->
