@@ -47,8 +47,8 @@ package org.exolab.castor.jdo.engine;
 
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.conf.Mapping;
+import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.DTDResolver;
 import org.exolab.castor.xml.MarshalException;
@@ -73,7 +73,6 @@ public class JDOConfLoader {
         if (!_loaded) {
             
             Unmarshaller       unmarshaller;
-            Mapping            mapping;
 
             unmarshaller = new Unmarshaller (JdoConf.class);
             try {
