@@ -1376,7 +1376,9 @@ public class SourceFactory  {
                         gInfo.setMinOccurs(group.getMinOccurs());
                     }
                     //set the compositor
-                    if (group.getParent() instanceof ComplexType) {
+                    if ((contentModel instanceof ComplexType) ||
+                         (contentModel instanceof ModelGroup))
+                    {
                         if (group.getOrder() == Order.choice)
                             gInfo.setAsChoice();
                         else if (group.getOrder() == Order.all)
