@@ -47,6 +47,7 @@ package org.exolab.castor.util;
 
 import org.exolab.castor.jdo.conf.DataSource;
 import org.exolab.castor.jdo.conf.Database;
+import org.exolab.castor.jdo.conf.DatabaseChoice;
 import org.exolab.castor.jdo.conf.Driver;
 import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Mapping;
@@ -89,7 +90,7 @@ import org.exolab.castor.jdo.conf.TransactionManager;
  * jdoDbConf = JdoConfFactory.createJdoDbConf(db_name, "oracle", JdoConfFactory.createJdoDSConf(ds));
  * </code>
  *
- * @author Martin Fuchs <a href="mailto:martin-fuchs AT gmx DOT net">Martin Fuchs</a>
+ * @author Martin Fuchs <martin-fuchs AT gmx DOT net>
  */
 public class JdoConfFactory
 {
@@ -117,8 +118,10 @@ public class JdoConfFactory
 	public static Database createJdoDbConf(String db_name, String engine, DataSource dsConf)
 	{
 		Database dbConf = createJdoDbConf(db_name, engine);
+		DatabaseChoice dbChoice = new DatabaseChoice();
 
-		dbConf.getDatabaseChoice().setDataSource(dsConf);
+		dbChoice.setDataSource(dsConf);
+		dbConf.setDatabaseChoice(dbChoice);
 
 		return dbConf;
 	}
@@ -132,8 +135,10 @@ public class JdoConfFactory
 	public static Database createJdoDbConf(String db_name, String engine, Driver driverConf)
 	{
 		Database dbConf = createJdoDbConf(db_name, engine);
+		DatabaseChoice dbChoice = new DatabaseChoice();
 
-		dbConf.getDatabaseChoice().setDriver(driverConf);
+		dbChoice.setDriver(driverConf);
+		dbConf.setDatabaseChoice(dbChoice);
 
 		return dbConf;
 	}
@@ -147,7 +152,7 @@ public class JdoConfFactory
 	 */
 	public static JdoConf createJdoConf(Database jdoDbConf, TransactionDemarcation transConf)
 	{
-		return createJdoConf (new Database[] {jdoDbConf }, transConf );
+		return createJdoConf (new Database[] {jdoDbConf}, transConf);
 	}
 
 	/**
@@ -156,11 +161,11 @@ public class JdoConfFactory
 	 * @param transConf TransactionDemarcation configuration 
 	 * @return JDO configuration
 	 */
-	public static JdoConf createJdoConf(Database[] jdoDbConf, TransactionDemarcation transConf)
+	public static JdoConf createJdoConf(Database[] jdoDbConfArray, TransactionDemarcation transConf)
 	{
 		JdoConf jdoConf = new JdoConf();
 
-		jdoConf.setDatabase(jdoDbConf);
+		jdoConf.setDatabase(jdoDbConfArray);
 		jdoConf.setTransactionDemarcation(transConf);
 
 		return jdoConf;
@@ -182,11 +187,11 @@ public class JdoConfFactory
 	 * @param jdoDbConf Database configuration
 	 * @return JDO configuration
 	 */
-	public static JdoConf createJdoConf(Database[] jdoDbConf)
+	public static JdoConf createJdoConf(Database[] jdoDbConfArray)
 	{
 		JdoConf jdoConf = new JdoConf();
 
-		jdoConf.setDatabase(jdoDbConf);
+		jdoConf.setDatabase(jdoDbConfArray);
 		jdoConf.setTransactionDemarcation(createSimpleTransactionDemarcationConf());
 
 		return jdoConf;
