@@ -62,6 +62,7 @@ import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 //-- xml related imports
 import org.xml.sax.*;
 import org.xml.sax.helpers.ParserFactory;
+import org.xml.sax.helpers.AttributeListImpl;
 
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -86,7 +87,7 @@ import java.util.StringTokenizer;
  * @version $Revision$ $Date$
 **/
 public final class UnmarshalHandler extends MarshalFramework
-    implements DocumentHandler, ErrorHandler
+    implements ContentHandler, DocumentHandler, ErrorHandler
 {
 
 
@@ -259,6 +260,19 @@ public final class UnmarshalHandler extends MarshalFramework
      */
     private int     _ignoreElementDepth = 0;
 
+    /**
+     * A flag to keep track of when a new namespace scope is needed
+     */
+    private boolean _createNamespaceScope = true;
+    
+    /**
+     * A "reusable" AttributeSet, for use when handling
+     * SAX 2 ContentHandler
+     */
+    private AttributeSetImpl _reusableAtts = null;
+    
+    private Stack _statePool = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -285,6 +299,8 @@ public final class UnmarshalHandler extends MarshalFramework
         _topClass     = _class;
         _namespaces   = new Namespaces();
         _nsPackageMappings = new Hashtable();
+        _reusableAtts = new AttributeSetImpl(5);
+        _statePool    = new Stack();
     } //-- UnmarshalHandler(Class)
 
     /**
@@ -859,10 +875,53 @@ public final class UnmarshalHandler extends MarshalFramework
             throw new SAXException(err);
         }
 
-         //-- remove current namespace scoping
+        //-- remove current namespace scoping
         _namespaces = _namespaces.getParent();
+        //-- free fieldState 
+        freeState(fieldState);
 
     } //-- endElement
+
+    /**
+     * <p>ContentHandler#endElement</p>
+     *
+     * Signals the end of an element
+     *
+     * @param name the name of the element
+     */
+    public void endElement(String namespaceURI, String localName, String qName) 
+        throws org.xml.sax.SAXException
+    {        
+        if ((qName == null) || (qName.length() == 0)) {
+            if ((localName == null) || (localName.length() == 0)) {
+                String error = "Missing either 'qName' or 'localName', both cannot be null or emtpy.";
+                throw new SAXException(error);
+            }
+            qName = localName;
+            if ((namespaceURI != null) && (namespaceURI.length() > 0)) {
+                //-- rebuild qName, for now
+                String prefix = _namespaces.getNamespacePrefix(namespaceURI);
+                if ((prefix != null) && (prefix.length() > 0))
+                    qName = prefix + ":" + localName;
+            }
+        }
+        endElement(qName); 
+    } //-- endElement
+    
+    
+    /**
+     * Signals to end the namespace prefix mapping
+     * 
+     * @param prefix the namespace prefix 
+     */
+    public void endPrefixMapping(String prefix)
+        throws SAXException
+    { 
+        //-- do nothing, already taken care of in 
+        //-- endElement
+        
+    } //-- endPrefixMapping
+
 
     public void ignorableWhitespace(char[] ch, int start, int length)
         throws org.xml.sax.SAXException
@@ -885,6 +944,21 @@ public final class UnmarshalHandler extends MarshalFramework
         return _locator;
     } //-- getDocumentLocator
 
+    /**
+     * Signals that an entity was skipped by the parser
+     *
+     * @param name the skipped entity's name
+     */
+    public void skippedEntity(String name)
+        throws SAXException
+    {
+        //-- do nothing
+        
+    } //-- skippedEntity
+    
+    /**
+     * Signals the start of a new document
+     */
     public void startDocument()
         throws org.xml.sax.SAXException
     {
@@ -894,7 +968,170 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- important logic here
 
     } //-- startDocument
+    
+    
+    /**
+     * <p>ContentHandler#startElement</p>
+     *
+     * Signals the start of element
+     *
+     * @param name the name of the element
+     * @param atts the AttributeList containing the associated
+     * attributes for the element
+     */
+    public void startElement(String namespaceURI, String localName, String qName, Attributes atts)
+        throws org.xml.sax.SAXException 
+    {
+        
+        if (debug) {
+            if ((qName != null) && (qName.length() > 0))
+                message("#startElement: " + qName);
+            else
+                message("#startElement: " + localName);
+        }
+        
+        //-- If we are skipping elements that have appeared in the XML but for
+        //-- which we have no mapping, increase the ignore depth counter and return
+        if ((!_strictElements) && (_ignoreElementDepth > 0)) {
+            ++_ignoreElementDepth;
+            return;
+        }
 
+        //-- if we are in an <any> section
+        //-- we delegate the event handling
+        if (_anyUnmarshaller != null) {
+            _depth++;
+           _anyUnmarshaller.startElement(namespaceURI, localName, qName, atts);
+           return;
+        }
+        
+        //-- Create a new namespace scope if necessary and
+        //-- make sure the flag is reset to true
+        if (_createNamespaceScope)
+            _namespaces = _namespaces.createNamespaces();
+        else
+            _createNamespaceScope = true;
+            
+            
+        _reusableAtts.clear();
+        
+        //-- process attributes
+        boolean hasQNameAtts = false;
+        if ((atts != null) && (atts.getLength() > 0)) {
+            //-- look for any potential namespace declarations
+            //-- in case namespace processing was disable
+            //-- on the parser
+            for (int i = 0; i < atts.getLength(); i++) {
+                String attName = atts.getQName(i);
+                if ((attName != null) && (attName.length() > 0)) {
+                    if (attName.equals(XMLNS)) {
+                        _namespaces.addNamespace("", atts.getValue(i));
+                    }
+                    else if (attName.startsWith(XMLNS_PREFIX)) {
+                        String prefix = attName.substring(XMLNS_PREFIX.length());
+                        _namespaces.addNamespace(prefix, atts.getValue(i));
+                    }
+                    else {
+                        //-- check for prefix
+                        if (attName.indexOf(':') < 0) {
+                            _reusableAtts.setAttribute(attName,
+                                atts.getValue(i), atts.getURI(i));
+                        }
+                        else hasQNameAtts = true;
+                    }
+                }
+                else {
+                    //-- if attName is null or empty, just process as a normal
+                    //-- attribute
+                    attName = atts.getLocalName(i);
+                    if (XMLNS.equals(attName)) {
+                        _namespaces.addNamespace("", atts.getValue(i));
+                    }
+                    else {
+                        _reusableAtts.setAttribute(attName, atts.getValue(i), atts.getURI(i));
+                    }
+                }
+            }
+        }
+        //-- if we found any qName-only atts, process those
+        if (hasQNameAtts) {
+            for (int i = 0; i < atts.getLength(); i++) {
+                String attName = atts.getQName(i);
+                if ((attName != null) && (attName.length() > 0)) {
+                    //-- process any non-namespace qName atts
+                    if ((!attName.equals(XMLNS)) && (!attName.startsWith(XMLNS_PREFIX))) 
+                    {
+                        int idx = attName.indexOf(':');
+                        if (idx >= 0) {
+                            String prefix = attName.substring(0, idx);
+                            attName = attName.substring(idx+1);
+                            String nsURI = atts.getURI(i);
+                            if ((nsURI == null) || (nsURI.length() == 0)) {
+                                nsURI = _namespaces.getNamespaceURI(prefix);
+                            }
+                            _reusableAtts.setAttribute(attName, atts.getValue(i), nsURI);
+                        }
+                    }
+                }
+                //-- else skip already processed in previous loop
+            }
+        }
+        
+        //-- preserve parser passed arguments for any potential
+        //-- delegation
+        ElementInfo elemInfo = new ElementInfo(null, atts);
+        
+        if ((localName == null) || (localName.length() == 0)) {
+            if ((qName == null) || (qName.length() == 0)) {
+                String error = "Missing either 'localName' or 'qName', both cannot be emtpy or null.";
+                throw new SAXException(error);
+            }
+            localName = qName;
+            elemInfo.qName = qName;
+        }
+        else {
+            if ((qName == null) || (qName.length() == 0)) {
+                if ((namespaceURI == null) || (namespaceURI.length() == 0)) {
+                    elemInfo.qName = localName;
+                }
+                else {
+                    String prefix = _namespaces.getNamespacePrefix(namespaceURI);
+                    if ((prefix != null) && (prefix.length() > 0)) {
+                        elemInfo.qName = prefix + ":" + localName;
+                    }
+                }
+                
+            }
+        }
+        
+        int idx = localName.indexOf(':');
+        if (idx >= 0) {
+            String prefix = localName.substring(0, idx);
+            localName = localName.substring(idx+1);
+            if ((namespaceURI == null) || (namespaceURI.length() == 0)) {
+                namespaceURI = _namespaces.getNamespaceURI(prefix);
+            }
+        }
+        else {
+            //-- adjust empty namespace
+            if ((namespaceURI != null) && (namespaceURI.length() == 0))
+                namespaceURI = null;
+        }
+        
+        //-- call private startElement
+        startElement(localName, namespaceURI, _reusableAtts, elemInfo);
+        
+    } //-- startElement
+    
+    /**
+     * <p>DocumentHandler#startElement</p>
+     *
+     * Signals the start of element
+     *
+     * @param name the name of the element
+     * @param atts the AttributeList containing the associated
+     * attributes for the element
+     */
     public void startElement(String name, AttributeList attList)
         throws org.xml.sax.SAXException
     {
@@ -916,6 +1153,9 @@ public final class UnmarshalHandler extends MarshalFramework
            _anyUnmarshaller.startElement(name,attList);
            return;
         }
+        
+        ElementInfo elemInfo = new ElementInfo(name, attList);
+        
         //-- The namespace of the given element
         String namespace = null;
 
@@ -929,7 +1169,7 @@ public final class UnmarshalHandler extends MarshalFramework
         AttributeSet atts = processAttributeList(attList);
 
         String prefix = "";
-        String qName = name;
+        //String qName = name;
         int idx = name.indexOf(':');
         if (idx >= 0) {
              prefix = name.substring(0,idx);
@@ -937,7 +1177,29 @@ public final class UnmarshalHandler extends MarshalFramework
         }
 
         namespace = _namespaces.getNamespaceURI(prefix);
+        
         //-- End Namespace Handling
+        
+        //-- call private startElement method
+        startElement(name, namespace, atts, elemInfo);
+        
+    } //-- startElement
+        
+    /**
+     * Signals the start of an element with the given name.
+     *
+     * @param name the NCName of the element. It is an error
+     * if the name is a QName (ie. contains a prefix).
+     * @param namespace the namespace of the element. This may be null.
+     * Note: A null namespace is not the same as the default namespace unless
+     * the default namespace is also null.
+     * @param atts the AttributeSet containing the attributes associated
+     * with the element.
+     */
+    private void startElement
+        (String name, String namespace, AttributeSet atts, ElementInfo elemInfo) 
+        throws SAXException
+    {
 
         UnmarshalState state = null;
 
@@ -960,7 +1222,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 }
             }
 
-            _topState = new UnmarshalState();
+            _topState = getState();
             _topState.elementName = name;
 
 
@@ -1098,8 +1360,14 @@ public final class UnmarshalHandler extends MarshalFramework
 
 
         //-- create new state object
-        state = new UnmarshalState();
+        state = getState();
         state.elementName = name;
+        //-- save location
+        if (parentState.location.length() == 0)
+            state.location = parentState.elementName;
+        else
+            state.location = parentState.location + "/" + parentState.elementName;
+            
         _stateInfo.push(state);
 
         //-- make sure we should proceed
@@ -1130,8 +1398,8 @@ public final class UnmarshalHandler extends MarshalFramework
         
         //-- loop through stack and find correct descriptor
         int pIdx = _stateInfo.size() - 2; //-- index of parentState
-        String path = "";
         UnmarshalState targetState = parentState;
+        String path = "";
         int count = 0;
         boolean isWrapper = false;
         XMLClassDescriptor oldClassDesc = classDesc;
@@ -1272,13 +1540,9 @@ public final class UnmarshalHandler extends MarshalFramework
             if (debug) {
                 message("#container: " + descriptor.getFieldName());
             }
-            _stateInfo.pop();
             
-            state = new UnmarshalState();
-            
-            // swap states so that container comes before the
-            // the state for the item contained within the container
-            _stateInfo.push(state);
+            //-- clear current state and re-use for the container
+            state.clear();
 
             //here we can hard-code a name or take the field name
             state.elementName = descriptor.getFieldName();
@@ -1314,7 +1578,8 @@ public final class UnmarshalHandler extends MarshalFramework
 
             //we need to recall startElement()
             //so that we can find a more appropriate descriptor in for the given name
-            startElement(qName, attList);
+            _namespaces = _namespaces.createNamespaces();
+            startElement(name, namespace, atts, elemInfo);
             return;
         }
         //--End of the container support
@@ -1452,7 +1717,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 if (classDesc == null) {
                     //-- use parent to get package information
                     String pkg = pClass.getName();
-                    idx = pkg.lastIndexOf('.');
+                    int idx = pkg.lastIndexOf('.');
                     if (idx > 0) {
                         pkg = pkg.substring(0,idx+1);
                         cname = pkg + cname;
@@ -1469,7 +1734,16 @@ public final class UnmarshalHandler extends MarshalFramework
                     //1- creates a new SAX2ANY handler
                     _anyUnmarshaller = new SAX2ANY(_namespaces);
                     //2- delegates the element handling
-                    _anyUnmarshaller.startElement(qName, attList);
+                    if (elemInfo.attributeList != null) {
+                        //-- SAX 1
+                        _anyUnmarshaller.startElement(elemInfo.qName, 
+                            elemInfo.attributeList);
+                    }
+                    else {
+                        //-- SAX 2
+                        _anyUnmarshaller.startElement(namespace, name, elemInfo.qName, 
+                            elemInfo.attributes);
+                    }
                     //first element so depth can only be one at this point
                     _depth = 1;
                     state.object = _anyUnmarshaller.getStartingNode();
@@ -1616,6 +1890,38 @@ public final class UnmarshalHandler extends MarshalFramework
 
     } //-- void startElement(String, AttributeList)
 
+
+
+    /**
+     * Signals to start the namespace - prefix mapping
+     * 
+     * @param prefix the namespace prefix to map
+     * @param uri the namespace URI
+     */
+    public void startPrefixMapping(String prefix, String uri)
+        throws SAXException
+    { 
+        if (_createNamespaceScope) {
+            _namespaces = _namespaces.createNamespaces();
+            _createNamespaceScope = false;
+        }
+        
+        _namespaces.addNamespace(prefix, uri);
+        
+        /*
+        //-- add namespace declarations to set of current attributes        
+        String attName = null;
+        if ((prefix == null)  || (prefix.length() == 0))
+            attName = XMLNS_DECL;
+        else
+            attName = XMLNS_PREFIX + prefix;
+            
+        _currentAtts.addAttribute(attName, uri);
+        */
+        
+    } //-- startPrefixMapping
+
+
      //------------------------------------/
     //- org.xml.sax.ErrorHandler methods -/
     //------------------------------------/
@@ -1693,6 +1999,28 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         return instance;
      } //-- createInstance
+     
+     /**
+      * Marks the given state as available for use
+      */
+     private void freeState(UnmarshalState state) {
+        state.clear();
+        _statePool.push(state);
+     } //-- freeState
+     
+     /**
+      * Returns a free state from the state pool
+      *
+      * @return a free state from the state pool
+      */
+     private UnmarshalState getState() {
+        if (_statePool.isEmpty()) 
+            return new UnmarshalState();
+        else {
+            return (UnmarshalState) _statePool.pop();
+        }
+     } //-- freeState
+     
      
     /**
      * Returns the resolved instance type attribute (xsi:type).
@@ -2663,6 +2991,39 @@ public final class UnmarshalHandler extends MarshalFramework
         return primitive;
     } //-- toPrimitiveObject
 
+    /**
+     * A utility class for keeping track of the
+     * qName and how the SAX parser passed attributes
+     */
+    class ElementInfo {
+        
+        String qName = null;
+        Attributes attributes = null;
+        AttributeList attributeList = null;
+        
+        ElementInfo() {
+            super();
+        }
+        
+        ElementInfo(String qName, Attributes atts) {
+            super();
+            this.qName = qName;
+            this.attributes = atts;
+        }
+        
+        ElementInfo(String qName, AttributeList atts) {
+            super();
+            this.qName = qName;
+            this.attributeList = atts;
+        }
+        
+        void clear() {
+            qName = null;
+            attributes = null;
+            attributeList = null;
+        }
+    } //-- ElementInfo
+    
     /**
      * Local IDResolver
     **/
