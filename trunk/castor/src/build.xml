@@ -25,7 +25,7 @@
         <property name="dist" value="dist"/>
         <property name="lib" value="lib"/>
         <property name="doc" value="${source}/doc"/>
-        <property name="schema" value="${source}/schema"/>
+        <property name="schema" value="${build}/schema"/>
         <property name="gen.src" value="gen-src"/>
         <property name="project.eclipse" value="${source}/tools/ide/eclipse" />
         <property file="${etc}/VERSION"/>
