@@ -5,6 +5,17 @@
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/XSL/Transform/1.0">
 
+
+  <!-- Include document for document transformation, widgets for some
+       simple HTML styles (e-mail, url, etc
+    -->
+  <xsl:include href="document.xsl"/>
+  <xsl:include href="widgets.xsl"/>
+
+
+  <xsl:output method="html" indent="no"/>
+
+
   <!-- Color -->
   <xsl:variable name="color-alpha">#ffffff</xsl:variable>
   <xsl:variable name="color-beta" select="'#666699'"/>
@@ -29,24 +40,22 @@
   <xsl:variable name="nbsp" select="'&#xA0;'"/>
 
 
-  <!-- Include document for document transformation, widgets for some
-       simple HTML styles (e-mail, url, etc
-    -->
-  <xsl:include href="document.xsl"/>
-  <xsl:include href="widgets.xsl"/>
-
-
   <!-- Match the entire document and process it into a Web page.
        The document properties and body are processed separately
        in a uniform way. The background is provided by this style
    -->
   <xsl:template match="/">
-    <xsl:variable name="project" select="document(document/@project)/project"/>
+    <xsl:variable name="project" select="document('../project.xml')/project"/>
 
     <html><head>
-      <meta name="author" content="{document/properties/authors/author/@first-name}"/>
-      <title><xsl:value-of select="document/properties/title"/></title>
+      <meta name="author" content="{document/properties/author/.}"/>
       <link rel="stylesheet" type="text/css" href="style/default.css"/>
+      <xsl:if test="/document/properties/title">
+        <title><xsl:value-of select="/document/properties/title"/></title>
+      </xsl:if>
+      <xsl:if test="/document/body/title">
+        <title><xsl:value-of select="/document/body/title"/></title>
+      </xsl:if>
     </head>
 
     <body bgcolor="{$color-e}" link="#bfbffe" vlink="#bfbffe" alink="#bfbffe" leftmargin="0" topmargin="0">
@@ -90,7 +99,12 @@
                   <tr>
                     <td width="15" valign="top" align="right"><img src="images/bullets/square-small-white.gif" alt="*" height="12" width="12"/></td>
                     <td><span class="alpha">
-                      <font size="2"><a href="{substring-before(@href, '.xml')}.html"><xsl:value-of select="@name"/></a></font>
+                      <xsl:variable name="href">
+                        <xsl:call-template name="link-convertor">
+                          <xsl:with-param name="href" select="@href"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <font size="2"><a href="{$href}"><xsl:value-of select="@name"/></a></font>
                     </span></td>
                   </tr>
                 </xsl:for-each>
@@ -121,7 +135,7 @@
       </xsl:if>
 
         <tr>
-          <td bgcolor="{$color-alpha}" width="11"><xsl:value-of select="$nbsp"/></td>
+          <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
           <td bgcolor="{$color-alpha}">
              <xsl:apply-templates select="document/body"/>
              <br/>
@@ -129,15 +143,24 @@
         </tr>
 
         <tr>
-          <td bgcolor="{$color-beta}" width="120"><xsl:value-of select="$nbsp"/></td>
-          <td bgcolor="{$color-beta}" width="11"></td>
-          <td bgcolor="{$color-beta}" valign="top">
-          </td>
+          <td bgcolor="{$color-beta}" width="120"></td>
+          <td bgcolor="{$color-beta}" height="11" width="11" valign="top"><img src="images/corners/sw-small.gif" height="11" width="11" valign="top"/></td>
+          <td bgcolor="{$color-alpha}" valign="top"><img src="images/blank.gif" height="11" width="11"/></td>
+        </tr>
+        <tr>
+          <td bgcolor="{$color-beta}" width="120"></td>
+          <td bgcolor="{$color-beta}" width="11"><img src="images/blank.gif" height="11" width="11"/></td>
+          <td bgcolor="{$color-beta}" valign="top"></td>
+        </tr>
+        <tr>
+          <td bgcolor="{$color-beta}" width="120"></td>
+          <td bgcolor="{$color-beta}" width="11" valign="top"><img src="images/corners/nw-small.gif" height="11" width="11"/></td>
+          <td bgcolor="{$color-alpha}" valign="top"><img src="images/blank.gif" height="11" width="11"/></td>
         </tr>
 
         <tr>
-          <td bgcolor="{$color-beta}" width="120"><xsl:value-of select="$nbsp"/></td>
-          <td bgcolor="{$color-alpha}" width="11"><xsl:value-of select="$nbsp"/></td>
+          <td bgcolor="{$color-beta}" width="120"></td>
+          <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
           <td bgcolor="{$color-alpha}"><br/>
             <xsl:for-each select="$project/notice">
               <small><xsl:copy-of select="."/></small><br/>
@@ -146,8 +169,13 @@
         </tr>
 
         <tr>
-          <td bgcolor="{$color-beta}" width="120"><xsl:value-of select="$nbsp"/></td>
-          <td bgcolor="{$color-beta}" width="11"><xsl:value-of select="$nbsp"/></td>
+          <td bgcolor="{$color-beta}" width="120"></td>
+          <td bgcolor="{$color-beta}" width="11" valign="top"><img src="images/corners/sw-small.gif" height="11" width="11" valign="top"/></td>
+          <td bgcolor="{$color-alpha}" valign="top"><img src="images/blank.gif" height="11" width="11"/></td>
+        </tr>
+        <tr>
+          <td bgcolor="{$color-beta}" width="120"></td>
+          <td bgcolor="{$color-beta}" width="11" valign="top"></td>
           <td bgcolor="{$color-beta}" valign="top">
             <xsl:apply-templates select="$project/links"/>
           </td>
@@ -164,15 +192,29 @@
    -->
   <xsl:template match="project/links">
     <xsl:for-each select="link">
-      <xsl:choose>
-        <xsl:when test="starts-with(@href, 'http:')">
-          <a href="{@href}"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
-        </xsl:when>
-        <xsl:otherwise>
-          <a href="{substring-before(@href, '.xml')}.html"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:variable name="href">
+        <xsl:call-template name="link-convertor">
+          <xsl:with-param name="href" select="@href"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <a href="{$href}"><img src="{@image}" alt="{@name}" height="{@height}" width="{@width}" border="0" vspace="5"/></a>
     </xsl:for-each>
+  </xsl:template>
+
+
+  <xsl:template name="link-convertor">
+    <xsl:param name="href" select="empty"/>
+    <xsl:choose>
+      <xsl:when test="starts-with($href,'http:')">
+        <xsl:value-of select="$href"/>
+      </xsl:when>
+      <xsl:when test="not(contains($href,'.xml'))">
+        <xsl:value-of select="$href"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="substring-before($href, '.xml')"/>.html
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

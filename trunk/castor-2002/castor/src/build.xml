@@ -48,7 +48,9 @@
   <!-- Same as core, but also cleans -->
   <target name="all" depends="clean,main,examples"/>
 
-  <target name="release" depends="jar,tarball,source,javadoc">
+  <target name="release" depends="jar,tarball,source,doc,javadoc">
+    <jar jarfile="${dist}/${jar.name}-doc.jar" basedir="${build}"
+         items="doc" />
   </target>
 
 
@@ -90,18 +92,15 @@
 
 
   <target name="javadoc" depends="prepare">
-    <mkdir dir="${build}/javadoc" />
-    <exec command="javadoc -sourcepath ${source}/main -d ${build}/javadoc
+    <mkdir dir="${build}/doc" />
+    <mkdir dir="${build}/doc/javadoc" />
+    <exec command="javadoc -sourcepath ${source}/main -d ${build}/doc/javadoc
                            -doctitle Castor -public -noindex -author
                            org.exolab.castor.xml
-			   org.exolab.castor.jdo org.exolab.castor.jdo.desc
-			   org.exolab.castor.jdo.engine
+			   org.exolab.castor.jdo org.exolab.castor.persist
 			   org.exolab.castor.dsml org.exolab.castor.dsml.jndi
 			   org.exolab.castor.dsml.mozilla org.exolab.castor.dsml.tools
 			   org.exolab.castor.util" />
-
-    <jar jarfile="${dist}/${jar.name}-doc.jar" basedir="${build}"
-         items="javadoc" />
   </target>
 
 
@@ -123,7 +122,6 @@
            classpath="${classpath}" debug="on"/>
   </target>
 
-
   <target name="source" depends="prepare">
     <deltree dir="${dist}/castor-${version}-src.tar.gz" />
     <exec command="tar --create --exclude-from ${source}/etc/exclude
@@ -132,10 +130,10 @@
     <exec command="gzip ${dist}/castor-${version}-src.tar" />
   </target>
 
-  <target name="style" depends="prepare">
+  <target name="doc" depends="prepare">
     <mkdir dir="${build}/doc" />
     <style srcdir="${source}/doc" destdir="${build}/doc"
-           exclude="project.xml,style" style="style/exolab.xsl"/>
+           exclude="project.xml" style="style/exolab.xsl"/>
   </target>
 
   <target name="tarball" depends="prepare">

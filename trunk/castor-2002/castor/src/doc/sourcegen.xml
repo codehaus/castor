@@ -1,14 +1,8 @@
 <?xml version="1.0"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document id="ELPD-2000-01-07-KV01-PR" project="../project.xml">
+<document url="http://castor.exolab.org/sourcegen.xml">
   <properties>
     <title>The Source Code Generator</title>
-    <authors>
-      <author email="kvisco@exoffice.com">
-        <firstname>Visco</firstname>
-        <lastname>Keith</lastname>
-      </author>
-    </authors>
+    <author email="kvisco@exoffice.com">Keith Visco</author>
     <abstract>
     </abstract>
     <status>Preliminary Draft</status>

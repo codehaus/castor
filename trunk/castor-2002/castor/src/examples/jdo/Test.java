@@ -36,6 +36,7 @@ public class Test
 	boolean       mapping = false;
 	boolean       runPerf = false;
 	boolean       runOdmg = false;
+	boolean       runDup = false;
 	
 	logger = Logger.getSystemLogger();
 	if ( args.length < 1 ) {
@@ -48,6 +49,8 @@ public class Test
 	    runPerf = true;
 	else if ( args[ 0 ].equalsIgnoreCase( "odmg" ) )
 	    runOdmg = true;
+	else if ( args[ 0 ].equalsIgnoreCase( "dup" ) )
+	    runDup = true;
 	else {
 	    System.out.println( Usage );
 	    System.exit( 1 );
@@ -86,6 +89,16 @@ public class Test
 		perfTest( odmg, db, logger,
 			  ( args.length > 1 ? args[ 1 ] : null ),
 			  ( args.length > 2 ? args[ 2 ] : null ) );
+		db.close();
+	    }
+
+	    if ( runDup ) {
+		DuplicateKey dupKey;
+
+		db = odmg.newDatabase();
+		db.open( "test", db.OPEN_EXCLUSIVE );
+		dupKey = new DuplicateKey( odmg, db, logger );
+		dupKey.run();
 		db.close();
 	    }
 
@@ -295,7 +308,7 @@ public class Test
 	product = new Product();
 	product.id = 4;
 	product.group = new ProductGroup();
-	for ( i = 0 ; i < 2000 ; ++i ) {
+	for ( i = 0 ; i < 200 ; ++i ) {
 	    stmt = conn.prepareStatement( "SELECT prod.price,prod.name,prod_group.id,prod_group.name,prod_inv.quant " +
 					  "FROM prod,prod_group,prod_inv WHERE prod.id=? AND " +
 					  "prod.group_id=prod_group.id AND prod.id=prod_inv.prod_id" );
@@ -324,7 +337,7 @@ public class Test
 	tx.begin();
 	timing = new Timing( "Query using O/R framework" );
 	timing.start();
-	for ( i = 0 ; i < 2000 ; ++i ) {
+	for ( i = 0 ; i < 200 ; ++i ) {
 	    // Specify the primary key id
 	    oql.bind( new Integer( 4 ) );
 	    // Retrieve

@@ -51,25 +51,14 @@
         <xsl:copy select="."/>
       </xsl:for-each>
       <xsl:if test="@href">
-        <xsl:choose>
-         <xsl:when test="starts-with(@href, 'http:')">
-           <xsl:attribute name="href">
-             <xsl:value-of select="@href"/>
-           </xsl:attribute>
-         </xsl:when>
-         <xsl:when test="contains(@href, '.xml')">
-            <xsl:attribute name="href">
-              <xsl:value-of select="substring-before(@href, '.xml')"/>
-              <xsl:value-of select="'.html'"/>
-              <xsl:value-of select="substring-after(@href, '.xml')"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="href">
-              <xsl:value-of select="@href"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:variable name="href">
+          <xsl:call-template name="link-convertor">
+            <xsl:with-param name="href" select="@href"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="href">
+          <xsl:value-of select="$href"/>
+        </xsl:attribute>
       </xsl:if>
       <xsl:apply-templates/>
     </a>

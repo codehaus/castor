@@ -122,7 +122,7 @@ public class DatabaseEngine
     }
 
 
-    static DatabaseEngine getDatabaseEngine( Class type )
+    public static DatabaseEngine getDatabaseEngine( Class type )
     {
 	DatabaseEngine engine;
 	Enumeration    enum;

@@ -16,6 +16,8 @@ width="39"/>
   </links>
 
   <menu name="API">
+    <item name="JavaDoc" href="javadoc/overview-summary.html"/>
+    <item name="Transactions &amp; Locks" href="locking.xml"/>
   </menu>
   <menu name="Mapping">
     <item name="Types" href="types.xml"/>

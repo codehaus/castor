@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet href="style/exolab.xsl" type="text/xsl"?>
-<document id="EXOLAB-2000-01-23-AA01-DR" project="../project.xml">
+<document url="http://castor.exolab.org/design-persist.xml">
   <properties>
     <title>Castor Persistence Architecture</title>
     <abstract>Describes the Castor persistence engines architecture</abstract>
-    <authors>
-      <author email="arkin@exoffice.com">
-        <firstname>Assaf</firstname>
-        <lastname>Arkin</lastname>
-      </author>
-    </authors>
+    <author email="arkin@exoffice.com">Assaf Arkin</author>
     <status>Preliminary Draft</status>
   </properties>
   <body>
     <section title="Layered Achitecture">
 
-      <p>The Castor persistence engine is based on a layer architecture allowing different
-         APIs to be plugged on top of the system, and different persistence engines to be
-         combined in a single environment.</p>
+      <p>The Castor persistence engine is based on a layer
+         architecture allowing different APIs to be plugged on top of
+         the system, and different persistence engines to be combined
+         in a single environment.</p>
 
       <div align="center">
       <table border="0" cellspacing="8" cellpadding="10" bgcolor="#444466">

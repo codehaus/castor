@@ -183,7 +183,11 @@ public final class DatabaseImpl
 	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoMapping", dbName ) );
 	if ( ! dbs.canConnect() )
 	    throw new DatabaseNotFoundException( Messages.format( "castor.jdo.odmg.dbNoDataSource", dbName ) );
-	_dbEngine = DatabaseEngine.getDatabaseEngine( dbs );
+	try {
+	    _dbEngine = DatabaseEngine.getDatabaseEngine( dbs );
+	} catch ( MappingException except ) {
+	    throw new ODMGException( except.getMessage() );
+	}
     }
 
 
