@@ -124,14 +124,19 @@ public class XSLObject {
     private XSLObject parent = null;
     
     private String typeName = DEFAULT_NAME;
-    
-    private Hashtable namespaces = null;
+   
+    private NamespaceDecl _namespaces = null;
     
     //-- static variables
     private static final Hashtable typeNames = buildNameHash();
     
     private static final XPathParser _parser = new XPathParser();
     
+    /**
+     * This XSLObject's namespace, really only useful for
+     * literal elements
+     */
+    private String _namespace = null;
     
     //-- configure XPathParser
     static {
@@ -157,12 +162,43 @@ public class XSLObject {
         attributes     = new AttributeListImpl(5);
         actions        = new ActionTemplateImpl();
         readOnlyAttrs  = new List(0);
-        namespaces     = new Hashtable(3);        
     } //-- XSLObject
     
       //------------------/
      //- Public Methods -/
     //------------------/
+    
+    /**
+     * Adds the Given namespace declaration to this XSLObject's set of namespace
+     * declarations
+     */
+    public void addNamespaceDecl(String prefix, String namespace) {
+        if (prefix == null) prefix = "";
+        
+        NamespaceDecl nsDecl = null;
+        //-- look for existing prefix declaration and overwrite
+        //-- if necessary
+        if (_namespaces != null) {
+            nsDecl = _namespaces;
+            while (nsDecl != null) {
+                if (nsDecl.prefix.equals(prefix)) {
+                    nsDecl.uri = namespace;
+                    return;
+                }
+                nsDecl = nsDecl.next;
+            }
+        }
+        
+        //-- not found, create new declaration        
+        nsDecl = new NamespaceDecl();
+        nsDecl.prefix = prefix;
+        nsDecl.uri = namespace;
+        if (_namespaces != null) {
+            nsDecl.next = _namespaces;
+        }
+        _namespaces = nsDecl;
+    } //-- addNamespaceDecl
+    
     
     /**
      * Appends the given XSLObject to this XSLObject's list of
@@ -297,6 +333,30 @@ public class XSLObject {
     public AttributeList getAttributes() {
         return attributes;
     } //-- getAttributeNames
+    
+    /**
+     * Returns this XSLObject's namespace URI.
+     *
+     * @return the namespace URI or null if none exists.
+     */
+    public String getNamespace() {
+        if (type == LITERAL) {
+            if (_namespace != null)
+                return _namespace;
+                
+            if (typeName != null) {
+                String prefix = "";
+                int idx = typeName.indexOf(':');
+                if (idx >= 0) {
+                    prefix = typeName.substring(0, idx);
+                }
+                _namespace = resolveNamespace(prefix);
+                return _namespace;
+            }
+            return null;
+        }
+        return XSLTStylesheet.XSLT_NAMESPACE;
+    } //-- getNamespace
     
     /**
      * Returns the nearest ancestor of this XSLObject that is of the given
@@ -435,9 +495,17 @@ public class XSLObject {
         //-- to return the default namespace...eventually        
         if (prefix == null) prefix = "";
         
-        String ns = (String)namespaces.get(prefix);
-        if (ns != null) return ns;
-        else if (parent != null) {
+        if (_namespaces != null) {
+            NamespaceDecl nsDecl = _namespaces;
+            while (nsDecl != null) {
+                if (nsDecl.prefix.equals(prefix)) {
+                    return nsDecl.uri;
+                }
+                nsDecl = nsDecl.next;
+            }
+        }
+        
+        if (parent != null) {
             return parent.resolveNamespace(prefix);
         }        
         return null;
@@ -464,12 +532,12 @@ public class XSLObject {
         if ((name != null) && (value != null)) {
             
             if (name.equals(DEFAULT_NS_DECL)) {
-                namespaces.put("", value);
+                addNamespaceDecl("", value);
                 attributes.addAttribute(name, value);
             }
             else if (name.startsWith(PREFIX_NS_DECL)) {
                 String prefix = name.substring(PREFIX_NS_DECL.length());
-                namespaces.put(prefix, value);
+                addNamespaceDecl(prefix, value);
                 attributes.addAttribute(name, value);
             }
             else if (readOnlyAttrs.contains(name)) {
@@ -485,6 +553,15 @@ public class XSLObject {
             }
         }
     } //-- setAttribute
+    
+    /** 
+     * Sets this XSLObject's namespace URI
+     *
+     * @param uri the namespace URI 
+     */
+    public void setNamespace(String uri) {
+        _namespace = uri;
+    } //-- setNamespace
     
       //---------------------/
      //- Protected Methods -/
@@ -665,6 +742,12 @@ public class XSLObject {
                 return DEFAULT_NAME;
         }
     } //-- getNameFromType
+    
+    class NamespaceDecl {
+        String uri = null;
+        String prefix = null;
+        NamespaceDecl next = null;
+    }
     
     /* */
 } //-- XSLObject
