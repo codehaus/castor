@@ -136,53 +136,6 @@ public class DoubleValidator extends PatternValidator
     } //--setMaxInclusive
 
 
-    /**
-     * Sets the fixed value the double to validate must
-     * be equal to.
-     * @param fixed the fixed value
-     */
-    public void setFixed(String fixed) {
-        setFixed(Double.parseDouble(fixed));
-    }
-    /**
-     * Sets the minimum value that decimals validated with this
-     * validator must be greater than
-     * @param minValue the minimum value an double validated with this
-     * validator must be greater than
-     */
-    public void setMinExclusive(String minValue) {
-        setMinExclusive(Double.parseDouble(minValue));
-    } //-- setMinExclusive
-
-    /**
-     * Sets the minimum value that decimals validated with this
-     * validator are allowed to be
-     * @param minValue the minimum value an double validated with this
-     * validator may be
-    **/
-    public void setMinInclusive(String minValue) {
-        setMinInclusive(Double.parseDouble(minValue));
-    } //-- setMinInclusive
-
-    /**
-     * Sets the maximum value that decimals validated with this
-     * validator must be less than
-     * @param maxValue the maximum value an double validated with this
-     * validator must be less than
-    **/
-    public void setMaxExclusive(String maxValue) {
-        setMaxExclusive(Double.parseDouble(maxValue));
-    } //-- setMaxExclusive
-
-    /**
-     * Sets the maximum value that decimals validated with this
-     * validator are allowed to be
-     * @param maxValue the maximum value an double validated with this
-     * validator may be
-    **/
-    public void setMaxInclusive(String maxValue) {
-        setMaxInclusive(Double.parseDouble(maxValue));
-    } //--setMaxInclusive
 
     public void validate(double d) throws ValidationException {
 
@@ -242,7 +195,7 @@ public class DoubleValidator extends PatternValidator
 
         double value = 0;
         try {
-             value = java.lang.Double.parseDouble(object.toString());
+             value = new java.lang.Double(object.toString()).doubleValue();
         }
         catch(Exception ex) {
             String err = "Expecting a double, received instead: ";
