@@ -34,8 +34,14 @@ public class Test
 	    search = dir.createSearch( "(ou=people)" );
 	    results = search.execute();
 	    while ( results.hasMoreElements() ) {
-		System.out.println( results.nextElement() );
+                user = (User) results.nextElement();
+                if ( user.full == null )
+                  user.full = user.first + " " + user.last;
+                System.out.println( user );
 	    }
+	    dir.commit();
+
+            dir.begin();
 	    user = (User) dir.read( "kvisco" );
 	    if ( user == null || user != null ) {
 		user = new User();

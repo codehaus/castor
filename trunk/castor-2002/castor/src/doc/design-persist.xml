@@ -322,7 +322,7 @@
            should attempt to perform dirty check prior to storing the object. Dirty check
            entails a comparison of the original object against the copy in persistent storage,
            to determine whether the object has changed in persistent storage since it was
-           originally loaded. The object descriptor will indicate whether the object is
+           originally loaded. The class descriptor will indicate whether the object is
            interested in dirty checking and which of its fields should be checked.</p>
 
         <p>The <tt>delete</tt> method is called to delete an object from persistent storage.

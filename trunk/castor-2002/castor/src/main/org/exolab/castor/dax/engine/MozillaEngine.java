@@ -136,14 +136,14 @@ public class MozillaEngine
 	    }
 	}
 
-	dnField = _clsDesc.getIdentityField();
+	dnField = _clsDesc.getIdentity();
 	if ( dnField instanceof ContainerFieldDesc ) {
 	    fields = ( (ContainerFieldDesc) dnField ).getContainedFields();
 	    _dnFields = new DAXFieldDesc[ fields.length ];
 	    for ( int i = 0 ; i < fields.length ; ++i )
 		_dnFields[ i ] = (DAXFieldDesc) fields[ i ];
 	} else {
-	    _dnFieldName = ( (DAXFieldDesc) _clsDesc.getIdentityField() ).getLdapName();
+	    _dnFieldName = ( (DAXFieldDesc) _clsDesc.getIdentity() ).getLdapName();
 	}
 	_rootDN = rootDN;
     }
@@ -442,7 +442,7 @@ public class MozillaEngine
 	if ( _dnFields != null ) {
 	    Object identity;
 
-	    identity = Types.newInstance( _clsDesc.getIdentityField().getFieldType() );
+	    identity = Types.newInstance( _clsDesc.getIdentity().getFieldType() );
 	    for ( int i = _dnFields.length ; i-- > 0 ; )
 		_dnFields[ i ].setValue( identity, rdns[ i ] );
 	    return identity;

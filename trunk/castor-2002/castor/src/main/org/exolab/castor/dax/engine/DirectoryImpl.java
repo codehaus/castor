@@ -239,7 +239,7 @@ public class DirectoryImpl
 	if ( clsDesc == null )
 	    throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
 
-	rdn = clsDesc.getIdentityField().getValue( obj );
+	rdn = clsDesc.getIdentity().getValue( obj );
 	if ( rdn == null )
 	    throw new DirectoryException( "Object has no RDN" );
 	try {

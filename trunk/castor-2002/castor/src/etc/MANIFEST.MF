@@ -7,15 +7,7 @@ Implementation-Vendor: Exoffice Technologies Inc.
 Implementation-Version: $VERSION$
 Class-path: xerces.jar, jdbc-se2.0.jar, odmg-3.0.jar, jndi.jar, jta1.0.1.jar
 
-Name: org/exolab/castor/xml
+Name: org/exolab/castor
 Sealed: true
 
-Name: org/exolab/castor/dsml
-Sealed: true
-
-Name: org/exolab/castor/jdo
-Sealed: true
-
-Name: org/exolab/castor/util
-Sealed: true
 

@@ -1,6 +1,6 @@
 <mapping>
 
-  <object type="dax.User">
+  <class class-name="dax.User">
     <ldap-entry object-class="person"/>
     <identity field-ref="uid"/>
     <field name="uid" type="string" required="true">
@@ -21,10 +21,10 @@
     <field name="ou" type="string" required="true">
       <ldap-info name="ou"/>
     </field>
-  </object>
+  </class>
 
 <!--
-  <object type="dax.Record">
+  <class class-name="dax.Record">
     <ldap-entry object-class="person" misc-field="misc"/>
     <identity field-ref="rdn"/>
     <container name="rdn" type="dax.RDN">
@@ -35,7 +35,7 @@
         <ldap-info name="uid"/>
       </field>
     </container>
-  </object>
+  </class>
 
 -->
 </mapping>

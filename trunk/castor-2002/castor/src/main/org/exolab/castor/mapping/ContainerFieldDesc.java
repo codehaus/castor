@@ -89,9 +89,20 @@ public class ContainerFieldDesc
      *
      * @return An array of zero of more contained fields
      */
-    public FieldDesc[] getContainedFields()
+    public FieldDesc[] getFields()
     {
-	return (FieldDesc[]) _contained.clone();
+	return _contained;
+    }
+
+
+    /**
+     * Create a new container object.
+     *
+     * @return New container object
+     */
+    public Object newInstance()
+    {
+	return Types.newInstance( getFieldType() );
     }
 
 
