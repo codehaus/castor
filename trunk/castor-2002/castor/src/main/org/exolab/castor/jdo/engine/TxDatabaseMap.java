@@ -49,12 +49,13 @@ package org.exolab.castor.jdo.engine;
 
 import javax.transaction.Transaction;
 import java.util.HashMap;
+import java.io.Serializable;
 
 /**
  * Transactions to Databases Map. 
  *
  */
-public final class TxDatabaseMap {
+public final class TxDatabaseMap implements Serializable {
 
     private HashMap _txDbMap = new HashMap();
 
