@@ -56,6 +56,7 @@ import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
@@ -289,7 +290,7 @@ public class DatabaseImpl
     }
 
     public void update( Object object )
-        throws ClassNotPersistenceCapableException,
+        throws ClassNotPersistenceCapableException, ObjectModifiedException,
                TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
@@ -299,6 +300,7 @@ public class DatabaseImpl
         info = _scope.getPersistenceInfo( object.getClass() );
         if ( info == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
+
         tx.update( info.engine, info.molder, object, null );
     }
 
@@ -427,6 +429,8 @@ public class DatabaseImpl
 
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
+
+        System.out.println("[transaction begin]");
         _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
         _threadTracer.add( Thread.currentThread(), this );
@@ -445,6 +449,7 @@ public class DatabaseImpl
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         try {
+            System.out.println("[transaction committing]");
             _threadTracer.remove( Thread.currentThread() );
             _ctx.prepare();
             _ctx.commit();
@@ -453,6 +458,7 @@ public class DatabaseImpl
             throw except;
         } finally {
             _ctx = null;
+            System.out.println("[transaction committed]");
         }
     }
 
@@ -469,6 +475,7 @@ public class DatabaseImpl
         _threadTracer.remove( Thread.currentThread() );
         _ctx.rollback();
         _ctx = null;
+        System.out.println("[transaction rollbacked]");
     }
 
 
