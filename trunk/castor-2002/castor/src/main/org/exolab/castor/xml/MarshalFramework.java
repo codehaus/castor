@@ -53,6 +53,32 @@ package org.exolab.castor.xml;
 **/
 abstract class MarshalFramework {
     
+    //--------------------------/
+    //- Public class variables -/
+    //--------------------------/
+
+    /**
+     * The XSI Namespace URI
+    **/
+    public static final String XSI_NAMESPACE
+        = "http://www.w3.org/2001/XMLSchema-instance";
+        
+    //-----------------------------/
+    //- Protected class variables -/
+    //-----------------------------/
+    
+    /**
+     * The default prefix used for specifying the
+     * xsi:type as a classname instead of a schema name.
+     * This is a Castor specific hack.
+    **/
+    static final String JAVA_PREFIX = "java:";
+    
+    /**
+     * The name of the QName type
+    **/
+    static final String QNAME_NAME = "QName";
+    
     /**
      * Returns true if the given class should be treated as a primitive
      * type. This method will return true for all Java primitive
