@@ -15,7 +15,6 @@ import org.odmg.Implementation;
 import org.odmg.Database;
 import org.odmg.Transaction;
 import org.odmg.OQLQuery;
-import org.exolab.testing.Timing;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.jdo.ODMG;
@@ -33,11 +32,10 @@ public class Test
     public static final String Usage =
         "Usage: test jdo <test-name> [<parameters>]\n" +
         "  odmg         ODMG API test\n" +
-        "  perf         Simple performance comparison\n" +
         "  duplicate    Duplicate primary key\n" +
         "  deadlock     Deadlock detection\n" +
         "  concurrenct  Concurrent locking\n" +
-        "Both perf and concurrent require direct access to the database through JDBC.\n" +
+        "Concurrent require direct access to the database through JDBC.\n" +
         "The JDBC driver class and URI are passed as command line arguments.\n";
 
     
@@ -65,6 +63,7 @@ public class Test
                 db.open( "test", db.OPEN_READ_WRITE );
                 odmgTest( odmg, db, logger );
                 db.close();
+                /*
             } else if ( "perf".startsWith( args[ 0 ] ) ) {
                 // Run the performance test, see prefTest()
                 Database      db;
@@ -74,6 +73,7 @@ public class Test
                           ( args.length > 1 ? args[ 1 ] : null ),
                           ( args.length > 2 ? args[ 2 ] : null ) );
                 db.close();
+                */
             } else if ( "duplicate".startsWith( args[ 0 ] ) ) {
                 DuplicateKey dupKey;
                 dupKey = new DuplicateKey( odmg, "test", logger );
@@ -231,6 +231,7 @@ public class Test
     }
     
     
+    /*
     static void perfTest( Implementation odmg, Database db, PrintWriter logger,
                           String driverClass, String jdbcUri )
         throws Exception
@@ -341,6 +342,7 @@ public class Test
         logger.println( "Query result: " + product );
         tx.abort();
     }
+    */
     
 
 }
