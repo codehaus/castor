@@ -607,10 +607,11 @@
   </xsl:template>
 
   <xsl:template match="news">
+	<xsl:param name="id" select="@id" />
     <br />
       <table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2"><tr><td>
           <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed"><tr><td>
-              <span class="newsTitle"><xsl:value-of select="title"/></span><br/><br/>
+              <span class="newsTitle"><a name="item{$id}"><xsl:value-of select="title"/></a></span><br/><br/>
               <span class="newsSummary"><xsl:apply-templates select="summary"/><br/><br/>
                   <xsl:if test="url">
                     <div align="center"><a href="{url}">[Read More/Comment]</a></div><br/>
