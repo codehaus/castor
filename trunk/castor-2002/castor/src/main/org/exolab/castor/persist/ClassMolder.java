@@ -623,7 +623,7 @@ public class ClassMolder {
         // load the fields from the persistent storage if the cache is empty
         // and the accessMode is readOnly.
         fields = (Object[]) locker.getObject( tx );
-        if ( fields == null ) {
+        if ( fields == null || accessMode == AccessMode.DbLocked ) {
             fields = new Object[_fhs.length];
             conn = (Connection)tx.getConnection(oid.getLockEngine());
             stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
