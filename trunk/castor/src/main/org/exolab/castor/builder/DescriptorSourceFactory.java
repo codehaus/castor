@@ -40,7 +40,10 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
- * Portions of this file are copyright 2005 (C) Keith Visco. All Rights Reserved.
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
  *
  * $Id$
  */
@@ -580,8 +583,14 @@ public class DescriptorSourceFactory {
 		jsc.add("return ");
         
         boolean isAbstract = false;
+        
         if (member.getDeclaringClassInfo() != null)
 		    isAbstract = member.getDeclaringClassInfo().isAbstract();
+        
+        if (!isAbstract && xsType.getJType() instanceof JClass) {
+        	isAbstract = ((JClass)xsType.getJType()).getModifiers().isAbstract();
+        }
+        
         if (any
             || forGeneralizedHandler
 			|| isEnumerated
