@@ -48,6 +48,9 @@ package org.exolab.castor.jdo.oql;
 
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Seperates an input string of OQL into a stream of {@link Token}s. 
  *
@@ -56,10 +59,16 @@ import java.util.Hashtable;
  */
 public class Lexer implements TokenTypes {
 
-  String _queryString;
-  int _pos;
-  Hashtable keywords;
-  boolean endOfQueryPassed = false;
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (Lexer.class);
+    
+    String _queryString;
+    int _pos;
+    Hashtable keywords;
+    boolean endOfQueryPassed = false;
   
   /**
    * Creates a lexer which will seperate a string query into a series of 
@@ -100,6 +109,7 @@ public class Lexer implements TokenTypes {
     keywords.put("max", new Integer(KEYWORD_MAX));
     keywords.put("avg", new Integer(KEYWORD_AVG));
     keywords.put("limit", new Integer(KEYWORD_LIMIT));
+    keywords.put("offset", new Integer(KEYWORD_OFFSET));
         
   }
 
@@ -139,9 +149,9 @@ public class Lexer implements TokenTypes {
       if (!endOfQueryPassed) {
         endOfQueryPassed = true;
         return (new Token(END_OF_QUERY, ""));
-      }
-      else
+      } else {
         throw (new NoMoreTokensException());
+      }
     }
   
     //consume white space
@@ -169,7 +179,9 @@ public class Lexer implements TokenTypes {
     try {
       nextChar = _queryString.charAt(_pos + 1);
     }
-    catch (IndexOutOfBoundsException e) {}
+    catch (IndexOutOfBoundsException e) {
+    	// _log.error (e.getClass().getName(), e);
+    }
 
     if (curChar == '!' && nextChar == '=') {
       _pos += 2;
@@ -470,20 +482,21 @@ public class Lexer implements TokenTypes {
           curChar = getChar();
         }
         
-        if ( ! isDigit(curChar) ) 
-          if (isExponentSigned)
-            throw (new InvalidCharException( "Digit expected after sign in exponent (double literal).  Position: " + _pos ));
-          else
-            throw (new InvalidCharException( "Digit expected after exponent character (double literal).  Position: " + _pos ));
-        else {
-          sb.append(curChar);
-          _pos++;
-          curChar = getChar();
-          while ( isDigit(curChar) ) {
-            sb.append(curChar);
-            _pos++;
-            curChar = getChar();
-          }
+        if ( ! isDigit(curChar) ) { 
+        	if (isExponentSigned) {
+        		throw (new InvalidCharException( "Digit expected after sign in exponent (double literal).  Position: " + _pos ));
+        	} else {
+        		throw (new InvalidCharException( "Digit expected after exponent character (double literal).  Position: " + _pos ));
+        	}
+        } else {
+        	sb.append(curChar);
+        	_pos++;
+        	curChar = getChar();
+        	while ( isDigit(curChar) ) {
+        		sb.append(curChar);
+        		_pos++;
+        		curChar = getChar();
+        	}
         }
       }
       
@@ -556,7 +569,7 @@ public class Lexer implements TokenTypes {
 
   /**
    * Consumes characters of a date literal.  The date keyword was already 
-   * consumed by the {@link identifier} function, and is passed as a parameter.
+   * consumed by the {@link #identifier(char)} function, and is passed as a parameter.
    *
    * @param alreadyConsumed the part of the date literal already consumed
    *    by the calling function.  This should always be "date".
@@ -654,7 +667,7 @@ public class Lexer implements TokenTypes {
 
   /**
    * Consumes characters of a time literal.  The time keyword was already 
-   * consumed by the {@link identifier} function, and is passed as a parameter.
+   * consumed by the {@link #identifier} function, and is passed as a parameter.
    *
    * @param alreadyConsumed the part of the time literal already consumed
    *    by the calling function.  This should always be "time".
@@ -769,7 +782,7 @@ public class Lexer implements TokenTypes {
 
   /**
    * Consumes characters of a time stamp literal.  The timestamp keyword was 
-   * already consumed by the {@link identifier} function, and is passed as a 
+   * already consumed by the {@link #identifier} function, and is passed as a 
    * parameter.
    *
    * @param alreadyConsumed the part of the timestamp literal already consumed
@@ -942,7 +955,7 @@ public class Lexer implements TokenTypes {
   /**
    * Consumes whitespace characters.
    *
-   * @param @curChar the current character before the call
+   * @param curChar the current character before the call
    * @return The current character after whitespace is consumed
    */
   private char consumeWhiteSpace(char curChar) {
