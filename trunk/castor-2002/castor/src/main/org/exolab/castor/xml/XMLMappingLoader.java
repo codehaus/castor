@@ -306,7 +306,9 @@ public class XMLMappingLoader
         //-- If deriveNameByClass we need to reset the name to
         //-- null because XMLFieldDescriptorImpl tries to be smart
         //-- and automatically creates the name.
-        xmlDesc.setXMLName(null);
+        if (deriveNameByClass) {
+            xmlDesc.setXMLName(null);
+        }
         
         //-- matches
         if (match != null) {
