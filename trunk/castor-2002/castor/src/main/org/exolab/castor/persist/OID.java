@@ -62,7 +62,7 @@ import org.exolab.castor.mapping.ObjectDesc;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public final class OID
+final class OID
 {
 
 

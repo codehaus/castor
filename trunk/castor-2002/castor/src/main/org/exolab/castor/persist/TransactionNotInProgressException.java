@@ -51,6 +51,9 @@ import org.exolab.castor.util.CastorException;
 
 
 /**
+ * Indicates the operation cannot be performed since a transaction is not
+ * in progress.
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */

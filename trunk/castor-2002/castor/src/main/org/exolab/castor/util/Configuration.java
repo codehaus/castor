@@ -90,6 +90,9 @@ public abstract class Configuration
 {
 
 
+    /**
+     * Names of properties used in the configuration file.
+     */
     public static class Property
     {
 
