@@ -248,7 +248,13 @@ public class XMLFieldDescriptorImpl
         if ( xmlName == null ) xmlName = getFieldName();        
         _xmlName = xmlName;
         
-        _nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
+        if (nodeType == null) {
+            if (this.multivalued)
+                _nodeType = NodeType.Element;
+            else
+                _nodeType = NodeType.Attribute;
+        }
+        else _nodeType = nodeType;
         
     } //-- XMLFieldDescriptorImpl
 
