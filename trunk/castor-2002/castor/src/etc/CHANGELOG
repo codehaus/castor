@@ -7,6 +7,7 @@ JDO:     Fixed some minor glitches in support for exclusive and db-locked
          access, documented the available access modes.
 
 JDO:     Fixed synchronization support, disabled checkpoint method.
+         Fixed bugs in handling of default field values.
 
 JDO:     Fixed circular exception problem in ObjectLock.release.
          (Contributed by Jason Weistein <jasonw@reticular.com>)
