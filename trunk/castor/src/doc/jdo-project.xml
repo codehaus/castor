@@ -74,7 +74,7 @@
         </p>
         <p>
         <b>Volunteer:</b> Bruce Snyder<br />
-        <b>Status:</b> started<br />
+        <b>Status:</b> completed<br />
         <b>Date Started:</b> 5 May 2003<br />
         <b>Notes:</b><br />
         Not sure if Jakarta Commons Logging should be used in Castor
@@ -85,6 +85,12 @@
         programmatic configuration of Log4J which I'm not really worried
         about. All of the configuration in Castor will take place in a
         properties or XML file. <br />
+        <b>Post Mortem:</b><br />
+        Jakarta Commons Logging was used with Log4J as the default logger. Now
+        the amount of logging just needs to be increase and configurations
+        offered in the default properties files for ease of disabling stuff
+        that's spewing. I'll be adding a class to support the TRACE level as
+        well.<br />
         </p>
         </section>
 
@@ -296,6 +302,103 @@ SELECT p FROM myapp.Product p]]>
         </p>
         </section>
 
+        <section title="Integrated Connection Pooling">
+        <p>
+        <b>Description:</b><br />
+        A database connection pooler should be integrated directly into
+        Castor. This would limit us to supporting <a href="">JDBC 3.0</a>
+        compliant drivers. Anything that's not JDBC 3.0 compliant would 
+        still be supported via an implemention within the driver for a 
+        pooled DataSource.
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b> not started<br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        Here is a list of database connection poolers:
+        <ul type="bullet">
+            <li>
+                <a href="http://jakarta.apache.org/commons/dbcp/">DBCP</a>
+            </li>
+            <li>
+                <a
+                href="http://download-west.oracle.com/docs/cd/A91202_01/901_doc/java.901/a90211/connpoca.htm#1057365">
+                Oracle JDBC driver</a> (Unable to locate 9.2.x docs)
+            </li>
+            <li>
+                <a href="http://poolman.sf.net/">PoolMan</a> 
+            </li>
+            <li>
+                <a href="http://jdbc.postgresql.org">PostgreSQL JDBC driver</a> 
+            </li>
+            <li>
+                <a href="http://proxool.sf.net/">Proxool</a> 
+            </li>
+            <li>
+                <a href="http://sqlrelay.sourceforge.net/">SQL Relay</a>
+            </li>
+        </ul>
+        </p>
+        </section>
+
+        <section title="Tyrex Integration">
+        <p>
+        <b>Description:</b><br />
+        Internally Castor handles its own transactions through somewhat of a
+        home grown approach. This should be replaced with <a
+        href="http://tyrex.sf.net/">Tyrex</a> or even better, <a
+        href="http://jotm.objectweb.org/">JOTM</a>. This would allow us to 
+        provide the following features: 
+        <ul type="bullet">
+            <li>nested tx</li>
+            <li>tx timeouts</li>
+            <li>max number of open tx</li>
+            <li>IIOP support</li>
+            <li>tx journaling</li>
+        </ul>
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b><br />
+        <b>Date Started:</b> not started<br />
+        <b>Notes:</b><br />
+        </p>
+        </section>
+
+        <section title="JCA Research">
+        <p>
+        <b>Description:</b><br />
+        Research the possibility of creating a JCA Connector for Castor to
+        hook into application servers that support JCA. 
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b><br />
+        <b>Date Started:</b> not started<br />
+        <b>Notes:</b><br />
+        </p>
+        </section>
+
+        <section title="Logos">
+        <p>
+        <b>Description:</b><br />
+        This task covers two topics: 
+        <ul type="1">
+            <li>Logos for Castor users to display on their websites</li>
+            <li>Logos of projects that Castor uses or with which Castor integrates</li>
+        </ul>
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b><br />
+        <b>Date Started:</b> not started<br />
+        <b>Notes:</b><br />
+        This is to increase awareness of Castor's use as well as Castor's
+        awareness of other projects. 
+        </p>
+        </section>
+
         <section title="Timestampable Dynamic Proxy">
         <p>
         <b>Description:</b><br />
@@ -357,8 +460,8 @@ SELECT p FROM myapp.Product p]]>
           http://www.mail-archive.com/castor-dev%40exolab.org/msg06972.html )
         - Loading/reloading of mapping descriptor should be simplified
         - Support for sub-queries, joins, order by, group by, between, functions, 
-          is null, is not null, named parameters, binary, logical and match 
-          operators, precedence via parens, etc. 
+          is null, is not null (these two are already supported), named parameters, 
+          binary, logical and match operators, precedence via parens, etc. 
         - Make it easier to use straight SQL (e.g. no AS <object-name> syntax
           for certain cases)
         - Support for the mapping of multiple classes to one table and one 
