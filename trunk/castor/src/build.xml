@@ -31,7 +31,8 @@
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
         <property name="main.opt.debug" value="true"/>
-        <property name="archive" value="${project}-${version}"/>
+        <property name="archive.name" value="${project}-${version}"/>
+        <property name="srcgen.ant.task.name" value="${project}-srcgen-ant-task"/>
         <property name="exampleexcludes" value="SourceGenerator/*,**/dax/**"/>
         <property name="excludes" value="**/package.html,**/dax/**,**/dax/engine/**"/>
         <property name="testexcludes" value="**/package.html, **/MasterTestSuite/**, **/RegressionTestSuite/**" />
@@ -234,7 +235,7 @@
         </copy>
 
         <!-- Make a webapp out of the servlet example -->
-        <available property="project_jar.present" file="${dist}/${archive}.jar" />
+        <available property="project_jar.present" file="${dist}/${archive.name}.jar" />
         <mkdir dir="${build}/examples/webapp"/>
         <copy toDir="${build}/examples/webapp/WEB-INF/classes">
             <fileset dir="${build}/examples">
@@ -256,7 +257,7 @@
 
             </fileset>
             <fileset dir="${dist}">
-                <include name="${archive}.jar" if="project_jar.present"/>
+                <include name="${archive.name}.jar" if="project_jar.present"/>
             </fileset>
         </copy>
 
@@ -282,19 +283,25 @@
             description="An alias to call the release and jar.jdotests targets"/>
 
     <target name="jar.jdotests" depends="tests" description="Creates a JAR file of the JDO tests">
-        <delete file="${dist}/${archive}-tests.jar"/>
+        <delete file="${dist}/${archive.name}-tests.jar"/>
 
         <copy todir="${build}/tests">
             <fileset dir="${source}/etc" includes="MANIFEST.MF" />
         </copy>
 
-        <jar jarfile="${dist}/${archive}-tests.jar" basedir="${build}/tests" manifest="${build}/tests/MANIFEST.MF"
+        <jar jarfile="${dist}/${archive.name}-tests.jar" basedir="${build}/tests" manifest="${build}/tests/MANIFEST.MF"
         includes="LICENSE,README,jdo/**,harness/**,*" excludes="xml" />
 
     </target>
 
+    <target name="srcgen.anttask.jar" depends="compile" description="Build the castor-srcgen-ant-task.jar files">
+        <jar jarfile="${dist}/${srcgen.ant.task.name}.jar" basedir="${classes}"
+              includes="org/exolab/castor/tools/ant/taskdefs/*,
+                        org/exolab/castor/util/Version.class" />
+    </target>
+
     <target name="jar" depends="compile" description="Build the castor.jar and castor-xml.jar files">
-        <delete file="${dist}/${archive}.jar"/>
+        <delete file="${dist}/${archive.name}.jar"/>
         <delete file="${classes}/MANIFEST.MF"/>
 
         <copy todir="${classes}">
@@ -305,11 +312,11 @@
             <fileset dir="${source}/etc" includes="LICENSE,README" />
         </copy>
 
-        <jar jarfile="${dist}/${archive}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
+        <jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
              includes="LICENSE,README,org/**,log4j.properties"/>
 
         <!-- Castor XML Only Jar -->
-        <jar jarfile="${dist}/${archive}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
+        <jar jarfile="${dist}/${archive.name}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
               includes="LICENSE,README,
               org/exolab/castor/*,
               org/exolab/castor/builder/**,
@@ -397,70 +404,70 @@
     </target>
 
     <target name="docs" depends="doc,api,javadoc" description="Build the HTML docs, full and API javadocs">
-        <zip zipfile="${dist}/${archive}-doc.zip" basedir="${build}" includes="doc/**"/>
-        <tar tarfile="${dist}/${archive}-doc.tar" basedir="${build}" includes="doc/**"/>
-        <gzip src="${dist}/${archive}-doc.tar" zipfile="${dist}/${archive}-doc.tgz"/>
-        <delete file="${dist}/${archive}-doc.tar"/>
+        <zip zipfile="${dist}/${archive.name}-doc.zip" basedir="${build}" includes="doc/**"/>
+        <tar tarfile="${dist}/${archive.name}-doc.tar" basedir="${build}" includes="doc/**"/>
+        <gzip src="${dist}/${archive.name}-doc.tar" zipfile="${dist}/${archive.name}-doc.tgz"/>
+        <delete file="${dist}/${archive.name}-doc.tar"/>
     </target>
 
-    <target name="source" depends="prepare" description="Build the source distributions (tarball and zip archives)">
-        <delete file="${dist}/${archive}-src.tgz"/>
-        <delete file="${dist}/${archive}-src.zip"/>
-        <delete dir="${build}/${archive}"/>
-        <mkdir dir="${build}/${archive}"/>
-        <mkdir dir="${build}/${archive}/src"/>
-        <!-- <copydir src="${source}" dest="${build}/${archive}/src" defaultexcludes="true"/> -->
-        <copy todir="${build}/${archive}/src">
+    <target name="source" depends="prepare" description="Build the source distributions (tarball and zip archive.names)">
+        <delete file="${dist}/${archive.name}-src.tgz"/>
+        <delete file="${dist}/${archive.name}-src.zip"/>
+        <delete dir="${build}/${archive.name}"/>
+        <mkdir dir="${build}/${archive.name}"/>
+        <mkdir dir="${build}/${archive.name}/src"/>
+        <!-- <copydir src="${source}" dest="${build}/${archive.name}/src" defaultexcludes="true"/> -->
+        <copy todir="${build}/${archive.name}/src">
         <fileset dir="${source}" />
     </copy>
-        <mkdir dir="${build}/${archive}/lib"/>
+        <mkdir dir="${build}/${archive.name}/lib"/>
 
-        <copy todir="${build}/${archive}/lib">
+        <copy todir="${build}/${archive.name}/lib">
         <fileset dir="${lib}" excludes="jconn2.jar"/>
     </copy>
 
-        <copy todir="${build}/${archive}">
+        <copy todir="${build}/${archive.name}">
         <fileset dir="." includes="*.sh,*.bat"/>
     </copy>
 
-        <tar includes="${archive}/**" basedir="${build}" tarfile="${dist}/${archive}-src.tar"/>
-        <gzip src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
-        <delete file="${dist}/${archive}-src.tar"/>
-        <zip zipfile="${dist}/${archive}-src.zip" basedir="${build}" includes="${archive}/**"/>
+        <tar includes="${archive.name}/**" basedir="${build}" tarfile="${dist}/${archive.name}-src.tar"/>
+        <gzip src="${dist}/${archive.name}-src.tar" zipfile="${dist}/${archive.name}-src.tgz"/>
+        <delete file="${dist}/${archive.name}-src.tar"/>
+        <zip zipfile="${dist}/${archive.name}-src.zip" basedir="${build}" includes="${archive.name}/**"/>
     </target>
 
     <target name="release" depends="clean,jar,source,docs,tarball"
             description="An alias to call the clean, jar, source, docs and tarball targets"/>
 
-    <target name="tarball" depends="prepare,doc,jar" description="Build the binary distrutions (tarball and zip archives)">
-        <delete file="${dist}/${archive}.tgz"/>
-        <delete file="${dist}/${archive}.zip"/>
-        <delete dir="${build}/${archive}"/>
-        <mkdir dir="${build}/${archive}"/>
-        <copy todir="${build}/${archive}">
+    <target name="tarball" depends="prepare,doc,jar" description="Build the binary distrutions (tarball and zip archive.names)">
+        <delete file="${dist}/${archive.name}.tgz"/>
+        <delete file="${dist}/${archive.name}.zip"/>
+        <delete dir="${build}/${archive.name}"/>
+        <mkdir dir="${build}/${archive.name}"/>
+        <copy todir="${build}/${archive.name}">
             <fileset dir="${etc}" includes="README,LICENSE,CHANGELOG,sourceGen*"/>
         </copy>
-        <copy todir="${build}/${archive}">
-            <fileset dir="${dist}" includes="${archive}.jar,${archive}-xml.jar"/>
+        <copy todir="${build}/${archive.name}">
+            <fileset dir="${dist}" includes="${archive.name}.jar,${archive.name}-xml.jar"/>
         </copy>
-        <copy todir="${build}/${archive}">
+        <copy todir="${build}/${archive.name}">
             <fileset dir="${lib}" includes="jdbc-se2.0.jar,jndi.jar,jta1.0.1.jar,xerces.jar,ldapjdk.jar,xslp.jar"/>
         </copy>
-        <copy todir="${build}/${archive}/schema">
+        <copy todir="${build}/${archive.name}/schema">
             <fileset dir="${schema}" />
         </copy>
-        <copy todir="${build}/${archive}/doc">
+        <copy todir="${build}/${archive.name}/doc">
             <fileset dir="${build}/doc" />
         </copy>
 
-        <delete dir="${build}/${archive}/doc/javadoc"/>
-        <tar tarfile="${build}/${archive}/examples.tar" basedir="${source}" includes="examples/**" defaultexcludes="true"/>
-        <gzip src="${build}/${archive}/examples.tar" zipfile="${build}/${archive}/examples.tgz"/>
-        <tar tarfile="${dist}/${archive}.tar" basedir="${build}" includes="${archive}/**" excludes="${archive}/*.tar,${archive}/*.zip"/>
-        <gzip src="${dist}/${archive}.tar" zipfile="${dist}/${archive}.tgz"/>
-        <delete file="${dist}/${archive}.tar"/>
-        <zip zipfile="${build}/${archive}/examples.zip" basedir="${source}" includes="examples/**" defaultexcludes="true"/>
-        <zip zipfile="${dist}/${archive}.zip" basedir="${build}" includes="${archive}/**" excludes="${archive}/*.tar,${archive}/*.tgz"/>
+        <delete dir="${build}/${archive.name}/doc/javadoc"/>
+        <tar tarfile="${build}/${archive.name}/examples.tar" basedir="${source}" includes="examples/**" defaultexcludes="true"/>
+        <gzip src="${build}/${archive.name}/examples.tar" zipfile="${build}/${archive.name}/examples.tgz"/>
+        <tar tarfile="${dist}/${archive.name}.tar" basedir="${build}" includes="${archive.name}/**" excludes="${archive.name}/*.tar,${archive.name}/*.zip"/>
+        <gzip src="${dist}/${archive.name}.tar" zipfile="${dist}/${archive.name}.tgz"/>
+        <delete file="${dist}/${archive.name}.tar"/>
+        <zip zipfile="${build}/${archive.name}/examples.zip" basedir="${source}" includes="examples/**" defaultexcludes="true"/>
+        <zip zipfile="${dist}/${archive.name}.zip" basedir="${build}" includes="${archive.name}/**" excludes="${archive.name}/*.tar,${archive.name}/*.tgz"/>
     </target>
 
     <target name="cvs" depends="clean"

@@ -1,6 +1,9 @@
 
 Version (CVS) 
 -------------
+JDO:   Added the Castor Ant Task and an Ant target to the build jar.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=885
+       (Bruce - 20041007)
 
 All:   Fixed bug 1757 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added core/** package and children to castor-xml.jar.
