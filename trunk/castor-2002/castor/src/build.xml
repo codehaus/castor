@@ -279,7 +279,7 @@
 
     </target>
 
-
+    <target name="jar.all" depends="release,tests" />
 
     <!-- Build the JAR file using main-opt -->
     <target name="jar.jdotests" depends="tests">
