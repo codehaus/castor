@@ -37,6 +37,32 @@
 
     <section title="Tasks">
 
+        <section title="Modularization of Castor JDO">
+        <p>
+        <b>Description:</b><br />
+        Castor is very tightly coupled in it's design. This tight coupling
+        leads to maintainence trouble, difficult to understand code, etc. 
+        </p>
+        <p>
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b> not started<br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        See the mail list threads titled 
+        <a href="http://www.mail-archive.com/castor-dev@exolab.org/msg06709.html">Castor JDO Status</a> and
+        <a href="http://www.mail-archive.com/castor-dev@exolab.org/msg06935.html">Strategy Proposal</a>. 
+        These threads are especially long and tend to be broken on
+        mail-archive.com. But there are some very good ideas amongst these two
+        threads concerning the modularization of Castor JDO.
+        <br />
+        <br />
+        This is a high-level architectural change that includes many of the
+        items in this list. 
+        </p>
+        </section>
+
         <section title="Logging Refactoring">
         <p>
         <b>Description:</b><br />
@@ -292,6 +318,9 @@ SELECT p FROM myapp.Product p]]>
         Items to be added to this list (in no particular order):
 
         - Queries should check the cache before going to the database
+        - Query by example would be a good thing to consider (e.g. 
+          http://www.mail-archive.com/castor-dev%40exolab.org/msg06972.html )
+        - Loading/reloading of mapping descriptor should be simplified
         - Support for sub-queries, joins, order by, group by, between, functions, 
           is null, is not null, named parameters, binary, logical and match 
           operators, precedence via parens, etc. 
@@ -316,7 +345,7 @@ SELECT p FROM myapp.Product p]]>
         - xPetstore Castor implementation
         - Castor tutorial document
         - More engine support (e.g. native XML databases, SAP DB, FirstSQL, 
-          McKoi SQL, Pointbase, etc.)
+          McKoi SQL, Pointbase, Pervasive, etc.)
         -->
 
         <!--
