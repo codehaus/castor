@@ -38,7 +38,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: LRU.java
+ * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ *
+ * $Id$
  */
 
 package org.exolab.castor.persist.cache;
@@ -55,64 +57,69 @@ import java.util.Enumeration;
 public abstract class AbstractBaseCache 
 implements Cache 
 {
-
-    /**
-     * Indicates the type of this cache.
-     */
-    private CacheType _cacheType;
     
-	/**
-	 * Maps the specified <code>key</code> to the specified 
-	 * <code>value</code> in this hashtable. Neither the key nor the 
-	 * value can be <code>null</code>. 
-	 * <p>
-	 * The value can be retrieved by calling the <code>get</code> method 
-	 * with a key that is equal to the original key, before it is diposed
-	 * by the least-recently-used map. 
-	 * <p>
-	 * @param      key     the hashtable key.
-	 * @param      value   the value.
-	 * @return     the previous value of the specified key in this hashtable,
-	 *             or <code>null</code> if it did not have one.
-	 * @exception  NullPointerException  if the key or value is
-	 *               <code>null</code>.
-	 */
-	public abstract Object put(Object key, Object value);
-	
-	/**
-	 *Returns the value to which the specified key is mapped in this hashtable.
-	 *@param key - a key in the hashtable.
-	 *@return the value to which the key is mapped in this hashtable; null if 
-	 * the key is not mapped to any value in this hashtable.
-	 */
-	public abstract Object get(Object key);
-	
-	/**
-	 * Removes the key (and its corresponding value) from this 
-	 * hashtable. This method does nothing if the key is not in the hashtable.
-	 *
-	 * @param   key   the key that needs to be removed.
-	 * @return  the value to which the key had been mapped in this hashtable,
-	 *          or <code>null</code> if the key did not have a mapping.
-	 */
-	public abstract Object remove(Object key);
-	
-	/**
-	 * Returns an enumeration of the values in this LRU map.
-	 * Use the Enumeration methods on the returned object to fetch the elements
-	 * sequentially.
-	 *
-	 * @return  an enumeration of the values in this hashtable.
-	 * @see     java.util.Enumeration
-	 */
-	public abstract Enumeration elements();
-	
-	/**
-	 * Remove the object identified by key from the cache.
-	 *
-	 * @param   key   the key that needs to be removed.
-	 */
-	public abstract void expire(Object key);
+    /**
+     * Type of this cache.
+     */
+    private String _cacheType;
+    
+    /**
+     * Cache capacity.
+     */
+    private int _capacity;
+    
+    /**
+     * Maps the specified <code>key</code> to the specified 
+     * <code>value</code> in this hashtable. Neither the key nor the 
+     * value can be <code>null</code>. 
+     * <p>
+     * The value can be retrieved by calling the <code>get</code> method 
+     * with a key that is equal to the original key, before it is diposed
+     * by the least-recently-used map. 
+     * <p>
+     * @param      key     the hashtable key.
+     * @param      value   the value.
+     * @return     the previous value of the specified key in this hashtable,
+     *             or <code>null</code> if it did not have one.
+     * @exception  NullPointerException  if the key or value is
+     *               <code>null</code>.
+     */
+    public abstract Object put(Object key, Object value);
+    
+    /**
+     *Returns the value to which the specified key is mapped in this hashtable.
+     *@param key - a key in the hashtable.
+     *@return the value to which the key is mapped in this hashtable; null if 
+     * the key is not mapped to any value in this hashtable.
+     */
+    public abstract Object get(Object key);
+    
+    /**
+     * Removes the key (and its corresponding value) from this 
+     * hashtable. This method does nothing if the key is not in the hashtable.
+     *
+     * @param   key   the key that needs to be removed.
+     * @return  the value to which the key had been mapped in this hashtable,
+     *          or <code>null</code> if the key did not have a mapping.
+     */
+    public abstract Object remove(Object key);
+    
+    /**
+     * Returns an enumeration of the values in this LRU map.
+     * Use the Enumeration methods on the returned object to fetch the elements
+     * sequentially.
+     *
+     * @return  an enumeration of the values in this hashtable.
+     * @see     java.util.Enumeration
+     */
+    public abstract Enumeration elements();
+    
+    /**
+     * Remove the object identified by key from the cache.
+     *
+     * @param   key   the key that needs to be removed.
+     */
+    public abstract void expire(Object key);
     
     
     /**
@@ -126,15 +133,31 @@ implements Cache
      * Indicates the type of this cache.
      * @return the cache type.
      */	
-    public CacheType getCacheType() {
-		return _cacheType;
-	}
-     
-     /**
-      * Sets the type of this cache instance.
-      * @param cacheType the type of this cache.
-      */
-     public void setCacheType(CacheType cacheType) {
+    public String getCacheType() {
+        return _cacheType;
+    }
+    
+    /**
+     * Sets the type of this cache instance.
+     * @param cacheType the type of this cache.
+     */
+    public void setCacheType(String cacheType) {
         this._cacheType = cacheType;
-	}
+    }
+    
+    /**
+     * Indicates the cache capacity.
+     * @return the cache capacity.
+     */
+    public int getCapacity() {
+        return _capacity;
+    }
+    
+    /**
+     * Sets the cache capacity.
+     * @param capacity the cache capacity.
+     */
+    public void setCapacity(int capacity) {
+        this._capacity = capacity;
+    }
 }
