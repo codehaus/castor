@@ -126,6 +126,21 @@
     </field>
     <field name="payRoll" type="jdo.TestLazyPayRoll" />
     <field name="contract" type="jdo.TestLazyContract" />
+    <field name="projects" type="jdo.TestLazyProject" collection="collection" lazy="true"/>
+  </class>
+
+  <class name="jdo.TestLazyProject" identity="id">
+    <description>Table used for testing lazy loading</description>
+    <map-to table="test_pks_project" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="owner" type="jdo.TestLazyEmployee">
+      <sql name="fname lname"/>
+    </field>
+    <field name="name" type="string">
+      <sql name="name" type="varchar"/>
+    </field>
   </class>
 
   <class name="jdo.TestLazyContract" depends="jdo.TestLazyEmployee" identity="policyNo contractNo">
