@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1517.
+       Added a new isCached() method to CacheManager.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1517
+       (Werner - 20041028)
+
 JDO:   Fixed bug 1262 using contribution from Jack Warner [jack.warner@agedwards.com]
        Castor JDO now uses timezone information when reading date/timestamp/time
        data from the RDBMS.
