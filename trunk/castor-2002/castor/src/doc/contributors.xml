@@ -139,7 +139,7 @@
   <contributor type="Contributor">
     <name surname="Lavandowska" given="Lance"/>
     <email>lance@aptura.com</email>
-    <description>Mapping GUI for Castor.</description>
+    <description>Mapping GUI</description>
   </contributor>
 
   <contributor type="Feedback">
@@ -231,6 +231,12 @@
     <email>jhall@solant.com</email>
     <company id="avolent"/>
     <description>Patch to upgrade Mapping.xsd to latest XML Schema draft</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Rousse" given="Guillaume" />
+	<email>Guillaume.Rousse@univ-reunion.fr</email>
+	<description>Mapping extension</description>
   </contributor>
 
   <contributor type="Feedback">
