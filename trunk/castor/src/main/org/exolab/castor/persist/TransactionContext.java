@@ -276,6 +276,9 @@ public abstract class TransactionContext
         _db = db;
     }
 
+	/*
+	* These constructors should be removed. It is no longer
+	* used from within the Castor code.
     public TransactionContext( Database db, Xid xid )
     {
         _xid = xid;
@@ -283,6 +286,43 @@ public abstract class TransactionContext
         _db = db;
     }
 
+	/*
+	* These constructors should be removed. It is no longer
+	* used from within the Castor code.
+	
+	   public TransactionContext( Database db, Xid xid , int status)
+    {
+        _xid = xid;
+        _status = status;
+        _db = db;
+    }
+	*/
+	
+	/*
+	* This constructor is used in the case of
+	* global transaction.
+	*/
+	public TransactionContext( Database db,  javax.transaction.Transaction transaction )
+    {
+        _xid = null;       
+        _db = db;
+		_status = -1;
+		//this should be removed when we move 
+		//to separate implementations of TransactionContext
+		//for explicit demarcation and global transactions.
+		//In the latter case, I think we should just wrap
+		//the global transaction and pass getStatus() through to the 
+		//wrapped transaction
+		try {
+			_status = transaction.getStatus();
+    	}
+		catch ( javax.transaction.SystemException e ) {
+			_log.error ( "Problem in TransactionContext( db , transaction )", e );
+			// TODO WG: do something about this exception; catching silently is not enough
+		}
+	}
+		
+	
     /**
      * Register a listener which wants to synchronize its state
      * to the state of the transaction.
