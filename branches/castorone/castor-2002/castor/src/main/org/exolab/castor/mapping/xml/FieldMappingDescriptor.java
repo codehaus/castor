@@ -90,8 +90,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _lazy
@@ -379,7 +381,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _manyToMany

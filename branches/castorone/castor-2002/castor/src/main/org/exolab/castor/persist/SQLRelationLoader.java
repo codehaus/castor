@@ -63,16 +63,31 @@ import org.exolab.castor.jdo.PersistenceException;
 import java.util.Vector;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SQLRelationLoader {
     private String tableName;
-    
-    private String left;
-    
-    private String right;
 
+	private int[] leftType;
+
+	private int[] rightType;
+
+    private String[] left;
+    
+    private String[] right;
+
+	private String select;
+
+	private String insert;
+
+	private String delete;
+
+	private String deleteAll;
+
+
+	/*
     public SQLRelationLoader( RelationDescriptor rd, String type ) throws MappingException {
         if ( rd.type1 != type && rd.type2 != type )
             throw new MappingException("Wrong relation descriptor for type:"+type);
@@ -86,74 +101,131 @@ public class SQLRelationLoader {
             right = rd.sql1;
         }
         
-        tableName = rd.table;        
-    }
+    }*/
 
-    public SQLRelationLoader( String table, String key, String otherKey ) {
+    public SQLRelationLoader( String table, String[] key, int[] keyType, String[] otherKey, int[] otherKeyType ) {
         tableName = table;
         left = key;
         right = otherKey;
-    }
-    /* always return vector of string for now */
-    public Vector loadRelation( Connection conn, String id ) throws PersistenceException {
-        try {
-            Statement stmt = conn.createStatement();
-            ResultSet rset = stmt.executeQuery("SELECT " + left + ", " + right + " FROM " + tableName + 
-                    " WHERE " + left + " = " + id + " ;" );
+		leftType = keyType;
+		rightType = otherKeyType;
 
-            Vector result = new Vector();
-            while ( rset.next() ) {
-                result.add( rset.getString( right ) );
-            }
-            return result;
-        } catch ( SQLException e ) {
-            throw new PersistenceException( e.toString() );
-        }
-    }
+		// construct select statement
+		StringBuffer sb = new StringBuffer();
+		int count = 0;
+		sb.append("SELECT ");
+		for ( int i=0; i < left.length; i++ ) {
+			if ( i > 0 ) sb.append(",");
+			sb.append( left[i] );
+			count++;
+		}
+		for ( int i=0; i < right.length; i++ ) {
+			sb.append(",");
+			sb.append( right[i] );	
+			count++;
+		}
+		sb.append(" FROM ");
+		sb.append( tableName );
+		sb.append(" WHERE ");
+		for ( int i=0; i < left.length; i++ ) {
+			if ( i > 0 ) sb.append(" AND ");
+			sb.append( left[i] );
+			sb.append("=?");
+		}
+		for ( int i=0; i < right.length; i++ ) {
+			sb.append(" AND ");
+			sb.append( right[i] );
+			sb.append("=?");
+		}
+		select = sb.toString();
 
-    public void createRelation( Connection conn, String leftValue, Vector rightValues ) 
-            throws PersistenceException {
-        try {
-            Statement stmt = conn.createStatement();
-            ResultSet rset;
-            for ( int i=0; i<rightValues.size(); i++ ) {
-                /*
-                String sStmt = "SELECT \"" + tableName+"\".\""+ left + 
-                    "\", \"" + tableName+"\".\"" + right + "\" FROM " + tableName + 
-                    " WHERE \""+tableName+"\".\""+ left + "\"=" + leftvalue + 
-                    " AND \""+tableName+"\".\"" + right + "\"="  + rightvalues.elementAt(i);
-                */
-                String sStmt = "SELECT "+left + ", " + right + " FROM " + tableName 
-                        + " WHERE " + left + "=" + leftValue + " AND " + right + "=" + rightValues.elementAt(i);
-                rset = stmt.executeQuery(  "select group_id, person_id FROM test_group_person WHERE group_id=1 AND person_id=0" );
-                if ( ! rset.next() ) {
-                    sStmt = "INSERT INTO " + tableName + 
-                        "( " + left + ", " + right + " ) VALUES ( " +
-                        leftValue + ", " + rightValues.elementAt(i) + " )" ;
-                    i = stmt.executeUpdate( sStmt );
-                }
-            }
-        } catch ( SQLException e ) {
-            throw new PersistenceException( e.toString() );
-        }
+		// construct insert statement
+		sb = new StringBuffer();
+		count = 0;
+		sb.append("INSERT INTO ");
+		sb.append( tableName );
+		sb.append(" (");
+		for ( int i=0; i < left.length; i++ ) {
+			if ( i > 0 ) sb.append(",");
+			sb.append( left[i] );
+			count++;
+		}
+		for ( int i=0; i < right.length; i++ ) {
+			sb.append(",");
+			sb.append( right[i] );	
+			count++;
+		}
+		sb.append(") VALUES (");
+		for ( int i=0; i < count; i++ ) {
+			if ( i > 0 ) sb.append(",");
+			sb.append("?");
+		}
+		sb.append(")");
+		insert = sb.toString();
+
+		// construct delete statement
+		sb = new StringBuffer();
+		count = 0;
+		sb.append("DELETE FROM ");
+		sb.append( tableName );
+		sb.append(" WHERE ");
+		for ( int i=0; i < left.length; i++ ) {
+			if ( i > 0 ) sb.append(" AND ");
+			sb.append( left[i] );
+			sb.append("=?");
+		}
+		for ( int i=0; i < right.length; i++ ) {
+			sb.append(" AND ");
+			sb.append( right[i] );
+			sb.append("=?");
+		}
+		delete = sb.toString();
+
+		// construct delete statement for the left side only
+		sb = new StringBuffer();
+		count = 0;
+		sb.append("DELETE FROM ");
+		sb.append( tableName );
+		sb.append(" WHERE ");
+		for ( int i=0; i < left.length; i++ ) {
+			if ( i > 0 ) sb.append(" AND ");
+			sb.append( left[i] );
+			sb.append("=?");
+		}
+		deleteAll = sb.toString();
+
     }
     public void createRelation( Connection conn, Object[] leftValue, Object[] rightValue ) 
             throws PersistenceException {
-        try {
-            Statement stmt = conn.createStatement();
-            ResultSet rset;
-
-            String sStmt = "SELECT "+left + ", " + right + " FROM " + tableName 
-                    + " WHERE " + left + "=" + leftValue[0] + " AND " + right + "=" + rightValue[0];
-            System.out.println( sStmt );
-            rset = stmt.executeQuery( sStmt );
+        
+		try {
+			int count = 1;
+			ResultSet rset;
+            PreparedStatement stmt = conn.prepareStatement( select );
+			for ( int i=0; i < leftValue.length; i++ ) {				
+				stmt.setObject( count, leftValue[i], leftType[i] );
+				count++;
+			}
+			for ( int i=0; i < rightValue.length; i++ ) {
+				stmt.setObject( count, rightValue[i], rightType[i] );
+				count++;
+			}
+			count = 1;
+            rset = stmt.executeQuery();
             if ( ! rset.next() ) {
-                sStmt = "INSERT INTO " + tableName + 
-                    "( " + left + ", " + right + " ) VALUES ( " +
-                    leftValue[0] + ", " + rightValue[0] + " )" ;
-                int i = stmt.executeUpdate( sStmt );
-            }
+				stmt = conn.prepareStatement( insert );
+				for ( int i=0; i < leftValue.length; i++ ) {				
+					stmt.setObject( count, leftValue[i], leftType[i] );
+					count++;
+				}
+				for ( int i=0; i < rightValue.length; i++ ) {
+					stmt.setObject( count, rightValue[i], rightType[i] );
+					count++;
+				}
+				int r = stmt.executeUpdate();
+            } 
         } catch ( SQLException e ) {
+			e.printStackTrace();
             throw new PersistenceException( e.toString() );
         }
     }
@@ -161,13 +233,15 @@ public class SQLRelationLoader {
             throws PersistenceException {
 
         try {
-            Statement stmt = conn.createStatement();
-            String sStmt;
-            ResultSet rset;
-
-            sStmt = "DELETE FROM " + tableName + " WHERE " + left + "=" + leftValue[0];
-            int i = stmt.executeUpdate( sStmt );
+			int count = 1;
+            PreparedStatement stmt = conn.prepareStatement( deleteAll );
+			for ( int i=0; i < leftValue.length; i++ ) {				
+				stmt.setObject( count, leftValue[i], leftType[i] );
+				count++;
+			}
+            int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
+			e.printStackTrace();
             throw new PersistenceException( e.toString() );
         }
     }
@@ -176,14 +250,19 @@ public class SQLRelationLoader {
             throws PersistenceException {
 
         try {
-            Statement stmt = conn.createStatement();
-            String sStmt;
-            ResultSet rset;
-
-            sStmt = "DELETE FROM " + tableName + " WHERE " + left + "=" + leftValue[0] +" AND " + right + "=" + rightValue[0];
-            System.out.println(sStmt);
-            int i = stmt.executeUpdate( sStmt );
+			int count = 1;
+            PreparedStatement stmt = conn.prepareStatement( delete );
+			for ( int i=0; i < leftValue.length; i++ ) {				
+				stmt.setObject( count, leftValue[i], leftType[i] );
+				count++;
+			}
+			for ( int i=0; i < rightValue.length; i++ ) {
+				stmt.setObject( count, rightValue[i], rightType[i] );
+				count++;
+			}
+            int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
+			e.printStackTrace();
             throw new PersistenceException( e.toString() );
         }
     }

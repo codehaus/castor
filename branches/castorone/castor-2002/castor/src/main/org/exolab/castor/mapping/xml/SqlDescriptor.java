@@ -89,8 +89,11 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
-        desc.setValidator(fieldValidator);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
+		desc.setValidator(fieldValidator);
         
         //-- _dirty
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_dirty", "dirty", NodeType.Attribute);
@@ -162,7 +165,7 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
             StringValidator sv = new StringValidator();
             fieldValidator.setValidator(sv);
         }
-        desc.setValidator(fieldValidator);
+		desc.setValidator(fieldValidator);
         
         //-- _manyKey
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyKey", "many-key", NodeType.Attribute);
@@ -193,8 +196,11 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         
         //-- validation code for: _manyKey
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
-        desc.setValidator(fieldValidator);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
+		desc.setValidator(fieldValidator);
         
         //-- _manyTable
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_manyTable", "many-table", NodeType.Attribute);

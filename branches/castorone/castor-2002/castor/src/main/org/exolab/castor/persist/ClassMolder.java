@@ -126,6 +126,10 @@ public class ClassMolder implements CacheHolder {
 
     ClassMolder _depends;
 
+	Vector _dependent;
+
+	Vector _extendent;
+
     AccessMode _accessMode;
 
     Persistence _persistence;
@@ -181,32 +185,44 @@ public class ClassMolder implements CacheHolder {
         for ( int i=0; i<_fhs.length; i++ ) {
             if ( fmFields[i].getSql() != null && fmFields[i].getSql().getManyTable() != null ) {
                 String manyTable = null; 
-                String idSQL = null;
-                String relatedIdSQL = null;
+                String[] idSQL = null;
+				int[] idType = null;
+                String[] relatedIdSQL = null;
+				int[] relatedIdType = null;
 
                 manyTable = fmFields[i].getSql().getManyTable();
-                idSQL = null;
 
-                if ( fmId.length == 1 ) { 
-                    idSQL = fmId[0].getSql().getName();
-                } else {
-                    throw new MappingException("Many-to-Many relation only support single column pk");
-                }
+				idSQL = new String[fmId.length];
+				idType = new int[fmId.length];
+				FieldDescriptor[] fd = ((ClassDescriptorImpl)clsDesc).getIdentities();
+				for ( int j=0; j < fmId.length; j++ ) {
+					idSQL[j] = fmId[j].getSql().getName();
+					
+					if ( fd[j] instanceof JDOFieldDescriptor ) {
+						idType[j] = ((JDOFieldDescriptor)fd[j]).getSQLType();
+					} else {
+						throw new MappingException("Identity type must contains sql information: "+ _name );
+					}
+				}
 
                 relatedIdSQL = null;
                 String relatedType = fmFields[i].getType();
                 ClassDescriptor relDesc = loader.getDescriptor( ds.resolve( relatedType ) );
                 if ( relDesc instanceof JDOClassDescriptor ) {
                     FieldDescriptor[] relatedIds = ((JDOClassDescriptor)relDesc).getIdentities();
-                    if ( relatedIds != null && relatedIds.length == 1 
-                            && (relatedIds[0] instanceof JDOFieldDescriptor) ) {
-                        relatedIdSQL = ((JDOFieldDescriptor)relatedIds[0]).getSQLName();
-                    } else {
-                        throw new MappingException("Many-to-Many relation only support single column pk");
+					relatedIdSQL = new String[relatedIds.length];
+					relatedIdType = new int[relatedIds.length];
+					for ( int j=0; j < relatedIdSQL.length; j++ ) {
+	                    if ( relatedIds[j] instanceof JDOFieldDescriptor ) {
+							relatedIdSQL[j] = ((JDOFieldDescriptor)relatedIds[j]).getSQLName();
+							relatedIdType[j] = ((JDOFieldDescriptor)relatedIds[j]).getSQLType();
+	                    } else {
+		                    throw new MappingException("Field type is not persistence-capable: "+ relatedIds[j].getFieldName() );
+						}
                     }
                 }
 
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, idSQL, relatedIdSQL ); 
+                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, idSQL, idType, relatedIdSQL, relatedIdType ); 
             } else {
                 _fhs[i] = new FieldMolder( ds, this, fmFields[i] ); 
             }
@@ -991,9 +1007,10 @@ public class ClassMolder implements CacheHolder {
 
                             if ( !tx.isPersistent( newobj ) ) {
                                 // should be created if transaction have no record of the object
-								if ( _fhs[i].isDependent() ) {
-	                                tx.create( fieldEngine, fieldClassMolder, newobj, oid );
-								}
+								// (will not be dependent, so don't create it)
+								//if ( _fhs[i].isDependent() ) {
+	                            //    tx.create( fieldEngine, fieldClassMolder, newobj, oid );
+								//}
                                 // create the relation in relation table too
                                 _fhs[i].getRelationLoader().createRelation( 
                                 (Connection)tx.getConnection(oid.getLockEngine()), 
@@ -1186,10 +1203,86 @@ public class ClassMolder implements CacheHolder {
         }
     }
 
+	private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object[] identities ) 
+			throws ObjectNotFoundException, PersistenceException {
+		// if the extend field contains dependent of field type,
+		// fields must be loaded, so that we get the foreign key
+		// of the depedent table. We may get no result. And, it 
+		// is good and we don't have to process further.
+		// it will be cheaper if we go directly to SQL and load
+		// only the foreign field needed. But, it require extra
+		// method in Persistent SPI. So, maybe we rather stay 
+		// with the expensive appoarch.
+
+		// if there is any depedent field of reference type, the simplest way is
+		// to load the dependent objects and delete it using tansaction. 
+		// (Will ObjectNotFound throws in the loading??)		
+
+		// if the extend field has many-to-many field, we must delete the 
+		// relation from he relation table.
+		System.out.println("Delete extend: "+extend+" ids: "+OID.flatten( identities ));
+		Object[] persistFields = null;
+		for ( int i=0; i < extend._fhs.length; i++ ) {
+			if ( extend._fhs[i].isDependent() ) {
+				try {
+					if ( persistFields == null ) {
+
+						persistFields = new Object[extend._fhs.length];
+						extend._persistence.load( (Connection)tx.getConnection(extend._engine), 
+	                    persistFields, identities, AccessMode.ReadOnly );
+					}
+
+					if ( extend._fhs[i].isMulti() ) {
+						Vector listOfIds = (Vector)persistFields[i];
+						for ( int j=0; i < listOfIds.size(); j++ ) {
+							extend._persistence.delete( tx.getConnection(extend._fhs[i].getFieldLockEngine()),
+							(Object[])listOfIds.get(j) );
+						}
+					}
+				} catch ( ObjectNotFoundException e ) {
+				}
+			} else if ( extend._fhs[i].isManyToMany() ) {
+                extend._fhs[i].getRelationLoader().deleteRelation( 
+                (Connection)tx.getConnection(extend._fhs[i].getFieldLockEngine()), 
+				identities );
+			}
+		}
+	}
+
     public void delete( TransactionContext tx, OID oid ) 
             throws PersistenceException {
-        
-        _persistence.delete( (Connection)tx.getConnection(oid.getLockEngine()), oid.getIdentities() );
+
+        Object[] ids = oid.getIdentities();
+        _persistence.delete( (Connection)tx.getConnection(oid.getLockEngine()), ids );
+
+		// All field along the extend path will be deleted by transaction
+		// However, everything off the path must be deleted by ClassMolder.
+
+		Vector extendPath = new Vector();
+		ClassMolder base = this;
+		while ( base != null ) {
+			extendPath.add( base );
+			base = base._extends;
+		}
+
+		base = _depends;
+		while ( base != null ) {
+			if ( base._extendent != null ) 
+				for ( int i=0; i < base._extendent.size(); i++ ) 
+					if ( !extendPath.contains( base._extendent.get(i) ) ) {
+						deleteExtend( tx, (ClassMolder)base._extendent.get(i), ids );
+					} else {
+					}
+
+			base = base._extends;
+		}
+
+		if ( _extendent != null ) {
+			for ( int i=0; i < _extendent.size(); i++ ) {
+				if ( !extendPath.contains( _extendent.get(i) ) )
+					deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
+			}
+		}
     }
 
     public void markDelete( TransactionContext tx, OID oid, Object object )
@@ -1435,19 +1528,31 @@ public class ClassMolder implements CacheHolder {
         return _depends != null;
     }
 
+	void addExtendent( ClassMolder ext ) {
+		if ( _extendent == null )
+			_extendent = new Vector();
+		_extendent.add( ext );
+	}
+
+	void addDependent( ClassMolder dep ) {
+		if ( _dependent == null )
+			_dependent = new Vector();
+		_dependent.add( dep );
+	}
     /*
      * Mutator method
      */
     void setExtends( ClassMolder ext ) {
         _extends = ext;
+		ext.addExtendent( this );
     }
 
     /*
      * Mutator method
      */
     void setDepends( ClassMolder dep ) {
-		System.out.println("++++++++++++++++++++++ setDepends "+dep);
         _depends = dep;
+		dep.addDependent( this );
     }
     private Iterator getIterator( Object o ) {
         if ( o instanceof Collection ) {
