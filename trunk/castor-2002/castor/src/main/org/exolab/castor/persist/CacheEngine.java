@@ -599,14 +599,14 @@ public final class CacheEngine
                 if ( relations[ i ] != null ) {
                     Object related;
 
-                    if ( ! relations[ i ].isMany() ) {
+                    if ( ! relations[ i ].isMulti() ) {
                         related = relations[ i ].getRelated( object );
                         if ( related != null && ! tx.isPersistent( related ) )
                             tx.create( this, related, relations[ i ].getIdentity( related ) );
                     } else {
                         Enumeration enum;
 
-                        enum = relations[ i ].getCollection( object );
+                        enum = (Enumeration) relations[ i ].getRelated( object );
                         if ( enum != null ) {
                             while ( enum.hasMoreElements() ) {
                                 related = enum.nextElement();
@@ -709,7 +709,7 @@ public final class CacheEngine
         for ( int i = 0 ; i < relations.length ; ++i ) {
             if ( relations[ i ] != null && fields[ i ] != null &&
                  relations[ i ].isAttached() ) {
-                if ( ! relations[ i ].isMany() ) {
+                if ( ! relations[ i ].isMulti() ) {
                     tx.markDelete( this, relations[ i ].getRelatedClass(), fields[ i ] );
                 } else {
                     Vector  related;
@@ -792,7 +792,7 @@ public final class CacheEngine
                 // XXX Need validity check and better testing for null elements
 
                 // relations[ i ].checkValidity( object );
-                if ( ! relations[ i ].isMany() ) {
+                if ( ! relations[ i ].isMulti() ) {
 
                     Object related;
                     Object relIdentity;
@@ -819,7 +819,7 @@ public final class CacheEngine
                     Enumeration enum;
 		    Object[]    origIdentity;
 
-                    enum = relations[ i ].getCollection( object );
+                    enum = (Enumeration) relations[ i ].getRelated( object );
 		    if ( original[ i ] == null )
 			origIdentity = new Object[ 0 ];
 		    else {
