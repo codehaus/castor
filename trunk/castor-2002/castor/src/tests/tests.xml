@@ -11,9 +11,7 @@
     <case class="jdo.Join" />
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenIdentity" />
-<!--
     <case class="jdo.StoredProcedure" />
- -->
   </category>
 
 <!--
