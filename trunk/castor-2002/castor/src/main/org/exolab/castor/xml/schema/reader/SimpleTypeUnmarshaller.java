@@ -77,6 +77,12 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
     **/
     private SimpleTypeDefinition _simpleTypeDef = null;
 
+    /**
+     * A reference to the SimpleType we are unmarshalling
+    **/
+    private SimpleType _simpleType = null;
+    
+    
     private boolean foundAnnotation   = false;
     private boolean foundList         = false;
     private boolean foundRestriction  = false;
@@ -124,7 +130,10 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
      * Returns the SimpleType created
     **/
     public SimpleType getSimpleType() {
-        return _simpleTypeDef.createSimpleType();
+        if (_simpleType == null) {
+            _simpleType = _simpleTypeDef.createSimpleType();
+        }
+        return _simpleType;
     } //-- getSimpletype
 
     /**
@@ -192,8 +201,8 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         }
         else if (SchemaNames.UNION.equals(name)) {
             foundUnion = true;
-
-            error("'union' elements are not yet supported.");
+            Schema schema = _simpleTypeDef.getSchema();
+            unmarshaller = new UnionUnmarshaller(schema, atts);
         }
         else illegalElement(name);
 
@@ -220,6 +229,11 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation annotation = (Annotation)unmarshaller.getObject();
             _simpleTypeDef.setAnnotation(annotation);
+        }
+        else if (SchemaNames.UNION.equals(name)) {
+            _simpleType = (SimpleType)unmarshaller.getObject();
+            _simpleTypeDef.copyInto(_simpleType);
+            
         }
 
         unmarshaller = null;
