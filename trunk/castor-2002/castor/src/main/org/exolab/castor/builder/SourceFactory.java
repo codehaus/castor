@@ -1667,7 +1667,7 @@ public class SourceFactory  {
         jdc.appendComment(" based on the given String value.");
 
         jsc = mValueOf.getSourceCode();
-        jsc.add("Object obj = null;");
+        jsc.add("java.lang.Object obj = null;");
         jsc.add("if (string != null) ");
         jsc.append("obj = _memberTable.get(string);");
         jsc.add("if (obj == null) {");

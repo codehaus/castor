@@ -610,7 +610,7 @@ public class CollectionInfo extends FieldInfo {
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
 
-        jsc.add("Object obj = ");
+        jsc.add("java.lang.Object obj = ");
         jsc.append(getName());
         jsc.append(".elementAt(index);");
         jsc.add(getName());

@@ -232,7 +232,7 @@ public class FieldInfo extends XMLInfo {
         //-- bound properties
         if (_bound) {
             // save old value
-            jsc.add("Object old");
+            jsc.add("java.lang.Object old");
             jsc.append(mname);
             jsc.append(" = ");
 			//-- 'this.' ensures this refers to the class member not the parameter
