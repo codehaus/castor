@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -99,15 +99,17 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         if (elementDecl == null) return;
 
         String name = elementDecl.getName();
-        String key = "element:"+name;
-        //-- check for naming collisions
-        if (_resolver.resolve(key) != null) {
-            String err = "An element declaration with the given name, ";
-            err += name + ", already exists in this scope.";
-            throw new SchemaException(err);
+        
+        if (!elementDecl.isReference()) {
+            String key = "element:"+name;
+            //-- check for naming collisions
+            if (_resolver.resolve(key) != null) {
+                String err = "An element declaration with the given name, ";
+                err += name + ", already exists in this scope.";
+                throw new SchemaException(err);
+            }
+            _resolver.addResolvable(key, elementDecl);
         }
-
-        _resolver.addResolvable(key, elementDecl);
 
         //-- add to content model
         _contentModel.addElement(elementDecl);
@@ -125,8 +127,10 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         int position = _contentModel.indexOf(elementDecl);
 	    if (position >= 0) {
 	        _contentModel.removeElementAt(position);
-	        String key = "element:"+elementDecl.getName();
-            _resolver.removeResolvable(key);
+	        if (!elementDecl.isReference()) {
+	            String key = "element:"+elementDecl.getName();
+                _resolver.removeResolvable(key);
+            }
             return true;
 	   }
        return false;
@@ -149,7 +153,7 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
             String key = "group:"+name;
             //-- check for naming collisions
             if (_resolver.resolve(key) != null) {
-                String err = "An element declaration with the given name, ";
+                String err = "A group definition with the given name, ";
                 err += name + ", already exists in this scope.";
                 throw new SchemaException(err);
             }
@@ -195,7 +199,7 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         if (group == null) return;
 
         String name = group.getName();
-        if (name != null) {
+        if ((name != null) && (!group.isReference())) {
             String key = "group:"+name;
             //-- check for naming collisions
             if (_resolver.resolve(key) != null) {
@@ -223,12 +227,12 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         int position = _contentModel.indexOf(group);
         if (position >= 0) {
             String name = group.getName();
-            if (name != null) {
-                 String key = "group:"+name;
-                 _resolver.removeResolvable(key);
-             }
+            if ((name != null) && (!group.isReference())) {
+                String key = "group:"+name;
+                _resolver.removeResolvable(key);
+            }
 	        _contentModel.removeElementAt(position);
-	         return true;
+	        return true;
 	   }
        return false;
      }
