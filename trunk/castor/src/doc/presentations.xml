@@ -9,9 +9,30 @@
         Java Software Symposium this past November!
         </p>
     </header>
+    
+    <section title="News">
+    
+    	<ul>
+    		<li>Added Jan 2005 article on TheServerSide.com on java <-> xml binding frameworks.</i>
+    	<ul>
+    	
+    </section>
 
     <section title="Articles">
       <p><b>Castor in the press...</b></p>
+
+      <p>
+          <b>TheServerSide.com (January 2005)</b>
+          <p/>
+          Joseph Fouad discusses the pros and cons of various data <-> xml binding tools 
+          incl. Castor, JABX et alias. About Castor, the following is said:
+          <p/>
+          <i>CASTOR is the first to address the problem so i expect it enjoy a huge user base, 
+             actually castor is a terrefic piece of software and its standard counterpart are 
+             TWO JSRs (JDO,JAXB) so the benefits of its use are obvious database<->java 
+             object<->xml which fulfill the needs of any MVC developer.
+             <a href="http://www.theserverside.com/news/thread.tss?thread_id=30658">Read</a></i>
+      </p>
 
       <p>
           <b>IBM developerWorks (October 2003)</b>
