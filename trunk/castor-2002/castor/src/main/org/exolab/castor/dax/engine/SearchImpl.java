@@ -52,9 +52,9 @@ import java.util.NoSuchElementException;
 import org.exolab.castor.dax.Search;
 import org.exolab.castor.dax.InvalidSearchException;
 import org.exolab.castor.dax.DirectoryException;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.QueryException;
@@ -127,7 +127,7 @@ class SearchImpl
                 if ( ! tx.isOpen() )
                     throw new DirectoryException( "Transaction closed" );
                 _paramIndex = 0;
-                return new SearchResults( dirEngine, tx.query( dirEngine, _query, AccessMode.ReadWrite ) );
+                return new SearchResults( dirEngine, tx.query( dirEngine, _query, AccessMode.Shared ) );
             }
         } catch ( QueryException except ) {
             throw new InvalidSearchException( except.getMessage() );
@@ -182,7 +182,7 @@ class SearchImpl
                 throw new NoSuchElementException( "No more elements in query result" );
             obj = _dirEngine.getClassDesc( _results.getResultType() ).newInstance();
             try {
-                _results.fetch( obj );
+                obj = _results.fetch();
                 _lastIdentity = _results.nextIdentity();
             } catch ( ObjectNotFoundException except ) {
                 return nextElement();

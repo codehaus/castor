@@ -51,9 +51,16 @@ import java.util.Hashtable;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.RelationContext;
+import org.exolab.castor.persist.PersistenceException;
 
 
 /**
+ * DAX class descriptors. Extends {@link ClassDesc} to include the
+ * object class and other LDAP-related information. All fields are of
+ * type {@link DAXFieldDesc}, identity field is part of the returned
+ * field list, and contained fields are flattened out for efficiency
+ * (thus all fields are directly accessible).
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -69,10 +76,11 @@ public class DAXClassDesc
     private String     _ldapClass;
 
 
-    public DAXClassDesc( ClassDesc clsDesc, FieldDesc attributeSet, String ldapClass )
+    public DAXClassDesc( ClassDesc clsDesc, String ldapClass, FieldDesc attributeSet )
         throws MappingException
     {
         super( clsDesc );
+
         if ( attributeSet != null ) {
             if ( attributeSet.getFieldType() != Hashtable.class )
                 throw new MappingException( "Not attribute set" );
@@ -94,11 +102,21 @@ public class DAXClassDesc
     }
 
 
-    public void copyInto( Object source, Object target )
+    /**
+     * Mutator method can only be used by {@link DAXMappingHelper}.
+     */
+    final void setDAXFields( DAXFieldDesc[] fields )
+    {
+        setFields( fields );
+    }
+
+
+    public void copyInto( Object source, Object target, RelationContext rtx )
+        throws PersistenceException
     {
         Hashtable attrSet;
         
-        super.copyInto( source, target );
+        super.copyInto( source, target, rtx );
         if ( _attributeSet != null ) {
             attrSet = (Hashtable) _attributeSet.getValue( source );
             if ( attrSet == null )
@@ -107,6 +125,12 @@ public class DAXClassDesc
                 _attributeSet.setValue( target, attrSet.clone() );
         }
     } 
+
+
+    public String toString()
+    {
+        return super.toString() + " AS " + _ldapClass;
+    }
 
 
 }

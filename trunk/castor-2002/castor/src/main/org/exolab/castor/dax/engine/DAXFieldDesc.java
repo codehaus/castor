@@ -59,7 +59,8 @@ import org.exolab.castor.util.Serializer;
 
 
 /**
- *
+ * DAX field descriptor. Wraps {@link FieldDesc} and adds LDAP-related
+ * information, type conversion, and set/get for LDAP.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -80,6 +81,13 @@ public class DAXFieldDesc
     }
 
 
+    protected DAXFieldDesc( DAXFieldDesc fieldDesc )
+    {
+        super( fieldDesc );
+        _ldapName = fieldDesc._ldapName;
+    }
+
+
     public String getLdapName()
     {
         return _ldapName;
@@ -92,7 +100,7 @@ public class DAXFieldDesc
         
         attr = entry.getAttribute( _ldapName );
         if ( attr == null )
-            super.setValue( obj, null );
+            setValue( obj, (Object) null );
         else  if ( getFieldType() == byte[].class ) {
             byte[][] values;
             int      count;
@@ -102,9 +110,9 @@ public class DAXFieldDesc
             // into a single array of bytes
             values = attr.getByteValueArray();
             if ( values.length == 0 )
-                super.setValue( obj, null );
+                setValue( obj, (Object) null );
             else if ( values.length == 1 )
-                super.setValue( obj, values[ 0 ] );
+                setValue( obj, (Object) values[ 0 ] );
             else {
                 count = 0;
                 for ( int i = 0 ; i < values.length ; ++i )
@@ -116,22 +124,22 @@ public class DAXFieldDesc
                         bytes[ count + j ] = values[ i ][ j ];
                     count += values[ i ].length;
                 }
-                super.setValue( obj, values );
+                setValue( obj, (Object) values );
             }
         } else if ( getFieldType() == String[].class ) {
-            super.setValue( obj, attr.getStringValueArray() );
+            setValue( obj, (Object) attr.getStringValueArray() );
         } else {
             // Type conversion comes here
             String[]  values;
             
             values = attr.getStringValueArray();
             if ( values.length == 0 )
-                super.setValue( obj, null );
+                setValue( obj, (Object) null );
             else if ( values.length == 1 )
-                super.setValue( obj, values[ 0 ] );
+                setValue( obj, (Object) values[ 0 ] );
             else
                 // Need to assemble all strings together
-                super.setValue( obj, values[ 0 ] );
+                setValue( obj, (Object) values[ 0 ] );
         }
     }
     
@@ -140,7 +148,7 @@ public class DAXFieldDesc
     {
         Object  value;
         
-        value = super.getValue( obj );
+        value = getValue( obj );
         if ( value == null ) {
             return null;
         } else if ( value instanceof byte[] ) {
@@ -166,5 +174,13 @@ public class DAXFieldDesc
     }
 
 
+    public String toString()
+    {
+        return super.toString() + " AS " + _ldapName;
+    }
+
+
 }
+
+
 

@@ -68,12 +68,21 @@ import org.exolab.castor.mapping.xml.LdapInfo;
 
 
 /**
+ * A DAX implementation of mapping helper. Creates DAX class descriptors
+ * from the mapping file.
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public class DAXMappingHelper
     extends MappingHelper
 {
+
+
+    /**
+     * The type for the name of a compiled class.
+     */
+    private static final String CompiledType = "DAX";
 
 
     public DAXMappingHelper( ClassLoader loader )
@@ -83,62 +92,99 @@ public class DAXMappingHelper
     }
 
 
-    protected void loadMapping( Mapping mapping )
+    protected void resolveRelations( ClassDesc clsDesc )
         throws MappingException
     {
-        Enumeration   enum;
-        ClassMapping  clsMap;
-        ClassDesc     clsDesc;
-        
-        enum = mapping.enumerateClassMapping();
-        while ( enum.hasMoreElements() ) {
-            clsMap = (ClassMapping) enum.nextElement();
-            clsDesc = createDescriptor( clsMap );
-            if ( clsDesc != null ) {
-                addDescriptor( clsDesc );
-            } else {
-                if ( getLogWriter() != null ) {
-                    getLogWriter().println( "Ignored mapping for class " + clsMap.getClassName() + " - not SQL information available" );
+        super.resolveRelations( clsDesc );
+
+        // At this point the descriptor may contain only DAX fields,
+        // and all container fields must be flattened.
+        FieldDesc[] fields;
+        Vector      allFields;
+
+        allFields = new Vector();
+        fields = clsDesc.getFields();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof ContainerFieldDesc ) {
+                FieldDesc[] cFields;
+                
+                cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
+                for ( int j = 0 ; j < cFields.length ; ++j ) {
+                    if ( cFields[ j ] instanceof DAXFieldDesc )
+                        allFields.add( cFields[ j ] );
                 }
+            } else if ( fields[ i ] instanceof DAXFieldDesc ) {
+                allFields.add( fields[ i ] );
             }
         }
+        
+        DAXFieldDesc[] daxFields;
+
+        daxFields = new DAXFieldDesc[ allFields.size() ];
+        allFields.copyInto( daxFields );
+        ( (DAXClassDesc) clsDesc ).setDAXFields( daxFields );
     }
 
 
-    protected ClassDesc createDescriptor( ClassMapping objMap )
+    protected ClassDesc createDescriptor( ClassMapping clsMap )
         throws MappingException
     {
-        ClassDesc clsDesc;
-        FieldDesc  attrSet;
+        ClassDesc   clsDesc;
+        FieldDesc[] fields;
+        Vector      jdoFields;
         
-        if ( objMap.getLdapEntry() == null )
-            return null;
-        clsDesc = super.createDescriptor( objMap );
-        if ( clsDesc.getIdentity() == null ) {
-            return null;
+        // If no LDAP information for class, ignore it. DAX only
+        // supports DAX class descriptors.
+        if ( clsMap.getLdapEntry() == null )
+            return ClassDesc.NoDescriptor;
+
+        // See if we have a compiled descriptor.
+        clsDesc = loadClassDescriptor( clsMap.getClassName(), CompiledType, DAXClassDesc.class );
+        if ( clsDesc != null )
+            return clsDesc;
+
+        // Use super class to create class descriptor. Field descriptors will be
+        // generated only for supported fields, see createFieldDesc later on.
+        // This class may only extend a DAX class, otherwise no mapping will be
+        // found for the parent.
+        clsDesc = super.createDescriptor( clsMap );
+
+        // DAX descriptor must include an identity field, the identity field
+        // is either a field, or a container field containing only DAX fields.
+        // If the identity field is not a JDO field, it will be cleaned later
+        // on (we need the descriptor for relations mapping).
+        if ( clsDesc.getIdentity() == null )
+            throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
+        if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
+            FieldDesc[] idFields;
+            
+            idFields = ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
+            for ( int i = 0 ; i < idFields.length ; ++i )
+                if ( ! ( idFields[ i ] instanceof DAXFieldDesc ) )
+                    throw new MappingException( "dax.identityNotDAX", idFields[ i ] );
         }
-        return new DAXClassDesc( clsDesc, null, objMap.getLdapEntry().getObjectClass() );
+        
+        return new DAXClassDesc( clsDesc, clsMap.getLdapEntry().getObjectClass(), null );
     }
 
 
-    protected FieldDesc[] createFieldDescs( Class objType, FieldMapping[] fieldMaps )
+    protected FieldDesc createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
     {
-        Vector      fields;
-        FieldDesc   fieldDesc;
-        FieldDesc[] array;
+        FieldDesc  fieldDesc;
+        String     ldapName;
         
-        fields = new Vector();
-        for ( int i = 0 ; i < fieldMaps.length ; ++i ) {
-            if ( fieldMaps[ i ].getLdapInfo() != null ) {
-                fieldDesc = createFieldDesc( objType, fieldMaps[ i ] );
-                fieldDesc = new DAXFieldDesc( fieldDesc, fieldMaps[ i ].getLdapInfo().getName() );
-                fields.addElement( fieldDesc );
-            }
-        }
-        array = new FieldDesc[ fields.size() ];
-        fields.copyInto( array );
-        return array;
+        // If not an LDAP field, return a stock field descriptor.
+        if ( fieldMap.getLdapInfo() == null )
+            return super.createFieldDesc( javaClass, fieldMap );
+        
+        // Create a DAX field descriptor
+        fieldDesc = super.createFieldDesc( javaClass, fieldMap );
+        if ( fieldMap.getLdapInfo().getName() == null )
+            ldapName = fieldDesc.getFieldName();
+        else
+            ldapName = fieldMap.getLdapInfo().getName();
+        return new DAXFieldDesc( fieldDesc, ldapName );
     }
 
 
