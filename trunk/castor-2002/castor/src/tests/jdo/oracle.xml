@@ -14,8 +14,8 @@
     <driver url="jdbc:oracle:thin:@localhost:1521:LEAF"	
             class-name="oracle.jdbc.driver.OracleDriver">
 
-      <param name="user" value="SYSTEM"/>
-      <param name="password" value="manager"/>
+      <param name="user" value="test"/>
+      <param name="password" value="secret"/>
     </driver>
   <mapping href="mapping.xml" />
 </database>
