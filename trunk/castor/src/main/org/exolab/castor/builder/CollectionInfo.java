@@ -105,6 +105,9 @@ public class CollectionInfo extends FieldInfo {
         super(new XSList(contentType), name);
         xsList = (XSList) getSchemaType();
         this.contentType = contentType;
+        if (elementName.charAt(0) == '_') {
+            elementName = elementName.substring(1);
+        }
         this.contentName = "v" + JavaNaming.toJavaClassName(elementName);
         this.elementName = elementName;
         content = new FieldInfo(contentType, contentName);
@@ -153,11 +156,12 @@ public class CollectionInfo extends FieldInfo {
         
         JSourceCode jsc = null;
 
-          //---------------------/
+          //----------------------/
          //- Create add methods -/
-        //---------------------/
+        //----------------------/
 
         String cName = JavaNaming.toJavaClassName(getElementName());
+
         method = new JMethod(null, "add"+cName);
         jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
