@@ -50,9 +50,9 @@ import org.exolab.castor.xml.schema.*;
 
 import org.exolab.javasource.*;
 import org.exolab.castor.util.CommandLineOptions;
+import org.exolab.castor.util.Configuration;
 
 import org.xml.sax.*;
-import org.xml.sax.helpers.ParserFactory;
       
 import java.io.Reader;
 import java.io.PrintWriter;
@@ -111,11 +111,9 @@ public class SourceGenerator {
             
         Parser parser = null;
         try {
-            parser = ParserFactory.makeParser(parserClass);
+	    parser = Configuration.getParser();
         }
-        catch(java.lang.IllegalAccessException iae) {}
-        catch(java.lang.ClassNotFoundException cnfe) {}
-        catch(java.lang.InstantiationException ie) {};
+        catch(RuntimeException rte) {}
         if (parser == null) {
             System.out.println("unable to create SAX parser");
             return;
