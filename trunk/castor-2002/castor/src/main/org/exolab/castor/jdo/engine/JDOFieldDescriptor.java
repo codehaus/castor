@@ -86,6 +86,8 @@ public class JDOFieldDescriptor
 
     private String         _manyKey;
 
+    private int            _sqlType;
+
 
     /**
      * Construct a new field descriptor for the specified field. This is
@@ -95,7 +97,8 @@ public class JDOFieldDescriptor
      * @param fieldDesc The field descriptor
      * @throws MappingException Invalid mapping information
      */
-    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, boolean dirtyCheck, String manyTable, String manyKey )
+    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, Class sqlType,
+                               boolean dirtyCheck, String manyTable, String manyKey )
         throws MappingException
     {
         super( fieldDesc );
@@ -107,6 +110,7 @@ public class JDOFieldDescriptor
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;
         _manyKey = manyKey;
+        _sqlType = SQLTypes.getSQLType( sqlType );
     }
 
 
@@ -141,6 +145,17 @@ public class JDOFieldDescriptor
     public boolean isDirtyCheck()
     {
         return _dirtyCheck;
+    }
+
+
+    /**
+     * Returns the SQL type of this field.
+     *
+     * @return The SQL type of this field
+     */
+    public int getSQLType()
+    {
+        return _sqlType;
     }
 
 

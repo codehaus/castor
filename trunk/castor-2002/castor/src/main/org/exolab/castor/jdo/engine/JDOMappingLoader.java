@@ -144,6 +144,7 @@ public class JDOMappingLoader
     {
         FieldDescriptor fieldDesc;
         String          sqlName;
+        Class           sqlType;
         
         // If not an SQL field, return a stock field descriptor.
         if ( fieldMap.getSql() == null )
@@ -155,7 +156,11 @@ public class JDOMappingLoader
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
         else
             sqlName = fieldMap.getSql().getName();
-        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName,
+        if ( fieldMap.getSql().getType() == null  )
+            sqlType = fieldDesc.getFieldType();
+        else
+            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
+        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sqlType,
             ! IgnoreDirty.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
     }
