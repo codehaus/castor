@@ -91,42 +91,6 @@ public class JDOMappingLoader
     }
 
 
-    /*
-    protected void resolveRelations( ClassDescriptor clsDesc )
-        throws MappingException
-    {
-        super.resolveRelations( clsDesc );
-
-        // At this point the descriptor may contain only JDO fields,
-        // and all container fields must be flattened.
-        FieldDesc[] fields;
-        Vector      allFields;
-
-        allFields = new Vector();
-        fields = clsDesc.getFields();
-        for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ] instanceof ContainerFieldDesc ) {
-                FieldDesc[] cFields;
-                
-                cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
-                for ( int j = 0 ; j < cFields.length ; ++j ) {
-                    if ( cFields[ j ] instanceof JDOFieldDesc )
-                        allFields.add( cFields[ j ] );
-                }
-            } else if ( fields[ i ] instanceof JDOFieldDesc ) {
-                allFields.add( fields[ i ] );
-            }
-        }
-        
-        JDOFieldDesc[] jdoFields;
-
-        jdoFields = new JDOFieldDesc[ allFields.size() ];
-        allFields.copyInto( jdoFields );
-        ( (JDOClassDesc) clsDesc ).setJDOFields( jdoFields );
-    }
-    */
-
-
     protected ClassDescriptor createDescriptor( ClassMapping clsMap )
         throws MappingException
     {
@@ -161,7 +125,7 @@ public class JDOMappingLoader
     }
 
 
-    protected TypeInfo getTypeInfo( Class fieldType, FieldMapping fieldMap )
+    protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
         throws MappingException
     {
         TypeConvertor convertorTo;
@@ -177,7 +141,7 @@ public class JDOMappingLoader
         } else
             convertorTo = convertorFrom = null;
         return new TypeInfo( fieldType, convertorTo, convertorFrom,
-                             fieldMap.getRequired(), null );
+                             fieldMap.getRequired(), null, colType );
     }
 
 
