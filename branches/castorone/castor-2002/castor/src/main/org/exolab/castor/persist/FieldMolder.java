@@ -38,8 +38,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id: FieldMolder.java,
  */
 
 
@@ -80,7 +81,12 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
 
 
-
+/**
+ * FieldMolder represents a field of a data object class. It is used by 
+ * ClassMolder to set and get the value from a field of a data object.
+ *
+ * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
+ */
 public class FieldMolder {
 
     public static final short PRIMITIVE = 0;
@@ -347,7 +353,7 @@ public class FieldMolder {
         }
     }
 
-    static CollectionInfo[] info = 
+    private static CollectionInfo[] info = 
         { new CollectionInfo( "collection", java.util.Collection.class ),
           new CollectionInfo( "vector", java.util.Vector.class ),
           new CollectionInfo( "hashtable", java.util.Hashtable.class ),

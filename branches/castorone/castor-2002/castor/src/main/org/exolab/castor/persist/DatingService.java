@@ -40,6 +40,7 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id: DatingService.java,
  */
 
 
@@ -80,6 +81,12 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 
+/**
+ * DataService is a helper class for constructing <tt>ClassMolder</tt>s and
+ * pairing up ClassMolders which depends and extends the other.
+ *
+ * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
+ */
 class DatingService {
 
     ClassLoader loader;
@@ -102,6 +109,10 @@ class DatingService {
         this.loader = loader;
     }
 
+    /**
+     * Indicate that all ClassMolder is registered. DatingService
+     * will resolve all the outstanding relation now.
+     */
     void close() throws MappingException{
         Enumeration e;
         ClassMolder initiateCm, targetCm;
@@ -122,16 +133,6 @@ class DatingService {
                 ((SQLEngine)initiateCm.getPersistence()).setExtends( (SQLEngine) targetCm.getPersistence() );
             }
         }
-
-        /*
-        e = clsMolders.keys();
-        while ( e.hasMoreElements() ) {
-            molder = (ClassMolder) e.nextElement();
-            extend = molder.getExtends();
-            if ( extend != null ) {
-                
-            }
-        }*/
 
         // resolve depends
         if ( needDependsClassMolder != null ) {
@@ -161,6 +162,10 @@ class DatingService {
 
     } 
 
+    /** 
+     * Pair up ClassMolder and it extends class.
+     * @return true if they can be paired up immediately.
+     */
     boolean pairExtends( ClassMolder me, String extName ) {
         if ( extName == null || extName.equals("") )
             throw new IllegalArgumentException("Null classname not allowed!");
@@ -180,6 +185,10 @@ class DatingService {
         return false;
     }
 
+    /** 
+     * Pair up ClassMolder and it depends class.
+     * @return true if they can be paired up immediately.
+     */
     boolean pairDepends( ClassMolder me, String depName ) {
         if ( depName == null || depName.equals("") )
             return true;
@@ -194,9 +203,13 @@ class DatingService {
             needDependsClassMolder = new Hashtable();
 
         needDependsClassMolder.put( depName, me );
-        System.out.println("++++++++++++needDepends added "+depName+" me: "+me.getJavaClass().getName());
         return false;
     }
+
+    /**
+     * Resolve the java.lang.Class of the fully qualified class name
+     *
+     */
     Class resolve( String className ) throws ClassNotFoundException {
         Class resolved;
         if ( javaClasses == null )
@@ -209,6 +222,12 @@ class DatingService {
         return resolved;
     }
 
+    /**
+     * Pair the FieldMolder with the ClassMolder of typeName
+     * @param fh  the fieldMolder to be paired.
+     * @param typeName the type of the field which the FieldMolder
+     *        represent
+     */
     boolean pairFieldClass( FieldMolder fh, String typeName ) throws MappingException {
         try {
             if ( typeName == null || typeName.equals("") )
@@ -241,12 +260,19 @@ class DatingService {
         return true;
     }
 
+    /**
+     * Register the name of a ClassMolder which will be pairing
+     * up.
+     */
     void register( String name, ClassMolder clsMold ) {
         if ( clsMolders == null )
             clsMolders = new Hashtable();
         clsMolders.put( name, clsMold );
     }
 
+    /**
+     * Register the RelationDescriptor
+     */
     void registerRelation( RelationDescriptor rd ) {
 
         if ( relations == null )
@@ -255,6 +281,10 @@ class DatingService {
         relations.put( rd.type2+"+"+rd.type1, rd );
     }
 
+    /**
+     * Return true if the classnames represents classes are relating
+     * to each other.
+     */
     boolean isRelated( String a, String b ) {
         RelationDescriptor rd;
         if ( relations == null )
@@ -264,6 +294,10 @@ class DatingService {
         return false;
     }
 
+    /**
+     * Get the RelationDescriptor given classnames of two classes.
+     *
+     */
     RelationDescriptor getRelated( String a, String b ) {
         RelationDescriptor rd;
         if ( relations == null )

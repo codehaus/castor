@@ -70,7 +70,6 @@ import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.persist.ObjectBin;
 import org.exolab.castor.util.Messages;
 
 
@@ -296,7 +295,6 @@ public abstract class TransactionContext
 
         ObjectEntry entry = null;
         OID         oid;
-        //System.out.println("Tx.fetch() class: "+molder.getJavaClass().getName()+" : "+OID.flatten( identities ));
 
         if ( identities == null ) 
             throw new PersistenceException("Identities can't be null!");
@@ -315,9 +313,7 @@ public abstract class TransactionContext
             if ( entry.engine != engine )
                 throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getJavaClass(), OID.flatten( identities )) );
             if ( entry.deleted ) {
-                //throw new ObjectNotFoundException( molder.getJavaClass() + OID.flatten( identities ) );
-                System.out.println(".....................................fetch a deleted object");
-                //return null;
+                return null;
             }
             if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getJavaClass(), OID.flatten( identities )) );
@@ -419,7 +415,6 @@ public abstract class TransactionContext
         // report error with the persistence engine.
         accessMode = molder.getAccessMode( accessMode );
         try {
-            System.out.println("new instance");
             object = molder.newInstance(); 
             entry = addObjectEntry( oid, object );
             oid = engine.load( this, oid, object, accessMode, _lockTimeout );
@@ -439,7 +434,6 @@ public abstract class TransactionContext
         } catch ( ClassNotPersistenceCapableException except ) {
             removeObjectEntry( object );
             // maybe we should remove it, when castor become stable
-            except.printStackTrace();
             throw new PersistenceException( Messages.format("persist.nested",except) );
         }
 
@@ -553,7 +547,6 @@ public abstract class TransactionContext
                 // If the object was already deleted in this transaction, 
                 // just undelete it.
                 // Remove the entry from a FIFO linked list of deleted entries.
-                System.out.println("*********** undelete object");
                 if ( _deletedList != null ) {
                     ObjectEntry deleted;
                     
@@ -600,7 +593,6 @@ public abstract class TransactionContext
             }
             return oid;
         } catch ( Exception except ) {
-            except.printStackTrace();
             if ( molder.getCallback() != null )
                 molder.getCallback().releasing( object, false );
             removeObjectEntry( object );
@@ -839,7 +831,6 @@ public abstract class TransactionContext
         entry = getObjectEntry( object );
 
         if ( entry != null ) {
-            //System.out.println("!!!!!!!!!!!!markModified "+object+(updatePersist?"":" not")+" updatePersist "+(updateCache?"":" not")+" updateCache");
             if ( updatePersist )
                 entry.updatePersistNeeded = true;
             if ( updateCache )
@@ -1025,7 +1016,6 @@ public abstract class TransactionContext
             _status = Status.STATUS_PREPARED;
             return true;
         } catch ( Exception except ) {
-            except.printStackTrace();
             _status = Status.STATUS_MARKED_ROLLBACK;
             if ( except instanceof TransactionAbortedException )
                 throw (TransactionAbortedException) except;
@@ -1064,9 +1054,7 @@ public abstract class TransactionContext
             // Go through all the connections opened in this transaction,
             // commit and close them one by one.
             commitConnections();
-            System.out.println("[connection commited!]");
         } catch ( Exception except ) {
-            except.printStackTrace();
             // Any error that happens, we're going to rollback the transaction.
             _status = Status.STATUS_MARKED_ROLLBACK;
             throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
@@ -1090,11 +1078,8 @@ public abstract class TransactionContext
                 // transaction, release its lock.
                 
                 if ( entry.updateCacheNeeded ) {
-                    System.out.println("updateCache");
                     entry.engine.updateCache( this, entry.oid, entry.object );
-                } else {
-                    System.out.println("---Object "+entry.oid+" is not modified!");
-                }
+                } 
                 entry.engine.releaseLock( this, entry.oid );
             }
             if ( entry.molder.getCallback() != null )
@@ -1154,7 +1139,6 @@ public abstract class TransactionContext
                     entry.molder.getCallback().releasing( entry.object, false );
             } catch ( Exception except ) { 
                 // maybe we should remove it, when castor become stable
-                except.printStackTrace();
             }
         }
 
@@ -1343,11 +1327,6 @@ public abstract class TransactionContext
         entry = new ObjectEntry( engine, molder, oid, object );
         entry.oid = oid;
         _objects.addElement( entry );
-        //System.out.println("addEntry oid: "+oid);
-        for ( int i=0; i < _objects.size(); i++ ) {
-            //System.out.print("["+((ObjectEntry)_objects.get(i)).oid+" "+((ObjectEntry)_objects.get(i)).oid.getMolder()+" "+((ObjectEntry)_objects.get(i)).oid.getLockEngine()+"]  ");
-        }
-        System.out.println();
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null ) {
             engineOids = new Hashtable();

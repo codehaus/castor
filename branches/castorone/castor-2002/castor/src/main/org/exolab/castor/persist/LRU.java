@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *
+ * $Id: LRU.java
  */
 package org.exolab.castor.persist;
 
@@ -49,60 +49,108 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 /**
- * <p>Base interface for all Least Recently Used Cache. 
+ * <p>Base interface for all least-recently-used cache. 
  *
  * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
  */
 public abstract class LRU {
+
     /**
-     * Specify no caching as the caching mechanism of this Cache. All released object
-     * will be discarded.
+     * Map type for no caching as the caching mechanism. All object
+     * put into the map will be discarded.
      */
-    public final static int CACHE_NONE = 0;
+    public final static int CACHE_NONE = 1;
     
     /**
-     * Specify Count-Limited Least Recently Used is used as caching mechanism of this Cache.
+     * Map type of Count-Limited least-recently-used as caching mechanism.
      * Object Lock which is not hold by any transcation will be put in the cache, until
      * the cache is full and other object overwritten it.
      */
-    public final static int CACHE_COUNT_LIMITED = 1;
+    public final static int CACHE_COUNT_LIMITED = 2;
     
     /**
-     * Specify Time-Limited Least Recently Used is used as caching mechanism of this Cache.
+     * Map type of Time-Limited least-recently-used is used as caching mechanism.
      * Object Lock which is not hold by any transcation will be put in the cache, until
      * timeout is reached.
      */
-    public final static int CACHE_TIME_LIMITED = 2;
+    public final static int CACHE_TIME_LIMITED = 3;
     
     /**
-     * Specify unlimited cache as caching mechanism of this Cache.
+     * Map type of unlimited cache as caching mechanism.
      * Object Lock which is not hold by any transcation will be put in the cache 
      * for later use.
      */
-    public final static int CACHE_UNLIMITED = 3;
+    public final static int CACHE_UNLIMITED = 4;
 
-	/**
-	 * ...work like Hashtable's <code>put</code>...except it's LRU limited
-	 */
+    /** 
+     * Specify the default LRU mechanism
+     */
+    public final static int DEFAULT_TYPE = CACHE_COUNT_LIMITED;
+
+    /**
+     * Specify the default LRU parameter
+     */
+    public final static int DEFAULT_PARAM = 30;
+
+    /**
+     * Maps the specified <code>key</code> to the specified 
+     * <code>value</code> in this hashtable. Neither the key nor the 
+     * value can be <code>null</code>. 
+     * <p>
+     * The value can be retrieved by calling the <code>get</code> method 
+     * with a key that is equal to the original key, before it is diposed
+     * by the least-recently-used map. 
+     * <p>
+     * @param      key     the hashtable key.
+     * @param      value   the value.
+     * @return     the previous value of the specified key in this hashtable,
+     *             or <code>null</code> if it did not have one.
+     * @exception  NullPointerException  if the key or value is
+     *               <code>null</code>.
+     */
 	public abstract Object put(Object key, Object value);
 
 	/**
-	 * ...work like Hashtable's <code>get</code>...except it's LRU limited
+     *Returns the value to which the specified key is mapped in this hashtable.
+     *@param key - a key in the hashtable.
+     *@return the value to which the key is mapped in this hashtable; null if 
+     * the key is not mapped to any value in this hashtable.
 	 */
 	public abstract Object get(Object key);
 
-	/**
-	 * ...work like Hashtable's <code>remove</code>...except it's LRU limited
-	 */
+    /**
+     * Removes the key (and its corresponding value) from this 
+     * hashtable. This method does nothing if the key is not in the hashtable.
+     *
+     * @param   key   the key that needs to be removed.
+     * @return  the value to which the key had been mapped in this hashtable,
+     *          or <code>null</code> if the key did not have a mapping.
+     */
 	public abstract Object remove(Object key);
 
-	/*
-	 * ...work like Hashtable's <code>elements</code>...except it's LRU limited
-	 */
+    /**
+     * Returns an enumeration of the values in this LRU map.
+     * Use the Enumeration methods on the returned object to fetch the elements
+     * sequentially.
+     *
+     * @return  an enumeration of the values in this hashtable.
+     * @see     java.util.Enumeration
+     */
 	public abstract Enumeration elements();
 
+    /**
+     * Factory method to create a LRU map of specified type.
+     *
+     * @param type   mechanism type
+     * @param param   capacity of the lru
+     */
 	public static LRU create( int type, int param ) {
 		LRU cache;
+
+        if ( type == 0 ) {
+            type = DEFAULT_TYPE;
+            param = DEFAULT_PARAM;
+        }
 
         switch ( type ) {
         case CACHE_COUNT_LIMITED :
@@ -129,20 +177,41 @@ public abstract class LRU {
 		return cache;
 	}
 
+    /**
+     * Map the type in String into an int to represent 
+     * the lru cache type.
+     */
+    public static int mapType( String type ) {
+        if ( type == null || type.equals("") )
+            return 0;
+
+        if ( type.toLowerCase().equals("none") )
+            return CACHE_NONE;
+
+        if ( type.toLowerCase().equals("count-limited") )
+            return CACHE_COUNT_LIMITED;
+
+        if ( type.toLowerCase().equals("time-limited") )
+            return CACHE_TIME_LIMITED;
+
+        if ( type.toLowerCase().equals("unlimited") )
+            return CACHE_UNLIMITED;
+
+        return 0;
+    }
 
 	/**
-	 * <p>A count limted LRU hashtable for caching objects.
-	 * 
+	 * CountLimited is a count limted least-recently-used <tt>Map</tt>.
 	 * <p>
-	 * Every object being put in the hashtable will live for until the
-	 * hashtable is full, then an object which <em>one of the</em> 
-	 * least recent used object will be disposed. 
-	 *
+	 * Every object being put in the Map will live until the
+	 * map is full. If the map is full, a least-recently-used object 
+     * will be disposed. 
 	 * <p>
-	 * If you are interested in the disposing object, extend it class
-	 * and override the method <code>dispose(Object o)</code>.
-	 * Otherwise, the object is silently discarded.
-	 *
+     * Method {@link dispose(Object)} will be called whenever an 
+     * old object is diposed. Developer can get notify by overriding
+     * the dispose method {@link dispose(Object)}.
+     *
+     * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
 	public static class CountLimited extends LRU {
 
@@ -164,9 +233,22 @@ public abstract class LRU {
 			this.size = size;
 		}
 
-		/**
-		 * ...work like Hashtable's <code>put</code>...except it's time limited
-		 */
+        /**
+         * Maps the specified <code>key</code> to the specified 
+         * <code>value</code> in this Map. Neither the key nor the 
+         * value can be <code>null</code>. 
+         * <p>
+         * The value can be retrieved by calling the <code>get</code> method 
+         * with a key that is equal to the original key, before it is diposed
+         * when the Map is full. 
+         * <p>
+         * @param      key     the Map key.
+         * @param      value   the value.
+         * @return     the previous value of the specified key in this Map,
+         *             or <code>null</code> if it did not have one.
+         * @exception  NullPointerException  if the key or value is
+         *               <code>null</code>.
+         */
 		public synchronized Object put( Object key, Object object ) {
 			Object oldPos = mapKeyPos.get(key);
 			if ( oldPos != null ) {
@@ -192,7 +274,6 @@ public abstract class LRU {
 				keys[cur] = key;
 				values[cur] = object;
 				status[cur] = LRU_NEW;
-				//System.out.println("mapKeyPos, key: "+key+" intvalue: "+intvalue);
 				mapKeyPos.put(key, intvalue);
 				cur++;
 				if ( cur >= size ) cur = 0;
@@ -201,22 +282,31 @@ public abstract class LRU {
 				return oldObject;
 			}
 		}
-		/**
-		 * ...work like Hashtable's <code>get</code>...except it's count limited
-		 */
+
+    	/**
+         *Returns the value to which the specified key is mapped in this Map.
+         *@param key - a key in the Map.
+         *@return the value to which the key is mapped in this Map; null if 
+         * the key is not mapped to any value in this Map.
+    	 */
 		public synchronized Object get( Object key ) {
 			Object intvalue = mapKeyPos.get(key);
 			if ( intvalue != null ) {
 				int pos = ((Integer)intvalue).intValue();
 				status[pos] = LRU_NEW;
-				//System.out.println("CountLimiteLRU: get("+key+") = "+values[pos]);
 				return values[pos];
 			}
 			return null;
 		}
-		/**
-		 * ...work like Hashtable's <code>remove</code>...except it's count limited
-		 */
+
+        /**
+         * Removes the key (and its corresponding value) from this 
+         * Map. This method does nothing if the key is not in the Map.
+         *
+         * @param   key   the key that needs to be removed.
+         * @return  the value to which the key had been mapped in this Map,
+         *          or <code>null</code> if the key did not have a mapping.
+         */
 		public synchronized Object remove( Object key ) {
 			Object intvalue = mapKeyPos.remove(key);
 			if ( intvalue != null ) {
@@ -225,24 +315,32 @@ public abstract class LRU {
 				keys[pos] = null;
 				values[pos] = null;
 				status[pos] = LRU_OLD;
-				//System.out.println("CountLimiteLRU: remove("+key+") = "+temp);
 				return temp;
 			}
 			return null;
 		}
-		/*
-		 * ...work like Hashtable's <code>elements</code>...except it's count limited
-		 */
+
+        /**
+         * Returns an enumeration of the values in this LRU map.
+         * Use the Enumeration methods on the returned object to fetch the elements
+         * sequentially.
+         *
+         * @return  an enumeration of the values in this Map.
+         * @see     java.util.Enumeration
+         */
 		public Enumeration elements() {
 			return new ValuesEnumeration(values);
 		}
-		/**
+
+        /**
 		 * This method is called when an object is disposed.
 		 * Override this method if you interested in the disposed object.
+         *
+         * @param o - the disposed object
 		 */
 		protected void dispose( Object o ) {
-			//System.out.println("diposed: "+o+" by CountLimitedLRU");
 		}
+
 		private int walkStatus() {
 			int s = status[cur];
 			if ( status[cur] == LRU_NEW ) {
@@ -277,8 +375,8 @@ public abstract class LRU {
 				return values[cur++];
 			}
 		}
-		/*
-		 * inner class for putting test cases only. Safe to delete.
+		/**
+		 * Test is an inner class for whitebox testing.
 		 */
 		private static class Test {
 			public static void main (String args[]) {
@@ -287,7 +385,6 @@ public abstract class LRU {
 						super(count);
 					}
 					protected void dispose(Object o) {
-						//System.out.println("dispose: " + o );
 					}
 				}
 				CountLimited cl = new TestLRU(3);
@@ -464,43 +561,67 @@ public abstract class LRU {
 
 
 	/**
-	 * <p>A count limted LRU hashtable for caching objects.
-	 * 
+	 * NoCache is a Map which dispose all object right the way.
 	 * <p>
-	 * Every object being put in the hashtable will live for until the
-	 * hashtable is full, then an object which <em>one of the</em> 
-	 * least recent used object will be disposed. 
-	 *
+	 * Every object being put in the Map will be disposed. 
 	 * <p>
-	 * If you are interested in the disposing object, extend it class
-	 * and override the method <code>dispose(Object o)</code>.
-	 * Otherwise, the object is silently discarded.
-	 *
+     * Method {@link dispose(Object)} will be called whenever an 
+     * old object is diposed. Developer can get notify by overriding
+     * the dispose method {@link dispose(Object)}.
+     *
+     * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
 	public static class NoCache extends LRU {
 
-		/**
-		 * ...work like Hashtable's <code>put</code>...except it's time limited
-		 */
+        /**
+         * Maps the specified <code>key</code> to the specified 
+         * <code>value</code> in this Map. Neither the key nor the 
+         * value can be <code>null</code>. End of theory.
+         * <p>
+         * Every object being put in the Map will be disposed.
+         * <p>
+         * @param      key     the Map key.
+         * @param      value   the value.
+         * @return     the previous value of the specified key in this Map,
+         *             or <code>null</code> if it did not have one.
+         * @exception  NullPointerException  if the key or value is
+         *               <code>null</code>.
+         */
 		public synchronized Object put( Object key, Object object ) {
 			dispose( object );
 			return null;
 		}
-		/**
-		 * ...work like Hashtable's <code>get</code>...except it's time limited
-		 */
+
+    	/**
+         *Returns the value to which the specified key is mapped in this Map.
+         *@param key - a key in the Map.
+         *@return the value to which the key is mapped in this Map; null if 
+         * the key is not mapped to any value in this Map.
+    	 */
 		public synchronized Object get( Object key ) {
 			return null;
 		}
-		/**
-		 * ...work like Hashtable's <code>remove</code>...except it's time limited
-		 */
+
+        /**
+         * Removes the key (and its corresponding value) from this 
+         * Map. This method does nothing if the key is not in the Map.
+         *
+         * @param   key   the key that needs to be removed.
+         * @return  the value to which the key had been mapped in this Map,
+         *          or <code>null</code> if the key did not have a mapping.
+         */
 		public synchronized Object remove( Object key ) {
 			return null;
 		}
-		/*
-		 * ...work like Hashtable's <code>elements</code>...except it's time limited
-		 */
+
+        /**
+         * Returns an enumeration of the values in this LRU map.
+         * Use the Enumeration methods on the returned object to fetch the elements
+         * sequentially.
+         *
+         * @return  an enumeration of the values in this Map.
+         * @see     java.util.Enumeration
+         */
 		public Enumeration elements() {
 			return new EmptyEnumeration();
 		}
@@ -525,26 +646,22 @@ public abstract class LRU {
 	}
 
 	/**
-	 * <p>A time limted LRU hashtable for caching objects.
-	 * 
+	 * TimeLimited is a time limted least-recently-used <tt>Map</tt>.
 	 * <p>
-	 * Every object being put in the hashtable will live for specified
-	 * amount of time and it will be disposed. Unless it is <code>put
-	 * </code> or <code>get</code> before it is disposed, then the time 
-	 * is reset. 
-	 *
+	 * Every object being put in the Map will live until the timeout
+	 * expired. 
 	 * <p>
-	 * If you are interested in the disposing object, extend it class
-	 * and override the method <code>dispose(Object o)</code>.
-	 * Otherwise, the object is silently discarded.
-	 *
-	 * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
+     * Method {@link dispose(Object)} will be called whenever an 
+     * old object is diposed. Developer can get notify by overriding
+     * the dispose method {@link dispose(Object)}.
+     *
+     * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
 	 */
 	public static class TimeLimited extends LRU {
 		/**
 		 *	The Default precision in millisecond is 1000. Percision is the interval 
 		 *  between each time which the timer thread will wake up and trigger 
-		 *  clean up of Least Recently Used Object.
+		 *  clean up of least-recently-used Object.
 		 */
 		public final static int DEFAULT_PRECISION = 1000;
 
@@ -567,9 +684,23 @@ public abstract class LRU {
 			this.interval = interval+1;
 			ticker.addListener( this );
 		}
-		/**
-		 * ...work like Hashtable's <code>put</code>...except it's time limited
-		 */
+
+        /**
+         * Maps the specified <code>key</code> to the specified 
+         * <code>value</code> in this Map. Neither the key nor the 
+         * value can be <code>null</code>. 
+         * <p>
+         * The value can be retrieved by calling the <code>get</code> method 
+         * with a key that is equal to the original key, before it is diposed
+         * when the timeout of the entry is expired. 
+         * <p>
+         * @param      key     the Map key.
+         * @param      value   the value.
+         * @return     the previous value of the specified key in this Map,
+         *             or <code>null</code> if it did not have one.
+         * @exception  NullPointerException  if the key or value is
+         *               <code>null</code>.
+         */
 		public synchronized Object put(Object key, Object value) {
 			QueueItem oldItem = (QueueItem) map.get(key);
 			if ( oldItem != null ) {
@@ -585,9 +716,13 @@ public abstract class LRU {
 				return null;
 			}
 		}
-		/**
-		 * ...work like Hashtable's <code>get</code>...except it's time limited
-		 */
+
+    	/**
+         *Returns the value to which the specified key is mapped in this Map.
+         *@param key - a key in the Map.
+         *@return the value to which the key is mapped in this Map; null if 
+         * the key is not mapped to any value in this Map.
+    	 */
 		public synchronized Object get(Object key) {
 			Object o = map.get(key);
 			if ( o == null )
@@ -595,9 +730,15 @@ public abstract class LRU {
 			else 
 				return ((QueueItem)o).item;
 		}
-		/**
-		 * ...work like Hashtable's <code>remove</code>...except it's time limited
-		 */
+
+        /**
+         * Removes the key (and its corresponding value) from this 
+         * Map. This method does nothing if the key is not in the Map.
+         *
+         * @param   key   the key that needs to be removed.
+         * @return  the value to which the key had been mapped in this Map,
+         *          or <code>null</code> if the key did not have a mapping.
+         */
 		public synchronized Object remove(Object key) {
 
 			Object o = map.remove(key);
@@ -609,18 +750,26 @@ public abstract class LRU {
 				return ((QueueItem)o).item;
 			}
 		}
-		/*
-		 * ...work like Hashtable's <code>elements</code>...except it's time limited
-		 */
+
+        /**
+         * Returns an enumeration of the values in this LRU map.
+         * Use the Enumeration methods on the returned object to fetch the elements
+         * sequentially.
+         *
+         * @return  an enumeration of the values in this Map.
+         * @see     java.util.Enumeration
+         */
 		public synchronized Enumeration elements() {
 			return new ValuesEnumeration(map.elements());
 		}
-		/**
+
+        /**
 		 * This method is called when an object is disposed.
 		 * Override this method if you interested in the disposed object.
+         *
+         * @param o - the disposed object
 		 */
 		protected void dispose( Object o ) {
-			//System.out.println("dispose: "+o+" by TimeLimiteLRU.");
 		}
 
 		private void remove(QueueItem item) {
@@ -809,8 +958,9 @@ public abstract class LRU {
 				}
 			}
 		}
-		/*
-		 * inner class for putting test cases only. Safe to delete.
+
+		/**
+		 * Test is an inner class for whitebox testing.
 		 */
 		private static class Test {
 			public static void main (String args[]) throws Exception {
@@ -916,53 +1066,81 @@ public abstract class LRU {
 	}
 
 	/**
-	 * <p>A time limted LRU hashtable for caching objects.
-	 * 
+	 * UnLimited is Map which implements the {@link LRU} interface.
 	 * <p>
-	 * Every object being put in the hashtable will live forever.
-	 *
+	 * Every object being put in the Map will live until it is
+     * removed manually.
+	 * <p>
+     * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
 	public static class Unlimited extends LRU {
 		private Hashtable map = new Hashtable();
 
 		/**
-		 * @param interval the number of ticks an object live before it is disposed.
-	     * @param tick precision in msec.
+         * Constructor
+         *
 		 */
 		public Unlimited() {
 		}
 
-		/**
-		 * ...work like Hashtable's <code>put</code>...except it's time limited
-		 */
+        /**
+         * Maps the specified <code>key</code> to the specified 
+         * <code>value</code> in this Map. Neither the key nor the 
+         * value can be <code>null</code>. 
+         * <p>
+         * The value can be retrieved by calling the <code>get</code> method 
+         * with a key that is equal to the original key.
+         * <p>
+         * @param      key     the Map key.
+         * @param      value   the value.
+         * @return     the previous value of the specified key in this Map,
+         *             or <code>null</code> if it did not have one.
+         * @exception  NullPointerException  if the key or value is
+         *               <code>null</code>.
+         */
 		public Object put(Object key, Object value) {
 			return map.put(key,value);
 		}
 
-		/**
-		 * ...work like Hashtable's <code>get</code>...except it's time limited
-		 */
+    	/**
+         *Returns the value to which the specified key is mapped in this Map.
+         *@param key - a key in the Map.
+         *@return the value to which the key is mapped in this Map; null if 
+         * the key is not mapped to any value in this Map.
+    	 */
 		public Object get(Object key) {
 			return map.get(key);
 		}
 
-		/**
-		 * ...work like Hashtable's <code>remove</code>...except it's time limited
-		 */
+        /**
+         * Removes the key (and its corresponding value) from this 
+         * Map. This method does nothing if the key is not in the Map.
+         *
+         * @param   key   the key that needs to be removed.
+         * @return  the value to which the key had been mapped in this Map,
+         *          or <code>null</code> if the key did not have a mapping.
+         */
 		public Object remove(Object key) {
 			return map.remove(key);
 		}
 
-		/*
-		 * ...work like Hashtable's <code>elements</code>...except it's time limited
-		 */
+        /**
+         * Returns an enumeration of the values in this LRU map.
+         * Use the Enumeration methods on the returned object to fetch the elements
+         * sequentially.
+         *
+         * @return  an enumeration of the values in this Map.
+         * @see     java.util.Enumeration
+         */
 		public Enumeration elements() {
 			return map.elements();
 		}
 
-		/**
+        /**
 		 * This method is called when an object is disposed.
 		 * Override this method if you interested in the disposed object.
+         *
+         * @param o - the disposed object
 		 */
 		protected void dispose( Object o ) {
 		}
