@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -49,12 +49,18 @@ package org.exolab.castor.xml.schema.reader;
 import org.exolab.castor.net.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.util.Configuration;
 import org.xml.sax.*;
 
-import java.net.URL;
-import java.util.Vector;
-
+/**
+ * A simple unmarshaller to read included schemas.
+ * Included schemas can be cached in the original parent Schema or
+ * can be inlined in that same XML Schema as recommended by the XML Schema
+ * specification.
+ * 
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @version $Revision$ $Date$
+ **/
 public class IncludeUnmarshaller extends ComponentReader
 {
 
@@ -91,7 +97,7 @@ public class IncludeUnmarshaller extends ComponentReader
         }
 
         if (uri != null)
-            include = uri.toString();
+            include = uri.getAbsoluteURI();
 
         //-- Has this schema location been included yet?
         if (schema.includeProcessed(include)) {
@@ -101,9 +107,34 @@ public class IncludeUnmarshaller extends ComponentReader
             return;
         }
         
+        Schema includedSchema = null;
+        boolean alreadyLoaded = false;
+
+        //-- caching is on
+        if (state.cacheIncludedSchemas) {
+            if (uri instanceof SchemaLocation) {
+        		includedSchema = ((SchemaLocation)uri).getSchema();
+        		schema.cacheIncludedSchema(includedSchema);
+        		alreadyLoaded = true;
+        	}
+        	//-- Have we already imported this XML Schema file?
+	        if (state.processed(include)) {
+	        	includedSchema = state.getSchema(include);
+	        	schema.cacheIncludedSchema(includedSchema);
+	        	alreadyLoaded = true;
+	        }
+        }
+	    
+        if (includedSchema == null)
+	    	includedSchema = new Schema();
+        else
+        	state.markAsProcessed(include, includedSchema);
+        
         //-- keep track of the schemaLocation
         schema.addInclude(include);
 
+        if (alreadyLoaded)
+        	return;
 		Parser parser = null;
 		try {
 		    parser = state.getConfiguration().getParser();
@@ -115,8 +146,13 @@ public class IncludeUnmarshaller extends ComponentReader
 		else
 		{
 			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(true, state, getURIResolver());
-            schemaUnmarshaller.setSchema(schema);
-			Sax2ComponentReader handler = new Sax2ComponentReader(schemaUnmarshaller);
+
+			if (state.cacheIncludedSchemas)
+			    schemaUnmarshaller.setSchema(includedSchema);
+            else
+            	schemaUnmarshaller.setSchema(schema);
+            
+		    Sax2ComponentReader handler = new Sax2ComponentReader(schemaUnmarshaller);
 			parser.setDocumentHandler(handler);
 			parser.setErrorHandler(handler);
 		}
@@ -131,6 +167,14 @@ public class IncludeUnmarshaller extends ComponentReader
 		}
 		catch(org.xml.sax.SAXException sx) {
 		    throw new SchemaException(sx);
+		}
+		if (state.cacheIncludedSchemas) {
+			String ns = includedSchema.getTargetNamespace();
+			if (ns == null || ns == "")
+				includedSchema.setTargetNamespace(schema.getTargetNamespace());
+			else if (!ns.equals(schema.getTargetNamespace()))
+				throw new SchemaException("The target namespace of the included components must be the same as the target namespace of the including schema");
+			schema.cacheIncludedSchema(includedSchema);
 		}
 	}
 

@@ -128,7 +128,7 @@ public class ExtensionUnmarshaller extends ComponentReader {
         if ((base != null) && (base.length() > 0)) {
 
             XMLType baseType= _schema.getType(base);
-		    if (baseType == null) {
+            if (baseType == null) {
                 _complexType.setBase(base); //the base type has not been read
                 if (_complexType.isSimpleContent()) {
                     _complexType.setContentType(new SimpleContent(_schema, base));
@@ -142,6 +142,7 @@ public class ExtensionUnmarshaller extends ComponentReader {
                     "must be a complexType but "+ base+" is a simpleType.\n";
                     error(err);
 				 }
+				 _complexType.setBase(base);
                  _complexType.setBaseType(baseType);
                 if (_complexType.isSimpleContent()) {
                     //--set the content type

@@ -93,6 +93,12 @@ public final class AttributeGroupDecl extends AttributeGroup {
      */
      private Wildcard _anyAttribute = null;
 
+     /**
+      * An attribute that indicates if this AttributeGroupDecl is
+      * a redefinition
+      */
+     private boolean _redefinition = false;
+     
     /**
      * Creates a new AttributeGroup definition
      * @param schema the Schema that this AttributeGroup
@@ -241,6 +247,15 @@ public final class AttributeGroupDecl extends AttributeGroup {
     } //-- isEmpty
 
     /**
+     * Returns true if this attributeGroupDecl is a redefinition.
+     * 
+     * @return true if this attributeGroupDecl is a redefinition.
+     */
+    public boolean isRedefined() {
+    	return _redefinition;
+    }
+    
+    /**
      * Removes the given AttributeDecl from this AttributeGroup.
      * @param attr the attribute to remove.
     **/
@@ -310,7 +325,14 @@ public final class AttributeGroupDecl extends AttributeGroup {
             this._name = name;
 
     } //-- setName
+    
 
+    /**
+     * Sets this Group has redefined. 
+     */
+    public void setRedefined() {
+    	_redefinition = true;
+    }
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/

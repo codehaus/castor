@@ -314,17 +314,48 @@ public class ElementDecl extends Particle
      * @return the XMLType of this ElementDecl
     **/
     public XMLType getType() {
-
+        
+    	XMLType result = null;
+        
         if (isReference()) {
             ElementDecl element = getReference();
-            if (element != null)
-                return element.getType();
-            return null;
+            if (element != null) {
+            	result = element.getType();
+            }
+            else
+            	return null;
         }
 
+        
+        
         if (_xmlType == null) return null;
-        else
-            return _xmlType.getType();
+        else {
+        	//-- here we might need to
+        	//-- relink the complexType or simpleType 
+        	//-- to a possible redefinition.
+        	
+        	//1--Anonymous types
+        	if (_xmlType.getName() == null)
+        	     return _xmlType.getType();
+        	else {
+        		//--we look in the parent schema if we have redefinitions of types.
+        		result = _xmlType.getType();
+        	}
+        }
+        
+        //-- the current XML schema might have a MasterSchema where all the
+        //-- type definitions have a higher priority [this is useful when
+        //-- resolving redefined types for instance].
+        if (result != null) {
+        	Schema tempSchema = result.getSchema().getMasterSchema();
+        	if (tempSchema != null) {
+        		XMLType tempType = tempSchema.getType(result.getName());
+        		if (tempType != null) {
+        			result = tempType;
+        		}
+        	}
+        }
+        return result;
     } //-- getXMLType
 
     /**
@@ -387,7 +418,25 @@ public class ElementDecl extends Particle
     public String getSubstitutionGroup() {
         return _substitutionGroup;
     } //-- getSubstitutionGroup
-
+    
+    /**
+     * Returns an enumeration of the elements that can be substitute to 
+     * this element declaration. 
+     * @return an enumeration of the elements that can be substitute to 
+     * this element declaration.
+     */
+    public Enumeration getSubstitutionGroupMembers() {
+    	Vector result = new Vector();
+    	Enumeration enum = _schema.getElementDecls();
+    	while (enum.hasMoreElements()) {
+    		ElementDecl temp  = (ElementDecl)enum.nextElement();
+    		String subName = temp.getSubstitutionGroup();
+    		if (subName!=null && subName.equals(_name)) 
+    			result.add(temp);
+    	}
+    	return result.elements();
+    }
+    
     /**
      * Returns true if this element definition is abstract
      * @return true if this element definition is abstract
@@ -592,7 +641,7 @@ public class ElementDecl extends Particle
                 case Structure.SCHEMA:
                     break;
                 default:
-                    String error = "Invalid parent for group";
+                    String error = "Invalid parent for element.";
                     throw new IllegalArgumentException(error);
             }
         }
@@ -679,8 +728,6 @@ public class ElementDecl extends Particle
         reference.setSchema(_schema);
         setType(reference);
     }
-
-
 
     //-------------------------------/
     //- Implementation of Structure -/
@@ -779,7 +826,6 @@ public class ElementDecl extends Particle
             
         }
 
-    } //-- validate
-
-
+    } //-- validate 
+   
 } //-- Element

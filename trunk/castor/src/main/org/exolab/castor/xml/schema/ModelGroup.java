@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 - 2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999 - 2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -48,11 +48,11 @@ package org.exolab.castor.xml.schema;
 import org.exolab.castor.xml.*;
 
 import java.util.Vector;
-import java.util.Hashtable;
 import java.util.Enumeration;
 
 /**
- * An XML Schema ModelGroup
+ * An XML Schema ModelGroup : <xsd:group>
+ * 
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -68,6 +68,12 @@ public class ModelGroup extends Group {
      * An ordered list of all ModelGroup definitions
     **/
     private Vector _modelDefs;
+    
+    /**
+     * An attribute that indicates if this Group is
+     * a redefinition
+     */
+    private boolean _redefinition = false;
 
 
     /**
@@ -180,6 +186,22 @@ public class ModelGroup extends Group {
     } //-- isReference
     
     /**
+     * Sets this Group has redefined. 
+     */
+    public void setRedefined() {
+    	_redefinition = true;
+    }
+    
+    /**
+     * Returns true if this group is a redefinition.
+     * 
+     * @return true if this group is a redefinition.
+     */
+    public boolean isRedefined() {
+    	return _redefinition;
+    }
+    
+    /**
      * Sets the reference for this ModelGroup definition
      * @param reference the name of the ModelGroup that this
      * definition references
@@ -218,6 +240,14 @@ public class ModelGroup extends Group {
         ModelGroup result = null;
         if (_groupRef != null) {
             result =  _schema.getModelGroup(_groupRef);
+            
+            //--check for redefinition
+            if (_schema.getMasterSchema() != null ) {
+            	ModelGroup temp = _schema.getMasterSchema().getModelGroup(_groupRef);
+            	if (temp != null)
+            		result = temp;
+            }
+            
             if (result == null) {
                 String err = "Unable to find group referenced :\" ";
                 err += getName();
@@ -277,10 +307,20 @@ public class ModelGroup extends Group {
                         name = tempGroup.getReference().getName();
 
                     if (name != null && name.equals(this.getName())) {
-                        String err = "in <group> named:"+this.getName();
-                        err +=  "\nCircular groups are disallowed.\n";
-                        err += "That is, within the {particles} of a group there must not be at any depth a particle whose {term} is the group itself.\n";
-                        throw new ValidationException(err);
+                        if (isRedefined()) {
+                        	if (getMaxOccurs() != 1 || getMinOccurs() != 1) {
+                        		String err = "in the redefined <group> named:"+this.getName();
+                        		err +=  "\nThe particle information (minOccurs, maxOccurs) of a circular group must be set to 1.\n";
+                        		throw new ValidationException(err);
+                        	}
+
+                        }
+                    	else {
+                    		String err = "in <group> named:"+this.getName();
+                            err +=  "\nCircular groups are disallowed.\n";
+                            err += "That is, within the {particles} of a group there must not be at any depth a particle whose {term} is the group itself.\n";
+                            throw new ValidationException(err);
+                    	}
                     }
                     //check cross-reference
                     int j = 0;
@@ -289,10 +329,19 @@ public class ModelGroup extends Group {
                         if (tempGroup.getParticle(j).getStructureType() == Structure.MODELGROUP) {
                             ModelGroup referencedGroup = ((ModelGroup)tempGroup.getParticle(j)).getReference();
                             if ((referencedGroup != null) && (referencedGroup.equals(this))) {
-                                String err = "Cross reference between <group>:"+this.getName()+" and <group>:"+tempGroup.getName();
-                                err +=  "\nCircular groups are disallowed.\n";
-                                err += "That is, within the {particles} of a group there must not be at any depth a particle whose {term} is the group itself.\n";
-                                throw new ValidationException(err);
+                            	if (isRedefined()) {
+                            		if (getMaxOccurs() != 1 || getMinOccurs() != 1) {
+                            			String err = "in the redefined <group> named:"+this.getName();
+                            			err +=  "\nThe particle information (minOccurs, maxOccurs) of a circular group must be set to 1.\n";
+                            			throw new ValidationException(err);
+                            		}
+                            	}
+                            	else {
+	                            	String err = "Cross reference between <group>:"+this.getName()+" and <group>:"+tempGroup.getName();
+	                                err +=  "\nCircular groups are disallowed.\n";
+	                                err += "That is, within the {particles} of a group there must not be at any depth a particle whose {term} is the group itself.\n";
+	                                throw new ValidationException(err);
+                            	}
                             }
 
                         }

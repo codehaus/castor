@@ -46,21 +46,17 @@
 package org.exolab.castor.xml.schema.reader;
 
 //-- imported classes and packages
-import java.util.Vector;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.AttributeSetImpl;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.net.URIResolver;
 import org.exolab.castor.net.util.URIResolverImpl;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
@@ -89,7 +85,7 @@ public class SchemaUnmarshaller extends ComponentReader {
     private static final String XML_PREFIX   = "xml";
     
     /**
-     * is this a included schema?
+     * is this an included schema?
      */
     private boolean _include = false;
     /**
@@ -125,7 +121,8 @@ public class SchemaUnmarshaller extends ComponentReader {
      * The SchemaUnmarsahller state
      */
     private SchemaUnmarshallerState _state = null;
-
+    
+   
     private RemappedPrefixes _prefixMappings = null;
     
       //----------------/
@@ -222,10 +219,12 @@ public class SchemaUnmarshaller extends ComponentReader {
         if (nsURI != null &&  nsURI.length() == 0)
            throw new SchemaException("empty string is not a legal namespace.");
         if ((nsURI != null) && (nsURI.length() > 0)) {
-            //if we are including a schema we must take care
-            //that the namespaces are the same
-            if ( (_include) &&(!_schema.getTargetNamespace().equals(nsURI)) ) {
-               throw new SchemaException("The target namespace of the included components must be the same as the target namespace of the including schema");
+        	if (!_state.cacheIncludedSchemas) {
+	        	//if we are including a schema we must take care
+	            //that the namespaces are the same
+	            if ( (_include) &&(!_schema.getTargetNamespace().equals(nsURI)) ) {
+	               throw new SchemaException("The target namespace of the included components must be the same as the target namespace of the including schema");
+	            }
             }
                _schema.setTargetNamespace(nsURI);
         }
@@ -234,7 +233,7 @@ public class SchemaUnmarshaller extends ComponentReader {
         _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
 
         //set the default locator of this schema
-        if (!_include) {
+        if (!_include || _state.cacheIncludedSchemas) {
             _schema.setSchemaLocation(getDocumentLocator().getSystemId());
         }
 
@@ -524,6 +523,11 @@ public class SchemaUnmarshaller extends ComponentReader {
             unmarshaller
                 = new ImportUnmarshaller(_schema, atts, _resolver, getURIResolver(), getDocumentLocator(), _state);
         }
+        //-- <redefine>
+        else if (name.equals(SchemaNames.REDEFINE)) {
+        	unmarshaller
+			= new RedefineUnmarshaller(_schema, atts, _resolver, getURIResolver(), getDocumentLocator(), _state);
+        }
         else {
             //-- we should throw a new Exception here
             //-- but since we don't support everything
@@ -651,6 +655,16 @@ public class SchemaUnmarshaller extends ComponentReader {
             group = (ModelGroup) (((ModelGroupUnmarshaller)unmarshaller).getGroup());
             _schema.addModelGroup(group);
         }
+        //--<redefine>
+        else if (name.equals(SchemaNames.REDEFINE)) {
+        	RedefineSchema redefine = null;
+        	redefine = (RedefineSchema) (((RedefineUnmarshaller)unmarshaller).getObject());
+        	if ((redefine.getSchemaLocation() == null) && (redefine.hasRedefinition()) ) {
+        		_schema.removeRedefineSchema(redefine);
+        		String err = "A <redefine> structure with no 'schemaLocation' attribute must contain only <annotation> elements";
+        		error(err);
+        	}
+        }
 
         unmarshaller = null;
     } //-- endElement
@@ -664,7 +678,7 @@ public class SchemaUnmarshaller extends ComponentReader {
         }
     } //-- characters
 
-
+    
     /**
      * This class handles remapping of namespace prefixes
      * for attributes of type QName. This is needed to 

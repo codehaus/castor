@@ -66,8 +66,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
 
 
-import org.apache.xml.serialize.Serializer;
-
 /**
  * A class for reading XML Schemas
  *
@@ -106,6 +104,14 @@ public class SchemaReader {
      * The resolver to be used for resolving href
      */
     private URIResolver _uriResolver;
+    
+    /**
+     * A flag that indicates that included schemas should be cached 
+     * instead of being inlined [which is the default behavior as specified
+     * by the XML Schema Specification].
+     * 
+     */
+    private boolean _cacheIncludedSchemas = false;
 
     private Schema      _schema   = null;
 
@@ -203,12 +209,12 @@ public class SchemaReader {
     public Schema read() throws IOException
     {
         if (_schema != null) return _schema;
-
         SchemaUnmarshaller schemaUnmarshaller = null;
 
         try {
             SchemaUnmarshallerState state = new SchemaUnmarshallerState();            
             state.setConfiguration(_config);            
+            state.cacheIncludedSchemas = _cacheIncludedSchemas;
             schemaUnmarshaller = new SchemaUnmarshaller(state);
             if (_uriResolver != null)
                 schemaUnmarshaller.setURIResolver(_uriResolver);
@@ -272,6 +278,17 @@ public class SchemaReader {
         _errorHandler = errorHandler;
     } //-- setErrorHandler
 
+    /**
+     * Sets wheter or not to cache the included xml schemas
+     * instead of inlining them as specified by the XML Schema
+     * specification.
+     *
+     * @param cache true to cache the included XML Schemas.
+     **/
+    public void setCacheIncludedSchemas(boolean cache) {
+    	_cacheIncludedSchemas = cache;
+    } //-- setErrorHandler
+    
     /**
      * Sets whether or not post-read validation should
      * occur. By default, validation is enabled. Note

@@ -242,17 +242,30 @@ public final class AttributeDecl extends Annotated {
      * @return the data type associated with this AttributeDecl.
     **/
     public SimpleType getSimpleType() {
-        if (isReference()) {
+        SimpleType result = null;
+        
+    	if (isReference()) {
             AttributeDecl attribute = getReference();
             if (attribute != null)
-                return attribute.getSimpleType();
-            return null;
+                result = attribute.getSimpleType();
+            else 
+            	return null;
         }
 
         if (_simpleType == null)
             return null;
-
-        return (SimpleType)_simpleType.getType();
+        result = (SimpleType)_simpleType.getType();
+        
+        if (result != null) {
+        	Schema tempSchema = result.getSchema().getMasterSchema();
+        	if (tempSchema != null) {
+        		SimpleType tempType = tempSchema.getSimpleType(result.getName());
+        		if (tempType != null) {
+        			result = tempType;
+        		}
+        	}
+        }
+        return result;
     } //-- getSimpleType
 
     /**
@@ -603,5 +616,18 @@ public final class AttributeDecl extends Annotated {
         }
         
     } //-- validate
+    
+    /**
+     * Set the parent schema of the current ElementDecl.
+     * The parent schema should at least have the same targetNamespace
+     * of the current schema.
+     * 
+     * This method is protected since it is only meant to be used by the internal
+     * API to propagate the parent XML Schema in case of a redefinition for instance.
+     * @param schema
+     */
+    protected void setSchema(Schema schema) {
+    	_schema = schema;
+    }
 
 } //-- AttrDecl

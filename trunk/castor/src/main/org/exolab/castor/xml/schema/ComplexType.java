@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,8 +47,6 @@ package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.*;
 
-import java.util.Vector;
-import java.util.Hashtable;
 import java.util.Enumeration;
 
 /**
@@ -120,6 +118,12 @@ public class ComplexType extends XMLType
 	 */
 	private boolean _restricted = false;
 
+	/**
+	 * An attribute that indicates if this ComplexType is
+	 * a redefinition
+	 */
+	private boolean _redefinition = false;
+	
     //------------------/
     //- Constructor(s) -/
     //------------------/
@@ -221,7 +225,8 @@ public class ComplexType extends XMLType
      *  null if no AttributeDecl with the given name was found.
     **/
     public AttributeDecl getAttributeDecl(String name) {
-        return _attributes.getAttribute(name);
+        AttributeDecl result = _attributes.getAttribute(name);
+	    return result;
     } //-- getAttributeDecl
 
     /**
@@ -362,6 +367,15 @@ public class ComplexType extends XMLType
         return _abstract;
     } //-- isAbstract
 
+    /**
+     * Returns true if this complexType is a redefinition.
+     * 
+     * @return true if this complexType is a redefinition.
+     */
+    public boolean isRedefined() {
+    	return _redefinition;
+    }
+    
     /**
      * Returns true if this is a top level Complextype
      * @return true if this is a top level Complextype
@@ -567,6 +581,13 @@ public class ComplexType extends XMLType
 	        _final = new FinalList(finalValue);
 	} //-- setFinal
 
+
+	/**
+	 * Sets this Group has redefined. 
+	 */
+	public void setRedefined() {
+		_redefinition = true;
+	}
 	/**
 	 * Sets whether or not this complexType is a 'simpleContent'
 	 * @param complexContent true if this complexType is a 'simpleContent'
@@ -692,7 +713,8 @@ public class ComplexType extends XMLType
      * ElementDecl exists in this ContentModelGroup.
     **/
     public ElementDecl getElementDecl(String name) {
-        return _contentModel.getElementDecl(name);
+        ElementDecl result = _contentModel.getElementDecl(name);
+        return result;
     } //-- getElementDecl
 
     /**
@@ -738,7 +760,8 @@ public class ComplexType extends XMLType
      * @returns the CMParticle at the specified index
     **/
     public Particle getParticle(int index) {
-        return _contentModel.getParticle(index);
+        Particle result = _contentModel.getParticle(index);
+        return result;
     } //-- getParticle
 
     /**

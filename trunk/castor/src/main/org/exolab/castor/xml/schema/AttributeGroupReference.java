@@ -111,7 +111,16 @@ public final class AttributeGroupReference
      * @return the attribute group defined at the schema level that is refered to by this class.
      */
     public AttributeGroup resolveReference() {
-        AttributeGroup attrGroup = _schema.getAttributeGroup(_reference);
+        AttributeGroup attrGroup = null;
+        //--check if there is no definition in the 
+        //--master schema
+        if (_schema.getMasterSchema() != null) {
+        	attrGroup = _schema.getMasterSchema().getAttributeGroup(_reference);
+        }
+        
+        if (attrGroup == null)
+            attrGroup = _schema.getAttributeGroup(_reference);
+
         if (attrGroup == null) {
             throw new IllegalStateException("Invalid AttributeGroupReference");
         }
