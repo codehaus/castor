@@ -71,12 +71,10 @@ public class FieldDescriptorImpl
      */
     private ClassDescriptor     _contClsDesc;
 
-
     /**
      * The field handler for get/set field value.
      */
     private FieldHandler        _handler;
-
 
     /**
      * The name of this field in the object. The field must have a
@@ -84,36 +82,30 @@ public class FieldDescriptorImpl
      */
     private String        _fieldName;
 
-
     /**
      * The field type.
      */
     private Class         _fieldType;
-
 
     /**
      * True if the field is transient and should not be saved/stored.
      */
     private boolean       _transient;
 
-
     /**
      * True if the field type is immutable.
      */
     private boolean       _immutable;
 
-
     /**
-     * True if the field type is immutable.
+     * True if the field type is required.
      */
     private boolean             _required;
-
 
     /**
      * True if the field is multi valued (a collection).
      */
     private boolean       _multi;
-
 
     /**
      * The type class descriptor, if this field is of a type
@@ -126,12 +118,10 @@ public class FieldDescriptorImpl
      */
     private TypeConvertor        _convertor;
 
-
     /**
      * The type convertor parameter.
      */
     private String               _convertorParam;
-
 
     /**
      * Constructs a new field descriptor.
