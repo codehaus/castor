@@ -59,6 +59,11 @@
          Intalio Inc. and <a href="mailto:arkin@intalio.com">Assaf Arkin</a>.
          Contributors are welcome to join this project. Please join us on the
          <a href="lists.xml">mailing list</a>.</p>
+       <p>
+         Castor includes software, such as Xerces, Jakarta ORO, and Jakarta Regexp,
+         developed by the <a href="http://www.apache.org/">Apache Software Foundation</a>.
+         Castor also includes <a href="http://www.junit.org">JUnit testing framework</a>.
+       </p>
     </section>
 
   </body>
