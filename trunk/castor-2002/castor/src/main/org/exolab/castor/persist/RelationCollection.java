@@ -40,7 +40,7 @@
  *
  * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id: RelationCollection,
+ * $Id$
  */
 
 package org.exolab.castor.persist;
