@@ -52,16 +52,15 @@ import org.exolab.castor.jdo.PersistenceException;
 
 
 /**
- * Interface for a key generator. The key generator is used
- * for producing identities for objects before they are
- * created in the database.
- * <p>
- * All the key generators belonging to the same database
- * share the same non-transactional connection to the
+ * Interface for a key generator. The key generator is used for
+ * producing identities for objects before they are created in the
  * database.
  * <p>
- * The key generator is configured from the mapping file
- * using Bean-like accessor methods.
+ * All the key generators belonging to the same database share the
+ * same non-transactional connection to the database.
+ * <p>
+ * The key generator is configured from the mapping file using
+ * Bean-like accessor methods.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -71,16 +70,19 @@ public interface KeyGenerator
 
 
     /**
-     * Generate a new key for the specified table.
+     * Generate a new key for the specified table. This method is
+     * called when a new object is about to be created. In some
+     * environments the name of the owner of the object is known,
+     * e.g. the principal in a J2EE server.
      *
      * @param Conneciton An open connection within the given transaction
      * @param tableName The table name
-     * @param fields The fields of the object being created
+     * @param owner The name of the table owner, if known
      * @return A new key
      * @throws PersistenceException An error occured talking to persistent
      *  storage
      */
-    public Object generateKey( Connection conn, String tableName, Object fields[] )
+    public Object generateKey( Connection conn, String tableName, String owner )
         throws PersistenceException;
 
 
