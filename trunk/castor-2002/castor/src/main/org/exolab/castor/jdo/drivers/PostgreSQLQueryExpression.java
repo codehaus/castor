@@ -70,6 +70,8 @@ public final class PostgreSQLQueryExpression
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
+        if ( _distinct )
+          sql.append( JDBCSyntax.Distinct );
         sql.append( getColumnList() );
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
