@@ -94,6 +94,7 @@ import java.util.Enumeration;
  * @see org.exolab.castor.builder.BindingComponent
 
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class XMLBindingComponent implements BindingComponent {
@@ -225,6 +226,7 @@ public class XMLBindingComponent implements BindingComponent {
         _prefix = null;
         _suffix = null;
         _userSpecifiedMemberName = false;
+        _compBinding = null;
         
         
         //--look up for the particular componentBinding relative to the
