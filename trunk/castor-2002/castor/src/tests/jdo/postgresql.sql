@@ -335,6 +335,8 @@ create unique index test_related_pk on test_related ( id );
 
 drop table test_identity;
 
+drop sequence test_identity_id_seq;
+
 create table test_identity (
   id SERIAL,
   attr varchar(200) not null
@@ -378,3 +380,16 @@ create table test_oqlext (
 );
 
 create unique index test_oqlext_pk on test_oqlext( ident );
+
+drop table test_pks_project;
+
+create table test_pks_project (
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  id    int             not null,
+  name  varchar(100)
+);
+
+create unique index test_pks_project_pk on test_pks_project( id );
+
+
