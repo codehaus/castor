@@ -52,10 +52,10 @@ import java.util.Enumeration;
 
 /**
  * Collection handler for adding/listing elements of a collection.
- * A collection field will provide a handler to the collection itself
- * (the field value) and a collection handler to process elements in
- * that collection. A collection handler is instantiated only once,
- * must be thread safe and not rely on synchronization.
+ * A collection field will use this handler to add elements when it's
+ * value is set, and to list then when it's value is retrieved.
+ * A collection handler is instantiated only once, must be thread
+ * safe and not rely on synchronization.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -66,37 +66,22 @@ public interface CollectionHandler
 
     /**
      * Add an object to the collection. A collection may not allow the
-     * same object/identity to be added more than once. The identity
-     * is required for map collections (e.g. <tt>Hashtable</tt>,
-     * <tt>HashMap</tt>). The collection is provided as a parameter
-     * and is returned as the return value. That way the handler can
-     * create a new collection or change the collection as necessary
-     * (e.g. when resizing an array).
+     * same object to be added more than once. The collection is provided
+     * as a parameter and is returned as the return value. That way the
+     * handler can create a new collection or change the collection as
+     * necessary (e.g. when resizing an array).
      *
      * @param collection The collection, null if no collection has
      *  been created yet
      * @param object The object to add to the collection
-     * @param identity The identity to use (may be null for list
-     *  collection, e.g. a <tt>Vector</tt>)
      * @return The collection with the new object, might be a different
      *  instance than the <tt>collection</tt> parameter
      * @throws ClassCastException The collection handler does not
      *  support collections of this type
      */
-    public Object addValue( Object collection, Object object, Object identity )
+    public Object add( Object collection, Object object )
         throws ClassCastException;
 
-
-    /**
-     * Returns the number of elements in the collection.
-     *
-     * @param collection The collection
-     * @return The number of elements in the collection
-     * @throws ClassCastException The collection handler does not
-     *  support collections of this type
-     */
-    public int getSize( Object collection )
-        throws ClassCastException;
 
     /**
      * Returns an enumeration of all the elements in the collection.
@@ -106,7 +91,7 @@ public interface CollectionHandler
      * @throws ClassCastException The collection handler does not
      *  support collections of this type
      */
-    public Enumeration getValues( Object collection )
+    public Enumeration elements( Object collection )
         throws ClassCastException;
 
 

@@ -146,9 +146,9 @@ final class CollectionHandlers
      * List of all the default collection handlers.
      */
     private static CollectionHandlerInfo[] _colHandlers = new CollectionHandlerInfo[] {
-        // For array (1.1)
+        // For array ([])
         new CollectionHandlerInfo( "array", Object[].class, new CollectionHandler() {
-            public Object addValue( Object collection, Object object, Object identity ) {
+            public Object add( Object collection, Object object ) {
                 Object[] array;
                 if ( collection == null ) {
                     array = new Object[ 1 ];
@@ -163,11 +163,10 @@ final class CollectionHandlers
                 newArray[ array.length ] = object;
                 return newArray;
             }
-            public Enumeration getValues( Object collection ) {
+            public Enumeration elements( Object collection ) {
+                if ( collection == null )
+                    return new EmptyEnumerator();
                 return new ArrayEnumerator( (Object[]) collection );
-            }
-            public int getSize( Object collection ) {
-                return ( (Object[]) collection ).length;
             }
             public String toString() {
                 return "Array CollectionHandler";
@@ -175,7 +174,7 @@ final class CollectionHandlers
         } ),
         // For Vector (1.1)
         new CollectionHandlerInfo( "vector", Vector.class, new CollectionHandler() {
-            public Object addValue( Object collection, Object object, Object identity ) {
+            public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new Vector();
                     ( (Vector) collection ).addElement( object );
@@ -184,11 +183,10 @@ final class CollectionHandlers
                         ( (Vector) collection ).addElement( object );
                 return collection;
             }
-            public Enumeration getValues( Object collection ) {
+            public Enumeration elements( Object collection ) {
+                if ( collection == null )
+                    return new EmptyEnumerator();
                 return ( (Vector) collection ).elements();
-            }
-            public int getSize( Object collection ) {
-                return ( (Vector) collection ).size();
             }
             public String toString() {
                 return "Vector CollectionHandler";
@@ -196,20 +194,19 @@ final class CollectionHandlers
         } ),
         // For Hashtable (1.1)
         new CollectionHandlerInfo( "hashtable", Hashtable.class, new CollectionHandler() {
-            public Object addValue( Object collection, Object object, Object identity ) {
+            public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new Hashtable();
-                    ( (Hashtable) collection ).put( identity, object );
+                    ( (Hashtable) collection ).put( object, object );
                 } else
                     if ( ! ( (Hashtable) collection ).contains( object ) )
-                        ( (Hashtable) collection ).put( identity, object );
+                        ( (Hashtable) collection ).put( object, object );
                 return collection;
             }
-            public Enumeration getValues( Object collection ) {
+            public Enumeration elements( Object collection ) {
+                if ( collection == null )
+                    return new EmptyEnumerator();
                 return ( (Hashtable) collection ).elements();
-            }
-            public int getSize( Object collection ) {
-                return ( (Hashtable) collection ).size();
             }
             public String toString() {
                 return "Hashtable CollectionHandler";
@@ -244,6 +241,26 @@ final class CollectionHandlers
             if ( index > array.length )
                 throw new NoSuchElementException();
             return array[ index++ ];
+        }
+
+    }
+
+
+    /**
+     * Enumerator for a null collection.
+     */
+    static final class EmptyEnumerator
+        implements Enumeration
+    {
+
+        public boolean hasMoreElements()
+        {
+            return false;
+        }
+
+        public Object nextElement()
+        {
+            throw new NoSuchElementException();
         }
 
     }
