@@ -235,7 +235,14 @@ public class Mapping
 
             try {
                 // Find the constructor and use it to create a loader
-                loaderClass = getClass().getClassLoader().loadClass( engine.getLoaderClass() );
+                ClassLoader loader = getClass().getClassLoader();
+                //-- make sure we check for null loader for people
+                //-- using JDK 1.1
+                if (loader != null)
+                    loaderClass = loader.loadClass( engine.getLoaderClass() );
+                else
+                    loaderClass = Class.forName(engine.getLoaderClass());
+                    
                 loaderConst = loaderClass.getConstructor( new Class[] { ClassLoader.class, PrintWriter.class } );
                 loaderImpl = (MappingLoader) loaderConst.newInstance( new Object[] { _loader, _logWriter } );
                 // Put loader in hash table first, so we don't get an error message if this
