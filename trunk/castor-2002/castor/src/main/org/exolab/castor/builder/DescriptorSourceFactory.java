@@ -364,7 +364,9 @@ public class DescriptorSourceFactory {
             //This is a temporary solution since we need to handle
             //the 'types' in specific handlers in the future
             //i.e add specific FieldHandler in org.exolab.castor.xml.handlers
-            if (isAttribute && xsType.isDateTime()) {
+            //dateTime is not concerned by the following since it is directly
+            //handle by DateFieldHandler
+            if (isAttribute && xsType.isDateTime() && xsType.getType() != xsType.DATETIME_TYPE) {
                 jsc.append(".parse");
                 jsc.append(JavaNaming.toJavaClassName(xsType.getName()));
                 jsc.append("((String) value))");
@@ -583,23 +585,23 @@ public class DescriptorSourceFactory {
                 if (xsDecimal.hasMinimum()) {
                     java.math.BigDecimal min = xsDecimal.getMinExclusive();
                     if (min != null)
-                        jsc.add("dv.setMinExclusive(new java.math.BigDecimal(");
+                        jsc.add("dv.setMinExclusive(new java.math.BigDecimal(\"");
                     else {
                         min = xsDecimal.getMinInclusive();
-                        jsc.add("dv.setMinInclusive(new java.math.BigDecimal(");
+                        jsc.add("dv.setMinInclusive(new java.math.BigDecimal(\"");
                     }
-                    jsc.append(min.toString()+")");
+                    jsc.append(min.toString()+"\")");
                     jsc.append(");");
                 }
                 if (xsDecimal.hasMaximum()) {
                     java.math.BigDecimal max = xsDecimal.getMaxExclusive();
                     if (max != null)
-                        jsc.add("dv.setMaxExclusive(new java.math.BigDecimal(");
+                        jsc.add("dv.setMaxExclusive(new java.math.BigDecimal(\"");
                     else {
                         max = xsDecimal.getMaxInclusive();
-                        jsc.add("dv.setMaxInclusive(new java.math.BigDecimal(");
+                        jsc.add("dv.setMaxInclusive(new java.math.BigDecimal(\"");
                     }
-                    jsc.append(max.toString()+")");
+                    jsc.append(max.toString()+"\")");
                     jsc.append(");");
                 }
 
