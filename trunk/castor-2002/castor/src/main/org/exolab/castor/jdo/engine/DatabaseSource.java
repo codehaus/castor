@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -63,15 +64,13 @@ import org.xml.sax.EntityResolver;
 import org.odmg.ODMGException;
 import org.odmg.DatabaseNotFoundException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.jdo.mapping.Databases;
-import org.exolab.castor.jdo.mapping.Database;
-import org.exolab.castor.jdo.mapping.Param;
-import org.exolab.castor.jdo.mapping.Include;
+import org.exolab.castor.jdo.conf.Database;
+import org.exolab.castor.jdo.conf.Param;
+import org.exolab.castor.jdo.conf.Mapping;
+import org.exolab.castor.jdo.conf.DTDResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.mapping.DTDResolver;
-import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.spi.Persistence;
@@ -88,363 +87,328 @@ public class DatabaseSource
 {
 
 
-    private String            _driverUrl;
+    /**
+     * The JDBC URL when using a JDBC driver.
+     */
+    private String            _jdbcUrl;
     
     
-    private Properties        _driverProps;
-    
-    
+    /**
+     * The properties when using a JDBC driver.
+     */
+    private Properties        _jdbcProps;
+
+
+    /**
+     * The data source when using a DataSource.
+     */
     private DataSource        _dataSource;
 
 
+    /**
+     * The map resolver for this database source.
+     */
     private MappingResolver    _mapResolver;
 
 
+    /**
+     * The database name of this database source.
+     */
     private String            _dbName;
 
 
+    /**
+     * The presistence engine for this database source.
+     */
     private PersistenceEngine _engine;
 
 
+    /**
+     * Listings of all databases by name.
+     */
+    private static Hashtable  _databases = new Hashtable();
+
+
+    private static Hashtable  _byEngine = new Hashtable();
+
+
+
+
     private static MappingResolver _defaultMapping;
+    public static String  DefaultMapping = "mapping.xml";
 
 
-    private static Hashtable  _engines = new Hashtable();
-    private static Hashtable  _dataSources = new Hashtable();
-
-
-    DatabaseSource( String dbName, String url, Properties props, MappingResolver mapResolver )
-	throws MappingException
+    /**
+     * Construct a new database source using a JDBC driver.
+     *
+     * @param dbName The database name
+     * @param mapResolver The mapping resolver
+     * @param sqlFactory Factory for SQL engines
+     * @param jdbcURL The JDBC URL
+     * @param jdbcProps The JDBC properties
+     * @throws MappingException Error occured when creating
+     *  persistence engines for the mapping descriptors
+     */
+    DatabaseSource( String dbName, MappingResolver mapResolver, SQLEngineFactory sqlFactory,
+                    String jdbcUrl, Properties jdbcProps )
+        throws MappingException
     {
-	_driverUrl = url;
-	_driverProps = props;
-	_mapResolver = ( mapResolver == null ? _defaultMapping : mapResolver );
-	_dbName = dbName;
-	_engine = new PersistenceEngineFactory().createEngine( _mapResolver, new SQLEngineFactory(), null );
-	_engines.put( _engine, this );
+        _dbName = dbName;
+        _mapResolver = mapResolver;
+        _jdbcUrl = jdbcUrl;
+        _jdbcProps = jdbcProps;
+        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, sqlFactory, null );
+        _byEngine.put( _engine, this );
     }
 
 
-    DatabaseSource( String dbName, DataSource dataSource, MappingResolver mapResolver )
-	throws MappingException
+    /**
+     * Construct a new database source using a <tt>DataSource</tt>.
+     *
+     * @param dbName The database name
+     * @param mapResolver The mapping resolver
+     * @param sqlFactory Factory for SQL engines
+     * @param dataSource The data source
+     * @throws MappingException Error occured when creating
+     *  persistence engines for the mapping descriptors
+     */
+    DatabaseSource( String dbName, MappingResolver mapResolver, SQLEngineFactory sqlFactory,
+                    DataSource dataSource )
+        throws MappingException
     {
-	_dataSource = dataSource;
-	_mapResolver = ( mapResolver == null ? _defaultMapping : mapResolver );
-	_dbName = dbName;
-	_engine = new PersistenceEngineFactory().createEngine( _mapResolver, new SQLEngineFactory(), null );
-	_engines.put( _engine, this );
+        _dbName = dbName;
+        _mapResolver = mapResolver;
+        _dataSource = dataSource;
+        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, sqlFactory, null );
+        _byEngine.put( _engine, this );
     }
 
 
-    DatabaseSource( String dbName, MappingResolver mapResolver )
-	throws MappingException
+
+    public MappingResolver getMappingResolver()
     {
-	_mapResolver = ( mapResolver == null ? _defaultMapping : mapResolver );
-	_dbName = dbName;
-	_engine = new PersistenceEngineFactory().createEngine( _mapResolver, new SQLEngineFactory(), null );
-	_engines.put( _engine, this );
+        return _mapResolver;
+    }
+
+
+    public String getDBName()
+    {
+        return _dbName;
+    }
+
+
+    static DatabaseSource registerDatabase( String dbName )
+        throws MappingException
+    {
+        DatabaseSource dbs;
+
+        if ( _defaultMapping == null ) {
+            JDOMappingHelper mapping;
+
+            try {
+                mapping = new JDOMappingHelper( null );
+                mapping.loadMapping( DefaultMapping );
+                _defaultMapping = mapping;
+            } catch ( IOException except ) {
+                throw new MappingException( except );
+            }
+        }
+        
+        if ( dbName.startsWith( "jdbc:" ) ) {
+            dbs = new DatabaseSource( dbName, _defaultMapping, new SQLEngineFactory(),
+                                      dbName, null );
+        } else if ( dbName.startsWith( "java:" ) ) {
+            Object obj;
+
+            try {
+                obj = new InitialContext().lookup( dbName );
+            } catch ( NameNotFoundException except ) {
+                throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
+            } catch ( NamingException except ) {
+                throw new MappingException( except );
+            }
+            if ( obj instanceof DataSource ) {
+                dbs = new DatabaseSource( dbName, _defaultMapping, new SQLEngineFactory(),
+                                          (DataSource) obj );
+            } else {
+                throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
+            }
+            _databases.put( dbName, dbs );
+        }
+        return null;
+    }
+
+
+    public static void loadDatabase( InputSource source, EntityResolver resolver,
+                                     PrintWriter logWriter )
+        throws MappingException
+    {
+        Unmarshaller     unm;
+        JDOMappingHelper mapping;
+        Mapping[]        mappings;
+        Database         database;
+        DatabaseSource   dbs;
+        
+        unm = new Unmarshaller( Database.class );
+        try {
+            if ( resolver == null )
+                unm.setEntityResolver( new DTDResolver() );
+            else
+                unm.setEntityResolver( new DTDResolver( resolver ) );
+            if ( logWriter != null )
+                unm.setLogWriter( logWriter );
+            database = (Database) unm.unmarshal( source );
+
+            mapping = new JDOMappingHelper( null );
+            if ( resolver != null )
+                mapping.setEntityResolver( resolver );
+            if ( logWriter != null )
+                mapping.setLogWriter( logWriter );
+            if ( source.getSystemId() != null )
+                mapping.setBaseURL( source.getSystemId() );
+            mappings = database.getMappings();
+            for ( int i = 0 ; i < mappings.length ; ++i ) {
+                mapping.loadMapping( mappings[ i ].getHref() );
+            }
+
+            if ( database.getDriver() != null ) {
+                Properties  props;
+                Enumeration params;
+                Param       param;
+          
+                if ( database.getDriver().getClassName() != null ) {
+                    try {
+                        Class.forName( database.getDriver().getClassName() );
+                    } catch ( ClassNotFoundException except ) {
+                        throw new MappingException( except );
+                    }
+                }
+                if ( DriverManager.getDriver( database.getDriver().getUrl() ) == null )
+                    throw new MappingException( "No suitable driver found for URL " + database.getDriver().getUrl() +
+                                                " - check if URL is correct and driver accessible in classpath" );
+
+                props = new Properties();
+                params = database.getDriver().listParams();
+                while ( params.hasMoreElements() ) {
+                    param = (Param) params.nextElement();
+                    props.put( param.getName(), param.getValue() );
+                }
+                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(),
+                                          database.getDriver().getUrl(), props );
+            } else if ( database.getDataSource() != null ) {
+                DataSource ds;
+          
+                ds = (DataSource) database.getDataSource().getParams();
+                if ( ds == null )
+                    throw new MappingException( "No data source specified for database " +
+                                                database.getDbName() );
+                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(), ds );
+            } else if ( database.getDataSourceRef() != null ) {
+                Object    ds;
+          
+                try {
+                    ds = new InitialContext().lookup( database.getDbName() );
+                } catch ( NameNotFoundException except ) {
+                    throw new MappingException( "The JNDI name " + database.getDbName() +
+                                                " does not map to a DataSource" );
+                } catch ( NamingException except ) {
+                    throw new MappingException( except );
+                }
+                if ( ! ( ds instanceof DataSource ) )
+                    throw new MappingException( "The JNDI name " + database.getDbName() +
+                                                " does not map to a DataSource" );
+                dbs = new DatabaseSource( database.getDbName(), mapping, new SQLEngineFactory(), (DataSource) ds );
+            } else {
+                throw new MappingException( "Bad" );
+            }
+
+            _databases.put( dbs.getDBName(), dbs );
+                                      
+        } catch ( MappingException except ) {
+            throw except;
+        } catch ( Exception except ) {
+            throw new MappingException( except );
+        }
     }
 
 
     static PersistenceEngine getPersistenceEngine( Class objType )
     {
-	Enumeration    enum;
-	DatabaseSource dbs;
-
-	enum = _dataSources.elements();
-	while ( enum.hasMoreElements() ) {
-	    dbs = (DatabaseSource) enum.nextElement();
-	    if ( dbs._mapResolver.getDescriptor( objType ) != null )
-		return dbs._engine;
-	}
-	return null;
+        Enumeration    enum;
+        DatabaseSource dbs;
+        
+        enum = _databases.elements();
+        while ( enum.hasMoreElements() ) {
+            dbs = (DatabaseSource) enum.nextElement();
+            if ( dbs._mapResolver.getDescriptor( objType ) != null )
+                return dbs._engine;
+        }
+        return null;
     }
 
 
     static PersistenceEngine getPersistenceEngine( DatabaseSource dbs )
     {
-	return dbs._engine;
-    }
-
-
-    public static synchronized void loadMapping( InputSource source )
-	throws MappingException
-    {
-	loadMapping( source, null, null );
-    }
-
-
-    public static synchronized void loadMapping( InputSource source,
-						 EntityResolver resolver,
-						 PrintWriter logWriter )
-	throws MappingException
-    {
-	Unmarshaller unm;
-
-	unm = new Unmarshaller( Mapping.class );
-	try {
-	    if ( resolver == null )
-		unm.setEntityResolver( new DTDResolver() );
-	    else
-		unm.setEntityResolver( new DTDResolver( resolver ) );
-	    if ( logWriter != null )
-		unm.setLogWriter( logWriter );
-	    loadMapping( (Mapping) unm.unmarshal( source ) );
-	} catch ( MappingException except ) {
-	    throw except;
-	} catch ( Exception except ) {
-	    throw new MappingException( except );
-	}
-    }
-
-
-    public static synchronized void loadMapping( Mapping mapping )
-	throws MappingException
-    {
-	Enumeration      enum;
-	JDOMappingHelper mapHelper;
-
-	mapHelper = new JDOMappingHelper( DatabaseSource.class.getClassLoader(), mapping );
-	_defaultMapping = mapHelper;
-	/*
-	enum = databases.listDatabases();
-	while ( enum.hasMoreElements() ) {
-	    db = (Database) enum.nextElement();
-	    mapTable = new MappingTable();
-
-	    mapping = db.listIncludes();
-	    while ( mapping.hasMoreElements() ) {
-		Include        include;
-		DatabaseSource dbs;
-
-		include = (Include) mapping.nextElement();
-		dbs = getDatabaseSource( include.getDbName() );
-		if ( dbs == null ) {
-		    if ( include.getUri() != null ) {
-			loadMapping( new InputSource( include.getUri() ) );
-			dbs = getDatabaseSource( db.getDbName() );
-		    }
-		    if ( dbs == null )
-			throw new MappingException( "Missing included database mapping " +
-						    db.getDbName() );
-		}
-		mapTable.addMapping( dbs.getMappingTable() );
-	    }
-
-	    mapping = db.listMappings();
-	    while ( mapping.hasMoreElements() ) {
-		mapTable.addMapping( (Mapping) mapping.nextElement() );
-	    }
-
-	    if ( db.getDriver() != null ) {
-		Properties  props;
-		Enumeration params;
-		Param       param;
-
-		if ( db.getDriver().getClassName() != null ) {
-		    try {
-			Class.forName( db.getDriver().getClassName() );
-		    } catch ( ClassNotFoundException except ) {
-			throw new MappingException( except );
-		    }
-		}
-		props = new Properties();
-		params = db.getDriver().listParams();
-		while ( params.hasMoreElements() ) {
-		    param = (Param) params.nextElement();
-		    props.put( param.getName(), param.getValue() );
-		}
-		registerDriver( db.getDbName(), db.getDriver().getUrl(), props, mapTable );
-	    } else if ( db.getDataSource() != null ) {
-		DataSource ds;
-
-		ds = (DataSource) db.getDataSource().getParams();
-		if ( ds == null )
-		    throw new MappingException( "No data source specified for database " +
-						db.getDbName() );
-		registerDataSource( db.getDbName(), ds, mapTable );
-	    } else if ( db.getDataSourceRef() != null ) {
-		Object    ds;
-		
-		try {
-		    ds = new InitialContext().lookup( db.getDbName() );
-		} catch ( NameNotFoundException except ) {
-		    throw new MappingException( "The JNDI name " + db.getDbName() +
-						" does not map to a DataSource" );
-		} catch ( NamingException except ) {
-		    throw new MappingException( except );
-		}
-		if ( ! ( ds instanceof DataSource ) )
-		    throw new MappingException( "The JNDI name " + db.getDbName() +
-						" does not map to a DataSource" );
-		registerDataSource( db.getDbName(), (DataSource) ds, mapTable );
-	    } else {
-		registerMapping( db.getDbName(), mapTable );
-	    }
-	}
-	*/
-    }
-
-
-    public static synchronized DatabaseSource registerDriver( String dbName, String url, Properties props,
-							      MappingResolver mapResovler )
-	throws MappingException
-    {
-	DatabaseSource dbs;
-
-	synchronized ( _dataSources ) {
-	    if ( _dataSources.get( dbName ) != null )
-		throw new MappingException( "A database with the name " + dbName + " is already registered" );
-	    try {
-		if ( DriverManager.getDriver( url ) == null )
-		    throw new MappingException( "No suitable driver found for URL " + url +
-						" - check if URL is correct and driver accessible in classpath" );
-	    } catch ( SQLException except ) {
-		throw new MappingException( "Error obtaining driver for URL " + url +
-					    ": " + except.getMessage() );
-	    }
-	    if ( props == null )
-		props = new Properties();
-	    dbs = new DatabaseSource( dbName, url, props, mapResovler );
-	    _dataSources.put( dbName, dbs );
-	    return dbs;
-	}
-    }
-
-
-    public static synchronized DatabaseSource registerDataSource( String dbName, DataSource dataSource,
-								  MappingResolver mapResovler )
-	throws MappingException
-    {
-	DatabaseSource dbs;
-
-	synchronized ( _dataSources ) {
-	    if ( _dataSources.get( dbName ) != null )
-		throw new MappingException( "A database with the name " + dbName + " is already registered" );
-	    if ( dataSource == null )
-		throw new NullPointerException( "Argument 'dataSource' is null" );
-	    dbs = new DatabaseSource( dbName, dataSource, mapResovler );
-	    _dataSources.put( dbName, dbs );
-	    return dbs;
-	}
-    }
-
-
-    public static synchronized DatabaseSource registerMapping( String dbName, MappingResolver mapResovler )
-	throws MappingException
-    {
-	DatabaseSource dbs;
-
-	synchronized ( _dataSources ) {
-	    if ( _dataSources.get( dbName ) != null )
-		throw new MappingException( "A database with the name " + dbName + " is already registered" );
-	    dbs = new DatabaseSource( dbName, mapResovler );
-	    _dataSources.put( dbName, dbs );
-	    return dbs;
-	}
+        return dbs._engine;
     }
 
 
     static DatabaseSource getDatabaseSource( Object obj )
     {
-	Enumeration    enum;
-	DatabaseSource dbs;
-
-	enum = _dataSources.elements();
-	while ( enum.hasMoreElements() ) {
-	    dbs = (DatabaseSource) enum.nextElement();
-	    if ( dbs._mapResolver.getDescriptor( obj.getClass() ) != null )
-		return dbs;
-	}
-	return null;
+        Enumeration    enum;
+        DatabaseSource dbs;
+        
+        enum = _databases.elements();
+        while ( enum.hasMoreElements() ) {
+            dbs = (DatabaseSource) enum.nextElement();
+            if ( dbs._mapResolver.getDescriptor( obj.getClass() ) != null )
+                return dbs;
+        }
+        return null;
     }
 
 
     static synchronized DatabaseSource getDatabaseSource( String dbName )
-	throws MappingException
+        throws MappingException
     {
-	DatabaseSource dbs;
-
-	dbs = (DatabaseSource) _dataSources.get( dbName );
-	if ( dbs == null ) {
-	    dbs = registerDatabase( dbName );
-	}
-	return dbs;
+        DatabaseSource dbs;
+        
+        dbs = (DatabaseSource) _databases.get( dbName );
+        if ( dbs == null )
+            dbs = registerDatabase( dbName );
+        return dbs;
     }
-
-
+    
+    
     static Connection createConnection( PersistenceEngine engine )
-	throws SQLException
+        throws SQLException
     {
-	DatabaseSource dbs;
-
-	dbs = (DatabaseSource) _engines.get( engine );
-	if ( dbs._dataSource != null )
-	    return dbs._dataSource.getConnection();
-	else
-	    return DriverManager.getConnection( dbs._driverUrl, dbs._driverProps );
+        DatabaseSource dbs;
+        
+        dbs = (DatabaseSource) _byEngine.get( engine );
+        if ( dbs._dataSource != null )
+            return dbs._dataSource.getConnection();
+        else
+            return DriverManager.getConnection( dbs._jdbcUrl, dbs._jdbcProps );
     }
-
-
-    MappingResolver getMappingTable()
-    {
-	return _mapResolver;
-    }
-
-
-    String getName()
-    {
-	return _dbName;
-    }
-
-
-    boolean canConnect()
-    {
-	return ( _driverUrl != null || _dataSource != null );
-    }
-
-
-    static DatabaseSource registerDatabase( String dbName )
-	throws MappingException
-    {
-	Object obj;
-
-	if ( dbName.startsWith( "jdbc:" ) ) {
-	    return registerDriver( dbName, dbName, null, null );
-	} else if ( dbName.startsWith( "java:" ) ) {
-	    try {
-		obj = new InitialContext().lookup( dbName );
-	    } catch ( NameNotFoundException except ) {
-		throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
-	    } catch ( NamingException except ) {
-		throw new MappingException( except );
-	    }
-	    if ( obj instanceof DataSource ) {
-		return registerDataSource( dbName, (DataSource) obj, _defaultMapping );
-	    } else {
-		throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
-	    }
-	}
-	return null;
-    }
-
+    
 
     static class SQLEngineFactory
-	implements PersistenceFactory
+        implements PersistenceFactory
     {
-	
-	public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
-	    throws MappingException
-	{
-	    try {
-		return new SQLEngine( (JDOClassDesc) clsDesc, logWriter );
-	    } catch ( MappingException except ) {
-		logWriter.println( except.toString() );
-		return null;
-	    }
-	}
-
+        
+        public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
+            throws MappingException
+        {
+            try {
+                return new SQLEngine( (JDOClassDesc) clsDesc, logWriter );
+            } catch ( MappingException except ) {
+                logWriter.println( except.toString() );
+                return null;
+            }
+        }
+        
     }
-
+    
 
 }

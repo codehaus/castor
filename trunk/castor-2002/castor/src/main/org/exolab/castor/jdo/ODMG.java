@@ -87,127 +87,113 @@ public class ODMG
 
     public void setLogWriter( PrintWriter logWriter )
     {
-	_logWriter = logWriter;
+        _logWriter = logWriter;
     }
 
 
     public PrintWriter getLogWriter()
     {
-	return _logWriter;
+        return _logWriter;
     }
 
 
     public Transaction currentTransaction()
     {
-	return TransactionImpl.getCurrent();
+        return TransactionImpl.getCurrent();
     }
 
 
     public Database getDatabase( Object obj )
     {
-	/*
-	DatabaseEngine dbEngine;
-	DatabaseImpl   db;
-
-	dbEngine = DatabaseEngine.getDatabaseEngine( obj );
-	if ( dbEngine == null )
-	    throw new ObjectNotPersistentException( "The object could not be found in memory" );
-	db = new DatabaseImpl( dbEngine );
-	if ( _logWriter != null )
-	    db.setLogWriter( _logWriter );
-	return db;
-	*/
-	return null;
+        /*
+          DatabaseEngine dbEngine;
+          DatabaseImpl   db;
+          
+          dbEngine = DatabaseEngine.getDatabaseEngine( obj );
+          if ( dbEngine == null )
+          throw new ObjectNotPersistentException( "The object could not be found in memory" );
+          db = new DatabaseImpl( dbEngine );
+          if ( _logWriter != null )
+          db.setLogWriter( _logWriter );
+          return db;
+        */
+        return null;
     }
-
-
+    
+    
     public String getObjectId( Object obj )
     {
-	/*
-	return DatabaseEngine.createObjectOID( obj ).toString();
-	*/
-	return null;
+        /*
+          return DatabaseEngine.createObjectOID( obj ).toString();
+        */
+        return null;
     }
-
-
+    
+    
     public DArray newDArray()
     {
-	throw new NotImplementedException( "Collections are not supported in this release" );
+        throw new NotImplementedException( "Collections are not supported in this release" );
     }
-
-
+    
+    
     public DBag newDBag()
     {
-	throw new NotImplementedException( "Collections are not supported in this release" );
+        throw new NotImplementedException( "Collections are not supported in this release" );
     }
-
-
+    
+    
     public DList newDList()
     {
-	throw new NotImplementedException( "Collections are not supported in this release" );
+        throw new NotImplementedException( "Collections are not supported in this release" );
     }
-
-
+    
+    
     public DMap newDMap()
     {
-	throw new NotImplementedException( "Collections are not supported in this release" );
+        throw new NotImplementedException( "Collections are not supported in this release" );
     }
 
 
     public DSet newDSet()
     {
-	throw new NotImplementedException( "Collections are not supported in this release" );
+        throw new NotImplementedException( "Collections are not supported in this release" );
     }
 
 
     public Database newDatabase()
     {
-	DatabaseImpl db;
-
-	db = new DatabaseImpl();
-	if ( _logWriter != null )
-	    db.setLogWriter( _logWriter );
-	return db;
+        DatabaseImpl db;
+        
+        db = new DatabaseImpl();
+        if ( _logWriter != null )
+            db.setLogWriter( _logWriter );
+        return db;
     }
 
 
     public OQLQuery newOQLQuery()
     {
-	return new OQLQueryImpl();
+        return new OQLQueryImpl();
     }
 
 
     public Transaction newTransaction()
     {
-	return new TransactionImpl();
+        return new TransactionImpl();
     }
 
 
-    public void loadMapping( InputStream input )
-	throws MappingException
+    public void loadDatabase( String url )
+        throws MappingException
     {
-	DatabaseSource.loadMapping( new InputSource( input ) );
+        DatabaseSource.loadDatabase( new InputSource( url ), null, _logWriter );
     }
-
-
-    public void loadMapping( Reader reader )
-	throws MappingException
+    
+    
+    public void loadDatabase( InputSource source, EntityResolver resolver )
+        throws MappingException
     {
-	DatabaseSource.loadMapping( new InputSource( reader ) );
-    }
-
-
-    public void loadMapping( String uri )
-	throws MappingException
-    {
-	DatabaseSource.loadMapping( new InputSource( uri ), null, _logWriter );
-    }
-
-
-    public void loadMapping( InputSource source, EntityResolver resolver )
-	throws MappingException
-    {
-	DatabaseSource.loadMapping( source, resolver, _logWriter );
+        DatabaseSource.loadDatabase( source, resolver, _logWriter );
     }
 
 
