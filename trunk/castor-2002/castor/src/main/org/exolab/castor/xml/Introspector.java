@@ -476,6 +476,20 @@ public final class Introspector {
         return classDesc;
     } //-- generateClassDescriptor
     
+    /**
+     * Returns true if the given XMLClassDescriptor was created via
+     * introspection
+    **/
+    public static boolean introspected(XMLClassDescriptor descriptor) {
+        return (descriptor instanceof IntrospectedXMLClassDescriptor);
+    } //-- introspected
+    
+    /**
+     * Returns true if the given Class can be marshalled.
+     *
+     * @param type the Class to check marshallability for.
+     * @return true if the given Class can be marshalled.
+    **/
     public static boolean marshallable(Class type) {
         
         //-- make sure type is not Void, or Class;
@@ -648,7 +662,7 @@ public final class Introspector {
        
     } //-- isPrimitive
     
-} //-- MarshalHelper
+} //-- Introspector
 
 /**
  * A simple extension of XMLClassDescriptor
