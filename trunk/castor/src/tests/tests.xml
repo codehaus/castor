@@ -183,6 +183,7 @@
     <case class="jdo.KeyGenUuid" />
     <!-- -->
     <case class="jdo.KeyGenSequence" />
+    <case class="jdo.KeyGenIdentity" />
     <!-- -->
     <case class="jdo.Persistent" />
     <case class="jdo.CustomInstanceFactory" />
