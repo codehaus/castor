@@ -231,7 +231,7 @@ public class XMLClassDescriptorImpl extends Validator
     **/
     public void addFieldDescriptor(XMLFieldDescriptor descriptor) {
         
-	descriptor.setContainingClassDescriptor( this );
+	    descriptor.setContainingClassDescriptor( this );
 
         NodeType nodeType = descriptor.getNodeType();
         switch(nodeType.getType()) {
@@ -637,6 +637,12 @@ public class XMLClassDescriptorImpl extends Validator
                     if (fieldValidator != null)
                         fieldValidator.validate(object, resolver);
                 }
+                //-- handle content, not affected by choice
+                if (contentDescriptor != null) {
+                    FieldValidator fieldValidator = contentDescriptor.getValidator();
+                    if (fieldValidator != null)
+                        fieldValidator.validate(object, resolver);
+                }
                 break;
             //-- Currently SEQUENCE is handled the same as all
             case SEQUENCE:
@@ -655,6 +661,12 @@ public class XMLClassDescriptorImpl extends Validator
                     XMLFieldDescriptor desc = 
                         (XMLFieldDescriptor) attributeDescriptors.get(i);
                     FieldValidator fieldValidator = desc.getValidator();
+                    if (fieldValidator != null)
+                        fieldValidator.validate(object, resolver);
+                }
+                //-- handle content
+                if (contentDescriptor != null) {
+                    FieldValidator fieldValidator = contentDescriptor.getValidator();
                     if (fieldValidator != null)
                         fieldValidator.validate(object, resolver);
                 }
@@ -768,7 +780,6 @@ public class XMLClassDescriptorImpl extends Validator
         if (idx >= 0) name = name.substring(idx+1);
         return _naming.toXMLName(name);
     }
-    
     
 } //-- XMLClassDescriptor
 
