@@ -234,12 +234,8 @@ public class Mapping
             Constructor   loaderConst;
 
             try {
-                // Find the constructor and use it to create a loader
-                ClassLoader loader = getClass().getClassLoader();
-                //-- make sure we check for null loader for people
-                //-- using JDK 1.1
-                if (loader != null)
-                    loaderClass = loader.loadClass( engine.getLoaderClass() );
+                if (_loader != null)
+                    loaderClass = _loader.loadClass(engine.getLoaderClass() );
                 else
                     loaderClass = Class.forName(engine.getLoaderClass());
                     
