@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2003 (C) Intalio Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
@@ -52,7 +57,7 @@ import java.util.Vector;
 /**
  * A class used to save State information for the SourceFactory
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  */
 class FactoryState implements ClassInfoResolver {
 
@@ -60,15 +65,17 @@ class FactoryState implements ClassInfoResolver {
     //- Member Variables -/
     //--------------------/
 
-    JClass       jClass           = null;
-    ClassInfo    classInfo        = null;
-
-    String packageName         = null;
+    JClass       jClass              = null;
+    ClassInfo    classInfo           = null;
+    FieldInfo    fieldInfoForChoice  = null;
+    String       packageName         = null;
 
     private ClassInfoResolver _resolver  = null;
     private Vector            _processed = null;
     private SGStateInfo       _sgState   = null;
     private boolean           _createGroupItem = false;
+    
+    
     /**
      * Keeps track of whether or not the BoundProperties
      * methods have been created
