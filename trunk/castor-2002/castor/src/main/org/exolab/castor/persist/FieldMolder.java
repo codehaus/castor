@@ -120,7 +120,7 @@ public class FieldMolder {
     private SQLRelationLoader _manyToManyLoader;
 
     public String toString() {
-        return "FieldMolder("+_fieldName+","+_fType+")"+_defaultReflectService._fClass+" inside "+_eMold.getName();
+        return "FieldMolder of "+_eMold.getName()+".set"+_fieldName+"("+_fType+" "+_fieldName+")";
     }
 
     /*
@@ -152,8 +152,7 @@ public class FieldMolder {
     }
 
     public boolean isStored() {
-        return !isPersistanceCapable() || !isMulti();
-        //_store;
+        return _fMold == null || _store; 
     }
 
     public boolean isManyToMany() {
@@ -427,9 +426,9 @@ public class FieldMolder {
 
             if ( fieldMap.getSql() == null )
                 _store = false;
-            else if ( fieldMap.getSql().getName() == null )
+            else if ( fieldMap.getSql().getManyTable() != null )
                 _store = false;
-            else if ( fieldMap.getSql().getManyTable() == null )
+            else if ( fieldMap.getSql().getName().length == 0 )
                 _store = false;
             else
                 _store = true;
