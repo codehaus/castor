@@ -18,7 +18,7 @@
     <name surname="Visco" given="Keith"/>
     <email>kvisco@intalio.com</email>
     <company id="intalio"/>
-    <description>Eliminated angle brackets on XML side</description>
+    <description>Responsible for all things wrong in Castor XML</description>
   </contributor>
 
   <contributor type="Committer">
