@@ -586,31 +586,6 @@ public interface Database
     
 
     /**
-     * @deprecated See {@link #create}
-     */
-    public void makePersistent( Object object )
-        throws ClassNotPersistenceCapableException,
-               DuplicateIdentityException, PersistenceException;
-
-
-    /**
-     * @deprecated See {@link #remove}
-     */
-    public void deletePersistent( Object object )
-        throws ObjectNotPersistentException, LockNotGrantedException, 
-               PersistenceException;
-
-
-    /**
-     * @deprecated Use {@link #commit} and {@link #rollback} instead;
-     *  this method cannot be implemented properly with multiple type
-     *  of locks and will not be supported in future versions of the
-     *  API
-     */
-    public void checkpoint()
-        throws TransactionNotInProgressException, TransactionAbortedException;
-
-    /**
      * Expire objects from the cache. Objects expired from the cache will be
      * read from persistent storage, as opposed to being read from the
      * performance cache, during subsequent load/query operations.

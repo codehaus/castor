@@ -379,17 +379,6 @@ public class DatabaseImpl
     }
 
 
-    /**
-     * @deprecated
-     */
-    public synchronized void makePersistent( Object object )
-        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
-               TransactionNotInProgressException, PersistenceException
-    {
-        create( object );
-    }
-
-
     public void remove( Object object )
         throws ObjectNotPersistentException, LockNotGrantedException, 
                TransactionNotInProgressException, PersistenceException
@@ -405,16 +394,6 @@ public class DatabaseImpl
         tx.delete( object );
     }
 
-
-    /**
-     * @deprecated
-     */
-    public synchronized void deletePersistent( Object object )
-        throws ObjectNotPersistentException, LockNotGrantedException, 
-               PersistenceException
-    {
-        remove( object );
-    }
 
     public boolean isPersistent( Object object )
     {
@@ -629,15 +608,6 @@ public class DatabaseImpl
     public boolean isActive()
     {
         return ( _ctx != null && _ctx.isOpen() );
-    }
-
-
-    /**
-     * @deprecated Use {@link #commit} and {@link #rollback} instead
-     */
-    public void checkpoint()
-        throws TransactionNotInProgressException, TransactionAbortedException
-    {
     }
 
 
