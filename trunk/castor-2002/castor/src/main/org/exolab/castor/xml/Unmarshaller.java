@@ -199,8 +199,8 @@ public class Unmarshaller {
         }
         catch(org.xml.sax.SAXException sx) {
             
-            MarshalException marshalEx = new MarshalException();
-           
+            MarshalException marshalEx = new MarshalException(sx);
+/*         
             String message = null;
             FileLocation fileLocation = null;
             
@@ -217,20 +217,19 @@ public class Unmarshaller {
                 }
             }
 	    else message = sx.getMessage();
+*/
+	    FileLocation location = new FileLocation();
+	    location.setFilename(handler.getDocumentLocator().getSystemId());
+	    location.setLineNumber(handler.getDocumentLocator().getLineNumber());
+	    location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
+	    marshalEx.setLocation(location);
 
-	    fileLocation = new FileLocation();
-	    fileLocation.setFilename(handler.getDocumentLocator().getSystemId());
-	    fileLocation.setLineNumber(handler.getDocumentLocator().getLineNumber());
-	    fileLocation.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
-	    marshalEx.setLocation(fileLocation);
-            
-            //if (message == null) 
+/*
+            if (message == null) 
                 message = sx.toString();
-System.out.println( sx );
-System.out.println( sx.getException() );
-sx.getException().printStackTrace();
 
             marshalEx.setMessage(message);
+*/
             throw marshalEx;
         }
         

@@ -46,6 +46,8 @@
 package org.exolab.castor.xml;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.PrintStream;
 
 /**
  * An exception that can be used to signal marshalling exceptions
@@ -172,5 +174,31 @@ public class MarshalException extends CastorException {
         }
         return sb.toString();
     } //-- toString
+
+
+
+    public void printStackTrace()
+    {
+	if ( _exception == null )
+	    super.printStackTrace();
+	else
+	    _exception.printStackTrace();
+    }
+
+    public void printStackTrace( PrintWriter printer )
+    {
+	if ( _exception == null )
+	    super.printStackTrace( printer );
+	else
+	    _exception.printStackTrace( printer);
+    }
+
+    public void printStackTrace( PrintStream printer )
+    {
+	if ( _exception == null )
+	    super.printStackTrace( printer );
+	else
+	    _exception.printStackTrace( printer );
+    }
     
 } //-- MarshalException
