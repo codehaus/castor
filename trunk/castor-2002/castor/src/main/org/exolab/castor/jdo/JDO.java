@@ -46,7 +46,7 @@
 
 package org.exolab.castor.jdo;
 
-
+ 
 import java.io.PrintWriter;
 import java.io.InputStream;
 import java.io.Reader;
