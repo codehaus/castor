@@ -48,6 +48,7 @@ package org.exolab.castor.builder.types;
 import java.util.Enumeration;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
+
 import org.exolab.javasource.*;
 
 /**
@@ -78,6 +79,10 @@ public final class XSString extends XSPatternBase {
     **/
     private int minLength =  0;
 
+    /**
+     * the whiteSpace facet
+     */
+     private String _whiteSpace = "preserved";
     /**
      * Creates a new XSString
      */
@@ -130,6 +135,15 @@ public final class XSString extends XSPatternBase {
      public int getLength() {
         return this._length;
      }
+
+    /**
+     * Returns the whiteSpace facet of this type
+     * @return the whiteSpace facet of this type
+     */
+     public String getWhiteSpace() {
+        return this._whiteSpace;
+     }
+
     /**
      * Returns true if a maximum length has been set
      * @return true if a maximum length has been set
@@ -153,6 +167,14 @@ public final class XSString extends XSPatternBase {
     public boolean hasLength() {
         return (_length > 0);
     }
+
+    /**
+     * Returns true if the whiteSpace facet is used
+     * @returns true if the whiteSpace facet is used
+     */
+     public boolean hasWhiteSpace() {
+        return (_whiteSpace != null);
+     }
 
     /**
      * Sets the length of this XSString.
@@ -185,6 +207,29 @@ public final class XSString extends XSPatternBase {
         this.minLength = minLength;
     } //-- setMinLength
 
+    /**
+     * <p>Sets the whiteSpace facet of this XSString.
+     * <p>The value of the whiteSpace facet must be one of the following:
+     * <ul>
+     *  <li>preserve</li>
+     *  <li>replace</li>
+     *  <li>collapse</li>
+     * </ul>
+     * any other value will generate a Warning and set the whiteSpace to preserved
+     * @param whiteSpace the whiteSpace value
+     */
+     public void setWhiteSpace(String value) {
+        if (value.equals("preserved"))
+            this._whiteSpace = value;
+        else if (value.equals("replace"))
+            this._whiteSpace = value;
+        else if (value.equals("collapse"))
+            this._whiteSpace = "preserved";
+        else {
+            System.out.println("Warning : "+value+" is a bad entry for the whiteSpace value");
+            this._whiteSpace = value;
+        }
+     }
     public void setFacets(SimpleType simpleType) {
      //-- copy valid facets
         Enumeration enum = getFacets(simpleType);
@@ -204,6 +249,8 @@ public final class XSString extends XSPatternBase {
                 setLength(facet.toInt());
             else if (Facet.PATTERN.equals(name))
                 setPattern(facet.getValue());
+            else if (Facet.WHITESPACE.equals(name))
+                setWhiteSpace(facet.getValue());
 
         }
     }
