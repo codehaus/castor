@@ -79,7 +79,7 @@ public class DatabaseImpl
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
      */
-    private static Log _log = LogFactory.getFactory().getInstance( SQLEngine.class );
+    private static Log _log = LogFactory.getFactory().getInstance( DatabaseImpl.class );
 
 
     /**
