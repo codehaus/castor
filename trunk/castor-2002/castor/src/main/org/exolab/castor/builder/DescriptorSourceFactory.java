@@ -407,7 +407,6 @@ public class DescriptorSourceFactory {
             else if (member.getSchemaType().getType() == XSType.COLLECTION) {
                 jsc.add("desc.setHandler( new CollectionFieldHandler(");
                 jsc.append("handler));");
-                jsc.add("desc.setImmutable(true);");
             }
             else jsc.add("desc.setHandler(handler);");
 
@@ -648,11 +647,12 @@ public class DescriptorSourceFactory {
                 jsc.append("handler));");
                 jsc.add("desc.setImmutable(true);");
             }
-            else if (member.getSchemaType().getType() == XSType.COLLECTION) {
+            //--We need to handle NMTOKENS with the CollectionFieldHandler
+            else if (xsType.getType() == XSType.NMTOKENS) {
                 jsc.add("desc.setHandler( new CollectionFieldHandler(");
                 jsc.append("handler));");
-                jsc.add("desc.setImmutable(true);");
             }
+            //IDREFS?
             else jsc.add("desc.setHandler(handler);");
 
             //-- namespace
