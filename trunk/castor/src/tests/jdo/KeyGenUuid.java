@@ -47,19 +47,10 @@
 package jdo;
 
 
-import java.io.IOException;
-import java.util.Enumeration;
-import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.engine.OQLQueryImpl;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -113,8 +104,7 @@ public class KeyGenUuid extends CastorTestCase {
         TestUuidObject      object;
         TestUuidObject      ext;
         QueryResults        enum;
-        boolean             result;
-
+        
         // Open transaction in order to perform JDO operations
         _db.begin();
 
