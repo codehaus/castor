@@ -204,7 +204,7 @@ public class RelationCollection implements Collection, Lazy {
                 throw new RuntimeException("Transaction is closed!");
 
             try {
-                o = parent._tx.load( parent._engine, parent._molder, ids, AccessMode.ReadOnly );
+                o = parent._tx.load( parent._engine, parent._molder, ids, null );
                 parent._loaded.put( ids, o );
                 return o;
             } catch ( LockNotGrantedException e ) {
