@@ -16,6 +16,7 @@ import java.sql.DriverManager;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.mapping.Mapping;
@@ -83,6 +84,10 @@ public class Test
         OQLQuery      productOql;
         OQLQuery      groupOql;
         OQLQuery      computerOql;
+        OQLQueryImpl  newProductOql;
+        OQLQueryImpl  newGroupOql;
+        OQLQueryImpl  newComputerOql;
+        
         Enumeration   enum;
 
         db = _jdo.getDatabase();
@@ -219,6 +224,151 @@ public class Test
         ser.asDocumentHandler().endDocument();
 
         db.commit();
+
+       
+       
+        //Start same tests as before, but with newCreate and newBind
+       
+        writer.println("\n\nStarting tests for new methods\n\n");
+       
+        db.begin();
+        writer.println( "Begin transaction" );
+        
+        // Look up the product and if found in the database,
+        // delete this object from the database
+        newProductOql = (OQLQueryImpl) db.getOQLQuery();
+        newProductOql.newCreate( "SELECT p FROM myapp.Product p WHERE id = $1" );
+        newProductOql.newBind( new Integer(4) );
+        enum = newProductOql.execute();
+        if ( enum.hasMoreElements() ) {
+            product = (Product) enum.nextElement();
+            writer.println( "Deleting existing product: " + product );
+            db.remove(  product );
+        }
+        
+        // Look up the computer and if found in the database,
+        // delete ethis object from the database
+        newComputerOql = (OQLQueryImpl) db.getOQLQuery();
+        newComputerOql.newCreate("SELECT c FROM myapp.Computer c WHERE id = $1" );
+        newComputerOql.newBind( new Integer(6) );
+        enum = newComputerOql.execute();
+        if ( enum.hasMoreElements() ) {
+            computer = (Computer) enum.nextElement();
+            writer.println( "Deleting existing computer: " + computer );
+            db.remove( computer );
+        }
+        
+        // Look up the group and if found in the database,
+        // delete this object from the database
+        newGroupOql = (OQLQueryImpl) db.getOQLQuery();
+        newGroupOql.newCreate( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
+        newGroupOql.newBind( new Integer(3) );
+        enum = newGroupOql.execute();
+        if ( enum.hasMoreElements() ) {
+            group = (ProductGroup) enum.nextElement();
+            writer.println( "Deleting existing group: " + group );
+            db.remove( group );
+        }
+        
+        
+        // Checkpoint commits all the updates to the database
+        // but leaves the transaction (and locks) open
+        writer.println( "Transaction checkpoint" );
+        db.commit();
+
+        db.begin();
+        // If no such group exists in the database, create a new
+        // object and persist it
+        newGroupOql.newBind( new Integer(3) );
+        enum = newGroupOql.execute();
+        if ( ! enum.hasMoreElements() ) {
+            group = new ProductGroup();
+            group.setId( 3 );
+            group.setName( "a group" );
+            db.create( group );
+            writer.println( "Creating new group: " + group );
+        } else {
+            group = (ProductGroup) enum.nextElement();
+            writer.println( "Query result: " + group );
+        }
+        
+        // If no such product exists in the database, create a new
+        // object and persist it
+        // Note: product uses group, so group object has to be
+        //       created first, but can be persisted later
+        newProductOql.newBind( new Integer(4) );
+        enum = newProductOql.execute();
+        if ( ! enum.hasMoreElements() ) {
+            product = new Product();
+            product.setId( 4 );
+            product.setName( "some product" );
+            product.setPrice( 55 );
+            product.setGroup( group );
+            detail = new ProductDetail();
+            detail.setId( 1 );
+            detail.setName( "one" );
+            product.addDetail( detail );
+            detail = new ProductDetail();
+            detail.setId( 2 );
+            detail.setName( "two" );
+            product.addDetail( detail );
+            writer.println( "Creating new product: " + product );
+            db.create( product );
+        } else {
+            writer.println( "Query result: " + enum.nextElement() );
+        }
+        
+        // If no such computer exists in the database, create a new
+        // object and persist it
+        // Note: computer uses group, so group object has to be
+        //       created first, but can be persisted later
+        newComputerOql.newBind( new Integer( 6 ));
+        enum = newComputerOql.execute();
+        if ( ! enum.hasMoreElements() ) {
+            computer = new Computer();
+            computer.setId( 6 );
+            computer.setCpu( "Pentium" );
+            computer.setName( "MyPC" );
+            computer.setPrice( 300 );
+            computer.setGroup( group );
+            detail = new ProductDetail();
+            detail.setId( 4 );
+            detail.setName( "mouse" );
+            computer.addDetail( detail );
+            detail = new ProductDetail();
+            detail.setId( 5 );
+            detail.setName( "screen" );
+            computer.addDetail( detail );
+            writer.println( "Creating new computer: " + computer );
+            db.create( computer );
+        } else {
+            writer.println( "Query result: " + enum.nextElement() );
+        }
+        writer.println( "Commit transaction" );
+        db.commit();
+
+        //Serializer  ser;
+        //Marshaller  marshal;
+
+        ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
+        ser.setOutputCharStream( writer );
+        marshal = new Marshaller( ser.asDocumentHandler() );
+        marshal.setMapping( _mapping );
+
+        db.begin();
+        newProductOql = (OQLQueryImpl)db.getOQLQuery();
+        newProductOql.newCreate( "SELECT p FROM myapp.Product p" );
+        enum = newProductOql.execute();
+        ser.asDocumentHandler().startDocument();
+        ser.asDocumentHandler().startElement( "products", null );
+        while( enum.hasMoreElements() )
+            marshal.marshal( enum.nextElement() );
+        ser.asDocumentHandler().endElement( "products" );
+        ser.asDocumentHandler().endDocument();
+
+        db.commit();
+
+
         db.close();
     }
 

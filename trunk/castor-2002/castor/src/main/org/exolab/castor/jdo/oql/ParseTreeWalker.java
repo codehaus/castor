@@ -98,6 +98,9 @@ public class ParseTreeWalker implements TokenTypes
     _dbEngine = dbEngine;
     _parseTree = parseTree;
 
+    _paramInfo = new Hashtable();
+    _fieldInfo = new Hashtable();
+
     if ( ! _parseTree.isRoot() )
       throw (new QueryException( "ParseTreeWalker must be created with the root node of the parse tree."));
 
@@ -155,11 +158,36 @@ public class ParseTreeWalker implements TokenTypes
     //get the class name from the from clause
     ParseTreeNode fromPart = _parseTree.getChild(1).getChild(0);
     if (fromPart.getToken().getTokenType() ==  KEYWORD_AS) {
-      _fromClassName = fromPart.getChild(0).getToken().getTokenValue();
+      ParseTreeNode classNameNode = fromPart.getChild(0);
+      if ( classNameNode.getToken().getTokenType() == DOT ) {
+        StringBuffer sb = new StringBuffer();
+        
+        for (Enumeration e = classNameNode.children(); e.hasMoreElements(); ) {
+          ParseTreeNode theChild = (ParseTreeNode) e.nextElement();
+          sb.append( theChild.getToken().getTokenValue() ).append(".");
+        }
+          
+        _fromClassName = sb.deleteCharAt( sb.length() - 1 ).toString();
+      }
+      else
+        _fromClassName = classNameNode.getToken().getTokenValue();
+        
       _fromClassAlias = fromPart.getChild(1).getToken().getTokenValue();
     }
     else {
-      _fromClassName = fromPart.getToken().getTokenValue();
+      if ( fromPart.getToken().getTokenType() == DOT ) {
+        StringBuffer sb = new StringBuffer();
+        
+        for (Enumeration e = fromPart.children(); e.hasMoreElements(); ) {
+          ParseTreeNode theChild = (ParseTreeNode) e.nextElement();
+          sb.append( theChild.getToken().getTokenValue() ).append(".");
+        }
+          
+        _fromClassName = sb.deleteCharAt( sb.length() - 1 ).toString();        
+      }
+      else
+        _fromClassName = fromPart.getToken().getTokenValue();
+        
       _fromClassAlias = _fromClassName;
     }
     
@@ -356,11 +384,18 @@ public class ParseTreeWalker implements TokenTypes
     int SQLParamIndex = 1;
     while ( pos != -1 ) {
       int endPos = sqlExpr.indexOf(" ", pos);
-      Integer paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos - 1));
+      Integer paramNumber = null;
+      if ( endPos != -1 )
+        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos - 1));
+      else
+        paramNumber = new Integer(sqlExpr.substring(pos + 1));
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
       paramInfo.mapToSQLParam( SQLParamIndex++ );
       sb.append(sqlExpr.substring(0, pos + 1)).append(" ");
-      sqlExpr = sqlExpr.substring(endPos);
+      if (endPos != -1 )
+        sqlExpr = sqlExpr.substring(endPos);
+      else
+        sqlExpr = "";
       pos = sqlExpr.indexOf("?");
     }
     sb.append(sqlExpr);

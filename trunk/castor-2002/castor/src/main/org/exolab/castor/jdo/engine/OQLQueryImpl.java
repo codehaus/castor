@@ -150,9 +150,9 @@ public class OQLQueryImpl
             throw new IllegalArgumentException( "Only " + _newBindTypes.size() +
                                                 " fields in this query" );
         try {
-            ParamInfo info = (ParamInfo) _newBindTypes.get(new Integer( _fieldNum ));
+            ParamInfo info = (ParamInfo) _newBindTypes.get(new Integer( _fieldNum + 1 ));
             
-            if ( value != null && ! info.getClass().isAssignableFrom( value.getClass() ) )
+            if ( value != null && ! info.getTheClass().isAssignableFrom( value.getClass() ) )
                 throw new IllegalArgumentException( "Query paramter " + _fieldNum + " is not of the expected type " + 
                                                     _bindTypes[ _fieldNum ].getName() );
             if ( _bindValues == null )
@@ -161,7 +161,7 @@ public class OQLQueryImpl
             for (Enumeration e = info.getParamMap().elements(); e.hasMoreElements(); )
             {
                 int fieldNum = ( (Integer) e.nextElement() ).intValue();
-                _bindValues[ fieldNum ] = value;
+                _bindValues[ fieldNum - 1 ] = value;
             }
             
         } catch ( IllegalArgumentException except ) {
@@ -230,7 +230,7 @@ public class OQLQueryImpl
 
         _objClass = walker.getObjClass();
         _expr = walker.getQueryExpression();
-        //        _newBindTypes = walker.getBindTypes();
+        _newBindTypes = walker.getParamInfo();
 
 
         //port new bind types back to the format of old bind types.
@@ -247,7 +247,7 @@ public class OQLQueryImpl
         }
         
         //then create the types array and fill it
-        _bindTypes = new Class[max - 1];
+        _bindTypes = new Class[max];
         for (Enumeration e = _newBindTypes.elements(); e.hasMoreElements(); ) 
         {
             ParamInfo info = (ParamInfo) e.nextElement();

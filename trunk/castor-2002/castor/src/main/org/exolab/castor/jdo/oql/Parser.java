@@ -201,7 +201,12 @@ public class Parser implements TokenTypes {
   
   /**
    * Consumes tokens of iteratorDef (the tables in the from part of an OQL 
-   * query).  This method also does a transformation.  In OQL, the following 
+   * query).  The EBNF grammar for iteratorDef looks like this:
+   * <pre>
+   *  iteratorDef             ::= identifier{.identifier} [ [as ] identifier ]
+   *                            | identifier in identifier{.identifier}
+   * </pre>
+   * This method also does a transformation.  In OQL, the following 
    * iteratorDefs are equivalent:
    * <pre>
    *  x as a
@@ -222,7 +227,19 @@ public class Parser implements TokenTypes {
             throws InvalidCharException, OQLSyntaxException {
     
     ParseTreeNode retNode = null;
-    ParseTreeNode tableIdentifier = match(IDENTIFIER);
+    ParseTreeNode tableIdentifier = null;
+
+    if ( _nextToken.getTokenType() == DOT ) {
+      tableIdentifier = new ParseTreeNode( new Token( DOT, "." ) );
+      tableIdentifier.addChild( match( IDENTIFIER ) );
+    }
+    else
+      tableIdentifier = match(IDENTIFIER);
+
+    while ( _curToken.getTokenType() == DOT ) {
+      match( DOT );
+      tableIdentifier.addChild( match( IDENTIFIER ) );
+    }
 
     if (_curToken.getTokenType() == KEYWORD_AS) {
       retNode = match(KEYWORD_AS);
@@ -235,9 +252,25 @@ public class Parser implements TokenTypes {
       retNode.addChild(match(IDENTIFIER));
     }
     else if (_curToken.getTokenType() == KEYWORD_IN) {
+      if ( tableIdentifier.getChildCount() > 0 ) 
+        throw new OQLSyntaxException( "Only the class name in the from clause can contain dots." );
       match(KEYWORD_IN);
       retNode = new ParseTreeNode(new Token(KEYWORD_AS, "as"));
-      retNode.addChild(match(IDENTIFIER));
+      
+      ParseTreeNode classNode = null;
+      if ( _nextToken.getTokenType() == DOT ) {
+        classNode = new ParseTreeNode ( new Token( DOT, "." ) );
+        classNode.addChild( match( IDENTIFIER ) );
+      }
+      else
+        classNode = match( IDENTIFIER );
+        
+      while ( _curToken.getTokenType() == DOT ) {
+        match( DOT );
+        classNode.addChild( match( IDENTIFIER ) );
+      }
+      
+      retNode.addChild( classNode );
       retNode.addChild(tableIdentifier);
     }
 
