@@ -689,6 +689,8 @@ public class SchemaWriter {
             XMLType type = element.getType();
             if (type.isComplexType())
                 processComplexType((ComplexType) type, schemaPrefix);
+            else
+                processSimpleType((SimpleType)type, schemaPrefix);
         }
 
         //-- process any identity-constraints
