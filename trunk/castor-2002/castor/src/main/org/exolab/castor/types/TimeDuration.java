@@ -523,12 +523,21 @@ public class TimeDuration  {
     } //parse
 
     /**
+     * Override the java.lang.equals method
+     * @see equal
+     */
+     public boolean equals(Object object) {
+        if (object instanceof TimeDuration)
+               return equal( (TimeDuration) object);
+        else return false;
+    }
+    /**
      * Returns true if the instance of TimeDuration has the same fields
      * of the parameter
      * @param timeD the time duration to compare
      * @return true if equal, false if not
      */
-    public boolean equals(TimeDuration timeD) {
+    public boolean equal(TimeDuration timeD) {
         boolean result = false;
         if (timeD == null)
             return result;

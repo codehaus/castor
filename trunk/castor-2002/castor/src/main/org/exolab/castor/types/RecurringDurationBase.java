@@ -376,6 +376,21 @@ public class RecurringDurationBase {
         return _zoneNegative;
     }
 
+     /**
+     * Override the java.lang.equals method
+     * @see equal
+     */
+     public boolean equals(Object object) {
+        if (object instanceof RecurringDurationBase) {
+            try {
+                return equal( (RecurringDurationBase) object);
+            } catch (ValidationException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        else return false;
+    }
     /**
      * <p> Returns true if the present instance of Recurring Duration Base is equal to
      * the parameter.
@@ -384,7 +399,7 @@ public class RecurringDurationBase {
      * @param reccD the recurring duration to compare with the present instance
      * @return true if the present instance is equal to the parameter false if not
      */
-     public boolean equals(RecurringDurationBase reccD) throws ValidationException
+     public boolean equal(RecurringDurationBase reccD) throws ValidationException
      {
         boolean result = false;
          if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
