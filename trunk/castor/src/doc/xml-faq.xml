@@ -27,6 +27,44 @@
                </code>
             </p>
             </section>
+            <section title="I'm getting an error about 'xml' prefix already declared?">
+            <p>For Castor 0.9.5.2</p>
+            <p>
+            The issue occurs with newer versions of Xerces than the version 1.4 that ships
+            with Castor. The older version works ok. For some reason, when the newer
+            version of Xerces encounters an "xml" prefixed attribute, such as
+            "xml:lang" it tries to automatically start a prefix mapping for "xml".
+            Which, in my opinion, is technically incorrect. They shouldn't be doing
+            that. According to the w3c, the "xml" prefix should never be declared.
+            <p/>
+            The reason it started appearing in the new Castor (0.9.5.2), was because
+            of a switch to SAX 2 by default during unmarshalling.
+            </p>
+            <p>
+               <b>Solution:</b><br/>
+
+                A built in work-around has been checked into the Castor CVS and will
+                automatically exist in any post 0.9.5.2 releases. For those who are
+                using 0.9.5.2 and can't upgrade I found a simple workaround
+               (tested with Xerces 2.5) , at first I thought about disabling namespace
+               processing in Xerces, but then realized that it's already disabled by
+               default by Castor...so I have no idea why they call #startPrefixMapping
+               when namespace processing has been disabled. But in any event...
+               explicitly enabling namespace processing seems to fix the problem:
+               <p/>
+               <pre>
+                  in the castor.properties file change the following line:
+
+                  org.exolab.castor.parser.namespaces=false
+
+                  to:
+
+                  org.exolab.castor.parser.namespaces=true
+              </pre>
+              Note: that work-around has only been tested with Xerces 2.5.
+            </p>
+            </section>
+
             <section title="Why is my 'get' method called twice?">
             <p>
                The get method will be called a second time during the
