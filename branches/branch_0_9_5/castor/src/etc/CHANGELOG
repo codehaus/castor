@@ -2,6 +2,33 @@
 Version (CVS) 
 -------------
 
+XML:   Added support for namespace to package mappings on the Unmarshaller
+       and UnmarshalHandler. This basically fixes issues where Castor
+       can't find the right package to look for classes during 
+       unmarshalling. This is main for those people using generated
+       source code, as using a mapping file you must specify the
+       packages and namespaces appropriately.
+       (kvisco - 20041104)
+
+XML:   Fixed bug in SourceGenerator where class names for SimpleType
+       instances with Enumeration facets were not getting resolved properly.
+       (kvisco - 20041104)
+
+XML:   Fixed bug 1685, A StackOverflowError was occuring at certain times
+       during container processing if the input XML was invalid.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1685
+       (kvisco - 20041005)
+
+XML:   Fixed StackOverflowError in FieldValidator which can occur during
+       validation of object models with circular references.
+       (kvisco - 20041005)
+
+XML:   Fixed bug 1592: DecimalValidator was not taking into account a leading
+       sign ('+' or '-').
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1592
+       (kvisco - 20041004)
+
+
 XML:   Fixed bug 1666: UnmarshalState._markedList Vector is a performance 
        bottleneck. Applied patch from David Thal which replaces the
        Vector with a HashSet.
