@@ -64,16 +64,17 @@ import java.util.Hashtable;
 import java.util.Properties;
 
 /**
- * A Java Source generation tool using XML Schema definitions
+ * A Java Source generation tool which uses XML Schema definitions
+ * to create an Object model
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class SourceGenerator {
 
-    static final String appName = "XML Data Binder for Java";
+    static final String appName = "Castor XML Data Binder for Java";
     static String DEFAULT_PARSER_CLASS = "org.apache.xerces.parsers.SAXParser";
     
-    private static final String version = "1.0 alpha (19991025)";
+    private static final String version = "0.8 (20000114)";
     
     private String lineSeparator = null;
     
