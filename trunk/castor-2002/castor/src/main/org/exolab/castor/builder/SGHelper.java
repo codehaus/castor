@@ -56,19 +56,19 @@ class SGHelper {
     
        
     /**
-     * Creates a get access method for the given member
-     * @param member the JMember to create the get access method for
+     * Creates a get access method for the given field
+     * @param field the JField to create the get access method for
      * @return the JMethod representing the get access method
     **/
-    protected static JMethod createGetMethod(JMember member) {
+    protected static JMethod createGetMethod(JField field) {
         
-        String methodName = "get"+ member.getName().substring(1);
+        String methodName = "get"+ field.getName().substring(1);
         
-        JMethod method = new JMethod(member.getType(), methodName);
+        JMethod method = new JMethod(field.getType(), methodName);
         
         JSourceCode jsc = method.getSourceCode();
         jsc.add("return this.");
-        jsc.append(member.getName());
+        jsc.append(field.getName());
         jsc.append(";");
         
         return method;
@@ -77,21 +77,21 @@ class SGHelper {
 
     
     /**
-     * Creates a set access method for the given member
-     * @param member the JMember to create the set access method for
+     * Creates a set access method for the given field
+     * @param field the JField to create the set access method for
      * @return the JMethod representing the set access method
     **/
-    protected static JMethod createSetMethod(JMember member) {
+    protected static JMethod createSetMethod(JField field) {
         
-        String methodName = "set"+ member.getName().substring(1);
+        String methodName = "set"+ field.getName().substring(1);
         
         JMethod method = new JMethod(null, methodName);
-        JParameter param = new JParameter(member.getType(), member.getName());
+        JParameter param = new JParameter(field.getType(), field.getName());
         method.addParameter(param);
         
         JSourceCode jsc = method.getSourceCode();
         jsc.add("this.");
-        jsc.append(member.getName());
+        jsc.append(field.getName());
         jsc.append(" = ");
         jsc.append(param.getName());
         jsc.append(";");

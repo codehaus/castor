@@ -131,46 +131,49 @@ public class FieldInfo extends XMLInfo {
         
         JType jType = type.getJType();
         
-        JMember jMember = new JMember(type.getJType(), name);
+        JField field = new JField(type.getJType(), name);
         
         if (_static || _final) {
-            JModifiers modifiers = jMember.getModifiers();
+            JModifiers modifiers = field.getModifiers();
             modifiers.setFinal(_final);
             modifiers.setStatic(_static);
         }
         
         //-- set init String
         if (_default != null) {
-            jMember.setInitString(_default);
+            field.setInitString(_default);
         }
         
         
         //-- set Javadoc comment
-        if (_comment != null) jMember.setComment(_comment);
+        if (_comment != null) field.setComment(_comment);
         
-        jClass.addMember(jMember);
-        
+        jClass.addField(field);
         
         //-- special supporting fields
         
         //-- has_field
         if ((!type.isEnumerated()) && type.isPrimitive()) {
-            jMember = new JMember(JType.Boolean, "_has" + name);
-            jMember.setComment("keeps track of state for field: " + name);
-            jClass.addMember(jMember);
+            field = new JField(JType.Boolean, "_has" + name);
+            field.setComment("keeps track of state for field: " + name);
+            jClass.addField(field);
         }
         
         //-- save default value for primitives
+        //-- not yet finished
+        /*
         if (type.isPrimitive()) {
-            jMember = new JMember(jType, "_DEFAULT" + name.toUpperCase());
-            JModifiers modifiers = jMember.getModifiers();
+            field = new JField(jType, "_DEFAULT" + name.toUpperCase());
+            JModifiers modifiers = field.getModifiers();
             modifiers.setFinal(true);
             modifiers.setStatic(true);
             
             if (_default != null)
-                jMember.setInitString(_default);
-           
+                field.setInitString(_default);
+            
+            jClass.addField(field);
         }
+        */
         
         
     } //-- createJavaField

@@ -131,12 +131,12 @@ public class DescriptorJClass extends JClass {
         addImport("org.exolab.castor.xml.validators.*");
         addImport("org.exolab.castor.xml.FieldValidator");
 
-        addMember(new JMember(SGTypes.String,  "nsPrefix"));
-        addMember(new JMember(SGTypes.String,  "nsURI"));
-        addMember(new JMember(SGTypes.String,  "xmlName"));
+        addField(new JField(SGTypes.String,  "nsPrefix"));
+        addField(new JField(SGTypes.String,  "nsURI"));
+        addField(new JField(SGTypes.String,  "xmlName"));
         //-- if there is a super class, the identity field must remain
         //-- the same than the one in the super class
-        addMember(new JMember(_XMLFieldDescriptorClass, "identity"));
+        addField(new JField(_XMLFieldDescriptorClass, "identity"));
 
         //-- create default constructor
         addConstructor( createConstructor() );
