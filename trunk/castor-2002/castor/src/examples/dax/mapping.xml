@@ -1,43 +1,27 @@
 <mapping>
 
-  <class class-name="dax.User">
-    <ldap-entry object-class="person"/>
-    <identity field-ref="uid"/>
+  <class name="dax.User" identity="uid">
+    <map-to ldap-oc="person" />
     <field name="uid" type="string" required="true">
-      <ldap-info name="uid"/>
+      <ldap name="uid" />
     </field>
     <field name="full" type="string" required="true">
-      <ldap-info name="cn"/>
+      <ldap name="cn" />
     </field>
     <field name="first" type="string" required="true">
-      <ldap-info name="givenname"/>
+      <ldap name="givenname" />
     </field>
     <field name="last" type="string" required="true">
-      <ldap-info name="sn"/>
+      <ldap name="sn" />
     </field>
     <field name="email" type="strings" required="true">
-      <ldap-info name="mail"/>
+      <ldap name="mail" />
     </field>
     <field name="ou" type="string" required="true">
-      <ldap-info name="ou"/>
+      <ldap name="ou" />
     </field>
   </class>
 
-<!--
-  <class class-name="dax.Record">
-    <ldap-entry object-class="person" misc-field="misc"/>
-    <identity field-ref="rdn"/>
-    <container name="rdn" type="dax.RDN">
-      <field name="ou" type="string" required="true">
-        <ldap-info name="ou"/>
-      </field>
-      <field name="uid" type="string" required="true">
-        <ldap-info name="uid"/>
-      </field>
-    </container>
-  </class>
-
--->
 </mapping>
 
 

@@ -190,7 +190,7 @@ public final class RelationHandler
 
     public String toString()
     {
-        return "Relation " + _handler;
+        return "Relation " + _handler + ( _multi ? " multi-valued" : ""  ) + ( _attached ? " attached" : "" ) ;
     }
 
 

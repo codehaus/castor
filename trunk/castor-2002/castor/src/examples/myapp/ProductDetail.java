@@ -1,28 +1,60 @@
 package myapp;
 
 
-import java.io.Serializable;
-
-
 public class ProductDetail
-    implements Serializable
 {
 
 
-    public int       id;
+    private int      _id;
 
 
-    public Product   product;
+    private Product  _product;
 
 
-    public String    name;
+    private String   _name;
 
 
-    public int getId() { return id; }
+    public int getId()
+    {
+        return _id;
+    }
 
-    public String getName() { return name; }
 
-    public Product getProduct() { return product; }
+    public void setId( int id )
+    {
+        _id = id;
+    }
+
+
+    public String getName()
+    {
+        return _name;
+    }
+
+
+    public void setName( String name )
+    {
+        _name = name;
+    }
+
+
+    public Product getProduct()
+    {
+        return _product;
+    }
+
+
+    public void setProduct( Product product )
+    {
+        _product = product;
+    }
+
+
+    public String toString()
+    {
+        return _id + " " + _name;
+    }
 
 
 }
+

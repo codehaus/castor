@@ -97,7 +97,8 @@
 
     <section title="TODO">
       <ul>
-        <li>Read-only queries or transactions</li>
+        <li>Add lock access mode and read-only queries or transactions</li>
+        <li>Add type convertors to bind parameters and load() method</li>
         <li>Update method - allow one object to be replaced with another, or an object to be introduced</li>
         <li>Refresh option - refresh flag to request a refresh (possibly also for OQLQuery)</li>
         <li>KeyGenerator - use one from SQLEngine, way to specify the key generator from the mapping file,

@@ -18,10 +18,6 @@ CLASSPATH=./build/classes:./build/tests:$CLASSPATH
 CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
 CLASSPATH=$JAVA_HOME/lib/tools.jar:$CLASSPATH
 
-if [ -z $1 ] ; then
-  echo "Usage: test <pkg>";
-  exit;
-fi
-$JAVA -cp $CLASSPATH $1.Test $2 $3 $4 $5 $6
+$JAVA -cp $CLASSPATH TestHarness $1 $2 $3 $4 $5 $6
 
 

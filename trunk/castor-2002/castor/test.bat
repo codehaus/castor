@@ -6,4 +6,4 @@ set cp=%CLASSPATH%
 for %%i in (lib\*.jar) do call cp.bat %%i
 set CP=%CP%;%JAVA_HOME%\lib\tools.jar
 
-%JAVA% -classpath %CP% %1.Test %2 %3 %4 %5 %6
+%JAVA% -classpath %CP% TestHarness %1 %2 %3 %4 %5 %6

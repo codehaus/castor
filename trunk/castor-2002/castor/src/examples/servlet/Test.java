@@ -84,6 +84,7 @@ public class Test
             Database      db;
             OQLQuery      oql;
             Object        result;
+            Marshaller    marshal;
 
             // Set the output type and stylesheet
             // response.setContentType( "text/html" );
@@ -108,6 +109,8 @@ public class Test
             oql = db.getOQLQuery( "SELECT p FROM myapp.Product p" );
             result = oql.execute();
 
+            marshal = new Marshaller( response.getDocumentHandler() );
+
             // Print all the products as elements under the root element
             // <products>, using the Marshaller.
             response.getDocumentHandler().startDocument();
@@ -117,9 +120,9 @@ public class Test
 
                 enum = (Enumeration) result;
                 while( enum.hasMoreElements() )
-                    Marshaller.marshal( enum.nextElement(), response.getDocumentHandler() );
+                   marshal.marshal( enum.nextElement() );
             } else 
-                Marshaller.marshal( result, response.getDocumentHandler() );
+                marshal.marshal( result );
 
             // Close the document, transaction and database.
             response.getDocumentHandler().endElement( "products" );
