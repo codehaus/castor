@@ -612,7 +612,12 @@ public abstract class TransactionContext
             // to prevent circular references
             if ( entry.object == object ) 
                 return oid;
-            throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
+            //[Oleg] in some cases (deletion of dependent objects) objects
+            //that were previously loaded in this transaction by the same 
+            //update() call must be replaced. Thus, we must allow this.
+            //I don't see other way.
+            release( entry.object );
+            //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
 
         // to prevent circular references
