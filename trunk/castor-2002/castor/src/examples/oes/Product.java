@@ -158,7 +158,7 @@ public class Product
     }
 
 
-    public Class jdoLoad()
+    public Class jdoLoad(short accessMode)
     {
         return null;
     }

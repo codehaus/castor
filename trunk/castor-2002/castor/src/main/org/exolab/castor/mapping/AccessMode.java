@@ -47,6 +47,11 @@
 package org.exolab.castor.mapping;
 
 
+
+import org.exolab.castor.jdo.Database;
+
+
+
 /**
  * The access mode for a class. This object is used by class
  * descriptors to specify the access mode for a class.
@@ -145,4 +150,20 @@ public class AccessMode
     }
 
 
+    /**
+     * Returnes the correspondent Database constant
+     */ 
+    public short toShort()
+    {
+        if ( this == Shared )
+            return Database.Shared;
+        if ( this == ReadOnly )
+            return Database.ReadOnly;
+        if ( this == DbLocked )
+            return Database.DbLocked;
+        if ( this == Exclusive )
+            return Database.Exclusive;
+        // never happens
+        return -1;
+    }
 } //-- AccessMode

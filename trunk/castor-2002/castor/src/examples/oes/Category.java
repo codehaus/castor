@@ -103,7 +103,7 @@ public class Category
     }
 
 
-    public Class jdoLoad()
+    public Class jdoLoad(short accessMode)
     {
         return null;
     }

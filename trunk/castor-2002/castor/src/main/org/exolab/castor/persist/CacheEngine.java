@@ -1573,6 +1573,42 @@ public final class CacheEngine
 
 
     /**
+     * Called to release lock held on the object and all its dependents.
+     * Is used to provide the ReadOnly mode.
+     *
+     * @param tx The transaction context
+     * @param oid The object OID
+     */
+    public void releaseLockWithDependent( TransactionContext tx, OID oid )
+    {
+        ObjectLock lock;
+        TypeInfo   typeInfo;
+        Object[]   fields;
+
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
+        oid.setDbLock( false );
+        //System.out.println("CacheEngine.realeaseLock!");
+        lock = typeInfo.cache.getLockForAquire( oid );
+        if ( lock != null ) {
+            try {
+                fields = (Object[]) lock.acquire( tx, true, 0 );
+        
+                // Release lock for all the dependent objects
+                typeInfo.handler.releaseDependent( fields, tx, this );
+        
+            } catch ( LockNotGrantedException except ) {
+            } finally {
+                // signal cache that it's now safe to release the object
+                // from transcation state to cache state.
+                if ( lock.hasLock( tx, false ) )
+                    lock.release( tx );
+                typeInfo.cache.finishLockForAquire( oid );
+            }
+        }
+    }
+
+
+    /**
      * Called at transaction commit or rollback to forget an object
      * and release its locks. Must be called for all objects that were
      * created when the transaction aborts, and for all objects that

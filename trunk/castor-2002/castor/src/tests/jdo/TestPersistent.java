@@ -227,14 +227,14 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }                        
 
 
-    public Class jdoLoad()
+    public Class jdoLoad(short accessMode)
         throws Exception
     {
         Query        qry;
         QueryResults res;
         
         if ( _parentId != null ) 
-            _parent = (TestPersistent) _db.load( TestPersistent.class, _parentId );
+            _parent = (TestPersistent) _db.load( TestPersistent.class, _parentId, accessMode );
         
         qry = _db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE parentId=$1" );
         qry.bind( _id );

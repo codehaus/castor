@@ -401,7 +401,7 @@ public abstract class TransactionContext
                 Class reloadClass;
 
                 handler.getCallback().using( object, _db );
-                reloadClass = handler.getCallback().loaded( object );
+                reloadClass = handler.getCallback().loaded( object, accessMode.toShort() );
                 if ( reloadClass != null && object.getClass() != reloadClass ) {
                     release( object );
                     engine.forgetObject( this, oid );
@@ -421,7 +421,7 @@ public abstract class TransactionContext
 
         if ( accessMode == AccessMode.ReadOnly ) {
             removeObjectEntryWithDependent( object );
-            engine.releaseLock( this, oid );
+            engine.releaseLockWithDependent( this, oid );
         }
         return object;
     }
@@ -829,7 +829,7 @@ public abstract class TransactionContext
         //    throw new ObjectNotPersistentExceptionImpl( object.getClass() );
 
         // Release the lock, forget about the object in this transaction
-        entry.engine.releaseLock( this, entry.oid );
+        entry.engine.releaseLockWithDependent( this, entry.oid );
         removeObjectEntryWithDependent( object );
         handler = entry.engine.getClassHandler( object.getClass() );
         if ( handler.getCallback() != null )

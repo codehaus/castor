@@ -136,7 +136,7 @@ public class Product implements Persistent
     }
 
 
-    public Class jdoLoad()
+    public Class jdoLoad(short accessMode)
     {
         if ( _name.indexOf("PC") >= 0 ) {
             return Computer.class;

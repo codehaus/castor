@@ -839,6 +839,30 @@ public final class ClassHandler
     }
 
 
+    /**
+     * Release lock for all dependent objects in the cache
+     *
+     * @param fields The fields of the object from the cache
+     * @param tx The transaction context
+     * @param cache The cache engine
+     * @throws PersistenceException An error forgetting the dependent objects
+     */
+    void releaseDependent( Object[] fields, TransactionContext tx, CacheEngine cache )
+    {
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            if ( _fields[ i ].relation != null && _fields[ i ].multi && fields[ i ] != null ) {
+                Enumeration enum;
+                ClassHandler handler;
+
+                handler = _fields[ i ].relation.getRelatedHandler();
+                for ( enum = ((Vector) fields[ i ]).elements(); enum.hasMoreElements(); ) {
+                    cache.releaseLockWithDependent( tx, new OID( handler, enum.nextElement() ) );
+                }
+            }
+        }
+    }
+
+
     public String toString()
     {
         return _clsDesc.toString();

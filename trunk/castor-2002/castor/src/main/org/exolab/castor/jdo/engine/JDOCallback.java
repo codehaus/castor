@@ -68,10 +68,10 @@ public class JDOCallback
     }
 
 
-    public Class loaded( Object object )
+    public Class loaded( Object object, short accessMode )
         throws Exception
     {
-        return ( (Persistent) object ).jdoLoad();
+        return ( (Persistent) object ).jdoLoad(accessMode);
     }
 
 
