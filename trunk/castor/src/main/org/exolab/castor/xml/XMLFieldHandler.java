@@ -66,7 +66,6 @@ public class XMLFieldHandler
     extends AbstractFieldHandler
 {
 
-    private boolean
     /**
      * Creates a new default XMLFieldHandler
      */
