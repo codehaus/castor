@@ -1,3 +1,16 @@
+Version 0.7.6  February 1, 2000
+-------------------------------
+
+DAX:  First appearance of the DAX implementation based on the Mozilla
+      Directory SDK, using the persistence cache engine and the new
+      mapping DTD.
+
+Mapping: The mapping package has been upgraded to the new mapping DTD,
+      and gained an XML sub-package that can be used to serialize
+      mapping information. MappingResolver and MappingHelper are used
+      to convert mapping files into descriptors.
+
+
 Version 0.7.5  January 28, 2000
 -------------------------------
 

@@ -1,23 +1,26 @@
-<directories>
-  <directory dir-name="local" root="dc=exoffice,dc=com">
-    <connection host="localhost" ldap-ver="2"/>
-    <mapping>
-      <object type="dax.Person"
-              ldap-class="person"
-        <field name="first" ldap-name="sn"/>
-        <field name="full" ldap-name="cn"/>
-        <field name="last" ldap-name="givenname"/>
-        <field name="uid" ldap-name="uid"/>
-        <field name="email" ldap-name="mail"/>
-        <field name="password" ldap-name="user-password"/>
-        <field name="other" type="attributes"/>
-        <fixed name="ou" ldap-name="ou" value="People"/>
-        <ldap-dn>
-	  <field-ref name="ou"/>
-          <field-ref name="uid"/>
-          <field name="dn" type="attributes"/>
-        </ldap-dn>
-      </object>
-    </mapping>
-  </directory>
-</directories>
+<mapping>
+  <object type="dax.User">
+    <ldap-entry object-class="person"/>
+    <identity field-ref="uid"/>
+    <field name="uid" type="string" required="true">
+      <ldap-info name="uid"/>
+    </field>
+    <field name="full" type="string" required="true">
+      <ldap-info name="cn"/>
+    </field>
+    <field name="first" type="string" required="true">
+      <ldap-info name="givenname"/>
+    </field>
+    <field name="last" type="string" required="true">
+      <ldap-info name="sn"/>
+    </field>
+    <field name="email" type="strings" required="true">
+      <ldap-info name="mail"/>
+    </field>
+    <field name="ou" type="string" required="true">
+      <ldap-info name="ou"/>
+    </field>
+  </object>
+</mapping>
+
+

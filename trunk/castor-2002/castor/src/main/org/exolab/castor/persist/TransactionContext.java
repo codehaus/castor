@@ -225,7 +225,7 @@ public class TransactionContext
      *  persistence engine
      */
     public synchronized boolean load( CacheEngine cache, Object obj,
-				   Object identity, int accessMode )
+				      Object identity, int accessMode )
 	throws TransactionNotInProgressException, ObjectNotFoundException,
 	       LockNotGrantedException, PersistenceException
     {
