@@ -52,6 +52,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -61,6 +62,7 @@ import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.QueryException;
 import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
@@ -80,12 +82,12 @@ import org.exolab.castor.util.Messages;
  * access to a single persistent storage. Type of access depends on
  * the mode in which this database is opened. The SQL database being
  * accessed as well as the mapping supported are defined through
- * {@link DatabaseSource}. Operations are not allowed unless the
+ * {@link DatabaseRegistry}. Operations are not allowed unless the
  * current thread is associated with a transaction.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see DatabaseSource
+ * @see DatabaseRegistry
  */
 public final class DatabaseImpl
     implements Database, XAResource
@@ -113,49 +115,41 @@ public final class DatabaseImpl
     private TransactionContext _ctx;
 
 
-    private PrintWriter      _logWriter;
-
-
-    private int              _lockWaitTimeout = 10000;
-
-
-    public DatabaseImpl( String dbName )
+    public DatabaseImpl( String dbName, PrintWriter logWriter )
         throws DatabaseNotFoundException
     {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
         // locking mode.
-        DatabaseSource dbs;
+        DatabaseRegistry dbs;
         
         try {
-            dbs = DatabaseSource.getDatabaseSource( dbName );
+            dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
         } catch ( MappingException except ) {
             throw new DatabaseNotFoundException( except.getMessage() );
         }
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
-        _dbEngine = DatabaseSource.getPersistenceEngine( dbs );
+        _dbEngine = DatabaseRegistry.getPersistenceEngine( dbs );
+        if ( logWriter != null )
+            _dbEngine.setLogWriter( logWriter );
     }
 
 
+    /*
     public DatabaseImpl( PersistenceEngine dbEngine )
     {
         if ( dbEngine == null )
             throw new IllegalArgumentException( "Argument 'dbEngine' is null" );
         _dbEngine = dbEngine;
     }
+    */
 
 
-    public void setLogWriter( PrintWriter logWriter )
+    PersistenceEngine getPersistenceEngine()
     {
-        _logWriter = logWriter;
-    }
-
-
-    public PrintWriter getLogWriter()
-    {
-        return _logWriter;
+        return _dbEngine;
     }
 
 
@@ -280,6 +274,23 @@ public final class DatabaseImpl
         } catch ( LockNotGrantedException except ) {
             throw new PersistenceExceptionImpl( except );
         }
+    }
+
+
+    public OQLQuery getOQLQuery()
+    {
+        return new OQLQueryImpl( this );
+    }
+
+
+    public OQLQuery getOQLQuery( String oql )
+        throws QueryException
+    {
+        OQLQuery oqlImpl;
+
+        oqlImpl = new OQLQueryImpl( this );
+        oqlImpl.create( oql );
+        return oqlImpl;
     }
     
     
