@@ -148,6 +148,13 @@
                 </td>         
                <td>Optional</td>
              </tr>
+             <tr>
+               <td align="center">generateImportedSchemas</td><td><br/></td>
+               <td>
+                  Generates automatically sources for imported XML Schemas (default is false).
+                </td>         
+               <td>Optional</td>
+             </tr>
           </table>
 
          <section title="Collection Types">
