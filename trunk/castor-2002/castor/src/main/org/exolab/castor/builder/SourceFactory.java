@@ -96,6 +96,7 @@ public class SourceFactory  {
 	 */
 	private boolean _testable = false;
 
+    
     /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
@@ -116,6 +117,7 @@ public class SourceFactory  {
             this.infoFactory = infoFactory;
 
         this.memberFactory = new MemberFactory(infoFactory);
+        
     } //-- SourceFactory
 
    /**
@@ -158,8 +160,15 @@ public class SourceFactory  {
 	 * @param createMarshall whether or not to create marshalling framework methods
     **/
     public JClass[] createSourceCode
-        (ElementDecl element, ClassInfoResolver resolver, String packageName)
+        (ElementDecl element, SGStateInfo sgState)
     {
+        if (element == null) {
+            throw new IllegalStateException("ElementDecl may not be null.");
+        }
+        if (sgState == null) {
+            throw new IllegalStateException("SGStateInfo may not be null.");
+        }
+        
         FactoryState state = null;
         JClass[] classes = new JClass[1];
 		boolean createGroupItem = false;
@@ -178,9 +187,9 @@ public class SourceFactory  {
             }
         }
 
-        className = resolveClassName(className, packageName);
+        className = resolveClassName(className, sgState.packageName);
 
-        state = new FactoryState(className, resolver, packageName);
+        state = new FactoryState(className, sgState);
 		//-- mark this element as being processed in this current
         //-- state to prevent the possibility of endless recursion
         ElementDecl tmpDecl = element;
@@ -227,7 +236,7 @@ public class SourceFactory  {
 				 if (!state.processed(complexType))
 					processComplexType( complexType, state);
                  if (createGroupItem) {
-                     resolver.bindReference(jClass, classInfo);
+                     sgState.bindReference(jClass, classInfo);
                      classes[1] = jClass;
 
                       //-- create main group class
@@ -238,7 +247,7 @@ public class SourceFactory  {
                       fInfo.setContainer(true);
                       className = className.substring(0,className.length()-4);
 
-                      state     = new FactoryState(className, resolver, packageName);
+                      state     = new FactoryState(className, sgState);
 		              classInfo = state.classInfo;
                       jClass    = state.jClass;
 		              initialize(jClass);
@@ -266,7 +275,7 @@ public class SourceFactory  {
             else {
                 String typeName = complexType.getName();
                 String superClass = JavaNaming.toJavaClassName(typeName);
-                superClass = resolveClassName(superClass, packageName);
+                superClass = resolveClassName(superClass, sgState.packageName);
                 jClass.setSuperClass(superClass);
                 derived = true;
             }
@@ -277,7 +286,7 @@ public class SourceFactory  {
             classInfo.setSchemaType(TypeConversion.convertType(simpleType));
             //-- handle our special case for enumerated types
             if (simpleType.hasFacet(Facet.ENUMERATION)) {
-                createSourceCode(simpleType, state, state.packageName);
+                createSourceCode(simpleType, sgState);
             }
         }
 
@@ -310,10 +319,9 @@ public class SourceFactory  {
 		if (state.hasBoundProperties() && (!realDerived))
 		    createPropertyChangeMethods(jClass);
 
-        if (resolver != null) {
-            resolver.bindReference(jClass, classInfo);
-            resolver.bindReference(element, classInfo);
-        }
+        sgState.bindReference(jClass, classInfo);
+        sgState.bindReference(element, classInfo);
+        
         classes[0] = jClass;
         return classes;
     } //-- createSourceCode
@@ -330,18 +338,21 @@ public class SourceFactory  {
      * @return the array of JClass objects created for the ComplexType
     **/
     public JClass[] createSourceCode
-        (ComplexType type, ClassInfoResolver resolver, String packageName)
+        (ComplexType type, SGStateInfo sgState)
     {
         if (type == null)
             throw new IllegalArgumentException("null ComplexType");
 
         if (!type.isTopLevel())
             throw new IllegalArgumentException("ComplexType is not top-level.");
+            
+        if (sgState == null)
+            throw new IllegalArgumentException("SGStateInfo cannot be null.");
 
         JClass[] classes = null;
 
         String className = JavaNaming.toJavaClassName(type.getName());
-        className = resolveClassName(className, packageName);
+        className = resolveClassName(className, sgState.packageName);
 
 
         boolean createGroupItem = false;
@@ -358,8 +369,7 @@ public class SourceFactory  {
             classes = new JClass[1];
         }
 
-        FactoryState state
-            = new FactoryState(className, resolver, packageName);
+        FactoryState state  = new FactoryState(className, sgState);
 		ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
 
@@ -380,9 +390,21 @@ public class SourceFactory  {
 
         processComplexType(type, state);
 
+        //-- check Group type
+        if (type.getParticleCount() == 1) {
+            Particle particle = type.getParticle(0);
+            if (particle.getStructureType() == Structure.GROUP) {
+                Group group = (Group) particle;
+                if (group.getOrder() == Order.choice) {
+                    classInfo.getGroupInfo().setAsChoice();
+                }
+            }
+        }
+
+
         if (createGroupItem) {
 
-            resolver.bindReference(jClass, classInfo);
+            sgState.bindReference(jClass, classInfo);
             classes[1] = jClass;
 
             //-- create main group class
@@ -393,7 +415,7 @@ public class SourceFactory  {
             fInfo.setContainer(true);
             className = className.substring(0,className.length()-4);
 
-            state     = new FactoryState(className, resolver, packageName);
+            state     = new FactoryState(className, sgState);
 		    classInfo = state.classInfo;
             jClass    = state.jClass;
 		    initialize(jClass);
@@ -414,6 +436,7 @@ public class SourceFactory  {
 
             //-- mark as a container
             classInfo.setContainer(true);
+            
         }
 
         //-- process annotation
@@ -451,10 +474,8 @@ public class SourceFactory  {
 		if (state.hasBoundProperties())
 		    createPropertyChangeMethods(jClass);
 
-		if (resolver != null) {
-            resolver.bindReference(jClass, classInfo);
-            resolver.bindReference(type, classInfo);
-        }
+        sgState.bindReference(jClass, classInfo);
+        sgState.bindReference(type, classInfo);
 
         classes[0] = jClass;
 
@@ -464,17 +485,23 @@ public class SourceFactory  {
 
     /**
      * Creates the Java source code to support the given Simpletype
+     *
      * @param simpletype the Simpletype to create the Java source for
+     * @param sgState the current SGStateInfo (cannot be null).
      * @return the JClass representation of the given Simpletype
     **/
     public JClass createSourceCode
-        (SimpleType simpleType, ClassInfoResolver resolver, String packageName)
+        (SimpleType simpleType, SGStateInfo sgState)
     {
 
         if ( SimpleTypesFactory.isBuiltInType( simpleType.getTypeCode() ) ) {
             String err = "You cannot construct a ClassInfo for a " +
                 "built-in SimpleType.";
             throw new IllegalArgumentException(err);
+        }
+        
+        if (sgState == null) {
+            throw new IllegalArgumentException("SGStateInfo cannot be null.");
         }
 
         boolean enumeration = false;
@@ -494,7 +521,8 @@ public class SourceFactory  {
             typeName += "Type";
         }
 
-        String className = JavaNaming.toJavaClassName(typeName);
+        String className   = JavaNaming.toJavaClassName(typeName);
+        String packageName = sgState.packageName;
 
         if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
@@ -508,8 +536,9 @@ public class SourceFactory  {
 
         className = resolveClassName(className, packageName);
 
-        FactoryState state
-            = new FactoryState(className, resolver, packageName);
+        FactoryState state = new FactoryState(className, sgState);
+        //-- reset package name
+        state.packageName = packageName;
 
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
@@ -540,10 +569,8 @@ public class SourceFactory  {
 		if (state.hasBoundProperties())
 		    createPropertyChangeMethods(jClass);
 
-        if (resolver != null) {
-            resolver.bindReference(jClass, classInfo);
-            resolver.bindReference(simpleType, classInfo);
-        }
+        sgState.bindReference(jClass, classInfo);
+        sgState.bindReference(simpleType, classInfo);
 
         return jClass;
 
@@ -558,21 +585,30 @@ public class SourceFactory  {
      * @param packageName the package to which generated classes should belong
     **/
     public JClass[] createSourceCode
-        (Group group, ClassInfoResolver resolver, String packageName)
+        (Group group, SGStateInfo sgState)
     {
 
-
+        if (group == null) {
+            throw new IllegalArgumentException("Group may not be null.");
+        }
+        if (sgState == null) {
+            throw new IllegalArgumentException("SGStateInfo may not be null.");            
+        }
+        
         String groupName = group.getName();
         if (groupName == null) {
-            throw new IllegalArgumentException("Currently unnamed groups are not supported.");
-            //groupName = "Group" + sgInfo.getNextGroupNumber();
+            groupName = sgState.getGroupNaming().createClassName(group);
+            if (groupName == null) {
+                String err = "Unable to create name for group";
+                throw new IllegalStateException(err);
+            }
         }
 
 
         JClass[] classes = null;
 
         String className = JavaNaming.toJavaClassName(groupName);
-        className = resolveClassName(className, packageName);
+        className = resolveClassName(className, sgState.packageName);
 
         boolean createGroupItem = false;
 
@@ -588,8 +624,7 @@ public class SourceFactory  {
         }
 
 
-        FactoryState state
-            = new FactoryState(className, resolver, packageName);
+        FactoryState state  = new FactoryState(className, sgState);
 		ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
 
@@ -605,13 +640,16 @@ public class SourceFactory  {
         //Schema  schema = group.getSchema();
         //classInfo.setNamespaceURI(schema.getTargetNamespace());
 
-
-        Order order = group.getOrder();
-        if (order == Order.choice) {
-            classInfo.getGroupInfo().setAsChoice();
-        }
-
         processContentModel(group, state);
+
+        //-- Check Group Type
+        Order order = group.getOrder();
+        if (order == Order.choice)
+            classInfo.getGroupInfo().setAsChoice();
+        else if (order == Order.seq)
+            classInfo.getGroupInfo().setAsSequence();
+        else
+            classInfo.getGroupInfo().setAsAll();
 
         if (createGroupItem) {
 
@@ -619,7 +657,7 @@ public class SourceFactory  {
 		    if (state.hasBoundProperties())
 		        createPropertyChangeMethods(jClass);
 
-            resolver.bindReference(jClass, classInfo);
+            sgState.bindReference(jClass, classInfo);
 
             classes[1] = jClass;
 
@@ -631,7 +669,7 @@ public class SourceFactory  {
             fInfo.setContainer(true);
             className = className.substring(0,className.length()-4);
 
-            state     = new FactoryState(className, resolver, packageName);
+            state     = new FactoryState(className, sgState);
 		    classInfo = state.classInfo;
             jClass    = state.jClass;
 		    initialize(jClass);
@@ -649,7 +687,7 @@ public class SourceFactory  {
 
             //-- mark as a container
             classInfo.setContainer(true);
-        }
+        }        
 
         //-- process annotation
         String comment  = processAnnotations(group);
@@ -676,8 +714,8 @@ public class SourceFactory  {
 		if (state.hasBoundProperties())
 		    createPropertyChangeMethods(jClass);
 
-        resolver.bindReference(jClass, classInfo);
-        resolver.bindReference(group, classInfo);
+        sgState.bindReference(jClass, classInfo);
+        sgState.bindReference(group, classInfo);
 
         //should be removed when the naming algorithm will be in place
         state.classInfo.setSchemaType(new XSClass(state.jClass, group.getName()));
@@ -1174,8 +1212,7 @@ public class SourceFactory  {
 
 					String packageName = state.jClass.getPackageName();
 					JClass[] classes = createSourceCode((ComplexType)base,
-					                                    state,
-					                                    packageName);
+					                                state.getSGStateInfo());
 					cInfo = state.resolve(base);
 					className = classes[0].getName();
 				}
@@ -1213,7 +1250,7 @@ public class SourceFactory  {
             SimpleType sType = attr.getSimpleType();
             if (sType != null) {
                 if ( ! (SimpleTypesFactory.isBuiltInType(sType.getTypeCode())) )
-                createSourceCode(sType, state, state.packageName);
+                createSourceCode(sType, state.getSGStateInfo());
             }
 
             FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
@@ -1325,8 +1362,7 @@ public class SourceFactory  {
 						//-- so that it's available to the MemberFactory
 						if ((state.resolve(struct) == null) && (!processed))
 						    createSourceCode((ElementDecl)struct,
-						                      state,
-						                      state.packageName);
+						                      state.getSGStateInfo());
 					}
 
                     fieldInfo
@@ -1354,22 +1390,12 @@ public class SourceFactory  {
                         handleField(fieldForAny, state);
                     }
 
-                    if (!((contentModel instanceof ComplexType)||
-                        (contentModel instanceof ModelGroup)) )
-                           nested = true;
-                    //--maxOccurs is one we set the compositor
-                    if (max == 1) {
-                        Order order = group.getOrder();
-                        if (order == Order.choice)
-                            state.classInfo.getGroupInfo().setAsChoice();
-                        else if (order == Order.seq)
-                            state.classInfo.getGroupInfo().setAsSequence();
-                        else
-                            state.classInfo.getGroupInfo().setAsAll();
-                    }
                     //-- create source code for the group,if necessary
-                    if (nested) {
-                        fieldInfo = memberFactory.createFieldInfo(group, state);
+                    if (!((contentModel instanceof ComplexType)||
+                        (contentModel instanceof ModelGroup)) ) 
+                    {
+                        fieldInfo = memberFactory.createFieldInfo(group, 
+                            state.getSGStateInfo());
                         handleField(fieldInfo, state);
                     }
                     //--else we just flatten the group
@@ -1395,7 +1421,8 @@ public class SourceFactory  {
                     //get the contentModel and proccess it
                     if (tmp.getContentModelGroup() != null) {
                           if (tmp.getName() != null) {
-                              fieldInfo = memberFactory.createFieldInfo(tmp, state);
+                              fieldInfo = memberFactory.createFieldInfo(tmp, 
+                                state.getSGStateInfo());
                               handleField(fieldInfo, state);
                               break;
                           } else processContentModel(tmp.getContentModelGroup(), state);
@@ -1829,13 +1856,14 @@ class FactoryState implements ClassInfoResolver {
     //- Member Variables -/
     //--------------------/
 
-    JClass    jClass           = null;
-    ClassInfo classInfo        = null;
-
+    JClass       jClass           = null;
+    ClassInfo    classInfo        = null;
+    
     String packageName         = null;
 
-    private ClassInfoResolver _resolver = null;
+    private ClassInfoResolver _resolver  = null;
     private Vector            _processed = null;
+    private SGStateInfo       _sgState   = null;
 
     /**
      * Keeps track of whether or not the BoundProperties
@@ -1850,30 +1878,26 @@ class FactoryState implements ClassInfoResolver {
     /**
      * Creates a new FactoryState
     **/
-    protected FactoryState(String className, ClassInfoResolver resolver) {
-        this(className, resolver, null);
-    } //-- FactoryState
-
-    /**
-     * Creates a new FactoryState
-    **/
     protected FactoryState
-        (String className, ClassInfoResolver resolver, String packageName)
+        (String className, SGStateInfo sgState)
     {
+        
+        if (sgState == null)
+            throw new IllegalArgumentException("SGStateInfo cannot be null.");
+            
+        _sgState     = sgState;
         _processed   = new Vector();
+        
 		//keep the elements and complexType already processed
-		if (resolver instanceof FactoryState)
-		   _processed = ((FactoryState)resolver)._processed;
+		//if (resolver instanceof FactoryState)
+		   //_processed = ((FactoryState)resolver)._processed;
 
         jClass       = new JClass(className);
         classInfo    = new ClassInfo(jClass);
 
-        if (resolver == null)
-            _resolver = new ClassInfoResolverImpl();
-        else
-            _resolver = resolver;
+        _resolver = sgState;
 
-        this.packageName = packageName;
+        this.packageName = sgState.packageName;
 
         //-- boundProperties
         _bound = SourceGenerator.boundPropertiesEnabled();
@@ -1893,6 +1917,15 @@ class FactoryState implements ClassInfoResolver {
         _resolver.bindReference(key, classInfo);
     } //-- bindReference
 
+    /**
+     * Returns the SGStateInfo
+     *
+     * @returns the SGStateInfo
+    **/
+    SGStateInfo getSGStateInfo() {
+        return _sgState;
+    } //-- getSGStateInfo
+    
     /**
      * Marks the given element as having been processed.
      * @param complexType the Element to mark as having
