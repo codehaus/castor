@@ -142,6 +142,7 @@
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
         This impacts Connection duration and needs to be investigated further.
+        </p>
         </section>
 
         <section title="Query Engine Refactoring">
