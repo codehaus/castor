@@ -224,5 +224,15 @@ public interface Persistence
         throws QueryException;
 
 
+    
+	public Persistence.FieldInfo[] getInfo();
+
+    public interface FieldInfo {
+		public boolean isComplex();
+
+		public boolean isPersisted();
+
+		public String getFieldName();
+    }
 }
 
