@@ -58,6 +58,15 @@ package org.exolab.castor.mapping;
 public interface FieldDescriptor
 {
 
+    /**
+     * Set the class which contains this field
+     */
+    public void setContainingClassDescriptor( ClassDescriptor contClsDesc );
+
+    /**
+     * @return the class which contains this field
+     */
+    public ClassDescriptor getContainingClassDescriptor();
 
     /**
      * Returns the name of the field.

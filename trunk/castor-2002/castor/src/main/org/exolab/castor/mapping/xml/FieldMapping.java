@@ -30,6 +30,8 @@ public class FieldMapping implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
+    private ClassMapping     _clsMapping;
+
     private java.lang.String _collection;
 
     private java.lang.String _setMethod;
@@ -69,6 +71,16 @@ public class FieldMapping implements java.io.Serializable {
       //-----------/
      //- Methods -/
     //-----------/
+
+    /**
+     *
+     */
+    public void setClassMapping( ClassMapping clsMapping ) {
+	_clsMapping = clsMapping;
+    }
+    public ClassMapping getClassMapping() {
+	return _clsMapping;
+    }
 
     /**
     **/

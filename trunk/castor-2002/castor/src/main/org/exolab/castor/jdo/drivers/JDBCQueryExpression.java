@@ -128,6 +128,13 @@ public class JDBCQueryExpression
                            condOp + value );
     }
 
+    public String encodeColumn( String tableName, String columnName )
+    {
+	return _factory.quoteName( tableName + 
+				   JDBCSyntax.TableColumnSeparator +
+				   columnName );
+    }
+ 
 
     public void addInnerJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
@@ -204,12 +211,10 @@ public class JDBCQueryExpression
             }
         }
         if ( _where != null ) {
-            if ( first ) {
-                sql.append( JDBCSyntax.Where );
-                first = false;
-            } else
-                sql.append( JDBCSyntax.And );
+	    sql.append( first ? JDBCSyntax.Where : ( JDBCSyntax.And + "( " ) );
             sql.append( _where );
+	    if ( ! first )
+		sql.append( " )" );
         }
         return first;
     }

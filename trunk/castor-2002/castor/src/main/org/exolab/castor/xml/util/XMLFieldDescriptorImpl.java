@@ -76,6 +76,11 @@ public class XMLFieldDescriptorImpl
          + "XMLFieldDescriptorImpl may not be null.";
 
     /**
+     *
+     */
+    private ClassDescriptor _contClsDescriptor;
+
+    /**
      * Flag to indicate that objects should be added
      * to their as soon as they are created, but before they
      * are finished being populated.
@@ -211,6 +216,11 @@ public class XMLFieldDescriptorImpl
         
         this();
 
+	if ( fieldDesc instanceof XMLFieldDescriptor )
+          this._contClsDescriptor = 
+              ( (XMLFieldDescriptor)fieldDesc
+                ).getContainingClassDescriptor();
+              
         this._handler         = fieldDesc.getHandler();
         this._fieldName       = fieldDesc.getFieldName();
         this._fieldType       = fieldDesc.getFieldType();
@@ -246,6 +256,22 @@ public class XMLFieldDescriptorImpl
     //- Public Methods -/
     //------------------/
     
+    /**
+     * Set the class which contains this field
+     */
+    public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
+    {
+      _contClsDescriptor = contClsDesc;
+    }
+
+    /**
+     * @return the class which contains this field
+     */
+    public ClassDescriptor getContainingClassDescriptor()
+    {
+      return _contClsDescriptor;
+    }
+
     /**
      * Returns the class descriptor related to the field type. If the
      * field type is a class for which a descriptor exists, this
