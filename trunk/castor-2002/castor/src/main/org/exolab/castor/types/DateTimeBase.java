@@ -557,7 +557,6 @@ public abstract class DateTimeBase
                   }
                   else if (tempDay > maxDay) {
                       tempDay = (short)(tempDay - (short)maxDay);
-                      this.setDay((short)tempDay);
                       carry = 1;
                   } else break;
                   try {
@@ -576,6 +575,7 @@ public abstract class DateTimeBase
                          throw e;
                   }
               }
+              this.setDay((short)tempDay);
 
 
           } catch (OperationNotSupportedException e) {
