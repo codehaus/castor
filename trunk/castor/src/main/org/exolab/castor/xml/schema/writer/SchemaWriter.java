@@ -579,7 +579,7 @@ public class SchemaWriter {
             } //--end of 'xsd' appending
             //add the targetNamespace prefix if necessary
             if (baseType.isComplexType()) {
-                String targetNamespace = complexType.getSchema().getTargetNamespace();
+                String targetNamespace = baseType.getSchema().getTargetNamespace();
                 String nsPrefix = getNSPrefix(complexType.getSchema(), targetNamespace);
                 if ((nsPrefix != null) && (nsPrefix.length() != 0))
                     baseTypeName = nsPrefix +':'+ baseTypeName;
