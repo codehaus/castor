@@ -120,6 +120,15 @@ public abstract class SourceGeneratorConfiguration
 	private static final String ELEMENT_VALUE = "element";
 	private static final String TYPE_VALUE = "type";
 
+    private static final int    ELEMENT_BINDING = 0;
+    private static final int    TYPE_BINDING    = 1;
+    
+    /**
+     * The flag indicating which type of binding we are
+     * configured for
+    **/
+    private static int  bindingType = ELEMENT_BINDING;
+    
 	/**
      * The default properties loaded from the configuration file.
      */
@@ -166,8 +175,10 @@ public abstract class SourceGeneratorConfiguration
 	 */	
 	public static boolean mappingSchemaElement2Java()
 	{
-		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
-		return prop.toLowerCase().equals(ELEMENT_VALUE);
+	    //-- call getDefault to ensure we loaded the properties
+	    getDefault();
+	    
+	    return (bindingType == ELEMENT_BINDING);  
 	}
 
 	/**
@@ -176,8 +187,10 @@ public abstract class SourceGeneratorConfiguration
 	 */	
 	public static boolean mappingSchemaType2Java()
 	{
-		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
-		return prop.toLowerCase().equals(TYPE_VALUE);
+	    //-- call getDefault to ensure we loaded the properties
+	    getDefault();
+	    
+	    return (bindingType == TYPE_BINDING);  
 	}
 	
 	/**
@@ -236,5 +249,17 @@ public abstract class SourceGeneratorConfiguration
 			String javaPackage = token.substring(comma+1).trim();
 			_nspackages.put(ns, javaPackage);
 		}
+		
+		initBindingType();
     }
-}
+    
+    /**
+     * Called by #load to initialize the binding type
+    **/
+    protected static void initBindingType() {
+		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
+		if (prop.toLowerCase().equals(TYPE_VALUE))
+		    bindingType = TYPE_BINDING;
+    } //-- initBindingType
+    
+} //-- SourceGeneratorConfiguration
