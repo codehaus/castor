@@ -431,9 +431,13 @@ public abstract class MappingLoader
                 } else {
                     // we leave things in the old way for the XML side
                     if ( idList.size() == 0 )
-                        idList.addElement( extend.getIdentity() );
-                    identities = new FieldDescriptor[idList.size()];
-                    idList.copyInto(identities);
+                        if ( extend.getIdentity() != null ) {
+                            idList.addElement( extend.getIdentity() );
+                            identities = new FieldDescriptor[1];
+                            idList.copyInto(identities);
+                        } else {
+                            identities = new FieldDescriptor[0];
+                        }
                 }
             }
             
