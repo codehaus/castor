@@ -88,34 +88,34 @@ public class TestCacheRegistry extends TestCase {
     public void testGetCache() throws Exception {
         Cache cache = null;
         
-        cache = CacheRegistry.getCache("time-limited", 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("time-limited", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("time-limited", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
         
-        cache = CacheRegistry.getCache("unlimited", 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("unlimited", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("unlimited", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
         
-        cache = CacheRegistry.getCache("count-limited", 3, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("count-limited", 3, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("count-limited", cache.getCacheType());
         assertEquals (3, cache.getCapacity());
         
-        cache = CacheRegistry.getCache("none", 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("none", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("none", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
 
-        cache = CacheRegistry.getCache("custom", 15, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("custom", 15, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("custom", cache.getCacheType());
         assertEquals (15, cache.getCapacity());
         
-        cache = CacheRegistry.getCache("not-existing", 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("not-existing", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertNull (cache);
 
-        cache = CacheRegistry.getCache("", 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("count-limited", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
         
-        cache = CacheRegistry.getCache(null, 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache(null, 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("count-limited", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
     }
