@@ -70,37 +70,46 @@ import org.apache.commons.logging.LogFactory;
  * @version $Revision$ $Date$
  */
 public class TimeLimited extends AbstractBaseCache implements Cache {
+	
+	/**
+	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+	 * Commons Logging</a> instance used for all logging.
+	 */
+	private static Log _log = LogFactory.getFactory().getInstance(TimeLimited.class);
+	
+	/**
+	 * Seconds between ticks, default is 1 second.
+	 * This value is used to decrease QueueItem.time on each tick.
+	 */
+	final private static int TICK_DELAY = 1;
 
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static Log _log = LogFactory.getFactory().getInstance(Class.class);
-
-    /**
-     * Seconds between ticks, default is 1 second.
-     * This value is used to decrease QueueItem.time on each tick.
-     */
-    final private static int TICK_DELAY = 1;
-
-    /**
-     *  The Default precision in millisecond is 1000. Precision is the interval 
-     *  between each time which the timer thread will wake up and trigger 
-     *  clean up of least-recently-used Object.
-     */
-    final private static int DEFAULT_PRECISION = 1000 * TICK_DELAY;
-
-    /**
-     * Timer is used to start a task that runs the tick-method.
-     */
-    //private static Timer timer = new Timer(true);
-    private static TickThread timer = new TickThread(DEFAULT_PRECISION);
+	/**
+	 *  The Default precision in millisecond is 1000. Precision is the interval 
+	 *  between each time which the timer thread will wake up and trigger 
+	 *  clean up of least-recently-used Object.
+	 */
+	final private static int DEFAULT_PRECISION = 1000 * TICK_DELAY;
+	
+	/**
+	 * Timer is used to start a task that runs the tick-method.
+	 */
+	private static TickThread timer = new TickThread (DEFAULT_PRECISION);
+	
+	/* Castor JDO is still required to support JDK/JRE 1.2. As such, Timer cannot be 
+	 * used (yet) as it is only available with JDK 1.3.
+	 */  
+	// private static Timer timer = new Timer(true);
+	
+    public final static int DEFAULT_INTERVAL = 30;
     
     /**
      * interval is the number of ticks an object lives before it will be disposed. 
      */
     private int interval;
-
+	private int tailtime;
+	private QueueItem head;
+	private QueueItem tail;
+	
     /**
      * Container for cached objects.
      */
@@ -108,14 +117,32 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 
     /**
      * Creates an instance of TimeLimited. 
-     *
-     * @param interval the number of ticks an object lives before it will be disposed.
      */
-    public TimeLimited(int interval) {
-        this.interval = interval;
-        timer.addTickerTask(this);
+    public TimeLimited () {
+    	super();
+        init (DEFAULT_INTERVAL);
+        
+        _log.debug ("Successfully initialized instance of " + getClass().getName());
     }
-
+    
+	/**
+	 * Creates an instance of TimeLimited. 
+	 *
+	 * @param interval the number of ticks an object lives before it will be disposed.
+	 */
+	public TimeLimited (int interval) {
+		init (interval);
+	}
+    
+	/**
+	 * Initializes object instance.
+	 * @param interval the number of ticks an object lives before it will be disposed.
+	 */
+	protected void init (int interval) {
+	    map = new Hashtable();
+	    timer.addTickerTask (this);
+	}
+	
     /**
      * Maps the specified <code>key</code> to the specified 
      * <code>value</code> in this Map. Neither the key nor the 
@@ -153,22 +180,30 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
             return null;
         }
     }
-
+    
     /**
-     *Returns the value to which the specified key is mapped in this Map.
-     *@param key - a key in the Map.
-     *@return the value to which the key is mapped in this Map; null if 
+     * Returns the value to which the specified key is mapped in this Map.
+     * @param key - a key in the Map.
+     * @return the value to which the key is mapped in this Map; null if 
      * the key is not mapped to any value in this Map.
      */
     public synchronized Object get(Object key) {
         Object o = map.get(key);
-        if (o == null) {
+        if ( o == null )
             return null;
-        } else {
-            return ((QueueItem) o).value;
-        }
+        else 
+            return ((QueueItem)o).value;
     }
-
+	
+    /* (non-Javadoc)
+     * @see org.exolab.castor.persist.cache.Cache#getCapacity()
+     */
+    public void setCapacity (int capacity) {
+        super.setCapacity(capacity);
+        this.interval = interval + 1;
+    }
+    
+	
     /**
      * Removes the key (and its corresponding value) from this 
      * Map. This method does nothing if the key is not in the Map.
@@ -191,72 +226,72 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
             return queueItem.value;
         }
     }
+	
+	/**
+	 * Returns an enumeration of the values in this LRU map.
+	 * Use the Enumeration methods on the returned object to fetch the elements
+	 * sequentially.
+	 *
+	 * @return  an enumeration of the values in this Map.
+	 * @see     java.util.Enumeration
+	 */
+	public synchronized Enumeration elements() {
+	    return new ValuesEnumeration(map.values());
+	}
 
-    /**
-     * Returns an enumeration of the values in this LRU map.
-     * Use the Enumeration methods on the returned object to fetch the elements
-     * sequentially.
-     *
-     * @return  an enumeration of the values in this Map.
-     * @see     java.util.Enumeration
-     */
-    public synchronized Enumeration elements() {
-        return new ValuesEnumeration(map.values());
-    }
+	
+	/**
+	 * Remove the object identified by key from the cache.
+	 * @param key the key that needs to be removed.
+	 */
+	public void expire (Object key) {
+		// remove key from map, object will ultimately be
+		// removed from queue when interval expires or a subsequent
+		// call to put() overwrites the reference to it in QueueItem
+		remove(key);
+		dispose(key);
+	}
+	
+	
+	/** 
+	 * Indicates whether the cache holds a value object for the specified key.
+	 * @see org.exolab.castor.persist.cache.Cache#contains(java.lang.Object)
+	 */
+	public boolean contains(Object key) {
+	    if (_log.isDebugEnabled()) {
+	        _log.trace("Testing for entry for key " + key);
+	    }
+	    return map.containsKey(key);
+	}
 
-    /**
-     * Remove the object identified by key from the cache.
-     *
-     * @param   key   the key that needs to be removed.
-     */
-    public void expire(Object key) {
-        // remove key from map, object will ultimately be
-        // removed from queue when interval expires or a subsequent
-        // call to put() overwrites the reference to it in QueueItem
-        remove(key);
-        dispose(key);
-    }
+	/**
+	 * This method is called when an object is disposed.
+	 * Override this method if you interested in the disposed object.
+	 * @param o - the disposed object
+	 */
+	protected void dispose( Object o ) {
+		if (_log.isDebugEnabled()) 
+			_log.trace("Disposing " + o);
+	}
+	
+	/**
+	 * Called by TickThread
+	 */
+	private synchronized void tick() {
+	    if (!map.isEmpty()) {
+	        for (Iterator iter = map.values().iterator(); iter.hasNext();) {
+	            QueueItem queueItem = (QueueItem) iter.next();
+	            Object value = queueItem.value;
+	            if (queueItem.time <= 0) {
+	                iter.remove();
+	                dispose(value);
+	            } else {
+	                queueItem.time -= TICK_DELAY;
+	            }
+	        }
+	    }
+	}
 
-    /** 
-     * Indicates whether the cache holds a valuze object for the specified key.
-     * @see org.exolab.castor.persist.cache.Cache#contains(java.lang.Object)
-     */
-    public boolean contains(Object key) {
-        if (_log.isDebugEnabled()) {
-            _log.trace("Testing for entry for key " + key);
-        }
-        return map.containsKey(key);
-    }
-
-    /**
-     * This method is called when an object is disposed.
-     * Override this method if you interested in the disposed object.
-     *
-     * @param o - the disposed object
-     */
-    protected void dispose(Object o) {
-        if (_log.isDebugEnabled()) {
-            _log.trace("Disposing " + o);
-        }
-    }
-
-    /**
-     * Called by TickThread
-     */
-    private synchronized void tick() {
-        if (!map.isEmpty()) {
-            for (Iterator iter = map.values().iterator(); iter.hasNext();) {
-                QueueItem queueItem = (QueueItem) iter.next();
-                Object value = queueItem.value;
-                if (queueItem.time <= 0) {
-                    iter.remove();
-                    dispose(value);
-                } else {
-                    queueItem.time -= TICK_DELAY;
-                }
-            }
-        }
-    }
 
     private class ValuesEnumeration implements Enumeration {
         private Enumeration enum;

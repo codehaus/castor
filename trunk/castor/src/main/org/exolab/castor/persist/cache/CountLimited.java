@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: LRU.java
+ * $Id$
  */
 
 package org.exolab.castor.persist.cache;
@@ -52,7 +52,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * CountLimited is a count limted least-recently-used <tt>Map</tt>.
+ * CustomCache is a count limted least-recently-used <tt>Map</tt>.
  * <p>
  * Every object being put in the Map will live until the
  * map is full. If the map is full, a least-recently-used object 
@@ -80,6 +80,8 @@ implements Cache
 	private int[] status;
 	private int cur;
 	private int size;
+    
+    public static int DEFAULT_SIZE = 30;
 	
 	/**
 	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
@@ -87,18 +89,36 @@ implements Cache
 	 */
 	private static Log _log = LogFactory.getFactory().getInstance(CountLimited.class);
 	
-	public CountLimited( int size ) {
-		keys = new Object[size];
-		values = new Object[size];
-		status = new int[size];
-		mapKeyPos = new Hashtable(size);
-		this.size = size;
-		
-		if (_log.isDebugEnabled()) {
-			_log.trace ("Successfully created count-limited cache instance" );
-		}
+    
+    public CountLimited () {
+    	super();
+        init (DEFAULT_SIZE);
+    }
+    
+	public CountLimited (int size) {
+		init (size);
 	}
 	
+    /**
+     * Initializes object instance.
+     * @param size the number of elemenst to be cached.
+     */
+    protected void init (int size) {
+        keys = new Object[size];
+        values = new Object[size];
+        status = new int[size];
+        mapKeyPos = new Hashtable(size);
+
+        this.size = size;
+        
+        if (_log.isDebugEnabled()) {
+            _log.trace ("Successfully initialzed count-limited cache instance" );
+        }
+        
+    }
+    
+    
+    
 	/**
 	 * Maps the specified <code>key</code> to the specified 
 	 * <code>value</code> in this Map. Neither the key nor the 
@@ -232,10 +252,10 @@ implements Cache
 			_log.trace ("Expiring cache entry for key " + key);
 		}
 		if ( remove(key) == null ) {
-			// log.trace ("CountLimited LRU expire: "+key+" not found");
+			// log.trace ("CustomCache LRU expire: "+key+" not found");
 		}
 		else {
-			// log.trace ("CountLimited LRU expire: "+key+" removed from cache");
+			// log.trace ("CustomCache LRU expire: "+key+" removed from cache");
 		}
 		dispose(key);
 	}
@@ -288,11 +308,23 @@ implements Cache
 		}
 	}
 	
-	/* Indicates whether the cache holds a valuze object for the specified key.
+	/**
+	 * Indicates whether the cache holds value object mapped to the specified key.
+	 * @param key - A key identifying a value object.
+	 * @return True if the cache holds a value object for the specified key, false otherwise.
 	 * @see org.exolab.castor.persist.cache.Cache#contains(java.lang.Object)
 	 */
 	public boolean contains(Object key) {
 		return (this.get(key) != null);
 	}
 	
+	/**
+	 * Sets the cache capacity.
+	 * @param capacity the cache capacity.
+	 * @see org.exolab.castor.persist.cache.Cache#setCapacity(int)
+	 */
+	public void setCapacity (int capacity) {
+		super.setCapacity (capacity);
+        this.size = capacity;
+	}
 }
