@@ -750,11 +750,15 @@ public class XMLClassDescriptorImpl extends Validator
                 " described by this ClassDecriptor.";
             throw new ValidationException(err);
         }
+        
+        //-- DEBUG
+        //System.out.println("Validating class: " + object.getClass().getName());
+        //-- /DEBUG
 
         XMLFieldDescriptor[] localElements = getElementArray();
         
         if (_extends != null) {
-
+            
             //-- cascade call for validation
             if (_extends instanceof XMLClassDescriptorImpl) {
                 ((XMLClassDescriptorImpl)_extends).validate(object, context);
@@ -797,6 +801,8 @@ public class XMLClassDescriptorImpl extends Validator
                 //-- handle elements, affected by choice
                 for (int i = 0; i < localElements.length; i++) {
                     XMLFieldDescriptor desc = localElements[i];
+                    
+                    if (desc == null) continue;
 
                     FieldHandler handler = desc.getHandler();
 
@@ -847,7 +853,9 @@ public class XMLClassDescriptorImpl extends Validator
                     buffer.append('(');
                     String sep = " | ";
                     for (int i = 0; i < localElements.length; i++) {
-                        XMLFieldDescriptor  desc = localElements[i];
+                        XMLFieldDescriptor  desc = localElements[i];                        
+                        if (desc != null) continue;
+                        
                         FieldValidator fieldValidator = desc.getValidator();
                         if (fieldValidator.getMinOccurs() > 0) {
                             if (error) {
@@ -885,8 +893,11 @@ public class XMLClassDescriptorImpl extends Validator
             case SEQUENCE:
             //-- ALL
             default:
+            
+            
                 //-- handle elements
-                for (int i = 0; i < localElements.length; i++) {
+                for (int i = 0; i < localElements.length; i++) {                                        
+                    if (localElements[i] == null) continue;
                     FieldValidator fieldValidator = localElements[i].getValidator();
                     if (fieldValidator != null)
                         fieldValidator.validate(object, context);
