@@ -1,9 +1,22 @@
 Version 0.8.9
 -------------
 
+JDO:    Fixed problem with Float/BigDecimal and Double/BigDecimal
+        type conversions. (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:    Implemented algorithm of "bounded" dirty checking for long
+        transactions, it uses local timestamps and is work only
+        if the object is still in the cache at the end of the transaction.
+        See interface TimeStampable and Database.update().
+        (Oleg Nitz <on@ibis.odessa.ua>)
+
 JDO:    Changed HIGH/LOW key generator implementation: now holds lock
         on the record in the sequence table until the end of the transaction
         and doesn't use updatable ResultSets. (Oleg Nitz <on@ibis.odessa.ua>)
+        Fixed a gap in HIGH/LOW key generator implementation: with databases
+        that don't support "SELECT FOR UPDATE" (like Hypersonic SQL and
+        InstantDB) it was possible to get the same key values in two concurrent
+        transactions (Reported by George Stewart <georgestewartiv@yahoo.com>)
 
 JDO:    Temporary fix to ClassLoader problem in EJB environment: application
         classes are loaded using context classloader of the current thread.
