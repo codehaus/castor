@@ -1,6 +1,9 @@
 Version (CVS)
 -------------
 
+XML:    Allow the use of uninitialized collection. Castor will instiate a new 
+        collection of the proper type when necessary. (seb)
+
 XML:    Added #setResolver method to Marshaller, thanks to George Stewart for
         pointing out to me that I neglected to add this method. (kvisco)
 
