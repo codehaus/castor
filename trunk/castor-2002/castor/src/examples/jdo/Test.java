@@ -3,6 +3,7 @@ package jdo;
 
 import myapp.*;
 import java.util.Hashtable;
+import java.util.Vector;
 import java.util.Enumeration;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
@@ -72,6 +73,7 @@ public class Test
     {
         Product       product;
         ProductGroup  group;
+        ProductDetail detail;
         Computer      computer;
         OQLQuery      productOql;
         OQLQuery      groupOql;
@@ -153,10 +155,17 @@ public class Test
             product.name = "some product";
             product.price = 55;
             product.group = group;
-            product.detail = new ProductDetail();
-            product.detail.id = 1;
-            product.detail.name = "one";
-            product.detail.product = product;
+            product.detail = new Vector();
+            detail = new ProductDetail();
+            detail.id = 1;
+            detail.name = "one";
+            detail.product = product;
+            product.detail.addElement( detail );
+            detail = new ProductDetail();
+            detail.id = 2;
+            detail.name = "two";
+            detail.product = product;
+            product.detail.addElement( detail );
             logger.println( "Creating new product: " + product );
             db.makePersistent( product );
         } else {
@@ -176,10 +185,17 @@ public class Test
             computer.name = "MyPC";
             computer.price = 300;
             computer.group = group;
-            computer.detail = new ProductDetail();
-            computer.detail.id = 4;
-            computer.detail.name = "four";
-            computer.detail.product = computer;
+            computer.detail = new Vector();
+            detail = new ProductDetail();
+            detail.id = 4;
+            detail.name = "mouse";
+            detail.product = computer;
+            computer.detail.addElement( detail );
+            detail = new ProductDetail();
+            detail.id = 5;
+            detail.name = "screen";
+            detail.product = computer;
+            computer.detail.addElement( detail );
             logger.println( "Creating new computer: " + computer );
             db.makePersistent( computer );
         } else {
@@ -188,7 +204,6 @@ public class Test
         
         logger.println( "Commit transaction" );
         tx.commit();
-
 
         tx = odmg.newTransaction();
         tx.begin();

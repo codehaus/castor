@@ -92,41 +92,6 @@ public class DAXMappingLoader
     }
 
 
-    /*
-    protected void resolveRelations( ClassDesc clsDesc )
-        throws MappingException
-    {
-        super.resolveRelations( clsDesc );
-        // At this point the descriptor may contain only DAX fields,
-        // and all container fields must be flattened.
-        FieldDesc[] fields;
-        Vector      allFields;
-
-        allFields = new Vector();
-        fields = clsDesc.getFields();
-        for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ] instanceof ContainerFieldDesc ) {
-                FieldDesc[] cFields;
-                
-                cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
-                for ( int j = 0 ; j < cFields.length ; ++j ) {
-                    if ( cFields[ j ] instanceof DAXFieldDesc )
-                        allFields.add( cFields[ j ] );
-                }
-            } else if ( fields[ i ] instanceof DAXFieldDesc ) {
-                allFields.add( fields[ i ] );
-            }
-        }
-        
-        DAXFieldDesc[] daxFields;
-
-        daxFields = new DAXFieldDesc[ allFields.size() ];
-        allFields.copyInto( daxFields );
-        ( (DAXClassDesc) clsDesc ).setDAXFields( daxFields );
-    }
-    */
-
-
     protected ClassDescriptor createDescriptor( ClassMapping clsMap )
         throws MappingException
     {

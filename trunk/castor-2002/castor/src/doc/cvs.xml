@@ -8,10 +8,8 @@
       <p>The source code, documentation and libraries are available for anonymous access
          from the Exolab CVS server.</p>
 
-<!-- Wait until WebCVS is fixed
       <p>You can browse the Castor sources
-         <a href="http://www.exolab.org/cgi-bin/cvsweb.cgi/castor/?cvsroot=Castor">via the web.</a></p>
- -->
+         <a href="http://castor.exolab.org/cgi-bin/cvsweb.cgi/castor/?cvsroot=Castor">via the web.</a></p>
 
       <p>You may <a href="download.xml">download</a> the full source distribution containing a
          snapshot of the CVS.</p>
