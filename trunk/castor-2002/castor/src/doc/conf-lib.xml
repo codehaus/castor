@@ -66,18 +66,18 @@
       <p>JARs required to build Castor and dependencies for various packages
          are contained in the <tt>lib</tt> directory. JARs required for
          distribution are marked with bold text:</p>
-         <table cellpadding="4" border="0">
+
+         <table cellpadding="4" border="1">
            <tr><td>ant.jar</td><td>The Ant build tool</td></tr>
            <tr><td><b>jdbc-se2.0.jar</b></td><td>JDBC 2.0 standard extension (JDO)</td></tr>
            <tr><td><b>jndi.jar</b></td><td>The JNDI API (DSML/JNDI)</td></tr>
            <tr><td><b>jta1.0.1.jar</b></td><td>The JTA API (transactions)</td></tr>
+           <tr><td>jtf-0.1.jar</td><td>The Java Testing Framework</td></tr>
            <tr><td><b>ldapjdk.jar</b></td><td>Mozilla Directory SDK (DSML/MDS)</td></tr>
            <tr><td>ldapsp.jar</td><td>JNDI LDAP service provider from Mozilla</td></tr>
-           <tr><td><b>odmg-3.0.jar</b></td><td>ODMG 3.0 API (JDO)</td></tr>
            <tr><td>postgresql-6.3.jar</td><td>PostgreSQL 6.3 driver with DataSource
                                               support (used in default example)</td></tr>
            <tr><td>servlet.jar</td><td>Used by the Servlet examples</td></tr>
-           <tr><td>utils-0.5.jar</td><td>Required for JDO performance testing</td></tr>
            <tr><td><b>xerces.jar</b></td><td>Xerces XML library</td></tr>
            <tr><td>xslp.jar</td><td>XSL processor, used for documentation</td></tr>
          </table>
@@ -93,10 +93,9 @@
         <p>Castor JDO uses Castor XML for processing the XML mapping file and
            has the same dependency on Xerces.</p>
 
-        <p>In addition applications that use Castor JDO must include the
+        <p>In addition applications that use Castor JDO must include
            <tt>jdbc-se2.0.jar</tt> or any alternative JAR that includes the
-           <tt>javax.sql.DataSource</tt> interface and <tt>odmg-3.0.jar</tt>
-           or any alternative JAR that includes the ODMG 3.0 API.</p>
+           <tt>javax.sql.DataSource</tt> interface.</p>
 
         <p>The JDO example uses the PostgreSQL database and depends on the
            provided JDBC driver which includes <tt>javax.sql.DataSource</tt> support.
@@ -131,7 +130,7 @@
         source run <tt>build.sh</tt> or <tt>build.bat</tt> in the Castor root
         directory with one (or any) of the following targets:</p>
 
-         <table cellpadding="4" border="0">
+         <table cellpadding="4" border="1">
            <tr><td>targets</td><td>Lists the build targets</td></tr>
            <tr><td>clean</td><td>Cleans the build and distribution directories</td></tr>
            <tr><td>all</td><td>Cleans and builds all the packages and examples</td></tr>
@@ -142,7 +141,8 @@
            <tr><td>tests</td><td>Builds the test packages (including debugging info)</td></tr>
            <tr><td>jar</td><td>Builds the binary JAR in the dist directory</td></tr>
            <tr><td>doc</td><td>Builds the documentation</td></tr>
-           <tr><td>javadoc</td><td>Builds the API JavaDocs</td></tr>
+           <tr><td>api</td><td>Builds the API JavaDocs</td></tr>
+           <tr><td>javadoc</td><td>Builds the full JavaDocs</td></tr>
            <tr><td>source</td><td>Builds the source tarball in the dist directory</td></tr>
            <tr><td>tarball</td><td>Builds the binary distribution in the dist directory</td></tr>
            <tr><td>cvs</td><td>Update the sources from the CVS</td></tr>
@@ -156,7 +156,7 @@
 
    <section title="Directory Structure">
 
-         <table cellpadding="4" border="0">
+         <table cellpadding="4" border="1">
            <tr><td>src/main</td><td>The source base for all the Castor modules</td></tr>
            <tr><td>src/doc</td><td>Documentation (in XML form)</td></tr>
            <tr><td>src/schema</td><td>DTD and XML schema for Castor mapping files</td></tr>

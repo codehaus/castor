@@ -8,13 +8,15 @@
          directories. It provides Java to XML binding, Java to SQL/LDAP persistence, and then
          some more.</p>
 
+      <p><a href="ora-mar-2k/castor.htm">The presentation we did at the Java O'Reilly Conference
+         is now available online</a>. For those who could not attend we promise to make another
+         one during the JavaOne conference.</p>
+
       <p><a href="origins.xml">About the origins of the name</a></p>
 
-      <p>We will host a Castor session during the Java O'Reilly Conference to review
-         the Castor philosophy and future directions. You are welcome to attend and
-         to share your ideas and like-to-see with the rest of us. The session will
-         take place <a href="http://conferences.oreilly.com/java/bofs/">Wedensday, 
-         March 29, 8:00 PM Ballroom C.</a></p>
+      <p><b>Note:</b> Presently we are only hosting one mailing list. Traffic is not high, so if
+         you are interested in keeping up to date with new releases, please <a href="lists.xml">subscribe
+         to this list</a>.</p>
 
     </header>
 
@@ -38,13 +40,12 @@
     </section>
 
     <section title="News">
-      <p>Version 0.8 is now <a href="download.xml">available for download</a>.
+      <p>Version $VERSION$ is now <a href="download.xml">available for download</a>.
       <ul>
+        <li>Apr 5, 2000: Version 0.8.1, API useability, new mapping file</li>
         <li>Mar 24, 2000: Version 0.8, unified mapping model, pluggable DB engine, dirty checking</li>
         <li>Mar 10, 2000: Version 0.7.11, supports one-many relations, XML-Servlet</li>
         <li>Mar 3, 2000: Version 0.7.10, addresses performance of the cache engine</li>
-        <li>Feb 25, 2000: Version 0.7.9, new mapping file, one-one relation handling</li>
-        <li>Feb 4, 2000: Version 0.7.7</li>
         <li>Jan 7, 2000: Version 0.7, first to include JDO</li>
         <li>Dec 21, 1999: Version 0.6</li>
       </ul>

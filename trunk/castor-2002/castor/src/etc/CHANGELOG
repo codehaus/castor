@@ -1,11 +1,20 @@
 Version 0.8.1   April 4, 2000
 -----------------------------
 
-JDO:     Fixed bug with modified exception not removing copy from cache.
+JDO:     Added Locked mode to provide locking at the database level, as
+         opposed to Exclusive mode which provides locking at the cache
+         level. Added support for loading/querying with a given access mode.
 
 JDO:     Added isOpen method to database.
 
+JDO:     Added preliminary support for controlling cache size and removing
+         objects from cache.
+
 JDO:     Fixed bug in bind( String) method of OQLQuery.
+
+JDO:     Fixed bug with modified exception not removing copy from cache.
+
+JDO:     Fixed bug with reusing queries.
 
 Misc:    Upgraded test cases to run inside JTF as a test harness.
 

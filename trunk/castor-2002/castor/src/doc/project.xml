@@ -31,6 +31,7 @@
   <menu name="Using">
     <item name="Using XML" href="xml-framework.xml"/>
     <item name="Using JDO" href="jdo.xml"/>
+    <item name="Tips &amp; Tricks" href="tips-tricks.xml"/>
     <item name="JDO Config" href="database-conf.xml"/>
     <item name="Types" href="types.xml"/>
     <item name="Source generator" href="sourcegen.xml"/>
@@ -43,6 +44,7 @@
   </menu>
   <menu name="Misc">
     <item name="JavaDoc" href="javadoc/overview-summary.html"/>
+    <item name="Presentation" href="ora-mar-2k/castor.htm"/>
     <item name="Status, Todo" href="status.xml"/>
     <item name="Changelog" href="changelog.xml"/>
   </menu>

@@ -54,6 +54,7 @@ package org.exolab.castor.mapping;
  * <li>Read only
  * <li>Shared (aka optimistic locking)
  * <li>Exclusive (aka pessimistic locking)
+ * <li>Locked (database lock)
  * </ul>
  * Transactions typically access objects based on the specified access
  * mode. A transaction may be requested to access any object as read
@@ -61,36 +62,18 @@ package org.exolab.castor.mapping;
  *
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
- * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class AccessMode
 {
 
     /**
-     * Represents the read only type
-    **/
-    public static final short READ_ONLY = 0;
-    
-    
-    /**
-     * Represents the shared type
-    **/
-    public static final short SHARED    = 1;
-    
-    
-    /**
-     * Represents the exlusive type
-    **/
-    public static final short EXCLUSIVE = 2;
-    
-    /**
      * Read only access. Objects can be read but are not made
      * persistent and changes to objects are not reflected in
      * persistent storage.
      */
     public static final AccessMode ReadOnly 
-        = new AccessMode( AccessMode.READ_ONLY, "read-only" );
+        = new AccessMode( "read-only" );
 
 
     /**
@@ -98,7 +81,7 @@ public class AccessMode
      * transactions. Equivalent to optimistic locking.
      */
     public static final AccessMode Shared 
-        = new AccessMode( AccessMode.SHARED, "shared" );
+        = new AccessMode( "shared" );
 
 
     /**
@@ -106,7 +89,15 @@ public class AccessMode
      * at any given time. Equivalent to pessimistic locking.
      */
     public static final AccessMode Exclusive 
-        = new AccessMode( AccessMode.EXCLUSIVE, "exclusive" );
+        = new AccessMode( "exclusive" );
+
+    /**
+     * Locked access. Objects can be access by a single transaction
+     * at any given time, and a lock is acquired in the database.
+     */
+    public static final AccessMode Locked 
+        = new AccessMode( "locked" );
+
 
     /**
      * Returns the access mode from the name. If <tt>accessMode</tt>
@@ -126,6 +117,8 @@ public class AccessMode
             return Exclusive;
         if ( accessMode.equals( ReadOnly._name ) )
             return ReadOnly;
+        if ( accessMode.equals( Locked._name ) )
+            return Locked;
         throw new IllegalArgumentException( "Unrecognized access mode" );
     }
 
@@ -136,26 +129,13 @@ public class AccessMode
      */
     private String _name;
 
-    /**
-     * The type of this AccessMode
-    **/
-    private short _type = READ_ONLY;
 
-    private AccessMode( short type, String name )
+    private AccessMode( String name )
     {
-        _type = type;
         _name = name;
     }
 
 
-    /**
-     * Returns the type of this AccessMode.
-     * @return the type of this AccessMode.
-    **/
-    public short getType() {
-        return _type;
-    } //-- getType
-    
     public String toString()
     {
         return _name;

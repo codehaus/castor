@@ -105,7 +105,6 @@ public class XMLMappingLoader
                     ( (XMLClassDescriptorImpl) clsDesc ).sortDescriptors();
             }
         }
-        
     }
 
 

@@ -87,7 +87,6 @@ public class Test
 
         db = _jdo.getDatabase();
 
-        /*
         db.begin();
         writer.println( "Begin transaction" );
         
@@ -201,7 +200,6 @@ public class Test
         writer.println( "Commit transaction" );
         db.commit();
 
-        */
         Serializer  ser;
         Marshaller  marshal;
         Mapping     mapping;
