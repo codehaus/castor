@@ -204,7 +204,7 @@
         <p>
             <table border="0">
                 <tr>
-                    <td align="top">Description:</td>
+                    <td valign="top">Description:</td>
                     <td>
                      XDoclet is a code generation engine. It enables 
                      Attribute-Oriented Programming for Java. It provides 
@@ -212,11 +212,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td align="top">Author:</td>
+                    <td valign="top">Author:</td>
                     <td>See the <a href="http://xdoclet.sourceforge.net/1.2beta/team-list.html">Team List</a></td>
                 </tr>
                 <tr>
-                    <td align="top">URL:</td>
+                    <td valign="top">URL:</td>
                     <td><url>http://xdoclet.sourceforge.net/1.2beta/index.html</url></td>
                 </tr>
             </table>
@@ -227,7 +227,7 @@
             <p>
                 <table border="0">
                     <tr>
-                        <td align="top">Description:</td>
+                        <td valign="top">Description:</td>
                         <td>
                           Xtreme Space is a JavaSpaces implementation using a RDBMS or a native XML
                           database as a backend. It is based on Castor for mapping between Java objects
@@ -235,18 +235,280 @@
                         </td>
                      </tr>
                      <tr>
-                        <td align="top">Author:</td>
+                        <td valign="top">Author:</td>
                         <td>Jerome Bernard</td>
                      </tr>
                      <tr>
-                        <td align="top">URL:</td>
+                        <td valign="top">URL:</td>
                         <td><url>http://www.kalixia.com/projects/XtremeSpace/</url></td>
                      </tr>
                   </table>
                </p>
         </section>
 
+        <section title="TogMap">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    TogMap is a module for the CASE Tool Together which generates 
+                    XML-mapping-files for OR-Mappers. It takes an existing object 
+                    model, which you can augment by OR-specific markers, and 
+                    produces an XML-mapping file. Currently only for Castor-JDO.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Author:</td>
+                    <td>Markus Blaurock</td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td>http://sourceforge.net/projects/togmap/</td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="CastorWizard">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    JBuilder Wizard OpenTool which offers one facilitated way 
+                    to generate java source code through O/R mapping, such as 
+                    Exolab's Castor JDO, DAO etc. It may also generate other 
+                    adjunction files according to your needs, such as Castor 
+                    JDO mapping file.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Author:</td>
+                    <td>Andy Laun</td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td>http://sourceforge.net/projects/castorwizard/</td>
+                </tr>
+            </table>
+        </section>
+
     </section>
+
+    <section title="Products that make use of Castor">
+    <p>
+    Does your project or product make use of Castor, but it's not listed here?
+    <a href="mailto:info@exolab.org">Send us</a> the info on it and we'll post
+    it here!
+    </p>
+
+        <section title="OpenEJB">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    OpenEJB is an Open Source implementation of version 1.1 of 
+                    the EJB specification, which supports both session and 
+                    entity beans in addition to an enhanced security model.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://openejb.sf.net/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="Roller Weblogger">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    Roller is server-based weblogging software, a web application 
+                    that is designed to support multiple simultaneous weblog 
+                    users and visitors.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://www.rollerweblogger.com/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="InfoGlue">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    InfoGlue is a free, open and competent content management 
+                    platform suitable for a wide range of applications and 
+                    organisations.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://www.infoglue.org/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="Altoweb Xpi">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    With AltoWeb Xpi, anyone who understands fundamental 
+                    application design and development concepts can quickly 
+                    assemble enterprise-level Java applications, while J2EE 
+                    experts maintain full access to the standard Java code and 
+                    descriptors that are generated. NOTE: AltoWeb is now out
+                    of business. 
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://www.altoweb.com/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="Borland JBuilder">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    This step-by-step tutorial explains how to use JBuilder's 
+                    XML databinding features using schema and Castor to generate 
+                    Java classes.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://info.borland.com/techpubs/jbuilder/jbuilder6/xml/xml_data_castor.html</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="jwma">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                     With the delivered basic view, which is based on standard 
+                     HTML 4.0 and does not require any Java functionality on the 
+                     client side, jwma is primarily a webmail package, enabling 
+                     the user to access, manage and compose email using a standard 
+                     web browser. However, due to it's flexible architecture, 
+                     that allows to replace elements with other implementations 
+                     (like for example a WAP view), jwma can be seen as multi-session 
+                     server side email client software based on Java technologies.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://jwma.sourceforge.net/overview.html</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="JAXBBuilder">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    JAXBBuilder is an eclipse plugin for generating Java classes 
+                    directly from XML schema, the generated classes can then 
+                    marshall to/from XML via Castor API. The plug-in includes a 
+                    JAXB project wizard, JAXB builder and property pages for 
+                    JAXB configuration.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://sourceforge.net/projects/jaxb-builder/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="JAFFA">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    An Enterprise Focused Java Framework For Rapid Application 
+                    Development. JAFFA build up existing projects like Tomcat, 
+                    Struts, Castor, Ant etc and glues them all together for a 
+                    complete web based componentized development environment.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://jaffa.sourceforge.net/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="JOrganizer">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    JOrganizer is a webbased PIM (Personal Information Manager), 
+                    written in Java. With it, you can manage your contacts, 
+                    emails, time and more. It is based on JSP, Servlets, Struts, 
+                    Castor, the xml.apache.org API's and other Open Source projects.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://jorganizer.sourceforge.net/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="Java Web Application Framework (JWAF)">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    Java Web Application Framework (JWAF) is a framework 
+                    designed to extend existing per-tier frameworks such as 
+                    Struts and Castor, to provide a complete 5-tier framework 
+                    and toolset that can be used to rapidly build business 
+                    process application and more.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://jwaf.sourceforge.net/</url></td>
+                </tr>
+            </table>
+        </section>
+
+        <section title="Out-of-the-Box">
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    Out-of-the-Box? 2.1 is an intelligent distribution of over 
+                    100 (and counting) Open Source projects for Java and LAMP 
+                    developers. It provides instant infrastructure with all the 
+                    things developers need to be productive: web server, web app 
+                    container, application server, database, database browser, 
+                    source code control system, source code browser, bug tracker, 
+                    discussion forum, mail server, web logger, template engine, 
+                    full text search engine, wiki site, charting package, and 
+                    many more utilities.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://www.ejbsolutions.com/</url></td>
+                </tr>
+            </table>
+        </section>
+
+    </section>
+
   </body>
 </document>
 
