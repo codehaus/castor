@@ -53,7 +53,7 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
-
+import java.lang.reflect.*;
 
 /**
  * Implementation of various collection handlers for the Java 1.1
@@ -82,27 +82,44 @@ public final class J1CollectionHandlers
             public Object add( Object collection, Object object ) {
                 Object[] array;
                 if ( collection == null ) {
-                    array = new Object[ 1 ];
-                    array[ 0 ] = object;
-                    return array;
+
+                    // If the collection is of primitive type, the instantiation
+                    // (if it was null) is handled in the FieldHandlerImpl. We
+                    // can rely here that we deal only with array of object.
+                    Object newArray = Array.newInstance(object.getClass(), 1);
+                    Array.set(newArray, 0,  object);
+                    return newArray;
                 }
-                Object[] newArray;
-                array = (Object[]) collection;
-                newArray = new Object[ array.length + 1 ];
-                for ( int i = 0 ; i < array.length ; ++i )
-                    newArray[ i ] = array[ i ];
-                newArray[ array.length ] = object;
+                
+                Class type = collection.getClass();
+                if (!type.isArray()) {
+                    String err = "J1CollectionHandlers.array#add: type "+
+                        "mismatch, expecting an array, instead received: ";
+                    err += type.getName();
+                    throw new IllegalArgumentException(err);
+                }
+                    
+                type = type.getComponentType();
+                
+                Object newArray = Array.newInstance(type, Array.getLength(collection)+1);
+
+                for ( int i = 0 ; i < Array.getLength(collection) ; ++i )
+                    Array.set(newArray, i,  Array.get(collection, i ));
+
+                Array.set(newArray, Array.getLength(collection),  object);
+
                 return newArray;
+                
             }
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
                     return new CollectionHandlers.EmptyEnumerator();
-                return new ArrayEnumerator( (Object[]) collection );
+                return new ArrayEnumerator( collection );
             }
             public int size( Object collection ) {
                 if ( collection == null )
                     return 0;
-                return ( (Object[]) collection ).length;
+                return Array.getLength(collection);
             }
             public Object clear( Object collection ) {
                 return null;
@@ -119,7 +136,6 @@ public final class J1CollectionHandlers
                     ( (Vector) collection ).addElement( object );
                     return collection;
                 } else {
-                    if ( ! ( (Vector) collection ).contains( object ) )
                         ( (Vector) collection ).addElement( object );
                     return null;
                 }
@@ -151,7 +167,6 @@ public final class J1CollectionHandlers
                     ( (Hashtable) collection ).put( object, object );
                     return collection;
                 } else {
-                    if ( ! ( (Hashtable) collection ).contains( object ) )
                         ( (Hashtable) collection ).put( object, object );
                     return null;
                 }
@@ -185,25 +200,25 @@ public final class J1CollectionHandlers
         implements Enumeration
     {
 
-        private final Object[] _array;
+        private final Object _array;
 
         private int            _index;
 
-        ArrayEnumerator( Object[] array )
+        ArrayEnumerator( Object array )
         {
             _array = array;
         }
 
         public boolean hasMoreElements()
         {
-            return ( _index < _array.length );
+            return ( _index < Array.getLength(_array) );
         }
 
         public Object nextElement()
         {
-            if ( _index > _array.length )
+            if ( _index >  Array.getLength(_array) )
                 throw new NoSuchElementException();
-            return _array[ _index++ ];
+            return Array.get(_array, _index++ );
         }
 
     }

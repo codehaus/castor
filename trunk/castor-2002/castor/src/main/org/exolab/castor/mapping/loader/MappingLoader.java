@@ -46,7 +46,7 @@
 
 package org.exolab.castor.mapping.loader;
 
-
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -64,8 +64,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.ManyToMany;
-import org.exolab.castor.mapping.xml.TypeMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.Container;
 import org.exolab.castor.mapping.xml.Include;
@@ -102,7 +100,6 @@ public abstract class MappingLoader
     private Hashtable  _clsDescs = new Hashtable();
 
 
-    private Hashtable _relDescs = new Hashtable();
     /**
      * All Java classes in the original order.
      */
@@ -150,10 +147,6 @@ public abstract class MappingLoader
         return _clsDescs.elements();
     }
 
-
-    public Enumeration listRelations() {
-        return _relDescs.elements();
-    }
 
     public Enumeration listJavaClasses()
     {
@@ -207,41 +200,10 @@ public abstract class MappingLoader
     {
         Enumeration   enum;
 
-        Enumeration   enumClass, enumField;
-
-        //System.out.println("getClassMapping count: "+mapping.getClassMappingCount());
-
-        //System.out.println("getKeyGeneratorDef count: "+mapping.getKeyGeneratorDefCount());
-
-        //System.out.println("getManyToMany count: "+mapping.getManyToManyCount());
-
-
-        // flatten relation, it is not fast, but it work....
-        enum = mapping.enumerateManyToMany();
-        while ( enum.hasMoreElements() ) {
-            ManyToMany  mnMap;
-            TypeMapping[] typeMap;
-
-            mnMap = (ManyToMany) enum.nextElement();
-            typeMap = mnMap.getTypeMapping();
-
-            String relationName = mnMap.getName();
-            String tableName = mnMap.getMapTo().getTable();
-            
-            String type1 = ((ClassMapping)typeMap[0].getType()).getName();
-            String sql1  = typeMap[0].getSql();
-            String type2 = ((ClassMapping)typeMap[1].getType()).getName();
-            String sql2  = typeMap[1].getSql();
-            //System.out.println("Add realtion: "+relationName+" "+tableName+" "+type1+" "
-            //        +sql1+" "+type2+" "+sql2);
-            addRelation( new RelationDescriptor( relationName, tableName, type1, sql1, type2, sql2 ) );
-        }
-
         // Load the mapping for all the classes. This is always returned
         // in the same order as it appeared in the mapping file.
         enum = mapping.enumerateClassMapping();
         while ( enum.hasMoreElements() ) {
-            //System.out.println("enumerating class mapping!");
             ClassMapping    clsMap;
             ClassDescriptor clsDesc;
 
@@ -261,14 +223,11 @@ public abstract class MappingLoader
             ClassDescriptor clsDesc;
 
             clsDesc = (ClassDescriptor) enum.nextElement();
-            if ( clsDesc != NoDescriptor  ) {
-                //System.out.println("start resolve relation");
+            if ( clsDesc != NoDescriptor  )
                 resolveRelations( clsDesc );
             }
         }
-        //System.out.println("load mapping is done");
 
-    }
 
     /**
      * Adds a class descriptor. Will throw a mapping exception if a
@@ -287,13 +246,6 @@ public abstract class MappingLoader
         _javaClasses.addElement( clsDesc.getJavaClass() );
     }
 
-    protected void addRelation( RelationDescriptor relDesc ) 
-            throws MappingException {
-        String left = relDesc.type1;
-        String right = relDesc.type2;
-        _relDescs.put( left+"+"+right, relDesc );        
-        _relDescs.put( right+"+"+left, relDesc );        
-    }
 
     protected void resolveRelations( ClassDescriptor clsDesc )
         throws MappingException
@@ -312,11 +264,6 @@ public abstract class MappingLoader
             }
         }
     }
-
-    public RelationDescriptor getRelation( String type1, String type2 ) {
-        return (RelationDescriptor)_relDescs.get( type1 + "+" + type2 );
-    }
-
 
     
     /**
@@ -576,9 +523,6 @@ public abstract class MappingLoader
         Method[]          setSequence = null;
 
 
-        // Set RelationDescriptor for the field
-
-        RelationDescriptor rd = getRelation( javaClass.getName(), fieldMap.getType() );
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. 
         if ( fieldMap.getType() != null ) {
@@ -618,6 +562,7 @@ public abstract class MappingLoader
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
         } else {
+
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                 int    point;
                 Vector getSeq = new Vector();
@@ -679,15 +624,21 @@ public abstract class MappingLoader
                                                 javaClass.getName() );
                 if ( fieldType == null && colType == null )
                     fieldType = getMethod.getReturnType();
-                if ( colType == null || getSetCollection ) {
+
+
+                // We try to locate a set method anyway and we complain only if we really need one.
                     setMethod = findAccessor( javaClass, "set" + capitalize( fieldName ),
                                               ( colType == null ? fieldType : colType ), false );
-                    if ( setMethod == null )
+
+                // If we have a collection that need both set and get and that
+                // we don't have a set method, we fail
+                if ( setMethod == null && colType != null && getSetCollection )
                         throw new MappingException( "mapping.accessorNotFound",
                                                     "set" + capitalize( fieldName ),
                                                     ( colType == null ? fieldType : colType ),
                                                     javaClass.getName() );
-                }
+
+
             } else {
                 // First look up the get accessors
                 if ( fieldMap.getGetMethod() != null ) {
@@ -770,7 +721,13 @@ public abstract class MappingLoader
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-        return new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient(), rd );
+        
+        FieldDescriptorImpl fieldDesc =
+            new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient() );
+        
+        fieldDesc.setRequired(fieldMap.getRequired());
+        
+        return fieldDesc;
     }
 
 
