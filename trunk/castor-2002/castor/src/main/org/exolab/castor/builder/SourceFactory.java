@@ -91,6 +91,12 @@ public class SourceFactory  {
 	private boolean _createMarshall = true;
 
     /**
+	 * A flag indicating whether or not to implement CastorTestable
+     * (used by the Castor Testing Framework)
+	 */
+	private boolean _testable = false;
+
+    /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
     public SourceFactory() {
@@ -125,6 +131,18 @@ public class SourceFactory  {
         _createMarshall = createMarshall;
     } //-- setDescriptorCreation
 
+    /**
+     * Sets whether or not to create the XML marshalling framework specific
+     * methods (marshall, unmarshall, validate) in the generated classes.
+	 * By default, these methods are generated.
+	 *
+     * @param createMarshall a boolean, when true indicates
+     * to generated the marshalling framework methods
+     *
+     */
+    public void setTestable(boolean testable) {
+           _testable = testable;
+    }
 
     //------------------/
     //- Public Methods -/
@@ -228,6 +246,12 @@ public class SourceFactory  {
            //-- #unmarshal()
            createUnmarshalMethods(jClass);
 		}
+        //create equals() method?
+        if (SourceGenerator.equalsMethod())
+            createEqualsMethod(jClass);
+        //implements CastorTestable?
+        if (_testable)
+               SourceFactory.createTestableMethods(jClass);
 
 		//-- This boolean is set to create bound properties
         //-- even if the user has set the SUPER CLASS property
@@ -730,6 +754,137 @@ public class SourceFactory  {
         jsc.append(".class, reader);");
 
     } //-- createUnmarshalMethods
+
+    /**
+     * Create an 'equals' method on the given
+     * JClass
+     * @param jclass the Jclass in which we create the equals method
+     */
+     public static void createEqualsMethod(JClass jclass) {
+         if (jclass == null)
+            throw new IllegalArgumentException("JClass must not be null");
+
+        JField[] fields = jclass.getFields();
+        JMethod jMethod = new JMethod(JType.Boolean, "equals");
+        jMethod.setComment("Override the java.lang.Object.equals method");
+        jMethod.setComment("Note: hashCode() has not been overriden");
+        jMethod.addParameter(new JParameter(SGTypes.Object, "obj"));
+        jclass.addMethod(jMethod);
+        JSourceCode jsc = jMethod.getSourceCode();
+        jsc.add("if ( this == obj )");
+        jsc.indent();
+        jsc.add("return true;");
+        jsc.unindent();
+        jsc.add("");
+        jsc.add("if (obj instanceof "+jclass.getName(true)+") {");
+        jsc.add("");
+        jsc.indent();
+        jsc.add(jclass.getName(true)+" temp = ("+jclass.getName(true)+")obj;");
+        for (int i = 0; i <fields.length; i++) {
+            JField temp = fields[i];
+            //Be careful to arrayList....
+
+            String name = temp.getName();
+            if (temp.getType().isPrimitive())
+               jsc.add("if (this."+ name +" != temp."+name+")");
+            else jsc.add("if (!(this."+ name +".equals(temp."+name+"))) ");
+            jsc.indent();
+            jsc.add("return false;");
+            jsc.unindent();
+        }
+        jsc.add("return true;");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("return false;");
+
+     }//CreateEqualsMethod
+
+
+    /**
+     * Implement org.exolab.castor.tests.framework.CastorTestable im the
+     * given JClass
+     * @param jclass the JCLass which will implement the CastorTestable Interface
+     * @see org.exolab.castor.tests.framework.CastorTestable
+     */
+     public static void createTestableMethods(JClass jclass) {
+         if (jclass == null)
+            throw new IllegalArgumentException("JClass must not be null");
+
+        jclass.addInterface("org.exolab.castor.tests.framework.CastorTestable");
+        jclass.addImport("org.exolab.castor.tests.framework.CastorTestable");
+        jclass.addImport("org.exolab.castor.tests.framework.RandomHelper");
+
+        //implementation of randomizeFields
+        JMethod jMethod = new JMethod(null, "randomizeFields");
+        jMethod.addException(new JClass("InstantiationException"));
+        jMethod.addException(new JClass("IllegalAccessException"));
+        jMethod.setComment("implementation of org.exolab.castor.tests.framework.CastorTestable");
+        jclass.addMethod(jMethod);
+        JSourceCode jsc = jMethod.getSourceCode();
+        JField[] fields = jclass.getFields();
+        for (int i = 0; i <fields.length; i++) {
+
+            JField temp = fields[i];
+            JType type = temp.getType();
+            JType component = null;
+            String name = temp.getName();
+            String setName = "set" + JavaNaming.toJavaClassName(name);
+            String componentName = null;
+
+            if (name.indexOf("_has") == -1) {
+               //Collection needs a specific handling
+               if ( (type.getName().equals("java.util.Vector")) ||
+                    (type.getName().equals("java.util.ArrayList")) ) {
+                     //if we are dealing with a Vector or an ArrayList
+                    //we retrieve the type included in this Collection
+                    int listLocat = name.lastIndexOf("List");
+                    String tempName = name;
+                    if (listLocat != -1)
+                       tempName = tempName.substring(0,listLocat);
+                    String methodName = JavaNaming.toJavaClassName(tempName);
+                    methodName = "get"+methodName;
+                    JMethod method = jclass.getMethod(methodName,0);
+                    componentName = method.getReturnType().getName();
+                    method = null;
+                    methodName = null;
+                    tempName = null;
+                    jsc.add(name+" = RandomHelper.getRandom("+name+", "+componentName+".class);");
+               }
+               else if (type.isPrimitive())
+                  jsc.add(setName+"(RandomHelper.getRandom("+name+"));");
+               else
+                 jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+type.getName()+".class));");
+                 //jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class));");
+                jsc.add("");
+            }
+        }
+
+        //implementation of dumpFields
+        jMethod = new JMethod(SGTypes.String, "dumpFields");
+        jMethod.setComment("implementation of org.exolab.castor.tests.framework.CastorTestable");
+        jclass.addMethod(jMethod);
+        jsc = jMethod.getSourceCode();
+        jsc.add("String result = \"DumpFields() for element: "+jclass.getName()+"\\n\";");
+        for (int i = 0; i <fields.length; i++) {
+
+            JField temp = fields[i];
+            String name = temp.getName();
+            if ( (temp.getType().isPrimitive()) ||
+                 (temp.getType().getName().equals("java.lang.String")))
+                  jsc.add("result += \"Field "+name+":\" +"+name+"+\"\\n\";");
+            else {
+                jsc.add("if ( ("+name+" != null) && ("+name+".getClass().isAssignableFrom(CastorTestable.class)))");
+                jsc.indent();
+                jsc.add("result += ((CastorTestable)"+name+").dumpFields();");
+                jsc.unindent();
+                jsc.add("else result += \"Field "+name+":\" +"+name+"+\"\\n\";");
+            }
+            jsc.add("");
+        }
+        jsc.add("");
+        jsc.add("return result;");
+     }//CreateTestableMethods
+
 
     /**
      * Creates the Validate methods for the given JClass
