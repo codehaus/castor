@@ -39,7 +39,7 @@ import org.exolab.adaptx.xpath.expressions.NodeExpression;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-class LocationStepImpl extends FilterBase 
+class LocationStepImpl extends AbstractPathComponent
     implements LocationStep
 {
 
@@ -72,9 +72,10 @@ class LocationStepImpl extends FilterBase
     /**
      * Creates a new LocationStep with the given ancestry operator
      */
-    protected LocationStepImpl( int ancestryOp )
+    protected LocationStepImpl()
     {
-        super( ancestryOp );
+        super();
+        
     } //-- LocationStep
 
     /**
@@ -84,7 +85,7 @@ class LocationStepImpl extends FilterBase
      */
     protected LocationStepImpl( ErrorExpr error )
     {
-        super( NO_OP );
+        super();
         _error = error;
     } //-- LocationStepImpl
     
@@ -92,9 +93,9 @@ class LocationStepImpl extends FilterBase
     /**
      * Creates a new LocationStep with the given AxisIdentifier
      */
-    protected LocationStepImpl( int ancestryOp, short axisIdentifier)
+    protected LocationStepImpl(short axisIdentifier)
     {
-        super( ancestryOp );
+        super();
         _axisIdentifier = axisIdentifier;
     } //-- LocationStepImpl
 
@@ -238,6 +239,19 @@ class LocationStepImpl extends FilterBase
     } //-- getDefaultPriority
 
     /**
+     * Returns the sub-expression encapsulated by this PathComponent.
+     * the sub-expression will either be a PrimaryExpr if this
+     * PathComponent is a FilterExpr, or a NodeExpression if this
+     * Pathcomponent is a LocationStep. This method may return
+     * null if no such sub-expression exists for the PathComponent.
+     *
+     * @return the sub-expression encapsulated by this PathComponent.
+     */
+    public XPathExpression getSubExpression() {
+        return getNodeExpr();
+    } //-- getSubExpression
+
+    /**
      * Returns the NodeExpression for this LocationStep.
      *
      * @return the NodeExpression for this LocationStep.
@@ -246,6 +260,29 @@ class LocationStepImpl extends FilterBase
         return _nodeExpr;
     } //-- getNodeExpr
 
+    /**
+     * Returns true if this PathComponent is a FilterExpr.
+     * Note that if this method returns true, then a call to 
+     * #isLocationStep must return false.
+     *
+     * @return true if this PathComponent is a FilterExpr
+     * @see isLocationStep
+     */
+    public boolean isFilterExpr() {
+        return false;
+    } //-- isFilterExpr
+    
+    /**
+     * Returns true if this PathComponent is a LocationStep.
+     * Note that if this method returns true, then a call to 
+     * #isFilterExpr must return false.
+     *
+     * @return true if this PathComponent is a LocationStep
+     * @see isFilterExpr
+     */
+    public boolean isLocationStep() {
+        return true;
+    } //-- isLocationStep
 
     /**
      * Determines if the given node is matched by this MatchExpr with
