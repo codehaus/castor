@@ -47,28 +47,16 @@
 package jdo;
 
 
-import java.io.IOException;
-import java.util.Enumeration;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.ResultSet;
-import java.lang.Math;
 import java.util.Random;
+
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -213,8 +201,8 @@ public class CacheLeakage extends CastorTestCase {
         _cacheType = Database.ReadOnly; 
         runOnce();
 
-        assert( "Element leak not detected!", !_errLeak );
-        assert( "Race condition not happened!", !_errCount );
+        assertTrue( "Element leak not detected!", !_errLeak );
+        assertTrue( "Race condition not happened!", !_errCount );
     }
 
     public void tearDown() 
@@ -229,11 +217,6 @@ public class CacheLeakage extends CastorTestCase {
      */
     public void runOnce() 
             throws PersistenceException, SQLException {
-
-        OQLQuery        oql;
-        TestObjectEx    object;
-        Enumeration     enum;
-        Database        db2;
 
         // clear the table
         int del = _conn.createStatement().executeUpdate( "DELETE FROM test_race" );
@@ -274,7 +257,7 @@ public class CacheLeakage extends CastorTestCase {
         // Polling the test case to see if it is finished
         try {
             while ( !cdThread.isDone() ) {
-                Thread.currentThread().sleep( 500 );
+                Thread.sleep( 500 );
             }
 
             // Joins all the finished threads
@@ -307,7 +290,7 @@ public class CacheLeakage extends CastorTestCase {
         ReadThread( CacheLeakage theTest, CreateDeleteThread other, JDOCategory c, int n ) 
                 throws PersistenceException {
 
-            this.db = c.getDatabase( theTest.verbose );
+            this.db = c.getDatabase( CastorTestCase.verbose );
             this.trial = n;
             this.ran = new Random();
             this.other = other;
@@ -317,7 +300,6 @@ public class CacheLeakage extends CastorTestCase {
         public void run() {
             boolean succeed;
             int trials = 0;
-            TestRace tr;
             try {
                 for ( int i=0; i < trial && !other.isDone(); i++ ) {
                     try {
@@ -329,7 +311,7 @@ public class CacheLeakage extends CastorTestCase {
                         while ( !succeed && trials < NUM_OF_RETRIAL && !other.isDone() ) {
                             trials++;
                             try {
-                                tr = (TestRace) db.load( _classType, id, Database.Shared );
+                                db.load( _classType, id, Database.Shared );
                                 // may throw ObjectNotFoundException
                                 // LockNotGrantedException
                                 db.commit();
@@ -337,15 +319,15 @@ public class CacheLeakage extends CastorTestCase {
                             } catch ( LockNotGrantedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } catch ( ObjectNotFoundException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } catch ( TransactionAbortedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             }
                         }
                         if ( db.isActive() ) 
@@ -389,7 +371,7 @@ public class CacheLeakage extends CastorTestCase {
         private CreateDeleteThread( CacheLeakage theTest, JDOCategory c, int cachetype, int n ) 
                 throws PersistenceException {
 
-            this.db = c.getDatabase( theTest.verbose );
+            this.db = c.getDatabase( CastorTestCase.verbose );
             this.trial = n;
             this.ran = new Random();
             this.cachetype = cachetype;
@@ -397,12 +379,9 @@ public class CacheLeakage extends CastorTestCase {
         }
         public void run() {
             try {
-                int num = 0;
-                theTest.stream.println("start testing");
+                CastorTestCase.stream.println("start testing");
                 TestRace tr;
                 TestRace testrace;
-                OQLQuery oql;
-                QueryResults qr;
                 boolean succeed;
                 int trials;
                 Integer id = new Integer(5);
@@ -454,12 +433,12 @@ public class CacheLeakage extends CastorTestCase {
                                 succeed = false;
                                 // ethernet way of retry
                                 db.rollback();
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } catch ( TransactionAbortedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
                                 db.rollback();
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } 
                         }
                         if ( db.isActive() ) 
@@ -481,7 +460,7 @@ public class CacheLeakage extends CastorTestCase {
                                 succeed = false;
                                 // ethernet way of retry
                                 db.rollback();
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } 
                         }
                         if ( db.isActive() ) 
@@ -503,12 +482,12 @@ public class CacheLeakage extends CastorTestCase {
                             } catch ( LockNotGrantedException e ) {
                                 succeed = false;
                                 db.rollback();
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } catch ( TransactionAbortedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
                                 db.rollback();
-                                Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
+                                Thread.sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             }
                         }
                         if ( db.isActive() ) 
@@ -517,19 +496,19 @@ public class CacheLeakage extends CastorTestCase {
                             throw new Exception("Transaction can't not lock the object within "+trials+" trials");
 
                     } catch ( TransactionNotInProgressException e ) {
-                        theTest.stream.println( "Thread <CreateDelete> will be killed. Unexcepted exception: "+e.getException() );
+                        CastorTestCase.stream.println( "Thread <CreateDelete> will be killed. Unexcepted exception: "+e.getException() );
                         e.printStackTrace();
                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     } catch ( PersistenceException e ) {
-                        theTest.stream.println( "Thread <CreateDelete> will be killed. Unexcepted exception: " );
+                        CastorTestCase.stream.println( "Thread <CreateDelete> will be killed. Unexcepted exception: " );
                         e.printStackTrace();
                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     } catch ( Exception e ) {
-                        theTest.stream.println( "Thread <CreateDelete> will be killed. Element not found: other exception: "+e );
+                        CastorTestCase.stream.println( "Thread <CreateDelete> will be killed. Element not found: other exception: "+e );
                         e.printStackTrace();
                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
