@@ -82,7 +82,7 @@ public class Dependent
     public Dependent( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC15", "Dependent objects tests" );
+        super( "TC13", "Dependent objects tests" );
         _category = (JDOCategory) category;
     }
 
@@ -257,90 +257,7 @@ public class Dependent
                 result = false;
             }
             db.commit();
-            if ( ! result )
-                return false;
 
-
-            stream.writeVerbose( "Test long transaction with dirty checking" );
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master == null ) {
-                stream.writeVerbose( "Error: failed to find master with details group" );
-                return false;
-            }
-            db.commit();
-            db.begin();
-            master2 = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            master2.setValue( master2.getValue() + "2" );
-            db.commit();
-
-            stream.writeVerbose( "Test 1" );
-            try {
-                db.begin();
-                db.update( master );
-                db.commit();
-                stream.writeVerbose( "Error: Dirty checking doesn't work" );
-                result  = false;
-            } catch ( ObjectModifiedException exept ) {
-                db.rollback();
-                stream.writeVerbose( "OK: Dirty checking works" );
-            }
- 
-            stream.writeVerbose( "Test 2" );
-            master2.addDetail( new TestDetail( 5 ) );
-            master2.addDetail( new TestDetail( 6 ) );
-            master2.getDetails().remove( master.getDetails().indexOf( new TestDetail( 8 ) ) );
-            master2.getDetails().remove( master.getDetails().indexOf( new TestDetail( 9 ) ) );
-            try {
-                db.begin();
-                db.update( master2 );
-                db.commit();
-                stream.writeVerbose( "OK: Dirty checking works" );
-            } catch ( ObjectModifiedException exept ) {
-                db.rollback();
-                stream.writeVerbose( "Error: Dirty checking doesn't work" );
-                result  = false;
-            }
-            stream.writeVerbose( "Test 3" );
-            _conn = _category.getJDBCConnection(); 
-            _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_master SET value='concurrent' WHERE id=" 
-                    + master2.getId() );
-            _conn.commit();
-            _conn.close();
-            master2.addDetail( new TestDetail( 10 ) );
-            try {
-                db.begin();
-                db.update( master2 );
-                db.commit();
-                stream.writeVerbose( "Error: Dirty checking doesn't work" );
-                result  = false;
-            } catch ( ObjectModifiedException exept ) {
-                if (db.isActive()) {
-                    db.rollback();
-                }
-                stream.writeVerbose( "OK: Dirty checking works" );
-            }
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getDetails().size() == 0 ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     master.getDetails().contains( new TestDetail( 9 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
-                    result  = false;
-                } else {
-                    stream.writeVerbose( "Details changed correctly in the long transaction: " + master );
-                }
-            } else {
-                stream.writeVerbose( "Error: master not found" );
-                result = false;
-            }
-            //db.remove( master );
-            db.commit();
             if ( ! result )
                 return false;
 

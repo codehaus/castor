@@ -743,13 +743,13 @@ public final class SQLEngine implements Persistence {
                 }
             }
             System.out.println();
-            //System.out.println();
+
             // Generate key during INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
                 CallableStatement cstmt = (CallableStatement) stmt;
                 int sqlType;
 
-                sqlType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
+                sqlType = _ids[0].sqlType;
                 cstmt.registerOutParameter( count, sqlType );
                 cstmt.execute();
 
