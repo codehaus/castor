@@ -242,7 +242,7 @@ public class ClassDescriptorResolverImpl
             //-- do nothing for now
         }
         
-        if ((_class != null) && (!UnmarshalHandler.isPrimitive(_class))) {
+        if (_class != null) {
             classDesc = resolve(_class);
         }
         else clearError(); //-- clear error flag
@@ -340,8 +340,6 @@ public class ClassDescriptorResolverImpl
     private Class loadClass(String className, ClassLoader loader) 
         throws ClassNotFoundException
     {
-        Class c = null;
-        
         //-- use passed in loader
 	    if ( loader != null )
 		    return loader.loadClass(className);
