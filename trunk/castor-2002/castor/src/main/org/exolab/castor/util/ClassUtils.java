@@ -72,7 +72,11 @@ public final class ClassUtils
         if ( JDK.startsWith( "1.1" ) ) {
             return Class.forName( name );
         } else {
-            return Thread.currentThread().getContextClassLoader().loadClass( name );
+            try {
+                return Thread.currentThread().getContextClassLoader().loadClass( name );
+            } catch ( ClassNotFoundException except ) {
+                return Class.forName( name );
+            }
         }
     }
 
