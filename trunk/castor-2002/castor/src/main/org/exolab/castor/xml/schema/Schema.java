@@ -59,6 +59,7 @@ import java.util.Enumeration;
 **/
 public class Schema extends Annotated {
 
+    
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/1999/XMLSchema";
 
@@ -66,11 +67,36 @@ public class Schema extends Annotated {
     private static final String NULL_ARGUMENT
         = "A null argument was passed to " +
            Schema.class.getName() + "#";
-
+           
+    /**
+     * The SimpleTypesFactory used by this Schema
+     */
+    private static SimpleTypesFactory simpleTypesFactory
+        = new SimpleTypesFactory();
+        
+    //--------------------/
+    //- Member Variables -/
+    //--------------------/
+    
+    /**
+     * The ID for this Schema
+    **/
+    private String id       = null;
+    
     private String name     = null;
+    
     private String schemaNS = null;
+    
+    /**
+     * The targetNamespace 
+    **/
     private String targetNS = null;
 
+    /**
+     * The version information as specified by the version
+     * attribute
+    **/
+    private String version  = null;
 
     /**
      * A list of defined architypes
@@ -103,7 +129,6 @@ public class Schema extends Annotated {
 	 */
 	private Hashtable namespaces = null;
 
-    private static SimpleTypesFactory simpleTypesFactory= new SimpleTypesFactory();
 
     /**
      * Creates a new SchemaDef
@@ -132,36 +157,6 @@ public class Schema extends Annotated {
 
     } //-- init
 
-	/**
-	 * Adds the given Schema definition to this Schema definition as an imported schenma
-	 * @param schema the Schema to add to this Schema as an imported schema
-     * @exception SchemaException if the Schema already exists
-	 */
-	public synchronized void addSchema(Schema schema)
-        throws SchemaException
-	{
-		String targetNamespace = schema.getTargetNamespace();
-		if (importedSchemas.get(targetNamespace)!=null)
-		{
-            String err = "a Schema has already been imported with the given namespace: ";
-            throw new SchemaException(err + targetNamespace);
-		}
-		importedSchemas.put(targetNamespace, schema);
-	}
-
-	/**
-	 * Returns True if the namespace is known to this schema
-	 * @param namespace the namespace URL
-	 * @return True if the namespace was declared in the schema
-	 */
-	public boolean isKnownNamespace(String namespaceURL)
-	{
-		Enumeration urls = namespaces.elements();
-		while(urls.hasMoreElements())
-			if (urls.nextElement().equals(namespaceURL))
-				return true;
-		return false;
-	}
 
     /**
      * Adds the given Complextype definition to this Schema defintion
@@ -192,6 +187,57 @@ public class Schema extends Annotated {
 
     } //-- addComplextype
 
+    /**
+     * Adds the given Element declaration to this Schema defintion
+     * @param elementDecl the ElementDecl to add to this SchemaDef
+     * @exception SchemaException when an ElementDecl already
+     * exists with the same name as the given ElementDecl
+    **/
+    public void addElementDecl(ElementDecl elementDecl)
+        throws SchemaException
+    {
+
+        String name = elementDecl.getName();
+
+        if (name == null) {
+            String err = "an element declaration must contain a name.";
+            throw new SchemaException(err);
+        }
+        if (elements.get(name) != null) {
+            String err = "an element declaration already exists with the given name: ";
+            throw new SchemaException(err + name);
+        }
+
+        elements.put(name, elementDecl);
+
+
+    } //-- addElementDecl
+    
+	/**
+	 * Adds the given Schema definition to this Schema definition as an imported schenma
+	 * @param schema the Schema to add to this Schema as an imported schema
+     * @exception SchemaException if the Schema already exists
+	 */
+	public synchronized void addImportedSchema(Schema schema)
+        throws SchemaException
+	{
+		String targetNamespace = schema.getTargetNamespace();
+		if (importedSchemas.get(targetNamespace)!=null)
+		{
+            String err = "a Schema has already been imported with the given namespace: ";
+            throw new SchemaException(err + targetNamespace);
+		}
+		importedSchemas.put(targetNamespace, schema);
+	} //-- addImportedSchema
+	
+	/**
+	 * Adds to the namespaces declared in this Schema
+	 * @param namespaces the list of namespaces
+	 */
+	public void addNamespace(String prefix, String ns) {
+		namespaces.put(prefix, ns);
+	} //-- setNamespaces
+	
     /**
      * Adds the given SimpletType definition to this Schema defintion
      * @param simpletype the SimpleType to add to this Schema
@@ -225,31 +271,6 @@ public class Schema extends Annotated {
 
     } //-- addSimpleType
 
-    /**
-     * Adds the given Element declaration to this Schema defintion
-     * @param elementDecl the ElementDecl to add to this SchemaDef
-     * @exception SchemaException when an ElementDecl already
-     * exists with the same name as the given ElementDecl
-    **/
-    public void addElementDecl(ElementDecl elementDecl)
-        throws SchemaException
-    {
-
-        String name = elementDecl.getName();
-
-        if (name == null) {
-            String err = "an element declaration must contain a name.";
-            throw new SchemaException(err);
-        }
-        if (elements.get(name) != null) {
-            String err = "an element declaration already exists with the given name: ";
-            throw new SchemaException(err + name);
-        }
-
-        elements.put(name, elementDecl);
-
-
-    } //-- addElementDecl
 
 
     /**
@@ -287,6 +308,12 @@ public class Schema extends Annotated {
         return simpleTypesFactory.createUserSimpleType(this, name, baseName, derivation, true);
     }
 
+    /**
+     * Gets a built in type's name given its code.
+     */
+    public String getBuiltInTypeName(int builtInTypeCode) {
+        return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
+    } //-- getBuiltInTypeName
 
     /**
      * Returns the ComplexType of associated with the given name
@@ -339,14 +366,6 @@ public class Schema extends Annotated {
     public Enumeration getComplexTypes() {
         return complexTypes.elements();
     } //-- getComplextypes
-
-
-    /**
-     * Gets a built in type's name given its code.
-     */
-    public String getBuiltInTypeName(int builtInTypeCode) {
-        return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
-    }
 
     /**
      * Returns the SimpleType associated with the given name,
@@ -430,6 +449,16 @@ public class Schema extends Annotated {
         return elements.elements();
     } //-- getElementDecls
 
+    /**
+     * Returns the Id for this Schema, as specified by the
+     * Id attribute, or null if no Id exists.
+     *
+     * @return the Id for this Scheam, or null if no Id exists
+    **/
+    public String getId() {
+        return id;
+    } //-- getId
+    
 	/**
 	 * Returns an imported schema by it's namespace
 	 * @return The imported schema
@@ -438,6 +467,15 @@ public class Schema extends Annotated {
 	{
 		return (Schema) importedSchemas.get(ns);
 	} //-- getImportedSchema
+	
+    /**
+     * Returns the namespaces declared for this Schema
+     * @return the namespaces declared for this Schema
+    **/
+    public Hashtable getNamespaces() {
+        return this.namespaces;
+    } //-- getNamespaces
+    
 
 	/**
 	 * Indicates that the given XML Schema file has been processed via an <xsd:include>
@@ -480,14 +518,32 @@ public class Schema extends Annotated {
         return this.targetNS;
     } //-- getTargetNamespace
 
-    /**
-     * Returns the namespaces declared for this Schema
-     * @return the namespaces declared for this Schema
-    **/
-    public Hashtable getNamespaces() {
-        return this.namespaces;
-    } //-- getNamespaces
 
+    /**
+     * Returns the version information of the XML Schema definition
+     * represented by this Schema instance. 
+     *
+     * @return the version information of the XML Schema
+     * definition, or null if no version information exists.
+    **/
+    public String getVersion() {
+        return version;
+    } //-- getVersion
+    
+	/**
+	 * Returns True if the namespace is known to this schema
+	 * @param namespace the namespace URL
+	 * @return True if the namespace was declared in the schema
+	 */
+	public boolean isKnownNamespace(String namespaceURL)
+	{
+		Enumeration urls = namespaces.elements();
+		while(urls.hasMoreElements())
+			if (urls.nextElement().equals(namespaceURL))
+				return true;
+		return false;
+	}
+	
     /**
      * Removes the given top level ComplexType from this Schema
      * @param complexType the ComplexType to remove
@@ -539,6 +595,14 @@ public class Schema extends Annotated {
         return result;
     }
 
+    /**
+     * Sets the Id for this Schema
+     *
+     * @param id the Id for this Schema
+    **/
+    public void setId(String id) {
+        this.id = id;
+    } //-- setId
 
     /**
      * Sets the target namespace for this Schema
@@ -549,15 +613,16 @@ public class Schema extends Annotated {
         this.targetNS = targetNamespace;
     } //-- setTargetNamespace
 
-
-	/**
-	 * Adds to the namespaces declared in this Schema
-	 * @param namespaces the list of namespaces
-	 */
-	public void addNamespace(String prefix, String ns) {
-		namespaces.put(prefix, ns);
-	} //-- setNamespaces
-
+    /**
+     * Sets the version information for the XML Schema defintion
+     * represented by this Schema instance.
+     * 
+     * @param the version for this XML Schema defination.
+    **/
+    public void setVersion(String version) {
+        this.version = version;
+    } //-- setVersion
+    
 
     /** Gets the type factory, package private */
     static SimpleTypesFactory getTypeFactory() { return simpleTypesFactory; }
