@@ -1,35 +1,44 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0">
 
-<xsl:template match="$project/navSections">
-  <xsl:for-each select="section">
-  <xsl:variable name="sectionName" select="@name"/>
-  <table width="95" border="0" cellpadding="0" cellspacing="0">
-  <xsl:for-each select="navLink">
-    <xsl:variable name="url">
-      <xsl:call-template name="link-convertor">
-        <xsl:with-param name="href" select="url"/>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:choose>
-      <xsl:when test="position()=$leftBottomNavPos">
+  <xsl:template match="$project/navSections">
+    <xsl:for-each select="section">
+      <table width="95" border="0" cellpadding="0" cellspacing="0">
         <tr>
-          <td width="95" valign="top" align="left"><a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a></td>
+          <td width="95" valign="top" align="left">
+            <xsl:choose>
+              <xsl:when test="@url">
+                <xsl:variable name="url">
+                  <xsl:call-template name="link-convertor">
+                    <xsl:with-param name="href" select="@url"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <a href="{$url}"><span class="subMenuOn"><xsl:value-of select="@name"/></span></a>
+                </xsl:when>
+                <xsl:otherwise>
+                  <span class="subMenuOn"><xsl:value-of select="@name"/></span>
+                </xsl:otherwise>
+              </xsl:choose>
+          </td>
         </tr>
-      </xsl:when>
-      <xsl:otherwise>
-        <tr>
-          <td width="95" valign="top" align="left"><a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a></td>
-        </tr>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:for-each>
-  </table>
-  <br/>
-  </xsl:for-each>
-</xsl:template>
-
+        <xsl:for-each select="navLink">
+          <xsl:variable name="url">
+            <xsl:call-template name="link-convertor">
+              <xsl:with-param name="href" select="url"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <tr>
+              <td width="95" valign="top" align="left">
+		&#160;&#160;
+                <a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a>
+              </td>
+            </tr>
+          </xsl:for-each>
+      </table>
+      <br/>
+    </xsl:for-each>
+  </xsl:template>
+  
 </xsl:stylesheet>
 
 
