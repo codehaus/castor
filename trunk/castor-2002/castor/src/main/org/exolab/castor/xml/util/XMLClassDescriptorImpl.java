@@ -138,12 +138,14 @@ public class XMLClassDescriptorImpl
     //- Constructors -/
     //----------------/
     
+    
     /**
      * Creates an XMLClassDescriptor class used by the Marshalling Framework.
      * @param type the Class type with which this ClassDescriptor describes.
     **/
     public XMLClassDescriptorImpl(Class type) {
-        this(type, null);
+        this();
+        this._class = type;
     } //-- XMLClassDescriptorImpl
 
     /**
@@ -151,13 +153,20 @@ public class XMLClassDescriptorImpl
      * @param type the Class type with which this ClassDescriptor describes.
     **/
     public XMLClassDescriptorImpl(Class type, String xmlName) {
+        this();
         this._class = type;
         this._xmlName = xmlName;
+    } //-- XMLClassDescriptorImpl
+
+    /**
+     * Protected constructor used by this class, and subclasses only
+    **/
+    protected XMLClassDescriptorImpl() {
         attributeDescriptors = new List(7);
         elementDescriptors = new List(7);
         validationRules = new List();
-    } //-- XMLClassDescriptorImpl
-
+    } //-- XMLClassDescriptor
+    
     //------------------/
     //- Public Methods -/
     //------------------/
@@ -347,6 +356,19 @@ public class XMLClassDescriptorImpl
         return _accessMode;
     } //-- getAccessMode
     
+    //---------------------/
+    //- Protected Methods -/
+    //---------------------/
+    
+    /**
+     * Sets the Class type being described by this descriptor.
+     *
+     * @type the Class type being described
+    **/
+    protected void setJavaClass(Class type) {
+        this._class = type;
+    } //-- setJavaClass
+
 } //-- XMLClassDescriptor
 
 

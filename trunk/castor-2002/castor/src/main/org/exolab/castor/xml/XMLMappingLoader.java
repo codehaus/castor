@@ -59,6 +59,9 @@ import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 
+import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
+import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
+
 
 /**
  * An XML implementation of mapping helper. Creates XML class
@@ -152,7 +155,8 @@ public class XMLMappingLoader
             xmlName = clsDesc.getJavaClass().getName();
         else
             xmlName = clsMap.getXmlSchema().getXmlName();
-        return new XMLClassDescriptor( clsDesc, xmlName );
+            
+        return new XMLClassDescriptorAdapter( clsDesc, xmlName );
     }
 
 
@@ -173,7 +177,7 @@ public class XMLMappingLoader
             nodeType = null;
         else
             nodeType = NodeType.getNodeType( fieldMap.getXmlInfo().getNodeType() );
-        return new XMLFieldDescriptor( (FieldDescriptorImpl) fieldDesc, xmlName, nodeType );
+        return new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
     }
 
 
