@@ -601,7 +601,14 @@ public final class SQLEngine
         ++count;
             }
         }
-        sql.append( ") VALUES (" );
+        // it is possible to have no fields in INSERT statement:
+        // only the primary key field in the table,
+        // with KeyGenerator DURING_INSERT or BEFORE_INSERT
+        if ( count == 0 ) 
+            sql.setLength( sql.length() - 2 ); // cut " ("
+        else 
+            sql.append( ")" );
+        sql.append( " VALUES (" );
         for ( int i = 0 ; i < count ; ++i ) {
             if ( i > 0 )
                 sql.append( ',' );
