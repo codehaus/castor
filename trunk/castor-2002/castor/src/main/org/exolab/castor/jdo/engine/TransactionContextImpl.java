@@ -87,22 +87,11 @@ final class TransactionContextImpl
 
 
     /**
-     * Create a new transaction context. This method is used by the
-     * ODMG transaction model, see {@link TransactionImpl}.
+     * Create a new transaction context.
      */
     public TransactionContextImpl()
     {
         super();
-    }
-
-
-    /**
-     * Create a new transaction context. This method is used by the
-     * JTA transaction model, see {@link XAResourceImpl}.
-     */
-    public TransactionContextImpl( Xid xid )
-    {
-        super( xid );
     }
 
 

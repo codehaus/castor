@@ -8,7 +8,7 @@ package org.exolab.castor.jdo;
  * @version $Revision$ $Date$
  */
 public class ObjectDeletedException
-    extends PersistenceException
+    extends ObjectNotPersistentException
 {
     
 

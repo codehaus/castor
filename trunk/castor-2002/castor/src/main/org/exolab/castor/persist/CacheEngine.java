@@ -395,7 +395,7 @@ public final class CacheEngine
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            if ( writeLock )
+            if ( accessMode == AccessMode.Locked )
                 oid.setExclusive( true );
             typeInfo.cache.addLock( oid, lock );
             return oid;
@@ -518,7 +518,7 @@ public final class CacheEngine
             } catch ( Exception except ) {
                 // This should never happen since we just created the lock
             }
-            if ( writeLock )
+            if ( accessMode == AccessMode.Locked )
                 oid.setExclusive( true );
             typeInfo.cache.addLock( oid, lock );
             return oid;
@@ -941,7 +941,7 @@ public final class CacheEngine
      *  persistence engine
      */
     public void writeLock( TransactionContext tx, OID oid, int timeout )
-        throws LockNotGrantedException, ObjectDeletedException, PersistenceException
+        throws LockNotGrantedException, PersistenceException
     {
         ObjectLock lock;
         TypeInfo   typeInfo;
@@ -982,11 +982,9 @@ public final class CacheEngine
      *  attempting to acquire lock on object
      * @throws ObjectDeletedException The object has been deleted from
      *  persistent storage
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
      */
     public void softLock( TransactionContext tx, OID oid, int timeout )
-        throws LockNotGrantedException, ObjectDeletedException, PersistenceException
+        throws LockNotGrantedException
     {
         ObjectLock lock;
         TypeInfo   typeInfo;

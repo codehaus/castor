@@ -232,12 +232,10 @@ public final class XAResourceImpl
                 } else {
                     return XA_RDONLY;
                 }
-            } catch ( TransactionNotInProgressException except ) {
-                // This should not happen since transaction will
-                // not be closed if we got active status
-                throw new XAException( XAException.XAER_RMFAIL );
             } catch ( TransactionAbortedException except ) {
                 throw new XAException( XAException.XA_RBROLLBACK );
+            } catch ( IllegalStateException except ) {
+                throw new XAException( XAException.XAER_PROTO );
             }
         case Status.STATUS_MARKED_ROLLBACK:
             // Report transaction marked for rollback.
@@ -274,13 +272,11 @@ public final class XAResourceImpl
             // as a heuristic decision to rollback.
             try {
                 tx.commit();
-            } catch ( TransactionNotInProgressException except ) {
-                // This should not happen since transaction will
-                // not be closed if we got prepared status
-                throw new XAException( XAException.XAER_PROTO );
             } catch ( TransactionAbortedException except ) {
                 // Transaction cannot commit and was rolledback
                 throw new XAException( XAException.XA_HEURRB );
+            } catch ( IllegalStateException except ) {
+                throw new XAException( XAException.XAER_PROTO );
             }
         default:
             throw new XAException( XAException.XAER_PROTO );
@@ -313,10 +309,8 @@ public final class XAResourceImpl
             // Rollback never fails with an application exception.
             try {
                 tx.rollback();
-            } catch ( TransactionNotInProgressException except ) {
-                // This should not happen since transaction will
-                // not be closed if we got active/marked status
-                throw new XAException( XAException.XAER_RMFAIL );
+            } catch ( IllegalStateException except ) {
+                throw new XAException( XAException.XAER_PROTO );
             }
             return;
         default:

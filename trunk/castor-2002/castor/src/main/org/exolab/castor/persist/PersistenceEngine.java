@@ -306,11 +306,9 @@ public interface PersistenceEngine
      *  attempting to acquire lock on object
      * @throws ObjectDeletedException The object has been deleted from
      *  persistent storage
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
      */
     public void softLock( TransactionContext tx, OID oid, int timeout )
-        throws LockNotGrantedException, ObjectDeletedException, PersistenceException;
+        throws LockNotGrantedException, ObjectDeletedException;
 
 
     /**

@@ -92,7 +92,7 @@ public class Test
         
         // Look up the product and if found in the database,
         // delete this object from the database
-        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE Id = $1" );
+        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE id = $1" );
         productOql.bind( 4 );
         enum = productOql.execute();
         if ( enum.hasMoreElements() ) {
@@ -103,7 +103,7 @@ public class Test
         
         // Look up the computer and if found in the database,
         // delete ethis object from the database
-        computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE Id = $1" );
+        computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE id = $1" );
         computerOql.bind( 6 );
         enum = computerOql.execute();
         if ( enum.hasMoreElements() ) {
@@ -114,7 +114,7 @@ public class Test
         
         // Look up the group and if found in the database,
         // delete this object from the database
-        groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE Id = $1" );
+        groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
         groupOql.bind( 3 );
         enum = groupOql.execute();
         if ( enum.hasMoreElements() ) {
@@ -201,7 +201,6 @@ public class Test
 
         Serializer  ser;
         Marshaller  marshal;
-        Mapping     mapping;
 
         ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
         ser.setOutputCharStream( writer );
@@ -217,6 +216,7 @@ public class Test
             marshal.marshal( enum.nextElement() );
         ser.asDocumentHandler().endElement( "products" );
         ser.asDocumentHandler().endDocument();
+
         db.commit();
         db.close();
     }
