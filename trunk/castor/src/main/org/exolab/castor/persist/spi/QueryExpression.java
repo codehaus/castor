@@ -48,6 +48,7 @@ package org.exolab.castor.persist.spi;
 
 
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
 
 
 /**
@@ -223,15 +224,19 @@ public interface QueryExpression
      * Adds an limit clause. 
      * @param limitClause The LIMIT clause to add (without the word 
      *    LIMIT).
+     * @throws SyntaxNotSupportedException If the LIMIT clause is not supported by the RDBMS.
      */
-    public void addLimitClause( String limitClause );  
+    public void addLimitClause( String limitClause )
+    	throws SyntaxNotSupportedException;  
 
     /**
      * Adds an offset clause. 
      * @param offsetClause The OFFSET clause to add (without the word 
      *    OFFSET).
+     * @throws SyntaxNotSupportedException If the OFFSET clause is not supported by the RDBMS.
      */
-    public void addOffsetClause( String offsetClause );  
+    public void addOffsetClause( String offsetClause )
+    	throws SyntaxNotSupportedException;  
 
     /**
      * Add an inner join.
@@ -337,7 +342,17 @@ public interface QueryExpression
      */
     public Object clone();
     
-
+    /**
+     * Indicates whether a RDBMS supports LIMIT clauses.
+     * @return True if a LIMIT clause is supported.
+     */
+    public boolean isLimitClauseSupported();
+    
+    /**
+     * Indicates whether a RDBMS supports OFFSET clauses.
+     * @return True if an OFFSET clause is supported.
+     */
+    public boolean isOffsetClauseSupported();
 
 }
 
