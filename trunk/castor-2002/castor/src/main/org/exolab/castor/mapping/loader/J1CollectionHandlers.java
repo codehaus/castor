@@ -53,7 +53,7 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
-
+import java.lang.reflect.*;
 
 /**
  * Implementation of various collection handlers for the Java 1.1
@@ -86,13 +86,28 @@ public final class J1CollectionHandlers
                     array[ 0 ] = object;
                     return array;
                 }
+                
+                Class type = collection.getClass();
+                if (!type.isArray()) {
+                    String err = "J1CollectionHandlers.array#add: type "+
+                        "mismatch, expecting an array, instead received: ";
+                    err += type.getName();
+                    throw new IllegalArgumentException(err);
+                }
+                    
+                type = type.getComponentType();
+                
                 Object[] newArray;
                 array = (Object[]) collection;
-                newArray = new Object[ array.length + 1 ];
+                
+                //newArray = new Object[ array.length + 1 ];
+                newArray = (Object[])Array.newInstance(type, array.length+1);
+                
                 for ( int i = 0 ; i < array.length ; ++i )
                     newArray[ i ] = array[ i ];
                 newArray[ array.length ] = object;
                 return newArray;
+                
             }
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
