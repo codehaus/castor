@@ -59,6 +59,7 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.IntegrityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.IndirectFieldHandler;
 import org.exolab.castor.util.Messages;
@@ -102,6 +103,7 @@ public class ClassHandler
 
 
     void normalize( CacheEngine cache )
+        throws MappingException
     {
         Vector            rels;
         Vector            fields;
