@@ -2,7 +2,12 @@
 Version (CVS) 
 -------------
 
-JDO:   Fixed bug 1877 using contribution from Nick Stuart [nick@newtsplace.com]
+All:   Fixed bug 1851 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added RSS news feed.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1851
+       (Werner - 20050307)
+       
+JDO:   Fixed bug 1852 using contribution from Nick Stuart [nick@newtsplace.com]
        Fixed Compile issue on JDK 1.5.0_01.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1852
        (Werner - 20050307)
