@@ -270,14 +270,17 @@ public final class SequenceKeyGenerator implements KeyGenerator
         tableName = st.nextToken();
 
         // remove every double quote in the tablename
-        int idxQuote = tableName.indexOf("\"");
+        int idxQuote = tableName.indexOf('"');
         if (idxQuote >= 0) {
-            StringBuffer buffer2 = new StringBuffer(tableName);
+            StringBuffer buffer2 = new StringBuffer();
+            int pos = 0;
 
             do {
-                buffer2.deleteCharAt(idxQuote);
-                idxQuote = buffer2.indexOf("\"", idxQuote);
-            } while(idxQuote >= 0);
+                buffer2.append(tableName.substring(pos, idxQuote));
+                pos = idxQuote+1;
+            } while((idxQuote=tableName.indexOf('"', pos)) != -1);
+
+            buffer2.append(tableName.substring(pos));
 
     		tableName = buffer2.toString();
         }
