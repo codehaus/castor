@@ -602,7 +602,7 @@ public abstract class TransactionContext
         // if autoStore is specified, we relieve user life a little bit here
         // so that if an object create automatically and user create it
         // again, it won't receive exception
-        if ( _autoStore && entry.object == object )
+        if ( _autoStore && entry != null && entry.object == object )
             return entry.oid;
 
         if ( entry != null && !entry.deleted )
