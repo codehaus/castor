@@ -2,6 +2,33 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.7.11  March 10, 2000"><pre>
+JDO:     Added support for one-many relations using the new mapping/persist
+         mechanisms. Retains support for one-one relations.
+
+Mapping: Introduced CollectionHandler and support for collection fields
+         (for one-one and one-many relations), with support for three basic
+         collection types: vectors, hashtable, and arrays.
+
+Persist: Added support for attached and non attached relations, singular and
+         multi, in both query and commit phase. Required new algorithm for
+         preparing the transaction to commit.
+
+Persist: Fixed bug in ObjectLock that could lead to deadlock detection when
+         there are more than two threads competing for the same object.
+         (contributed by Jim Alateras)
+
+Misc:    Updated build.xml file now builds docs tarball, and builds source
+         tarball/zip for expansion with a castor-x.x directory (contributed
+         by Kevin Burton)
+
+Examples: Upgraded the JDO example to produce XML output of the query results
+         using a Marshaller and the Xerces Serializer.
+
+Examples: Example of XML-Servlet using JDO to load products from the database,
+         XML to fire SAX events and the XML-Servlet to apply XSLT transformation
+         and produce the HTML page.
+    </pre></section>
     <section title="Version 0.7.10  March 3, 2000"><pre>
 JDO:     Upgraded to use new cache mechanism, reducing memory overhead for
          loading. Initial code base for one-many relation support.
