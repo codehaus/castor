@@ -71,6 +71,11 @@ public abstract class XSType {
     public static final String DECIMAL_NAME        = "decimal";
 
     /**
+     * The name of the date type
+     */
+    public static final String DATE_NAME = "date";
+
+    /**
      * The name of the double type
     **/
     public static final String DOUBLE_NAME         = "double";
@@ -132,6 +137,15 @@ public abstract class XSType {
     **/
     public static final String TIME_INSTANT_NAME   = "timeInstant";
 
+    /**
+     * the name of the timeDuration type
+     */
+    public static final String TIME_DURATION_NAME = "timeDuration";
+
+    /**
+     * the name of the time type
+     */
+     public static final String TIME_NAME = "time";
 	/**
      * The name of the URIReference type
      */
@@ -163,16 +177,19 @@ public abstract class XSType {
     public static final short IDREFS             =  7;
     public static final short INTEGER            =  8;
     public static final short COLLECTION         =  9;
-    public static final short LONG               = 10;
-    public static final short NCNAME             = 11;
-    public static final short NEGATIVE_INTEGER   = 12;
-    public static final short NMTOKEN            = 13;
-    public static final short POSITIVE_INTEGER   = 14;
-    public static final short STRING             = 15;
-    public static final short TIME_INSTANT       = 16;
-    public static final short URIREFERENCE       = 17;
-	public static final short SHORT				 = 18;
-	public static final short INT				 = 19;
+    public static final short DATE               = 10;
+    public static final short LONG               = 11;
+    public static final short NCNAME             = 12;
+    public static final short NEGATIVE_INTEGER   = 13;
+    public static final short NMTOKEN            = 14;
+    public static final short POSITIVE_INTEGER   = 15;
+    public static final short STRING             = 16;
+    public static final short TIME               = 17;
+    public static final short TIME_INSTANT       = 18;
+    public static final short TIME_DURATION      = 19;
+    public static final short URIREFERENCE       = 20;
+	public static final short SHORT				 = 21;
+	public static final short INT				 = 22;
 
     private short   type       = NULL;
 
@@ -260,6 +277,7 @@ public abstract class XSType {
             case POSITIVE_INTEGER:
 			case SHORT:
 			case INT:
+            case TIME_DURATION:
                 return true;
             default:
                 return false;
@@ -276,6 +294,8 @@ public abstract class XSType {
                 return BINARY_NAME;
             case BOOLEAN:
                 return BOOLEAN_NAME;
+            case DATE:
+                return DATE_NAME;
             case DECIMAL:
                 return DECIMAL_NAME;
             case DOUBLE:
@@ -300,8 +320,12 @@ public abstract class XSType {
                 return POSITIVE_INTEGER_NAME;
             case STRING:
                 return STRING_NAME;
+            case TIME:
+                return TIME_NAME;
             case TIME_INSTANT:
                 return TIME_INSTANT_NAME;
+            case TIME_DURATION:
+                return TIME_DURATION_NAME;
 			case SHORT:
 				return SHORT_NAME;
 			case INT:
