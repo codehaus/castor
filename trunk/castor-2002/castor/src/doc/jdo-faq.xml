@@ -4,11 +4,11 @@
     <title>Castor JDO FAQ</title>
 
     <section title="JSR-000012 and Castor JDO">
-	<p><b>Is Castor JDO comply the SUN JSR-000012 specification?</b></p>
+	<p><b>Does Castor JDO comply with the SUN JSR-000012 specification?</b></p>
 
 	<p>No. Castor JDO doesn't comply with the JDO specification.</p>
 
-	<p>Although Castor JDO carries very similar goal as JSR's JDO, it have been developed Castor independently from JSR. In fact, Castor was started before the JSR specification, although at that time the project had not yet named.</p>
+	<p>Although Castor JDO carries very similar goal as JSR's JDO, it has been developed Castor independently from JSR. In fact, Castor was started before the JSR specification, although at that time the project had not yet named.</p>
 
 	<p>Although it is not absolutely impossible to hammer Castor JDO into JSR's JDO specification, Between Castor and JSR, there are several major technical and design differences which make the merging unfavorable.</p>
 
