@@ -33,6 +33,15 @@
 <code>
 public class Person implements java.io.Serializable {
 
+   <comment>//The name of the person</comment>
+   private String name = null;
+
+   public Person() {
+      super();
+   }
+
+   public Person(String name)
+
 }
 </code>
 
@@ -76,8 +85,6 @@ Marshaller.marshal(person, writer);
          prevent objects from being marshalled.
          </note>
      </p>
-
-      <p>
     </section>
 
   </body>
