@@ -234,6 +234,9 @@ public class TypeConversion {
                         xsLong.setFacets(simpleType);
                     return xsLong;
                 }
+                //--NCName
+                case SimpleTypesFactory.NCNAME_TYPE:
+                    return new XSNCName();
                 //-- nonPositiveInteger
                 case SimpleTypesFactory.NON_POSITIVE_INTEGER_TYPE:
                 {
