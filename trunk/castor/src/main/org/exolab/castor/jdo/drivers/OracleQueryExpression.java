@@ -187,24 +187,24 @@ public final class OracleQueryExpression
 
 
     /**
-     * Indicates that Oracle supports an OQL LIMIT clause.
+     * Indicates that Oracle supports an OQL LIMIT clause for versions >= 8.1.6.
      * 
      * @return true to indicate that Oracle supports an OQL LIMIT clause.
      */
-    public boolean isLimitClauseSupported()
-    {
-    	return true;
-    }
+	public boolean isLimitClauseSupported()
+	{
+	    return _dbInfo!=null? _dbInfo.compareDbVersion("8.1.6")>=0: false;
+	}
 
     /**
-     * Indicates that Oracle supports an OQL OFFSET clause.
+     * Indicates that Oracle supports an OQL OFFSET clause for versions >= 8.1.6.
      * 
      * @return true to indicate that Oracle supports an OQL OFFSET clause.
      */
-    public boolean isOffsetClauseSupported()
-    {
-    	return true;
-    }
+	public boolean isOffsetClauseSupported()
+	{
+	    return _dbInfo!=null? _dbInfo.compareDbVersion("8.1.6")>=0: false;
+	}
 
     /**
      * @param paramInfo
