@@ -418,7 +418,7 @@ public abstract class TransactionContext
         try {
             if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
-                molder.getCallback().loaded( object, accessMode.toShort() );
+                molder.getCallback().loaded( object, toDatabaseAccessMode( accessMode ) );
             }
         } catch ( Exception except ) {
             removeObjectEntry( object );
@@ -1347,6 +1347,24 @@ public abstract class TransactionContext
     ObjectEntry getReadOnlyObjectEntry( OID oid )
     {
         return (ObjectEntry) _readOnlyObjects.get( oid );
+    }
+
+
+    /**
+     * Converts AccessMode constant to Database short constant
+     */
+    static short toDatabaseAccessMode( AccessMode mode )
+    {
+        if ( mode == AccessMode.Shared )
+            return Database.Shared;
+        if ( mode == AccessMode.ReadOnly )
+            return Database.ReadOnly;
+        if ( mode == AccessMode.DbLocked )
+            return Database.DbLocked;
+        if ( mode == AccessMode.Exclusive )
+            return Database.Exclusive;
+        // never happens
+        return -1;
     }
 
     /**
