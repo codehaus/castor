@@ -208,8 +208,11 @@ public class FieldInfo extends XMLInfo {
         jClass.addMethod(method);
         
         String paramName = this.name;
-        if (paramName.indexOf('_') == 0)
-            paramName = paramName.substring(1);
+		//-- Keith, not sure why this was needed? I've commented it out
+		//-- since it causes compile failures when a field name is used 
+		//-- that is a Java reserved word
+        // if (paramName.indexOf('_') == 0)
+        //   paramName = paramName.substring(1);
         
         method.addParameter(new JParameter(jType, paramName));
         jsc = method.getSourceCode();
@@ -220,7 +223,8 @@ public class FieldInfo extends XMLInfo {
             jsc.add("Object old");
             jsc.append(mname);
             jsc.append(" = ");
-            jsc.append(xsType.createToJavaObjectCode(getName()));
+			//-- 'this.' ensures this refers to the class member not the parameter
+            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
             jsc.append(";");
         } 
         
@@ -239,7 +243,8 @@ public class FieldInfo extends XMLInfo {
             jsc.append("\", old");
             jsc.append(mname);
             jsc.append(", ");
-            jsc.append(xsType.createToJavaObjectCode(getName()));
+			//-- 'this.' ensures this refers to the class member not the parameter
+            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
             jsc.append(");");
         } 
         
