@@ -97,7 +97,12 @@ final public class SqlBindParser
 	/** 
 	 * complete SQL expression to be parsed 
 	 */
-    private String _sql;	
+    private String _sql;
+
+    /**
+     * length of _sql string
+     */
+    private int _sql_len;
 
     /** 
      * current parse position 
@@ -122,6 +127,7 @@ final public class SqlBindParser
     public SqlBindParser(String sql)
     {
         _sql = sql;
+        _sql_len = _sql.length();
         _pos = 0;
         _lastPos = 0;
         _bindPos = 0;
@@ -136,24 +142,40 @@ final public class SqlBindParser
     {
         _lastPos = _pos;
 
-         // search for the begin of the next bind variable 
-        int idxStart = _sql.indexOf('?', _pos);
-        if (idxStart == -1) {
-            _bindPos = _pos = _sql.length();
-            return false;
+         // search for the begin of the next bind variable
+        for(int pos=_pos; pos<_sql_len; ++pos) {
+            char c = _sql.charAt(pos);
+
+            switch(c) {
+              case '\'':	// character constant
+              case '\"':	// string constant
+                while(pos < _sql_len) {
+                    pos = _sql.indexOf(c, pos+1);
+                    if (pos == -1) {	// unexpected end of the constant?
+                        pos = _sql_len;
+                        break;
+                    } else if (_sql.charAt(pos-1) != '\\')	// handle escape characters
+                        break;	// end of the constant
+                }
+                break;
+
+              case '?':		// bind variable
+                _bindPos = pos;
+
+                // search for the end of the bind variable
+               do
+                   ++pos;
+               while(pos<_sql_len && Character.isDigit(_sql.charAt(pos)));
+
+               _pos = pos;
+
+               return true;
+            }
         }
 
-        _bindPos = idxStart;
+        _bindPos = _pos = _sql_len;
 
-         // search for the end of the bind variable
-        int idxEnd = idxStart;
-        do
-            ++idxEnd;
-        while(idxEnd<_sql.length() && Character.isDigit(_sql.charAt(idxEnd)));
-
-        _pos = idxEnd;
-
-        return true;
+        return false;
     }
 
     /**
