@@ -900,6 +900,8 @@ public final class SQLEngine
         private int            _identSqlType;
 
 
+        private boolean        _resultSetDone;
+
         SQLQuery( SQLEngine engine, String sql, Class[] types )
         {
             _engine = engine;
@@ -947,12 +949,14 @@ public final class SQLEngine
                     _values[ i ] = null;
                 }
                 _rs = _stmt.executeQuery();
+                _resultSetDone = false;
             } catch ( SQLException except ) {
                 if ( _stmt != null ) {
                     try {
                         _stmt.close();
                     } catch ( SQLException e2 ) { }
                 }
+                _resultSetDone = true;
                 throw new PersistenceExceptionImpl( except );
             }
         }
@@ -962,9 +966,14 @@ public final class SQLEngine
             throws PersistenceException
         {
             try {
+                if ( _resultSetDone )
+                    return null;
+
                 if ( _lastIdentity == null ) {
-                    if ( ! _rs.next() )
+                    if ( ! _rs.next() ) {
+                        _resultSetDone = true;
                         return null;
+                    }
                     _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
                     return _lastIdentity;
                 }
@@ -972,6 +981,7 @@ public final class SQLEngine
                 while ( _lastIdentity.equals( identity ) ) {
                     if ( ! _rs.next() ) {
                         _lastIdentity = null;
+                        _resultSetDone = true;
                         return null;
                     }
                     _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
@@ -1027,7 +1037,7 @@ public final class SQLEngine
                     ++count;
                 }
 
-                if ( _rs.next() ) {
+                if ( !_resultSetDone && _rs.next() ) {
                     _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
                     while ( identity.equals( _lastIdentity ) ) {
                         count = 2;
@@ -1043,13 +1053,17 @@ public final class SQLEngine
                             }
                             ++count;
                         }
-                        if ( _rs.next() )
+                        if ( _rs.next() ) {
                             _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
-                        else
+                        } else {
                             _lastIdentity = null;
+                            _resultSetDone = true;
+                        }
                     }
-                } else
+                } else {
                     _lastIdentity = null;
+                    _resultSetDone = true;
+                }
             } catch ( SQLException except ) {
                 throw new PersistenceExceptionImpl( except );
             }
