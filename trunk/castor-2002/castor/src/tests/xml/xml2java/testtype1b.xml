@@ -18,7 +18,7 @@
 
 <integer>2147483647</integer> <!-- min value not defined by the W3C -->
 <int>2147483647</int>
-<long>9223372036854775807</long>   <!-- +-9223372036854775808 is too big for the java long type used by castor -->
+<long>9223372036854775807</long>  
 <short>32767</short>
 <boolean>false</boolean>
 <float>3.4028235E38</float>  <!-- INF not recognized by the unmarshaller -->
