@@ -180,7 +180,7 @@ class SearchImpl
             
             if ( _lastIdentity == null )
                 throw new NoSuchElementException( "No more elements in query result" );
-            obj = _dirEngine.getClassDesc( _results.getResultType() ).newInstance();
+            obj = _dirEngine.getClassHandler( _results.getResultType() ).newInstance();
             try {
                 obj = _results.fetch();
                 _lastIdentity = _results.nextIdentity();

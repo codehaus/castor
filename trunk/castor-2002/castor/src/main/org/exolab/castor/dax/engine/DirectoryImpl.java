@@ -60,10 +60,11 @@ import org.exolab.castor.dax.DirectoryException;
 import org.exolab.castor.dax.InvalidSearchException;
 import org.exolab.castor.dax.DuplicateRDNException;
 import org.exolab.castor.dax.Search;
-import org.exolab.castor.mapping.ClassDesc;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.TransactionAbortedException;
@@ -90,40 +91,43 @@ public class DirectoryImpl
 {
 
 
-    private LDAPConnection  _conn;
+    private LDAPConnection     _conn;
 
 
-    private String          _dn;
+    private String             _dn;
 
 
-    private PersistenceEngine _dirEngine;
+    private PersistenceEngine  _dirEngine;
 
 
-    private PrintWriter     _logWriter;
+    private PrintWriter        _logWriter;
 
 
-    private MappingResolver _mapResolver;
+    private MappingResolver    _mapResolver;
 
 
     private TransactionContext _tx;
 
 
-    private ClassDesc        _clsDesc;
+    private ClassHandler       _handler;
 
 
     DirectoryImpl( LDAPConnection conn, LDAPUrl url, 
                    MappingResolver mapResolver, PrintWriter logWriter )
         throws DirectoryException
     {
+        ClassDescriptor clsDesc;
+
         _conn = conn;
         _dn = url.getDN();
         _mapResolver = mapResolver;
-        _clsDesc = (ClassDesc) _mapResolver.listDescriptors().nextElement();
+        clsDesc = (ClassDescriptor) _mapResolver.listDescriptors().nextElement();
         try {
-            _dirEngine = getEngine( url, _clsDesc , logWriter );
+            _dirEngine = getEngine( url, clsDesc, logWriter );
         } catch ( MappingException except ) {
             throw new DirectoryException( except );
         }
+        _handler = _dirEngine.getClassHandler( clsDesc.getJavaClass() );
         _logWriter = logWriter;
     }
 
@@ -150,7 +154,7 @@ public class DirectoryImpl
         try {
             next = expr.indexOf( '$' );
             if ( next <= 0 ) {
-                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( null, expr, new Class[ 0 ] ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( null, expr, new Class[ 0 ] ) );
             } else {
                 pos = 0;
                 query = new StringBuffer();
@@ -176,7 +180,7 @@ public class DirectoryImpl
                 array = new Class[ types.size() ];
                 types.copyInto( array );
                 System.out.println( query.toString() );
-                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( null, query.toString(), array ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( null, query.toString(), array ) );
             }
         } catch ( QueryException except ) {
             throw new InvalidSearchException( except.getMessage() );
@@ -189,15 +193,15 @@ public class DirectoryImpl
     public synchronized Object read( Object rdn )
         throws DirectoryException
     {
-        ClassDesc         clsDesc;
-        Object             obj;
+        ClassHandler  handler;
+        Object        obj;
         
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
         
-        clsDesc = _clsDesc;
+        handler = _handler;
         // clsDesc = _dirEngine.getClassDesc();
-        obj = clsDesc.newInstance();
+        obj = handler.newInstance();
         try {
             if ( _tx != null ) {
                 _tx.load( _dirEngine, obj, rdn, AccessMode.Shared );
@@ -223,23 +227,23 @@ public class DirectoryImpl
     public synchronized void create( Object obj )
         throws DuplicateRDNException, DirectoryException
     {
-        ClassDesc         clsDesc;
-        Object             rdn;
+        ClassHandler handler;
+        Object       rdn;
         
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
         
-        clsDesc = _clsDesc;
+        handler = _handler;
         // clsDesc = _dirEngine.getClassDesc();
-        while ( clsDesc != null ) {
-            if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
+        while ( handler != null ) {
+            if ( handler.getJavaClass().isAssignableFrom( obj.getClass() ) )
                 break;
-            clsDesc = clsDesc.getExtends();
+            handler = handler.getExtends();
         }
-        if ( clsDesc == null )
+        if ( handler == null )
             throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
         
-        rdn = clsDesc.getIdentity().getValue( obj );
+        rdn = handler.getIdentity( obj );
         if ( rdn == null )
             throw new DirectoryException( "Object has no RDN" );
         try {
@@ -266,19 +270,19 @@ public class DirectoryImpl
     public synchronized void delete( Object obj )
         throws DirectoryException
     {
-        ClassDesc clsDesc;
+        ClassHandler handler;
         
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
         
-        clsDesc = _clsDesc;
+        handler = _handler;
         // clsDesc = _dirEngine.getClassDesc();
-        while ( clsDesc != null ) {
-            if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
+        while ( handler != null ) {
+            if ( handler.getJavaClass().isAssignableFrom( obj.getClass() ) )
                 break;
-            clsDesc = clsDesc.getExtends();
+            handler = handler.getExtends();
         }
-        if ( clsDesc == null )
+        if ( handler == null )
             throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
         
         try {
@@ -414,7 +418,7 @@ public class DirectoryImpl
     private static Hashtable  _engines = new Hashtable();
     
     
-    public static PersistenceEngine getEngine( LDAPUrl url, ClassDesc clsDesc, PrintWriter logWriter )
+    public static PersistenceEngine getEngine( LDAPUrl url, ClassDescriptor clsDesc, PrintWriter logWriter )
         throws MappingException
     {
         PersistenceEngine engine;
@@ -437,15 +441,15 @@ public class DirectoryImpl
         
         private Hashtable _clsDescs;
         
-        SingleMapping( ClassDesc clsDesc )
+        SingleMapping( ClassDescriptor clsDesc )
         {
             _clsDescs = new Hashtable();
             _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
         }
         
-        public ClassDesc getDescriptor( Class type )
+        public ClassDescriptor getDescriptor( Class type )
         {
-            return (ClassDesc) _clsDescs.get( type );
+            return (ClassDescriptor) _clsDescs.get( type );
         }
         
         public Enumeration listDescriptors()
@@ -472,10 +476,10 @@ public class DirectoryImpl
             _rootDN = rootDN;
         }
         
-        public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
+        public Persistence getPersistence( ClassHandler handler, PrintWriter logWriter )
         {
             try {
-                return new MozillaEngine( (DAXClassDesc) clsDesc, _rootDN );
+                return new MozillaEngine( handler, _rootDN );
             } catch ( MappingException except ) {
                 return null;
             }
