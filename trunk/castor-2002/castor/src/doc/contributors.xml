@@ -189,7 +189,17 @@
     <description>Contributed "trigger" mode for SEQUENCE key generator.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Thyen" given="Michael"/>
+    <email>mthyen@excite.com</email>
+    <description>Patch to fix introspection of addXxx() method.</description>
+  </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Smith" given="Ron"/>
+    <email>rsmith7209@yahoo.com</email>
+    <description>Patch to make 'Map' collection really generic.</description>
+  </contributor>
 
   <!--
       Company Information, so we don't have to duplicate it for
