@@ -8,17 +8,8 @@ package org.exolab.castor.jdo;
  * @version ODMG 3.0
  */
 public class ObjectDeletedException
-    extends org.odmg.ObjectDeletedException
+    extends PersistenceException
 {
-    
-
-    /**
-     * Construct an instance of the exception.
-     */
-    public ObjectDeletedException()
-    {
-        super();
-    }
     
 
     /**
@@ -26,9 +17,9 @@ public class ObjectDeletedException
      *
      * @param msg A string providing a description of the exception.
      */
-    public ObjectDeletedException(String msg)
+    public ObjectDeletedException( String message )
     {
-        super(msg);
+        super( message );
     }
 
 
