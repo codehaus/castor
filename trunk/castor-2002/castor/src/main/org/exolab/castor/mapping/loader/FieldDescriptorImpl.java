@@ -48,6 +48,7 @@ package org.exolab.castor.mapping.loader;
 
 
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 
@@ -100,6 +101,13 @@ public class FieldDescriptorImpl
      * True if the field type is immutable.
      */
     private boolean       _required;
+
+
+    /**
+     * The type class descriptor, if this field is of a type
+     * known by a descriptor.
+     */
+    private ClassDescriptor  _typeDesc;
 
 
     /**
@@ -173,12 +181,27 @@ public class FieldDescriptorImpl
     }
 
 
+    public ClassDescriptor getTypeDescriptor()
+    {
+        return _typeDesc;
+    }
+
+
     /**
      * Mutator method used by {@link MappingLoader}.
      */
     void setHandler( FieldHandler handler )
     {
         _handler = handler;
+    }
+
+
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    void setTypeDescriptor( ClassDescriptor typeDesc )
+    {
+        _typeDesc = typeDesc;
     }
 
 
