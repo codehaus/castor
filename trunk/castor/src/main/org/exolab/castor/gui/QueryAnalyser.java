@@ -48,31 +48,27 @@ package org.exolab.castor.gui;
 
 import javax.swing.UIManager;
 import java.awt.*;
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.exolab.castor.jdo.JDO;
+import org.exolab.castor.jdo.JDO2;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
-import java.util.Properties;
 import java.lang.Class;
 import java.lang.reflect.Method;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.Date;
-import org.exolab.castor.jdo.oql.*;
-import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
 
 import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.Marshaller;
 
 import java.io.FileWriter;
 import java.io.FileReader;
-import org.exolab.castor.xml.*;
 
 
 /**
@@ -131,7 +127,7 @@ public class QueryAnalyser {
         BorderLayout borderLayout1 = new BorderLayout();
         DefaultTableModel model;
 
-        JDO jdo;
+        JDO2 jdo;
         String databasename;
         String dbconfig;
         JTabbedPane TabbedPane = new JTabbedPane();
@@ -387,13 +383,16 @@ public class QueryAnalyser {
 
         private void openDB() {
             try{
-                jdo= new JDO();
-                jdo.setDatabaseName(databasename);
-                jdo.setConfiguration(dbconfig);
-                jdo.setClassLoader(ClassLoader.getSystemClassLoader());
+                JDO2.loadConfiguration (dbconfig, ClassLoader.getSystemClassLoader());
+                jdo = JDO2.createInstance(databasename);
                 //only to try a connection
                 Database db = jdo.getDatabase();
-            } catch(org.exolab.castor.jdo.PersistenceException pe) {
+            } 
+            catch (MappingException pe) {
+                pe.printStackTrace();
+                System.exit(1);
+            } 
+            catch(org.exolab.castor.jdo.PersistenceException pe) {
                 pe.printStackTrace();
                 System.exit(1);
             }
