@@ -90,6 +90,11 @@ public abstract class MappingLoader
      * The suffix for the name of a compiled class.
      */
     private static final String CompiledSuffix = "Descriptor";
+    
+    /**
+     * The prefix for the "add" method
+    **/
+    private static final String ADD_METHOD_PREFIX = "add";
 
 
     /**
@@ -195,9 +200,10 @@ public abstract class MappingLoader
      * files.
      *
      * @param mapping The mapping information
+     * @param param Arbitrary parameter that can be used by subclasses
      * @throws MappingException The mapping file is invalid
      */
-    public void loadMapping( MappingRoot mapping )
+    public void loadMapping( MappingRoot mapping, Object param )
         throws MappingException
     {
         Enumeration   enum;
@@ -276,7 +282,7 @@ public abstract class MappingLoader
     protected void addDescriptor( ClassDescriptor clsDesc )
         throws MappingException
     {
-        if ( _clsDescs.contains( clsDesc.getJavaClass() ) )
+        if ( _clsDescs.containsKey( clsDesc.getJavaClass() ) )
             throw new MappingException( "mapping.duplicateDescriptors", clsDesc.getJavaClass().getName() );
         _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
         _javaClasses.addElement( clsDesc.getJavaClass() );
@@ -667,21 +673,21 @@ public abstract class MappingLoader
                     throw except;
                 } catch ( Exception except ) {
                 }
-                //if ( getMethod == null )
-                    //throw new MappingException( "mapping.accessorNotFound",
-                    //                            "get" + capitalize( fieldName ),
-                    //                            ( colType == null ? fieldType : colType ),
-                    //                            javaClass.getName() );
+                if ( getMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                "get" + capitalize( fieldName ),
+                                                ( colType == null ? fieldType : colType ),
+                                                javaClass.getName() );
                 if ( fieldType == null && colType == null )
                     fieldType = getMethod.getReturnType();
                 if ( colType == null || getSetCollection ) {
                     setMethod = findAccessor( javaClass, "set" + capitalize( fieldName ),
                                               ( colType == null ? fieldType : colType ), false );
-                    //if ( setMethod == null )
-                        //throw new MappingException( "mapping.accessorNotFound",
-                        //                            "set" + capitalize( fieldName ),
-                        //                            ( colType == null ? fieldType : colType ),
-                        //                            javaClass.getName() );
+                    if ( setMethod == null )
+                        throw new MappingException( "mapping.accessorNotFound",
+                                                    "set" + capitalize( fieldName ),
+                                                    ( colType == null ? fieldType : colType ),
+                                                    javaClass.getName() );
                 }
             } else {
                 // First look up the get accessors
@@ -698,11 +704,19 @@ public abstract class MappingLoader
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
+                    
+                    String methodName = fieldMap.getSetMethod();
+                    Class type = fieldType;
+                    if (colType != null) {
+                        if (!methodName.startsWith(ADD_METHOD_PREFIX))
+                            type = colType;
+                    }
+                    
                     setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
-                                              ( colType == null ? fieldType : colType ), false );
+                                              type , false );
                     if ( setMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                                                    fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
+                                                    fieldMap.getSetMethod(), type,
                                                     javaClass.getName() );
                     if ( fieldType == null )
                         fieldType = setMethod.getParameterTypes()[ 0 ];
@@ -711,7 +725,7 @@ public abstract class MappingLoader
             
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             
-            fieldName = fieldMap.getName();
+            fieldName = fieldMap.getName(); // Not the same for nested fields
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
             handler = new FieldHandlerImpl( fieldName, getSequence, setSequence, getMethod, setMethod, typeInfo );
@@ -757,7 +771,7 @@ public abstract class MappingLoader
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false, rd );
+        return new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient(), rd );
     }
 
 

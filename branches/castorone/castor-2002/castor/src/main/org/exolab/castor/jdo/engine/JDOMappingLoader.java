@@ -278,7 +278,7 @@ public class JDOMappingLoader
             _keyGenDefs.put( name, keyGenDef );
         }
 
-        super.loadMapping( mapping );
+        super.loadMapping( mapping, null );
 
         _keyGenDefs = null;
         _keyGenDescs = null;
