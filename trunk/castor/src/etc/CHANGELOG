@@ -1,17 +1,56 @@
 
 Version (CVS) 
 -------------
-JDO:   Fixed bug 1521 refactoring the performance cache code.
-	   This introduces a new interface (Cache.java) which all existing cache 
-	   implementations implement. This lays the foundation for many additions 
-	   as noted in the bug report. 
-       (Werner - 20040210)
+
+
+Version 0.9.5.3, February 16, 2004
+----------------------------------
+
+
+XML:   Patch for bug 1461 JakartaRegExpEvaluator issue
+       Patch from Johan Van vlerken.
+       (kvisco - 20040213)
+
+XML:   Fixed bug 1475 - removed check for DocumentHandler (which 
+       prevented wrapping in a ParserAdapter)
+       (kvisco - 20040213)
+
+XML:   Patch for bug 1449 - Configuration.loadProperties throws 
+       SecurityException when running under app-server.
+       Patch from Joakim Ohlrogge.
+       (kvisco - 20040213)
+
+XML:   Patch for bug 1471 - unspecified type causing uncompilable source
+       (kvisco - 20040213)
+
+XML:   Fixed bug 1272 - Uncompilable code with boundproperties
+       Patch from Brett Randall and Peter Lin 
+       (kvisco - 20040213)
+
+
+XML:   Fix for bug 1245: Nicer variable names for typesafe enumerations 
+       from Source Generator. Patch from Rhett Sutphin.
+       (kvisco - 20040213)
+
+XML:   Fixed bug 1530 by adding readResolve method when generating enumerations
+       to handle deserialization issues. Patch contributed by Thomas De Smedt
+       (kvisco - 20040213)
+
+XML:   Patch to prevent duplicate simpleType class generation. This was causing
+       unnecessary warnings during source code generation.
+       (kvisco - 20040213)
        
 JDO:   Fixed bug 1514 adding Eclipse related project files.
 	   Added new Ant target 'prepare-eclipse' to copy Eclipse-specific project files 
 	   to the base directory.
        (Werner - 20040212)
        
+JDO:   Fixed bug 1521 refactoring the performance cache code.
+	   This introduces a new interface (Cache.java) which all existing cache 
+	   implementations implement. This lays the foundation for many additions 
+	   as noted in the bug report. 
+       (Werner - 20040210)
+
 JDO:   Fixed bug 1462 using contribution from Christoph Ernst [christoph.ernst@dit.de]
 	   Fixes a problem with SQL type conversions between java.sql.Timestamp and 
 	   java.util.Date and vice versa. Additionally, this fixes a couple of problems 
@@ -36,7 +75,14 @@ JDO:   Fixed bug 1417 using contribution from Stein M. Hugubakken [dulci@start.n
 	   Added missing entry for resource string "persist.missingEnd" to 
 	   messages.properties. 
        (Werner - 20040129)
+
+ALL:   Fixed bug when using extends of a class from an included mapping.
+       (kvisco - 20040128)
        
+
+XML:   Fixed bug 1477: Use of fixed value elements fails in choice blocks
+       (kvisco - 20040122)
+
 JDO:   Fixed bug 1500 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
 	   Fixes a problem with dereferencing members of Complex that are set to null. 
        (Werner - 20040122)
@@ -50,14 +96,33 @@ JDO:   Fixed bug 1495 using contribution from Stein M. Hugubakken [dulci@start.n
        This improves code quality in the jdo.drivers package by removing
        unused import statements and local variables.
        (Werner - 20040119)
+
+XML:   bind-xml now allows nesting a class mapping to enable the user
+       to map a specific class differently in different situations.
+       (kvisco - 20040109)
+
+XML:   Fix for bug 1439 (improves Hashtable / Map handling)
+       (kvisco - 20040109)
+
+XML:   Fix bug where wrong field descriptor may be returned if the class 
+       descriptor also supports wildcards.
+       (kvisco - 20040108)
        
 JDO:   Fixed bug 1493 using contribution from Stein M. Hugubakken [dulci@start.no]
        This patch improves code quality in the jdo.engine package by removing
        unnecessary import statements in various classes.
        (Werner - 20040118)
        
+XML:   Patch to make sure cyclic imports/includes on the primary schema
+       don't occur.
+       (kvisco - 20031216)
+
 JDO:   Fixed bug 1484 as noted by Jon Revie [revie@rhinointernet.com]
        (Bruce - 20031210)
+
+XML:   Fix for handling built-in attributes such as xml:lang and xml:base
+       for XML mapping files.
+       (kvisco - 20031208)
 
 JDO:   Fixed bug 1473 as noted by Jon Revie [revie@rhinointernet.com]
        (Bruce - 20031206)
@@ -73,6 +138,17 @@ JDO:   Fixed the SQLTypes TypeConverters so that each anonymous method
        once. 
        (Bruce - 20031124)
 
+XML:   Improved class name conflict detection and reporting
+       (kvisco - 20031119)
+
+XML:   Fix for incorrect descriptor generation for groups that contain 
+       only optional elements
+       (kvisco - 20031118)
+
+XML:   Added error notification when unresolved references occur during
+       unmarshalling.
+       (kvisco - 20031117)
+
 JDO:   Switched the logging mechanism in Castor over to use Jakarta Commons
        Logging with Log4J as the default logging package. 
        (Bruce - 20031110) 
@@ -83,6 +159,25 @@ JDO:   Fixed bug 1391 using contribution from xgard@gmx.de.
 JDO:   Fixed bug 1452 as noted by Marc Guillemot[mguillemot@yahoo.fr]. 
        (Bruce - 20031110)
 
+XML:   Fix for bug 1423 (EnumFieldHandler can't handle nillable element). 
+       Applied Stephane Pelchat's patch [stephane (at) ofoto.com]
+       (kvisco - 20031110)
+
+XML:   Improved the error messages for the FieldValidator to use the
+       xmlName + fieldName to make the message more intuitive.
+       (kvisco - 20031110)
+
+XML:   Added basic support for xs:token (treated as a string)
+       (kvisco - 20031110)
+
+XML:   Added support for FieldHandlerFactory, which allows using
+       custom GeneralizedFieldHandler instances per type 
+       without having to specify them on a per-field basis in the
+       mapping file. Currently this must be set through the
+       Introspector, but an easier configuration will be available
+       in a future release.
+       (kvisco - 20031023)
+       
 XML:   Add a new option in the CTF to allow dynamic configuration
        of the marshalling framework by using the java reflection.
        (Arnaud - 20031017)
@@ -96,11 +191,25 @@ XML:   Enhance SAX2ANY to be compliant with the use of XML Reader.
 
 XML:   Improvements to the CTF (better error reporting)
        (Arnaud - 20031015)
+
+XML:   Fixed xsi:type bug when xsi:type appears on the root element.
+       (kvisco - 20031010)
+
+XML:   Fix for 'xml' prefix cannot be declared exception when using
+       Xerces 2.x, when using SAX 2.0.
+       (kvisco - 20031010)
    
 XML:   Added the Source Generator command-line option 
        '-generateImportedSchemas' that lets you specify 
        the automatic generation of Java for imported XML Schemas.
        (Arnaud - 20031010)
+
+XML:   Fix for unmarshalling primitives as root elements.
+       (kvisco - 20031003)
+
+XML:   Updated FieldValidator to prevent validation of transient fields.
+       (kvisco - 20031003)
+
 
 Version 0.9.5.2, September 28, 2003
 -----------------------------------
