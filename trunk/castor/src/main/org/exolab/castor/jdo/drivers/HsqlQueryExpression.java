@@ -111,6 +111,20 @@ public final class HsqlQueryExpression
         addWhereClause( sql, aliasInfo, first );
         addOrderByClause(sql);
         addForUpdateClause(sql, lock);
+        
+        if ( _limit != null )
+        {
+            if (_offset != null)
+            {
+                sql.append(JDBCSyntax.Limit);
+                sql.append(_offset).append(" "); // hsqldb doesn't use comma
+                sql.append(_limit);
+            }
+            else
+            {
+                sql.append(" TOP ").append(_limit);
+            }
+        }
  
         return sql.toString();
     }
@@ -126,7 +140,7 @@ public final class HsqlQueryExpression
         if ( _distinct )
           buffer.append( JDBCSyntax.Distinct );
 
-	addColumnList(buffer, aliasInfo);
+	   addColumnList(buffer, aliasInfo);
     }
     
     /**
