@@ -189,7 +189,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         String attValue = null;
 
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
-        if (nsURI.length() == 0)
+        if (nsURI != null &&  nsURI.length() == 0)
            throw new SAXException("empty string is not a legal namespace.");
         if ((nsURI != null) && (nsURI.length() > 0)) {
             //if we are including a schema we must take care
