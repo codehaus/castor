@@ -613,13 +613,16 @@ public class UnmarshalHandler implements DocumentHandler {
         
         Class _class = null;
             
-        XMLClassDescriptor classDesc 
-            = (XMLClassDescriptor)parentState.fieldDesc.getClassDescriptor();
-
-        if (classDesc == null)
-           classDesc = getClassDescriptor(parentState.object.getClass());
+        //-- Find ClassDescriptor for Parent
+        XMLClassDescriptor classDesc = parentState.classDesc;
+        if (classDesc == null) {
+            classDesc = (XMLClassDescriptor)parentState.fieldDesc.getClassDescriptor();
+            if (classDesc == null)
+                classDesc = getClassDescriptor(parentState.object.getClass());
+        }
         
-        //-- find Descriptor
+        //-- Find FieldDescriptor for the element
+        //-- we wish to unmarshal
         XMLFieldDescriptor descriptor = null;
         descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
         
