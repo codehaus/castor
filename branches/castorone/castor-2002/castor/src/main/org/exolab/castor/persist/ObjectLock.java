@@ -148,6 +148,8 @@ final class ObjectLock implements DepositBox {
     private LinkedTx           _readWaiting;
 
 
+    private int _waitCount;
+
     /**
      * List of all transactions waiting for a write lock (including
      * waiting for upgrade from read lock). Attempts to acquire a
@@ -166,17 +168,6 @@ final class ObjectLock implements DepositBox {
 
     private short              _confirmWaitingAction;
 
-    /**
-     * List of all transaction which is waiting for write lock, when
-     * this locked is deleted.
-     */
-    //private LinkedTx           _deletedWriteWaiting;
-
-    /**
-     * List of all transaction which is waiting for read lock, when
-     * this locked is deleted.
-     */
-    //private LinkedTx           _deletedReadWaiting;
 
     /**
      * Number of transactions which are interested to invoke method 
@@ -191,6 +182,9 @@ final class ObjectLock implements DepositBox {
 
 
     private boolean            _deleted;
+
+    private boolean            _invalidated;
+
     /**
      * Create a new lock for the specified object. Must not create two
      * locks for the same object. This will be the object returned from
@@ -260,7 +254,7 @@ final class ObjectLock implements DepositBox {
      * holding any lock, nor any transaction isEntered.
      */
     boolean isDisposable() {
-        return _gateCount == 0 && isFree();
+        return _gateCount == 0 && isFree() && _waitCount == 0;
     }
 
     /**
@@ -275,7 +269,7 @@ final class ObjectLock implements DepositBox {
     boolean hasLock( TransactionContext tx, boolean write ) {
         LinkedTx read;
 
-        System.out.println("hasLock called: "+_writeLock+" r "+_readLock);
+        //System.out.println("hasLock called: "+_writeLock+" r "+_readLock);
         if ( _writeLock == tx )
             return true;
 
@@ -307,7 +301,7 @@ final class ObjectLock implements DepositBox {
     boolean isFree() {
         return ( _writeLock == null && _readLock == null && 
                  _writeWaiting == null && _readWaiting == null && 
-                 _confirmWaiting == null );
+                 _confirmWaiting == null && _waitCount == 0 );
     }
 
     boolean isExclusivelyOwned( TransactionContext tx ) {
@@ -347,16 +341,17 @@ final class ObjectLock implements DepositBox {
                 //      then, put it tx into read/write waiting
                 // 2/ read exist
                 //      then, put it read, or write waiting
-                if ( _confirmWaiting != null ) {
+                if ( _deleted ) {
+                    throw new ObjectDeletedWaitingForLockException("Object deleted");
+                } else if ( _confirmWaiting != null ) {
                     // other thread is loading or creating object and haven't finished
                     try {
-                        wait();
-
-                        while ( _deleted ) {
-                            wait();
-                        }
+                        _waitCount++;
+                        wait();                        
                     } catch ( InterruptedException e ) {
                         throw new LockNotGrantedException("Thread interrupted acquiring lock!");
+                    } finally {
+                        _waitCount--;
                     }
                 } else if ( _writeLock == tx ) {
                     //throw new IllegalStateException("Transaction: "+tx+" has already hold the write lock on "+_oid+
@@ -456,15 +451,18 @@ final class ObjectLock implements DepositBox {
             // 2/ lock can't be granted, throw LockNotGrantedException
             // 3/ lock can be granted
             //      then, we return and wait for confirmation
-            if ( _confirmWaiting != null ) {
+            if ( _deleted || _confirmWaiting != null ) {
                 // other thread is loading or creating object and haven't finished
                 try {
+                    _waitCount++;
                     wait();
                     while ( _deleted ) {
                         wait();
                     }
                 } catch ( InterruptedException e ) {
                     throw new LockNotGrantedException("Thread interrupted acquiring lock!");
+                } finally {
+                    _waitCount++;
                 }
             } else if ( _readLock != null || _writeLock != null ) {
                 throw new LockNotGrantedException("Lock already exist!");
@@ -490,20 +488,25 @@ final class ObjectLock implements DepositBox {
                 // 2/ lock can be granted, and _object is not empty
                 //      then, we return and wait for confirmation
                 // 3/ lock can not granted, wait
-                if ( _confirmWaiting != null ) {
+
+                if ( _deleted || _confirmWaiting != null ) {
                     try {
+                        _waitCount++;
                         wait();
+                        /*
                         if ( _deleted ) {
                             throw new ObjectDeletedWaitingForLockException("Object deleted!");
-                        }
+                        }*/
                     } catch ( InterruptedException e ) {
                         throw new LockNotGrantedException("Thread interrupted acquiring lock!");
+                    } finally {
+                        _waitCount--;
                     }
                 } else if ( _writeLock == tx ) {
                     return;
                 } else if ( _writeLock == null && _readLock == null ) {
                     // can get the lock now
-                    System.out.println("acquire Update, go into cofirmWaiting");
+                    //System.out.println("acquire Update, go into cofirmWaiting");
                     _confirmWaiting = tx;
                     _confirmWaitingAction = ACTION_UPDATE;
                     return;
@@ -559,7 +562,7 @@ final class ObjectLock implements DepositBox {
 
     public synchronized void setObject( TransactionContext tx, Object object ) {
 
-        System.out.println( "setObject: "+toString() + " cur tx: "+tx+" writeLock "+_writeLock);
+        //System.out.println( "setObject: "+toString() + " cur tx: "+tx+" writeLock "+_writeLock);
         if ( _confirmWaiting != null && _confirmWaiting == tx ) {
             _timeStamp = System.currentTimeMillis();
             _object = object;
@@ -600,7 +603,7 @@ final class ObjectLock implements DepositBox {
 
     synchronized void confirm( TransactionContext tx, boolean succeed ) {
 
-        System.out.println( "confirm: "+toString() + " cur tx: "+tx+" writeLock "+_writeLock+"succeed: "+succeed);
+        //System.out.println( "confirm: "+toString() + " cur tx: "+tx+" writeLock "+_writeLock+"succeed: "+succeed);
         // cases to consider:
         // 1/ not in waitingForConfirmation
         // 2/ load_read,
@@ -696,7 +699,7 @@ final class ObjectLock implements DepositBox {
         // in the middle. An exception may be thrown by a Thread.stop().
         // Must make sure not to lose consistency.
 
-        System.out.println("upgrade lock on " + toString() + " by " + tx);
+        //System.out.println("upgrade lock on " + toString() + " by " + tx);
         if ( _confirmWaiting != null ) {
             IllegalStateException e = new IllegalStateException("Internal error: acquire when confirmWaiting is not null");
             throw e;
@@ -723,7 +726,7 @@ final class ObjectLock implements DepositBox {
                         System.out.println( "Acquired on " + toString() + " by " + tx );
                     _writeLock = tx;
                     _readLock = null;
-                    System.out.println("Upgrade lock succeed on "+toString() + " by " + tx);
+                    //System.out.println("Upgrade lock succeed on "+toString() + " by " + tx);
                     return;
                 } else {
                     // Don't wait if timeout is zero
@@ -796,6 +799,8 @@ final class ObjectLock implements DepositBox {
             if ( _writeLock == tx ) {
                 _writeLock = null;
                 _deleted = false;
+                if ( _invalidated )
+                    _object = null;
             } else if ( _readLock != null ) {
                 if ( _readLock.tx == tx ) {
                     _readLock = _readLock.next;
@@ -824,7 +829,7 @@ final class ObjectLock implements DepositBox {
             release( tx );
             throw death;
         }
-        System.out.println("release return ObjectLock: "+toString()+" r: "+_readLock + " w: "+_writeLock + " tx: "+tx);
+        //System.out.println("release return ObjectLock: "+toString()+" r: "+_readLock + " w: "+_writeLock + " tx: "+tx);
     }
 
     /**
@@ -857,6 +862,17 @@ final class ObjectLock implements DepositBox {
             release( tx );
             throw death;
         }
+    }
+
+    synchronized void invalidate( TransactionContext tx ) {
+        
+        if ( tx != _writeLock ) 
+            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + tx );
+
+        if ( TRACE )
+            System.out.println( "Delete " + this.toString() + " by " + tx );
+
+        _invalidated = true;
     }
 
 
