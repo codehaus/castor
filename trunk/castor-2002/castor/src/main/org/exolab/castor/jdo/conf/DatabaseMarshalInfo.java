@@ -51,7 +51,7 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         Class[] classArgs = new Class[1];
         //-- initialize attributes
         
-        attributes = new MarshalDescriptor[1];
+        attributes = new MarshalDescriptor[2];
         //-- vName
         desc = new SimpleMarshalDescriptor(String.class, "vName", "name");
         desc.setDescriptorType(DescriptorType.attribute);
@@ -64,9 +64,21 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         
         attributes[0] = desc;
         
+        //-- vName
+        desc = new SimpleMarshalDescriptor(String.class, "vEngine", "engine");
+        desc.setDescriptorType(DescriptorType.attribute);
+        try {
+            desc.setReadMethod(Database.class.getMethod("getEngine", emptyClassArgs));
+            classArgs[0] = String.class;
+            desc.setWriteMethod(Database.class.getMethod("setEngine", classArgs));
+        }
+        catch(java.lang.NoSuchMethodException nsme) {};
+        
+        attributes[1] = desc;
+        
         //-- initialize elements
         
-        elements = new MarshalDescriptor[5];
+        elements = new MarshalDescriptor[4];
         //-- vDriver
         desc = new SimpleMarshalDescriptor(Driver.class, "vDriver", "driver");
         desc.setDescriptorType(DescriptorType.element);
@@ -103,18 +115,6 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         
         elements[2] = desc;
 
-        //-- vEngine
-        desc = new SimpleMarshalDescriptor(Engine.class, "vEngine", "engine");
-        desc.setDescriptorType(DescriptorType.element);
-        try {
-            desc.setReadMethod(Database.class.getMethod("getEngine", emptyClassArgs));
-            classArgs[0] = Engine.class;
-            desc.setWriteMethod(Database.class.getMethod("setEngine", classArgs));
-        }
-        catch(java.lang.NoSuchMethodException nsme) {};
-        
-        elements[3] = desc;
-
         //-- vMappingList
         desc = new SimpleMarshalDescriptor(Mapping.class, "vMappingList", "mapping");
         desc.setDescriptorType(DescriptorType.element);
@@ -126,7 +126,7 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         }
         catch(java.lang.NoSuchMethodException nsme) { };
         
-        elements[4] = desc;
+        elements[3] = desc;
         
     } //-- DatabaseMarshalInfo()
 
