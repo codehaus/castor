@@ -95,54 +95,64 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
 
         setResolver(resolver);
 
-        if (atts.getValue(SchemaNames.REF_ATTR) != null) {
-            String err = "Attribute references are currently not supported.";
-            throw new IllegalStateException(err);
-        }
 
-        String name = atts.getValue(SchemaNames.NAME_ATTR);
-
-        _attribute = new AttributeDecl(schema, name);
+        _attribute = new AttributeDecl(schema);
 
         //-- form (Not yet supported)
         //_attribute.setForm(...);
 
+        //--@ref
+        String attValue = atts.getValue(SchemaNames.REF_ATTR);
+        if (attValue != null) {
+            _attribute.setReference(attValue);
+            //@todo: remove this limitation
+            System.out.println("Warning: attribute references are only supported in the SOM");
+        }
+
+        //-- @name
+        attValue = atts.getValue(SchemaNames.NAME_ATTR);
+        if (attValue != null) {
+            if (_attribute.isReference()) {
+                String err = "An attribute cannot have a 'name' attribute and a 'ref' attribute at the same time.";
+                throw new IllegalStateException(err);
+            }
+            else _attribute.setName(attValue);
+        }
         //-- id
         _attribute.setId(atts.getValue(SchemaNames.ID_ATTR));
 
         //-- fixed
-        String temp = atts.getValue(SchemaNames.FIXED_ATTR);
-        if (temp != null) {
+        attValue = atts.getValue(SchemaNames.FIXED_ATTR);
+        if (attValue != null) {
             if (_attribute.isDefault())
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _attribute.setValue(temp);
+            _attribute.setValue(attValue);
             _attribute.setFixed();
         }
 
         //-- default
-        temp = atts.getValue(SchemaNames.DEFAULT_ATTR);
-        if (temp != null) {
+        attValue = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        if (attValue != null) {
             if (_attribute.isFixed())
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
-            _attribute.setValue(temp);
+            _attribute.setValue(attValue);
             _attribute.setDefault();
         }
-        temp = null;
 
         //-- use
-        String use = atts.getValue(SchemaNames.USE_ATTR);
-        if (use != null) {
-            if (_attribute.isDefault() && (!use.equals(AttributeDecl.USE_OPTIONAL)) )
+        attValue = atts.getValue(SchemaNames.USE_ATTR);
+        if (attValue != null) {
+            if (_attribute.isDefault() && (!attValue.equals(AttributeDecl.USE_OPTIONAL)) )
                 throw new IllegalArgumentException("When 'default' is present, the 'use' attribute must have the value 'optional'.");
-           _attribute.setUse(use);
+           _attribute.setUse(attValue);
         }
 
         //-- type
-        String type = atts.getValue("type");
-        if (type != null) {
-            _attribute.setSimpleTypeReference(type);
+        attValue = atts.getValue(SchemaNames.TYPE_ATTR);
+        if (attValue != null) {
+            _attribute.setSimpleTypeReference(attValue);
         }
-
+        attValue = null;
     } //-- AttributeUnmarshaller
 
       //-----------/
