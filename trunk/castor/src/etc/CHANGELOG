@@ -2,11 +2,15 @@
 Version (CVS) 
 -------------
 
+XML:    Added support for constructor arguments for attribute mapped fields.
+        Information will be added to the documentation soon.
+        (kvisco - 20030422)
+
 JDO:    Fixed Bug 1261 and 1253 : In case of CALL SQL binding param inside parens results adds extra paren
         (Mickael - 20030415)
 
 JDO:    Fixed bug 1290: Possible bug in object value rollback of primitive types. 
-        (Bruce 20030413)
+        (Bruce - 20030413)
 
 JDO:    Fixed Bug 1106 : JDO mapping with collection="array" does not work
         (Mickael - 20030325)
