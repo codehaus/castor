@@ -226,7 +226,6 @@ public class CacheLeakage extends CWTestCase {
                 for ( int i=0; i < trial && !other.isDone(); i++ ) {
                     try {
                         // load it and modify it
-                        System.out.println("load it and modify it");
                         db.begin();
                         succeed = false;
                         trials = 0;
