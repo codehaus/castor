@@ -941,6 +941,17 @@ Database db = jdo.getDatabase();
               mapping.</p>
 
        </section>
+
+       <section title="Lazy loading for 1:1 relations and serialization">
+       
+       	   <p>Please note that Castor does not support full serialization of lazy-loaded objects
+       	      at this time. Rather than serializing just the information required to re-build the 
+       	      underlying proxy implementation during deserialization, Castor will materialize (read: 
+       	      load from the persistence store) all objects before serialization. As this can lead to 
+       	      a lot of database accesses, please use this feature carefully. A full working 
+       	      solution will be provided with the next release.</p>
+       	      
+       </section>
        
        <section title="How do I configure the JDO mapping to use the lazy loading feature for 1:m and M:N relations?">
            <p>
