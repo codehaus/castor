@@ -2,8 +2,12 @@
 Version (CVS)
 -------------
 
-XML:	Added setRootElement method to Marshaller.java to override default root element name for document. 
-	Usefull when using classses generated via 'type' mapping, as the root element name is not known.
+XML:	Remove the xsi:type when using the generated descriptors.(Arnaud)
+
+XML:	Support for the <any> element in the Marshalling Framework.(Arnaud)
+
+XML:	Added setRootElement method to Marshaller.java to override default root element name for 	document. 
+	Usefull when using classes generated via 'type' mapping, as the root element name is not known.
 	(Andrew Fawcett, andrew.fawcett@coda.com)
 
 XML:	Fix the Marshaller to handle correctly Vector by keeping the xsi:type information 
