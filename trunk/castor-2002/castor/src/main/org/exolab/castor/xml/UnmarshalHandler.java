@@ -205,6 +205,12 @@ public final class UnmarshalHandler extends MarshalFramework
     private Hashtable _nsPackageMappings = null;
     
     /**
+     * A boolean to indicate that objects should
+     * be re-used where appropriate
+    **/
+    private boolean _reuseObjects = false;
+    
+    /**
      * A boolean that indicates attribute processing should
      * be strict and an error should be flagged if any
      * extra attributes exist.
@@ -256,25 +262,6 @@ public final class UnmarshalHandler extends MarshalFramework
     } //-- setClassLoader
 
     /**
-     * Sets the ClassDescriptorResolver to use for loading and
-     * resolving ClassDescriptors
-     *
-     * @param cdResolver the ClassDescriptorResolver to use
-    **/
-    public void setResolver(ClassDescriptorResolver cdResolver) {
-        this._cdResolver = cdResolver;
-    } //-- setResolver
-
-    /**
-     * Sets the root (top-level) object to use for unmarshalling into.
-     *
-     * @param root the instance to unmarshal into.
-    **/
-    public void setRootObject(Object root) {
-        _topObject = root;
-    } //-- setRootObject
-
-    /**
      * Turns debuging on or off. If no Log Writer has been set, then
      * System.out will be used to display debug information
      * @param debug the flag indicating whether to generate debug information.
@@ -316,6 +303,38 @@ public final class UnmarshalHandler extends MarshalFramework
         killWriter = false;
     } //-- setLogWriter
 
+    /**
+     * Sets a boolean that when true indicates that objects
+     * contained within the object model should be re-used 
+     * where appropriate. This is only valid when unmarshalling 
+     * to an existing object.
+     *
+     * @param reuse the boolean indicating whether or not
+     * to re-use existing objects in the object model.
+    **/
+    public void setReuseObjects(boolean reuse) {
+        _reuseObjects = reuse;
+    } //-- setReuseObjects
+    
+    /**
+     * Sets the ClassDescriptorResolver to use for loading and
+     * resolving ClassDescriptors
+     *
+     * @param cdResolver the ClassDescriptorResolver to use
+    **/
+    public void setResolver(ClassDescriptorResolver cdResolver) {
+        this._cdResolver = cdResolver;
+    } //-- setResolver
+
+    /**
+     * Sets the root (top-level) object to use for unmarshalling into.
+     *
+     * @param root the instance to unmarshal into.
+    **/
+    public void setRootObject(Object root) {
+        _topObject = root;
+    } //-- setRootObject
+    
     /**
      * Sets the flag for validation
      * @param validate, a boolean to indicate whether or not
@@ -1073,8 +1092,18 @@ public final class UnmarshalHandler extends MarshalFramework
             else {
                 //-- XXXX should remove this test once we can
                 //-- XXXX come up with a better solution
-                if ((!state.derived) && useHandler)
-                    state.object = handler.newInstance(parentState.object);
+                if ((!state.derived) && useHandler) {
+                    
+                    boolean create = true;
+                    if (_reuseObjects) {
+                        state.object = handler.getValue(parentState.object);
+                        create = (state.object == null);
+                    }
+                    
+                    if (create) {
+                        state.object = handler.newInstance(parentState.object);
+                    }
+                }
                 //-- reassign class in case there is a conflict
                 //-- between descriptor#getFieldType and
                 //-- handler#newInstance...I should hope not, but
