@@ -91,10 +91,9 @@ public class XMLClassDescriptorImpl
     private XMLFieldDescriptor contentDescriptor = null;
     
     /**
-     * The ValidationRule to use when performing validation
-     * of instances of the Class associated with this MarshalInfo
+     * The TypeValidator to use for validation of the described class
     **/
-    //private List validationRules = null;
+    private TypeValidator validator = null;
 
     /**
      * The set of element descriptors
@@ -259,6 +258,18 @@ public class XMLClassDescriptorImpl
     } //-- getNameSpaceURI
 
     /**
+     * Returns a specific validator for the class described by
+     * this ClassDescriptor. A null value may be returned
+     * if no specific validator exists. 
+     *
+     * @return the type validator for the class described by this
+     * ClassDescriptor. 
+    **/
+    public TypeValidator getValidator() {
+        return validator;
+    } //-- getValidator
+    
+    /**
      * Returns the XML Name for the Class being described.
      *
      * @return the XML name.
@@ -355,6 +366,18 @@ public class XMLClassDescriptorImpl
     } //-- setNameSpaceURI
 
     /**
+     * Sets the validator to use for the class described by this
+     * ClassDescriptor
+     *
+     * @param validator the validator to use when peforming validation
+     * of the described class. This may be null to signal default
+     * validation.
+    **/
+    public void setValidator(TypeValidator validator) {
+        this.validator = validator;
+    } //-- setValidator
+    
+    /**
      * Sets the XML name for the Class described by this XMLClassDescriptor
      *
      * @param xmlName the XML name for the Class described by this 
@@ -418,11 +441,27 @@ public class XMLClassDescriptorImpl
             
     } //-- sortDescriptors
     
-    public String toString()
-    {
-        return super.toString() + " AS " + _xmlName;
-    }
+    /**
+     * Returns the String representation of this XMLClassDescriptor
+     * @return the String representation of this XMLClassDescriptor
+    **/
+    public String toString() {
+        
+        String str = super.toString() + "; descriptor for class: ";
+        
+        //-- add class name
+        if (_class != null) 
+            str += _class.getName();
+        else 
+            str += "[null]";
+        
+        //-- add xml name
+        str += "; xml name: " + _xmlName;
+        
+        return str;
+    } //-- toString
 
+    
     //-------------------------------------/
     //- Implementation of ClassDescriptor -/
     //-------------------------------------/
@@ -509,7 +548,7 @@ public class XMLClassDescriptorImpl
         this._extends = classDesc;
     } //-- setExtendsWithoutFlatten
     
-    private String toXMLName(String className) {
+    protected String toXMLName(String className) {
         //-- create default XML name
         String name = className;
         int idx = name.lastIndexOf('.');

@@ -93,6 +93,8 @@ public class StringClassDescriptor
     **/
     private String _nsURI   = null;
     
+    private StringValidator _validator = null;
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -192,6 +194,18 @@ public class StringClassDescriptor
     } //-- getAccessMode
     
     /**
+     * Returns a specific validator for the class described by
+     * this ClassDescriptor. A null value may be returned
+     * if no specific validator exists. 
+     *
+     * @return the type validator for the class described by this
+     * ClassDescriptor. 
+    **/
+    public TypeValidator getValidator() {
+        return _validator;
+    } //-- getValidator
+    
+    /**
      * Returns the XML Name for the Class being described.
      *
      * @return the XML name.
@@ -201,8 +215,7 @@ public class StringClassDescriptor
     } //-- getXMLName   
     
     public void setValidator(StringValidator validator) {
-        //this._validator = validator;
-        //rules[0].setTypeValidator(_validator);
+        this._validator = validator;
     } //-- setValidator
     
     /**

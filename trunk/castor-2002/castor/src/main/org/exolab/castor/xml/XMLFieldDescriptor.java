@@ -88,6 +88,15 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     public NodeType getNodeType();
 
     /**
+     * Returns a specific validator for the field described by
+     * this descriptor. A null value may be returned
+     * if no specific validator exists. 
+     *
+     * @return the field validator for the described field
+    **/
+    public FieldValidator getValidator();
+    
+    /**
      * Returns the XML Name for the field being described.
      *
      * @return the XML name.
@@ -130,7 +139,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     **/
     public boolean matches(String xmlName);
     
-
+    
 } //-- XMLFieldDescriptor
 
 

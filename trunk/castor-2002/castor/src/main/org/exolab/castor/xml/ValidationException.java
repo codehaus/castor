@@ -135,6 +135,10 @@ public class ValidationException extends CastorException {
         return _exception;
     } //-- getException
     
+    public Location getLocation() {
+        return _location;
+    } //-- getLocation
+    
     /**
      * Sets the location information for this ValidationException
      * @param location, the location information for this validation
@@ -153,7 +157,7 @@ public class ValidationException extends CastorException {
         String message = getMessage();
         if (message != null) sb.append(message);
         if (_location != null) {
-            sb.append(";\n   ");
+            sb.append(";\n   - location of error: ");
             sb.append(_location.toString());
         }
         return sb.toString();

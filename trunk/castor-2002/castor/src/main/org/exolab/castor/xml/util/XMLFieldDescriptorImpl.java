@@ -147,7 +147,7 @@ public class XMLFieldDescriptorImpl
 
 
     
-    private TypeValidator _validator = null;
+    private FieldValidator _validator = null;
     
     //----------------/
     //- Constructors -/
@@ -198,9 +198,8 @@ public class XMLFieldDescriptorImpl
         ClassDescriptor cd    = fieldDesc.getClassDescriptor();
         if (cd instanceof XMLClassDescriptor)
             this._classDescriptor = (XMLClassDescriptor)cd;
-        else {
-            this._classDescriptor = null;
-        }
+        else
+            this._classDescriptor = new XMLClassDescriptorAdapter(cd, null);
         
         //-- check for instances of java.util.Date
         if (java.util.Date.class.isAssignableFrom(_fieldType)) {
@@ -213,6 +212,7 @@ public class XMLFieldDescriptorImpl
         if ( xmlName == null )
             xmlName = getFieldName();
         _xmlName = xmlName;
+        
         _nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
     } //-- XMLFieldDescriptorImpl
 
@@ -305,6 +305,16 @@ public class XMLFieldDescriptorImpl
         return _nodeType;
     }
 
+    /**
+     * Returns a specific validator for the field described by
+     * this descriptor. A null value may be returned
+     * if no specific validator exists. 
+     *
+     * @return the type validator for the described field
+    **/
+    public FieldValidator getValidator() {
+        return _validator;
+    } //-- getValidator
 
 
     /**
@@ -487,8 +497,19 @@ public class XMLFieldDescriptorImpl
         _transient = isTransient;
     } //-- isTransient
     
-    public void setValidator(TypeValidator validator) {
+    public void setValidator(FieldValidator validator) {
+        
+        //-- remove reference from current FieldValidator
+        if (_validator != null) {
+            _validator.setDescriptor((XMLFieldDescriptor)null);
+        }
+        
         this._validator = validator;
+        
+        if (_validator != null) {
+            _validator.setDescriptor((XMLFieldDescriptor)this);
+        }
+            
     } //-- setValidator
     
     public String toString()
