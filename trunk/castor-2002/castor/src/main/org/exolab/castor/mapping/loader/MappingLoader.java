@@ -95,6 +95,12 @@ public abstract class MappingLoader
 
 
     /**
+     * All Java classes in the original order.
+     */
+    private Vector  _javaClasses = new Vector();
+
+
+    /**
      * Log writer to report progress. May be null.
      */
     private PrintWriter _logWriter;
@@ -138,7 +144,9 @@ public abstract class MappingLoader
 
     public Enumeration listJavaClasses()
     {
-        return _clsDescs.keys();
+        //return _clsDescs.keys();
+        // The original order of classes is important for CasheEngine
+        return _javaClasses.elements();
     }
 
 
@@ -220,6 +228,7 @@ public abstract class MappingLoader
         if ( _clsDescs.contains( clsDesc.getJavaClass() ) )
             throw new MappingException( "mapping.duplicateDescriptors", clsDesc.getJavaClass().getName() );
         _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
+        _javaClasses.add( clsDesc.getJavaClass() );
     }
 
 
@@ -236,7 +245,7 @@ public abstract class MappingLoader
             if ( relDesc == NoDescriptor ) {
                 // XXX Error message should come here
             } else if ( relDesc != null && fields[ i ] instanceof FieldDescriptorImpl ) {
-		( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
+        ( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
             }
         }
     }
