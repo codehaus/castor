@@ -440,7 +440,7 @@
     </field>
   </class>
 
-  <class name="jdo.TestLOB" access="shared" identity="id">
+  <class name="jdo.TestLOB" access="db-locked" identity="id">
     <description>Test type handling of CLOB and BLOB</description>
     <map-to table="test_lob" />
     <field name="id" type="long">
