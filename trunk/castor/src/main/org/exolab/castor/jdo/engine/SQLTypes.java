@@ -610,6 +610,8 @@ public final class SQLTypes
             return fromType.getName()+"-->"+toType.getName();
         }
     }
+
+
     /**
      * List of all the default convertors between Java types.
      */
@@ -693,8 +695,10 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.util.Date.class, java.lang.Integer.class ) {
             public Object convert( Object obj, String param ) {
-                getParamDateFormat().applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                return new Integer( getParamDateFormat().format( (java.util.Date) obj ) );
+                SimpleDateFormat paramDateFormat = getParamDateFormat();
+                paramDateFormat.applyPattern( 
+                        org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
+                return new Integer( paramDateFormat.format( (java.util.Date) obj ) );
             }
         } ),
         // Convertors to long
@@ -798,8 +802,10 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.util.Date.class, java.lang.Double.class ) {
             public Object convert( Object obj, String param ) {
-                getParamDateFormat().applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                return new Double( getParamDateFormat().format( (java.util.Date) obj ) );
+                SimpleDateFormat paramDateFormat = getParamDateFormat();
+                paramDateFormat.applyPattern( 
+                        org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
+                return new Double( paramDateFormat.format( (java.util.Date) obj ) );
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.String.class, java.lang.Double.class ) {
@@ -873,8 +879,10 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.util.Date.class, java.math.BigDecimal.class ) {
             public Object convert( Object obj, String param ) {
-                getParamDateFormat().applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                return new BigDecimal( new BigInteger( getParamDateFormat().format( (java.util.Date) obj ) ) );
+                SimpleDateFormat paramDateFormat = getParamDateFormat();
+                paramDateFormat.applyPattern( 
+                        org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
+                return new BigDecimal( new BigInteger( paramDateFormat.format( (java.util.Date) obj ) ) );
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Boolean.class, java.math.BigDecimal.class ) {
@@ -918,8 +926,9 @@ public final class SQLTypes
                 if ( param == null || param.length() == 0 )
                     return obj.toString();
                 else {
-                    getParamDateFormat().applyPattern( param );
-                    return getParamDateFormat().format( (java.util.Date) obj );
+                    SimpleDateFormat paramDateFormat = getParamDateFormat();
+                    paramDateFormat.applyPattern( param );
+                    return paramDateFormat.format( (java.util.Date) obj );
                 }
             }
         } ),
@@ -981,8 +990,9 @@ public final class SQLTypes
                     if ( param == null || param.length() == 0 )
                         return getDateFormat().parse( (String) obj );
                     else {
-                        getParamDateFormat().applyPattern( param );
-                        return getParamDateFormat().parse( (String) obj );
+                        SimpleDateFormat paramDateFormat = getParamDateFormat();
+                        paramDateFormat.applyPattern( param );
+                        return paramDateFormat.parse( (String) obj );
                     }
                 } catch ( ParseException except ) {
                     throw new IllegalArgumentException( except.toString() );
@@ -992,8 +1002,10 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Integer.class, java.util.Date.class ) {
             public Object convert( Object obj, String param ) {
                 try {
-                    getParamDateFormat().applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                    return getParamDateFormat().parse( obj.toString() );
+                    SimpleDateFormat paramDateFormat = getParamDateFormat();
+                    paramDateFormat.applyPattern( 
+                            org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
+                    return paramDateFormat.parse( obj.toString() );
                 } catch ( ParseException except ) {
                     throw new IllegalArgumentException( except.toString() );
                 }
@@ -1002,8 +1014,10 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( java.math.BigDecimal.class, java.util.Date.class ) {
             public Object convert( Object obj, String param ) {
                 try {
-                    getParamDateFormat().applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                    return getParamDateFormat().parse( obj.toString() );
+                    SimpleDateFormat paramDateFormat = getParamDateFormat();
+                    paramDateFormat.applyPattern( 
+                            org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
+                    return paramDateFormat.parse( obj.toString() );
                 } catch ( ParseException except ) {
                     throw new IllegalArgumentException( except.toString() );
                 }
@@ -1012,8 +1026,9 @@ public final class SQLTypes
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Double.class, java.util.Date.class ) {
             public Object convert( Object obj, String param ) {
                 try {
-                    getParamDateFormat().applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                    return getParamDateFormat().parse( getDecimalFormat().format(obj).trim() );
+                    SimpleDateFormat paramDateFormat = getParamDateFormat();
+                    paramDateFormat.applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
+                    return paramDateFormat.parse( getDecimalFormat().format(obj).trim() );
                 } catch ( ParseException except ) {
                     throw new IllegalArgumentException( except.toString() );
                 }
@@ -1061,8 +1076,9 @@ public final class SQLTypes
                     param = "yyyy-MM-dd HH:mm:ss.SSS";
                 }
                 try {
-                    getParamDateFormat().applyPattern( param );
-                    time = getParamDateFormat().parse( (String) obj ).getTime();
+                    SimpleDateFormat paramDateFormat = getParamDateFormat();
+                    paramDateFormat.applyPattern( param );
+                    time = paramDateFormat.parse( (String) obj ).getTime();
                 } catch ( ParseException except ) {
                     throw new IllegalArgumentException( except.toString() );
                 }
@@ -1078,8 +1094,9 @@ public final class SQLTypes
                     param = "yyyy-MM-dd HH:mm:ss.SSS";
                 }
                 java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
-                getParamDateFormat().applyPattern( param );
-                return getParamDateFormat().format( new java.util.Date(timestamp.getTime() + timestamp.getNanos() / 1000000) );
+                SimpleDateFormat paramDateFormat = getParamDateFormat();
+                paramDateFormat.applyPattern( param );
+                return paramDateFormat.format( new java.util.Date(timestamp.getTime() + timestamp.getNanos() / 1000000) );
             }
         } ),
         // InputStream convertors
