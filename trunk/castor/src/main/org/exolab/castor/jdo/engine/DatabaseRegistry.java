@@ -47,32 +47,31 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.sql.DriverManager;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.naming.NameNotFoundException;
-import org.xml.sax.InputSource;
-import org.xml.sax.EntityResolver;
-import org.exolab.castor.xml.Unmarshaller;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
+import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
-import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.DTDResolver;
+import org.exolab.castor.xml.Unmarshaller;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -135,10 +134,6 @@ public class DatabaseRegistry
 
 
     private static Hashtable  _byEngine = new Hashtable();
-
-
-
-    private static MappingResolver _defaultMapping;
 
 
     public static String  DefaultMapping = "mapping.xml";

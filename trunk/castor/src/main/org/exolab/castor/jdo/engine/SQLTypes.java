@@ -46,30 +46,26 @@
 
 package org.exolab.castor.jdo.engine;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.ResultSet;
-import java.sql.Types;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.io.IOException;
-import org.exolab.castor.util.Messages;
+import java.text.SimpleDateFormat;
+
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.util.MimeBase64Decoder;
+import org.exolab.castor.util.MimeBase64Encoder;
 
 
 
@@ -1112,7 +1108,6 @@ public final class SQLTypes
                     java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
                     byte[] buffer = new byte[loadLobBufferSize()];
                     int len = 0;
-                    int b;
                     while ( (len = is.read(buffer)) > 0 )
                         bos.write( buffer, 0, len );
                     return bos.toByteArray();
@@ -1141,7 +1136,6 @@ public final class SQLTypes
                     java.io.CharArrayWriter writer = new java.io.CharArrayWriter();
                     char[] buffer = new char[loadLobBufferSize()];
                     int len = 0;
-                    int b;
                     while ( (len = reader.read(buffer)) > 0 )
                         writer.write( buffer, 0, len );
                     return writer.toString();
@@ -1157,7 +1151,6 @@ public final class SQLTypes
                     java.io.CharArrayWriter writer = new java.io.CharArrayWriter();
                     char[] buffer = new char[loadLobBufferSize()];
                     int len = 0;
-                    int b;
                     while ( (len = reader.read(buffer)) > 0 )
                         writer.write( buffer, 0, len );
                     return writer.toCharArray();
@@ -1204,7 +1197,6 @@ public final class SQLTypes
                     java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
                     byte[] buffer = new byte[loadLobBufferSize()];
                     int len = 0;
-                    int b;
                     while ( (len = is.read(buffer)) > 0 )
                         bos.write( buffer, 0, len );
                     return bos.toByteArray();

@@ -47,9 +47,10 @@
 package org.exolab.castor.jdo.engine;
 
 
-import javax.transaction.Transaction;
-import java.util.HashMap;
 import java.io.Serializable;
+import java.util.HashMap;
+
+import javax.transaction.Transaction;
 
 /**
  * Transactions to Databases Map. 

@@ -48,29 +48,28 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
-import org.exolab.castor.mapping.MappingException;
+
 import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.mapping.xml.MappingRoot;
+import org.exolab.castor.mapping.xml.CacheTypeMapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
-import org.exolab.castor.mapping.xml.CacheTypeMapping;
+import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.Param;
 import org.exolab.castor.mapping.xml.types.DirtyType;
 import org.exolab.castor.util.Messages;
-import java.util.ArrayList;
 
 /**
  * A JDO implementation of mapping helper. Creates JDO class descriptors
@@ -82,9 +81,6 @@ import java.util.ArrayList;
 public class JDOMappingLoader
     extends MappingLoader
 {
-
-
-    private static final String IgnoreDirty = "ignore";
 
 
     /**

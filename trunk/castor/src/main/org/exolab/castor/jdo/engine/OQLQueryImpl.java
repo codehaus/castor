@@ -47,46 +47,32 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.Vector;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.NoSuchElementException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import org.exolab.castor.jdo.Query;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
+import java.util.Vector;
+
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.Query;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.oql.Lexer;
-import org.exolab.castor.jdo.oql.Parser;
-import org.exolab.castor.jdo.oql.Token;
-import org.exolab.castor.jdo.oql.TokenTypes;
+import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.jdo.oql.ParseTreeNode;
 import org.exolab.castor.jdo.oql.ParseTreeWalker;
-import org.exolab.castor.jdo.oql.ParamInfo;
-import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.jdo.oql.Parser;
+import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.Logger;
-import org.exolab.castor.persist.OID;
-import org.exolab.castor.persist.spi.Complex;
 
 /**
  *

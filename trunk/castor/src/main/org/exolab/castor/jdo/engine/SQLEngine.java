@@ -52,9 +52,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Stack;
@@ -62,11 +60,8 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
-import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -75,16 +70,9 @@ import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
-import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.mapping.loader.FieldHandlerImpl;
-import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.persist.ClassMolder;
-import org.exolab.castor.persist.OID;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
@@ -115,12 +103,6 @@ public final class SQLEngine implements Persistence {
      * Commons Logging</a> instance used for all logging.
      */
     private static Log _log = LogFactory.getFactory().getInstance( SQLEngine.class );
-
-
-    private final static boolean ID_TYPE = true;
-
-
-    private final static boolean FIELD_TYPE = false;
 
 
     static private Hashtable    _separateConnections = new Hashtable();
@@ -180,7 +162,6 @@ public final class SQLEngine implements Persistence {
     private KeyGenerator         _keyGen;
 
 
-    private ClassMolder          _mold;
 
 
     SQLEngine( JDOClassDescriptor clsDesc, PersistenceFactory factory, String stampField )
@@ -261,7 +242,6 @@ public final class SQLEngine implements Persistence {
         // clsDesc
         // we always put the original id info in front
         // [oleg] except for SQL name, it may differ.
-        JDOClassDescriptor jdoBase = (JDOClassDescriptor) base;
         FieldDescriptor[] baseIdDescriptors = base.getIdentities();
         FieldDescriptor[] idDescriptors = clsDesc.getIdentities();
 
@@ -530,7 +510,6 @@ public final class SQLEngine implements Persistence {
 
         PreparedStatement stmt = null;
         int               count;
-        Object            sqlId;
 
         if ( _extends == null && _keyGen == null && identity == null )
             throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
@@ -878,7 +857,6 @@ public final class SQLEngine implements Persistence {
                     }
                     
                     ResultSet res = stmt.executeQuery();
-                    int c = res.getMetaData().getColumnCount();
                     if ( res.next() ) {
 
                         stmt.close();
@@ -1125,12 +1103,9 @@ public final class SQLEngine implements Persistence {
     private void buildSql() throws QueryException {
 
         StringBuffer         sql;
-        JDOFieldDescriptor[] jdoFields;
-        FieldDescriptor[]    fields;
         int                  count;
         QueryExpression      query;
         String               wherePK;
-        String               primKeyName;
         String               tableName;
         boolean              keyGened = false;
 
@@ -1248,11 +1223,9 @@ public final class SQLEngine implements Persistence {
 
 
     private void buildFinder( JDOClassDescriptor clsDesc ) throws MappingException, QueryException {
-        Vector          fields;
         QueryExpression expr;
         QueryExpression find;
 
-        fields = new Vector();
         expr = _factory.getQueryExpression();
         find = _factory.getQueryExpression();
         //addLoadSql( expr, fields, false, true, true );
@@ -1319,12 +1292,6 @@ public final class SQLEngine implements Persistence {
 
         _log.debug( Messages.format( "jdo.loading", _type, _sqlLoad ) );
 
-    }
-
-
-    private void addLoadSql( QueryExpression expr, Vector allFields,
-            boolean loadPk, boolean queryPk, boolean store )
-            throws MappingException {
     }
 
 
