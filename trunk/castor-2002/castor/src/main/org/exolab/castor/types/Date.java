@@ -77,7 +77,7 @@ public class Date extends TimePeriod {
         if (temp < 0){
             temp = -temp;
             try {
-                this.setZoneNegative();
+                super.setZoneNegative();
             } catch (OperationNotSupportedException e) {
             }
         }
@@ -85,7 +85,7 @@ public class Date extends TimePeriod {
         temp = temp % (60*60*1000);
         short zmin  = (short)(temp / (60*1000));
         try {
-            this.setZone(zhour,zmin);
+            super.setZone(zhour,zmin);
         } catch (OperationNotSupportedException e) {
         }
     }
