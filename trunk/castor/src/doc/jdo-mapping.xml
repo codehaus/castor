@@ -194,9 +194,10 @@
           of the 'type' attribute. The value of the type attribute can be a fully qualified Java
           object like 'java.lang.String' or one of the allowed aliases:</p>
 
-	  <table border="1" cellpadding="4">
+      <table border="1" cellpadding="4">
             <tr><th>short name</th><th>Primitive type?</th><th>Java Class</th></tr>
             <tr><td>big-decimal</td><td>N</td><td>java.math.BigDecimal</td></tr>
+            <tr><td>big-integer</td><td>Y</td><td>java.math.BigInteger</td></tr>
             <tr><td>boolean</td><td>Y</td><td>java.lang.Boolean.TYPE</td></tr>
             <tr><td>byte</td><td>Y</td><td>java.lang.Byte.TYPE</td></tr>
             <tr><td>bytes</td><td>N</td><td>byte[]</td></tr>
@@ -206,18 +207,23 @@
             <tr><td>date</td><td>N</td><td>java.util.Date</td></tr>
             <tr><td>double</td><td>Y</td><td>java.lang.Double.TYPE</td></tr>
             <tr><td>float</td><td>Y</td><td>java.lang.Float.TYPE</td></tr>
-            <tr><td>integer</td><td>Y</td><td>java.lang.Integer.TYPE</td></tr>
+            <tr><td>int</td><td>Y</td><td>java.lang.Integer.TYPE</td></tr>
+            <tr><td>integer</td><td>Y</td><td>java.lang.Integer</td></tr>
             <tr><td>locale</td><td>N</td><td>java.util.Locale</td></tr>
             <tr><td>long</td><td>Y</td><td>java.lang.Long.TYPE</td></tr>
             <tr><td>other</td><td>N</td><td>java.lang.Object</td></tr>
+            <tr><td>serializable</td><td>Y</td><td>java.io.Serializable</td></tr>
             <tr><td>short</td><td>Y</td><td>java.lang.Short.TYPE</td></tr>
+            <tr><td>sqldate</td><td>Y</td><td>java.sql.Date</td></tr>
+            <tr><td>sqltime</td><td>Y</td><td>java.sql.Date</td></tr>
             <tr><td>string</td><td>N</td><td>java.lang.String</td></tr>
             <tr><td>strings</td><td>N</td><td>String[]</td></tr>                
             <tr><td>stream</td><td>N</td><td>java.io.InputStream</td></tr>
+            <tr><td>timestamp</td><td>N</td><td>java.sql.Timestamp</td></tr>
           </table>
 
 
-	  <p>Castor will try to cast the data in the mapping file to the proper Java 
+      <p>Castor will try to cast the data in the mapping file to the proper Java 
             type.</p></li>
 
 
