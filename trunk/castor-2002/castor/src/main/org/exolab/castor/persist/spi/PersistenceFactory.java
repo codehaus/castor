@@ -48,18 +48,18 @@ package org.exolab.castor.persist.spi;
 
 
 import java.io.PrintWriter;
-import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.persist.ClassHandler;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 
 
 /**
- * Factory for producing new persistence implementations. This factory
- * is called by the cache engine to return persistence implementations
- * for each of the object types supported by that engine. The returned
- * implementations may be shared or one per object type. Only the
- * cache engine requesting the implementation will ever use the
- * returned implementation.
+ * Factory for producing new persistence implementations. Used for
+ * constructing a persistence service provider (see {@link Persistence})
+ * as well as for constructing new query expressions (see {@link
+ * QueryExpression}).
+ * <p>
+ * The factory is specified in the JDO configuration file for the
+ * database and is configured through Bean-like accessor methods.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -70,20 +70,40 @@ public interface PersistenceFactory
 
 
     /**
+     * Returns the name of this factory. A descriptive name that
+     * indicates the type of supported database server or SQL syntax.
+     *
+     * @return The name of this factory
+     */
+    public String getFactoryName();
+
+
+    /**
      * Returns a persistence implementation for the specified object
      * type (given its descriptor) on behalf of the specified cache
      * engine. Return null if no persistence support is available for
      * the specified object type.
      *
-     * @param handler The class handler
+     * @param clsDesc The class descriptor
      * @param logWriter Writer to use for logging errors and tracing
      *  messages (may be null)
      * @return A suiteable persistence implementation, or null
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( ClassHandler handler, PrintWriter logWriter )
+    public Persistence getPersistence( ClassDescriptor clsDesc, PrintWriter logWriter )
         throws MappingException;
 
 
+    /**
+     * Returns a new empty query expression suitable for the underlying
+     * SQL engine. The implementation will construct SQL query
+     * statements in the preferred syntax.
+     *
+     * @return New empty query expression
+     */
+    public QueryExpression getQueryExpression();
+
+
 }
+
