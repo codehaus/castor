@@ -70,6 +70,7 @@ import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.Types;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.QueryException;
@@ -79,6 +80,7 @@ import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.ObjectDeletedException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.FatalPersistenceException;
+import org.exolab.castor.persist.RelationContext;
 
 
 
@@ -188,7 +190,8 @@ public class MozillaEngine
     }
 
 
-    public Object load( Object conn, Object obj, Object identity, boolean lock )
+    public Object load( Object conn, RelationContext rtx, Object obj, Object identity,
+                        AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException
     {
         LDAPAttributeSet ldapSet;
@@ -392,7 +395,7 @@ public class MozillaEngine
     }
     
 
-    public PersistenceQuery createQuery( String query, Class[] types )
+    public PersistenceQuery createQuery( RelationContext rtx, String query, Class[] types )
         throws QueryException
     {
         return new MozillaQuery( query, types );
@@ -522,7 +525,7 @@ public class MozillaEngine
         }
         
         
-        public void execute( Object conn, boolean lock )
+        public void execute( Object conn, AccessMode accessMode )
             throws QueryException, PersistenceException
         {
             try {

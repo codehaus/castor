@@ -57,7 +57,11 @@ import org.exolab.castor.mapping.Types;
 
 
 /**
- *
+ * A contained field descriptor. A contained field is a field in
+ * object X, where object X is contained in object Y. When object Y
+ * is persisted, the contained field is persisted through object Y
+ * directly, by being listed as a field of object Y. Contained fields
+ * are used to flatten out one-one relations.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -71,80 +75,54 @@ public class DAXContainedFieldDesc
      * The field in the parent object that should be used to
      * access this object.
      */
-    protected FieldDesc   _containerField;
+    protected FieldDesc   _parentField;
 
 
     /**
-     * A field in this object that references the parent object.
-     * Must be set when creating a new object of this type.
-     */
-    protected FieldDesc   _parentRefField;
-
-
-    /**
-     * Constructs a new contained field descriptor. A contained field
-     * descriptor is created for each field in the contained object.
-     * The actual field descriptor is passed, along with the field in the
-     * parent object (contained field) used to access the contained object.
+     * Constructs a new contained field for the specified field.
      *
-     * @param fieldDesc The descriptor of this field
-     * @param objectDesc The descriptor of this field's object type
-     * @param containerField The field in the parent object used to access
-     *   this contained object
-     * @throws MappingException This should never happen
+     * @param fieldDesc The field descriptor
+     * @param parentField The field in the parent object
+     * @throws MappingException The container object is not constructable
      */
-    public DAXContainedFieldDesc( DAXFieldDesc fieldDesc, FieldDesc containerField )
+    public DAXContainedFieldDesc( DAXFieldDesc fieldDesc, FieldDesc parentField )
         throws MappingException
     {
-        this( fieldDesc, containerField, null );
+        super( fieldDesc );
+
+        if ( parentField == null )
+            throw new IllegalArgumentException( "Argument 'parentField' is null" );
+        if ( ! Types.isConstructable( parentField.getFieldType() ) )
+            throw new MappingException( "mapping.classNotConstructable",
+                                        parentField.getFieldType().getName() );
+        _parentField = parentField;
     }
 
 
-    public DAXContainedFieldDesc( DAXFieldDesc fieldDesc, FieldDesc containerField,
-                                  FieldDesc parentRefField )
-        throws MappingException
+    /**
+     * Returns the field in the parent object which holds the
+     * container object for this field.
+     *
+     * @return The parent field
+     */
+    FieldDesc getParentField()
     {
-        super( fieldDesc, fieldDesc.getLdapName() );
-        if ( containerField == null )
-            throw new IllegalArgumentException( "Argument 'containerField' is null" );
-        if ( ! Types.isConstructable( containerField.getFieldType() ) )
-            throw new MappingException( "The field type " + containerField.getFieldType().getName() +
-                                        " is not a consturctable class" );
-        _containerField = containerField;
-        _parentRefField = parentRefField;
+        return _parentField;
     }
-    
-    
-    FieldDesc getContainerField()
-    {
-        return _containerField;
-    }
-    
-    
+
+
     public Object getValue( Object obj )
     {
         // This is always called with an instance of the parent
         // object, so we have to obtain the contained object
         // first before retrieving the field from it.
-        obj = _containerField.getValue( obj );
+        obj = _parentField.getValue( obj );
         if ( obj == null )
             return null;
         return super.getValue( obj );
     }
-
-
-    public LDAPAttribute getAttribute( Object obj )
-    {
-        // This is always called with an instance of the parent
-        // object, so we have to obtain the contained object
-        // first before retrieving the field from it.
-        obj = _containerField.getValue( obj );
-        if ( obj == null )
-            return null;
-        return super.getAttribute( obj );
-    }
-
-
+    
+    
     public void setValue( Object obj, Object value )
     {
         Object self;
@@ -152,44 +130,21 @@ public class DAXContainedFieldDesc
         // This is always called with an instance of the parent
         // object, so we have to obtain the contained object
         // first before retrieving the field from it.
-        self = _containerField.getValue( obj );
+        self = _parentField.getValue( obj );
         if ( self == null ) {
             // If the contained object does not exist, it is
             // created at this point.
-            self = Types.newInstance( _containerField.getFieldType() );
-            if ( _parentRefField != null )
-                _parentRefField.setValue( self, obj );
-            _containerField.setValue( obj, self );
+            self = Types.newInstance( _parentField.getFieldType() );
+            _parentField.setValue( obj, self );
         }
         super.setValue( self, value );
     }
 
 
-    public void setValue( Object obj, LDAPEntry entry )
-    {
-        Object self;
-        
-        // This is always called with an instance of the parent
-        // object, so we have to obtain the contained object
-        // first before retrieving the field from it.
-        self = _containerField.getValue( obj );
-        if ( self == null ) {
-            // If the contained object does not exist, it is
-            // created at this point.
-            self = Types.newInstance( _containerField.getFieldType() );
-            if ( _parentRefField != null )
-                _parentRefField.setValue( self, obj );
-            _containerField.setValue( obj, self );
-        }
-        super.setValue( self, entry );
-    }
-    
-    
     public String toString()
     {
-        return super.toString() + " on " + _containerField.getFieldName();
+        return super.toString() + " on " + _parentField.getFieldName();
     }
-
 
 
 }

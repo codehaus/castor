@@ -63,8 +63,8 @@ import org.exolab.castor.dax.Search;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TransactionContext.AccessMode;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.TransactionAbortedException;
 import org.exolab.castor.persist.PersistenceException;
@@ -150,7 +150,7 @@ public class DirectoryImpl
         try {
             next = expr.indexOf( '$' );
             if ( next <= 0 ) {
-                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( expr, new Class[ 0 ] ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( null, expr, new Class[ 0 ] ) );
             } else {
                 pos = 0;
                 query = new StringBuffer();
@@ -176,7 +176,7 @@ public class DirectoryImpl
                 array = new Class[ types.size() ];
                 types.copyInto( array );
                 System.out.println( query.toString() );
-                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( query.toString(), array ) );
+                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( null, query.toString(), array ) );
             }
         } catch ( QueryException except ) {
             throw new InvalidSearchException( except.getMessage() );
@@ -200,7 +200,7 @@ public class DirectoryImpl
         obj = clsDesc.newInstance();
         try {
             if ( _tx != null ) {
-                _tx.load( _dirEngine, obj, rdn, AccessMode.ReadWrite );
+                _tx.load( _dirEngine, obj, rdn, AccessMode.Shared );
             } else {
                 TransactionContext tx;
                 
