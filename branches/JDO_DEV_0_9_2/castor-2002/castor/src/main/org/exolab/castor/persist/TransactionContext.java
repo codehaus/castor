@@ -222,6 +222,13 @@ public class TransactionContext extends Lockable {
 
 
     /**
+     * True if running inside a global transaction and should not
+     * attempt to commit/rollback directly.
+     */
+    private boolean     _globalTx;
+
+
+    /**
      * The database to which this transaction belongs.
      */
     private Database     _db;
@@ -236,11 +243,12 @@ public class TransactionContext extends Lockable {
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
      */
-    public TransactionContext( DatabaseRegistry dbReg, Database db ) {
+    public TransactionContext( DatabaseRegistry dbReg, Database db, boolean global ) {
         _xid = null;
         _status = Status.STATUS_ACTIVE;
         _dbReg = dbReg;
         _db = db;
+        _globalTx = global;
         ClassLoader ctx = Thread.currentThread().getContextClassLoader();
         if ( ctx == null )
             _threadClassLoader = getClass().getClassLoader();
@@ -315,51 +323,83 @@ public class TransactionContext extends Lockable {
 
 
     /**
-     * The derived class must implement this method and return an open
-     * connection for the specified engine. The connection should be
-     * created only one for a given engine in the same transaction.
-     *
-     * @param engine The persistence engine
-     * @return An open connection
-     * @throws PersistenceException An error occured talking to the
-     *   persistence engine
-     */
-    //public abstract Object getConnection( LockEngine engine )
-    //    throws PersistenceException;
-
-
-    /**
-     * The derived class must implement this method and commit all the
-     * connections used in this transaction. If the transaction could
-     * not commit fully or partially, this method will throw an {@link
-     * TransactionAbortedException}, causing a rollback to occur as
-     * the next step.
+     * This method call the LockEngine and commit all the connections used 
+     * in this transaction. If the transaction could not commit fully or 
+     * partially, this method will throw an {@link TransactionAbortedException}, 
+     * causing a rollback to occur as the next step.
      *
      * @throws TransactionAbortedException The transaction could not
      *  commit fully or partially and should be rolled back
      */
-    //protected abstract void commitConnections()
-    //    throws TransactionAbortedException;
+    protected void commitConnections()
+            throws TransactionAbortedException {
+
+        if ( _globalTx ) {
+            //_conns.clear();
+        } else {
+            try {
+                // Go through all the lockEngine in the DatabaseRegistry,
+                // commit and close them one by one.
+
+                // in this version, only one lockEngine is returned
+                LockEngine le = _dbReg.getLockEngine();
+                le.commitConnection( this );
+            } catch ( PersistenceException except ) {
+                throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
+            } finally {
+            }
+        }
+    }
 
 
     /**
-     * The derived class must implement this method and close all the
-     * connections used in this transaction.
+     * This method call the LockEngine to close all the connections 
+     * used in this transaction.
+     *
      * @throws TransactionAbortedException The transaction could not
      *  close all the connections
      */
-    //protected abstract void closeConnections()
-    //    throws TransactionAbortedException;
+    protected void closeConnections()
+            throws TransactionAbortedException {
+
+        if ( ! _globalTx ) {
+            return;
+        }
+        // Go through all the LockEngine in the DatabaseRegistry,
+        // close them one by one.
+        // Close all that can be closed, after that report error if any.
+
+        // in this version, only one LockEngine per DatabaseRegistry is returned.
+        // multiple data store support will be added. (and DatabaseRegistry
+        // will return one lock engine per data store.
+        try {
+            LockEngine le = _dbReg.getLockEngine();
+            le.closeConnection( this );
+        } catch ( Exception error ) {
+            throw new TransactionAbortedException( Messages.format("persist.nested", error ), error );
+        }
+    }
 
 
     /**
-     * The derived class must implement this method and rollback all
-     * the connections used in this transaction. The connections may
+     * This method invokes the LockEngine to rollback all the 
+     * connections used in this transaction. The connections may
      * be closed, as they will not be reused in this transaction.
      * This operation is guaranteed to succeed.
      */
-    //protected abstract void rollbackConnections();
+    protected void rollbackConnections() {
 
+        if ( ! _globalTx ) {
+            // Go through all the connections opened in this transaction,
+            // rollback and close them one by one. Ignore errors.
+
+            // in this version, only one LockEngine per DatabaseRegistry is returned.
+            // multiple data store support will be added. (and DatabaseRegistry
+            // will return one lock engine per data store.
+            LockEngine le = _dbReg.getLockEngine();
+            le.rollbackConnection( this );
+        }
+    }
 
     public synchronized Object fetch( Resolver molder,
             Object identity, AccessMode suggestedAccessMode )
@@ -1131,8 +1171,7 @@ public class TransactionContext extends Lockable {
             // Any error is reported as transaction aborted
             throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
         } finally {
-            // | need to call LockEngine to close connections
-            //closeConnections();
+            closeConnections();
         }
     }
 
@@ -1165,8 +1204,7 @@ public class TransactionContext extends Lockable {
 
             // Go through all the connections opened in this transaction,
             // commit and close them one by one.
-            // | call LockEngine to commit connections
-            //commitConnections();
+            commitConnections();
         } catch ( Exception except ) {
             // Any error that happens, we're going to rollback the transaction.
             _status = Status.STATUS_MARKED_ROLLBACK;
@@ -1227,7 +1265,7 @@ public class TransactionContext extends Lockable {
 
         // Go through all the connections opened in this transaction,
         // rollback and close them one by one.
-        //rollbackConnections();
+        rollbackConnections();
 
         // un-delete object first
         enum = _objects.elements();
@@ -1300,7 +1338,7 @@ public class TransactionContext extends Lockable {
         try {
             // Go through all the connections opened in this transaction,
             // close them one by one.
-            //closeConnections();
+            closeConnections();
 
         } catch ( Exception except ) {
             // Any error that happens, we're going to rollback the transaction.
