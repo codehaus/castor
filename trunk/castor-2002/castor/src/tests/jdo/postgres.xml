@@ -3,8 +3,9 @@
 
 
 <database name="postgresql" engine="postgresql" >
-  <data-source class-name="org.postgresql.PostgresqlDataSource"> 
-    <params user="test" password="test" port-number="5432" server-name="localhost"  database-name="test" />
-  </data-source>
+  <driver class-name="org.postgresql.Driver" url="jdbc:postgresql:test"> 
+    <param name="user" value="root"/>
+    <param name="password" value="" />
+  </driver>
   <mapping href="mapping.xml" />
 </database>
