@@ -77,6 +77,12 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The underlying field handler used by this handler.
+     */
+    private final FieldHandler _handler;
+
+
+    /**
      * The Java field described and accessed through this descriptor.
      */
     private final Field   _field;
@@ -85,19 +91,31 @@ public final class FieldHandlerImpl
     /**
      * The method used to obtain the value of this field. May be null.
      */
-    private Method  _getMethod;
+    private Method        _getMethod;
 
 
     /**
      * The method used to set the value of this field. May be null.
      */
-    private Method  _setMethod;
+    private Method        _setMethod;
+
+
+    /**
+     * The method used to check if the value of this field exists. May be null.
+     */
+    private Method  _hasMethod;
+
+
+    /**
+     * The method used to delete the value of this field. May be null.
+     */
+    private Method  _deleteMethod;
 
 
     /**
      * The method used to create a new instance of the field.
      */
-    private Method         _createMethod;
+    private Method  _createMethod;
 
 
     /**
@@ -161,15 +179,12 @@ public final class FieldHandlerImpl
      * @throws MappingException If the field is not public, is static or
      *    transient
      */
-    public FieldHandlerImpl( Field field, TypeInfo typeInfo )
+    public FieldHandlerImpl( FieldHandler handler, TypeInfo typeInfo )
         throws MappingException
     {
-        if ( field.getModifiers() != Modifier.PUBLIC &&
-             field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
-            throw new MappingException( "mapping.fieldNotAccessible", field.getName(),
-                                        field.getDeclaringClass().getName() );
-        _field = field;
-        _fieldName = field.getName();
+        _handler = handler;
+        _field = null;
+        _fieldName = handler.toString();
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
         _immutable = typeInfo.isImmutable();
         _required = typeInfo.isRequired();
@@ -180,8 +195,39 @@ public final class FieldHandlerImpl
             _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
         else
             _colHandler = null;
-        _getMethod = null;
-        _setMethod = null;
+    }
+
+
+    /**
+     * Construct a new field handler for the specified field. The field must
+     * be public, and may not be static or transient. The field name is
+     * determined from the Java field, the type from the type information.
+     *
+     * @param field The field being described
+     * @param typeInfo Type information
+     * @throws MappingException If the field is not public, is static or
+     *    transient
+     */
+    public FieldHandlerImpl( Field field, TypeInfo typeInfo )
+        throws MappingException
+    {
+        if ( field.getModifiers() != Modifier.PUBLIC &&
+             field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
+            throw new MappingException( "mapping.fieldNotAccessible", field.getName(),
+                                        field.getDeclaringClass().getName() );
+        _handler = null;
+        _field = field;
+        _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
+        _fieldName = field.getName() + "(" + _fieldType.getName() + ")";
+        _immutable = typeInfo.isImmutable();
+        _required = typeInfo.isRequired();
+        _default = typeInfo.getDefaultValue();
+        _convertTo = typeInfo.getConvertorTo();
+        _convertFrom = typeInfo.getConvertorFrom();
+        if ( typeInfo.getCollectionType() != null )
+            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
+        else
+            _colHandler = null;
     }
 
 
@@ -207,16 +253,20 @@ public final class FieldHandlerImpl
     public FieldHandlerImpl( String fieldName, Method getMethod, Method setMethod, TypeInfo typeInfo )
         throws MappingException
     {
+        _handler = null;
+        _field = null;
         if ( fieldName == null )
             throw new IllegalArgumentException( "Argument 'fieldName' is null" );
-        _fieldName = fieldName;
         if ( getMethod == null && setMethod == null )
             throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
-        if ( setMethod != null ) setWriteMethod(setMethod);
-        if ( getMethod != null ) setReadMethod(getMethod);
+        if ( setMethod != null )
+            setWriteMethod( setMethod );
+        if ( getMethod != null )
+            setReadMethod(getMethod);
         
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
+        _fieldName = fieldName + "(" + _fieldType.getName() + ")";
         _immutable = typeInfo.isImmutable();
         _required = typeInfo.isRequired();
         _default = typeInfo.getDefaultValue();
@@ -226,7 +276,6 @@ public final class FieldHandlerImpl
             _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
         else
             _colHandler = null;
-        _field = null;
     }
 
 
@@ -235,13 +284,22 @@ public final class FieldHandlerImpl
         Object value;
 
         try {
-            // Get the field value
-            if ( _field != null )
+            // If field is accessed directly, get it's value, if not
+            // need to call get method. It's possible to not have a
+            // way to access the field.
+            if ( _handler != null )
+                value = _handler.getValue( object );
+            else if ( _field != null )
                 value = _field.get( object );
-            else if ( _getMethod != null )
-                value = _getMethod.invoke( object, null );
-            else
-                return null;
+            else if ( _getMethod != null ) {
+                // If field has 'has' method, false means field is null
+                // and do not attempt to call getValue. Otherwise, 
+                if ( _hasMethod != null && _hasMethod.invoke( object, null ) == Boolean.FALSE )
+                    value = null;
+                else
+                    value = _getMethod.invoke( object, null );
+            } else
+                value = null;
         } catch ( IllegalAccessException except ) {
             // This should never happen
             throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
@@ -252,8 +310,12 @@ public final class FieldHandlerImpl
         }
 
         // If a collection, return an enumeration of it's values.
-        if ( _colHandler != null )
-            return _colHandler.elements( value );
+        if ( _colHandler != null ) {
+            if ( value == null )
+                return new CollectionHandlers.EmptyEnumerator();
+            else
+                return _colHandler.elements( value );
+        }
 
         // If there is a convertor, apply it
         if ( _convertFrom == null )
@@ -283,10 +345,16 @@ public final class FieldHandlerImpl
             }
 
             try {
-                if ( _field != null )
+                if ( _handler != null )
+                    _handler.setValue( object, value );
+                else if ( _field != null )
                     _field.set( object, value );
-                else if ( _setMethod != null )
-                    _setMethod.invoke( object, new Object[] { value } );
+                else if ( _setMethod != null ) {
+                    if ( value == null && _deleteMethod != null )
+                        _deleteMethod.invoke( object, null );
+                    else
+                        _setMethod.invoke( object, new Object[] { value } );
+                }
                 // If the field has no set method, ignore it.
                 // If this is a problem, identity it someplace else.
             } catch ( IllegalArgumentException except ) {
@@ -306,21 +374,27 @@ public final class FieldHandlerImpl
             }
 
         } else if ( value != null ) {
-
-            Object collection;
+            Object collect;
 
             try {
                 // Get the field value (the collection), add the value to it,
                 // possibly yielding a new collection (in the case of an array),
                 // and set that collection back into the field.
-                if ( _field != null ) {
-                    collection = _field.get( object );
-                    collection = _colHandler.add( collection, value );
-                    _field.set( object, collection );
+                if ( _handler != null ) {
+                    collect = _handler.getValue( object );
+                    collect = _colHandler.add( collect, value );
+                    if ( collect != null )
+                        _handler.setValue( object, collect );
+                } else if ( _field != null ) {
+                    collect = _field.get( object );
+                    collect = _colHandler.add( collect, value );
+                    if ( collect != null )
+                        _field.set( object, collect );
                 } else if ( _getMethod != null && _setMethod != null ) {
-                    collection = _getMethod.invoke( object, null );
-                    collection = _colHandler.add( collection, value );
-                    _setMethod.invoke( object, new Object[] { collection } );
+                    collect = _getMethod.invoke( object, null );
+                    collect = _colHandler.add( collect, value );
+                    if ( collect != null )
+                        _setMethod.invoke( object, new Object[] { collect } );
                 }                
             } catch ( IllegalAccessException except ) {
                 // This should never happen
@@ -335,9 +409,13 @@ public final class FieldHandlerImpl
     }
 
 
+    /**
+     * @deprecated
+     */
     public void checkValidity( Object object )
         throws ValidityException
     {
+        /*
         try {
             if ( _required ) {
                 if ( ( _field != null && _field.get( object ) == null ) ||
@@ -353,6 +431,7 @@ public final class FieldHandlerImpl
             throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
                                                               toString(), except.getMessage() ) );
         }
+        */
     }
 
 
@@ -361,6 +440,8 @@ public final class FieldHandlerImpl
     {
         if ( _immutable )
             throw new IllegalStateException( Messages.format( "mapping.classNotConstructable", _fieldType ) );
+        if ( _handler != null )
+            return _handler.newInstance( object );
         // If we have a create method and parent object, call the create method.
         if ( _createMethod != null && object != null ) {
             try {
@@ -409,6 +490,39 @@ public final class FieldHandlerImpl
 
 
     /**
+     * Mutator method used by {@link MappingLoader} and
+     * {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
+     */
+    public void setHasDeleteMethod( Method hasMethod, Method deleteMethod )
+        throws MappingException
+    {
+        if ( hasMethod != null ) {
+            if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                 ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
+                throw new MappingException( "mapping.accessorNotAccessible",
+                                            hasMethod, hasMethod.getDeclaringClass().getName() );
+            if ( hasMethod.getParameterTypes().length != 0 )
+                throw new MappingException( "mapping.createMethodNoParam",
+                                            hasMethod, hasMethod.getDeclaringClass().getName() );
+            _hasMethod = hasMethod;
+        }
+
+        if ( _deleteMethod != null ) {
+            if ( ( deleteMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                 ( deleteMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
+                throw new MappingException( "mapping.accessorNotAccessible",
+                                            deleteMethod, deleteMethod.getDeclaringClass().getName() );
+            if ( deleteMethod.getParameterTypes().length != 0 )
+                throw new MappingException( "mapping.createMethodNoParam",
+                                            deleteMethod, deleteMethod.getDeclaringClass().getName() );
+            _deleteMethod = deleteMethod;
+        }
+    }
+
+
+    /**
      * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
      * Please understand how this method is used before you start
      * playing with it! :-)
@@ -448,7 +562,7 @@ public final class FieldHandlerImpl
 
     public String toString()
     {
-        return _fieldName + "(" + _fieldType.getName() + ")";
+        return _fieldName;
     }
     
 
