@@ -165,9 +165,9 @@ public class CollectionInfo extends FieldInfo {
         createGetMethod(method);
 
         
-          //---------------------/
-         //- Create set method -/
-        //---------------------/
+          //----------------------/
+         //- Create set methods -/
+        //----------------------/
         
         method = new JMethod(null, "set"+cName);
         jClass.addMethod(method);
@@ -175,8 +175,17 @@ public class CollectionInfo extends FieldInfo {
         method.addParameter(contentParam);
         method.addParameter(new JParameter(JType.Int, "index"));
         
-        createSetMethod(method);
+        createSetByIndexMethod(method);
         
+        //-- array setter
+        JType arrayType = contentParam.getType().createArray();
+        String pName = JavaXMLNaming.toJavaMemberName(cName);
+        JParameter arrayParam = new JParameter(arrayType, pName+"Array");
+        method = new JMethod(null, "set"+cName);
+        method.addParameter(arrayParam);
+        jClass.addMethod(method);
+        
+        createSetArrayMethod(method);
         
           //--------------------------/
          //- Create getCount method -/
@@ -385,11 +394,45 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(";");
     } //-- createGetByIndex
 
+    /**
+     * Creates implementation of array set method
+    **/
+    public void createSetArrayMethod(JMethod method) {
+        
+        JSourceCode jsc = method.getSourceCode();
+        
+        String paramName = method.getParameter(0).getName();
+        
+        String index = "i";
+        if (paramName.equals(index)) index = "j";
+        
+        jsc.add("//-- copy array");
+        jsc.add(getName());
+        jsc.append(".removeAllElements();");
+        jsc.add("for (int ");
+        jsc.append(index);
+        jsc.append(" = 0; ");
+        jsc.append(index);
+        jsc.append(" < ");
+        jsc.append(paramName);
+        jsc.append(".length; ");
+        jsc.append(index);
+        jsc.append("++) {");
+        jsc.indent();
+        jsc.add(getName());
+        jsc.append(".addElement(");
+        jsc.append(paramName);
+        jsc.append("[");
+        jsc.append(index);
+        jsc.append("]);");
+        jsc.unindent();
+        jsc.add("}");
+    } //-- createSetArrayMethod
 
     /** 
      * Creates implementation of set method.
     **/
-    public void createSetMethod(JMethod method) {
+    public void createSetByIndexMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
         
