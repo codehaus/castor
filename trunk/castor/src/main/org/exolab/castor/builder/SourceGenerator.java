@@ -1258,6 +1258,10 @@ public class SourceGenerator {
       private void createClasses(Group group, SGStateInfo sInfo) {
         if (group == null)
            return;
+        //-- don't generate classes for empty groups
+        if (group.getParticleCount() == 0)
+            return;
+            
         _bindingComponent.setView(group);
         JClass[] classes = _sourceFactory.createSourceCode(_bindingComponent, sInfo);
         processContentModel(group, sInfo);
