@@ -2,8 +2,19 @@
 Version (CVS)
 -------------
 
-XML:    Fixed bug that prevented elements that reference each other to generate classes. It removes
-        the StackOverFlow Exception. (Arnaud)
+XML:    Support for Identity-Constraints in the Schema Object Model and 
+        SchemaWriter. Not yet supported in SourceGenerator (kvisco) 20011120
+
+XML:    Applied Nathan Green's patch to allow "all" option when prompting
+        to overwrite files during source code generation. (kvisco) 20011113
+
+XML:    A number of improvements to SchemaWriter (kvisco) 20011112
+
+XML:    Applied Glenn Nielsen's patch to allow double qoutes in default/fixed 
+        schema values (kvisco) 20011111.
+
+XML:    Fixed bug that prevented elements that reference each other to generate 
+        classes. It removes the StackOverFlow Exception. (Arnaud)
 
 XML:    Added code from Matt Small [msmall@clickability.com] that improves the SchemaWriter support (Arnaud)
 
