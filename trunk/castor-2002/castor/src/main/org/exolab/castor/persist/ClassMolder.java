@@ -722,13 +722,14 @@ public class ClassMolder {
                     // the collection and set the Collection as the data object
                     // field.
 
-                    CollectionProxy cp = CollectionProxy.create( _fhs[i].getCollectionType() );
+                    CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
                             cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
                         }
-                        _fhs[i].setValue( object, cp.getCollection(), tx.getClassLoader() );
+                        cp.close();
+                        //_fhs[i].setValue( object, cp.getCollection() );
                     } else {
                         _fhs[i].setValue( object, null, tx.getClassLoader() );
                     }
@@ -2255,7 +2256,7 @@ public class ClassMolder {
                 } else {
                     _fhs[i].setValue( object, null, tx.getClassLoader() );
                 }
-                break;
+                break; 
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
 
@@ -2267,13 +2268,14 @@ public class ClassMolder {
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
 
-                    CollectionProxy cp = CollectionProxy.create( _fhs[i].getCollectionType() );
-                    ArrayList v = (ArrayList) fields[i];
+                    CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
+                    ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
                             cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
                         }
-                        _fhs[i].setValue( object, cp.getCollection(), tx.getClassLoader() );
+                        cp.close();
+                        //_fhs[i].setValue( object, cp.getCollection() );
                     } else {
                         _fhs[i].setValue( object, null, tx.getClassLoader() );
                     }
@@ -2667,23 +2669,26 @@ abstract class CollectionProxy {
 
     abstract void add( Object key, Object value );
 
-    static CollectionProxy create( Class cls ) {
+    abstract void close();
+
+    static CollectionProxy create( FieldMolder fm, Object object, ClassLoader cl ) {
+        Class cls = fm.getCollectionType();
         if ( cls == Vector.class ) {
-            return new ColProxy( new Vector() );
+            return new ColProxy( fm, object, cl, new Vector() );
         } else if ( cls == ArrayList.class ) {
-            return new ColProxy( new ArrayList() );
+            return new ColProxy( fm, object, cl, new ArrayList() );
         } else if ( cls == Collection.class ) {
-            return new ColProxy( new ArrayList() );
+            return new ColProxy( fm, object, cl, new ArrayList() );
         } else if ( cls == Set.class ) {
-            return new ColProxy( new HashSet() );
+            return new ColProxy( fm, object, cl, new HashSet() );
         } else if ( cls == HashSet.class ) {
-            return new ColProxy( new HashSet() );   
+            return new ColProxy( fm, object, cl, new HashSet() );   
         } else if ( cls == Hashtable.class ) {
-            return new MapProxy( new Hashtable() );
+            return new MapProxy( fm, object, cl, new Hashtable() );
         } else if ( cls == HashMap.class ) {
-            return new MapProxy( new HashMap() );
+            return new MapProxy( fm, object, cl, new HashMap() );
         } else if ( cls == Map.class ) {
-            return new MapProxy( new HashMap() );
+            return new MapProxy( fm, object, cl, new HashMap() );
         } else {
             throw new IllegalArgumentException("Collection Proxy doesn't exist for it type");
         }
@@ -2691,21 +2696,40 @@ abstract class CollectionProxy {
 
     private static class ColProxy extends CollectionProxy {
         private Collection _col;
-        private ColProxy( Collection col ) {
+        private FieldMolder _fm;
+        private Object _object;
+        private ClassLoader _cl;
+        private ColProxy( FieldMolder fm, Object object, ClassLoader cl, Collection col ) {
+            _cl = cl;
+            _fm = fm;
             _col = col;
+            _object = object;
         }
         Object getCollection() {
             return _col;
         }
         void add( Object key, Object value ) {
-            _col.add( value );
+            if ( !_fm.isAddable() )
+                _col.add( value );
+            else
+                _fm.addValue( _object, value, _cl );
+        }
+        void close() {
+            if ( !_fm.isAddable() )
+                _fm.setValue( _object, _col, _cl ); 
         }
     }
 
     private static class MapProxy extends CollectionProxy {
         private Map _map;
-        private MapProxy( Map map ) {
+        private FieldMolder _fm;
+        private Object _object;
+        private ClassLoader _cl;
+        private MapProxy( FieldMolder fm, Object object, ClassLoader cl, Map map ) {
+            _cl = cl;
             _map = map;
+            _fm = fm;
+            _object = object;
         }
         Object getCollection() {
             return _map;
@@ -2713,6 +2737,11 @@ abstract class CollectionProxy {
         void add( Object key, Object value ) {
             _map.put( key, value );
         }
+        void close() {
+            if ( !_fm.isAddable() )
+                _fm.setValue( _object, _map, _cl ); 
+        }
+
     }
 }
 

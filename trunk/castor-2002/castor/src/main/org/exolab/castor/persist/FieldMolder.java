@@ -108,6 +108,8 @@ public class FieldMolder {
 
     private boolean _serial;
 
+    private boolean _addable;
+
     private ClassMolder _eMold;
 
     private ClassMolder _fMold;
@@ -205,6 +207,9 @@ public class FieldMolder {
     public boolean isLazy() {
         return _lazy;
     }
+    public boolean isAddable() {
+        return _addable;
+    }
     void setFieldClassMolder( ClassMolder fMold ) {
         _fMold = fMold;
     }    
@@ -262,6 +267,26 @@ public class FieldMolder {
         }
     }
     
+    public void addValue( Object object, Object value, ClassLoader loader ) {
+
+        ReflectService rf = getContextReflectService ( loader );
+        try {
+            if ( rf._addMethod == null )
+                throw new RuntimeException("No add method defined for this field");
+
+            if ( value == null )
+                throw new NullPointerException("Adding null value is not allowed");
+
+            rf._addMethod.invoke( object, new Object[] { value } );
+        } catch ( IllegalArgumentException e ) {
+            throw e;
+        } catch ( IllegalAccessException e ) {
+            throw new RuntimeException("Field access error");
+        } catch ( InvocationTargetException e ) {
+            throw new RuntimeException("Field invocation error");
+        }
+    }
+
     public void setValue( Object object, Object value, ClassLoader loader ) {
         // If there is a convertor, apply conversion here.
         ReflectService rf = getContextReflectService ( loader );
@@ -297,7 +322,7 @@ public class FieldMolder {
                         rf._setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                 }
             } else {
-                throw new RuntimeException("no method to set value");
+                throw new RuntimeException("no method to set value for field: "+_fType+" in class: "+_eMold);
             }
             // If the field has no set method, ignore it.
             // If this is a problem, identity it someplace else.
@@ -537,9 +562,36 @@ public class FieldMolder {
 
                 _defaultReflectService._setMethod = findAccessor( javaClass, "set" + capitalize( name ), sgClass, false );
 
-                //if ( _setMethod == null )
-                //    throw new MappingException( "mapping.accessorNotFound",
-                //            "set" + name, null, javaClass.getName() );
+                if ( _defaultReflectService._setMethod == null )
+                    _defaultReflectService._addMethod 
+                        = findAccessor( javaClass, "add" + capitalize( name ), null, false );
+                
+                if ( _defaultReflectService._addMethod == null && name.endsWith("s") )
+                    _defaultReflectService._addMethod 
+                        = findAccessor( javaClass, "add" + capitalize( name ).substring(0,name.length()-1), null, false );
+
+                if ( _defaultReflectService._setMethod == null && _defaultReflectService._addMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                        "set/add" + capitalize( name ), null, javaClass.getName() );
+    
+                if ( _defaultReflectService._addMethod != null )
+                    _addable = true;
+                /*
+                try {
+                    if ( _fClass == null ) {
+                        if ( _fType != null )
+                            _fClass = Types.typeFromName( (_setMethod!=null?_setMethod:_addMethod).getClass().getClassLoader(), _fType );
+                        else {
+                            Class[] params = _addMethod.getParameterTypes();
+                            if ( params != null && params.length == 1 ) {
+                                _fClass = params[0];
+                                _fType = _fClass.getName();
+                            }
+                        }
+                    }
+                } catch ( ClassNotFoundException e ) {
+                    throw new MappingException("Field type of "+_fType+" can not be found!");
+                }*/
                 fieldName = fieldMap.getName();
                 if ( fieldName == null )
                     fieldName = ( _defaultReflectService._getMethod == null ? _defaultReflectService._setMethod.getName() : _defaultReflectService._getMethod.getName() );
@@ -565,7 +617,7 @@ public class FieldMolder {
                     _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), _defaultReflectService._fClass, false );
                     if ( _defaultReflectService._setMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                               fieldMap.getSetMethod(), _defaultReflectService._fClass, javaClass.getName() );
+                                fieldMap.getSetMethod(), _defaultReflectService._fClass, javaClass.getName() );
                     if ( _defaultReflectService._fClass == null )
                         _defaultReflectService._fClass = _defaultReflectService._setMethod.getParameterTypes()[ 0 ];
                 }
@@ -816,6 +868,7 @@ public class FieldMolder {
         Method[]      _setSequence;
         Method        _getMethod;
         Method        _setMethod;
+        Method        _addMethod;
         Method        _hasMethod;
         Method        _deleteMethod;
         Method        _createMethod;
