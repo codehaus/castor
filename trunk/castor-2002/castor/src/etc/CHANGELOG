@@ -1,6 +1,12 @@
 Version (CVS)
 -------------
 
+
+JDO:    Bug fix when castor closed Connection during db.close() (before the end of
+        transaction) and the got new Connection during beforeCompletion(),
+        which remains open after the end of transaction.
+        (Solution submitted by Terry Child <tmchild@gmx.net>)
+
 JDO:    Castor JDO should now behave shamelessly in a multi classloader context.
         This is especially relevant when used in a BMP/CMP environment where the 
         EJB container might assign a ClassLoader instance per set of Beans, or 
