@@ -1,6 +1,11 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1495 using contribution from Stein M. Hugubakken [dulci@start.no]
+       This improves code quality in the jdo.drivers package by removing
+       unused import statements and local variables.
+       (Werner - 20040119)
+       
 JDO:   Fixed bug 1493 using contribution from Stein M. Hugubakken [dulci@start.no]
        This patch improves code quality in the jdo.engine package by removing
        unnecessary import statements in various classes.
