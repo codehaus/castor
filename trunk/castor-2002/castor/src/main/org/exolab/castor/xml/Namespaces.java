@@ -45,6 +45,7 @@
 
 package org.exolab.castor.xml;
 
+import org.xml.sax.helpers.AttributeListImpl;
 /**
  * A class for handling Namespace declaration and scoping
  *
@@ -52,27 +53,38 @@ package org.exolab.castor.xml;
  * @version $Revision$ $Date$
 **/
 final class Namespaces {
-    
+
     /**
      * The first namespace in this set of Namespaces
     **/
     private Namespace _first = null;
-    
+
     /**
      * The last namespace in this set of Namespaces
     **/
     private Namespace _last  = null;
-    
-    
+
+
     private Namespaces _parent = null;
-    
+
+    /**
+     * The CDATA type..uses for SAX attributes
+     */
+    private static final String CDATA = "CDATA";
+
+    /**
+     * The namespace declaration String
+    **/
+    private static final String XMLNS  = "xmlns";
+
+
     /**
      * Creates a new Namespaces instance
     **/
     public Namespaces() {
         super();
     } //-- Namespaces
-    
+
     /**
      * Creates a new Namespaces instance
     **/
@@ -80,7 +92,7 @@ final class Namespaces {
         super();
         _parent = parent;
     } //-- Namespaces
-    
+
     /**
      * Adds the given namespace declaration to this Namespaces
      *
@@ -88,14 +100,14 @@ final class Namespaces {
      * @param uri the namespace URI to be associated with the given prefix
     **/
     public void addNamespace(String prefix, String uri) {
-        
+
         if (uri == null) {
             throw new IllegalArgumentException("Namespace URI must not be null");
         }
-        
+
         //-- adjust prefix to prevent null value
         if (prefix == null) prefix = "";
-            
+
         if (_first == null) {
             _first = new Namespace(prefix, uri);
             _last  = _first;
@@ -119,14 +131,14 @@ final class Namespaces {
             }
         }
     } //-- method: addNamespace
-    
+
     /**
      * Creates a new Namespaces instance with this Namespaces as the parent
     **/
     public Namespaces createNamespaces() {
         return new Namespaces(this);
     } //-- method: createNamespaces
-    
+
     /**
      * Returns the Namespace URI associated with the given prefix
      *
@@ -136,7 +148,7 @@ final class Namespaces {
     public String getNamespaceURI(String prefix) {
         //-- adjust prefix to prevent null value
         if (prefix == null) prefix = "";
-        
+
         Namespace ns = _first;
         while (ns != null) {
             if (ns.prefix.equals(prefix)) {
@@ -144,14 +156,40 @@ final class Namespaces {
             }
             ns = ns.next;
         }
-        
+
         if (_parent != null) {
             return _parent.getNamespaceURI(prefix);
         }
         return null;
-        
+
     } //-- method: getNamespaceURI
-    
+
+     /**
+     * Returns the Namespace prefix associated with the given URI
+     *
+     * @param nsURI the namespace URI to lookup
+     * @return the namespace prefix associated with the given URI
+    **/
+    public String getNamespacePrefix(String nsURI) {
+        //-- adjust prefix to prevent null value
+        if (nsURI == null)
+            throw new IllegalArgumentException("Namespace URI must not be null.");
+
+        Namespace ns = _first;
+        while (ns != null) {
+            if (ns.uri.equals(nsURI)) {
+                return ns.prefix;
+            }
+            ns = ns.next;
+        }
+
+        if (_parent != null) {
+            return _parent.getNamespacePrefix(nsURI);
+        }
+        return null;
+
+    } //-- method: getNamespaceURI
+
     /**
      * Returns the parent Namespaces for this Namespaces instance.
      *
@@ -160,7 +198,7 @@ final class Namespaces {
     public Namespaces getParent() {
         return _parent;
     } //-- method: getParent
-    
+
     /**
      * Sets the parent Namespaces for this Namespaces instance.
      *
@@ -169,26 +207,55 @@ final class Namespaces {
     public void setParent(Namespaces namespaces) {
         _parent = namespaces;
     } //-- method: setParent
-    
-    
+
+    /**
+     * Declare the namespaces of this stack in as attributes.
+     * @param atts the Attribute List to fill in.
+     */
+    public void declareAsAttributes(AttributeListImpl atts) {
+
+        Namespace ns = _first;
+        String attName = null;
+        while (ns != null) {
+            if (ns.prefix != null) {
+                int len = ns.prefix.length();
+                if (len > 0) {
+                    StringBuffer buf = new StringBuffer(6+len);
+                    buf.append(XMLNS);
+                    buf.append(':');
+                    buf.append(ns.prefix);
+                    attName = buf.toString();
+                }
+                atts.addAttribute(attName, CDATA, getNamespaceURI(ns.prefix));
+            }
+
+            ns = ns.next;
+        }
+
+        if (_parent != null) {
+            _parent.declareAsAttributes(atts);
+        }
+    } //method:declareAsAttributes
+
+
     /**
      * An internal class used to represent a namespace
     **/
     class Namespace {
-        
+
         String prefix = null;
         String uri    = null;
-        
+
         Namespace next = null;
-        
+
         Namespace() {
             super();
         }
-        
+
         Namespace(String prefix, String uri) {
             this.prefix = prefix;
             this.uri    = uri;
         }
     } //-- class: Namespace
-    
+
 } //-- class: Namespaces
