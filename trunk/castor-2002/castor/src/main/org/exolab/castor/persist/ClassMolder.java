@@ -1031,20 +1031,26 @@ public class ClassMolder {
                 try {
                     byte[] bytes = (byte[]) fields[i];
                     Object fieldValue = _fhs[i].getValue( object );
-                    if ( fieldValue == null ) {
-                        if ( bytes != null ) {
-                            updateCache = true;
-                            if ( _fhs[i].isStored() ) {
-                                if ( _fhs[i].isCheckDirty() ) {
-                                    modified = true;
-                                    lockrequired = true;
-                                } else {
-                                    modified = true;
-                                }
+                    if ( fieldValue == null && bytes == null) {
+                        // do nothing
+                    } else if ( fieldValue == null || bytes == null ) {
+                        // indicate store is needed
+                        updateCache = true;
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
                             }
                         }
-                    } else {
-                        if ( bytes == null ) {
+                    } else { // both not null
+                        // The following code can be updated, after Blob-->InputStream
+                        // to enhance performance.
+                        ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
+                        ObjectInputStream os = new ObjectInputStream( bis );
+                        Object dependent = os.readObject();
+                        if ( !dependent.equals( fieldValue ) ) {
                             updateCache = true;
                             if ( _fhs[i].isStored() ) {
                                 if ( _fhs[i].isCheckDirty() ) {
@@ -1052,23 +1058,6 @@ public class ClassMolder {
                                     lockrequired = true;
                                 } else {
                                     modified = true;
-                                }
-                            }
-                        } else {
-                            // The following code can be updated, after Blob-->InputStream
-                            // to enhance performance.
-                            ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
-                            ObjectInputStream os = new ObjectInputStream( bis );
-                            Object dependent = os.readObject();
-                            if ( dependent.equals( fieldValue ) ) {
-                                updateCache = true;
-                                if ( _fhs[i].isStored() ) {
-                                    if ( _fhs[i].isCheckDirty() ) {
-                                        modified = true;
-                                        lockrequired = true;
-                                    } else {
-                                        modified = true;
-                                    }
                                 }
                             }
                         }
@@ -1558,8 +1547,21 @@ public class ClassMolder {
                 newfields[i] = _fhs[i].getValue( object );
                 break;
             case FieldMolder.SERIALIZABLE:
-                
+                try {
+                    Object dependent = _fhs[i].getValue( object );
+                    if ( dependent != null ) {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        ObjectOutputStream os = new ObjectOutputStream( bos );
+                        os.writeObject( dependent );
+                        fields[i] = bos.toByteArray();
+                    } else {
+                        fields[i] = null;
+                    }
+                } catch ( IOException e ) {
+                    throw new PersistenceException( "Error during serializing dependent object", e );
+                }
                 break;
+
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();

@@ -195,7 +195,7 @@ public class FieldMolder {
     }
 
     public boolean isSerializable() {
-        return _serial == true;
+        return _serial;
     }
 
     public boolean isCheckDirty() {
