@@ -157,12 +157,13 @@ public class SimpleTypesFactory
     public static final int TIME_INSTANT_TYPE             = 36;
     public static final int TIME_TYPE                     = 37;
     public static final int TIME_PERIOD_TYPE              = 38;
-    public static final int DATE_TYPE                     = 39;
-    public static final int MONTH_TYPE                    = 40;
-    public static final int YEAR_TYPE                     = 41;
-    public static final int CENTURY_TYPE                  = 42;
-    public static final int RECURRING_DATE_TYPE           = 43;
-    public static final int RECURRING_DAY_TYPE            = 44;
+	public static final int TOKEN_TYPE                    = 39;
+    public static final int DATE_TYPE                     = 40;
+    public static final int MONTH_TYPE                    = 41;
+    public static final int YEAR_TYPE                     = 42;
+    public static final int CENTURY_TYPE                  = 43;
+    public static final int RECURRING_DATE_TYPE           = 44;
+    public static final int RECURRING_DAY_TYPE            = 45;
 
     /**
      * The resource location for the built-in types
@@ -255,10 +256,10 @@ public class SimpleTypesFactory
             else
                 return null;
         }
-        
+
         return createUserSimpleType(schema, name, baseType, derivation);
-    } 
-        
+    }
+
     /**
      * Creates an instance of a class derived from SimpleType, representing the
      * user type defined by the given name, baseName and derivation method.
@@ -266,7 +267,7 @@ public class SimpleTypesFactory
      * Package private (used by Schema and DeferredSimpleType).
      *
      * The given schema is used as the owning Schema document, yet a call to
-     * schema#addSimpleType must still be made to add the SimpleType to the 
+     * schema#addSimpleType must still be made to add the SimpleType to the
      * Schema if the SimpleType is not anonymous.
      *
      * If the base type is not found in the schema, a DeferredSimpleType
@@ -285,7 +286,7 @@ public class SimpleTypesFactory
     {
         String internalName = name;
         if (name == null) internalName = "anonymous-simple-type";
-        
+
         if ( (baseType == null) ) {
             //We need a base type
             sendToLog(Messages.format( "schema.noBaseType", internalName ));
@@ -298,8 +299,8 @@ public class SimpleTypesFactory
             //derive as list
             if ( !(baseType instanceof AtomicType) ) {
                 //only lists of atomic values are allowed by the specification
-                sendToLog( Messages.format("schema.deriveByListError", 
-                                           internalName, 
+                sendToLog( Messages.format("schema.deriveByListError",
+                                           internalName,
                                            baseType.getName()) );
                 return null;
             }
@@ -311,7 +312,7 @@ public class SimpleTypesFactory
             //Find the built in ancestor type
             SimpleType builtInBase= baseType.getBuiltInBaseType();
             if (builtInBase == null) {
-               sendToLog( Messages.format("schema.noBuiltInParent", 
+               sendToLog( Messages.format("schema.noBuiltInParent",
                                           internalName) );
                return null;
             }
