@@ -62,7 +62,7 @@ import harness.CastorTestCase;
 public class Size extends CastorTestCase 
 {
 
-    private Database       _db;
+    protected Database       _db;
 
     private JDOCategory    _category;
 
@@ -74,6 +74,12 @@ public class Size extends CastorTestCase
     public Size( TestHarness category ) 
     {
         super( category, "TC66", "Size" );
+        _category = (JDOCategory) category;
+    }
+
+    public Size( TestHarness category, String name, String description ) 
+    {
+        super( category, name, description );
         _category = (JDOCategory) category;
     }
 
