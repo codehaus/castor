@@ -678,7 +678,9 @@ public final class LocalConfiguration extends Configuration {
             URL url = getClass().getResource("/" + fileOrResourceName);
             if (url != null) {
                 _resourceUrl = url.toString();
-                _log.debug ("Trying to load configuration file from " + _resourceUrl);
+                if(_log.isDebugEnabled()) {
+                    _log.debug ("Trying to load configuration file from " + _resourceUrl);
+                }
                 _props.load( url.openStream() );
                 //-- debug information
                 //System.out.println("merging local configuration: " + url.toExternalForm());

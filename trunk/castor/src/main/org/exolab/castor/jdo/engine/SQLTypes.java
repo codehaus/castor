@@ -153,7 +153,9 @@ public final class SQLTypes
             // eat the exception and just use the old size
             lobSize = 256;
         }
-        log.debug ( "Using lobSize: " + lobSize );
+        if(log.isDebugEnabled()) {
+            log.debug ( "Using lobSize: " + lobSize );
+        }
         return lobSize;
     }
 

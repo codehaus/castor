@@ -258,11 +258,12 @@ final public class SqlBindParser
 
             Object value = values[bindNum-1];
 
-            if (_log.isDebugEnabled())
+            if (_log.isDebugEnabled()) {
                 if (value == null)
                     _log.debug(Messages.format("jdo.bindSqlNull", Integer.toString(i)));
                 else
                     _log.debug(Messages.format("jdo.bindSql", Integer.toString(i), value, value.getClass().getName()));
+            }
 
             stmt.setObject(i, value);
         }

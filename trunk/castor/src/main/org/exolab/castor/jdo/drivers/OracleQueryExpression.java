@@ -180,7 +180,9 @@ public final class OracleQueryExpression
         	}
         }
 
-        _log.debug ("SQL statement = " + sql.toString());
+        if(_log.isDebugEnabled()) {
+            _log.debug ("SQL statement = " + sql.toString());
+        }
         return sql.toString();
     }
 

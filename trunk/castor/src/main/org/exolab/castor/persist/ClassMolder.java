@@ -2316,7 +2316,9 @@ public class ClassMolder
         if ( _extendent != null ) {
             for ( int i=0; i < _extendent.size(); i++ ) {
                 if ( !extendPath.contains( _extendent.get(i) ) ) {
-                	_log.debug ("About to call ClassMolder.deleteExtend on " + ((ClassMolder)_extendent.get(i)));
+                    if(_log.isDebugEnabled()) {
+                        _log.debug ("About to call ClassMolder.deleteExtend on " + ((ClassMolder)_extendent.get(i)));
+                    }
                     // deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
                 }
             }
@@ -2503,7 +2505,9 @@ public class ClassMolder
         for ( int i=0; i < _fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
 
-            _log.debug( "Reverting field: " + ( ( FieldMolder ) _fhs[i] ).getName() );
+            if(_log.isDebugEnabled()) {
+                _log.debug( "Reverting field: " + ( ( FieldMolder ) _fhs[i] ).getName() );
+            }
 
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
@@ -3264,7 +3268,9 @@ class SingleProxy
 		}
 		// to not load if method geClass() or finalize()
 		if ("writeReplace".equals(methodName)) {
-			_log.debug ("writeReplacing " + _classMolder.getName() + " with identity " + _identity);
+            if(_log.isDebugEnabled()) {
+                _log.debug ("writeReplacing " + _classMolder.getName() + " with identity " + _identity);
+            }
 			if (!hasMaterialized) {
 				try {
 					_object = loadOnly ();
@@ -3277,8 +3283,10 @@ class SingleProxy
 				}
 			}
 			
-			_log.debug ("Serializing instance of " + _object.getClass().getName());
-			_log.debug ("_object = " + _object);
+            if(_log.isDebugEnabled()) {
+                _log.debug ("Serializing instance of " + _object.getClass().getName());
+			    _log.debug ("_object = " + _object);
+            }
 			return _object;
 		} else if ( "interceptedClass".equals(methodName) ) {
 			return _clazz;
