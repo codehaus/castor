@@ -936,11 +936,15 @@ public class SourceFactory  {
 					if (SourceGenerator.mappingSchemaElement2Java())
 						//-- If mapping elements to Java classes
 						elementSource = true;
-					else if (SourceGenerator.mappingSchemaType2Java() &
-							 eDecl.getType()==null)
-						//-- If mapping schema types to Java classes
+					else if (SourceGenerator.mappingSchemaType2Java()
+                             && ( (eDecl.getType().getName() == null)
+                                  || (eDecl.getType().isSimpleType())) )
+                    {
+                        //-- If mapping schema types to Java classes
 						//-- only when anonymous complexType used by element
-						elementSource = true;
+                        //-- or if the element is a simpleType
+                        elementSource = true;
+					}
 
 					//-- Output Java class for element declaration?
 					if (elementSource)
