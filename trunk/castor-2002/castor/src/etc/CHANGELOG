@@ -1,6 +1,15 @@
 Version 0.7.8  February 10, 2000
 -------------------------------
 
+XML:    If annotations are used within elements, or attributes, I add
+        these to the Javadoc comments of the generated source.
+        example:
+        <attribute name="foo" type="string">
+           <annotation>
+              <info>This comment will be included in the Java source</info>
+           </annotation>
+        </attribute>
+
 JDO:     Fixed bug in SQLEngine not deleting row. (Contributed by
          Oleg Nitz)
 
