@@ -134,6 +134,14 @@ public class DatabaseImpl
     private ClassLoader _classLoader;
 
 
+    /** 
+     * In EJB environment the databased should be actually closed only after 
+     * _transaction.commit(), because jdoStore which is called on that phase
+     * need to operate with the Database instance.
+     */
+    private boolean _dbMarkedClosed;
+
+
     public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
                          Transaction transaction, ClassLoader classLoader )
         throws DatabaseNotFoundException
@@ -192,7 +200,14 @@ public class DatabaseImpl
                 _ctx.close();
             }
         } finally {
-            _dbEngine = null;
+            // In EJB environment Database.close() should be called before
+            // the end of transaction, but may be used in jdoStore/jdoRemove
+            // which may be called on commit.
+            // Therefore, we have to close the Database in afterCompletion
+            if ( _transaction == null ) 
+                _dbEngine = null;
+            else 
+                _dbMarkedClosed = true;
         }
     }
 
@@ -477,6 +492,8 @@ public class DatabaseImpl
             return;
         if ( _ctx.getStatus() != Status.STATUS_PREPARED )
             throw new IllegalStateException( "Unexpected state: afterCompletion called at status " + _ctx.getStatus() );
+        if ( _dbMarkedClosed )
+            _dbEngine = null;
         switch ( status ) {
         case Status.STATUS_COMMITTED:
             try {
