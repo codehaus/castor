@@ -1,6 +1,6 @@
 name=adaptx
 project=adaptx
-version=0.9.6
+version=0.9.7
 build.compiler=classic
 release_date=June 16, 2003
 copyright= (C) 1998-2003 Keith Visco.  All rights reserved. \
