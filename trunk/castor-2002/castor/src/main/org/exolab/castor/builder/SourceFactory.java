@@ -51,6 +51,7 @@ import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.util.Configuration;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
 import org.exolab.javasource.*;
 
@@ -115,9 +116,8 @@ public class SourceFactory  {
      * from this ClassInfo
     **/
     public JClass createSourceCode
-        (ElementDecl element, ClassInfoResolver resolver, String packageName)
-    {
-
+        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
+    {		
         FactoryState state = null;
 
         String elementName = element.getName();
@@ -232,12 +232,14 @@ public class SourceFactory  {
         JClass    jClass    = state.jClass;
 
         initialize(jClass);
+        
+        //-- make class abstract?
+		//-- when mapping elements to Java classes this class forms the 
+		//-- base for elements that reference this type.
+		if (Configuration.mappingSchemaElement2Java())
+			jClass.getModifiers().setAbstract(true);        
 
-        //-- make class abstract
-        jClass.getModifiers().setAbstract(true);
-
-
-        //-- name information
+		//-- name information
         classInfo.setNodeName(type.getName());
 
         //-- namespace information
@@ -258,12 +260,16 @@ public class SourceFactory  {
 
         //-- #validate()
         createValidateMethods(jClass);
-        //-- #marshal()
-        //createMarshalMethods(jClass);
-        //-- #unmarshal()
-        //createUnmarshalMethods(jClass);
+		//-- Marshalling methods are not required if the class is abstract
+		if (jClass.getModifiers().isAbstract())
+		{
+			//-- #marshal()
+			createMarshalMethods(jClass);
+			//-- #unmarshal()
+			createUnmarshalMethods(jClass);
+		}
 
-        if (resolver != null) {
+		if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(type, classInfo);
         }
@@ -458,7 +464,7 @@ public class SourceFactory  {
     private void createUnmarshalMethods(JClass parent) {
 
         //-- create main marshal method
-        JMethod jMethod = new JMethod(parent,"unmarshal");
+        JMethod jMethod = new JMethod(parent,"unmarshal"+parent.getName()); 
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
@@ -666,23 +672,39 @@ public class SourceFactory  {
                 case Structure.ELEMENT:
 
                     ElementDecl eDecl = (ElementDecl)struct;
-
-                    //-- make sure we haven't processed this element yet
-                    //-- to prevent endless recursion.
-                    ElementDecl tmpDecl = eDecl;
-                    while (tmpDecl.isReference())
-                        tmpDecl = tmpDecl.getReference();
-
-                    boolean processed = state.processed(tmpDecl);
-
-                    //-- make sure we process the element first
-                    //-- so that it's available to the MemberFactory
-                    if ((state.resolve(struct) == null) && (!processed))
-                        createSourceCode((ElementDecl)struct,
-                                          state,
-                                          state.packageName);
-                    fieldInfo
-                        = memberFactory.createFieldInfo((ElementDecl)struct,
+                    
+					//-- Output source for element definition?
+					boolean elementSource = false;
+					if (Configuration.mappingSchemaElement2Java())
+						//-- If mapping elements to Java classes
+						elementSource = true;
+					else if (Configuration.mappingSchemaType2Java() &
+							 eDecl.getType()==null)
+						//-- If mapping schema types to Java classes
+						//-- only when anonymous complexType used by element
+						elementSource = true;
+					
+					//-- Output Java class for element declaration?
+					if (elementSource)
+					{
+						//-- make sure we haven't processed this element yet
+						//-- to prevent endless recursion.
+						ElementDecl tmpDecl = eDecl;
+						while (tmpDecl.isReference()) 
+						    tmpDecl = tmpDecl.getReference();
+						    
+						boolean processed = state.processed(tmpDecl);
+                    
+						//-- make sure we process the element first
+						//-- so that it's available to the MemberFactory
+						if ((state.resolve(struct) == null) && (!processed))
+						    createSourceCode((ElementDecl)struct,
+						                      state,
+						                      state.packageName);
+					}
+					
+                    fieldInfo 
+                        = memberFactory.createFieldInfo((ElementDecl)struct, 
                                                          state);
                     handleField(fieldInfo, state);
                     break;

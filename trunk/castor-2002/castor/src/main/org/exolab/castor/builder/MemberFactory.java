@@ -48,13 +48,14 @@ package org.exolab.castor.builder;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.castor.xml.schema.*;
-//import org.exolab.castor.xml.schema.types.BuiltInType;
+import org.exolab.castor.util.Configuration;
 
 import org.exolab.javasource.JClass;
 import org.exolab.javasource.JSourceCode;
 import org.exolab.javasource.JType;
 
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -247,18 +248,23 @@ public class MemberFactory {
         int minOccurs = element.getMinimumOccurance();
 
         ElementDecl eDecl = element;
-        if (eDecl.isReference()) {
-            ElementDecl eRef = eDecl.getReference();
-            if (eRef == null) {
-                String err = "unable to resolve element reference: ";
-                err += element.getName();
-                System.out.println(err);
-                return null;
-            }
-            else eDecl = eRef;
-        }
+		
+		//-- If mapping schema elements, replace element passed in with referenced element
+		if (Configuration.mappingSchemaElement2Java())
+		{
+			if (eDecl.isReference()) {
+			    ElementDecl eRef = eDecl.getReference();
+			    if (eRef == null) {
+			        String err = "unable to resolve element reference: ";
+			        err += element.getName();
+			        System.out.println(err);
+			        return null;
+			    }
+			    else eDecl = eRef;
+			}
+		}
 
-        //-- determine type
+		//-- determine type
 
         JSourceCode jsc     = null;
         FieldInfo fieldInfo = null;
@@ -287,7 +293,16 @@ public class MemberFactory {
         }
         //-- ComplexType
         else {
-            String className = JavaXMLNaming.toJavaClassName(eDecl.getName());
+			String className = null;
+			//-- Java class name depends on mapping setup in properties file
+			if (Configuration.mappingSchemaElement2Java())
+				className = eDecl.getName();
+			else if (Configuration.mappingSchemaType2Java())
+				className = getElementType(eDecl);
+			if (className==null)
+				return null;
+			//-- Convert XML name to class name
+			className = JavaXMLNaming.toJavaClassName(className);
             xsType = new XSClass(new JClass(className));
         }
 
@@ -329,7 +344,49 @@ public class MemberFactory {
         return fieldInfo;
     } //-- createFieldInfo(ElementDecl)
 
-    /**
+	/**
+	 * Returns the actual element type (handles 'ref' attribute and anonymous complextypes)
+	 * @param e The element the type is need from
+	 * @return The actual element type
+	 */
+	private String getElementType(ElementDecl e)
+	{
+		ElementDecl element = e;
+		Hashtable refs = new Hashtable();
+		String className = null;
+		while(className==null)
+		{
+			// Handle element's with 'ref' attribute
+			if (e.isReference())
+				e = e.getReference();
+            if (e == null) {
+                String err = "unable to resolve element reference: ";
+                err += element.getName(false);
+                System.out.println(err);
+                return null;
+            }
+			else if (refs.get(e.getName())!=null) {
+                String err = "cyclic element reference: ";
+                err += element.getName(false);
+                System.out.println(err);
+                return null;
+			}
+			refs.put(e.getName(), e);
+			if (e.isReference())
+				continue;
+				
+			// Is element using a named complexType?
+			XMLType xmlType = e.getType();
+			if (xmlType!=null)
+				className = xmlType.getName();
+			if (className==null)
+				// No type, then class is the element name (elements using anonymous complexType's)
+				className = e.getName(false); 
+		}
+		return className;
+	}
+
+	/**
      * Creates a comment to be used in Javadoc from
      * the given Annotated Structure.
      * @param annotated the Annotated structure to process

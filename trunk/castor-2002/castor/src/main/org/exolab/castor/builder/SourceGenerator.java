@@ -416,6 +416,11 @@ public class SourceGenerator {
 
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
 
+		//-- when mapping schema types, only interested in producing classes
+		//-- for elements with anonymous complex types
+		if (Configuration.mappingSchemaType2Java())
+			if (elementDecl.getType()!=null)
+				return;
 
         //-- create classes for sub-elements if necessary
         XMLType xmlType = elementDecl.getType();
@@ -430,7 +435,7 @@ public class SourceGenerator {
         //-- ComplexType
         else if (xmlType.isComplexType()) {
 
-            JClass jClass = sourceFactory.createSourceCode(elementDecl,
+			JClass jClass = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
 

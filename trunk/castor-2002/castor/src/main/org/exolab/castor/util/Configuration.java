@@ -148,6 +148,20 @@ public abstract class Configuration
 
         public static final String ParserFeatureSeparator = ",";
 
+		/**
+         * Property specifying how element's and type's are mapped into a Java
+         * class hierarchy by the Source Generator. 
+         * The value must contain one of the following.
+         * 'element' outputs a Java class hierarchy based on element 
+         * names used in the XML Schema. This is the default.
+         * 'type' outputs a Java class hierarchy based on the type 
+         * information defined in the XML Schema.
+         * <pre>
+         * org.exolab.castor.javaclassmapping
+         * </pre>
+         */
+        public static final String JavaClassMapping = "org.exolab.castor.javaclassmapping";
+        
         /**
          * Property specifying whether to run in debug mode.
          * <pre>
@@ -178,8 +192,10 @@ public abstract class Configuration
     // Some static string definitions
     private static final String TRUE_VALUE  = "true";
     private static final String ON_VALUE    = "on";
+	private static final String ELEMENT_VALUE = "element";
+	private static final String TYPE_VALUE = "type";
 
-    /**
+	/**
      * The default properties loaded from the configuration file.
      */
     private static Properties _default;
@@ -408,7 +424,26 @@ public abstract class Configuration
         return docHandler;
     }
 
+	/**
+	 * Tests the org.exolab.castor.javaclassmapping property for the 'element' value.
+	 * @return True if the Source Generator is mapping schema elements to Java classes.
+	 */	
+	public static boolean mappingSchemaElement2Java()
+	{
+		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
+		return prop.toLowerCase().equals(ELEMENT_VALUE);
+	}
 
+	/**
+	 * Tests the org.exolab.castor.javaclassmapping property for the 'type' value.
+	 * @return True if the Source Generator is mapping schema types to Java classes.
+	 */	
+	public static boolean mappingSchemaType2Java()
+	{
+		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
+		return prop.toLowerCase().equals(TYPE_VALUE);
+	}
+	
     /**
      * Called by {@link #getDefault} to load the configuration the
      * first time. Will not complain about inability to load

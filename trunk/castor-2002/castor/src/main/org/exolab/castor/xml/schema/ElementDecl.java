@@ -166,16 +166,27 @@ public class ElementDecl extends ContentModelType {
     public int getMinimumOccurance() {
         return minOccurs;
     } //-- getMinimumOccurance
-
+    
     /**
-     * Returns the name of this Element declaration
+     * Returns the name of this Element declaration. The name of the 
+     * referenced element is returned if the 'ref' attribute was used.
      * @return the name of this element declaration
     **/
     public String getName() {
-        if (isReference()) {
+		return getName(true);
+	}
+    
+    /**
+     * Returns the name of this Element declaration
+     * @param ingoreRef If True the name of the referenced 
+     * element (if specified) is returned
+     * @return the name of this element declaration
+    **/
+    public String getName(boolean ignoreRef) {
+        if (isReference() && ignoreRef == false) {
             return elementRef;
         }
-        else return name;
+		else return name;
     } //-- getName
 
     /**
