@@ -12,6 +12,8 @@ public class TestPKsContract {
     private int _policyNo;
     private int _contractNo;
     private String _comment;
+	private TestPKsEmployee _employee;
+	private ArrayList _category;
 
     public void setPolicyNo( int policy ) {
         _policyNo = policy;
@@ -31,4 +33,16 @@ public class TestPKsContract {
     public void setComment( String s ) {
         _comment = s;
     }
+	public void setEmployee( TestPKsEmployee employee ) {
+		_employee = employee;
+	}
+	public TestPKsEmployee getEmployee() {
+		return _employee;
+	}
+	public void setCategory( ArrayList category ) {
+		_category = category;
+	}
+	public ArrayList getCategory() {
+		return _category;
+	}
 }
