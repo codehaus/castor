@@ -170,7 +170,7 @@ public class Parser implements TokenTypes {
             throws InvalidCharException, OQLSyntaxException {
     
     ParseTreeNode retNode = null;
-    ParseTreeNode queryTarget = match(IDENTIFIER);
+    ParseTreeNode queryTarget = expr();
 
     if (_curToken.getTokenType() == KEYWORD_AS) {
       retNode = match(KEYWORD_AS);
@@ -178,9 +178,11 @@ public class Parser implements TokenTypes {
       retNode.addChild(match(IDENTIFIER));
     }
     else if (_curToken.getTokenType() == COLON) {
+      if ( queryTarget.getToken().getTokenType() != IDENTIFIER )
+        throw new OQLSyntaxException( "When using the ':' in projection attributes (select part of query) the token before the ':' must be an identifier." );
       match(COLON);
       retNode = new ParseTreeNode(new Token(KEYWORD_AS, "as"));
-      retNode.addChild(match(IDENTIFIER));
+      retNode.addChild( expr() );
       retNode.addChild(queryTarget);
     }
 
@@ -619,10 +621,21 @@ public class Parser implements TokenTypes {
         retNode = undefinedExpr();
       case KEYWORD_LIST:
         retNode = collectionExpr();
+      case KEYWORD_COUNT:
+      case KEYWORD_SUM:
+      case KEYWORD_MIN:
+      case KEYWORD_MAX:
+      case KEYWORD_AVG:
+        retNode = aggregateExpr();
       case DOLLAR:
         retNode = queryParam();
         break;
       case IDENTIFIER:
+        if ( _nextToken.getTokenType() == LPAREN )
+          retNode = functionCall();
+        else
+          retNode = match( IDENTIFIER );
+        break;
       case KEYWORD_NIL:
       case KEYWORD_UNDEFINED:
       case BOOLEAN_LITERAL:
@@ -643,6 +656,36 @@ public class Parser implements TokenTypes {
       return primaryExpr();
     else
       return retNode;
+  }
+
+  /**
+   * Consumes tokens of a function call. 
+   *
+   * @return a Parse tree containing an identifier root which is the name of 
+   *      the function, child LPAREN with children the arguments.
+   * @throws InvalidCharException passed through from match().
+   * @throws OQLSyntaxException passed through from match(), or if an unknown
+   *    token is encountered here.
+   */
+  private ParseTreeNode functionCall() 
+            throws InvalidCharException, OQLSyntaxException {
+
+    int tokenType = _curToken.getTokenType();
+    int nextTokenType = _nextToken.getTokenType();
+
+    if ( tokenType != IDENTIFIER || nextTokenType != LPAREN )
+      throw new OQLSyntaxException( "Expected a function call and did not find one, near " + _curToken.getTokenValue() );
+    
+    ParseTreeNode retNode = match( IDENTIFIER );
+    retNode.addChild( match( LPAREN ) );
+
+    tokenType = _curToken.getTokenType();
+    while ( tokenType != RPAREN )
+      retNode.addChild( expr() );
+    
+    match( RPAREN );
+    
+    return retNode;
   }
 
   /**
@@ -676,6 +719,51 @@ public class Parser implements TokenTypes {
     }
 
     throw new OQLSyntaxException( "Expected collectionExpr and didn't find it at or near: " + _curToken.getTokenValue() );
+  }
+
+  /**
+   * Consumes tokens of aggregateExpr.
+   *
+   * @return Parse Tree with the root containing the function call and 
+   *    the child containing the parameter.
+   * @throws InvalidCharException passed through from match()
+   * @throws OQLSyntaxException passed through from match() or if an
+   *    unexpected token is encountered here.
+   */
+  private ParseTreeNode aggregateExpr()
+            throws InvalidCharException, OQLSyntaxException {
+    
+    int tokenType = _curToken.getTokenType();
+    ParseTreeNode retNode = null;
+    
+    switch ( tokenType ) {
+      case KEYWORD_SUM:
+      case KEYWORD_MIN:
+      case KEYWORD_MAX:
+      case KEYWORD_AVG:
+        retNode = match( tokenType );
+        match( LPAREN );
+        retNode.addChild( expr() );
+        match( RPAREN );
+        break;
+      case KEYWORD_COUNT:
+        //special case because it supports count(*)
+        retNode = match( KEYWORD_COUNT );
+        match( LPAREN );
+        
+        if ( _curToken.getTokenType() == TIMES )
+          retNode.addChild( match( TIMES ) );
+        else
+          retNode.addChild( expr() );
+          
+        match( RPAREN );
+        break;
+      default:
+        throw new OQLSyntaxException( "Expected aggregateExpr and didn't find it at or near: " + _curToken.getTokenValue() );
+    }
+      
+    return( retNode );
+
   }
 
   /**
