@@ -1234,27 +1234,21 @@ public final class SQLEngine implements Persistence {
         //fields.copyInto( _fields );
 
         // get id columns' names
-        String[] idnames = new String[_ids.length];
+        String[] idnames = _clsDesc.getIdentityColumnNames();
         for ( int i=0; i<_ids.length; i++ ) {
-            idnames[i] = _ids[i].name;
             expr.addParameter( _mapTo, _ids[i].name, QueryExpression.OpEquals );
         }
 
         // join all the extended table
         JDOClassDescriptor curDesc = clsDesc;
         JDOClassDescriptor baseDesc;
-        String[] curIds = idnames;
-        String[] baseIds;
         while ( curDesc.getExtends() != null ) {
             baseDesc = (JDOClassDescriptor) curDesc.getExtends();
-            baseIds = new String[_ids.length];
-            for ( int i=0; i<_ids.length; i++ ) {
-                baseIds[i] = ((JDOFieldDescriptor) (baseDesc.getIdentities()[i])).getSQLName()[0];
-            }
-            expr.addInnerJoin( curDesc.getTableName(), curIds, baseDesc.getTableName(), baseIds );
-            find.addInnerJoin( curDesc.getTableName(), curIds, baseDesc.getTableName(), baseIds );
+            expr.addInnerJoin(curDesc.getTableName(), curDesc.getIdentityColumnNames(),
+                              baseDesc.getTableName(), baseDesc.getIdentityColumnNames());
+            find.addInnerJoin(curDesc.getTableName(), curDesc.getIdentityColumnNames(),
+                              baseDesc.getTableName(), baseDesc.getIdentityColumnNames());
             curDesc = baseDesc;
-            curIds = baseIds;
         }
         for ( int i=0; i<_ids.length; i++ ) {
             find.addColumn( _mapTo, idnames[i] );
