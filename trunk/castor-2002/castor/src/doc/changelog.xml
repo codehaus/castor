@@ -2,6 +2,41 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.8.7  June 2, 2000"><pre>
+JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga
+         &lt;santiago.arriaga@catnet.com.mx&gt;)
+
+JDO:     SEQUENCE key generator now works with Oracle. It has a special 
+         RETURNING mode for Oracle8i which is more efficient because 
+         obtains the identity during INSERT, without any additional SQL queries.
+         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Added three paramaterized type convertors: Date&lt;-&gt;Integer,
+         Date&lt;-&gt;BigDecimal and Date&lt;-&gt;String. The latter uses the SimpleDateFormat
+         patterns (e.g. char[MMM d, yyyy]). The others uses similar
+         but shortened patterns (e.g. numeric[YMDhmsS], which is equivalent
+         to &quot;yyyyMMddhhmmssSSS&quot; SimpleDateFormat pattern).
+         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Fixes to handling of dependent objects create/delete/modify during
+         transaction commit. (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Added convertor from byte to short/integer. (Contributed by Harindranath P. R. Nair
+         &lt;hari.nair@alopa.com&gt;)
+
+XML:     Identity field will now use XML name provided in mapping file.
+
+XML:     Marshaller will now accept both primitive and non-primitive types and apply the
+         proper conversion; no dropped in convertor used, so Date/byte conversion should
+         work as expected; added test case for type handling of XML. (Bug reported by
+         Eitan Suez &lt;eitan@uptodata.com&gt;)
+
+Misc:    Fixed security bug when running as an Applet. (Reported by Remus Pereni
+         &lt;remus@nolimits.ro&gt;).
+
+Misc:    Added support for Java 1.2 Collection by running the source generator with the
+         option '-types j2'. Vectors are used with 'j1' and ODMG 3.0 DArray with 'odmg'.
+    </pre></section>
     <section title="Version 0.8.6  May 24, 2000"><pre>
 XML:     Added support in the Marshaller to specify whether or not to marshal
          as an XML document, or just an XML fragment (default). Currently
