@@ -48,11 +48,13 @@ package org.exolab.castor.xml;
 //-- xml related imports
 import org.xml.sax.*;
 import org.apache.xml.serialize.Serializer;
+import org.apache.xml.serialize.OutputFormat;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.util.List;
 import org.exolab.castor.util.Stack;
@@ -76,13 +78,12 @@ import java.util.Vector;
 **/
 public class Marshaller {
     
-    
     /**
-     * A flag indicating whether or not to 
-     * marshal as an XML document, or just a fragment
+     * Message name for a non sax capable serializer error
     **/
-    private boolean _asDocument = false;
-    
+    private static final String SERIALIZER_NOT_SAX_CAPABLE
+        = "conf.serializerNotSaxCapable";
+            
     /**
      * A flag indicating whether or not to generate 
      * debug information
@@ -121,8 +122,8 @@ public class Marshaller {
     **/
     private ClassDescriptorResolver _cdResolver = null;
 
-    private DocumentHandler  _handler;
-
+    private DocumentHandler  _handler      = null;
+    private Serializer       _serializer   = null;
     
     /**
      * The depth of the sub tree, 0 denotes document level
@@ -138,14 +139,11 @@ public class Marshaller {
     **/
     public Marshaller( DocumentHandler handler ) {
         if ( handler == null )
-            throw new IllegalArgumentException( "Argument 'handler' is null" );
+            throw new IllegalArgumentException( "Argument 'handler' is null." );
         _handler         = handler;
-        _nsPrefixKeyHash = new Hashtable(3);
-        _nsURIKeyHash    = new Hashtable(3);
-        _nsScope         = new List(3);
-        _packages        = new List(3);
-        _cdResolver      = new ClassDescriptorResolverImpl();
-        _parents         = new Stack();
+        
+        // call internal initializer
+        initialize();
     } //-- Marshaller
 
 
@@ -156,10 +154,40 @@ public class Marshaller {
     public Marshaller( Writer out )
         throws IOException
     {
-        this( Configuration.getSerializer( out ) );
+        if (out == null)
+            throw new IllegalArgumentException( "Argument 'out' is null.");
+        
+        // call internal initializer
+        initialize();
+        
+        _serializer = Configuration.getSerializer();
+        
+        if (_serializer == null)
+            throw new RuntimeException("Unable to obtain serailizer");
+            
+        _serializer.setOutputCharStream( out );
+        _handler = _serializer.asDocumentHandler();
+        if ( _handler == null ) {            
+            String err = Messages.format( this.SERIALIZER_NOT_SAX_CAPABLE,
+                                          _serializer.getClass().getName() );                                          
+            throw new RuntimeException( err );
+        }
     } //-- Marshaller
 
 
+    /**
+     * Initializes this Marshaller. This is common code shared among
+     * the Constructors
+    **/
+    private void initialize() {
+        _nsPrefixKeyHash = new Hashtable(3);
+        _nsURIKeyHash    = new Hashtable(3);
+        _nsScope         = new List(3);
+        _packages        = new List(3);
+        _cdResolver      = new ClassDescriptorResolverImpl();
+        _parents         = new Stack();
+    } //-- initialize();
+    
     /**
      * Sets whether or not to marshal as a document which includes
      * the XML declaration, and if necessary the DOCTYPE declaration.
@@ -170,7 +198,23 @@ public class Marshaller {
      * as a complete XML document.
     **/
     public void setMarshalAsDocument(boolean asDocument) {
-        this._asDocument = asDocument;
+        
+        if (_serializer != null) {
+            OutputFormat format = Configuration.getOutputFormat();
+            format.setOmitXMLDeclaration( ! asDocument );
+            _serializer.setOutputFormat( format );
+            
+            try {
+                _handler = _serializer.asDocumentHandler();
+            }
+            catch (java.io.IOException iox) {
+                //-- we can ignore this exception since it shouldn't
+                //-- happen. If _serializer is not null, it means
+                //-- we've already called this method sucessfully
+                //-- in the Marshaller() constructor
+            }
+        }
+
     } //-- setMarshalAsDocument
     
     public void setMapping( Mapping mapping )
@@ -249,20 +293,8 @@ public class Marshaller {
     public void marshal(Object object) 
         throws MarshalException, ValidationException
     {
-        validate(object);
-        
-        if (_asDocument) {
-            try {
-                _handler.startDocument();
-                marshal(object, null, _handler);
-                _handler.endDocument();
-            }
-            catch(org.xml.sax.SAXException sx) {
-                throw new MarshalException(sx);
-            }
-        }
-        else marshal(object, null, _handler);
-        
+        validate(object);        
+        marshal(object, null, _handler);        
     } //-- marshal
     
     /**
