@@ -32,7 +32,7 @@
 
     <table border="0" cellpadding="0" cellspacing="0" width="712" height="400">
 
-      <tr><td width="20" valign="top" align="left" bgcolor="#7270c2"><img
+      <tr><td width="10" valign="top" align="left" bgcolor="#7270c2"><img
         src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
         <td width="95" valign="top" align="left" bgcolor="#7270c2"><img
           src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
@@ -42,14 +42,14 @@
           src="images/dotTrans.gif" width="70" height="6" border="0"/></td>
         <td width="400" valign="top" align="left"><img
           src="images/top_2.gif"  width="400" height="6" border="0"/></td>
-        <td width="120" valign="top" align="left"><xsl:element
+	<td width="120" valign="top" align="left"><xsl:element
           name="img"><xsl:attribute name="src">images/line_purple.gif</xsl:attribute>
         <xsl:attribute name="width">120</xsl:attribute>
         <xsl:attribute name="height">6</xsl:attribute>
         <xsl:attribute name="border">0</xsl:attribute>
       </xsl:element></td></tr>
       <tr>
-        <td width="20" bgcolor="#7270c2" valign="top" align="left"><img
+        <td width="10" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
         <td width="95" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
@@ -62,8 +62,8 @@
         <td width="120" height="20" valign="top" align="left">&#160;</td>
       </tr>
       <tr>
-        <td width="20" bgcolor="#7270c2" valign="top" align="left"><img
-          src="images/dotTrans.gif" width="20" height="3" border="0"/></td>
+        <td width="10" bgcolor="#7270c2" valign="top" align="left"><img
+          src="images/dotTrans.gif" width="10" height="3" border="0"/></td>
         <td width="95" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/line_sm.gif" width="105" height="3" border="0"/></td>
         <td width="7" bgcolor="#a9a5de" valign="top" align="left"><img
@@ -78,7 +78,7 @@
 
       <tr>
         <td bgcolor="#7270c2" valign="top" align="left"><img
-          src="images/dotTrans.gif" width="20" height="10" border="0"/></td>
+          src="images/dotTrans.gif" width="10" height="10" border="0"/></td>
 
         <td width="95" bgcolor="#7270c2" valign="top" align="left"><img src="images/dotTrans.gif" width="1" height="2" border="0"/><br/>
 <xsl:apply-templates select="$project/navSections"/></td>
@@ -86,12 +86,15 @@
         <td width="7" bgcolor="#a9a5de" valign="top" align="left">&#160;</td>
         <td width="70" valign="top" align="left">&#160;</td>
         <td rowspan="4" width="400" valign="top">
-          <table cols="1" rows="2" border="0" cellpadding="0" cellspacing="0" width="400">
+          <table cols="2" rows="2" border="0" cellpadding="0" cellspacing="0" width="400">
             <tr>
               <td valign="top" align="left"><br/><img border="0" height="34" hspace="0"
                   src="{$project/logo}" vspace="0" width="115"/><br/><img border="0" height="10" hspace="0"
                   src="images/dotTrans.gif"/>
               </td>
+	      <td width="120" height="5" valign="top"
+		align="right"><a href="http://www.exolab.org"><img
+		src="images/logo_exolab.gif" hspace="0" vspace="10" width="77" height="20" border="0"/></a></td>
             </tr>
           </table><p/><p/><br/>
 
@@ -126,15 +129,12 @@
         <!-- now show the sections themselves -->
         <xsl:apply-templates select="document/body/section"/>
       </td>
-      <td width="120" height="5" valign="top"
-        align="left"><a href="http://www.exolab.org"><img
-        src="images/logo_exolab.gif" hspace="0" vspace="10" width="77" height="20" border="0"/></a></td>
       </tr>
 
       <!-- line row -->
 
       <tr height="5">
-        <td width="20" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
+        <td width="10" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
         <td width="95" height="5" bgcolor="#7270c2" valign="top">
         <img src="images/dotTrans.gif" width="1" height="15" border="0"/><br/>
         <img src="images/line_sm.gif" width="105" height="3" border="0"/>
@@ -149,7 +149,7 @@
       <!-- content row -->
 
       <tr>
-        <td width="20" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
+        <td width="10" height="5" bgcolor="#7270c2" valign="top" align="left">&#160;</td>
         <td width="95" bgcolor="#7270c2" valign="top"
           align="left"><xsl:apply-templates select="searchForm"/></td>
         <td width="7" bgcolor="#a9a5de" valign="top" align="left">
@@ -164,8 +164,8 @@
       <!-- final row -->
 
       <tr height="5">
-        <td width="20" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom"
-          align="left"><img src="images/stripes1.gif" width="20" height="125" border="0"/></td>
+        <td width="10" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom"
+          align="left"><img src="images/stripes1.gif" width="10" height="125" border="0"/></td>
         <td width="95" rowspan="2" height="100%" bgcolor="#7270c2" valign="bottom"
           align="left"><img src="images/stripe105.gif" width="105" height="125" border="0"/></td>
         <td width="7" rowspan="2" height="100%" bgcolor="#a9a5de" valign="top"
@@ -177,7 +177,7 @@
       <!-- extra  row -->
 
       <tr height="5">
-        <!--td width="20" height="25" valign="top" align="left">&#160;</td>
+        <!--td width="10" height="25" valign="top" align="left">&#160;</td>
         <td width="95" height="25" valign="top" align="left">&#160;</td>
         <td width="7" height="25" valign="top" align="left">&#160;</td-->
         <td width="70" height="25" valign="top" align="left">&#160;</td>
