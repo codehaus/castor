@@ -132,8 +132,8 @@ public class ClassDescriptorImpl
         _accessMode = accessMode;
         _depends = depend;
 
-        if ( extend != null && depend != null )
-            throw new MappingException( "Class must either extends or depends on other classes, but not both!" );
+        //if ( extend != null && depend != null )
+        //    throw new MappingException( "Class must either extends or depends on other classes, but not both!" );
 
         if ( extend != null ) {
             if ( ! extend.getJavaClass().isAssignableFrom( javaClass ) )

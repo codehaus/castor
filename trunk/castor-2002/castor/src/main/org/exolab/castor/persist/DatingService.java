@@ -135,7 +135,9 @@ class DatingService {
      * Pair up ClassMolder and it extends class.
      * @return true if they can be paired up immediately.
      */
-    boolean pairExtends( ClassMolder me, String extName ) {
+    boolean pairExtends( ClassMolder me, String extName ) 
+            throws MappingException {
+
         if ( extName == null || extName.equals("") )
             throw new IllegalArgumentException("Null classname not allowed!");
 
@@ -143,6 +145,8 @@ class DatingService {
         if ( clsMold != null ) {
             me.setExtends( clsMold );
             SQLEngine sql = ((SQLEngine)me.getPersistence());
+            if ( sql == null )
+                throw new MappingException("Class "+me+" extends on "+extName+" which is not persistence capable!");
             sql.setExtends((SQLEngine)clsMold.getPersistence() );
             return true;
         }

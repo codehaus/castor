@@ -236,8 +236,8 @@ public class ClassMolder {
         ClassMapping dep = (ClassMapping) clsMap.getDepends();
         ClassMapping ext = (ClassMapping) clsMap.getExtends();
 
-        if ( dep != null && ext != null )
-            throw new MappingException("A JDO cannot both extends and depends on other objects");
+        //if ( dep != null && ext != null )
+        //    throw new MappingException("A JDO cannot both extends and depends on other objects");
 
         if ( dep != null ) {
             ds.pairDepends( this, dep.getName() );

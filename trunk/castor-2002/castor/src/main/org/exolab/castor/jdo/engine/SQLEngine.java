@@ -239,8 +239,8 @@ public final class SQLEngine implements Persistence {
         Stack stack = new Stack();
         stack.push( base );
         while ( base.getExtends() != null ) {
-            if ( base.getDepends() != null )
-                throw new MappingException("Class should not both depends on and extended other classes");
+            //if ( base.getDepends() != null )
+            //    throw new MappingException("Class should not both depends on and extended other classes");
             base = (JDOClassDescriptor) base.getExtends();
             stack.push( base );
             // do we need to add loop detection?
