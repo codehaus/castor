@@ -307,7 +307,6 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
-<!--
   <class name="jdo.TestObject2" access="shared" identity="id" key-generator="MAX">
     <description>Table used for timestamp testing</description>
     <map-to table="test_table2" />
@@ -321,7 +320,6 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
--->
   <class name="jdo.TestObjectExtends" access="shared" extends="jdo.TestObject">
     <description>Table used for cache testing</description>
     <map-to table="test_table_extends" />
