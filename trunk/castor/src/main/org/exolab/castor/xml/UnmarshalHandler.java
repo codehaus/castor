@@ -471,8 +471,10 @@ public final class UnmarshalHandler extends MarshalFramework
     public void characters(char[] ch, int start, int length)
         throws SAXException
     {
-        //System.out.println("#characters");
-
+        if (debug) {
+            System.out.println("#characters");
+        }
+        
         //-- If we are skipping elements that have appeared in the XML but for
         //-- which we have no mapping, skip the text and return
         if ( _ignoreElementDepth > 0) {
@@ -485,8 +487,20 @@ public final class UnmarshalHandler extends MarshalFramework
         if (_anyUnmarshaller != null)
            _anyUnmarshaller.characters(ch, start, length);
         else {
-             UnmarshalState state = (UnmarshalState)_stateInfo.peek();
-
+             
+             //-- we look for the proper state since we could be unmarshalling containers
+             //-- that don't hold text value
+             Object[] states = _stateInfo.toArray();
+             int counter = _stateInfo.size();
+             boolean found = false;
+             
+             UnmarshalState state = (UnmarshalState)states[counter-1];
+             
+             while (state.fieldDesc.isContainer() && counter > 0) {
+             	counter = counter - 1;
+             	state = (UnmarshalState)states[counter-1]; 	
+             }
+             
              if (state.buffer == null) state.buffer = new StringBuffer();
              state.buffer.append(ch, start, length);
         }
@@ -548,7 +562,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- make sure we have the correct closing tag
         XMLFieldDescriptor descriptor = state.fieldDesc;
-
+        
         if (!state.elementName.equals(name)) {
             //maybe there is still a container to end
             if (descriptor.isContainer()) {
@@ -633,7 +647,7 @@ public final class UnmarshalHandler extends MarshalFramework
         if ((state.buffer != null) &&
             (state.buffer.length() > 0) &&
             (state.classDesc != null)) {
-           XMLFieldDescriptor cdesc = state.classDesc.getContentDescriptor();
+            XMLFieldDescriptor cdesc = state.classDesc.getContentDescriptor();
             if (cdesc != null) {
                 Object value = state.buffer.toString();
                 if (isPrimitive(cdesc.getFieldType()))
@@ -1162,7 +1176,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 isWrapper = (isWrapper || hasFieldsAtLocation(location, classDesc));
             }
             
-            //-- Make sure ther are more parent classes on stack
+            //-- Make sure there are more parent classes on stack
             //-- otherwise break, since there is nothing to do
             if (pIdx == 0) break;
             
@@ -1244,7 +1258,7 @@ public final class UnmarshalHandler extends MarshalFramework
         Object object = parentState.object;
         //--container support
         if (descriptor.isContainer()) {
-            //create a new state a set the container as the object
+            //create a new state to set the container as the object
             //don't save the current state, it will be recreated later
             _stateInfo.pop();
             state = new UnmarshalState();

@@ -1,6 +1,8 @@
 
 Version (CVS) 
 -------------
+XML:    Fixed bug 1358: mixed content was not handle properly when used with collection
+        (Arnaud 20030730)
 
 JDO:    Fixed bug 1355: SAP DB will not execute a function that is quoted.
         (bruce - 20030710)
