@@ -26,6 +26,9 @@
          Since logging is used for warning messages and simple tracing, Castor does not require
          a sophisticated logging mechanism.</p>
 
+      <p>Interested to integrate Castor's logging with Log4J? Then see 
+      <a href="jdo-faq.html#Integrating-Castor's-logging-with-Log4J">this question</a> in the FAQ.</p>
+
     </section>
 
     <section title="JDO: Access Mode">
