@@ -250,6 +250,11 @@
     <description>Contributed Interbase driver.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Chin" given="Stephen"/>
+    <email>schin@qrs.com</email>
+    <description>Proposed patch for bug 1530</description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Christmann" given="Paul"/>
@@ -268,6 +273,13 @@
     <name surname="Cumberland" given="David"/>
     <email>dcumberl@truelink.com</email>
     <description>Patch for DateTimeValidator.</description>
+  </contributor>
+
+
+  <contributor type="Contributor">
+    <name surname="De Smedt" given="Thomas"/>
+    <email>thomas.de.smedt@pandora.be</email>
+    <description>Patch for bug 1530</description>
   </contributor>
 
   <contributor type="Contributor">
@@ -764,6 +776,12 @@
     <name surname="Kovacs" given="Zsolt"/>
     <email>Zsolt.Kovacs@cern.ch</email>
     <description>NullPointerException fix in XMLInstance2SchemaHandler</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="La Ferla" given="Robert"/>
+    <email>robertlaferla@comcast.net</email>
+    <description>Castor XML feedback</description>
   </contributor>
 
   <!-- Last names begin with M-P -->
