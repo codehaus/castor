@@ -119,9 +119,9 @@ public class ImportUnmarshaller extends ComponentReader
             }
         }
 
-		//-- Is this namespace one the schema knows about?
-		if (!schema.isKnownNamespace(namespace))
-			throw new SchemaException("namespace '" + namespace + "' not declared in schema");
+        //-- Make sure targetNamespace is not the same as the
+        //-- importing schema, see section 4.2.3 in the
+        //-- XML Schema Recommendation
         if (namespace.equals(schema.getTargetNamespace()) )
             throw new SchemaException("the 'namespace' attribute in the <import> element cannot be the same of the targetNamespace of the global schema");
 
