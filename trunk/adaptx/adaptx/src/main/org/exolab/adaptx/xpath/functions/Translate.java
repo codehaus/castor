@@ -33,10 +33,10 @@ import org.exolab.adaptx.xpath.engine.Names;
 
 
 /**
- * A implementation of the "translate" function call
+ * An implementation of the "translate" function call
  *
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
-**/
+ */
 public class Translate
     extends FunctionCall
 {
@@ -47,7 +47,7 @@ public class Translate
     
     /**
      * Creates a new Translate FunctionCall
-    **/
+     */
     public Translate()
     {
         super( TRANSLATE );
@@ -61,7 +61,7 @@ public class Translate
      * @return The XPathResult (not null).
      * @exception XPathException if an error occured while 
      * evaluating this expression.
-    **/
+     */
     public XPathResult evaluate( XPathContext context )
         throws XPathException
     {
@@ -72,17 +72,39 @@ public class Translate
         String str2 = getParameter( 1 ).evaluate( context ).stringValue();
         String str3 = getParameter( 2 ).evaluate( context ).stringValue();
             
-        StringBuffer result = new StringBuffer();
-        char[] xchars = str1.toCharArray();
-        for ( int i = 0 ; i < xchars.length ; i++ ) {
-            int idx = str2.indexOf( xchars[ i ] );
-            if ( idx >= 0 ) {
-                char nchar = str3.charAt( idx );
-                if ( nchar != -1 )
-                    xchars[ i ] = nchar;
+        //-- identity translation?
+        if ((str2 == null) || (str2.length() == 0)) 
+            return new StringResult(str1);
+            
+        if (str3 == null) str3 = "";
+        
+        //-- simple one character replace?
+        if (str2.length() == 1) {
+            char old = str2.charAt(0);
+            if (str3.length() > 0) {
+                return new StringResult(str1.replace(old, str3.charAt(0)));
             }
         }
-        return new StringResult( new String( xchars ) );
+        
+        char[] fromChars = str1.toCharArray();
+        char[] toChars = new char[fromChars.length];
+        int len = 0;
+        for ( int i = 0 ; i < fromChars.length ; i++ ) {
+            int idx = str2.indexOf( fromChars[ i ] );
+            if (idx >= 0 ) {
+                //-- if matching char in str3 exits use it as replacement
+                //-- character, otherwise strip off character
+                if (idx < str3.length()) {
+                    char nchar = 
+                    toChars[ len++ ] = str3.charAt( idx );
+                }
+            }
+            else {
+                //-- copy over character, no replacement character exists
+                toChars[len++] = fromChars[i];
+            }
+        }
+        return new StringResult( new String( toChars, 0, len ) );
     } //-- evaluate
 
     
