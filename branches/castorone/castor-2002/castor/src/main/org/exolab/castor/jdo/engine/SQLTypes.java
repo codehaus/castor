@@ -114,6 +114,30 @@ public final class SQLTypes
         }
         throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
     }
+
+
+    /**
+     * Returns the Java type from the SQL type name.
+     *
+     * @param sqlTypeName SQL type name (e.g. numeric)
+     * @return The suitable Java type
+     * @throws MappingException The SQL type is not recognized.
+     */
+    public static int sqlTypeFromName( String sqlTypeName )
+        throws MappingException
+    {
+        int sep;
+
+        sep = sqlTypeName.indexOf( LeftParamSeparator );
+        if ( sep >= 0 )
+            sqlTypeName = sqlTypeName.substring( 0, sep );
+
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
+                return _typeInfos[ i ].sqlType;
+        }
+        throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
+    }
     
 
     /**

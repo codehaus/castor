@@ -15,8 +15,8 @@
       <sql name="value" type="varchar" />
     </field>
     <field name="people" type="jdo.TestManyPerson" collection="collection" 
-	required="false" >
-	<sql many-table="test_group_person"/>
+    required="false" >
+    <sql many-table="test_group_person"/>
     </field>
   </class>
 
@@ -36,7 +36,7 @@
       <sql name="sthelse" type="varchar" />
     </field>
     <field name="group" type="jdo.TestManyGroup" collection="collection" 
-	required="false">
+    required="false">
       <sql many-table="test_group_person"/>
     </field>
   </class>
@@ -551,7 +551,7 @@
     </field>
   </class>
 
-	
+    
   <class name="jdo.TestPersistent" access="shared" identity="id">
     <description>Test Persistent interface handling</description>
     <map-to table="test_persistent" />
@@ -570,9 +570,11 @@
     <field name="parentId" type="integer" required="false">
       <sql name="parent_id" type="integer" dirty="ignore" />
     </field>
+    <field name="group" type="jdo.TestGroup" required="true">
+      <sql name="group_id" />
+    </field>
   </class> 
 
-  <!--
   <class name="jdo.TestNestedFields" access="shared" identity="id">
     <description>Table used for nested fields testing</description>
     <map-to table="test_table" />
@@ -585,6 +587,6 @@
     <field name="nested2.nested3.value2" type="string">
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
-  </class> -->
+  </class> 
 
 </mapping>

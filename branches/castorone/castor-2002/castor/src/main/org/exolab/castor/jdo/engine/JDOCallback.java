@@ -82,6 +82,13 @@ public class JDOCallback
     }
 
 
+    public void creating( Object object, Database db )
+        throws Exception
+    {
+        ( (Persistent) object ).jdoBeforeCreate( db );
+    }
+
+
     public void created( Object object )
         throws Exception
     {
