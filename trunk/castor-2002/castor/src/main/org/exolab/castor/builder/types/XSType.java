@@ -72,6 +72,10 @@ public abstract class XSType {
     public static final String BOOLEAN_NAME        = "boolean";
 
     /**
+     * The name of the the century type
+     */
+     public static final String CENTURY_NAME        = "century";
+    /**
      * The name of the decimal type
     **/
     public static final String DECIMAL_NAME        = "decimal";
@@ -113,6 +117,11 @@ public abstract class XSType {
     public static final String LONG_NAME           = "long";
 
     /**
+     * The name for the month type
+     */
+     public static final String MONTH_NAME              = "month";
+
+    /**
      * The name of the NCName type
     **/
     public static final String NCNAME_NAME         = "NCName";
@@ -134,6 +143,11 @@ public abstract class XSType {
     public static final String POSITIVE_INTEGER_NAME  = "positive-integer";
 
     /**
+     * the name of the recurring duration type
+     */
+     public static final String RECURRING_DURATION_NAME     ="recurringDuration";
+
+    /**
      * The name of the string type
     **/
     public static final String STRING_NAME         = "string";
@@ -152,11 +166,19 @@ public abstract class XSType {
      * the name of the time type
      */
      public static final String TIME_NAME = "time";
+     /**
+      * the name of the time period type
+      */
+     public static final String TIME_PERIOD_NAME    = "timePeriod";
 	/**
      * The name of the URIReference type
      */
      public static final String URIRREFERENCE_NAME = "uriReference";
 
+    /**
+     * the name of the year type
+     */
+     public static final String YEAR_NAME           = "year";
     /**
 	 * The name of the short type
 	 */
@@ -196,7 +218,11 @@ public abstract class XSType {
     public static final short URIREFERENCE       = 20;
 	public static final short SHORT				 = 21;
 	public static final short INT				 = 22;
-
+    public static final short CENTURY            = 23;
+    public static final short MONTH              = 24;
+    public static final short YEAR               = 25;
+    public static final short RECURRING_DURATION = 26;
+    public static final short TIME_PERIOD        = 27;
     private short   type       = NULL;
 
     /**
@@ -326,6 +352,8 @@ public abstract class XSType {
                 return BINARY_NAME;
             case BOOLEAN:
                 return BOOLEAN_NAME;
+            case CENTURY:
+                return CENTURY_NAME;
             case DATE:
                 return DATE_NAME;
             case DECIMAL:
@@ -342,6 +370,8 @@ public abstract class XSType {
                 return INTEGER_NAME;
             case LONG:
                 return LONG_NAME;
+            case MONTH :
+                return MONTH_NAME;
             case NCNAME:
                 return NCNAME_NAME;
             case NEGATIVE_INTEGER:
@@ -350,6 +380,8 @@ public abstract class XSType {
                 return NMTOKEN_NAME;
             case POSITIVE_INTEGER:
                 return POSITIVE_INTEGER_NAME;
+            case RECURRING_DURATION:
+                return RECURRING_DURATION_NAME;
             case STRING:
                 return STRING_NAME;
             case TIME:
@@ -358,6 +390,10 @@ public abstract class XSType {
                 return TIME_INSTANT_NAME;
             case TIME_DURATION:
                 return TIME_DURATION_NAME;
+            case TIME_PERIOD:
+                return TIME_PERIOD_NAME;
+            case YEAR :
+                return YEAR_NAME;
 			case SHORT:
 				return SHORT_NAME;
 			case INT:

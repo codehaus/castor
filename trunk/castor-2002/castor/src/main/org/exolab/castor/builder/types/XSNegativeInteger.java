@@ -52,17 +52,17 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSNegativeInteger extends XSInteger {
-    
-    
+public final class XSNegativeInteger extends XSInteger {
+
+
     /**
      * The maximum value for this type
     **/
     private int maxIncl = -1;
-    
+
     public XSNegativeInteger() {
         super();
         super.setMaxInclusive(-1);
     } //-- XSInteger
-    
+
 } //-- XSNegativeInteger
