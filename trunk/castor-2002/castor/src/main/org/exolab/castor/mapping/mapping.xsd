@@ -71,8 +71,8 @@
       <xsd:element ref="sql" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="bind-xml" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="ldap" minOccurs="0" maxOccurs="1"/>
-      <xsd:attribute name="name" type="NMTOKENS" minOccurs="1"/>
-      <xsd:attribute name="type" type="NMTOKENS" minOccurs="0"/>
+      <xsd:attribute name="name" type="NMTOKEN" minOccurs="1"/>
+      <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="transient" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
