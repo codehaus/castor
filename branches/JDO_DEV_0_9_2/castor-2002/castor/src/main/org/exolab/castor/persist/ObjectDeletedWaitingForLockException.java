@@ -58,18 +58,18 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-class ObjectDeletedWaitingForLockException
+public class ObjectDeletedWaitingForLockException
     extends LockNotGrantedException
 {
 
 
-    ObjectDeletedWaitingForLockException()
+    public ObjectDeletedWaitingForLockException()
     {
         super( Messages.message( "persist.deletedWaitingForLock" ) );
     }
 
 
-    ObjectDeletedWaitingForLockException( String msg ) {
+    public ObjectDeletedWaitingForLockException( String msg ) {
         super( msg );
     }
 
