@@ -223,7 +223,7 @@ public class DescriptorSourceFactory {
 
 
            /*jsc.add("desc = (new XMLFieldDescriptorImpl(");
-           jsc.append("Object.class, \"");
+           jsc.append("java.lang.Object.class, \"");
            jsc.append(member.getName());
            jsc.append("\", (String)null, NodeType.Element) { ");
            jsc.indent();
@@ -311,7 +311,7 @@ public class DescriptorSourceFactory {
        jsc.indent();
 
        //-- read method
-       jsc.add("public Object getValue( Object object ) ");
+       jsc.add("public java.lang.Object getValue( java.lang.Object object ) ");
        jsc.indent();
        jsc.add("throws IllegalStateException");
        jsc.unindent();
@@ -340,7 +340,7 @@ public class DescriptorSourceFactory {
         //--end of read method
 
         //-- write method
-        jsc.add("public void setValue( Object object, Object value) ");
+        jsc.add("public void setValue( java.lang.Object object, java.lang.Object value) ");
         jsc.indent();
         jsc.add("throws IllegalStateException, IllegalArgumentException");
         jsc.unindent();
@@ -411,7 +411,7 @@ public class DescriptorSourceFactory {
 
 
         //-- newInstance method
-        jsc.add("public Object newInstance( Object parent ) {");
+        jsc.add("public java.lang.Object newInstance( java.lang.Object parent ) {");
         jsc.indent();
         jsc.add("return ");
 

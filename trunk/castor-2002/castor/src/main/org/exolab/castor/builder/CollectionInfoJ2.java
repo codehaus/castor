@@ -501,7 +501,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
 
-        jsc.add("Object obj = ");
+        jsc.add("java.lang.Object obj = ");
         jsc.append(getName());
         jsc.append(".get(index);");
         jsc.add(getName());
