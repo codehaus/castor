@@ -389,9 +389,12 @@ public final class FieldHandlerImpl
 
 
     /**
-     * Mutator method used by {@link MappingLoader}.
+     * Mutator method used by {@link MappingLoader} and
+     * {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
      */
-    void setCreateMethod( Method method )
+    public void setCreateMethod( Method method )
         throws MappingException
     {
         if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
