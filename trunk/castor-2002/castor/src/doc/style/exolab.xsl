@@ -40,7 +40,7 @@
           width="1" height="1"/></td>
         <td width="70" valign="top" align="left"><img
           src="images/dotTrans.gif" width="70" height="6" border="0"/></td>
-        <td width="400" valign="top" align="left" bgcolor="#5a5cb8"><img
+        <td width="400" valign="top" align="left"><img
           src="images/top_2.gif"  width="400" height="6" border="0"/></td>
         <td width="120" valign="top" align="left"><xsl:element
           name="img"><xsl:attribute name="src">images/line_purple.gif</xsl:attribute>
@@ -96,7 +96,7 @@
           </table><p/><p/><br/>
 
           <xsl:if test="/document/properties/title">
-            <span class="header"><xsl:value-of select="/document/properties/title"/></span>
+            <span class="header"><xsl:value-of select="/document/properties/title"/></span><br/><br/>
           </xsl:if>
 
           <xsl:apply-templates select="document/body/header"/>
