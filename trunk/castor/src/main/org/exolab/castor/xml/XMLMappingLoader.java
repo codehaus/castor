@@ -409,9 +409,15 @@ public class XMLMappingLoader
 
         xmlDesc.setContainer(fieldMap.getContainer());
 
-        //is the value type needs specific handling
-        //such as QName or NCName support?
         if (xml != null) {
+            
+            //-- has location path?
+            if (xml.getLocation() != null) {
+                System.out.println("location: " + xml.getLocation());
+                xmlDesc.setLocationPath(xml.getLocation());
+            }
+            //is the value type needs specific handling
+            //such as QName or NCName support?
             String xmlType = xml.getType();
             xmlDesc.setSchemaType(xmlType);
             xmlDesc.setQNamePrefix(xml.getQNamePrefix());
