@@ -57,8 +57,37 @@ import java.util.Vector;
 **/
 public final class AttributeDecl extends Annotated {
 
-    private static final short FIXED   = 1; // #b01
-    private static final short DEFAULT = 2; // #b10
+    /**
+     * The use attribute value for default
+    **/
+    public static final String USE_DEFAULT = "default";
+    
+    /**
+     * The use attribute value for fixed
+    **/
+    public static final String USE_FIXED = "fixed";
+    
+    /**
+     * The use attribute value for optional
+    **/
+    public static final String USE_OPTIONAL = "optional";
+    
+    /**
+     * The use attribute value for prohibited
+    **/
+    public static final String USE_PROHIBITED = "prohibited";
+    
+    /**
+     * The use attribute value for required
+    **/
+    public static final String USE_REQUIRED = "required";
+    
+    
+    private static final short DEFAULT    = 1;
+    private static final short FIXED      = 2; 
+    private static final short OPTIONAL   = 3;
+    private static final short PROHIBITED = 4;
+    private static final short REQUIRED   = 5;
 
     /**
      * Error message for a null argument
@@ -68,19 +97,14 @@ public final class AttributeDecl extends Annotated {
            AttributeDecl.class.getName();
 
     /**
+     * The id for this AttributeDecl
+    **/
+    private String id = null;
+    
+    /**
      * The name of attributes defined by this AttributeDecl
     **/
     private String name = null;
-
-    /**
-     * The minimum occurance that this attribute must appear
-    **/
-    private int minOccurs = 0;
-    /**
-     * The maximum occurance that this attribute must appear
-    **/
-    private int maxOccurs = 1;
-
 
     /**
      * The simple type for this AttributeDecl.
@@ -94,37 +118,33 @@ public final class AttributeDecl extends Annotated {
 
     private String value = null;
 
-    private short useFlag = FIXED;
-
-    /**
-     * Creates a default Attribute declaration.
-     * Since name is required for a valid Attribute declaration
-     * this should be set before using
-    **/
-    public AttributeDecl(Schema schema, String name) {
-        this(schema, name, 0);
-    } //-- Attribute
+    private short useFlag = OPTIONAL;
 
     /**
      * Creates a new AttrDecl with the given name
      * @param name of the Attribute defined by this attribute declaration
      * @param minOccurs the minimum number of occurances that attributes
      * defined by this definition must appear
-     * <BR />
-     * The only valid values for minOccurs are 0 and 1.
     **/
-    public AttributeDecl(Schema schema, String name, int minOccurs) {
+    public AttributeDecl(Schema schema, String name) {
         
         if (schema == null) {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
         this.schema  = schema;
-        
         setName(name);
-        setMinOccurs(minOccurs);
     } //-- AttributeDecl
 
+    /**
+     * Returns the Id for this attribute declaration
+     *
+     * @return the Id for this attribute declaration
+    **/
+    public String getId() {
+        return id;
+    } //-- getId
+    
     /**
      * Returns the name of attributes defined by this AttributeDecl
      * @return the name of attributes defined by this AttributeDecl
@@ -141,66 +161,6 @@ public final class AttributeDecl extends Annotated {
         return (SimpleType)simpleType.getType();
     } //-- getSimpleType
 
-
-    /**
-     * Returns the default value, or null if none was defined
-     * @return the default value, or null if none was defined
-    **/
-    public String getDefaultValue() {
-        if (useFlag == DEFAULT) {
-            return value;
-        }
-        return null;
-    } //-- getDefaultValue
-
-    /**
-     * Returns the maximum occurance that attributes defined by this
-     * definition must appear
-     * @return the maximum occurance that attributes defined by this
-     * definition must appear
-     * <BR />
-     * This value will always be 1. It's simply here because it's
-     * specified in the XML Schema.
-    **/
-    public int getMaxOccurs() {
-        return 1;
-    } //-- getMaxOccurs
-
-    /**
-     * Returns the minimum occurance that attributes defined by this
-     * definition must appear
-     * @return the minimum occurance that attributes defined by this
-     * definition must appear
-    **/
-    public int getMinOccurs() {
-        return this.minOccurs;
-    } //-- getMinOccurs
-
-
-    /**
-     * Checks to see if attributes defined by this definition are required.
-     * This is the same as checking for minOccurs equal to 1.
-     * @return true if minOccurs is equal to 1.
-    **/
-    public boolean getRequired() {
-        return (minOccurs == 1);
-    } //-- getRequired
-
-
-    /**
-     * Returns the fixed value of which attributes of this type must
-     * lexically match, or null if no fixed value has been specified.
-     * @return the fixed value for this attribute declaration.
-    **/
-    public String getFixedValue() {
-
-        if (useFlag == FIXED) {
-            return value;
-        }
-        return null;
-
-    } //-- getFixedValue
-
     /**
      * Returns the Schema that this AttributeGroupDecl belongs to.
      *
@@ -211,77 +171,85 @@ public final class AttributeDecl extends Annotated {
     } //-- getSchema
     
     /**
-     * Returns true if this attribute declaration has a fixed value
-     * of which attributes of this type must lexically match.
-     * @return true if this attribute declaration has a fixed value.
-    **/
-    public boolean hasFixedValue() {
-        return ((value != null) && (useFlag == FIXED));
-    } //-- hasFixedValue
-
-    /**
-     * Sets the SimpleType for this attribute declaration
-     * @param simpleType the SimpleType for this attribute
+     * Returns the value of the use attribute for this attribute
+     * declaration.
+     *
+     * @return the value of the use attribute for this attribute
      * declaration
     **/
-    public void setSimpleType(SimpleType simpleType) {
-        this.simpleType = simpleType;
-        if (simpleType != null) {
-            simpleType.setParent(this);
+    public String getUse() {
+        switch (useFlag) {
+            case DEFAULT:
+                return USE_DEFAULT;
+            case FIXED:
+                return USE_FIXED;
+            case PROHIBITED:
+                return USE_PROHIBITED;
+            case REQUIRED:
+                return USE_REQUIRED;
+            default:
+                return USE_OPTIONAL;
         }
-    } //-- setSimpleType
-
+    } //-- getUse
+    
     /**
-     * Sets the simple type of this attribute to be a reference.
-     */
-    public void setSimpleTypeReference(String name)
-    {
-        SimpleTypeReference reference= new SimpleTypeReference();
-        reference.setName(name);
-        reference.setSchema(schema);
-        setSimpleType(reference);
-    }
-
-
-
-    /**
-     * Sets the default value for instances of this Attribute
+     * Returns the default (or fixed) value of this Attribute declaration
      *
-     * @param value the default value
+     * @return the default value of this attribute declaration
     **/
-    public void setDefaultValue(String value) {
-        this.value = value;
-        if (value != null) this.useFlag = DEFAULT;
-    } //-- setDefault
-
-    public void setUseValue(String value) {
-        if (value != null) {
-            if (value.equals("fixed")) {
-                this.useFlag = FIXED;
-            }
-            if (value.equals("required")) {
-                this.minOccurs = 1;
-            }
-            if (value.equals("prohibited")) {
-                this.maxOccurs = 0;
-            }
-        }
-    } //-- setUse
+    public String getValue() {
+        return value;
+    } //-- getValue
 
     /**
-     * Sets the minimum occurance that attributes defined by this
-     * definition must appear
-     * @param minOccurs the minimum occurance that attributes defined
-     * by this definition must appear
-     * <BR />
-     * The only valid values for minOccurs are 0 and 1.
+     * Returns true if the use attribute is equal to "optional".
+     *
+     * @return true if the use attribute is equal to "optional".
     **/
-    public void setMinOccurs(int minOccurs) {
-        if (minOccurs > 0)
-            this.minOccurs = 1;
-        else
-            this.minOccurs = 0;
-    } //-- setMinOccurs
+    public boolean isFixed() {
+        return (useFlag == FIXED);
+    } //-- isFixed
+    
+    /**
+     * Returns true if the use attribute is equal to "optional".
+     *
+     * @return true if the use attribute is equal to "optional".
+    **/
+    public boolean isOptional() {
+        return (useFlag == OPTIONAL);
+    } //-- isProhibited
+    
+    /**
+     * Returns true if the use attribute is equal to "prohibited".
+     *
+     * @return true if the use attribute is equal to "prohibited".
+    **/
+    public boolean isProhibited() {
+        return (useFlag == PROHIBITED);
+    } //-- isProhibited
+    
+    /**
+     * Returns true if the 'use' attribute is equal to REQUIRED and
+     * there is no specified value. If a value is specifed and the
+     * 'use' attribute is  "required" then required is will return
+     * false, because the attribute value automatically becomes
+     * fixed.
+     *
+     * @return true if the use attribute is equal to "required" and
+     * no default value has been specified, otherwise false
+    **/
+    public boolean isRequired() {
+        return ((value == null) && (useFlag == REQUIRED));
+    } //-- getRequired
+    
+    /**
+     * Sets the Id for this attribute declaration
+     *
+     * @param id the Id for this attribute declaration
+    **/
+    public void setId(String id) {
+        this.id = id;
+    } //-- setId
 
     /**
      * Sets the name of attributes defined by this attribute definition
@@ -312,6 +280,75 @@ public final class AttributeDecl extends Annotated {
         
         this.name = name;
     } //-- setName
+    
+    /**
+     * Sets the SimpleType for this attribute declaration
+     * @param simpleType the SimpleType for this attribute
+     * declaration
+    **/
+    public void setSimpleType(SimpleType simpleType) {
+        this.simpleType = simpleType;
+        if (simpleType != null) {
+            simpleType.setParent(this);
+        }
+    } //-- setSimpleType
+
+    /**
+     * Sets the simple type of this attribute to be a reference.
+     */
+    public void setSimpleTypeReference(String name)
+    {
+        SimpleTypeReference reference= new SimpleTypeReference();
+        reference.setName(name);
+        reference.setSchema(schema);
+        setSimpleType(reference);
+    }
+
+
+    /**
+     * Sets the 'use' attribute of this attribute declaration
+     *
+     * @param value one of the following: 
+     * ("prohibited" | "optional" | "required" | "default" | "fixed")
+     * @see #USE_PROHIBITED
+     * @see #USE_OPTIONAL
+     * @see #USE_REQUIRED
+     * @see #USE_DEFAULT
+     * @see #USE_FIXED
+    **/
+    public void setUse(String value) {
+        
+        if (value == null) {
+            useFlag = OPTIONAL;
+            return;
+        }
+        
+        if (value.equals(USE_REQUIRED))
+            useFlag = REQUIRED;
+        else if (value.equals(USE_OPTIONAL))
+            useFlag = OPTIONAL;
+        else if (value.equals(USE_DEFAULT))
+            useFlag = DEFAULT;
+        else if (value.equals(USE_FIXED)) 
+            useFlag = FIXED;
+        else if (value.equals(USE_PROHIBITED))
+            useFlag = PROHIBITED;
+        else {
+            throw new IllegalArgumentException("Invalid value for 'use': " + 
+                value);
+        }
+    } //-- setUse
+
+    /**
+     * Sets the default value (or fixed depending on the 'use' option) for
+     * this attribute declaration
+     *
+     * @param value the default value
+    **/
+    public void setValue(String value) {
+        this.value = value;
+    } //-- setValue
+    
 
 
     //-------------------------------/
