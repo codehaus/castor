@@ -81,14 +81,10 @@ public abstract class MarshalDescriptor {
     private boolean incremental = false;
     
     /**
-     * The maximum occurance the described field may occur
+     * A flag to indicate that the Object described by this
+     * descriptor is multivalued
     **/
-    private int maxOccurs = -1;
-    
-    /**
-     * The minimum occurance the described field may occur 
-    **/
-    private int minOccurs = 0;
+    private boolean multivalued = false;
     
     /**
      * The programmatic name of the member
@@ -258,6 +254,16 @@ public abstract class MarshalDescriptor {
     } //-- isIncremental
     
     /**
+     * Returns true if the Object described by this descriptor can
+     * contain more than one value
+     * @return true if the Object described by this descriptor can
+     * contain more than one value
+    **/
+    public boolean isMultivalued() {
+        return multivalued;
+    } //-- isMultivalued
+    
+    /**
      * Returns true if the field described by this descriptor is a required
      * field
      * @return true if the field described by this descriptor is a required
@@ -303,6 +309,9 @@ public abstract class MarshalDescriptor {
         this.incremental = incremental;
     } //-- setIncremental
     
+    public void setMultivalued(boolean multivalued) {
+        this.multivalued = multivalued;
+    } //-- setMultivalued
     
     /**
      * Sets the namespace prefix used when marshalling as XML.
