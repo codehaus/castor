@@ -1121,7 +1121,13 @@ public final class UnmarshalHandler extends MarshalFramework
             if ((descriptor != null) && (!descriptor.isContainer())) {
                 if ((namespace != null) && (namespace.length() > 0)) {
                     if (!namespaceEquals(namespace, descriptor.getNameSpaceURI())) {
-                        descriptor = null;
+                        //-- if descriptor namespace is not null, then we must
+                        //-- have a namespace match, so set descriptor to null,
+                        //-- or if descriptor is not a wildcard we can also
+                        //-- set to null. 
+                        if ((descriptor.getNameSpaceURI() != null) || (!descriptor.matches("*")))
+                            descriptor = null;
+                        
                     }
                 }
             }
