@@ -113,6 +113,30 @@ go
 grant all on test_seqtable to test
 go
 
+-- test the identity key generator
+drop table test_identity
+go
+create table test_identity (
+  id numeric(10,0) identity,
+  attr varchar(200) not null,
+)
+go
+drop table test_identity_ext
+go
+create table test_identity_ext (
+  id numeric(10,0) not null,
+  ext varchar(200) not null,
+)
+go
+create unique index test_ident_ext_pk on test_identity_ext ( id )
+go
 
 
+-- The test stored procedure on TransactSQL
+drop procedure sp_check_permissions
+go
+create procedure sp_check_permissions @userName varchar(200),
+                                      @groupName varchar(200) AS
+    SELECT id, value1, value2 FROM test_table WHERE value1 = @userName
+    SELECT id, value1, value2 FROM test_table WHERE value2 = @groupName
 
