@@ -54,6 +54,33 @@ import java.util.NoSuchElementException;
  * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
  */
 public abstract class LRU {
+    /**
+     * Specify no caching as the caching mechanism of this Cache. All released object
+     * will be discarded.
+     */
+    public final static int CACHE_NONE = 0;
+    
+    /**
+     * Specify Count-Limited Least Recently Used is used as caching mechanism of this Cache.
+     * Object Lock which is not hold by any transcation will be put in the cache, until
+     * the cache is full and other object overwritten it.
+     */
+    public final static int CACHE_COUNT_LIMITED = 1;
+    
+    /**
+     * Specify Time-Limited Least Recently Used is used as caching mechanism of this Cache.
+     * Object Lock which is not hold by any transcation will be put in the cache, until
+     * timeout is reached.
+     */
+    public final static int CACHE_TIME_LIMITED = 2;
+    
+    /**
+     * Specify unlimited cache as caching mechanism of this Cache.
+     * Object Lock which is not hold by any transcation will be put in the cache 
+     * for later use.
+     */
+    public final static int CACHE_UNLIMITED = 3;
+
 	/**
 	 * ...work like Hashtable's <code>put</code>...except it's LRU limited
 	 */
@@ -74,6 +101,33 @@ public abstract class LRU {
 	 */
 	public abstract Enumeration elements();
 
+	public static LRU create( int type, int param ) {
+		LRU cache;
+
+        switch ( type ) {
+        case CACHE_COUNT_LIMITED :
+            if ( param > 0 ) 
+                cache = new LRU.CountLimited( param );
+            else 
+                cache = new LRU.NoCache();
+            break;
+        case CACHE_TIME_LIMITED :
+            if ( param > 0 ) 
+                cache = new LRU.TimeLimited( param );
+            else 
+                cache = new LRU.NoCache();
+            break;
+        case CACHE_UNLIMITED :
+            cache = new LRU.Unlimited();
+            break;
+        case CACHE_NONE :
+            cache = new LRU.NoCache();
+            break;
+        default :
+            cache = new LRU.CountLimited( 100 );
+        }
+		return cache;
+	}
 
 
 	/**
