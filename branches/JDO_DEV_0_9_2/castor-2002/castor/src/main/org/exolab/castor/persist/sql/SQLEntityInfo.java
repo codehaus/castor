@@ -48,6 +48,7 @@ package org.exolab.castor.persist.sql;
 
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
@@ -77,7 +78,7 @@ public class SQLEntityInfo
 
     /**
      * The positions of idInfo elements in fieldInfo array (idInfo.length == idPos.length).
-     *
+     * It is used for top super-class only, is null for sub-classes.
      */
     public final int[] idPos;
 
@@ -97,13 +98,23 @@ public class SQLEntityInfo
      */
     public final SQLEntityInfo[] subEntities;
 
+    /**
+     * All superEntities from the top to this one, including.
+     * This entity goes last in the array.
+     */
+    public final SQLEntityInfo[] superEntities;
 
     private SQLEntityInfo(EntityInfo info) throws MappingException {
         ArrayList idNamesList = new ArrayList();
         String[] fieldNames;
         boolean isId;
+        EntityInfo superInfo;
+        int level;
 
         this.info = info;
+
+        // Must be done as early as possible to avoid infinite loop of sub/super-entities
+        _instances.put(info, this);
 
         // "Linearize" the identity columns
         idInfo = new SQLFieldInfo[info.idInfo.length];
@@ -117,16 +128,38 @@ public class SQLEntityInfo
         idNames = new String[idNamesList.size()];
         idNamesList.toArray(idNames);
 
+        // Prepare super-entity info
+        superInfo = info;
+        for (level = 0; superInfo.superEntity != null; level++) {
+            superInfo = superInfo.superEntity;
+        }
+        superEntities = new SQLEntityInfo[level + 1];
+        superInfo = info;
+        superEntities[level] = this;
+        for (level--; level >= 0; level--) {
+            superInfo = superInfo.superEntity;
+            superEntities[level] = SQLEntityInfo.getInstance(superInfo);
+        }
+
+        if (superEntities.length > 1) {
+            idPos = null;
+        } else {
+            idPos = new int[idInfo.length];
+            Arrays.fill(idPos, -1);
+        }
+
         // Prepare field info
         fieldInfo = new SQLFieldInfo[info.fieldInfo.length];
         for (int i = 0; i < fieldInfo.length; i++) {
             if (!info.fieldInfo[i].join) {
                 isId = false;
-                for (int j = 0; j < idInfo.length; j++) {
-                    if (info.fieldInfo[i].fieldNames[0].equals(info.idInfo[j].fieldNames[0])) {
-                        isId = true;
-                        idPos[j] = i;
-                        break;
+                if (idPos != null) { // identity fields always belong to a top super-class.
+                    for (int j = 0; j < idInfo.length; j++) {
+                        if (info.fieldInfo[i].fieldNames[0].equals(info.idInfo[j].fieldNames[0])) {
+                            isId = true;
+                            idPos[j] = i;
+                            break;
+                        }
                     }
                 }
                 if (!isId) {
@@ -152,7 +185,6 @@ public class SQLEntityInfo
         res = (SQLEntityInfo) _instances.get(info);
         if (res == null) {
             res = new SQLEntityInfo(info);
-            _instances.put(info, res);
         }
         return res;
     }

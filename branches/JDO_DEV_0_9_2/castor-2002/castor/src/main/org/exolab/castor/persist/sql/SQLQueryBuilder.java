@@ -100,7 +100,7 @@ public class SQLQueryBuilder implements SQLQueryKinds {
     /**
      * The factory method for creating instances of this class.
      */
-    public static SQLQueryExecutor getInstance(BaseFactory factory, SQLConnector connector, LogInterceptor log,
+    public static SQLQueryExecutor getExecutor(BaseFactory factory, SQLConnector connector, LogInterceptor log,
                                                EntityInfo info, byte kind, boolean dirtyCheck, boolean withLock)
             throws MappingException {
         SQLEntityInfo sqlInfo;
@@ -181,9 +181,37 @@ public class SQLQueryBuilder implements SQLQueryKinds {
 
     private static void buildSelect(QueryExpression query, SQLEntityInfo info)
             throws QueryException {
+        // super-entities must go before sub-entities
+        for (int i = 0; i < info.superEntities.length - 1; i++) {
+            buildSelectForOneEntity(query, info.superEntities[i]);
+            query.addInnerJoin(info.superEntities[i].info.entityClass, info.superEntities[i].idNames,
+                               info.superEntities[i + 1].info.entityClass, info.superEntities[i + 1].idNames);
+        }
+        buildSelectForSubEntities(query, info);
+    }
+
+    /**
+     * Build SELECT for this entity and all sub-entities (without super-entities)
+     */
+    private static void buildSelectForSubEntities(QueryExpression query, SQLEntityInfo info)
+            throws QueryException {
+        buildSelectForOneEntity(query, info);
+        if (info.subEntities != null) {
+            for (int sub = 0; sub < info.subEntities.length; sub++) {
+                query.addOuterJoin(info.info.entityClass, info.idNames,
+                                   info.subEntities[sub].info.entityClass, info.subEntities[sub].idNames);
+                buildSelectForSubEntities(query, info.subEntities[sub]);
+            }
+        }
+    }
+
+    /**
+     * Build SELECT for this entity only
+     */
+    private static void buildSelectForOneEntity(QueryExpression query, SQLEntityInfo info)
+            throws QueryException {
         String[] fieldNames;
         String entityClass;
-        SQLEntityInfo subInfo;
 
         entityClass = info.info.entityClass;
         for (int i = 0; i < info.idNames.length; i++) {
@@ -196,14 +224,6 @@ public class SQLQueryBuilder implements SQLQueryKinds {
                     query.addColumn(entityClass,  fieldNames[j]);
                 }
             }
-        }
-        if (info.subEntities == null) {
-            return;
-        }
-        for (int sub = 0; sub < info.subEntities.length; sub++) {
-            subInfo = info.subEntities[sub];
-            query.addOuterJoin(entityClass, info.idNames, subInfo.info.entityClass, subInfo.idNames);
-            buildSelect(query, subInfo);
         }
     }
 

@@ -209,7 +209,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
         EntityKey entityKey;
         String[] entityClasses;
         Object[][] values;
-        SQLEntityInfo subInfo;
+        SQLEntityInfo curInfo;
         Object[] temp = new Object[MAX_COMPLEX];
         Object[] temp2 = new Object[MAX_COMPLEX];
         int level;
@@ -258,6 +258,10 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             }
             if (entity.identity != null) {
                 bindIdentity(entity.identity, stmt, count, _info.idInfo);
+            } else {
+                if (_keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT) {
+                    throw new PersistenceException( Messages.format("persist.noIdentity", _info.info.entityClass));
+                }
             }
             // Dirty checking
             if ((_kind == UPDATE || _kind == DELETE) && _checkDirty) {
@@ -300,34 +304,47 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
 
             // prepare the entity for loading
             if (_info.subEntities == null) {
-                entityClasses = new String[1];
-                values = new Object[1][];
+                entityClasses = new String[_info.superEntities.length];
+                values = new Object[_info.superEntities.length][];
             } else {
                 entityClasses = new String[MAX_DEPTH];
                 values = new Object[MAX_DEPTH][];
             }
-            entityClasses[0] = _info.info.entityClass;
-            values[0] = new Object[_info.fieldInfo.length];
 
             count = 1;
-            // Skip identity fields
-            count += _info.idNames.length;
-            count = readEntity(values[0], rs, count, _info, temp);
-            // Now fill all fields that are a part of identity
-            if (_info.idPos.length == 1) {
-                values[0][_info.idPos[0]] = entity.identity;
-            } else {
-                Complex complex = (Complex) entity.identity;
-                for (int i = 0; i < _info.idPos.length; i++) {
-                    values[0][_info.idPos[i]] = complex.get(i);
+
+            // load super-entities first, then this class, then sub-entities
+            // the following loop process super-entities and this class
+            for (level = 0; level < _info.superEntities.length; level++) {
+                curInfo = _info.superEntities[level];
+                entityClasses[level] = curInfo.info.entityClass;
+                values[level] = new Object[curInfo.fieldInfo.length];
+
+                // Fill all fields that are a part of identity (it's possible for top level only)
+                if (level == 0) {
+                    if (curInfo.idPos.length == 1) {
+                        values[0][curInfo.idPos[0]] = entity.identity;
+                    } else {
+                        Complex complex = (Complex) entity.identity;
+                        for (int i = 0; i < curInfo.idPos.length; i++) {
+                            values[0][curInfo.idPos[i]] = complex.get(i);
+                        }
+                    }
                 }
+
+                // Skip identity fields
+                count += _info.idNames.length;
+
+                // Load other fields
+                count = readEntity(values[level], rs, count, curInfo, temp);
             }
+
+            // Now load sub-entities
             if (_info.subEntities == null) {
                 entity.entityClasses = entityClasses;
                 entity.values = values;
             } else {
-                // Now load sub-entities
-                level = loadSubEntityLevel(_info, 1, entityClasses, values, rs, count, temp, temp2);
+                level = loadSubEntityLevel(_info, level, entityClasses, values, rs, count, temp, temp2);
                 entity.entityClasses = new String[level];
                 entity.values = new Object[level][];
                 System.arraycopy(entityClasses, 0, entity.entityClasses, 0, level);
@@ -345,7 +362,6 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     public void executeRelation(Key key, Connection conn, Relation relation)
             throws PersistenceException {
     }
-
 
     /**
      * Recursive method that loads sub-entities in depth-first order.
@@ -384,8 +400,8 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
             throws PersistenceException, MappingException {
         SQLQueryExecutor lookup;
 
-        lookup = SQLQueryBuilder.getInstance(_factory, _connector, _logInterceptor,
-                                             entity.info, LOOKUP, false, false);
+        lookup = SQLQueryBuilder.getExecutor(_factory, _connector, _logInterceptor,
+                                             _info.info, LOOKUP, false, false);
         try {
             lookup.executeEntity(key, lockEngine, conn, entity);
 
