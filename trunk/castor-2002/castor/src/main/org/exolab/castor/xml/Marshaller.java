@@ -68,9 +68,9 @@ import org.xml.sax.helpers.AttributeListImpl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
+//import java.io.Serializable;
 import java.io.Writer;
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -961,7 +961,7 @@ public class Marshaller extends MarshalFramework {
         }
         //-- declare namespace at this element scope?
         if (nsURI != null) {
-		    if ((nsPrefix == null) && (!nsURI.equals(_defaultNamespace))) 
+		    if ((nsPrefix == null) && (!nsURI.equals(_defaultNamespace)))
 		    {
 		        nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
 		    }
@@ -1166,10 +1166,10 @@ public class Marshaller extends MarshalFramework {
     private boolean declareNamespace(String nsPrefix, String nsURI)
     {
         boolean declared = false;
-        
+
         //-- make sure it's not already declared...
         if ( (nsURI != null) && (nsURI.length() != 0)) {
-            
+
             String tmpURI = _namespaces.getNamespaceURI(nsPrefix);
             if ((tmpURI != null) && (tmpURI.equals(nsURI))) {
                 return declared;
@@ -1199,6 +1199,18 @@ public class Marshaller extends MarshalFramework {
     public void setLogWriter(PrintWriter printWriter) {
         this._logWriter = printWriter;
     } //-- setLogWriter
+
+    /**
+     * Sets the encoding for the serializer
+     * @param encoding the encoding to set
+     */
+    public void setEncoding(String encoding) {
+        OutputFormat format = Configuration.getOutputFormat();
+        format.setEncoding(encoding);
+        //the serializer can't be null at this point
+        _serializer.setOutputFormat(format);
+
+    }
 
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
@@ -1298,9 +1310,9 @@ public class Marshaller extends MarshalFramework {
             return value;
         if (!(fieldDesc instanceof XMLFieldDescriptorImpl))
            return value;
-           
+
         String result = (String)value;
-        
+
         String nsURI = null;
         int idx = -1;
         if ((result.length() > 0) && (result.charAt(0) == '{')) {
@@ -1312,7 +1324,7 @@ public class Marshaller extends MarshalFramework {
             nsURI = result.substring(1, idx);
         }
         else return value;
-        
+
         String prefix = ((XMLFieldDescriptorImpl)fieldDesc).getQNamePrefix();
         //no prefix provided, check if one has been previously defined
         if (prefix == null)
