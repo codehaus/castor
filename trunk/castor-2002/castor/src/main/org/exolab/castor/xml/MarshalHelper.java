@@ -469,8 +469,10 @@ public class MarshalHelper {
         else if ((type == Boolean.TYPE) || (type == Boolean.class)) {
             if (isNull)
                 primitive = new Boolean(false);
-            else
-                primitive = new Boolean(value);
+            else				
+				primitive = (value.equals("1") || 
+							 value.toLowerCase().equals("true")) 
+								? Boolean.TRUE : Boolean.FALSE;
         }
         // double
         else if ((type == Double.TYPE) || (type == Double.class)) {
