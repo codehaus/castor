@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -53,26 +53,27 @@ import java.io.*;
 
 /**
  * A class that "SOMEWHAT" represents a Java Doc Comment.
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class JDocComment {
 
         
        
     /**
      * An ordered list of descriptors
-    **/
+     */
     private Vector       _descriptors = null;
     
     /** 
      * The internal buffer for this JDocComment
-    **/
+     */
     private StringBuffer _comment     = null;
     
     /**
      * Creates a new JavaDoc Comment
-    **/
+     */
     public JDocComment() {
         super();
         _descriptors = new Vector();
@@ -80,10 +81,10 @@ public class JDocComment {
     } //--  JDocComment
 
     /**
-     * Adds the given exception to this JDocComment
-     * @param name the name of the exception
-     * @param desc the description of the exception
-    **/
+     * Adds the given JDocDescriptor to this JDocComment
+     *
+     * @param jdesc the JDocDescriptor to add
+     */
     public void addDescriptor(JDocDescriptor jdesc) {
         
         if (jdesc == null) return;
@@ -119,11 +120,39 @@ public class JDocComment {
     
     /**
      * Appends the comment String to this JDocComment
+     *
      * @param comment the comment to append
-    **/
+     */
     public void appendComment(String comment) {
         _comment.append(comment);
     } //-- appendComment
+    
+    /**
+     * Returns the String value of this JDocComment.
+     *
+     * @return the String value of the JDocComment.
+     */
+    public String getComment() {
+        return _comment.toString();
+    } //-- getComment
+    
+    /**
+     * Returns an enumeration of the parameters of this JDocComment
+     *
+     * @return an enumeration of the parameters of this JDocComment
+     */
+    public Enumeration getDescriptors() {
+        return _descriptors.elements();
+    } //-- getDescriptors
+    
+    /**
+     * Returns the length of the comment
+     *
+     * @return the length of the comment
+     */
+    public int getLength() {
+        return _comment.length();
+    } //-- getLength
     
     /**
      * Returns the Parameter Descriptor associated with the
@@ -131,7 +160,7 @@ public class JDocComment {
      *
      * @return the Parameter Descriptor associated with the
      * given name
-    **/
+     */
     public JDocDescriptor getParamDescriptor(String name) {
         if (name == null) return null;
         
@@ -147,17 +176,12 @@ public class JDocComment {
         
     } //-- getParamDescriptor
     
-    /**
-     * Returns an enumeration of the parameters of this JDocComment
-     * @return an enumeration of the parameters of this JDocComment
-    **/
-    public Enumeration getDescriptors() {
-        return _descriptors.elements();
-    } //-- getDescriptors
     
     /**
      * prints this JavaDoc comment using the given JSourceWriter
-    **/
+     *
+     * @param jsw the JSourceWriter to print to
+     */
     public void print(JSourceWriter jsw) {
         
         //-- I reuse JComment for printing
@@ -179,8 +203,9 @@ public class JDocComment {
     
     /**
      * Sets the comment String of this JDocComment
+     *
      * @param comment the comment String of this JDocComment
-    **/
+     */
     public void setComment(String comment) {
         _comment.setLength(0);
         _comment.append(comment);
@@ -188,8 +213,9 @@ public class JDocComment {
     
     /**
      * Returns the String representation of this Java Doc Comment
+     *
      * @return the String representation of this Java Doc Comment
-    **/
+     */
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("/**\n");
