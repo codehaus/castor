@@ -70,7 +70,6 @@ import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
 
-
 /**
  * A transaction context is required in order to perform operations
  * against the database. The transaction context is mapped to an
@@ -82,7 +81,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class TransactionContext extends Lockable {
+public class TransactionContext implements Key.KeyHolder {
 
 
     /**
@@ -237,7 +236,12 @@ public class TransactionContext extends Lockable {
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
      */
-    private boolean _autoStore;
+    private boolean     _autoStore;
+
+    /**
+     * The {@link Key} used to lock entity in LockEngine of this transaction
+     */
+    private Key         _key;
 
     /**
      * Create a new transaction context. This method is used by the
@@ -256,6 +260,19 @@ public class TransactionContext extends Lockable {
             _threadClassLoader = ctx;
     }
 
+    /**
+     * Set the {@link Key} of this transaction 
+     */
+    public void setKey( Key key ) {
+        _key = key;
+    }
+
+    /**
+     * Get the {@link Key} of this transaction
+     */
+    public Key getKey() {
+        return _key;
+    }
 
     /**
      * Create a new transaction context. This method is used by the
