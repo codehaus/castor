@@ -120,6 +120,15 @@ public final class Introspector {
     } //-- Introspector
     
     /**
+     * Returns the NodeType for java primitives
+     *
+     * @return the NodeType for java primitives
+    **/
+    public NodeType getPrimitiveNodeType() {
+        return _primitiveNodeType;
+    } //-- getPrimitiveNodeType
+    
+    /**
      * Creates an XMLClassDescriptor for the given class by using Reflection.
      * @param c the Class to create the XMLClassDescriptor for
      * @return the new XMLClassDescriptor created for the given class
