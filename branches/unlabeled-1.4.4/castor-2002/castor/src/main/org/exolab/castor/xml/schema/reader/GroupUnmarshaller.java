@@ -52,7 +52,7 @@ import org.xml.sax.*;
 
 /**
  * A class for Unmarshalling ModelGroups
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
 public class GroupUnmarshaller extends SaxUnmarshaller {

@@ -53,7 +53,7 @@ import java.util.Enumeration;
 
 /**
  * The default implementation of the ClassDescriptorResolver interface
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class ClassDescriptorResolverImpl
