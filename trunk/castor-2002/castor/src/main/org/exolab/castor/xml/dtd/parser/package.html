@@ -11,15 +11,20 @@
     <ul>
       <li>{@link org.exolab.castor.xml.dtd.parser.DTDInitialParser Initial Parser}
           parses the input text, searches for <b>parameter
-          entity</b> declarations and substitutes <b>parameter entity
+          entity</b> declarations (i.e. entities used only within XML DTD)
+          and substitutes <b>parameter entity
           references</b> by corresponding <b>replacement text</b>. All other
           text is passed to the output "as is".<br>
-          The initial parser parses internal parameter entity declarations only,
-          signaling an error if an external parameter entity declaration is met.
-          Future versions will be able to parse and handle external parameter
-          entity declarations.<br>
+          The initial parser parses <b>internal parameter entity</b> declarations only, like:<pre>
+&lt;!ENTITY % name "John White" &gt; </pre>
+          signaling an error if an <b>external parameter entity</b> declaration, like:<pre>
+&lt;!ENTITY % ISOLat2 SYSTEM "http://www.xml.com/iso/isolat2-xml.entities" &gt;</pre>
+          is met.
+          Future versions will be able to parse and handle <b>external parameter
+          entity</b> declarations.<br>
           The output of this parser is a document without paramater entity
-          declarations and all parameter entity references expanded.
+          declarations and all parameter entity references substituted by corresponding
+          replacement text.
        <li>{@link org.exolab.castor.xml.dtd.parser.DTDParser Main Parser}
           performes the main parsing process. It is able to parse:
           <ul>
@@ -42,7 +47,7 @@
     </ul>
     <p>
     The parser is fully compliant with the current
-    <a href="http://www.w3.org/TR/1998/REC-xml-19980210">XML specification</a>,
+    <a href="http://www.w3.org/TR/REC-xml">XML specification</a>,
     unless otherwise is stated, for instance it is able to parse Unicode text,
     provided the {@link java.io.Reader java.io.Reader} used to instantiate
     the parser is correctly set up.
@@ -106,7 +111,7 @@
           a <tt>reader</tt>, which allows to set desired character encoding.
           This class is an intermediate component between input
           character reader and the parser.<br>
-          The class is based on the class
+          The code of this class is based on the class
           <b>ASCII_CharStream</b> - implementation of interface
           {@link org.exolab.castor.xml.dtd.parser.CharStream CharStream}, that
           JavaCC would have generated with the following options set in

@@ -61,7 +61,7 @@ package org.exolab.castor.xml.dtd.parser;
  * as a <tt>reader</tt>, which allows to set desired character encoding.
  * This class is an intermediate component between input
  * character reader and the parser.<br>
- * This class is based on the class <b>ASCII_CharStream</b> - implementation
+ * The code of this class is based on the class <b>ASCII_CharStream</b> - implementation
  * of interface
  * {@link org.exolab.castor.xml.dtd.parser.CharStream CharStream},
  * that JavaCC would have generated with
