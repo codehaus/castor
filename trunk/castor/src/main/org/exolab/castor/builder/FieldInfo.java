@@ -333,6 +333,13 @@ public class FieldInfo extends XMLInfo {
         if ((_comment != null) && (_comment.length() > 0)) {
             mComment += " The field '" + fieldName +
                 "' has the following description: ";
+
+            // XDoclet support - Add a couple newlines if it's a doclet tag
+            if ( _comment.startsWith( "@" ) )
+            {
+                mComment += "\n\n";
+            }
+
             mComment += _comment;
         }
         jDocComment.setComment(mComment);
