@@ -46,6 +46,8 @@
 
 package org.exolab.castor.jdo.transactionmanager;
 
+import org.exolab.castor.core.exceptions.CastorException;
+
 /**
  * An exception encapsulating an exception that occurs during the operation 
  * to acquire a <tt>javax.transaction.TransactionManager</tt>.
@@ -55,7 +57,7 @@ package org.exolab.castor.jdo.transactionmanager;
  * @version $Id$
  */
 public class TransactionManagerAcquireException
-    extends Exception 
+    extends CastorException 
 {
 
 	public TransactionManagerAcquireException( String message, Throwable except ) 
