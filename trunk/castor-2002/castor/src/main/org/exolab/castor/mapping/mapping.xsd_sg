@@ -59,7 +59,7 @@
 	   </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="key-generator" type="string"   use="optional"/>
-        <xsd:attribute name="auto-complete" type="boolean" use="optional" value="false"/>
+        <xsd:attribute name="auto-complete" type="boolean" use="optional" default="false"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -83,16 +83,17 @@
         <xsd:element ref="ldap"           minOccurs="0" maxOccurs="1"/>
       </xsd:sequence>
 
-      <xsd:attribute name="name"          type="NMTOKEN" use="required"/>
-      <xsd:attribute name="type"          type="NMTOKEN" use="optional"/>
-      <xsd:attribute name="container"     type="boolean"  use="optional"   value="false"/>
-      <xsd:attribute name="required"      type="boolean"  use="optional"   value="false"/>
-      <xsd:attribute name="transient"     type="boolean"  use="optional"   value="false"/>
-      <xsd:attribute name="direct"        type="boolean"  use="optional"   value="false"/>
-      <xsd:attribute name="lazy"          type="boolean"  use="optional"   value="false"/>
-      <xsd:attribute name="get-method"    type="NMTOKEN"  use="optional"/>
-      <xsd:attribute name="set-method"    type="NMTOKEN"  use="optional"/>
-      <xsd:attribute name="create-method" type="NMTOKEN"  use="optional"/>
+      <xsd:attribute name="name"          type="NMTOKEN"    use="required"/>
+      <xsd:attribute name="type"          type="NMTOKEN"     use="optional"/>
+      <xsd:attribute name="container"     type="boolean"     use="optional"   default="false"/>
+      <xsd:attribute name="required"      type="boolean"     use="optional"   default="false"/>
+      <xsd:attribute name="transient"     type="boolean"     use="optional"   default="false"/>
+      <xsd:attribute name="direct"        type="boolean"     use="optional"   deafult="false"/>
+      <xsd:attribute name="lazy"          type="boolean"     use="optional"   deafult="false"/>
+      <xsd:attribute name="get-method"    type="NMTOKEN"     use="optional"/>
+      <xsd:attribute name="set-method"    type="NMTOKEN"     use="optional"/>
+      <xsd:attribute name="create-method" type="NMTOKEN"     use="optional"/>
+      <xsd:attribute name="handler"       type="xsd:string"   use="optional"/>
       <xsd:attribute name="collection"    use="optional">
          <xsd:simpleType>
 	    <xsd:restriction base="string">
@@ -118,8 +119,8 @@
        </xsd:sequence>
        <xsd:attribute name="name"          type="NMTOKEN" use="required"/>
        <xsd:attribute name="type"          type="NMTOKEN" use="optional"/>
-       <xsd:attribute name="required"      type="boolean" use="optional"  value="false"/>
-       <xsd:attribute name="direct"        type="boolean" use="optional"  value="false"/>
+       <xsd:attribute name="required"      type="boolean" use="optional"  default="false"/>
+       <xsd:attribute name="direct"        type="boolean" use="optional"  default="false"/>
        <xsd:attribute name="get-method"    type="NMTOKEN" use="optional"/>
        <xsd:attribute name="set-method"    type="NMTOKEN" use="optional"/>
        <xsd:attribute name="create-method" type="NMTOKEN" use="optional"/>
@@ -132,7 +133,7 @@
       <xsd:attribute name="type"       type="NMTOKENS"   use="optional"/>
       <xsd:attribute name="many-table" type="NMTOKEN"    use="optional"/>
       <xsd:attribute name="many-key"   type="NMTOKENS"   use="optional"/>
-      <xsd:attribute name="dirty"      value="check"   use="optional">
+      <xsd:attribute name="dirty"      default="check"   use="optional">
         <xsd:simpleType>
 	   <xsd:restriction base="string">
               <xsd:enumeration value="check"/>
@@ -184,7 +185,7 @@
 
   <xsd:element name="cache-type-mapping">
      <xsd:complexType content="empty">
-        <xsd:attribute name="type" use="optional" value="count-limited">
+        <xsd:attribute name="type" use="optional" default="count-limited">
            <xsd:simpleType>
 	      <xsd:restriction base="string">
                  <xsd:enumeration value="none"/>

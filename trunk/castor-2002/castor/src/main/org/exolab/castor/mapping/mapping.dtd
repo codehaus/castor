@@ -139,6 +139,7 @@
     required       ( true | false )  "false"
     direct         ( true | false )  "false"
     lazy           ( true | false )  "false"
+    handler        NMTOKEN  #IMPLIED
     get-method     NMTOKEN  #IMPLIED
     set-method     NMTOKEN  #IMPLIED
     create-method  NMTOKEN  #IMPLIED
