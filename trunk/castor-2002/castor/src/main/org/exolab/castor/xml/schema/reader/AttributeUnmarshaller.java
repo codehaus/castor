@@ -93,7 +93,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         String attValue = null;
         
         //-- default
-        _attribute.setDefault(atts.getValue("default"));
+        _attribute.setDefaultValue(atts.getValue("default"));
         
         //-- type
         attValue = atts.getValue("type");
