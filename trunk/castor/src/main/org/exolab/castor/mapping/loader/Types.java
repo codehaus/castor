@@ -449,6 +449,8 @@ public class Types
                       java.lang.String.class,     true,     null ),
         new TypeInfo( "integer",     java.lang.Integer.TYPE,
                       java.lang.Integer.class,    true,     new Integer( 0 ) ),
+        new TypeInfo( "int",         java.lang.Integer.TYPE,
+                      java.lang.Integer.TYPE,    true,     new Integer( 0 ) ),
         new TypeInfo( "long",        java.lang.Long.TYPE,
                       java.lang.Long.class,       true,     new Long( 0 ) ),
         new TypeInfo( "big-integer", null,
