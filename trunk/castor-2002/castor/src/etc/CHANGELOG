@@ -1,6 +1,12 @@
 Version (CVS)
 -------------
 
+XML:    Added fix to Marshaller#isPrimitive to support BigDecimal, submitted
+        by Don Kleppinger. (kvisco)
+
+XML:    Added "-nodesc" flag to source generater to disable generation of
+        class descriptors. Suggested by George Stewart. (kvisco)
+
 XML:    Fixed a bug in the unmarshalling of array of primitive type when using mapping.
         (Seb <gignoux@intalio.com>)
 
