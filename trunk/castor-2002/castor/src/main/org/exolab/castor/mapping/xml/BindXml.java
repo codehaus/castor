@@ -39,7 +39,10 @@ public class BindXml implements java.io.Serializable {
 
     private org.exolab.castor.mapping.xml.types.NodeType _node;
 
-
+    private boolean _reference = false;
+    
+    private boolean _has_reference = false;
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -53,6 +56,14 @@ public class BindXml implements java.io.Serializable {
      //- Methods -/
     //-----------/
 
+    /**
+    **/
+    public void deleteReference()
+    {
+        this._has_reference = false;
+        this._reference = false;
+    } //-- void deleteReference() 
+    
     /**
     **/
     public java.lang.String getMatches()
@@ -76,11 +87,25 @@ public class BindXml implements java.io.Serializable {
 
     /**
     **/
+    public boolean getReference()
+    {
+        return this._reference;
+    } //-- boolean getReference() 
+
+    /**
+    **/
     public java.lang.String getType()
     {
         return this._type;
     } //-- java.lang.String getType() 
 
+    /**
+    **/
+    public boolean hasReference()
+    {
+        return this._has_reference;
+    } //-- boolean hasReference() 
+    
     /**
     **/
     public boolean isValid()
@@ -143,6 +168,14 @@ public class BindXml implements java.io.Serializable {
         this._node = _node;
     } //-- void setNode(org.exolab.castor.mapping.xml.types.NodeType) 
 
+    /**
+    **/
+    public void setReference(boolean reference)
+    {
+        this._has_reference = true;
+        this._reference = reference;
+    } //-- void setReference(boolean) 
+    
     /**
      * 
      * @param _type

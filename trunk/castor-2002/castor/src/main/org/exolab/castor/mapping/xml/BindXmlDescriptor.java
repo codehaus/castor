@@ -193,6 +193,45 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
 
+        //-- _reference
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_reference", "reference", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object )
+                throws IllegalStateException
+            {
+                BindXml target = (BindXml) object;
+                if(!target.hasReference())
+                    return null;
+                return new Boolean(target.getReference());
+            }
+            public void setValue( Object object, Object value)
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    BindXml target = (BindXml) object;
+                    // if null, use delete method for optional primitives
+                    if (value == null) {
+                        target.deleteReference();
+                        return;
+                    }
+                    target.setReference( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+
+        //-- validation code for: _reference
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+
         //-- initialize element descriptors
 
     } //-- org.exolab.castor.mapping.xml.BindXmlDescriptor()
