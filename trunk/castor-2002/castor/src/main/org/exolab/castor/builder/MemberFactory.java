@@ -135,9 +135,6 @@ public class MemberFactory {
             case XSType.ID:
                 fieldInfo = new SGId(memberName);
                 break;
-            case XSType.IDREF:
-                fieldInfo = new SGIdRef(memberName);
-                break;
             default:
                 fieldInfo = new FieldInfo(xsType, memberName);
                 break;

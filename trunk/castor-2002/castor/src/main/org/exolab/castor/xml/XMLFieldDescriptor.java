@@ -113,6 +113,13 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     public boolean isMultivalued();
     
     /**
+     * Returns true if the field described by this descriptor is
+     * a reference (ie. IDREF) to another object in the 
+     * "Object Model" (XML tree)
+    **/
+    public boolean isReference();
+    
+    /**
      * Returns true if this descriptor can be used to handle elements
      * or attributes with the given XML name. By default this method
      * simply compares the given XML name with the internal XML name.

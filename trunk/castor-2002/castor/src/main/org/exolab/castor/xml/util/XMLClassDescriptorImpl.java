@@ -257,6 +257,21 @@ public class XMLClassDescriptorImpl
     } //-- getXMLName   
     
     /**
+     * Sets the Identity FieldDescriptor, if the FieldDescriptor is
+     * not already a contained in this ClassDescriptor, it will be
+     * added
+    **/
+    public void setIdentity(XMLFieldDescriptor fieldDesc) {
+        if (fieldDesc != null) {
+            if ( (! attributeDescriptors.contains(fieldDesc)) &&
+                (! elementDescriptors.contains(fieldDesc))) {
+                addFieldDescriptor(fieldDesc);
+            }
+        }
+        this._identity = fieldDesc;
+    } //-- setIdentity
+    
+    /**
      * Sets the namespace prefix used when marshalling as XML.
      * @param nsPrefix the namespace prefix used when marshalling
      * the "described" object

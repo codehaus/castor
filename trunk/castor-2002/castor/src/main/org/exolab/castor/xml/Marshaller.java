@@ -48,6 +48,7 @@ package org.exolab.castor.xml;
 //-- xml related imports
 import org.xml.sax.*;
 import org.apache.xml.serialize.Serializer;
+import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.MimeBase64Encoder;
@@ -353,12 +354,51 @@ public class Marshaller {
             //-- [need to add this support]
             
             Object value = null;
+            
             try {
                 value = attDescriptor.getHandler().getValue(object);
             }
             catch(IllegalStateException ise) {
                 continue;
             }
+            
+            //-- handle IDREFs
+            if (attDescriptor.isReference() && (value != null)) {
+                XMLClassDescriptor cd = getClassDescriptor(value.getClass());
+                String err = null;
+                if (cd != null) {
+                    XMLFieldDescriptor fieldDesc 
+                        = (XMLFieldDescriptor) cd.getIdentity();
+                    if (fieldDesc != null) {
+                        FieldHandler fieldHandler = fieldDesc.getHandler();
+                        if (fieldHandler != null) {
+                            try {
+                                value = fieldHandler.getValue(value);
+                            }
+                            catch(IllegalStateException ise) {
+                                err = ise.toString();
+                            }
+                        } 
+                        else { 
+                            err = "FieldHandler for Identity descriptor is null.";
+                        }
+                    }
+                    else err = "No identity descriptor available";
+                }
+                else  {
+                    err = "Unable to resolve ClassDescriptor for: " +
+                        value.getClass().getName();
+                }
+                    
+                if (err != null) {
+                    String errMsg = "Unable to save reference to: " +
+                        cd.getXMLName() + " from element: " +
+                        classDesc.getXMLName() + 
+                        " due to the following error: ";
+                    throw new MarshalException(errMsg);
+                }
+            }
+            
             if (value == null) continue;
             
             atts.addAttribute(xmlName, null, value.toString());
