@@ -984,11 +984,12 @@ public final class SQLEngine implements Persistence {
                         }
                         count++;
                     }
-                    if ( notNull ) 
+                    if ( notNull ) {
                         if ( _fields[i].columns.length == 1 )
                             res.add( temp[0] );
                         else
                             res.add( new Complex( _fields[i].columns.length, temp ) );
+                    }
                     fields[i] = res;
                 }
             }
@@ -1012,7 +1013,7 @@ public final class SQLEngine implements Persistence {
                             }
                             count++;
                         }
-                        if ( notNull || !res.contains( temp ) ) {
+                        if ( notNull && !res.contains( temp ) ) {
                             if ( _fields[i].columns.length == 1 )
                                 res.add( temp[0] );
                             else
