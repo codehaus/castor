@@ -22,6 +22,18 @@ create unique index test_table2_pk
    on test_table2 ( id );
 
 
+drop table if exists test_table3;
+
+create table test_table3 (
+  id      numeric(10,0) not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200)
+);
+
+create unique index test_table3_pk
+   on test_table3 ( id );
+
+
 drop table if exists test_group_person;
 
 create table test_group_person (
