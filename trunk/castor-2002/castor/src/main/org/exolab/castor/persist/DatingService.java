@@ -40,7 +40,7 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id: DatingService.java,
+ * $Id$
  */
 
 
@@ -92,13 +92,11 @@ class DatingService {
 
     Hashtable clsMolders;
 
-    Hashtable needExtendsClassMolder;
+    Vector needExtendsClassMolder;
 
-    Hashtable needDependsClassMolder;
+    Vector needDependsClassMolder;
 
-    Hashtable needFieldClass;
-
-    Hashtable needRelation;
+    Vector needFieldClass;
 
     Hashtable javaClasses;
 
@@ -111,6 +109,7 @@ class DatingService {
      * will resolve all the outstanding relation now.
      */
     void close() throws MappingException{
+
         Enumeration e;
         ClassMolder initiateCm, targetCm;
         FieldMolder initiateFm;
@@ -119,13 +118,13 @@ class DatingService {
 
         // resolve extends
         if ( needExtendsClassMolder != null ) {
-            e = needExtendsClassMolder.keys();
+            e = needExtendsClassMolder.elements();
             while ( e.hasMoreElements() ) {
-                o = e.nextElement();
-                initiateCm = (ClassMolder) needExtendsClassMolder.get( o );
-                targetCm = (ClassMolder) clsMolders.get( o );
+                Pair pair = (Pair)e.nextElement();
+                initiateCm = (ClassMolder) pair.value;
+                targetCm = (ClassMolder) clsMolders.get( pair.key );
                 if ( targetCm == null )
-                    throw new MappingException("Extended element, \""+o+"\"  not found!");
+                    throw new MappingException("Extended element, \""+pair.key+"\"  not found!");
                 initiateCm.setExtends( targetCm );
                 ((SQLEngine)initiateCm.getPersistence()).setExtends( (SQLEngine) targetCm.getPersistence() );
             }
@@ -133,26 +132,26 @@ class DatingService {
 
         // resolve depends
         if ( needDependsClassMolder != null ) {
-            e = needDependsClassMolder.keys();
+            e = needDependsClassMolder.elements();
             while ( e.hasMoreElements() ) {
-                o = e.nextElement();
-                initiateCm = (ClassMolder) needDependsClassMolder.get( o );
-                targetCm = (ClassMolder) clsMolders.get( o );
+                Pair pair = (Pair)e.nextElement();
+                initiateCm = (ClassMolder) pair.value;
+                targetCm = (ClassMolder) clsMolders.get( pair.key );
                 if ( targetCm == null )
-                    throw new MappingException("Depended element, \""+o+"\"  not found!");
+                    throw new MappingException("Depended element, \""+pair.key+"\"  not found!");
                 initiateCm.setDepends( targetCm );
             }
         }
 
         // resolve depends field
         if ( needFieldClass != null ) {
-            e = needFieldClass.keys();
+            e = needFieldClass.elements();
             while ( e.hasMoreElements() ) {
-                o = e.nextElement();
-                initiateFm = (FieldMolder) needFieldClass.get( o );
-                targetCm = (ClassMolder) clsMolders.get( o );
+                Pair pair = (Pair)e.nextElement();
+                initiateFm = (FieldMolder) pair.value;
+                targetCm = (ClassMolder) clsMolders.get( pair.key );
                 if ( targetCm == null )
-                    throw new MappingException("Field element, \""+o+"\"  not found!");
+                    throw new MappingException("Field element, \""+pair.key+"\"  not found!");
                 initiateFm.setFieldClassMolder( targetCm );
             }
         }
@@ -176,9 +175,9 @@ class DatingService {
         }
 
         if ( needExtendsClassMolder == null )
-            needExtendsClassMolder = new Hashtable();
+            needExtendsClassMolder = new Vector();
 
-        needExtendsClassMolder.put( extName, me );
+        needExtendsClassMolder.add( new Pair( extName, me ) );
         return false;
     }
 
@@ -197,9 +196,9 @@ class DatingService {
         }
 
         if ( needDependsClassMolder == null )
-            needDependsClassMolder = new Hashtable();
+            needDependsClassMolder = new Vector();
 
-        needDependsClassMolder.put( depName, me );
+        needDependsClassMolder.add( new Pair( depName, me ) );
         return false;
     }
 
@@ -225,6 +224,7 @@ class DatingService {
      *        represent
      */
     boolean pairFieldClass( FieldMolder fh, String typeName ) throws MappingException {
+        
         try {
             if ( typeName == null || typeName.equals("") )
                 return true;
@@ -238,8 +238,8 @@ class DatingService {
                 return true;
             }
 
-            if ( needFieldClass == null ) needFieldClass = new Hashtable();
-            needFieldClass.put( typeName, fh );
+            if ( needFieldClass == null ) needFieldClass = new Vector();
+            needFieldClass.add( new Pair( typeName, fh ) );
             return false;
         } catch ( ClassNotFoundException e ) {
             throw new MappingException("ClassNotFound :\n"+e);
@@ -254,6 +254,15 @@ class DatingService {
         if ( clsMolders == null )
             clsMolders = new Hashtable();
         clsMolders.put( name, clsMold );
+    }
+
+    private class Pair {
+        public Object key;
+        public Object value;
+        private Pair( Object key, Object value ) {
+            this.key = key;
+            this.value = value;
+        }
     }
 
 }

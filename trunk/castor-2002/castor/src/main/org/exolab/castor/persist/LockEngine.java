@@ -48,7 +48,9 @@ package org.exolab.castor.persist;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Properties;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
@@ -164,22 +166,65 @@ public final class LockEngine {
     LockEngine( MappingResolver mapResolver, PersistenceFactory factory, 
             LogInterceptor logInterceptor )
             throws MappingException {
+
         try {
-            ClassMolder molder;
-            Enumeration enum;
-            TypeInfo info;
-            TypeInfo baseInfo;
-            Vector v;
-            
-            v = ClassMolder.resolve( (MappingLoader) mapResolver, this, factory, logInterceptor );
+            Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, factory, logInterceptor );
     
-            Vector waitingForBase = new Vector();
             _typeInfo = new HashMap();
-            enum = v.elements();
+            Enumeration enum = v.elements();
+
+            HashSet processedClasses = new HashSet();
+            HashSet freshClasses = new HashSet();
+            // copy things into an arraylist
+            while ( enum.hasMoreElements() )
+                freshClasses.add( enum.nextElement() );
 
             // iterates through all the ClassMolders in the LockEngine.
             // We first create a TypeInfo for all the base class (ie not extends
             // other class) in the first iteration.
+            int counter = 0;
+            do {
+                counter = freshClasses.size();
+                Iterator itor = freshClasses.iterator();
+                while ( itor.hasNext() ) {
+                    ClassMolder molder = (ClassMolder) itor.next();
+                    ClassMolder extend = molder.getExtends();
+
+                    if ( extend == null ) {
+                        // create new LRU for the base type
+                        LRU lru = LRU.create( molder.getCacheType(), molder.getCacheParam() );
+                        TypeInfo info = new TypeInfo( molder, new HashMap(), lru ); 
+                        _typeInfo.put( molder.getName(), info );
+                        itor.remove();
+                        processedClasses.add( molder );
+
+                    } else if ( processedClasses.contains( molder.getExtends() ) ) {
+                        // use the base type to construct the new type
+                        TypeInfo baseInfo = (TypeInfo)_typeInfo.get( extend.getName() );
+                        _typeInfo.put( molder.getName(), new TypeInfo( molder, baseInfo ) );
+                        itor.remove();
+                        processedClasses.add( molder );
+
+                    } else {
+                        // do nothing and wait for the next turn
+                    }
+
+                }
+            } while ( freshClasses.size() > 0 && counter != freshClasses.size() );
+
+            // error if there is molder left.
+            if ( freshClasses.size() > 0 ) {
+                Iterator itor = freshClasses.iterator();
+                while ( itor.hasNext() ) {
+                    ClassMolder molder = (ClassMolder)itor.next();
+                    _logInterceptor.message("The base class, "
+                        + (molder.getExtends().getName())
+                        + ", of the extends class ," + molder.getName() 
+                        + " can not be resolved! ");
+                }
+                throw new MappingException("Some base class can not be resolved!");
+            }
+            /*
             while ( enum.hasMoreElements() ) {
                 molder = (ClassMolder) enum.nextElement();
                 if ( molder.getExtends() != null ) {
@@ -219,7 +264,7 @@ public final class LockEngine {
                 } else {
                     throw new MappingException("Base class "+extend.getName()+" of "+molder.getName()+" not found!");
                 }
-            }
+            } */
 
             _logInterceptor = logInterceptor;
     
