@@ -371,7 +371,7 @@ public class ExtendedBinding extends Binding {
      *
      * @param structure the structure for which to return a representation.
      */
-    private String getSchemaLocation(Structure structure) {
+    public static String getSchemaLocation(Structure structure) {
         if (structure == null)
             return null;
         StringBuffer buffer = new StringBuffer(30);
@@ -379,7 +379,7 @@ public class ExtendedBinding extends Binding {
         return buffer.toString();
     }
 
-    private void getSchemaLocation(Structure structure, StringBuffer location) {
+    private static void getSchemaLocation(Structure structure, StringBuffer location) {
         if (structure == null)
             throw new IllegalArgumentException("Structure cannot be null");
 
