@@ -67,7 +67,6 @@ public interface TimeStampable
 
     /**
      * Get the timestamp.
-     * NOTE: immediately after the object creation this method must return 0.
      */
     public long jdoGetTimeStamp();
 
