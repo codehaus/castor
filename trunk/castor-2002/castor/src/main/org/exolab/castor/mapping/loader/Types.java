@@ -499,6 +499,12 @@ public class Types
             }
             public String toString() { return "String->Boolean"; }
         } ),
+        new TypeConvertorInfo( java.math.BigDecimal.class, java.lang.Boolean.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new Boolean( ( (java.math.BigDecimal) obj).intValue() != 0 );
+            }
+            public String toString() { return "BigDecimal->Boolean"; }
+        } ),
         // Convertors to integer
         new TypeConvertorInfo( java.lang.Byte.class, java.lang.Integer.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
@@ -723,6 +729,12 @@ public class Types
                 return new BigDecimal( _paramDateFormat.format( (Date) obj ) + ".0" );
             }
             public String toString() { return "Date->BigDecimal"; }
+        } ),
+        new TypeConvertorInfo( java.lang.Boolean.class, java.math.BigDecimal.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return BigDecimal.valueOf( ( (Boolean) obj).booleanValue() ? 1 : 0 );
+            }
+            public String toString() { return "Boolean->BigDecimal"; }
         } ),
         // Convertors to string
         new TypeConvertorInfo( java.lang.Short.class, java.lang.String.class, new TypeConvertor() {
