@@ -414,6 +414,12 @@
     <description>Add support of Identity Key generator for Informix</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Haghani" given="Sasha"/>
+    <email>shaghani@activience.com</email>
+    <description>Reported bug with 1-1 Related Objects and autoStore</description>
+  </contributor>
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
