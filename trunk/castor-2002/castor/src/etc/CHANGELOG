@@ -1,5 +1,8 @@
-Version (CVS)
+Version 0.8.11
 -------------
+
+XML:    Updated Schema syntax and some of the Schema Object Model to support 
+        the W3C XML Schema Candidate Release. (kvisco)
 
 XML:    Allow the use of uninitialized collection. Castor will instiate a new 
         collection of the proper type when necessary. (seb)
