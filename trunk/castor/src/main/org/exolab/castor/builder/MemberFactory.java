@@ -279,10 +279,16 @@ public class MemberFactory {
                     XMLBindingComponent temp = new XMLBindingComponent(_config);
                     temp.setBinding(component.getBinding());
                     temp.setView(xmlType);
-                    String className = temp.getQualifiedName();
-                    if (className != null) {
-                    	xsType = new XSClass(new JClass(className));
-                        className = null;
+                    ClassInfo typeInfo = resolver.resolve(xmlType);
+                    if (typeInfo != null) {
+                        xsType = typeInfo.getSchemaType();
+                    }
+                    else {
+                        String className = temp.getQualifiedName();
+                        if (className != null) {
+                        	xsType = new XSClass(new JClass(className));
+                            className = null;
+                        }
                     }
                 }
             }//--complexType
