@@ -226,7 +226,12 @@ public final class FieldHandlerImpl
         _fieldName = field.getName() + "(" + _fieldType.getName() + ")";
         _immutable = typeInfo.isImmutable();
         _required = typeInfo.isRequired();
-        _default = typeInfo.getDefaultValue();
+        // If the field is of a primitive type or if it is required
+        // we use the default value
+        if ( _field.getType().isPrimitive() )
+            _default = typeInfo.getDefaultValue();
+        else
+            _default = null;
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
@@ -272,7 +277,12 @@ public final class FieldHandlerImpl
         _fieldName = fieldName + "(" + _fieldType.getName() + ")";
         _immutable = typeInfo.isImmutable();
         _required = typeInfo.isRequired();
-        _default = typeInfo.getDefaultValue();
+        // If the field is of a primitive type or if it is required
+        // we use the default value 
+        if ( setMethod != null && setMethod.getParameterTypes()[0].isPrimitive() )
+            _default = typeInfo.getDefaultValue();
+        else
+            _default = null;
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
@@ -417,6 +427,7 @@ public final class FieldHandlerImpl
                 else if ( _field != null )
                     _field.set( object, _default );
                 else if ( _setMethod != null ) {
+System.out.println(_setMethod);
                     if ( _deleteMethod != null )
                         _deleteMethod.invoke( object, null );
                     else
