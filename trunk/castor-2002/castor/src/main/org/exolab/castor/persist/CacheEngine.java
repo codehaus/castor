@@ -767,7 +767,7 @@ public final class CacheEngine
             sameIdentity = identity.equals( oldIdentity );
 
             // Check if object has been modified, and whether it can be stored.
-            if ( sameIdentity || ! typeInfo.handler.isModified( object, original ) )
+            if ( sameIdentity && ! typeInfo.handler.isModified( object, original ) )
                 return oid;
             try {
                 typeInfo.handler.checkValidity( object );
