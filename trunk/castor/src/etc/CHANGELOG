@@ -2,13 +2,16 @@
 Version (CVS) 
 -------------
 
-JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
-       Brought test setup for SAP DB in-line with test requirements.
-       (Werner - 20040427)
+ALL:   Reworked the mailing list guidelines. Added various sections re: cross-posting, etc.
+       (Werner - 20040502)
 
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
+       Brought test setup for SAP DB in-line with test requirements.
+       (Werner - 20040429)
+9
+JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Brought test config file for SAP DB in-line with XML Schema.
-       (Werner - 20040427)
+       (Werner - 20040429)
        
 JDO:   Fixed bug 1368 using contribution from Tim O'Brien [tobrien@discursive.com].
 	   Small (mostly syntactical) changes to src/doc/jdo-faq.xml. Added a reference
@@ -83,8 +86,6 @@ ALL:   Fixed bug 1563 using a patch from Keith
 ALL:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
        Updates Eclipse related project files.
        (Werner - 20040319)
-
->>>>>>> 1.61
 
 Version 0.9.5.3, March 09, 2004
 -------------------------------
