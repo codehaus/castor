@@ -63,8 +63,6 @@ public final class XSString extends XSPatternBase {
     private static final JType jType
         = new JClass("java.lang.String");
 
-    private String value = null;
-
     /**
      * The length facet
      */
@@ -207,13 +205,6 @@ public final class XSString extends XSPatternBase {
                 setPattern(facet.getValue());
 
         }
-    }
-    /**
-     * Returns the String value of this XSString
-     * @return thr String value of this XSString
-    **/
-    public String toString() {
-        return value;
     }
 
 } //-- XSString
