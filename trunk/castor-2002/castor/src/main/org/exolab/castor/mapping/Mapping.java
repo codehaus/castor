@@ -283,6 +283,13 @@ public class Mapping
         return resolver;
     }
 
+    /**
+     * Returns a MappingRoot which contains all loaded mapping classes and 
+     * key generators definition.
+     */
+    public MappingRoot getRoot() {
+        return _mapping;
+    }
 
     /**
      * Sets the log writer. If not null, errors and other messages
