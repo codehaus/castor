@@ -76,11 +76,11 @@ public class PersistenceEngineFactory
      * @throws MappingException The SPI factory could not support one of
      *  object types due to a mapping errot
      */
-    public PersistenceEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
+    public LockEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
                                            LogInterceptor logInterceptor )
         throws MappingException
     {
-        return new CacheEngine( mapResolver, factory, logInterceptor );
+        return new LockEngine( mapResolver, factory, logInterceptor );
     }
 
 

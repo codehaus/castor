@@ -64,6 +64,7 @@ import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
+import org.exolab.castor.mapping.xml.ManyToMany;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.DTDResolver;
 
@@ -465,6 +466,12 @@ public class Mapping
             enum = loaded.enumerateKeyGeneratorDef();
             while ( enum.hasMoreElements() ) {
                 _mapping.addKeyGeneratorDef( (KeyGeneratorDef) enum.nextElement() );
+            }
+
+            // gather "many-to-many" tags
+            enum = loaded.enumerateManyToMany();
+            while ( enum.hasMoreElements() ) {
+                _mapping.addManyToMany( (ManyToMany) enum.nextElement() );
             }
 
             // Load all the included mapping by reference

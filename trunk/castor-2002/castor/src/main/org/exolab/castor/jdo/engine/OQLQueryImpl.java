@@ -71,11 +71,8 @@ import org.exolab.castor.jdo.oql.TokenTypes;
 import org.exolab.castor.jdo.oql.ParseTreeNode;
 import org.exolab.castor.jdo.oql.ParseTreeWalker;
 import org.exolab.castor.jdo.oql.ParamInfo;
-import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.TransactionContext;
-//import org.exolab.castor.persist.QueryResults;
-import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
@@ -87,7 +84,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
-
+import org.exolab.castor.persist.OID;
 
 /**
  *
@@ -100,7 +97,7 @@ public class OQLQueryImpl
 {
 
 
-    private PersistenceEngine  _dbEngine;
+    private LockEngine  _dbEngine;
 
 
     private DatabaseImpl       _dbImpl;
@@ -146,18 +143,12 @@ public class OQLQueryImpl
 
     public void bind( Object value )
     {
-        ClassHandler handler;
 
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         if ( _fieldNum == _paramInfo.size() )
             throw new IllegalArgumentException( "Only " + _paramInfo.size() +
                                                 " fields in this query" );
-
-        handler = _dbEngine.getClassHandler( value.getClass() );
-        if ( handler != null ) {
-            value = handler.getIdentity( value );
-        }
         try {
             ParamInfo info = (ParamInfo) _paramInfo.get(new Integer( _fieldNum + 1 ));
             
@@ -261,7 +252,7 @@ public class OQLQueryImpl
         Parser parser = new Parser(lexer);
         ParseTreeNode parseTree = parser.getParseTree();
 
-        _dbEngine = _dbImpl.getPersistenceEngine(); 
+        _dbEngine = _dbImpl.getLockEngine(); 
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
@@ -297,14 +288,11 @@ public class OQLQueryImpl
             {
                 int paramIndex = ( (Integer) f.nextElement() ).intValue();
                 _bindTypes[ paramIndex - 1 ] = f.getClass();
-            }        
+            }
         }
-         
+
     }
 
-    /**
-     * The simple parser for CALL-type queries (using stored procedured)
-     */
     public void createCall( String oql ) throws QueryException {
         StringBuffer sql;
         int as;
@@ -389,12 +377,12 @@ public class OQLQueryImpl
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = _dbImpl.getPersistenceEngine();
+        _dbEngine = _dbImpl.getLockEngine(); 
         if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
-    
-   
+
+
     public QueryResults execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
@@ -425,7 +413,7 @@ public class OQLQueryImpl
     {
         org.exolab.castor.persist.QueryResults      results;
         SQLEngine         engine;
-        
+
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         if (_results != null) {
@@ -436,26 +424,24 @@ public class OQLQueryImpl
                 case ParseTreeWalker.PARENT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT:
                 case ParseTreeWalker.DEPENDANT_OBJECT_VALUE:
-                    
-                    //System.out.println("Executing object query");
-                    
-                    engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-                    if ( _expr != null ) {
-                        _query = engine.createQuery( _expr, _bindTypes, accessMode );
-                    } else {
-                        _query = engine.createCall( _spCall, _bindTypes );
-                        if (_query == null) 
-                            throw new QueryException( Messages.message( "query.callNotSupported" ) );
-                    }
-                    if ( _bindValues != null ) {
-                        for ( int i = 0 ; i < _bindValues.length ; ++i )
-                            _query.setParameter( i, _bindValues[ i ] );
+
+                    try {
+                        engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+                        if ( _expr != null ) {
+                            _query = engine.createQuery( _expr, _bindTypes, accessMode );
+                        } else {
+                            _query = engine.createCall( _spCall, _bindTypes );
+                        }
+                        if ( _bindValues != null ) {
+                            for ( int i = 0 ; i < _bindValues.length ; ++i )
+                                _query.setParameter( i, _bindValues[ i ] );
+                        }
+                    } catch ( QueryException except ) {
+                        throw new QueryException( except.getMessage() );
                     }
                     results = _dbImpl.getTransaction().query( _dbEngine, _query, accessMode );
                     _fieldNum = 0;
 
-                    // System.out.println( _projectionType );
-                    
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
                       _results = new OQLEnumeration( results );
                     else
@@ -464,20 +450,18 @@ public class OQLQueryImpl
                 case ParseTreeWalker.DEPENDANT_VALUE:
                 case ParseTreeWalker.AGGREGATE:
                 case ParseTreeWalker.FUNCTION:
-                
-                    //System.out.println("Executing simple query");
 
                     SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
                     _results =  sqe.execute( _expr, _bindValues);
-                    
+
             }
         } catch ( PersistenceException except ) {
             throw except;
         }
         return _results;
     }
-        
-    
+
+
     public void close()
     {
         if ( _query != null ) {
@@ -491,18 +475,18 @@ public class OQLQueryImpl
     }
 
 
-    protected void finalize() throws Throwable
+    protected void finalize()
+        throws Throwable
     {
         close();
     }
-
 
 
     static class OQLEnumeration
         implements QueryResults, Enumeration
     {
 
-        
+
         private Object                 _lastObject;
 
         private Vector                 _pathInfo;
@@ -516,13 +500,12 @@ public class OQLQueryImpl
         OQLEnumeration( org.exolab.castor.persist.QueryResults results,
                         Vector pathInfo, JDOClassDescriptor clsDesc )
         {
-            //System.out.println( "OQLEnumeration initialized with pathInfo and class." );
             _results = results;
             _pathInfo = pathInfo;
             _classDescriptor = clsDesc;
         }
         
-        
+
         OQLEnumeration( org.exolab.castor.persist.QueryResults results )
         {
             _results = results;
@@ -552,31 +535,31 @@ public class OQLQueryImpl
         public boolean hasMore( boolean skipError )
             throws PersistenceException
         {
-            Object identity;
+            Object[] identities;
 
             if ( _lastObject != null )
                 return true;
             if ( _results == null )
                 return false;
             try {
-                identity = _results.nextIdentity();
-                while ( identity != null ) {
+                identities = _results.nextIdentities();
+                while ( identities != null ) {
                     try {
                         _lastObject = _results.fetch();
                         if ( _lastObject != null )
                             break;
                     } catch ( ObjectNotFoundException except ) {
                         // Object not found, deleted, etc. Just skip to next one.
-                        identity = _results.nextIdentity();
+                        identities = _results.nextIdentities();
                     } catch ( PersistenceException except ) {
                         // Error occured. If not throwing exception just skip to
                         // next object.
-                        identity = _results.nextIdentity();
+                        identities = _results.nextIdentities();
                         if ( ! skipError )
                             throw except;
                     }
                 }
-                if ( identity == null ) {
+                if ( identities == null ) {
                     _results.close();
                     _results = null;
                 }
@@ -612,7 +595,7 @@ public class OQLQueryImpl
         private Object next( boolean skipError )
             throws PersistenceException, NoSuchElementException
         {
-            Object identity;
+            Object[] identities;
 
             if ( _lastObject != null ) {
                 Object result;
@@ -627,8 +610,8 @@ public class OQLQueryImpl
             if ( _results == null )
                 throw new NoSuchElementException();
             try {
-                identity = _results.nextIdentity();
-                while ( identity != null ) {
+                identities = _results.nextIdentities();
+                while ( identities != null ) {
                     try {
                         Object result;
                         
@@ -646,13 +629,13 @@ public class OQLQueryImpl
                         if ( ! skipError )
                             throw except;
                     }
-                    identity = _results.nextIdentity();
+                    identities = _results.nextIdentities();
                 }
-                if ( identity == null ) {
+                if ( identities == null ) {
                     _results.close();
                     _results = null;
                 }
-            } catch ( PersistenceException except ) { 
+            } catch ( PersistenceException except ) {
                 _results.close();
                 _results = null;
                 if ( ! skipError )
@@ -673,10 +656,7 @@ public class OQLQueryImpl
         protected void finalize()
             throws Throwable
         {
-            if ( _results != null ) {
-                _results.close();
-                _results = null;
-            }
+            close();
         }
 
 

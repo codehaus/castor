@@ -49,7 +49,6 @@ package org.exolab.castor.jdo.drivers;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
@@ -77,7 +76,6 @@ public final class DB2QueryExpression
         Enumeration  enum;
         boolean      first;
         Hashtable    tables;
-        Vector       done = new Vector();
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
@@ -99,20 +97,22 @@ public final class DB2QueryExpression
         // Use outer join syntax for all outer joins. Inner joins come later.
         tables = (Hashtable) _tables.clone();
         first = true;
-        // gather all outer joins with the same left part
         for ( int i = 0 ; i < _joins.size() ; ++i ) {
             Join join;
 
             join = (Join) _joins.elementAt( i );
 
-            if ( ! join.outer || done.contains( join.leftTable ) ) 
+            if ( ! join.outer ) 
                 continue;
             if ( first )
                 first = false;
             else
                 sql.append( JDBCSyntax.TableSeparator );
             sql.append(  _factory.quoteName( join.leftTable ) );
-            sql.append( JDBCSyntax.LeftJoin );
+            if ( join.outer )
+                sql.append( JDBCSyntax.LeftJoin );
+            else
+                sql.append( JDBCSyntax.InnerJoin );
             sql.append(  _factory.quoteName( join.rightTable ) ).append( JDBCSyntax.On );
             for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                 if ( j > 0 )
@@ -125,25 +125,6 @@ public final class DB2QueryExpression
             
             tables.remove( join.leftTable );
             tables.remove( join.rightTable );
-            for ( int k = i + 1 ; k < _joins.size() ; ++k ) {
-                Join join2;
-
-                join2 = (Join) _joins.elementAt( k );
-                if ( ! join.leftTable.equals( join2.leftTable ) ) 
-                    continue;        
-                sql.append( JDBCSyntax.LeftJoin );
-                sql.append(  _factory.quoteName( join2.rightTable ) ).append( JDBCSyntax.On );
-                for ( int j = 0 ; j < join2.leftColumns.length ; ++j ) {
-                    if ( j > 0 )
-                        sql.append( JDBCSyntax.And );
-                    sql.append( _factory.quoteName( join2.leftTable + JDBCSyntax.TableColumnSeparator +
-                                                    join2.leftColumns[ j ] ) ).append( OpEquals );
-                    sql.append( _factory.quoteName( join2.rightTable + JDBCSyntax.TableColumnSeparator +
-                                                    join2.rightColumns[ j ] ) );
-                }
-                tables.remove( join2.rightTable );
-            }
-            done.addElement( join.leftTable );
         }
         enum = tables.elements();
         while ( enum.hasMoreElements() ) {

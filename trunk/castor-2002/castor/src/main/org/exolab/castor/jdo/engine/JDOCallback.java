@@ -92,14 +92,14 @@ public class JDOCallback
     public void created( Object object )
         throws Exception
     {
-        ( (Persistent) object ).jdoCreate();
+        ( (Persistent) object ).jdoAfterCreate();
     }
 
 
     public void removing( Object object )
         throws Exception
     {
-        ( (Persistent) object ).jdoRemove();
+        ( (Persistent) object ).jdoBeforeRemove();
     }
 
 

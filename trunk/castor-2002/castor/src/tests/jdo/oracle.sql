@@ -1,3 +1,4 @@
+
 drop table   test_table;
 create table test_table (
   id      int           not null,
@@ -7,6 +8,162 @@ create table test_table (
 create unique index test_table_pk
    on test_table ( id );
 grant all on test_table to test;
+
+-- test many to many
+drop table test_group_person;
+create table test_group_person (
+  gid int         not null,
+  pid int        not null 
+);
+create index test_group_person_p_pk on test_group_person ( pid );
+create index test_group_person_g_pk on test_group_person ( gid );
+grant all on test_group_person to test;
+
+drop table test_many_group;
+create table test_many_group (
+  gid       int           not null,
+  value    varchar(100)  not null
+);
+create unique index test_many_group_pk on test_many_group ( gid );
+grant all on test_many_group to test;
+
+drop table test_many_person;
+create table test_many_person (
+   pid      int          not null,
+   value   varchar(100) not null,
+   helloworld varchar(100) null,
+   sthelse varchar(100) null
+);
+create unique index test_many_person_pk on test_many_person ( pid );
+grant all on test_many_person to test;
+
+
+-- test multiple pk
+drop table test_pks_person;
+create table test_pks_person (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  bday  date null
+);
+create unique index test_pks_person_pk on test_pks_person( fname, lname );
+grant all on test_pks_person to test;
+
+drop table test_pks_employee;
+create table test_pks_employee (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  start_date date null
+);
+create unique index test_pks_person_employee_pk on test_pks_employee( fname, lname );
+grant all on test_pks_employee to test;
+
+drop table test_pks_payroll;
+create table test_pks_payroll (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+);
+create unique index test_pks_payroll_fk on test_pks_payroll( fname, lname );
+create unique index test_pks_payroll_pk on test_pks_payroll( id );
+
+drop table test_pks_address;
+create table test_pks_address (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  street varchar(30)    null,
+  city  varchar(30)    null,
+  state varchar(2)     null,
+  zip varchar(6)       null
+);
+create unique index test_pks_address_pk on test_pks_address( id );
+grant all on test_pks_address to test;
+
+drop table test_pks_contract;
+create table test_pks_contract (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  policy_no int        not null,
+  contract_no int      not null,
+  c_comment varchar(90)  null
+);
+create unique index test_pks_contract_fk on test_pks_contract( fname, lname );
+create unique index test_pks_contract_pk on test_pks_contract( policy_no, contract_no );
+grant all on test_pks_contract to test;
+
+drop table test_pks_category_contract;
+create table test_pks_category_contract (
+  policy_no int        not null,
+  contract_no int      not null,
+  cate_id int          not null
+);
+
+drop table test_pks_category;
+create table test_pks_category (
+  id  int              not null,
+  name varchar(20)     not null
+);
+create unique index test_pks_category_pk on test_pks_category( id );
+
+-- base class
+drop table test_rel_person;
+
+create table test_rel_person (
+  pid    int             not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  bday  date 
+);
+
+
+create unique index test_rel_person_pk on test_rel_person( pid );
+
+
+-- extend base class (person)
+drop table test_rel_employee;
+
+create table test_rel_employee (
+  pid    int             not null,
+  start_date date null
+);
+
+create unique index test_rel_employee_pk on test_rel_employee( pid );
+
+
+-- depends class of person
+drop table test_rel_address;
+
+create table test_rel_address (
+  pid    int             not null,
+  id  int               not null,
+  street varchar(30) null,
+  city  varchar(30) null,
+  state varchar(30) null,
+  zip varchar(30) null
+);
+
+create index test_rel_address_fk on test_rel_address( pid );
+
+create unique index test_rel_address_pk on test_rel_address( id );
+
+
+-- depend class of employee
+drop table test_rel_payroll;
+
+create table test_rel_payroll (
+  pid    int             not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+);
+
+create index test_rel_payroll_fk on test_rel_payroll( pid );
+
+create unique index test_rel_payroll_pk on test_rel_payroll( id );
+
+-- end for test_relations
 
 
 -- test_table_ex
@@ -21,6 +178,20 @@ create table test_table_ex (
 create unique index test_table_ex_pk on test_table_ex ( id );
 
 grant all on test_table_ex to test;
+
+
+-- test_table_ex
+drop table test_table_extends;
+
+create table test_table_extends (
+  id      int          not null,
+  value3  varchar(200) null,
+  value4  varchar(200) null
+);
+
+create unique index test_table_extends_pk on test_table_extends ( id );
+
+grant all on test_table_extends to test;
 
 
 -- test_race
@@ -39,7 +210,7 @@ grant all on test_race to test;
 drop table   test_master;
 create table test_master (
   id       numeric(10,0)    not null,
-  value1     varchar(200)  not null,
+  value     varchar(200)  not null,
   group_id numeric(10,0)  null
 );
 create unique index test_master_pk
@@ -51,7 +222,7 @@ drop table   test_detail;
 create table test_detail (
   detail_id  numeric(10,0)  not null,
   master_id  numeric(10,0)  not null,
-  value1      varchar(200)  not null
+  value      varchar(200)  not null
 );
 create unique index test_detail_pk
   on test_detail ( detail_id );
@@ -63,7 +234,7 @@ drop table test_detail2;
 create table test_detail2 (
   detail2_id  numeric(10,0)  not null,
   detail_id  numeric(10,0)  not null,
-  value1      varchar(200 )  not null
+  value      varchar(200 )  not null
 );
 create unique index test_detail2_pk on test_detail2 ( detail2_id );
 grant all on test_detail2 to test;
@@ -72,29 +243,11 @@ grant all on test_detail2 to test;
 drop table   test_group;
 create table test_group (
   id     numeric(10,0)  not null,
-  value1  varchar(200)  not null
+  value  varchar(200)  not null
 );
 create unique index test_group_pk
    on test_group ( id );
 grant all on test_group to test;
-
-
--- test_smaster
-drop table test_smaster;
-create table test_smaster (
-  id       numeric(10,0)    not null
-);
-create unique index test_smaster_pk on test_smaster ( id );
-
-
--- test_sdetail
-drop table test_sdetail;
-create table test_sdetail (
-  detail_id  numeric(10,0)  not null,
-  master_id  numeric(10,0)  not null
-);
-create unique index test_sdetail_pk on test_sdetail ( detail_id );
-create index test_sdetail_fk on test_sdetail ( master_id );
 
 
 drop table   test_types;
@@ -106,7 +259,6 @@ create table test_types (
   long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
-  dbl_val  numeric(14,2)  not null,
   int_date integer        null,
   str_time char(12)       null,
   num_date numeric(17,0)  null
@@ -125,6 +277,24 @@ create unique index test_keygen_pk
   on test_keygen ( id );
 grant all on test_keygen to test;
 
+
+-- list_types
+drop table list_types;
+create table list_types (
+  o_char  CHAR         null,
+  o_nchar NCHAR        null,
+  o_varchar VARCHAR(20) null,
+  o_varchar2 VARCHAR2(20) null,
+  o_clob CLOB null,
+  o_long LONG null,
+  o_number NUMBER null,
+  o_int   INT null,
+  o_date DATE null,
+  o_raw   RAW(20)      null,
+--  o_longraw LONG RAW    null,
+  o_blob  BLOB         null,
+  o_bfile BFILE        null
+);
 
 -- test_keygen_ext
 drop table test_keygen_ext;
@@ -156,7 +326,7 @@ create table test_persistent (
   id       integer         not null,
   ctime    date            not null,
   mtime    date            null,
-  value1    varchar(200)    not null,
+  value    varchar(200)    not null,
   parent_id integer        null,
   group_id numeric(10,0)   not null
 );

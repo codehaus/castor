@@ -66,8 +66,8 @@ import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.persist.ClassHandler;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.ClassMolder;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.Persistence;
@@ -125,7 +125,7 @@ public class DatabaseRegistry
     /**
      * The presistence engine for this database source.
      */
-    private PersistenceEngine _engine;
+    private LockEngine _engine;
 
 
     /**
@@ -205,12 +205,6 @@ public class DatabaseRegistry
     }
 
 
-    public DataSource getDataSource()
-    {
-        return _dataSource;
-    }
-
-
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver,
                                                   LogInterceptor logInterceptor, ClassLoader loader )
         throws MappingException
@@ -250,8 +244,6 @@ public class DatabaseRegistry
             // configuration file, relative to the configuration file.
             // Fail if cannot load the mapping for whatever reason.
             mapping = new Mapping( loader );
-            if ( logInterceptor != null )
-                  mapping.setLogWriter( logInterceptor.getPrintWriter() );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
             if ( source.getSystemId() != null )
@@ -283,7 +275,7 @@ public class DatabaseRegistry
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );
                 }
-                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
                                             database.getDriver().getUrl(), props, logInterceptor );
             } else if ( database.getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
@@ -294,7 +286,7 @@ public class DatabaseRegistry
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
-                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
                                             ds, logInterceptor );
             } else if ( database.getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
@@ -311,7 +303,7 @@ public class DatabaseRegistry
                 if ( ! ( ds instanceof DataSource ) )
                     throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
 
-                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
+                dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
                                             (DataSource) ds, logInterceptor );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
@@ -338,7 +330,7 @@ public class DatabaseRegistry
     }
 
 
-    static PersistenceEngine getPersistenceEngine( Class objType )
+    static LockEngine getLockEngine( Class objType )
     {
         Enumeration      enum;
         DatabaseRegistry dbs;
@@ -353,13 +345,13 @@ public class DatabaseRegistry
     }
 
 
-    static PersistenceEngine getPersistenceEngine( DatabaseRegistry dbs )
+    static LockEngine getLockEngine( DatabaseRegistry dbs )
     {
         return dbs._engine;
     }
 
 
-    static DatabaseRegistry getDatabaseRegistry( Object obj )
+    public static DatabaseRegistry getDatabaseRegistry( Object obj )
     {
         Enumeration      enum;
         DatabaseRegistry dbs;
@@ -383,7 +375,7 @@ public class DatabaseRegistry
     }
 
 
-    static Connection createConnection( PersistenceEngine engine )
+    static Connection createConnection( LockEngine engine )
         throws SQLException
     {
         DatabaseRegistry dbs;

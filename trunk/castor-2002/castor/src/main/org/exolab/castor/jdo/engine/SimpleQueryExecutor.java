@@ -99,11 +99,9 @@ public class SimpleQueryExecutor
     
     try {
     
-      _conn = DatabaseRegistry.createConnection( _dbImpl.getPersistenceEngine() );
-
-      System.out.println( expr.getStatement(false) );
-
+      _conn = DatabaseRegistry.createConnection( _dbImpl.getLockEngine() );
       _stmt = _conn.prepareStatement( expr.getStatement(false) );
+
       if ( bindValues != null ) {
         for ( int i = 0 ; i < bindValues.length ; ++i ) {
           _stmt.setObject( i + 1, bindValues[ i ] );

@@ -62,12 +62,10 @@ import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.PersistenceExceptionImpl;
-import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-
+import org.exolab.castor.util.Messages;
 
 /**
  * PersistenceQuery implementation for CallableStatements
@@ -154,7 +152,7 @@ final class MultiRSCallQuery implements PersistenceQuery
             _stmt.execute();
             _rs = _stmt.getResultSet();
         } catch ( SQLException except ) {
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
     }
 
@@ -173,7 +171,7 @@ final class MultiRSCallQuery implements PersistenceQuery
     }
 
 
-    public Object nextIdentity( Object identity )
+    public Object[] nextIdentities( Object[] identities )
         throws PersistenceException
     {
         try {
@@ -181,20 +179,20 @@ final class MultiRSCallQuery implements PersistenceQuery
                 if ( !nextRow() )
                     return null;
                 _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
-                return _lastIdentity;
+                return new Object[] { _lastIdentity };
             }
 
-            while ( _lastIdentity.equals( identity ) ) {
+            while ( _lastIdentity.equals( identities[0] ) ) {
                 if ( ! nextRow() ) {
                     _lastIdentity = null;
                     return null;
                 }
                 _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
             }
-            return _lastIdentity;
+            return new Object[] { _lastIdentity };
         } catch ( SQLException except ) {
             _lastIdentity = null;
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
     }
 
@@ -216,7 +214,7 @@ final class MultiRSCallQuery implements PersistenceQuery
     }
 
 
-    public Object fetch( Object[] fields, Object identity )
+    public Object fetch( Object[] fields, Object[] identities )
         throws ObjectNotFoundException, PersistenceException
     {
         Object stamp = null;
@@ -231,7 +229,7 @@ final class MultiRSCallQuery implements PersistenceQuery
             else
                 _lastIdentity = null;
         } catch ( SQLException except ) {
-            throw new PersistenceExceptionImpl( except );
+            throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
         return stamp;
     }

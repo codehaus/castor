@@ -1,10 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
- * $Id$
- *
- * Note: This file has been modified by hand.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -17,10 +15,12 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-
+import org.exolab.castor.xml.validators.*;
 
 /**
  * 
@@ -53,37 +53,33 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
     //----------------/
 
     public XmlDescriptor() {
-        xmlName = "bind-xml";
+        xmlName = "xml";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
         attributes = new XMLFieldDescriptorImpl[4];
-        //-- _node
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_node", "node", NodeType.Attribute);
+        //-- _match
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_match", "match", NodeType.Attribute);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 Xml target = (Xml) object;
-                return target.getNode();
+                return target.getMatch();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     Xml target = (Xml) object;
-                    target.setNode( (java.lang.String) value);
+                    target.setMatch( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return null;
@@ -92,45 +88,12 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         desc.setHandler(handler);
         attributes[0] = desc;
         
-        //-- validation code for: _node
+        //-- validation code for: _match
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
-        desc.setValidator(fieldValidator);
-        
-        //-- _type
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Xml target = (Xml) object;
-                return target.getType();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Xml target = (Xml) object;
-                    target.setType( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
-            public Object newInstance( Object parent ) {
-                return new java.lang.String();
-            }
-        } );
-        desc.setHandler(handler);
-        attributes[1] = desc;
-        
-        //-- validation code for: _type
-        fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _name
@@ -153,9 +116,37 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[1] = desc;
+        
+        //-- validation code for: _name
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        desc.setValidator(fieldValidator);
+        
+        //-- _type
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
             {
-                setValue( object, null );
+                Xml target = (Xml) object;
+                return target.getType();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Xml target = (Xml) object;
+                    target.setType( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -164,34 +155,31 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         desc.setHandler(handler);
         attributes[2] = desc;
         
-        //-- validation code for: _name
+        //-- validation code for: _type
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-
-        //-- _match
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_match", "match", NodeType.Attribute);
+        
+        //-- _node
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_node", "node", NodeType.Attribute);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 Xml target = (Xml) object;
-                return target.getMatch();
+                return target.getNode();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     Xml target = (Xml) object;
-                    target.setMatch( (java.lang.String) value);
+                    target.setNode( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
-            }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return null;
@@ -200,8 +188,12 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         desc.setHandler(handler);
         attributes[3] = desc;
         
-        //-- validation code for: _match
+        //-- validation code for: _node
         fieldValidator = new FieldValidator();
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors

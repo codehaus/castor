@@ -47,12 +47,13 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.ClassHandler;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.ObjectNotPersistentExceptionImpl;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.util.Messages;
 
 /**
  * The utility class which adds to the standard JDO functionality
@@ -71,7 +72,7 @@ import org.exolab.castor.jdo.PersistenceException;
 public class LongTransactionSupport 
 {
     
-    private final PersistenceEngine _dbEngine;
+    private final LockEngine _dbEngine;
     private final TransactionContext _tx;
     
 
@@ -82,7 +83,7 @@ public class LongTransactionSupport
     public LongTransactionSupport( Database db ) 
         throws PersistenceException
     {
-        _dbEngine = ((DatabaseImpl) db).getPersistenceEngine();
+        _dbEngine = ((DatabaseImpl) db).getLockEngine();
         _tx = ((DatabaseImpl) db).getTransaction();
     }
 
@@ -94,11 +95,11 @@ public class LongTransactionSupport
         throws PersistenceException
     {
         //TransactionContext tx;
-        ClassHandler handler;
+        ClassMolder handler;
 
         //tx = _dbImpl.getTransaction();
-        handler = _dbEngine.getClassHandler( target.getClass() );
-        handler.copyObject( source, target );
+        handler = _dbEngine.getClassMolder( target.getClass() );
+        //handler.copyObject( source, target );
     }
     
     /**
@@ -108,13 +109,14 @@ public class LongTransactionSupport
     public Object updateFromCopy(Object object) 
         throws PersistenceException
     {
-        ClassHandler handler;
+        ClassMolder handler;
         Object result;
 
-        handler = _dbEngine.getClassHandler( object.getClass() );
-        result = handler.fillFromCopy( object, _tx, _dbEngine );
+        handler = _dbEngine.getClassMolder( object.getClass() );
+        result = null;
+        //handler.fillFromCopy( object, _tx, _dbEngine );
         if ( result == object ) 
-            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
+            throw new ObjectNotPersistentException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
         return result;
     }
     

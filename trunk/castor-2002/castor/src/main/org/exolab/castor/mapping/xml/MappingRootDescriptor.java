@@ -1,10 +1,8 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
- * using an XML Schema.
- * $Id$
- *
- * Note: This file has been modified by hand.
+ * <a href="http://castor.exolab.org">Castor 0.8.7</a>, using an
+ * XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -17,10 +15,12 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.validators.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.*;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
-
+import org.exolab.castor.xml.validators.*;
 
 /**
  * 
@@ -62,7 +62,7 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         attributes = new XMLFieldDescriptorImpl[0];
         //-- initialize element descriptors
         
-        elements = new XMLFieldDescriptorImpl[4];
+        elements = new XMLFieldDescriptorImpl[5];
         //-- _description
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
         desc.setImmutable(true);
@@ -84,10 +84,6 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object )
-            {
-                setValue( object, null );
-            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -98,7 +94,10 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         
         //-- validation code for: _description
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new StringValidator());
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
         //-- _includeList
@@ -121,17 +120,6 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object ) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.removeAllInclude();
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
             public Object newInstance( Object parent ) {
                 return new Include();
             }
@@ -141,6 +129,39 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         elements[1] = desc;
         
         //-- validation code for: _includeList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(0);
+        desc.setValidator(fieldValidator);
+        
+        //-- _manyToManyList
+        desc = new XMLFieldDescriptorImpl(ManyToMany.class, "_manyToManyList", "many-to-many", NodeType.Element);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                MappingRoot target = (MappingRoot) object;
+                return target.getManyToMany();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    MappingRoot target = (MappingRoot) object;
+                    target.addManyToMany( (ManyToMany) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new ManyToMany();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setMultivalued(true);
+        elements[2] = desc;
+        
+        //-- validation code for: _manyToManyList
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
@@ -165,24 +186,13 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.removeAllClassMapping();
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
             public Object newInstance( Object parent ) {
                 return new ClassMapping();
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(true);
-        elements[2] = desc;
+        elements[3] = desc;
         
         //-- validation code for: _classMappingList
         fieldValidator = new FieldValidator();
@@ -209,24 +219,13 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public void resetValue( Object object ) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MappingRoot target = (MappingRoot) object;
-                    target.removeAllKeyGeneratorDef();
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
             public Object newInstance( Object parent ) {
                 return new KeyGeneratorDef();
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(true);
-        elements[3] = desc;
+        elements[4] = desc;
         
         //-- validation code for: _keyGeneratorDefList
         fieldValidator = new FieldValidator();

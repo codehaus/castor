@@ -48,6 +48,7 @@ package org.exolab.castor.mapping.loader;
 
 
 import java.util.Vector;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -86,10 +87,11 @@ final class CollectionHandlers
         if ( _info == null )
             loadInfo();
         for ( int i = 0 ; i < _info.length ; ++i )
-            if ( _info[ i ].shortName.equalsIgnoreCase( name ) ||
+            if ( _info[ i ].shortName.equals( name ) ||
                  _info[ i ].javaClass.getName().equals( name ) )
                 return _info[ i ].javaClass;
-        throw new MappingException( "mapping.noCollectionHandler", name );
+        //throw new MappingException( "mapping.noCollectionHandler", name );
+        return Collection.class;
     }
 
 

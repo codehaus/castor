@@ -66,8 +66,8 @@ import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
+import org.exolab.castor.mapping.xml.CacheTypeMapping;
 import org.exolab.castor.mapping.xml.Param;
-import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -127,7 +127,6 @@ public class JDOMappingLoader
     {
         ClassDescriptor   clsDesc;
         String            keyGenName;
-        CacheType         cacheType;
         KeyGeneratorDescriptor keyGenDesc;
         
         // If no SQL information for class, ignore it. JDO only
@@ -183,9 +182,17 @@ public class JDOMappingLoader
             }
         }
 
-        cacheType = new CacheType( clsMap.getCacheTypeMapping() );
+        JDOClassDescriptor jd;
+        CacheTypeMapping cacheMapping = clsMap.getCacheTypeMapping();
+        if ( cacheMapping != null ) 
+            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+                    keyGenDesc, cacheMapping.getType(), cacheMapping.getCapacity() );
+        else 
+            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+                    keyGenDesc, null, 0 );
 
-        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), keyGenDesc, cacheType );
+        jd.setMapping( clsMap );
+        return jd;
     }
 
 
@@ -233,26 +240,36 @@ public class JDOMappingLoader
         
         // Create a JDO field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
+
+        sqlName = fieldMap.getSql().getName();
+        /*
         if ( fieldMap.getSql().getName() == null )
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
         else
             sqlName = fieldMap.getSql().getName();
+        */
+        /*
         if ( fieldMap.getSql().getType() == null  )
             sqlType = fieldDesc.getFieldType();
         else
+            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() ); */
+        if ( fieldMap.getSql().getType() != null  ) {
             sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
+        } else {
+            try {
+                sqlType = Types.typeFromName( this.getClass().getClassLoader(), fieldMap.getType() );
+            } catch ( ClassNotFoundException e ) {
+                throw new MappingException( "SQLType not found, nor field type of, "+fieldMap.getType()+" convertable to sql type!" );
+            }
+        }
         if ( _factory != null ) {
             sqlType = _factory.adjustSqlType( sqlType );
         }
-        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sqlType,
+        return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, SQLTypes.getSQLType(sqlType),
             ! IgnoreDirty.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
     }
 
-    /**
-     * @param param The persistenceFactory which is used to adjust
-     * SQL types.
-     */
     public void loadMapping( MappingRoot mapping, Object param )
         throws MappingException
     {
@@ -275,7 +292,7 @@ public class JDOMappingLoader
             _keyGenDefs.put( name, keyGenDef );
         }
 
-        super.loadMapping( mapping, param );
+        super.loadMapping( mapping, null );
 
         _keyGenDefs = null;
         _keyGenDescs = null;

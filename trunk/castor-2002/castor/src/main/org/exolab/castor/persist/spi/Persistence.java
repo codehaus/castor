@@ -111,7 +111,7 @@ public interface Persistence
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object create( Object conn, Object[] fields, Object identity )
+    public Object[] create( Object conn, Object[] fields, Object[] identities )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -133,7 +133,7 @@ public interface Persistence
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, Object[] fields, Object identity,
+    public Object load( Object conn, Object[] fields, Object[] identities,
                         AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
@@ -168,7 +168,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( Object conn, Object[] fields, Object identity,
+    public Object store( Object conn, Object[] fields, Object[] identities,
                          Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
@@ -184,7 +184,7 @@ public interface Persistence
      * @param identity The object's identity
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Object conn, Object identity )
+    public void delete( Object conn, Object[] identities )
         throws PersistenceException;
     
 
@@ -203,7 +203,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( Object conn, Object identity )
+    public void writeLock( Object conn, Object[] identities )
         throws ObjectDeletedException, PersistenceException;
     
 
@@ -224,5 +224,15 @@ public interface Persistence
         throws QueryException;
 
 
+    
+	public Persistence.FieldInfo[] getInfo();
+
+    public interface FieldInfo {
+		public boolean isComplex();
+
+		public boolean isPersisted();
+
+		public String getFieldName();
+    }
 }
 

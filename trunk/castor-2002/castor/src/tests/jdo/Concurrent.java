@@ -55,6 +55,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -89,7 +90,7 @@ public class Concurrent
     public Concurrent( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC01", "Concurrent access" );
+        super( "TC02", "Concurrent access" );
         _category = (JDOCategory) category;
     }
 
@@ -113,7 +114,6 @@ public class Concurrent
         try {
             _db = _category.getDatabase( stream.verbose() );
             _conn = _category.getJDBCConnection(); 
-            _conn.setAutoCommit( false );
 
             stream.writeVerbose( "Running in access mode shared" );
             if ( ! runOnce( stream, Database.Shared ) )
@@ -127,7 +127,6 @@ public class Concurrent
             if ( ! runOnce( stream, Database.DbLocked ) )
                 result = false;
             stream.writeVerbose( "" );
-
             _db.close();
             _conn.close();
         } catch ( Exception except ) {
@@ -146,7 +145,7 @@ public class Concurrent
         try {
             OQLQuery      oql;
             TestObject    object;
-            Enumeration   enum;
+            QueryResults   enum;
 
             // Open transaction in order to perform JDO operations
             _db.begin();
@@ -157,8 +156,8 @@ public class Concurrent
             oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
+            if ( enum.hasMore() ) {
+                object = (TestObject) enum.next();
                 stream.writeVerbose( "Retrieved object: " + object );
                 object.setValue1( TestObject.DefaultValue1 );
                 object.setValue2( TestObject.DefaultValue2 );
@@ -173,17 +172,39 @@ public class Concurrent
             // Open a new transaction in order to conduct test
             _db.begin();
             oql.bind( new Integer( TestObject.DefaultId ) );
-            object = (TestObject) oql.execute(  accessMode ).nextElement();
+            object = (TestObject) oql.execute( accessMode ).nextElement();
             object.setValue1( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
             if ( accessMode != Database.DbLocked ) {
                 _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
-                                             "' WHERE id=" + TestObject.DefaultId );
-                _conn.commit();
-                stream.writeVerbose( "Updated test object from JDBC" );
+                                                 "' WHERE id=" + TestObject.DefaultId );
+                stream.writeVerbose( "OK: Updated test object from JDBC" );
+            } else {
+                Thread th = new Thread() {
+                    public void run() {
+                        try {
+                            _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
+                                                             "' WHERE id=" + TestObject.DefaultId );
+                        } catch (Exception ex) {
+                        }
+                    }
+                };
+                th.start();
+                synchronized (this) {
+                    try {
+                        wait(5000);
+                        if (th.isAlive()) {
+                            th.interrupt();
+                            stream.writeVerbose( "OK: Cannot update test object from JDBC" );
+                        } else {
+                            stream.writeVerbose( "Error: Updated test object from JDBC" );
+                        }
+                    } catch (InterruptedException ex) {
+                    }
+                }
             }
-        
+
             // Commit JDO transaction, this should report object modified
             // exception
             stream.writeVerbose( "Committing JDO update: dirty checking field modified" );
@@ -199,6 +220,9 @@ public class Concurrent
                 try {
                     _db.commit();
                     stream.writeVerbose( "OK: ObjectModifiedException not thrown" );
+                    // After _db.commit the concurrent update will be performed, undo it.
+                    _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDOValue +
+                                                     "' WHERE id=" + TestObject.DefaultId );
                 } catch ( ObjectModifiedException except ) {
                     result = false;
                     stream.writeVerbose( "Error: ObjectModifiedException thrown" );
@@ -208,17 +232,16 @@ public class Concurrent
             // Open a new transaction in order to conduct test
             _db.begin();
             oql.bind( new Integer( TestObject.DefaultId ) );
-            object = (TestObject) oql.execute(  accessMode ).nextElement();
+            object = (TestObject) oql.execute( accessMode ).nextElement();
             object.setValue2( JDOValue );
             
             // Perform direct JDBC access and override the value of that table
             if ( accessMode != Database.DbLocked ) {
                 _conn.createStatement().execute( "UPDATE test_table SET value2='" + JDBCValue +
                                                  "' WHERE id=" + TestObject.DefaultId );
-                _conn.commit();
                 stream.writeVerbose( "Updated test object from JDBC" );
             }
-
+        
             // Commit JDO transaction, this should report object modified
             // exception
             stream.writeVerbose( "Committing JDO update: no dirty checking field not modified" );

@@ -119,18 +119,20 @@ public class TestDetail2
 
     public String toString()
     {
-        return _id + " / " + _value + " / " + _detail.getId();
+        return _id + " / " + _value + " / " + (_detail==null?0:_detail.getId());
     }
 
+
+    public int hashCode() {
+        return _id;
+    }
 
     public boolean equals( Object other )
     {
         if ( other == this )
             return true;
         if ( other != null && other instanceof TestDetail2 ) {
-            if ( ( (TestDetail2) other )._id == _id &&
-                 ( (TestDetail2) other )._value.equals( _value ) )
-                return true;
+           return ( ( (TestDetail2) other )._id == _id );
         }
         return false;
     }

@@ -78,13 +78,15 @@ import org.exolab.exceptions.CWClassConstructorException;
  */
 public class CacheLeakage extends CWTestCase {
 
-    private final static int NUM_OF_CREATE_DELETE = 50;
+    private final static int NUM_OF_CREATE_DELETE = 10;
 
-    private final static int NUM_OF_READ = 200;
+    private final static int NUM_OF_READ = 50;
 
     private final static int NUM_OF_RETRIAL = 20;
 
-    private final static int SLEEP_BASE_TIME = 10;
+    private final static int SLEEP_BASE_TIME = 100;
+
+    private final static int NUM_OF_READ_THREADS = 1;
 
     private JDOCategory    _category;
 
@@ -105,7 +107,7 @@ public class CacheLeakage extends CWTestCase {
     public CacheLeakage( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC17", "Cache leakage" );
+        super( "TC08", "Cache leakage" );
         _category = (JDOCategory) category;
         _errLeak = false;
         _errCount = false;
@@ -128,7 +130,6 @@ public class CacheLeakage extends CWTestCase {
             _db = _category.getDatabase( stream.verbose() );
             _conn = _category.getJDBCConnection();
             _conn.setAutoCommit( false );
-
 
             boolean result = true;
             for ( int i=0; i < 4; i++ ) {
@@ -186,10 +187,14 @@ public class CacheLeakage extends CWTestCase {
 
             CreateDeleteThread cdThread = new CreateDeleteThread( stream, _category, _cacheType, NUM_OF_CREATE_DELETE );
 
-            ReadThread rThread =  new ReadThread( stream, cdThread, _category, NUM_OF_READ );
+            ReadThread[] rThread =  new ReadThread[NUM_OF_READ_THREADS];
+            for ( int i=0; i < NUM_OF_READ_THREADS; i++ ) {
+                rThread[i] = new ReadThread( stream, cdThread, _category, NUM_OF_READ );
+                rThread[i].start();
+            }
 
             cdThread.start();
-            rThread.start();
+            
 
             while ( !cdThread.isDone() /*&& !rThread.isDone()*/ ) {
                 Thread.currentThread().sleep( 500 );
@@ -235,8 +240,8 @@ public class CacheLeakage extends CWTestCase {
                             trials++;
                             try {
                                 tr = (TestRace) db.load( _classType, id, Database.Shared );
-                                                    // may throw ObjectNotFoundException
-                                                    // LockNotGrantedException
+                                // may throw ObjectNotFoundException
+                                // LockNotGrantedException
                                 db.commit();
                                 succeed = true;
                             } catch ( LockNotGrantedException e ) {
@@ -252,7 +257,6 @@ public class CacheLeakage extends CWTestCase {
                                 // ethernet way of retry
                                 Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             }
-                            Thread.currentThread().sleep( 0 );
                         }
                         if ( db.isActive() ) 
                             db.rollback();
@@ -333,7 +337,6 @@ public class CacheLeakage extends CWTestCase {
                         succeed = false;
                         trials = 0;
                         while ( !succeed && trials < NUM_OF_RETRIAL ) {
-                            Thread.currentThread().sleep( 0 );
                             trials++;
                             try {
                                 db.begin();
@@ -346,12 +349,12 @@ public class CacheLeakage extends CWTestCase {
                             } catch ( LockNotGrantedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                if ( db.isActive() ) db.rollback();
+                                db.rollback();
                                 Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } catch ( TransactionAbortedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                if ( db.isActive() ) db.rollback();
+                                db.rollback();
                                 Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } 
                         }
@@ -362,7 +365,6 @@ public class CacheLeakage extends CWTestCase {
                         succeed = false;
                         trials = 0;
                         while ( !succeed && trials < NUM_OF_RETRIAL ) {
-                            Thread.currentThread().sleep( 0 );
                             trials++;
                             try {
                                 db.begin();
@@ -374,7 +376,7 @@ public class CacheLeakage extends CWTestCase {
                             } catch ( LockNotGrantedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                if ( db.isActive() ) db.rollback();
+                                db.rollback();
                                 Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } 
                         }
@@ -385,7 +387,6 @@ public class CacheLeakage extends CWTestCase {
                         succeed = false;
                         trials = 0;
                         while ( !succeed && trials < NUM_OF_RETRIAL ) {
-                            Thread.currentThread().sleep( 0 );
                             trials++;    
                             try {
                                 db.begin();
@@ -397,12 +398,12 @@ public class CacheLeakage extends CWTestCase {
                                 succeed = true;
                             } catch ( LockNotGrantedException e ) {
                                 succeed = false;
-                                if ( db.isActive() ) db.rollback();
+                                db.rollback();
                                 Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             } catch ( TransactionAbortedException e ) {
                                 succeed = false;
                                 // ethernet way of retry
-                                if ( db.isActive() ) db.rollback();
+                                db.rollback();
                                 Thread.currentThread().sleep( (long) ((SLEEP_BASE_TIME^trials) * ran.nextDouble()) );
                             }
                         }
@@ -414,19 +415,19 @@ public class CacheLeakage extends CWTestCase {
                     } catch ( TransactionNotInProgressException e ) {
                         stream.writeVerbose( "Thread <CreateDelete> will be killed. Unexcepted exception: "+e.getException() );
                         e.printStackTrace();
-                        if ( db.isActive() ) try { db.rollback(); } catch ( TransactionNotInProgressException ee ) {}
+                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     } catch ( PersistenceException e ) {
                         stream.writeVerbose( "Thread <CreateDelete> will be killed. Unexcepted exception: " );
                         e.printStackTrace();
-                        if ( db.isActive() ) try { db.rollback(); } catch ( TransactionNotInProgressException ee ) {}
+                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     } catch ( Exception e ) {
                         stream.writeVerbose( "Thread <CreateDelete> will be killed. Element not found: other exception: "+e );
                         e.printStackTrace();
-                        if ( db.isActive() ) try { db.rollback(); } catch ( TransactionNotInProgressException ee ) {}
+                        if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     }

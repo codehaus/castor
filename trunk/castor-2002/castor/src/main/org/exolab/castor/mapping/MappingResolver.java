@@ -82,6 +82,8 @@ public interface MappingResolver
     public Enumeration listDescriptors();
 
 
+    public Enumeration listRelations();
+
     /**
      * Returns an enumeration of all the supported Java classes.
      * Each element is of type <tt>java.lang.Class</tt>, and for

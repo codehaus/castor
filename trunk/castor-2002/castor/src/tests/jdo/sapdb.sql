@@ -1,3 +1,4 @@
+
 drop table   test_table;
 
 create table test_table (
@@ -10,6 +11,126 @@ create unique index test_table_pk
    on test_table ( id );
 
 
+drop table test_group_person;
+
+create table test_group_person (
+  gid int         not null,
+  pid int        not null 
+);
+
+create index test_group_person_p_pk on test_group_person ( pid );
+
+create index test_group_person_g_pk on test_group_person ( gid );
+
+
+drop table test_many_group;
+
+create table test_many_group (
+  gid       int           not null,
+  value1    varchar(100)  not null
+);
+
+create unique index test_many_group_pk on test_many_group ( gid );
+
+
+drop table test_many_person;
+
+create table test_many_person (
+   pid      int          not null,
+   value1   varchar(100) not null,
+   helloworld varchar(100) null,
+   sthelse varchar(100) null
+);
+
+create unique index test_many_person_pk on test_many_person ( pid );
+
+
+drop table test_pks_person;
+
+create table test_pks_person (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  bday  timestamp null
+);
+
+create unique index test_pks_person_pk on test_pks_person( fname, lname );
+
+
+drop table test_pks_employee;
+
+create table test_pks_employee (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  start_date timestamp null
+);
+
+create unique index test_pks_person_employee_pk on test_pks_employee( fname, lname );
+
+
+drop table test_pks_payroll;
+
+create table test_pks_payroll (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+);
+
+create unique index test_pks_payroll_fk on test_pks_payroll( fname, lname );
+
+create unique index test_pks_payroll_pk on test_pks_payroll( id );
+
+
+drop table test_pks_address;
+
+create table test_pks_address (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  street varchar(30)    null,
+  city  varchar(30)    null,
+  state varchar(2)     null,
+  zip varchar(6)       null
+);
+
+create unique index test_pks_address_pk on test_pks_address( id );
+
+
+drop table test_pks_contract;
+
+create table test_pks_contract (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  policy_no int        not null,
+  contract_no int      not null,
+  c_comment varchar(90)  null
+);
+
+create unique index test_pks_contract_fk on test_pks_contract( fname, lname );
+
+create unique index test_pks_contract_pk on test_pks_contract( policy_no, contract_no );
+
+
+drop table test_pks_category_contract;
+
+create table test_pks_category_contract (
+  policy_no int        not null,
+  contract_no int      not null,
+  cate_id int          not null
+);
+
+
+drop table test_pks_category;
+
+create table test_pks_category (
+  id  int              not null,
+  name varchar(20)     not null
+);
+
+create unique index test_pks_category_pk on test_pks_category( id );
+
+
 drop table test_table_ex;
 
 create table test_table_ex (
@@ -19,6 +140,17 @@ create table test_table_ex (
 );
 
 create unique index test_table_ex_pk on test_table_ex ( id );
+
+
+drop table test_table_extends;
+
+create table test_table_extends (
+  id      int          not null,
+  value3  varchar(200) null,
+  value4  varchar(200) null
+);
+
+create unique index test_table_extends_pk on test_table_extends ( id );
 
 
 drop table test_race;
@@ -77,27 +209,6 @@ create unique index test_group_pk
    on test_group ( id );
 
 
-drop table test_smaster;
-
-create table test_smaster (
-  id       fixed(10,0)    not null
-);
-
-create unique index test_smaster_pk on test_smaster ( id );
-
-
-drop table test_sdetail;
-
-create table test_sdetail (
-  detail_id  fixed(10,0)  not null,
-  master_id  fixed(10,0)  not null
-);
-
-create unique index test_sdetail_pk on test_sdetail ( detail_id );
-
-create index test_sdetail_fk on test_sdetail ( master_id );
-
-
 drop table   test_types;
 
 create table test_types (
@@ -108,7 +219,6 @@ create table test_types (
   long_val fixed(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
-  dbl_val  fixed(14,2)  not null,
   int_date integer        null,
   str_time char(12)       null,
   num_date fixed(17,0)  null
@@ -127,6 +237,24 @@ create table test_keygen (
 
 create unique index test_keygen_pk
   on test_keygen ( id );
+
+
+drop table list_types;
+
+create table list_types (
+  o_char  CHAR  null,
+  o_nchar CHAR  null,
+  o_varchar VARCHAR(20) null,
+  o_varchar2 VARCHAR(20) null,
+  o_clob LONG null,
+  o_long LONG null,
+  o_number FIXED null,
+  o_int   INT null,
+  o_date timestamp null,
+  o_raw   CHAR (20) BYTE   null,
+  o_blob  LONG BYTE     null,
+  o_bfile LONG BYTE     null
+);
 
 
 drop table test_keygen_ext;
@@ -153,6 +281,24 @@ create unique index test_seqtable_pk
 drop sequence   test_keygen_seq;
 
 create sequence test_keygen_seq;
+
+
+drop table test_identity;
+
+create table test_identity (
+  id fixed(10,0) default serial,
+  attr varchar(200) not null
+);
+
+
+drop table test_identity_ext;
+
+create table test_identity_ext (
+  id fixed(10,0) not null,
+  ext varchar(200) not null
+);
+
+create unique index test_ident_ext_pk on test_identity_ext ( id );
 
 
 drop table test_persistent;

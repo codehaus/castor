@@ -12,7 +12,7 @@ grant all on test_table to test;
 drop table   test_master;
 create table test_master (
   id       numeric(10,0)    not null,
-  value     varchar(200)  not null,
+  value1     varchar(200)  not null,
   group_id numeric(10,0)  null
 );
 create unique index test_master_pk
@@ -24,7 +24,7 @@ drop table   test_detail;
 create table test_detail (
   detail_id  numeric(10,0)  not null,
   master_id  numeric(10,0)  not null,
-  value      varchar(200)  not null
+  value1      varchar(200)  not null
 );
 create unique index test_detail_pk
   on test_detail ( detail_id );
@@ -36,7 +36,7 @@ drop table test_detail2;
 create table test_detail2 (
   detail2_id  numeric(10,0)  not null,
   detail_id  numeric(10,0)  not null,
-  value      varchar(200 )  not null
+  value1      varchar(200 )  not null
 );
 create unique index test_detail2_pk on test_detail2 ( detail2_id );
 grant all on test_detail2 to test;
@@ -45,29 +45,11 @@ grant all on test_detail2 to test;
 drop table   test_group;
 create table test_group (
   id     numeric(10,0)  not null,
-  value  varchar(200)  not null
+  value1  varchar(200)  not null
 );
 create unique index test_group_pk
    on test_group ( id );
 grant all on test_group to test;
-
-
--- test_smaster
-drop table test_smaster;
-create table test_smaster (
-  id       numeric(10,0)    not null
-);
-create unique index test_smaster_pk on test_smaster ( id );
-
-
--- test_sdetail
-drop table test_sdetail;
-create table test_sdetail (
-  detail_id  numeric(10,0)  not null,
-  master_id  numeric(10,0)  not null
-);
-create unique index test_sdetail_pk on test_sdetail ( detail_id );
-create index test_sdetail_fk on test_sdetail ( master_id );
 
 
 drop table   test_types;
@@ -79,7 +61,6 @@ create table test_types (
   long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
-  dbl_val  numeric(14,2)  not null,
   int_date integer        null,
   str_time char(12)       null,
   num_date numeric(17,0)  null
@@ -97,7 +78,7 @@ create table test_keygen (
 create unique index test_keygen_pk
   on test_keygen ( id );
 grant all on test_keygen to test;
- 
+
 
 -- test_keygen_ext
 drop table test_keygen_ext;
@@ -130,7 +111,7 @@ create table test_persistent (
   id       integer         not null,
   ctime    date            not null,
   mtime    date            null,
-  value    varchar(200)    not null,
+  value1    varchar(200)    not null,
   parent_id integer        null,
   group_id numeric(10,0)   not null
 );

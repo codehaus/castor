@@ -62,17 +62,4 @@ public class InstantDBFactory extends GenericFactory {
         return null;
     }
 
-
-    /**
-     * For NUMERIC type ResultSet.getObject() returns Double instead of
-     * BigDecimal for InstantDB.
-     */
-    public Class adjustSqlType( Class sqlType ) {
-        if (sqlType == java.math.BigDecimal.class) {
-            return java.lang.Double.class;
-        } else {
-            return sqlType;
-        }
-    }
-
 }
