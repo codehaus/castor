@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1788 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added support for SQL parameters as part of IN statements in WHERE clauses.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1788
+       (Werner - 20041123)
+
 JDO:   Fixed bug 1790 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added additional debug statements during binding of SQL parameters.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1790
