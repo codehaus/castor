@@ -12,6 +12,7 @@ XML:   Fixed bug 1875. The primary issue was that the generated
 XML:   Fixed limitation that prevented using GeneralizedFieldHandler
        from a binding-file. The generated source code now works
        properly.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1869
        (kvisco - 20050222)
 
 
