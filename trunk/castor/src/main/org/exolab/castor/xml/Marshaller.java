@@ -424,6 +424,40 @@ public class Marshaller extends MarshalFramework {
         _processingInstructions.add(new ProcessingInstruction(target, data));
     } //-- addProcessingInstruction
 
+   /**
+    * Sets the document type definition for the serializer. Note that this method
+    * cannot be called if you've passed in your own DocumentHandler.
+    *
+    * @param publicId the public identifier
+    * @param systemId the system identifier
+    */
+    public void setDoctype(String publicId, String systemId) {
+     
+        if (_serializer != null) {
+            if (_format == null) {
+                _format = _config.getOutputFormat();
+            }
+            _format.setDoctype(publicId, systemId);
+            //-- reset output format, this needs to be done
+            //-- any time a change occurs to the format.
+            _serializer.setOutputFormat( _format );
+            try {
+                _handler = _serializer.asDocumentHandler();
+            }
+            catch (java.io.IOException iox) {
+                //-- we can ignore this exception since it shouldn't
+                //-- happen. If _serializer is not null, it means
+                //-- we've already called this method sucessfully
+                //-- in the Marshaller() constructor
+            }
+        }
+        else {
+            String error = "doctype cannot be set if you've passed in "+
+            "your own DocumentHandler";
+            throw new IllegalStateException(error);
+        }
+    } //-- setDoctype
+
     /**
      * Sets whether or not to marshal as a document which includes
      * the XML declaration, and if necessary the DOCTYPE declaration.
@@ -443,6 +477,7 @@ public class Marshaller extends MarshalFramework {
                 _format = _config.getOutputFormat();
             }
             _format.setOmitXMLDeclaration( ! asDocument );
+            _format.setOmitDocumentType( ! asDocument );
 
             //-- reset output format, this needs to be done
             //-- any time a change occurs to the format.
