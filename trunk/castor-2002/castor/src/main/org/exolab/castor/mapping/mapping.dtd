@@ -63,21 +63,22 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
+<!ELEMENT class ( description?, cache-type-mapping?, map-to?, (field|container)+ )>
 <!ATTLIST class
     name            ID       #REQUIRED
     extends         IDREF    #IMPLIED
     depends         IDREF    #IMPLIED
-    identity        CDATA    #IMPLIED
+    identity        NMTOKENS #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
-    key-generator   IDREF    #IMPLIED >
+    key-generator   IDREF    #IMPLIED 
+    auto-complete   (true|false) "false">
 
 
 <!--
     Specifies the cache type and capacity used for this class
  -->
-<!ELEMENT cache-type EMPTY>
-<!ATTLIST cache-type
+<!ELEMENT cache-type-mapping EMPTY>
+<!ATTLIST cache-type-mapping
     type           ( none | count-limited | time-limited | unlimited ) "count-limited"
     capacity       NMTOKEN  #IMPLIED>
 
@@ -137,7 +138,8 @@
     get-method     NMTOKEN  #IMPLIED
     set-method     NMTOKEN  #IMPLIED
     create-method  NMTOKEN  #IMPLIED
-    collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
+    transient      (true|false) "false"
+    collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate )  #IMPLIED>
 
 
 <!--
@@ -154,9 +156,9 @@
  -->
 <!ELEMENT sql EMPTY>
 <!ATTLIST sql
-    name        NMTOKEN  #IMPLIED
-    type        CDATA    #IMPLIED
-    many-key    NMTOKEN  #IMPLIED
+    name        NMTOKENS  #IMPLIED
+    type        NMTOKENS    #IMPLIED
+    many-key    NMTOKENS  #IMPLIED
     many-table  NMTOKEN  #IMPLIED
     dirty  ( check | ignore )  "check"> 
 
@@ -182,6 +184,8 @@
     name  NMTOKEN  #IMPLIED
     type  NMTOKEN  #IMPLIED
     matches  NMTOKEN  #IMPLIED
+    QName-prefix NMTOKEN #IMPLIED
+    reference (true|false) "false"
     node  ( attribute | element | text )  #IMPLIED>
 
 
@@ -222,13 +226,13 @@
 
 <!ELEMENT key-generator  ( param* )>
 <!ATTLIST key-generator
-          name   CDATA  #REQUIRED
-          alias  CDATA  #IMPLIED>
+          name   ID  #REQUIRED
+          alias  NMTOKEN  #IMPLIED>
 
 <!ELEMENT param EMPTY>
 <!ATTLIST param
-          name   CDATA  #REQUIRED
-          value  CDATA  #REQUIRED>
+          name   NMTOKEN  #REQUIRED
+          value  NMTOKEN  #REQUIRED>
 
 <!--
     A textual description.
