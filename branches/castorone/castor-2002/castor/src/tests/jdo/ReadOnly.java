@@ -76,7 +76,7 @@ public class ReadOnly
     public ReadOnly( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC04", "Read only tests" );
+        super( "TC05", "Read only tests" );
         _category = (JDOCategory) category;
     }
 

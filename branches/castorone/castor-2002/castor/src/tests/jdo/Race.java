@@ -88,7 +88,7 @@ public class Race extends CWTestCase {
     public Race( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC18", "Race" );
+        super( "TC07", "Race" );
         _category = (JDOCategory) category;
     }
 

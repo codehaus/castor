@@ -82,7 +82,7 @@ public class DependentUpdate
     public DependentUpdate( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC14", "Dependent update objects tests" );
+        super( "TC25", "Dependent update objects tests" );
         _category = (JDOCategory) category;
     }
 

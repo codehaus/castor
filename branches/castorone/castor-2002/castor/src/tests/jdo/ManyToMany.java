@@ -93,7 +93,7 @@ public class ManyToMany extends CWTestCase {
     public ManyToMany( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC12", "ManyToMany" );
+        super( "TC23", "ManyToMany" );
         _category = (JDOCategory) category;
     }
 

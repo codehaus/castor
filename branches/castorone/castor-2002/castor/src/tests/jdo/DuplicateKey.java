@@ -77,7 +77,7 @@ public class DuplicateKey
     public DuplicateKey( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC03", "Duplicate key detection" );
+        super( "TC01", "Duplicate key detection" );
         _category = (JDOCategory) category;
     }
 

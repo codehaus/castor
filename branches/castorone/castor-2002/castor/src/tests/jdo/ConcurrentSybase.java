@@ -89,7 +89,7 @@ public class ConcurrentSybase
     public ConcurrentSybase( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC01", "Concurrent access" );
+        super( "TC03", "Concurrent access" );
         _category = (JDOCategory) category;
     }
 

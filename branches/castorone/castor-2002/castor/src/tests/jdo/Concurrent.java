@@ -90,7 +90,7 @@ public class Concurrent
     public Concurrent( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC01", "Concurrent access" );
+        super( "TC02", "Concurrent access" );
         _category = (JDOCategory) category;
     }
 
