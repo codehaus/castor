@@ -137,5 +137,53 @@
 
     </section>
 
+    
+    <section title="Parameterized Type Convertors">
+      <p>Some of the type convertors may have a string parameter, which
+         changes the conversion algorithm. The parameter is specified in
+         square brackets after the SQL type, for example:
+      <pre><![CDATA[
+  <field name="active" type="boolean">
+    <sql name="acc_active" type="char[01]"/>
+  </field>]]>
+      </pre>
+         where "0" is the character value for <b>false</b> and "1" is
+         the character value for <b>true</b></p>
+      <p>In the above example the first of four parameterized type convertors
+         is used, "boolean->char" convertor.
+         The parameter must have length 2, the first character is the value
+         for <b>false</b>, the second character is the value for <b>true</b>.
+         The default value is "FT".
+         The actual SQL type should be char(1).</p>
+      <p>The second convertor is "date->char".
+         Its parameter must be a correct pattern for SimpleDateFormat.
+         For example:</p>
+      <pre><![CDATA[
+  <field name="dateOfBirth" type="date">
+    <sql name="pers_dob" type="char[MMM d, yyyy]"/>
+  </field>]]>
+      </pre>
+      <p>The third and the fourth convertors are "date->integer" and
+         "date->numeric".
+         Their parameters are also patterns having syntax based on the 
+         SimpleDateFormat syntax, but repeated characters are eliminated.
+         The following table shows the substitution rules that are used
+         to obtain the SimpleDateFormat pattern from the parameter.
+         <table border="1" cellpadding="4">
+           <tr><td>Y,y</td><td>yyyy</td><td>year</td></tr>
+           <tr><td>M</td><td>MM</td><td>month in year</td></tr>
+           <tr><td>D,d</td><td>dd</td><td>day in month</td></tr>
+           <tr><td>h,H</td><td>HH</td><td>hour in day (0~23)</td></tr>
+           <tr><td>m</td><td>mm</td><td>minute in hour</td></tr>
+           <tr><td>s</td><td>ss</td><td>second in minute</td></tr>
+           <tr><td>S</td><td>SSS</td><td>millisecond</td></tr>
+         </table>
+         For example, "YMD" parameter is expanded to "yyyyMMdd"
+         SimpleDateFormat pattern,
+         "YMDhmsS" parameter is expanded to "yyyyMMddHHmmssSSS"
+         SimpleDateFormat pattern.
+         The length of the expanded parameter gives the minimal number of
+         decimal digits that the actual SQL type must support.</p>
+    </section>
   </body>
 </document>
