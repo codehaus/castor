@@ -101,6 +101,11 @@ public class DateFieldHandler extends XMLFieldHandler {
     private static TimeZone TIMEZONE = TimeZone.getDefault();
     
     /**
+     * UTC TimeZone instance 
+     */
+	private static final TimeZone UTC_TIMEZONE_INSTANCE = TimeZone.getTimeZone( UTC_TIMEZONE );    
+    
+    /**
      * A boolean to indicate that the TimeZone can be suppressed
      * if the TimeZone is equivalent to the "default" timezone.
      */
@@ -437,63 +442,72 @@ public class DateFieldHandler extends XMLFieldHandler {
         
         //-- Handle TimeZone
         if (timezone) {
-            TimeZone tz = TimeZone.getTimeZone(UTC_TIMEZONE);
+            TimeZone tz = null;
             char designator = chars[i++];
-            flags = HOURS_FLAG;
-            int millis = 0;
-            count = 0;
-            value = 0;
-            for (; i < chars.length; i++) {
-                char ch = chars[i];
-                switch(ch) {
-                    case ':':
-                        if ((count != 2) || (flags != HOURS_FLAG)) {
-                            String err = INVALID_DATE + dateTime + 
-                                "; TimeZone offset must be in the format 'hh:mm'";
-                            throw new ParseException(err, i);
-                        }
-                        //-- convert hours to milliseconds
-                        millis = value * 3600000; // 3600000 = (60 * 60 * 1000)
-                        count = 0;
-                        value = 0;
-                        ++flags;
-                        break;
-                    default:
-                        if ((ch >= '0') && (ch <= '9')) {
-                            if (count == 2) {
-                                //-- Be friendly to timezone without ':' between
-                                //-- hours and minutes such as -0500, which occur
-                                //-- frequently
-                                //-- convert hours to milliseconds
-                                millis = value * 3600000; // 3600000 = (60 * 60 * 1000)
-                                count = 0;
-                                value = 0;
-                                ++flags;
-                            }
-                            ++count; //-- keep track of number of digits
-                            value = (value*10) + Character.digit(ch,10);
-                        }
-                        else {
-                            throw new ParseException("Unparseable date: " + dateTime, i);
-                        }
-                        break;
-                }
+            if(designator == 'Z')
+            {
+            	//-- Use static for UTC as TimeZone.getTimeZone is very expensive (requires fileio)
+            	tz = UTC_TIMEZONE_INSTANCE;
             }
-            if (flags == MINUTES_FLAG) {
-                if (count != 2) {
-                    String err = INVALID_DATE + dateTime + 
-                        "; TimeZone offset must be in the format 'hh:mm'";
-                    throw new ParseException(err, i);
-                }
-                millis = millis + (value * 60000);
-                if (designator == '-') millis = 0 - millis;
-                tz.setRawOffset(millis);
-            }
-            else if (designator != 'Z') {
-                String err = INVALID_DATE + dateTime + 
-                    "; TimeZone offset must be in the format 'hh:mm'";
-                throw new ParseException(err, i);
-            }
+            else
+            {
+            	tz = TimeZone.getTimeZone(UTC_TIMEZONE);
+	            flags = HOURS_FLAG;
+	            int millis = 0;
+	            count = 0;
+	            value = 0;
+	            for (; i < chars.length; i++) {
+	                char ch = chars[i];
+	                switch(ch) {
+	                    case ':':
+	                        if ((count != 2) || (flags != HOURS_FLAG)) {
+	                            String err = INVALID_DATE + dateTime + 
+	                                "; TimeZone offset must be in the format 'hh:mm'";
+	                            throw new ParseException(err, i);
+	                        }
+	                        //-- convert hours to milliseconds
+	                        millis = value * 3600000; // 3600000 = (60 * 60 * 1000)
+	                        count = 0;
+	                        value = 0;
+	                        ++flags;
+	                        break;
+	                    default:
+	                        if ((ch >= '0') && (ch <= '9')) {
+	                            if (count == 2) {
+	                                //-- Be friendly to timezone without ':' between
+	                                //-- hours and minutes such as -0500, which occur
+	                                //-- frequently
+	                                //-- convert hours to milliseconds
+	                                millis = value * 3600000; // 3600000 = (60 * 60 * 1000)
+	                                count = 0;
+	                                value = 0;
+	                                ++flags;
+	                            }
+	                            ++count; //-- keep track of number of digits
+	                            value = (value*10) + Character.digit(ch,10);
+	                        }
+	                        else {
+	                            throw new ParseException("Unparseable date: " + dateTime, i);
+	                        }
+	                        break;
+	                }
+	            }
+	            if (flags == MINUTES_FLAG) {
+	                if (count != 2) {
+	                    String err = INVALID_DATE + dateTime + 
+	                        "; TimeZone offset must be in the format 'hh:mm'";
+	                    throw new ParseException(err, i);
+	                }
+	                millis = millis + (value * 60000);
+	                if (designator == '-') millis = 0 - millis;
+	                tz.setRawOffset(millis);
+	            }
+	            else if (designator != 'Z') {
+	                String err = INVALID_DATE + dateTime + 
+	                    "; TimeZone offset must be in the format 'hh:mm'";
+	                throw new ParseException(err, i);
+	            }
+			}
             cal.setTimeZone(tz);
         }
         else {
