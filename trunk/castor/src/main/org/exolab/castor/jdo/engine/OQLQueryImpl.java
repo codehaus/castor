@@ -352,7 +352,7 @@ public class OQLQueryImpl
                             char c = oql.charAt( j );
                             if (!Character.isDigit(c)) {
                                 didParam = true;
-                                sql.append("?").append(c); // replace characters with "?"
+                                sql.append("?"); // replace characters with "?"
                                 break;
                             }
                             sb.append( c );
