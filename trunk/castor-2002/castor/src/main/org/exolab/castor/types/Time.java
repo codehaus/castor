@@ -153,6 +153,18 @@ public class Time extends RecurringDurationBase {
 
     }//toString
 
+   /**
+    * parse a String and convert it into a java.lang.Object
+    * @param str the string to parse
+    * @return the java.lang.Object represented by the string
+    * @throws ParseException a parse exception is thrown if the string to parse
+    *                        does not follow the rigth format (see the description
+    *                        of this class)
+    */
+    public static Object parse(String str) throws ParseException {
+        return parseTime(str);
+    }
+
      /**
      * parse a String and convert it into a Time
      * @param str the string to parse
@@ -162,7 +174,7 @@ public class Time extends RecurringDurationBase {
      *                        of this class)
      */
 
-    public static Time parse(String str) throws ParseException {
+    public static Time parseTime(String str) throws ParseException {
 
 
         Time result = new Time();

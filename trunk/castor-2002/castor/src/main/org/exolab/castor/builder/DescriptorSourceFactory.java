@@ -46,11 +46,12 @@
 package org.exolab.castor.builder;
 
 import org.exolab.javasource.*;
+import org.exolab.castor.builder.util.DescriptorJClass;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.types.RecurringDuration;
 import org.exolab.castor.types.Time;
-import org.exolab.castor.builder.util.DescriptorJClass;
 
 /**
  * A factory for creating the source code of descriptor classes
@@ -231,7 +232,7 @@ public class DescriptorSourceFactory {
            jsc.add("}");
            jsc.unindent();
            jsc.add("});");
-        } 
+        }
         else {
             if (xsType.getType() == XSType.COLLECTION)
                 //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
@@ -356,7 +357,18 @@ public class DescriptorSourceFactory {
         } else {
             jsc.append("(");
             jsc.append(xsType.getJType().toString());
-            jsc.append(") value");
+            //special handling for the type package
+            //when we are dealing with attributes
+            //This is a temporary solution since we need to handle
+            //the 'types' in specific handlers in the future
+            //i.e add specific FieldHandler in org.exolab.castor.xml.handlers
+            if (isAttribute && xsType.isDateTime()) {
+                jsc.append(".parse");
+                jsc.append(JavaNaming.toJavaClassName(xsType.getName()));
+                jsc.append("((String) value))");
+            }
+
+            else jsc.append(") value");
         }
         jsc.append(");");
 
@@ -383,7 +395,7 @@ public class DescriptorSourceFactory {
                 (xsType.getType() == XSType.STRING))
         {
             jsc.append("null;");
-        } 
+        }
         else {
             jsc.append(xsType.newInstanceCode());
         }
@@ -399,21 +411,21 @@ public class DescriptorSourceFactory {
             jsc.append(classType(xsType.getJType()));
             jsc.append(", handler));");
             jsc.add("desc.setImmutable(true);");
-        } 
+        }
         else if (xsType.getType() == XSType.TIME_INSTANT) {
             jsc.add("desc.setHandler( new DateFieldHandler(");
             jsc.append("handler));");
             jsc.add("desc.setImmutable(true);");
-        } 
+        }
         else if (xsType.getType() == XSType.DECIMAL) {
             jsc.add("desc.setHandler( new DecimalFieldHandler(");
             jsc.append("handler));");
             jsc.add("desc.setImmutable(true);");
         }
-        //-- We need to handle NMTOKENS and IDREFS with the 
+        //-- We need to handle NMTOKENS and IDREFS with the
         //-- CollectionFieldHandler
         else if (member.getSchemaType().getType() == XSType.COLLECTION) {
-            
+
             switch (xsType.getType()) {
                 case XSType.NMTOKEN:
                 case XSType.NMTOKENS:
@@ -428,7 +440,7 @@ public class DescriptorSourceFactory {
             }
         }
         else jsc.add("desc.setHandler(handler);");
-        
+
         //-- namespace
         if (nsURI != null) {
             jsc.add("desc.setNameSpaceURI(\"");

@@ -336,7 +336,7 @@ public class TimeDescriptor
 
             //-- update current instance of time with new time
             try {
-                Time temp = Time.parse(value.toString()) ;
+                Time temp = Time.parseTime(value.toString()) ;
                 timeTarget.setHour(temp.getHour());
                 timeTarget.setMinute(temp.getMinute());
                 timeTarget.setSecond(temp.getSeconds(), temp.getMilli());

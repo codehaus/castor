@@ -103,7 +103,7 @@ public class XSTimePeriod extends XSRecurringDuration {
             try {
                 //duration
                 if (Facet.DURATION.equals(name))
-                    setDuration(TimeDuration.parse(facet.getValue()));
+                    setDuration(TimeDuration.parseTimeDuration(facet.getValue()));
 
             } catch(ParseException e) {
                 System.out.println("Error in setting the facets of timePeriod");

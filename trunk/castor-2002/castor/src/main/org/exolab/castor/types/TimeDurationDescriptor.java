@@ -338,7 +338,7 @@ public class TimeDurationDescriptor
 
             //-- update current instance of time with new time
             try {
-                TimeDuration temp = TimeDuration.parse(value.toString()) ;
+                TimeDuration temp = TimeDuration.parseTimeDuration(value.toString()) ;
                 time.setYear(temp.getYear());
                 time.setMonth(temp.getMonth());
                 time.setDay(temp.getDay());

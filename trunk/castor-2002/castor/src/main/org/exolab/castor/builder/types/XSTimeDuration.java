@@ -189,16 +189,16 @@ public final class XSTimeDuration extends XSType {
             try {
                 //-- maxExclusive
                 if (Facet.MAX_EXCLUSIVE.equals(name))
-                    this.setMaxExclusive(TimeDuration.parse(facet.getValue()));
+                    this.setMaxExclusive(TimeDuration.parseTimeDuration(facet.getValue()));
                 //-- maxInclusive
                 else if (Facet.MAX_INCLUSIVE.equals(name))
-                    this.setMaxInclusive(TimeDuration.parse(facet.getValue()));
+                    this.setMaxInclusive(TimeDuration.parseTimeDuration(facet.getValue()));
                 //-- minExclusive
                 else if (Facet.MIN_EXCLUSIVE.equals(name))
-                    this.setMinExclusive(TimeDuration.parse(facet.getValue()));
+                    this.setMinExclusive(TimeDuration.parseTimeDuration(facet.getValue()));
                 //-- minInclusive
                 else if (Facet.MIN_INCLUSIVE.equals(name))
-                    this.setMinInclusive(TimeDuration.parse(facet.getValue()));
+                    this.setMinInclusive(TimeDuration.parseTimeDuration(facet.getValue()));
                 //-- pattern
                 else if (Facet.PATTERN.equals(name)) {
                     //do nothing for the moment

@@ -309,6 +309,18 @@ public class TimeDuration
         return result;
     } //toString
 
+   /**
+    * parse a String and convert it into a java.lang.Object
+    * @param str the string to parse
+    * @return the java.lang.Object represented by the string
+    * @throws ParseException a parse exception is thrown if the string to parse
+    *                        does not follow the rigth format (see the description
+    *                        of this class)
+    */
+    public static Object parse(String str) throws ParseException {
+        return parseTimeDuration(str);
+    }
+
     /**
      * <p>Parse the given string and return a time duration
      * which represents this string
@@ -316,7 +328,7 @@ public class TimeDuration
      * @return a TimeDuration instance which represent the string
      * @throws ParseException thrown when the string is not valid
      */
-     public static TimeDuration parse (String str) throws ParseException
+     public static TimeDuration parseTimeDuration (String str) throws ParseException
     {
 
 
