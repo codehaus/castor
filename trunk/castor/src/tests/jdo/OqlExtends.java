@@ -47,24 +47,18 @@
 package jdo;
 
 
-import java.io.IOException;
+import harness.CastorTestCase;
+import harness.TestHarness;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Date;
-import java.util.Enumeration;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import org.exolab.castor.jdo.DataObjects;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
-import harness.TestHarness;
-import harness.CastorTestCase;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.Utils;
 
 
 /**
@@ -80,9 +74,22 @@ public class OqlExtends extends CastorTestCase {
         _category = (JDOCategory) category;
     }
 
-    public void setUp()
-            throws PersistenceException {
-        _db = _category.getDatabase( verbose );
+    public void setUp() throws PersistenceException {
+        _db = _category.getDatabase(verbose);
+        
+        // XXX [SMH]: We need to clear some tables because "TC23 ManyToMany" is doing something unwise, see bug 1445. 
+        Connection conn = null;
+        try {
+            conn = _category.getJDBCConnection();
+            conn.setAutoCommit(false);
+            conn.createStatement().executeUpdate("DELETE FROM test_oqlext2");
+			conn.createStatement().executeUpdate("DELETE FROM test_persistent");
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	Utils.closeConnection (conn);
+        }
     }
 
     public void runTest()
@@ -140,7 +147,7 @@ public class OqlExtends extends CastorTestCase {
         stream.println( "Creating new object: " + t2 );
         _db.create( t2 );
         date = new Date();
-        Thread.currentThread().sleep(2000);
+        Thread.sleep(2000);
         t = new TestOqlExtends();
         t.setId(TestOqlExtends.DefaultId + 10);
         t.setGroup(group1);
