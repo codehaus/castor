@@ -27,34 +27,14 @@ public class Test
 
     public static final String DatabaseFile = "database.xml";
     public static final String MappingFile  = "mapping.xml";
-    public static final String Usage = "Usage: test.sh jdo [mapping|odmg|perf <driver-class> <jdbc-uri>]";
+    public static final String Usage = "Usage: example jdo";
 
 
     public static void main( String[] args )
     {
 	PrintWriter   logger;
-	boolean       mapping = false;
-	boolean       runPerf = false;
-	boolean       runOdmg = false;
-	boolean       runDup = false;
 	
 	logger = Logger.getSystemLogger();
-	if ( args.length < 1 ) {
-	    System.out.println( Usage );
-	    System.exit( 1 );
-	}
-	if ( args[ 0 ].equalsIgnoreCase( "mapping" ) )
-	    mapping = true;
-	else if ( args[ 0 ].equalsIgnoreCase( "perf" ) )
-	    runPerf = true;
-	else if ( args[ 0 ].equalsIgnoreCase( "odmg" ) )
-	    runOdmg = true;
-	else if ( args[ 0 ].equalsIgnoreCase( "dup" ) )
-	    runDup = true;
-	else {
-	    System.out.println( Usage );
-	    System.exit( 1 );
-	}
 
 	try {
 	    ODMG          odmg;
@@ -66,41 +46,11 @@ public class Test
 	    logger.println( "Reading database sources from " + DatabaseFile );
 	    odmg.loadMapping( Test.class.getResource( DatabaseFile ).toString() );
 
-	    if ( mapping ) {
-		// Simply dump the mapping to the logger
-		odmg.setLogWriter( logger );
-		db = odmg.newDatabase();
-		db.open( "test", db.OPEN_READ_WRITE );
-		db.close();
-	    }
-
-	    if ( runOdmg ) {
-		// Run the ODMG API test, see odmgTest()
-		db = odmg.newDatabase();
-		db.open( "test", db.OPEN_READ_WRITE );
-		odmgTest( odmg, db, logger );
-		db.close();
-	    }
-
-	    if ( runPerf ) {
-		// Run the performance test, see prefTest()
-		db = odmg.newDatabase();
-		db.open( "test", db.OPEN_EXCLUSIVE );
-		perfTest( odmg, db, logger,
-			  ( args.length > 1 ? args[ 1 ] : null ),
-			  ( args.length > 2 ? args[ 2 ] : null ) );
-		db.close();
-	    }
-
-	    if ( runDup ) {
-		DuplicateKey dupKey;
-
-		db = odmg.newDatabase();
-		db.open( "test", db.OPEN_EXCLUSIVE );
-		dupKey = new DuplicateKey( odmg, db, logger );
-		dupKey.run();
-		db.close();
-	    }
+	    // Run the ODMG API test, see odmgTest()
+	    db = odmg.newDatabase();
+	    db.open( "test", db.OPEN_READ_WRITE );
+	    odmgTest( odmg, db, logger );
+	    db.close();
 
 	} catch ( Exception except ) {
 	    logger.println( except );
@@ -236,118 +186,6 @@ public class Test
 	    logger.println( "Query result: " + enum.nextElement() );
 	}
 	tx.commit();
-    }
-
-
-    static void perfTest( Implementation odmg, Database db, PrintWriter logger,
-			  String driverClass, String jdbcUri )
-	throws Exception
-    {
-	Timing               timing;
-	PreparedStatement    stmt;
-	ResultSet            rs;
-	int                  i, j;
-	Product              product = null;
-	ProductGroup         group;
-	Connection           conn;
-	Transaction          tx;
-	OQLQuery             oql;
-
-	// Use the command line arguments to determine the JDBC driver
-	// and JDBC URL and open up a connection to the database
-	if ( driverClass == null )
-	    driverClass = "postgresql.Driver";
-	logger.println( "Using JDBC driver " + driverClass );
-	Class.forName( driverClass );
-	if ( jdbcUri == null )
-	    jdbcUri = "jdbc:postgresql:test?user=test&password=test";
-	logger.println( "Using JDBC URI " + jdbcUri );
-	conn = DriverManager.getConnection( jdbcUri );
-
-	// Must be inside an ODMG transaction in order to create the
-	// product and group we're about to retrieve
-	tx = odmg.newTransaction();
-	tx.begin();
-
-	// If product or group are not found in the database,
-	// create new objects and persist them. 
-	oql = odmg.newOQLQuery();
-	oql.create( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
-	oql.bind( new Integer( 3 ) );
-	group = (ProductGroup) oql.execute();
-	if ( group == null ) {
-	    group = new ProductGroup();
-	    group.id = 3;
-	    group.name = "new group";
-	    logger.println( "Creating new group: " + group );
-	    db.makePersistent( group );
-	}
-	oql.create( "SELECT p FROM myapp.Product p WHERE id = $1" );
-	oql.bind( new Integer( 4 ) );
-	product = (Product) oql.execute();
-	if ( product == null ) {
-	    product = new Product();
-	    product.id = 4;
-	    product.name = "new product";
-	    product.price = 55;
-	    product.group = group;
-	    product.inventory = new ProductInventory();
-	    product.inventory.quantity = 50;
-	    logger.println( "Creating new product: " + product );
-	    db.makePersistent( product );
-	}
-	// Commit the transaction so we can now retrieve these
-	// objects
-	tx.commit();
-
-	// JDBC retrieval of product object using shortest query
-	// with inner joins performed 2000 time in a loop.
-	// At the end the elapsed time and per/minute will be printed.
-	timing = new Timing( "Query using direct JDBC" );
-	timing.start();
-	product = new Product();
-	product.id = 4;
-	product.group = new ProductGroup();
-	for ( i = 0 ; i < 200 ; ++i ) {
-	    stmt = conn.prepareStatement( "SELECT prod.price,prod.name,prod_group.id,prod_group.name,prod_inv.quant " +
-					  "FROM prod,prod_group,prod_inv WHERE prod.id=? AND " +
-					  "prod.group_id=prod_group.id AND prod.id=prod_inv.prod_id" );
-	    stmt.setInt( 1, product.id );
-	    rs = stmt.executeQuery();
-	    while ( rs.next() ) {
-		product.price = (float) rs.getDouble( 1 );
-		product.name = rs.getString( 2 );
-		product.group.id = rs.getInt( 3 );
-		product.group.name = rs.getString( 4 );
-		product.inventory = new ProductInventory();
-		product.inventory.quantity = rs.getInt( 5 );
-		product.inventory.product = product;
-	    }
-	    rs.close();
-	    stmt.close();
-	}
-	timing.count( i );
-	timing.stop();
-	logger.println( timing.report() );
-	logger.println( "Query result: " + product );
-
-	// ODMG retrieval of product object using OQL query
-	// with inner joins performed 2000 time in a loop.
-	// At the end the elapsed time and per/minute will be printed.
-	tx.begin();
-	timing = new Timing( "Query using O/R framework" );
-	timing.start();
-	for ( i = 0 ; i < 200 ; ++i ) {
-	    // Specify the primary key id
-	    oql.bind( new Integer( 4 ) );
-	    // Retrieve
-	    product = (Product) oql.execute();
-	}
-	timing.count( i );
-	timing.stop();
-	logger.println( timing.report() );
-	logger.println( "Query result: " + product );
-	tx.abort();
     }
 
 

@@ -5,8 +5,14 @@ JDO: ObjectDesc/PrimaryKeyDesc are cloning return arrays to assure it
 
 JDO: Check that required fields are not null prior to storing object.
 
-JDO: Deal with null values, using either defaults or setting the proper
-     value.
+JDO: Required, read/write attributes are currently ignored.
+
+JDO: Inheritence is not fully working.
+
+JDO: Need to think up a better alternative to the ODMG API.
+
+JDO: Add identityChange feature.
+
 
 
 
