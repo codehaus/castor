@@ -720,30 +720,36 @@ public class Marshaller extends MarshalFramework {
             // with the XML name of this class
             XMLClassDescriptor xmlElementNameClassDesc = _cdResolver.resolveByXMLName(xmlElementName, null, null);
 
-            // More than one class can map to a given element name
-            ClassDescriptorEnumeration cdEnum= _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
-            for (; cdEnum.hasNext();) {
-                xmlElementNameClassDesc = cdEnum.getNext();
-                if (_class == xmlElementNameClassDesc.getJavaClass())
-                    break;
-            }
+            if ((xmlElementName == null) || (xmlElementNameClassDesc == null)) {
+                // We can do nothing in this case (source generated vector)
+                saveType = true;
+            } else {
 
-            // Try to find a field descriptor directly in the parent object
-            XMLFieldDescriptor fieldDescMatch = ((XMLClassDescriptor)descriptor.getContainingClassDescriptor()).getFieldDescriptor(xmlElementName, NodeType.Element);
+                // More than one class can map to a given element name
+                ClassDescriptorEnumeration cdEnum= _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
+                for (; cdEnum.hasNext();) {
+                    xmlElementNameClassDesc = cdEnum.getNext();
+                    if (_class == xmlElementNameClassDesc.getJavaClass())
+                        break;
+                }
+
+                // Try to find a field descriptor directly in the parent object
+                XMLFieldDescriptor fieldDescMatch = ((XMLClassDescriptor)descriptor.getContainingClassDescriptor()).getFieldDescriptor(xmlElementName, NodeType.Element);
             
-            // Try to find a field descriptor by inheritance in the parent object
-            Vector inheritancesList = UnmarshalHandler.searchInheritance(xmlElementName, null, (XMLClassDescriptor)descriptor.getContainingClassDescriptor(), _cdResolver);
+                // Try to find a field descriptor by inheritance in the parent object
+                Vector inheritancesList = UnmarshalHandler.searchInheritance(xmlElementName, null, (XMLClassDescriptor)descriptor.getContainingClassDescriptor(), _cdResolver);
 
-            boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
+                boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
 
-            boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) || 
-                                                 ((inheritancesList.size() == 1) && 
-                                                  (((UnmarshalHandler.InheritanceMatch)inheritancesList.get(0))._parentFieldDesc == descriptor)));
+                boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) || 
+                                                     ((inheritancesList.size() == 1) && 
+                                                      (((UnmarshalHandler.InheritanceMatch)inheritancesList.get(0))._parentFieldDesc == descriptor)));
 
-            // Can we remove the xsi:type ?
-            if (foundTheRightClass && oneAndOnlyOneMatchedField) {
-                saveType = false;
-                name     = xmlElementName;
+                // Can we remove the xsi:type ?
+                if (foundTheRightClass && oneAndOnlyOneMatchedField) {
+                    saveType = false;
+                    name     = xmlElementName;
+                }
             }
         }//--- End of "if (saveType)"
 
