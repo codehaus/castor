@@ -47,6 +47,7 @@
 package org.exolab.castor.dax.engine;
 
 
+import netscape.ldap.LDAPException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
@@ -106,6 +107,15 @@ public final class MozillaFactory
             return null;
         }
     }
+
+
+    public Boolean isDuplicateKeyException( Exception except )
+    {
+        if ( except instanceof LDAPException )
+            return new Boolean( ( (LDAPException) except ).getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS );
+        return null;
+    }
+
 
 
 }
