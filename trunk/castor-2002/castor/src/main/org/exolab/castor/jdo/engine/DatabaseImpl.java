@@ -161,16 +161,17 @@ public class DatabaseImpl
     private TxDatabaseMap              _txMap;
 
 
-    public DatabaseImpl( String dbName, int lockTimeout, 
+    public DatabaseImpl( String dbName, int lockTimeout,
             LogInterceptor logInterceptor, CallbackInterceptor callback,
-            Transaction transaction, ClassLoader classLoader )
+            Transaction transaction, ClassLoader classLoader, boolean autoStore )
             throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
         // locking mode.
         DatabaseRegistry dbs;
-        
+
+        _autoStore = autoStore;
         dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
@@ -209,7 +210,7 @@ public class DatabaseImpl
 
     /*
      * Return if the current transaction is set to autoStore, it there is
-     * transaction active. If there is no active transaction, return if 
+     * transaction active. If there is no active transaction, return if
      * the next transaction will be set to autoStore.
      */
     public boolean isAutoStore() {
@@ -220,7 +221,7 @@ public class DatabaseImpl
     }
 
     /**
-     * Gets the current application ClassLoader's instance. 
+     * Gets the current application ClassLoader's instance.
      * For use in OQLQueryImpl and TransactionContext.
      * @return the current ClassLoader's instance, or <code>null</code> if not provided
      */
