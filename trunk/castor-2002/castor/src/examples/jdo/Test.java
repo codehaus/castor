@@ -43,8 +43,15 @@ public class Test
 	    odmg = new ODMG();
 	    logger.println( "Reading Java-SQL mapping from " + MappingFile );
 	    odmg.loadMapping( Test.class.getResource( MappingFile ).toString() );
+
+	    postgresql.PostgresqlDataSource ds = new postgresql.PostgresqlDataSource();
+	    ds.setUser( "test" ); ds.setPassword( "test" ); ds.setDatabaseName( "test" );
+	    org.exolab.castor.jdo.engine.DatabaseSource.registerDataSource( "test", ds, null );
+
+	    /*
 	    logger.println( "Reading database sources from " + DatabaseFile );
 	    odmg.loadMapping( Test.class.getResource( DatabaseFile ).toString() );
+	    */
 
 	    // Run the ODMG API test, see odmgTest()
 	    db = odmg.newDatabase();
