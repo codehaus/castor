@@ -1762,7 +1762,7 @@ public class ClassMolder {
                         if ( v != null ) {
                             while ( itor.hasNext() ) {
                                 Object element = itor.next();
-                                if ( v.contains( fieldClassMolder.getIdentity( tx, element ) ) ) {
+                                if ( v.contains( fieldClassMolder.getActualIdentity( tx, element ) ) ) {
                                     tx.update( fieldEngine, fieldClassMolder, element, null );
                                 } else {
                                     tx.create( fieldEngine, fieldClassMolder, element, null );
