@@ -188,7 +188,7 @@ public class SourceFactory  {
         className = resolveClassName(className, sgState.packageName);
 
         state = new FactoryState(className, sgState);
-        
+
         //-- mark this element as being processed in this current
         //-- state to prevent the possibility of endless recursion
         ElementDecl tmpDecl = element;
@@ -305,7 +305,9 @@ public class SourceFactory  {
             //-- handle our special case for enumerated types
             if (simpleType.hasFacet(Facet.ENUMERATION)) {
                 createSourceCode(simpleType, sgState);
-            }
+            } else
+            // return nothing
+                return null;
         }
 
         //-- add imports required by the marshal methods
@@ -376,7 +378,7 @@ public class SourceFactory  {
 
         int max = type.getMaxOccurs();
 
-        //-- we must create a group item class for unbounded or 
+        //-- we must create a group item class for unbounded or
         //-- multiple occurance groups.
         if ((max < 0) || (max > 1)) {
             createGroupItem = true;
@@ -433,12 +435,12 @@ public class SourceFactory  {
             //-- clean up inheritence
             if (type.isComplexContent()) {
                 // remove extended base type and set any
-                // specified base type from properties file 
+                // specified base type from properties file
                 String oldBase = jClass.getSuperClass();
                 jClass.setSuperClass(base);
                 base = oldBase;
             }
-            
+
             sgState.bindReference(jClass, classInfo);
             classes[1] = jClass;
 
