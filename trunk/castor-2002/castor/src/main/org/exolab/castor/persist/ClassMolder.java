@@ -524,7 +524,7 @@ public class ClassMolder {
     }
 
     /**
-     * Remove the reference of a related object from an object of.
+     * Remove the reference of a related object from an object of
      * the base class. <p>
      *
      * If the related object is PersistanceCapable, the field will
@@ -535,7 +535,7 @@ public class ClassMolder {
      * will be called, to indicate the object is modified. <p>
      *
      * It method will iterate thur all of the object's field and
-     * try to remove all the occurence.
+     * try to remove all the occurrence.
      *
      * @param tx      the TransactionContext of the transaction in action
      * @param object  the target object of the base type of this ClassMolder
@@ -582,15 +582,20 @@ public class ClassMolder {
                     relatedBaseMolder = relatedBaseMolder._extends;
                 }
                 if ( fieldClassMolder == relatedBaseMolder ) {
-                    // same action to be taken for lazy and non lazy collection
                     boolean changed = false;
                     Object related = _fhs[i].getValue( object, tx.getClassLoader() );
-                    Iterator itor = getIterator( related );
-                    while ( itor.hasNext() ) {
-                        Object o = itor.next();
-                        if ( o == relatedObject ) {
-                            changed = true;
-                            itor.remove();
+
+                    if ( related instanceof RelationCollection ) {
+                        RelationCollection lazy = (RelationCollection)related;
+                        change = lazy.remove( relatedObject );
+                    } else {
+                        Iterator itor = getIterator( related );
+                        while ( itor.hasNext() ) {
+                            Object o = itor.next();
+                            if ( o == relatedObject ) {
+                                changed = true;
+                                itor.remove();
+                            }
                         }
                     }
                     if ( changed ) {
