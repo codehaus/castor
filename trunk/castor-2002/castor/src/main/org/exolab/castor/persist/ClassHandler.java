@@ -63,11 +63,16 @@ import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.loader.IndirectFieldHandler;
 import org.exolab.castor.util.Messages;
 
 
 /**
+ * The class handler is an efficient mechanism for dealing with objects
+ * and used exclusively by the {@link CacheEngine}. Each class is
+ * represented as a set of fields and relations, including those of the
+ * parent class. The handler provides methods for copying objects into
+ * and from the cached copy, checking validity and modification, and
+ * getting/setting the object's identity.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -77,30 +82,59 @@ public final class ClassHandler
 {
 
 
-    private final ClassDescriptor   _clsDesc;
+    /**
+     * The class descriptor.
+     */
+    private final ClassDescriptor  _clsDesc;
 
 
+    /**
+     * The handler of the parent class.
+     */
     private ClassHandler      _extends;
 
 
+    /**
+     * Information about all the fields in this class.
+     */
     private FieldInfo[]       _fields;
 
 
-    private FieldInfo         _identity;
-
-
-    private FieldHandler      _relIdentity;
-
-
+    /**
+     * Relation handlers for all the fields in this class.
+     */
     private RelationHandler[] _relations;
 
 
+    /**
+     * The identity field.
+     */
+    private FieldInfo         _identity;
+
+
+    /**
+     * The field handler for obtaining the identity through a relation.
+     */
+    private FieldHandler      _relIdentity;
+
+
+    /**
+     * Constructs a new handler. The handler cannot be used until it
+     * is normalized (see {@link #normalize}).
+     */
     ClassHandler( ClassDescriptor clsDesc )
     {
         _clsDesc = clsDesc;
     }
 
 
+    /**
+     * Used by {@link #CacheEngine} to normalize the handler. Since
+     * an handler reference each other including circular references,
+     * an handler is created, registered with the cache engine and
+     * then normalized. In the process of normalization the other
+     * relations are processed.
+     */
     void normalize( CacheEngine cache )
         throws MappingException
     {
@@ -125,7 +159,13 @@ public final class ClassHandler
     }
 
 
-    private void addFields( CacheEngine cache, ClassDescriptor clsDesc, Vector fields, Vector rels )
+    /**
+     * Used by {@link #normalize} to add fields to this handler.
+     * Recursive function that flattens the field of this class
+     * and the parent class into one set.
+     */
+    private void addFields( CacheEngine cache, ClassDescriptor clsDesc,
+			    Vector fields, Vector rels )
         throws MappingException
     {
         FieldDescriptor[] descs;
@@ -159,20 +199,121 @@ public final class ClassHandler
     }
 
 
-    public int getFieldCount()
+    /**
+     * Returns the Java class.
+     */
+    public Class getJavaClass()
     {
-        return _fields.length;
+        return _clsDesc.getJavaClass();
     }
 
 
     /**
-     * Returns the access mode for this class.
+     * Constructs a new object of this class. Does not generate any
+     * exceptions, since object creation has been proven to work when
+     * creating descriptor from mapping.
      *
-     * @return The access mode
+     * @return A new instance of this class
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this descriptor, or the descriptor
+     *  is not compatiable with the Java object
      */
-    public AccessMode getAccessMode()
+    public Object newInstance()
+        throws IllegalStateException
     {
-        return _clsDesc.getAccessMode();
+        return Types.newInstance( _clsDesc.getJavaClass() );
+    }
+
+
+    /**
+     * Returns the identity of the object.
+     *
+     * @param object The object
+     * @return The identity
+     */
+    public Object getIdentity( Object object )
+    {
+        if ( _relIdentity == null )
+            return _identity.handler.getValue( object );
+        else {
+            // Get the related object and it's identity;
+            object = _identity.handler.getValue( object );
+            return _relIdentity.getValue( object );
+        }
+    }
+
+
+    /**
+     * Sets the identity of the object.
+     *
+     * @param object The object
+     * @param identity The identity
+     */
+    void setIdentity( Object object, Object identity )
+    {
+        _identity.handler.setValue( object, identity );
+    }
+
+
+    /**
+     * Returns the descriptor of this class.
+     */
+    ClassDescriptor getDescriptor()
+    {
+        return _clsDesc;
+    }
+
+
+    /**
+     * Returns the class handler which this handler extends.
+     */
+    ClassHandler getExtends()
+    {
+        return _extends;
+    }
+
+
+    /**
+     * Returns an array of all the fields in this class.
+     *
+     * @return Array of zero or more field handlers
+     */
+    FieldHandler[] getFields()
+    {
+        FieldHandler[] fields;
+
+        fields = new FieldHandler[ _fields.length ];
+        for ( int i = 0 ; i < _fields.length ; ++i )
+            fields[ i ] = _fields[ i ].handler;
+        return fields;
+    }
+
+
+    /**
+     * Returns an array of all the relations in this class.
+     * This array is the same size as the array returned
+     * from {@link #getFields} and has the order of fields.
+     * Fields that do not represent relations are simply null.
+     *
+     * @return Array of zero or more relation handlers
+     *  including nulls for non-relation fields
+     */
+    RelationHandler[] getRelations()
+    {
+        return _relations;
+    }
+
+
+    /**
+     * Create a new field set for holding a cached copy.
+     * Returns an array capable of holding all the fields
+     * in the object.
+     *
+     * @return A new field set
+     */
+    Object[] newFieldSet()
+    {
+	return new Object[ _fields.length ];
     }
 
 
@@ -195,88 +336,18 @@ public final class ClassHandler
      * @param txMode The transaction mode, or null
      * @return The suitable access mode
      */
-    public AccessMode getAccessMode( AccessMode txMode )
+    AccessMode getAccessMode( AccessMode txMode )
     {
         AccessMode clsMode;
 
         if ( txMode == null )
-            return getAccessMode();
-        clsMode = getAccessMode();
+            return _clsDesc.getAccessMode();
+        clsMode = _clsDesc.getAccessMode();
         if ( clsMode == AccessMode.ReadOnly || txMode == AccessMode.ReadOnly )
             return AccessMode.ReadOnly;
         if ( clsMode == AccessMode.Exclusive || txMode == AccessMode.Exclusive )
             return AccessMode.Exclusive;
         return txMode;
-    }
-
-
-    public Class getJavaClass()
-    {
-        return _clsDesc.getJavaClass();
-    }
-
-
-    public ClassDescriptor getDescriptor()
-    {
-        return _clsDesc;
-    }
-
-
-    public RelationHandler[] getRelations()
-    {
-        return _relations;
-    }
-
-
-    public ClassHandler getExtends()
-    {
-        return _extends;
-    }
-
-
-    public FieldHandler[] getFields()
-    {
-        FieldHandler[] fields;
-
-        fields = new FieldHandler[ _fields.length ];
-        for ( int i = 0 ; i < _fields.length ; ++i )
-            fields[ i ] = _fields[ i ].handler;
-        return fields;
-    }
-
-
-    /**
-     * Constructs a new object of this class. Does not generate any
-     * exceptions, since object creation has been proven to work when
-     * creating descriptor from mapping.
-     *
-     * @return A new instance of this class
-     * @throws IllegalStateException The Java object has changed and
-     *  is no longer supported by this descriptor, or the descriptor
-     *  is not compatiable with the Java object
-     */
-    public Object newInstance()
-        throws IllegalStateException
-    {
-        return Types.newInstance( _clsDesc.getJavaClass() );
-    }
-
-
-    public Object getIdentity( Object object )
-    {
-        if ( _relIdentity == null )
-            return _identity.handler.getValue( object );
-        else {
-            // Get the related object and it's identity;
-            object = _identity.handler.getValue( object );
-            return _relIdentity.getValue( object );
-        }
-    }
-
-
-    public void setIdentity( Object object, Object identity )
-    {
-        _identity.handler.setValue( object, identity );
     }
 
 
@@ -297,7 +368,7 @@ public final class ClassHandler
      * @param ctx The fetch context, or null
      * @throws PersistenceException An error fetching the related object
      */
-    public void copyInto( Object[] fields, Object target, FetchContext ctx )
+    void copyInto( Object[] fields, Object target, FetchContext ctx )
         throws PersistenceException
     {
         for ( int i = 0 ; i < _fields.length ; ++i ) {
@@ -310,17 +381,17 @@ public final class ClassHandler
                     _fields[ i ].relation.setRelated( target, null );
                 else if ( _fields[ i ].colHandler != null ) {
                     Object collection = null;
-                    Vector array;
+                    Vector vector;
 
-                    array = (Vector) fields[ i ];
-                    for ( int j = 0 ; j < array.size() ; ++j ) {
+                    vector = (Vector) fields[ i ];
+                    for ( int j = 0 ; j < vector.size() ; ++j ) {
                         Object object;
 
-                        object = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), array.elementAt( j ) );
+                        object = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), vector.elementAt( j ) );
                         if ( object == null )
-                            throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedHandler().getJavaClass(),
-                                                               array.elementAt( j ) );
-                        collection = _fields[ i ].colHandler.addValue( collection, object, array.elementAt( j ) );
+                            throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedClass(),
+                                                               vector.elementAt( j ) );
+                        collection = _fields[ i ].colHandler.addValue( collection, object, vector.elementAt( j ) );
                     }
                     _fields[ i ].relation.setRelated( target, collection );
                 } else {
@@ -328,7 +399,7 @@ public final class ClassHandler
 
                     relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
                     if ( relTarget == null )
-                        throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedHandler().getJavaClass(),
+                        throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedClass(),
                                                            fields[ i ] );
                     _fields[ i ].relation.setRelated( target, relTarget );
                 }
@@ -337,8 +408,16 @@ public final class ClassHandler
     }
 
 
-    public void copyInto( Object source, Object[] fields )
-        throws PersistenceException
+    /**
+     * Copies the contents of the object into the field array. The
+     * fields are copied in their mapping order, with relations
+     * represented by their identity value and collections using a
+     * <tt>Vector</tt>.
+     *
+     * @param source The source object
+     * @param field The target set of fields
+     */
+    void copyInto( Object source, Object[] fields )
     {
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].relation == null )
@@ -404,7 +483,7 @@ public final class ClassHandler
      * @param cached The cached copy
      * @return True if the object has been modified
      */
-    public boolean isModified( Object object, Object[] original )
+    boolean isModified( Object object, Object[] original )
     {
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( isModified( _fields[ i ], object, original[ i ] ) )
@@ -417,20 +496,66 @@ public final class ClassHandler
     /**
      * Used by {@link #isModified(Object,Object[])} to check a single field.
      */
-    public boolean isModified( FieldInfo field, Object object, Object original )
+    private boolean isModified( FieldInfo field, Object object, Object original )
     {
-        Object value;
+        if ( field.colHandler == null ) {
+            Object value;
 
-        value = field.handler.getValue( object );
-        if ( value == null )
-            return ( original == null );
-        else
-            return value.equals( original );
+	    // Modified if field has value but original is null,
+	    // original has value but field is null, or the value
+	    // of boths does not pass equality test.
+	    value = field.handler.getValue( object );
+	    if ( value == null )
+		return ( original != null );
+	    if ( field.relation != null )
+		value = field.relation.getIdentity( value );
+            if ( value == null )
+                return ( original != null );
+            else
+                return ! value.equals( original );
+        } else {
+            Object collection;
+
+	    // Modified if collection is null or zero size, and original
+	    // is not null or has some elements, or if collection has
+	    // some elements but original is null or does not have the
+	    // same number of elements.
+            collection = field.handler.getValue( object );
+            if ( collection == null || field.colHandler.getSize( collection ) == 0 )
+                return ( original != null && ( (Vector) original ).size() >= 0 );
+            if ( original == null || ( (Vector) original ).size() != field.colHandler.getSize( collection ) )
+                return true;
+
+	    // Collection and original both have the same number of
+	    // elements, modified if collection has an identity that
+	    // does not exist in the original.
+	    Enumeration enum;
+	    Object      relIdentity;
+
+	    enum = field.colHandler.getValues( collection );
+	    while ( enum.hasMoreElements() ) {
+		relIdentity = field.relation.getIdentity( enum.nextElement() );
+		if ( ! ( (Vector) original ).contains( relIdentity ) )
+		    return true;
+	    }
+            return false;
+        }
     }
 
 
-    public void checkValidity( Object object )
-        throws ValidityException
+    /**
+     * Checks the object validity. Returns successfully if the object
+     * can be stored, is valid, etc, throws an exception otherwise.
+     *
+     * @param object The object
+     * @throws ValidityException The object is invalid, a required is
+     *  null, or any other validity violation
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler
+     *  is not compatiable with the Java object
+     */
+    void checkValidity( Object object )
+        throws ValidityException, IllegalStateException
     {
         // Object cannot be saved if one of the required fields is null
         for ( int i = 0 ; i < _fields.length ; ++i )
@@ -444,30 +569,43 @@ public final class ClassHandler
     }
 
 
+    /**
+     * Holds information about a field in the class that can be
+     * used to handle that field.
+     */
     final static class FieldInfo
     {
 
+	/**
+	 * The field handler.
+	 */
         final FieldHandler      handler;
 
+	/**
+	 * The field type.
+	 */
         final Class             fieldType;
 
-        final String            fieldName;
-
+	/**
+	 * True if the field is an immutable type.
+	 */
         final boolean           immutable;
 
-        final boolean           required;
-
+	/**
+	 * The relation handler if the field is a relation.
+	 */
         final RelationHandler   relation;
 
+	/**
+	 * The collection handler if the field is a collection.
+	 */
         final CollectionHandler colHandler;
 
         FieldInfo( FieldDescriptor fieldDesc, RelationHandler relation )
         {
-            this.fieldName = fieldDesc.getFieldName();
             this.fieldType = fieldDesc.getFieldType();
-            this.handler = fieldDesc.getHandler();
+	    this.handler = fieldDesc.getHandler();
             this.immutable = fieldDesc.isImmutable();
-            this.required = fieldDesc.isRequired();
             this.relation = relation;
             this.colHandler = fieldDesc.getCollectionHandler();
         }
