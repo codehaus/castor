@@ -47,7 +47,8 @@
     <name surname="Blandin" given="Arnaud"/>
     <email>blandin@intalio.com</email>
     <company id="intalio"/>
-    <description>XML enhancements - Bug Fixes - Documentation on Source Generator</description>
+    <description>Responsible for all the boring stuff that Keith doesn't want to do anymore.
+    Causes immense stress for the other contributors. Introduces bad franglish into the documentation.</description>
   </contributor>
 
   <contributor type="Committer">
