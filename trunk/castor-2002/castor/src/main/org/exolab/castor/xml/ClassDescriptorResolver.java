@@ -47,7 +47,15 @@
 package org.exolab.castor.xml;
 
 /**
- * An interface for finding or "resolving" XMLClassDescriptor classes
+ * An interface for finding or "resolving" XMLClassDescriptor classes.
+ * 
+ * <BR/>
+ * <B>Note:</B>
+ * This interface is used by the marshalling Framework for
+ * resolving XMLClassDescriptors for non-primitive types.
+ * There is no guarantees that this class will be called for
+ * java native classes.
+ * 
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -70,6 +78,10 @@ public interface ClassDescriptorResolver {
     **/
     public boolean error();
     
+    /** 
+     * <BR />
+     * <B>Note:</B> This method will be removed soon (kv).
+    **/
     public XMLMappingLoader getMappingLoader();
     
     /**
@@ -105,6 +117,9 @@ public interface ClassDescriptorResolver {
     
     /**
      * Sets the mapping loader for this ClassDescriptorResolver
+     *
+     * <BR />
+     * <B>Note:</B> This method will be removed soon (kv).
     **/
     public void setMappingLoader(XMLMappingLoader xmlMappingLoader);
     
