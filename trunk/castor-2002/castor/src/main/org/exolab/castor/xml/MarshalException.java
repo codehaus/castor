@@ -169,8 +169,9 @@ public class MarshalException extends CastorException {
         String message = getMessage();
         if (message != null) sb.append(message);
         if (_location != null) {
-            sb.append(";\n   ");
+            sb.append(" { ");
             sb.append(_location.toString());
+            sb.append(" }");
         }
         return sb.toString();
     } //-- toString
@@ -179,26 +180,26 @@ public class MarshalException extends CastorException {
 
     public void printStackTrace()
     {
-	if ( _exception == null )
-	    super.printStackTrace();
-	else
-	    _exception.printStackTrace();
+        if ( _exception == null )
+            super.printStackTrace();
+        else
+            _exception.printStackTrace();
     }
 
     public void printStackTrace( PrintWriter printer )
     {
-	if ( _exception == null )
-	    super.printStackTrace( printer );
-	else
-	    _exception.printStackTrace( printer);
+        if ( _exception == null )
+            super.printStackTrace( printer );
+        else
+            _exception.printStackTrace( printer);
     }
 
     public void printStackTrace( PrintStream printer )
     {
-	if ( _exception == null )
-	    super.printStackTrace( printer );
-	else
-	    _exception.printStackTrace( printer );
+        if ( _exception == null )
+            super.printStackTrace( printer );
+        else
+            _exception.printStackTrace( printer );
     }
     
 } //-- MarshalException
