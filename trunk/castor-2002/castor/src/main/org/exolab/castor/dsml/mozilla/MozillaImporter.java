@@ -128,16 +128,24 @@ public class MozillaImporter
 		modifs = new LDAPModificationSet();
 		attrSet = entry.getAttributeSet();
 		for ( i = 0 ; i < attrSet.size() ; ++i ) {
-		    attr = attrSet.elementAt( i );
-		    if ( attr.size() > 0 ) {
-			modifs.add( LDAPModification.REPLACE, attr );
-		    } else {
-			if ( existing.getAttributeSet().getAttribute( attr.getName() ) != null ) { 
-			    modifs.add( LDAPModification.REPLACE, attr );
-			}
-		    }
-		}
-		if ( ( policy & ImportDescriptor.Policy.ReplaceAttr ) != 0 ) {
+                    attr = attrSet.elementAt( i );
+                    if ( existing.getAttributeSet().getAttribute( attr.getName() ) != null ) { 
+                        if ( ( policy & ImportDescriptor.Policy.NewAttrOnly ) == 0 ) {
+                            if ( attr.size() > 0 ) {
+                                modifs.add( LDAPModification.REPLACE, attr );
+                            } else {
+                                modifs.add( LDAPModification.DELETE, attr );
+                            }
+                        }
+                    } else {
+                        if ( ( policy & ImportDescriptor.Policy.UpdateOnly ) == 0 ) {
+                            if ( attr.size() > 0 ) {
+                                modifs.add( LDAPModification.ADD, attr );
+                            }
+                        }
+                    }
+                }
+                if ( ( policy & ImportDescriptor.Policy.ReplaceAttr ) != 0 ) {
 		    enum = existing.getAttributeSet().getAttributes();
 		    while ( enum.hasMoreElements() ) {
 			attr = (LDAPAttribute) enum.nextElement();

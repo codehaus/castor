@@ -127,11 +127,21 @@ public class JNDIImporter
 		enum = attrSet.getAll();
 		while ( enum.hasMore() ) {
 		    attr = (Attribute) enum.next();
-		    if ( attr.size() > 0 ) {
-			modifs.addElement( new ModificationItem( DirContext.REPLACE_ATTRIBUTE, attr ) );
-		    } else if ( existing.get( attr.getID() ) != null ) { 
-			modifs.addElement( new ModificationItem( DirContext.REMOVE_ATTRIBUTE, attr ) );
-		    }
+		    if ( existing.get( attr.getID() ) != null ) {
+                        if ( ( policy & ImportDescriptor.Policy.NewAttrOnly ) == 0 ) {
+                            if ( attr.size() > 0 ) {
+                                modifs.addElement( new ModificationItem( DirContext.REPLACE_ATTRIBUTE, attr ) );
+                            } else {
+                                modifs.addElement( new ModificationItem( DirContext.REMOVE_ATTRIBUTE, attr ) );
+                            }
+                        }
+                    } else {
+                        if ( ( policy & ImportDescriptor.Policy.UpdateOnly ) == 0 ) {
+                            if ( attr.size() > 0 ) {
+                                modifs.addElement( new ModificationItem( DirContext.ADD_ATTRIBUTE, attr ) );
+                            }
+                        }
+                    }
 		}
 		if ( ( policy & ImportDescriptor.Policy.ReplaceAttr ) != 0 ) {
 		    enum = existing.getAll();
