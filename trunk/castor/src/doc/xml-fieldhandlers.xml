@@ -21,11 +21,13 @@
        </p>
 
        <p>
+          <body-note>
           The <i>FieldHandler</i> is the basic interface used by the Castor
           Framework when accessing field values or setting them. By specifying
           a custom <i>FieldHandler</i> in the mapping file we can basically
           intercept the calls to retreive or set a field's value and do
           whatever conversions are necessary.
+          </body-note>
         </p>
 
 
@@ -49,10 +51,8 @@
        <p>
          Let's take a look at how to convert a date in the format YYYY-MM-DD using
          a custom FieldHandler. We want to marshal the following XML input file:
-         <code-panel top-caption="test.xml">
-&lt;?xml version="1.0"?&gt;
-&lt;root&gt;2004-05-10&lt;/root&gt;
-         </code-panel>
+         <code-panel top-caption="test.xml">&lt;?xml version="1.0"?&gt;
+&lt;root&gt;2004-05-10&lt;/root&gt;</code-panel>
 
          The class we'll be marshalling from and unmarshalling to looks as follows:
 
@@ -236,7 +236,7 @@ public class MyDateHandler implements FieldHandler
 
          We can now use a simple Test class to unmarshal our XML document:
 
-         <code-panel>
+         <code-panel top-caption="Test.java">
 import java.io.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.mapping.*;
@@ -609,6 +609,63 @@ public class Foo {
   &lt;/class&gt;
 &lt;/mapping&gt;
        </code-panel>
+
+       We can now use our custom FieldHandler to unmarshal the following xml input:
+       <code-panel top-caption="test.xml">
+&lt;?xml version="1.0"?&gt;
+&lt;foo&gt;
+   &lt;name&gt;MyFoo&lt;/name&gt;
+   &lt;size&gt;345&lt;/size&gt;
+   &lt;color&gt;blue&lt;/color&gt;
+&lt;/foo&gt;
+       </code-panel>
+
+       A sample test class is as follows:
+       <code-panel top-caption="Test.java">
+
+import java.io.*;
+import org.exolab.castor.xml.*;
+import org.exolab.castor.mapping.*;
+
+public class Test {
+
+    public static void main(String[] args) {
+	    try {
+
+	        //--load mapping
+	        Mapping mapping = new Mapping();
+	        mapping.loadMapping("mapping.xml");
+
+            System.out.println("unmarshalling Foo:");
+            System.out.println();
+
+            Reader reader = new FileReader("test.xml");
+            Unmarshaller unmarshaller = new Unmarshaller(Foo.class);
+            unmarshaller.setMapping(mapping);
+            Foo foo = (Foo) unmarshaller.unmarshal(reader);
+            reader.close();
+
+            System.out.println("Foo#size : " + foo.getSize());
+            System.out.print("Foo#color: ");
+            if (foo.getColor() == null) {
+                System.out.println("null");
+            }
+            else {
+                System.out.println(foo.getColor().toString());
+            }
+
+            PrintWriter pw = new PrintWriter(System.out);
+            Marshaller marshaller = new Marshaller(pw);
+            marshaller.setMapping(mapping);
+            marshaller.marshal(foo);
+            pw.flush();
+	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	    }
+    }
+}
+        </code-panel>
      </p>
     </section>
 
