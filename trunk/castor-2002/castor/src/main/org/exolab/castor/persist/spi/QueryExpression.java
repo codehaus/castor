@@ -47,6 +47,9 @@
 package org.exolab.castor.persist.spi;
 
 
+import org.exolab.castor.jdo.QueryException;
+
+
 /**
  * Defines the interface for a query expression. The query
  * expression object is used to construct queries including
@@ -189,8 +192,11 @@ public interface QueryExpression
      *
      * @param writeLock True if a write lock is required
      * @return The SQL statement
+     * @throws QueryExpression The query cannot be constructed for
+     *  this engine
      */
-    public String getStatement( boolean writeLock );
+    public String getStatement( boolean writeLock )
+        throws QueryException;
 
 
     /**
