@@ -196,8 +196,12 @@ public class DatabaseImpl
         _transaction = transaction;
 	
 		if (_transaction != null) {
-            _ctx = new TransactionContextImpl(this , true , transaction );
-        	//_ctx.setStatusActive();
+			try {
+            	_ctx = new TransactionContextImpl(this , true , transaction );
+			}
+			catch ( javax.transaction.SystemException se ) {
+				throw new DatabaseNotFoundException( se );
+			}
 		} else {
             _ctx = new TransactionContextImpl(this, false );
         }
