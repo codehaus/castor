@@ -71,7 +71,6 @@ import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
-import org.exolab.castor.mapping.loader.RelationDescriptor;
 import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
