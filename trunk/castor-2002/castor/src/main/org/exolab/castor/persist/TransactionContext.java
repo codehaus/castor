@@ -430,7 +430,7 @@ public abstract class TransactionContext
                 Class reloadClass;
 
                 handler.getCallback().using( object, _db );
-                reloadClass = handler.getCallback().loaded( object, accessMode.toShort() );
+                reloadClass = handler.getCallback().loaded( object, toDatabaseAccessMode( accessMode ) );
                 if ( reloadClass != null && object.getClass() != reloadClass ) {
                     release( object );
                     engine.forgetObject( this, oid );
@@ -1422,6 +1422,25 @@ public abstract class TransactionContext
     {
         return (ObjectEntry) _readOnlyObjects.get( oid );
     }
+
+
+    /**
+     * Converts AccessMode constant to Database short constant
+     */ 
+    static short toDatabaseAccessMode( AccessMode mode )
+    {
+        if ( mode == AccessMode.Shared )
+            return Database.Shared;
+        if ( mode == AccessMode.ReadOnly )
+            return Database.ReadOnly;
+        if ( mode == AccessMode.DbLocked )
+            return Database.DbLocked;
+        if ( mode == AccessMode.Exclusive )
+            return Database.Exclusive;
+        // never happens
+        return -1;
+    }
+
 
     /**
      * A transaction records all objects accessed during the lifetime

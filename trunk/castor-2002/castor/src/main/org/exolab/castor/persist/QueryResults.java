@@ -268,7 +268,7 @@ public final class QueryResults
                         Class reloadClass;
 
                         handler.getCallback().using( object, _db );
-                        reloadClass = handler.getCallback().loaded( object, _accessMode.toShort() );
+                        reloadClass = handler.getCallback().loaded( object, _tx.toDatabaseAccessMode( _accessMode ) );
                         if ( reloadClass != null && object.getClass() != reloadClass ) {
                             _tx.release( object );
                             _engine.forgetObject( _tx, oid );
