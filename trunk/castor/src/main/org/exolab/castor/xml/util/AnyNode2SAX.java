@@ -181,7 +181,7 @@ public class AnyNode2SAX implements EventProducer {
                 if (attPrefix != null && attPrefix.length() > 0)
                     xmlName = attPrefix + ':' + xmlName;
                 value = tempNode.getStringValue();
-                atts.addAttribute(xmlName, null, value);
+                atts.addAttribute(xmlName, "CDATA", value);
                 tempNode = tempNode.getNextSibling();
             }//attributes
 
