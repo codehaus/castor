@@ -79,6 +79,7 @@ public final class XSInt extends XSPatternBase {
         super(XSType.INT_TYPE);
         if (asWrapper)
             this.jType = new JClass("java.lang.Integer");
+        else this.jType = JType.Int;
     } //-- XSInt
 
 

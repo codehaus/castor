@@ -79,6 +79,7 @@ public final class XSDouble extends XSPatternBase {
         super(XSType.DOUBLE_TYPE);
         if (asWrapper)
             this.jType = new JClass("java.lang.Double");
+        else this.jType = JType.Double;
     } //-- XSReal
 
 
