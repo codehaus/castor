@@ -256,6 +256,10 @@ public class XMLFieldDescriptorImpl
         }
         else _nodeType = nodeType;
         
+        if (_required) {
+            _validator = new FieldValidator();
+            _validator.setMinOccurs(1);
+        }
     } //-- XMLFieldDescriptorImpl
 
     //------------------/
