@@ -622,7 +622,10 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Boolean.class, java.lang.Short.class ) {
             public Object convert( Object obj, String param ) {
-                return new Short( ((Boolean)obj).booleanValue()? (byte)1: (byte)0 );
+                if ( param == null || param.length() != 1 || param.charAt(0) != '-')
+                    return new Short( ((Boolean)obj).booleanValue()? (byte)1: (byte)0 );
+                else
+                    return new Short( ((Boolean)obj).booleanValue()? (byte)-1: (byte)0 );
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Integer.class, java.lang.Boolean.class ) {
@@ -632,7 +635,10 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Boolean.class, java.lang.Integer.class ) {
             public Object convert( Object obj, String param ) {
-                return new Integer( ((Boolean)obj).booleanValue()? 1: 0 );
+                if ( param == null || param.length() != 1 || param.charAt(0) != '-')
+                    return new Integer( ((Boolean)obj).booleanValue()? 1: 0 );
+                else
+                    return new Integer( ((Boolean)obj).booleanValue()? -1: 0 );
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.String.class, java.lang.Boolean.class ) {
@@ -885,7 +891,10 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Boolean.class, java.math.BigDecimal.class ) {
             public Object convert( Object obj, String param ) {
-                return BigDecimal.valueOf( ( (Boolean) obj).booleanValue() ? 1 : 0 );
+                if ( param == null || param.length() != 1 || param.charAt(0) != '-')
+                    return BigDecimal.valueOf( ( (Boolean) obj).booleanValue() ? 1 : 0 );
+                else
+                    return BigDecimal.valueOf( ( (Boolean) obj).booleanValue() ? -1 : 0 );
             }
         } ),
         // Convertors to string
