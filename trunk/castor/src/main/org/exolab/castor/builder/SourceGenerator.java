@@ -1551,6 +1551,7 @@ public class SourceGenerator {
                 InputStream is = SourceGenerator.class.getResourceAsStream("/" + Property.FileName);
                 if (is != null) {
                     _default.load( is );
+                    is.close();
                 }      
             } catch ( Exception except ) {
                 // Do nothing
