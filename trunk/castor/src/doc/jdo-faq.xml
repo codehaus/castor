@@ -32,7 +32,7 @@
             Internally, Castor JDO maintains a single copy of lock (and cache) 
             for each active persistence object for all transaction. SUN's JDO 
             specification implicitly requires a copy of cache per object per 
-            transaction. SUN's JDO also implicitly require a bytecode modifier 
+            transaction. SUN's JDO also implicitly requires a bytecode modifier 
             which Castor doesn't require.
             </p>
 
@@ -44,31 +44,35 @@
 
         <section title="Is Castor JDO better than EJB CMP?">
             <p>
-            The relation between JDO and EJB Bean is sometimes more complicated 
-            than simply saying, "one is better than the other".
+            The relation between JDO and EJB Container-Managed
+            Persistence is more complicated than simply saying, "one
+            is better than the other".
             </p>
 
             <p>
-            An Entity Bean may manage to persist itself (the EJB specification 
-            calls this Bean Managed Persistence or BMP). Or, it may rely on its 
-            EJB container to do so (the EJB specification calls this Container 
-            Managed Persistence or CMP). For BMP, an Entity Bean may use Castor 
-            JDO as its persistence mechanism, or use another method, such as 
-            dealing with JDBC directly, as its persistence mechanism. For CMP, 
-            an EJB Container vendor may implement their CMP on top of Castor JDO. 
-            In such an implementation, Castor JDO will be used to persist the 
-            Entity Bean.
+            An Entity Bean may manage persistence itself - the EJB
+            specification calls this Bean Managed Persistence
+            (BMP). Alternatively, the Entity Bean may rely on an EJB
+            container to manage all peersistence automatically - the
+            EJB specification calls this Container Managed Persistence
+            (CMP). When implementing BMP, an Entity Bean may use
+            Castor JDO as its persistence mechanism, or it may use
+            others methods, such as dealing with JDBC directly.
+            During CMP, an EJB Container vendor may implement their
+            CMP on top of Castor JDO.  In such an implementation,
+            Castor JDO will be used to persist the Entity Bean.
             </p>
 
             <p>
-            If a developer would like to take advantage of EJB's life-cycle 
-            management, security, the "write once deploy anywhere" promise and 
-            other distributed business application facilities, then EJB will be 
-            the right choice. Otherwise, the fact that Castor is simple, is Open 
-            Source (you can always include Castor in your application or product), 
-            has much less overhead, provides more design freedom, and is 
-            integrated with Castor XML may be enough of a reason to choose 
-            Castor JDO.
+            If a developer would like to take advantage of an EJB's
+            life-cycle management, security, the "write once deploy
+            anywhere" promise and other distributed business
+            application facilities, then EJB will be the right
+            choice. Otherwise, the fact that Castor is simple, is Open
+            Source (you can always include Castor in your application
+            or product), has much less overhead, provides more design
+            freedom, and is integrated with Castor XML may be enough
+            of a reason to choose Castor JDO.
             </p>
         </section>
 
@@ -101,6 +105,19 @@
             querying is important for you, you should consider using a DBMS to store 
             your data instead of using XML files, especially if querying performance 
             is a concern.
+            </p>
+            <p>
+            Another alternative is parse an XML Document directly and use XPath to
+            retrieve Nodes and/or NodeSets from an XML Document.  Other open source
+            tools which provide this functionality are:
+            <ul>
+             <li>
+              <a href="http://sourceforge.net/projects/saxpath/">SAXPath</a>
+             </li>
+             <li>
+              <a href="http://jakarta.apache.org/commons/jxpath/index.html">Jakarta Commons JXPath</a>
+             </li>
+            </ul>
             </p>
         </section>
 
