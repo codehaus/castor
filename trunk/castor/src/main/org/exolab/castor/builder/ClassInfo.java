@@ -40,22 +40,27 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the course
+ * of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 
+ * are Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ * 
  * $Id$
  */
 
 package org.exolab.castor.builder;
 
 import org.exolab.javasource.*;
-import java.util.Enumeration;
 import java.util.Vector;
 
 /**
- * This class holds the necessary information
- * so that the source generator can properly create
- * the necessary Classes for the Object model.
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * This class holds the necessary information so that the
+ * source generator can properly create the necessary 
+ * classes for the object model.
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class ClassInfo extends XMLInfo {
 
     private Vector    _atts      = null;
@@ -106,6 +111,8 @@ public class ClassInfo extends XMLInfo {
     public void addFieldInfo(FieldInfo fieldInfo) {
 
         if (fieldInfo == null) return;
+        
+        fieldInfo.setDeclaringClassInfo(this);
 
         switch(fieldInfo.getNodeType()) {
             case FieldInfo.ATTRIBUTE_TYPE:
