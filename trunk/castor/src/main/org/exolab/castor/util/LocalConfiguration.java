@@ -102,7 +102,7 @@ public final class LocalConfiguration extends Configuration {
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
      */
-    private static final Log _log = LogFactory.getFactory().getInstance(Class.class);
+    private static final Log _log = LogFactory.getFactory().getInstance(LocalConfiguration.class);
 
 	/**
      * The properties loaded from the local configuration file.
