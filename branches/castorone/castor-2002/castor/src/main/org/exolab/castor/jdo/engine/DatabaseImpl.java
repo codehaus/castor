@@ -578,6 +578,7 @@ public class DatabaseImpl
                         while ( threads.hasNext() ) {
                             Thread t = (Thread) threads.next();
                             if ( !t.isAlive() ) {
+                                /*
                                 System.out.println("Thread dead: "+t);
                                 Database db = (Database) _threads.get( t );
                                 if ( db.isActive() ) {
@@ -589,6 +590,7 @@ public class DatabaseImpl
                                     }
                                 }
                                 threads.remove();
+                                */
                             }
                         }
                     //}
