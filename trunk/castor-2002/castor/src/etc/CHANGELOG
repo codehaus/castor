@@ -1,6 +1,9 @@
 Version (CVS)
 -------------
 
+XML:   Added setNSPrefixAtRoot method. When used in conjunction with setNamespaceMapping this
+	will insert the namepsace declarations at the root node.
+	(Andrew Fawcett, andrew.fawcett@coda.com)
 XML:    Bug fix for using addXxx methods.
         (Fix submitted by Michael Thyen <mthyen@excite.com>)
 
