@@ -23,6 +23,33 @@
 					<date></date>
 				</bug>
 -->
+	    <release version="CVS">
+	        <description>New and on-going development</description>
+    		<date>tbd</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+              Short description days all ...
+            </summary>
+			<bugs>
+				<bug id="1877">
+					<description>
+						Fixed wrong class and method name for Websphere 5.0 transaction manager factory.
+					</description>
+					<contributor>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>Lilians Auvigne)</reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050217</date>
+				</bug>
+			</bugs>
+		</release>
 
 	    <release version="0.9.6">
          <description>Bug fixes in Castor JDO, XML.</description>
@@ -62,8 +89,8 @@
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
 					<reporter>Jon Wilmoth</reporter>
-               <type>Bug</type>
-               <project>JDO</project>
+					<type>Bug</type>
+					<project>JDO</project>
 					<module>Core</module>
 					<date>20050208</date>
 				</bug>
