@@ -1082,10 +1082,13 @@ public class SourceFactory  {
             JType type = temp.getType();
             JType component = null;
             String name = temp.getName();
-            String setName = "set" + JavaNaming.toJavaClassName(name);
+            if (name.startsWith("_"))
+                name = JavaNaming.toJavaClassName(name.substring(1));
+            else
+                name = JavaNaming.toJavaClassName(name);
+            String setName = "set" + name;
             String componentName = null;
-
-            if (name.indexOf("_has") == -1) {
+            if (name.indexOf("Has") == -1) {
                //Collection needs a specific handling
                if ( (type.getName().equals("java.util.Vector")) ||
                     (type.getName().equals("java.util.ArrayList")) ) {
@@ -1108,7 +1111,7 @@ public class SourceFactory  {
                     tempName = null;
                     jsc.add(name);
                     jsc.append(" = RandomHelper.getRandom(");
-                    jsc.append(name);
+                    jsc.append(temp.getName());
                     jsc.append(", ");
                     jsc.append(componentName);
                     jsc.append(".class);");
@@ -1116,7 +1119,7 @@ public class SourceFactory  {
                else if (type.isPrimitive()) {
                  jsc.add(setName);
                  jsc.append("(RandomHelper.getRandom(");
-                 jsc.append(name);
+                 jsc.append(temp.getName());
                  jsc.append("));");
                }
                else {
@@ -1124,7 +1127,7 @@ public class SourceFactory  {
                  jsc.append("((");
                  jsc.append(type.getName());
                  jsc.append(")RandomHelper.getRandom(");
-                 jsc.append(name);
+                 jsc.append(temp.getName());
                  jsc.append(", ");
                  jsc.append(type.getName());
                  jsc.append(".class));");
