@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+XML: Fixed bug that prevented string-to-primitive conversion code from being
+     executed for identity fields (kvisco) 20010808
+      - Bug reported by Patric Bechtel
+
 XML: Fixed bug which prevented IDREFS from working properly (kvisco) 20010807
       - Applied patches sent in from Steve Vaughan
 
