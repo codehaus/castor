@@ -99,5 +99,19 @@ public interface QueryResults
      */
     public void close();
 
+    /**
+     * moves the result of the query to the absolute position in the
+     * resultset
+     * @param int The row to move to
+     * @throws PersistenceException A persistence error occured
+     */
+    public boolean absolute(int row)
+      throws PersistenceException;
+
+    /**
+     * finds the size of the resulting resultset from the query.
+     */
+    public int size()
+      throws PersistenceException;
 
 }

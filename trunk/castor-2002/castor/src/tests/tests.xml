@@ -92,6 +92,9 @@
     <!-- jdo.ListTypes is a helper class for
               writing castor jdo driver      -->
     <!-- <case class="jdo.ListTypes" /> -->
+    <case class="jdo.Size" />
+    <case class="jdo.Absolute" />
+
   </category>
 
   <category name="mysql" class="jdo.JDOCategory">
@@ -207,6 +210,8 @@
     <case class="jdo.CustomInstanceFactory" />
 
     <!-- D -->
+    <case class="jdo.Size" />
+    <case class="jdo.Absolute" />
   </category>
 
 </harness>

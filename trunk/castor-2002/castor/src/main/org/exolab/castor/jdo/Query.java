@@ -190,6 +190,12 @@ public interface Query
     public QueryResults execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException;
 
+    /**
+     * <b>Experimental</b>
+     * This is used for cursor support
+     */
+    public QueryResults execute( boolean scrollable )
+        throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
      * <b>Experimental</b>
@@ -213,6 +219,12 @@ public interface Query
     public QueryResults execute( short accessMode )
         throws QueryException, PersistenceException, TransactionNotInProgressException;
 
+    /*
+     * <b>Experimental</b>
+     * This is used for cursor support
+     */
+    public QueryResults execute( short accessMode, boolean scrollable )
+        throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
      * Close the query and release all resources held by the query.
@@ -221,4 +233,3 @@ public interface Query
 
 
 }
-

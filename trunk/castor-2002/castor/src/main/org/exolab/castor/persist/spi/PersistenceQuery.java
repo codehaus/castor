@@ -130,6 +130,18 @@ public interface PersistenceQuery
     public void execute( Object conn, AccessMode accessMode )
         throws QueryException, PersistenceException;
 
+    /**
+     * same as above, but parameterized for scrollable resultsets.
+     * @param conn An open connection
+     * @param accessMode The access mode (null equals shared)
+     * @param scrollable The db cursor mode.
+     * @throws QueryException An invalid query
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public void execute( Object conn, AccessMode accessMode, boolean scrollable )
+        throws QueryException, PersistenceException;
+
 
     /**
      * Returns the identity of the next object to be returned.
@@ -180,6 +192,21 @@ public interface PersistenceQuery
      */
     public void close();
     
+    /**
+     * moves the result of the query to the absolute position in the
+     * resultset
+     * @param int The row to move to
+     * @throws PersistenceException A persistence error occured
+     */
+    public boolean absolute(int row)
+      throws PersistenceException;
+
+    /**
+     * finds the size of the resulting resultset from the query.
+     */
+    public int size()
+      throws PersistenceException;
+
 
 }
 

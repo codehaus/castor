@@ -661,14 +661,20 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized QueryResults query( LockEngine engine, 
-            PersistenceQuery query, AccessMode accessMode )
+            PersistenceQuery query, AccessMode accessMode, boolean scrollable )
             throws QueryException, PersistenceException {
         // Need to execute query at this point. This will result in a
         // new result set from the query, or an exception.
-        query.execute( getConnection( engine ), accessMode );
+        query.execute( getConnection( engine ), accessMode, scrollable);
         return new QueryResults( this, engine, query, accessMode, _db );
     }
 
+    public synchronized QueryResults query( LockEngine engine,
+            PersistenceQuery query, AccessMode accessMode )
+            throws QueryException, PersistenceException
+      {
+         return query( engine, query, accessMode, false );
+      }
     /**
      * Walk a data object tree starting from the specified object, and
      * mark all object to be created.

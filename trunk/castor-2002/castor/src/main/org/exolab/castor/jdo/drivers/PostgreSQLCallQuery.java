@@ -127,6 +127,17 @@ final class PostgreSQLCallQuery implements PersistenceQuery
         _values = new Object[ _types.length ];
     }
 
+    public boolean absolute(int row)
+      throws PersistenceException
+    {
+      return false;
+    }
+
+    public int size()
+      throws PersistenceException
+    {
+      return 0;
+    }
 
     public int getParameterCount()
     {
@@ -153,6 +164,11 @@ final class PostgreSQLCallQuery implements PersistenceQuery
         return _javaClass;
     }
 
+    public void execute( Object conn, AccessMode accessMode, boolean scrollable)
+      throws QueryException, PersistenceException
+    {
+      execute(conn, accessMode);
+    }
 
     public void execute( Object conn, AccessMode accessMode )
         throws QueryException, PersistenceException
