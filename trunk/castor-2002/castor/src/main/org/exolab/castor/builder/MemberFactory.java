@@ -90,6 +90,7 @@ public class MemberFactory {
         XSType xsType = new XSString();
         String fieldName = "_content";
         FieldInfo fInfo = new FieldInfo(new XSString(),fieldName);
+        fInfo.setNodeType(XMLInfo.TEXT_TYPE);
         fInfo.setComment("internal character storage");
         fInfo.setRequired(false);
         fInfo.setNodeName("#text");
