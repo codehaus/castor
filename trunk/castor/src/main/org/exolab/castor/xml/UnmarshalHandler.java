@@ -1115,6 +1115,18 @@ public final class UnmarshalHandler extends MarshalFramework
             
             descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
             
+            //-- Namespace patch, should be moved to XMLClassDescriptor, but
+            //-- this is the least intrusive patch at the moment. kv - 20030423
+            if (descriptor != null) {
+                if ((namespace != null) && (namespace.length() > 0)) {
+                    if (!namespaceEquals(namespace, descriptor.getNameSpaceURI())) {
+                        descriptor = null;
+                    }
+                }
+            }
+            //-- end namespace patch
+            
+            
             /*
                If descriptor is null, we need to handle possible inheritence,
                which might not be described in the current ClassDescriptor.
