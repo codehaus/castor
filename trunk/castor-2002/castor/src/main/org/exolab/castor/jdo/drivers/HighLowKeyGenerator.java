@@ -97,6 +97,10 @@ public class HighLowKeyGenerator implements KeyGenerator
     // grab size as int
     private int _grabSizeI;
 
+    // flag of use of the same connection
+    // (less efficient, but in EJB envirinment we have no choice for now) 
+    private boolean _sameConnection;
+
     // grab size as BigDecimal
     private BigDecimal _grabSizeD;
 
@@ -105,6 +109,7 @@ public class HighLowKeyGenerator implements KeyGenerator
     
     // maximum possible values after which database operation is needed
     private Hashtable _maxValues = new Hashtable();
+
 
     /**
      * Initialize the HIGH/LOW key generator.
@@ -145,6 +150,7 @@ public class HighLowKeyGenerator implements KeyGenerator
             throw new MappingException( Messages.format( "mapping.wrongKeyGenParam",
                                         factorStr, GRAB_SIZE, getClass().getName() ) );
         _grabSizeD = new BigDecimal( _grabSizeI );
+        _sameConnection = "true".equals( params.getProperty("same-connection") );
     }
 
     /**
@@ -183,7 +189,8 @@ public class HighLowKeyGenerator implements KeyGenerator
 
             try {
                 // the separate connection should be committed/rolled back at this point
-                conn.rollback();
+                if ( ! _sameConnection ) 
+                    conn.rollback();
 
                 // Create SQL sentence of the form
                 // "SELECT seq_val FROM seq_table WHERE seq_key='table'"
@@ -278,16 +285,21 @@ public class HighLowKeyGenerator implements KeyGenerator
                         success = true;
                     }
                 }
-                if ( success ) 
-                    conn.commit();
-                else {
-                    conn.rollback();
-                    throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
+                if ( ! _sameConnection ) {
+                    if ( success ) 
+                        conn.commit();
+                    else {
+                        conn.rollback();
+                    }
                 }
+                if ( ! success )
+                    throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
             } catch ( SQLException ex ) {
-                try {
-                    conn.rollback();
-                } catch ( SQLException ex2 ) {
+                if ( ! _sameConnection ) {
+                    try {
+                        conn.rollback();
+                    } catch ( SQLException ex2 ) {
+                    }
                 }
                 throw new PersistenceException( Messages.format(
                         "persist.keyGenSQL", ex.toString() ), ex );
@@ -345,7 +357,7 @@ public class HighLowKeyGenerator implements KeyGenerator
      * Is key generated in the same connection as INSERT?
      */
     public final boolean isInSameConnection() {
-        return false;
+        return _sameConnection;
     }
 
 }
