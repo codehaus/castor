@@ -1,5 +1,12 @@
-Version (CVS)
--------------
+Version 0.9 February, 15 2001
+-----------------------------
+
+XML:   Adding a new feature for handling all types of content and not only TEXT content (Arnaud)  
+
+XML:   Change the read method name for arrays (Arnaud)
+       (bug reported by thebuledirt@yahoo.com)	 
+
+XML:   Several bug fixes in the SourceGenerator concerning the attribute string value (Arnaud) 
 
 XML:   Added improved grouping support. Grouping support is not finished,
        but is definately improved over Castor 0.8.11. 1st-level choice is
