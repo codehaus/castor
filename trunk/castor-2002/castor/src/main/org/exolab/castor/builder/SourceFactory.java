@@ -1315,8 +1315,31 @@ public class SourceFactory  {
         Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
-            if (attr.isReference())
-                attr = complexType.getSchema().getAttribute(attr.getName(false));
+            if (attr.isReference()) {
+               AttributeDecl tempAttr = attr.getSchema().getAttribute(attr.getName(false));
+               if (tempAttr == null) {
+                    String err = "Unable to find attribute referenced :\" ";
+                    err += attr.getName(false);
+                    err +="\"";
+                    throw new IllegalStateException(err);
+               }
+               //This part of code should be introduced
+               //in the new SOM
+               //we check if the attribute is required, has default value, etc...
+               if (attr.isDefault()) {
+                   tempAttr.setDefault();
+                   tempAttr.setValue(attr.getValue());
+               }
+               if (attr.isFixed()) {
+                   tempAttr.setFixed();
+                   tempAttr.setValue(attr.getValue());
+               }
+               String use = attr.getUse();
+               if ( (use != null) && (use.length() != 0) )
+                   tempAttr.setUse(use);
+
+               attr = tempAttr;
+            }
 
             //-- if we have a new SimpleType...generate ClassInfo
             SimpleType sType = attr.getSimpleType();
