@@ -244,6 +244,13 @@ Person person = (Person)unmarshaller.unmarshal(reader);
               descriptor cannot be found for a class, introspection occurs
               automatically.
           </p>
+          <p>
+              Some behavior of the introspector may be controlled by setting
+              the appropriate properties in the <i>castor.properties</i> file.
+              Such behavior consists of changing the naming conventions, and
+              whether primitive types are treated as attributes or elements.
+              See <i>castor.properties</i> file for more information.
+          </p>
            <p>
               A mapping file may also be used to "describe" the classes which
               are to be marshalled. The mapping is loaded before any
