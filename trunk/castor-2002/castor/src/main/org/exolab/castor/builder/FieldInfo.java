@@ -66,8 +66,6 @@ public class FieldInfo extends XMLInfo {
     private String name = null;
 
 
-    private CodeHelper codeHelper = null;
-
     private ClassInfo declaringClassInfo = null;
 
     private String _comment    = null;
@@ -216,8 +214,8 @@ public class FieldInfo extends XMLInfo {
         jClass.addMethod(method);
 
         String paramName = this.name;
-        
-        //-- make parameter name pretty, 
+
+        //-- make parameter name pretty,
         //-- simply for aesthetic beauty
         if (paramName.indexOf('_') == 0) {
             String tempName = paramName.substring(1);
@@ -288,11 +286,6 @@ public class FieldInfo extends XMLInfo {
 
 
     } //-- createAccessMethods
-
-
-    public CodeHelper getCodeHelper() {
-        return codeHelper;
-    } //-- getCodeHelper
 
 
     /**
@@ -407,14 +400,6 @@ public class FieldInfo extends XMLInfo {
         return (_transient || _final || _static);
     } //-- isTransient
 
-    /**
-     * Sets the CodeHelper to use when creating source code
-     * @param codeHelper the CodeHelper to use when creating source code
-     * @see FieldInfo
-    **/
-    public void setCodeHelper(CodeHelper codeHelper) {
-        this.codeHelper = codeHelper;
-    } //-- setCodeHelper
 
     /**
      * Sets the comment for this Member
