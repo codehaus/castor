@@ -77,6 +77,10 @@
           <li>Mapping file supporting object dependency and relations. </li>
 
           <li>Serializable field type</li>
+
+          <li>Calling Stored procedures returning result sets</li>
+
+          <li>Support for many data types, including BLOBs and CLOBs</li>
         </ul>
       </section>
 
@@ -115,7 +119,7 @@
 
         <li>More generic mapping API and mapping tools.</li>
 
-        <li>Stored procedures, BLOBs, XML content.</li>
+        <li>Stored procedures, XML content.</li>
 
         <li>Debugging tools.</li>
       </ul>
@@ -134,7 +138,7 @@
 
             <li>SQLData, DOM and Castor XML data object field types</li>
 
-            <li>Stored procedures</li>
+            <li>Calling Stored procedures without result set</li>
          </ul>
        </section>
        <section title="XML">
