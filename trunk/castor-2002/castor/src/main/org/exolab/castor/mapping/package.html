@@ -5,23 +5,16 @@
     <p>This package provides a common base for the class mapping descriptors and tools to
        generate mapping descriptors from a mapping file. The Java objects for the XML-based
        mapping file are contained in the sub-package <tt>xml</tt> and the DTD and XML schema
-       originate in this package.</p>
+       originate in this package. The sub-package <tt>loader</tt> implements a mapping loader.</p>
 
-    <p>{@link ClassDesc} is a mapping descriptor for a Java class,  consisting of any
-       number of fields. {@link FieldDesc} is a mapping descriptor for a Java field within
-       that class. {@link ContainerFieldDesc} describes a special type of field, one that
-       contains additional fields that are mapped as part of the container class, not with a
-       separate class mapping. Relations are described using a {@link RelationDesc}.</p>
-
-   <p>{@link Types} provides generic type functionality, e.g. constructing new instances,
-      getting the class from a type name, determining if a class is a simple object, immutable, etc.
-      Conversion between different Java types is implemented through a series of convertors
-      implementing the {@link TypeConvertor} interface and listed in {@link Types}.</p>
+    <p>{@link ClassDescriptor} is a mapping descriptor for a Java class, consisting of any
+       number of fields. {@link FieldDescriptor} is a mapping descriptor for a Java field
+       within that class. Access to the field value is granted through a {@link FieldHandler},
+       obtained from the field descriptor.</p>
 
    <p>{@link MappingResolver} is an interface to a collection of class mapping that can provide
-      the mapping descriptor ({@link ClassDesc}>) for a particular Java class. A {@link MappingResolver}
-      is constructed using a mapping helper, with {@link MappingHelper} providing common functionality,
-      and each engine using its own derived implementation.</p>
+      the mapping descriptor for a particular Java class. A {@link MappingResolver} is constructed
+      using a mapping loader, see the <tt>loader</tt> package.</p>
 
   </body>
 </html>
