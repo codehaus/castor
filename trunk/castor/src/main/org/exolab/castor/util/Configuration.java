@@ -1037,6 +1037,10 @@ public abstract class Configuration
             catch ( IOException except ) {
                 // Do nothing
             }
+            catch (SecurityException sx) {
+                // Most likely running under an app-server
+                // Do nothing
+            }
         }
         
 
