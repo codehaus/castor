@@ -78,7 +78,10 @@ public class DTDResolver
      */
     private static final String[] PublicId = new String[] {
         "-//EXOLAB/Castor Mapping DTD Version 1.0//EN",
-        "-//EXOLAB/Castor Mapping Schema Version 1.0//EN"
+        "-//EXOLAB/Castor Mapping Schema Version 1.0//EN",
+        "-//W3C//DTD XMLSCHEMA 19991216//EN",
+        null,
+        null
     };
 
     /**
@@ -86,15 +89,21 @@ public class DTDResolver
      */
     private static final String[] SystemId = new String[] {
         "http://castor.exolab.org/mapping.dtd",
-        "http://castor.exolab.org/mapping.xsd"
+        "http://castor.exolab.org/mapping.xsd",
+        "http://www.w3.org/TR/2000/WD-xmlschema-1-20000225/structures.dtd",
+        "http://www.w3.org/TR/2000/WD-xmlschema-2-20000225/datatypes.dtd",
+        "http://www.w3.org/TR/2000/WD-xmlschema-1-20000225/structures.xsd"
     };
 
     /**
      * List of resources for the actual files.
      */
     private static final String[] Resource = new String[] {
-        "/org/exolab/castor/mapping/schema/mapping.dtd",
-        "/org/exolab/castor/mapping/schame/mapping.xsd"
+        "/org/exolab/castor/mapping/mapping.dtd",
+        "/org/exolab/castor/mapping/mapping.xsd",
+        "/org/exolab/castor/mapping/structures.dtd",
+        "/org/exolab/castor/mapping/datatypes.dtd",
+        "/org/exolab/castor/mapping/structures.xsd"
     };
 
 
@@ -152,7 +161,8 @@ public class DTDResolver
         
         // First, resolve all the DTD/schema.
         for ( i = 0 ; i < PublicId.length ; ++i ) {
-            if ( PublicId[ i ].equals( publicId ) || SystemId[ i ].equals( systemId ) ) {
+            if ( ( PublicId[ i ] != null && PublicId[ i ].equals( publicId ) ) ||
+                 ( SystemId[ i ] != null && SystemId[ i ].equals( systemId ) ) ) {
                 return new InputSource( getClass().getResourceAsStream( Resource[ i ] ) );
             }
         }
