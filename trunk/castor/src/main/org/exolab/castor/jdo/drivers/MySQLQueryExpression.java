@@ -47,8 +47,6 @@
 package org.exolab.castor.jdo.drivers;
 
 
-import java.util.Map;
-
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
@@ -80,8 +78,10 @@ public final class MySQLQueryExpression
         if ( _limit != null )
         {
             sql.append(JDBCSyntax.Limit);
+
             if (_offset != null)
-                sql.append(_offset).append(",");
+                sql.append(_offset).append(", ");
+
             sql.append(_limit);
         }
 
@@ -111,17 +111,4 @@ public final class MySQLQueryExpression
     	return true;
     }
 
-    /**
-	 * Post-process the ParamInfo instances for DB-specific re-ordering
-     * @param paramInfo
-     * @return re-ordered bind parameter info
-     */
-    public Map postProcessParamInfo(Map paramInfo)
-    {
-        if ( _limit != null && _offset != null ) {
-            return reorderParamInfo(paramInfo, _limitFirstBindIdx, _limitLastBindIdx, _offsetFirstBindIdx, _offsetLastBindIdx);
-        } else {
-            return paramInfo;
-        }
-    }
 }

@@ -48,7 +48,6 @@ package org.exolab.castor.persist.spi;
 
 
 import org.exolab.castor.jdo.DbMetaInfo;
-import java.util.Map;
 
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
@@ -231,7 +230,7 @@ public interface QueryExpression
      * @param paramIndexTo last bind variable index
      * @throws SyntaxNotSupportedException If the LIMIT clause is not supported by the RDBMS.
      */
-    public void addLimitClause( String limitClause, int paramIndexFrom, int paramIndexTo )
+    public void addLimitClause( String limitClause )
     	throws SyntaxNotSupportedException;  
 
     /**
@@ -242,7 +241,7 @@ public interface QueryExpression
      * @param paramIndexTo last bind variable index
      * @throws SyntaxNotSupportedException If the OFFSET clause is not supported by the RDBMS.
      */
-    public void addOffsetClause( String offsetClause, int paramIndexFrom, int paramIndexTo )
+    public void addOffsetClause( String offsetClause )
     	throws SyntaxNotSupportedException;  
 
     /**
@@ -361,13 +360,6 @@ public interface QueryExpression
      */
     public boolean isOffsetClauseSupported();
 
-    /**
-	 * Post-process the ParamInfo instances for DB-specific re-ordering
-     * @param paramInfo
-     * @return re-ordered bind parameter info
-     */
-    public Map postProcessParamInfo(Map paramInfo);
-    
     /**
      * Store database meta information
      * @param dbInfo DbMetaInfo instance

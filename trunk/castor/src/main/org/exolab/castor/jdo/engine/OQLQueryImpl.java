@@ -256,7 +256,7 @@ public class OQLQueryImpl
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
         _expr = walker.getQueryExpression();
-        _paramInfo = (Hashtable) _expr.postProcessParamInfo(walker.getParamInfo());
+        _paramInfo = walker.getParamInfo();
         _projectionType = walker.getProjectionType();
         _pathInfo = walker.getPathInfo();
 
@@ -530,7 +530,7 @@ public class OQLQueryImpl
 	  if(_expr != null)
           return _expr.getStatement(true);
         else
-         return  _spCall;
+         return _spCall;
     }
 
     public void close()
