@@ -49,6 +49,9 @@ package org.exolab.castor.jdo.engine;
 
 import java.util.Vector;
 import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.CallableStatement;
@@ -66,29 +69,26 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
+import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 //import org.exolab.castor.persist.ClassMolder;
+import org.exolab.castor.persist.AccessMode;
+import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.persist.OID;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.EntityInfo;
+import org.exolab.castor.persist.EntityFieldInfo;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.persist.types.Complex;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.OID;
-import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.types.Complex;
-import java.util.ArrayList;
-import java.util.HashSet;
-import org.exolab.castor.persist.Entity;
-import org.exolab.castor.persist.EntityInfo;
-import org.exolab.castor.persist.EntityFieldInfo;
 
 
 /**
@@ -175,7 +175,7 @@ public final class SQLEngine implements Persistence {
 
 
 
-    SQLEngine( /*JDOClassDescriptor clsDesc*/ Entity entity,
+    SQLEngine( /*JDOClassDescriptor clsDesc*/ EntityInfo entityInfo,
                LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
         throws MappingException {
 
@@ -472,9 +472,26 @@ public final class SQLEngine implements Persistence {
     }
 
 
-    public Object create( Object conn, Object[] fields, Object identity )
-            throws DuplicateIdentityException, PersistenceException {
-
+    /**
+     * Creates a new object in persistence storage. Called for an
+     * object that was created during the transaction when the identity
+     * of that object is known. Creates a new record in persistence
+     * storage. Must detect an attempt to create an object with the
+     * same identity and must retain a lock on the object after creation.
+     * If the identity is null, an identity might be created and returned
+     * by this method.
+     *
+     * @param tx The transaction context
+     * @param conn An open connection
+     * @param entity The entity to create
+     * @return The object's identity
+     * @throws DuplicateIdentityException An object with the same
+     *   identity already exists in persistent storage
+     * @throws PersistenceException A persistence error occured
+     */
+    public Object create( TransactionContext tx, Object conn, Entity entity )
+        throws DuplicateIdentityException, PersistenceException {
+/*
         PreparedStatement stmt = null;
         int               count;
         Object            sqlId;
@@ -641,6 +658,7 @@ public final class SQLEngine implements Persistence {
             } catch ( SQLException except2 ) { }
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
+*/ return null;
     }
 
 
@@ -707,10 +725,38 @@ public final class SQLEngine implements Persistence {
         return sb.toString();
     }
 
-    public Object store( Object conn, Object[] fields, Object identity,
-                         Object[] original, Object stamp )
+    /**
+     * Stores the object in persistent storage, given the object fields
+     * and its identity. The object has been loaded before or has been
+     * created through a call to {@link #create}. This method should
+     * detect whether the object has been modified in persistent storage
+     * since it was loaded. After this method returns all locks on the
+     * object must be retained until the transaction has completed.
+     * This method may return a new stamp to track further updates to
+     * the object.
+     * <p>
+     * If the object was not retrieved for exclusive access, this
+     * method will be asked to perform dirty checking prior to storing
+     * the object. The <tt>original</tt> argument will contains the
+     * object's original fields as retrieved in the transaction, and
+     * <tt>stamp</tt> the object's stamp returned from a successful
+     * call to {@link #load}. These arguments are null for objects
+     * retrieved with an exclusive lock.
+     *
+     * @param tx The transaction context
+     * @param conn An open connection
+     * @param entity The entity to store
+     * @param original The original entity, or null
+     * @return The object's stamp, or null
+     * @throws ObjectModifiedException The object has been modified
+     *  in persistence storage since it was last loaded
+     * @throws ObjectDeletedException Indicates the object has been
+     *  deleted from persistence storage
+     * @throws PersistenceException A persistence error occured
+     */
+    public Object store( TransactionContext tx, Object conn, Entity entity, Entity orginal )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
-
+/*
         PreparedStatement stmt = null;
         int               count;
 
@@ -801,7 +847,7 @@ public final class SQLEngine implements Persistence {
                 // dirty checking. Determine which is which.
                 stmt.close();
                 if ( original != null ) {
-                    stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
+                    stmt = ( (Connection) conn ).prepareStatement( _sqlLoad ); //_pkLookup
 
                     // bind the identity to the prepareStatement
                     count = 1;
@@ -836,12 +882,25 @@ public final class SQLEngine implements Persistence {
             } catch ( SQLException except2 ) { }
             throw new PersistenceException( Messages.format("persist.nested", except) );
         }
+*/ return null;
     }
 
 
-    public void delete( Object conn, Object identity )
-            throws PersistenceException {
-
+    /**
+     * Deletes the object from persistent storage, given the object'
+     * identity. The object has been loaded before or has been created
+     * through a call to {@link #create}. After this method returns all
+     * locks on the object must be retained until the transaction has
+     * completed.
+     *
+     * @param tx The transaction context
+     * @param conn An open connection
+     * @param entity The entity to delete
+     * @throws PersistenceException A persistence error occured
+     */
+    public void delete( TransactionContext tx, Object conn, Entity entity )
+        throws PersistenceException {
+/*
         PreparedStatement stmt = null;
 
         try {
@@ -880,12 +939,29 @@ public final class SQLEngine implements Persistence {
             } catch ( SQLException except2 ) { }
             throw new PersistenceException( Messages.format("persist.nested", except) );
         }
+*/
     }
 
 
-    public void writeLock( Object conn, Object identity )
-            throws ObjectDeletedException, PersistenceException {
-
+    /**
+     * Obtains a write lock on the object. This method is called in
+     * order to lock the object and prevent concurrent access from
+     * other transactions. The object is known to have been loaded
+     * before either in this or another transaction. This method is
+     * used to assure that updates or deletion of the object will
+     * succeed when the transaction completes, without attempting to
+     * reload the object.
+     *
+     * @param tx The transaction context
+     * @param conn An open connection
+     * @param entity The entity to lock
+     * @throws ObjectDeletedException Indicates the object has been
+     *  deleted from persistence storage
+     * @throws PersistenceException A persistence error occured
+     */
+    public void writeLock( TransactionContext tx, Object conn, Entity entity )
+        throws ObjectDeletedException, PersistenceException {
+/*
         PreparedStatement stmt = null;
         try {
             // Must obtain lock on record in parent table first.
@@ -924,12 +1000,31 @@ public final class SQLEngine implements Persistence {
             } catch ( SQLException except2 ) { }
             throw new PersistenceException( Messages.format("persist.nested", except) );
         }
+*/
     }
 
 
-    public Object load( Object conn, Object[] fields, Object identity, AccessMode accessMode )
-            throws ObjectNotFoundException, PersistenceException {
-
+    /**
+     * Loads the object from persistence storage. This method will load
+     * the object fields from persistence storage based on the object's
+     * identity. This method may return a stamp which can be used at a
+     * later point to determine whether the copy of the object in
+     * persistence storage is newer than the cached copy (see {@link
+     * #store}). If <tt>lock</tt> is true the object must be
+     * locked in persistence storage to prevent concurrent updates.
+     *
+     * @param tx The transaction context
+     * @param conn An open connection
+     * @param entity The entity to load into
+     * @param accessMode The access mode (null equals shared)
+     * @return The object's stamp, or null
+     * @throws ObjectNotFoundException The object was not found in
+     *   persistent storage
+     * @throws PersistenceException A persistence error occured
+     */
+    public Object load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
+        throws ObjectNotFoundException, PersistenceException {
+/*
         PreparedStatement stmt;
         ResultSet         rs;
         Object            stamp = null;
@@ -1053,6 +1148,25 @@ public final class SQLEngine implements Persistence {
             throw new PersistenceException( Messages.format("persist.nested", except) );
         }
         return stamp;
+*/ return null;
+    }
+
+    /**
+     * Loads all the identities of entity in which the specified field match
+     * the supplied value. Conceptually, the specified field is a foreign key
+     * field; the supplied values is the value the foreign key.
+     *
+     * @param tx The transaction context
+     * @param conn An open connection
+     * @param field The field on the "many" side of the relation
+     * @param value The value of the field
+     * @param entityIds The list of loaded identities that should be filled in the method
+     * @param accessMode The access mode (null equals shared)
+     * @throws PersistenceException A persistence error occured
+     */
+    public Object loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
+            throws PersistenceException {
+        return null;
     }
 
     private void buildSql() throws QueryException {

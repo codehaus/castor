@@ -99,7 +99,8 @@ public interface PersistenceFactory
         throws MappingException;
 
 
-    public Connector getConnector( Database conf );
+    public Connector getConnector( Database conf )
+        throws MappingException, PersistenceException;
 
     /**
      * Returns a new empty query expression suitable for the underlying
