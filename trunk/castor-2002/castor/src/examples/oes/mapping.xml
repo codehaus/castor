@@ -4,7 +4,7 @@
 
   <class name="oes.Categories">
     <map-to xml="categories" />
-    <field name="category" type="oes.Category" collection="vector" >
+    <field name="categories" type="oes.Category" collection="vector" >
       <xml name="category" node="element" />
     </field>
   </class>
