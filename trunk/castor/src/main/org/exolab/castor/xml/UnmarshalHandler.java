@@ -1938,13 +1938,22 @@ public final class UnmarshalHandler extends MarshalFramework
                     continue;
                 }
                 classDesc = targetState.classDesc;
-                descriptor = classDesc.getFieldDescriptor(name, NodeType.Attribute);
                 
-                if (descriptor != null) {
-                    String tmpPath = descriptor.getLocationPath();
-                    if (tmpPath == null) tmpPath = "";
-                    if (path.equals(tmpPath)) break; //-- found
+                XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
+                boolean found = false;
+                for (int a = 0; a < descriptors.length; a++) {
+                    descriptor = descriptors[a];
+                    if (descriptor == null) continue;
+                    if (descriptor.matches(name)) {
+                        String tmpPath = descriptor.getLocationPath();
+                        if (tmpPath == null) tmpPath = "";
+                        if (path.equals(tmpPath)) {
+                            found = true;
+                            break;
+                        }
+                    }
                 }
+                if (found) break;
                         
                 path = targetState.elementName + "/" + path;
                 //-- reset descriptor to make sure we don't
