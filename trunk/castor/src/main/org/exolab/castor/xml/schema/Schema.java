@@ -1050,22 +1050,37 @@ public class Schema extends Annotated {
      }
 
     /**
-     * Returns an imported schema by its namespace
-     * @return The imported schema
+     * Returns the imported schema with the given namespace
+     * 
+     * @param ns the namespace of the imported schema to return
+     * @return the imported schema
      */
-    public Schema getImportedSchema(String ns)
-    {
+    public Schema getImportedSchema(String ns) {
+        return getImportedSchema(ns, null);
+    } //-- getImportedSchema
+    
+    /**
+     * Returns the imported schema with the given namespace
+     * 
+     * @param ns the namespace of the imported schema to return
+     * @return the imported schema
+     */
+    private Schema getImportedSchema(String ns, Schema caller) {
+        
+        //-- Check for recursive calls
+        if (caller == this) return null;
+        //-- Associate caller if necessary
+        if (caller == null) caller = this;
+        
         Schema result = (Schema) _importedSchemas.get(ns);
         //--maybe we are the schema imported is at
         //--a depth > 1
         if (result == null) {
             Enumeration schemas = _importedSchemas.elements();
-            boolean found = false;
-            while (schemas.hasMoreElements() && !found) {
+            while (schemas.hasMoreElements()) {
                 Schema temp = (Schema) schemas.nextElement();
-                result = temp.getImportedSchema(ns);
-                if (result != null)
-                   found = true;
+                result = temp.getImportedSchema(ns, caller);
+                if (result != null) break;
            }
         }
         return result;
