@@ -28,7 +28,7 @@
 
       <p>Castor's source code generator creates a set of Java classes
          which represent an object model for an XML Schema
-         (W3C XML Schema, 20000407 Working Draft)<sup>1</sup>, as well as the
+         (W3C XML Schema, 200001024 Candidate Recommendation)<sup>1</sup>, as well as the
          necessary Class Descriptors used by the
          <a href="xml-framework.xml">marshalling framework</a>
          to obtain information about the generated classes.
@@ -269,7 +269,7 @@
   </section>
 
    <section>
-      <body-note><sup>1</sup>Castor 0.8.8 uses XML Schema draft 19991217</body-note>
+      <body-note><sup>1</sup>Castor 0.9.0 uses XML Schema Candidate Recommendation 20001024</body-note>
       <body-note>
          <sup>2</sup>XML Schema is a <a href="http://www.w3.org">W3C</a> Working Draft
       </body-note>
