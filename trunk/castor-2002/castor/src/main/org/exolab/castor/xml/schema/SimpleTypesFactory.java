@@ -356,7 +356,6 @@ public class SimpleTypesFactory
 	        }
 	        catch (Exception except)
 	        {
-				except.printStackTrace(System.out);
                 //Of course, this should not happen if the config files are there.
                 System.out.println(Messages.message("schema.cantLoadBuiltInTypes"));
                 throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
