@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- This file contains a list of Castor contributors -->
 <document url="http://castor.exolab.org/contributors.xml">
   <body>
@@ -473,6 +473,12 @@
     <name surname="Parent" given="Marc-Antoine"/>
     <email>Marc-Antoine_Parent@mitel.com</email>
     <description>Enhancements to the Castor DSML and bug fixing.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Pelchat" given="Stéphane"/>
+    <email>stephane@ofoto.com</email>
+    <description>Patches to enum and date field handlers to support "nillable" fields.</description>
   </contributor>
 
   <contributor type="Contributor">
