@@ -497,6 +497,12 @@ public final class UnmarshalHandler extends MarshalFramework
     public void endElement(String name)
         throws org.xml.sax.SAXException
     {
+        
+        
+        if (debug) {
+            message("#endElement: " + name);
+        }
+        
         //-- If we are skipping elements that have appeared in the XML but for
         //-- which we have no mapping, decrease the ignore depth counter and return
         if ( _ignoreElementDepth > 0) {
@@ -553,10 +559,12 @@ public final class UnmarshalHandler extends MarshalFramework
         Class type = state.type;
 
         if ( type == null ) {
-            //-- this message will only show up if debug
-            //-- is turned on...how should we handle this case?
-            //-- should it be a fatal error?
-            message("Ignoring " + state.elementName + " no descriptor was found");
+            if (!state.wrapper) {
+                //-- this message will only show up if debug
+                //-- is turned on...how should we handle this case?
+                //-- should it be a fatal error?
+                message("Ignoring " + state.elementName + " no descriptor was found");
+            }
             //-- remove current namespace scoping
             _namespaces = _namespaces.getParent();
             return;
@@ -575,6 +583,8 @@ public final class UnmarshalHandler extends MarshalFramework
             _namespaces = _namespaces.getParent();
             return;
         }
+        
+        /// DEBUG System.out.println("end: " + name);
 
         if (state.primitiveOrImmutable) {
             String str = null;
@@ -721,6 +731,10 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- get target object
         state = (UnmarshalState) _stateInfo.peek();
+        if (state.wrapper) {
+            state = fieldState.targetState;
+        }
+        
         //-- check to see if we have already read in
         //-- an element of this type
         if (!descriptor.isMultivalued() ) {
@@ -852,6 +866,10 @@ public final class UnmarshalHandler extends MarshalFramework
     public void startElement(String name, AttributeList attList)
         throws org.xml.sax.SAXException
     {
+        if (debug) {
+            message("#startElement: " + name);
+        }
+        
         //-- If we are skipping elements that have appeared in the XML but for
         //-- which we have no mapping, increase the ignore depth counter and return
         if ((!_strictElements) && (_ignoreElementDepth > 0)) {
@@ -1065,7 +1083,7 @@ public final class UnmarshalHandler extends MarshalFramework
         _stateInfo.push(state);
 
         //-- make sure we should proceed
-        if (parentState.object == null) return;
+        //if (parentState.object == null) return;
 
         Class _class = null;
 
@@ -1077,40 +1095,95 @@ public final class UnmarshalHandler extends MarshalFramework
                 classDesc = getClassDescriptor(parentState.object.getClass());
         }
 
-        //-- Find FieldDescriptor for the element
-        //-- we wish to unmarshal
-        XMLFieldDescriptor descriptor = null;
-        descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
-
-        /*
-          If descriptor is null, we need to handle possible inheritence,
-          which might not be described in the current ClassDescriptor.
-          This can be a slow process...for speed use the match attribute
-          of the xml element in the mapping file. This logic might
-          not be completely necessary, and perhaps we should remove it.
-        */
+        //----------------------------------------------------/
+        //- Find FieldDescriptor associated with the element -/
+        //----------------------------------------------------/
+        
+        //-- A reference to the FieldDescriptor associated
+        //-- the the "current" element
+        XMLFieldDescriptor descriptor = null; 
+        
+        //-- inherited class descriptor 
+        //-- (only needed if descriptor cannot be found directly)
         XMLClassDescriptor cdInherited = null;
-        if (descriptor == null) {
-             MarshalFramework.InheritanceMatch[] matches = searchInheritance(name, namespace, classDesc, _cdResolver);
-             if (matches.length != 0) {
-                 InheritanceMatch match = matches[0];
-                 descriptor  = match.parentFieldDesc;
-                 cdInherited = match.inheritedClassDesc;
-             }
+        
+        
+        //-- loop through stack and find correct descriptor
+        int pIdx = _stateInfo.size() - 2; //-- index of parentState
+        String path = "";
+        UnmarshalState targetState = parentState;
+        int count = 0;
+        boolean isWrapper = false;
+        while (descriptor == null) {
+            
+            descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
+            
+            /*
+               If descriptor is null, we need to handle possible inheritence,
+               which might not be described in the current ClassDescriptor.
+               This can be a slow process...for speed use the match attribute
+               of the xml element in the mapping file. This logic might
+               not be completely necessary, and perhaps we should remove it.
+            */
+            if ((descriptor == null) && (count == 0)) {
+                MarshalFramework.InheritanceMatch[] matches = searchInheritance(name, namespace, classDesc, _cdResolver);
+                if (matches.length != 0) {
+                    InheritanceMatch match = matches[0];
+                    descriptor  = match.parentFieldDesc;
+                    cdInherited = match.inheritedClassDesc;
+                    break; //-- found
+                }
+                isWrapper = (isWrapper || hasFieldsAtLocation(name, classDesc));
+            }
+            else if (descriptor != null) {
+                String tmpPath = descriptor.getLocationPath();
+                if (tmpPath == null) tmpPath = "";
+                if (path.equals(tmpPath)) break; //-- found
+            }
+            else {
+                String location = path + "/" + name;
+                isWrapper = (isWrapper || hasFieldsAtLocation(location, classDesc));
+            }
+            
+            //-- Make sure ther are more parent classes on stack
+            //-- otherwise break, since there is nothing to do
+            if (pIdx == 0) break;
+            
+            //-- adjust name and try parent
+            if (count == 0)
+                path = parentState.elementName;
+            else
+                path = parentState.elementName + "/" + path;
+                
+            //-- get 
+            --pIdx;
+            targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
+            classDesc = targetState.classDesc;
+            count++;
         }
-
+        
         //-- The field descriptor is still null, we face a problem
         if (descriptor == null) {
-
-            String msg = "unable to find FieldDescriptor for '" + name;
-            msg += "' in ClassDescriptor of " + classDesc.getXMLName();
-
-            //if we have no field descriptor and
-            //the class descriptor was introspected
-            //just log it
-            if (Introspector.introspected(classDesc)) {
-                message(msg);
+            
+            //-- isWrapper?
+            if (isWrapper) {
+                state.classDesc = new XMLClassDescriptorImpl(ContainerElement.class, name);
+                state.wrapper = true;
+                if (debug) {
+                    message("wrapper-element: " + name);
+                }
+                //-- process attributes
+                processWrapperAttributes(atts);
                 return;
+            }
+            
+            String mesg = "unable to find FieldDescriptor for '" + name;
+            mesg += "' in ClassDescriptor of " + classDesc.getXMLName();
+
+            //-- unwrap classDesc, if necessary, for the check
+            //-- Introspector.introspected done below
+            if (classDesc instanceof InternalXMLClassDescriptor) {
+                classDesc = ((InternalXMLClassDescriptor)classDesc).getClassDescriptor();
             }
 
             //-- If we are skipping elements that have appeared in the XML but for
@@ -1119,14 +1192,34 @@ public final class UnmarshalHandler extends MarshalFramework
                 ++_ignoreElementDepth;
                 //-- remove the StateInfo we just added
                 _stateInfo.pop();
+                if (debug) {
+                    message(mesg + " - ignoring extra element.");
+                }
                 return;
             }
-            //but if we could not find the field descriptor
-            //whereas a class descriptor has been provided (using the
-            //Source Generator for instance)
-            else throw new SAXException(msg);
-
+            //if we have no field descriptor and
+            //the class descriptor was introspected
+            //just log it
+            else if (Introspector.introspected(classDesc)) {
+                //if (warn)
+                message(mesg);
+                return;
+            }
+            //-- otherwise report error since we cannot find a suitable 
+            //-- descriptor
+            else {
+                throw new SAXException(mesg);
+            }
+        } //-- end null descriptor
+        
+        
+        //-- Save targetState (used in endElement)
+        if (targetState != parentState) {
+            state.targetState = targetState;
+            parentState = targetState; //-- reassign
         }
+            
+        /// DEBUG: System.out.println("path: " + path);
 
         Object object = parentState.object;
         //--container support
@@ -1653,7 +1746,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- Handle any non processed attributes...
         //-- This is useful for descriptors that might use
-        //-- wild-cards or other types of matching..as well
+        //-- wild-cards or other types of matching...as well
         //-- as backward compatibility...attribute descriptors
         //-- were erronously getting set with the default
         //-- namespace by the source generator...this is
@@ -1689,6 +1782,35 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- backward compatibility issue mentioned above.
             XMLFieldDescriptor descriptor =
                 classDesc.getFieldDescriptor(name, NodeType.Attribute);
+                
+            if (descriptor == null) {
+                //-- check for nested attribute...loop through
+                //-- stack and find correct descriptor
+                int pIdx = _stateInfo.size() - 2; //-- index of parentState
+                String path = state.elementName;
+                while (pIdx >= 0) {
+                    UnmarshalState targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
+                    --pIdx;
+                    if (targetState.wrapper) {
+                        path = targetState.elementName + "/" + path;
+                        continue;
+                    }
+                    classDesc = targetState.classDesc;
+                    descriptor = classDesc.getFieldDescriptor(name, NodeType.Attribute);
+                
+                    if (descriptor != null) {
+                        String tmpPath = descriptor.getLocationPath();
+                        if (tmpPath == null) tmpPath = "";
+                        if (path.equals(tmpPath)) break; //-- found
+                    }
+                        
+                    path = targetState.elementName + "/" + path;
+                    //-- reset descriptor to make sure we don't
+                    //-- exit the loop with a reference to a 
+                    //-- potentially incorrect one.
+                    descriptor = null;
+                }
+            }
             if (descriptor == null) {
                 if (_strictAttributes) {
                     //-- handle error
@@ -1713,6 +1835,75 @@ public final class UnmarshalHandler extends MarshalFramework
 
     } //-- processAttributes
 
+    /**
+     * Processes the given AttributeSet for wrapper elements.
+     * 
+     * @param atts the AttributeSet to process
+     */
+    private void processWrapperAttributes(AttributeSet atts)
+        throws org.xml.sax.SAXException
+    {
+        
+        UnmarshalState state = (UnmarshalState)_stateInfo.peek();
+        
+        //-- loop through attributes and look for the
+        //-- ancestor objects that they may belong to
+        for (int i = 0; i < atts.getSize(); i++) {
+            String name = atts.getName(i);
+            String namespace = atts.getNamespace(i);
+            
+            //-- skip XSI attributes
+            if (XSI_NAMESPACE.equals(namespace))
+                continue;
+                
+            XMLFieldDescriptor descriptor = null;
+            XMLClassDescriptor classDesc = null;
+            //-- check for nested attribute...loop through
+            //-- stack and find correct descriptor
+            int pIdx = _stateInfo.size() - 2; //-- index of parentState
+            String path = state.elementName;
+            UnmarshalState targetState = null;
+            while (pIdx >= 0) {
+                targetState = (UnmarshalState)_stateInfo.elementAt(pIdx);
+                --pIdx;
+                if (targetState.wrapper) {
+                    path = targetState.elementName + "/" + path;
+                    continue;
+                }
+                classDesc = targetState.classDesc;
+                descriptor = classDesc.getFieldDescriptor(name, NodeType.Attribute);
+                
+                if (descriptor != null) {
+                    String tmpPath = descriptor.getLocationPath();
+                    if (tmpPath == null) tmpPath = "";
+                    if (path.equals(tmpPath)) break; //-- found
+                }
+                        
+                path = targetState.elementName + "/" + path;
+                //-- reset descriptor to make sure we don't
+                //-- exit the loop with a reference to a 
+                //-- potentially incorrect one.
+                descriptor = null;
+            }
+            if (descriptor != null) {
+                try {
+                    processAttribute(name, 
+                                     atts.getValue(i), 
+                                     descriptor, 
+                                     classDesc, 
+                                     targetState.object);
+                }
+                catch(java.lang.IllegalStateException ise) {
+                    String err = "unable to add attribute \"" + name + "\" to '";
+                    err += state.classDesc.getJavaClass().getName();
+                    err += "' due to the following error: " + ise;
+                    throw new SAXException(err);
+                }
+            }
+        }
+        
+    } //-- processWrapperAttributes
+    
     /**
      * Processes the given Attribute
     **/
@@ -2021,7 +2212,9 @@ public final class UnmarshalHandler extends MarshalFramework
 
         classDesc = _cdResolver.resolve(_class);
 
-        if (classDesc != null) return classDesc;
+        if (classDesc != null) {
+            return new InternalXMLClassDescriptor(classDesc);
+        }
 
         //-- we couldn't create a ClassDescriptor, check for
         //-- error message
@@ -2052,7 +2245,9 @@ public final class UnmarshalHandler extends MarshalFramework
 
         XMLClassDescriptor classDesc = _cdResolver.resolve(className, loader);
 
-        if (classDesc != null) return classDesc;
+        if (classDesc != null) {
+            return new InternalXMLClassDescriptor(classDesc);
+        }
 
         //-- we couldn't create a ClassDescriptor, check for
         //-- error message
