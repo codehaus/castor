@@ -40,6 +40,9 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) Keith Visco. All Rights Reserverd.
+ *
  * $Id$
  */
 
@@ -82,7 +85,7 @@ import java.util.StringTokenizer;
  * the proper access methods (setters/getters) in order for instances
  * of the Class to be properly unmarshalled.
  * 
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public final class UnmarshalHandler extends MarshalFramework
@@ -828,7 +831,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     String err = "unable to add text content to ";
                     err += descriptor.getXMLName();
                     err += " due to the following error: " + ise;
-                    throw new SAXException(err);
+                    throw new SAXException(err, ise);
                 }
             }
             //-- Handle references
