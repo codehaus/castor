@@ -203,7 +203,8 @@ public abstract class MappingLoader
 
             clsMap = (ClassMapping) enum.nextElement();
             clsDesc = createDescriptor( clsMap );
-            addDescriptor( clsDesc );
+            if ( clsDesc != NoDescriptor )
+                addDescriptor( clsDesc );
             // If the return value is NoDescriptor then the derived
             // class was not successful in constructing a descriptor.
             if ( clsDesc == NoDescriptor && _logWriter != null ) {
