@@ -60,32 +60,51 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
+ * The "Factory" responsible for creating fields for
+ * the given schema components
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class MemberFactory {
 
 
     /**
      * The FieldInfo factory.
-    **/
+     */
     private FieldInfoFactory _infoFactory = null;
 
     /**
+     * The BuilderConfiguration instance, for callbacks
+     * to obtain certain configured properties
+     */
+    private BuilderConfiguration _config = null;
+    
+    /**
      * Creates a new MemberFactory with default type factory.
-    **/
-    public MemberFactory() {
-        this(new FieldInfoFactory());
+     *
+     * @param config the BuilderConfiguration
+     */
+    public MemberFactory(BuilderConfiguration config) {
+        this(config, new FieldInfoFactory());
     } //-- MemberFactory
 
 
     /**
      * Creates a new MemberFactory using the given FieldInfo factory.
+     *
+     * @param config the BuilderConfiguration
      * @param infoFactory the FieldInfoFactory to use
-    **/
-    public MemberFactory(FieldInfoFactory infoFactory)
+     */
+    public MemberFactory(BuilderConfiguration config, FieldInfoFactory infoFactory)
     {
         super();
+        if (config == null) {
+            String err = "The 'BuilderConfiguration' argument must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        _config = config;
+        
         if (infoFactory == null)
             _infoFactory = new FieldInfoFactory();
         else
@@ -230,8 +249,8 @@ public class MemberFactory {
             else if (xmlType.isComplexType() && (xmlType.getName() != null)) {
                 //--if we use the type method then no class is output for
                 //--the element we are processing
-                if (SourceGenerator.mappingSchemaType2Java()) {
-                    XMLBindingComponent temp = new XMLBindingComponent();
+                if (_config.mappingSchemaType2Java()) {
+                    XMLBindingComponent temp = new XMLBindingComponent(_config);
                     temp.setBinding(component.getBinding());
                     temp.setView(xmlType);
                     String className = temp.getQualifiedName();

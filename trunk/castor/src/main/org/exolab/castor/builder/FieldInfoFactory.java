@@ -67,7 +67,19 @@ public class FieldInfoFactory {
     /**
      * The default collection name
      */
-    private String _default;
+    private String _default = null;
+
+    /**
+     * A flag indicating that "extra" accessor methods
+     * should be created for returning and setting a
+     * reference to the underlying collection
+     */
+    private boolean _extraMethods = false;
+    
+    /**
+     * The reference suffix to use.
+     */
+    private String _referenceSuffix = null;
 
     /**
      * Creates a new FieldInfoFactory. The default collection used will be
@@ -102,22 +114,54 @@ public class FieldInfoFactory {
         String temp = collectionName;
         if (temp == null || temp.length() >0)
             temp = _default;
+        
+        CollectionInfo cInfo = null;
         if (temp.equals(VECTOR)) {
-             return new CollectionInfo(contentType,name,elementName);
+             cInfo = new CollectionInfo(contentType,name,elementName);
         } else if (temp.equals(ARRAY_LIST)) {
-             return new CollectionInfoJ2(contentType,name,elementName);
+             cInfo = new CollectionInfoJ2(contentType,name,elementName);
         } else if (temp.equals(ODMG)) {
-             return new CollectionInfoODMG30(contentType,name,elementName);
+             cInfo = new CollectionInfoODMG30(contentType,name,elementName);
         }
         //--other to come here
         //--not sure it is pluggable enough, it is not really beautiful to specify
         //--the collection to use here
-        return null;
+        cInfo.setCreateExtraMethods(_extraMethods);
+        if (_referenceSuffix != null) {
+            cInfo.setReferenceMethodSuffix(_referenceSuffix);
+        }        
+        return cInfo;
     }
 
     public FieldInfo createFieldInfo (XSType type, String name) {
         return new FieldInfo(type,name);
     } //-- createFieldInfo
 
+
+    /**
+     * Sets whether or not to create extra collection methods
+     * for accessing the actual collection
+     *
+     * @param extraMethods a boolean that when true indicates that
+     * extra collection accessor methods should be created. False
+     * by default.
+     * @see setReferenceMethodSuffix
+     */
+    public void setCreateExtraMethods(boolean extraMethods) {
+        _extraMethods = extraMethods;
+    } //-- setCreateExtraMethods
+    
+    /**
+     * Sets the method suffix (ending) to use when creating
+     * the extra collection methods.
+     *
+     * @param suffix the method suffix to use when creating
+     * the extra collection methods. If null or emtpty the default
+     * value, as specified in CollectionInfo will be used.
+     * @see setCreateExtraMethods
+     */
+    public void setReferenceMethodSuffix(String suffix) {
+        _referenceSuffix = suffix;
+    } //-- setReferenceMethodSuffix
 
 } //-- FieldInfoFactory
