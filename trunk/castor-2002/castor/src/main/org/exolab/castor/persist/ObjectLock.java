@@ -250,7 +250,9 @@ final class ObjectLock
 	while ( true ) {
             try {
                 // Repeat forever until lock is acquired or timeout
-                
+                if ( _deleted )
+                    throw new ObjectDeletedWaitingForLockException();
+
                 if ( _writeLock == tx ) {
                     // Already have write lock, can acquire object
                     return _object;
@@ -272,7 +274,7 @@ final class ObjectLock
                     if ( TRACE )
                         System.out.println( "Acquired on " + toString() + " by " + tx );
                     return _object;
-                } else if ( ! write && _writeLock == null && _writeWaiting == null ) {
+                } else if ( ! write && _writeLock == null && (_readLock != null || _writeWaiting == null) ) {
                     // Looking for read lock and no write locks, can acquire
                     // But only if not other transaction is waiting for write lock first
                     // Make sure we do not wait twice for the same lock
