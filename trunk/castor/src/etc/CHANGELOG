@@ -3,6 +3,10 @@ Version (CVS)
 -------------
 
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
+       Brought test setup for SAP DB in-line with test requirements.
+       (Werner - 20040427)
+
+JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Brought test config file for SAP DB in-line with XML Schema.
        (Werner - 20040427)
        
