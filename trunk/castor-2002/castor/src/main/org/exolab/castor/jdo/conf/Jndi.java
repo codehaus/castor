@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.jdo.conf;
@@ -9,17 +11,16 @@ package org.exolab.castor.jdo.conf;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
-import org.xml.sax.SAXException;
 
 /**
- * @author <a href="http://castor.exolab.org">Castor-XML</a>
+ * 
  * @version $Revision$ $Date$
 **/
 public class Jndi implements java.io.Serializable {
@@ -29,10 +30,7 @@ public class Jndi implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private String vName;
+    private java.lang.String _name;
 
 
       //----------------/
@@ -40,7 +38,8 @@ public class Jndi implements java.io.Serializable {
     //----------------/
 
     public Jndi() {
-    } //-- Jndi()
+        super();
+    } //-- org.exolab.castor.jdo.conf.Jndi()
 
 
       //-----------/
@@ -48,41 +47,73 @@ public class Jndi implements java.io.Serializable {
     //-----------/
 
     /**
-     * 
-     * @param deep 
     **/
-    protected void validate(boolean deep) 
-        throws org.exolab.castor.xml.ValidationException
-    {
-    } //-- void validate(boolean) 
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
 
     /**
-     * 
-     * @param deep 
     **/
-    public boolean isValid(boolean deep) {
+    public boolean isValid() {
         try {
-            validate(deep);
+            validate();
         }
         catch (org.exolab.castor.xml.ValidationException vex) {
             return false;
         }
         return true;
-    } //-- boolean isValid(boolean) 
+    } //-- boolean isValid() 
 
     /**
      * 
+     * @param out
     **/
-    public String getName() {
-        return this.vName;
-    } //-- String getName() 
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
 
     /**
      * 
-     * @param vName 
+     * @param handler
     **/
-    public void setName(String vName) {
-        this.vName = vName;
-    } //-- void setName(String) 
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
+
+    /**
+     * 
+     * @param _name
+    **/
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param reader
+    **/
+    public static org.exolab.castor.jdo.conf.Jndi unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.jdo.conf.Jndi) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.Jndi.class, reader);
+    } //-- org.exolab.castor.jdo.conf.Jndi unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }
