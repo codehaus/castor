@@ -31,6 +31,8 @@
 					<xsd:element ref="SourceGeneratorTest" minOccurs="0" maxOccurs="1"/>
 					<!-- Test case for the Marshalling Framework-->
 					<xsd:element ref="MarshallingTest" minOccurs="0" maxOccurs="1"/>
+                    <!-- Test case for the Schema Object Model-->
+                    <xsd:element ref="SchemaTest" minOccurs="0" maxOccurs="1"/>
 				</xsd:choice>
 			</xsd:sequence>
 		</xsd:complexType>
@@ -90,12 +92,26 @@
 		</xsd:complexType>
 	</xsd:element>
 
+    <xsd:element name="SchemaTest">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="UnitTestCase" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
 	<xsd:element name="UnitTestCase">
 		<xsd:complexType>
 			<xsd:sequence>
-    		    <!-- The name of the test -->
-				<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-				<!-- the input XML file for unmarshalling-->
+    		    <xsd:choice>
+				    <!-- The name of the test -->
+                    <xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                    <!-- the name of the schema to read/write -->
+                    <!-- a '*' will indicate that the CTF will try to read/write -->
+                    <!-- all the schema present in the directory or jar -->
+                    <xsd:element name="Schema" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+				</xsd:choice>
+                <!-- the input XML file for unmarshalling-->
 				<xsd:element name="Input" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 				<!-- the output file for marshalling -->
 				<xsd:element name="Output" type="xsd:string" minOccurs="0" maxOccurs="1"/>
@@ -103,6 +119,8 @@
 				<xsd:element name="ObjectBuilder" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 			    <!-- a boolean that indicates if the test case intents to fail (Exception thrown)-->
                 <xsd:element name="Failure" type="xsd:boolean" default="false" minOccurs="0" maxOccurs="1"/>
+                <!-- will cause the test to be ignored -->
+                <xsd:element name="Skip"   type="xsd:boolean" minOccurs="0"/>
             </xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>

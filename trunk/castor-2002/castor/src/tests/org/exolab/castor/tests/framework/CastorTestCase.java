@@ -63,6 +63,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.tests.framework.testDescriptor.TestDescriptor;
 import org.exolab.castor.tests.framework.testDescriptor.MarshallingTest;
 import org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest;
+import org.exolab.castor.tests.framework.testDescriptor.SchemaTest;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
 
 /**
@@ -227,6 +228,7 @@ public class CastorTestCase extends TestCase {
 
         MarshallingTest     mar = _testDescriptor.getTestDescriptorChoice().getMarshallingTest();
         SourceGeneratorTest sg  = _testDescriptor.getTestDescriptorChoice().getSourceGeneratorTest();
+        SchemaTest schemaTest = _testDescriptor.getTestDescriptorChoice().getSchemaTest();
 
         if (mar != null) {
             // Set up marshalling tests
@@ -242,6 +244,15 @@ public class CastorTestCase extends TestCase {
                 UnitTestCase tc = sg.getUnitTestCase(i);
                 SourceGeneratorTestCase sgtc = new SourceGeneratorTestCase(this, tc, sg, _outputRootFile);
                 suite.addTest(sgtc.suite());
+            }
+        } else if (schemaTest != null) {
+            //set up for SchemaTest
+            for (int i=0 ; i<schemaTest.getUnitTestCaseCount(); i++) {
+                UnitTestCase tc = schemaTest.getUnitTestCase(i);
+                //little trick
+                tc.getUnitTestCaseChoice().setName(tc.getUnitTestCaseChoice().getSchema());
+                SchemaTestCase stc = new SchemaTestCase(this, tc, _outputRootFile);
+                suite.addTest(stc);
             }
         }
         return suite;

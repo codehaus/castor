@@ -30,7 +30,7 @@ public class UnitTestCase implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
-    private java.lang.String _name;
+    private UnitTestCaseChoice _unitTestCaseChoice;
 
     private java.lang.String _input;
 
@@ -44,6 +44,13 @@ public class UnitTestCase implements java.io.Serializable {
      * keeps track of state for field: _failure
     **/
     private boolean _has_failure;
+
+    private boolean _skip;
+
+    /**
+     * keeps track of state for field: _skip
+    **/
+    private boolean _has_skip;
 
 
       //----------------/
@@ -67,6 +74,13 @@ public class UnitTestCase implements java.io.Serializable {
     } //-- void deleteFailure() 
 
     /**
+    **/
+    public void deleteSkip()
+    {
+        this._has_skip= false;
+    } //-- void deleteSkip() 
+
+    /**
      * Returns the value of field 'failure'.
      * @return the value of field 'failure'.
     **/
@@ -83,15 +97,6 @@ public class UnitTestCase implements java.io.Serializable {
     {
         return this._input;
     } //-- java.lang.String getInput() 
-
-    /**
-     * Returns the value of field 'name'.
-     * @return the value of field 'name'.
-    **/
-    public java.lang.String getName()
-    {
-        return this._name;
-    } //-- java.lang.String getName() 
 
     /**
      * Returns the value of field 'objectBuilder'.
@@ -112,11 +117,36 @@ public class UnitTestCase implements java.io.Serializable {
     } //-- java.lang.String getOutput() 
 
     /**
+     * Returns the value of field 'skip'.
+     * @return the value of field 'skip'.
+    **/
+    public boolean getSkip()
+    {
+        return this._skip;
+    } //-- boolean getSkip() 
+
+    /**
+     * Returns the value of field 'unitTestCaseChoice'.
+     * @return the value of field 'unitTestCaseChoice'.
+    **/
+    public UnitTestCaseChoice getUnitTestCaseChoice()
+    {
+        return this._unitTestCaseChoice;
+    } //-- UnitTestCaseChoice getUnitTestCaseChoice() 
+
+    /**
     **/
     public boolean hasFailure()
     {
         return this._has_failure;
     } //-- boolean hasFailure() 
+
+    /**
+    **/
+    public boolean hasSkip()
+    {
+        return this._has_skip;
+    } //-- boolean hasSkip() 
 
     /**
     **/
@@ -173,15 +203,6 @@ public class UnitTestCase implements java.io.Serializable {
     } //-- void setInput(java.lang.String) 
 
     /**
-     * Sets the value of field 'name'.
-     * @param name the value of field 'name'.
-    **/
-    public void setName(java.lang.String name)
-    {
-        this._name = name;
-    } //-- void setName(java.lang.String) 
-
-    /**
      * Sets the value of field 'objectBuilder'.
      * @param objectBuilder the value of field 'objectBuilder'.
     **/
@@ -198,6 +219,26 @@ public class UnitTestCase implements java.io.Serializable {
     {
         this._output = output;
     } //-- void setOutput(java.lang.String) 
+
+    /**
+     * Sets the value of field 'skip'.
+     * @param skip the value of field 'skip'.
+    **/
+    public void setSkip(boolean skip)
+    {
+        this._skip = skip;
+        this._has_skip = true;
+    } //-- void setSkip(boolean) 
+
+    /**
+     * Sets the value of field 'unitTestCaseChoice'.
+     * @param unitTestCaseChoice the value of field
+     * 'unitTestCaseChoice'.
+    **/
+    public void setUnitTestCaseChoice(UnitTestCaseChoice unitTestCaseChoice)
+    {
+        this._unitTestCaseChoice = unitTestCaseChoice;
+    } //-- void setUnitTestCaseChoice(UnitTestCaseChoice) 
 
     /**
      * 

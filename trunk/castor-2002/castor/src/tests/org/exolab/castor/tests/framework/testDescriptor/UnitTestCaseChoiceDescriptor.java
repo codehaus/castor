@@ -26,7 +26,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class TestDescriptorChoiceDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class UnitTestCaseChoiceDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
 
       //--------------------------/
@@ -46,7 +46,7 @@ public class TestDescriptorChoiceDescriptor extends org.exolab.castor.xml.util.X
      //- Constructors -/
     //----------------/
 
-    public TestDescriptorChoiceDescriptor() {
+    public UnitTestCaseChoiceDescriptor() {
         super();
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
@@ -58,106 +58,89 @@ public class TestDescriptorChoiceDescriptor extends org.exolab.castor.xml.util.X
         
         //-- initialize element descriptors
         
-        //-- _sourceGeneratorTest
-        desc = new XMLFieldDescriptorImpl(SourceGeneratorTest.class, "_sourceGeneratorTest", "SourceGeneratorTest", NodeType.Element);
+        //-- _name
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "Name", NodeType.Element);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                TestDescriptorChoice target = (TestDescriptorChoice) object;
-                return target.getSourceGeneratorTest();
+                UnitTestCaseChoice target = (UnitTestCaseChoice) object;
+                return target.getName();
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    TestDescriptorChoice target = (TestDescriptorChoice) object;
-                    target.setSourceGeneratorTest( (SourceGeneratorTest) value);
+                    UnitTestCaseChoice target = (UnitTestCaseChoice) object;
+                    target.setName( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new SourceGeneratorTest();
+                return null;
             }
         } );
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
+        desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _sourceGeneratorTest
+        //-- validation code for: _name
         fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserve");
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
-        //-- _marshallingTest
-        desc = new XMLFieldDescriptorImpl(MarshallingTest.class, "_marshallingTest", "MarshallingTest", NodeType.Element);
+        //-- _schema
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_schema", "Schema", NodeType.Element);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                TestDescriptorChoice target = (TestDescriptorChoice) object;
-                return target.getMarshallingTest();
+                UnitTestCaseChoice target = (UnitTestCaseChoice) object;
+                return target.getSchema();
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    TestDescriptorChoice target = (TestDescriptorChoice) object;
-                    target.setMarshallingTest( (MarshallingTest) value);
+                    UnitTestCaseChoice target = (UnitTestCaseChoice) object;
+                    target.setSchema( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new MarshallingTest();
+                return null;
             }
         } );
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
+        desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _marshallingTest
+        //-- validation code for: _schema
         fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserve");
+            fieldValidator.setValidator(sv);
+        }
         desc.setValidator(fieldValidator);
         
-        //-- _schemaTest
-        desc = new XMLFieldDescriptorImpl(SchemaTest.class, "_schemaTest", "SchemaTest", NodeType.Element);
-        handler = (new XMLFieldHandler() {
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                TestDescriptorChoice target = (TestDescriptorChoice) object;
-                return target.getSchemaTest();
-            }
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    TestDescriptorChoice target = (TestDescriptorChoice) object;
-                    target.setSchemaTest( (SchemaTest) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new SchemaTest();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _schemaTest
-        fieldValidator = new FieldValidator();
-        desc.setValidator(fieldValidator);
-        
-    } //-- org.exolab.castor.tests.framework.testDescriptor.TestDescriptorChoiceDescriptor()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCaseChoiceDescriptor()
 
 
       //-----------/
@@ -189,7 +172,7 @@ public class TestDescriptorChoiceDescriptor extends org.exolab.castor.xml.util.X
     **/
     public java.lang.Class getJavaClass()
     {
-        return org.exolab.castor.tests.framework.testDescriptor.TestDescriptorChoice.class;
+        return org.exolab.castor.tests.framework.testDescriptor.UnitTestCaseChoice.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**

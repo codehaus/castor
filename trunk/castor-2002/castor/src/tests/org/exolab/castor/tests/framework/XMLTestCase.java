@@ -158,9 +158,15 @@ public abstract class XMLTestCase extends TestCase {
     protected boolean _hasRandom;
 
     /**
+     * True to skip a test case (only supported in the SOM test)
+     */
+     protected boolean _skip;
+
+    /**
      * True if we expect a lot of info on what happen.
      */
     protected static boolean _verbose;
+
 
     /**
      * The ouput the unmarshalling test.
@@ -180,8 +186,9 @@ public abstract class XMLTestCase extends TestCase {
      * Create a new test case for the given setup.
      */
     public XMLTestCase(CastorTestCase test, UnitTestCase unit, File outputRoot) {
-        super(unit.getName());
-        _name            = unit.getName();
+        super(unit.getUnitTestCaseChoice().getName());
+        _name            = unit.getUnitTestCaseChoice().getName();
+        _skip            = unit.getSkip();
         _test            = test;
         _unitTest        = unit;
         _outputRootFile  = outputRoot;
