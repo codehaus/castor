@@ -10,7 +10,7 @@
  -->
 
 
-<!ELEMENT jdo-conf ( database ) >
+<!ELEMENT jdo-conf ( database+ ) >
 
 <!--
     The database configuration specifies the means to obtain a connection
