@@ -3150,7 +3150,8 @@ abstract class CollectionProxy {
         }
         void add( Object key, Object value ) {
             if ( !_fm.isAddable() ) {
-            	_log.warn(Messages.format ("jdo.fieldMolder.not.addable", _fm, value.getClass().getName()));            	
+//            	[TODO] Find a better way to express this scenario where no setter is specified either.
+//            	_log.warn(Messages.format ("jdo.fieldMolder.not.addable", _fm, value.getClass().getName()));            	
                 _col.add( value );
             } else
                 _fm.addValue( _object, value, _cl );
