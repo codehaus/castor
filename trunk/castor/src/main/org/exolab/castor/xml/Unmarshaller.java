@@ -172,6 +172,14 @@ public class Unmarshaller {
      */
     private boolean _validate = false;
 
+    /**
+     * A flag indicating the unmarshaller should preserve 
+     * "ignorable" whitespace. The XML instance can
+     * control it's own behavior using the xml:space
+     * attribute. This sets the "default" behavior
+     * when xml:space="default".
+     */
+    private boolean _wsPreserve = false;
     
     //----------------/
     //- Constructors -/
@@ -280,6 +288,7 @@ public class Unmarshaller {
         handler.setIgnoreExtraAttributes(_ignoreExtraAtts);
         handler.setIgnoreExtraElements(_ignoreExtraElements);
         handler.setConfiguration(_config);
+        handler.setWhitespacePreserve(_wsPreserve);
 
 
         if (_instanceObj != null) {
@@ -474,6 +483,19 @@ public class Unmarshaller {
         _validate = validate;
     } //-- setValidation
 
+    /**
+     * Sets the top-level whitespace (xml:space) to either
+     * preserving or non preserving. The XML document
+     * can override this value using xml:space on specific
+     * elements.This sets the "default" behavior
+     * when xml:space="default".
+     *
+     * @param preserve a boolean that when true enables
+     * whitespace preserving by default. 
+     */
+    public void setWhitespacePreserve(boolean preserve) {
+        _wsPreserve = preserve;
+    } //-- setWhitespacePreserve
 
     /**
      * Unmarshals Objects of this Unmarshaller's Class type.
