@@ -85,7 +85,7 @@ public class JavaXMLNaming {
     
     public static String toJavaClassName(String name) {
                 
-        if ((name == null) && (name.length() <= 0)) {
+        if ((name == null) || (name.length() <= 0)) {
            // handle error 
            return name; //-- for now just return name
         }        
