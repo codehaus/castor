@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,6 +47,7 @@ package org.exolab.castor.builder.util;
 
 import org.exolab.javasource.*;
 
+import org.exolab.castor.builder.BuilderConfiguration;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.castor.builder.SGTypes;
@@ -97,8 +98,11 @@ public class DescriptorJClass extends JClass {
 
     private JClass _type = null;
 
-    public DescriptorJClass(String className, JClass type) {
+    private BuilderConfiguration _config = null;
+    
+    public DescriptorJClass(BuilderConfiguration config, String className, JClass type) {
         super(className);
+        _config = config;
         this._type = type;
         init();
     } //-- DescriptorJClass
@@ -116,7 +120,10 @@ public class DescriptorJClass extends JClass {
         //Make sure that the Descriptor is extended XMLClassDescriptor
         //even when the user has specified a super class for all the generated
         //classes
-        String superClass = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
+        String superClass = null;
+        if (_config != null) {
+            superClass = _config.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
+        }
         if ( (_type.getSuperClass()==null) || 
 			 (_type.getSuperClass().equals(superClass)) )
 			setSuperClass("org.exolab.castor.xml.util.XMLClassDescriptorImpl");

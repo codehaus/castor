@@ -71,6 +71,8 @@ public class CollectionInfo extends FieldInfo {
     public static final String REFERENCE_SUFFIX_PROPERTY
         = "org.exolab.castor.builder.collections.reference.suffix";
 
+    public static final String DEFAULT_REFERENCE_SUFFIX = "AsReference";
+    
     protected XSList xsList      = null;
     private String contentName = null;
     private XSType contentType = null;
@@ -78,6 +80,19 @@ public class CollectionInfo extends FieldInfo {
     private FieldInfo content   = null;
     private String elementName;
 
+    /**
+     * A flag indicating that "extra" accessor methods
+     * should be created for returning and setting a
+     * reference to the underlying collection
+     */
+    private boolean _extraMethods = false;
+    
+    /**
+     * The reference suffix to use.
+     */
+    private String _referenceSuffix = DEFAULT_REFERENCE_SUFFIX;
+    
+    
     /**
      * Creates a new CollectionInfo
      * @param contextType the content type of the collection, ie. the type
@@ -182,9 +197,7 @@ public class CollectionInfo extends FieldInfo {
 
         if (extraMethods()) {
             //-- Reference getter (non type-safe)
-            String suffix = SourceGenerator.getProperty(this.REFERENCE_SUFFIX_PROPERTY, 
-                "AsReference");
-            method = new JMethod(SGTypes.Vector, "get" + cName + suffix);
+            method = new JMethod(SGTypes.Vector, "get" + cName + _referenceSuffix);
             jClass.addMethod(method);
             createGetCollectionReferenceMethod(method);
         }
@@ -218,9 +231,7 @@ public class CollectionInfo extends FieldInfo {
             createSetCollectionMethod(method);
             
             //-- Reference setter (non type-safe
-            String suffix = SourceGenerator.getProperty(this.REFERENCE_SUFFIX_PROPERTY, 
-                "AsReference");
-            method = new JMethod(null, "set" + cName + suffix);
+            method = new JMethod(null, "set" + cName + _referenceSuffix);
             method.addParameter(vParam);
             jClass.addMethod(method);
             createSetCollectionReferenceMethod(method);
@@ -685,6 +696,38 @@ public class CollectionInfo extends FieldInfo {
 
     } //-- createSetCollectionReferenceMethod
 
+
+    /**
+     * Sets whether or not to create extra collection methods
+     * for accessing the actual collection
+     *
+     * @param extraMethods a boolean that when true indicates that
+     * extra collection accessor methods should be created. False
+     * by default.
+     * @see setReferenceMethodSuffix
+     */
+    public void setCreateExtraMethods(boolean extraMethods) {
+        _extraMethods = extraMethods;
+    } //-- setCreateExtraMethods
+    
+    /**
+     * Sets the method suffix (ending) to use when creating
+     * the extra collection methods.
+     *
+     * @param suffix the method suffix to use when creating
+     * the extra collection methods. If null or emtpty the default
+     * value, as specified by DEFAULT_REFERENCE_SUFFIX will
+     * used.
+     * @see setCreateExtraMethods
+     */
+    public void setReferenceMethodSuffix(String suffix) {
+        if ((suffix == null) || (suffix.length() == 0)) {
+            this._referenceSuffix = DEFAULT_REFERENCE_SUFFIX;
+        }
+        else _referenceSuffix = suffix;
+    } //-- setReferenceMethodSuffix
+    
+    
     /**
      * Creates the necessary source code for notifying
      * PropertyChangeListeners when the collection has
@@ -811,13 +854,27 @@ public class CollectionInfo extends FieldInfo {
     } //-- createRemoveAllMethod
 
     /**
-     * Returns true if extra collection methods should be generated
+     * Returns true if extra collection methods should be generated.
+     * The extra collection methods are methods which return an
+     * actual reference to the underlying collection as opposed to
+     * an enumeration, iterator, or copy.
      *
      * @return true if extra collection methods should be generated
      */
     protected final boolean extraMethods() {
-        return SourceGenerator.generateExtraCollectionMethods();
+        return _extraMethods;
     } //-- extraMethods
+    
+    /**
+     * Returns the suffix (ending) that should be used when
+     * creating the extra collection methods
+     *
+     * @return the suffix for the reference methods
+     */
+    protected final String getReferenceMethodSuffix() {
+        return _referenceSuffix;
+    } //-- getReferenceMethodSuffix
+    
 
 } //-- CollectionInfo
 
