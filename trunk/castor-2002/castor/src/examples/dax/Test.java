@@ -21,13 +21,23 @@ public class Test
 	    DirectorySourceImpl dirs;
 	    Directory           dir;
 	    User                user;
+	    Record              rec;
 
+	    dirs = new DirectorySourceImpl();
+	    dirs.setURL( "ldap://localhost/dc=exoffice,dc=com" );
+	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
+	    dir.begin();
+	    rec = (Record) dir.read( new RDN( "people", "kvisco" ) );
+	    System.out.println( rec );
+	    dir.commit();
+
+	    /*
 	    dirs = new DirectorySourceImpl();
 	    dirs.setURL( "ldap://localhost/ou=people,dc=exoffice,dc=com" );
 	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
 	    dir.begin();
 	    user = (User) dir.read( "kvisco" );
-	    if ( user == null ) {
+	    if ( user == null || user != null ) {
 		user = new User();
 		user.uid = "kvisco";
 		user.first = "Keith";
@@ -38,10 +48,10 @@ public class Test
 		dir.create( user );
 	    } else {
 		System.out.println( "Query: " + user );
-		user.first = user.first + ".";
+		dir.delete( user );
 	    }
 	    dir.commit();
-
+	    */
 
 	} catch ( Exception except ) {
 	    System.out.println( except );

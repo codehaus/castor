@@ -181,7 +181,7 @@ public abstract class MappingHelper
 	    try {
 		 fieldType = Types.typeFromName( loader, fieldMap.getType() );
 	    } catch ( ClassNotFoundException except ) {
-		throw new MappingException( "Class not found" );
+		throw new MappingException( except.toString() );
 	    }
 	} else
 	    fieldType = null;

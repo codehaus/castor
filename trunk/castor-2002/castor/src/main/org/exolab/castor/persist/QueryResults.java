@@ -52,6 +52,10 @@ import org.exolab.castor.mapping.ObjectDesc;
 
 
 /**
+ * The result of a query in the context of a transaction. A query is
+ * executed against the cache engine in the context of a transaction.
+ * The result of a query is this object that can be used to obtain
+ * the next object in the query.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -75,7 +79,7 @@ public final class QueryResults
     /**
      * The executed query.
      */
-    private Query               _query;
+    private PersistenceQuery     _query;
     
     
     /**
@@ -91,7 +95,7 @@ public final class QueryResults
     private Object              _lastIdentity;
     
 
-    QueryResults( TransactionContext tx, CacheEngine cache, Query query, int accessMode )
+    QueryResults( TransactionContext tx, CacheEngine cache, PersistenceQuery query, int accessMode )
     {
 	_tx = tx;
 	_cache = cache;
@@ -115,9 +119,9 @@ public final class QueryResults
     }
 
 
-    public ObjectDesc getObjectDesc()
+    public Class getResultType()
     {
-	return _query.getObjectDesc();
+	return _query.getResultType();
     }
     
     
@@ -127,6 +131,7 @@ public final class QueryResults
     {
 	OID                            oid;
 	TransactionContext.ObjectEntry entry;
+	ObjectDesc                     objDesc;
 	
 	// Make sure transaction is still open.
 	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
@@ -166,12 +171,13 @@ public final class QueryResults
 		}
 		return false;
 	    }
-	    
+
 	    // Get the next OID from the query engine. The object is
 	    // already loaded into the cache engine at this point and
 	    // has a lock based on the original query (i.e. read write
 	    // or exclusive). If no next record return null.
-	    oid = new OID( _query.getObjectDesc(), identity );
+	    objDesc = _cache.getObjectDesc( _query.getResultType() );
+	    oid = new OID( objDesc, identity );
 	    
 	    // Did we already load (or created) this object in this
 	    // transaction.
@@ -192,7 +198,7 @@ public final class QueryResults
 			// synchronized with the database, but we cannot
 			// synchronize a live object.
 			throw new PersistenceException( "persist.lockConflict",
-							_query.getObjectDesc().getObjectType(), identity );
+							_query.getResultType(), identity );
 		    } else {
 			// Either read only or exclusive mode, and we
 			// already have an object in that mode, so we
