@@ -80,7 +80,7 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public final class UnmarshalHandler extends MarshalFramework
-    implements DocumentHandler
+    implements DocumentHandler, ErrorHandler
 {
 
 
@@ -1049,6 +1049,39 @@ public final class UnmarshalHandler extends MarshalFramework
 
     } //-- void startElement(String, AttributeList)
 
+     //------------------------------------/
+    //- org.xml.sax.ErrorHandler methods -/
+    //------------------------------------/
+
+    public void error(SAXParseException exception)
+        throws org.xml.sax.SAXException
+    {
+        String err = "Parsing Error : "+exception.getMessage()+'\n'+
+                     "Line : "+ exception.getLineNumber() + '\n'+
+                     "Column : "+exception.getColumnNumber() + '\n';
+        throw new SAXException (err);
+    } //-- error
+
+    public void fatalError(SAXParseException exception)
+        throws org.xml.sax.SAXException
+    {
+        String err = "Parsing Error : "+exception.getMessage()+'\n'+
+                     "Line : "+ exception.getLineNumber() + '\n'+
+                     "Column : "+exception.getColumnNumber() + '\n';
+        throw new SAXException (err);
+
+    } //-- fatalError
+
+
+    public void warning(SAXParseException exception)
+        throws org.xml.sax.SAXException
+    {
+        String err = "Parsing Error : "+exception.getMessage()+'\n'+
+                     "Line : "+ exception.getLineNumber() + '\n'+
+                     "Column : "+exception.getColumnNumber() + '\n';
+        throw new SAXException (err);
+
+    } //-- warning
 
       //-------------------/
      //- Private Methods -/
