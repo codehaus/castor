@@ -46,6 +46,7 @@
 
 package org.exolab.castor.xml;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.reflect.Array;
@@ -177,7 +178,9 @@ public class FieldValidator extends Validator {
     public void validate(Object object, ValidationContext context)
         throws ValidationException
     {
+        
         if (_descriptor == null) return;
+        if (object == null) return; 
         
         //-- Do not validate references as these should
         //-- be validated elsewhere, validating them
@@ -186,6 +189,7 @@ public class FieldValidator extends Validator {
         
         //-- don't validate "transient" fields...
         if (_descriptor.isTransient()) return;
+               
         
         FieldHandler handler = _descriptor.getHandler();
         
@@ -194,22 +198,23 @@ public class FieldValidator extends Validator {
         //-- get the value of the field
         Object value = handler.getValue(object);
         
-        if ((value == null) && (_descriptor.isRequired())) {
+        if (value == null) {
+            if (!_descriptor.isRequired()) return;
             String err = "The field '" + _descriptor.getFieldName() + "' ";
             if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
                 err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
             }
-            err += "is a required field.";
+            err += "is a required field of class '" + object.getClass().getName();
             throw new ValidationException(err);
         }
         
         
-        //-- check number of occurances occurance
-        if (value != null) {
 
-            Class type = value.getClass();
+        Class type = value.getClass();
+        int size = 1;
             
-            int size = 1;
+        try {
+            
             boolean byteArray = false;
             if (type.isArray()) {
                 byteArray = (type.getComponentType() == Byte.TYPE);
@@ -244,11 +249,21 @@ public class FieldValidator extends Validator {
             else if (value instanceof Vector) {
                 Vector vector = (Vector)value;
                 size = vector.size();
-                for (int i = 0; i < vector.size(); i++) {
+                for (int i = 0; i < size; i++) {
                     if (_validator != null)
                         _validator.validate(vector.elementAt(i), context);
                     else
                         super.validate(vector.elementAt(i), context);
+                }
+            }
+            else if (value instanceof List) {
+                List list = (List)value;
+                size = list.size();
+                for (int i = 0; i < size; i++) {
+                    if (_validator != null)
+                        _validator.validate(list.get(i), context);
+                    else
+                        super.validate(list.get(i), context);
                 }
             }
             else {
@@ -257,39 +272,47 @@ public class FieldValidator extends Validator {
                 else
                     super.validate(value, context);
             }
+        }
+        catch(ValidationException vx) {
+            //-- add additional validation information
+            String err = "The following exception occured while validating field: " + 
+                _descriptor.getFieldName() + " of class: " + object.getClass().getName();
+            throw new ValidationException(err, vx);
+        }
+         
             
-            //-- Check size of collection
-            
-            //-- check minimum
-            if (size < minOccurs) {
-                //-- If any items exist (size != 0) or the descriptor
-                //-- is marked as required then we need to report the
-                //-- error. Otherwise size == 0 and field is not
-                //-- required, so no error.
-                if ((size != 0) || (_descriptor.isRequired())) {
-                    String err = "A minimum of " + minOccurs + " ";
-                    err += _descriptor.getFieldName() + " object(s) ";
-                    if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
-                        err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
-                    }
-                    err += "are required.";
-                    
-                    throw new ValidationException(err);
-                }
-            }
-            
-            //-- check maximum
-            if ((maxOccurs >= 0) && (size > maxOccurs)) {
-                String err = "A maximum of " + maxOccurs + " ";
+        //-- Check size of collection
+                
+        //-- check minimum
+        if (size < minOccurs) {
+            //-- If any items exist (size != 0) or the descriptor
+            //-- is marked as required then we need to report the
+            //-- error. Otherwise size == 0 and field is not
+            //-- required, so no error.
+            if ((size != 0) || (_descriptor.isRequired())) {
+                String err = "A minimum of " + minOccurs + " ";
                 err += _descriptor.getFieldName() + " object(s) ";
                 if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
                     err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
                 }
-                err += "are required.";
+                err += "are required for class: " + object.getClass().getName();
+                        
                 throw new ValidationException(err);
             }
         }
+                
+        //-- check maximum
+        if ((maxOccurs >= 0) && (size > maxOccurs)) {
+            String err = "A maximum of " + maxOccurs + " ";
+            err += _descriptor.getFieldName() + " object(s) ";
+            if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
+                err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
+            }
+            err += "are required for class: " + object.getClass().getName() + ".";
+            throw new ValidationException(err);
+        }
         
     } //-- validate
+    
     
 } //-- FieldValidator
