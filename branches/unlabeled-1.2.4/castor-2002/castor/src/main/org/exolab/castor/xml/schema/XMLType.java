@@ -52,7 +52,7 @@ import org.exolab.castor.xml.ValidationException;
  * The base type for XML Schema types, such as complex types
  * and simple types.
  * <BR />
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public abstract class XMLType extends Annotated
