@@ -234,6 +234,11 @@ public class MemberFactory {
                 tmp += "\");";
                 value = tmp;
             }
+            else if (!xsType.getJType().isPrimitive()) {
+                 //XXX This works only if a constructor
+                 //XXX with String as parameter exists
+                 value = "new "+xsType.getJType().toString()+"(\""+value+"\")";
+            }
 
             if (attribute.isFixed()) {
                 fieldInfo.setFixedValue(value);
@@ -404,6 +409,7 @@ public class MemberFactory {
         fieldInfo.setContainer(isContainer);
         //handle fixed or default values
         String value = (eDecl.getDefaultValue() != null)?eDecl.getDefaultValue():eDecl.getFixedValue();
+
         if (value != null) {
 
            if (value.length() == 0)
@@ -436,7 +442,11 @@ public class MemberFactory {
                 tmp += "\");";
                 value = tmp;
             }
-
+            else if (!xsType.getJType().isPrimitive()) {
+                 //XXX This works only if a constructor
+                 //XXX with String as parameter exists
+                 value = "new "+xsType.getJType().toString()+"(\""+value+"\")";
+            }
             if (eDecl.getFixedValue() != null) {
                 fieldInfo.setFixedValue(value);
             }
