@@ -61,7 +61,6 @@ public final class XSNMToken extends XSType {
     private static final JType jType
         = new JClass("java.lang.String");
 
-    private String value = null;
 
     public XSNMToken() {
         super(XSType.NMTOKEN);
@@ -88,8 +87,5 @@ public final class XSNMToken extends XSType {
         return this.jType;
     }
 
-    public String toString() {
-        return value;
-    }
 
 } //-- XSNMToken

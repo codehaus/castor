@@ -61,8 +61,6 @@ public final class XSId extends XSType {
     private static final JType jType
         = new JClass("java.lang.String");
 
-    private String value = null;
-
     public XSId() {
         super(XSType.ID);
     } //-- XSId
@@ -78,8 +76,5 @@ public final class XSId extends XSType {
 
     public void setFacets(SimpleType simpletype) {}
 
-    public String toString() {
-        return value;
-    }
 
 } //-- XSId

@@ -61,8 +61,6 @@ public final class XSIdRef extends XSType {
     private static final JType jType
         = new JClass("java.lang.Object");
 
-    private String value = null;
-
     public XSIdRef() {
         super(XSType.IDREF);
     } //-- XSId
@@ -76,8 +74,5 @@ public final class XSIdRef extends XSType {
         return this.jType;
     }
 
-    public String toString() {
-        return value;
-    }
 
 } //-- XSIdRef

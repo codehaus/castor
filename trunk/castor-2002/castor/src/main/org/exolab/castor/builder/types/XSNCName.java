@@ -61,8 +61,6 @@ public final class XSNCName extends XSType {
     private static final JType jType
         = new JClass("java.lang.String");
 
-    private String value = null;
-
     public XSNCName() {
         super(XSType.NCNAME);
     } //-- XSNCName
@@ -88,8 +86,5 @@ public final class XSNCName extends XSType {
         return this.jType;
     }
 
-    public String toString() {
-        return value;
-    }
 
 } //-- XSNCName
