@@ -28,9 +28,24 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
-              Short description days all ...
+              Short description says all ...
             </summary>
 			<bugs>
+				<bug id="1851">
+					<description>Added RSS news feed</description>
+					<contributor>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>Werner Guttmann</reporter>
+					<type>Enh</type>
+					<module>All</module>
+					<date>20050307</date>
+				</bug>
 				<bug id="1852">
 					<description>Fixed Compile issue on JDK 1.5.0_01.</description>
 					<contributor>
