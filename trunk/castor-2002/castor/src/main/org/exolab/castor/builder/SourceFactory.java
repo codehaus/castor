@@ -1378,10 +1378,22 @@ public class SourceFactory  {
 
             if (useValuesAsName) objName = value.toUpperCase();
             else objName = "VALUE_" + count;
-
+                
             //-- create typeName
             //-- Note: this could cause name conflicts
             typeName = objName + "_TYPE";
+
+
+            //-- Inheritence/Duplicate name cleanup
+            boolean addInitializerCode = true;
+            if (jClass.getField(objName) != null) {
+                //-- either inheritence, duplicate name, or error.
+                //-- if inheritence or duplicate name, always take
+                //-- the later definition. Do same if error, for now.
+                jClass.removeField(objName);
+                jClass.removeField(typeName);
+                addInitializerCode = false;
+            }
 
             //-- handle int type
             field = new JField(JType.Int, typeName);
@@ -1417,12 +1429,15 @@ public class SourceFactory  {
 
 
             //-- initializer method
-            jsc = mInit.getSourceCode();
-            jsc.add("members.put(\"");
-            jsc.append(escapeValue(value));
-            jsc.append("\", ");
-            jsc.append(objName);
-            jsc.append(");");
+            
+            if (addInitializerCode) {
+                jsc = mInit.getSourceCode();
+                jsc.add("members.put(\"");
+                jsc.append(escapeValue(value));
+                jsc.append("\", ");
+                jsc.append(objName);
+                jsc.append(");");
+            }
 
             ++count;
         }
