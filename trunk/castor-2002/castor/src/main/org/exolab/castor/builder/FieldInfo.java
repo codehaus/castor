@@ -159,6 +159,9 @@ public class FieldInfo extends XMLInfo {
         //-- has_field
         if ((!type.isEnumerated()) && jType.isPrimitive()) {
             field = new JField(JType.Boolean, "_has" + name);
+            //indicate that a fixed value has been set for this primitive
+            if (_fixed != null)
+                field.setInitString("true");
             field.setComment("keeps track of state for field: " + name);
             jClass.addField(field);
         }
