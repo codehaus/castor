@@ -740,64 +740,77 @@ public class Marshaller extends MarshalFramework {
         if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
             saveType = false;
         //-- XXXX end Date fix
-        if (saveType) {
 
-            // XML Name associated with the class we are marshalling
-            String xmlElementName = classDesc.getXMLName();
-            // We try to find if there is a XMLClassDescriptor associated
-            // with the XML name of this class
-            XMLClassDescriptor xmlElementNameClassDesc =
-                _cdResolver.resolveByXMLName(xmlElementName, null, null);
-            // Make sure ClassDescriptor was not created by the introspector
-            if (xmlElementNameClassDesc != null &&
-                ! (Introspector.introspected(xmlElementNameClassDesc)))
-            {
+     if (saveType) {
 
-                // Make sure Castor can unmarshal instances of this type
-                // by using the element name by checking that the
-                // ClassDescriptorResolver can find a ClassDescriptor for the
-                // same java type (or a subclass) as the current object.
-                // This mechanism should be equivalent to the one performed
-                // during unmarshalling (UnmarshalHandler).
+             // When the type of the instance of the field is not the
+             // type specified for the field, it might be necessary to
+             // store the type explicitly (using xsi:type) to avoid
+             // confusion during unmarshalling.
+             //
+             // However, it might be possible to use the XMLName of the
+             // instance rather than the XMLName of the field. If
+             // Castor could find back the type from the name of the
+             // element, there is no need to add an xsi:type.
+             //
+             // In order to do that, there is two conditions:
+             // 1. Castor should be able to find the right class to
+             // instantiate form the XMLName of the instance.
+             // 2. Castor should be sure than when using the XMLName of
+             // the instance, there is only one field wich will match
+             // that name (and that it is the current field)
 
-                //-- This approach is not fool proof however, since it
-                //-- may require the same mapping file or
-                //-- ClassDescriptorResolver to be used during unmarshalling.
+             // XML Name associated with the class we are marshalling
+             String xmlElementName = name;
 
-                // Try to find if the type of the field is a super class of the
-                // class returned by the class resolver.
-                Class fieldType = descriptor.getFieldType();
-                ClassDescriptor superclass = xmlElementNameClassDesc.getExtends();
-                while ((superclass != null)  &&  (superclass.getJavaClass() != fieldType))
-                    superclass = superclass.getExtends();
+             // We try to find if there is a XMLClassDescriptor associated
+             // with the XML name of this class
+             XMLClassDescriptor xmlElementNameClassDesc = _cdResolver.resolveByXMLName(xmlElementName, null, null);
 
-                // here, superclass is null if we didn't find that
-                // xmlElementNameClassDesc extends the type of field
+             if ((xmlElementName == null) || (xmlElementNameClassDesc == null)) {
+                 // We can do nothing in this case (source generated vector)
+                 saveType = true;
+             } else {
 
-                // The 'isAssignableFrom' is a security, Castor should have detected
-                // a problem with the 'extends' already.
-                if (fieldType.isAssignableFrom(xmlElementNameClassDesc.getJavaClass()) &&
-                    (xmlElementNameClassDesc.getJavaClass() == fieldType ||
-                     (superclass != null  &&  superclass.getJavaClass() == fieldType))) {
-                    // If the test is true, we know that Castor is able to
-                    // find the proper class to instantiate using the element
-                    // name so we don't need the 'xsi:type' attribute
-                    saveType = false;
-                    name     = xmlElementName;
-                }
-            }
-            if (xmlElementName == null) {
-                //in case we are dealing with field and not class
-                //make sure we don't have a provided class descriptor
-                //if we have one we don't need the xsi:type
-                if (descriptor.getContainingClassDescriptor() != null) {
-                    xmlElementNameClassDesc =
-                        (XMLClassDescriptor)descriptor.getContainingClassDescriptor();
-                    if (!Introspector.introspected(xmlElementNameClassDesc))
-                        saveType = false;
-               }
-            }
-        }//--- End of "Supress 'xsi:type' ..."
+                 // More than one class can map to a given element name
+                 ClassDescriptorEnumeration cdEnum= _cdResolver.resolveAllByXMLName(xmlElementName, null, null);
+                 for (; cdEnum.hasNext();) {
+                     xmlElementNameClassDesc = cdEnum.getNext();
+                     if (_class == xmlElementNameClassDesc.getJavaClass())
+                         break;
+                 }
+
+                 //make sure we only run into this logic if the classDescriptor
+                 //is coming from a mapping file.
+                 if  (xmlElementNameClassDesc instanceof XMLClassDescriptorAdapter) {
+
+                   // Try to find a field descriptor directly in the parent object
+                     XMLClassDescriptor tempContaining = (XMLClassDescriptor)descriptor.getContainingClassDescriptor();
+
+                     //Comment for Keith: is it needed to check that tempContaining is not null?
+                     XMLFieldDescriptor fieldDescMatch = tempContaining.getFieldDescriptor(xmlElementName, NodeType.Element);
+
+                     // Try to find a field descriptor by inheritance in the parent object
+                     MarshalFramework.InheritanceMatch[] matches =
+                           MarshalFramework.searchInheritance(xmlElementName, null, tempContaining, _cdResolver);
+
+                     MarshalFramework.InheritanceMatch match = matches[0];
+
+                     boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
+
+                     boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) ||
+                                                          ( (matches.length == 1) &&
+                                                          (match.parentFieldDesc == descriptor)));
+
+                     // Can we remove the xsi:type ?
+                     if (foundTheRightClass && oneAndOnlyOneMatchedField) {
+                         saveType = false;
+                        //no name swapping for now
+                     }
+                 }//the classDesc comes from a mapping file
+             }
+         }//--- End of "if (saveType)"
+
 
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();
@@ -809,7 +822,7 @@ public class Marshaller extends MarshalFramework {
 
             XMLFieldDescriptor attDescriptor = descriptors[i];
             String xmlName = attDescriptor.getXMLName();
-            
+
             //-- handle attribute namespaces
             String namespace = attDescriptor.getNameSpaceURI();
             if ((namespace != null) && (namespace.length() > 0)) {
@@ -822,7 +835,7 @@ public class Marshaller extends MarshalFramework {
                     prefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
                 }
                 declareNamespace(prefix, namespace, atts);
-                xmlName = prefix + ':' + xmlName;                
+                xmlName = prefix + ':' + xmlName;
             }
 
             Object value = null;
