@@ -136,7 +136,7 @@ public final class TransactionImpl
             -- _threadCount;
         } else {
             // Not inside transaction
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         }
     }
     
@@ -144,9 +144,9 @@ public final class TransactionImpl
     public synchronized void begin()
     {
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         if ( _txContext != null && _txContext.isOpen() )
-            throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.txInProgress" ) );
+            throw new TransactionInProgressException( Messages.message( "jdo.odmg.txInProgress" ) );
         _txContext = new TransactionContextImpl();
     }
 
@@ -162,13 +162,13 @@ public final class TransactionImpl
         // Thread must be inside transaction, transaction must be owner,
         // thread must be only thread associated with transaction
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-            throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         if ( _threadCount != 1 )
-            throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
+            throw new ODMGRuntimeException( Messages.message( "jdo.odmg.threadNotSingleOwner" ) );
         try {
             _txContext.prepare();
             _txContext.commit();
@@ -192,11 +192,11 @@ public final class TransactionImpl
         // Thread must be inside transaction, transaction must be owner,
         // thread must be only thread associated with transaction
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         if ( _threadCount != 1 )
-            throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
+            throw new ODMGRuntimeException( Messages.message( "jdo.odmg.threadNotSingleOwner" ) );
         try {
             _txContext.rollback();
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
@@ -211,11 +211,11 @@ public final class TransactionImpl
     {
         // Thread must be inside transaction, transaction must be open
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-            throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         try {
             _txContext.checkpoint();
         } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
@@ -233,11 +233,11 @@ public final class TransactionImpl
         throws LockNotGrantedException
     {
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-            throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         try {
             if ( lockMode == WRITE )
                 _txContext.writeLock( obj, DefaultWaitLockTimeout );

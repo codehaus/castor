@@ -252,7 +252,7 @@ public class OQLQueryImpl
         try {
             tx = TransactionImpl.getCurrentContext();
             if ( tx == null || ! tx.isOpen() )
-                throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
+                throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.dbTxNotInProgress" ) );
             results = tx.query( _dbEngine, _query, AccessMode.Shared );
             _fieldNum = 0;
             
