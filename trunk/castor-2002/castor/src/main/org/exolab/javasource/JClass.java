@@ -116,6 +116,8 @@ public class JClass extends JType {
      * The package to which this JClass belongs
     **/
     private String packageName   = null;
+
+    private Vector packageClasses = null;
     
     /**
      * Creates a new Class with the given name
@@ -128,13 +130,14 @@ public class JClass extends JType {
     {
         super(name);
         this.packageName = getPackageFromClassName(name);
-        imports       = new Vector();
-        interfaces    = new Vector();
-        jdc           = new JDocComment();
-        constructors  = new Vector();
-        members       = new JNamedMap();
-        methods       = new Vector();
-        modifiers     = new JModifiers();
+        imports          = new Vector();
+        interfaces       = new Vector();
+        jdc              = new JDocComment();
+        constructors     = new Vector();
+        members          = new JNamedMap();
+        methods          = new Vector();
+        modifiers        = new JModifiers();
+        packageClasses   = new Vector();
         //-- initialize default Java doc
         jdc.addDescriptor(JDocDescriptor.createVersionDesc(version));
         
@@ -285,6 +288,15 @@ public class JClass extends JType {
             addMethod(jMethods[i]);
     } //-- addMethods
 
+    /**
+     * Adds a JClass which should be printed in the same
+     * source file as this JClass
+    **
+    public void addPackageClass(JClass jClass) {
+        if (jClass != null) packageClasses.addElement(jClass);
+    } //-- addPackageClass
+    */
+    
     public JConstructor createConstructor() {
         return new JConstructor(this);
     } //-- createConstructor
