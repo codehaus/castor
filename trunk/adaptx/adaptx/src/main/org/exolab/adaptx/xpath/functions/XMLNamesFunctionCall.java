@@ -148,11 +148,11 @@ public class XMLNamesFunctionCall
     {
         switch( type ) {
         case LOCAL_PART:
-            return "local-part";
+            return Names.LOCAL_NAME_FN;
         case NAMESPACE:
-            return "namespace";
+            return Names.NAMESPACE_FN;
         default:
-            return "name";
+            return Names.NAME_FN;
         }
     } //-- getFunctionName
     
