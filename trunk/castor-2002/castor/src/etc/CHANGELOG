@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+XML:    Added Rick Hogge's patch to the source generator that makes 
+        java.lang.Object fully qualified to prevent errors when an element name
+        is "object" or "Object". (kvisco - 20020124)
+
 XML:    Improved Javadoc support - method names now use the Schema annotations for
         their respective fields. (kvisco - 20020117)
 
